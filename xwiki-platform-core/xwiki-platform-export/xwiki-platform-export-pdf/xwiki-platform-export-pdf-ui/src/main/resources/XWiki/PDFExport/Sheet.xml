@@ -1,0 +1,665 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.PDFExport.Sheet" locale="">
+  <web>XWiki.PDFExport</web>
+  <name>Sheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity output="false"}}
+#set ($sheetReference = 'XWiki.PDFExport.Sheet')
+#set ($pdfElements = ['cover', 'header', 'footer', 'toc'])
+#set ($pdfExportJobId = $request.jobId.split('/'))
+
+#macro (getPDFExportConfigFromRequest $pdfExportConfig)
+  #if ($pdfExportJobId)
+    #set ($pdfExportJobRequest = $services.job.getJobStatus($pdfExportJobId).request)
+    #if ($pdfExportJobRequest)
+      #set ($discard = $pdfExportConfig.putAll({
+        'template': $pdfExportJobRequest.template,
+        'cover': $pdfExportJobRequest.isWithCover(),
+        'toc': $pdfExportJobRequest.isWithToc(),
+        'header': $pdfExportJobRequest.isWithHeader(),
+        'footer': $pdfExportJobRequest.isWithFooter()
+      }))
+    #end
+  #else
+    #if ("$!request.pdftemplate" != '')
+      #set ($pdfExportConfig.template = $request.pdftemplate)
+    #end
+    #foreach ($param in $pdfElements)
+      #if ("$!request.getParameter(""pdf$param"")" != '')
+        #set ($discard = $pdfExportConfig.put($param, $request.getParameter("pdf$param") != '0'))
+      #end
+    #end
+  #end
+#end
+
+#macro (renderPDFSheet $pdfExportConfig)
+  #set ($discard  = $response.setContentType('text/html'))
+  #set ($discard = $xwiki.ssx.use($pdfExportConfig.template))
+  #set ($discard = $xwiki.jsx.use($pdfExportConfig.template))
+  #set ($discard = $xwiki.ssx.use($sheetReference))
+  #set ($discard = $xwiki.jsx.use($sheetReference))
+  ## Output the HTML header but without the garbage from the start of the BODY tag.
+  #set ($htmlHeader = "#template('htmlheader.vm')")
+  #set ($headTagEnd = $htmlHeader.indexOf('&lt;/head&gt;'))
+  #set ($bodyTagStart = $htmlHeader.indexOf('&lt;body'))
+  #set ($bodyContentStart = $htmlHeader.indexOf('&gt;', $bodyTagStart) + 1)
+  $htmlHeader.substring(0, $headTagEnd)
+  ## Inject the required skin extensions.
+  #if ($pdfExportJobId)
+    $!services.job.getJobStatus($pdfExportJobId).requiredSkinExtensions
+  #end
+  ## Start the BODY tag.
+  $htmlHeader.substring($headTagEnd, $bodyContentStart)
+  #set ($pdfTemplateObj = $xwiki.getDocument($pdfExportConfig.template).getObject('XWiki.PDFExport.TemplateClass'))
+  #foreach ($element in $pdfElements)
+    #if ($pdfExportConfig.get($element))
+      #set ($output = "#renderPDFElement($pdfTemplateObj $element)")
+      #set ($output = $output.trim())
+      #if ($output != '')
+        &lt;div class="pdf-$element"&gt;$output&lt;/div&gt;
+      #end
+    #end
+  #end
+  &lt;div id="xwikicontent"&gt;
+    #renderPDFContent()
+  &lt;/div&gt;
+  ## Close the tags opened in htmlheader.vm
+    &lt;/body&gt;
+  &lt;/html&gt;
+#end
+
+#macro (renderPDFElement $pdfTemplateObj $element)
+  #set ($output = $tdoc.display($element, $pdfTemplateObj))
+  #set ($output = $stringtool.removeStart($output, '{{html clean="false" wiki="false"}}'))
+  #set ($output = $stringtool.removeEnd($output, '{{/html}}'))
+  $!output
+#end
+
+#macro (renderPDFContent)
+  #if ($pdfExportJobId)
+    #set ($renderingResults = $services.job.getJobStatus($pdfExportJobId).documentRenderingResults)
+    #foreach ($renderingResult in $renderingResults)
+      $renderingResult.getHTML()
+    #end
+  #else
+    ## We want to render the current document without applying the sheet specified on the HTTP request (which is this
+    ## page). We basically want to render the current document using its default sheet. For this we need to use a
+    ## different document instance (e.g. a clone) than the one on the context. By setting the comment we force the
+    ## current document to be cloned and thus we end up with a different document instance to render.
+    #set ($discard = $tdoc.setComment(''))
+    $tdoc.renderedContent
+  #end
+#end
+{{/velocity}}
+
+{{velocity wiki="false"}}
+#if ($request.sheet == $sheetReference)
+  ## Default PDF Export configuration.
+  #set ($pdfExportConfig = {
+    'template': 'XWiki.PDFExport.Template',
+    'cover': true,
+    'toc': true,
+    'header': true,
+    'footer': true
+  })
+  #getPDFExportConfigFromRequest($pdfExportConfig)
+  #renderPDFSheet($pdfExportConfig)
+#end
+{{/velocity}}</content>
+  <object>
+    <name>XWiki.PDFExport.Sheet</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>f47dbbaa-6eac-4125-ae06-954e5d92215a</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>require(['jquery', 'xwiki-page-ready'], function($, pageReady) {
+  const fixInternalAnchors = function(container) {
+    var baseURL = new URL(XWiki.currentDocument.getURL(), window.location.href).toString();
+    container.find('a[href]').each(function() {
+      const anchor = $(this);
+      try {
+        const url = new URL(anchor.prop('href'));
+        if (url.hash &amp;&amp; baseURL + url.hash === url.toString()) {
+          anchor.attr('href', url.hash);
+        }
+      } catch (e) {
+        console.log('Failed to parse URL: ' + anchor.prop('href'));
+      }
+    });
+  };
+
+  const replaceCanvasesWithImages = function(container) {
+    return $.makeArray(container.find('canvas')).reduce((replacePreviousCanvas, canvas) =&gt; {
+      return replacePreviousCanvas.then(replaceCanvasWithImage.bind(null, canvas)).catch((e) =&gt; {
+        console.log(`Failed to replace ${canvas.outerHTML} with image: ${e}`);
+      });
+    }, Promise.resolve());
+  };
+
+  // See https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob#getting_a_file_representing_the_canvas
+  const objectURLs = [];
+  const replaceCanvasWithImage = function(canvas) {
+    return new Promise((resolve, reject) =&gt; {
+      canvas.toBlob(blob =&gt; {
+        const image = document.createElement('img'),
+          url = URL.createObjectURL(blob);
+        objectURLs.push(url);
+        // Note that we don't revoke the object URL when the image is loaded because the image is going to be moved
+        // within the DOM when paged.js generates the print layout. Firefox is smart enough to not reload moved images
+        // but Chrome isn't and shows the broken image icon if the object URL was revoked since the image was loaded.
+        // The solution is to collect the object URLs and revoke them only after the print layout is ready.
+        image.onload = resolve;
+        image.src = url;
+        canvas.parentNode.replaceChild(image, canvas);
+      }, 'image/png', 1);
+    });
+  };
+
+  // Remove the Table of Contents if empty.
+  const removeEmptyToC = function() {
+    const toc = $('.pdf-toc');
+    if (!toc.find('li').length) {
+      toc.remove();
+    }
+  };
+
+  // Replace each canvas with an image before paged.js layouts the print pages, otherwise all canvases become blank when
+  // they are moved around within the DOM tree.
+  pageReady.afterPageReady(() =&gt; {
+    fixInternalAnchors($('#xwikicontent, .pdf-toc'));
+    removeEmptyToC();
+    // Canvases are replaced with images asynchronously so we need to return a promise in order to delay the rest of the
+    // page ready callbacks.
+    return replaceCanvasesWithImages($('#xwikicontent'));
+  });
+
+  // Trigger the print preview after the page is ready. Note that by returning a promise we're making the next page
+  // ready callbacks wait for the print preview to be ready. This is important in case one of the next page ready
+  // callbacks triggers the print.
+  pageReady.afterPageReady(() =&gt; new Promise((resolve, reject) =&gt; {
+    window.PagedConfig = {after: resolve};
+    require(['paged-polyfill'], function(PagedPolyfill) {});
+  }));
+
+  // Revoke the object URLs previously created, after the print layout is ready.
+  pageReady.afterPageReady(() =&gt; {
+    objectURLs.forEach(url =&gt; URL.revokeObjectURL(url));
+  });
+});</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.PDFExport.Sheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>141c16dd-091a-4b59-96cd-d63132aeeb41</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>@media print {
+  /**
+   * Cover Page
+   */
+  .pdf-cover {
+    page: cover;
+  }
+
+  /**
+   * Table of Contents
+   */
+  .pdf-toc {
+    break-after: page;
+  }
+
+  .pdf-toc ul {
+    list-style: none;
+    padding-left: .2in
+  }
+  .pdf-toc &gt; ul {
+    padding-left: 0;
+  }
+
+  .pdf-toc li {
+    margin: .5em 0;
+    /* Make sure the fake dotted leader doesn't overflow. */
+    overflow-x: hidden;
+  }
+  .pdf-toc &gt; ul &gt; li &gt; span {
+    font-size: 110%;
+  }
+
+  /* Fake dotted leader, see https://pagedjs.org/post/toc/ */
+  .pdf-toc li &gt; span::after {
+    content:
+      ".............................................."
+      ".............................................."
+      ".............................................."
+      "........";
+    float: left;
+    width: 0;
+    letter-spacing: 2px;
+  }
+
+  /* Section title */
+  .pdf-toc ul a {
+    /* Make sure the leader dots are not displayed beneath the section title. */
+    background-color: white !important;
+    padding-right: .5em;
+  }
+  .pdf-toc ul a,
+  .pdf-toc ul a:visited {
+    text-decoration: none;
+  }
+
+  /* Page number */
+  .pdf-toc ul a::after {
+    content: target-counter(attr(href), page);
+    /* For the fake dotted leader. */
+    position: absolute;
+    right: 0;
+    /* Make sure the leader dots are not displayed beneath the page number */
+    background-color: white !important;
+    padding-left: .5em;
+  }
+
+  /**
+   * Header &amp; Footer
+   */
+  .pdf-page-number::after {
+    content: counter(page);
+  }
+  .pdf-page-count::after {
+    content: counter(pages);
+  }
+
+  /**
+   * Content
+   */
+  a:link::after, a:visited::after {
+    content: none;
+  }
+
+  table {
+    /* Tables need to fit the available page width otherwise paged.js has a hard time splitting them on multiple print
+      pages. Tables that exceed both the page width and the page height cause an infinite loop in paged.js (leads to the
+      creation of an infinite number of print pages). Tables that exceed only the page height are fine. The solution we
+      choose is to make sure that the table text can always be split (hyphenate) on multiple lines. This is not a
+      complete solution but it should cover most of the large tables. */
+    .hyphenate();
+  }
+}</code>
+    </property>
+    <property>
+      <contentType>LESS</contentType>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.PDFExport.Sheet</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>68c24782-b67b-4c25-b004-868783d31b2b</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>3</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>4</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>, </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>2</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>1</number>
+        <prettyName>Executed Content</prettyName>
+        <rows>25</rows>
+        <size>120</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>5</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>6</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>parameters</name>
+        <number>7</number>
+        <prettyName>Extension Parameters</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>8</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
+      <content/>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.platform.requirejs.module</extensionPointId>
+    </property>
+    <property>
+      <name>org.xwiki.platform.export.pdf.module.paged-polyfill</name>
+    </property>
+    <property>
+      <parameters>id=paged-polyfill
+path=$services.webjars.url('org.webjars.npm:pagedjs', 'dist/paged.polyfill.js')</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
+</xwikidoc>

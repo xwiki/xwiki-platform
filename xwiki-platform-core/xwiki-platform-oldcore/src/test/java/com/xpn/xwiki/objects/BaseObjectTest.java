@@ -21,19 +21,28 @@ package com.xpn.xwiki.objects;
 
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.store.merge.MergeManager;
+import org.xwiki.store.merge.MergeManagerResult;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the {@link BaseObject} class.
@@ -41,11 +50,15 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
  * @version $Id$
  */
 @ReferenceComponentList
+@OldcoreTest
 public class BaseObjectTest
 {
-    @Rule
-    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
 
+    @MockComponent
+    private MergeManager mergeManager;
+    
     @Test
     public void testSetDocumentReference() throws Exception
     {
@@ -54,7 +67,7 @@ public class BaseObjectTest
         DocumentReference reference = new DocumentReference("wiki", "space", "page");
         baseObject.setDocumentReference(reference);
 
-        Assert.assertEquals(reference, baseObject.getDocumentReference());
+        assertEquals(reference, baseObject.getDocumentReference());
     }
 
     @Test
@@ -65,9 +78,9 @@ public class BaseObjectTest
 
         baseObject.setName("space.page");
 
-        Assert.assertEquals(database, baseObject.getDocumentReference().getWikiReference().getName());
-        Assert.assertEquals("space", baseObject.getDocumentReference().getLastSpaceReference().getName());
-        Assert.assertEquals("page", baseObject.getDocumentReference().getName());
+        assertEquals(database, baseObject.getDocumentReference().getWikiReference().getName());
+        assertEquals("space", baseObject.getDocumentReference().getLastSpaceReference().getName());
+        assertEquals("page", baseObject.getDocumentReference().getName());
     }
 
     @Test
@@ -81,18 +94,18 @@ public class BaseObjectTest
         try {
             this.oldcore.getXWikiContext().setWikiId("otherwiki");
 
-            Assert.assertEquals(database, baseObject.getDocumentReference().getWikiReference().getName());
-            Assert.assertEquals("space", baseObject.getDocumentReference().getLastSpaceReference().getName());
-            Assert.assertEquals("page", baseObject.getDocumentReference().getName());
+            assertEquals(database, baseObject.getDocumentReference().getWikiReference().getName());
+            assertEquals("space", baseObject.getDocumentReference().getLastSpaceReference().getName());
+            assertEquals("page", baseObject.getDocumentReference().getName());
 
             baseObject.setName("otherspace.otherpage");
         } finally {
             this.oldcore.getXWikiContext().setWikiId(database);
         }
 
-        Assert.assertEquals(database, baseObject.getDocumentReference().getWikiReference().getName());
-        Assert.assertEquals("otherspace", baseObject.getDocumentReference().getLastSpaceReference().getName());
-        Assert.assertEquals("otherpage", baseObject.getDocumentReference().getName());
+        assertEquals(database, baseObject.getDocumentReference().getWikiReference().getName());
+        assertEquals("otherspace", baseObject.getDocumentReference().getLastSpaceReference().getName());
+        assertEquals("otherpage", baseObject.getDocumentReference().getName());
 
         baseObject = new BaseObject();
         try {
@@ -102,15 +115,15 @@ public class BaseObjectTest
             this.oldcore.getXWikiContext().setWikiId(database);
         }
 
-        Assert.assertEquals("otherwiki", baseObject.getDocumentReference().getWikiReference().getName());
-        Assert.assertEquals("space", baseObject.getDocumentReference().getLastSpaceReference().getName());
-        Assert.assertEquals("page", baseObject.getDocumentReference().getName());
+        assertEquals("otherwiki", baseObject.getDocumentReference().getWikiReference().getName());
+        assertEquals("space", baseObject.getDocumentReference().getLastSpaceReference().getName());
+        assertEquals("page", baseObject.getDocumentReference().getName());
 
         baseObject.setName("otherspace.otherpage");
 
-        Assert.assertEquals("otherwiki", baseObject.getDocumentReference().getWikiReference().getName());
-        Assert.assertEquals("otherspace", baseObject.getDocumentReference().getLastSpaceReference().getName());
-        Assert.assertEquals("otherpage", baseObject.getDocumentReference().getName());
+        assertEquals("otherwiki", baseObject.getDocumentReference().getWikiReference().getName());
+        assertEquals("otherspace", baseObject.getDocumentReference().getLastSpaceReference().getName());
+        assertEquals("otherpage", baseObject.getDocumentReference().getName());
     }
 
     @Test
@@ -123,7 +136,7 @@ public class BaseObjectTest
         DocumentReference classReference = new DocumentReference("wiki", "space", "class");
         baseObject.setXClassReference(classReference);
 
-        Assert.assertEquals(new BaseObjectReference(classReference, baseObject.getNumber(), documentReference),
+        assertEquals(new BaseObjectReference(classReference, baseObject.getNumber(), documentReference),
             baseObject.getReference());
     }
 
@@ -137,8 +150,8 @@ public class BaseObjectTest
         DocumentReference classReference = new DocumentReference("otherwiki", "space", "class");
         baseObject.setXClassReference(classReference);
 
-        Assert.assertEquals(new DocumentReference("wiki", "space", "class"), baseObject.getXClassReference());
-        Assert.assertEquals(new EntityReference("class", EntityType.DOCUMENT, new EntityReference("space",
+        assertEquals(new DocumentReference("wiki", "space", "class"), baseObject.getXClassReference());
+        assertEquals(new EntityReference("class", EntityType.DOCUMENT, new EntityReference("space",
             EntityType.SPACE)), baseObject.getRelativeXClassReference());
     }
 
@@ -152,18 +165,24 @@ public class BaseObjectTest
         BaseObject currentObject = new BaseObject();
         currentObject.setStringValue("str", "value");
 
+        when(mergeManager.mergeObject(any(), any(), any(), any())).thenReturn(new MergeManagerResult<>());
+        MergeManagerResult<String, String> mergeManagerResult = new MergeManagerResult<>();
+        mergeManagerResult.setMergeResult("newvalue");
+        mergeManagerResult.setModified(true);
+        when(mergeManager.mergeObject(eq("value"), eq("newvalue"), eq("value"), any())).thenReturn(mergeManagerResult);
+
         MergeConfiguration mergeConfiguration = new MergeConfiguration();
         MergeResult mergeResult = new MergeResult();
 
         currentObject
             .merge(previousObject, nextObject, mergeConfiguration, this.oldcore.getXWikiContext(), mergeResult);
 
-        List<LogEvent> errors = mergeResult.getLog().getLogsFrom(LogLevel.WARN);
+        List<LogEvent> errors = mergeResult.getLog().getLogsFrom(LogLevel.ERROR);
         if (errors.size() > 0) {
-            Assert.fail("Found error or warning during the merge (" + errors.get(0) + ")");
+            fail("Found error or warning during the merge (" + errors.get(0) + ")");
         }
 
-        Assert.assertEquals("newvalue", currentObject.getStringValue("str"));
+        assertEquals("newvalue", currentObject.getStringValue("str"));
     }
 
     @Test
@@ -184,6 +203,6 @@ public class BaseObjectTest
         o1.setNumber(number);
         o2.setNumber(number);
 
-        Assert.assertEquals(o1.hashCode(), o2.hashCode());
+        assertEquals(o1.hashCode(), o2.hashCode());
     }
 }

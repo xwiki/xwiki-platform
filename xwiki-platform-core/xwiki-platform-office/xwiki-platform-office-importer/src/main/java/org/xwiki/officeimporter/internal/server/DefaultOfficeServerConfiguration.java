@@ -20,11 +20,12 @@
 package org.xwiki.officeimporter.internal.server;
 
 import java.io.File;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.jodconverter.office.LocalOfficeUtils;
+import org.jodconverter.local.office.LocalOfficeUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -52,7 +53,7 @@ public class DefaultOfficeServerConfiguration implements OfficeServerConfigurati
     private static final int DEFAULT_SERVER_TYPE = SERVER_TYPE_INTERNAL;
 
     /**
-     * @see OfficeServerConfiguration#getServerPort()
+     * @see OfficeServerConfiguration#getServerPorts()
      */
     private static final int DEFAULT_SERVER_PORT = 8100;
 
@@ -69,7 +70,7 @@ public class DefaultOfficeServerConfiguration implements OfficeServerConfigurati
     /**
      * @see OfficeServerConfiguration#getTaskExecutionTimeout()
      */
-    private static final long DEFAULT_TASK_EXECUTION_TIMEOUT = 30000L;
+    private static final long DEFAULT_TASK_EXECUTION_TIMEOUT = 60000L;
 
     /**
      * @see OfficeServerConfiguration#getHomePath()
@@ -92,6 +93,22 @@ public class DefaultOfficeServerConfiguration implements OfficeServerConfigurati
     public int getServerPort()
     {
         return this.configuration.getProperty(PREFIX + "serverPort", DEFAULT_SERVER_PORT);
+    }
+
+    @Override
+    public int[] getServerPorts()
+    {
+        List<String> serverPorts = this.configuration.getProperty(PREFIX + "serverPorts", List.class);
+        int[] result;
+        if (serverPorts != null && serverPorts.size() > 0) {
+            result = new int[serverPorts.size()];
+            for (int i = 0; i < serverPorts.size(); i++) {
+                result[i] = Integer.parseInt(serverPorts.get(i));
+            }
+        } else {
+            result = new int[] { getServerPort() };
+        }
+        return result;
     }
 
     @Override

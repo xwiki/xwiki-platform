@@ -21,30 +21,36 @@ package org.xwiki.messagestream.internal;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.Event.Importance;
 import org.xwiki.eventstream.EventFactory;
-import org.xwiki.eventstream.EventStream;
+import org.xwiki.eventstream.EventStore;
+import org.xwiki.eventstream.EventStreamException;
+import org.xwiki.eventstream.query.SimpleEventQuery;
+import org.xwiki.eventstream.query.SortableEventQuery.SortClause.Order;
+import org.xwiki.messagestream.DirectMessageDescriptor;
+import org.xwiki.messagestream.GroupMessageDescriptor;
 import org.xwiki.messagestream.MessageStream;
+import org.xwiki.messagestream.PersonalMessageDescriptor;
+import org.xwiki.messagestream.PublicMessageDescriptor;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
-import org.xwiki.query.Query;
-import org.xwiki.query.QueryException;
-import org.xwiki.query.QueryManager;
 
 /**
- * Implementation of the {@link MessageStream} that stores messages as {@link Event events} in the {@link EventStream}.
+ * Implementation of the {@link MessageStream} that stores messages as {@link Event events} in the {@link EventStore}.
  * 
  * @version $Id$
  * @since 3.0M3
@@ -53,12 +59,7 @@ import org.xwiki.query.QueryManager;
 @Singleton
 public class DefaultMessageStream implements MessageStream
 {
-    /** Logging helper object. */
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultMessageStream.class);
-
-    /** Needed for altering queries. */
-    @Inject
-    private QueryManager qm;
+    private static final String EVENT_APPLICATION = "MessageStream";
 
     /** Needed for obtaining the current wiki name. */
     @Inject
@@ -68,9 +69,8 @@ public class DefaultMessageStream implements MessageStream
     @Inject
     private EntityReferenceSerializer<String> serializer;
 
-    /** The event stream used for storing the messages. */
     @Inject
-    private EventStream stream;
+    private EventStore eventStore;
 
     /** The default factory for creating event objects. */
     @Inject
@@ -80,25 +80,30 @@ public class DefaultMessageStream implements MessageStream
     @Inject
     private DocumentAccessBridge bridge;
 
+    @Inject
+    private Logger logger;
+
     @Override
     public void postPublicMessage(String message)
     {
-        Event e = createMessageEvent(message, "publicMessage");
+        Event e = createMessageEvent(message, PublicMessageDescriptor.EVENT_TYPE);
         DocumentReference userDoc = this.bridge.getCurrentUserReference();
         e.setRelatedEntity(userDoc);
         e.setImportance(Importance.MINOR);
         e.setStream(this.serializer.serialize(userDoc));
-        this.stream.addEvent(e);
+        e.setTitle("messagestream.descriptors.rss.publicMessage.title");
+        saveEvent(e);
     }
 
     @Override
     public void postPersonalMessage(String message)
     {
-        Event e = createMessageEvent(message, "personalMessage");
+        Event e = createMessageEvent(message, PersonalMessageDescriptor.EVENT_TYPE);
         DocumentReference userDoc = this.bridge.getCurrentUserReference();
         e.setRelatedEntity(userDoc);
         e.setStream(this.serializer.serialize(userDoc));
-        this.stream.addEvent(e);
+        e.setTitle("messagestream.descriptors.rss.personalMessage.title");
+        saveEvent(e);
     }
 
     @Override
@@ -107,11 +112,12 @@ public class DefaultMessageStream implements MessageStream
         if (!this.bridge.exists(user)) {
             throw new IllegalArgumentException("Target user does not exist");
         }
-        Event e = createMessageEvent(message, "directMessage");
+        Event e = createMessageEvent(message, DirectMessageDescriptor.EVENT_TYPE);
         e.setRelatedEntity(new ObjectReference("XWiki.XWikiUsers", user));
         e.setStream(this.serializer.serialize(user));
         e.setImportance(Importance.CRITICAL);
-        this.stream.addEvent(e);
+        e.setTitle("messagestream.descriptors.rss.directMessage.title");
+        saveEvent(e);
     }
 
     @Override
@@ -120,11 +126,21 @@ public class DefaultMessageStream implements MessageStream
         if (!this.bridge.exists(group)) {
             throw new IllegalArgumentException("Target group does not exist");
         }
-        Event e = createMessageEvent(message, "groupMessage");
+        Event e = createMessageEvent(message, GroupMessageDescriptor.EVENT_TYPE);
         e.setRelatedEntity(new ObjectReference("XWiki.XWikiGroups", group));
         e.setStream(this.serializer.serialize(group));
         e.setImportance(Importance.MAJOR);
-        this.stream.addEvent(e);
+        e.setTitle("messagestream.descriptors.rss.groupMessage.title");
+        saveEvent(e);
+    }
+
+    private void saveEvent(Event event)
+    {
+        try {
+            this.eventStore.saveEvent(event).get();
+        } catch (Exception e) {
+            this.logger.error("Failed to save the message", e);
+        }
     }
 
     @Override
@@ -145,20 +161,27 @@ public class DefaultMessageStream implements MessageStream
         return getRecentPersonalMessages(author, 30, 0);
     }
 
+    private SimpleEventQuery createEventQuery(String type, int limit, int offset)
+    {
+        SimpleEventQuery query = new SimpleEventQuery(offset >= 0 ? offset : 0, limit > 0 ? limit : 30);
+        query.eq(Event.FIELD_APPLICATION, type);
+        query.eq(Event.FIELD_TYPE, PersonalMessageDescriptor.EVENT_TYPE);
+        query.addSort(Event.FIELD_DATE, Order.DESC);
+
+        return query;
+    }
+
     @Override
     public List<Event> getRecentPersonalMessages(DocumentReference author, int limit, int offset)
     {
-        List<Event> result = new ArrayList<Event>();
+        List<Event> result = new ArrayList<>();
         try {
-            Query q = this.qm.createQuery(
-                "where event.application = 'MessageStream' and event.type = 'personalMessage'"
-                    + " and event.user = :user order by event.date desc",
-                Query.XWQL);
-            q.bindValue("user", this.serializer.serialize(author));
-            q.setLimit(limit > 0 ? limit : 30).setOffset(offset >= 0 ? offset : 0);
-            result = this.stream.searchEvents(q);
-        } catch (QueryException ex) {
-            LOG.warn("Failed to search personal messages: {}", ex.getMessage());
+            SimpleEventQuery query = createEventQuery(PersonalMessageDescriptor.EVENT_TYPE, limit, offset);
+            query.eq(Event.FIELD_USER, author);
+
+            result = this.eventStore.search(query).stream().collect(Collectors.toList());
+        } catch (EventStreamException ex) {
+            this.logger.warn("Failed to search personal messages: {}", ex.getMessage());
         }
         return result;
     }
@@ -172,17 +195,14 @@ public class DefaultMessageStream implements MessageStream
     @Override
     public List<Event> getRecentDirectMessages(int limit, int offset)
     {
-        List<Event> result = new ArrayList<Event>();
+        List<Event> result = new ArrayList<>();
         try {
-            Query q = this.qm.createQuery(
-                "where event.application = 'MessageStream' and event.type = 'directMessage'"
-                    + " and event.stream = :targetUser order by event.date desc",
-                Query.XWQL);
-            q.bindValue("targetUser", this.serializer.serialize(this.bridge.getCurrentUserReference()));
-            q.setLimit(limit > 0 ? limit : 30).setOffset(offset >= 0 ? offset : 0);
-            result = this.stream.searchEvents(q);
-        } catch (QueryException ex) {
-            LOG.warn("Failed to search direct messages: {}", ex.getMessage());
+            SimpleEventQuery query = createEventQuery(DirectMessageDescriptor.EVENT_TYPE, limit, offset);
+            query.eq(Event.FIELD_STREAM, this.bridge.getCurrentUserReference());
+
+            result = this.eventStore.search(query).stream().collect(Collectors.toList());
+        } catch (EventStreamException ex) {
+            this.logger.warn("Failed to search direct messages: {}", ex.getMessage());
         }
         return result;
     }
@@ -196,17 +216,14 @@ public class DefaultMessageStream implements MessageStream
     @Override
     public List<Event> getRecentMessagesForGroup(DocumentReference group, int limit, int offset)
     {
-        List<Event> result = new ArrayList<Event>();
+        List<Event> result = new ArrayList<>();
         try {
-            Query q = this.qm.createQuery(
-                "where event.application = 'MessageStream' and event.type = 'groupMessage'"
-                    + " and event.stream = :group order by event.date desc",
-                Query.XWQL);
-            q.bindValue("group", this.serializer.serialize(group));
-            q.setLimit(limit > 0 ? limit : 30).setOffset(offset >= 0 ? offset : 0);
-            result = this.stream.searchEvents(q);
-        } catch (QueryException ex) {
-            LOG.warn("Failed to search group messages: {}", ex.getMessage());
+            SimpleEventQuery query = createEventQuery(GroupMessageDescriptor.EVENT_TYPE, limit, offset);
+            query.eq(Event.FIELD_STREAM, group);
+
+            result = this.eventStore.search(query).stream().collect(Collectors.toList());
+        } catch (EventStreamException ex) {
+            this.logger.warn("Failed to search group messages: {}", ex.getMessage());
         }
         return result;
     }
@@ -214,20 +231,18 @@ public class DefaultMessageStream implements MessageStream
     @Override
     public void deleteMessage(String id)
     {
-        Query q;
         try {
-            q = this.qm.createQuery("where event.id = :id", Query.XWQL);
-            q.bindValue("id", id);
-            List<Event> events = this.stream.searchEvents(q);
-            if (events == null || events.isEmpty()) {
+            Optional<Event> event = this.eventStore.getEvent(id);
+
+            if (event.isEmpty()) {
                 throw new IllegalArgumentException("This message does not exist");
-            } else if (events.get(0).getUser().equals(this.bridge.getCurrentUserReference())) {
-                this.stream.deleteEvent(events.get(0));
+            } else if (event.get().getUser().equals(this.bridge.getCurrentUserReference())) {
+                this.eventStore.deleteEvent(event.get()).get();
             } else {
                 throw new IllegalArgumentException("You are not authorized to delete this message");
             }
-        } catch (QueryException ex) {
-            LOG.warn("Failed to delete message: {}", ex.getMessage());
+        } catch (Exception e) {
+            this.logger.warn("Failed to delete message: {}", ExceptionUtils.getRootCauseMessage(e));
         }
     }
 
@@ -236,16 +251,16 @@ public class DefaultMessageStream implements MessageStream
      * It also fills in the provided message body and type.
      * 
      * @param message the message to store in the event; at most 2000 characters are stored, longer messages are
-     *        automatically trimmed
+     *            automatically trimmed
      * @param messageType the type of message
      * @return the initialized event object
      */
     protected Event createMessageEvent(String message, String messageType)
     {
         Event e = this.factory.createEvent();
-        e.setApplication("MessageStream");
-        e.setDocument(new DocumentReference(this.context.getCurrentEntityReference().getRoot().getName(), "XWiki",
-            e.getId()));
+        e.setApplication(EVENT_APPLICATION);
+        e.setDocument(
+            new DocumentReference(this.context.getCurrentEntityReference().getRoot().getName(), "XWiki", e.getId()));
         e.setBody(StringUtils.left(message, 2000));
         e.setType(messageType);
         return e;

@@ -1,0 +1,150 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+##
+## @Deprecated since 9.8RC1 use the ClassPropertyValues REST resource instead.
+##
+$response.setContentType("text/xml")
+##
+#set($classname = $request.get("classname"))
+#set($fieldname = $request.get("fieldname"))
+#set($firCol = "$!{request.get('firCol')}")
+#set($secCol = "$!{request.get('secCol')}")
+#set($templatename = $classname + 'Template')
+#set($p = $xwiki.getDocument($classname).getxWikiClass().get($fieldname).getPropertyClass())
+#set($hibquery = "$!p.getSql()")
+##
+## Determine what was the input. If the property accepts multiple values and has separators, then
+## use only the last token as the input.
+## TODO: What if the user is actually typing in the middle of the input string? The actual word for
+## which the autocompletion is triggered should be sent from JS.
+##
+#set($input = "$!{request.get('input').toLowerCase()}")
+#set($sep = "$!{p.getSeparators()}")
+#if($p.isMultiSelect() && ($sep != "")) ### has separators
+  #set($input_words = $stringtool.split($input, $sep))
+  #foreach($i in $input_words)
+    #set($input = $i.trim())
+  #end
+#end
+#set($input = $input.replaceAll('[\[_%!]', '!$0'))
+##
+######################### User hibernate query
+#if("$!hibquery" != "")
+  #if($secCol != "-")
+    ### two columns, hidden input
+    #set($likeCol = $secCol)
+    #set($resultsType = 1)
+  #else ### one column, no hidden input
+    #set($likeCol = $firCol)
+    #set($resultsType = 2)
+  #end
+  #set($whereidx = $hibquery.toLowerCase().indexOf("where"))
+  #if($whereidx < 0)
+    #set($like = " where lower("+ $likeCol.replaceAll("[^a-zA-Z0-9_.]", "") + ") like :input ESCAPE '!'")
+    #set($hibquery = $hibquery.concat($like))
+  #else
+    #set($whereidx = $whereidx + 5)
+    #set($like = " lower("+ $likeCol.replaceAll("[^a-zA-Z0-9_.]", "") + ") like :input ESCAPE '!' and")
+    #set($hibquery = "${hibquery.substring(0, $whereidx)}${like}${hibquery.substring($whereidx)}")
+  #end
+  #set($results = $services.query.hql($hibquery).setLimit(30).bindValue('input', "%${input}%").execute())
+  <?xml version="1.0" encoding="UTF-8"?>
+  <results type="${resultsType}">
+  #foreach($res in $results)
+    #set($info = '')
+    #set($rs = $res)
+    #foreach($r in $res)
+      #if($foreach.count == 1)
+        #set($info = $r)
+      #elseif($foreach.count == 2)
+        #set($rs = $r)
+      #end
+    #end
+    #if(($info != '-') && ($rs != '-'))
+      <rs id="" info="$!{escapetool.xml($info)}">$!{escapetool.xml($rs)}</rs>
+    #end
+  #end
+  </results>
+#else ## hibquery == ""
+  ######################### DBListProperty query
+  #if($p.isRelationalStorage() && $p.isMultiSelect())
+    #set($query = "select distinct list from BaseObject as obj, DBStringListProperty as prop join prop.list list where obj.name <> :templatename and obj.className = :classname and prop.id.id = obj.id and prop.id.name = :fieldname and lower(list) like :input ESCAPE '!'")
+    #set($queryResult = $services.query.hql($query).setLimit(30).bindValues({'templatename' : ${templatename}, 'classname' : ${classname}, 'fieldname' : ${fieldname}, 'input' : "%${input}%"}).execute())
+    #set($results = $queryResult.toArray())
+    #set($documentQuery = 'select obj.name from BaseObject as obj, DBStringListProperty as prop join prop.list list
+    where obj.name <> :templateName and obj.className = :className and prop.id.id = obj.id
+    and prop.id.name = :fieldname and list = :propertyValue')
+    <?xml version="1.0" encoding="UTF-8"?>
+    <results type="3">
+    #foreach($res in $results)
+      #set($documentQueryResult = $services.query.hql($documentQuery).setLimit(1).bindValues({'templateName' :
+        ${templatename}, 'className' : ${classname}, 'fieldname' : ${fieldname}, 'propertyValue' : $res}).execute())
+      #if (!$documentQueryResult.isEmpty() && $xwiki.hasAccessLevel('view', $documentQueryResult.get(0)))
+        <rs id="$foreach.count" info="">$!{escapetool.xml($res)}</rs>
+      #end
+    #end
+    </results>
+  ######################### StringListProperty query
+  #elseif($p.isMultiSelect())
+    #set($query = "select distinct prop.textValue from BaseObject as obj, StringListProperty as prop where obj.name <> :templatename and obj.className = :classname and prop.id.id = obj.id and prop.name = :fieldname and lower(prop.textValue) like :input ESCAPE '!'")
+    #set($queryResult = $services.query.hql($query).setLimit(30).bindValues({'templatename' : ${templatename}, 'classname' : ${classname}, 'fieldname' : ${fieldname}, 'input' : "%${input}%"}).execute())
+    #set($results = $queryResult.toArray())
+    #set($documentQuery = 'select obj.name from BaseObject as obj, StringListProperty as prop where obj.name <>
+    :templateName and obj.className = :className and prop.id.id = obj.id and prop.name = :fieldname and
+    prop.textValue = :propertyValue')
+    <?xml version="1.0" encoding="UTF-8"?>
+    <results type="5">
+    #foreach($res in $results)
+      #set($documentQueryResult = $services.query.hql($documentQuery).setLimit(1).bindValues({'templateName' :
+        ${templatename}, 'className' : ${classname}, 'fieldname' : ${fieldname}, 'propertyValue' : $res}).execute())
+      #if (!$documentQueryResult.isEmpty() && $xwiki.hasAccessLevel('view', $documentQueryResult.get(0)))
+        #set($list = $p.getListFromString($res, $sep, false))
+        #set($list = $list.toArray())
+        #foreach($word in $list)
+          <rs id="$foreach.count" info="">$!{escapetool.xml($word)}</rs>
+        #end
+      #end
+    #end
+    </results>
+  ######################### StringProperty query
+  #elseif($p && ($p.getClassType() != "Email" || !$services.mail.general.shouldObfuscate()) && $p.getClassType() != "Password")
+    #set($query = "select distinct prop.value from BaseObject as obj, StringProperty as prop where obj.className = :classname and obj.name <> :templatename and prop.id.id = obj.id and prop.id.name = :fieldname and lower(prop.value) like :input ESCAPE '!'")
+    #set($queryResult = $services.query.hql($query).setLimit(30).bindValues({'templatename' : ${templatename}, 'classname' : ${classname}, 'fieldname' : ${fieldname}, 'input' : "%${input}%"}).execute())
+    #set($results = $queryResult.toArray())
+    #set($documentQuery = 'select obj.name from BaseObject as obj, StringProperty as prop where
+    obj.className = :className and obj.name <> :templateName and prop.id.id = obj.id and prop.id.name = :fieldname and
+    prop.value = :propertyValue')
+    <?xml version="1.0" encoding="UTF-8"?>
+    <results type="8">
+    #foreach($res in $results)
+      #set($documentQueryResult = $services.query.hql($documentQuery).setLimit(1).bindValues({'templateName' :
+        ${templatename}, 'className' : ${classname}, 'fieldname' : ${fieldname}, 'propertyValue' : $res}).execute())
+      #if (!$documentQueryResult.isEmpty() && $xwiki.hasAccessLevel('view', $documentQueryResult.get(0)))
+        <rs id="$foreach.count" info="">$!{escapetool.xml($res)}</rs>
+      #end
+    #end
+    </results>
+  ## Inaccessible property, return empty results.
+  #else
+    <?xml version="1.0" encoding="UTF-8"?>
+    <results type="8">
+    </results>
+  #end
+#end ## if hibquery

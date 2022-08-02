@@ -303,6 +303,19 @@ public class Class extends Collection
         BaseObject obj = (BaseObject) getBaseClass().newObject(getXWikiContext());
         return obj.newObjectApi(obj, getXWikiContext());
     }
+
+    @Override
+    public boolean equals(java.lang.Object other)
+    {
+        if (other == null) {
+            return false;
+        }
+        if (!(other instanceof Class)) {
+            return false;
+        }
+        Class otherClass = (Class) other;
+        return getBaseClass().equals(((Class) other).getBaseClass());
+    }
 }
 
 class PropertyComparator implements Comparator<PropertyClass>

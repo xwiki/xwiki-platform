@@ -27,6 +27,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -42,7 +45,7 @@ public class DefaultEvent implements Event
 {
     /** The format of the {@link #toString()} result. */
     private static final MessageFormat STRING_FORMAT =
-        new MessageFormat("{0} at {1,time,yyyy-MM-dd HH:mm:ss} by {2} on {3}");
+        new MessageFormat("{0} at {1,time,yyyy-MM-dd HH:mm:ss} by {2} on {3} with id {4}");
 
     /** @see #getId() */
     private String id;
@@ -96,13 +99,20 @@ public class DefaultEvent implements Event
     private String body;
 
     /** @see #getParameters() */
-    private Map<String, String> parameters;
+    private Map<String, String> parametersCache;
+
+    /** @see #getCustom() */
+    private Map<String, Object> custom;
 
     /** @see #getTarget() */
     private Set<String> target;
 
     private boolean hidden;
-    
+
+    private boolean prefiltered;
+
+    private String observationInstanceId;
+
     @Override
     public String getId()
     {
@@ -328,19 +338,50 @@ public class DefaultEvent implements Event
     @Override
     public Map<String, String> getParameters()
     {
-        return this.parameters == null ? Collections.<String, String> emptyMap()
-            : Collections.unmodifiableMap(this.parameters);
+        if (this.parametersCache == null) {
+            // Convert Map<String, Object> to Map<String, String> (as much as possible)
+            Map<String, String> parameters;
+            if (MapUtils.isEmpty(this.custom)) {
+                parameters = Collections.emptyMap();
+            } else {
+                parameters = new HashMap<>(this.custom.size());
+                this.custom.forEach((k, v) -> parameters.put(k, v != null ? v.toString() : null));
+            }
+
+            this.parametersCache = parameters;
+        }
+
+        return this.parametersCache;
+    }
+
+    @Override
+    public Map<String, Object> getCustom()
+    {
+        if (this.custom == null) {
+            this.custom = Collections.emptyMap();
+        }
+
+        return this.custom;
     }
 
     @Override
     public void setParameters(Map<String, String> parameters)
     {
-        if (parameters != null) {
-            this.parameters = new HashMap<String, String>(parameters);
+        setCustom(parameters);
+    }
+
+    @Override
+    public void setCustom(Map<String, ?> custom)
+    {
+        if (custom != null) {
+            this.custom = Collections.unmodifiableMap(new HashMap<>(custom));
         } else {
             // Fallback to empty parameters map.
-            this.parameters = new HashMap<String, String>();
+            this.custom = Collections.emptyMap();
         }
+
+        // Reset the String parameters cache
+        this.parametersCache = null;
     }
 
     @Override
@@ -352,14 +393,13 @@ public class DefaultEvent implements Event
     @Override
     public Set<String> getTarget()
     {
-        return this.target != null ? Collections.unmodifiableSet(this.target)
-                : Collections.emptySet();
+        return this.target != null ? Collections.unmodifiableSet(this.target) : Collections.emptySet();
     }
 
     @Override
     public String toString()
     {
-        return STRING_FORMAT.format(new Object[] {getType(), getDate(), getUser(), getDocument()});
+        return STRING_FORMAT.format(new Object[] {getType(), getDate(), getUser(), getDocument(), getId()});
     }
 
     @Override
@@ -372,5 +412,114 @@ public class DefaultEvent implements Event
     public void setHidden(boolean isHidden)
     {
         this.hidden = isHidden;
+    }
+
+    @Override
+    public boolean isPrefiltered()
+    {
+        return this.prefiltered;
+    }
+
+    @Override
+    public void setPrefiltered(boolean prefiltered)
+    {
+        this.prefiltered = prefiltered;
+    }
+    
+    @Override
+    public String getRemoteObservationId()
+    {
+        return this.observationInstanceId;
+    }
+
+    /**
+     * @param observationInstanceId the unique identifier of the instance in the cluster
+     * @since 14.7RC1
+     */
+    public void setRemoteObservationId(String observationInstanceId)
+    {
+        this.observationInstanceId = observationInstanceId;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#equals(java.lang.Object)
+     * @since 12.4RC1
+     */
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj instanceof Event) {
+            Event otherEvent = (Event) obj;
+
+            EqualsBuilder builder = new EqualsBuilder();
+
+            builder.append(getApplication(), otherEvent.getApplication());
+            builder.append(getBody(), otherEvent.getBody());
+            builder.append(getDate(), otherEvent.getDate());
+            builder.append(getDocument(), otherEvent.getDocument());
+            builder.append(getDocumentTitle(), otherEvent.getDocumentTitle());
+            builder.append(getDocumentVersion(), otherEvent.getDocumentVersion());
+            builder.append(getGroupId(), otherEvent.getGroupId());
+            builder.append(getHidden(), otherEvent.getHidden());
+            builder.append(getId(), otherEvent.getId());
+            builder.append(getImportance(), otherEvent.getImportance());
+            builder.append(getCustom(), otherEvent.getCustom());
+            builder.append(getRelatedEntity(), otherEvent.getRelatedEntity());
+            builder.append(getSpace(), otherEvent.getSpace());
+            builder.append(getStream(), otherEvent.getStream());
+            builder.append(getTarget(), otherEvent.getTarget());
+            builder.append(getTitle(), otherEvent.getTitle());
+            builder.append(getType(), otherEvent.getType());
+            builder.append(getUrl(), otherEvent.getUrl());
+            builder.append(getUser(), otherEvent.getUser());
+            builder.append(getWiki(), otherEvent.getWiki());
+            builder.append(isPrefiltered(), otherEvent.isPrefiltered());
+
+            return builder.build();
+        }
+
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#hashCode()
+     * @since 12.4RC1
+     */
+    @Override
+    public int hashCode()
+    {
+        HashCodeBuilder builder = new HashCodeBuilder();
+
+        builder.append(getApplication());
+        builder.append(getBody());
+        builder.append(getDate());
+        builder.append(getDocument());
+        builder.append(getDocumentTitle());
+        builder.append(getDocumentVersion());
+        builder.append(getGroupId());
+        builder.append(getHidden());
+        builder.append(getId());
+        builder.append(getImportance());
+        builder.append(getCustom());
+        builder.append(getRelatedEntity());
+        builder.append(getSpace());
+        builder.append(getStream());
+        builder.append(getTarget());
+        builder.append(getTitle());
+        builder.append(getType());
+        builder.append(getUrl());
+        builder.append(getUser());
+        builder.append(getWiki());
+        builder.append(isPrefiltered());
+
+        return builder.build();
     }
 }

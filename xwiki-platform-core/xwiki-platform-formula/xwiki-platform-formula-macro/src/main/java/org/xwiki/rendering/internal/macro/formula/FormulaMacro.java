@@ -21,6 +21,7 @@ package org.xwiki.rendering.internal.macro.formula;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -95,7 +96,7 @@ public class FormulaMacro extends AbstractMacro<FormulaMacroParameters>
     public FormulaMacro()
     {
         super("Formula", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION), FormulaMacroParameters.class);
-        setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_CONTENT));
     }
 
     @Override
@@ -107,8 +108,10 @@ public class FormulaMacro extends AbstractMacro<FormulaMacroParameters>
         }
 
         String rendererHint = this.configuration.getRenderer();
-        FontSize size = parameters.getFontSize();
-        Type type = parameters.getImageType();
+        FontSize size = (parameters.getFontSize() != null) ? parameters.getFontSize()
+            : this.configuration.getDefaultFontSize();
+        Type type = (parameters.getImageType() != null) ? parameters.getImageType()
+            : this.configuration.getDefaultType();
         Block result;
         try {
             result = render(content, context.isInline(), size, type, rendererHint);

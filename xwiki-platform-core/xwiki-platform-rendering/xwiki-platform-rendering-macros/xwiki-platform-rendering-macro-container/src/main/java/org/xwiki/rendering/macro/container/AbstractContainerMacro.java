@@ -80,7 +80,7 @@ public abstract class AbstractContainerMacro<P extends ContainerMacroParameters>
         // TODO: include here container CSS. FTM the only rule, the one about justified text, is in the columns.css, in
         // which case the justification makes the most sense.
         // transform the container in a group, with appropriate parameters
-        Map<String, String> containerParameters = new HashMap<String, String>();
+        Map<String, String> containerParameters = new HashMap<>();
         if (parameters.isJustify()) {
             containerParameters.put(CLASS_ATTRIBUTE, "container-justified");
         }
@@ -103,7 +103,7 @@ public abstract class AbstractContainerMacro<P extends ContainerMacroParameters>
         }
 
         // and finally return the styled container root
-        return Collections.<Block> singletonList(containerRoot);
+        return Collections.singletonList(containerRoot);
     }
 
     /**

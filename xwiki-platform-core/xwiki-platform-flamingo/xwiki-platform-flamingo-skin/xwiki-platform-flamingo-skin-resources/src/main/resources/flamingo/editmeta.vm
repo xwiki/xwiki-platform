@@ -1,3 +1,22 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
 #set($docTitle = $request.getParameter('title'))
 #if("$!docTitle" == '')
   #set($docTitle = $!tdoc.title)
@@ -14,14 +33,28 @@
   <input type="text" id="xwikidocparentinput" name="parent" value="$!{escapetool.xml("$!docParent")}" size="30" class="suggestDocuments "/>
 </div>
 #if ($editor != 'inline')
-<div id="titleinput" class="form-group">
-  <label for="xwikidoctitleinput">$services.localization.render('core.editors.content.titleField.label')</label>
-  <input type="text" id="xwikidoctitleinput" name="title" value="$escapetool.xml("$!docTitle")" class="#if($xwiki.getXWikiPreference('xwiki.title.mandatory') == 1)required#end"/>
-</div>
+<dl id="titleinput" class="form-group">
+  <dt>
+    <label for="xwikidoctitleinput">
+      $escapetool.xml($services.localization.render('core.editors.content.titleField.label'))
+    </label>
+  </dt>
+  <dd>
+    <input type="text" id="xwikidoctitleinput" name="title" value="$escapetool.xml("$!docTitle")" 
+      class="#if($xwiki.getXWikiPreference('xwiki.title.mandatory') == 1)required#end"/>
+  </dd>
+</dl>
 #end
 
 #if($editor == 'wiki')
-<div id="contentMeta">
-  <label for="content">$services.localization.render('core.editors.content.contentField.label')</label>
-</div>
+<dl id="contentMeta">
+  <dt>
+    <label for="content">
+      $escapetool.xml($services.localization.render('core.editors.content.contentField.label'))
+    </label>
+  </dt>
+  ## Content area has an empty <dd> because the content text area is far below and couldn't be moved here,
+  ## and the HTML needs to remain valid.
+  <dd></dd>
+</dl>
 #end

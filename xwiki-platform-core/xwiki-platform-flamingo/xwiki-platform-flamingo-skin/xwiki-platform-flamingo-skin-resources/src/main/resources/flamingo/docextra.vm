@@ -1,3 +1,22 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
 ##
 ##
 ## More document related data: comments, attachments ...
@@ -28,6 +47,8 @@
     $xwiki.ssfx.use('uicomponents/widgets/upload.css', true)
     $xwiki.jsfx.use('js/xwiki/viewers/attachments.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})
     $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
+    $xwiki.jsfx.use('js/xwiki/table/livetable.js', true)
+    $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
     ### Support attachment sorting
     #set ($sortAttachmentsBy = "$!{request.sortAttachmentsBy}")
     #if ($sortAttachmentsBy != '')
@@ -45,9 +66,22 @@
   #if ($showinformation)
     $xwiki.jsfx.use('js/xwiki/viewers/information.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})
     $xwiki.ssfx.use('js/xwiki/viewers/information.css', true)
+    $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {'forceSkinAction': true, 'language': $xcontext.locale})
     #set ($discard = $docextras.add(['Information', 'information', $services.localization.render('docextra.information'), -1, 'informationinline.vm', $services.localization.render('core.shortcuts.view.information')]))
   #end
 #end
+
+#set ($docExtraExtensions = $services.uix.getExtensions('org.xwiki.plaftorm.template.docextra', {'sortByParameter' : 'order'}))
+#foreach($docExtraExtension in $docExtraExtensions)
+  #set ($params = $docExtraExtension.parameters)
+  #set ($template = "loaddocextrauix.vm&uix=$docExtraExtension.id")
+  ## Params are evaluated as string
+  #if ($params.show && $params.show == 'true')
+    #set ($newDocExtra = [$docExtraExtension.id, $params.name, $params.title, $params.itemnumber, $template, $params.shortcut])
+    #set ($discard = $docextras.add($newDocExtra))
+  #end
+#end
+
 ##
 ## Put anchors before the footer, otherwise the top of each section would be hidden by the floating topmenu
 ##
@@ -64,7 +98,7 @@
     <div class="floatcontainer" id="docExtraTabs">
       <ul class="xwikitabbar" id="docExtrasTabsUl">
         #foreach($docextra in $docextras)
-          <li id="${docextra.get(0)}tab">
+          <li id="${docextra.get(0)}tab" data-template="$escapetool.xml($docextra.get(4))">
             ## Note: Add rel='nofollow' to prevent search crawler from navigating the links and indexing them in search results
             <a id="${docextra.get(0)}link" href="$doc.getURL('view', "viewer=${docextra.get(1)}")" rel="nofollow">
               $docextra.get(2) #if($docextra.get(3) >= 0) <span class="itemCount">$services.localization.render('docextra.extranb', [$docextra.get(3)])</span> #end
@@ -84,7 +118,7 @@
     ##
     ## JavaScript code generation
     ##
-    <script type="text/javascript">
+    <script>
       var hashviewer = self.document.location.hash.substring(1);
       #foreach($docextra in $docextras)
         #set ($extraAnchor = $docextra[0])
@@ -94,7 +128,7 @@
         ##
         ## Set the extra to load
         ##
-        #if ($velocityCount == 1)
+        #if ($foreach.count == 1)
           var extraInit = function(){ XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", false) };
         #end
         if (hashviewer == "${extraAnchor}") {

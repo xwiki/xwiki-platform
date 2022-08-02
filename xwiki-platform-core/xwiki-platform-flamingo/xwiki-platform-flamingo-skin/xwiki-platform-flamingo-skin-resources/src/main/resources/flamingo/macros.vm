@@ -1,3 +1,22 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
 ###############################################################
 ## Contains various standard Velocity macros automatically
 ## loaded and usable everywhere (in Velocity).
@@ -12,16 +31,18 @@
 ###    Message box
 ###
 #macro(xwikimessageboxstart $title $message)
-    <div class="centered panel panel-default xwikimessage">
-     <div class="panel-heading">
+  <div class="centered panel panel-default xwikimessage">
+    <div class="panel-heading">
       <div class="panel-title">$title</div>
-     </div>
-     <div class="panel-body">
-      <p class="xwikimessage">$message</p>
+    </div>
+    <div class="panel-body">
+      #if ("$!message" != '')
+        <p class="xwikimessage">$message</p>
+      #end
 #end
 #macro(xwikimessageboxend)
-      </div>
-    </div>
+    </div>##panel-body
+  </div>##panel
 #end
 
 #macro(xwikimessagebox $title $message $urlyes $urlno $msgyes $msgno)
@@ -54,48 +75,10 @@
  *#
 #macro(editActionButton $action $resourceIdentifier $class)
 #submitButton("action_${action}", $services.localization.render("core.shortcuts.edit.${resourceIdentifier}"), $services.localization.render($resourceIdentifier), $class)
+<input type="hidden" name="xaction" value="$escapetool.xml($action)" />
 #end
 
-#**
- * AJAX Live table that displays XWiki data.
- *
- * Example of usage, in syntax 2.0:
- * <code>
- * {{velocity}}
- * #set($columns = [ "_avatar", "first_name", "last_name", "email"])
- * #set($columnsProperties = {
- *                  "first_name" : { "type" : "text" , "size" : 10, "link" : "view"},
- *                  "last_name" : { "type" : "text" , "size" : 10, "link" : "view"},
- *                  "email" : { "type" : "text" , "size" : 20, "link" : "editor"},
- *                  "_avatar" : { "type" : "none" , "size" : 20, "link" : "none", "html" : "true", "sortable":false }
- *                })
- * #set($options = {  "className":"XWiki.XWikiUsers",
- *                    "translationPrefix" : "platform.index.",
- *                    "tagCloud" : true,
- *                    "rowCount": 15,
- *                    "javascriptName" : "MyModule.myTable",
- *                    "description: "The description of this table here", })
- * #livetable("userstable" $columns $columnsProperties $options)
- * {{/velocity}}
- * </code>
- *
- * @param divid the id of the table div
- * @param collist the column list
- * @param colprops the columns properties
- * @param options the livetable options.
- *#
-#macro(livetable $divid $collist $colprops $options)
-## Open wiki syntax wrappers.
-#if("$!options.outputOnlyHtml" != 'true')
-## Do not indent:
-#if($xwiki.getCurrentContentSyntaxId() != "xwiki/1.0")
-
-
-## We don't clean the HTML because we control the markup and because we want to preserve the whitespace characters in the
-## attribute values (e.g. if the live table id contains whitespaces)
-{{html clean="false"}}
-#else {pre} #end
-#end
+#macro(livetable_html $divid $collist $colprops $options)
   ##
   ## SX deps.
   ##
@@ -106,20 +89,11 @@
   ##
   #if("$!options.translationPrefix" != '') #set($transprefix = $options.translationPrefix) #else #set($transprefix = '') #end
   #if("$!options.defaultOrder" == 'desc') #set($defaultOrder = 'desc') #else #set($defaultOrder = 'asc') #end
-  #if("$!options.rowCount" != '') #set($count = $options.rowCount) #else #set($count = 15) #end
-  #if("$!options.maxPages" != '') #set($maxPages = $options.maxPages) #else #set($maxPages = 10) #end
   #if("$!options.selectedColumn" != '') #set($selectedColumn = $options.selectedColumn) #end
-  #if("$!options.callback" != '') #set($callback = $options.callback) #else #set($callback = '') #end
   #if("$!options.tagCloud" == '' || $options.tagCloud == false) #set($tagcloud=false) #else #set($tagcloud = true) #end
-  #if ($options.selectedTags && $options.selectedTags.size() > 0)
-    #set ($selectedTags = $options.selectedTags)
-  #else
-    #set ($selectedTags = [])
-  #end
-  #if("$!options.javascriptName" != '') #set($jsName = $options.javascriptName) #else #set($jsName = "livetable_$divid") #end
   #set ($topfilters = $options.topFilters)
+  #set ($hasTopFilters = "$!topfilters" !='')
   #if("$options.pageSize" == '' || $!options.pageSize == false) #set($hasPageSize=false) #else #set($hasPageSize = true) #end
-  #if("$!options.pageSizeBounds" != '') #set($pageSizeBounds = $options.pageSizeBounds) #end
   #set ($queryFilters = $options.queryFilters)
   #if (!$queryFilters)
     #set ($queryFilters = 'currentlanguage,hidden')
@@ -164,12 +138,28 @@
     #end
     #set ($dataurl = $xwiki.getURL($resultPage, 'get', "$escapetool.url($parameters)&$!options.extraParams"))
   #end
+  ## Clone the column properties because we modify them.
+  #set ($macro.columnDescriptors = $jsontool.fromString($jsontool.serialize($colprops)))
+  #livetable_normalizeColumnDescriptors($macro.columnDescriptors $collist $transprefix)
+  #set ($macro.settings = {
+    'name': $options.javascriptName,
+    'url': $dataurl,
+    'columns': $collist,
+    'columnDescriptors': $macro.columnDescriptors,
+    'xclass': $classname,
+    'maxPages': $options.maxPages,
+    'hasPageSize': $hasPageSize,
+    'pageSizeBounds': $options.pageSizeBounds,
+    'limit': $options.rowCount,
+    'selectedTags': $options.selectedTags,
+    'hasTopFilters': $hasTopFilters,
+    'callback': $options.callback
+  })
   ##
   ## HTML Table
   ##
   #set ($htmlLiveTableId = $escapetool.xml($divid))
 <div class="xwiki-livetable-container">
-  #if("$!topfilters" !='') #set($hasTopFilters = true) #else #set($hasTopFilters = false) #end
   #if($tagcloud || $hasTopFilters)
   <div class="tipfilters">
   #end
@@ -202,7 +192,8 @@
   #if($tagcloud || $hasTopFilters)
   </div>
   #end
-  <table id="${htmlLiveTableId}" class="xwiki-livetable">
+  <table id="${htmlLiveTableId}" class="xwiki-livetable"
+      data-settings="$escapetool.xml($jsontool.serialize($macro.settings))">
     #if("$!options.description" != '')
       <caption class="sr-only">$options.description</caption>
     #end
@@ -236,12 +227,16 @@
             #set($columnCount = 0)
             #foreach($colname in $collist)
               #set($colprop = $colprops.get($colname))
-              #set($isFilterable = $colprop.filterable != false && "$!colname" != '_actions')
-              #set($isSortable = $colprop.sortable != false && "$!colname" != '_actions')
+              #set ($isFilterable = $colprop.filterable != false && $colname != '_actions' && $colprop.type != 'hidden')
+              #set ($isSortable = $colprop.sortable != false && $colname != '_actions' && $colprop.type != 'hidden')
               ## Get the column's display name to use in the header.
               #set($displayName = "#getLivetableColumnDisplayName($colname, $colprop, $transprefix)")
-              <th class="xwiki-livetable-display-header-text $!colprop.headerClass #if($!colprop.type=='hidden')hidden#end #if($isSortable)sortable #if($colname == $selectedColumn)selected $defaultOrder#else asc#end#end#if ($colname == '_avatar') avatar#end" scope="col">
-                #if($isFilterable)<label for="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}">#end
+              #set ($defaultHeaderClass = {'_actions': 'actions', '_avatar': 'avatar'})
+              #set ($discard = $colprop.putIfAbsent('headerClass', $defaultHeaderClass.get($colname)))
+              <th scope="col" class="xwiki-livetable-display-header-text $!colprop.headerClass
+                  #if ($!colprop.type == 'hidden')hidden#end
+                  #if ($isSortable)sortable #if ($colname == $selectedColumn)selected $defaultOrder#else asc#end#end">
+                #if($isFilterable)<label for="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}">#end
                 #if($isSortable)<a data-rel="${colname}">#end
                 $displayName
                 #if($isSortable)</a>#end
@@ -257,7 +252,12 @@
               </td>
             </tr>
           </thead>
-          <tbody id="${htmlLiveTableId}-display" class="xwiki-livetable-display-body"><tr><td>&nbsp;</td></tr></tbody>
+          ## Use hyphenation in order to prevent the live table from overflowing the available width (e.g. when the
+          ## table cells contain long words that cannot be wrapped otherwise).
+          ## See https://justmarkup.com/articles/2015-07-31-dealing-with-long-words-in-css/
+          <tbody id="${htmlLiveTableId}-display" class="xwiki-livetable-display-body hyphenate">
+            <tr><td colspan="${columnCount}">&nbsp;</td></tr>
+          </tbody>
         </table>
       </td>
     </tr>
@@ -281,67 +281,7 @@
   <div id="${htmlLiveTableId}-computed-title-docs" class="hidden">
     #info("(<span class='docTitleComputed'></span>)&nbsp;$services.localization.render('platform.livetable.docTitleComputedHint')")
   </div>
-  <script type="text/javascript">
-  //<![CDATA[
-(function() {
-  var startup = function(container) {
-    // Make sure the LiveTable code is loaded (the WYSIWYG editor doesn't load the JavaScript code for instance).
-    var liveTableCodeLoaded = XWiki && XWiki.widgets && XWiki.widgets.LiveTable;
-    // Also make sure the live table is not already initialized.
-    #set ($jsLiveTableId = $escapetool.javascript($divid))
-    var liveTableElement = $('$jsLiveTableId');
-    if (liveTableCodeLoaded && liveTableElement && !liveTableElement.__liveTable &&
-        (liveTableElement == container || liveTableElement.descendantOf(container))) {
-      #set ($liveTableParams = {
-        'maxPages': $maxPages,
-        'limit': $count,
-        'selectedTags': $selectedTags
-      })
-      #if ($hasTopFilters)
-        #set ($cssLiveTableId = $escapetool.css($divid))
-        #set ($discard = $liveTableParams.put('filterNodes', [
-          "$escapetool.h$cssLiveTableId .xwiki-livetable-display-filters",
-          "${jsLiveTableId}-topfilters"
-        ]))
-      #end
-      #if ($hasPageSize && "$!pageSizeBounds" != '')
-        #set ($discard = $liveTableParams.put('pageSizeBounds', $pageSizeBounds))
-      #end
-      #set ($callbackParam = "#livetablecallback($divid $collist $colprops $transprefix), ")
-      #if ($!callback != '')
-        #set ($callbackParam = "$callback, ")
-      #end
-      window[$jsontool.serialize($jsName)] = liveTableElement.__liveTable = new XWiki.widgets.LiveTable("$dataurl",
-        "$jsLiveTableId", $callbackParam$jsontool.serialize($liveTableParams));
-      #if ($hasPageSize)
-        document.observe("xwiki:livetable:${jsLiveTableId}:loadingEntries", function() {
-          $('${jsLiveTableId}-pagesize').addClassName("hidden");
-        });
-        document.observe("xwiki:livetable:${jsLiveTableId}:loadingComplete", function() {
-          $('${jsLiveTableId}-pagesize').removeClassName("hidden");
-        });
-      #end
-      return true;
-    }
-    return false;
-  };
-  var init = function(event) {
-    var elements = (event && event.memo.elements) || [$('body')];
-    return elements.length > 0 && elements.some(startup);
-  };
-  // Initialize the live table on page load or after the live table code has been loaded.
-  (XWiki && XWiki.isInitialized && init()) || document.observe('xwiki:livetable:loading', init);
-  // Initialize the live table when it is added after the page is loaded.
-  document.observe('xwiki:dom:updated', init);
-})();
-   //]]>
-  </script>
 </div>## xwiki-livetable-container
-## Close wiki syntax wrappers. Do not modify the indentation below or it will generate unwanted paragraphs!
-#if("$!options.outputOnlyHtml" != 'true')#if($xwiki.getCurrentContentSyntaxId() != "xwiki/1.0"){{/html}}
-
-#else{/pre}#end##
-#end## end-wrappers
 #end## end-livetable-macro
 
 #macro (livetable_filter $column $columnProperties $xproperty)
@@ -370,7 +310,7 @@
     #end
   #end
   #if ($filterType == 'list' || $filterType == 'multilist')
-    <select id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" name="$column"
+    <select id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$column"
       #if ($filterType == 'multilist')
         #set ($discard = $xwiki.jsfx.use('js/xwiki/table/livetablemulti.js', true))
         #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-select', 'css/bootstrap-select.css'),
@@ -392,13 +332,13 @@
     #end
     </select>
   #elseif ($filterType == 'boolean')
-    <select id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" name="$column">
+    <select id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$column">
       <option value="">$services.localization.render('platform.livetable.selectAll')</option>
       <option value="0">$services.localization.render('no')</option>
       <option value="1">$services.localization.render('yes')</option>
     </select>
   #elseif ($filterType == 'text' || $filterType == 'number')
-    <input id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" name="$column" type="text"
+    <input id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$column" type="text"
       #if ("$!columnProperties.size" != '')size="$!escapetool.xml($columnProperties.size)"#end
       title="$escapetool.xml($services.localization.render('platform.livetable.filtersTitle',
         [$services.localization.render("${transprefix}$column")]))" />
@@ -412,7 +352,7 @@
     #if ("$!dateFormat" == '')
       #set ($dateFormat = $xwiki.getXWikiPreference('dateformat', 'yyyy/MM/dd HH:mm'))
     #end
-    <input id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" type="text"
+    <input id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" type="text"
       data-type="date" data-dateformat="$escapetool.xml($dateFormat)"
       #if ("$!columnProperties.size" != '')size="$!escapetool.xml($columnProperties.size)"#end
       title="$escapetool.xml($services.localization.render('platform.livetable.filtersTitle',
@@ -421,9 +361,8 @@
     #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'),
       {'type': 'text/css', 'rel': 'stylesheet'}))
     #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))
-    #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPropertyValues.js',
-      {'forceSkinAction' : true, 'language' : $xcontext.locale}))
-    <select id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" name="$!escapetool.xml($column)"
+    #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPropertyValues.js'))
+    <select id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$!escapetool.xml($column)"
       class="suggest-propertyValues" multiple="multiple" size="1"
       data-className="$!escapetool.xml($xproperty.className)" data-propertyName="$!escapetool.xml($xproperty.name)">
     </select>
@@ -524,4 +463,53 @@
 ### @param iconName The name of the icon to display, without the glyphicon prefix (eg: 'globe')
 #macro(glyphicon $iconName)
 #if("$!iconName"!='')<span class="glyphicon glyphicon-${iconName}"></span>#end
+#end
+#macro(displayDocumentTitle $stepTitle $titleHint)
+<div class="row document-header">
+  <div class="document-info col-xs-12">
+    <div id="document-title"><h1>$stepTitle</h1></div>
+    #if ($titleHint)
+      <div class="xdocLastModification">$titleHint</div>
+    #end
+  </div>
+</div>
+<hr/>
+#end
+
+#**
+ * Pulls all the JavaScript and CSS resources needed by the date & time picker.
+ *#
+#macro (dateTimePicker_import)
+  #set ($discard = $xwiki.linkx.use(
+    $services.webjars.url('Eonasdan-bootstrap-datetimepicker', 'css/bootstrap-datetimepicker.min.css'),
+    {'type': 'text/css', 'rel': 'stylesheet'}
+  ))
+  #set ($discard = $xwiki.jsfx.use('dateTimePicker.js', true))
+#end
+
+#**
+ * Pulls all the JavaScript and CSS resources needed by the color picker.
+ *#
+#macro (colorPicker_import)
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('colpick', 'css/colpick.css'),
+    {'type': 'text/css', 'rel': 'stylesheet'}))
+  #set ($discard = $xwiki.ssfx.use('colorPicker.css'))
+  #set ($discard = $xwiki.jsfx.use('colorPicker.js', true))
+#end
+
+#macro (colorPicker_input $parameters)
+  #set ($discard = $parameters.putIfAbsent('class', 'form-control color-picker type-color'))
+  #if ("$!parameters.disabled" == 'true')
+    #set ($parameters.disabled = 'disabled')
+  #else
+    #set ($discard = $parameters.remove('disabled'))
+  #end
+  <div class="input-group">
+    <input type="text"
+      #foreach ($parameter in $parameters.entrySet())
+        $escapetool.xml($parameter.key)="$!escapetool.xml($parameter.value)"
+      #end
+    />
+    <span class="input-group-addon"><span class="color-preview"></span></span>
+  </div>
 #end

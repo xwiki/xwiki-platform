@@ -33,6 +33,7 @@ import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.displayer.HTMLDisplayer;
 import org.xwiki.displayer.HTMLDisplayerException;
 import org.xwiki.script.ScriptContextManager;
@@ -126,7 +127,8 @@ public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer<Object>
      * <li>html_displayer/[mode].vm
      * <li>html_displayer/default.vm
      * </ul>
-     * 
+     * Please note that the following special characters: &gt;, &lt;, ? and spaces will be replaced by "." in the path.
+     *
      * @return the template name used to make the rendering
      */
     private Template getTemplate(Type type, Object value, String mode)
@@ -151,17 +153,22 @@ public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer<Object>
         return template;
     }
 
+    private String cleanPath(String path)
+    {
+        return path.replaceAll("<", "(").replaceAll(">", ")").replaceAll("\\?", "_").replaceAll(" ", "");
+    }
+
     private List<String> getTemplatePaths(Type type, String mode)
     {
         List<String> paths = new ArrayList<>();
         for (String typeName : getTypeNames(type)) {
             if (mode != null) {
-                paths.add(typeName + '/' + mode);
+                paths.add(cleanPath(typeName + '/' + mode));
             }
-            paths.add(typeName);
+            paths.add(cleanPath(typeName));
         }
         if (mode != null) {
-            paths.add(mode);
+            paths.add(cleanPath(mode));
         }
         paths.add("default");
         return paths;
@@ -177,7 +184,7 @@ public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer<Object>
                 typeNames.add("enum");
             }
         } else if (type != null) {
-            typeNames.add(type.getTypeName().toLowerCase());
+            typeNames.add(ReflectionUtils.serializeType(type).toLowerCase());
         }
         return typeNames;
     }

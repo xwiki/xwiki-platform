@@ -27,36 +27,34 @@ import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.junit.jupiter.api.Test;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Unit tests for {@link org.xwiki.mail.internal.factory.message.MessageMimeMessageFactory}.
  *
  * @version $Id$
  */
+@ComponentTest
 public class MessageMimeMessageFactoryTest
 {
-    @Rule
-    public MockitoComponentMockingRule<MessageMimeMessageFactory> mocker =
-        new MockitoComponentMockingRule<>(MessageMimeMessageFactory.class);
+    @InjectMockComponents
+    private MessageMimeMessageFactory mimeMessageFactory;
 
     @Test
-    public void createMessageWithBadSource() throws Exception
+    public void createMessageWithBadSource()
     {
-        try {
-            this.mocker.getComponentUnderTest().createMessage("source", null);
-            fail("Should have thrown an exception");
-        } catch (MessagingException expected) {
-            assertEquals("Failed to create mime message from source [class java.lang.String]", expected.getMessage());
-        }
+        Throwable exception = assertThrows(MessagingException.class, () -> {
+            this.mimeMessageFactory.createMessage("source", null);
+        });
+        assertEquals("Failed to create mime message from source [class java.lang.String]", exception.getMessage());
     }
 
     @Test
@@ -68,7 +66,7 @@ public class MessageMimeMessageFactoryTest
         source.setSubject("Subject");
         source.setText("Content");
 
-        MimeMessage first = mocker.getComponentUnderTest().createMessage(source, null);
+        MimeMessage first =this.mimeMessageFactory.createMessage(source, null);
 
         assertEqualMimeMessage(first, source);
 
@@ -77,7 +75,7 @@ public class MessageMimeMessageFactoryTest
         first.setSubject("First subject");
         first.setText("First content");
 
-        MimeMessage second = mocker.getComponentUnderTest().createMessage(source, null);
+        MimeMessage second = this.mimeMessageFactory.createMessage(source, null);
 
         // Ensure second message is similar to source, and not to modified first
         assertEqualMimeMessage(second, source);
@@ -89,8 +87,8 @@ public class MessageMimeMessageFactoryTest
         MimeMessage source = new MimeMessage(Session.getInstance(new Properties()));
         source.setText("Content");
 
-        MimeMessage first = mocker.getComponentUnderTest().createMessage(source, null);
-        MimeMessage second = mocker.getComponentUnderTest().createMessage(source, null);
+        MimeMessage first = this.mimeMessageFactory.createMessage(source, null);
+        MimeMessage second = this.mimeMessageFactory.createMessage(source, null);
 
         // Ensure second message is similar to source, and not to modified first
         assertThat(first.getMessageID(), notNullValue());

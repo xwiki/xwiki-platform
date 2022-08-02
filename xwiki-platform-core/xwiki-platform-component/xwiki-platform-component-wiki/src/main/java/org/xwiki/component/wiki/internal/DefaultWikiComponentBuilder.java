@@ -30,6 +30,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
@@ -39,6 +40,7 @@ import org.xwiki.component.wiki.WikiComponentBuilder;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.internal.bridge.WikiComponentBridge;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.security.authorization.AuthorExecutor;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -75,15 +77,18 @@ public class DefaultWikiComponentBuilder implements WikiComponentBuilder, WikiCo
     @Inject
     private WikiComponentBridge componentBridge;
 
+    @Inject
+    private AuthorExecutor authorExecutor;
+
     @Override
     public List<DocumentReference> getDocumentReferences()
     {
-        List<DocumentReference> results = new ArrayList<DocumentReference>();
+        List<DocumentReference> results = new ArrayList<>();
         // Note that the query is made to work with Oracle which treats empty strings as null.
-        String query = ", BaseObject as obj, StringProperty as role where obj.className=? and obj.name=doc.fullName "
-            + "and role.id.id=obj.id and role.id.name=? "
+        String query = ", BaseObject as obj, StringProperty as role where obj.className=?1 and obj.name=doc.fullName "
+            + "and role.id.id=obj.id and role.id.name=?2 "
             + "and  (role.value <> '' or (role.value is not null and '' is null))";
-        List<String> parameters = new ArrayList<String>();
+        List<String> parameters = new ArrayList<>();
         parameters.add(COMPONENT_CLASS);
         parameters.add(COMPONENT_ROLE_TYPE_FIELD);
 
@@ -91,7 +96,8 @@ public class DefaultWikiComponentBuilder implements WikiComponentBuilder, WikiCo
             XWikiContext xcontext = xcontextProvider.get();
             results.addAll(xcontext.getWiki().getStore().searchDocumentReferences(query, parameters, xcontext));
         } catch (XWikiException e) {
-            this.logger.error("Failed to search for existing wiki components [{}]", e.getMessage());
+            this.logger.warn("Failed to get document references for existing wiki components. Considering there's no "
+                + "wiki component. Root cause: [{}]", ExceptionUtils.getRootCauseMessage(e));
         }
 
         return results;
@@ -116,7 +122,8 @@ public class DefaultWikiComponentBuilder implements WikiComponentBuilder, WikiCo
         rawComponent.setSyntax(componentBridge.getSyntax(reference));
 
         // Create the method invocation handler of the proxy
-        InvocationHandler handler = new DefaultWikiComponentInvocationHandler(rawComponent, contextComponentManager);
+        InvocationHandler handler =
+            new DefaultWikiComponentInvocationHandler(rawComponent, this.authorExecutor, this.contextComponentManager);
 
         // Prepare a list containing the interfaces the component implements
         List<Class<?>> implementedInterfaces = new ArrayList<Class<?>>();

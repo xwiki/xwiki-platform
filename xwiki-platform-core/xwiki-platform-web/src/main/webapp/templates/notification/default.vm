@@ -1,6 +1,0 @@
-## Default renderer for any kind of notification.
-## Each application should create its own.
-## The variable "$event" contains the event to display.
-## See: org.xwiki.notifications.CompositeEvent
-#template('notification/macros.vm')
-#displayNotificationEvent($event)

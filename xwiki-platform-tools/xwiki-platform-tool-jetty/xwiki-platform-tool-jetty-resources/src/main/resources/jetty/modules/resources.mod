@@ -18,9 +18,14 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-#
-# Module to add resources directory to classpath
-#
+DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
+
+[description]
+Adds the $JETTY_BASE/resources directory to the server classpath.
+Useful for configuration property files (eg jetty-logging.properties)
+
+[tags]
+classpath
 
 [lib]
 resources/

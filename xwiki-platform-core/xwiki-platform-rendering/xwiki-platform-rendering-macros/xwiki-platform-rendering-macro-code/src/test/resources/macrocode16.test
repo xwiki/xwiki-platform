@@ -1,0 +1,150 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Validates that the code macro accurately identifies the language used in the code macro when not specified.
+.# Pygments 2.4.2, and 2.0.8 identify the sample below as Tera Term macro syntax, presenting an acceptable highlight of
+.# the code, whereas version 2.5.1 to 2.7.0 identifies this sample as MIME syntax, consequently proposing a degraded 
+.# highlighting where the text is in black and each line is framed by a red line.
+.#-----------------------------------------------------
+{{code}}
+# Admins must wait 3 days before being allowed to permanently delete
+xwiki.store.recyclebin.adminWaitDays=3
+# Normal users must also wait 3 days
+xwiki.store.recyclebin.waitDays=3
+{{/code}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [code] [] [# Admins must wait 3 days before being allowed to permanently delete
+xwiki.store.recyclebin.adminWaitDays=3
+# Normal users must also wait 3 days
+xwiki.store.recyclebin.waitDays=3]
+beginGroup [[class]=[box]]
+beginGroup [[class]=[code]]
+onSpecialSymbol [#]
+onSpace
+beginFormat [NONE] [[style]=[color: #19177C; ]]
+onWord [Admins]
+endFormat [NONE] [[style]=[color: #19177C; ]]
+onSpace
+beginFormat [NONE] [[style]=[color: #19177C; ]]
+onWord [must]
+endFormat [NONE] [[style]=[color: #19177C; ]]
+onSpace
+beginFormat [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+onWord [wait]
+endFormat [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+onSpace
+beginFormat [NONE] [[style]=[color: #666666; ]]
+onWord [3]
+endFormat [NONE] [[style]=[color: #666666; ]]
+onSpace
+beginFormat [NONE] [[style]=[color: #19177C; ]]
+onWord [days]
+endFormat [NONE] [[style]=[color: #19177C; ]]
+onSpace
+beginFormat [NONE] [[style]=[color: #19177C; ]]
+onWord [before]
+endFormat [NONE] [[style]=[color: #19177C; ]]
+onSpace
+beginFormat [NONE] [[style]=[color: #19177C; ]]
+onWord [being]
+endFormat [NONE] [[style]=[color: #19177C; ]]
+onSpace
+beginFormat [NONE] [[style]=[color: #19177C; ]]
+onWord [allowed]
+endFormat [NONE] [[style]=[color: #19177C; ]]
+onSpace
+beginFormat [NONE] [[style]=[color: #19177C; ]]
+onWord [to]
+endFormat [NONE] [[style]=[color: #19177C; ]]
+onSpace
+beginFormat [NONE] [[style]=[color: #19177C; ]]
+onWord [permanently]
+endFormat [NONE] [[style]=[color: #19177C; ]]
+onSpace
+beginFormat [NONE] [[style]=[color: #19177C; ]]
+onWord [delete]
+endFormat [NONE] [[style]=[color: #19177C; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #19177C; ]]
+onWord [xwiki]
+endFormat [NONE] [[style]=[color: #19177C; ]]
+onSpecialSymbol [.]
+beginFormat [NONE] [[style]=[color: #19177C; ]]
+onWord [store]
+endFormat [NONE] [[style]=[color: #19177C; ]]
+onSpecialSymbol [.]
+beginFormat [NONE] [[style]=[color: #19177C; ]]
+onWord [recyclebin]
+endFormat [NONE] [[style]=[color: #19177C; ]]
+onSpecialSymbol [.]
+beginFormat [NONE] [[style]=[color: #19177C; ]]
+onWord [adminWaitDays]
+endFormat [NONE] [[style]=[color: #19177C; ]]
+beginFormat [NONE] [[style]=[color: #666666; ]]
+onSpecialSymbol [=]
+endFormat [NONE] [[style]=[color: #666666; ]]
+beginFormat [NONE] [[style]=[color: #666666; ]]
+onWord [3]
+endFormat [NONE] [[style]=[color: #666666; ]]
+onNewLine
+onSpecialSymbol [#]
+onSpace
+beginFormat [NONE] [[style]=[color: #19177C; ]]
+onWord [Normal]
+endFormat [NONE] [[style]=[color: #19177C; ]]
+onSpace
+beginFormat [NONE] [[style]=[color: #19177C; ]]
+onWord [users]
+endFormat [NONE] [[style]=[color: #19177C; ]]
+onSpace
+beginFormat [NONE] [[style]=[color: #19177C; ]]
+onWord [must]
+endFormat [NONE] [[style]=[color: #19177C; ]]
+onSpace
+beginFormat [NONE] [[style]=[color: #19177C; ]]
+onWord [also]
+endFormat [NONE] [[style]=[color: #19177C; ]]
+onSpace
+beginFormat [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+onWord [wait]
+endFormat [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+onSpace
+beginFormat [NONE] [[style]=[color: #666666; ]]
+onWord [3]
+endFormat [NONE] [[style]=[color: #666666; ]]
+onSpace
+beginFormat [NONE] [[style]=[color: #19177C; ]]
+onWord [days]
+endFormat [NONE] [[style]=[color: #19177C; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #19177C; ]]
+onWord [xwiki]
+endFormat [NONE] [[style]=[color: #19177C; ]]
+onSpecialSymbol [.]
+beginFormat [NONE] [[style]=[color: #19177C; ]]
+onWord [store]
+endFormat [NONE] [[style]=[color: #19177C; ]]
+onSpecialSymbol [.]
+beginFormat [NONE] [[style]=[color: #19177C; ]]
+onWord [recyclebin]
+endFormat [NONE] [[style]=[color: #19177C; ]]
+onSpecialSymbol [.]
+beginFormat [NONE] [[style]=[color: #19177C; ]]
+onWord [waitDays]
+endFormat [NONE] [[style]=[color: #19177C; ]]
+beginFormat [NONE] [[style]=[color: #666666; ]]
+onSpecialSymbol [=]
+endFormat [NONE] [[style]=[color: #666666; ]]
+beginFormat [NONE] [[style]=[color: #666666; ]]
+onWord [3]
+endFormat [NONE] [[style]=[color: #666666; ]]
+endGroup [[class]=[code]]
+endGroup [[class]=[box]]
+endMacroMarkerStandalone [code] [] [# Admins must wait 3 days before being allowed to permanently delete
+xwiki.store.recyclebin.adminWaitDays=3
+# Normal users must also wait 3 days
+xwiki.store.recyclebin.waitDays=3]
+endDocument

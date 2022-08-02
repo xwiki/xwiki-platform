@@ -23,9 +23,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
@@ -47,6 +51,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @version $Id$
  * @since 1.2M1
  */
+@Component
+@Named("undelete")
+@Singleton
 public class UndeleteAction extends XWikiAction
 {
     private static final String ID_PARAMETER = "id";

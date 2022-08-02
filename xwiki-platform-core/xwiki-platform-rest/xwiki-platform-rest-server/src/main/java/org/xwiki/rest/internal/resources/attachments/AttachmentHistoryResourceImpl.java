@@ -74,9 +74,9 @@ public class AttachmentHistoryResourceImpl extends XWikiResource implements Atta
                 com.xpn.xwiki.api.Attachment xwikiAttachmentAtVersion =
                         xwikiAttachment.getAttachmentRevision(version.toString());
 
-                URL url = Utils.getXWikiContext(componentManager).getURLFactory()
-                    .createAttachmentRevisionURL(attachmentName, spaceName, doc.getDocumentReference().getName(),
-                        version.toString(), null, wikiName, Utils.getXWikiContext(componentManager));
+                URL url = Utils.getXWikiContext(componentManager).getURLFactory().createAttachmentRevisionURL(
+                    attachmentName, doc.getSpace(), doc.getDocumentReference().getName(), version.toString(), null,
+                    wikiName, Utils.getXWikiContext(componentManager));
                 String attachmentXWikiAbsoluteUrl = url.toString();
                 String attachmentXWikiRelativeUrl =
                     Utils.getXWikiContext(componentManager).getURLFactory().getURL(url,

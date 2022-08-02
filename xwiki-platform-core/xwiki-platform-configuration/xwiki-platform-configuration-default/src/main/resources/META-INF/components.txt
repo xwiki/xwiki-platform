@@ -2,7 +2,6 @@ org.xwiki.configuration.internal.XWikiPropertiesConfigurationSource
 org.xwiki.configuration.internal.SpacePreferencesConfigurationSource
 org.xwiki.configuration.internal.SpacesConfigurationSource
 org.xwiki.configuration.internal.WikiPreferencesConfigurationSource
-org.xwiki.configuration.internal.UserPreferencesConfigurationSource
 org.xwiki.configuration.internal.DefaultConfigurationSource
 org.xwiki.configuration.internal.RestrictedConfigurationSource
 org.xwiki.configuration.internal.AllConfigurationSource

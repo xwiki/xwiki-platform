@@ -24,12 +24,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Assert;
-
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.eventstream.Event.Importance;
 import org.xwiki.eventstream.internal.DefaultEvent;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for the {@link EventGroup event group}.
@@ -40,203 +45,205 @@ public class EventGroupTest
 {
     EventGroup g;
 
-    @Before
-    public void setup()
+    DefaultEvent event1 = new DefaultEvent();
+
+    DefaultEvent event2 = new DefaultEvent();
+
+    DefaultEvent event3 = new DefaultEvent();
+
+    @BeforeEach
+    public void beforeEach()
     {
         this.g = new EventGroup();
+
+        this.event1.setId("id1");
+        this.event2.setId("id2");
+        this.event3.setId("id3");
     }
 
     @Test
     public void testConstructors()
     {
-        Event e = new DefaultEvent();
+        assertNotNull(this.g.getEvents());
+        assertEquals(0, this.g.getEvents().size());
 
-        Assert.assertNotNull(this.g.getEvents());
-        Assert.assertEquals(0, this.g.getEvents().size());
-
-        this.g = new EventGroup(e);
-        Assert.assertEquals(1, this.g.getEvents().size());
-        Assert.assertTrue(this.g.getEvents().contains(e));
+        this.g = new EventGroup(this.event1);
+        assertEquals(1, this.g.getEvents().size());
+        assertTrue(this.g.getEvents().contains(this.event1));
 
         List<Event> l = new ArrayList<Event>();
-        l.add(e);
+        l.add(this.event1);
         this.g = new EventGroup(l);
-        Assert.assertEquals(1, this.g.getEvents().size());
-        Assert.assertTrue(this.g.getEvents().contains(e));
+        assertEquals(1, this.g.getEvents().size());
+        assertTrue(this.g.getEvents().contains(this.event1));
 
         Set<Event> s = new HashSet<Event>();
-        s.add(e);
+        s.add(this.event1);
         this.g = new EventGroup(s);
-        Assert.assertEquals(1, this.g.getEvents().size());
-        Assert.assertTrue(this.g.getEvents().contains(e));
+        assertEquals(1, this.g.getEvents().size());
+        assertTrue(this.g.getEvents().contains(this.event1));
         // Test that the internal set is not the same as the passed set
-        s.remove(e);
-        Assert.assertEquals(1, this.g.getEvents().size());
-        Assert.assertTrue(this.g.getEvents().contains(e));
-        s.add(new DefaultEvent());
-        s.add(new DefaultEvent());
-        Assert.assertEquals(1, this.g.getEvents().size());
+        s.remove(this.event1);
+        assertEquals(1, this.g.getEvents().size());
+        assertTrue(this.g.getEvents().contains(this.event1));
+        s.add(this.event2);
+        s.add(this.event3);
+        assertEquals(1, this.g.getEvents().size());
         this.g = new EventGroup(s);
-        Assert.assertEquals(2, this.g.getEvents().size());
+        assertEquals(2, this.g.getEvents().size());
     }
 
     @Test
     public void testConstructorsWithNull()
     {
         this.g = new EventGroup((List<Event>) null);
-        Assert.assertNotNull(this.g.getEvents());
-        Assert.assertTrue(this.g.getEvents().isEmpty());
+        assertNotNull(this.g.getEvents());
+        assertTrue(this.g.getEvents().isEmpty());
 
         this.g = new EventGroup((Set<Event>) null);
-        Assert.assertNotNull(this.g.getEvents());
-        Assert.assertTrue(this.g.getEvents().isEmpty());
+        assertNotNull(this.g.getEvents());
+        assertTrue(this.g.getEvents().isEmpty());
 
         this.g = new EventGroup((Event[]) null);
-        Assert.assertNotNull(this.g.getEvents());
-        Assert.assertTrue(this.g.getEvents().isEmpty());
+        assertNotNull(this.g.getEvents());
+        assertTrue(this.g.getEvents().isEmpty());
     }
 
     @Test
     public void testConstructorsWithNullElements()
     {
         List<Event> eventsList = new ArrayList<Event>();
-        eventsList.add(new DefaultEvent());
+        eventsList.add(this.event1);
         eventsList.add(null);
-        eventsList.add(new DefaultEvent());
-        eventsList.add(new DefaultEvent());
+        eventsList.add(this.event2);
+        eventsList.add(this.event3);
         this.g = new EventGroup(eventsList);
-        Assert.assertEquals(3, this.g.getEvents().size());
+        assertEquals(3, this.g.getEvents().size());
 
         Set<Event> eventsSet = new HashSet<Event>();
-        eventsSet.add(new DefaultEvent());
+        eventsSet.add(this.event1);
         eventsSet.add(null);
-        eventsSet.add(new DefaultEvent());
-        eventsSet.add(new DefaultEvent());
+        eventsSet.add(this.event2);
+        eventsSet.add(this.event3);
         this.g = new EventGroup(eventsSet);
-        Assert.assertEquals(3, this.g.getEvents().size());
+        assertEquals(3, this.g.getEvents().size());
 
-        this.g = new EventGroup(new DefaultEvent(), null, new DefaultEvent(), null, new DefaultEvent());
-        Assert.assertEquals(3, this.g.getEvents().size());
+        this.g = new EventGroup(this.event1, null, this.event2, null, this.event3);
+        assertEquals(3, this.g.getEvents().size());
     }
 
     @Test
     public void testGetMainEvent()
     {
-        Event e1 = new DefaultEvent();
-        e1.setImportance(Importance.BACKGROUND);
-        Event e2 = new DefaultEvent();
-        e2.setImportance(Importance.MAJOR);
-        Event e3 = new DefaultEvent();
-        e3.setImportance(Importance.MAJOR);
+        this.event1.setImportance(Importance.BACKGROUND);
+        this.event2.setImportance(Importance.MAJOR);
+        this.event3.setImportance(Importance.MAJOR);
 
-        Assert.assertNull(this.g.getMainEvent());
+        assertNull(this.g.getMainEvent());
 
-        this.g.addEvents(e1);
-        Assert.assertEquals(e1, this.g.getMainEvent());
-        this.g.addEvents(e2);
-        Assert.assertEquals(e2, this.g.getMainEvent());
-        this.g.addEvents(e3);
-        Assert.assertEquals(e2, this.g.getMainEvent());
+        this.g.addEvents(this.event1);
+        assertEquals(this.event1, this.g.getMainEvent());
+        this.g.addEvents(this.event2);
+        assertEquals(this.event2, this.g.getMainEvent());
+        this.g.addEvents(this.event3);
+        assertEquals(this.event2, this.g.getMainEvent());
 
         this.g.clearEvents();
-        Assert.assertNull(this.g.getMainEvent());
+        assertNull(this.g.getMainEvent());
 
         this.g.clearEvents();
-        this.g.addEvents(e3);
-        Assert.assertEquals(e3, this.g.getMainEvent());
-        this.g.addEvents(e2);
-        Assert.assertEquals(e3, this.g.getMainEvent());
-        this.g.addEvents(e1);
-        Assert.assertEquals(e3, this.g.getMainEvent());
+        this.g.addEvents(this.event3);
+        assertEquals(this.event3, this.g.getMainEvent());
+        this.g.addEvents(this.event2);
+        assertEquals(this.event3, this.g.getMainEvent());
+        this.g.addEvents(this.event1);
+        assertEquals(this.event3, this.g.getMainEvent());
 
         this.g.clearEvents();
-        this.g.addEvents(e2);
-        Assert.assertEquals(e2, this.g.getMainEvent());
-        this.g.addEvents(e3);
-        Assert.assertEquals(e2, this.g.getMainEvent());
-        this.g.addEvents(e1);
-        Assert.assertEquals(e2, this.g.getMainEvent());
+        this.g.addEvents(this.event2);
+        assertEquals(this.event2, this.g.getMainEvent());
+        this.g.addEvents(this.event3);
+        assertEquals(this.event2, this.g.getMainEvent());
+        this.g.addEvents(this.event1);
+        assertEquals(this.event2, this.g.getMainEvent());
 
         this.g.clearEvents();
-        this.g.addEvents(e3);
-        Assert.assertEquals(e3, this.g.getMainEvent());
-        this.g.addEvents(e3);
-        Assert.assertEquals(e3, this.g.getMainEvent());
-        this.g.addEvents(e2);
-        Assert.assertEquals(e3, this.g.getMainEvent());
+        this.g.addEvents(this.event3);
+        assertEquals(this.event3, this.g.getMainEvent());
+        this.g.addEvents(this.event3);
+        assertEquals(this.event3, this.g.getMainEvent());
+        this.g.addEvents(this.event2);
+        assertEquals(this.event3, this.g.getMainEvent());
     }
 
     @Test
     public void testAddEvents()
     {
-        Assert.assertTrue(this.g.getEvents().isEmpty());
-        Event e1 = new DefaultEvent();
-        Assert.assertTrue(this.g.getEvents().isEmpty());
-        this.g.addEvents(e1);
-        Assert.assertFalse(this.g.getEvents().isEmpty());
-        Assert.assertEquals(1, this.g.getEvents().size());
-        this.g.addEvents(e1);
-        Assert.assertEquals(1, this.g.getEvents().size());
-        Event e2 = new DefaultEvent();
-        this.g.addEvents(e2, e2, e2);
-        Assert.assertEquals(2, this.g.getEvents().size());
-        this.g.addEvents(e1, e2);
-        Assert.assertEquals(2, this.g.getEvents().size());
-        Event e3 = new DefaultEvent();
-        this.g.addEvents(e1, e2, e3);
-        Assert.assertEquals(3, this.g.getEvents().size());
+        assertTrue(this.g.getEvents().isEmpty());
+        assertTrue(this.g.getEvents().isEmpty());
+        this.g.addEvents(this.event1);
+        assertFalse(this.g.getEvents().isEmpty());
+        assertEquals(1, this.g.getEvents().size());
+        this.g.addEvents(this.event1);
+        assertEquals(1, this.g.getEvents().size());
+        this.g.addEvents(this.event2, this.event2, this.event2);
+        assertEquals(2, this.g.getEvents().size());
+        this.g.addEvents(this.event1, this.event2);
+        assertEquals(2, this.g.getEvents().size());
+        this.g.addEvents(this.event1, this.event2, this.event3);
+        assertEquals(3, this.g.getEvents().size());
         this.g.clearEvents();
-        Assert.assertEquals(0, this.g.getEvents().size());
-        Assert.assertTrue(this.g.getEvents().isEmpty());
-        this.g.addEvents(e1, e2, e3);
-        Assert.assertEquals(3, this.g.getEvents().size());
+        assertEquals(0, this.g.getEvents().size());
+        assertTrue(this.g.getEvents().isEmpty());
+        this.g.addEvents(this.event1, this.event2, this.event3);
+        assertEquals(3, this.g.getEvents().size());
     }
 
     @Test
     public void testAddEventsWithNull()
     {
         this.g.addEvents((Event) null);
-        Assert.assertTrue(this.g.getEvents().isEmpty());
+        assertTrue(this.g.getEvents().isEmpty());
 
-        this.g.addEvents(new DefaultEvent());
-        Assert.assertEquals(1, this.g.getEvents().size());
+        this.g.addEvents(this.event1);
+        assertEquals(1, this.g.getEvents().size());
         this.g.addEvents((Event) null);
-        Assert.assertEquals(1, this.g.getEvents().size());
+        assertEquals(1, this.g.getEvents().size());
     }
 
     @Test
     public void testClearEvents()
     {
-        Assert.assertTrue(this.g.getEvents().isEmpty());
-        this.g.addEvents(new DefaultEvent());
-        this.g.addEvents(new DefaultEvent());
-        this.g.addEvents(new DefaultEvent());
-        Assert.assertFalse(this.g.getEvents().isEmpty());
+        assertTrue(this.g.getEvents().isEmpty());
+        this.g.addEvents(this.event1);
+        this.g.addEvents(this.event2);
+        this.g.addEvents(this.event3);
+        assertFalse(this.g.getEvents().isEmpty());
         this.g.clearEvents();
-        Assert.assertTrue(this.g.getEvents().isEmpty());
+        assertTrue(this.g.getEvents().isEmpty());
         this.g.clearEvents();
-        Assert.assertTrue(this.g.getEvents().isEmpty());
-        this.g.addEvents(new DefaultEvent());
-        Assert.assertFalse(this.g.getEvents().isEmpty());
+        assertTrue(this.g.getEvents().isEmpty());
+        this.g.addEvents(this.event1);
+        assertFalse(this.g.getEvents().isEmpty());
         this.g.clearEvents();
-        Assert.assertTrue(this.g.getEvents().isEmpty());
+        assertTrue(this.g.getEvents().isEmpty());
     }
 
-    @Test(expected = java.lang.UnsupportedOperationException.class)
+    @Test
     public void testGetEventsIsReadonly()
     {
-        this.g.addEvents(new DefaultEvent(), new DefaultEvent());
-        this.g.getEvents().clear();
-        Assert.fail("No exception thrown");
+        this.g.addEvents(this.event1, this.event2);
+
+        assertThrows(UnsupportedOperationException.class, () -> this.g.getEvents().clear());
     }
 
     @Test
     public void testGetEventsIsNotLive()
     {
-        this.g.addEvents(new DefaultEvent(), new DefaultEvent());
+        this.g.addEvents(this.event1, this.event2);
         Set<Event> view = this.g.getEvents();
-        Assert.assertEquals(2, view.size());
-        this.g.addEvents(new DefaultEvent());
-        Assert.assertEquals(2, view.size());
+        assertEquals(2, view.size());
+        this.g.addEvents(this.event3);
+        assertEquals(2, view.size());
     }
 }

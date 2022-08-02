@@ -46,7 +46,7 @@ public class JobStatusRestURLGenerator extends AbstractJobRestURLGenerator<List<
         // The idea is to use the UriBuilder of jax-rs to generate URLs that match the resources paths.
         // So it is consistent.
         try {
-            return Utils.createURI(getBaseURI(), JobStatusResource.class, getIdStringElement(id)).toURL();
+            return Utils.createURI(getBaseURI(), JobStatusResource.class, id).toURL();
         } catch (MalformedURLException e) {
             throw new XWikiRestException(String.format("Failed to generate a REST URL for the job id [%s].", id), e);
         }

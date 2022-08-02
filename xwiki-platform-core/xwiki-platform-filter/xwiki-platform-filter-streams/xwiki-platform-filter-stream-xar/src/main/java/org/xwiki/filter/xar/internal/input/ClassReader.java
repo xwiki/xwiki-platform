@@ -101,7 +101,10 @@ public class ClassReader extends AbstractReader implements XARXMLReader<ClassRea
                     }
                 }
             } else {
-                wikiClass.addProperty(this.propertyReader.read(xmlReader, properties));
+                WikiClassProperty property = this.propertyReader.read(xmlReader, properties);
+                if (property != null) {
+                    wikiClass.addProperty(property);
+                }
             }
         }
 

@@ -200,7 +200,10 @@ public class WikiTemplateManagerScript implements ScriptService
      * @param ownerId Id of the wiki owner
      * @param failOnExist fail the creation of the wiki id if not available
      * @return true if it succeed
+     * @deprecated since 7.0M2, use
+     *             {@code org.xwiki.platform.wiki.creationjob.script.WikiCreationJobScriptServices#createWiki} instead
      */
+    @Deprecated
     public boolean createWikiFromTemplate(String newWikiId, String newWikiAlias,
             String templateId, String ownerId, boolean failOnExist)
     {
@@ -258,7 +261,9 @@ public class WikiTemplateManagerScript implements ScriptService
      *
      * @param jobId id of the provisioning job.
      * @return the status of the job
+     * @deprecated since 7.0M2
      */
+    @Deprecated
     public JobStatus getWikiProvisioningJobStatus(List<String> jobId)
     {
         try {

@@ -42,11 +42,12 @@ import org.xwiki.resource.ResourceReferenceHandler;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
 import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.resource.ResourceType;
+import org.xwiki.stability.Unstable;
 import org.xwiki.tika.internal.TikaUtils;
 
 /**
  * Base class for {@link ResourceReferenceHandler}s that can handle servlet resource requests.
- * 
+ *
  * @param <R> the resource type
  * @version $Id$
  * @since 7.4.6
@@ -79,16 +80,18 @@ public abstract class AbstractServletResourceReferenceHandler<R extends Resource
                 getResourceName(typedResourceReference));
         } else if (!shouldBrowserUseCachedContent(typedResourceReference)) {
             // If we get here then either the resource is not cached by the browser or the resource is dynamic.
-            InputStream resourceStream = getResourceStream(typedResourceReference);
-            if (resourceStream != null) {
-                try {
-                    serveResource(typedResourceReference, filterResource(typedResourceReference, resourceStream));
-                } catch (ResourceReferenceHandlerException e) {
-                    this.logger.error(e.getMessage(), e);
-                    sendError(HttpStatus.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+            try (InputStream resourceStream = getResourceStream(typedResourceReference)) {
+                if (resourceStream != null) {
+                    try (InputStream filteredSteam = filterResource(typedResourceReference, resourceStream)) {
+                        serveResource(typedResourceReference, filteredSteam);
+                    }
+                } else {
+                    sendError(HttpStatus.SC_NOT_FOUND, "Resource not found [%s].",
+                        getResourceName(typedResourceReference));
                 }
-            } else {
-                sendError(HttpStatus.SC_NOT_FOUND, "Resource not found [%s].", getResourceName(typedResourceReference));
+            } catch (IOException | ResourceReferenceHandlerException e) {
+                this.logger.error(e.getMessage(), e);
+                sendError(HttpStatus.SC_INTERNAL_SERVER_ERROR, e.getMessage());
             }
         }
 
@@ -118,7 +121,8 @@ public abstract class AbstractServletResourceReferenceHandler<R extends Resource
         Request request = this.container.getRequest();
         if (request instanceof ServletRequest
             && ((ServletRequest) request).getHttpServletRequest().getHeader("If-Modified-Since") != null
-            && isResourceCacheable(resourceReference)) {
+            && isResourceCacheable(resourceReference))
+        {
             // The user probably used F5 to reload the page and the browser checks if there are changes.
             Response response = this.container.getResponse();
             if (response instanceof ServletResponse) {
@@ -162,8 +166,7 @@ public abstract class AbstractServletResourceReferenceHandler<R extends Resource
         throws ResourceReferenceHandlerException
     {
         InputStream resourceStream = rawResourceStream;
-        String resourceName = getResourceName(resourceReference);
-
+        
         // Make sure the resource stream supports mark & reset which is needed in order be able to detect the
         // content type without affecting the stream (Tika may need to read a few bytes from the start of the
         // stream, in which case it will mark & reset the stream).
@@ -174,13 +177,29 @@ public abstract class AbstractServletResourceReferenceHandler<R extends Resource
         try {
             Response response = this.container.getResponse();
             setResponseHeaders(response, resourceReference);
-            response.setContentType(TikaUtils.detect(resourceStream, resourceName));
+            response.setContentType(getContentType(resourceStream, resourceReference));
             IOUtils.copy(resourceStream, response.getOutputStream());
         } catch (Exception e) {
+            String resourceName = getResourceName(resourceReference);
             throw new ResourceReferenceHandlerException(String.format("Failed to read resource [%s]", resourceName), e);
-        } finally {
-            IOUtils.closeQuietly(resourceStream);
         }
+    }
+
+    /**
+     * Computes the content type of the resource. By default the content type is inferred by {@link
+     * TikaUtils#detect(InputStream, String)} based on the resource content and name.
+     *
+     * @param resourceStream the stream of the requested resource
+     * @param resourceReference the reference of the request resource
+     * @return the content type of the resource
+     * @throws IOException in case of error during the content type analysis
+     * @since 13.3RC1
+     */
+    @Unstable
+    protected String getContentType(InputStream resourceStream, R resourceReference)
+        throws IOException
+    {
+        return TikaUtils.detect(resourceStream, getResourceName(resourceReference));
     }
 
     /**

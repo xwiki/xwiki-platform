@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -247,7 +247,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
     $senderConfig.setHost($config.get('smtp_server'))##
   #end
   #if("$!config.get('smtp_port')" != '')
-    $senderConfig.setPort($mathtool.toInteger($config.get('smtp_port')))##
+    $senderConfig.setPort($numbertool.toNumber($config.get('smtp_port')).intValue())##
   #end
   #if("$!config.get('smtp_server_username')" != '')
     $senderConfig.setSmtpUsername($config.get('smtp_server_username'))##

@@ -64,6 +64,8 @@ import com.xpn.xwiki.web.Utils;
 public abstract class BaseCollection<R extends EntityReference> extends BaseElement<R>
     implements ObjectInterface, Cloneable
 {
+    private static final long serialVersionUID = 1L;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseCollection.class);
 
     /**
@@ -878,6 +880,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                 }
             }
         }
+
+        super.merge(previousElement, newElement, configuration, context, mergeResult);
     }
 
     protected void mergeField(PropertyInterface currentElement, ElementInterface previousElement,
@@ -940,12 +944,14 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     @Override
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
-        super.setOwnerDocument(ownerDocument);
+        if (this.ownerDocument != ownerDocument) {
+            super.setOwnerDocument(ownerDocument);
 
-        for (String propertyName : getPropertyList()) {
-            PropertyInterface property = getField(propertyName);
-            if (property instanceof BaseElement) {
-                ((BaseElement) property).setOwnerDocument(ownerDocument);
+            for (String propertyName : getPropertyList()) {
+                PropertyInterface property = getField(propertyName);
+                if (property instanceof BaseElement) {
+                    ((BaseElement) property).setOwnerDocument(ownerDocument);
+                }
             }
         }
     }

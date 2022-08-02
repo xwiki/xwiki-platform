@@ -27,9 +27,9 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Unit tests for {@link XWikiRequestCopier}.
@@ -37,7 +37,7 @@ import static org.junit.Assert.assertNull;
  * @version $Id$
  */
 @ComponentTest
-public class XWikiRequestCopierTest
+class XWikiRequestCopierTest
 {
     @InjectMockComponents
     private XWikiRequestCopier copier;
@@ -45,7 +45,7 @@ public class XWikiRequestCopierTest
     XWikiServletRequestStub originalRequest;
 
     @BeforeEach
-    public void beforeEach()
+    void beforeEach()
     {
         this.originalRequest = new XWikiServletRequestStub();
         this.originalRequest.setHost("host");
@@ -57,7 +57,7 @@ public class XWikiRequestCopierTest
     }
 
     @Test
-    public void copyRequest()
+    void copyRequest()
     {
         XWikiRequest copy = this.copier.copy(this.originalRequest);
         assertNotSame(this.originalRequest, copy);
@@ -74,7 +74,7 @@ public class XWikiRequestCopierTest
     }
 
     @Test
-    public void copyContextWhenNull()
+    void copyContextWhenNull()
     {
         assertNull(this.copier.copy(null));
     }

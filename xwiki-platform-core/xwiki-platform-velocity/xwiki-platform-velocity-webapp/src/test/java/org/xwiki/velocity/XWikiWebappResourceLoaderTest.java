@@ -19,43 +19,71 @@
  */
 package org.xwiki.velocity;
 
+import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.util.Properties;
 
 import javax.servlet.ServletContext;
 
 import org.apache.velocity.VelocityContext;
-import org.junit.Assert;
-import org.junit.Test;
+import org.apache.velocity.runtime.RuntimeConstants;
+import org.junit.jupiter.api.Test;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
-import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.xwiki.localization.LocalizationContext;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Integration test for {@link XWikiWebappResourceLoader}.
  *
  * @version $Id$
- * @since 3.0M3
  */
-public class XWikiWebappResourceLoaderTest extends AbstractComponentTestCase
+@ComponentTest
+@AllComponents
+public class XWikiWebappResourceLoaderTest
 {
+    @MockComponent
+    private ConfigurationSource configuration;
+
+    @MockComponent
+    private LocalizationContext localizationContext;
+
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
     @Test
     public void testVelocityInitialization() throws Exception
     {
-        // Fake the initialization of the Servlet Environment
-        ServletEnvironment environment = (ServletEnvironment) getComponentManager().getInstance(Environment.class);
-        environment.setServletContext(getMockery().mock(ServletContext.class));
-        
-        Properties properties = new Properties();
-        properties.setProperty("resource.loader", "xwiki");
-        properties.setProperty("xwiki.resource.loader.class", XWikiWebappResourceLoader.class.getName());
+        this.componentManager.registerMemoryConfigurationSource();
 
-        VelocityFactory factory = getComponentManager().getInstance(VelocityFactory.class);
+        // Fake the initialization of the Servlet Environment
+        ServletEnvironment environment = (ServletEnvironment) this.componentManager.getInstance(Environment.class);
+        ServletContext servletContext = mock(ServletContext.class);
+        environment.setServletContext(servletContext);
+        when(servletContext.getResourceAsStream("/templates/macros.vm"))
+            .thenReturn(new ByteArrayInputStream(new byte[0]));
+
+        VelocityFactory factory = this.componentManager.getInstance(VelocityFactory.class);
+
+        Properties properties = new Properties();
+        properties.setProperty(RuntimeConstants.RESOURCE_LOADERS, "xwiki");
+        properties.setProperty(RuntimeConstants.RESOURCE_LOADER + ".xwiki." + RuntimeConstants.RESOURCE_LOADER_CLASS,
+            XWikiWebappResourceLoader.class.getName());
+
         VelocityEngine engine = factory.createVelocityEngine("key", properties);
 
         // Ensure Velocity has been correctly initialized by trying to evaluate some content.
         StringWriter out = new StringWriter();
         engine.evaluate(new VelocityContext(), out, "template", "#set ($var = 'value')$var");
-        Assert.assertEquals("value", out.toString());
+        assertEquals("value", out.toString());
     }
 }

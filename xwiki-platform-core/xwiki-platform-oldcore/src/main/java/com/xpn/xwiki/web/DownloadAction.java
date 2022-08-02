@@ -21,16 +21,19 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.IllegalCharsetNameException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
@@ -39,6 +42,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -48,6 +52,8 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.resource.entity.EntityResourceReference;
+import org.xwiki.stability.Unstable;
+import org.xwiki.store.TemporaryAttachmentSessionsManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -62,6 +68,9 @@ import com.xpn.xwiki.util.Util;
  *
  * @version $Id$
  */
+@Component
+@Named("download")
+@Singleton
 public class DownloadAction extends XWikiAction
 {
     /** The identifier of the download action. */
@@ -74,15 +83,21 @@ public class DownloadAction extends XWikiAction
     public static final List<String> MIMETYPE_WHITELIST =
         Arrays.asList("audio/basic", "audio/L24", "audio/mp4", "audio/mpeg", "audio/ogg", "audio/vorbis",
             "audio/vnd.rn-realaudio", "audio/vnd.wave", "audio/webm", "image/gif", "image/jpeg", "image/pjpeg",
-            "image/png", "image/svg+xml", "image/tiff", "text/csv", "text/plain", "text/xml", "text/rtf",
-            "video/mpeg", "video/ogg", "video/quicktime", "video/webm", "video/x-matroska", "video/x-ms-wmv",
-            "video/x-flv");
+            "image/png", "image/tiff", "text/csv", "text/plain", "text/xml", "text/rtf", "video/mpeg",
+            "video/ogg", "video/quicktime", "video/webm", "video/x-matroska", "video/x-ms-wmv", "video/x-flv");
 
     /** Key of the whitelist in xwiki.properties. */
     public static final String WHITELIST_PROPERTY = "attachment.download.whitelist";
 
     /** Key of the blacklist in xwiki.properties. */
     public static final String BLACKLIST_PROPERTY = "attachment.download.blacklist";
+
+    /**
+     * Key of the forceDownload list in xwiki.properties.
+     * @since 12.10
+     */
+    @Unstable
+    public static final String FORCE_DOWNLOAD_PROPERTY = "attachment.download.forceDownload";
 
     /** The URL part separator. */
     private static final String SEPARATOR = "/";
@@ -93,13 +108,8 @@ public class DownloadAction extends XWikiAction
     /** The format of a valid range header. */
     private static final Pattern RANGE_HEADER_PATTERN = Pattern.compile("bytes=([0-9]+)?-([0-9]+)?");
 
-    /**
-     * Default constructor.
-     */
-    public DownloadAction()
-    {
-       this.handleRedirectObject = true;
-    }
+    @Inject
+    private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
 
     @Override
     public String render(XWikiContext context) throws XWikiException
@@ -155,12 +165,12 @@ public class DownloadAction extends XWikiAction
             // Try to load the attachment content just to make sure that the attachment really exists
             // This will throw an exception if the attachment content isn't available
             try {
-                attachment.getContentSize(context);
+                attachment.getContentLongSize(context);
             } catch (XWikiException e) {
                 Object[] args = { filename };
                 throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                    XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND,
-                    "Attachment content {0} not found", null, args);
+                    XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND, "Attachment content {0} not found", null,
+                    args);
             }
 
             long lastModifiedOnClient = request.getDateHeader("If-Modified-Since");
@@ -180,7 +190,7 @@ public class DownloadAction extends XWikiAction
                     // Broken response...
                 }
             }
-            sendContent(attachment, request, response, filename, context);
+            sendContent(attachment, request, response, context);
             return null;
         } finally {
             if (backwardCompatibilityContextObjects != null) {
@@ -189,12 +199,18 @@ public class DownloadAction extends XWikiAction
         }
     }
 
+    @Override
+    protected boolean supportRedirections()
+    {
+        return true;
+    }
+
     private void throwNotFoundException(String filename) throws XWikiException
     {
-        String message = filename == null ? "Attachment not found" :
-            String.format("Attachment [%s] not found", filename);
-        throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-            XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND, message);
+        String message =
+            filename == null ? "Attachment not found" : String.format("Attachment [%s] not found", filename);
+        throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND,
+            message);
     }
 
     /**
@@ -212,11 +228,8 @@ public class DownloadAction extends XWikiAction
      * @throws XWikiException if the attachment content cannot be retrieved
      * @throws IOException if the response cannot be written
      */
-    private boolean sendPartialContent(final XWikiAttachment attachment,
-        final XWikiRequest request,
-        final XWikiResponse response,
-        final XWikiContext context)
-        throws XWikiException, IOException
+    private boolean sendPartialContent(final XWikiAttachment attachment, final XWikiRequest request,
+        final XWikiResponse response, final XWikiContext context) throws XWikiException, IOException
     {
         String range = request.getHeader(RANGE_HEADER_NAME);
         Matcher m = RANGE_HEADER_PATTERN.matcher(range);
@@ -234,9 +247,9 @@ public class DownloadAction extends XWikiAction
                 return false;
             }
             if (end == null) {
-                end = attachment.getContentSize(context) - 1L;
+                end = attachment.getContentLongSize(context) - 1L;
             }
-            end = Math.min(end, attachment.getContentSize(context) - 1L);
+            end = Math.min(end, attachment.getContentLongSize(context) - 1L);
             writeByteRange(attachment, start, end, request, response, context);
             return true;
         }
@@ -256,11 +269,8 @@ public class DownloadAction extends XWikiAction
      * @throws XWikiException if the attachment content cannot be retrieved
      * @throws IOException if the response cannot be written
      */
-    private void writeByteRange(final XWikiAttachment attachment, Long start, Long end,
-        final XWikiRequest request,
-        final XWikiResponse response,
-        final XWikiContext context)
-        throws XWikiException, IOException
+    private void writeByteRange(final XWikiAttachment attachment, Long start, Long end, final XWikiRequest request,
+        final XWikiResponse response, final XWikiContext context) throws XWikiException, IOException
     {
         if (start >= 0 && start < attachment.getContentLongSize(context)) {
             InputStream data = attachment.getContentInputStream(context);
@@ -269,10 +279,10 @@ public class DownloadAction extends XWikiAction
             setCommonHeaders(attachment, request, response, context);
             response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
             if ((end - start + 1L) < Integer.MAX_VALUE) {
-                response.setContentLength((int) (end - start + 1));
+                setContentLength(response, end - start + 1);
             }
-            response.setHeader("Content-Range", "bytes " + start + "-" + end + SEPARATOR
-                + attachment.getContentLongSize(context));
+            response.setHeader("Content-Range",
+                "bytes " + start + "-" + end + SEPARATOR + attachment.getContentLongSize(context));
             IOUtils.copyLarge(data, response.getOutputStream());
         } else {
             response.setStatus(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
@@ -285,27 +295,21 @@ public class DownloadAction extends XWikiAction
      * @param attachment the attachment to get content from
      * @param request the current client request
      * @param response the response to write to.
-     * @param filename the filename to show in the message in case an exception needs to be thrown
      * @param context the XWikiContext just in case it is needed to load the attachment content
      * @throws XWikiException if something goes wrong
      */
-    private void sendContent(final XWikiAttachment attachment,
-        final XWikiRequest request,
-        final XWikiResponse response,
-        final String filename,
-        final XWikiContext context)
-        throws XWikiException
+    protected void sendContent(final XWikiAttachment attachment, final XWikiRequest request,
+        final XWikiResponse response, final XWikiContext context) throws XWikiException
     {
         InputStream stream = null;
         try {
             setCommonHeaders(attachment, request, response, context);
-            response.setContentLength(attachment.getContentSize(context));
+            setContentLength(response, attachment.getContentLongSize(context));
             stream = attachment.getContentInputStream(context);
             IOUtils.copy(stream, response.getOutputStream());
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,
-                "Exception while sending response", e);
+                XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while sending response", e);
         } finally {
             if (stream != null) {
                 IOUtils.closeQuietly(stream);
@@ -420,7 +424,25 @@ public class DownloadAction extends XWikiAction
                 attachment = document.getAttachmentList().get(id);
             }
         } else {
-            attachment = document.getAttachment(filename);
+            XWikiAttachment standardAttachment = document.getAttachment(filename);
+            DocumentReference documentReference = document.getDocumentReference();
+            Optional<XWikiAttachment> uploadedAttachmentOpt =
+                this.temporaryAttachmentSessionsManager.getUploadedAttachment(documentReference, filename);
+
+            // If there's no uploaded attachment, we always rely on the standard attachment, be it empty.
+            if (uploadedAttachmentOpt.isEmpty()) {
+                attachment = standardAttachment;
+            // If there's an uploaded attachment on current session, and no standard attachment, then we should display
+            // that one.
+            } else if (standardAttachment == null) {
+                attachment = uploadedAttachmentOpt.get();
+            // Finally, if there's both an uploaded attachment in current session and a standard one with same name,
+            // we use the uploaded one.
+            // TODO: this should be better handled since it's possible that the user who uploaded the attachment wants
+            // to see the original page with the old attachment: right now this usecase is not supported.
+            } else {
+                attachment = uploadedAttachmentOpt.get();
+            }
         }
 
         return attachment;
@@ -434,10 +456,8 @@ public class DownloadAction extends XWikiAction
      * @param response the response to write to.
      * @param context the current request context
      */
-    private void setCommonHeaders(final XWikiAttachment attachment,
-        final XWikiRequest request,
-        final XWikiResponse response,
-        final XWikiContext context)
+    private void setCommonHeaders(final XWikiAttachment attachment, final XWikiRequest request,
+        final XWikiResponse response, final XWikiContext context)
     {
         // Choose the right content type
         String mimetype = attachment.getMimeType(context);
@@ -449,8 +469,7 @@ public class DownloadAction extends XWikiAction
             response.setCharacterEncoding(characterEncoding);
         }
 
-        String ofilename =
-            Util.encodeURI(attachment.getFilename(), context).replaceAll("\\+", "%20");
+        String ofilename = Util.encodeURI(attachment.getFilename(), context).replaceAll("\\+", "%20");
 
         // The inline attribute of Content-Disposition tells the browser that they should display
         // the downloaded file in the page (see http://www.ietf.org/rfc/rfc1806.txt for more
@@ -463,14 +482,13 @@ public class DownloadAction extends XWikiAction
         boolean hasPR = false;
         String author = attachment.getAuthor();
         try {
-            hasPR =
-                context.getWiki().getRightService().hasAccessLevel(
-                    "programming", author, "XWiki.XWikiPreferences", context);
+            hasPR = context.getWiki().getRightService().hasAccessLevel("programming", author, "XWiki.XWikiPreferences",
+                context);
         } catch (Exception e) {
             hasPR = false;
         }
         // If the mimetype is not authorized to be displayed inline, let's force its content disposition to download.
-        if ((!hasPR && !isAuthorized(mimetype)) || "1".equals(request.getParameter("force-download"))) {
+        if (shouldBeDownloaded(hasPR, request, mimetype)) {
             dispType = ATTACHMENT;
         }
         // Use RFC 2231 for encoding filenames, since the normal HTTP headers only allows ASCII characters.
@@ -501,15 +519,48 @@ public class DownloadAction extends XWikiAction
         return start == null || end == null || end >= start;
     }
 
-    private boolean isAuthorized(String mimeType)
+    /**
+     * Check if an attachment should be downloaded or can be displayed inline.
+     * Attachments should be downloaded if:
+     * <ul>
+     *     <li>the request contains a force-download parameter with the value 1</li>
+     *     <li>or the mimetype is part of the forceDownload property list</li>
+     *     <li>or no custom whitelist exists and a custom blacklist exists and contains the mimetype and the attachment
+     *     has not been added by a user with programming rights</li>
+     *     <li>or the whitelist (default or custom) does not contains the mimetype and the attachment has not been added
+     *     by a user with programming rights</li>
+     * </ul>
+     *
+     * Note that in the case of the request does not contain a force-downloaded parameter with the value 1 and the
+     * mimetype is not part of the forceDownload property list, but the attachment has been added by a user with
+     * programming right, then the attachment is always displayed inline.
+     *
+     * @param hasPR a boolean indicating if the attachment has been added by someone with programming rights.
+     * @param request the current download request.
+     * @param mimeType the mimetype of the attachment.
+     * @return {@code true} if the attachment should be downloaded, and {@code false} if it can be displayed inline.
+     */
+    private boolean shouldBeDownloaded(boolean hasPR, XWikiRequest request, String mimeType)
     {
+        boolean result;
         ConfigurationSource configuration = Utils.getComponent(ConfigurationSource.class, "xwikiproperties");
-        if (configuration.containsKey(BLACKLIST_PROPERTY) && !configuration.containsKey(WHITELIST_PROPERTY)) {
-            List<String> blackList = (configuration.getProperty(BLACKLIST_PROPERTY, Collections.<String>emptyList()));
-            return !blackList.contains(mimeType);
+
+        boolean whiteListExists = configuration.containsKey(WHITELIST_PROPERTY);
+        boolean blackListExists = configuration.containsKey(BLACKLIST_PROPERTY);
+        List<String> blackList = configuration.getProperty(BLACKLIST_PROPERTY, Collections.emptyList());
+        List<String> whiteList = configuration.getProperty(WHITELIST_PROPERTY, MIMETYPE_WHITELIST);
+        List<String> forceDownloadList = configuration.getProperty(FORCE_DOWNLOAD_PROPERTY, Collections.emptyList());
+
+        if ("1".equals(request.getParameter("force-download")) || forceDownloadList.contains(mimeType)) {
+            result = true;
+        } else if (hasPR) {
+            result = false;
+        } else if (blackListExists && !whiteListExists) {
+            result = blackList.contains(mimeType);
         } else {
-            List<String> whiteList = configuration.getProperty(WHITELIST_PROPERTY, MIMETYPE_WHITELIST);
-            return whiteList.contains(mimeType);
+            result = !whiteList.contains(mimeType);
         }
+
+        return result;
     }
 }

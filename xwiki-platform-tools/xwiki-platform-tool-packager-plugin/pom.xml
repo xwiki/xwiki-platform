@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tools</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
   <name>XWiki Platform - Tools - Packager</name>
@@ -36,8 +36,6 @@
    </description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.01</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>4</xwiki.pitest.mutationThreshold>
-
     <!-- It might be causing issue with this plugin build but not sure why and it's quite random -->
     <xwiki.spoon.skip>true</xwiki.spoon.skip>
   </properties>
@@ -46,6 +44,11 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-tool-extension-plugin</artifactId>
       <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-core</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -59,7 +62,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.velocity</groupId>
-      <artifactId>velocity</artifactId>
+      <artifactId>velocity-engine-core</artifactId>
     </dependency>
     <!-- Plexus -->
     <dependency>
@@ -111,15 +114,26 @@
       <artifactId>javax.servlet-api</artifactId>
       <scope>runtime</scope>
     </dependency>
-    <!-- These dependencies are needed at runtime when this plugin executes. We list them here to be sure that any
-         pom.xml that uses this packager plugin is built after those deps are built -->
+    <!-- Needed to unpack the Flamingo skin resourced into the custom WAR -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
       <version>${project.version}</version>
-      <type>zip</type>
-      <scope>runtime</scope>
+      <!-- Using provided even though it's not strictly required but in case some other module depend on this one, to
+           stop the chain -->
+      <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
+      <version>${project.version}</version>
+      <type>zip</type>
+      <!-- Using provided even though it's not strictly required but in case some other module depend on this one, to
+           stop the chain -->
+      <scope>provided</scope>
+    </dependency>
+    <!-- These dependencies are needed at runtime when this plugin executes. We list them here to be sure that any
+         pom.xml that uses this packager plugin is built after those deps are built -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-tool-configuration-resources</artifactId>
@@ -128,14 +142,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
-      <version>${project.version}</version>
-      <type>zip</type>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-web</artifactId>
+      <artifactId>xwiki-platform-web-war</artifactId>
       <version>${project.version}</version>
       <type>war</type>
       <scope>runtime</scope>
@@ -197,13 +204,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-security-bridge</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-security-script</artifactId>
+      <artifactId>xwiki-platform-security-authorization-bridge</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -316,6 +317,67 @@
       <artifactId>xwiki-platform-captcha-default</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
+    </dependency>
+    <!-- Authentication Default Module -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-authentication-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-authentication-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- The default name strategies components to enable checks and transformation on page names -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-model-validation-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- The default User API + script implementations, needed by oldcore, platform web and more -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-user-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-user-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Needed for Jobs components -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-job-default</artifactId>
+      <version>${commons.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Needed to wait for document backlink indexation queue to be consumed. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-index-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- Dependencies not needed by the plugin itself but included in the WAR it generates,
+         listed to be sure it's built before the plugin -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-velocity-webapp</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <!-- Test Dependencies -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>

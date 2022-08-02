@@ -19,7 +19,9 @@
  */
 package org.xwiki.rendering.macro.dashboard;
 
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyDisplayType;
 
 /**
  * Parameters for the dashboard macro.
@@ -100,10 +102,11 @@ public class DashboardMacroParameters
 
     /**
      * @param source the source to set
-     * @since 3.0M3 
+     * @since 3.0M3
      */
     @PropertyDescription("The source of the dashboard macro, as a serialized document reference, where the gadget "
         + "configurations (objects) should be read from. By default the current document will be used.")
+    @PropertyDisplayType(DocumentReference.class)
     public void setSource(String source)
     {
         this.source = source;

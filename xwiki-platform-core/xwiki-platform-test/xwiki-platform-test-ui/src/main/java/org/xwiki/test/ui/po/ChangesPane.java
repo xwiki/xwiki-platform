@@ -125,7 +125,7 @@ public class ChangesPane extends BaseElement
     public boolean hasNoChanges()
     {
         return getDriver().findElementsWithoutWaiting(container,
-            By.xpath("div[@class = 'infomessage' and . = 'No changes']")).size() > 0
+            By.xpath("//div[@class = 'infomessage' and . = 'No changes']")).size() > 0
             && getChangedEntities().isEmpty();
     }
 

@@ -51,6 +51,5 @@ Följande syntaxer finns implementerade i XWiki enterprise 1.6 och senare:
 * [[Creole 1.0&gt;&gt;http://www.wikicreole.org/wiki/Creole1.0]]
 * [[XHTML 1.0&gt;&gt;http://www.w3.org/TR/xhtml1/]]
 
-{{warning}}Implementationen för dessa syntaxer är ej kompletta ännu.  Länkar fungerar exempelvis inte alltid som förväntat.  Vi måste även bestämma om syntaxerna skall utökas för att stödja XWiki-specifik funktionalitet såsom möjligheten att länka till en annan virtuell wiki.{{/warning}}
-</content>
+{{warning}}Implementationen för dessa syntaxer är ej kompletta ännu.  Länkar fungerar exempelvis inte alltid som förväntat.  Vi måste även bestämma om syntaxerna skall utökas för att stödja XWiki-specifik funktionalitet såsom möjligheten att länka till en annan virtuell wiki.{{/warning}}</content>
 </xwikidoc>

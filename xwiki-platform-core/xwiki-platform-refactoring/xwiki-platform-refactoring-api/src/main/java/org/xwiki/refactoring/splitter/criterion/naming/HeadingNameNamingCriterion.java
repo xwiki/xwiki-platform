@@ -139,7 +139,8 @@ public class HeadingNameNamingCriterion implements NamingCriterion
         }
 
         // Truncate long document names.
-        int maxWidth = (documentNames.contains(documentName) || docBridge.exists(documentName)) ? 252 : 255;
+        // TODO: the value should be asked to the store API instead of being hardcoded
+        int maxWidth = (documentNames.contains(documentName) || docBridge.exists(documentName)) ? 765 : 768;
         if (documentName.length() > maxWidth) {
             documentName = documentName.substring(0, maxWidth);
         }

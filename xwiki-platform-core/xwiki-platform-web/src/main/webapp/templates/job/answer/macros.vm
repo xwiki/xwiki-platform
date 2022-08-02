@@ -1,6 +1,0 @@
-#template('job_macros.vm')
-
-#macro(answerResponse)
-  #getJobStatusJSON($job.status $json)
-  $jsontool.serialize($json)
-#end

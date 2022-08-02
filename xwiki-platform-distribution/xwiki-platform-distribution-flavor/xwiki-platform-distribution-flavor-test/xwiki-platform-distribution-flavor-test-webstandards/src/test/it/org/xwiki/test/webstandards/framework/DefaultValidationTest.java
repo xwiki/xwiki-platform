@@ -26,9 +26,14 @@ import java.io.PrintStream;
 import java.io.StringReader;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.lang3.StringUtils;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.integration.junit.LogCaptureConfiguration;
+import org.xwiki.test.integration.junit.LogCaptureValidator;
 import org.xwiki.validator.ValidationError;
 import org.xwiki.validator.Validator;
 
@@ -63,11 +68,15 @@ public class DefaultValidationTest extends AbstractValidationTest
      */
     protected ByteArrayOutputStream err;
 
+    private LogCaptureValidator logCaptureValidator;
+    private LogCaptureConfiguration logCaptureConfiguration;
+
     public DefaultValidationTest(Target target, HttpClient client, Validator validator, String credentials)
         throws Exception
     {
         super("testDocumentValidity", target, client, credentials);
 
+        this.logCaptureValidator = new LogCaptureValidator();
         this.validator = validator;
     }
 
@@ -75,6 +84,8 @@ public class DefaultValidationTest extends AbstractValidationTest
     protected void setUp() throws Exception
     {
         super.setUp();
+        this.logCaptureConfiguration = new LogCaptureConfiguration();
+        this.registerExpectedLogs();
 
         // TODO Until we find a way to incrementally display the result of tests this stays
         System.out.println(getName());
@@ -87,6 +98,30 @@ public class DefaultValidationTest extends AbstractValidationTest
         this.stderr = System.err;
         this.err = new ByteArrayOutputStream();
         System.setErr(new PrintStream(this.err));
+    }
+
+    private void registerExpectedLogs()
+    {
+        Target resetPassword = new DocumentReferenceTarget(new DocumentReference("xwiki", "XWiki", "ResetPassword",
+            Locale.ROOT));
+        if (this.target.equals(resetPassword)) {
+            this.logCaptureConfiguration.registerExpected("[DEPRECATED] The page [XWiki.ResetPassword] "
+                + "should not be used anymore in favor of the new 'authenticate/resetpassword' URL.");
+        }
+
+        Target resetPasswordComplete = new DocumentReferenceTarget(
+            new DocumentReference("xwiki", "XWiki", "ResetPasswordComplete", Locale.ROOT));
+        if (this.target.equals(resetPasswordComplete)) {
+            this.logCaptureConfiguration.registerExpected("[DEPRECATED] The page [XWiki.ResetPasswordComplete] "
+                + "should not be used anymore in favor of the new 'authenticate/resetpassword' URL.");
+        }
+
+        Target forgotUsername = new DocumentReferenceTarget(
+            new DocumentReference("xwiki", "XWiki", "ForgotUsername", Locale.ROOT));
+        if (this.target.equals(forgotUsername)) {
+            this.logCaptureConfiguration.registerExpected("[DEPRECATED] The page [XWiki.ForgotUsername] "
+                + "should not be used anymore in favor of the new 'authenticate/retrieveusername' URL.");
+        }
     }
 
     @Override
@@ -102,12 +137,12 @@ public class DefaultValidationTest extends AbstractValidationTest
         System.err.print(errput);
 
         // Detect server-side error/warning messages from the stdout
-        assertFalse("Errors found in the stdout output", hasLogErrors(output));
-        assertFalse("Warnings found in the stdout output", hasLogWarnings(output));
+        assertFalse(String.format("Errors found in the stdout output: [%s]", output), hasLogErrors(output));
+        this.logCaptureValidator.validate(output, this.logCaptureConfiguration, false);
 
         // Detect server-side error/warning messages from the stderr
-        assertFalse("Errors found in the stderr output", hasLogErrors(errput));
-        assertFalse("Warnings found in the stderr output", hasLogWarnings(errput));
+        assertFalse(String.format("Errors found in the stderr output: [%s]", errput), hasLogErrors(errput));
+        this.logCaptureValidator.validate(errput, this.logCaptureConfiguration);
 
         super.tearDown();
     }
@@ -136,7 +171,8 @@ public class DefaultValidationTest extends AbstractValidationTest
             if (error.getType() == ValidationError.Type.WARNING) {
                 if (error.getLine() >= 0) {
                     System.out
-                        .println("Warning at " + error.getLine() + ":" + error.getColumn() + " " + error.getMessage());
+                        .println(
+                            "Warning at " + error.getLine() + ":" + error.getColumn() + " " + error.getMessage());
                 } else {
                     System.out.println("Warning " + error.getMessage());
                 }
@@ -190,11 +226,11 @@ public class DefaultValidationTest extends AbstractValidationTest
 
     protected boolean hasLogErrors(String output)
     {
-        return output.indexOf("ERROR") >= 0 || output.indexOf("ERR") >= 0;
+        return StringUtils.containsIgnoreCase(output, "error") || StringUtils.containsIgnoreCase(output, "err");
     }
 
     protected boolean hasLogWarnings(String output)
     {
-        return output.indexOf("WARNING") >= 0 || output.indexOf("WARN") >= 0;
+        return StringUtils.containsIgnoreCase(output, "warning") || StringUtils.containsIgnoreCase(output, "warn");
     }
 }

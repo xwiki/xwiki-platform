@@ -19,28 +19,55 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.model.reference.DocumentReference;
+import java.util.List;
 
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import org.junit.jupiter.api.Test;
+import org.xwiki.diff.internal.DefaultDiffManager;
+import org.xwiki.logging.LogLevel;
+import org.xwiki.logging.event.LogEvent;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.store.merge.MergeManager;
+import org.xwiki.store.merge.MergeManagerResult;
+import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.MockComponent;
+
+import com.xpn.xwiki.doc.merge.MergeConfiguration;
+import com.xpn.xwiki.doc.merge.MergeResult;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the {@link BaseClass} class.
  *
  * @version $Id$
  */
+@OldcoreTest
+// @formatter:off
+@ComponentList({
+    DefaultDiffManager.class
+})
+// @formatter:on
 @ReferenceComponentList
-public class BaseClassTest
+class BaseClassTest
 {
-    @Rule
-    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
+
+    @MockComponent
+    private MergeManager mergeManager;
 
     @Test
-    public void setDocumentReference() throws Exception
+    void setDocumentReference()
     {
         BaseClass baseClass = new BaseClass();
 
@@ -51,7 +78,7 @@ public class BaseClassTest
     }
 
     @Test
-    public void setNameSetWiki() throws Exception
+    void setNameSetWiki()
     {
         String database = this.oldcore.getXWikiContext().getWikiId();
         BaseClass baseClass = new BaseClass();
@@ -64,7 +91,7 @@ public class BaseClassTest
     }
 
     @Test
-    public void setNameAloneWithChangingContext() throws Exception
+    void setNameAloneWithChangingContext()
     {
         String database = this.oldcore.getXWikiContext().getWikiId();
         BaseClass baseClass = new BaseClass();
@@ -107,7 +134,7 @@ public class BaseClassTest
     }
 
     @Test
-    public void addTextAreaFieldWhenNullContentType() throws Exception
+    void addTextAreaFieldWhenNullContentType()
     {
         BaseClass baseClass = new BaseClass();
 
@@ -122,12 +149,80 @@ public class BaseClassTest
     }
 
     @Test
-    public void addTextAreaFieldWhenExistingNumberField() throws Exception
+    void addTextAreaFieldWhenExistingNumberField()
     {
         BaseClass baseClass = new BaseClass();
 
         baseClass.addNumberField("field", "int pretty name", 30, "int");
 
         assertTrue(baseClass.addTextAreaField("field", "pretty name", 55, 33));
+    }
+
+    @Test
+    void merge()
+    {
+        BaseClass previousClass = new BaseClass();
+        previousClass.setPrettyName("previous");
+        previousClass.setValidationScript("my validation script");
+        previousClass.setDefaultEditSheet("A previous edit sheet");
+
+        BaseClass currentClass = new BaseClass();
+        currentClass.setPrettyName("current");
+        currentClass.setValidationScript("my validation script");
+        currentClass.setDefaultEditSheet("An edit sheet");
+
+        BaseClass newClass = new BaseClass();
+        newClass.setPrettyName("new");
+        newClass.setValidationScript("my new validation script");
+        newClass.setDefaultEditSheet("A previous edit sheet");
+
+        when(mergeManager.mergeObject(any(), any(), any(), any())).thenReturn(new MergeManagerResult<>());
+
+        MergeManagerResult<String, String> mergeManagerResult = new MergeManagerResult<>();
+        mergeManagerResult.setMergeResult("current");
+        mergeManagerResult.setModified(false);
+        mergeManagerResult.getLog().error("Failed to merge objects: previous=[previous] new=[new] current=[current]");
+        when(mergeManager.mergeObject(eq("previous"), eq("new"), eq("current"), any())).thenReturn(mergeManagerResult);
+
+        mergeManagerResult = new MergeManagerResult<>();
+        mergeManagerResult.setMergeResult("my new validation script");
+        mergeManagerResult.setModified(true);
+        when(mergeManager
+            .mergeObject(eq("my validation script"), eq("my new validation script"), eq("my validation script"), any()))
+            .thenReturn(mergeManagerResult);
+
+        mergeManagerResult = new MergeManagerResult<>();
+        mergeManagerResult.setMergeResult("An edit sheet");
+        mergeManagerResult.setModified(false);
+        when(mergeManager
+            .mergeObject(eq("A previous edit sheet"), eq("A previous edit sheet"), eq("An edit sheet"), any()))
+            .thenReturn(mergeManagerResult);
+
+        MergeResult mergeResult = new MergeResult();
+        currentClass.merge(previousClass, newClass, new MergeConfiguration(), oldcore.getXWikiContext(), mergeResult);
+
+        List<LogEvent> errors = mergeResult.getLog().getLogsFrom(LogLevel.ERROR);
+        assertEquals(1, errors.size());
+        assertEquals("ERROR:Failed to merge objects: previous=[previous] new=[new] current=[current]",
+            errors.get(0).toString());
+
+        assertTrue(mergeResult.isModified());
+        assertEquals("current", currentClass.getPrettyName());
+        assertEquals("my new validation script", currentClass.getValidationScript());
+        assertEquals("An edit sheet", currentClass.getDefaultEditSheet());
+    }
+
+    @Test
+    void addStaticListField()
+    {
+        BaseClass baseClass = new BaseClass();
+
+        StaticListClass slc = baseClass.addStaticListField("field");
+        slc.setPrettyName("Custom Field");
+
+        assertNotNull(slc);
+        assertNotNull(slc.getObject());
+        assertNotNull(baseClass.get("field"));
+        assertEquals("Custom Field", ((StaticListClass) baseClass.get("field")).getPrettyName());
     }
 }

@@ -1,0 +1,216 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="XWiki.Notifications.Code.Translations" locale="pl">
+  <web>XWiki.Notifications.Code</web>
+  <name>Translations</name>
+  <language>pl</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Notifications.Code.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <parent>XWiki.Notifications.Code.WebHome</parent>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>platform.core.profile.category.notifications=powiadomienia
+notifications.filters.cancel=anuluj
+notifications.filters.submit=zapisz
+notifications.filters.type.label=typ filtra:
+notifications.filters.type.hint=Jak filtr powinien działać w stosunku do zdarzenia w podanej lokalizacji
+notifications.filters.location.label=zakres filtra:
+notifications.filters.location.hint=Jaka część wiki powinien dotyczyć filtr?
+
+## Advanced filters options
+notifications.settings.filters.advanced=zaawansowane opcje filtrowania
+notifications.filters.advanced.toggles.hint=Te filtry są domyślnie aktywowane, możesz je wyłączyć za pomocą przycisku obok każdego filtra.
+notifications.filters.advanced.toggles.table.name=nazwa filtra
+notifications.filters.advanced.toggles.table.description=opis
+notifications.filters.advanced.toggles.table.toggle=przełącznik
+notifications.filters.advanced.modal.close=zamknij
+
+## Filters names
+notifications.filters.name.systemUserNotificationFilter=filtr systemu
+notifications.filters.description.systemUserNotificationFilter=ukryj powiadomienia z system użytkownika
+notifications.filters.name.ownEventsNotificationFilter=filtr zdarzeń własnych
+notifications.filters.description.ownEventsNotificationFilter=ukryj powiadomienia o twojej aktywności
+notifications.filters.name.eventReadAlertFilter=Przeczytaj filtr zdarzeń (alert)
+notifications.filters.description.eventReadAlertFilter=ukryj powiadomienia które oznaczyłeś jako przeczytane
+notifications.filters.name.eventReadEmailFilter=przeczytaj filtr zdarzeń (email)
+notifications.filters.description.eventReadEmailFilter=ukryj powiadomienia które oznaczyłeś jako przeczytane
+notifications.filters.name.minorEventAlertNotificationFilter=drugorzędne wydarzenie (alert)
+notifications.filters.description.minorEventAlertNotificationFilter=Ukryj powiadomienia dotyczące drobnych zmian na stronach
+notifications.filters.name.minorEventEmailNotificationFilter=drugorzędne wydarzenie (email)
+notifications.filters.description.minorEventEmailNotificationFilter=Ukryj powiadomienia dotyczące drobnych zmian na stronach
+
+## Filter Types
+notifications.filters.type.inclusive=włącznie
+notifications.filters.type.exclusive=wyłączny
+
+## Translation keys for the scopeNotificationFilter
+notifications.filters.preferences.scopeNotificationFilter.name=Filtr powiadomień o zakresie
+notifications.filters.preferences.scopeNotificationFilter.page=tylko strona
+notifications.filters.preferences.scopeNotificationFilter.space=Strona i dziecko
+notifications.filters.preferences.scopeNotificationFilter.wiki=Wiki
+
+notifications.filters.preferences.allEvents=-
+
+notifications.filters.preferences.addPreference.filterType.inclusive=włącznie
+notifications.filters.preferences.addPreference.filterType.exclusive=Wyłączny
+notifications.filters.preferences.addPreference.notificationFormat.label=Format powiadomienia
+notifications.filters.preferences.addPreference.notificationFormat.hint=Do jakiego formatu powiadomienia powinien stosować filtr?
+notifications.filters.preferences.addPreference.eventType.label=Typ wydarzenia
+notifications.filters.preferences.addPreference.eventType.hint=Który typ zdarzenia powinien być kierowany przez filtr?
+notifications.filters.preferences.addPreference.location.label=Filtruj zakres
+notifications.filters.preferences.addPreference.location.hint=Która strona powinna być kierowana przez filtr?
+notifications.filters.preferences.delete.inProgress=Usuwam ...
+notifications.filters.preferences.delete.done=Usunięto preferencję filtra!
+notifications.filters.preferences.delete.error=Nie udało się usunąć preferencji filtra
+notifications.filters.preferences.setEnabled.inProgress=Zaoisywanie...
+notifications.filters.preferences.setEnabled.done=Filtr preferencji zapisany!
+notifications.filters.preferences.setEnabled.error=Nie udało się zapisać preferencji filtra
+
+## Notifications toggles
+notifications.toggle.disabled.hint=Aby oglądać te lokalizacje, musisz włączyć powiadomienia w ustawieniach
+
+## Notifications formats
+notifications.format.alert=Alarm
+notifications.format.email=Poczta
+
+## Filter preferences settings
+notifications.settings.filters.preferences.title=Filtry
+notifications.settings.filters.preferences.hint=Twórz filtry, aby precyzyjniej kontrolować, kiedy aktywne zdarzenia powinny wyzwalać powiadomienia.
+notifications.settings.filters.preferences.forGuest=Zaloguj się lub zarejestruj, aby obsługiwać filtry powiadomień.
+
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.table.name=Nazwa
+notifications.settings.filters.preferences.table.filterType=Rodzaj filtra
+notifications.settings.filters.preferences.table.eventTypes=Wydarzenia
+notifications.settings.filters.preferences.table.notificationFormats=Formaty
+notifications.settings.filters.preferences.table.isEnabled=Jest włączony?
+notifications.settings.filters.preferences.table._actions=działania
+
+notifications.menu.header=Powiadomienia
+notifications.menu.header.settings=Ustawienia
+notifications.menu.clear=Wyczyść wszystko
+notifications.menu.clearing=Usuwanie powiadomień
+notifications.menu.cleared=Powiadomienia zostały usunięte
+notifications.settings.title=Preferencje powiadomień
+notifications.settings.error.notAdmin=Aby to zobaczyć, musisz być administratorem.
+notifications.settings.menu=Menu powiadomień
+notifications.settings.menu.hint=Menu powiadomień znajduje się w prawym górnym rogu strony i można je wyświetlić, klikając dzwonek ({0})
+notifications.settings.email=Email
+notifications.settings.email.forGuest=Zaloguj się lub zarejestruj, aby obsługiwać ustawienia powiadomień.
+notifications.settings.email.disabled=Powiadomienia e-mail są wyłączone. Skontaktuj się z administratorem.
+notifications.settings.email.hint=Regularnie wysyłany jest e-mail z podsumowaniem wydarzeń na wiki
+notifications.settings.email.title=Preferencje e-mail
+notifications.settings.email.frequency=Częstotliwość e-mail
+notifications.settings.email.frequency.hint=Wybierz, jak często chcesz otrzymywać wiadomości e-mail ze streszczeniem wydarzeń na wiki.
+notifications.settings.email.diffType.hint=Wybierz poziom szczegółowości, jaki chcesz otrzymywać o wszystkich zmianach w wiadomości e-mail.
+notifications.settings.saving=Twoje ustawienia są zapisywane ...
+notifications.settings.saved=Zapisano!
+notifications.settings.savingfailed=Nie udało się zapisać ustawień
+notifications.settings.filters=Filtry ({0})
+notifications.settings.addFilter=Dodaj filtr
+notifications.settings.errorFilterWiki=Błąd: musisz wybrać wiki, a nie stronę
+notifications.settings.preferences=Preferencje
+notifications.settings.preferences.hint=Przechwytuj wydarzenia, które mają miejsce, i przesyłaj je strumieniowo lub pocztą e-mail.
+notifications.settings.applications.title=Aplikacje
+notifications.settings.applications.hint=To jest lista aplikacji, które mogą wysyłać powiadomienia. Możesz włączyć lub wyłączyć dowolny z nich.
+notifications.settings.applications.forGuest=Zaloguj się lub zarejestruj, aby obsługiwać ustawienia powiadomień.
+notifications.settings.applications.appName=Nazwa
+notifications.settings.events=Wydarzenia
+notifications.settings.watch.title=Obejrzane strony
+notifications.settings.watch.autowatchmode=Automatyczne oglądanie strony
+notifications.settings.watch.autowatchmode.hint=Zdecyduj, czy chcesz oglądać stronę po zakończeniu pracy
+notifications.settings.watch.forGuest=Zaloguj się lub zarejestruj, aby obsługiwać ustawienia powiadomień.
+notifications.settings.watch.disabled=Obserwowane byty są wyłączone. Skontaktuj się z administratorem.
+notifications.events.by=pod redakcją {0}.
+notifications.events.lastChange=Ostatnia zmiana: {0}.
+notifications.events.lastComment=Ostatni komentarz: {0}.
+notifications.preferences.scope.table.scope=Zakres
+notifications.preferences.scope.table.location=Lokalizacja
+notifications.preferences.scope.table.scopeFilterType=Rodzaj filtra
+notifications.preferences.scope.table._actions=działania
+notifications.email.title=Zdarzenia na wiki:
+### Missing: notifications.email.subject={0} event(s) on the wiki
+notifications.email.seeChanges=Zmiany: {0}
+notifications.email.linkDetails=Patrz szczegóły
+notifications.rss.feedLink=Kanał RSS
+notifications.rss.feedLinkDescription=Kanał zdarzeń dla powiadomień
+notifications.rss.feedTitle=Powiadomienia Kanał RSS
+notifications.rss.feedDescription=Ten kanał RSS można dostosować na stronie swojego profilu.
+notifications.rss.seeChanges=Zmiany: {0}
+### Missing: notifications.rss.defaultTitleWithPage=New event on {0}
+### Missing: notifications.rss.defaultTitle=New event
+notifications.globalsettings.email=Powiadomienia e-mail
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily=Codziennie
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly=Cogodzinny
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_weekly=Co tydzień
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_live=Relacja na żywo
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType=Szczegóły zmian
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_NOTHING=Nic
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_STANDARD=Standardowy
+XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_inclusive=Włącznie
+XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_exclusive=Ekskluzywny
+XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NONE=Nigdy
+XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_ALL=Za każdym razem, gdy dokonam modyfikacji
+XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_MAJOR=Za każdym razem, gdy dokonam ważnej modyfikacji
+XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NEW=Tylko wtedy, gdy utworzę nową stronę
+
+## User profile
+notifications.userprofile.following=Następujący
+notifications.userprofile.notfollowing=Nie śledzić
+notifications.userprofile.follow=Zacznij obserwować
+notifications.userprofile.unfollow=Przestań obserwować
+notifications.userprofile.done=Zrobione
+notifications.userprofile.saving=Zapisywanie...
+notifications.userprofile.error=Błąd podczas zapisywania ustawienia powiadomienia
+
+## Macros description
+rendering.macro.notificationsApplicationsPreferences.name=Powiadomienia Preferencje aplikacji
+rendering.macro.notificationsApplicationsPreferences.description=Wyświetl preferencje bieżącego użytkownika dotyczące aplikacji powiadomień.
+rendering.macro.notificationsApplicationsPreferences.parameter.target.name=Cel
+rendering.macro.notificationsApplicationsPreferences.parameter.target.description=Cel makra (może to być „użytkownik” dla bieżącego użytkownika lub „wiki” dla bieżącej wiki)
+
+rendering.macro.notificationsAutoWatchPreferences.name=Powiadomienia Preferencje automatycznego oglądania
+rendering.macro.notificationsAutoWatchPreferences.description=Wyświetl preferencje bieżącego użytkownika dotyczące automatycznie oglądanych stron.
+rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=Cel
+rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=Cel makra (może to być „użytkownik” dla bieżącego użytkownika lub „wiki” dla bieżącej wiki)
+
+## Toggle notification filters labels
+notifications.filters.preferences.label.page=Przełącz tylko powiadomienia strony
+notifications.filters.preferences.label.space=Przełącz powiadomienia strony i dzieci
+notifications.filters.preferences.label.wiki=Przełącz powiadomienia Wiki
+
+## Notifications switches
+notifications.switches.tooltip.page=Obejrzyj tę stronę
+notifications.switches.tooltip.pageAndChildren=Obejrzyj tę stronę i jej dzieci
+notifications.switches.tooltip.space=Obejrzyj stronę nadrzędną i jej dzieci
+notifications.switches.tooltip.wiki=Obejrzyj tę wiki
+notifications.switches.changeStatusError=Nie udało się zmienić statusu powiadomień.</content>
+</xwikidoc>

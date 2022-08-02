@@ -31,9 +31,12 @@ import java.util.zip.ZipOutputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.test.annotation.AllComponents;
 
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
 /**
  * Utility functions used by ImportTest and PackageTest.
@@ -41,8 +44,12 @@ import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
  * @since 4.1M2
  * @version $Id$
  */
-public abstract class AbstractPackageTest extends AbstractBridgedXWikiComponentTestCase
+@OldcoreTest
+@AllComponents
+public abstract class AbstractPackageTest
 {
+    @InjectMockitoOldcore
+    MockitoOldcore oldcore;
 
     /**
      * Create a XAR file using java.util.zip.
@@ -68,7 +75,7 @@ public abstract class AbstractPackageTest extends AbstractBridgedXWikiComponentT
             }
             ZipEntry zipe = new ZipEntry(zipEntryName);
             zos.putNextEntry(zipe);
-            String xmlCode = docs[i].toXML(false, false, false, false, getContext());
+            String xmlCode = docs[i].toXML(false, false, false, false, this.oldcore.getXWikiContext());
             zos.write(getEncodedByteArray(xmlCode, encodings[i]));
         }
         zos.finish();
@@ -112,7 +119,7 @@ public abstract class AbstractPackageTest extends AbstractBridgedXWikiComponentT
             }
             ZipArchiveEntry zipe = new ZipArchiveEntry(zipEntryName);
             zos.putArchiveEntry(zipe);
-            String xmlCode = docs[i].toXML(false, false, false, false, getContext());
+            String xmlCode = docs[i].toXML(false, false, false, false, this.oldcore.getXWikiContext());
             zos.write(getEncodedByteArray(xmlCode, encodings[i]));
             zos.closeArchiveEntry();
         }

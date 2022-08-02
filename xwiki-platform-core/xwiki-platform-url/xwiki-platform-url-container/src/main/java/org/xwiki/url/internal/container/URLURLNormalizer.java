@@ -43,6 +43,16 @@ public class URLURLNormalizer implements URLNormalizer<URL>
     @Override
     public URL normalize(ExtendedURL partialURL)
     {
-        return null;
+        URL result;
+
+        // If the passed ExtendedURL wraps a full URL then return it.
+        URL wrappedURL = partialURL.getWrappedURL();
+        if (wrappedURL != null) {
+            result = wrappedURL;
+        } else {
+            // TODO: Implement it!
+            result = null;
+        }
+        return result;
     }
 }

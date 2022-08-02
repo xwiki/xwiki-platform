@@ -75,6 +75,5 @@ Mail.SendMailStatus_livetable.error=Kļūda
 Mail.SendMailStatus_livetable.actions=Darbības
 Mail.SendMailStatus_livetable.resend=Nosūtīt vēlreiz
 mailSender.admin.resendSuccess=E-pasts veiksmīgi nosūtīts
-mailSender.admin.resendFailure=Neizdevās nosūtīt e-pastu. Klikšķiet, lai gūtu papildu informāciju.
-</content>
+mailSender.admin.resendFailure=Neizdevās nosūtīt e-pastu. Klikšķiet, lai gūtu papildu informāciju.</content>
 </xwikidoc>

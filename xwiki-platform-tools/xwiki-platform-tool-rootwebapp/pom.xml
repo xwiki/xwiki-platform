@@ -25,12 +25,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tools</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-rootwebapp</artifactId>
   <packaging>war</packaging>
   <name>XWiki Platform - Tools - Root Webapp</name>
   <description>Contains a simple webapp whose purpose is to redirect to the XWiki one, and provide support for certain WebDAV clients.</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>javax.servlet</groupId>

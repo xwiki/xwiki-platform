@@ -21,6 +21,7 @@ package org.xwiki.search.solr.internal.job;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.xwiki.model.internal.reference.comparator.DocumentReferenceComparator;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 

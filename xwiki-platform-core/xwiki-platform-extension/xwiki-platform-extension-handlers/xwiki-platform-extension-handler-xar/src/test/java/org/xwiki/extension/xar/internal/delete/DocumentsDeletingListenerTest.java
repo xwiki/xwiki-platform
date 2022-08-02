@@ -54,7 +54,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -165,8 +165,8 @@ public class DocumentsDeletingListenerTest
         // Verify
         verify(mocker.getMockedLogger()).warn(
                 "XAR Extension Documents Deleting Listener will not check the document in non-interactive mode.");
-        verifyZeroInteractions(status);
-        verifyZeroInteractions(repository);
+        verifyNoInteractions(status);
+        verifyNoInteractions(repository);
     }
 
     @Test

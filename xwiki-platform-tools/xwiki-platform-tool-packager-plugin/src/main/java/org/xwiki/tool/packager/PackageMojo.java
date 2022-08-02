@@ -53,7 +53,6 @@ import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -64,8 +63,6 @@ import org.apache.maven.repository.RepositorySystem;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
-import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.xwiki.tool.utils.AbstractOldCoreMojo;
@@ -95,16 +92,10 @@ public class PackageMojo extends AbstractOldCoreMojo
     private File outputClassesDirectory;
 
     /**
-     * Used to look up Artifacts in the remote repository.
+     * * Used to look up Artifacts in the remote repository.
      */
     @Component
     protected RepositorySystem repositorySystem;
-
-    /**
-     * Local repository to be used by the plugin to resolve dependencies.
-     */
-    @Parameter(property = "localRepository")
-    protected ArtifactRepository localRepository;
 
     /**
      * List of remote repositories to be used by the plugin to resolve dependencies.
@@ -203,7 +194,7 @@ public class PackageMojo extends AbstractOldCoreMojo
     }
 
     @Override
-    public void executeInternal() throws MojoExecutionException, MojoFailureException
+    public void executeInternal() throws MojoExecutionException
     {
         LogUtils.configureXWikiLogs();
 
@@ -220,7 +211,7 @@ public class PackageMojo extends AbstractOldCoreMojo
             File warDirectory = new File(this.webappsDirectory, getContextPath(warArtifact));
             unzip(warArtifact.getFile(), warDirectory);
             // Only generate the extension.xed descriptor for the distribution war
-            if (warArtifact.getArtifactId().equals("xwiki-platform-web")) {
+            if (warArtifact.getArtifactId().equals("xwiki-platform-web-war")) {
                 generateDistributionXED(warDirectory, warArtifact);
             }
         }
@@ -358,6 +349,21 @@ public class PackageMojo extends AbstractOldCoreMojo
         return artifact;
     }
 
+    /**
+     * Resolve {@code xwiki-platform-tool-configuration-resources}, then look for velocity scripts inside the artifact
+     * and interpret them before copying the result to {@code configurationFileTargetDirectory}.
+     * <p>
+     * <a 
+     *   href="https://sonarcloud.io/organizations/xwiki/rules?open=javasecurity%3AS6096&rule_key=javasecurity%3AS6096">
+     *   javasecurity:S6096
+     * </a> is ignored because we trust the content of {@code xwiki-platform-tool-configuration-resources} since it is 
+     * produced by maven using source code we own.
+     *
+     * @param configurationFileTargetDirectory the root directory where the configuration files found in {@code
+     *     xwiki-platform-tool-configuration-resources} are copied ({@code webapps/xwiki/WEB-INF} by default)
+     * @throws MojoExecutionException when failing to resolve {@code xwiki-platform-tool-configuration-resources}
+     */
+    @SuppressWarnings("javasecurity:S6096")
     private void generateConfigurationFiles(File configurationFileTargetDirectory) throws MojoExecutionException
     {
         VelocityContext context = createVelocityContext();
@@ -367,6 +373,8 @@ public class PackageMojo extends AbstractOldCoreMojo
 
         configurationFileTargetDirectory.mkdirs();
 
+        // Since the jar comes from a trusted source, there is no risk of "zip slip" attack. Consequently, the
+        // entries of the jar do not need to be validated.
         try (JarInputStream jarInputStream =
             new JarInputStream(new FileInputStream(configurationResourcesArtifact.getFile()))) {
             JarEntry entry;
@@ -507,7 +515,7 @@ public class PackageMojo extends AbstractOldCoreMojo
 
     private Collection<Artifact> resolveWarArtifacts() throws MojoExecutionException
     {
-        List<Artifact> warArtifacts = new ArrayList<Artifact>();
+        List<Artifact> warArtifacts = new ArrayList<>();
 
         // First look for dependencies of type WAR.
         for (Artifact artifact : this.project.getArtifacts()) {
@@ -518,7 +526,7 @@ public class PackageMojo extends AbstractOldCoreMojo
 
         // If there are no WAR artifacts specified in the list of dependencies then use the default WAR artifacts.
         if (warArtifacts.isEmpty()) {
-            warArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform", "xwiki-platform-web",
+            warArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform", "xwiki-platform-web-war",
                 getXWikiPlatformVersion(), "", "war"));
             warArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
                 "xwiki-platform-tool-rootwebapp", getXWikiPlatformVersion(), "", "war"));
@@ -537,7 +545,7 @@ public class PackageMojo extends AbstractOldCoreMojo
         if (contextPath == null) {
             // Should we put this as default "contextPathMapping" configuration in a parent POM? (and rely on
             // configuration merging)
-            if (warArtifact.getArtifactId().equals("xwiki-platform-web")) {
+            if (warArtifact.getArtifactId().equals("xwiki-platform-web-war")) {
                 contextPath = "xwiki";
             } else if (warArtifact.getArtifactId().equals("xwiki-platform-tool-rootwebapp")) {
                 contextPath = "root";
@@ -566,7 +574,7 @@ public class PackageMojo extends AbstractOldCoreMojo
             }
         } else {
             Artifact defaultSkin = resolveArtifact("org.xwiki.platform", "xwiki-platform-flamingo-skin-resources",
-                getXWikiPlatformVersion(), "zip");
+                getXWikiPlatformVersion(), "jar");
             skinArtifacts.add(defaultSkin);
         }
 
@@ -586,7 +594,7 @@ public class PackageMojo extends AbstractOldCoreMojo
 
         // Remove the non JAR artifacts. Note that we need to include non JAR artifacts before the transitive resolve
         // because for example some XARs mayb depend on JARs and we need those JARs to be packaged!
-        Set<Artifact> jarArtifacts = new HashSet<Artifact>();
+        Set<Artifact> jarArtifacts = new HashSet<>();
         for (Artifact artifact : resolvedArtifacts) {
             // Note: test-jar is used in functional tests from time to time and we need to package them too.
             if (artifact.getType().equals("jar") || artifact.getType().equals("test-jar")) {
@@ -603,6 +611,10 @@ public class PackageMojo extends AbstractOldCoreMojo
 
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-oldcore", getXWikiPlatformVersion(), null, "jar"));
+
+        // Required to load macros.vm by default
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-velocity-webapp", getXWikiPlatformVersion(), null, "jar"));
 
         // Required Plugins
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
@@ -625,7 +637,7 @@ public class PackageMojo extends AbstractOldCoreMojo
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-localization-source-legacy", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
-            "xwiki-platform-security-bridge", getXWikiPlatformVersion(), null, "jar"));
+            "xwiki-platform-security-authorization-bridge", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-url-scheme-standard", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
@@ -653,9 +665,9 @@ public class PackageMojo extends AbstractOldCoreMojo
         // Velocity templates. Most of these templates are located in platform-web and currently we don't declare the
         // dependencies of platform-web (they are declared in enterprise-web) thus we need to bundle this script service
         // here. In the future we may want to create a separate module to hold the Velocity templates from platform-web
-        // and this module should have a dependency on platform-security-script.
+        // and this module should have a dependency on platform-security-authorization-script.
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
-            "xwiki-platform-security-script", getXWikiPlatformVersion(), null, "jar"));
+            "xwiki-platform-security-authorization-script", getXWikiPlatformVersion(), null, "jar"));
 
         // Copy/Delete/Rename/Move actions are currently in the Refactoring module and for now we consider them as
         // core actions.
@@ -705,6 +717,10 @@ public class PackageMojo extends AbstractOldCoreMojo
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-store-filesystem-oldcore", getXWikiPlatformVersion(), null, "jar"));
 
+        // Components for executing Jobs.
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.commons",
+            "xwiki-commons-job-default", this.getXWikiCommonsVersion(), "compile", "jar"));
+
         // Add a special JAR used for functional tests to discover if some scripts in some wiki page require Programming
         // Rights.
         if (this.test && !isSkipTests() && this.testProgrammingRights) {
@@ -721,6 +737,26 @@ public class PackageMojo extends AbstractOldCoreMojo
         // CAPTCHA Default module used to avoid cyclic dependency on oldcore but needed to access the configuration.
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-captcha-default", getXWikiPlatformVersion(), null, "jar"));
+
+        // Authentication default component used by oldcore in authenticators and script service used by login.vm
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-security-authentication-default", getXWikiPlatformVersion(), null, "jar"));
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-security-authentication-script", getXWikiPlatformVersion(), null, "jar"));
+
+        // Name strategies components
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-model-validation-default", getXWikiPlatformVersion(), null, "jar"));
+
+        // Default component for the merge operation used by oldcore.
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-store-merge-default", getXWikiPlatformVersion(), null, "jar"));
+
+        // User API implementation required by oldcore, platform web and others.
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-user-default", getXWikiPlatformVersion(), null, "jar"));
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-user-script", getXWikiPlatformVersion(), null, "jar"));
 
         return mandatoryTopLevelArtifacts;
     }
@@ -741,8 +777,8 @@ public class PackageMojo extends AbstractOldCoreMojo
             .setManagedVersionMap(getManagedVersionMap()).setResolveRoot(false);
         ArtifactResolutionResult resolutionResult = this.repositorySystem.resolve(request);
         if (resolutionResult.hasExceptions()) {
-            throw new MojoExecutionException(
-                String.format("Failed to resolve artifacts [%s]", artifacts, resolutionResult.getExceptions().get(0)));
+            throw new MojoExecutionException(String.format("Failed to resolve artifacts [%s]", artifacts),
+                resolutionResult.getExceptions().get(0));
         }
 
         return resolutionResult.getArtifacts();
@@ -750,7 +786,7 @@ public class PackageMojo extends AbstractOldCoreMojo
 
     private Map<String, Artifact> getManagedVersionMap() throws MojoExecutionException
     {
-        Map<String, Artifact> dependencyManagementMap = new HashMap<String, Artifact>();
+        Map<String, Artifact> dependencyManagementMap = new HashMap<>();
 
         // Add Platform Core's <dependencyManagement> since this is where we keep all our dependencies management
         // information. We absolutely need to include those because Maven 3.x's artifact seems to have a big hole in
@@ -837,7 +873,7 @@ public class PackageMojo extends AbstractOldCoreMojo
             FileUtils.copyDirectoryStructureIfModified(sourceDirectory, targetDirectory);
         } catch (IOException e) {
             throw new MojoExecutionException(
-                String.format("Failed to copy directory [%] to [%]", sourceDirectory, targetDirectory), e);
+                String.format("Failed to copy directory [%s] to [%s]", sourceDirectory, targetDirectory), e);
         }
     }
 
@@ -846,7 +882,7 @@ public class PackageMojo extends AbstractOldCoreMojo
         try {
             FileUtils.copyFileToDirectoryIfModified(source, targetDirectory);
         } catch (IOException e) {
-            throw new MojoExecutionException(String.format("Failed to copy file [%] to [%]", source, targetDirectory),
+            throw new MojoExecutionException(String.format("Failed to copy file [%s] to [%s]", source, targetDirectory),
                 e);
         }
     }
@@ -868,7 +904,6 @@ public class PackageMojo extends AbstractOldCoreMojo
         createDirectory(targetDirectory);
         try {
             ZipUnArchiver unArchiver = new ZipUnArchiver();
-            unArchiver.enableLogging(new ConsoleLogger(Logger.LEVEL_ERROR, "Package"));
             unArchiver.setSourceFile(source);
             unArchiver.setDestDirectory(targetDirectory);
             unArchiver.setOverwrite(true);
@@ -885,8 +920,8 @@ public class PackageMojo extends AbstractOldCoreMojo
             .setRemoteRepositories(this.remoteRepositories).setLocalRepository(this.localRepository);
         ArtifactResolutionResult resolutionResult = this.repositorySystem.resolve(request);
         if (resolutionResult.hasExceptions()) {
-            throw new MojoExecutionException(
-                String.format("Failed to resolve artifact [%s]", artifact, resolutionResult.getExceptions().get(0)));
+            throw new MojoExecutionException(String.format("Failed to resolve artifact [%s]", artifact),
+                resolutionResult.getExceptions().get(0));
         }
     }
 
@@ -900,7 +935,7 @@ public class PackageMojo extends AbstractOldCoreMojo
 
     private VelocityContext createVelocityContext()
     {
-        Properties properties = new Properties();
+        Map<String, Object> properties = new HashMap<>();
         properties.putAll(getDefaultConfigurationProperties());
         final Properties projectProperties = this.project.getProperties();
         for (Object key : projectProperties.keySet()) {
@@ -927,35 +962,34 @@ public class PackageMojo extends AbstractOldCoreMojo
         return context;
     }
 
-    private Properties getDefaultConfigurationProperties()
+    private Map<String, Object> getDefaultConfigurationProperties()
     {
-        Properties props = new Properties();
+        Map<String, Object> props = new HashMap<>();
 
         // Default configuration data for hibernate.cfg.xml
-        props.setProperty("xwikiDbConnectionUrl",
+        props.put("xwikiDbConnectionUrl",
             "jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=true");
-        props.setProperty("xwikiDbConnectionUsername", "sa");
-        props.setProperty("xwikiDbConnectionPassword", "");
-        props.setProperty("xwikiDbConnectionDriverClass", "org.hsqldb.jdbcDriver");
-        props.setProperty("xwikiDbDialect", "org.hibernate.dialect.HSQLDialect");
-        props.setProperty("xwikiDbHbmXwiki", "xwiki.hbm.xml");
-        props.setProperty("xwikiDbHbmFeeds", "feeds.hbm.xml");
+        props.put("xwikiDbConnectionUsername", "sa");
+        props.put("xwikiDbConnectionPassword", "");
+        props.put("xwikiDbConnectionDriverClass", "org.hsqldb.jdbcDriver");
+        props.put("xwikiDbHbmXwiki", "xwiki.hbm.xml");
+        props.put("xwikiDbHbmFeeds", "feeds.hbm.xml");
 
         // Default configuration data for xwiki.cfg
-        props.setProperty("xwikiCfgPlugins",
+        props.put("xwikiCfgPlugins",
             "com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,\\"
                 + "        com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,\\"
                 + "        com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,\\"
                 + "        com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,\\"
                 + "        com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin");
-        props.setProperty("xwikiCfgVirtualUsepath", "1");
-        props.setProperty("xwikiCfgEditCommentMandatory", "0");
-        props.setProperty("xwikiCfgDefaultSkin", "flamingo");
-        props.setProperty("xwikiCfgDefaultBaseSkin", "flamingo");
-        props.setProperty("xwikiCfgEncoding", "UTF-8");
+        props.put("xwikiCfgVirtualUsepath", "1");
+        props.put("xwikiCfgEditCommentMandatory", "0");
+        props.put("xwikiCfgDefaultSkin", "flamingo");
+        props.put("xwikiCfgDefaultBaseSkin", "flamingo");
+        props.put("xwikiCfgEncoding", "UTF-8");
 
         // Other default configuration properties
-        props.setProperty("xwikiDataDir", "data");
+        props.put("xwikiDataDir", "data");
 
         return props;
     }

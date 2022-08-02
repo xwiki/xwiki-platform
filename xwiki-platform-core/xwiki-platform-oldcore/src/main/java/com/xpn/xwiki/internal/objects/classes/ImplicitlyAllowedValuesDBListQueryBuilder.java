@@ -37,6 +37,7 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.objects.classes.DBListClass;
+import com.xpn.xwiki.objects.classes.DBTreeListClass;
 
 /**
  * Builds a query from the meta data of a Database List property.
@@ -49,6 +50,27 @@ import com.xpn.xwiki.objects.classes.DBListClass;
 @Singleton
 public class ImplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<DBListClass>
 {
+    private static class DBListQuerySpec
+    {
+        public String wiki;
+
+        public String className;
+
+        public String idField;
+
+        public String valueField;
+
+        public String parentField;
+
+        public boolean hasClassName;
+
+        public boolean hasIdField;
+
+        public boolean hasValueField;
+
+        public boolean hasParentField;
+    }
+
     private static final String DOC_PREFIX = "doc.";
 
     private static final String OBJ_PREFIX = "obj.";
@@ -83,30 +105,41 @@ public class ImplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
     @Override
     public Query build(DBListClass dbListClass) throws QueryException
     {
-        String className = StringUtils.defaultString(dbListClass.getClassname());
-        String idField = StringUtils.defaultString(dbListClass.getIdField());
-        String valueField = StringUtils.defaultString(dbListClass.getValueField());
+        DBListQuerySpec spec = new DBListQuerySpec();
+        spec.wiki = dbListClass.getOwnerDocument().getDocumentReference().getWikiReference().getName();
 
-        boolean hasClassName = !StringUtils.isBlank(className);
-        boolean hasIdField = !StringUtils.isBlank(idField);
-        boolean hasValueField = !StringUtils.isBlank(valueField);
+        spec.className = StringUtils.defaultString(dbListClass.getClassname());
+        spec.idField = StringUtils.defaultString(dbListClass.getIdField());
+        spec.valueField = StringUtils.defaultString(dbListClass.getValueField());
+        spec.parentField =
+            dbListClass instanceof DBTreeListClass ? ((DBTreeListClass) dbListClass).getParentField() : "";
+
+        spec.hasClassName = !StringUtils.isBlank(spec.className);
+        spec.hasIdField = !StringUtils.isBlank(spec.idField);
+        spec.hasValueField = !StringUtils.isBlank(spec.valueField);
+        spec.hasParentField = !StringUtils.isBlank(spec.parentField);
+
+        return build(spec);
+    }
+
+    private Query build(DBListQuerySpec spec) throws QueryException
+    {
 
         // Initialize with default query (that returns no rows).
         String statement = "select doc.name from XWikiDocument doc where 1 = 0";
         Map<String, Object> parameters = new HashMap<>();
 
-        if (hasIdField || hasValueField) {
-            statement = getStatementWhenIdValueFieldsAreSpecified(className, idField, valueField, hasClassName,
-                hasIdField, hasValueField, parameters);
-        } else if (hasClassName) {
+        if (spec.hasIdField || spec.hasValueField) {
+            statement = getStatementWhenIdOrValueFieldsAreSpecified(spec, parameters);
+        } else if (spec.hasClassName) {
             statement = "select distinct doc.fullName from XWikiDocument as doc, BaseObject as obj"
                 + " where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName";
-            parameters.put(CLASS_NAME, className);
-            parameters.put(TEMPLATE_NAME, getTemplateName(className));
+            parameters.put(CLASS_NAME, spec.className);
+            parameters.put(TEMPLATE_NAME, getTemplateName(spec.className));
         }
 
         Query query = this.queryManager.createQuery(statement, Query.HQL);
-        query.setWiki(dbListClass.getOwnerDocument().getDocumentReference().getWikiReference().getName());
+        query.setWiki(spec.wiki);
         for (Map.Entry<String, Object> entry : parameters.entrySet()) {
             query.bindValue(entry.getKey(), entry.getValue());
         }
@@ -130,15 +163,28 @@ public class ImplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
         }
     }
 
-    private String getStatementWhenIdValueFieldsAreSpecified(String className, String idField, String valueField,
-        boolean hasClassName, boolean hasIdField, boolean hasValueField, Map<String, Object> parameters)
+    private String getStatementWhenIdOrValueFieldsAreSpecified(DBListQuerySpec spec, Map<String, Object> parameters)
     {
-        // Make sure we always have an id field. Ignore the value field if it duplicates the id field.
-        if (!hasIdField || idField.equals(valueField)) {
-            return getStatementWhenIdValueFieldsAreSpecified(className, valueField, "", hasClassName, true, false,
-                parameters);
+        // Make sure we always have an id field. Ignore the value field if it duplicates the id field and there's no
+        // parent field specified.
+        if (!spec.hasIdField || (spec.idField.equals(spec.valueField) && !spec.hasParentField)) {
+            // If the parent field is specified then we need to include the value field, even if it duplicates the id
+            // field, because otherwise we can't distinguish between the value and the parent.
+            spec.idField = spec.valueField;
+            spec.hasIdField = true;
+            spec.valueField = spec.hasParentField ? spec.valueField : "";
+            spec.hasValueField = spec.hasParentField;
+        } else if (!spec.hasValueField && spec.hasParentField) {
+            // Same as above, we need to include the value field when the parent field is specified.
+            spec.valueField = spec.idField;
+            spec.hasValueField = true;
         }
 
+        return getStatementWhenIdFieldIsSpecified(spec, parameters);
+    }
+
+    private String getStatementWhenIdFieldIsSpecified(DBListQuerySpec spec, Map<String, Object> parameters)
+    {
         List<String> selectClause = new ArrayList<>();
         List<String> fromClause = new ArrayList<>();
         List<String> whereClause = new ArrayList<>();
@@ -150,20 +196,29 @@ public class ImplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
 
         // We need to join the objects table if the class name is specified or if one of the selected columns is an
         // object property.
-        if (hasClassName || idField.startsWith(OBJ_PREFIX) || valueField.startsWith(OBJ_PREFIX)) {
+        if (spec.hasClassName || spec.idField.startsWith(OBJ_PREFIX) || spec.valueField.startsWith(OBJ_PREFIX)
+            || spec.parentField.startsWith(OBJ_PREFIX)) {
             fromClause.add("BaseObject as obj");
             whereClause.add("doc.fullName = obj.name");
-            if (hasClassName) {
+            if (spec.hasClassName) {
                 whereClause.add("obj.className = :className and doc.fullName <> :templateName");
-                parameters.put(CLASS_NAME, className);
-                parameters.put(TEMPLATE_NAME, getTemplateName(className));
+                parameters.put(CLASS_NAME, spec.className);
+                parameters.put(TEMPLATE_NAME, getTemplateName(spec.className));
             }
         }
 
-        addFieldToQuery(idField, "idProp", hasClassName, selectClause, fromClause, whereClause, parameters);
+        addFieldToQuery(spec.idField, "idProp", spec.hasClassName, selectClause, fromClause, whereClause, parameters);
 
-        if (hasValueField) {
-            addFieldToQuery(valueField, "valueProp", hasClassName, selectClause, fromClause, whereClause, parameters);
+        if (spec.hasValueField) {
+            addFieldToQuery(spec.valueField, "valueProp", spec.hasClassName, selectClause, fromClause, whereClause,
+                parameters);
+
+            // We cannot include the parent field if there's no value field because we would confuse it with the value
+            // field (the second column in the result set is reserved for the value).
+            if (spec.hasParentField) {
+                addFieldToQuery(spec.parentField, "parentProp", spec.hasClassName, selectClause, fromClause,
+                    whereClause, parameters);
+            }
         }
 
         StringBuilder statementBuilder =

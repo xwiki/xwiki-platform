@@ -25,12 +25,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-configuration</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-configuration-api</artifactId>
   <name>XWiki Platform - Rendering - Configuration - API</name>
   <packaging>jar</packaging>
   <description>XWiki-specific Rendering Configuration API</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>

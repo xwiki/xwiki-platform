@@ -1,0 +1,16 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{async}}
+toto
+{{/async}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [async] [] [toto]
+beginGroup [[class]=[xwiki-async][data-xwiki-async-client-id]=[1]]
+endGroup [[class]=[xwiki-async][data-xwiki-async-client-id]=[1]]
+endMacroMarkerStandalone [async] [] [toto]
+endDocument

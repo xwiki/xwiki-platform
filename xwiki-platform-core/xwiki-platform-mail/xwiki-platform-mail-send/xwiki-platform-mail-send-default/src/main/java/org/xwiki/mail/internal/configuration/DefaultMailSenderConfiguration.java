@@ -29,19 +29,21 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.mail.MailSenderConfiguration;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * Gets the Mail Sending configuration. The configuration is checked in the following order:
  * <ul>
- *   <li>Look in Mail.MailConfig in the current wiki</li>
- *   <li>[Backward compatibility] Look in (current space).XWikiPreferences in the current wiki</li>
- *   <li>[Backward compatibility] Look in XWiki.XWikiPreferences in the current wiki</li>
+ *   <li>Look in {@code Mail.MailConfig} in the current wiki</li>
+ *   <li>Look in {@code Mail.MailConfig} in the main wiki</li>
+ *   <li>[Backward compatibility] Look in {@code (current space).XWikiPreferences} in the current wiki</li>
+ *   <li>[Backward compatibility] Look in {@code }XWiki.XWikiPreferences} in the current wiki</li>
  *   <li>Look in the xwiki properties file</li>
  * </ul>
  *
@@ -73,11 +75,6 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     public static final String JAVAMAIL_SMTP_USERNAME = "mail.smtp.user";
 
     /**
-     * Java Mail SMTP property for the from email address.
-     */
-    public static final String JAVAMAIL_SMTP_FROM = "mail.smtp.from";
-
-    /**
      * Java Mail SMTP property for specifying that we are authenticating.
      */
     public static final String JAVAMAIL_SMTP_AUTH = "mail.smtp.auth";
@@ -104,31 +101,45 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     private static final String PROPERTIES_PROPERTY = "properties";
     private static final String SEND_WAIT_TIME = "sendWaitTime";
 
+    private static final String PREPARE_QUEUE_CAPACITY_PROPERTY = "prepareQueueCapacity";
+    private static final String SEND_QUEUE_CAPACITY_PROPERTY = "sendQueueCapacity";
+
+    /**
+     * The default size of the prepare queue.
+     */
+    private static final int PREPARE_QUEUE_CAPACITY_DEFAULT = 1000;
+
+    /**
+     * The default size of the send queue.
+     */
+    private static final int SEND_QUEUE_CAPACITY_DEFAULT = 1000;
+
     @Inject
     private Logger logger;
 
     @Inject
     @Named("mailsend")
-    private ConfigurationSource mailConfigSource;
+    private ConfigurationSource currentWikiMailConfigSource;
 
     @Inject
-    @Named("documents")
-    private ConfigurationSource documentsSource;
+    @Named("mailsendmainwiki")
+    private ConfigurationSource mainWikiMailConfigSource;
 
     @Inject
     @Named("xwikiproperties")
     private ConfigurationSource xwikiPropertiesSource;
 
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
+
     @Override
     public String getHost()
     {
-        String host;
+        String host = this.currentWikiMailConfigSource.getProperty(HOST_PROPERTY, String.class);
+        if (host == null && !isMainWiki()) {
+            host = this.mainWikiMailConfigSource.getProperty(HOST_PROPERTY, String.class);
+        }
 
-        // First, look in the document sources
-        host = this.mailConfigSource.getProperty(HOST_PROPERTY,
-            this.documentsSource.getProperty("smtp_server", String.class));
-
-        // If not found, look in the xwiki properties source
         if (host == null) {
             host = this.xwikiPropertiesSource.getProperty(PREFIX + HOST_PROPERTY, "localhost");
         }
@@ -139,21 +150,11 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     @Override
     public int getPort()
     {
-        Integer port;
-
-        // First, look in the document sources
-        String portAsString = this.documentsSource.getProperty("smtp_port");
-        if (!StringUtils.isEmpty(portAsString)) {
-            try {
-                port = this.mailConfigSource.getProperty(PORT_PROPERTY, Integer.parseInt(portAsString));
-            } catch (NumberFormatException e) {
-                port = DEFAULT_PORT;
-            }
-        } else {
-            port = this.mailConfigSource.getProperty(PORT_PROPERTY, Integer.class);
+        Integer port = this.currentWikiMailConfigSource.getProperty(PORT_PROPERTY, Integer.class);
+        if (port == null && !isMainWiki()) {
+            port = this.mainWikiMailConfigSource.getProperty(PORT_PROPERTY, Integer.class);
         }
 
-        // If not found, look in the xwiki properties source
         if (port == null) {
             port = this.xwikiPropertiesSource.getProperty(PREFIX + PORT_PROPERTY, DEFAULT_PORT);
         }
@@ -164,13 +165,11 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     @Override
     public String getUsername()
     {
-        String username;
+        String username = this.currentWikiMailConfigSource.getProperty(USERNAME_PROPERTY, String.class);
+        if (username == null && !isMainWiki()) {
+            username = this.mainWikiMailConfigSource.getProperty(USERNAME_PROPERTY, String.class);
+        }
 
-        // First, look in the document sources
-        username = this.mailConfigSource.getProperty(USERNAME_PROPERTY,
-            this.documentsSource.getProperty("smtp_server_username", String.class));
-
-        // If not found, look in the xwiki properties source
         if (username == null) {
             username = this.xwikiPropertiesSource.getProperty(PREFIX + USERNAME_PROPERTY, String.class);
         }
@@ -181,13 +180,11 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     @Override
     public String getPassword()
     {
-        String password;
+        String password = this.currentWikiMailConfigSource.getProperty(PASSWORD_PROPERTY, String.class);
+        if (password == null && !isMainWiki()) {
+            password = this.mainWikiMailConfigSource.getProperty(PASSWORD_PROPERTY, String.class);
+        }
 
-        // First, look in the document sources
-        password = this.mailConfigSource.getProperty(PASSWORD_PROPERTY,
-            this.documentsSource.getProperty("smtp_server_password", String.class));
-
-        // If not found, look in the xwiki properties source
         if (password == null) {
             password = this.xwikiPropertiesSource.getProperty(PREFIX + PASSWORD_PROPERTY, String.class);
         }
@@ -200,10 +197,11 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     {
         List<String> bccAddresses = new ArrayList<>();
 
-        // First, look in the document source
-        String bccAsString = this.mailConfigSource.getProperty(BCC_PROPERTY, String.class);
+        String bccAsString = this.currentWikiMailConfigSource.getProperty(BCC_PROPERTY, String.class);
+        if (bccAsString == null && !isMainWiki()) {
+            bccAsString = this.mainWikiMailConfigSource.getProperty(BCC_PROPERTY, String.class);
+        }
 
-        // If not found, look in the xwiki properties source
         if (bccAsString == null) {
             bccAsString = this.xwikiPropertiesSource.getProperty(PREFIX + BCC_PROPERTY, String.class);
         }
@@ -221,13 +219,11 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     @Override
     public String getFromAddress()
     {
-        String from;
+        String from = this.currentWikiMailConfigSource.getProperty(FROM_PROPERTY, String.class);
+        if (from == null && !isMainWiki()) {
+            from = this.mainWikiMailConfigSource.getProperty(FROM_PROPERTY, String.class);
+        }
 
-        // First, look in the document sources
-        from = this.mailConfigSource.getProperty(FROM_PROPERTY,
-            this.documentsSource.getProperty("admin_email", String.class));
-
-        // If not found, look in the xwiki properties source
         if (from == null) {
             from = this.xwikiPropertiesSource.getProperty(PREFIX + FROM_PROPERTY, String.class);
         }
@@ -240,15 +236,16 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     {
         Properties properties;
 
-        // First, look in the document sources
-        String extraPropertiesAsString = this.mailConfigSource.getProperty(PROPERTIES_PROPERTY,
-            this.documentsSource.getProperty("javamail_extra_props", String.class));
+        String extraPropertiesAsString =
+            this.currentWikiMailConfigSource.getProperty(PROPERTIES_PROPERTY, String.class);
+        if (extraPropertiesAsString == null && !isMainWiki()) {
+            extraPropertiesAsString = this.mainWikiMailConfigSource.getProperty(PROPERTIES_PROPERTY, String.class);
+        }
 
-        // If not found, look in the xwiki properties source
         if (extraPropertiesAsString == null) {
             properties = this.xwikiPropertiesSource.getProperty(PREFIX + PROPERTIES_PROPERTY, Properties.class);
         } else {
-            // The "javamail_extra_props" property is stored in a text area and thus we need to convert it to a Map.
+            // The property is stored in a text area and thus we need to convert it to a Map.
             InputStream is = new ByteArrayInputStream(extraPropertiesAsString.getBytes());
             properties = new Properties();
             try {
@@ -271,8 +268,15 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
         addProperty(properties, JAVAMAIL_TRANSPORT_PROTOCOL, "smtp");
         addProperty(properties, JAVAMAIL_SMTP_HOST, getHost());
         addProperty(properties, JAVAMAIL_SMTP_USERNAME, getUsername());
-        addProperty(properties, JAVAMAIL_SMTP_FROM, getFromAddress());
         addProperty(properties, JAVAMAIL_SMTP_PORT, Integer.toString(getPort()));
+
+        // Important: We don't set the "mail.smtp.from" property because the default behavior of JavaMail is to get
+        // it from the MimeMessage's FROM field  when it's not set (see
+        // https://javaee.github.io/javamail/docs/api/com/sun/mail/smtp/package-summary.html), which is the behavior
+        // we want.
+        // This also avoids setting a bad email address. Indeed, must not have any pretty name or "<" and ">" characters
+        // as that wouldn't obey the RFC5321 (see section 4.1.2 from https://tools.ietf.org/html/rfc5321). Thus if
+        // we were setting the address we would need to get internal address and not the full "pretty" one.
 
         // If a username and a password have been provided consider we're authenticating against the SMTP server
         if (usesAuthentication()) {
@@ -310,12 +314,31 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     @Override
     public long getSendWaitTime()
     {
-        Long waitTime = this.mailConfigSource.getProperty(SEND_WAIT_TIME);
+        Long waitTime = this.currentWikiMailConfigSource.getProperty(SEND_WAIT_TIME);
 
         if (waitTime == null) {
             waitTime = this.xwikiPropertiesSource.getProperty(PREFIX + SEND_WAIT_TIME, DEFAULT_SEND_WAIT_TIME);
         }
 
         return waitTime;
+    }
+
+    @Override
+    public int getPrepareQueueCapacity()
+    {
+        return this.xwikiPropertiesSource.getProperty(PREFIX + PREPARE_QUEUE_CAPACITY_PROPERTY,
+            PREPARE_QUEUE_CAPACITY_DEFAULT);
+    }
+
+    @Override
+    public int getSendQueueCapacity()
+    {
+        return this.xwikiPropertiesSource.getProperty(PREFIX + SEND_QUEUE_CAPACITY_PROPERTY,
+            SEND_QUEUE_CAPACITY_DEFAULT);
+    }
+
+    private boolean isMainWiki()
+    {
+        return this.wikiDescriptorManager.isMainWiki(this.wikiDescriptorManager.getCurrentWikiId());
     }
 }

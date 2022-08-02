@@ -45,6 +45,21 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 public class XWikiUsersDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
+     * Local reference of the XWikiUsers class document.
+     */
+    public static final LocalDocumentReference XWIKI_USERS_DOCUMENT_REFERENCE =
+        new LocalDocumentReference(XWiki.SYSTEM_SPACE, "XWikiUsers");
+
+    /**
+     * The local reference of the XWikiUsers class document as String.
+     * 
+     * @since 12.7RC1
+     * @since 12.6.1
+     */
+    public static final String CLASS_REFERENCE_STRING =
+        XWiki.SYSTEM_SPACE + '.' + XWIKI_USERS_DOCUMENT_REFERENCE.getName();
+
+    /**
      * The name of the field containing the user email.
      */
     private static final String EMAIL_FIELD = "email";
@@ -66,7 +81,7 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryClassInitial
      */
     public XWikiUsersDocumentInitializer()
     {
-        super(new LocalDocumentReference(XWiki.SYSTEM_SPACE, "XWikiUsers"));
+        super(XWIKI_USERS_DOCUMENT_REFERENCE);
     }
 
     @Override
@@ -78,7 +93,6 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryClassInitial
         xclass.addPasswordField("password", "Password", 10);
         xclass.addPasswordField("validkey", "Validation Key", 10);
         xclass.addBooleanField("active", "Active", "active");
-        xclass.addTextField("default_language", "Default Language", 30);
         xclass.addTextField("company", "Company", 30);
         xclass.addTextField("blog", "Blog", 60);
         xclass.addTextField("blogfeed", "Blog Feed", 60);
@@ -98,6 +112,7 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryClassInitial
         xclass.addTextAreaField("address", "Address", 40, 3);
 
         xclass.addBooleanField("extensionConflictSetup", "Enable extension conflict setup", "yesno");
+        xclass.addBooleanField("email_checked", "Email address verified");
     }
 
     @Override

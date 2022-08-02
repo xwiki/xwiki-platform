@@ -96,14 +96,18 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
             return;
         }
 
-        // If the notifications for the XWiki app (create, update, delete, addComment) are not enabled but autowatch is
-        // on, then we need to enable the notifications in the user preferences.
-        // We do that because it has no sense for a user to use the "AutoWatch" feature when the notifications are not
-        // enabled.
-        // Moreover, it makes the notifications feature discoverable. It means that, by default, all pages where the
-        // user has made a contribution will generate notifications. That's probably what users expect from a
-        // notification area.
-        xwikiEventTypesEnabler.ensureXWikiNotificationsAreEnabled(user);
+        if (shouldBeWatched) {
+            // If the notifications for the XWiki app (create, update, delete, addComment) are not enabled but autowatch
+            // is on, then we need to enable the notifications in the user preferences.
+            // We do that because it has no sense for a user to use the "AutoWatch" feature when the notifications are
+            // not enabled.
+            // Moreover, it makes the notifications feature discoverable. It means that, by default, all pages where the
+            // user has made a contribution will generate notifications. That's probably what users expect from a
+            // notification area.
+            // Now we only enable those events in case of a watch: it doesn't make sense to enable them in case of
+            // unwatch.
+            xwikiEventTypesEnabler.ensureXWikiNotificationsAreEnabled(user);
+        }
 
         Iterator<NotificationFilterPreference> filterPreferences = getAllEventsFilterPreferences(user).iterator();
 
@@ -126,7 +130,7 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
         }
 
         // But it might been still unwatched because of an other filter!
-        if (!thereIsAMatch || entity.isWatched(user) != shouldBeWatched) {
+        if (!thereIsAMatch || entity.isWatchedWithAllEventTypes(user) != shouldBeWatched) {
             notificationFilterPreferenceManager.saveFilterPreferences(user,
                     Sets.newHashSet(createFilterPreference(entity, shouldBeWatched)));
         }
@@ -136,7 +140,8 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
             boolean desiredState) throws NotificationException
     {
         // If the notifications are enabled and the entity is already in the desired state, then we have nothing to do
-        return !xwikiEventTypesEnabler.isNotificationDisabled(user) && entity.isWatched(user) == desiredState;
+        return !xwikiEventTypesEnabler.isNotificationDisabled(user)
+            && entity.isWatchedWithAllEventTypes(user) == desiredState;
     }
 
     private void enableOrDeleteFilter(boolean enable, NotificationFilterPreference notificationFilterPreference,

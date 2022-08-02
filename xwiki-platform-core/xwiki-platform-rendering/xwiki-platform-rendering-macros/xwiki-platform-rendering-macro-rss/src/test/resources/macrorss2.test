@@ -28,7 +28,7 @@ onWord [Item1]
 endLink [Typed = [true] Type = [url] Reference = [http://localhost/blog/item1]] [true]
 endParagraph [[class]=[rssitemtitle]]
 beginGroup [[class]=[rssitemdescription]]
-onRawText [An item with<b>HTML</b>markup.] [xhtml/1.0]
+onRawText [<p>An item with<b>HTML</b>markup.</p>] [html/5.0]
 endGroup [[class]=[rssitemdescription]]
 endGroup [[class]=[box rssfeed]]
 endMacroMarkerStandalone [testrss] [feed=file://feed2.xml|content=true|count=1|image=false]
@@ -36,4 +36,4 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<div class="box rssfeed"><p class="rsschanneltitle"><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://localhost/feed.xml">Test Feed 2</a></span><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://localhost/feed.xml"><img src="/xwiki/resources/icons/silk/feed.png" alt="/xwiki/resources/icons/silk/feed.png"/></a></span></p><p class="rssitemtitle"><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://localhost/blog/item1">Item1</a></span></p><div class="rssitemdescription">An item with<b>HTML</b>markup.</div></div>
+<div class="box rssfeed"><p class="rsschanneltitle"><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://localhost/feed.xml">Test Feed 2</a></span><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://localhost/feed.xml"><img src="/xwiki/resources/icons/silk/feed.png" alt="/xwiki/resources/icons/silk/feed.png"/></a></span></p><p class="rssitemtitle"><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://localhost/blog/item1">Item1</a></span></p><div class="rssitemdescription"><p>An item with<b>HTML</b>markup.</p></div></div>

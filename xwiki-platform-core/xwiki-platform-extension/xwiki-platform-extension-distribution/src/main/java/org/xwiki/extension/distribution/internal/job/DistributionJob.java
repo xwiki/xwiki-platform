@@ -44,4 +44,27 @@ public interface DistributionJob extends Job
      *             supported)
      */
     void awaitReady() throws InterruptedException;
+
+    /**
+     * @since 11.7RC1
+     * @since 11.3.3
+     * @since 10.11.10
+     */
+    void setProperty(String key, Object value);
+
+    /**
+     * @since 11.7RC1
+     * @since 11.3.3
+     * @since 10.11.10
+     */
+    Object getProperty(String key);
+
+    /**
+     * Remove a stored property.
+     *
+     * @param key the name of the property to remove.
+     * @since 11.10.6
+     * @since 12.4
+     */
+    void removeProperty(String key);
 }

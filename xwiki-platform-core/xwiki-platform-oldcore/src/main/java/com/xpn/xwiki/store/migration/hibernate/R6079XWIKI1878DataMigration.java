@@ -27,9 +27,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -89,8 +89,7 @@ public class R6079XWIKI1878DataMigration extends AbstractHibernateDataMigration
     private XWikiHibernateVersioningStore getVersioningStore() throws XWikiException
     {
         try {
-            return (XWikiHibernateVersioningStore) this.componentManager
-                .getInstance(XWikiVersioningStoreInterface.class, XWikiHibernateBaseStore.HINT);
+            return this.componentManager.getInstance(XWikiVersioningStoreInterface.class, XWikiHibernateBaseStore.HINT);
         } catch (ComponentLookupException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_MIGRATION,
                 String.format("Unable to reach the versioning store for database %s", getXWikiContext().getWikiId()),
@@ -102,16 +101,18 @@ public class R6079XWIKI1878DataMigration extends AbstractHibernateDataMigration
     public void hibernateMigrate() throws DataMigrationException, XWikiException
     {
         // migrate data
-        getStore().executeWrite(getXWikiContext(), true, new XWikiHibernateBaseStore.HibernateCallback<Object>()
+        getStore().executeWrite(getXWikiContext(), new XWikiHibernateBaseStore.HibernateCallback<Object>()
         {
             @Override
             public Object doInHibernate(Session session) throws HibernateException, XWikiException
             {
                 try {
-                    Query query = session.createQuery("select rcs.id, rcs.patch, doc.fullName "
-                        + "from XWikiDocument as doc, XWikiRCSNodeContent as rcs where "
-                        + "doc.id = rcs.id.docId and rcs.patch.diff = true and rcs.patch.content like '<?xml%'");
-                    Iterator it = query.list().iterator();
+                    Query<Object[]> query = session.createQuery(
+                        "select rcs.id, rcs.patch, doc.fullName "
+                            + "from XWikiDocument as doc, XWikiRCSNodeContent as rcs where "
+                            + "doc.id = rcs.id.docId and rcs.patch.diff = true and rcs.patch.content like '<?xml%'",
+                        Object[].class);
+                    Iterator<Object[]> it = query.list().iterator();
 
                     XWikiContext context = getXWikiContext();
                     XWikiHibernateVersioningStore versioningStore = getVersioningStore();
@@ -120,7 +121,7 @@ public class R6079XWIKI1878DataMigration extends AbstractHibernateDataMigration
                     versioningStore.setTransaction(null, context);
 
                     while (it.hasNext()) {
-                        Object[] result = (Object[]) it.next();
+                        Object[] result = it.next();
                         if (R6079XWIKI1878DataMigration.this.logger.isInfoEnabled()) {
                             R6079XWIKI1878DataMigration.this.logger.info("Fixing document [{}]...", result[2]);
                         }

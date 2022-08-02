@@ -35,7 +35,7 @@ public class WatchdogResponse
     /**
      * The response content, if any.
      */
-    public byte[] responseBody;
+    public String responseBody;
 
     /**
      * The response code (200, etc).

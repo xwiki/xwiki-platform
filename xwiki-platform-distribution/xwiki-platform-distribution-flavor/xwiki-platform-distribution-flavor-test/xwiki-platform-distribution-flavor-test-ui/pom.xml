@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor-test</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test-ui</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - UI</name>
@@ -59,14 +59,6 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-application-test-pageobjects</artifactId>
       <version>${project.version}</version>
-    </dependency>
-
-    <!-- Used by several tests to send mails -->
-    <dependency>
-      <groupId>com.icegreen</groupId>
-      <artifactId>greenmail</artifactId>
-      <version>1.5.8</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>

@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.QueryManager;
 import org.xwiki.xml.XMLUtils;
 import org.suigeneris.jrcs.diff.delta.Chunk;
@@ -1156,5 +1157,59 @@ public privileged aspect XWikiCompatibilityAspect
         } catch (Exception e) {
             return buf.toString();
         }
+    }
+
+    /**
+     * API to rename a page (experimental) Rights are necessary to edit the source and target page All objects and
+     * attachments ID are modified in the process to link to the new page name
+     *
+     * @param doc page to rename
+     * @param newFullName target page name to move the information to
+     * @deprecated since 12.0RC1. Use {@link Document#rename(DocumentReference)}.
+     */
+    @Deprecated
+    public boolean XWiki.renamePage(Document doc, String newFullName)
+    {
+        try {
+            if (this.xwiki.exists(newFullName, getXWikiContext()) && !this.xwiki.getRightService()
+                .hasAccessLevel("delete", getXWikiContext().getUser(), newFullName, getXWikiContext())) {
+                return false;
+            }
+            if (this.xwiki.getRightService().hasAccessLevel("edit", getXWikiContext().getUser(), doc.getFullName(),
+                getXWikiContext())) {
+                this.xwiki.renamePage(doc.getFullName(), newFullName, getXWikiContext());
+            }
+        } catch (XWikiException e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @return the ids of configured syntaxes for this wiki (e.g. {@code xwiki/2.0}, {@code xwiki/2.1},
+     *         {@code mediawiki/1.0}, etc), taken only from {@code xwiki.cfg} (using the
+     *         {@code xwiki.rendering.syntaxes} property)
+     * @deprecated since 8.2M1, use the XWiki Rendering Configuration component or the Rendering Script Service one
+     *             instead (they use a more elaborate algorithm to find out the supported syntaxes)
+     */
+    @Deprecated
+    public List<String> XWiki.getConfiguredSyntaxes()
+    {
+        return this.xwiki.getConfiguredSyntaxes();
+    }
+
+    /**
+     * Designed to include dynamic content, such as Servlets or JSPs, inside Velocity templates; works by creating a
+     * RequestDispatcher, buffering the output, then returning it as a string.
+     *
+     * @param url URL of the servlet
+     * @return text result of the servlet
+     * @deprecated since 12.10.9, 13.4.3, 13.7RC1
+     */
+    @Deprecated
+    public String XWiki.invokeServletAndReturnAsString(String url)
+    {
+        return hasProgrammingRights() ? this.xwiki.invokeServletAndReturnAsString(url, getXWikiContext()) : null;
     }
 }

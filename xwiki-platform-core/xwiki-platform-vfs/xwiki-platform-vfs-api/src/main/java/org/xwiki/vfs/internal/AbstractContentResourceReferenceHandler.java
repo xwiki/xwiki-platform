@@ -47,6 +47,12 @@ public abstract class AbstractContentResourceReferenceHandler extends AbstractRe
     protected void serveResource(String resourceName, InputStream resourceStream)
         throws ResourceReferenceHandlerException
     {
+        serveResource(resourceName, resourceStream, null);
+    }
+
+    protected void serveResource(String resourceName, InputStream resourceStream, String contentType)
+        throws ResourceReferenceHandlerException
+    {
         // Make sure the resource stream supports mark & reset which is needed in order be able to detect the
         // content type without affecting the stream (Tika may need to read a few bytes from the start of the
         // stream, in which case it will mark & reset the stream).
@@ -57,7 +63,14 @@ public abstract class AbstractContentResourceReferenceHandler extends AbstractRe
 
         try {
             Response response = this.container.getResponse();
-            response.setContentType(TikaUtils.detect(markResetSupportingStream, resourceName));
+
+            // Set the content type
+            if (contentType != null) {
+                response.setContentType(contentType);
+            } else {
+                response.setContentType(TikaUtils.detect(markResetSupportingStream, resourceName));
+            }
+
             IOUtils.copy(markResetSupportingStream, response.getOutputStream());
         } catch (Exception e) {
             throw new ResourceReferenceHandlerException(String.format("Failed to read resource [%s]", resourceName), e);

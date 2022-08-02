@@ -49,4 +49,40 @@ public interface NotificationConfiguration
      * @since 9.6RC1
      */
     int liveNotificationsGraceTime();
+
+    /**
+     * @return true if pre filtering should be used for ALERT user notifications
+     * @since 12.6
+     */
+    default boolean isEventPrefilteringEnabled()
+    {
+        return false;
+    }
+
+    /**
+     * @return true if the REST/async cache is enabled.
+     * @since 12.2
+     */
+    default boolean isRestCacheEnabled()
+    {
+        return true;
+    }
+
+    /**
+     * @return the number of threads to use for computing notifications in REST.
+     * @since 12.5RC1
+     */
+    default int getRESTPoolSize()
+    {
+        return 2;
+    }
+
+    /**
+     * @return the number of threads to use for computing notifications in Async renderer.
+     * @since 12.5RC1
+     */
+    default int getAsyncPoolSize()
+    {
+        return 2;
+    }
 }

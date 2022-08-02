@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-war</artifactId>
   <name>XWiki Platform - Distribution - War</name>
@@ -34,16 +34,15 @@
   <properties>
     <!-- Put the name of the distribution which will be displayed in the footer -->
     <xwiki.extension.name>XWiki</xwiki.extension.name>
-
     <xwiki.extension.features>${platform.distribution.features}</xwiki.extension.features>
   </properties>
   <dependencies>
-   <dependency>
-     <groupId>org.xwiki.platform</groupId>
-     <artifactId>${war.dependencies.artifactId}</artifactId>
-     <version>${project.version}</version>
-     <type>pom</type>
-   </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>${war.dependencies.artifactId}</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -58,7 +57,7 @@
           </execution>
         </executions>
       </plugin>
-      <!-- Unpack the Skins (they're packaged as zips) -->
+      <!-- Unpack the Skins resources -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
@@ -76,7 +75,8 @@
                   <groupId>org.xwiki.platform</groupId>
                   <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
                   <version>${project.version}</version>
-                  <type>zip</type>
+                  <type>jar</type>
+                  <excludes>META-INF/**</excludes>
                   <outputDirectory>${project.build.directory}/skin</outputDirectory>
                 </artifactItem>
               </artifactItems>
@@ -124,11 +124,7 @@
               <filtering>false</filtering>
             </resource>
           </webResources>
-          <!-- - Exclude JCL and LOG4J since we want all logging to go through SLF4J. Note that we're excluding
-                 log4j-<version>.jar but keeping log4j-over-slf4j-<version>.jar
-               - Exclude legacy modules if the legacy profile is not enabled so that we don't have both aspectified JAR
-                 and non aspectified ones
-               - Exclude STAX API since it's included in Java SE 6
+          <!--
                - Exclude all XAR files from being placed in WEB-INF/lib. This is done by the WAR plugin which supports
                  XAR files (not our format, some other format! See https://jira.codehaus.org/browse/MWAR-281). The
                  reason we have XAR files in our dependencies is because we've added them in order to automatically
@@ -138,9 +134,6 @@
                  report an error if it's not the case (see https://jira.xwiki.org/browse/XWIKI-15567).
           -->
           <packagingExcludes>
-            WEB-INF/lib/commons-logging-*.jar,
-            %regex[WEB-INF/lib/log4j-(?!over-slf4j).*.jar],
-            WEB-INF/lib/stax-api-*.jar,
             WEB-INF/extensions/*.xar,
             */**/META-INF/**
           </packagingExcludes>
@@ -161,13 +154,20 @@
                 <bannedDependencies>
                   <excludes>
                     <exclude>org.jmock:*</exclude>
+                    <exclude>jmock:*</exclude>
                     <exclude>junit:*</exclude>
+                    <exclude>org.junit.*:*</exclude>
+                    <exclude>org.mockito:*</exclude>
                     <exclude>javax.servlet:servlet-api:*:*:compile</exclude>
+                    <exclude>jakarta.mail:jakarta.mail-api</exclude>
                   </excludes>
                   <includes>
                     <!-- Allow only JUnit and JMock with scope test because -->
                     <include>org.jmock:*:*:*:test</include>
+                    <include>jmock:*:*:*:test</include>
                     <include>junit:*:*:*:test</include>
+                    <include>org.junit.*:*:*:*:test</include>
+                    <include>org.mockito:*:*:*:test</include>
                   </includes>
                 </bannedDependencies>
               </rules>
@@ -224,7 +224,7 @@
       </build>
     </profile>
     <profile>
-      <id>snapshotModules</id>
+      <id>snapshot</id>
       <dependencies>
         <dependency>
           <groupId>org.xwiki.commons</groupId>

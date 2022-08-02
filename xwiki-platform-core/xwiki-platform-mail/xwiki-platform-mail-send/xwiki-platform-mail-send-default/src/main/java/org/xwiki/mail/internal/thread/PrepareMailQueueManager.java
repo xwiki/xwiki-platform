@@ -19,9 +19,13 @@
  */
 package org.xwiki.mail.internal.thread;
 
+import java.util.concurrent.LinkedBlockingQueue;
+
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.mail.MailSenderConfiguration;
 
 /**
  * Handles all operations on the Prepare Mail Queue.
@@ -34,4 +38,12 @@ import org.xwiki.component.annotation.Component;
 public class PrepareMailQueueManager extends AbstractMailQueueManager<PrepareMailQueueItem>
     implements MailQueueManager<PrepareMailQueueItem>
 {
+    @Inject
+    private MailSenderConfiguration configuration;
+
+    @Override
+    public void initialize()
+    {
+        this.mailQueue = new LinkedBlockingQueue<>(this.configuration.getPrepareQueueCapacity());
+    }
 }

@@ -19,10 +19,20 @@
  */
 package org.xwiki.test.integration;
 
-import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.params.HttpMethodParams;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.util.TimeValue;
+import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,46 +57,48 @@ public class XWikiWatchdog
      */
     public WatchdogResponse isXWikiStarted(String url, long timeout) throws Exception
     {
-        HttpClient client = new HttpClient();
-
-        boolean connected = false;
-        long startTime = System.currentTimeMillis();
         WatchdogResponse response = new WatchdogResponse();
         response.timedOut = false;
         response.responseCode = -1;
-        response.responseBody = new byte[0];
-        while (!connected && !response.timedOut) {
-            GetMethod method = new GetMethod(url);
+        response.responseBody = "";
 
+        HttpClientBuilder builder = HttpClients
+            .custom()
             // Don't retry automatically since we're doing that in the algorithm below
-            method.getParams().setParameter(HttpMethodParams.RETRY_HANDLER,
-                new DefaultHttpMethodRetryHandler(0, false));
-            // Set a socket timeout to ensure the server has no chance of not answering to our request...
-            method.getParams().setParameter(HttpMethodParams.SO_TIMEOUT, 10000);
+            .useSystemProperties().setRetryStrategy(
+                new DefaultHttpRequestRetryStrategy(0, TimeValue.ZERO_MILLISECONDS));
 
-            try {
-                // Execute the method.
-                response.responseCode = client.executeMethod(method);
+        try (CloseableHttpClient httpclient = builder.build()) {
+            boolean connected = false;
+            long startTime = System.currentTimeMillis();
+            while (!connected && !response.timedOut) {
+                HttpGet httpGet = new HttpGet(url);
 
-                // We must always read the response body.
-                response.responseBody = method.getResponseBody();
+                // Set a socket timeout to ensure the server has no chance of not answering to our request...
+                RequestConfig requestConfig = RequestConfig.custom()
+                    .setConnectTimeout(Timeout.of(10000, TimeUnit.MILLISECONDS))
+                    .setResponseTimeout(Timeout.of(10000, TimeUnit.MILLISECONDS))
+                    .build();
+                HttpClientContext httpContext = HttpClientContext.create();
+                httpContext.setRequestConfig(requestConfig);
 
-                if (DEBUG) {
-                    LOGGER.info("Result of pinging [{}] = [{}], Message = [{}]", url, response.responseCode,
-                        new String(response.responseBody));
+                try (CloseableHttpResponse httpResponse = httpclient.execute(httpGet, httpContext)) {
+                    HttpEntity entity = httpResponse.getEntity();
+                    response.responseBody = IOUtils.toString(entity.getContent(), "UTF-8");
+                    if (DEBUG) {
+                        LOGGER.info("Result of pinging [{}] = [{}], Message = [{}]", url, response.responseCode,
+                            response.responseBody);
+                    }
+
+                    // check the http response code is either not an error, either "unauthorized"
+                    // (which is the case for products that deny view for guest, for example).
+                    connected = (response.responseCode < 400 || response.responseCode == 401);
+                } catch (Exception e) {
+                    // Do nothing as it simply means the server is not ready yet...
                 }
-
-                // check the http response code is either not an error, either "unauthorized"
-                // (which is the case for products that deny view for guest, for example).
-                connected = (response.responseCode < 400 || response.responseCode == 401);
-            } catch (Exception e) {
-                // Do nothing as it simply means the server is not ready yet...
-            } finally {
-                // Release the connection.
-                method.releaseConnection();
+                response.timedOut = (System.currentTimeMillis() - startTime > timeout * 1000L);
+                Thread.sleep(500L);
             }
-            Thread.sleep(500L);
-            response.timedOut = (System.currentTimeMillis() - startTime > timeout * 1000L);
         }
 
         if (response.timedOut) {

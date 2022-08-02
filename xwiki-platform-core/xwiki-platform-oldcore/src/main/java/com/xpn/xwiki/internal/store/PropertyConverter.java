@@ -66,21 +66,23 @@ public class PropertyConverter
         BaseProperty<?> newProperty = null;
         if (newValue != null) {
             newProperty = modifiedPropertyClass.newProperty();
-            try {
-                // Try to set the converted value.
-                newProperty.setValue(newValue);
-            } catch (Exception e) {
-                // Looks like the conversion didn't succeed. Let's try to compute the value from string.
-                // This should return null if the new value cannot be parsed from string.
-                newProperty = modifiedPropertyClass.fromString(storedProperty.toText());
-            }
             if (newProperty != null) {
-                newProperty.setId(storedProperty.getId());
-                newProperty.setName(storedProperty.getName());
-            } else {
-                // The stored value couldn't be converted to the new property type.
-                this.logger.warn("Incompatible data migration when changing field [{}] of class [{}]",
-                    modifiedPropertyClass.getName(), modifiedPropertyClass.getClassName());
+                try {
+                    // Try to set the converted value.
+                    newProperty.setValue(newValue);
+                } catch (Exception e) {
+                    // Looks like the conversion didn't succeed. Let's try to compute the value from string.
+                    // This should return null if the new value cannot be parsed from string.
+                    newProperty = modifiedPropertyClass.fromString(storedProperty.toText());
+                }
+                if (newProperty != null) {
+                    newProperty.setId(storedProperty.getId());
+                    newProperty.setName(storedProperty.getName());
+                } else {
+                    // The stored value couldn't be converted to the new property type.
+                    this.logger.warn("Incompatible data migration when changing field [{}] of class [{}]",
+                        modifiedPropertyClass.getName(), modifiedPropertyClass.getClassName());
+                }
             }
         } else {
             // If the new value is null then it means the property is not set (it can be removed).

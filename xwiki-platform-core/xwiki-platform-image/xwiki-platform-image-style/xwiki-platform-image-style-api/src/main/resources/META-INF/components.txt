@@ -1,0 +1,7 @@
+org.xwiki.image.style.internal.configuration.source.CurrentWikiImageStyleConfigurationSource
+org.xwiki.image.style.internal.configuration.source.ImageStyleConfigurationSource
+org.xwiki.image.style.internal.configuration.source.SpaceImageStyleConfigurationSource
+org.xwiki.image.style.internal.configuration.source.SpacesImageStyleConfigurationSource
+org.xwiki.image.style.internal.configuration.DefaultImageStyleConfiguration
+org.xwiki.image.style.internal.DefaultImageStyleManager
+org.xwiki.image.style.ImageStyleScriptService

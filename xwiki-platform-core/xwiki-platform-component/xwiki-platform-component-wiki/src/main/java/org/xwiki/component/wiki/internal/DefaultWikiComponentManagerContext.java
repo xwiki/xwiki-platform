@@ -24,7 +24,6 @@ import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.Execution;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -57,12 +56,6 @@ public class DefaultWikiComponentManagerContext implements WikiComponentManagerC
      */
     @Inject
     private EntityReferenceSerializer<String> serializer;
-
-    /**
-     * The {@link org.xwiki.context.Execution} component used for accessing XWikiContext.
-     */
-    @Inject
-    private Execution execution;
 
     @Override
     public DocumentReference getCurrentUserReference()

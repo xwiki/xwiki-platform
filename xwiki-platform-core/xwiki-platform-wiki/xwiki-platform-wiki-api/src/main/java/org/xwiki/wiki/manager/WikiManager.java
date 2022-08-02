@@ -43,6 +43,24 @@ public interface WikiManager
     WikiDescriptor create(String wikiId, String wikiAlias, boolean failOnExist) throws WikiManagerException;
 
     /**
+     * Create a new wiki.
+     *
+     * @param wikiId Id of the new wiki
+     * @param wikiAlias Default alias of the new wiki
+     * @param ownerId the identifier of the owner of the wiki (generally a serialized user reference)
+     * @param failOnExist throw an exception if the wikiId already exists
+     * @return the descriptor of the created wiki
+     * @throws WikiManagerException if problems occur
+     * @since 11.3
+     * @since 10.11.8
+     */
+    default WikiDescriptor create(String wikiId, String wikiAlias, String ownerId, boolean failOnExist)
+        throws WikiManagerException
+    {
+        return create(wikiId, wikiAlias, failOnExist);
+    }
+
+    /**
      * Copy a wiki.
      *
      * @param fromWikiId If of the wiki to copy
@@ -55,7 +73,7 @@ public interface WikiManager
      * @throws WikiManagerException if problems occur
      */
     WikiDescriptor copy(String fromWikiId, String newWikiId, String newWikiAlias, boolean copyHistory,
-            boolean copyRecycleBin, boolean failOnExist) throws WikiManagerException;
+        boolean copyRecycleBin, boolean failOnExist) throws WikiManagerException;
 
     /**
      * Rename a wiki.

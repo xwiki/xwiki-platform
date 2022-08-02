@@ -1,0 +1,270 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="AppWithinMinutes.Translations" locale="mr">
+  <web>AppWithinMinutes</web>
+  <name>Translations</name>
+  <language>mr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>AppWithinMinutes.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>### Home page
+platform.appwithinminutes.homePageTitle=मिनिटांतले अँप
+platform.appwithinminutes.description=XWiki च्या शक्तिशाली संरचित डेटा व्यवस्थापन प्रणालीवर आधारित, मिनिटांच्या आत सहयोगी वेब अनुप्रयोग तयार करा.
+platform.appwithinminutes.createAppButtonLabel=अनुप्रयोग बनवा
+platform.appwithinminutes.appsLiveTableHeading=अनुप्रयोग
+platform.appwithinminutes.appsLiveTable.doc.title=अनुप्रयोग
+platform.appwithinminutes.appsLiveTable.doc.author=शेवटचा लेखक
+platform.appwithinminutes.appsLiveTable.doc.date=दिनांक अपडेट करा
+platform.appwithinminutes.appsLiveTable._actions=क्रिया
+platform.appwithinminutes.grantSpaceAdminRightsSaveComment=जागा प्रशासनाचे अधिकार द्या.
+
+### AWM Applications panel entry
+platform.appwithinminutes.appPanelCreateEntry=आपले स्वतःचे तयार करा!
+
+### Wizard step
+platform.appwithinminutes.wizardStepHeading=पायरी {0} - {1}
+appWithinMinutes.wizardStep.name.name=नाव
+appWithinMinutes.wizardStep.name.title=आपल्या अनुप्रयोगास नाव द्या
+appWithinMinutes.wizardStep.name.description=अनुप्रयोगाचे नाव निवडा
+appWithinMinutes.wizardStep.structure.name=रचना करा
+appWithinMinutes.wizardStep.structure.title=आपल्या डेटाची रचना करा
+appWithinMinutes.wizardStep.structure.description=अनुप्रयोग डेटाचे वर्णन करा
+appWithinMinutes.wizardStep.entries.name=नोंदी
+appWithinMinutes.wizardStep.entries.title=आपला डेटा शोधा
+appWithinMinutes.wizardStep.entries.description=डेटा कोठे संग्रहित करायचा ते निवडा
+appWithinMinutes.wizardStep.presentation.name=सादरीकरण
+appWithinMinutes.wizardStep.presentation.title=आपले अनुप्रयोग मुख्यपृष्ठ सानुकूलित करा
+appWithinMinutes.wizardStep.presentation.description=अनुप्रयोग मुख्यपृष्ठ सानुकूलित करा
+platform.appwithinminutes.wizardStepNextButtonLabel=पुढील पायरी
+platform.appwithinminutes.wizardStepNextButtonTip=पुढील पायरीवर जा
+platform.appwithinminutes.wizardStepFinishButtonLabel=समाप्त
+platform.appwithinminutes.wizardStepFinishButtonTip=अनुप्रयोग मुख्यपृष्ठावर जा
+platform.appwithinminutes.wizardStepPreviousButtonLabel=मागील पायरी
+platform.appwithinminutes.wizardStepPreviousButtonTip=मागील पायरीवर जा
+platform.appwithinminutes.wizardStepHelpTitle=पायर्‍या
+platform.appwithinminutes.wizardStepHelpDescription=हा विझार्ड अनुप्रयोग तयार करण्याच्या प्रक्रियेमध्ये आपले मार्गदर्शन करेल. त्यासाठी या टप्प्यांचे आपल्याला अनुसरण करावे लागेल:
+
+### Wizard Step 1: Application Name
+appWithinMinutes.createApp.location.label=स्थान
+appWithinMinutes.createApp.location.hint=पृष्ठ पदानुक्रमातील स्थान जेथे अनुप्रयोग तयार केला जाईल.
+appWithinMinutes.createApp.parent.label=पालक
+### Missing: appWithinMinutes.createApp.parent.hint=The parent of the new application. Leave this field empty if you want to create a top level application.
+appWithinMinutes.createApp.parent.placeholder=Path.To.Parent
+appWithinMinutes.codeSpace.title=कोड
+appWithinMinutes.codeSpace.description=हे असे स्थान आहे जेथे अनुप्रयोग कोड आहे.
+### Missing: appWithinMinutes.codeSpace.hiddenPagesInfo=The hidden pages are also listed, even though your current user profile settings prevent to do so, otherwise none of the application code pages would be visible because they are all hidden by default.
+platform.appwithinminutes.appNamePageTitle=अनुप्रयोग तयार करा
+platform.appwithinminutes.appNameLabel=अनुप्रयोगाचे नाव
+### Missing: platform.appwithinminutes.appNameHint=The application name determines the homepage URL and the location where the application code is stored.
+platform.appwithinminutes.appNamePreviewHomePageUrlLabel=अनुप्रयोग मुख्यपृष्ठ URL
+platform.appwithinminutes.appNamePreviewCodeSpaceLabel=अनुप्रयोग कोड स्थान
+### Missing: platform.appwithinminutes.appNameIsUsedWarning=This application already exists. If you go to the next step you will be editing the existing application.
+platform.appwithinminutes.appNameEmptyError=कृपया अनुप्रयोगाचे नाव प्रविष्ट करा.
+
+### Wizard Step 2: Application Structure
+platform.appwithinminutes.classEditorPaletteTitle=फील्ड पॅलेट
+### Missing: platform.appwithinminutes.classEditorPaletteHint=Drag &amp; drop fields from the palette to create the form that will be used to input your data.
+platform.appwithinminutes.classEditorCanvasHint=पॅलेटमधून फील्ड ड्रॅग करा आणि त्यांना या भागात ड्रॉप करा.
+
+platform.appwithinminutes.classEditorUpdateTemplateLabel=टेम्पलेट अद्यतनित करा
+### Missing: platform.appwithinminutes.classEditorUpdateTemplateHint=The template ({0}) stores the default field values.
+platform.appwithinminutes.classEditorUpdateSheetLabel=पत्रक अद्यतनित करा
+### Missing: platform.appwithinminutes.classEditorUpdateSheetHint=The sheet ({0}) is used to display and edit the structured data.
+platform.appwithinminutes.classEditorUpdateTranslationsLabel=भाषांतर अद्यतनित करा
+### Missing: platform.appwithinminutes.classEditorUpdateTranslationsHint=Update the translation of field pretty names and list values ({0}).
+
+platform.appwithinminutes.classEditorMultipleSheetsWarning=या वर्गात एकाधिक पत्रके आहेत.
+platform.appwithinminutes.classEditorDuplicateFieldNameError=वर्गात समान नावाची दोन फील्ड आहेत: {0}
+platform.appwithinminutes.classEditorTemplateSaveComment=डीफॉल्ट मूल्ये अद्यतनित करा
+platform.appwithinminutes.classEditorBindSheetSaveComment=वर्ग पत्रक बांधा
+platform.appwithinminutes.classEditorSheetSaveComment=वर्ग पत्रक अद्यतनित करा
+platform.appwithinminutes.classEditorTranslationsSaveComment=भाषांतर अद्यतनित करा
+
+platform.appwithinminutes.classEditorStandardCategoryName=मानक
+platform.appwithinminutes.classEditorPickersCategoryName=पिकर्स
+platform.appwithinminutes.classEditorDocumentCategoryName=पृष्ठ
+platform.appwithinminutes.classEditorAdvancedCategoryName=प्रगत
+
+platform.appwithinminutes.classEditorDBListFieldName=डेटाबेस यादी
+platform.appwithinminutes.classEditorGroupsFieldName=गट
+platform.appwithinminutes.classEditorUsersFieldName=वापरकर्ता
+platform.appwithinminutes.classEditorDateFieldName=दिनांक
+platform.appwithinminutes.classEditorStaticListFieldName=स्थिर यादी
+platform.appwithinminutes.classEditorBooleanFieldName=बुलियन
+platform.appwithinminutes.classEditorNumberFieldName=संख्या
+platform.appwithinminutes.classEditorTextAreaFieldName=लांब मजकूर
+platform.appwithinminutes.classEditorStringFieldName=लघु मजकूर
+platform.appwithinminutes.classEditorContentFieldName=मजकूर
+platform.appwithinminutes.classEditorTitleFieldName=शीर्षक
+platform.appwithinminutes.classEditorPageFieldName=पृष्ठ
+
+platform.appwithinminutes.classEditorDeleteFieldLabel=हटवा
+platform.appwithinminutes.classEditorConfigureFieldLabel=कॉन्फिगर करा
+platform.appwithinminutes.classEditorPreviewFieldLabel=पूर्वावलोकन
+platform.appwithinminutes.classEditorPreviewFieldHint=कॉन्फिगरेशन पॅनेल लपवा आणि बदल लागू करा
+platform.appwithinminutes.classEditorMoveFieldLabel=हलवा
+platform.appwithinminutes.classEditorMoveFieldHint=ऑर्डर बदलण्यासाठी ड्रॅग आणि ड्रॉप करा
+
+platform.appwithinminutes.classEditorFieldDefaultValueToolTip=डीफॉल्ट मूल्य
+
+### Date Picker
+platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=ठीक आहे
+platform.appwithinminutes.classEditorDatePickerClearSelectedDate=साफ करा
+platform.appwithinminutes.classEditorDatePickerSelectCurrentTime=आता
+platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=आज
+
+### Static List Editor
+platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=मूल्य
+platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=आयडी
+platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=जोडा
+platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=हटवा
+
+### Missing: appWithinMinutes.templateProviderEditor.hint=Application entries are wiki pages that contain structured data.
+### Missing: appWithinMinutes.templateProviderEditor.icon.hint=The icon associated with an application entry.
+### Missing: appWithinMinutes.templateProviderEditor.description.hint=Short description of an application entry.
+### Missing: appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Where to create the entries from
+### Missing: appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=If no location is selected, the entries can be created from any page.
+### Missing: appWithinMinutes.templateProviderEditor.creationRestrictions.name=Where to create the entries
+### Missing: appWithinMinutes.templateProviderEditor.creationRestrictions.hint=If no location is selected, the entries can be created anywhere in the wiki.
+### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Don't enforce entry location
+### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Use the locations specified above only as suggestions, allowing the user to select a different location when creating an application entry.
+### Missing: appWithinMinutes.templateProviderEditor.terminal.hint=Whether the application entries should be terminal pages or not.
+
+### Wizard Step 3: Application Presentation
+### Missing: platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=Application fields
+### Missing: platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel=Generic columns
+### Missing: platform.appwithinminutes.liveTableEditorHelpTitle=Tip
+### Missing: platform.appwithinminutes.liveTableEditorHelpDescription=Generic live table columns are independent of your application structure. They provide information about the pages that hold your application data.
+### Missing: platform.appwithinminutes.liveTableEditorDocTitleColumnName=Page Title
+### Missing: platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=The title of the page that contains application data
+### Missing: platform.appwithinminutes.liveTableEditorDocNameColumnName=Page Name
+### Missing: platform.appwithinminutes.liveTableEditorDocNameColumnDescription=The name of the page that contains application data
+### Missing: platform.appwithinminutes.liveTableEditorDocLocationColumnName=Location
+### Missing: platform.appwithinminutes.liveTableEditorDocLocationColumnDescription=The location of the page that contains application data
+### Missing: platform.appwithinminutes.liveTableEditorDocAuthorColumnName=Last Author
+### Missing: platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=The user who last edited the application data
+### Missing: platform.appwithinminutes.liveTableEditorDocCreatorColumnName=Creator
+### Missing: platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription=The user who created the application data
+### Missing: platform.appwithinminutes.liveTableEditorDocDateColumnName=Date
+### Missing: platform.appwithinminutes.liveTableEditorDocDateColumnDescription=The date when the application data was last edited
+### Missing: platform.appwithinminutes.liveTableEditorDocCreationDateColumnName=Creation Date
+### Missing: platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription=The date when the application data was created
+### Missing: platform.appwithinminutes.liveTableEditorActionsColumnName=Actions
+### Missing: platform.appwithinminutes.liveTableEditorActionsColumnDescription=A list of actions that can be performed on the application data, such as edit and delete
+### Missing: platform.appwithinminutes.liveTableEditorAttachmentsColumnName=Attachments
+### Missing: platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=A special column to display links to the attachments of a data page
+### Missing: platform.appwithinminutes.liveTableEditorImagesColumnName=Images
+### Missing: platform.appwithinminutes.liveTableEditorImagesColumnDescription=A special column to display the images attached to a data page
+### Missing: platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
+### Missing: platform.appwithinminutes.liveTableEditorAvatarColumnDescription=A special column to display the user avatar. Works only for a table bound to the XWiki.XWikiUsers class
+### Missing: platform.appwithinminutes.liveTableEditorTitleHint=The application title to be displayed on the application home page, on the applications panel and live table, on the breadcrumb, etc.
+### Missing: platform.appwithinminutes.liveTableEditorDescriptionHint=The content to be displayed on the homepage above the live table with the application data. Use it to describe the application.
+### Missing: platform.appwithinminutes.liveTableEditorColumnsHint=Select the columns you would like to include in the live table displayed on the application home page.
+### Missing: platform.appwithinminutes.liveTableEditorSaveComment=Update LiveTable
+### Missing: platform.appwithinminutes.liveTableEditorMoveColumnHint=Drag and drop to change the order
+platform.appwithinminutes.liveTableEditorDeleteColumnHint=हटवा
+platform.appwithinminutes.liveTableEditorAddColumnHint=निवडलेला स्तंभ जोडा
+### Missing: platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Some columns are deprecated, probably because the corresponding application fields have been deleted. Do you want to remove them? &lt;a href=""&gt;Yes&lt;/a&gt; / &lt;a href=""&gt;No&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorIcon=आयकॉन
+### Missing: platform.appwithinminutes.liveTableEditorIconHintWithPicker=The application icon. You can select an icon from the icon picker or you can reference an attached image.
+
+### Wizard Step 4: Application home page
+platform.appwithinminutes.appLiveTableHeading=नोंदी
+platform.appwithinminutes.appLiveTableEditEntryActionName=संपादित करा
+platform.appwithinminutes.appLiveTableDeleteEntryActionName=हटवा
+platform.appwithinminutes.appHomePageActionsHeading=क्रिया
+platform.appwithinminutes.appHomePageAddEntryLabel=जोडा
+platform.appwithinminutes.appHomePageAddEntryHint=नवीन प्रविष्टी जोडा
+platform.appwithinminutes.appHomePageEntryNameLabel=नोंदीचे नाव:
+platform.appwithinminutes.appHomePageDeleteEntriesLabel=सर्व नोंदी हटवा
+platform.appwithinminutes.appHomePageEditAppLabel=अनुप्रयोग संपादित करा
+platform.appwithinminutes.appHomePageTranslateAppLabel=अनुप्रयोगाचा अनुवाद करा
+platform.appwithinminutes.appHomePageDeleteAppLabel=अनुप्रयोग हटवा
+### Missing: platform.appwithinminutes.appHomePageMovedWarning=The application might not function correctly because it has been renamed or moved without updating the code. Please edit the application and follow the steps in order to update the code.
+### Missing: AppWithinMinutes.LiveTableClass_description=Description
+### Missing: AppWithinMinutes.LiveTableClass_columns=Live Table Columns
+
+### Delete application dialog
+### Missing: platform.appwithinminutes.deleteAppConfirmation=The application {0} and ALL its entries will be deleted. Are you sure you want to continue?
+### Missing: platform.appwithinminutes.deleteAppEntriesConfirmation=ALL the entries of the application {0} will be deleted. Are you sure you want to continue?
+platform.appwithinminutes.deleteAppDoesNotExistError=निर्दिष्ट अनुप्रयोग अस्तित्वात नाही.
+platform.appwithinminutes.deleteAppInvalidAppError=निर्दिष्ट नाव मिनिटांच्या अनुप्रयोगामध्ये वैध अ‍ॅप नाही.
+platform.appwithinminutes.deleteAppNotSpecifiedError=अनुप्रयोगाचे नाव निर्दिष्ट केलेले नाही.
+
+### Rename Application
+### Missing: appWithinMinutes.renameApp.changeAppTitleInfo=You can change the application title without renaming the application just by editing the application home page.
+### Missing: appWithinMinutes.renameApp.regenerateAppCodeWarning=The application code is going to be regenerated if you rename the application. Code customizations will be overwritten as a consequence.
+appWithinMinutes.renameApp.newName.label=नवीन नाव
+appWithinMinutes.renameApp.pageExistsError=या नावाचे पृष्ठ निवडलेल्या ठिकाणी आधीपासून विद्यमान आहे.
+appWithinMinutes.renameApp.locationForbiddenError=आपल्याला निवडलेल्या ठिकाणी अनुप्रयोग हलविण्याची परवानगी नाही.
+appWithinMinutes.renameApp.location.label=नवीन स्थान
+appWithinMinutes.renameApp.location.hint=अनुप्रयोग कोठे हलवायचे ते पृष्ठ पदानुक्रमातील स्थान.
+appWithinMinutes.renameApp.parent.label=नवीन पालक
+### Missing: appWithinMinutes.renameApp.parent.hint=The new parent page. Leave this field empty if you want to move the application to the top of the page hierarchy.
+appWithinMinutes.renameApp.inProgress=अनुप्रयोग पुनर्नामित करीत आहे...
+appWithinMinutes.renameApp.done=अनुप्रयोगाचे नाव बदलले
+appWithinMinutes.renameApp.failed=अनुप्रयोगाचे नाव बदलण्यात अयशस्वी
+
+### Deprecated keys
+### Since 8.4
+platform.appwithinminutes.appNamePreviewClassReferenceLabel=अनुप्रयोग वर्ग
+platform.appwithinminutes.appNamePreviewDataSpaceLabel=अनुप्रयोग डेटा स्थान
+
+platform.appwithinminutes.liveTableEditorDocSpaceColumnName=जागा
+platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=अनुप्रयोग प्रविष्टी असलेल्या जागेचे नाव
+platform.appwithinminutes.liveTableEditorDocFullNameColumnName=पृष्ठ पूर्ण नाव
+### Missing: platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=The name of the page that contains the application entry, prefixed with the space name
+
+#@deprecated appWithinMinutes.wizardStep.name.name
+platform.appwithinminutes.wizardStep1Name=नाव
+#@deprecated appWithinMinutes.wizardStep.name.title
+platform.appwithinminutes.wizardStep1Title=आपल्या अनुप्रयोगास नाव द्या
+#@deprecated appWithinMinutes.wizardStep.name.description
+platform.appwithinminutes.wizardStep1Description=अनुप्रयोग नाव निवडा
+#@deprecated appWithinMinutes.wizardStep.structure.name
+platform.appwithinminutes.wizardStep2Name=रचना करा
+#@deprecated appWithinMinutes.wizardStep.structure.title
+platform.appwithinminutes.wizardStep2Title=आपल्या डेटाची रचना करा
+#@deprecated appWithinMinutes.wizardStep.structure.description
+platform.appwithinminutes.wizardStep2Description=अनुप्रयोग डेटाचे वर्णन करा
+#@deprecated appWithinMinutes.wizardStep.presentation.name
+platform.appwithinminutes.wizardStep3Name=सादरीकरण
+#@deprecated appWithinMinutes.wizardStep.presentation.title
+platform.appwithinminutes.wizardStep3Title=आपले अनुप्रयोग मुख्यपृष्ठ सानुकूलित करा
+#@deprecated appWithinMinutes.wizardStep.presentation.description
+platform.appwithinminutes.wizardStep3Description=अनुप्रयोग मुख्यपृष्ठ सानुकूलित करा
+
+### Since 11.0
+platform.appwithinminutes.appsLiveTable.doc.space=अनुप्रयोग नाव
+appWithinMinutes.classEditor.title={0} रचना
+appWithinMinutes.templateProviderEditor.title={0} नोंदी</content>
+</xwikidoc>

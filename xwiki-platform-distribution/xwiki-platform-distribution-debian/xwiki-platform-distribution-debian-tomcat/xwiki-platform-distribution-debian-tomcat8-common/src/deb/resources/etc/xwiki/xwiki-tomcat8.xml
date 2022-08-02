@@ -22,12 +22,32 @@
  *
 -->
 
-<!-- Context configuration file for the XWiki Web App -->
+<!--
+  Context configuration file for the XWiki Web App
 
-<Context path="/xwiki" docBase="/usr/lib/xwiki" privileged="true" crossContext="true">
-  <!-- Make symlinks work in Tomcat -->
-  <Resources allowLinking="true" />
+  This file is used only for Tomcat8 deployment of XWiki via debian packages.
+  It is equivalent to, and needs to be kept up to date with traditional
+  deployment file:
+  xwiki-platform/xwiki-platform-core/xwiki-platform-web/xwiki-platform-web-war/src/main/webapp/META-INF/context.xml
 
-  <!-- Disable JAR scanning since Xwiki does not need that -->
-  <JarScanner scanClassPath="false"/>
+  Prevent JAR scanning and disable JSP support in order to optimize Tomcat startup time. Note that we keep WebSocket
+  support enabled because it is needed by the real-time editing.
+  See https://wiki.apache.org/tomcat/HowTo/FasterStartUp &
+  https://tcollignon.github.io/2016/02/09/Accelerate-tomcat-78-start-up.html
+  (sections "Disable scanning the web application", "Disable scanning web-fragment jar", "Excludes jars for scanning",
+  "Disable JSP support")
+-->
+<Context path="/xwiki" docBase="/usr/lib/xwiki" containerSciFilter="org.apache.jasper.servlet.JasperInitializer">
+
+  <!-- Make symlinks work in Tomcat, and fix problem described in
+       XWIKI-16236 & XWIKI-15756 causing catalina.out warnings on "evicting
+       expired cache entries", which is solved by increasing the cache
+       size. 
+  -->
+  <Resources allowLinking="true" cachingAllowed="true" cacheMaxSize="50176"/>
+
+  <!-- Disable JAR scanning since XWiki does not need that -->
+  <JarScanner scanClassPath="false">
+    <JarScanFilter defaultTldScan="false"/>
+  </JarScanner>
 </Context>

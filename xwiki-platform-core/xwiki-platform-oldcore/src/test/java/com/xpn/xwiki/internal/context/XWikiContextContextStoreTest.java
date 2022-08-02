@@ -21,16 +21,23 @@ package com.xpn.xwiki.internal.context;
 
 import java.io.Serializable;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.Cookie;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.container.Container;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -62,11 +69,15 @@ import static org.mockito.Mockito.when;
  */
 @OldcoreTest
 @ReferenceComponentList
-public class XWikiContextContextStoreTest
+@ComponentList(RequestInitializer.class)
+class XWikiContextContextStoreTest
 {
     private static final String WIKI = "wiki";
 
     private static final String REQUESTWIKI = "requestwiki";
+
+    @MockComponent
+    private Container container;
 
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
@@ -90,17 +101,17 @@ public class XWikiContextContextStoreTest
 
         doReturn("webapppath").when(this.oldcore.getSpyXWiki()).getWebAppPath(this.oldcore.getXWikiContext());
 
-        this.wikiURL = new URL("http", "host", 42, "file");
+        this.wikiURL = new URL("http", "host", 42, "/file");
         doReturn(this.wikiURL).when(this.oldcore.getSpyXWiki()).getServerURL(this.descriptor.getId(),
             this.oldcore.getXWikiContext());
 
-        this.requestwikiURL = new URL("https", "host2", 84, "file2");
+        this.requestwikiURL = new URL("https", "host2", 84, "/file2");
         doReturn(this.requestwikiURL).when(this.oldcore.getSpyXWiki()).getServerURL(REQUESTWIKI,
             this.oldcore.getXWikiContext());
     }
 
     @Test
-    public void saveEmpty()
+    void saveEmpty()
     {
         Map<String, Serializable> contextStore = new HashMap<>();
 
@@ -110,7 +121,7 @@ public class XWikiContextContextStoreTest
     }
 
     @Test
-    public void save()
+    void save()
     {
         this.oldcore.getXWikiContext().setWikiId(WIKI);
 
@@ -122,7 +133,37 @@ public class XWikiContextContextStoreTest
     }
 
     @Test
-    public void saveRequestwiki()
+    void saveRequest()
+    {
+        Map<String, String[]> parameters = new HashMap<>();
+        parameters.put("param1", new String[] {"value1", "value2"});
+        Cookie[] cookies = new Cookie[] {new Cookie("color", "red")};
+        XWikiServletRequestStub request = new XWikiServletRequestStub(this.wikiURL, "/test", parameters, cookies);
+        this.oldcore.getXWikiContext().setRequest(request);
+
+        Map<String, Serializable> contextStore = new HashMap<>();
+
+        this.store.save(contextStore, Arrays.asList(XWikiContextContextStore.PREFIX_PROP_REQUEST));
+
+        assertEquals(4, contextStore.size());
+        assertEquals(this.wikiURL.toString(), contextStore.get(XWikiContextContextStore.PROP_REQUEST_URL).toString());
+        assertEquals("/test", contextStore.get(XWikiContextContextStore.PROP_REQUEST_CONTEXTPATH));
+
+        Map<String, String[]> storedParameters =
+            (Map<String, String[]>) contextStore.get(XWikiContextContextStore.PROP_REQUEST_PARAMETERS);
+        assertEquals(1, storedParameters.size());
+        Map.Entry<String, String[]> entry = storedParameters.entrySet().iterator().next();
+        assertEquals("param1", entry.getKey());
+        assertEquals(Arrays.asList(parameters.get("param1")), Arrays.asList(entry.getValue()));
+
+        Cookie[] storedCookies = (Cookie[]) contextStore.get(XWikiContextContextStore.PROP_REQUEST_COOKIES);
+        assertEquals(1, storedCookies.length);
+        assertEquals(cookies[0].getName(), storedCookies[0].getName());
+        assertEquals(cookies[0].getValue(), storedCookies[0].getValue());
+    }
+
+    @Test
+    void saveRequestwiki()
     {
         this.oldcore.getXWikiContext().setWikiId(WIKI);
         this.oldcore.getXWikiContext().setOriginalWikiId(this.oldcore.getXWikiContext().getWikiId());
@@ -147,13 +188,20 @@ public class XWikiContextContextStoreTest
     }
 
     @Test
-    public void restoreEmpty()
+    void restoreEmpty() throws MalformedURLException
     {
+        XWikiServletRequestStub request = new XWikiServletRequestStub(new URL("http://stub"),
+            Collections.singletonMap("parameter", new String[] {"value"}));
+
+        this.oldcore.getXWikiContext().setRequest(request);
+
         this.store.restore(new HashMap<>());
+
+        assertTrue(((XWikiServletRequestStub) this.oldcore.getXWikiContext().getRequest()).isDaemon());
     }
 
     @Test
-    public void restoreWiki()
+    void restoreWiki()
     {
         assertNotEquals(WIKI, this.oldcore.getXWikiContext().getWikiId());
         assertNull(this.oldcore.getXWikiContext().getRequest());
@@ -176,7 +224,36 @@ public class XWikiContextContextStoreTest
     }
 
     @Test
-    public void restoreAuthor() throws XWikiException
+    void restoreRequestURL() throws MalformedURLException, URISyntaxException
+    {
+        assertNull(this.oldcore.getXWikiContext().getURL());
+
+        URL url = new URL("http://host:80/path?param=value#hash");
+
+        Map<String, Serializable> contextStore = new HashMap<>();
+        contextStore.put(XWikiContextContextStore.PROP_REQUEST_URL, url);
+
+        this.store.restore(contextStore);
+
+        assertEquals(url.toURI(), this.oldcore.getXWikiContext().getURL().toURI());
+    }
+
+    @Test
+    void restoreDocument()
+    {
+        DocumentReference document = new DocumentReference("docwiki", "space", "doc");
+
+        Map<String, Serializable> contextStore = new HashMap<>();
+        contextStore.put(XWikiContextContextStore.PROP_DOCUMENT_REFERENCE, document);
+
+        this.store.restore(contextStore);
+
+        assertEquals(document, this.oldcore.getXWikiContext().getDoc().getDocumentReference());
+        assertEquals("docwiki", this.oldcore.getXWikiContext().getWikiId());
+    }
+
+    @Test
+    void restoreAuthor() throws XWikiException
     {
         assertNull(this.oldcore.getXWikiContext().getAuthorReference());
         assertNull(this.oldcore.getXWikiContext().get(XWikiDocument.CKEY_SDOC));

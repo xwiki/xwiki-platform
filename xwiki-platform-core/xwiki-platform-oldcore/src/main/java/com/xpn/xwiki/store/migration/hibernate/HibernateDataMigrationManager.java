@@ -26,17 +26,21 @@ import java.util.List;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Projections;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
+import com.xpn.xwiki.internal.store.hibernate.MigrationResourceAccessor;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -45,6 +49,7 @@ import com.xpn.xwiki.store.migration.DataMigration;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
+import liquibase.Contexts;
 import liquibase.Liquibase;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
@@ -72,14 +77,21 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
      * @return store system for execute store-specific actions.
      * @throws DataMigrationException if the store could not be reached
      */
-    public XWikiHibernateBaseStore getStore() throws DataMigrationException
+    public XWikiHibernateBaseStore getBaseStore() throws DataMigrationException
     {
         try {
-            return (XWikiHibernateBaseStore) this.componentManager.getInstance(XWikiStoreInterface.class,
-                XWikiHibernateBaseStore.HINT);
+            return this.componentManager.getInstance(XWikiStoreInterface.class, XWikiHibernateBaseStore.HINT);
         } catch (ComponentLookupException e) {
-            throw new DataMigrationException(
-                String.format("Unable to reach the store for database %s", getXWikiContext().getWikiId()), e);
+            throw new DataMigrationException("Unable to reach the base store", e);
+        }
+    }
+
+    private HibernateStore getStore() throws DataMigrationException
+    {
+        try {
+            return this.componentManager.getInstance(HibernateStore.class);
+        } catch (ComponentLookupException e) {
+            throw new DataMigrationException("Unable to reach the store", e);
         }
     }
 
@@ -92,33 +104,40 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
         }
 
         final XWikiContext context = getXWikiContext();
-        final XWikiHibernateBaseStore store = getStore();
+        final HibernateStore store = getStore();
+
+        // Check if the version table exist
+        if (!store.tableExists(XWikiDBVersion.class)) {
+            // Check if the document table exist
+            if (!store.tableExists(XWikiDocument.class)) {
+                // The database does not seems to be initialized at all
+                return null;
+            }
+
+            // The database seems older than the introduction of the version table
+            return new XWikiDBVersion(0);
+        }
+
+        XWikiHibernateBaseStore baseStore = getBaseStore();
 
         // Try retrieving a version from the database
-        ver = store.failSafeExecuteRead(context, new HibernateCallback<XWikiDBVersion>()
-        {
-            @Override
-            public XWikiDBVersion doInHibernate(Session session) throws HibernateException
-            {
-                // Retrieve the version from the database
-                return (XWikiDBVersion) session.createCriteria(XWikiDBVersion.class).uniqueResult();
-            }
-        });
-
-        // if it fails, return version 0 if there is some documents in the database, else null (empty db?)
-        if (ver == null) {
-            ver = store.failSafeExecuteRead(getXWikiContext(), new HibernateCallback<XWikiDBVersion>()
+        try {
+            ver = baseStore.executeRead(context, new HibernateCallback<XWikiDBVersion>()
             {
                 @Override
                 public XWikiDBVersion doInHibernate(Session session) throws HibernateException
                 {
-                    if (((Number) session.createCriteria(XWikiDocument.class).setProjection(Projections.rowCount())
-                        .uniqueResult()).longValue() > 0) {
-                        return new XWikiDBVersion(0);
-                    }
-                    return null;
+                    CriteriaBuilder builder = session.getCriteriaBuilder();
+                    CriteriaQuery<XWikiDBVersion> query = builder.createQuery(XWikiDBVersion.class);
+                    Root<XWikiDBVersion> root = query.from(XWikiDBVersion.class);
+                    query.select(root);
+                    List<XWikiDBVersion> versions = session.createQuery(query).getResultList();
+
+                    return versions.isEmpty() ? new XWikiDBVersion(0) : versions.get(0);
                 }
             });
+        } catch (XWikiException e) {
+            throw new DataMigrationException("Failed to get the database version", e);
         }
 
         return ver;
@@ -128,7 +147,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
     protected void initializeEmptyDB() throws DataMigrationException
     {
         final XWikiContext context = getXWikiContext();
-        final XWikiHibernateBaseStore store = getStore();
+        final XWikiHibernateBaseStore store = getBaseStore();
 
         final Session originalSession = store.getSession(context);
         final Transaction originalTransaction = store.getTransaction(context);
@@ -150,16 +169,11 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
         final XWikiContext context = getXWikiContext();
 
         try {
-            getStore().executeWrite(context, new HibernateCallback<Object>()
-            {
-                @Override
-                public Object doInHibernate(Session session) throws HibernateException
-                {
-                    session.createQuery("delete from " + XWikiDBVersion.class.getName()).executeUpdate();
-                    session.save(version);
+            getBaseStore().executeWrite(context, session -> {
+                session.createQuery("delete from " + XWikiDBVersion.class.getName()).executeUpdate();
+                session.save(version);
 
-                    return null;
-                }
+                return null;
             });
         } catch (Exception e) {
             throw new DataMigrationException(String.format("Unable to store new data version %d into database %s",
@@ -191,51 +205,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
             this.logger.info("Checking Hibernate mapping and updating schema if needed for wiki [{}]",
                 getXWikiContext().getWikiId());
         }
-        getStore().updateSchema(getXWikiContext(), true);
-    }
-
-    /**
-     * Get agregated liquibase change logs from a set of migration.
-     *
-     * @param migrations the set of migration to visit
-     * @param preHibernate if true, get pre-hibernate schema update changelogs.
-     * @return retrieved change logs
-     * @throws DataMigrationException if an issue occurs in a migrator during retrieval of a change log
-     * @since 4.3
-     */
-    private String getLiquibaseChangeLogs(Collection<XWikiMigration> migrations, boolean preHibernate)
-        throws DataMigrationException
-    {
-        StringBuilder changeLogs = new StringBuilder(10000);
-        if (migrations != null) {
-            for (XWikiMigration migration : migrations) {
-                if (migration.dataMigration instanceof HibernateDataMigration) {
-                    String changeLog;
-                    if (preHibernate) {
-                        changeLog =
-                            ((HibernateDataMigration) migration.dataMigration).getPreHibernateLiquibaseChangeLog();
-                    } else {
-                        changeLog = ((HibernateDataMigration) migration.dataMigration).getLiquibaseChangeLog();
-                    }
-                    if (changeLog != null) {
-                        changeLogs.append(changeLog);
-                    }
-                }
-            }
-        }
-
-        if (!preHibernate) {
-            // Add liquibase changes from resources if any
-            try {
-                if (getClass().getClassLoader().getResources(LIQUIBASE_RESOURCE).hasMoreElements()) {
-                    changeLogs.append("<includeAll path=\"" + LIQUIBASE_RESOURCE + "\"/>");
-                }
-            } catch (IOException ignored) {
-                // ignored
-            }
-        }
-
-        return changeLogs.toString();
+        getBaseStore().updateSchema(getXWikiContext(), true);
     }
 
     /**
@@ -245,64 +215,104 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
      * @param preHibernate if true, use pre-hibernate schema update changelogs.
      * @throws XWikiException
      * @throws DataMigrationException
-     * @since 4.3
      */
     private void liquibaseUpdate(Collection<XWikiMigration> migrations, boolean preHibernate)
         throws XWikiException, DataMigrationException
     {
-        String liquibaseChangeLogs = getLiquibaseChangeLogs(migrations, preHibernate);
+        final String database = getXWikiContext().getWikiId();
+
+        // Execute migrations
+        if (migrations != null) {
+            for (XWikiMigration migration : migrations) {
+                if (migration.dataMigration instanceof HibernateDataMigration) {
+                    liquibaseUpdate((HibernateDataMigration) migration.dataMigration, preHibernate, database);
+                }
+            }
+        }
+
+        if (!preHibernate) {
+            // Execute liquibase changes from resources if any
+            try {
+                if (getClass().getClassLoader().getResources(LIQUIBASE_RESOURCE).hasMoreElements()) {
+                    this.logger.info("Execute liquibase changes from [{}] resource on database [{}]",
+                        LIQUIBASE_RESOURCE, database);
+                }
+            } catch (IOException ignored) {
+                // ignored
+            }
+        }
+    }
+
+    private void liquibaseUpdate(HibernateDataMigration migration, boolean preHibernate, String database)
+        throws XWikiException, DataMigrationException
+    {
+        String liquibaseChangeLogs;
+        if (preHibernate) {
+            liquibaseChangeLogs = migration.getPreHibernateLiquibaseChangeLog();
+        } else {
+            liquibaseChangeLogs = migration.getLiquibaseChangeLog();
+        }
+
         if (liquibaseChangeLogs == null || liquibaseChangeLogs.length() == 0) {
             return;
         }
 
-        final String database = getXWikiContext().getWikiId();
-
         if (this.logger.isInfoEnabled()) {
             if (preHibernate) {
-                this.logger.info("Running early schema updates (using liquibase) for database [{}]", database);
+                this.logger.info("Running early schema updates (using liquibase) for migration [{}] on database [{}]",
+                    migration.getName(), database);
             } else {
-                this.logger.info("Running additional schema updates (using liquibase) for database [{}]", database);
+                this.logger.info(
+                    "Running additional schema updates (using liquibase) for migration [{}] on database [{}]",
+                    migration.getName(), database);
             }
         }
 
+        liquibaseUpdate(liquibaseChangeLogs, database);
+    }
+
+    private void liquibaseUpdate(String liquibaseChangeLogs, String database)
+        throws XWikiException, DataMigrationException
+    {
         final StringBuilder changeLogs = new StringBuilder(10000);
         changeLogs.append(getLiquibaseChangeLogHeader());
         changeLogs.append(liquibaseChangeLogs);
         changeLogs.append(getLiquibaseChangeLogFooter());
 
-        final XWikiHibernateBaseStore store = getStore();
+        final XWikiHibernateBaseStore store = getBaseStore();
 
         store.executeRead(getXWikiContext(), new HibernateCallback<Object>()
         {
             @Override
             public Object doInHibernate(Session session) throws XWikiException
             {
+                session.doWork(connection -> {
+                    Liquibase lb;
+                    try {
+                        Database lbDatabase = DatabaseFactory.getInstance()
+                            .findCorrectDatabaseImplementation(new JdbcConnection(connection));
 
-                Liquibase lb;
-                try {
-                    Database lbDatabase = DatabaseFactory.getInstance()
-                        .findCorrectDatabaseImplementation(new JdbcConnection(session.connection()));
+                        // Precise the schema name to liquibase, since it does not usually determine it
+                        // properly (See XWIKI-8813).
+                        lbDatabase.setDefaultSchemaName(store.getSchemaFromWikiName(getXWikiContext()));
 
-                    // Precise the schema name to liquibase, since it does not usually determine it
-                    // properly (See XWIKI-8813).
-                    lbDatabase.setDefaultSchemaName(store.getSchemaFromWikiName(getXWikiContext()));
+                        lb = new Liquibase(MigrationResourceAccessor.CHANGELOG_NAME,
+                            new MigrationResourceAccessor(changeLogs.toString()), lbDatabase);
+                    } catch (LiquibaseException e) {
+                        throw new HibernateException(new XWikiException(
+                            XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_MIGRATION, String
+                                .format("Unable to launch liquibase for database %s, schema update failed.", database),
+                            e));
+                    }
 
-                    lb = new Liquibase(MigrationResourceAccessor.CHANGELOG_NAME,
-                        new MigrationResourceAccessor(changeLogs.toString()), lbDatabase);
-                } catch (LiquibaseException e) {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                        XWikiException.ERROR_XWIKI_STORE_MIGRATION,
-                        String.format("Unable to launch liquibase for database %s, schema update failed.", database),
-                        e);
-                }
-
-                try {
-                    lb.update(null);
-                } catch (LiquibaseException e) {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                        XWikiException.ERROR_XWIKI_STORE_MIGRATION,
-                        String.format("Unable to update schema of database %s.", database), e);
-                }
+                    try {
+                        lb.update((Contexts) null);
+                    } catch (LiquibaseException e) {
+                        throw new HibernateException(new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                            XWikiException.ERROR_XWIKI_STORE_MIGRATION,
+                            String.format("Unable to update schema of database %s.", database), e));
+                    }
+                });
 
                 return null;
             }
@@ -318,8 +328,9 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
         return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + "<databaseChangeLog\n"
             + "    xmlns=\"http://www.liquibase.org/xml/ns/dbchangelog\"\n"
             + "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
+            + "    xmlns:ext=\"http://www.liquibase.org/xml/ns/dbchangelog-ext\"\n"
             + "    xsi:schemaLocation=\"http://www.liquibase.org/xml/ns/dbchangelog "
-            + "http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd\">";
+            + "http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd\">";
     }
 
     /**
@@ -335,7 +346,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
     protected void startMigrations() throws DataMigrationException
     {
         XWikiContext context = getXWikiContext();
-        XWikiHibernateBaseStore store = getStore();
+        XWikiHibernateBaseStore store = getBaseStore();
 
         Session originalSession = store.getSession(context);
         Transaction originalTransaction = store.getTransaction(context);

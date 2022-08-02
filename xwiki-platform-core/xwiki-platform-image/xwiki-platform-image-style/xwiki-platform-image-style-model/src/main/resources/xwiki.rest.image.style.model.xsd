@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ *
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+-->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.xwiki.org/imageStyle"
+  xmlns:imageStyle="http://www.xwiki.org/imageStyle" elementFormDefault="qualified">
+
+  <!--
+  *
+  * Types
+  *
+  -->
+
+  <complexType name="Style">
+    <annotation>
+      <documentation>Image Style metadata.</documentation>
+    </annotation>
+    <sequence>
+      <element name="identifier" type="string"/>
+      <element name="prettyName" type="string"/>
+      <element name="type" type="string"/>
+      <element name="adjustableSize" type="boolean" nillable="true"/>
+      <element name="defaultWidth" type="long" nillable="true"/>
+      <element name="defaultHeight" type="long" nillable="true"/>
+      <element name="adjustableBorder" type="boolean" nillable="true"/>
+      <element name="defaultBorder" type="boolean" nillable="true"/>
+      <element name="adjustableAlignment" type="boolean" nillable="true"/>
+      <element name="defaultAlignment" type="string"/>
+      <element name="adjustableTextWrap" type="boolean" nillable="true"/>
+      <element name="defaultTextWrap" type="boolean" nillable="true"/>
+    </sequence>
+  </complexType>
+
+  <complexType name="Styles">
+    <annotation>
+      <documentation>A collection of image styles.</documentation>
+    </annotation>
+    <sequence>
+      <!-- A collection of resolved translations. -->
+      <element name="imageStyle" type="imageStyle:Style" minOccurs="0" maxOccurs="unbounded"/>
+<!--      <element name="default" type="string"/>-->
+    </sequence>
+  </complexType>
+
+  <!--
+  *
+  * Elements
+  *
+  -->
+
+  <element name="styles" type="imageStyle:Styles"/>
+</schema>

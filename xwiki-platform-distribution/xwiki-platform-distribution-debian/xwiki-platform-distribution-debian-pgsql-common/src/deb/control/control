@@ -3,11 +3,10 @@ Version: [[version]]
 Section: java
 Priority: optional
 Architecture: all
-Depends: xwiki-common (= [[version]]), postgresql, libpg-java, dbconfig-common
+Depends: xwiki-common (= [[version]]), postgresql, dbconfig-pgsql | dbconfig-common
 Provides: xwiki-database
 Replaces: xwiki-database, xwiki-enterprise-database
 Conflicts: xwiki-database, xwiki-enterprise-database
-Suggests: xwiki-tomcat7-pgsql | xwiki-tomcat8-pgsql
 Maintainer: [[debian.maintainer]]
 License: [[debian.license]]
 Description: [[debian.description]]

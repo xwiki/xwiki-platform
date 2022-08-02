@@ -19,8 +19,6 @@
  */
 package org.xwiki.store.filesystem.internal;
 
-import org.apache.commons.io.FilenameUtils;
-
 /**
  * Internal class for providing static utilities used by multiple classes in this package.
  *
@@ -58,7 +56,7 @@ public final class StoreFileUtils
             storedFileNameBuilder.append(versionName);
         }
 
-        int extensionIndex = FilenameUtils.indexOfExtension(filename);
+        int extensionIndex = filename.lastIndexOf('.');
         if (extensionIndex != -1) {
             storedFileNameBuilder.append(filename.substring(extensionIndex));
         }

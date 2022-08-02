@@ -1,15 +1,37 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
 #template('tree_macros.vm')
 
 #set ($isDocumentTreeAvailable = $xwiki.exists('XWiki.DocumentTree'))
 
 ## Configuration options for the Document Tree Source (that is used to retrieve the tree nodes).
 #set ($docTreeConfig = {
-  'exclusions': $collectionstool.set,
+  'exclusions': $collectiontool.set,
+  'filters': [],
   'filterByClass': '',
   'filterHiddenDocuments': true,
   'hierarchyMode': 'reference',
   'limit': 15,
   'root': '',
+  'rootData': {},
+  'sheet': '',
   'showAddAttachment': false,
   'showAddDocument': false,
   'showAttachments': true,
@@ -49,7 +71,25 @@
       #set ($discard = $resourceParams.put($entry.key, $value))
     #end
   #end
-  #set ($macro.options.reference = "path:$doc.getURL('get', $escapetool.url($resourceParams))")
+  ## If the current doc is forbidden in view, the tree won't be displayed because of a 403.
+  ## In that case we fallback on requesting it from the main page of the wiki.
+  #if (!$services.security.authorization.hasAccess("view", $doc.getDocumentReference()))
+    #set ($docForRequestReference = $services.wiki.getCurrentWikiDescriptor().getMainPageReference())
+    #set ($docForRequest = $xwiki.getDocument($docForRequestReference))
+  #else
+    #set ($docForRequest = $doc)
+  #end
+  #set ($macro.options.reference = "path:$docForRequest.getURL('get', $escapetool.url($resourceParams))")
+  #if ($macro.options.root && !$macro.options.showRoot && "$!macro.options.rootData" == "$!docTreeConfig.rootData")
+    ## Try to initialize the root node data based on the root node id.
+    #set ($parts = $macro.options.root.split(':', 2))
+    #if ($parts.size() == 2)
+      #set ($macro.options.rootData = {
+        'type': $parts[0],
+        'id': $parts[1]
+      })
+    #end
+  #end
   #set ($editable = $macro.options.remove('readOnly') != 'true')
   #set ($macro.options.dragAndDrop = $editable)
   #set ($macro.options.contextMenu = $editable)
@@ -66,8 +106,6 @@
   ## not handled correctly by the WebJar action. This has been fixed in the FontAwesome icon theme so we load the theme
   ## SSX instead.
   #set ($discard = $xwiki.ssx.use('IconThemes.FontAwesome'))
-  ## Include also the fix for the FontAwesome loading issue on IE8.
-  #set ($discard = $xwiki.jsx.use('IconThemes.FontAwesome'))
   #set ($_options = $macro.options)
   #tree($_options)
 #end

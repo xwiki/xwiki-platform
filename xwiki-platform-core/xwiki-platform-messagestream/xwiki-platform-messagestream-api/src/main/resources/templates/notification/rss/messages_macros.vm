@@ -1,0 +1,47 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+#template('notification/macros.vm')
+##
+##
+#*
+ * Displays the RSS feed content of a message stream event.
+ * @param event the group message event
+ * @param translationKey translation key of the message description sentence
+ * @param isGroup if 'true', includes the group as the second argument of the translationKey translation
+ *#
+#macro (messageStreamRss $event $translationKey $isGroup)
+  #set ($messageEvent = $event.events[0])
+  #set ($user = $messageEvent.user)
+  #set ($group = $messageEvent.stream)
+  #set ($userDoc = $xwiki.getDocument($user))
+  #set ($userName = $xwiki.getUserName($user, false))
+  #set ($translationParameters = ["<a href='$userDoc.getURL()'>$userName</a>"])
+  #if ($isGroup == 'true')
+    #set ($groupDoc = $xwiki.getDocument($group))
+    #set ($groupName = $xwiki.getUserName($group, false))
+    #set ($discard = $translationParameters.add("<a href='$groupDoc.getURL()'>$groupName</a>"))
+  #end
+
+<strong>$!event.events.get(0).application</strong>
+<div>
+  $services.localization.render($translationKey, $translationParameters)
+</div>
+<blockquote>$messageEvent.body</blockquote>
+#end

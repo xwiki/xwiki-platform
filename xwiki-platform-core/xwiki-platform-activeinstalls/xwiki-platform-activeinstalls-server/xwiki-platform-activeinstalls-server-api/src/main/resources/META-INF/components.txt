@@ -1,2 +1,0 @@
-org.xwiki.activeinstalls.internal.server.DefaultDataManager
-org.xwiki.activeinstalls.server.script.ActiveInstallsScriptService

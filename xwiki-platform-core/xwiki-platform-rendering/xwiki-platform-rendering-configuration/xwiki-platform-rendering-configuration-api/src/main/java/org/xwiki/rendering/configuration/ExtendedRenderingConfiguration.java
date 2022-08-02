@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.stability.Unstable;
 
 /**
  * Extends {@link RenderingConfiguration} with XWiki-specific configuration properties.
@@ -71,14 +70,15 @@ public interface ExtendedRenderingConfiguration
 
     /**
      * @return the list of Rendering Syntaxes that should be used for the current wiki (i.e. that should be proposed to
-     *         the user when editing wiki pages).
+     *         the user when editing wiki pages). These are input Syntaxes only (i.e. Syntaxes having a Parser for
+     *         them).
      */
     List<Syntax> getConfiguredSyntaxes();
 
     /**
      * @return the list of Rendering Syntaxes that should not be used for the current wiki (i.e. that should not be
      *         proposed to the user when editing wiki pages). The reason is that we want by default that all syntaxes
-     *         are enabled (for example so that when installing a new Syntax throught the Extension Manager it's active
+     *         are enabled (for example so that when installing a new Syntax through the Extension Manager it's active
      *         by default)
      */
     List<Syntax> getDisabledSyntaxes();
@@ -86,8 +86,8 @@ public interface ExtendedRenderingConfiguration
     /**
      * @return the default Syntax to use when creating new content (Documents, etc).
      * @since 11.0
+     * @since 10.11.9
      */
-    @Unstable
     default Syntax getDefaultContentSyntax()
     {
         return Syntax.XWIKI_2_1;

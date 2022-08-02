@@ -19,9 +19,12 @@
  */
 package org.xwiki.uiextension;
 
+import javax.script.ScriptContext;
+
 import org.apache.commons.collections.MapUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponentException;
@@ -32,6 +35,7 @@ import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.async.AsyncContext;
+import org.xwiki.rendering.async.internal.block.BlockAsyncRenderer;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererConfiguration;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererExecutor;
 import org.xwiki.rendering.block.WordBlock;
@@ -39,6 +43,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.util.ErrorBlockGenerator;
+import org.xwiki.script.ScriptContextManager;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.uiextension.internal.WikiUIExtension;
@@ -50,8 +55,14 @@ import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
+import static javax.script.ScriptContext.ENGINE_SCOPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNotNull;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -62,7 +73,7 @@ import static org.mockito.Mockito.when;
  */
 @OldcoreTest
 @ReferenceComponentList
-public class WikiUIExtensionTest
+class WikiUIExtensionTest
 {
     private static final DocumentReference CLASS_REF = new DocumentReference("xwiki", "XWiki", "UIExtensionClass");
 
@@ -88,6 +99,12 @@ public class WikiUIExtensionTest
     @MockComponent
     private ContentParser contentParser;
 
+    @MockComponent
+    private ScriptContextManager scriptContextManager;
+
+    @MockComponent
+    private ScriptContext scriptContext;
+
     @InjectComponentManager
     private ComponentManager componentManager;
 
@@ -105,10 +122,11 @@ public class WikiUIExtensionTest
         this.baseObject = new BaseObject();
         this.baseObject.setOwnerDocument(ownerDocument);
         this.baseObject.setXClassReference(CLASS_REF);
+        when(this.scriptContextManager.getCurrentScriptContext()).thenReturn(this.scriptContext);
     }
 
     @Test
-    public void createWikiUIExtension()
+    void createWikiUIExtension()
         throws ComponentLookupException, WikiComponentException, JobException, RenderingException
     {
         when(this.contentParser.parse("", Syntax.XWIKI_2_1, DOC_REF)).thenReturn(XDOM.EMPTY);
@@ -128,5 +146,16 @@ public class WikiUIExtensionTest
             .thenReturn(new WordBlock(""));
 
         assertEquals(new WordBlock(""), wikiUIX.execute());
+    }
+
+    @Test
+    void render() throws Exception
+    {
+        WikiUIExtension wikiUIX = new WikiUIExtension(this.baseObject, "roleHint", "id", "epId", this.componentManager);
+        BlockAsyncRenderer blockAsyncRenderer = mock(BlockAsyncRenderer.class);
+        wikiUIX.render(blockAsyncRenderer, true, true);
+        InOrder inOrder = inOrder(this.scriptContext);
+        inOrder.verify(this.scriptContext).setAttribute(eq("uix"), isNotNull(), eq(ENGINE_SCOPE));
+        inOrder.verify(this.scriptContext).setAttribute(eq("uix"), isNull(), eq(ENGINE_SCOPE));
     }
 }

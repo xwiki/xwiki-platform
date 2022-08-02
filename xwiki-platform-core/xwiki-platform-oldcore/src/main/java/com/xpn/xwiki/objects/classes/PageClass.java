@@ -34,6 +34,8 @@ public class PageClass extends DBListClass
      **/
     protected static final String XCLASSNAME = "page";
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Constructor for PageClass.
      *

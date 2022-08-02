@@ -52,7 +52,8 @@ public class X509NameScriptService implements ScriptService
      * @param email the name.
      * @return an typed {@link X509GeneralName}
      */
-    public X509Rfc822Name createX509Rfc822Name(String email) {
+    public X509Rfc822Name createX509Rfc822Name(String email)
+    {
         return new X509Rfc822Name(email);
     }
 
@@ -62,7 +63,8 @@ public class X509NameScriptService implements ScriptService
      * @param dn the name.
      * @return an typed {@link X509GeneralName}
      */
-    public X509DirectoryName createX509DirectoryName(String dn) {
+    public X509DirectoryName createX509DirectoryName(String dn)
+    {
         return new X509DirectoryName(dn);
     }
 
@@ -72,7 +74,8 @@ public class X509NameScriptService implements ScriptService
      * @param ip the name.
      * @return an typed {@link X509GeneralName}
      */
-    public X509IpAddress createX509IpAddress(String ip) {
+    public X509IpAddress createX509IpAddress(String ip)
+    {
         return new X509IpAddress(ip);
     }
 
@@ -82,7 +85,8 @@ public class X509NameScriptService implements ScriptService
      * @param uri the name.
      * @return an typed {@link X509GeneralName}
      */
-    public X509URI createX509URI(String uri) {
+    public X509URI createX509URI(String uri)
+    {
         return new X509URI(uri);
     }
 }

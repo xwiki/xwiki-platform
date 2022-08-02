@@ -254,7 +254,7 @@
     #if ($request.acceptUser || $request.rejectUser)
       ## Handle a candidate members's request.
       ##
-      #set ($candidateNumber = $mathtool.toInteger("$!{request.candidateNumber}"))
+      #set ($candidateNumber = $numbertool.toNumber("$!{request.candidateNumber}").intValue())
       #set ($candidacy = $services.wiki.user.getCandidacy($wiki.id, $candidateNumber))
       #if ($candidacy &amp;&amp; $candidacy.status == 'PENDING')
         #if ($request.acceptUser)
@@ -348,7 +348,7 @@
     #elseif ($request.cancelInvitation)
       ##
       ## Handle cancelling an invitation.
-      #set ($candidateNumber = $mathtool.toInteger("$!{request.candidateNumber}"))
+      #set ($candidateNumber = $numbertool.toNumber("$!{request.candidateNumber}").intValue())
       #set ($candidateMember = $services.wiki.user.getCandidacy($wiki.id, $candidateNumber))
       #if ($candidateMember &amp;&amp; $candidateMember.status == 'PENDING')
         ## Remove the invitation
@@ -525,7 +525,7 @@
     // Disable the membership type radio buttons when the user scope is local only.
     $('input[type=radio][name=WikiManager\\.WikiUserClass_0_membershipType]').prop('disabled', value === 'local_only');
   };
-  userScope.click(userScopeChanged);
+  userScope.on('click', userScopeChanged);
   userScopeChanged();
 });
 
@@ -545,17 +545,17 @@ require(['jquery'], function($) {
     addMembersButton.prop('disabled', true);
     parameters.push({name: 'xpage', value: 'adduorg'});
     var addMembersURL = new XWiki.Document('XWikiAllGroup', 'XWiki').getURL('get');
-    $.post(addMembersURL, parameters).done(function() {
+    Promise.resolve($.post(addMembersURL, parameters)).then(function() {
       // Clear the list of selected users.
       $('#userInput')[0].selectize.clear(true);
       // Reload the live table.
       editgrouptable.refresh();
       // Show notification message.
       new XWiki.widgets.Notification("$services.localization.render('xe.admin.groups.addSuccess')", 'done', {timeout: 5});
-    }).fail(function(response) {
+    }).catch(function(response) {
       new XWiki.widgets.Notification("$services.localization.render('xe.admin.groups.addFailure')" +
         response.statusText, 'error', {timeout: 5});
-    }).always(function() {
+    }).finally(function() {
       addMembersButton.prop('disabled', false);
     });
   });
@@ -564,7 +564,9 @@ require(['jquery'], function($) {
 require(['jquery'], function($) {
   // Refresh the members live table whenever an user is created or deleted.
   $('#userstable').on('xwiki:user:created xwiki:user:deleted', function() {
-    editgrouptable.refresh();
+    if (typeof editgrouptable != 'undefined') {
+      editgrouptable.refresh();
+    }
   });
 });</code>
     </property>

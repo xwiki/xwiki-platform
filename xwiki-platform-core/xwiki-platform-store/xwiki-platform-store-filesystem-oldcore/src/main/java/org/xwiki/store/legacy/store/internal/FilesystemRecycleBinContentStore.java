@@ -31,7 +31,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.store.FileDeleteTransactionRunnable;
 import org.xwiki.store.FileSaveTransactionRunnable;
-import org.xwiki.store.FileSerializer;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.internal.FileSystemStoreUtils;
 
@@ -62,6 +61,9 @@ public class FilesystemRecycleBinContentStore implements XWikiRecycleBinContentS
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
+    @Inject
+    private Provider<DeletedDocumentContentFileSerializer> serializerProvider;
+
     @Override
     public String getHint()
     {
@@ -78,7 +80,8 @@ public class FilesystemRecycleBinContentStore implements XWikiRecycleBinContentS
         final File contentFile =
             this.fileTools.getDeletedDocumentFileProvider(document.getDocumentReferenceWithLocale(), index)
                 .getDeletedDocumentContentFile();
-        FileSerializer serializer = new DeletedDocumentContentFileSerializer(document, StandardCharsets.UTF_8.name());
+        DeletedDocumentContentFileSerializer serializer = this.serializerProvider.get();
+        serializer.init(document, StandardCharsets.UTF_8.name());
         new FileSaveTransactionRunnable(contentFile, fileTools.getTempFile(contentFile),
             fileTools.getBackupFile(contentFile), fileTools.getLockForFile(contentFile), serializer).runIn(transaction);
 

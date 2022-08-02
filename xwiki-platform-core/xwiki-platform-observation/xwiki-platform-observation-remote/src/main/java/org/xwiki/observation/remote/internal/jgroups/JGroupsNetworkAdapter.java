@@ -79,12 +79,12 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
     /**
      * The network channels.
      */
-    private Map<String, JChannel> channels = new ConcurrentHashMap<String, JChannel>();
+    private Map<String, JChannel> channels = new ConcurrentHashMap<>();
 
     @Override
     public void send(RemoteEventData remoteEvent)
     {
-        this.logger.debug("Send JGroups remote event [" + remoteEvent + "]");
+        this.logger.debug("Send JGroups remote event [{}]", remoteEvent.toString());
 
         // Send the message to the whole group
         Message message = new Message(null, remoteEvent);
@@ -94,8 +94,8 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
             try {
                 entry.getValue().send(message);
             } catch (Exception e) {
-                this.logger
-                    .error("Failed to send message [" + remoteEvent + "] to the channel [" + entry.getKey() + "]", e);
+                this.logger.error("Failed to send message [{}] to the channel [{}]", remoteEvent.toString(),
+                    entry.getKey(), e);
             }
         }
     }
@@ -146,7 +146,7 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             JmxConfigurator.unregister(channel, mbs, channel.getClusterName());
         } catch (Exception e) {
-            this.logger.warn("Failed to unregister channel [" + channelId + "] from the JMX Server", e);
+            this.logger.warn("Failed to unregister channel [{}] from the JMX Server", channelId, e);
         }
 
         this.logger.info("Channel [{}] stopped", channelId);
@@ -190,6 +190,13 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
      */
     private ProtocolStackConfigurator loadChannelConfiguration(String channelId) throws IOException
     {
+        try (InputStream stream = getChannelConfiguration(channelId)) {
+            return XmlConfigurator.getInstance(stream);
+        }
+    }
+
+    private InputStream getChannelConfiguration(String channelId) throws IOException
+    {
         String channelFile = channelId + ".xml";
         String path = "/WEB-INF/" + CONFIGURATION_PATH + channelFile;
 
@@ -212,7 +219,7 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
             }
         }
 
-        return XmlConfigurator.getInstance(is);
+        return is;
     }
 
     @Override

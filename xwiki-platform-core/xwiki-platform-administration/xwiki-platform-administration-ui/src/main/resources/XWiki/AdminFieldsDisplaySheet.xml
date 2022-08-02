@@ -84,6 +84,9 @@
   &lt;/dt&gt;
   #if ($out != '')
     &lt;dd&gt;$out&lt;/dd&gt;
+  #else
+    ## We always display a dd element to avoid having a last dt element alone, which would lead to an invalid html.
+    &lt;dd class="hidden"&gt;&lt;/dd&gt;
   #end
   #if ($prop.name == 'colorTheme' &amp;&amp; $colorThemeHint)
     &lt;dd class="xHint"&gt;$colorThemeHint&lt;/dd&gt;

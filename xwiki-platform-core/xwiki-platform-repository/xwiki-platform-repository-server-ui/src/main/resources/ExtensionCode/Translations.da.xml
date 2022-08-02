@@ -49,6 +49,5 @@ extension.repository.doc.date=Senest rettet
 ### Missing: extension.repository.installedCount=Installs
 
 ## Administration UI
-admin.repository=Udvidelsesdepot
-</content>
+admin.repository=Udvidelsesdepot</content>
 </xwikidoc>

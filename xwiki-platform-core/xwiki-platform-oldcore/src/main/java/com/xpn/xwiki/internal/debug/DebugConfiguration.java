@@ -50,9 +50,11 @@ public class DebugConfiguration
      */
     public boolean isMinify()
     {
-        String minifyString = (String) this.container.getRequest().getProperty("minify");
-        if (minifyString != null) {
-            return Boolean.valueOf(minifyString);
+        if (this.container.getRequest() != null) {
+            String minifyString = (String) this.container.getRequest().getProperty("minify");
+            if (minifyString != null) {
+                return Boolean.valueOf(minifyString);
+            }
         }
 
         return this.properties.getProperty("debug.minify", true);

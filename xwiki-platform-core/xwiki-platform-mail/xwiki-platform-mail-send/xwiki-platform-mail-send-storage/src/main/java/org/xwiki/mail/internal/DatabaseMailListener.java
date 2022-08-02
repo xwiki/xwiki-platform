@@ -29,7 +29,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MailContentStore;
@@ -70,7 +69,7 @@ public class DatabaseMailListener extends AbstractMailListener implements Initia
     private DatabaseMailStatusResult mailStatusResult;
 
     @Override
-    public void initialize() throws InitializationException
+    public void initialize()
     {
         mailStatusResult = new DatabaseMailStatusResult(this.mailStatusStore);
     }
@@ -114,7 +113,7 @@ public class DatabaseMailListener extends AbstractMailListener implements Initia
         super.onPrepareFatalError(exception, parameters);
 
         //TODO: Store failure exception
-        logger.error("Failure during preparation phase of thread [" + getBatchId() + "]", exception);
+        logger.error("Failure during preparation phase of thread [{}]", getBatchId(), exception);
     }
 
     @Override
@@ -159,7 +158,7 @@ public class DatabaseMailListener extends AbstractMailListener implements Initia
             saveStatus(status, parameters);
         } else {
             this.logger.error("Unable to report the fatal error encountered during mail sending for message [{}] "
-                    + "of batch [{}].", uniqueMessageId, getBatchId(), exception);
+                + "of batch [{}].", uniqueMessageId, getBatchId(), exception);
         }
 
         this.mailStatusResult.incrementCurrentSize();

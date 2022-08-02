@@ -23,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 
 public class BufferOutputStream extends ServletOutputStream
 {
@@ -70,4 +71,15 @@ public class BufferOutputStream extends ServletOutputStream
         return this.buffer.toByteArray();
     }
 
+    @Override
+    public boolean isReady()
+    {
+        return true;
+    }
+
+    @Override
+    public void setWriteListener(WriteListener writeListener)
+    {
+        // Not needed
+    }
 }

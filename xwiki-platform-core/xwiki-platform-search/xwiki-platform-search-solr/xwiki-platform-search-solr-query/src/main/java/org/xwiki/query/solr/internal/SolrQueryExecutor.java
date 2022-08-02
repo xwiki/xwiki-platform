@@ -88,7 +88,7 @@ public class SolrQueryExecutor implements QueryExecutor
      * Provider for the {@link SolrInstance} that allows communication with the Solr server.
      */
     @Inject
-    protected Provider<SolrInstance> solrInstanceProvider;
+    protected SolrInstance solrInstance;
 
     /**
      * Used to retrieve the configured supported locales.
@@ -114,12 +114,11 @@ public class SolrQueryExecutor implements QueryExecutor
         try {
             this.progress.startStep(query, "query.solr.progress.execute.prepare", "Prepare");
 
-            SolrInstance solrInstance = solrInstanceProvider.get();
             SolrQuery solrQuery = createSolrQuery(query);
 
             this.progress.startStep(query, "query.solr.progress.execute.execute", "Execute");
 
-            QueryResponse response = solrInstance.query(solrQuery);
+            QueryResponse response = this.solrInstance.query(solrQuery);
 
             this.progress.startStep(query, "query.solr.progress.execute.filter", "Filter");
 

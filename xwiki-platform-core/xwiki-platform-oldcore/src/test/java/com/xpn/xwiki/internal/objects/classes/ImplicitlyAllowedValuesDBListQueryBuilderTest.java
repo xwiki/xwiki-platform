@@ -31,9 +31,12 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.DBListClass;
+import com.xpn.xwiki.objects.classes.DBTreeListClass;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertSame;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link ImplicitlyAllowedValuesDBListQueryBuilder}.
@@ -269,5 +272,41 @@ public class ImplicitlyAllowedValuesDBListQueryBuilderTest
             + "where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName "
             + "and obj.id = idProp.id.id and idProp.id.name = :idProp "
             + "and obj.id = valueProp.id.id and valueProp.id.name = :valueProp");
+    }
+
+    @Test
+    public void buildWithParent() throws Exception
+    {
+        DBTreeListClass dbTreeListClass = new DBTreeListClass();
+        dbTreeListClass.setOwnerDocument(this.dbListClass.getOwnerDocument());
+        dbTreeListClass.setParentField("parent");
+
+        this.dbListClass = dbTreeListClass;
+        assertQuery("select doc.name from XWikiDocument doc where 1 = 0");
+
+        this.dbListClass.setIdField("doc.fullName");
+        assertQuery("select distinct doc.fullName as unfilterable0, doc.fullName, doc.fullName, doc.parent"
+            + " from XWikiDocument as doc");
+
+        this.dbListClass.setIdField("");
+        this.dbListClass.setValueField("title");
+        assertQuery("select distinct doc.fullName as unfilterable0, doc.title, doc.title, doc.parent"
+            + " from XWikiDocument as doc");
+        
+        this.dbListClass.setIdField("title");
+        assertQuery("select distinct doc.fullName as unfilterable0, doc.title, doc.title, doc.parent"
+            + " from XWikiDocument as doc");
+
+        this.dbListClass.setIdField("fullName");
+        assertQuery("select distinct doc.fullName as unfilterable0, doc.fullName, doc.title, doc.parent"
+            + " from XWikiDocument as doc");
+
+        this.dbListClass.setClassname("XWiki.TagClass");
+        assertQuery("select distinct doc.fullName as unfilterable0, idProp.value, valueProp.value, parentProp.value"
+            + " from XWikiDocument as doc, BaseObject as obj, StringProperty as idProp, StringProperty as valueProp,"
+            + " StringProperty as parentProp where doc.fullName = obj.name and obj.className = :className and"
+            + " doc.fullName <> :templateName and obj.id = idProp.id.id and idProp.id.name = :idProp and"
+            + " obj.id = valueProp.id.id and valueProp.id.name = :valueProp and obj.id = parentProp.id.id and"
+            + " parentProp.id.name = :parentProp");
     }
 }

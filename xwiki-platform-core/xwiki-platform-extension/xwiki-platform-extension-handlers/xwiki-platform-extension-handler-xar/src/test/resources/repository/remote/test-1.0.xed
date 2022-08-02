@@ -12,5 +12,9 @@
       <id>dependency</id>
       <version>1.0</version>
     </dependency>
+    <dependency>
+      <id>otherdependency</id>
+      <version>1.0</version>
+    </dependency>
   </dependencies>
 </extension>

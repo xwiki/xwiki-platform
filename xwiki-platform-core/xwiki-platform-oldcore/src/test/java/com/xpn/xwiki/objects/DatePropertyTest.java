@@ -19,19 +19,18 @@
  */
 package com.xpn.xwiki.objects;
 
-import static org.junit.Assert.*;
-
 import java.sql.Timestamp;
 import java.util.Date;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
-import org.xwiki.test.ComponentManagerRule;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.ComponentTest;
 
-import com.xpn.xwiki.web.Utils;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * Unit tests for {@link DateProperty}.
@@ -39,22 +38,12 @@ import com.xpn.xwiki.web.Utils;
  * @version $Id$
  * @since 5.0M1
  */
-@ComponentList({
-    LocalStringEntityReferenceSerializer.class
-})
-public class DatePropertyTest
+@ComponentTest
+@ComponentList({LocalStringEntityReferenceSerializer.class})
+class DatePropertyTest
 {
-    @Rule
-    public ComponentManagerRule componentManager = new ComponentManagerRule();
-
-    @Before
-    public void setUp()
-    {
-        Utils.setComponentManager(this.componentManager);
-    }
-
     @Test
-    public void setValue()
+    void setValue()
     {
         Date date = new Date();
         DateProperty property = new DateProperty();
@@ -68,7 +57,7 @@ public class DatePropertyTest
      * @see "XWIKI-8648: DateProperty#equals pretty much never works between a document loaded from the database and a document loaded from the XAR for example"
      */
     @Test
-    public void setValueWithExtendedDate()
+    void setValueWithExtendedDate()
     {
         Timestamp timestamp = new Timestamp(new Date().getTime());
         DateProperty property = new DateProperty();
@@ -81,10 +70,21 @@ public class DatePropertyTest
      * Verify that we can set a date that is null (<a href="https://jira.xwiki.org/browse/XWIKI-8837">XWIKI-8837</a>).
      */
     @Test
-    public void setValueWithNullDate()
+    void setValueWithNullDate()
     {
         DateProperty property = new DateProperty();
         property.setValue(null);
         assertNull(property.getValue());
+    }
+
+    @Test
+    void cloneDate()
+    {
+        DateProperty property = new DateProperty();
+        property.setValue(new Date());
+
+        DateProperty clonedProperty = property.clone();
+
+        assertNotSame(property.getValue(), clonedProperty.getValue());
     }
 }

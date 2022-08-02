@@ -107,6 +107,21 @@ public interface Query
     Query bindValues(List<Object> values);
 
     /**
+     * Bind a map of named parameters values. This method is a convenience method allowing passing a map of values in
+     * one call instead of multiple calls to {@link #bindValue(String, Object)}.
+     *
+     * @param values list of positional parameters values.
+     * @return this query
+     * @see #bindValue(String, Object)
+     * @since 11.5RC1
+     */
+    default Query bindValues(Map<String, ?> values)
+    {
+        values.forEach(this::bindValue);
+        return this;
+    }
+
+    /**
      * Bind named parameter var with a value that will be constructed using calls to
      * {@link QueryParameter#literal(String)}, {@link QueryParameter#anychar()} and {@link QueryParameter#anyChars()}.
      * In order to perserve the fluent API, it's also possible to call {@link QueryParameter#query()} to get back the

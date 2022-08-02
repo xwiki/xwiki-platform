@@ -31,6 +31,8 @@ import com.xpn.xwiki.objects.classes.StringClass;
  */
 public class ListMetaClass extends PropertyMetaClass
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * Default constructor. Initializes the default meta properties of all List XClass property.
      */
@@ -67,15 +69,9 @@ public class ListMetaClass extends PropertyMetaClass
         displayTypeClass.setValues("input|select|radio|checkbox");
         safeput(displayTypeClass.getName(), displayTypeClass);
 
-        BooleanClass multiSelectClass = newCheckBox(false);
-        multiSelectClass.setName("multiSelect");
-        multiSelectClass.setPrettyName("Multiple Select");
-        safeput(multiSelectClass.getName(), multiSelectClass);
-
-        BooleanClass pickerClass = newCheckBox(true);
-        pickerClass.setName("picker");
-        pickerClass.setPrettyName("Use Suggest");
-        safeput(pickerClass.getName(), pickerClass);
+        addBooleanProperty("multiSelect", "Multiple Select", false);
+        addBooleanProperty("picker", "Use Suggest", true);
+        addBooleanProperty("largeStorage", "Allow large strings", false);
 
         NumberClass sizeClass = new NumberClass(this);
         sizeClass.setName("size");
@@ -131,5 +127,13 @@ public class ListMetaClass extends PropertyMetaClass
         checkBox.setDisplayFormType("checkbox");
         checkBox.setDefaultValue(checked ? 1 : 0);
         return checkBox;
+    }
+
+    private void addBooleanProperty(String name, String prettyName, boolean defaultValue)
+    {
+        BooleanClass booleanClass = newCheckBox(defaultValue);
+        booleanClass.setName(name);
+        booleanClass.setPrettyName(prettyName);
+        safeput(booleanClass.getName(), booleanClass);
     }
 }

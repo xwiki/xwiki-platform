@@ -32,7 +32,7 @@
       <outputFileNameMapping>start.jar</outputFileNameMapping>
       <outputDirectory>/jetty</outputDirectory>
       <includes>
-        <include>org.eclipse.jetty:jetty-start</include>
+        <include>org.eclipse.jetty:jetty-start:jar:shaded</include>
       </includes>
       <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->
       <useProjectArtifact>false</useProjectArtifact>
@@ -40,26 +40,22 @@
     <dependencySet>
       <outputDirectory>/jetty/lib</outputDirectory>
       <excludes>
-        <exclude>org.eclipse.jetty:jetty-start</exclude>
+        <exclude>org.eclipse.jetty:jetty-start:jar:shaded</exclude>
+        <!-- lib/ext -->
         <exclude>org.xwiki.platform:xwiki-platform-tool-jetty-listener</exclude>
         <exclude>commons-io:commons-io</exclude>
-        <!-- jetty-start.jar's  start.config file (see http://wiki.eclipse.org/Jetty/Feature/Start.jar) expects the
-             Servlet API JAR to be named servlet-api-3.0.jar. However Jetty names it javax.servlet-<version>.jar, thus
-             we need to rename it. -->
-        <exclude>org.eclipse.jetty.orbit:javax.servlet</exclude>
+        <!-- lib/annotations -->
+        <exclude>org.ow2.asm:*</exclude>
+        <exclude>jakarta.annotation:jakarta.annotation-api</exclude>
+        <!-- lib/logging -->
+        <exclude>org.slf4j:slf4j-api</exclude>
+        <exclude>org.eclipse.jetty:jetty-slf4j-impl</exclude>
+        <!-- lib/websocket -->
+        <exclude>org.eclipse.jetty.websocket:*</exclude>
+        <exclude>*:jetty-javax-websocket-api</exclude>
+        <!-- lib/apache-jsp -->
+        <exclude>org.mortbay.jasper:apache-el</exclude>
       </excludes>
-      <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->
-      <useProjectArtifact>false</useProjectArtifact>
-    </dependencySet>
-    <!-- jetty-start.jar's  start.config file (see http://wiki.eclipse.org/Jetty/Feature/Start.jar) expects the
-         Servlet API JAR to be named servlet-api-3.0.jar. However Jetty names it javax.servlet-<version>.jar, thus
-         we need to rename it. -->
-    <dependencySet>
-      <outputFileNameMapping>servlet-api-3.0.jar</outputFileNameMapping>
-      <outputDirectory>/jetty/lib</outputDirectory>
-      <includes>
-        <include>org.eclipse.jetty.orbit:javax.servlet</include>
-      </includes>
       <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->
       <useProjectArtifact>false</useProjectArtifact>
     </dependencySet>
@@ -68,6 +64,44 @@
       <includes>
         <include>org.xwiki.platform:xwiki-platform-tool-jetty-listener</include>
         <include>commons-io:commons-io</include>
+      </includes>
+      <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->
+      <useProjectArtifact>false</useProjectArtifact>
+    </dependencySet>
+    <dependencySet>
+      <outputDirectory>/jetty/lib/annotations</outputDirectory>
+      <includes>
+        <include>org.ow2.asm:*</include>
+        <include>jakarta.annotation:jakarta.annotation-api</include>
+      </includes>
+      <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->
+      <useProjectArtifact>false</useProjectArtifact>
+    </dependencySet>
+    <dependencySet>
+      <outputDirectory>/jetty/lib/websocket</outputDirectory>
+      <includes>
+        <include>org.eclipse.jetty.websocket:*</include>
+        <include>*:jetty-javax-websocket-api</include>
+      </includes>
+      <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->
+      <useProjectArtifact>false</useProjectArtifact>
+    </dependencySet>
+    <!-- Logging -->
+    <dependencySet>
+      <outputDirectory>/jetty/lib/logging</outputDirectory>
+      <includes>
+        <include>org.slf4j:slf4j-api</include>
+        <include>org.eclipse.jetty:jetty-slf4j-impl</include>
+      </includes>
+      <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->
+      <useProjectArtifact>false</useProjectArtifact>
+    </dependencySet>
+    <!-- EL -->
+    <dependencySet>
+      <!-- We don't really need JSP features (only EL implementation) but we keep the same folder and module name to limit customizations -->
+      <outputDirectory>/jetty/lib/apache-jsp</outputDirectory>
+      <includes>
+        <include>org.mortbay.jasper:apache-el</include>
       </includes>
       <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->
       <useProjectArtifact>false</useProjectArtifact>
@@ -90,6 +124,11 @@
       <excludes>
         <exclude>**/*.sh</exclude>
       </excludes>
+    </fileSet>
+    <!-- Jetty cannot output logs in a non-existent directory so we need to have it created -->
+    <fileSet>
+      <directory>${basedir}/src/main/resources/logs</directory>
+      <outputDirectory>/logs</outputDirectory>
     </fileSet>
   </fileSets>
 </assembly>

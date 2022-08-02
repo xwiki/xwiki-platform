@@ -19,9 +19,12 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -38,6 +41,9 @@ import com.xpn.xwiki.XWikiException;
  *
  * @version $Id$
  */
+@Component
+@Named("logout")
+@Singleton
 public class LogoutAction extends XWikiAction
 {
     @Override

@@ -19,165 +19,147 @@
  */
 package org.xwiki.messagestream.script;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.messagestream.MessageStream;
 import org.xwiki.messagestream.MessageStreamConfiguration;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link MessageStreamScriptService}.
- * 
+ *
  * @version $Id$
  */
-public class MessageStreamScriptServiceTest
+@ComponentTest
+class MessageStreamScriptServiceTest
 {
     private final DocumentReference targetUser = new DocumentReference("wiki", "XWiki", "JaneBuck");
 
     private final DocumentReference targetGroup = new DocumentReference("wiki", "XWiki", "MyFriends");
 
-    @Rule
-    public MockitoComponentMockingRule<MessageStreamScriptService> mocker =
-        new MockitoComponentMockingRule<>(MessageStreamScriptService.class);
-
+    @InjectMockComponents
     private MessageStreamScriptService streamService;
 
-    private DocumentAccessBridge documentAccessBridge;
+    @MockComponent
+    private Execution execution;
 
+    @MockComponent
+    private MessageStream stream;
+
+    @MockComponent
     private MessageStreamConfiguration messageStreamConfiguration;
 
-    private ExecutionContext executionContext;
+    @MockComponent
+    private DocumentAccessBridge documentAccessBridge;
 
-    @Before
-    public void configure() throws Exception
+    @BeforeEach
+    void setUp()
     {
-        this.streamService = this.mocker.getComponentUnderTest();
-
-        Execution execution = this.mocker.getInstance(Execution.class);
-        this.executionContext = new ExecutionContext();
-        when(execution.getContext()).thenReturn(this.executionContext);
-
-        documentAccessBridge = mocker.getInstance(DocumentAccessBridge.class);
-        messageStreamConfiguration = mocker.getInstance(MessageStreamConfiguration.class);
+        when(this.execution.getContext()).thenReturn(new ExecutionContext());
     }
 
     @Test
-    public void postPublicMessage() throws Exception
+    void postPublicMessage()
     {
         assertTrue(this.streamService.postPublicMessage("Hello World!"));
-
-        MessageStream stream = this.mocker.getInstance(MessageStream.class);
-        verify(stream).postPublicMessage("Hello World!");
+        verify(this.stream).postPublicMessage("Hello World!");
     }
 
     @Test
-    public void postPublicMessageWithFailure() throws Exception
+    void postPublicMessageWithFailure()
     {
-        MessageStream stream = this.mocker.getInstance(MessageStream.class);
-        doThrow(new RuntimeException("error")).when(stream).postPublicMessage("Hello World!");
-
+        doThrow(new RuntimeException("error")).when(this.stream).postPublicMessage("Hello World!");
         assertFalse(this.streamService.postPublicMessage("Hello World!"));
     }
 
     @Test
-    public void postPersonalMessage() throws Exception
+    void postPersonalMessage()
     {
         assertTrue(this.streamService.postPersonalMessage("Hello World!"));
-
-        MessageStream stream = this.mocker.getInstance(MessageStream.class);
-        verify(stream).postPersonalMessage("Hello World!");
+        verify(this.stream).postPersonalMessage("Hello World!");
     }
 
     @Test
-    public void postPersonalMessageWithFailure() throws Exception
+    void postPersonalMessageWithFailure()
     {
-        MessageStream stream = this.mocker.getInstance(MessageStream.class);
-        doThrow(new RuntimeException("error")).when(stream).postPersonalMessage("Hello World!");
-
+        doThrow(new RuntimeException("error")).when(this.stream).postPersonalMessage("Hello World!");
         assertFalse(this.streamService.postPersonalMessage("Hello World!"));
         assertEquals("error", this.streamService.getLastError().getMessage());
     }
 
     @Test
-    public void postDirectMessage() throws Exception
+    void postDirectMessage()
     {
         assertTrue(this.streamService.postDirectMessageToUser("Hello World!", this.targetUser));
-
-        MessageStream stream = this.mocker.getInstance(MessageStream.class);
-        verify(stream).postDirectMessageToUser("Hello World!", this.targetUser);
+        verify(this.stream).postDirectMessageToUser("Hello World!", this.targetUser);
     }
 
     @Test
-    public void postDirectMessageWithFailure() throws Exception
+    void postDirectMessageWithFailure()
     {
-        MessageStream stream = this.mocker.getInstance(MessageStream.class);
-        doThrow(new RuntimeException("error")).when(stream).postDirectMessageToUser("Hello World!", this.targetUser);
+        doThrow(new RuntimeException("error")).when(this.stream)
+            .postDirectMessageToUser("Hello World!", this.targetUser);
 
         assertFalse(this.streamService.postDirectMessageToUser("Hello World!", this.targetUser));
         assertEquals("error", this.streamService.getLastError().getMessage());
     }
 
     @Test
-    public void postGroupMessage() throws Exception
+    void postGroupMessage()
     {
         assertTrue(this.streamService.postMessageToGroup("Hello World!", this.targetGroup));
-
-        MessageStream stream = this.mocker.getInstance(MessageStream.class);
-        verify(stream).postMessageToGroup("Hello World!", this.targetGroup);
+        verify(this.stream).postMessageToGroup("Hello World!", this.targetGroup);
     }
 
     @Test
-    public void postGroupMessageWithFailure() throws Exception
+    void postGroupMessageWithFailure()
     {
-        MessageStream stream = this.mocker.getInstance(MessageStream.class);
-        doThrow(new RuntimeException("error")).when(stream).postMessageToGroup("Hello World!", this.targetGroup);
+        doThrow(new RuntimeException("error")).when(this.stream).postMessageToGroup("Hello World!", this.targetGroup);
 
         assertFalse(this.streamService.postMessageToGroup("Hello World!", this.targetGroup));
         assertEquals("error", this.streamService.getLastError().getMessage());
     }
 
     @Test
-    public void deleteMessage() throws Exception
+    void deleteMessage()
     {
         assertTrue(this.streamService.deleteMessage("abc123"));
-
-        MessageStream stream = this.mocker.getInstance(MessageStream.class);
-        verify(stream).deleteMessage("abc123");
+        verify(this.stream).deleteMessage("abc123");
     }
 
     @Test
-    public void deleteMessageWithFailure() throws Exception
+    void deleteMessageWithFailure()
     {
-        MessageStream stream = this.mocker.getInstance(MessageStream.class);
-        doThrow(new IllegalArgumentException("error")).when(stream).deleteMessage("abc123");
+        doThrow(new IllegalArgumentException("error")).when(this.stream).deleteMessage("abc123");
 
         assertFalse(this.streamService.deleteMessage("abc123"));
         assertEquals("error", this.streamService.getLastError().getMessage());
     }
 
     @Test
-    public void isActive() throws Exception
+    void isActive()
     {
-        when(documentAccessBridge.getCurrentDocumentReference()).thenReturn(
-                new DocumentReference("wikiA", "Space", "Page"),
-                new DocumentReference("wikiB", "Space", "Page"));
-        when(messageStreamConfiguration.isActive("wikiA")).thenReturn(true);
-        when(messageStreamConfiguration.isActive("wikiB")).thenReturn(false);
+        when(this.documentAccessBridge.getCurrentDocumentReference()).thenReturn(
+            new DocumentReference("wikiA", "Space", "Page"),
+            new DocumentReference("wikiB", "Space", "Page"));
+        when(this.messageStreamConfiguration.isActive("wikiA")).thenReturn(true);
+        when(this.messageStreamConfiguration.isActive("wikiB")).thenReturn(false);
 
         // Test
-        assertTrue(mocker.getComponentUnderTest().isActive());
-        assertFalse(mocker.getComponentUnderTest().isActive());
+        assertTrue(this.streamService.isActive());
+        assertFalse(this.streamService.isActive());
     }
 }

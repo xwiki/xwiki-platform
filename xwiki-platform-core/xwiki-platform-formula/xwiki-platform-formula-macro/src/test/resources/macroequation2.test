@@ -1,0 +1,21 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{formula size="extremely_huge" imageType="jpeg"}}a+b{{/formula}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [formula] [size=extremely_huge|imageType=jpeg] [a+b]
+beginParagraph
+onImage [Typed = [true] Type = [url] Reference = [/xwiki/bin/view/space/page/190ef2f68e7fbd75c869d74dea959b1a48faadefc7a0c9219e3e94d005821935]] [false] [[alt]=[a+b]]
+endParagraph
+endMacroMarkerStandalone [formula] [size=extremely_huge|imageType=jpeg] [a+b]
+endDocument
+.#-----------------------------------------------------
+.expect|xwiki/2.0
+.#-----------------------------------------------------
+{{formula size="extremely_huge" imageType="jpeg"}}
+a+b
+{{/formula}}

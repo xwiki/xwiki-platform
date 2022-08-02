@@ -21,8 +21,10 @@ package org.xwiki.validator;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.validator.ValidationError.Type;
@@ -36,12 +38,12 @@ public class HTML5DutchWebGuidelinesValidatorTest
     private HTML5DutchWebGuidelinesValidator validator;
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    public void beforeEach()
     {
         this.validator = new HTML5DutchWebGuidelinesValidator();
     }
 
-    private void setValidatorDocument(InputStream document) throws Exception
+    private void setValidatorDocument(InputStream document)
     {
         this.validator.setDocument(document);
     }
@@ -56,13 +58,12 @@ public class HTML5DutchWebGuidelinesValidatorTest
 
     private String getErrors(HTML5DutchWebGuidelinesValidator validator)
     {
-        StringBuffer buffer = new StringBuffer();
-
+        List<String> errors = new ArrayList<>(validator.getErrors().size());
         for (ValidationError error : validator.getErrors()) {
-            buffer.append(error + "\n");
+            errors.add(error.toString());
         }
 
-        return buffer.toString();
+        return StringUtils.join(errors, '\n');
     }
 
     private boolean isValid(HTML5DutchWebGuidelinesValidator validator)
@@ -94,7 +95,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testInvalid() throws Exception
+    public void testInvalid()
     {
         setValidatorDocument(getClass().getResourceAsStream("/html5-invalid.html"));
         this.validator.validate();
@@ -224,19 +225,19 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd2s5FramesetDoctype() throws Exception
+    public void testRpd2s5FramesetDoctype()
     {
         // JSoup does not handle the doctype.
     }
 
     @Test
-    public void testRpd2s5FramesetTag() throws Exception
+    public void testRpd2s5FramesetTag()
     {
         // JSoup does not handle the <frameset> tag
     }
 
     @Test
-    public void testRpd2s5FrameTag() throws Exception
+    public void testRpd2s5FrameTag()
     {
         // JSoup does not handle <frame> tags
     }
@@ -333,7 +334,8 @@ public class HTML5DutchWebGuidelinesValidatorTest
     {
         setValidatorDocument("<body><p><sub>sub</sub></p></body>");
         this.validator.validateRpd3s9();
-        assertFalse(isValid(this.validator), getErrors(this.validator));
+        assertEquals("WARNING: The use of <sub> is not recommended.", getErrors(validator));
+        assertTrue(isValid(this.validator));
     }
 
     @Test
@@ -341,7 +343,8 @@ public class HTML5DutchWebGuidelinesValidatorTest
     {
         setValidatorDocument("<body><p><sup>sup</sup></p></body>");
         this.validator.validateRpd3s9();
-        assertFalse(isValid(this.validator), getErrors(this.validator));
+        assertEquals("WARNING: The use of <sup> is not recommended.", getErrors(validator));
+        assertTrue(isValid(this.validator));
     }
 
     // RPD 3s11
@@ -357,7 +360,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     // RPD 3s13
 
     @Test
-    public void testRpd3s13BulletList() throws Exception
+    public void testRpd3s13BulletList()
     {
         //ToDo: difficult to do with JSoup
         /*
@@ -372,7 +375,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd3s13DashList() throws Exception
+    public void testRpd3s13DashList()
     {
         //ToDo: difficult to do with JSoup
         /*
@@ -387,7 +390,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd3s13NumberedList() throws Exception
+    public void testRpd3s13NumberedList()
     {
         //ToDo: difficult to do with JSoup
         /*
@@ -615,6 +618,18 @@ public class HTML5DutchWebGuidelinesValidatorTest
         setValidatorDocument("<body><iframe/></body>");
         this.validator.validateRpd12s1();
         assertFalse(isValid(this.validator), getErrors(this.validator));
+
+        setValidatorDocument("<body><iframe title='an youtube video iframe'/></body>");
+        this.validator.validateRpd12s1();
+        assertFalse(isValid(this.validator), getErrors(this.validator));
+
+        setValidatorDocument("<body><iframe role='an youtube video iframe'/></body>");
+        this.validator.validateRpd12s1();
+        assertFalse(isValid(this.validator), getErrors(this.validator));
+
+        setValidatorDocument("<body><iframe title='an youtube video iframe' role='video tutorial'/></body>");
+        this.validator.validateRpd12s1();
+        assertTrue(isValid(this.validator), getErrors(this.validator));
     }
 
     @Test

@@ -20,7 +20,6 @@
 package com.xpn.xwiki.internal.filter.output;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -31,7 +30,6 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.filter.FilterDescriptorManager;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
@@ -39,16 +37,16 @@ import org.xwiki.filter.event.model.WikiDocumentFilter;
 import org.xwiki.filter.instance.output.DocumentInstanceOutputProperties;
 import org.xwiki.filter.output.AbstractBeanOutputFilterStream;
 import org.xwiki.logging.marker.TranslationMarker;
+import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.WikiReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
+import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 
 /**
  * @version $Id$
@@ -73,27 +71,19 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
     private FilterDescriptorManager filterManager;
 
     @Inject
-    @Named("current")
-    private DocumentReferenceResolver<EntityReference> entityResolver;
-
-    @Inject
-    @Named("relative")
-    private EntityReferenceResolver<String> relativeResolver;
-
-    @Inject
     private Provider<XWikiContext> xcontextProvider;
-
-    @Inject
-    @Named("context")
-    private Provider<ComponentManager> componentManagerProvider;
 
     @Inject
     private EntityOutputFilterStream<XWikiDocument> documentListener;
 
     @Inject
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> documentReferenceUserReferenceResolver;
+
+    @Inject
     private Logger logger;
 
-    private boolean documentDeleted;
+    private boolean firstVersion;
 
     private FilterEventParameters currentLocaleParameters;
 
@@ -129,10 +119,11 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
     @Override
     public void beginWikiDocument(String name, FilterEventParameters parameters) throws FilterException
     {
-        this.documentDeleted = false;
-
         this.currentLocaleParameters = parameters;
         this.currentRevisionParameters = parameters;
+
+        // Init the first version marker
+        this.firstVersion = true;
     }
 
     @Override
@@ -143,6 +134,7 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
         // Reset
         this.currentRevisionParameters = null;
         this.currentLocaleParameters = null;
+        this.firstVersion = false;
     }
 
     @Override
@@ -150,6 +142,9 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
     {
         this.currentLocaleParameters = parameters;
         this.currentRevisionParameters = parameters;
+
+        // Init the first version marker
+        this.firstVersion = true;
     }
 
     @Override
@@ -160,6 +155,7 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
         // Reset
         this.currentRevisionParameters = null;
         this.currentLocaleParameters = null;
+        this.firstVersion = false;
     }
 
     @Override
@@ -175,6 +171,7 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
 
         // Reset
         this.currentRevisionParameters = null;
+        this.firstVersion = false;
     }
 
     private void maybeSaveDocument() throws FilterException
@@ -186,57 +183,42 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
             return;
         }
 
+        boolean hasJRCSHistory = inputDocument.getDocumentArchive() != null;
+
         XWikiContext xcontext = this.xcontextProvider.get();
 
         try {
-            XWikiDocument document =
+            XWikiDocument databaseDocument =
                 xcontext.getWiki().getDocument(inputDocument.getDocumentReferenceWithLocale(), xcontext);
 
-            if (!this.documentDeleted && !document.isNew() && this.properties.isPreviousDeleted()) {
-                XWikiDocument originalDocument = document;
-
-                // Save current context wiki
-                WikiReference currentWiki = xcontext.getWikiReference();
-                try {
-                    // Make sure the store is executed in the right context
-                    xcontext.setWikiReference(document.getDocumentReference().getWikiReference());
-
-                    // Put previous version in recycle bin
-                    if (xcontext.getWiki().hasRecycleBin(xcontext)) {
-                        xcontext.getWiki().getRecycleBinStore().saveToRecycleBin(document, xcontext.getUser(),
-                            new Date(), xcontext, true);
-                    }
-
-                    // Make sure to not generate DocumentDeletedEvent since from listener point of view it's not
-                    xcontext.getWiki().getStore().deleteXWikiDoc(document, xcontext);
-                    this.documentDeleted = true;
-                } finally {
-                    // Restore current context wiki
-                    xcontext.setWikiReference(currentWiki);
-                }
-
-                document = xcontext.getWiki().getDocument(inputDocument.getDocumentReferenceWithLocale(), xcontext);
-
-                // Remember deleted document as the actual previous version of the document (to simulate an update
-                // instead of a creation)
-                document.setOriginalDocument(originalDocument);
-            } else {
-                // Make sure to remember that the document should not be deleted anymore
-                this.documentDeleted = true;
-            }
-
             // Remember if it's a creation or an update
-            boolean isnew = document.isNew();
+            boolean isnew = databaseDocument.isNew();
 
-            // Safer to clone for thread safety and in case the save fail
-            document = document.clone();
+            // Make sure document's attachments content are loaded from the store
+            databaseDocument.loadAttachmentsContentSafe(xcontext);
 
-            document.loadAttachmentsContentSafe(xcontext);
-            document.apply(inputDocument);
+            XWikiDocument document;
+            if (this.firstVersion && this.properties.isPreviousDeleted()) {
+                // We want to replace the existing document
+                document = inputDocument;
 
-            // Get the version from the input document
+                // But it's still an update from outside world point of view
+                document.setOriginalDocument(databaseDocument);
+            } else {
+                // Safer to clone for thread safety and in case the save fail
+                document = databaseDocument.clone();
 
-            document.setMinorEdit(inputDocument.isMinorEdit());
+                // We want to update the existing document
+                document.apply(inputDocument);
+
+                // Get the version from the input document
+                document.setMinorEdit(inputDocument.isMinorEdit());
+
+                // Copy input document authors if they should be preserved
+                if (this.properties.isAuthorPreserved()) {
+                    setAuthors(document, inputDocument);
+                }
+            }
 
             // Authors
 
@@ -246,12 +228,11 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
                 } else {
                     setAuthorReference(document, xcontext.getUserReference());
                 }
-                document.setContentAuthorReference(document.getAuthorReference());
+                DocumentAuthors authors = document.getAuthors();
+                authors.setContentAuthor(authors.getEffectiveMetadataAuthor());
                 if (document.isNew()) {
-                    document.setCreatorReference(document.getAuthorReference());
+                    authors.setCreator(authors.getEffectiveMetadataAuthor());
                 }
-            } else {
-                setAuthors(document, inputDocument);
             }
 
             // Version related information and save
@@ -269,12 +250,23 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
                     document.setDocumentArchive(inputDocument.getDocumentArchive());
                 }
 
-                // Make sure the document won't be modified by the store
+                // Make sure the document is stored exactly as is (don't increment version, etc.)
                 document.setMetaDataDirty(false);
                 document.setContentDirty(false);
+                document.getAttachmentList().forEach(a -> a.setMetaDataDirty(false));
 
                 xcontext.getWiki().saveDocument(document, inputDocument.getComment(), inputDocument.isMinorEdit(),
                     xcontext);
+
+                if (!hasJRCSHistory) {
+                    // Not a JRCS based history document
+                    // Explicitly update the history because the store won't do it automatically (because
+                    // metadata/content dirty is false)
+                    XWikiVersioningStoreInterface versioningStore = document.getVersioningStore(xcontext);
+                    if (versioningStore != null) {
+                        versioningStore.updateXWikiDocArchive(document, true, xcontext);
+                    }
+                }
             } else {
                 // Forget the input history to let the store do its standard job
                 document.setDocumentArchive((XWikiDocumentArchive) null);
@@ -304,7 +296,9 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
     private void setAuthorReference(XWikiDocument document, DocumentReference authorReference)
     {
         // Document author
-        document.setAuthorReference(authorReference);
+        UserReference authorUserReference = this.documentReferenceUserReferenceResolver.resolve(authorReference);
+        document.getAuthors().setEffectiveMetadataAuthor(authorUserReference);
+        document.getAuthors().setOriginalMetadataAuthor(authorUserReference);
 
         // Attachments author
         for (XWikiAttachment attachment : document.getAttachmentList()) {
@@ -315,10 +309,14 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
     private void setAuthors(XWikiDocument document, XWikiDocument inputDocument)
     {
         // Document author
-        document.setAuthorReference(inputDocument.getAuthorReference());
-        document.setContentAuthorReference(inputDocument.getContentAuthorReference());
+        DocumentAuthors documentAuthors = document.getAuthors();
+        DocumentAuthors inputDocumentAuthors = inputDocument.getAuthors();
         if (document.isNew()) {
-            document.setCreatorReference(inputDocument.getCreatorReference());
+            documentAuthors.copyAuthors(inputDocumentAuthors);
+        } else {
+            documentAuthors.setEffectiveMetadataAuthor(inputDocumentAuthors.getEffectiveMetadataAuthor());
+            documentAuthors.setContentAuthor(inputDocumentAuthors.getContentAuthor());
+            documentAuthors.setOriginalMetadataAuthor(inputDocumentAuthors.getOriginalMetadataAuthor());
         }
 
         // Attachments author

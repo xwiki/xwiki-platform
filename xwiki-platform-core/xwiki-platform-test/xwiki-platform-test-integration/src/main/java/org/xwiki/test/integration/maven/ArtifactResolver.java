@@ -121,9 +121,8 @@ public class ArtifactResolver
         throws Exception
     {
         // If in cache, serve from the cache for increased performances
-        String artifactAsString = String.format("%s:%s:%s:%s", artifact.getGroupId(), artifact.getArtifactId(),
-            artifact.getExtension(), artifact.getVersion());
-        List<ArtifactResult> artifactResults = this.artifactResultCache.get(artifactAsString);
+        String cacheKey = computeCacheKey(artifact, dependentArtifacts);
+        List<ArtifactResult> artifactResults = this.artifactResultCache.get(cacheKey);
         if (artifactResults == null) {
             DependencyFilter filter = new AndDependencyFilter(Arrays.asList(
                 // Include compile and runtime scopes only (we don't want provided since it's supposed to be available
@@ -176,7 +175,7 @@ public class ArtifactResolver
                 sendError(artifact, dependencyResult.getCollectExceptions());
             }
             artifactResults = dependencyResult.getArtifactResults();
-            this.artifactResultCache.put(artifactAsString, artifactResults);
+            this.artifactResultCache.put(cacheKey, artifactResults);
         }
 
         return artifactResults;
@@ -219,12 +218,16 @@ public class ArtifactResolver
             dependentArtifacts.add(artifact);
         }
 
-        // It seems that Maven Resolver is not able to resolve the ZIP dependencies from
-        // xwiki-platform-distribution-war-minimaldependencies for some reason, so we manually ask for resolving the
-        // skin dependency (which of ZIP type).
+        // Since the minimal dependency list doesn't include the Flamingo resources JAR (see the comment in it for
+        // more explanations), we need to add it manually.
         Artifact skinArtifact = new DefaultArtifact(PLATFORM_GROUPID, "xwiki-platform-flamingo-skin-resources",
-            "zip", xwikiVersion);
+            JAR, xwikiVersion);
         dependentArtifacts.add(skinArtifact);
+
+        // We use the ComponentScriptService in TestUtils#setPropertyInXWikiCfg so we need the dependency for our tests.
+        Artifact componentScript = new DefaultArtifact(PLATFORM_GROUPID, "xwiki-platform-component-script",
+            JAR, xwikiVersion);
+        dependentArtifacts.add(componentScript);
 
         // Add specified extra artifacts
         dependentArtifacts.addAll(extraArtifacts);
@@ -235,8 +238,23 @@ public class ArtifactResolver
     private void sendError(Artifact artifact, Collection<Exception> exceptions) throws Exception
     {
         for (Exception exception : exceptions) {
-            LOGGER.error("Problem [{}]", exception);
+            LOGGER.error("Artifact resolving error for [{}]", artifact, exception);
         }
         throw new Exception(String.format("Failed to resolve artifact [%s]", artifact));
+    }
+
+    private String computeCacheKey(Artifact artifact, List<Artifact> dependentArtifacts)
+    {
+        StringBuilder builder = new StringBuilder(computeArtifactKey(artifact));
+        for (Artifact dependentArtifact : dependentArtifacts) {
+            builder.append('-').append(computeArtifactKey(dependentArtifact));
+        }
+        return builder.toString();
+    }
+
+    private String computeArtifactKey(Artifact artifact)
+    {
+        return String.format("%s:%s:%s:%s", artifact.getGroupId(), artifact.getArtifactId(), artifact.getExtension(),
+            artifact.getVersion());
     }
 }

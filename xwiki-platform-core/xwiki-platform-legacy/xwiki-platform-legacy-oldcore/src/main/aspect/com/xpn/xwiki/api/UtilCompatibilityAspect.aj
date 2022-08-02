@@ -160,7 +160,7 @@ public privileged aspect UtilCompatibilityAspect
      * @param object the object to convert
      * @return the object as a {@link Number}, or {@code null}
      * @since 1.3 Milestone 2
-     * @deprecated use {@code $mathtool.toNumber($string)}
+     * @deprecated use {@code $numbertool.toNumber($string)}
      *             ({@link org.apache.velocity.tools.generic.MathTool#toNumber(java.lang.Object)})
      */
     @Deprecated
@@ -179,7 +179,7 @@ public privileged aspect UtilCompatibilityAspect
      * @param str the String to convert to a long
      * @return the parsed long or zero if the string is not a valid long number
      * @since 1.3 Milestone 2
-     * @deprecated use {@code $mathtool.toNumber($string).longValue()}
+     * @deprecated use {@code $numbertool.toNumber($string).longValue()}
      *             ({@link org.apache.velocity.tools.generic.MathTool#toNumber(java.lang.Object)})
      */
     @Deprecated

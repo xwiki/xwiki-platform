@@ -102,15 +102,15 @@ public class WikiObjectReader extends AbstractWikiObjectPropertyReader
             } else if (elementName.equals(XARObjectPropertyModel.ELEMENT_PROPERTY)) {
                 wikiObject.properties.add(readObjectProperty(xmlReader, properties, wikiObject.wikiClass));
             } else {
-                String value = xmlReader.getElementText();
-
                 EventParameter parameter = XARObjectModel.OBJECT_PARAMETERS.get(elementName);
 
                 if (parameter != null) {
-                    Object wsValue = convert(parameter.type, value);
+                    Object wsValue = convert(parameter.type, xmlReader.getElementText());
                     if (wsValue != null) {
                         wikiObject.parameters.put(parameter.name, wsValue);
                     }
+                } else {
+                    unknownElement(xmlReader);
                 }
             }
         }

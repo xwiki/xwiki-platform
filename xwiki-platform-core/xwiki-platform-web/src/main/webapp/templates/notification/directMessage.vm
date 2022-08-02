@@ -1,3 +1,0 @@
-## TODO: find a way to move it to the "message stream" module
-#template('notification/macros.vm')
-#displayMessageNotification($event, 'messagestream.notification.directMessage.description', 'user')

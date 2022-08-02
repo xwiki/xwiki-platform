@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -92,9 +93,9 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
      */
     public ChartMacro()
     {
-        super("Chart", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION, false),
+        super("Chart", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION, false, Block.LIST_BLOCK_TYPE),
             ChartMacroParameters.class);
-        setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_CONTENT));
     }
 
     @Override
@@ -115,7 +116,7 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
         ResourceReference reference = new ResourceReference(imageLocation, ResourceType.URL);
         ImageBlock imageBlock = new ImageBlock(new ResourceReference(imageLocation, ResourceType.URL), true);
         imageBlock.setParameter("alt", title);
-        LinkBlock linkBlock = new LinkBlock(Collections.singletonList((Block) imageBlock), reference, true);
+        LinkBlock linkBlock = new LinkBlock(Collections.singletonList(imageBlock), reference, true);
         linkBlock.setParameter("title", title);
 
         // If the macro is used standalone then we need to wrap it in a paragraph block.
@@ -123,7 +124,7 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
         if (context.isInline()) {
             resultBlock = linkBlock;
         } else {
-            resultBlock = new ParagraphBlock(Collections.singletonList((Block) linkBlock));
+            resultBlock = new ParagraphBlock(Collections.singletonList(linkBlock));
         }
 
         return Collections.singletonList(resultBlock);
@@ -192,7 +193,7 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
      */
     private Map<String, String> getSourceParameters(ChartMacroParameters chartMacroParameters, String sourceHint)
     {
-        Map<String, String> parameters = new HashMap<String, String>();
+        Map<String, String> parameters = new HashMap<>();
         parameters.put(ChartGenerator.TITLE_PARAM, chartMacroParameters.getTitle());
         parameters.put(ChartGenerator.WIDTH_PARAM, String.valueOf(chartMacroParameters.getWidth()));
         parameters.put(ChartGenerator.HEIGHT_PARAM, String.valueOf(chartMacroParameters.getHeight()));

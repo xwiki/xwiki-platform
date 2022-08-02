@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -187,8 +187,8 @@
   };
 
   var updateExpandCollapseAllFacetsState = function(facetsContainer) {
-    var facetCount = facetsContainer.find('.search-facet').size();
-    var expandedFacetCount = facetsContainer.find('.search-facet.expanded').size();
+    var facetCount = facetsContainer.find('.search-facet').length;
+    var expandedFacetCount = facetsContainer.find('.search-facet.expanded').length;
     if (expandedFacetCount &gt; facetCount / 2) {
       facetsContainer.find('.search-facets-action-collapseAll').show()
         .parent().children('.search-facets-action-expandAll').hide();
@@ -203,7 +203,7 @@
     checkBox.prop('checked', $(this).hasClass('selected'));
     // Add the 'checked' attribute so that it can be easily located with CSS.
     checkBox.prop('checked') &amp;&amp; checkBox.attr('checked', 'checked');
-    checkBox.click($.proxy(this, 'click'));
+    checkBox.on('click', this.click.bind(this));
     // Remove the 'selected' class because the selected state is marked using the check box.
     $(this).removeClass('selected').before(checkBox);
   };
@@ -212,17 +212,17 @@
     var facetsContainer = $(this);
 
     // Add the ability to collapse the facets pane on extra small screens (phones).
-    facetsContainer.find('.search-facets-header').click(function() {
+    facetsContainer.find('.search-facets-header').on('click', function() {
       facetsContainer.toggleClass('collapsed-xs');
     });
 
     // Global Expand/Collapse toggle.
-    facetsContainer.find('.search-facets-action-collapseAll').removeClass('hidden').click(collapseAllFacets);
-    facetsContainer.find('.search-facets-action-expandAll').removeClass('hidden').click(expandAllFacets);
+    facetsContainer.find('.search-facets-action-collapseAll').removeClass('hidden').on('click', collapseAllFacets);
+    facetsContainer.find('.search-facets-action-expandAll').removeClass('hidden').on('click', expandAllFacets);
     updateExpandCollapseAllFacetsState(facetsContainer);
 
     // Expand/Collapse toggle for each facet.
-    facetsContainer.find('.search-facet-header').click(function(event) {
+    facetsContainer.find('.search-facet-header').on('click', function(event) {
       $(event.target).parent('.search-facet').toggleClass('expanded');
       updateExpandCollapseAllFacetsState(facetsContainer);
     });
@@ -271,7 +271,8 @@
     searchRequest &amp;&amp; searchRequest.abort();
     $('.search-ui').attr('aria-busy', true);
     var getURL = XWiki.currentDocument.getURL('get', getQueryString(viewURL));
-    searchRequest = $.get(getURL).done(function(html) {
+    searchRequest = $.get(getURL);
+    searchRequest.then(html =&gt; {
       var state = getSearchUIState();
       updateSearchUI(html);
       setSearchUIState(state);
@@ -284,7 +285,7 @@
   var reloadSearchUI = function(event) {
     event.preventDefault();
     var anchor = $(event.target).closest('a');
-    anchor.size() &gt; 0 &amp;&amp; $(document).trigger('xwiki:search:update', anchor.attr('href'));
+    anchor.length &amp;&amp; $(document).trigger('xwiki:search:update', anchor.attr('href'));
   };
 
   // Others (e.g. a custom facet) can trigger a search UI update by firing this event.
@@ -298,7 +299,8 @@
     $('.search-ui').attr('aria-busy', true);
     var state = event.originalEvent.state;
     var getURL = XWiki.currentDocument.getURL('get', window.location.search.substr(1));
-    searchRequest = $.get(getURL).done(function(html) {
+    searchRequest = $.get(getURL);
+    searchRequest.then(html =&gt; {
       updateSearchUI(html);
       setSearchUIState(state);
     });
@@ -339,7 +341,7 @@
       '.search-facet a.itemName',
       '.search-facet-body a.more',
       '.search-facet-body .selectedLocation a'
-    ].join(',')).click(reloadSearchUI);
+    ].join(',')).on('click', reloadSearchUI);
   };
 
   enhanceSearchUI();

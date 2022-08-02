@@ -75,6 +75,13 @@ public interface RefactoringJobs
     String CREATE = GROUP_PREFIX + "create";
 
     /**
+     * The role hint of the job that replace user references.
+     * 
+     * @since 11.8RC1
+     */
+    String REPLACE_USER = GROUP_PREFIX + "replaceUser";
+
+    /**
      * The role hint of the job that permanently deletes entities.
      *
      * @since 10.10RC1

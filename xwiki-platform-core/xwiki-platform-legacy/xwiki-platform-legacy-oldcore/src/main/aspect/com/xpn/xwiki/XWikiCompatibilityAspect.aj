@@ -25,6 +25,7 @@ import java.lang.reflect.Type;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +34,9 @@ import java.net.InetAddress;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.net.smtp.SMTPClient;
 import org.apache.commons.net.smtp.SMTPReply;
@@ -48,6 +52,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.environment.Environment;
+import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.xml.XMLUtils;
 import org.xwiki.model.reference.EntityReference;
@@ -76,6 +81,7 @@ import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiRequest;
+import com.xpn.xwiki.web.includeservletasstring.IncludeServletAsString;
 
 /**
  * Add a backward compatibility layer to the {@link com.xpn.xwiki.XWiki} class.
@@ -98,6 +104,9 @@ public privileged aspect XWikiCompatibilityAspect
 
     /** Is the wiki running in test mode? Deprecated, was used when running Cactus tests. */
     private boolean XWiki.test = false;
+
+    /** List of configured syntax ids. */
+    private List<String> XWiki.configuredSyntaxes;
 
     /**
      * Transform a text in a URL compatible text
@@ -1323,5 +1332,84 @@ public privileged aspect XWikiCompatibilityAspect
         }
 
         return "1".equals(getConfiguration().getProperty("xwiki.usedefaultweb", "0"));
+    }
+
+    /**
+     * @deprecated use {@link XWikiDocument#rename(String, XWikiContext)} instead
+     */
+    @Deprecated
+    public XWikiDocument XWiki.renamePage(XWikiDocument doc, XWikiContext context, String newFullName)
+        throws XWikiException
+    {
+        return renamePage(doc, newFullName, context);
+    }
+
+    /**
+     * @deprecated Since 12.0RC1: Use {@link XWikiDocument#rename(DocumentReference, XWikiContext)} instead.
+     */
+    @Deprecated
+    public void XWiki.renamePage(String fullName, String newFullName, XWikiContext context) throws XWikiException
+    {
+        renamePage(context.getWiki().getDocument(fullName, context), newFullName, context);
+    }
+
+    /**
+     * @deprecated use {@link XWikiDocument#rename(String, XWikiContext)} instead
+     */
+    @Deprecated
+    public XWikiDocument XWiki.renamePage(XWikiDocument doc, String newFullName, XWikiContext context)
+        throws XWikiException
+    {
+        if (context.getWiki().exists(newFullName, context)) {
+            XWikiDocument delDoc = context.getWiki().getDocument(newFullName, context);
+            context.getWiki().deleteDocument(delDoc, context);
+        }
+
+        XWikiDocument renamedDoc = doc.copyDocument(newFullName, context);
+        saveDocument(renamedDoc, context);
+        renamedDoc.saveAllAttachments(context);
+        deleteDocument(doc, context);
+
+        return renamedDoc;
+    }
+
+    /**
+     * @return the ids of configured syntaxes for this wiki (e.g. {@code xwiki/2.0}, {@code xwiki/2.1},
+     *         {@code mediawiki/1.0}, etc), taken only from {@code xwiki.cfg} (using the
+     *         {@code xwiki.rendering.syntaxes} property)
+     * @deprecated since 8.2M1, use the XWiki Rendering Configuration component or the Rendering Script Service one
+     *             instead (they use a more elaborate algorithm to find out the supported syntaxes)
+     */
+    @Deprecated
+    public List<String> XWiki.getConfiguredSyntaxes()
+    {
+        if (this.configuredSyntaxes == null) {
+            ExtendedRenderingConfiguration extendedRenderingConfiguration =
+                Utils.getComponent(ExtendedRenderingConfiguration.class);
+            String syntaxes = getConfiguration().getProperty("xwiki.rendering.syntaxes",
+                extendedRenderingConfiguration.getDefaultContentSyntax().toIdString());
+            this.configuredSyntaxes = Arrays.asList(StringUtils.split(syntaxes, " ,"));
+        }
+        return this.configuredSyntaxes;
+    }
+
+    /**
+     * Designed to include dynamic content, such as Servlets or JSPs, inside Velocity templates; works by creating a
+     * RequestDispatcher, buffering the output, then returning it as a string.
+     * 
+     * @deprecated since 12.10.9, 13.4.3, 13.7RC1
+     */
+    @Deprecated
+    public String XWiki.invokeServletAndReturnAsString(String url, XWikiContext xwikiContext)
+    {
+        HttpServletRequest servletRequest = xwikiContext.getRequest();
+        HttpServletResponse servletResponse = xwikiContext.getResponse();
+
+        try {
+            return IncludeServletAsString.invokeServletAndReturnAsString(url, servletRequest, servletResponse);
+        } catch (Exception e) {
+            LOGGER.warn("Exception including url: " + url, e);
+            return "Exception including \"" + url + "\", see logs for details.";
+        }
     }
 }

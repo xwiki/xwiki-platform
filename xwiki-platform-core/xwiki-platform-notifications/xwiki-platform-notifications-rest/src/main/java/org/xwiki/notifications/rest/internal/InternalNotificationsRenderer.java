@@ -25,6 +25,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -60,6 +61,9 @@ public class InternalNotificationsRenderer
     @Inject
     private NotificationRenderer notificationRenderer;
 
+    @Inject
+    private Logger logger;
+
     /**
      * Render the notifications.
      *
@@ -94,6 +98,7 @@ public class InternalNotificationsRenderer
         try {
             html = render(event);
         } catch (Exception e) {
+            this.logger.error("Error while rendering notification", e);
             exception = e.toString();
         }
 

@@ -22,6 +22,7 @@ package org.xwiki.eventstream;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,6 +31,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * A recorded event that occurred at some point in the wiki.
@@ -49,7 +51,8 @@ import org.xwiki.model.reference.WikiReference;
  * </ul>
  * Events are categorized into:
  * <ol>
- * <li>the {@link #getApplication() the application} that created them, like blog, user statuses, or the general wiki</li>
+ * <li>the {@link #getApplication() the application} that created them, like blog, user statuses, or the general
+ * wiki</li>
  * <li>an {@link #getStream() eventual sub-stream} inside the application, for example a space for wiki events, or a
  * certain group for user statuses</li>
  * <li>the {@link #getType() particular type} of event, like adding a comment, updating an attachment, setting a new
@@ -70,12 +73,139 @@ import org.xwiki.model.reference.WikiReference;
  * <li>the {@link #getDocumentTitle() display title} of the target document at the time that the event occurred</li>
  * <li>the {@link #getUrl() requested URL} that caused the event</li>
  * </ul>
+ * Use {@link org.xwiki.eventstream.EventFactory} to create a new {@link Event} instance.
  * 
  * @version $Id$
  * @since 3.0M2
  */
 public interface Event
 {
+    /**
+     * @see #getId()
+     * @since 12.4RC1
+     */
+    String FIELD_ID = "id";
+
+    /**
+     * @see #getGroupId()
+     * @since 12.4RC1
+     */
+    String FIELD_GROUPID = "groupId";
+
+    /**
+     * @see #getDate()
+     * @since 12.4RC1
+     */
+    String FIELD_DATE = "date";
+
+    /**
+     * @see #getImportance()
+     * @since 12.4RC1
+     */
+    String FIELD_IMPORTANCE = "importance";
+
+    /**
+     * @see #getTitle()
+     * @since 12.4RC1
+     */
+    String FIELD_TITLE = "title";
+
+    /**
+     * @see #getBody()
+     * @since 12.4RC1
+     */
+    String FIELD_BODY = "body";
+
+    /**
+     * @see #getApplication()
+     * @since 12.4RC1
+     */
+    String FIELD_APPLICATION = "application";
+
+    /**
+     * @see #getStream()
+     * @since 12.4RC1
+     */
+    String FIELD_STREAM = "stream";
+
+    /**
+     * @see #getType()
+     * @since 12.4RC1
+     */
+    String FIELD_TYPE = "type";
+
+    /**
+     * @see #getWiki()
+     * @since 12.4RC1
+     */
+    String FIELD_WIKI = "wiki";
+
+    /**
+     * @see #getSpace()
+     */
+    String FIELD_SPACE = "space";
+
+    /**
+     * @see #getDocument()
+     * @since 12.4RC1
+     */
+    String FIELD_DOCUMENT = "document";
+
+    /**
+     * @see #getDocumentVersion()
+     * @since 12.4RC1
+     */
+    String FIELD_DOCUMENTVERSION = "documentVersion";
+
+    /**
+     * @see #getRelatedEntity()
+     * @since 12.4RC1
+     */
+    String FIELD_RELATEDENTITY = "relatedEntity";
+
+    /**
+     * @see #getUser()
+     * @since 12.4RC1
+     */
+    String FIELD_USER = "user";
+
+    /**
+     * @see #getUrl()
+     * @since 12.4RC1
+     */
+    String FIELD_URL = "url";
+
+    /**
+     * @see #getDocumentTitle()
+     * @since 12.4RC1
+     */
+    String FIELD_DOCUMENTTITLE = "documentTitle";
+
+    /**
+     * @see #getTarget()
+     * @since 12.4RC1
+     */
+    String FIELD_TARGET = "target";
+
+    /**
+     * @see #getHidden()
+     * @since 12.4RC1
+     */
+    String FIELD_HIDDEN = "hidden";
+
+    /**
+     * @see #isPrefiltered()
+     * @since 12.5RC1
+     */
+    String FIELD_PREFILTERED = "preFiltered";
+
+    /**
+     * @see #getRemoteObservationId()
+     * @since 14.7RC1
+     */
+    @Unstable
+    String FIELD_REMOTE_OBSERVATION_ID = "observationInstanceId";
+
     /** The importance of an event. */
     enum Importance
     {
@@ -326,32 +456,75 @@ public interface Event
      * @see #getDocumentTitle()
      */
     void setDocumentTitle(String title);
-    
+
     /**
      * @return the named parameters associated with this event as key/value pairs.
+     * @deprecated use {@link #getCustom()} instead
      */
+    @Deprecated(since = "14.2RC1")
     Map<String, String> getParameters();
 
     /**
      * @param parameters the parameters to associate to the event.
      * @see #getParameters()
+     * @deprecated use {@link #setCustom(Map)} instead
      */
+    @Deprecated(since = "14.2RC1")
     void setParameters(Map<String, String> parameters);
+
+    /**
+     * @return the custom properties associated with this event
+     * @since 14.2RC1
+     */
+    default Map<String, Object> getCustom()
+    {
+        return (Map) getParameters();
+    }
+
+    /**
+     * Associate the event with custom named values.
+     * <p>
+     * The exactly list of supported types can vary depending on the {@link EventStore} implementation but it's expected
+     * that at least the following are supported:
+     * <ul>
+     * <li>String</li>
+     * <li>All standard primitive wrappers (Boolean, Integer, etc)</li>
+     * <li>java.util.Date</li>
+     * <li>Iterable and arrays of other supported types</li>
+     * </ul>
+     * 
+     * @param custom the custom properties associated with this event
+     * @since 14.2RC1
+     */
+    default void setCustom(Map<String, ?> custom)
+    {
+        Map<String, String> parameters;
+        if (custom == null) {
+            parameters = null;
+        } else {
+            parameters = new HashMap<>(custom.size());
+            custom.forEach((k, v) -> parameters.put(k, v != null ? v.toString() : null));
+        }
+
+        setParameters(parameters);
+    }
 
     /**
      * @param target a list of entities (users, groups) that are interested by this event
      * @since 9.2RC1
      */
-    default void setTarget(Set<String> target) {
+    default void setTarget(Set<String> target)
+    {
         LoggerFactory.getLogger(Event.class)
-                .warn("org.xwiki.eventstream.Event#setTarget() has been called without being reimplemented.");
+            .warn("org.xwiki.eventstream.Event#setTarget() has been called without being reimplemented.");
     }
 
     /**
      * @return a list of entities (users, groups) that are interested by this event
      * @since 9.2RC1
      */
-    default Set<String> getTarget() {
+    default Set<String> getTarget()
+    {
         return Collections.emptySet();
     }
 
@@ -371,6 +544,36 @@ public interface Event
     default void setHidden(boolean isHidden)
     {
         LoggerFactory.getLogger(Event.class)
-                .warn("org.xwiki.eventstream.Event#setHidden() has been called without being reimplemented.");
+            .warn("org.xwiki.eventstream.Event#setHidden(boolean) has been called without being reimplemented.");
+    }
+
+    /**
+     * @return true if the event has already been prefiltered
+     * @since 11.5RC1
+     */
+    default boolean isPrefiltered()
+    {
+        return false;
+    }
+
+    /**
+     * @param prefiltered true if the event has already been prefiltered
+     * @since 11.5RC1
+     */
+    default void setPrefiltered(boolean prefiltered)
+    {
+        LoggerFactory.getLogger(Event.class)
+            .warn("org.xwiki.eventstream.Event#setPrefiltered(boolean) has been called without being reimplemented.");
+    }
+
+    /**
+     * @return the unique identifier of the instance in the cluster, or {@code null} if the event was produced in a
+     *         version of XWiki older than 14.7
+     * @since 14.7RC1
+     */
+    @Unstable
+    default String getRemoteObservationId()
+    {
+        return null;
     }
 }

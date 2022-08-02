@@ -47,6 +47,12 @@ public class RepositoryResolver
 {
     private static final String DEFAULT_REPO_TYPE = "default";
 
+    /**
+     * We use a {@code never} policy to make the functional tests execute as fast as possible. This makes the Artifact
+     * Resolver code use the artifacts from the local Maven repository instead of the versions from remote Maven
+     * repositories. Note that Maven still connects to the remote repos to read metadata. It's also possible (to be
+     * checked) that artifacts will get downloaded if they don't exist locally.
+     */
     private static final RepositoryPolicy REPOSITORY_POLICY = new RepositoryPolicy(true, "never", "warn");
 
     private RemoteRepositoryManager remoteRepositoryManager;
@@ -134,17 +140,17 @@ public class RepositoryResolver
     private List<RemoteRepository> newRemoteRepositories()
     {
         RemoteRepository mavenCentral = new RemoteRepository.Builder(
-            "central", DEFAULT_REPO_TYPE, "http://repo1.maven.org/maven2/")
+            "central", DEFAULT_REPO_TYPE, "https://repo1.maven.org/maven2/")
             .setPolicy(REPOSITORY_POLICY)
             .build();
         RemoteRepository mavenXWiki = new RemoteRepository.Builder(
-            "xwiki", DEFAULT_REPO_TYPE, "http://nexus.xwiki.org/nexus/content/groups/public")
+            "xwiki", DEFAULT_REPO_TYPE, "https://nexus.xwiki.org/nexus/content/groups/public")
             .setPolicy(REPOSITORY_POLICY)
             .build();
         RemoteRepository mavenXWikiSnapshot = new RemoteRepository.Builder(
             // Note: we make sure to use the same id as the one used my Maven in the hope to have more up to date
             // metadata (in maven-metadata-xwiki-snapshots.xml).
-            "xwiki-snapshots", DEFAULT_REPO_TYPE, "http://nexus.xwiki.org/nexus/content/groups/public-snapshots/")
+            "xwiki-snapshots", DEFAULT_REPO_TYPE, "https://nexus.xwiki.org/nexus/content/groups/public-snapshots/")
             .setPolicy(REPOSITORY_POLICY)
             .build();
 

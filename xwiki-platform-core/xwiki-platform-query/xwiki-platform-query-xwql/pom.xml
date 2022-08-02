@@ -25,15 +25,17 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-query</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-query-xwql</artifactId>
   <name>XWiki Platform - Query - XWQL</name>
+  <description>Perform queries on the XWiki model, using the XWQL syntax</description>
   <packaging>jar</packaging>
   <properties>
     <xwiki.jacoco.instructionRatio>0.77</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>92</xwiki.pitest.mutationThreshold>
-  </properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>XWQL Query API</xwiki.extension.name>
+    </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -47,7 +49,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-model</artifactId>
+      <artifactId>xwiki-platform-model-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

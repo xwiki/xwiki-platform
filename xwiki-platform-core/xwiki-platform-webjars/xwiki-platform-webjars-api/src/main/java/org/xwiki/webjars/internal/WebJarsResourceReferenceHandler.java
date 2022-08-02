@@ -19,10 +19,8 @@
  */
 package org.xwiki.webjars.internal;
 
-import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,12 +28,14 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.tika.mime.MediaType;
 import org.xwiki.classloader.ClassLoaderManager;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.servlet.AbstractServletResourceReferenceHandler;
-import org.xwiki.velocity.VelocityManager;
+import org.xwiki.tika.internal.TikaUtils;
+import org.xwiki.webjars.internal.filter.WebJarsResourceFilter;
 
 /**
  * Handles {@code webjars} Resource References.
@@ -54,19 +54,18 @@ public class WebJarsResourceReferenceHandler extends AbstractServletResourceRefe
      */
     private static final String WEBJARS_RESOURCE_PREFIX = "META-INF/resources/webjars/";
 
-    /**
-     * The encoding used when evaluating WebJar (text) resources.
-     */
-    private static final String UTF8 = "UTF-8";
-
-    /**
-     * Used to evaluate the Velocity code from the WebJar resources.
-     */
-    @Inject
-    private VelocityManager velocityManager;
+    private static final String LESS_FILE_EXTENSION = ".less";
 
     @Inject
     private ClassLoaderManager classLoaderManager;
+
+    @Inject
+    @Named("less")
+    private WebJarsResourceFilter lessFilter;
+
+    @Inject
+    @Named("velocity")
+    private WebJarsResourceFilter velocityFilter;
 
     @Override
     public List<ResourceType> getSupportedResourceReferences()
@@ -90,27 +89,25 @@ public class WebJarsResourceReferenceHandler extends AbstractServletResourceRefe
     @Override
     protected boolean isResourceCacheable(WebJarsResourceReference resourceReference)
     {
-        return !Boolean.valueOf(resourceReference.getParameterValue("evaluate"));
+        return !Boolean.parseBoolean(resourceReference.getParameterValue("evaluate"));
     }
 
     @Override
     protected InputStream filterResource(WebJarsResourceReference resourceReference, InputStream resourceStream)
         throws ResourceReferenceHandlerException
     {
+        InputStream stream;
         if (!isResourceCacheable(resourceReference)) {
             String resourceName = getResourceName(resourceReference);
-            try {
-                // Evaluates the given resource using Velocity.
-                StringWriter writer = new StringWriter();
-                this.velocityManager.getVelocityEngine().evaluate(this.velocityManager.getVelocityContext(), writer,
-                    resourceName, new InputStreamReader(resourceStream, UTF8));
-                return new ByteArrayInputStream(writer.toString().getBytes(UTF8));
-            } catch (Exception e) {
-                throw new ResourceReferenceHandlerException(
-                    String.format("Failed to evaluate the Velocity code from WebJar resource [%s]", resourceName), e);
+            if (resourceName.endsWith(LESS_FILE_EXTENSION)) {
+                stream = this.lessFilter.filter(resourceStream, resourceName);
+            } else {
+                stream = this.velocityFilter.filter(resourceStream, resourceName);
             }
+        } else {
+            stream = super.filterResource(resourceReference, resourceStream);
         }
-        return super.filterResource(resourceReference, resourceStream);
+        return stream;
     }
 
     /**
@@ -119,5 +116,31 @@ public class WebJarsResourceReferenceHandler extends AbstractServletResourceRefe
     protected ClassLoader getClassLoader(String namespace)
     {
         return this.classLoaderManager.getURLClassLoader(namespace, true);
+    }
+
+    @Override
+    protected String getContentType(InputStream resourceStream,
+        WebJarsResourceReference resourceReference) throws IOException
+    {
+        String mimeType;
+        // When the resource is not cacheable and the request resource is a less file, we compile it to css.
+        // In this case, the content type must be explicitly set to text/css instead of the default text/x-less
+        // that would otherwise be computed from the resource filename.
+        if (!isResourceCacheable(resourceReference) && getResourceName(resourceReference)
+            .endsWith(LESS_FILE_EXTENSION))
+        {
+            mimeType = "text/css";
+        } else {
+            // Tika is doing some content analysis even for text files and will tend to give priority to that over the
+            // file extension. But content based detection is much less accurate than file name based detection for most
+            // cases of text files.
+            mimeType = TikaUtils.detect(getResourceName(resourceReference));
+
+            // If file name did not help try the content
+            if (mimeType.equals(MediaType.OCTET_STREAM.toString())) {
+                mimeType = TikaUtils.detect(resourceStream);
+            }
+        }
+        return mimeType;
     }
 }

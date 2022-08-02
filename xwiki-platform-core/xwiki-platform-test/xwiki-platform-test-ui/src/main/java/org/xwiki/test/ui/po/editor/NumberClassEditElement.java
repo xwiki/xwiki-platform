@@ -19,7 +19,7 @@
  */
 package org.xwiki.test.ui.po.editor;
 
-import org.xwiki.test.ui.po.FormElement;
+import org.xwiki.test.ui.po.FormContainerElement;
 
 /**
  * Represents a NumberClass property form.
@@ -29,7 +29,7 @@ import org.xwiki.test.ui.po.FormElement;
  */
 public class NumberClassEditElement extends ClassPropertyEditPane
 {
-    public NumberClassEditElement(FormElement form, String propertyName)
+    public NumberClassEditElement(FormContainerElement form, String propertyName)
     {
         super(form, propertyName);
     }

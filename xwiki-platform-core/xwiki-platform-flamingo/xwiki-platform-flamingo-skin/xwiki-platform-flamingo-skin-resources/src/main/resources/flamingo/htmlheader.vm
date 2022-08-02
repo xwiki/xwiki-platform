@@ -1,3 +1,22 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------------------------
 ## In non-Servlet mode (in Portlet mode for example) we don't display the <HTML>, <HEAD> and <BODY>
 ## elements.
@@ -7,22 +26,40 @@
 #if("$!request.noDoctype" != "true")
 <!DOCTYPE html>
 #end
-#macro(xwikiDataAttribute $name $value)
-  data-xwiki-${name}="$escapetool.xml($value)"
+#macro(addMetaAttribute $metaAttributes $name $value)
+  #set ($discard = $metaAttributes.add("data-xwiki-${name}=""$escapetool.xml($value)"""))
 #end
-<html xmlns="http://www.w3.org/1999/xhtml" lang="$xcontext.locale" xml:lang="$xcontext.locale"
+## ---------------------------------------------------------------------------------------------------------------
+## Compute all the meta attributes to add to the HTML tag.
+## ---------------------------------------------------------------------------------------------------------------
+#set ($metaAttributes = [])
+#if("$!doc" != "" && "$!tdoc" != "")
   ## NOTE: you should not use these attributes in javascript directly, but via the 'xwiki-meta' module instead:
   ## http://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/FrontendResources/JavaScriptAPI/#HGetsomeinformationaboutthecurrentdocument
-  #xwikiDataAttribute('reference', $services.model.serialize($doc.documentReference, 'default'))
-  #xwikiDataAttribute('document', $doc.fullName)##deprecated, use 'reference' instead
-  #xwikiDataAttribute('wiki', $doc.wiki)##deprecated, use 'reference' instead
-  #xwikiDataAttribute('space', $doc.space)##deprecated, use 'reference' instead
-  #xwikiDataAttribute('page', $doc.documentReference.name)##deprecated, use 'reference' instead
-  #xwikiDataAttribute('version', $tdoc.version)
-  #xwikiDataAttribute('rest-url', $services.rest.url($tdoc.documentReferenceWithLocale))
-  #xwikiDataAttribute('form-token', "$!{services.csrf.token}")
-  #xwikiDataAttribute('user-reference', $!services.model.serialize($xcontext.userReference, 'default'))
-  #xwikiDataAttribute('locale', $tdoc.locale)>
+  #addMetaAttribute($metaAttributes, 'reference', $services.model.serialize($doc.documentReference, 'default'))
+  #addMetaAttribute($metaAttributes, 'document', $doc.fullName)##deprecated, use 'reference' instead
+  #addMetaAttribute($metaAttributes, 'wiki', $doc.wiki)##deprecated, use 'reference' instead
+  #addMetaAttribute($metaAttributes, 'space', $doc.space)##deprecated, use 'reference' instead
+  #addMetaAttribute($metaAttributes, 'page', $doc.documentReference.name)##deprecated, use 'reference' instead
+  #addMetaAttribute($metaAttributes, 'isnew', $tdoc.isNew())
+  ## If tdoc is a new document, its version when checking for conflict will be the original doc version.
+  ## This fix XWIKI-16299.
+  #if ($tdoc.isNew())
+    #set ($version = $doc.version)
+  #else
+    #set ($version = $tdoc.version)
+  #end
+  #addMetaAttribute($metaAttributes, 'version', $version)
+  #addMetaAttribute($metaAttributes, 'rest-url', $services.rest.url($tdoc.documentReferenceWithLocale))
+  #addMetaAttribute($metaAttributes, 'locale', $tdoc.locale)
+#end
+#addMetaAttribute($metaAttributes, 'form-token', "$!{services.csrf.token}")
+## Don't put any user-reference tag when the user is not logged in
+#if ("$!xcontext.userReference" != '')
+  #addMetaAttribute($metaAttributes, 'user-reference', $!services.model.serialize($xcontext.userReference, 'default'))
+#end
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="$xcontext.locale" xml:lang="$xcontext.locale" $stringtool.join($metaAttributes, ' ')>
   <head>
     ## ---------------------------------------------------------------------------------------------------------------
     ## Ensure that the Content-Type meta directive is the first one in the header.
@@ -47,24 +84,10 @@
     #end
     <title>$title</title>
     ## ---------------------------------------------------------------------------------------------------------------
-    ## Force Compatibility mode for IE browsers to use the latest rendering mode. In order to work, the declaration 
-    ## needs to be placed in the <head>, before all other elements except for the <title> and other <meta> elements
-    ## See http://msdn.microsoft.com/en-us/library/jj676915(v=vs.85).aspx#SETMODE
-    ## ---------------------------------------------------------------------------------------------------------------
-    #set($userAgent = $request.getHeader('User-Agent'))
-    #if($userAgent.contains('MSIE') || $userAgent.contains('Trident'))
-      ## Add a meta-tag to disable the IE compatibility mode
-      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-      ## Add the equivalent HTTP header to disable the compatibility mode (the meta is not enough on intranet sites)
-      #set($discard = $response.addHeader('X-UA-Compatible', 'IE=edge'))
-    #end
-    ## ---------------------------------------------------------------------------------------------------------------
     ## Enable Responsiveness for phones
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     ## ---------------------------------------------------------------------------------------------------------------
     ## Favicons
-    ## Legacy, for IE
-    <link rel="shortcut icon" href="$xwiki.getSkinFile('icons/xwiki/favicon.ico')" />
     ## Present, HTML5
     <link rel="icon" href="$xwiki.getSkinFile('icons/xwiki/favicon16.png')" type="image/png" />
     ## The future, scalable icons
@@ -106,6 +129,6 @@
   #set($bodyAction = "view")
 #end
 ## These elements will be closed in the htmlfooter.vm file
-<$bodyTagName id="body" class="skin-flamingo wiki-${xcontext.database} space-${escapetool.xml($doc.space.replaceAll(' ', '_'))} ${bodyAction}body #if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end#if($hidecolumns && ($!hidecolumns == 1))hidelefthideright#end #if($showLeftPanels != "0" && $showRightPanels != "0" && $!hidecolumns != 1)content#end panel-left-width-${leftPanelsWidth} panel-right-width-${rightPanelsWidth} drawer drawer-right drawer-close">
+<$bodyTagName id="body" class="skin-flamingo wiki-${xcontext.database} #if("$!doc.space" != "")space-${escapetool.xml($doc.space.replaceAll(' ', '_'))}#end ${bodyAction}body #if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end#if($hidecolumns && ($!hidecolumns == 1))hidelefthideright#end #if($showLeftPanels != "0" && $showRightPanels != "0" && $!hidecolumns != 1)content#end panel-left-width-${leftPanelsWidth} panel-right-width-${rightPanelsWidth} drawer drawer--right drawer-close">
 <div id="xwikimaincontainer">
 <div id="xwikimaincontainerinner">

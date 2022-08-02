@@ -20,11 +20,15 @@
 package org.xwiki.test.integration.maven;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.text.StringSubstitutor;
+import org.apache.commons.text.lookup.StringLookup;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuilderFactory;
@@ -90,11 +94,22 @@ public class MavenResolver
      */
     public String getPlatformVersion() throws Exception
     {
-        String platformVersion = getModelFromCurrentPOM().getProperties().getProperty("platform.version");
-        if (platformVersion == null) {
-            throw new Exception("Missing property <platform.version> in the current pom.xml");
+        return getPropertyFromCurrentPOM("platform.version");
+    }
+
+    /**
+     * @param propertyName the maven property name for which to retrieve the value
+     * @return the property value
+     * @throws Exception if the property doesn't exist
+     * @since 11.7RC1
+     */
+    public String getPropertyFromCurrentPOM(String propertyName) throws Exception
+    {
+        String propertyValue = getModelFromCurrentPOM().getProperties().getProperty(propertyName);
+        if (propertyValue == null) {
+            throw new Exception(String.format("Missing property [%s] in the current pom.xml", propertyName));
         }
-        return platformVersion;
+        return propertyValue;
     }
 
     /**
@@ -169,5 +184,130 @@ public class MavenResolver
     {
         return new DefaultArtifact(dependency.getGroupId(), dependency.getArtifactId(),
             dependency.getClassifier(), dependency.getType(), dependency.getVersion());
+    }
+
+    /**
+     * @param dependencies the dependencies to convert to Artifact instances
+     * @return the converted Artifact instances
+     * @since 12.5RC1
+     */
+    public List<Artifact> convertToArtifacts(Collection<Dependency> dependencies)
+    {
+        List<Artifact> artifacts = new ArrayList<>();
+        for (Dependency dependency : dependencies) {
+            artifacts.add(convertToArtifact(dependency));
+        }
+        return artifacts;
+    }
+
+    /**
+     * @param artifactCoordinates the Maven artifact coordinates to convert to a resolved list of Artifacts
+     * @param resolveExtraJARs whether or not extra JARs without version should get their version resolved from the
+     *        current POM or not
+     * @return the resolved list of artifacts
+     * @throws Exception in case the POM model cannot be resolved
+     * @since 12.5RC1
+     */
+    public List<Artifact> convertToArtifacts(Collection<ArtifactCoordinate> artifactCoordinates,
+        boolean resolveExtraJARs)
+        throws Exception
+    {
+        List<Artifact> artifacts = new ArrayList<>();
+        for (ArtifactCoordinate artifactCoordinate : artifactCoordinates) {
+            Artifact artifact = artifactCoordinate.toArtifact(resolveVersion(artifactCoordinate, resolveExtraJARs));
+            LOGGER.info("Adding extra JAR to WEB-INF/lib: [{}]", artifact);
+            artifacts.add(artifact);
+        }
+        return artifacts;
+    }
+
+    /**
+     * @param artifacts the list of artifacts to which to add the Clover JAR
+     * @throws Exception in case the POM model cannot be resolved
+     * @since 10.11.2
+     * @since 12.0RC1
+     */
+    public void addCloverJAR(List<Artifact> artifacts) throws Exception
+    {
+        // Add the Clover JAR if it's defined in the current pom.xml since it's needed when the clover profile is
+        // enabled. Note that we need this since by default we don't add any JAR to WEB-INF/lib (since we install
+        // module artifacts as XWiki Extensions).
+        Model model = getModelFromCurrentPOM();
+        for (Dependency dependency : model.getDependencies()) {
+            if (dependency.getArtifactId().equals("clover") && dependency.getGroupId().equals("org.openclover")) {
+                artifacts.add(convertToArtifact(dependency));
+            }
+        }
+    }
+
+    /**
+     * @param model the model from which to find the current artifact and its transitive dependencies
+     * @return the full transitive dependencies for the current POM
+     * @throws Exception in case an error occurred during resolving
+     * @since 12.5RC1
+     */
+    public Collection<Artifact> getDependencies(Model model) throws Exception
+    {
+        List<Artifact> artifacts = new ArrayList<>();
+        Artifact currentPOMArtifact = new DefaultArtifact(model.getGroupId(), model.getArtifactId(),
+            model.getPackaging(), model.getVersion());
+        Collection<ArtifactResult> results = this.artifactResolver.getArtifactDependencies(currentPOMArtifact,
+            convertToArtifacts(model.getDependencies()));
+        for (ArtifactResult artifactResult : results) {
+            artifacts.add(artifactResult.getArtifact());
+        }
+        return artifacts;
+    }
+
+    /**
+     * Find the version to use if it's not specified. We look in the current Maven POM's dependencies to try to find
+     * a matching artifact and get its version. If not, we default to the version of the current Maven POM module:
+     * {@code getModelFromCurrentPOM().getVersion()}. Since resolving takes time and since it'll resolve
+     * SNAPSHOTs and it may not be what you want (you may have modifications done locally that you want to be used),
+     * we check if the {@code resolveExtraJARs} parameter is set or not.
+     */
+    private String resolveVersion(ArtifactCoordinate artifactCoordinate, boolean resolveExtraJARs) throws Exception
+    {
+        Model model = getModelFromCurrentPOM();
+        String version = null;
+        if (resolveExtraJARs) {
+            for (Artifact dependencyArtifact : getDependencies(model)) {
+                if (dependencyArtifact.getGroupId().equals(artifactCoordinate.getGroupId())
+                    && dependencyArtifact.getArtifactId().equals(artifactCoordinate.getArtifactId())
+                    && dependencyArtifact.getExtension().equals(artifactCoordinate.getType()))
+                {
+                    version = dependencyArtifact.getVersion();
+                    break;
+                }
+            }
+        }
+        if (version == null) {
+            version = model.getVersion();
+        }
+        return version;
+    }
+
+    /**
+     * @param value the value in which to resolve Maven properties
+     * @return the resolved value
+     */
+    public String replacePropertiesFromCurrentPOM(String value)
+    {
+        StringSubstitutor substitutor = new StringSubstitutor(new StringLookup()
+        {
+            @Override
+            public String lookup(String key)
+            {
+                try {
+                    return getPropertyFromCurrentPOM(key);
+                } catch (Exception e) {
+                    LOGGER.error("Failed to resolve Maven property [{}] in value [{}]", key, value, e);
+                }
+
+                return null;
+            }
+        });
+
+        return substitutor.replace(value);
     }
 }

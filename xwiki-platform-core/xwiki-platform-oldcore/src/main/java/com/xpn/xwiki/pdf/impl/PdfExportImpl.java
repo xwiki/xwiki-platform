@@ -47,7 +47,6 @@ import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.css.CSSStyleDeclaration;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -75,6 +74,7 @@ import com.xpn.xwiki.web.Utils;
 import io.sf.carte.doc.dom4j.CSSStylableElement;
 import io.sf.carte.doc.dom4j.XHTMLDocument;
 import io.sf.carte.doc.dom4j.XHTMLDocumentFactory;
+import io.sf.carte.doc.style.css.CSSStyleDeclaration;
 import io.sf.carte.doc.xml.dtd.DefaultEntityResolver;
 
 /**
@@ -107,6 +107,8 @@ public class PdfExportImpl implements PdfExport
 
     /** Velocity engine manager, used for interpreting velocity. */
     private static VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
+
+    private static XMLReaderFactory xmlReaderFactory = Utils.getComponent(XMLReaderFactory.class);
 
     /**
      * Used to get the temporary directory.
@@ -221,10 +223,10 @@ public class PdfExportImpl implements PdfExport
      * Convert a valid XHTML document into an XSL-FO document through XSLT transformations. Two transformations are
      * involved:
      * <ol>
-     * <li>A base transformation which converts the XHTML into a temporary XSL-FO; it uses the <tt>xhtml2fo.xsl</tt>
-     * file, or the <tt>xhtmlxsl</tt> property of the applied PDFTemplate.</li>
+     * <li>A base transformation which converts the XHTML into a temporary XSL-FO; it uses the {@code xhtml2fo.xsl}
+     * file, or the {@code xhtmlxsl} property of the applied PDFTemplate.</li>
      * <li>An eventual post-processing transformation which cleans up the temporary XSL-FO in order to avoid FOP bugs;
-     * it uses the <tt>fop.xsl</tt> file, or the <tt>fopxsl</tt> property of the applied PDFTemplate.</li>
+     * it uses the {@code fop.xsl} file, or the {@code fopxsl} property of the applied PDFTemplate.</li>
      * </ol>
      *
      * @param xhtml the XHTML document to convert
@@ -234,8 +236,15 @@ public class PdfExportImpl implements PdfExport
      */
     private String convertXHtmlToXMLFO(String xhtml, XWikiContext context) throws XWikiException
     {
-        String xmlfo = applyXSLT(xhtml, getXhtml2FopXslt(context));
+        String xmlfo = null;
+        try (InputStream stream = getXhtml2FopXslt(context)) {
+            xmlfo = applyXSLT(xhtml, stream);
+        } catch (IOException e) {
+            LOGGER.error("Failed to close the XSLT stream", e);
+        }
+
         LOGGER.debug("Intermediary XSL-FO:\n{}", xmlfo);
+
         return applyXSLT(xmlfo, getFopCleanupXslt(context));
     }
 
@@ -285,11 +294,11 @@ public class PdfExportImpl implements PdfExport
     /**
      * Apply CSS styling to an XHTML document. The style to apply is taken from:
      * <ol>
-     * <li>the <tt>pdf.css</tt> skin file</li>
-     * <li>and the <tt>style</tt> property of the applied PDFTemplate</li>
+     * <li>the {@code pdf.css} skin file</li>
+     * <li>and the {@code style} property of the applied PDFTemplate</li>
      * </ol>
      * The content found in these locations is concatenated. The CSS rules are applied on the document, and the
-     * resulting style properties are embedded in the document, inside <tt>style</tt> attributes. The resulting XHTML
+     * resulting style properties are embedded in the document, inside {@code style} attributes. The resulting XHTML
      * document with the inlined style is then serialized and returned.
      *
      * @param html the valid XHTML document to style
@@ -310,7 +319,7 @@ public class PdfExportImpl implements PdfExport
 
     /**
      * Apply a CSS style sheet to an XHTML document and return the document with the resulting style properties inlined
-     * in <tt>style</tt> attributes.
+     * in {@code style} attributes.
      *
      * @param html the valid XHTML document to style
      * @param css the style sheet to apply
@@ -321,21 +330,27 @@ public class PdfExportImpl implements PdfExport
     {
         LOGGER.debug("Applying the following CSS [{}] to HTML [{}]", css, html);
         try {
-            //System.setProperty("org.w3c.css.sac.parser", "org.apache.batik.css.parser.Parser");
-
             // Prepare the input
             Reader re = new StringReader(html);
             InputSource source = new InputSource(re);
-            SAXReader reader = new SAXReader(XHTMLDocumentFactory.getInstance());
+            XHTMLDocumentFactory docFactory = XHTMLDocumentFactory.getInstance();
+            SAXReader reader = new SAXReader(docFactory);
+
+            // Dom4J 2.1.1 disables external DTDs by default, so we set our own XMLReader.
+            // See https://github.com/dom4j/dom4j/issues/51
+            XMLReader xmlReader = xmlReaderFactory.createXMLReader();
+            reader.setXMLReader(xmlReader);
+
             reader.setEntityResolver(new DefaultEntityResolver());
             XHTMLDocument document = (XHTMLDocument) reader.read(source);
 
             // Set the base URL so that CSS4J can resolve URLs in CSS. Use the current document in the XWiki Context
             document.setBaseURL(new URL(context.getDoc().getExternalURL("view", context)));
 
-            // Apply the style sheet
-            document.addStyleSheet(new org.w3c.css.sac.InputSource(new StringReader(css)));
+            // Apply the style sheet.
+            document.addStyleSheet(new io.sf.carte.doc.style.css.nsac.InputSource(new StringReader(css)));
             applyInlineStyle(document.getRootElement());
+
             OutputFormat outputFormat = new OutputFormat("", false);
             if ((context == null) || (context.getWiki() == null)) {
                 outputFormat.setEncoding("UTF-8");
@@ -346,10 +361,7 @@ public class PdfExportImpl implements PdfExport
             XMLWriter writer = new XMLWriter(out, outputFormat);
             writer.write(document);
             String result = out.toString();
-            // Debug output
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("HTML with CSS applied [{}]", result);
-            }
+            LOGGER.debug("HTML with CSS applied [{}]", result);
             return result;
         } catch (Exception e) {
             LOGGER.warn("Failed to apply CSS [{}] to HTML [{}]", css, html, e);
@@ -383,8 +395,8 @@ public class PdfExportImpl implements PdfExport
     /**
      * Get the XSLT for converting (valid) XHTML to XSL-FO. The content is searched in:
      * <ol>
-     * <li>the <tt>xhtmlxsl</tt> property of the current PDFTemplate</li>
-     * <li>the <tt>xhtml2fo.xsl</tt> resource (usually a file inside xwiki-core-*.jar)</li>
+     * <li>the {@code xhtmlxsl} property of the current PDFTemplate</li>
+     * <li>the {@code xhtml2fo.xsl} resource (usually a file inside xwiki-core-*.jar)</li>
      * </ol>
      *
      * @param context the current request context
@@ -398,8 +410,8 @@ public class PdfExportImpl implements PdfExport
     /**
      * Get the XSLT for post-processing the XSL-FO file. The content is searched in:
      * <ol>
-     * <li>the <tt>fopxsl</tt> property of the current PDFTemplate</li>
-     * <li>the <tt>fop.xsl</tt> resource (usually a file inside xwiki-core-*.jar)</li>
+     * <li>the {@code fopxsl} property of the current PDFTemplate</li>
+     * <li>the {@code fop.xsl} resource (usually a file inside xwiki-core-*.jar)</li>
      * </ol>
      *
      * @param context the current request context
@@ -426,14 +438,7 @@ public class PdfExportImpl implements PdfExport
     {
         String xsl = getPDFTemplateProperty(propertyName, context);
         if (!StringUtils.isBlank(xsl)) {
-            try {
-                return IOUtils.toInputStream(xsl, context.getWiki().getEncoding());
-            } catch (IOException e) {
-                // This really shouldn't happen since it would mean that the encoding is either invalid or doesn't
-                // exist in the JVM.
-                LOGGER.error("Couldn't get XSLT for PDF exporting. Invalid or not existing encoding [{}]",
-                    context.getWiki().getEncoding(), e);
-            }
+            return IOUtils.toInputStream(xsl, context.getWiki().getEncoding());
         }
         return getClass().getClassLoader().getResourceAsStream(fallbackFile);
     }

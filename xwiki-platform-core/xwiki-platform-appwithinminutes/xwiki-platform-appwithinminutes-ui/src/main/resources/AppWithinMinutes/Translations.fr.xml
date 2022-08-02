@@ -58,9 +58,9 @@ appWithinMinutes.wizardStep.name.description=Choisissez un nom pour l'applicatio
 appWithinMinutes.wizardStep.structure.name=Structure
 appWithinMinutes.wizardStep.structure.title=Définissez la structure de votre application
 appWithinMinutes.wizardStep.structure.description=Décrivez les données de l'application
-appWithinMinutes.wizardStep.entries.name=Eléments
+appWithinMinutes.wizardStep.entries.name=Entrées
 appWithinMinutes.wizardStep.entries.title=Localisez vos entrées
-appWithinMinutes.wizardStep.entries.description=Choisissez où stocker les éléments de votre application
+appWithinMinutes.wizardStep.entries.description=Choisissez où stocker les données de votre application
 appWithinMinutes.wizardStep.presentation.name=Présentation
 appWithinMinutes.wizardStep.presentation.title=Personnalisez la page d'accueil de votre application
 appWithinMinutes.wizardStep.presentation.description=Personnalisez la page d'accueil de votre application
@@ -94,26 +94,22 @@ platform.appwithinminutes.appNameEmptyError=Saisissez le nom de l'application.
 platform.appwithinminutes.classEditorPaletteTitle=Palette de champs
 platform.appwithinminutes.classEditorPaletteHint=Glissez-Déposez des champs de la palette pour créer votre formulaire.
 platform.appwithinminutes.classEditorCanvasHint=Glissez-déposez les champs de la palette dans cette zone.
-
 platform.appwithinminutes.classEditorUpdateTemplateLabel=Mettre à jour le template de la classe
 platform.appwithinminutes.classEditorUpdateTemplateHint=Sauvegarder les valeurs par défaut dans le template de la classe ({0}).
 platform.appwithinminutes.classEditorUpdateSheetLabel=Mettre à jour la sheet de la classe
 platform.appwithinminutes.classEditorUpdateSheetHint=Recréer le formulaire utilisé pour afficher et modifier les objets de cette classe ({0}).
 platform.appwithinminutes.classEditorUpdateTranslationsLabel=Mettre à jour le paquet de traduction de la classe
 platform.appwithinminutes.classEditorUpdateTranslationsHint=Mettre à jour la traduction pour le nom d''affichage des champs et afficher les valeurs ({0}).
-
 platform.appwithinminutes.classEditorMultipleSheetsWarning=Cette classe a plusieurs sheets.
 platform.appwithinminutes.classEditorDuplicateFieldNameError=La classe possède deux champs ayant le même nom : {0}
 platform.appwithinminutes.classEditorTemplateSaveComment=Mettre à jour les valeurs par défaut
 platform.appwithinminutes.classEditorBindSheetSaveComment=Liaison de la sheet à la classe
 platform.appwithinminutes.classEditorSheetSaveComment=Mise à jour de la sheet de la classe
 platform.appwithinminutes.classEditorTranslationsSaveComment=Mettre à jour les traductions
-
 platform.appwithinminutes.classEditorStandardCategoryName=Standard
 platform.appwithinminutes.classEditorPickersCategoryName=Sélecteurs
 platform.appwithinminutes.classEditorDocumentCategoryName=Document
 platform.appwithinminutes.classEditorAdvancedCategoryName=Avancé
-
 platform.appwithinminutes.classEditorDBListFieldName=Liste en base de données
 platform.appwithinminutes.classEditorGroupsFieldName=Groupe
 platform.appwithinminutes.classEditorUsersFieldName=Utilisateur
@@ -126,14 +122,12 @@ platform.appwithinminutes.classEditorStringFieldName=Texte court
 platform.appwithinminutes.classEditorContentFieldName=Contenu
 platform.appwithinminutes.classEditorTitleFieldName=Titre
 platform.appwithinminutes.classEditorPageFieldName=Page
-
 platform.appwithinminutes.classEditorDeleteFieldLabel=Supprimer
 platform.appwithinminutes.classEditorConfigureFieldLabel=Configurer
 platform.appwithinminutes.classEditorPreviewFieldLabel=Prévisualiser
-platform.appwithinminutes.classEditorPreviewFieldHint=Masquer le panneau de configuration et appliquer les changements
+platform.appwithinminutes.classEditorPreviewFieldHint=Masquer le panneau de configuration et appliquer les modifications
 platform.appwithinminutes.classEditorMoveFieldLabel=Déplacer
 platform.appwithinminutes.classEditorMoveFieldHint=Glissez-Déposez pour changer l'odre
-
 platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Valeur par défaut
 
 ### Date Picker
@@ -147,7 +141,6 @@ platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=Valeur
 platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Ajouter
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Supprimer
-
 appWithinMinutes.templateProviderEditor.hint=Les éléments d’une application sont des pages wiki contenant des données structurées.
 appWithinMinutes.templateProviderEditor.icon.hint=Icône associée à chaque élément de l’application.
 appWithinMinutes.templateProviderEditor.description.hint=Courte description d’un élément de l’application.
@@ -197,7 +190,7 @@ platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Certaines colo
 platform.appwithinminutes.liveTableEditorIcon=Icône
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=Une référence à une icône. Cele peut être n'importe quelle image dans le wiki mais également une icône affichée dans le sélecteur d'icônes lorsque celui-ci est actif.
 
-### Application home page
+### Wizard Step 4: Application home page
 platform.appwithinminutes.appLiveTableHeading=Entrées
 platform.appwithinminutes.appLiveTableEditEntryActionName=Modifier
 platform.appwithinminutes.appLiveTableDeleteEntryActionName=Supprimer
@@ -209,6 +202,9 @@ platform.appwithinminutes.appHomePageDeleteEntriesLabel=Supprimer toutes les ent
 platform.appwithinminutes.appHomePageEditAppLabel=Modifier l'application
 platform.appwithinminutes.appHomePageTranslateAppLabel=Traduire l'application
 platform.appwithinminutes.appHomePageDeleteAppLabel=Supprimer application
+platform.appwithinminutes.appHomePageMovedWarning=L'application pourrait ne plus fonctionner correctement car elle a été renommée ou déplacée sans que son code n'ait été mis à jour. Merci de modifier l'application en mettant le code à jour pas à pas.
+AppWithinMinutes.LiveTableClass_description=Description
+AppWithinMinutes.LiveTableClass_columns=Colonnes du tableau dynamique
 
 ### Delete application dialog
 platform.appwithinminutes.deleteAppConfirmation=L''application {0} et TOUS SES DOCUMENTS vont être détruits. Etes-vous certain de vouloir continuer ?
@@ -217,11 +213,24 @@ platform.appwithinminutes.deleteAppDoesNotExistError=L'application indiquée n'e
 platform.appwithinminutes.deleteAppInvalidAppError=Le nom spécifié n'est pas une application App Within Minutes valide.
 platform.appwithinminutes.deleteAppNotSpecifiedError=Aucun nom d'application n'a été indiqué.
 
+### Rename Application
+appWithinMinutes.renameApp.changeAppTitleInfo=Vous pouvez modifier le titre de l'application sans la renommer, simplement en éditant sa page d'accueil.
+appWithinMinutes.renameApp.regenerateAppCodeWarning=Si vous renommez l'application, le code de l'application va être ré-généré. Par conséquent les personnalisations effectuées dans le code de l'application seront écrasées.
+appWithinMinutes.renameApp.newName.label=Nouveau nom
+appWithinMinutes.renameApp.pageExistsError=Une page portant ce nom existe déjà à l'emplacement sélectionné.
+appWithinMinutes.renameApp.locationForbiddenError=Vous n'êtes pas autorisés à déplacer l'application à l'emplacement sélectionné.
+appWithinMinutes.renameApp.location.label=Nouvel emplacement
+appWithinMinutes.renameApp.location.hint=Emplacement, dans la hiérarchie des pages, où déplacer l'application.
+appWithinMinutes.renameApp.parent.label=Nouveau parent
+appWithinMinutes.renameApp.parent.hint=Le nouveau parent de la page. Laissez vide si vous souhaitez déplacer l'application en haut de la hiérarchie.
+appWithinMinutes.renameApp.inProgress=Renommage de l'application en cours...
+appWithinMinutes.renameApp.done=Application renommée
+appWithinMinutes.renameApp.failed=Impossible de renommer l'application
+
 ### Deprecated keys
 ### Since 8.4
 platform.appwithinminutes.appNamePreviewClassReferenceLabel=Nom de la classe de l'application
 platform.appwithinminutes.appNamePreviewDataSpaceLabel=Espace des données de l'application
-
 platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Espace
 platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=Le nom de l'espace qui contient l'entrée de l'application
 platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Nom complet de la page

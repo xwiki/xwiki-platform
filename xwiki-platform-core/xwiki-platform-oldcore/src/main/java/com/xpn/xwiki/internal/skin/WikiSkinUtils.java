@@ -88,7 +88,7 @@ public class WikiSkinUtils
                 try {
                     doc = xwiki.getDocument(skinReference, xcontext);
                 } catch (XWikiException e) {
-                    this.logger.error("Faied to get document [{}]", skinReference, e);
+                    this.logger.error("Failed to get document [{}]", skinReference, e);
 
                     return null;
                 }

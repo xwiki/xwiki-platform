@@ -53,7 +53,7 @@ menu.livetable._avatar=Аватар
 menu.livetable._images=Изображения
 menu.livetable._attachments=Вложения
 menu.livetable._actions=Действия
-menu.livetable._actions.edit=Редактировать
+menu.livetable._actions.edit=Правка
 menu.livetable._actions.delete=Удалить
 menu.livetable.emptyvalue=-
 
@@ -64,14 +64,14 @@ menu.livetable.content1=Структура меню
 admin.menu.name=Меню
 
 # UIX keys
-menu.uix.extensionPoint.label=Расположение отображения меню
-menu.uix.extensionPoint.hint=Определяет, где отображать меню. Меню отображается горизонтально или вертикально в зависимости от выбранного расположения.
+menu.uix.extensionPoint.label=Место отображения меню
+menu.uix.extensionPoint.hint=Указывает, где отображать меню. Меню отображается горизонтально или вертикально в зависимости от выбранного расположения.
 menu.uix.extensionPoint.value.nowhere=Нигде
 menu.uix.extensionPoint.value.template.header.after=После заголовка страницы
 menu.uix.extensionPoint.value.panels.rightPanels=Внутри правой панели
 menu.uix.extensionPoint.value.panels.leftPanels=Внутри левой панели
 menu.uix.content.label=Расширение пользовательского интерфейса
-menu.uix.content.hint=Если вы видите это, вероятно, что у вас отключен JavaScript. Вы должны выбрать то же значение, что и для расположения отображения меню.
+menu.uix.content.hint=Если вы видите это, вероятно, у вас отключен JavaScript. Вам следует выбрать то же значение, что и для места отображения меню.
 menu.uix.scope.label=Область видимости меню
 menu.uix.scope.hint=Указывает, в каком контексте отображается меню.
 

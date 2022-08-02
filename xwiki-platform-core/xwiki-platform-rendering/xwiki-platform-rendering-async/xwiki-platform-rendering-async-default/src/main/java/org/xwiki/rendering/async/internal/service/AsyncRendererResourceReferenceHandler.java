@@ -29,16 +29,20 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.Container;
 import org.xwiki.container.Response;
 import org.xwiki.container.servlet.ServletResponse;
+import org.xwiki.job.event.status.JobStatus.State;
 import org.xwiki.rendering.async.AsyncContextHandler;
 import org.xwiki.rendering.async.internal.AsyncRendererExecutor;
 import org.xwiki.rendering.async.internal.AsyncRendererJobStatus;
@@ -47,6 +51,10 @@ import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
 import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.resource.ResourceType;
+import org.xwiki.resource.annotations.Authenticate;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.internal.context.RequestInitializer;
 
 /**
  * Async renderer resource handler.
@@ -57,6 +65,7 @@ import org.xwiki.resource.ResourceType;
 @Component
 @Named(AsyncRendererResourceReferenceHandler.HINT)
 @Singleton
+@Authenticate
 public class AsyncRendererResourceReferenceHandler extends AbstractResourceReferenceHandler<ResourceType>
 {
     /**
@@ -79,6 +88,12 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
     private ComponentManager componentManager;
 
     @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
+    @Inject
+    private RequestInitializer requestInitializer;
+
+    @Inject
     private Logger logger;
 
     @Override
@@ -93,67 +108,110 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
     {
         AsyncRendererResourceReference reference = (AsyncRendererResourceReference) resourceReference;
 
-        String clientIdString = reference.getClientId();
+        String clientId = reference.getClientId();
 
-        if (clientIdString == null) {
+        if (clientId == null) {
             throw new ResourceReferenceHandlerException("Client id is mandatory");
         }
-
-        long clientId = Long.parseLong(clientIdString);
 
         // Get the asynchronous renderer status
         AsyncRendererJobStatus status;
         try {
-            // TODO: don't wait forever and return the job progress if not finished
-            status = this.executor.getAsyncStatus(reference.getId(), clientId, Long.MAX_VALUE, TimeUnit.DAYS);
+            status = this.executor.getAsyncStatus(reference.getId(), clientId, reference.getTimeout(),
+                TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             throw new ResourceReferenceHandlerException("Failed to get content", e);
         }
 
-        // Check of a result was actually found for this id
+        // Check if a result was actually found for this id
         if (status == null) {
             throw new ResourceReferenceHandlerException("Cannot find any status for id [" + reference.getId() + "]");
         }
 
         // Send the result back
-        sendReponse(status);
+        if (status.getState() != State.FINISHED) {
+            sendRUNNINGResponse(status);
+        } else {
+            sendFINISHEDResponse(reference, status);
+        }
 
         // Be a good citizen, continue the chain, in case some lower-priority Handler has something to do for this
         // Resource Reference.
         chain.handleNext(reference);
     }
 
-    private void sendReponse(AsyncRendererJobStatus status) throws ResourceReferenceHandlerException
+    private void sendRUNNINGResponse(AsyncRendererJobStatus status)
     {
-        // Send the result back
+        Response response = this.container.getResponse();
+        response.setContentType("application/json; charset=utf-8");
+
+        if (response instanceof ServletResponse) {
+            ((ServletResponse) response).getHttpServletResponse().setStatus(HttpServletResponse.SC_ACCEPTED);
+        }
+
+        // TODO: Send back a REST version of the job status
+    }
+
+    private void sendFINISHEDResponse(AsyncRendererResourceReference reference, AsyncRendererJobStatus status)
+        throws ResourceReferenceHandlerException
+    {
         Response response = this.container.getResponse();
         response.setContentType("text/html; charset=utf-8");
 
-        // Create the asynchronous HTML meta
-        StringBuilder head = new StringBuilder();
-        Map<String, Collection<Object>> uses = status.getUses();
-        for (Map.Entry<String, Collection<Object>> entry : uses.entrySet()) {
-            AsyncContextHandler handler;
-            try {
-                handler = this.componentManager.getInstance(AsyncContextHandler.class, entry.getKey());
-            } catch (ComponentLookupException e) {
-                this.logger.error("Failed to get AsyncContextHandler with type [{}]", entry.getKey(), e);
-
-                continue;
-            }
-
-            handler.addHTMLHead(head, entry.getValue());
-        }
-        if (head.length() > 0) {
-            if (response instanceof ServletResponse) {
-                ((ServletResponse) response).getHttpServletResponse().addHeader("X-XWIKI-HTML-HEAD", head.toString());
-            }
-        }
+        addUse(reference, status, response);
 
         try (OutputStream stream = response.getOutputStream()) {
-            IOUtils.write(status.getResult().getResult(), stream, StandardCharsets.UTF_8);
+            if (status.getError() != null) {
+                IOUtils.write(toHTML(status.getError()), stream, StandardCharsets.UTF_8);
+            } else if (status.getResult() != null && status.getResult().getResult() != null) {
+                IOUtils.write(status.getResult().getResult(), stream, StandardCharsets.UTF_8);
+            } else {
+                // TODO: print more details about the status of the job ?
+                IOUtils.write("", stream, StandardCharsets.UTF_8);
+            }
         } catch (Exception e) {
             throw new ResourceReferenceHandlerException("Failed to send content", e);
         }
+    }
+
+    private void addUse(AsyncRendererResourceReference reference, AsyncRendererJobStatus status, Response response)
+    {
+        Map<String, Collection<Object>> uses = status.getUses();
+        if (uses != null && response instanceof ServletResponse) {
+            // Create the asynchronous HTML meta
+            StringBuilder head = new StringBuilder();
+            StringBuilder scripts = new StringBuilder();
+            for (Map.Entry<String, Collection<Object>> entry : uses.entrySet()) {
+                try {
+                    AsyncContextHandler handler =
+                        this.componentManager.getInstance(AsyncContextHandler.class, entry.getKey());
+
+                    // Setup a proper request and URL factory for the passed wiki
+                    this.requestInitializer.restoreRequest(reference.getWiki(), this.xcontextProvider.get());
+
+                    handler.addHTMLHead(head, entry.getValue(), false);
+                    handler.addHTMLScripts(scripts, entry.getValue());
+                } catch (Exception e) {
+                    this.logger.error("Failed to get HTML head for handler type [{}]", entry.getKey(), e);
+                }
+            }
+            if (head.length() > 0) {
+                ((ServletResponse) response).getHttpServletResponse().addHeader("X-XWIKI-HTML-HEAD", head.toString());
+            }
+            if (scripts.length() > 0) {
+                ((ServletResponse) response).getHttpServletResponse().addHeader("X-XWIKI-HTML-SCRIPTS",
+                    scripts.toString());
+            }
+        }
+    }
+
+    private String toHTML(Throwable t)
+    {
+        String content = StringEscapeUtils.escapeHtml4(ExceptionUtils.getStackTrace(t));
+
+        content = content.replace(" ", "&nbsp;");
+        content = content.replace("\n", "<br/>");
+
+        return content;
     }
 }

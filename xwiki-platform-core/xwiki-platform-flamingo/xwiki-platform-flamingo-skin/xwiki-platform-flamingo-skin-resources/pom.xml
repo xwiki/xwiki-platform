@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-flamingo-skin</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
   <name>XWiki Platform - Flamingo - Skin - Resources</name>
@@ -85,6 +85,13 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-index-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>requirejs</artifactId>
     </dependency>
@@ -92,56 +99,61 @@
       <groupId>org.webjars</groupId>
       <artifactId>jquery</artifactId>
     </dependency>
+    <!-- Loaded from javascript.vm by default because it's still used in many JavaScript modules from the XWiki WAR. -->
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>prototype</artifactId>
+    </dependency>
+    <!-- Used by the class editor (editclass.vm) to reorder properties with drag & drop. -->
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>scriptaculous</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>bootstrap</artifactId>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>Keypress</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>respond</artifactId>
-      <version>1.4.2</version>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>html5shiv</artifactId>
-      <version>3.7.2</version>
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>drawer</artifactId>
-      <version>2.4.0</version>
+      <version>3.2.2</version>
     </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>iscroll</artifactId>
-      <version>5.1.3</version>
+      <version>5.2.0</version>
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>momentjs</artifactId>
-      <version>2.18.1</version>
     </dependency>
     <dependency>
-      <groupId>org.webjars.bower</groupId>
+      <groupId>org.webjars</groupId>
       <artifactId>moment-jdateformatparser</artifactId>
-      <version>1.0.2</version>
+      <version>1.2.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>moment-timezone</artifactId>
+      <version>0.5.34</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>Eonasdan-bootstrap-datetimepicker</artifactId>
+      <version>4.17.49</version>
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>bootstrap-daterangepicker</artifactId>
-      <version>2.1.24</version>
     </dependency>
     <dependency>
       <!-- Used by the Database List, List of Users, List of Groups and Page property displayers and filters. -->
       <groupId>org.webjars</groupId>
       <artifactId>selectize.js</artifactId>
-      <version>0.12.5</version>
     </dependency>
     <!-- Refactoring -->
     <dependency>
@@ -159,11 +171,45 @@
   </dependencies>
   <build>
     <plugins>
-      <!-- Step 2: Verify and minify the JavaScript code. -->
+      <!-- Verify the JavaScript code. -->
       <plugin>
-        <groupId>com.cj.jshintmojo</groupId>
+        <groupId>org.xwiki.contrib</groupId>
         <artifactId>jshint-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>lint</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
+      <!-- Minify and optimize the JavaScript code. -->
+      <plugin>
+        <groupId>com.github.blutorange</groupId>
+        <artifactId>closure-compiler-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>minify</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <sourceDir>../resources</sourceDir>
+          <targetDir>../classes</targetDir>
+          <!-- Fix the path to the source file from the generated source map. This works ATM because all the JavaScript
+            source files are located in the same folder. Note that the source mapping is not going to be perfect if the
+            JavaScript code contains Velocity code. -->
+          <closureSourceMapLocationMappings>
+            <closureSourceMapLocationMapping>
+              <name>flamingo/</name>
+              <!-- We can't leave the value empty because it generates "null" in the path. -->
+              <value>./</value>
+            </closureSourceMapLocationMapping>
+          </closureSourceMapLocationMappings>
+        </configuration>
+      </plugin>
+      <!-- Minify the CSS code. -->
       <plugin>
         <groupId>net.alchim31.maven</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>
@@ -175,7 +221,7 @@
           </execution>
         </executions>
       </plugin>
-      <!-- Step 2: Unpack Bootstrap jar in order to add LESS sources in Flamingo -->
+      <!-- Unpack Bootstrap jar in order to add LESS sources in Flamingo -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>

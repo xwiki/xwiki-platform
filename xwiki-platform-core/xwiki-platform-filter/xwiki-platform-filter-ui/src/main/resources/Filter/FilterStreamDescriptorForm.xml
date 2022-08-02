@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -48,7 +48,7 @@
       &lt;dt&gt;
         &lt;label for="$descriptorId"&gt;$descriptor.name&lt;/label&gt;
         &lt;span class="xHint"&gt;$descriptor.description&lt;/span&gt;
-        &lt;span class="xHint"&gt;&lt;tt&gt;$descriptor.type.getName()&lt;/tt&gt;&lt;/span&gt;
+        &lt;span class="xHint"&gt;&lt;tt&gt;#if($descriptor.type.name)$descriptor.type.name#{else}$descriptor.type#end&lt;/tt&gt;&lt;/span&gt;
         #if ($descriptor.type.getName() == 'org.xwiki.filter.output.OutputTarget')
           &lt;span class="xHint"&gt;&lt;tt&gt;Supported format is &lt;strong&gt;file:&amp;lt;path in server&amp;gt;&lt;/strong&gt; (e.g. &lt;strong&gt;file:/home/myuser/target.xml&lt;/strong&gt;). When empty it send a file named &lt;strong&gt;target&lt;/strong&gt; to the browser.&lt;/tt&gt;&lt;/span&gt;
         #elseif ($descriptor.type.getName() == 'org.xwiki.filter.input.InputSource')
@@ -58,9 +58,9 @@
       &lt;dd&gt;
         ## TODO: design a real framework to generate form by type
         #if (($descriptor.defaultValue || "$!descriptor.defaultValue" != '') &amp;&amp; ($descriptor.type.getName() == 'boolean' || $descriptor.type.getName() == 'int' || $descriptor.type.getName() == 'java.lang.String'))
-          &lt;input type="text" id="$descriptorId" name="$descriptorId" value="#if($request.get($descriptorId))$request.get($descriptorId)#else$descriptor.defaultValue#end"/&gt;
+          &lt;input type="text" id="$descriptorId" name="$descriptorId" value="#if($request.get($descriptorId))$escapetool.xml($request.get($descriptorId))#else$descriptor.defaultValue#end"/&gt;
         #else
-          &lt;input type="text" id="$descriptorId" name="$descriptorId"#if($request.get($descriptorId))value="$request.get($descriptorId)"#end/&gt;
+          &lt;input type="text" id="$descriptorId" name="$descriptorId"#if($request.get($descriptorId))value="$escapetool.xml($request.get($descriptorId))"#end/&gt;
         #end
       &lt;/dd&gt;
     #end

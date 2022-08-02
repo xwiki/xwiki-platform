@@ -46,10 +46,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 5.1M1
  */
-public class ExtendedURLTest
+class ExtendedURLTest
 {
     @Test
-    public void extractParameters() throws Exception
+    void extractParameters() throws Exception
     {
         URL url = new URL("http://localhost:8080/xwiki/?foo=bar&toto&foo=baz");
         ExtendedURL extendedURL = new ExtendedURL(url, null);
@@ -59,7 +59,7 @@ public class ExtendedURLTest
     }
 
     @Test
-    public void withoutPrefix() throws Exception
+    void withoutPrefix() throws Exception
     {
         URL url = new URL("http://localhost:8080/some/path");
         ExtendedURL extendedURL = new ExtendedURL(url, null);
@@ -69,7 +69,7 @@ public class ExtendedURLTest
     }
 
     @Test
-    public void withPrefix() throws Exception
+    void withPrefix() throws Exception
     {
         URL url = new URL("http://localhost:8080/xwiki/path");
         ExtendedURL extendedURL = new ExtendedURL(url, "xwiki");
@@ -79,7 +79,7 @@ public class ExtendedURLTest
     }
 
     @Test
-    public void withPrefixAndNoSlashAfter() throws Exception
+    void withPrefixAndNoSlashAfter() throws Exception
     {
         URL url = new URL("http://localhost:8080/xwiki");
         ExtendedURL extendedURL = new ExtendedURL(url, "xwiki");
@@ -89,7 +89,7 @@ public class ExtendedURLTest
     }
 
     @Test
-    public void withPrefixStartingWithSlash() throws Exception
+    void withPrefixStartingWithSlash() throws Exception
     {
         URL url = new URL("http://localhost:8080/xwiki/path");
         ExtendedURL extendedURL = new ExtendedURL(url, "/xwiki");
@@ -99,7 +99,7 @@ public class ExtendedURLTest
     }
 
     @Test
-    public void withPrefixStartingWithSlashAndNoSlashAfter() throws Exception
+    void withPrefixStartingWithSlashAndNoSlashAfter() throws Exception
     {
         URL url = new URL("http://localhost:8080/xwiki");
         ExtendedURL extendedURL = new ExtendedURL(url, "/xwiki");
@@ -109,7 +109,7 @@ public class ExtendedURLTest
     }
 
     @Test
-    public void withInvalidPrefix() throws Exception
+    void withInvalidPrefix() throws Exception
     {
         URL url = new URL("http://localhost:8080/some/path");
         Throwable exception = assertThrows(CreateResourceReferenceException.class, () -> {
@@ -119,7 +119,7 @@ public class ExtendedURLTest
     }
 
     @Test
-    public void equality() throws Exception
+    void equality() throws Exception
     {
         ExtendedURL extendedURL1 = new ExtendedURL(new URL("http://localhost:8080/some/path"), null);
         ExtendedURL extendedURL2 = new ExtendedURL(new URL("http://localhost:8080/some/path"), null);
@@ -134,7 +134,7 @@ public class ExtendedURLTest
     }
 
     @Test
-    public void invalidURL() throws Exception
+    void invalidURL()
     {
         Throwable exception = assertThrows(CreateResourceReferenceException.class, () -> {
             // Invalid URL since the space in the page name isn't encoded.
@@ -144,7 +144,7 @@ public class ExtendedURLTest
     }
 
     @Test
-    public void withEncodedChars() throws Exception
+    void withEncodedChars() throws Exception
     {
         ExtendedURL extendedURL =
             new ExtendedURL(new URL("http://host/xwiki/bin/view/space/page%20name?param=%2D"), null);
@@ -156,7 +156,7 @@ public class ExtendedURLTest
      * Verify we ignore path parameters (see section 3.3 of the RFC 2396: http://www.faqs.org/rfcs/rfc2396.html).
      */
     @Test
-    public void ignoreSpecialPathParameters() throws Exception
+    void ignoreSpecialPathParameters() throws Exception
     {
         ExtendedURL extendedURL = new ExtendedURL(
             new URL("http://host/xwiki/bin/view/space;param1=value1/page;param2=value2"), "xwiki");
@@ -170,7 +170,7 @@ public class ExtendedURLTest
     }
 
     @Test
-    public void serialize() throws Exception
+    void serialize()
     {
         // Without parameters
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "with/slash", "with space"));

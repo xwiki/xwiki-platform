@@ -20,22 +20,29 @@
 package org.xwiki.extension.xar.internal.repository;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.extension.Extension;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.event.ExtensionEvent;
 import org.xwiki.extension.event.ExtensionInstalledEvent;
 import org.xwiki.extension.event.ExtensionUninstalledEvent;
 import org.xwiki.extension.event.ExtensionUpgradedEvent;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.extension.xar.internal.event.XarExtensionInstalledEvent;
+import org.xwiki.extension.xar.internal.event.XarExtensionUninstalledEvent;
+import org.xwiki.extension.xar.internal.event.XarExtensionUpgradedEvent;
 import org.xwiki.extension.xar.internal.handler.UnsupportedNamespaceException;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.observation.AbstractEventListener;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 
 /**
@@ -57,6 +64,9 @@ public class InstalledExtensionSynchronizer extends AbstractEventListener
     @Inject
     private Logger logger;
 
+    @Inject
+    private Provider<ObservationManager> observationManagerProvider;
+
     /**
      * Default constructor.
      */
@@ -71,6 +81,7 @@ public class InstalledExtensionSynchronizer extends AbstractEventListener
         return (XarInstalledExtensionRepository) this.xarRepository;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
@@ -107,5 +118,45 @@ public class InstalledExtensionSynchronizer extends AbstractEventListener
         } catch (UnsupportedNamespaceException e) {
             logger.error("Failed to extract wiki from namespace [{}]", extensionEvent.getNamespace());
         }
+
+        // Trigger the corresponding XAR extension event after the XAR extension repository has been synchronized.
+        maybeTriggerXarExtensionEvent((ExtensionEvent) event, (InstalledExtension) source,
+            (Collection<InstalledExtension>) data);
+    }
+
+    private void maybeTriggerXarExtensionEvent(ExtensionEvent event, InstalledExtension source,
+        Collection<InstalledExtension> data)
+    {
+        if (isXarExtension(source) || (data != null && data.stream().anyMatch(this::isXarExtension))) {
+            InstalledExtension newSource = asXarInstalledExtension(source);
+            Collection<InstalledExtension> newData =
+                data == null ? null : data.stream().map(this::asXarInstalledExtension).collect(Collectors.toList());
+            ObservationManager observationManager = this.observationManagerProvider.get();
+            if (event instanceof ExtensionInstalledEvent) {
+                observationManager.notify(new XarExtensionInstalledEvent((ExtensionInstalledEvent) event), newSource,
+                    newData);
+            } else if (event instanceof ExtensionUninstalledEvent) {
+                observationManager.notify(new XarExtensionUninstalledEvent((ExtensionUninstalledEvent) event),
+                    newSource, newData);
+            } else if (event instanceof ExtensionUpgradedEvent) {
+                observationManager.notify(new XarExtensionUpgradedEvent((ExtensionUpgradedEvent) event), newSource,
+                    newData);
+            }
+        }
+    }
+
+    private boolean isXarExtension(Extension extension)
+    {
+        return XarExtensionHandler.TYPE.equals(extension.getType());
+    }
+
+    private InstalledExtension asXarInstalledExtension(InstalledExtension extension)
+    {
+        if (extension instanceof XarInstalledExtension) {
+            return extension;
+        } else if (XarExtensionHandler.TYPE.equals(extension.getType())) {
+            return getXarRepository().getInstalledExtension(extension.getId());
+        }
+        return extension;
     }
 }

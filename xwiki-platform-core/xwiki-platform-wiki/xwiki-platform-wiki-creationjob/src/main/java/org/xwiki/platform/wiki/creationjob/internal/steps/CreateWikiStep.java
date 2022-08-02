@@ -25,9 +25,9 @@ import javax.inject.Named;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.platform.wiki.creationjob.WikiCreationException;
 import org.xwiki.platform.wiki.creationjob.WikiCreationRequest;
 import org.xwiki.platform.wiki.creationjob.WikiCreationStep;
-import org.xwiki.platform.wiki.creationjob.WikiCreationException;
 import org.xwiki.wiki.manager.WikiManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -49,7 +49,7 @@ public class CreateWikiStep implements WikiCreationStep
     public void execute(WikiCreationRequest request) throws WikiCreationException
     {
         try {
-            wikiManager.create(request.getWikiId(), request.getAlias(), request.isFailOnExist());
+            wikiManager.create(request.getWikiId(), request.getAlias(), request.getOwnerId(), request.isFailOnExist());
         } catch (WikiManagerException e) {
             throw new WikiCreationException(String.format("Failed to create the wiki [%s].", request.getWikiId()), e);
         }

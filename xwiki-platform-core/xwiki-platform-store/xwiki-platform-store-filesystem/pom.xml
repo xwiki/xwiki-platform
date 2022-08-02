@@ -25,15 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-store</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-store-filesystem</artifactId>
   <name>XWiki Platform - Store - Filesystem</name>
   <description>Tools for manipulating files on the filesystem in a transaction safe way.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.68</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>95</xwiki.pitest.mutationThreshold>
-  </properties>
+    <xwiki.jacoco.instructionRatio>0.67</xwiki.jacoco.instructionRatio>
+    </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -42,7 +41,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-model</artifactId>
+      <artifactId>xwiki-platform-model-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

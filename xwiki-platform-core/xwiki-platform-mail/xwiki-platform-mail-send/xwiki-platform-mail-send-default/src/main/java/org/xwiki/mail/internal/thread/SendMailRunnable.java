@@ -151,7 +151,7 @@ public class SendMailRunnable extends AbstractMailRunnable
             message = this.mailContentStore.load(item.getSession(), item.getBatchId(), item.getUniqueMessageId());
         } catch (Exception e) {
             if (listener != null) {
-                listener.onSendMessageFatalError(item.getUniqueMessageId(), e, Collections.<String, Object>emptyMap());
+                listener.onSendMessageFatalError(item.getUniqueMessageId(), e, Collections.emptyMap());
             }
             return;
         }
@@ -178,12 +178,12 @@ public class SendMailRunnable extends AbstractMailRunnable
 
             // Step 4: Notify the user of the success if a listener has been provided
             if (listener != null) {
-                listener.onSendMessageSuccess(message, Collections.<String, Object>emptyMap());
+                listener.onSendMessageSuccess(message, Collections.emptyMap());
             }
         } catch (Exception e) {
             // An error occurred, notify the user if a listener has been provided.
             if (listener != null) {
-                listener.onSendMessageError(message, e, Collections.<String, Object>emptyMap());
+                listener.onSendMessageError(message, e, Collections.emptyMap());
             }
         }
     }

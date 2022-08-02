@@ -21,6 +21,7 @@ package org.xwiki.rendering.internal.macro.cache;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
@@ -94,8 +95,9 @@ public class CacheMacro extends AbstractMacro<CacheMacroParameters>
      */
     public CacheMacro()
     {
-        super("Cache", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION), CacheMacroParameters.class);
-        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
+        super("Cache", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION, true, Block.LIST_BLOCK_TYPE),
+            CacheMacroParameters.class);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_DEVELOPMENT));
     }
 
     @Override

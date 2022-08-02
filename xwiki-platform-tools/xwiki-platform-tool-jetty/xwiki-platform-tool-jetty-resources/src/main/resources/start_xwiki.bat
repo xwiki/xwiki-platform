@@ -54,8 +54,6 @@ if not defined JETTY_STOP_PORT (
   )
 )
 
-echo Starting Jetty on port %JETTY_PORT%, please wait...
-
 REM Discover java.exe from the latest properly installed JRE
 for /f tokens^=2^ delims^=^" %%i in ('reg query HKEY_CLASSES_ROOT\jarfile\shell\open\command /ve') do set JAVAW_PATH=%%i
 set JAVA_PATH=%JAVAW_PATH:\javaw.exe=%\java.exe
@@ -76,16 +74,11 @@ if not exist "%XWIKI_DATA_DIR%" mkdir "%XWIKI_DATA_DIR%"
 REM Ensure the logs directory exists as otherwise Jetty reports an error
 if not exist "%XWIKI_DATA_DIR%\logs" mkdir "%XWIKI_DATA_DIR%\logs"
 
-REM Set up the Jetty Base directory (used for custom Jetty configuration) to point to the Data Directory
-REM Also created some Jetty directorie that Jetty would otherwise create at first startup. We do this to avoid
-REM cryptic messages in the logs such as: "MKDIR: ${jetty.base}/lib"
-set JETTY_BASE=%XWIKI_DATA_DIR%\jetty
-if not exist "%JETTY_BASE%" mkdir "%JETTY_BASE%"
-if not exist "%JETTY_BASE%\lib" mkdir "%JETTY_BASE%\lib"
-if not exist "%JETTY_BASE%\lib\ext" mkdir "%JETTY_BASE%\lib\ext"
+REM Set up the Jetty Base directory (used for custom Jetty configuration) to be the current directory where this file
+REM is.
+REM Also make sure the log directory exists since Jetty won't create it.
+set JETTY_BASE=.
 if not exist "%JETTY_BASE%\logs" mkdir "%JETTY_BASE%\logs"
-if not exist "%JETTY_BASE%\resources" mkdir "%JETTY_BASE%\resources"
-if not exist "%JETTY_BASE%\webapps" mkdir "%JETTY_BASE%\webapps"
 
 REM Specify Jetty's home and base directories
 set JETTY_HOME=jetty
@@ -95,10 +88,10 @@ REM Specify the encoding to use
 set XWIKI_OPTS=%XWIKI_OPTS% -Dfile.encoding=UTF8
 
 REM Specify port on which HTTP requests will be handled
-set JETTY_OPTS=%JETTY_OPTS% jetty.port=%JETTY_PORT%
+set JETTY_OPTS=%JETTY_OPTS% jetty.http.port=%JETTY_PORT%
 REM In order to print a nice friendly message to the user when Jetty has finished loading the XWiki webapp, we pass
 REM the port we use as a System Property
-set XWIKI_OPTS=%XWIKI_OPTS% -Djetty.port=%JETTY_PORT%
+set XWIKI_OPTS=%XWIKI_OPTS% -Djetty.http.port=%JETTY_PORT%
 
 REM Specify port and key to stop a running Jetty instance
 set JETTY_OPTS=%JETTY_OPTS% STOP.KEY=xwiki STOP.PORT=%JETTY_STOP_PORT%

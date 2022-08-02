@@ -170,8 +170,22 @@ public interface WikiDocumentFilter
 
     /**
      * @type {@link String}
+     * @since 14.0RC1
      */
-    String PARAMETER_REVISION_AUTHOR = "revision_author";
+    String PARAMETER_REVISION_EFFECTIVEMETADATA_AUTHOR = "revision_author";
+
+    /**
+     * @type {@link String}
+     * @since 14.0RC1
+     */
+    String PARAMETER_REVISION_ORIGINALMETADATA_AUTHOR = "revision_original_author";
+
+    /**
+     * @type {@link String}
+     * @deprecated since 14.0RC1, use {@link #PARAMETER_REVISION_EFFECTIVEMETADATA_AUTHOR} instead
+     */
+    @Deprecated
+    String PARAMETER_REVISION_AUTHOR = PARAMETER_REVISION_EFFECTIVEMETADATA_AUTHOR;
 
     /**
      * @type {@link String}

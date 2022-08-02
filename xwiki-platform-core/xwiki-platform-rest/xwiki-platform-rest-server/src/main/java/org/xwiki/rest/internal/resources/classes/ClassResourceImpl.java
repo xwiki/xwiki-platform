@@ -25,12 +25,18 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.Class;
 import org.xwiki.rest.resources.classes.ClassResource;
+import org.xwiki.security.authorization.AccessDeniedException;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiException;
 
@@ -44,6 +50,13 @@ public class ClassResourceImpl extends XWikiResource implements ClassResource
     @Inject
     private ModelFactory utils;
 
+    @Inject
+    private ContextualAuthorizationManager authorization;
+
+    @Inject
+    @Named("currentmixed")
+    private DocumentReferenceResolver<String> resolver;
+
     @Override
     public Class getClass(String wikiName, String className) throws XWikiRestException
     {
@@ -52,7 +65,9 @@ public class ClassResourceImpl extends XWikiResource implements ClassResource
         try {
             Utils.getXWikiContext(componentManager).setWikiId(wikiName);
 
-            com.xpn.xwiki.api.Class xwikiClass = Utils.getXWikiApi(componentManager).getClass(className);
+            DocumentReference classReference = this.resolver.resolve(className, new WikiReference(wikiName));
+            this.authorization.checkAccess(Right.VIEW, classReference);
+            com.xpn.xwiki.api.Class xwikiClass = Utils.getXWikiApi(componentManager).getClass(classReference);
             if (xwikiClass == null) {
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
@@ -60,6 +75,8 @@ public class ClassResourceImpl extends XWikiResource implements ClassResource
             return this.utils.toRestClass(uriInfo.getBaseUri(), xwikiClass);
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
+        } catch (AccessDeniedException e) {
+            throw new WebApplicationException(e, Status.UNAUTHORIZED);
         } finally {
             Utils.getXWikiContext(componentManager).setWikiId(database);
         }

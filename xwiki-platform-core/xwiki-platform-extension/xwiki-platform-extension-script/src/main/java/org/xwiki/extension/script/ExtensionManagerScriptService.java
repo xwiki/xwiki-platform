@@ -38,6 +38,7 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
+import org.xwiki.extension.index.IndexedExtension;
 import org.xwiki.extension.internal.ExtensionFactory;
 import org.xwiki.extension.internal.validator.AbstractExtensionValidator;
 import org.xwiki.extension.job.ExtensionRequest;
@@ -399,11 +400,15 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     {
         setError(null);
 
-        // Force proper id
-        String extensionId = installRequest.getExtensions().iterator().next().getId();
-        String namespace =
-            installRequest.getNamespaces() == null ? null : installRequest.getNamespaces().iterator().next();
-        installRequest.setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_ACTION_PREFIX, extensionId, namespace));
+        if (installRequest.getId() == null || (installRequest.getId().size() > 2
+            && installRequest.getId().get(1).equals(ExtensionRequest.JOBID_PLAN_PREFIX))) {
+            // Force proper id
+            String extensionId = installRequest.getExtensions().iterator().next().getId();
+            String namespace =
+                installRequest.getNamespaces() == null ? null : installRequest.getNamespaces().iterator().next();
+            installRequest
+                .setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_ACTION_PREFIX, extensionId, namespace));
+        }
 
         // Check rights
         if (!this.authorization.hasAccess(Right.PROGRAM)) {
@@ -550,11 +555,15 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     {
         setError(null);
 
-        // Force proper id
-        String extensionId = uninstallRequest.getExtensions().iterator().next().getId();
-        String namespace =
-            uninstallRequest.getNamespaces() == null ? null : uninstallRequest.getNamespaces().iterator().next();
-        uninstallRequest.setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_ACTION_PREFIX, extensionId, namespace));
+        if (uninstallRequest.getId() == null || (uninstallRequest.getId().size() > 2
+            && uninstallRequest.getId().get(1).equals(ExtensionRequest.JOBID_PLAN_PREFIX))) {
+            // Force proper id
+            String extensionId = uninstallRequest.getExtensions().iterator().next().getId();
+            String namespace =
+                uninstallRequest.getNamespaces() == null ? null : uninstallRequest.getNamespaces().iterator().next();
+            uninstallRequest
+                .setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_ACTION_PREFIX, extensionId, namespace));
+        }
 
         // Check rights
         if (!this.authorization.hasAccess(Right.PROGRAM)) {
@@ -608,7 +617,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      */
     private UninstallRequest createUninstallPlanRequest(ExtensionId extensionId, String namespace)
     {
-        UninstallRequest uninstallRequest = new UninstallRequest();
+        UninstallRequest uninstallRequest = createUninstallRequest();
         uninstallRequest
             .setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_PLAN_PREFIX, extensionId.getId(), namespace));
         uninstallRequest.setInteractive(true);
@@ -620,6 +629,20 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         // Indicate if it's allowed to do modification on root namespace
         uninstallRequest.setRootModificationsAllowed(
             namespace == null || this.xcontextProvider.get().isMainWiki(toWikiId(namespace)));
+
+        return uninstallRequest;
+    }
+
+    /**
+     * Create an {@link UninstallRequest} instance.
+     * 
+     * @return the {@link UninstallRequest}
+     * @since 11.10
+     */
+    public UninstallRequest createUninstallRequest()
+    {
+        UninstallRequest uninstallRequest = new UninstallRequest();
+        uninstallRequest.setInteractive(true);
 
         contextualize(uninstallRequest);
 
@@ -667,8 +690,9 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      * @param uninstallRequest the uninstall plan request to perform
      * @return the {@link Job} object which can be used to monitor the progress of the uninstall plan process, or
      *         {@code null} in case of failure
+     * @since 11.10
      */
-    private Job createUninstallPlan(UninstallRequest uninstallRequest)
+    public Job createUninstallPlan(UninstallRequest uninstallRequest)
     {
         setError(null);
 
@@ -748,15 +772,16 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      */
     public Job createUpgradePlan(InstallRequest request)
     {
+        request.setProperty(AbstractExtensionValidator.PROPERTY_CHECKRIGHTS, true);
+        request.setProperty(AbstractExtensionValidator.PROPERTY_CHECKRIGHTS_USER, true);
         request.setProperty(AbstractExtensionValidator.PROPERTY_USERREFERENCE,
             this.documentAccessBridge.getCurrentUserReference());
         XWikiDocument callerDocument = getCallerDocument();
         if (callerDocument != null) {
+            request.setProperty(AbstractExtensionValidator.PROPERTY_CHECKRIGHTS_CALLER, true);
             request.setProperty(AbstractExtensionValidator.PROPERTY_CALLERREFERENCE,
                 callerDocument.getContentAuthorReference());
         }
-
-        request.setProperty(AbstractExtensionValidator.PROPERTY_CHECKRIGHTS, true);
 
         Job job = null;
         try {
@@ -954,7 +979,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
 
         try {
             return this.factory.getExtensionDependency(id, this.factory.getVersionConstraint(versionConstraint),
-                optional, null);
+                optional, null, null, null);
         } catch (Exception e) {
             setError(e);
         }
@@ -981,6 +1006,13 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      */
     public boolean isAllowed(Extension extension, String namespace)
     {
+        if (extension instanceof IndexedExtension) {
+            if (Boolean.FALSE.equals(((IndexedExtension) extension).isCompatible(namespace))) {
+                // If the extension has explicitly been marked as incompatible, return false
+                return false;
+            }
+        }
+
         return this.namespaceResolver.isAllowed(extension.getAllowedNamespaces(), namespace);
     }
 

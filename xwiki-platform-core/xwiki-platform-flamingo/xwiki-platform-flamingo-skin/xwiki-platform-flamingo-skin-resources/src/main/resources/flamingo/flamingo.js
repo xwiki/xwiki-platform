@@ -1,5 +1,24 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 require(['jquery', 'bootstrap'], function($) {
-  $(document).ready(function() {
+  $(function() {
 
     // Fix the bad location of the dropdown menu when the trigger is close to the end of the screen.
     // See: http://jira.xwiki.org/browse/XWIKI-12609
@@ -27,5 +46,8 @@ require(['jquery', 'bootstrap'], function($) {
       $('.drawer-menu-sub-item').removeClass('in').attr('aria-expanded', 'false');
     });
 
+    // Activate the popover when hovering the Translate button.
+    var translateButton = $('#tmTranslate [data-toggle="popover"]');
+    translateButton.attr('title', translateButton.attr('data-title')).popover();
   });
 });

@@ -31,16 +31,17 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.lang3.StringUtils;
-import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
-import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.properties.converter.Converter;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 import org.xwiki.tree.AbstractTreeNode;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserPropertiesResolver;
 
 /**
  * Base class for tree nodes that represent entities.
@@ -51,6 +52,11 @@ import org.xwiki.tree.AbstractTreeNode;
  */
 public abstract class AbstractEntityTreeNode extends AbstractTreeNode
 {
+    /**
+     * There is a single farm node and this is its id.
+     */
+    protected static final String FARM_NODE_ID = "farm:*";
+
     @Inject
     protected EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
 
@@ -62,66 +68,35 @@ public abstract class AbstractEntityTreeNode extends AbstractTreeNode
     protected QueryManager queryManager;
 
     @Inject
-    @Named("current")
-    private EntityReferenceResolver<String> currentEntityReferenceResolver;
-
-    @Inject
-    @Named("user")
-    private ConfigurationSource userPreferencesSource;
+    private UserPropertiesResolver userPropertiesResolver;
 
     @Inject
     private EntityReferenceProvider defaultEntityReferenceProvider;
 
+    @Inject
+    @Named("entityTreeNodeId")
+    private Converter<EntityReference> entityTreeNodeIdConverter;
+
     protected EntityReference resolve(String nodeId)
     {
-        String[] parts = StringUtils.split(nodeId, ":", 2);
-        if (parts == null || parts.length != 2) {
-            return null;
-        }
-
-        try {
-            EntityType entityType = EntityType.valueOf(camelCaseToUnderscore(parts[0]).toUpperCase());
-            return this.currentEntityReferenceResolver.resolve(parts[1], entityType);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
+        return this.entityTreeNodeIdConverter.convert(EntityReference.class, nodeId);
     }
 
     protected String serialize(EntityReference entityReference)
     {
-        return underscoreToCamelCase(entityReference.getType().name().toLowerCase()) + ':'
-            + this.defaultEntityReferenceSerializer.serialize(entityReference);
+        return this.entityTreeNodeIdConverter.convert(String.class, entityReference);
     }
 
     protected <E extends EntityReference> List<String> serialize(List<E> entityReferences)
     {
-        List<String> nodeIds = new ArrayList<String>();
-        for (EntityReference entityReference : entityReferences) {
-            nodeIds.add(serialize(entityReference));
-        }
-        return nodeIds;
-    }
-
-    private String camelCaseToUnderscore(String nodeType)
-    {
-        return StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(nodeType), '_');
-    }
-
-    private String underscoreToCamelCase(String entityType)
-    {
-        StringBuilder result = new StringBuilder();
-        for (String part : StringUtils.split(entityType, '_')) {
-            result.append(StringUtils.capitalize(part));
-        }
-        return StringUtils.uncapitalize(result.toString());
+        return entityReferences.stream().map(this::serialize).collect(Collectors.toList());
     }
 
     protected boolean areHiddenEntitiesShown()
     {
         boolean shown = !Boolean.TRUE.equals(getProperties().get("filterHiddenDocuments"));
         if (!shown) {
-            Integer value = this.userPreferencesSource.getProperty("displayHiddenDocuments", Integer.class);
-            shown = value != null && value == 1;
+            shown = this.userPropertiesResolver.resolve(CurrentUserReference.INSTANCE).displayHiddenDocuments();
         }
         return shown;
     }
@@ -174,21 +149,21 @@ public abstract class AbstractEntityTreeNode extends AbstractTreeNode
         return !Boolean.FALSE.equals(getProperties().get("showTerminalDocuments"));
     }
 
-    protected Set<EntityReference> getExcludedEntities()
+    protected Set<EntityReference> getExcludedEntities(String parentNodeId)
     {
-        return getExclusions().stream().map(nodeId -> this.resolve(nodeId)).filter(Objects::nonNull)
+        return getExclusions(parentNodeId).stream().map(nodeId -> this.resolve(nodeId)).filter(Objects::nonNull)
             .collect(Collectors.toSet());
     }
 
     protected Set<String> getExcludedWikis()
     {
-        return getExcludedEntities().stream().filter(AbstractEntityTreeNode::isWiki)
+        return getExcludedEntities(FARM_NODE_ID).stream().filter(AbstractEntityTreeNode::isWiki)
             .map(entityReference -> entityReference.getName()).collect(Collectors.toSet());
     }
 
     protected Set<String> getExcludedSpaces(EntityReference parentReference)
     {
-        return getExcludedEntities().stream()
+        return getExcludedEntities(serialize(parentReference)).stream()
             .filter(entityReference -> this.isSpace(entityReference) || this.isNestedDocument(entityReference))
             .filter(entityReference -> entityReference.hasParent(parentReference))
             .map(entityReference -> this.localEntityReferenceSerializer
@@ -198,11 +173,11 @@ public abstract class AbstractEntityTreeNode extends AbstractTreeNode
 
     protected Set<String> getExcludedDocuments(EntityReference parentReference)
     {
-        return getExcludedEntities().stream().filter(entityReference -> this.isTerminalDocument(entityReference))
+        return getExcludedEntities(serialize(parentReference)).stream()
+            .filter(entityReference -> this.isTerminalDocument(entityReference))
             .filter(entityReference -> entityReference.hasParent(parentReference))
             .map(entityReference -> this.localEntityReferenceSerializer.serialize(entityReference))
             .collect(Collectors.toSet());
-
     }
 
     private static boolean isWiki(EntityReference entityReference)

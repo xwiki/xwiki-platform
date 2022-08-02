@@ -32,7 +32,7 @@ import org.xwiki.rendering.syntax.SyntaxContent;
 
 /**
  * Edit script service specialized in {@link SyntaxContent} {@link Editor}s.
- * 
+ *
  * @version $Id$
  * @since 8.2RC1
  */

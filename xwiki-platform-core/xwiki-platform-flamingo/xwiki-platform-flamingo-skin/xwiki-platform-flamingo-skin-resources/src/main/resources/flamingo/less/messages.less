@@ -14,8 +14,11 @@ fieldset.xwikimessage { // Used by: Login form, Delete messages
   overflow-x: auto;
 }
 
-.box > *:last-child { // Remove space added by last elements inside box, like paragraphs
-    margin-bottom: 0;
+// Remove space added by last elements inside box, like paragraphs.
+.box > *:last-child,
+// Do the same when the box macro is edited in-line.
+.box > .xwiki-metadata-container > *:last-child {
+  margin-bottom: 0;
 }
 
 .plainmessage {
@@ -45,7 +48,7 @@ fieldset.xwikimessage { // Used by: Login form, Delete messages
 // When the error is not inline, display it in a box
 div.xwikirenderingerror {
   .box;
-  
+
   // Put the description box just after the error box, which has a 20px margin (see bootstrap/wells.less).
   & + .xwikirenderingerrordescription {
     margin-top: -20px;

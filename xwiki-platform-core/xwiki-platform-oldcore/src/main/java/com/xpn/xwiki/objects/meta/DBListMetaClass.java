@@ -39,6 +39,8 @@ import com.xpn.xwiki.objects.classes.TextAreaClass;
 @Singleton
 public class DBListMetaClass extends ListMetaClass
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * Default constructor. Initializes the default meta properties of a Database List XClass property.
      */

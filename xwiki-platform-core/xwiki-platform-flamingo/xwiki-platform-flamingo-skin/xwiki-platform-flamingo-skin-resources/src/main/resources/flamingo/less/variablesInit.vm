@@ -1,3 +1,22 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
 ################################################
 ##
 ## LESS variables initialized by Velocity
@@ -81,7 +100,7 @@
   @panel-default-text:                  $theme.panelTextColor;
   @xwiki-panel-header-bg:               $theme.panelHeaderBackgroundColor;
   @xwiki-panel-header-text:             $theme.panelHeaderTextColor;
-  
+
   ##
   ## XWiki variables: LESS variables specific to XWiki
   ##
@@ -89,8 +108,8 @@
   @xwiki-page-content-bg:               $theme.pageContentBackgroundColor;
   @xwiki-background-secondary-color:    $theme.backgroundSecondaryColor;
   @xwiki-page-header-bg-color:          $theme.pageHeaderBackgroundColor;
-  @xwiki-page-header-bg-image:          $!{theme.headerBackgroundImage};
-  @xwiki-page-header-bg-position:       $!{theme.headerBackgroundPosition};
+  @xwiki-page-header-bg-image:          $stringtool.defaultString($theme.headerBackgroundImage, '""');
+  @xwiki-page-header-bg-position:       $stringtool.defaultString($theme.headerBackgroundPosition, '""');
 #end
 
 ##############################################
@@ -211,8 +230,8 @@
   @xwiki-page-content-bg:               $theme.pageContentBackgroundColor;
   @xwiki-background-secondary-color:    $theme.backgroundSecondaryColor;
   @xwiki-page-header-bg-color:          $theme.pageHeaderBackgroundColor;
-  @xwiki-page-header-bg-image:          $!{theme.headerBackgroundImage};
-  @xwiki-page-header-bg-position:       $!{theme.headerBackgroundPosition};
+  @xwiki-page-header-bg-image:          $stringtool.defaultString($theme.headerBackgroundImage, '""');
+  @xwiki-page-header-bg-position:       $stringtool.defaultString($theme.headerBackgroundPosition, '""');
 #end
 
 ##############################################
@@ -241,4 +260,5 @@
 @xwiki-icon-parent-edit:              "$xwiki.getSkinFile('icons/xwiki/parent_edit.gif')";
 @xwiki-icon-edit-section:             "\f040";
 @xwiki-icon-spinner:                  "$xwiki.getSkinFile('icons/xwiki/spinner.gif')";
+@xwiki-icon-spinner-height:           16px;
 @xwiki-icon-link-external:            "$xwiki.getSkinFile('icons/xwiki/external-link.png')";

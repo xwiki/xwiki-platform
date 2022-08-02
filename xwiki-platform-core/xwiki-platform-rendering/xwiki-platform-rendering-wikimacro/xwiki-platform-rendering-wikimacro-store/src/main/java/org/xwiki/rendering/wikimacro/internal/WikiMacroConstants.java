@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.wikimacro.internal;
 
+import org.xwiki.model.reference.LocalDocumentReference;
+
 /**
  * Constants identifying various properties used for defining wiki macros.
  *
@@ -43,6 +45,14 @@ public interface WikiMacroConstants
     String WIKI_MACRO_CLASS = WIKI_MACRO_CLASS_SPACE + '.' + WIKI_MACRO_CLASS_PAGE;
 
     /**
+     * Constant for representing XWiki.WikiMacroClass xwiki class local reference.
+     * 
+     * @since 11.8RC1
+     */
+    LocalDocumentReference WIKI_MACRO_CLASS_REFERENCE =
+        new LocalDocumentReference(WIKI_MACRO_CLASS_SPACE, WIKI_MACRO_CLASS_PAGE);
+
+    /**
      * Constant for representing macro id property.
      */
     String MACRO_ID_PROPERTY = "id";
@@ -58,9 +68,10 @@ public interface WikiMacroConstants
     String MACRO_DESCRIPTION_PROPERTY = "description";
 
     /**
-     * Constant for representing default macro category property.
+     * Constant for representing default macro categories property.
+     * @since 14.6RC1
      */
-    String MACRO_DEFAULT_CATEGORY_PROPERTY = "defaultCategory";
+    String MACRO_DEFAULT_CATEGORIES_PROPERTY = "defaultCategories";
 
     /**
      * Name of the macro visibility property in the Wiki Macro Class.
@@ -73,9 +84,24 @@ public interface WikiMacroConstants
     String MACRO_INLINE_PROPERTY = "supportsInlineMode";
 
     /**
-     * Constant for representing macro content type property.
+     * Constant for representing macro content optionality property.
      */
     String MACRO_CONTENT_TYPE_PROPERTY = "contentType";
+
+    /**
+     * Constant for representing macro content java type property.
+     */
+    String MACRO_CONTENT_JAVA_TYPE_PROPERTY = "contentJavaType";
+
+    /**
+     * Constant for the "Wiki" choice for Macro Content Type.
+     */
+    String MACRO_CONTENT_TYPE_WIKI = "Wiki";
+
+    /**
+     * Constant for the "Unkown" choice for Macro Content Type.
+     */
+    String MACRO_CONTENT_TYPE_UNKNOWN = "Unknown";
 
     /**
      * Constant for representing macro content mandatory status.
@@ -101,6 +127,13 @@ public interface WikiMacroConstants
      * Constant for representing macro code property.
      */
     String MACRO_CODE_PROPERTY = "code";
+
+    /**
+     * Constant for representing macro priority property.
+     * 
+     * @since 13.1RC1
+     */
+    String MACRO_PRIORITY_PROPERTY = "priority";
 
     /**
      * Constant for representing XWiki.WikiMacroParameterClass xwiki class space name.

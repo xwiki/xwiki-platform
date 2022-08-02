@@ -45,7 +45,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -135,7 +135,7 @@ public class SkinListenerTest
         mocker.getComponentUnderTest().onEvent(event, doc, data);
 
         // Verify
-        verifyZeroInteractions(lessResourcesCache);
-        verifyZeroInteractions(colorThemeCache);
+        verifyNoInteractions(lessResourcesCache);
+        verifyNoInteractions(colorThemeCache);
     }
 }

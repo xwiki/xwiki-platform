@@ -39,7 +39,7 @@ public abstract class AbstractRegistrationPage extends BasePage
     @FindBy(id = "register")
     private WebElement registerFormElement;
 
-    private FormElement form;
+    private FormContainerElement form;
 
     public abstract void clickRegister();
 
@@ -52,6 +52,9 @@ public abstract class AbstractRegistrationPage extends BasePage
         final String password, final String confirmPassword, final String email)
     {
         Map<String, String> map = new HashMap<String, String>();
+        // remove the onfocus on login, to avoid any problem to put the value.
+        getDriver().executeJavascript("try{ document.getElementById('xwikiname').onfocus = null; " +
+            "}catch(err){}");
         if (firstName != null) {
             map.put("register_first_name", firstName);
         }
@@ -71,19 +74,12 @@ public abstract class AbstractRegistrationPage extends BasePage
             map.put("register_email", email);
         }
         getForm().fillFieldsByName(map);
-        // There is a little piece of js which fills in the name for you.
-        // This causes flickering if what's filled in is not cleared.
-        if (username != null) {
-            while (!username.equals(getForm().getFieldValue(By.name("xwikiname")))) {
-                getForm().setFieldValue(By.name("xwikiname"), username);
-            }
-        }
     }
 
-    private FormElement getForm()
+    private FormContainerElement getForm()
     {
         if (this.form == null) {
-            this.form = new FormElement(this.registerFormElement);
+            this.form = new FormContainerElement(By.id("register"));
         }
         return this.form;
     }

@@ -19,24 +19,37 @@
  */
 package com.xpn.xwiki.internal.filter.output;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
+import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.instance.output.DocumentInstanceOutputProperties;
+import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxType;
+import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.user.UserReferenceSerializer;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.internal.filter.AbstractInstanceFilterStreamTest;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
 
@@ -44,31 +57,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Validate {@link DocumentInstanceOutputFilterStream}.
  * 
  * @version $Id$
  */
-public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilterStreamTest
+class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilterStreamTest
 {
     // Tests
 
-    @Test
-    public void testImportDocumentsPreserveVersion() throws FilterException, XWikiException, ParseException
+    private void assertDocument1PreserveVersion(XWikiDocument document) throws XWikiException, ParseException
     {
-        DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
-
-        outputProperties.setVersionPreserved(true);
-        outputProperties.setVerbose(false);
-
-        importFromXML("document1", outputProperties);
-
-        XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
-            this.oldcore.getXWikiContext());
-
-        assertFalse(document.isNew());
-
         assertEquals(Locale.ENGLISH, document.getDefaultLocale());
         assertEquals(new DocumentReference("wiki", "space", "parent"), document.getParentReference());
         assertEquals("customclass", document.getCustomClass());
@@ -95,7 +97,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
         XWikiAttachment attachment = document.getAttachment("attachment.txt");
         assertEquals("attachment.txt", attachment.getFilename());
         assertEquals(10, attachment.getLongSize());
-        assertTrue(Arrays.equals(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 },
+        assertTrue(Arrays.equals(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
             attachment.getContent(this.oldcore.getXWikiContext())));
 
         assertEquals("XWiki.attachmentAuthor", attachment.getAuthor());
@@ -155,7 +157,51 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
     }
 
     @Test
-    public void testImportDocumentsWithoutLocaleAndRevision() throws FilterException, XWikiException, ParseException
+    void importDocument1WithPreserveVersion() throws FilterException, XWikiException, ParseException
+    {
+        DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
+
+        outputProperties.setVersionPreserved(true);
+        outputProperties.setVerbose(false);
+
+        importFromXML("document1", outputProperties);
+
+        XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getXWikiContext());
+
+        assertFalse(document.isNew());
+
+        assertDocument1PreserveVersion(document);
+    }
+
+    @Test
+    void importDocument1WithDeletePreviousAndPreserveVersion() throws FilterException, XWikiException, ParseException
+    {
+        DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
+
+        outputProperties.setPreviousDeleted(true);
+        outputProperties.setVersionPreserved(true);
+        outputProperties.setVerbose(false);
+
+        XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getXWikiContext());
+        this.oldcore.getSpyXWiki().saveDocument(document, this.oldcore.getXWikiContext());
+
+        assertFalse(this.oldcore.getSpyXWiki()
+            .getDocument(new DocumentReference("wiki", "space", "page"), this.oldcore.getXWikiContext()).isNew());
+
+        importFromXML("document1", outputProperties);
+
+        document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getXWikiContext());
+
+        assertFalse(document.isNew());
+
+        assertDocument1PreserveVersion(document);
+    }
+
+    @Test
+    void importDocumentsWithoutLocaleAndRevision() throws FilterException, XWikiException, ParseException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 
@@ -181,9 +227,9 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
 
         assertEquals(new DocumentReference("wiki", "XWiki", "creator"), document.getCreatorReference());
         assertEquals(toDate("2000-01-01 00:00:00.0 UTC"), document.getCreationDate());
-        assertEquals(new DocumentReference("wiki", "XWiki", "author"), document.getAuthorReference());
         assertEquals(toDate("2000-01-02 00:00:00.0 UTC"), document.getDate());
         assertEquals(toDate("2000-01-03 00:00:00.0 UTC"), document.getContentUpdateDate());
+        assertEquals(new DocumentReference("wiki", "XWiki", "author"), document.getAuthorReference());
         assertEquals(new DocumentReference("wiki", "XWiki", "contentAuthor"), document.getContentAuthorReference());
         assertEquals(true, document.isMinorEdit());
         assertEquals("comment", document.getComment());
@@ -195,7 +241,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
         XWikiAttachment attachment = document.getAttachment("attachment.txt");
         assertEquals("attachment.txt", attachment.getFilename());
         assertEquals(10, attachment.getLongSize());
-        assertTrue(Arrays.equals(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 },
+        assertTrue(Arrays.equals(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
             attachment.getContent(this.oldcore.getXWikiContext())));
 
         assertEquals("XWiki.attachmentAuthor", attachment.getAuthor());
@@ -255,7 +301,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
     }
 
     @Test
-    public void testDocumentwithunexistingobjectproperty() throws FilterException, XWikiException
+    void documentwithunexistingobjectproperty() throws FilterException, XWikiException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 
@@ -284,7 +330,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
     }
 
     @Test
-    public void testDocumentwithnumberversion() throws FilterException, XWikiException
+    void documentwithnumberversion() throws FilterException, XWikiException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 
@@ -303,9 +349,39 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
     }
 
     @Test
-    public void testDocumentwithoutauthorandcreator() throws FilterException, XWikiException
+    void documentwithshortusers() throws FilterException, XWikiException
     {
+        DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
+
+        outputProperties.setVerbose(false);
+
+        importFromXML("documentwithshortusers", outputProperties);
+
+        XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getXWikiContext());
+
+        assertFalse(document.isNew());
+
+        assertEquals(new DocumentReference("wiki", "XWiki", "creator"), document.getCreatorReference());
+        assertEquals(new DocumentReference("wiki", "XWiki", "author"), document.getAuthorReference());
+        assertEquals(new DocumentReference("wiki", "XWiki", "contentAuthor"), document.getContentAuthorReference());
+
+        XWikiAttachment attachment = document.getAttachment("attachment.txt");
+        assertEquals("XWiki.attachmentAuthor", attachment.getAuthor());
+    }
+
+    @Test
+    void documentwithoutauthorandcreator(MockitoComponentManager componentManager) throws Exception
+    {
+        UserReferenceSerializer<DocumentReference> userReferenceSerializer = componentManager.registerMockComponent(
+            new DefaultParameterizedType(null, UserReferenceSerializer.class, DocumentReference.class), "document");
+        UserReferenceResolver<DocumentReference> userReferenceResolver = componentManager.registerMockComponent(
+            new DefaultParameterizedType(null, UserReferenceResolver.class, DocumentReference.class), "document");
+
         DocumentReference contextUser = new DocumentReference("wiki", "XWiki", "contextuser");
+        UserReference contextUserReference = mock(UserReference.class, "contextuser");
+        when(userReferenceResolver.resolve(contextUser)).thenReturn(contextUserReference);
+        when(userReferenceSerializer.serialize(contextUserReference)).thenReturn(contextUser);
         this.oldcore.getXWikiContext().setUserReference(contextUser);
 
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
@@ -313,20 +389,23 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
         outputProperties.setVerbose(false);
         outputProperties.setAuthorPreserved(true);
 
-        importFromXML("documentwithnumberversion", outputProperties);
+        importFromXML("documentwithoutauthorandcreator", outputProperties);
 
         XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
             this.oldcore.getXWikiContext());
 
         assertFalse(document.isNew());
 
-        assertEquals(contextUser, document.getCreatorReference());
-        assertEquals(contextUser, document.getAuthorReference());
-        assertEquals(contextUser, document.getContentAuthorReference());
+        DocumentAuthors authors = document.getAuthors();
+        assertEquals(contextUserReference, authors.getCreator());
+        assertEquals(contextUserReference, authors.getEffectiveMetadataAuthor());
+        assertEquals(contextUserReference, authors.getOriginalMetadataAuthor());
+        assertEquals(contextUserReference, authors.getCreator());
+        assertEquals(contextUserReference, authors.getContentAuthor());
     }
 
     @Test
-    public void testDocumentwithattachmentwithoutdate() throws FilterException, XWikiException
+    void documentwithattachmentwithoutdate() throws FilterException, XWikiException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 
@@ -345,7 +424,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
         XWikiAttachment attachment = document.getAttachment("attachment.txt");
         assertEquals("attachment.txt", attachment.getFilename());
         assertEquals(10, attachment.getLongSize());
-        assertTrue(Arrays.equals(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 },
+        assertTrue(Arrays.equals(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
             attachment.getContent(this.oldcore.getXWikiContext())));
 
         assertNotNull(attachment.getDate());
@@ -354,9 +433,8 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
         assertEquals("text/plain", attachment.getMimeType());
     }
 
-
     @Test
-    public void testDocumentwithattachmentwithoutcontent() throws FilterException, XWikiException
+    void documentwithattachmentwithoutcontent() throws FilterException, XWikiException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 
@@ -378,7 +456,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
     }
 
     @Test
-    public void testDocumentwithunknownclassproperty() throws FilterException, XWikiException
+    public void documentwithunknownClassproperty() throws FilterException, XWikiException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 
@@ -407,7 +485,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
     }
 
     @Test
-    public void testDocumentwithobjectwithoutnumberandclass() throws FilterException, XWikiException
+    void documentwithobjectwithoutnumberandclass() throws FilterException, XWikiException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 
@@ -431,5 +509,149 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
         assertEquals(0, documentObject.getNumber());
         assertEquals(1, documentObject.getFieldList().size());
         assertEquals("propvalue", documentObject.getStringValue("prop"));
+    }
+
+    @Test
+    void documentwithobjectmissingapropertyfromanotexistingclass() throws FilterException, XWikiException
+    {
+        DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
+
+        outputProperties.setVerbose(false);
+
+        importFromXML("documentwithobjectmissingapropertyfromanotexistingclass", outputProperties);
+
+        XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getXWikiContext());
+
+        assertFalse(document.isNew());
+
+        // Objects
+
+        Map<DocumentReference, List<BaseObject>> objects = document.getXObjects();
+        assertEquals(1, objects.size());
+
+        List<BaseObject> documentObjects = objects.get(new DocumentReference("wiki", "missingspace", "missingclass"));
+        assertEquals(1, documentObjects.size());
+        BaseObject documentObject = documentObjects.get(0);
+        assertEquals(0, documentObject.getNumber());
+        assertEquals(2, documentObject.getFieldList().size());
+        assertEquals("propvalue", documentObject.getStringValue("prop"));
+        assertEquals("", documentObject.getStringValue("missingprop"));
+    }
+
+    @Test
+    void documentwithobjectwithinconsistentclasses() throws FilterException, XWikiException
+    {
+        DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
+
+        outputProperties.setVerbose(false);
+
+        importFromXML("documentwithobjectwithinconsistentclasses", outputProperties);
+
+        XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getXWikiContext());
+
+        assertFalse(document.isNew());
+
+        // Objects
+
+        Map<DocumentReference, List<BaseObject>> objects = document.getXObjects();
+        assertEquals(1, objects.size());
+
+        List<BaseObject> documentObjects = objects.get(new DocumentReference("wiki", "otherspace", "otherclass"));
+        assertEquals(1, documentObjects.size());
+        BaseObject documentObject = documentObjects.get(0);
+        assertEquals(0, documentObject.getNumber());
+        assertEquals(4, documentObject.getFieldList().size());
+        assertEquals("propvalue", documentObject.getStringValue("prop"));
+        assertEquals("42", ((BaseProperty) documentObject.get("prop2")).getValue());
+        assertEquals("", ((BaseProperty) documentObject.get("missingprop1")).getValue());
+        assertEquals("", ((BaseProperty) documentObject.get("missingprop2")).getValue());
+    }
+
+    @Test
+    void importAttachmentWithRevisions() throws FilterException, XWikiException, IOException
+    {
+        DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
+
+        outputProperties.setVersionPreserved(true);
+        outputProperties.setVerbose(false);
+
+        importFromXML("documentwithattachmentrevisions", outputProperties);
+
+        XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getXWikiContext());
+
+        assertFalse(document.isNew());
+
+        XWikiAttachment attachment = document.getAttachment("attachment.txt");
+
+        assertNotNull(attachment);
+
+        assertEquals(10, attachment.getContentLongSize(null));
+        assertTrue(Arrays.equals(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
+            attachment.getContent(this.oldcore.getXWikiContext())));
+
+        XWikiAttachment attachment11 = attachment.getAttachmentRevision("1.1", null);
+
+        assertEquals(3, attachment11.getContentLongSize(null));
+        assertContentEquals("1.1", attachment11);
+        assertEquals("Comment 1.1", attachment11.getComment());
+
+        XWikiAttachment attachment12 = attachment.getAttachmentRevision("1.2", null);
+
+        assertEquals(3, attachment12.getContentLongSize(null));
+        assertContentEquals("1.1", attachment12);
+        assertEquals("Comment 1.2", attachment12.getComment());
+
+        XWikiAttachment attachment13 = attachment.getAttachmentRevision("1.3", null);
+
+        assertEquals(10, attachment13.getContentLongSize(null));
+        assertTrue(Arrays.equals(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
+            attachment13.getContent(this.oldcore.getXWikiContext())));
+        assertEquals("Comment 1.3", attachment13.getComment());
+    }
+
+    private void assertContentEquals(String expected, XWikiAttachment attachment) throws IOException, XWikiException
+    {
+        try (InputStream stream = attachment.getContentInputStream(null)) {
+            assertEquals(expected, IOUtils.toString(stream, StandardCharsets.UTF_8));
+        }
+    }
+
+    @Test
+    void importDocumentWithRevisionsAndPreserveVersion() throws FilterException, XWikiException
+    {
+        DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
+
+        outputProperties.setVersionPreserved(true);
+        outputProperties.setVerbose(false);
+
+        importFromXML("documentwithrevisions", outputProperties);
+
+        XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getXWikiContext());
+
+        assertFalse(document.isNew());
+
+        assertEquals("42.3", document.getVersion());
+
+        Version[] versions = document.getRevisions(this.oldcore.getXWikiContext());
+
+        assertEquals(3, versions.length);
+
+        XWikiDocumentArchive archive = document.getDocumentArchive(this.oldcore.getXWikiContext());
+
+        XWikiDocument document1 = archive.loadDocument(versions[0], this.oldcore.getXWikiContext());
+
+        assertEquals("42.1", document1.getVersion());
+
+        XWikiDocument document2 = archive.loadDocument(versions[1], this.oldcore.getXWikiContext());
+
+        assertEquals("42.2", document2.getVersion());
+
+        XWikiDocument document3 = archive.loadDocument(versions[2], this.oldcore.getXWikiContext());
+
+        assertEquals("42.3", document3.getVersion());
     }
 }

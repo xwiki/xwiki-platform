@@ -24,7 +24,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.solr.common.SolrInputDocument;
@@ -268,7 +267,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
      * Communication with the Solr instance.
      */
     @Inject
-    private Provider<SolrInstance> solrInstanceProvider;
+    private SolrInstance solrInstance;
 
     /**
      * Extract contained indexable references.
@@ -391,8 +390,6 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
      */
     private boolean processBatch(IndexQueueEntry queueEntry)
     {
-        SolrInstance solrInstance = this.solrInstanceProvider.get();
-
         int length = 0;
 
         for (IndexQueueEntry batchEntry = queueEntry; batchEntry != null; batchEntry = this.indexQueue.poll()) {
@@ -450,8 +447,6 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
      */
     private void commit()
     {
-        SolrInstance solrInstance = this.solrInstanceProvider.get();
-
         try {
             solrInstance.commit();
         } catch (Exception e) {

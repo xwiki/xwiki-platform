@@ -1,6 +1,0 @@
-###
-### Share page by email
-###
-###
-<div id="document-title"><h1>$services.localization.render('core.viewers.share.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()])</h1></div>
-#template("shareinline.vm")

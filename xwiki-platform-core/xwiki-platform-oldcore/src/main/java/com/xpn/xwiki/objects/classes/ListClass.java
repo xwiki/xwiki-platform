@@ -27,14 +27,16 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.input;
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
 import org.dom4j.Element;
-import org.hibernate.collection.PersistentCollection;
+import org.hibernate.collection.spi.PersistentCollection;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.stability.Unstable;
 import org.xwiki.xar.internal.property.ListXarObjectPropertySerializer;
 import org.xwiki.xml.XMLUtils;
 
@@ -45,6 +47,7 @@ import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.DBStringListProperty;
+import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.StringListProperty;
 import com.xpn.xwiki.objects.StringProperty;
@@ -102,30 +105,9 @@ public abstract class ListClass extends PropertyClass
      */
     public static final String FREE_TEXT_ALLOWED = "allowed";
 
+    private static final long serialVersionUID = 1L;
+
     private static final String XCLASSNAME = "list";
-
-    /**
-     * Regex used to split lists stored in a string. Supports escaped separators inside values. The individually
-     * regex-escaped separators string needs to be passed as parameter.
-     */
-    private static final String LIST_ITEM_SEPARATOR_REGEX_FORMAT = "(?<!\\\\)[%s]";
-
-    /**
-     * Regex used to unescape separators inside the actual values of the list. The individually regex-escaped separators
-     * string needs to be passed as parameter.
-     */
-    private static final String ESCAPED_SEPARATORS_REGEX_FORMAT = "\\%s([%s])";
-
-    /**
-     * Regex used to find unescaped separators in a list item's value. Regex-escaped separators string needs to be
-     * passed as parameter.
-     */
-    private static final String UNESCAPED_SEPARATORS_REGEX_FORMAT = "([%s])";
-
-    /**
-     * Replacement string used to escaped a separator found by the String.replace regex.
-     */
-    private static final String UNESCAPED_SEPARATOR_REPLACEMENT = String.format("\\%s$1", SEPARATOR_ESCAPE);
 
     public ListClass(String name, String prettyname, PropertyMetaClass wclass)
     {
@@ -248,6 +230,22 @@ public abstract class ListClass extends PropertyClass
     }
 
     /**
+     * @since 11.5RC1
+     */
+    public boolean isLargeStorage()
+    {
+        return (getIntValue("largeStorage") == 1);
+    }
+
+    /**
+     * @since 11.5RC1
+     */
+    public void setLargeStorage(boolean largeStorage)
+    {
+        setIntValue("largeStorage", largeStorage ? 1 : 0);
+    }
+
+    /**
      * @return a string (usually just 1 character long) used to join this list's items when displaying it in the UI in
      *         view mode.
      * @see #displayView(StringBuffer, String, String, BaseCollection, XWikiContext)
@@ -318,6 +316,21 @@ public abstract class ListClass extends PropertyClass
     }
 
     /**
+     * @return the first separator of the list of separators, or fallback on {@link #DEFAULT_SEPARATOR}.
+     * @since 14.2RC1
+     */
+    protected String getFirstSeparator()
+    {
+        String separator;
+        if (!StringUtils.isEmpty(getSeparators())) {
+            separator = String.valueOf(getSeparators().charAt(0));
+        } else {
+            separator = DEFAULT_SEPARATOR;
+        }
+        return separator;
+    }
+
+    /**
      * @param value the string holding a serialized list
      * @param separators the separator characters (given as a string) used to delimit the list's items inside the input
      *            string. These separators can also be present, in escaped ({@value #SEPARATOR_ESCAPE}) form, inside
@@ -328,45 +341,107 @@ public abstract class ListClass extends PropertyClass
      */
     public static List<String> getListFromString(String value, String separators, boolean withMap)
     {
+        return ListClass.getListFromString(value, separators, withMap, false);
+    }
+
+    /**
+     * @param value the string holding a serialized list
+     * @param separators the separator characters (given as a string) used to delimit the list's items inside the input
+     *            string. These separators can also be present, in escaped ({@value #SEPARATOR_ESCAPE}) form, inside
+     *            list items
+     * @param withMap set to true if the list's values contain map entries (key=value pairs) that should also be parsed.
+     *            Only the keys are extracted from such list items
+     * @param filterEmptyValues {@code true} if the result should not contain any empty values.
+     * @return the list that was stored in the input string
+     */
+    protected static List<String> getListFromString(String value, String separators, boolean withMap,
+        boolean filterEmptyValues)
+    {
         List<String> list = new ArrayList<>();
-        if (value == null) {
+        if (StringUtils.isEmpty(value)) {
             return list;
         }
         if (separators == null) {
             separators = DEFAULT_SEPARATOR;
         }
 
-        // Escape the list of separators individually to be safely used in regexes.
-        String regexEscapedSeparatorsRegexPart =
-            SEPARATOR_ESCAPE + StringUtils.join(separators.toCharArray(), SEPARATOR_ESCAPE);
+        // flag to know if we are in an escape
+        boolean inEscape = false;
 
-        String escapedSeparatorsRegex =
-            String.format(ESCAPED_SEPARATORS_REGEX_FORMAT, SEPARATOR_ESCAPE, regexEscapedSeparatorsRegexPart);
+        // flag to know if we are parsing a map value
+        boolean inMapValue = false;
 
-        // Split the values and process each list item.
-        String listItemSeparatorRegex =
-            String.format(LIST_ITEM_SEPARATOR_REGEX_FORMAT, regexEscapedSeparatorsRegexPart);
-        String[] elements = value.split(listItemSeparatorRegex);
-        for (String element : elements) {
-            // Adjacent separators are treated as one separator.
-            if (StringUtils.isBlank(element)) {
+        // flag to know if previous character was a separator, since we skip values when separators are concatenated:
+        // e.g. a|b <=> a||b <=> a|||b
+        boolean previousWasSeparator = false;
+
+        Character previousSeparator = null;
+        StringBuilder currentValue = new StringBuilder();
+        for (int i = 0; i < value.length(); i++) {
+            char currentChar = value.charAt(i);
+
+            // if we are parsing an = not in escape mode and we are parsing with map
+            // then we are starting a map value mode
+            if (currentChar == '=' && withMap && !inEscape) {
+                inMapValue = true;
+            // all time of the map value mode, we are skipping the characters, except if it's a separator
+            } else if (withMap && inMapValue && !StringUtils.containsAny(separators, currentChar)) {
                 continue;
+            // if we are finding an escape and we are not yet in escape mode, then we entering the escape mode
+            } else if (currentChar == SEPARATOR_ESCAPE && !inEscape) {
+                inEscape = true;
+                previousWasSeparator = false;
+            // if we were already in escape mode, then we are escaping an escape: we output the escape
+            // and leave the escape mode
+            } else if (currentChar == SEPARATOR_ESCAPE) {
+                currentValue.append(SEPARATOR_ESCAPE);
+                inEscape = false;
+                previousWasSeparator = false;
+            // if the current character is a separator and previous value was already a separator then we are in a case
+            // of separator concatenation: we just skip them.
+            } else if (StringUtils.containsAny(separators, currentChar) && previousWasSeparator) {
+                // in case of two consecutive identical characters different than a whitespace, then it means
+                // we want to record an empty value.
+                if (!inEscape && currentChar == previousSeparator && !StringUtils.isWhitespace(currentChar + "")) {
+                    if (!filterEmptyValues) {
+                        list.add("");
+                    }
+                    previousWasSeparator = false;
+                }
+                previousSeparator = currentChar;
+                continue;
+            // if we are finding a separator and we are not in escape mode, then we finished to parse one value
+            // we are adding the value to the result, and start a new value to parse
+            } else if (StringUtils.containsAny(separators, currentChar) && !inEscape) {
+                if (!filterEmptyValues || !StringUtils.isEmpty(currentValue.toString())) {
+                    list.add(currentValue.toString());
+                }
+                currentValue = new StringBuilder();
+                inMapValue = false;
+                previousWasSeparator = true;
+                previousSeparator = currentChar;
+            // then if we are finding a separator we need to output the separator and leave the escape mode
+            } else if (StringUtils.containsAny(separators, currentChar)) {
+                currentValue.append(currentChar);
+                inEscape = false;
+                previousWasSeparator = false;
+                previousSeparator = currentChar;
+            // finally if we are still in escape mode: we are actually escaping a normal character,
+            // we still output the escape for backward compatibility reason, and leave the escape mode
+            } else if (inEscape) {
+                currentValue.append(SEPARATOR_ESCAPE);
+                currentValue.append(currentChar);
+                inEscape = false;
+                previousWasSeparator = false;
+            // else we just output the current character
+            } else {
+                currentValue.append(currentChar);
+                previousWasSeparator = false;
             }
-
-            // Unescape any escaped separator in the individual list item.
-            String unescapedElement = element.replaceAll(escapedSeparatorsRegex, "$1");
-            String item = unescapedElement;
-
-            // Check if it is a map entry, i.e. "key=value"
-            if (withMap && (unescapedElement.indexOf('=') != -1)) {
-                // Get just the key, ignore the value/label.
-                item = StringUtils.split(unescapedElement, '=')[0];
-            }
-
-            // Ignore empty items.
-            if (StringUtils.isNotBlank(item.trim())) {
-                list.add(item);
-            }
+        }
+        // don't forget to add the latest value in the result.
+        if (!filterEmptyValues || !StringUtils.isEmpty(currentValue.toString())) {
+            list.add(currentValue.toString());
         }
 
         return list;
@@ -403,17 +478,49 @@ public abstract class ListClass extends PropertyClass
             separators = DEFAULT_SEPARATOR;
         }
 
-        // Escape the list of separators individually to be safely used in regexes.
-        String regexEscapedSeparatorsRegexPart =
-            SEPARATOR_ESCAPE + StringUtils.join(separators.toCharArray(), SEPARATOR_ESCAPE);
-
-        String unescapedSeparatorsRegex =
-            String.format(UNESCAPED_SEPARATORS_REGEX_FORMAT, regexEscapedSeparatorsRegexPart);
-
         List<String> escapedValues = new ArrayList<>();
-        for (String value : list) {
-            String escapedValue = value.replaceAll(unescapedSeparatorsRegex, UNESCAPED_SEPARATOR_REPLACEMENT);
-            escapedValues.add(escapedValue);
+
+        for (String valueElement : list) {
+            // flag to know if we are in escape mode or not
+            boolean inEscape = false;
+            StringBuilder newValue = new StringBuilder();
+
+            if (valueElement != null) {
+                for (int i = 0; i < valueElement.length(); i++) {
+                    char currentChar = valueElement.charAt(i);
+
+                    // if the current char represents an escape, and we're not yet in escape mode, we enter in escape mode
+                    if (currentChar == SEPARATOR_ESCAPE && !inEscape) {
+                        inEscape = true;
+                        newValue.append(SEPARATOR_ESCAPE);
+                        // if we are already in escape mode: we were escaping the escape character
+                        // so we output it and leave the escape mode
+                    } else if (currentChar == SEPARATOR_ESCAPE) {
+                        inEscape = false;
+                        newValue.append(SEPARATOR_ESCAPE);
+                        // if the current character represents a separator, we need to escape it no matter what
+                    } else if (StringUtils.containsAny(separators, currentChar)) {
+                        // if we were in escape mode, it means that the separator was escaped even if it wasn't needed
+                        // so we escape the escape to be able to output it.
+                        // Note that we don't do that generically since we don't want to escape the escape for a normal
+                        // character: List[a\b] is serialized in a\b not in a\\b.
+                        if (inEscape) {
+                            newValue.append(SEPARATOR_ESCAPE);
+                        }
+                        newValue.append(SEPARATOR_ESCAPE);
+                        newValue.append(currentChar);
+                        inEscape = false;
+                    } else {
+                        newValue.append(currentChar);
+                        inEscape = false;
+                    }
+                }
+                // if we are still in escape mode, it means the final character is an escape and we should escape it.
+                if (inEscape) {
+                    newValue.append(SEPARATOR_ESCAPE);
+                }
+                escapedValues.add(newValue.toString());
+            }
         }
 
         // Use the first separator to join the list.
@@ -428,11 +535,11 @@ public abstract class ListClass extends PropertyClass
         }
 
         String val = StringUtils.replace(value, SEPARATOR_ESCAPE + DEFAULT_SEPARATOR, "%PIPE%");
-        String[] result = StringUtils.split(val, "|");
+        String[] result = val.split("\\|");
         for (String element2 : result) {
             String element = StringUtils.replace(element2, "%PIPE%", DEFAULT_SEPARATOR);
             if (element.indexOf('=') != -1) {
-                String[] data = StringUtils.split(element, "=", 2);
+                String[] data = element.split("=", 2);
                 map.put(data[0], new ListItem(data[0], data[1]));
             } else {
                 map.put(element, new ListItem(element, element));
@@ -467,10 +574,13 @@ public abstract class ListClass extends PropertyClass
     {
         BaseProperty lprop;
 
+        // FIXME: this if is actually wrong: it means a multiselect static list cannot be stored with a large storage.
         if (isRelationalStorage() && isMultiSelect()) {
             lprop = new DBStringListProperty();
         } else if (isMultiSelect()) {
             lprop = new StringListProperty();
+        } else if (isLargeStorage()) {
+            lprop = new LargeStringProperty();
         } else {
             lprop = new StringProperty();
         }
@@ -498,6 +608,7 @@ public abstract class ListClass extends PropertyClass
             return fromString(strings[0]);
         }
         BaseProperty prop = newProperty();
+        // FIXME: this should be probably removed since we can never reach it.
         if (prop instanceof StringProperty) {
             return fromString(strings[0]);
         }
@@ -569,8 +680,10 @@ public abstract class ListClass extends PropertyClass
      * @param map The value=name mapping specified in the "values" parameter of the property.
      * @param context The request context.
      * @return The text that should be displayed, representing a human-understandable name for the internal value.
+     * @since 13.10RC1
      */
-    protected String getDisplayValue(String value, String name, Map<String, ListItem> map, XWikiContext context)
+    @Unstable
+    public String getDisplayValue(String value, String name, Map<String, ListItem> map, XWikiContext context)
     {
         return getDisplayValue(value, name, map, value, context);
     }
@@ -665,25 +778,24 @@ public abstract class ListClass extends PropertyClass
     public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object,
         XWikiContext context)
     {
-        List<String> selectlist;
-        String separator = getSeparator();
         BaseProperty prop = (BaseProperty) object.safeget(name);
-        Map<String, ListItem> map = getMap(context);
 
         // Skip unset values.
         if (prop == null) {
             return;
         }
 
+        Map<String, ListItem> map = getMap(context);
         if (prop instanceof ListProperty) {
-            selectlist = ((ListProperty) prop).getList();
+            String separator = getSeparator();
+            List<String> selectlist = ((ListProperty) prop).getList();
             List<String> newlist = new ArrayList<>();
             for (String value : selectlist) {
-                newlist.add(getDisplayValue(value, name, map, context));
+                newlist.add(XMLUtils.escapeElementText(getDisplayValue(value, name, map, context)));
             }
             buffer.append(StringUtils.join(newlist, separator));
         } else {
-            buffer.append(getDisplayValue(prop.getValue(), name, map, context));
+            buffer.append(XMLUtils.escapeElementText(getDisplayValue(prop.getValue(), name, map, context)));
         }
     }
 
@@ -902,10 +1014,36 @@ public abstract class ListClass extends PropertyClass
      */
     public void fromList(BaseProperty<?> property, List<String> list)
     {
-        if (property instanceof ListProperty) {
-            ((ListProperty) property).setList(list);
+        fromList(property, list, false);
+    }
+
+    /**
+     * Set the passed {@link List} into the passed property.
+     *
+     * @param property the property to modify
+     * @param list the list to set
+     * @param filterEmptyValues if {@code true} filter out the empty values from the list.
+     * @since 14.2RC1
+     */
+    protected void fromList(BaseProperty<?> property, List<String> list, boolean filterEmptyValues)
+    {
+        if (list == null && !(property instanceof ListProperty)) {
+            property.setValue(null);
         } else {
-            property.setValue(list == null || list.isEmpty() ? null : list.get(0));
+            List<String> actualList;
+            if (filterEmptyValues && list != null) {
+                actualList = list.stream().filter(item -> !StringUtils.isEmpty(item)).collect(Collectors.toList());
+            } else {
+                actualList = list;
+            }
+
+            if (property instanceof ListProperty) {
+                ((ListProperty) property).setList(actualList);
+            } else if (isMultiSelect()) {
+                property.setValue(getStringFromList(actualList, getFirstSeparator()));
+            } else {
+                property.setValue(actualList.isEmpty() ? null : actualList.get(0));
+            }
         }
     }
 

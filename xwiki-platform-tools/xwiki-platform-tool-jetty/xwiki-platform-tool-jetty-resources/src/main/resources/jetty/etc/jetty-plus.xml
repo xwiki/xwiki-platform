@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_0.dtd">
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "https://www.eclipse.org/jetty/configure_10_0.dtd">
 
 <!-- =============================================================== -->
 <!-- Configure extended support for webapps                          -->
@@ -30,10 +30,9 @@
   <!-- =========================================================== -->
   <!-- Add plus Configuring classes to all webapps for this Server -->
   <!-- =========================================================== -->
-  <Call class="org.eclipse.jetty.webapp.Configuration$ClassList" name="setServerDefault">
+  <Call class="org.eclipse.jetty.webapp.Configurations" name="setServerDefault">
     <Arg><Ref refid="Server" /></Arg>
-    <Call name="addAfter">
-      <Arg name="afterClass">org.eclipse.jetty.webapp.FragmentConfiguration</Arg>
+    <Call name="add">
       <Arg>
         <Array type="String">
           <Item>org.eclipse.jetty.plus.webapp.EnvConfiguration</Item>
@@ -42,4 +41,10 @@
       </Arg>
     </Call>
   </Call>
+
+  <Call name="addBean">
+    <Arg><New class="org.eclipse.jetty.plus.jndi.NamingDump"/></Arg>
+  </Call>
+
 </Configure>
+

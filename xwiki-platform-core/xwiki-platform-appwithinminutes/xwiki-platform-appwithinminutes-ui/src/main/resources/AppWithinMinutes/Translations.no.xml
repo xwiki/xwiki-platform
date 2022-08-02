@@ -1,0 +1,270 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="AppWithinMinutes.Translations" locale="no">
+  <web>AppWithinMinutes</web>
+  <name>Translations</name>
+  <language>no</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>AppWithinMinutes.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>### Home page
+platform.appwithinminutes.homePageTitle=Applikasjon på minutter
+platform.appwithinminutes.description=Opprett samarbeidende webapplikasjoner på noen minutter, basert på XWiki's kraftige system for å håndtere strukturerte data.
+platform.appwithinminutes.createAppButtonLabel=Opprett applikasjon
+platform.appwithinminutes.appsLiveTableHeading=Applikasjoner
+platform.appwithinminutes.appsLiveTable.doc.title=Applikasjon
+platform.appwithinminutes.appsLiveTable.doc.author=Siste forfatter
+platform.appwithinminutes.appsLiveTable.doc.date=Oppdateringsdato
+platform.appwithinminutes.appsLiveTable._actions=Handlinger
+platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Gi administrasjonsrettigheter til rommet.
+
+### AWM Applications panel entry
+platform.appwithinminutes.appPanelCreateEntry=Opprett din egen!
+
+### Wizard step
+platform.appwithinminutes.wizardStepHeading=Steg {0} - {1}
+appWithinMinutes.wizardStep.name.name=Navn
+appWithinMinutes.wizardStep.name.title=Navngi applikasjonen din
+appWithinMinutes.wizardStep.name.description=Oppgi applikasjonens navn
+appWithinMinutes.wizardStep.structure.name=Struktur
+appWithinMinutes.wizardStep.structure.title=Strukturer dataene dine
+appWithinMinutes.wizardStep.structure.description=Beskriv strukturen på applikasjonens data
+appWithinMinutes.wizardStep.entries.name=Oppføringer
+appWithinMinutes.wizardStep.entries.title=Angi plasseringen av dataene dine
+appWithinMinutes.wizardStep.entries.description=Velg hvor du skal lagre dataene
+appWithinMinutes.wizardStep.presentation.name=Presentasjon
+appWithinMinutes.wizardStep.presentation.title=Tilpass applikasjonens startside
+appWithinMinutes.wizardStep.presentation.description=Tilpass applikasjonens startside
+platform.appwithinminutes.wizardStepNextButtonLabel=Neste steg
+platform.appwithinminutes.wizardStepNextButtonTip=Gå til neste steg
+platform.appwithinminutes.wizardStepFinishButtonLabel=Fullfør
+platform.appwithinminutes.wizardStepFinishButtonTip=Gå til applikasjonens startside
+platform.appwithinminutes.wizardStepPreviousButtonLabel=Forrige steg
+platform.appwithinminutes.wizardStepPreviousButtonTip=Gå til forrige steg
+platform.appwithinminutes.wizardStepHelpTitle=Steg
+platform.appwithinminutes.wizardStepHelpDescription=Denne veiviseren vil veilede deg gjennom prosessen med å lage en applikasjon. Dette er stegene du vil ta:
+
+### Wizard Step 1: Application Name
+appWithinMinutes.createApp.location.label=Plassering
+appWithinMinutes.createApp.location.hint=Plasseringen i sidehierarkiet der applikasjonen skal opprettes.
+appWithinMinutes.createApp.parent.label=Forelder
+appWithinMinutes.createApp.parent.hint=Overelementet til den nye applikasjonen. La stå tom for å lage en applikasjon på toppen av hierarkiet.
+appWithinMinutes.createApp.parent.placeholder=Sti.Til.Foreldre
+appWithinMinutes.codeSpace.title=Kode
+appWithinMinutes.codeSpace.description=Dette er stedet der applikasjonskoden er plassert.
+appWithinMinutes.codeSpace.hiddenPagesInfo=De skjulte sidene er også oppført, selv om dine nåværende brukerprofilinnstillinger forhindrer det, ellers ville ingen av applikasjonskodesidene være synlige fordi de er skjult som standard.
+platform.appwithinminutes.appNamePageTitle=Opprett applikasjon
+platform.appwithinminutes.appNameLabel=Applikasjonsnavn
+platform.appwithinminutes.appNameHint=Applikasjonsnavnet bestemmer hjemmesidenes nettadresse og stedet der applikasjonskoden er lagret.
+platform.appwithinminutes.appNamePreviewHomePageUrlLabel=URL til applikasjonens startside
+platform.appwithinminutes.appNamePreviewCodeSpaceLabel=Plassering av applikasjonskoden
+platform.appwithinminutes.appNameIsUsedWarning=Denne applikasjonen eksisterer allerede. Hvis du går til neste steg, redigerer du den eksisterende applikasjonen.
+platform.appwithinminutes.appNameEmptyError=Vennligst skriv inn applikasjonsnavnet.
+
+### Wizard Step 2: Application Structure
+platform.appwithinminutes.classEditorPaletteTitle=Feltpalett
+platform.appwithinminutes.classEditorPaletteHint=Dra og slipp felt fra paletten for å lage skjemaet som skal brukes til å skrive inn dataene dine.
+platform.appwithinminutes.classEditorCanvasHint=Dra felt fra paletten og slipp dem i dette området.
+
+platform.appwithinminutes.classEditorUpdateTemplateLabel=Oppdater malen
+platform.appwithinminutes.classEditorUpdateTemplateHint=Malen ({0}) lagrer standardfeltverdiene.
+platform.appwithinminutes.classEditorUpdateSheetLabel=Oppdater klassens presentasjonsmal
+platform.appwithinminutes.classEditorUpdateSheetHint=Presentasjonsmalen for klassen ({0}) brukes til å vise og redigere strukturerte data.
+platform.appwithinminutes.classEditorUpdateTranslationsLabel=Oppdater oversettelsen
+platform.appwithinminutes.classEditorUpdateTranslationsHint=Oppdater oversettelsen av feltnavn og listeverdier ({0}).
+
+platform.appwithinminutes.classEditorMultipleSheetsWarning=Denne klassen har flere presentasjonsmaler.
+platform.appwithinminutes.classEditorDuplicateFieldNameError=Klassen har to felt med samme navn: {0}
+platform.appwithinminutes.classEditorTemplateSaveComment=Oppdater standardverdier
+platform.appwithinminutes.classEditorBindSheetSaveComment=Bind klassens presentasjonsmal
+platform.appwithinminutes.classEditorSheetSaveComment=Oppdater klassens presentasjonsmal
+platform.appwithinminutes.classEditorTranslationsSaveComment=Oppdater oversettelser
+
+platform.appwithinminutes.classEditorStandardCategoryName=Standard
+platform.appwithinminutes.classEditorPickersCategoryName=Velgere
+platform.appwithinminutes.classEditorDocumentCategoryName=Side
+platform.appwithinminutes.classEditorAdvancedCategoryName=Avansert
+
+platform.appwithinminutes.classEditorDBListFieldName=Databaseliste
+platform.appwithinminutes.classEditorGroupsFieldName=Gruppe
+platform.appwithinminutes.classEditorUsersFieldName=Bruker
+platform.appwithinminutes.classEditorDateFieldName=Dato
+platform.appwithinminutes.classEditorStaticListFieldName=Statisk liste
+platform.appwithinminutes.classEditorBooleanFieldName=Boolsk
+platform.appwithinminutes.classEditorNumberFieldName=Nummer
+platform.appwithinminutes.classEditorTextAreaFieldName=Lang tekst
+platform.appwithinminutes.classEditorStringFieldName=Kort tekst
+platform.appwithinminutes.classEditorContentFieldName=Innhold
+platform.appwithinminutes.classEditorTitleFieldName=Tittel
+platform.appwithinminutes.classEditorPageFieldName=Side
+
+platform.appwithinminutes.classEditorDeleteFieldLabel=Slett
+platform.appwithinminutes.classEditorConfigureFieldLabel=Konfigurer
+platform.appwithinminutes.classEditorPreviewFieldLabel=Forhåndsvisning
+platform.appwithinminutes.classEditorPreviewFieldHint=Skjul konfigurasjonspanel og bruk endringer
+platform.appwithinminutes.classEditorMoveFieldLabel=Flytt
+platform.appwithinminutes.classEditorMoveFieldHint=Dra og slipp for å endre rekkefølgen
+
+platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Standardverdi
+
+### Date Picker
+platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=OK
+platform.appwithinminutes.classEditorDatePickerClearSelectedDate=Tøm
+platform.appwithinminutes.classEditorDatePickerSelectCurrentTime=Nå
+platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=I dag
+
+### Static List Editor
+platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=Verdi
+platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
+platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Legg til
+platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Slett
+
+appWithinMinutes.templateProviderEditor.hint=Applikasjonsoppføringer er wiki-sider som inneholder strukturerte data.
+appWithinMinutes.templateProviderEditor.icon.hint=Ikonet knyttet til en applikasjon.
+appWithinMinutes.templateProviderEditor.description.hint=Kort beskrivelse av en applikasjon.
+appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Hvor skal oppføringene lagres
+appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=Hvis ingen plassering er valgt, kan oppføringene opprettes fra hvilken som helst side.
+appWithinMinutes.templateProviderEditor.creationRestrictions.name=Hvor skal oppføringene lagres
+appWithinMinutes.templateProviderEditor.creationRestrictions.hint=Hvis ingen plassering er valgt, kan oppføringene opprettes hvor som helst i wikien.
+appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Deaktiver restriksjoner på plassering
+appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Bruk stedene som er angitt ovenfor bare som forslag, slik at brukeren kan velge et annet sted når du oppretter en applikasjonsoppføring.
+appWithinMinutes.templateProviderEditor.terminal.hint=Hvorvidt applikasjonsoppføringene skal være terminalsider eller ikke.
+
+### Wizard Step 3: Application Presentation
+platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=Applikasjonsfelter
+platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel=Generiske kolonner
+platform.appwithinminutes.liveTableEditorHelpTitle=Tips
+platform.appwithinminutes.liveTableEditorHelpDescription=Generiske live-tabellkolonner er uavhengige av din applikasjonstruktur. De gir informasjon om sidene som inneholder dataene til applikasjonen.
+platform.appwithinminutes.liveTableEditorDocTitleColumnName=Sidetittel
+platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=Tittelen på siden som inneholder applikasjonsdata
+platform.appwithinminutes.liveTableEditorDocNameColumnName=Sidenavn
+platform.appwithinminutes.liveTableEditorDocNameColumnDescription=Navnet på siden som inneholder applikasjonsdata
+platform.appwithinminutes.liveTableEditorDocLocationColumnName=Plassering
+platform.appwithinminutes.liveTableEditorDocLocationColumnDescription=Plasseringen til siden som inneholder applikasjonsdata
+platform.appwithinminutes.liveTableEditorDocAuthorColumnName=Siste forfatter
+platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=Brukeren som sist redigerte applikasjonsdata
+platform.appwithinminutes.liveTableEditorDocCreatorColumnName=Opprettet av
+platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription=Brukeren som opprettet applikasjonsdataene
+platform.appwithinminutes.liveTableEditorDocDateColumnName=Dato
+platform.appwithinminutes.liveTableEditorDocDateColumnDescription=Datoen da applikasjonsdataene ble sist redigert
+platform.appwithinminutes.liveTableEditorDocCreationDateColumnName=Dato opprettet
+platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription=Datoen da applikasjonsdatene ble opprettet
+platform.appwithinminutes.liveTableEditorActionsColumnName=Handlinger
+platform.appwithinminutes.liveTableEditorActionsColumnDescription=En liste over handlinger som kan utføres på programdataene, for eksempel redigere og slette
+platform.appwithinminutes.liveTableEditorAttachmentsColumnName=Vedlegg
+platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=En spesiell kolonne for å vise koblinger til vedleggene til en dataside
+platform.appwithinminutes.liveTableEditorImagesColumnName=Bilder
+platform.appwithinminutes.liveTableEditorImagesColumnDescription=En spesiell kolonne for å vise bildene vedlagt en dataside
+platform.appwithinminutes.liveTableEditorAvatarColumnName=Profilbilde
+platform.appwithinminutes.liveTableEditorAvatarColumnDescription=En spesiell kolonne for å vise brukerens profilbilde. Fungerer bare for tabeller som er bundet til XWiki.XWikiUsers-klassen
+platform.appwithinminutes.liveTableEditorTitleHint=Applikasjonstittelen som vises på programmets startside, på applikasjonspanelet, i livebordet, på breadcrumb, osv.
+platform.appwithinminutes.liveTableEditorDescriptionHint=Innholdet som skal vises på hjemmesiden over live-tabellen med applikasjonsdataene. Bruk denne for å beskrive applikasjonen.
+platform.appwithinminutes.liveTableEditorColumnsHint=Velg kolonnene du vil inkludere i live-tabellen som vises på applikasjonens startside.
+platform.appwithinminutes.liveTableEditorSaveComment=Oppdater Live-tabell
+platform.appwithinminutes.liveTableEditorMoveColumnHint=Dra og slipp for å endre rekkefølgen
+platform.appwithinminutes.liveTableEditorDeleteColumnHint=Slett
+platform.appwithinminutes.liveTableEditorAddColumnHint=Legg til valgt kolonne
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Noen kolonner er utdatert, sannsynligvis fordi de tilsvarende programfeltene er slettet. Ønsker du å slette de? &lt;a href=""&gt;Ja&lt;/a&gt; / &lt;a href=""&gt;Nei&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorIcon=Ikon
+platform.appwithinminutes.liveTableEditorIconHintWithPicker=Programikonet. Du kan velge et ikon fra ikonvelgeren eller du kan referere til et vedlagt bilde.
+
+### Wizard Step 4: Application home page
+platform.appwithinminutes.appLiveTableHeading=Oppføringer
+platform.appwithinminutes.appLiveTableEditEntryActionName=Rediger
+platform.appwithinminutes.appLiveTableDeleteEntryActionName=Slett
+platform.appwithinminutes.appHomePageActionsHeading=Handlinger
+platform.appwithinminutes.appHomePageAddEntryLabel=Legg til
+platform.appwithinminutes.appHomePageAddEntryHint=Legg til ny oppføring
+platform.appwithinminutes.appHomePageEntryNameLabel=Oppføringsnavn:
+platform.appwithinminutes.appHomePageDeleteEntriesLabel=Slett alle oppføringer
+platform.appwithinminutes.appHomePageEditAppLabel=Rediger applikasjon
+platform.appwithinminutes.appHomePageTranslateAppLabel=Oversett applikasjon
+platform.appwithinminutes.appHomePageDeleteAppLabel=Slett applikasjon
+platform.appwithinminutes.appHomePageMovedWarning=Applikasjonen fungerer kanskje ikke riktig fordi den er omdøpt eller flyttet uten å oppdatere koden. Vennligst rediger programmet og følg stegene for å oppdatere koden.
+AppWithinMinutes.LiveTableClass_description=Beskrivelse
+AppWithinMinutes.LiveTableClass_columns=Livetabell kolonner
+
+### Delete application dialog
+platform.appwithinminutes.deleteAppConfirmation=Applikasjonen {0} og ALLE dens oppføringer vil bli slettet. Er du sikker på at du vil fortsette?
+platform.appwithinminutes.deleteAppEntriesConfirmation=ALLE oppføringene i applikasjonen {0} blir slettet. Er du sikker på at du vil fortsette?
+platform.appwithinminutes.deleteAppDoesNotExistError=Den angitte applikasjonen eksisterer ikke.
+platform.appwithinminutes.deleteAppInvalidAppError=Det angitte navnet er ikke en gyldig Applikasjon på minutter.
+platform.appwithinminutes.deleteAppNotSpecifiedError=Applikasjonsnavn ble ikke spesifisert.
+
+### Rename Application
+appWithinMinutes.renameApp.changeAppTitleInfo=Du kan endre applikasjonens tittel uten å omdøpe programmet ved å redigere applikasjonens startside.
+appWithinMinutes.renameApp.regenerateAppCodeWarning=Applikasjonskoden vil bli regenerert hvis du omdøper applikasjonen. Eventuelle kodejusteringer blir overskrevet.
+appWithinMinutes.renameApp.newName.label=Nytt navn
+appWithinMinutes.renameApp.pageExistsError=En side med dette navnet eksisterer allerede på den valgte plasseringen.
+appWithinMinutes.renameApp.locationForbiddenError=Du har ikke tilgang til å flytte programmet til det valgte stedet.
+appWithinMinutes.renameApp.location.label=Ny plassering
+appWithinMinutes.renameApp.location.hint=Plasseringen i sidehierarkiet hvor du vil flytte applikasjonen.
+appWithinMinutes.renameApp.parent.label=Ny forelder
+appWithinMinutes.renameApp.parent.hint=Den nye foreldresiden. La dette feltet stå tomt hvis du vil flytte programmet til toppen av sidehierarkiet.
+appWithinMinutes.renameApp.inProgress=Endrer navn på applikasjonen...
+appWithinMinutes.renameApp.done=Applikasjonen er omdøpt
+appWithinMinutes.renameApp.failed=Kunne ikke gi nytt navn til applikasjonen
+
+### Deprecated keys
+### Since 8.4
+platform.appwithinminutes.appNamePreviewClassReferenceLabel=Applikasjonsklasse
+platform.appwithinminutes.appNamePreviewDataSpaceLabel=Applikasjonens dataplassering
+
+platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Rom
+platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=Navnet på rommet som inneholder applikasjonen
+platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Sidens fulle navn
+platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=Navnet på siden som inneholder applikasjonsoppføringen, prefiks med romnavnet
+
+#@deprecated appWithinMinutes.wizardStep.name.name
+platform.appwithinminutes.wizardStep1Name=Navn
+#@deprecated appWithinMinutes.wizardStep.name.title
+platform.appwithinminutes.wizardStep1Title=Navngi applikasjonen
+#@deprecated appWithinMinutes.wizardStep.name.description
+platform.appwithinminutes.wizardStep1Description=Angi applikasjonens navn
+#@deprecated appWithinMinutes.wizardStep.structure.name
+platform.appwithinminutes.wizardStep2Name=Struktur
+#@deprecated appWithinMinutes.wizardStep.structure.title
+platform.appwithinminutes.wizardStep2Title=Definer struktur på dataene
+#@deprecated appWithinMinutes.wizardStep.structure.description
+platform.appwithinminutes.wizardStep2Description=Spesifiser datafelter applikasjonen inneholder
+#@deprecated appWithinMinutes.wizardStep.presentation.name
+platform.appwithinminutes.wizardStep3Name=Presentasjon
+#@deprecated appWithinMinutes.wizardStep.presentation.title
+platform.appwithinminutes.wizardStep3Title=Tilpass applikasjonens startside
+#@deprecated appWithinMinutes.wizardStep.presentation.description
+platform.appwithinminutes.wizardStep3Description=Tilpass applikasjonens startside
+
+### Since 11.0
+platform.appwithinminutes.appsLiveTable.doc.space=Applikasjonsnavn
+appWithinMinutes.classEditor.title={0} Struktur
+appWithinMinutes.templateProviderEditor.title={0} Oppføringer</content>
+</xwikidoc>

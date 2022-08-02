@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -71,7 +71,7 @@
 
 #set ($crtCategoryId = "$!{request.category}")
 #if ($crtCategoryId != '')
-  #set ($crtCategoryId = $mathtool.toInteger($crtCategoryId))
+  #set ($crtCategoryId = $numbertool.toNumber($crtCategoryId).intValue())
 #end
 #set ($crtSectionId = "$!{request.section}")
 #set ($crtSyntaxVer = "$!{request.syntax}")
@@ -197,9 +197,9 @@ $syntaxMenu.add($cat)
 ##
 #foreach ($category in $syntaxMenu)
   ## "Standard" URLs and icons for categories
-  #set ($category.url = "?syntax=$escapetool.url(${crtSyntaxVer})&amp;category=${mathtool.sub($velocityCount, 1)}${extraParams}")  
+  #set ($category.url = "?syntax=$escapetool.url(${crtSyntaxVer})&amp;category=${mathtool.sub($foreach.count, 1)}${extraParams}")
   #set ($category.cssClass = "${category.id}Icon")
-  #if ("$!{crtCategoryId}" != '' &amp;&amp; $velocityCount == $mathtool.add($crtCategoryId, 1))
+  #if ("$!{crtCategoryId}" != '' &amp;&amp; $foreach.count == $mathtool.add($crtCategoryId, 1))
     #set ($crtCategory = $category)
   #end
   ##

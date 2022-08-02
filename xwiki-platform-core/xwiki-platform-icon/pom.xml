@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-icon</artifactId>
   <name>XWiki Platform - Icon - Parent POM</name>
@@ -36,7 +36,16 @@
     <module>xwiki-platform-icon-default</module>
     <module>xwiki-platform-icon-script</module>
     <module>xwiki-platform-icon-ui</module>
+    <module>xwiki-platform-icon-rest</module>
     <!-- Icon Themes -->
     <module>xwiki-platform-icon-fontawesome</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-icon-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

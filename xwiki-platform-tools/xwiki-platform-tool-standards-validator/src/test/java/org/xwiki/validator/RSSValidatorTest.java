@@ -19,27 +19,38 @@
  */
 package org.xwiki.validator;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RSSValidatorTest
 {
     private RSSValidator validator;
-    
-    @Before
+
+    @BeforeEach
     public void setUp() throws Exception
     {
-        validator = new RSSValidator();
+        this.validator = new RSSValidator();
     }
 
     @Test
-    public void testValidRSS() throws Exception 
-    {        
+    public void testValidRSS() throws Exception
+    {
         this.validator.setDocument(getClass().getResourceAsStream("/rss-valid.xml"));
         this.validator.validate();
 
-        assertTrue(this.validator.getErrors().toString(), this.validator.getErrors().isEmpty());
+        assertTrue(this.validator.getErrors().isEmpty(), this.validator.getErrors().toString());
+    }
+
+    @Test
+    public void testInvalidRSS() throws Exception
+    {
+        this.validator.setDocument(getClass().getResourceAsStream("/rss-invalid.xml"));
+        this.validator.validate();
+
+        assertEquals(1, this.validator.getErrors().size());
+        assertEquals("Invalid XML", this.validator.getErrors().get(0).getMessage());
     }
 }

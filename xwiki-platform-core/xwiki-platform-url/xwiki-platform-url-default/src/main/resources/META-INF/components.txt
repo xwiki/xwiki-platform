@@ -1,0 +1,14 @@
+org.xwiki.url.internal.XWikiServerClassListener
+org.xwiki.url.internal.DefaultURLSecurityManager
+org.xwiki.url.internal.DefaultURLConfiguration
+org.xwiki.url.internal.DefaultResourceReferenceResolver
+org.xwiki.url.internal.DefaultResourceReferenceSerializer
+org.xwiki.url.internal.DefaultResourceTypeResolver
+org.xwiki.url.internal.GenericResourceReferenceResolver
+org.xwiki.url.internal.GenericStringResourceTypeResolver
+org.xwiki.url.internal.DefaultStringResourceTypeResolver
+org.xwiki.url.internal.URLExecutionContextInitializer
+org.xwiki.url.internal.DefaultURLContextManager
+org.xwiki.url.internal.URLSymbolScheme
+org.xwiki.url.internal.URLStringEntityReferenceSerializer
+org.xwiki.url.internal.URLStringEntityReferenceResolver

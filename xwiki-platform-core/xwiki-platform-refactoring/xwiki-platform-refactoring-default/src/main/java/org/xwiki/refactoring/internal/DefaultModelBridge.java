@@ -36,6 +36,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -131,9 +132,6 @@ public class DefaultModelBridge implements ModelBridge
     private EntityReferenceResolver<String> relativeStringEntityReferenceResolver;
 
     @Inject
-    private DocumentReferenceResolver<EntityReference> documentReferenceResolver;
-
-    @Inject
     private JobProgressManager progressManager;
 
     @Inject
@@ -183,19 +181,30 @@ public class DefaultModelBridge implements ModelBridge
     @Override
     public boolean delete(DocumentReference reference)
     {
+        return delete(reference, false);
+    }
+
+    @Override
+    public boolean delete(DocumentReference reference, boolean skipRecycleBin)
+    {
         XWikiContext xcontext = this.xcontextProvider.get();
         try {
             XWikiDocument document = xcontext.getWiki().getDocument(reference, xcontext);
             if (document.getTranslation() == 1) {
-                xcontext.getWiki().deleteDocument(document, xcontext);
-                this.logger.info("Document [{}] has been deleted.", reference);
+                xcontext.getWiki().deleteDocument(document, !skipRecycleBin, xcontext);
+                this.logger
+                    .info("Document [{}] has been deleted (to the recycle bin: [{}]).", reference, !skipRecycleBin);
             } else {
-                xcontext.getWiki().deleteAllDocuments(document, xcontext);
-                this.logger.info("Document [{}] has been deleted with all its translations.", reference);
+                xcontext.getWiki().deleteAllDocuments(document, !skipRecycleBin, xcontext);
+                this.logger
+                    .info("Document [{}] has been deleted with all its translations (to the recycle bin: [{}]).",
+                        reference,
+                        !skipRecycleBin);
             }
             return true;
         } catch (Exception e) {
-            this.logger.error("Failed to delete document [{}].", reference, e);
+            this.logger
+                .error("Failed to delete document [{}] (to the recycle bin: [{}]).", reference, !skipRecycleBin, e);
             return false;
         }
     }
@@ -276,9 +285,28 @@ public class DefaultModelBridge implements ModelBridge
         String previousWikiId = xcontext.getWikiId();
         try {
             xcontext.setWikiId(wikiId);
-            return xcontext.getWiki().getDocument(documentReference, xcontext).getBackLinkedReferences(xcontext);
+
+            return xcontext.getWiki().getStore().loadBacklinks(documentReference, true, xcontext);
         } catch (XWikiException e) {
             this.logger.error("Failed to retrieve the back-links for document [{}] on wiki [{}].", documentReference,
+                wikiId, e);
+            return Collections.emptyList();
+        } finally {
+            xcontext.setWikiId(previousWikiId);
+        }
+    }
+
+    @Override
+    public List<DocumentReference> getBackLinkedReferences(AttachmentReference reference, String wikiId)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        String previousWikiId = xcontext.getWikiId();
+        try {
+            xcontext.setWikiId(wikiId);
+
+            return xcontext.getWiki().getStore().loadBacklinks(reference, true, xcontext);
+        } catch (XWikiException e) {
+            this.logger.error("Failed to retrieve the back-links for attachment [{}] on wiki [{}].", reference,
                 wikiId, e);
             return Collections.emptyList();
         } finally {
@@ -399,8 +427,8 @@ public class DefaultModelBridge implements ModelBridge
                 DocumentReference hierarchicalParent = getHierarchicalParent(documentReference);
 
                 // we compute a relative reference for the hierarchical parent
-                String hierarchicalParentSerialized = this.compactEntityReferenceSerializer
-                    .serialize(hierarchicalParent, documentReference);
+                String hierarchicalParentSerialized =
+                    this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference);
                 EntityReference relativeHierarchicalReference = this.relativeStringEntityReferenceResolver
                     .resolve(hierarchicalParentSerialized, EntityType.DOCUMENT);
 
@@ -494,8 +522,8 @@ public class DefaultModelBridge implements ModelBridge
                 && !canRestoreDeletedDocument(deletedDocument, context.getAuthorReference())) {
                 logger.error("The author [{}] of this script is not allowed to restore document [{}] with ID [{}]",
                     context.getAuthorReference(), deletedDocumentReference, deletedDocumentId);
-            } else if (request.isCheckRights() &&
-                !canRestoreDeletedDocument(deletedDocument, context.getUserReference())) {
+            } else if (request.isCheckRights()
+                && !canRestoreDeletedDocument(deletedDocument, context.getUserReference())) {
                 logger.error("You are not allowed to restore document [{}] with ID [{}]", deletedDocumentReference,
                     deletedDocumentId);
             } else {
@@ -566,12 +594,12 @@ public class DefaultModelBridge implements ModelBridge
         return result;
     }
 
-    protected boolean canPermanentlyDeleteDocument(XWikiDeletedDocument deletedDocument, DocumentReference userReference)
+    protected boolean canPermanentlyDeleteDocument(XWikiDeletedDocument deletedDocument,
+        DocumentReference userReference)
     {
         boolean result = false;
 
         XWikiContext context = this.xcontextProvider.get();
-        XWiki xwiki = context.getWiki();
 
         // Remember the context user.
         DocumentReference currentUserReference = context.getUserReference();
@@ -616,7 +644,7 @@ public class DefaultModelBridge implements ModelBridge
             } else if (request.isCheckAuthorRights()
                 && !canPermanentlyDeleteDocument(deletedDocument, context.getAuthorReference())) {
                 logger.error("The author [{}] of this script is not allowed to permanently deleted document [{}] with "
-                        + "id", context.getAuthorReference(), deletedDocumentReference, deletedDocumentId);
+                        + "id [{}]", context.getAuthorReference(), deletedDocumentReference, deletedDocumentId);
             } else {
                 // Restore the document.
                 xwiki.getRecycleBinStore().deleteFromRecycleBin(deletedDocumentId, context, true);
@@ -676,6 +704,20 @@ public class DefaultModelBridge implements ModelBridge
             logger.error("Failed to permanently delete all documents", e);
         }
 
+        return false;
+    }
+
+    @Override
+    public boolean rename(DocumentReference source, DocumentReference destination)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        try {
+            return xcontext.getWiki()
+                .renameDocument(source, destination, true,
+                    Collections.emptyList(), Collections.emptyList(), xcontext);
+        } catch (Exception e) {
+            this.logger.error("Failed to rename [{}] to [{}].", source, destination, e);
+        }
         return false;
     }
 }

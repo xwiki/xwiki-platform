@@ -38,7 +38,7 @@ import org.xwiki.model.reference.EntityReferenceSet;
 import org.xwiki.script.service.ScriptService;
 
 /**
- * Expose various FilterStream <tt>instance</tt> input/output streams related APIs to scripts.
+ * Expose various FilterStream {@code instance} input/output streams related APIs to scripts.
  * 
  * @version $Id$
  * @since 6.2M1

@@ -1,3 +1,24 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+## Make sure this template is not executed more than necessary
+##!unique=request
 ##
 ## In admin mode, Panels.PanelWizard must display the layout for the requested space
 ##
@@ -16,7 +37,9 @@
   #set($showRightPanels = $xwiki.getXWikiPreference("showRightPanels"))
   #set($leftPanelsWidth = $xwiki.getXWikiPreference("leftPanelsWidth"))
   #set($rightPanelsWidth = $xwiki.getXWikiPreference("rightPanelsWidth"))
-#else
+## We only rely on the space reference if we are displaying a doc
+## we want to be able to control this value in case of special resources such as authenticate.
+#elseif ("$!doc" != "")
   #set($showLeftPanels = $xwiki.getSpacePreference("showLeftPanels"))
   #set($showRightPanels = $xwiki.getSpacePreference("showRightPanels"))
   #set($leftPanelsWidth = $xwiki.getSpacePreference("leftPanelsWidth"))
@@ -96,9 +119,13 @@
  #end
 #end
 
+## Check that the doc velocity variable is defined: it might not be the case when using some resource handlers.
+#set ($docIsDefined = ($doc != $NULL))
+
 #set($displayContentMenu = true) ## menu on the top of the page with create/edit/more actions
 #set($displayCreateMenu = true) ## create menu
 #set($displayEditMenu = true) ## edit menu
+#set($displayTranslateMenu = $displayEditMenu) ## translate menu
 #set($displayAdminMenu = true) ## the admin menu, related to the page
 #set($displayMoreActionsMenu = true) ## more actions menu
 #set($displayMainMenu = true)
@@ -107,7 +134,9 @@
 #set($displayShortcuts = true)
 #set($displayPageHeader = false) ## page header containing the logo and the banner taken from ColorTheme
 #set ($displayQuickSearch = true)
-#set ($displayLanguageChoice = true)
+
+## The language choice only makes sense when a doc is declared.
+#set ($displayLanguageChoice = $docIsDefined)
 
 #if ($xcontext.action=='preview')
   #set($displayContentMenu = false)

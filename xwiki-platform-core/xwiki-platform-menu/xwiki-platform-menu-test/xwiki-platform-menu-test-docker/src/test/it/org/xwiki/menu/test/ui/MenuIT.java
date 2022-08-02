@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.application.test.po.ApplicationIndexHomePage;
 import org.xwiki.appwithinminutes.test.po.EntryNamePane;
+import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.menu.test.po.MenuEntryEditPage;
 import org.xwiki.menu.test.po.MenuHomePage;
 import org.xwiki.model.reference.DocumentReference;
@@ -33,6 +34,7 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -52,11 +54,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 //@UITest(database = Database.HSQLDB_EMBEDDED, servletEngine = ServletEngine.JETTY_STANDALONE,
 //  browser = Browser.FIREFOX, verbose = true)
 @UITest
-public class MenuIT
+class MenuIT
 {
     @Test
     @Order(1)
-    public void verifyMenuInApplicationsIndex(TestUtils setup)
+    void verifyMenuInApplicationsIndex(TestUtils setup)
     {
         // Log in as superadmin
         setup.loginAsSuperAdmin();
@@ -79,7 +81,7 @@ public class MenuIT
 
     @Test
     @Order(2)
-    public void verifyMenuCreationInLeftPanelWithCurrentWikiVisibility(TestUtils setup)
+    void verifyMenuCreationInLeftPanelWithCurrentWikiVisibility(TestUtils setup)
     {
         // Log in as superadmin again
         setup.loginAsSuperAdmin();
@@ -108,11 +110,21 @@ public class MenuIT
         // Verify that the menu is displayed inside left panels
         mhp = MenuHomePage.gotoPage();
         assertTrue(mhp.hasLeftPanel("menu1"));
+
+        // Verify that the menu is displayed in the entries tables.
+        TableLayoutElement tableLayout = mhp.getLiveData().getTableLayout();
+        assertEquals(1, tableLayout.countRows());
+        tableLayout.assertCellWithLink("Location", "menu1", setup.getURL(menu1Reference.getLastSpaceReference()));
+        tableLayout.assertRow("Update date", hasItem(tableLayout.getDatePatternMatcher()));
+        tableLayout.assertCellWithLink("Last Author", "superadmin",
+            setup.getURL(new DocumentReference("xwiki", "XWiki", "superadmin")));
+        tableLayout.assertCellWithEditAction("Actions", menu1Reference);
+        tableLayout.assertCellWithDeleteAction("Actions", menu1Reference);
     }
 
     @Test
     @Order(3)
-    public void verifyMenuIsAvailableInAdministration(TestUtils setup) throws Exception
+    void verifyMenuIsAvailableInAdministration(TestUtils setup) throws Exception
     {
         // Log in as superadmin
         setup.loginAsSuperAdmin();
@@ -123,9 +135,9 @@ public class MenuIT
         AdministrationPage administrationPage = AdministrationPage.gotoPage();
 
         // check that the look & feel category contains a Menu section
-        assertTrue(administrationPage.hasSection("Look & Feel", "Menu"));
+        assertTrue(administrationPage.hasSection("Look & Feel", "Menus"));
 
-        administrationPage.clickSection("Look & Feel", "Menu");
+        administrationPage.clickSection("Look & Feel", "Menus");
 
         // after having clicked on the menu section, we are in the menu home page
         MenuHomePage menuPage = new MenuHomePage();

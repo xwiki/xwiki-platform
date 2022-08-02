@@ -19,33 +19,120 @@
  */
 package org.xwiki.notifications.internal;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link SimilarityCalculator}.
+ *
+ * @version $Id$
  */
 public class SimilarityCalculatorTest
 {
     private SimilarityCalculator sq;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception
     {
         this.sq = new SimilarityCalculator();
     }
 
     @Test
-    public void testComputeSimilarity() throws Exception
+    void computeSimilarityWhenSameGroupIdAndDocumentButNullTypes()
     {
         DocumentReference document =
                 new DocumentReference("xwiki", "somewhere", "something");
+        String group = "myGroupId";
+
+        Event event1 = mock(Event.class);
+        Event event2 = mock(Event.class);
+
+        when(event1.getDocument()).thenReturn(document);
+        when(event2.getDocument()).thenReturn(document);
+
+        when(event1.getGroupId()).thenReturn(group);
+        when(event2.getGroupId()).thenReturn(group);
+
+        assertEquals(SimilarityCalculator.SAME_GROUP_ID_AND_DOCUMENT_BUT_DIFFERENT_TYPES,
+            this.sq.computeSimilarity(event1, event2));
+    }
+
+    @Test
+    void computeSimilarityWhenSameGroupIdAndDocumentButNonNullTypes()
+    {
+        DocumentReference document =
+            new DocumentReference("xwiki", "somewhere", "something");
+        String group = "myGroupId";
+
+        Event event1 = mock(Event.class);
+        Event event2 = mock(Event.class);
+
+        when(event1.getDocument()).thenReturn(document);
+        when(event2.getDocument()).thenReturn(document);
+
+        when(event1.getGroupId()).thenReturn(group);
+        when(event2.getGroupId()).thenReturn(group);
+
+        when(event1.getType()).thenReturn("type1");
+        when(event2.getType()).thenReturn("type2");
+
+        assertEquals(SimilarityCalculator.SAME_GROUP_ID_AND_DOCUMENT_BUT_DIFFERENT_TYPES,
+            this.sq.computeSimilarity(event1, event2));
+    }
+
+    @Test
+    void computeSimilarityWhenNoSimilarity()
+    {
+        DocumentReference document =
+            new DocumentReference("xwiki", "somewhere", "something");
+        String group = "myGroupId";
+
+        Event event1 = mock(Event.class);
+        Event event2 = mock(Event.class);
+
+        when(event1.getDocument()).thenReturn(document);
+        when(event2.getDocument()).thenReturn(document);
+
+        when(event1.getGroupId()).thenReturn(group);
+        when(event2.getGroupId()).thenReturn("somethingElse");
+
+        assertEquals(SimilarityCalculator.NO_SIMILARITY, this.sq.computeSimilarity(event1, event2));
+    }
+
+    @Test
+    void computeSimilarityWhenSameDocumentAndTypeWithDifferentGroups()
+    {
+        DocumentReference document =
+            new DocumentReference("xwiki", "somewhere", "something");
+        String group = "myGroupId";
+        String type = "type";
+
+        Event event1 = mock(Event.class);
+        Event event2 = mock(Event.class);
+
+        when(event1.getDocument()).thenReturn(document);
+        when(event2.getDocument()).thenReturn(document);
+
+        when(event1.getGroupId()).thenReturn(group);
+        when(event2.getGroupId()).thenReturn("somethingElse");
+
+        when(event1.getType()).thenReturn(type);
+        when(event2.getType()).thenReturn(type);
+
+        assertEquals(SimilarityCalculator.SAME_DOCUMENT_AND_TYPE, this.sq.computeSimilarity(event1, event2));
+    }
+
+    @Test
+    void computeSimilarityWhenSameDocumentAndTypeWithSameGroup()
+    {
+        DocumentReference document =
+            new DocumentReference("xwiki", "somewhere", "something");
         String group = "myGroupId";
         String type = "type";
 
@@ -58,19 +145,31 @@ public class SimilarityCalculatorTest
         when(event1.getGroupId()).thenReturn(group);
         when(event2.getGroupId()).thenReturn(group);
 
-        assertEquals(SimilarityCalculator.SAME_GROUP_ID_AND_DOCUMENT_BUT_DIFFERENT_TYPES, this.sq.computeSimilarity(event1, event2));
-
-        when(event2.getGroupId()).thenReturn("somethingElse");
-
-        assertEquals(SimilarityCalculator.NO_SIMILARITY, this.sq.computeSimilarity(event1, event2));
-
         when(event1.getType()).thenReturn(type);
         when(event2.getType()).thenReturn(type);
 
-        assertEquals(SimilarityCalculator.SAME_DOCUMENT_AND_TYPE, this.sq.computeSimilarity(event1, event2));
-
         // Even if the group is the same, if they share the same type, we consider not as the same groupid
-        when(event2.getGroupId()).thenReturn(group);
         assertEquals(SimilarityCalculator.SAME_DOCUMENT_AND_TYPE, this.sq.computeSimilarity(event1, event2));
+    }
+
+    @Test
+    void computeSimilarityWhenDocumentAndTypeAreNull()
+    {
+        Event event1 = mock(Event.class);
+        Event event2 = mock(Event.class);
+
+        assertEquals(SimilarityCalculator.NO_SIMILARITY, this.sq.computeSimilarity(event1, event2));
+    }
+
+    @Test
+    void computeSimilarityWhenDocumentIsNullButTypesEqual()
+    {
+        Event event1 = mock(Event.class);
+        Event event2 = mock(Event.class);
+
+        when(event1.getType()).thenReturn("type");
+        when(event2.getType()).thenReturn("type");
+
+        assertEquals(SimilarityCalculator.SAME_TYPE_BUT_NO_DOCUMENT, this.sq.computeSimilarity(event1, event2));
     }
 }

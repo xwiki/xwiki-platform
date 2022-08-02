@@ -37,6 +37,7 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
+#set($displayDocExtra = false)
 #if ($isguest)
   #error($services.localization.render('xe.officeimporter.notallowed'))
 #else
@@ -51,7 +52,12 @@
     {{error}}$services.localization.render('xe.officeimporter.results.missingfile', [$goBack]){{/error}}
   #else
     #set ($discard = $fileUpload.loadFileList())
-    #set ($officeFileStream = $fileUpload.fileItems.get(0).inputStream)
+    #foreach ($fileItem in $fileUpload.fileItems)
+      #if ($fileItem.fieldName == "filePath")
+        #set ($officeFileStream = $fileItem.inputStream)
+        #break
+      #end
+    #end
   #end
 ###########################
 ## Validate Target       ##
@@ -121,6 +127,7 @@
           {{error}}$services.officeimporter.errorMessage{{/error}}
         #end
       #end
+      #set ($discard = $xdomOfficeDoc.close())
     #else
       {{error}}$services.officeimporter.errorMessage{{/error}}
     #end

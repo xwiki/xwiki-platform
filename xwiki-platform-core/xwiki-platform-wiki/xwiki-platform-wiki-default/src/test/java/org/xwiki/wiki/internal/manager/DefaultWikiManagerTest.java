@@ -168,11 +168,12 @@ public class DefaultWikiManagerTest
         // The wiki name is available
         when(store.isWikiNameAvailable(eq("wikiid1"), any(XWikiContext.class))).thenReturn(true);
 
-        DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("wikiid1", "wikialias1");
-        when(wikiCreator.create("wikiid1", "wikialias1")).thenReturn(descriptor);
+        DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("wikiid1", "wikialias1", "owner");
+        when(wikiCreator.create("wikiid1", "wikialias1", "owner")).thenReturn(descriptor);
 
         // Create
-        WikiDescriptor newWikiDescriptor = this.mocker.getComponentUnderTest().create("wikiid1", "wikialias1", true);
+        WikiDescriptor newWikiDescriptor =
+            this.mocker.getComponentUnderTest().create("wikiid1", "wikialias1", "owner", true);
 
         // Verify a descriptor has been returned
         assertNotNull(newWikiDescriptor);
@@ -181,7 +182,7 @@ public class DefaultWikiManagerTest
         assertTrue(newWikiDescriptor instanceof DefaultWikiDescriptor);
 
         // Verify that the wiki has been created
-        verify(wikiCreator).create("wikiid1", "wikialias1");
+        verify(wikiCreator).create("wikiid1", "wikialias1", "owner");
 
         // Verify the events has been sent
         verify(observationManager).notify(new WikiCreatingEvent("wikiid1"), "wikiid1", xcontext);
@@ -200,13 +201,13 @@ public class DefaultWikiManagerTest
         // The wiki name is available
         when(store.isWikiNameAvailable(eq("wikiid1"), any(XWikiContext.class))).thenReturn(true);
 
-        DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("wikiid1", "wikialias1");
-        when(wikiCreator.create("wikiid1", "wikialias1")).thenThrow(new WikiManagerException("..."));
+        DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("wikiid1", "wikialias1", "owner");
+        when(wikiCreator.create("wikiid1", "wikialias1", "owner")).thenThrow(new WikiManagerException("..."));
 
         // Create
         boolean exceptionCaught = false;
         try {
-            this.mocker.getComponentUnderTest().create("wikiid1", "wikialias1", true);
+            this.mocker.getComponentUnderTest().create("wikiid1", "wikialias1", "owner", true);
         } catch (WikiManagerException e) {
             exceptionCaught = true;
         }
@@ -256,7 +257,7 @@ public class DefaultWikiManagerTest
 
         // Other mocks
         DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("wikiid1", "wikialias1");
-        when(wikiCreator.create("wikiid1", "wikialias1")).thenReturn(descriptor);
+        when(wikiCreator.create("wikiid1", "wikialias1", null)).thenReturn(descriptor);
 
         // Copy
         WikiDescriptor newWikiDescriptor = this.mocker.getComponentUnderTest().copy("wikiid", "wikiid1",
@@ -264,7 +265,7 @@ public class DefaultWikiManagerTest
         assertNotNull(newWikiDescriptor);
 
         // Verify that the wiki has been created
-        verify(wikiCreator).create("wikiid1", "wikialias1");
+        verify(wikiCreator).create("wikiid1", "wikialias1", null);
         // Verify that the wiki has been copied
         verify(wikiCopier).copyDocuments(eq("wikiid"), eq("wikiid1"), eq(true));
         // Verify that deleted documents has been copied too

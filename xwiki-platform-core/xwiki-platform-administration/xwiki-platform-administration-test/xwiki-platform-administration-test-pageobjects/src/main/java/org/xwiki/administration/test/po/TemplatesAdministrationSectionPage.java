@@ -24,6 +24,7 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.ui.po.DocumentPicker;
 
 /**
@@ -41,8 +42,6 @@ public class TemplatesAdministrationSectionPage extends AdministrationSectionPag
      */
     @FindBy(className = "location-picker")
     private WebElement documentPickerElement;
-
-    private DocumentPicker documentPicker;
 
     @FindBy(id = "createTemplateProvider")
     private WebElement createButton;
@@ -66,11 +65,7 @@ public class TemplatesAdministrationSectionPage extends AdministrationSectionPag
      */
     public DocumentPicker getDocumentPicker()
     {
-        if (this.documentPicker == null) {
-            this.documentPicker = new DocumentPicker(this.documentPickerElement);
-        }
-
-        return this.documentPicker;
+        return new DocumentPicker(this.documentPickerElement);
     }
 
     public TemplateProviderInlinePage createTemplateProvider(String space, String page)
@@ -79,9 +74,30 @@ public class TemplatesAdministrationSectionPage extends AdministrationSectionPag
         documentPicker.toggleLocationAdvancedEdit();
         documentPicker.setParent(space);
         documentPicker.setName(page);
+        
+        // Livevalidation blocks the form submission until the validated fields are valid. Until the form is validated,
+        // Livevalidation prevents the submission button to be clicked.
+        // On some rare cases, the click of the button is done too early and the form submission is prevented.
+        // To be sure that the form is validated before clicking, wait for the two fields validation messages to be 
+        // displayed before clicking.
+        getDriver().waitUntilCondition(input ->
+            getDriver().findElementsWithoutWaiting(By.cssSelector("form .LV_validation_message.LV_valid")).size() == 2);
         this.createButton.click();
 
         return new TemplateProviderInlinePage();
+    }
+
+    /**
+     * Takes the user to the form used to create the template provider.
+     * 
+     * @param templateProviderReference the reference of the template provider page to create
+     * @return the page to edit the template provider
+     * @since 12.9RC1
+     */
+    public TemplateProviderInlinePage createTemplateProvider(LocalDocumentReference templateProviderReference)
+    {
+        return createTemplateProvider(getUtil().serializeReference(templateProviderReference.getParent()),
+            templateProviderReference.getName());
     }
 
     public List<WebElement> getExistingTemplatesLinks()

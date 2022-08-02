@@ -83,6 +83,11 @@ public final class Relations
     public static final String ATTACHMENT_DATA = "http://www.xwiki.org/rel/attachmentData";
 
     /**
+     * Relation for links pointing to attachment metadata.
+     */
+    public static final String ATTACHMENT_METADATA = "http://www.xwiki.org/rel/attachmentMetadata";
+
+    /**
      * Relation for links pointing to the list of comments.
      */
     public static final String COMMENTS = "http://www.xwiki.org/rel/comments";

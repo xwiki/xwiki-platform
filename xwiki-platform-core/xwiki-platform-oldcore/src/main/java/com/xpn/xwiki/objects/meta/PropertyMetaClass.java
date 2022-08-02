@@ -46,6 +46,8 @@ import com.xpn.xwiki.web.Utils;
  */
 public class PropertyMetaClass extends BaseClass implements PropertyMetaClassInterface, PropertyClassProvider
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * Default constructor. Initializes the meta properties that are common to all XClass property types.
      */

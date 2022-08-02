@@ -1,3 +1,22 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
 #######################################################
 ###              RESTORE (UNDELETE) PAGE ACTION
 ###              ------------------
@@ -73,29 +92,6 @@
       $services.localization.render('core.restore.status.notFound')
     </div>
   #end
-#end
-#macro (displayJobStatus $jobStatus)
-  #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js', true))
-  #set ($jobState = $jobStatus.state)
-  #set ($finished = $jobState == 'FINISHED')
-  #set ($jobRequest = $jobStatus.request)
-  ## FIXME: refactor jobs to use the /rest/jobstatus and /rest/joblog resources.
-  #set ($jobStatusURL = $doc.getURL('get', $escapetool.url({
-    'xpage': 'restore',
-    'outputSyntax': 'plain',
-    'jobId': $stringtool.join($jobRequest.id, '/')
-  })))
-  <div class="job-status" data-url="$jobStatusURL">
-    #if (!$finished)
-      <p>$services.localization.render('core.restore.waitmessage')</p>
-      #displayJobProgressBar($jobStatus)
-    #else
-      #displayJobFinishedMessage($jobStatus)
-    #end
-    #if ($isAdvancedUser || $isSuperAdmin)
-      #displayJobStatusLog($jobStatus true)
-    #end
-  </div>
 #end
 #macro (outputJobStatusJSON $jobStatus)
   #getJobStatusJSON($jobStatus $json)

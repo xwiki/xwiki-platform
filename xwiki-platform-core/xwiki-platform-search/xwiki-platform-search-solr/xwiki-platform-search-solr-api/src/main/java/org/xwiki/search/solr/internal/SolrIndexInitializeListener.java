@@ -19,6 +19,7 @@
  */
 package org.xwiki.search.solr.internal;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -29,13 +30,18 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
+import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
 import org.xwiki.search.solr.internal.api.SolrIndexer;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 import org.xwiki.search.solr.internal.job.IndexerRequest;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 /**
  * Automatically start synchronization at startup.
@@ -51,7 +57,9 @@ public class SolrIndexInitializeListener implements EventListener
     /**
      * The events to listen to that trigger the index update.
      */
-    private static final List<Event> EVENTS = Arrays.<Event> asList(new ApplicationReadyEvent());
+    private static final List<Event> EVENTS = Arrays.<Event> asList(new ApplicationReadyEvent(), new WikiReadyEvent());
+
+    private static final List<String> REQUEST_DEFAULT_ID = Arrays.asList("solr", "indexer");
 
     /**
      * Logging framework.
@@ -70,6 +78,12 @@ public class SolrIndexInitializeListener implements EventListener
     @Inject
     private SolrConfiguration configuration;
 
+    @Inject
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
+
     @Override
     public List<Event> getEvents()
     {
@@ -86,13 +100,39 @@ public class SolrIndexInitializeListener implements EventListener
     public void onEvent(Event event, Object source, Object data)
     {
         if (this.configuration.synchronizeAtStartup()) {
-            // Start synchronization
-            IndexerRequest request = new IndexerRequest();
-            request.setId(Arrays.asList("solr", "indexer"));
+            SolrConfiguration.SynchronizeAtStartupMode startupMode =
+                this.configuration.synchronizeAtStartupMode();
+            IndexerRequest request = null;
+            ArrayList<String> requestId = new ArrayList<>(REQUEST_DEFAULT_ID);
 
             try {
-                this.solrIndexer.get().startIndex(request);
-            } catch (SolrIndexerException e) {
+                if (event instanceof ApplicationReadyEvent) {
+                    if (startupMode == SolrConfiguration.SynchronizeAtStartupMode.FARM) {
+                        request = new IndexerRequest();
+                        request.setId(requestId);
+                    } else if (startupMode == SolrConfiguration.SynchronizeAtStartupMode.WIKI) {
+                        // Startup of the application: start indexing the main wiki.
+                        request = new IndexerRequest();
+                        WikiReference wikiReference = this.wikiDescriptorManager.getMainWikiDescriptor().getReference();
+                        request.setRootReference(wikiReference);
+                        requestId.add(this.entityReferenceSerializer.serialize(wikiReference));
+                        request.setId(requestId);
+                    }
+                } else if (startupMode == SolrConfiguration.SynchronizeAtStartupMode.WIKI
+                    && event instanceof WikiReadyEvent) {
+                    WikiReadyEvent wikiReadyEvent = (WikiReadyEvent) event;
+                    WikiReference wikiReference = new WikiReference(wikiReadyEvent.getWikiId());
+                    request = new IndexerRequest();
+                    request.setRootReference(wikiReference);
+
+                    requestId.add(this.entityReferenceSerializer.serialize(wikiReference));
+                    request.setId(requestId);
+                }
+
+                if (request != null) {
+                    this.solrIndexer.get().startIndex(request);
+                }
+            } catch (SolrIndexerException | WikiManagerException e) {
                 this.logger.error("Failed to start initial Solr index synchronization", e);
             }
         }

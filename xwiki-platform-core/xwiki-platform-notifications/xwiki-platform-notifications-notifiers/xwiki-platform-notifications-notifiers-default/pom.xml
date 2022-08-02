@@ -25,14 +25,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-notifications-notifiers</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-notifications-notifiers-default</artifactId>
   <name>XWiki Platform - Notifications - Notifiers - Default bridge</name>
   <description>Default bridge to oldcore for the notifications notifiers API module.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.19</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>14</xwiki.pitest.mutationThreshold>
+    <xwiki.jacoco.instructionRatio>0.32</xwiki.jacoco.instructionRatio>
+    <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
+    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
   </properties>
   <dependencies>
     <dependency>
@@ -60,6 +61,12 @@
       <artifactId>xwiki-platform-component-wiki</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-user-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!-- Test Dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -73,4 +80,26 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
+            <id>default</id>
+            <configuration>
+              <excludes>
+                org/xwiki/notifications/notifiers/internal/UserEventDispatcher.java,
+                org/xwiki/notifications/notifiers/internal/email/AbstractMimeMessageIterator.java
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

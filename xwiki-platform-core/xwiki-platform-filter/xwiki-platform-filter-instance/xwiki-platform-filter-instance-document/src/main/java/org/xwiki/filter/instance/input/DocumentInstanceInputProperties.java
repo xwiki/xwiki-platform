@@ -19,6 +19,9 @@
  */
 package org.xwiki.filter.instance.input;
 
+import java.util.Collections;
+import java.util.Set;
+
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyName;
 
@@ -47,6 +50,21 @@ public class DocumentInstanceInputProperties extends InstanceInputProperties
      * @see #isWithWikiAttachmentsContent()
      */
     private boolean withWikiAttachmentsContent = true;
+
+    /**
+     * @see #getAttachmentsContent()
+     */
+    private Set<String> attachmentsContent;
+
+    /**
+     * @see #isWithWikiAttachmentsRevisions()
+     */
+    private boolean withWikiAttachmentsRevisions;
+
+    /**
+     * @see #isWithWikiAttachmentJRCSRevisions()
+     */
+    private boolean withWikiAttachmentJRCSRevisions = true;
 
     /**
      * @see #isWithWikiObjects()
@@ -97,6 +115,9 @@ public class DocumentInstanceInputProperties extends InstanceInputProperties
     public void setWithJRCSRevisions(boolean withJRCSRevisions)
     {
         this.withJRCSRevisions = withJRCSRevisions;
+
+        // Also update the attachment JRCS status when updating document JRCS status for retro compatibility reasons
+        setWithWikiAttachmentJRCSRevisions(withJRCSRevisions);
     }
 
     /**
@@ -118,7 +139,7 @@ public class DocumentInstanceInputProperties extends InstanceInputProperties
     }
 
     /**
-     * @return Indicate if events should be generated for attachments
+     * @return Indicate if events should be generated for attachments content
      * @since 9.0RC1
      */
     @PropertyName("With attachments content")
@@ -135,6 +156,65 @@ public class DocumentInstanceInputProperties extends InstanceInputProperties
     public void setWithWikiAttachmentsContent(boolean withWikiAttachmentsContent)
     {
         this.withWikiAttachmentsContent = withWikiAttachmentsContent;
+    }
+
+    /**
+     * @return the attachments for which to generate content events
+     * @since 13.8RC1
+     */
+    @PropertyName("Content of attachments")
+    @PropertyDescription("The attchments names for which to generate events")
+    public Set<String> getAttachmentsContent()
+    {
+        return this.attachmentsContent != null ? this.attachmentsContent : Collections.emptySet();
+    }
+
+    /**
+     * @param attachmentsContent the attachments for which to generate content events
+     * @since 13.8RC1
+     */
+    public void setAttachmentsContent(Set<String> attachmentsContent)
+    {
+        this.attachmentsContent = attachmentsContent;
+    }
+
+    /**
+     * @return Indicate if events should be generated for attachments revisions
+     * @since 12.0RC1
+     */
+    @PropertyName("With attachments revisions")
+    @PropertyDescription("Indicate if events should be generated for attachments revisions")
+    public boolean isWithWikiAttachmentsRevisions()
+    {
+        return this.withWikiAttachmentsRevisions;
+    }
+
+    /**
+     * @param withWikiAttachmentsRevisions Indicate if events should be generated for attachments revisions
+     * @since 12.0RC1
+     */
+    public void setWithWikiAttachmentsRevisions(boolean withWikiAttachmentsRevisions)
+    {
+        this.withWikiAttachmentsRevisions = withWikiAttachmentsRevisions;
+    }
+
+    /**
+     * @return Indicates if JRCS based history should be added to attachment event properties
+     */
+    @PropertyName("With attachment JRCS revisions")
+    @PropertyDescription("Indicates if JRCS based history should be added to attachment event properties")
+    public boolean isWithWikiAttachmentJRCSRevisions()
+    {
+        return withWikiAttachmentJRCSRevisions;
+    }
+
+    /**
+     * @param withWikiAttachmentJRCSRevisions Indicates if JRCS based history should be added to attachment event
+     *            properties
+     */
+    public void setWithWikiAttachmentJRCSRevisions(boolean withWikiAttachmentJRCSRevisions)
+    {
+        this.withWikiAttachmentJRCSRevisions = withWikiAttachmentJRCSRevisions;
     }
 
     /**

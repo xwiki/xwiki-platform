@@ -30,12 +30,18 @@ REM       execute, try setting it to "--list-config". See
 REM       http://www.eclipse.org/jetty/documentation/current/start-jar.html for more options.
 REM   JETTY_PORT - the port on which to start Jetty, 8080 by default
 REM   JETTY_STOP_PORT - the port on which Jetty listens for a Stop command, 8079 by default
+REM   JETTY_DEBUG_PORT - the port to use for debugging purpose (default: 5005).
 REM -------------------------------------------------------------------------
 
 setlocal EnableDelayedExpansion
 
+REM The port on which to listen for debugging operations
+if not defined JETTY_DEBUG_PORT (
+  set JETTY_DEBUG_PORT=5005
+)
+
 if not defined XWIKI_OPTS set XWIKI_OPTS=-Xmx1024m
-set XWIKI_OPTS=%XWIKI_OPTS% -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005
+set XWIKI_OPTS=%XWIKI_OPTS% -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=%JETTY_DEBUG_PORT%
 
 REM The port on which to start Jetty can be defined in an enviroment variable called JETTY_PORT
 if not defined JETTY_PORT (
@@ -50,8 +56,6 @@ REM The port on which Jetty listens for a Stop command can be defined in an envi
 if not defined JETTY_STOP_PORT (
   set JETTY_STOP_PORT=8079
 )
-
-echo Starting Jetty on port %JETTY_PORT%, please wait...
 
 REM For enabling YourKit Profiling.
 REM %3 must the path where Yourkit can find the agent.
@@ -84,16 +88,11 @@ if not exist "%XWIKI_DATA_DIR%" mkdir "%XWIKI_DATA_DIR%"
 REM Ensure the logs directory exists as otherwise Jetty reports an error
 if not exist "%XWIKI_DATA_DIR%\logs" mkdir "%XWIKI_DATA_DIR%\logs"
 
-REM Set up the Jetty Base directory (used for custom Jetty configuration) to point to the Data Directory
-REM Also created some Jetty directorie that Jetty would otherwise create at first startup. We do this to avoid
-REM cryptic messages in the logs such as: "MKDIR: ${jetty.base}/lib"
-set JETTY_BASE=%XWIKI_DATA_DIR%\jetty
-if not exist "%JETTY_BASE%" mkdir "%JETTY_BASE%"
-if not exist "%JETTY_BASE%\lib" mkdir "%JETTY_BASE%\lib"
-if not exist "%JETTY_BASE%\lib\ext" mkdir "%JETTY_BASE%\lib\ext"
+REM Set up the Jetty Base directory (used for custom Jetty configuration) to be the current directory where this file
+REM is.
+REM Also make sure the log directory exists since Jetty won't create it.
+set JETTY_BASE=.
 if not exist "%JETTY_BASE%\logs" mkdir "%JETTY_BASE%\logs"
-if not exist "%JETTY_BASE%\resources" mkdir "%JETTY_BASE%\resources"
-if not exist "%JETTY_BASE%\webapps" mkdir "%JETTY_BASE%\webapps"
 
 REM Specify Jetty's home and base directories
 set JETTY_HOME=jetty
@@ -103,10 +102,10 @@ REM Specify the encoding to use
 set XWIKI_OPTS=%XWIKI_OPTS% -Dfile.encoding=UTF8
 
 REM Specify port on which HTTP requests will be handled
-set JETTY_OPTS=%JETTY_OPTS% jetty.port=%JETTY_PORT%
+set JETTY_OPTS=%JETTY_OPTS% jetty.http.port=%JETTY_PORT%
 REM In order to print a nice friendly message to the user when Jetty has finished loading the XWiki webapp, we pass
 REM the port we use as a System Property
-set XWIKI_OPTS=%XWIKI_OPTS% -Djetty.port=%JETTY_PORT%
+set XWIKI_OPTS=%XWIKI_OPTS% -Djetty.http.port=%JETTY_PORT%
 
 REM Specify port and key to stop a running Jetty instance
 set JETTY_OPTS=%JETTY_OPTS% STOP.KEY=xwiki STOP.PORT=%JETTY_STOP_PORT%

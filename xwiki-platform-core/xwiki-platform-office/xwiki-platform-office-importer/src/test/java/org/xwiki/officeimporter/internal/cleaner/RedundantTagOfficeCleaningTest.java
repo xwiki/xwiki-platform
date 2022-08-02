@@ -21,10 +21,12 @@ package org.xwiki.officeimporter.internal.cleaner;
 
 import java.io.StringReader;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Test case for filtering redundant html tags in {@link OfficeHTMLCleaner}.
@@ -32,13 +34,14 @@ import org.w3c.dom.NodeList;
  * @version $Id$
  * @since 1.8
  */
+@ComponentTest
 public class RedundantTagOfficeCleaningTest extends AbstractHTMLCleaningTest
 {
     /**
      * Test filtering of those tags which doesn't have any attributes set.
      */
     @Test
-    public void testFilterIfZeroAttributes()
+    public void filterIfZeroAttributes()
     {
         String htmlTemplate = header + "<p>Test%sRedundant%sFiltering</p>" + footer;
         String[] filterIfZeroAttributesTags = new String[] {"span", "div"};
@@ -48,7 +51,7 @@ public class RedundantTagOfficeCleaningTest extends AbstractHTMLCleaningTest
             String html = String.format(htmlTemplate, startTag, endTag);
             Document doc = officeHTMLCleaner.clean(new StringReader(html));
             NodeList nodes = doc.getElementsByTagName(tag);
-            Assert.assertEquals(0, nodes.getLength());
+            assertEquals(0, nodes.getLength());
         }
     }
 
@@ -56,7 +59,7 @@ public class RedundantTagOfficeCleaningTest extends AbstractHTMLCleaningTest
      * Test filtering of those tags which doesn't have any textual content in them.
      */
     @Test
-    public void testFilterIfNoContent()
+    public void filterIfNoContent()
     {
         String htmlTemplate = header + "<p>Test%sRedundant%s%s%sFiltering</p>" + footer;
         String[] filterIfNoContentTags =
@@ -68,7 +71,7 @@ public class RedundantTagOfficeCleaningTest extends AbstractHTMLCleaningTest
             String html = String.format(htmlTemplate, startTag, endTag, startTag, endTag);
             Document doc = officeHTMLCleaner.clean(new StringReader(html));
             NodeList nodes = doc.getElementsByTagName(tag);
-            Assert.assertEquals(1, nodes.getLength());
+            assertEquals(1, nodes.getLength());
         }
     }
 }

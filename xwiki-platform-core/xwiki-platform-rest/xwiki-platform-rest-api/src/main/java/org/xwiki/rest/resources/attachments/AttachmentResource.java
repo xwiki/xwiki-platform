@@ -20,6 +20,7 @@
 package org.xwiki.rest.resources.attachments;
 
 import javax.ws.rs.DELETE;
+import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -36,14 +37,14 @@ public interface AttachmentResource
 {
     @GET Response getAttachment(
             @PathParam("wikiName") String wikiName,
-            @PathParam("spaceName") String spaceName,
+            @PathParam("spaceName") @Encoded String spaceName,
             @PathParam("pageName") String pageName,
             @PathParam("attachmentName") String attachmentName
     ) throws XWikiRestException;
 
     @PUT Response putAttachment(
             @PathParam("wikiName") String wikiName,
-            @PathParam("spaceName") String spaceName,
+            @PathParam("spaceName") @Encoded String spaceName,
             @PathParam("pageName") String pageName,
             @PathParam("attachmentName") String attachmentName,
             byte[] content
@@ -51,7 +52,7 @@ public interface AttachmentResource
 
     @DELETE void deleteAttachment(
             @PathParam("wikiName") String wikiName,
-            @PathParam("spaceName") String spaceName,
+            @PathParam("spaceName") @Encoded String spaceName,
             @PathParam("pageName") String pageName,
             @PathParam("attachmentName") String attachmentName
     ) throws XWikiRestException;

@@ -124,9 +124,9 @@ platform.wiki.users.leave.confirmation.no=Ne
 platform.wiki.users.leave.success=Korisnik {0}{1}{2} uspješno je napustio/la wiki {3}{4}{5}.
 platform.wiki.users.join.title=Pridružite se wikiju
 platform.wiki.users.leave.title=Napustite wiki "{0}"
-platform.wiki.users.leave.empty=
+### Missing: platform.wiki.users.leave.empty=Leave Wiki
 platform.wiki.users.delete.title=Obrišite wiki "{0}"
-platform.wiki.users.delete.empty=
+### Missing: platform.wiki.users.delete.empty=Delete Wiki
 platform.wiki.users.invitation.reply.hint=Odgovor, vidljiv administratoru wikija, u kojem možete obrazložiti vašu odluku.
 platform.wiki.users.join.request.hint=Da biste se pridružili wikiju {0}{1}{2}, najprije morate izdati zahtjev za pridruživanjem. Nakon toga, jedan od administratora wikija će pregledati vaš zahtjev i razmotriti njegovo prihvaćanje ili odbijanje.
 platform.wiki.users.join.request.message.hint=Poruka, vidljiva administratoru wikija, u kojoj možete obrazložiti vašu odluku.
@@ -230,7 +230,7 @@ platform.wiki.create.wizard.step.create=Izradi
 platform.wiki.create.wizard.step.creation=Izrada wikija
 platform.wiki.create.wizard.step.creation.wait=Molim pričekajte dok wiki ne bude izrađen.
 platform.wiki.create.wizard.step.creation.complete=Wiki {0} je uspješno izrađen. Sada mu možete pristupiti.
-### Missing: platform.wiki.create.wizard.step.creation.errorlog=However error(s) have been generated during that process and you might want to review them.
+### Missing: platform.wiki.create.wizard.step.creation.errorlog=However, error(s) have been generated during that process and you might want to review them.
 platform.wiki.create.wizard.step.creation.error=Wiki {0} je izrađen, ali neke stranice nisu instalirane. Posljedično, wiki bi se mogao ponašati pogrešno, tako da biste ga vjerojatno trebali obrisati.
 platform.wiki.create.wizard.step.creation.go=Idite na wiki
 
@@ -303,6 +303,5 @@ platform.wiki.delete.confirmation.yes=Da, molim obriši ovaj wiki\!
 platform.wiki.delete.confirmation.no=Ne, vrati me natrag\!
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend
-</content>
+#@deprecatedend</content>
 </xwikidoc>

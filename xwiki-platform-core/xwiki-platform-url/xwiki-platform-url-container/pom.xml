@@ -25,15 +25,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-url</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-url-container</artifactId>
   <name>XWiki Platform - URL - Container</name>
   <packaging>jar</packaging>
   <description>Container-related URL code</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.97</xwiki.jacoco.instructionRatio>
-  </properties>
+    <xwiki.jacoco.instructionRatio>0.98</xwiki.jacoco.instructionRatio>
+    </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

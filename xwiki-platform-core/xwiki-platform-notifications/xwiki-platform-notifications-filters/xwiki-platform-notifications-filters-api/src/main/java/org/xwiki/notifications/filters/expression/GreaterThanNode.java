@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.filters.expression;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.notifications.filters.expression.generics.AbstractBinaryOperatorNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractValueNode;
 
@@ -30,6 +31,8 @@ import org.xwiki.notifications.filters.expression.generics.AbstractValueNode;
  */
 public final class GreaterThanNode extends AbstractBinaryOperatorNode
 {
+    private final boolean orEquals;
+
     /**
      * Constructs a new "&gt;=" node.
      *
@@ -38,24 +41,63 @@ public final class GreaterThanNode extends AbstractBinaryOperatorNode
      */
     public GreaterThanNode(AbstractValueNode leftOperand, AbstractValueNode rightOperand)
     {
+        this(leftOperand, rightOperand, true);
+    }
+
+    /**
+     * Constructs a new "&lt;=" node.
+     *
+     * @param leftOperand the left operand
+     * @param rightOperand the right operand
+     * @param orEquals true if it's a greater or equals, false if it's only lesser
+     * @since 12.7RC1
+     * @since 12.6.1
+     */
+    public GreaterThanNode(AbstractValueNode leftOperand, AbstractValueNode rightOperand, boolean orEquals)
+    {
         super(leftOperand, rightOperand);
+
+        this.orEquals = orEquals;
+    }
+
+    /**
+     * @return true if it's a lesser or equals, false if it's only lesser
+     * @since 12.7RC1
+     * @since 12.6.1
+     */
+    public boolean isOrEquals()
+    {
+        return this.orEquals;
     }
 
     @Override
     public boolean equals(Object o)
     {
-        return (o instanceof GreaterThanNode && super.equals(o));
+        if (o == this) {
+            return true;
+        }
+
+        if (o instanceof GreaterThanNode) {
+            return super.equals(o) && isOrEquals() == ((GreaterThanNode) o).isOrEquals();
+        }
+
+        return false;
     }
 
     @Override
     public int hashCode()
     {
-        return this.getClass().getTypeName().hashCode() * 571 + super.hashCode();
+        HashCodeBuilder builder = new HashCodeBuilder();
+
+        builder.appendSuper(super.hashCode());
+        builder.append(isOrEquals());
+
+        return builder.hashCode();
     }
 
     @Override
     public String toString()
     {
-        return String.format("%s >= %s", getLeftOperand(), getRightOperand());
+        return String.format("%s %s %s", getLeftOperand(), isOrEquals() ? ">=" : ">", getRightOperand());
     }
 }

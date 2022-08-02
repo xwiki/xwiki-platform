@@ -39,6 +39,7 @@ import org.xwiki.test.jmock.MockingComponentManager;
  * @since 3.0RC1
  */
 @RunWith(RenderingTestSuite.class)
+@RenderingTestSuite.Scope(pattern = "macropython.*")
 public class IntegrationTests
 {
     @RenderingTestSuite.Initialized

@@ -1,3 +1,22 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
 <div class="row document-header">
   <div class="document-info col-xs-12 #if($displayContentMenu)col-md-7#end">
     ## --------------------------------------------------------
@@ -8,16 +27,20 @@
     #end
     <div id="document-title"><h1>$titleToDisplay</h1></div>
     #if (!$doc.isNew())
+      ## Note that this serialization step is mandatory and we cannot count on the UserReferenceConverter here
+      ## because UserReference#toString does not rely on the serializer so it's not the expected format for
+      ## XWiki#getUserName(String).
+      #set ($authorName = $services.user.serialize($tdoc.authors.originalMetadataAuthor))
       <div class="xdocLastModification">
         #if (!$doc.isMostRecent())
           $services.localization.render(
             'core.document.modificationWithVersion',
             ["<a href='$tdoc.getURL('view', ""rev=$tdoc.version"")'>$tdoc.version</a>",
-            $xwiki.getUserName($tdoc.author),
+            $xwiki.getUserName($authorName),
             $xwiki.formatDate($tdoc.date)
           ])
         #else
-          $services.localization.render('core.footer.modification', [$xwiki.getUserName($tdoc.author), $xwiki.formatDate($tdoc.date)])
+          $services.localization.render('core.footer.modification', [$xwiki.getUserName($authorName), $xwiki.formatDate($tdoc.date)])
         #end
       </div>
     #end

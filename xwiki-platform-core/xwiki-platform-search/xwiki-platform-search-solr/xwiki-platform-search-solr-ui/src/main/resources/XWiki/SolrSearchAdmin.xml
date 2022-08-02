@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -105,10 +105,11 @@
   #set ($discard = $xwiki.jsx.use('XWiki.SolrSearchAdmin'))
   == $services.localization.render('solr.admin.status.title') ==
 
-  (% class="xform" %)
+  (% class="xform" %)(((
   ; {{html clean="false"}}&lt;label&gt;$services.localization.render('solr.admin.status.queueSize.label')&lt;/label&gt;{{/html}}##
     (% class="xHint" %)$services.localization.render('solr.admin.status.queueSize.hint')
   : (% class="solrQueueSize" %)$services.solr.queueSize
+  )))
 
   == $services.localization.render('solr.admin.indexing.title') ==
 
@@ -187,7 +188,7 @@
 #macro(handleSolrAction $withValidToken)
   #set ($indexActions = ['index', 'reindex', 'delete'])
   #if ($withValidToken &amp;&amp; $indexActions.contains($request.action))
-    #set ($allWikis = $sorttool.sort($xwiki.wikiNames))
+    #set ($allWikis = $collectiontool.sort($xwiki.wikiNames))
     #handleSolrIndexAction()
   #elseif ($request.action == 'getQueueSize')
     $response.setContentType('application/json')
@@ -196,7 +197,7 @@
       'timestamp': $datetool.date.time
     })
   #else
-    #set ($allWikis = $sorttool.sort($xwiki.wikiNames))
+    #set ($allWikis = $collectiontool.sort($xwiki.wikiNames))
     #displaySolrAdminSection()
   #end
 #end
@@ -347,10 +348,10 @@
 
   var requestQueueSizeUpdate = function() {
     var queueSizeContainer = this;
-    $.ajax({
-      url: "$xwiki.getURL('XWiki.SolrSearchAdmin', 'get', 'outputSyntax=plain')",
-      data: {action: 'getQueueSize'}
-    }).done(function(data) {
+    $.get(new XWiki.Document('SolrSearchAdmin', 'XWiki').getURL('get'), {
+      outputSyntax: 'plain',
+      action: 'getQueueSize'
+    }).then(data =&gt; {
       updateQueueSize.call(queueSizeContainer, data);
     });
   };

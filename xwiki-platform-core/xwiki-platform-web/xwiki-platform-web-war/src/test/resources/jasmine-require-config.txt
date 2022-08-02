@@ -1,0 +1,36 @@
+paths: {
+  'jquery': '/webjars/jquery.min',
+  'jQueryNoConflict': '/spec/jQueryNoConflict',
+
+  'prototype': '/webjars/prototype',
+
+  'bootstrap': '/webjars/bootstrap.min',
+
+  // Tree
+  'jsTree': '/webjars/jstree.min',
+  'xwiki-job-runner': '/webjars/jobRunner.min',
+  'tree-finder': '/webjars/finder.min',
+  'tree': '/webjars/tree.min',
+
+  'xwiki-entityReference': 'uicomponents/model/entityReference.min'
+},
+map: {
+  // '*' means all modules will get 'jQueryNoConflict' for their 'jquery' dependency.
+  '*': {
+    'jquery': 'jQueryNoConflict'
+  },
+  // 'jQueryNoConflict' wants the real jQuery module though. If this line was not here, there would be an unresolvable
+  // cyclic dependency.
+  'jQueryNoConflict': {
+    'jquery': 'jquery'
+  }
+},
+shim: {
+  'prototype': {
+    exports: '$'
+  },
+  'bootstrap': ['jquery'],
+  'xwiki-entityReference': {
+    exports: 'XWiki'
+  }
+}

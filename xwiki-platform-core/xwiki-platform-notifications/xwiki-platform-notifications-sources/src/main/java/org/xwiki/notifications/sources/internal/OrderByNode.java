@@ -33,7 +33,8 @@ public class OrderByNode extends AbstractOperatorNode
     /**
      * The different kind of ordering.
      */
-    public enum Order {
+    public enum Order
+    {
         /**
          * Ascending order.
          */

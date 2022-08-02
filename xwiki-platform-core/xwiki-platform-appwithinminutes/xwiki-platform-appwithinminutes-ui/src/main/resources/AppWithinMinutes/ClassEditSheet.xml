@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="AppWithinMinutes.ClassEditSheet" locale="">
+<xwikidoc version="1.5" reference="AppWithinMinutes.ClassEditSheet" locale="">
   <web>AppWithinMinutes</web>
   <name>ClassEditSheet</name>
   <language/>
@@ -135,6 +135,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
             #set ($fieldURL = $doc.getURL('edit', $escapetool.url({
               'xpage': 'plain',
               'sheet': 'AppWithinMinutes.ClassEditSheet',
+              'template': 'AppWithinMinutes.ClassTemplate',
               'field': $formFieldDoc.fullName,
               'xeditmode': 'text'
             })))
@@ -329,12 +330,18 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
 #**
  * Displays the input used to edit the specified property of the given object. The given object can be either an
  * instance of an XWiki class or a class field. In the first case the property represents an object field and in the
- * second case the property represents a field meta property.
+ * second case the property represents a field meta property. We currently don't use custom display for metaproperty,
+ * so in that case we fallback on displayEdit.
  *#
 #macro (displayPropertyEditInput $property $prefix $object)
   #set ($wrappedProperty = $property.propertyClass)
   #if ($wrappedProperty.isCustomDisplayed($xcontext.context))
-    $xcontext.get('propertyCustomDisplayer').display($property, $prefix, $object)
+    #set ($customDisplayer = $!xcontext.get('propertyCustomDisplayer').display($property, $prefix, $object))
+    #if ((! $customDisplayer) &amp;&amp; ("$!customDisplayer" == ""))
+      $doc.displayEdit($property, $prefix, $object)
+    #else
+      $customDisplayer
+    #end
   #else
     $doc.displayEdit($property, $prefix, $object)
   #end
@@ -419,7 +426,6 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
  * Display the edit class form.
  *#
 #macro (displayEditForm)
-  #set ($discard = $xwiki.jsfx.use('js/scriptaculous/dragdrop.js'))
   #set ($discard = $xwiki.jsx.use('AppWithinMinutes.ClassEditSheet'))
   #set ($discard = $xwiki.ssx.use('AppWithinMinutes.ClassEditSheet'))
   #set ($discard = $xwiki.ssx.use('AppWithinMinutes.ClassSheetGenerator'))
@@ -469,10 +475,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #try()
       #set ($discard = $copyAsJob.join())
       #set ($copyAsJobStatus = $services.job.getJobStatus($copyAsJob.request.id))
-      #set ($errorLogs = $copyAsJobStatus.log.getLogs('ERROR'))
-      #if ($errorLogs.size() &gt; 0)
-        #set ($errorMessage = $errorLogs.get(0).toString())
-      #end
+      #set ($errorMessage = $copyAsJobStatus.logTail.getFirstLogEvent('ERROR').toString())
     #end
   #end
 #end
@@ -652,6 +655,10 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
       #set($discard = $sheetDoc.setParent($doc.documentReference.name))
       #set($discard = $sheetDoc.setContent($doc.getRenderedContent($sheetGeneratorDoc.content,
         $sheetGeneratorDoc.syntax.toIdString(), 'plain/1.0')))
+      ## We assume for now that the output produced by the sheet generator uses the same syntax as the code of the sheet
+      ## generator. We have to set the syntax because the default wiki syntax (used when creating new wiki pages) could
+      ## be different than the one used by the sheet generator.
+      #set($discard = $sheetDoc.setSyntax($sheetGeneratorDoc.syntax))
       #set($discard = $sheetDoc.setHidden(true))
       #set($discard = $sheetDoc.save($services.localization.render('platform.appwithinminutes.classEditorSheetSaveComment'),
         $minorEdit))
@@ -677,6 +684,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #set($translationsGeneratorDoc = $xwiki.getDocument('AppWithinMinutes.ClassTranslationsGenerator'))
     #set($discard = $translationsDoc.setContent($doc.getRenderedContent($translationsGeneratorDoc.content,
       $translationsGeneratorDoc.syntax.toIdString(), 'plain/1.0')))
+    #set($discard = $translationsDoc.setSyntaxId('plain/1.0'))
     #set($discard = $translationsDoc.setHidden(true))
     #set($discard = $translationsDoc.save(
       $services.localization.render('platform.appwithinminutes.classEditorTranslationsSaveComment'),
@@ -799,6 +807,8 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
         <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -846,6 +856,8 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -1008,6 +1020,8 @@ return XWiki;
         <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -1055,6 +1069,8 @@ return XWiki;
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -1589,11 +1605,7 @@ return XWiki;
 }(XWiki || {}));
 
 (function() {
-  function init() {
-    var form = $('inline');
-    if (!form) {
-      return false;
-    }
+  function initForm(form) {
     // Let the sheet handle the form submit. The form is submitted by default to the preview action which dispatches the
     // request to the save action if the save button is detected on the request parameters. By submitting to the edit
     // action the edit sheet is evaluated and thus it can handle the save by itself.
@@ -1631,9 +1643,18 @@ return XWiki;
     // Make the palette and the canvas live.
     new XWiki.FormFieldPalette('palette');
     new XWiki.FormCanvas('canvas');
-
-    return true;
   }
+
+  function init() {
+    var form = $('inline');
+    if (form) {
+      require(['scriptaculous/dragdrop'], function() {
+        initForm(form);
+      });
+    }
+    return form;
+  }
+
   (XWiki.domIsLoaded &amp;&amp; init()) || document.observe('xwiki:dom:loaded', init);
 }).call();
 
@@ -1778,6 +1799,8 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -1806,6 +1829,8 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -1841,6 +1866,8 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -2025,6 +2052,8 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -2053,6 +2082,8 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -2088,6 +2119,8 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>

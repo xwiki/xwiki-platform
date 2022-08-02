@@ -75,6 +75,5 @@ Mail.SendMailStatus_livetable.error=Greška
 Mail.SendMailStatus_livetable.actions=Akcije
 Mail.SendMailStatus_livetable.resend=Ponovo pošalji
 mailSender.admin.resendSuccess=E-pošta je uspješno ponovo poslana
-mailSender.admin.resendFailure=Ponovno slanje e-pošte nije uspjelo. Kliknite za više detalja.
-</content>
+mailSender.admin.resendFailure=Ponovno slanje e-pošte nije uspjelo. Kliknite za više detalja.</content>
 </xwikidoc>

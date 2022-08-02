@@ -100,7 +100,7 @@ public abstract class XWikiDefaultStore implements XWikiStoreInterface
     @Override
     public List getCustomMappingPropertyList(BaseClass bclass)
     {
-        return new ArrayList();
+        return new ArrayList<>();
     }
 
     @Override

@@ -18,6 +18,11 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
+DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
+
+[description]
+Creates an ini template for setting JVM arguments (eg -Xmx ).
+
 [ini-template]
 ## JVM Configuration
 ## If JVM args are include in an ini file then --exec is needed
@@ -33,11 +38,10 @@
 # -XX:+CMSClassUnloadingEnabled
 # -XX:+UseCMSCompactAtFullCollection
 # -XX:CMSInitiatingOccupancyFraction=80
-# -verbose:gc
+# -internal:gc
 # -XX:+PrintGCDateStamps
 # -XX:+PrintGCTimeStamps
 # -XX:+PrintGCDetails
 # -XX:+PrintTenuringDistribution
 # -XX:+PrintCommandLineFlags
 # -XX:+DisableExplicitGC
-# -Dorg.apache.jasper.compiler.disablejsr199=true

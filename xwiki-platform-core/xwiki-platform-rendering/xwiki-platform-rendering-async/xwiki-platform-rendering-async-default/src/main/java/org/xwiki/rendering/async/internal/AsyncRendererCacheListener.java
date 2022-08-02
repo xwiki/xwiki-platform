@@ -34,6 +34,7 @@ import org.xwiki.component.event.ComponentDescriptorRemovedEvent;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
+import org.xwiki.security.authorization.event.RightUpdatedEvent;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.EntityEvent;
@@ -73,13 +74,16 @@ public class AsyncRendererCacheListener extends AbstractEventListener
         super(NAME, new WikiDeletedEvent(), new XClassPropertyAddedEvent(), new XClassPropertyDeletedEvent(),
             new XClassPropertyUpdatedEvent(), new XObjectAddedEvent(), new XObjectDeletedEvent(),
             new XObjectUpdatedEvent(), new DocumentCreatedEvent(), new DocumentUpdatedEvent(),
-            new DocumentDeletedEvent(), new ComponentDescriptorAddedEvent(), new ComponentDescriptorRemovedEvent());
+            new DocumentDeletedEvent(), new ComponentDescriptorAddedEvent(), new ComponentDescriptorRemovedEvent(),
+            new RightUpdatedEvent());
     }
 
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (event instanceof ComponentDescriptorEvent) {
+        if (event instanceof RightUpdatedEvent) {
+            this.cache.cleanCacheForRight();
+        } else if (event instanceof ComponentDescriptorEvent) {
             ComponentDescriptorEvent componentEvent = ((ComponentDescriptorEvent) event);
             this.cache.cleanCache(componentEvent.getRoleType(), componentEvent.getRoleHint());
         } else if (event instanceof WikiDeletedEvent) {

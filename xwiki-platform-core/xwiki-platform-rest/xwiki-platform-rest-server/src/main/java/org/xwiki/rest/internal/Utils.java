@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Provider;
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.commons.httpclient.URIException;
@@ -31,7 +32,6 @@ import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -249,12 +249,9 @@ public class Utils
      */
     public static XWikiContext getXWikiContext(ComponentManager componentManager)
     {
-        Execution execution;
-        XWikiContext xwikiContext;
         try {
-            execution = componentManager.getInstance(Execution.class);
-            xwikiContext = (XWikiContext) execution.getContext().getProperty("xwikicontext");
-            return xwikiContext;
+            Provider<XWikiContext> xcontextProvider = componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
+            return xcontextProvider.get();
         } catch (Exception e) {
             throw new RuntimeException("Unable to get XWiki context", e);
         }
@@ -296,7 +293,7 @@ public class Utils
             return XWikiRightService.GUEST_USER_FULLNAME;
         }
 
-        return user.getUser();
+        return user.getFullName();
     }
 
     /**
@@ -360,15 +357,24 @@ public class Utils
             if (pathElement != null) {
                 try {
                     // see generateEncodedSpacesURISegment() to understand why we manually handle "spaceName"
+                    // Note that it would be cleaner to not rely on the variable name and to rely on the instanceof List
+                    // and on generateEncodedListURISegment and to give as argument
+                    // the list of spaces with the intermediate "spaces" segments. We don't go there for now to avoid
+                    // breaking something since this method is heavily used.
                     if (i < pathVariableNames.size() && "spaceName".equals(pathVariableNames.get(i))) {
                         if (!(pathElement instanceof List)) {
                             throw new RuntimeException("The 'spaceName' parameter must be a list!");
                         }
                         encodedPathElements[i] = generateEncodedSpacesURISegment((List) pathElements[i]);
+                    // see generateEncodedJobIdURISegment to understand why we manually handle the lists
+                    } else if (pathElement instanceof List) {
+                        encodedPathElements[i] = generateEncodedListURISegment((List) pathElements[i]);
                     } else if (pathElement instanceof EncodedElement) {
                         encodedPathElements[i] = pathElement.toString();
                     } else {
-                        encodedPathElements[i] = URIUtil.encodePath(pathElement.toString());
+                        // It looks like we cannot use URILUtil#encodeWithinPath because it does not encode the "%"
+                        // character. So it seems safer here to just encode properly the '/'.
+                        encodedPathElements[i] = URIUtil.encodePath(pathElement.toString()).replaceAll("/", "%2F");
                     }
                 } catch (URIException e) {
                     throw new RuntimeException("Failed to encode path element: " + pathElements[i], e);
@@ -414,6 +420,31 @@ public class Utils
     }
 
     /**
+     * Generate an encoded segment for the List arguments.
+     * Apparently RestLet does not handle properly when several segments are expected for the same variable name
+     * in the path and given as an array in createURI. To avoid problems, we pass list as argument and handle them
+     * directly here.
+     * An example of such usage can be find in {@link org.xwiki.rest.internal.url.resources.JobStatusRestURLGenerator}.
+     *
+     * @param listSegment the list of elements to be used for the listSegment
+     * @return a proper segment
+     * @throws URIException in case of problem when performing the encoding.
+     */
+    private static String generateEncodedListURISegment(List<Object> listSegment) throws URIException
+    {
+        StringBuilder jobIdSegment = new StringBuilder();
+        for (Object idElement : listSegment) {
+            if (jobIdSegment.length() > 0) {
+                jobIdSegment.append('/');
+            }
+            // It looks like we cannot use URILUtil#encodeWithinPath because it does not encode the "%"
+            // character. So it seems safer here to just encode properly the '/'.
+            jobIdSegment.append(URIUtil.encodePath(idElement.toString()).replaceAll("/", "%2F"));
+        }
+        return jobIdSegment.toString();
+    }
+
+    /**
      * Generate an encoded segment for the 'spaceName' parameter of a resource URL.
      *
      * Using UriBuilder is an elegant way to generate a REST URL for a jax-rs resource. It takes the path from the
@@ -432,7 +463,9 @@ public class Utils
             if (spaceSegment.length() > 0) {
                 spaceSegment.append("/spaces/");
             }
-            spaceSegment.append(URIUtil.encodePath(space.toString()));
+            // It looks like we cannot use URILUtil#encodeWithinPath because it does not encode the "%"
+            // character. So it seems safer here to just encode properly the '/'.
+            spaceSegment.append(URIUtil.encodePath(space.toString()).replaceAll("/", "%2F"));
         }
         return spaceSegment.toString();
     }

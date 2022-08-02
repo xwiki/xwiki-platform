@@ -90,6 +90,5 @@ index.documentTree.more={0} autres...
 
 ## Until 7.2M2
 rendering.macro.documentTree.parameter.showChildDocuments.name=Montrer les documents enfants
-rendering.macro.documentTree.parameter.showChildDocuments.description=Montrer les documents enfant basé sur le champ parent du document.
-</content>
+rendering.macro.documentTree.parameter.showChildDocuments.description=Montrer les documents enfant basé sur le champ parent du document.</content>
 </xwikidoc>

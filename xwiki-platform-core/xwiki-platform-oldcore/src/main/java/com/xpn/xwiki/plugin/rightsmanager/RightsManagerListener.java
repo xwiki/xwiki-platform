@@ -27,8 +27,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationContext;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
+import org.xwiki.refactoring.event.DocumentRenamingEvent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -62,6 +64,8 @@ public final class RightsManagerListener implements EventListener
             add(new DocumentDeletedEvent());
         }
     };
+
+    private static final DocumentRenamingEvent DOCUMENT_RENAMING_EVENT = new DocumentRenamingEvent();
 
     // ////////////////////////////////////////////////////////////////////////////
 
@@ -106,8 +110,8 @@ public final class RightsManagerListener implements EventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        // Only take into account local events
-        if (!Utils.getComponent(RemoteObservationManagerContext.class).isRemoteState()) {
+        // Only take into account local events and ensure the deleted event is not triggered as part of a rename.
+        if (!Utils.getComponent(RemoteObservationManagerContext.class).isRemoteState() && !isInRenamingEvent()) {
             XWikiDocument document = ((XWikiDocument) source).getOriginalDocument();
             XWikiContext context = (XWikiContext) data;
 
@@ -129,6 +133,11 @@ public final class RightsManagerListener implements EventListener
                 }
             }
         }
+    }
+
+    private boolean isInRenamingEvent()
+    {
+        return (Utils.getComponent(ObservationContext.class).isIn(DOCUMENT_RENAMING_EVENT));
     }
 
     /**

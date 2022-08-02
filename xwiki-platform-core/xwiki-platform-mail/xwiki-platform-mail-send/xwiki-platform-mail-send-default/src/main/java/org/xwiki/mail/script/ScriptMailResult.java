@@ -66,10 +66,9 @@ public class ScriptMailResult implements MailResult
      *
      * @param timeout the maximum amount of time to wait in milliseconds
      * @since 6.4
-     * @deprecated since 7.1M2 use {@link MailStatusResult#waitTillProcessed(long)} instead. Kept to not break
-     *             script backward compatibility
+     * @deprecated use {@link MailStatusResult#waitTillProcessed(long)}. Kept to not break script backward compatibility
      */
-    @Deprecated
+    @Deprecated(since = "7.1M2")
     public void waitTillProcessed(long timeout)
     {
         getStatusResult().waitTillProcessed(timeout);

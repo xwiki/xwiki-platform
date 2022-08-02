@@ -61,7 +61,7 @@ public class TemporaryResourceReference extends EntityResourceReference
 
         setType(TYPE);
         this.moduleId = moduleId;
-        this.resourcePath = Collections.unmodifiableList(new ArrayList<String>(resourcePath));
+        this.resourcePath = Collections.unmodifiableList(new ArrayList<>(resourcePath));
     }
 
     /**

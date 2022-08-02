@@ -35,6 +35,7 @@ import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentRuntimeException;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.security.authorization.AuthorExecutor;
 
 /**
  * Method invocation handler for wiki component proxy instances. Has a reference on a map of name/body wiki code of
@@ -58,23 +59,29 @@ public class DefaultWikiComponentInvocationHandler implements InvocationHandler
     /**
      * Our component manager.
      */
-    private ComponentManager componentManager;
+    private final ComponentManager componentManager;
 
     /**
      * The proxied wiki component.
      */
-    private DefaultWikiComponent wikiComponent;
-    
+    private final DefaultWikiComponent wikiComponent;
+
+    private final AuthorExecutor authorExecutor;
+
     /**
      * Constructor of this invocation handler.
      * 
      * @param wikiComponent the proxied wiki component
      * @param componentManager the component manager
+     * @param authorExecutor used to execute the component calls with the right author
      */
-    public DefaultWikiComponentInvocationHandler(DefaultWikiComponent wikiComponent, ComponentManager componentManager)
+    public DefaultWikiComponentInvocationHandler(DefaultWikiComponent wikiComponent, AuthorExecutor authorExecutor,
+        ComponentManager componentManager)
     {
         this.wikiComponent = wikiComponent;
         this.componentManager = componentManager;
+
+        this.authorExecutor = authorExecutor;
     }
 
     /**
@@ -149,8 +156,11 @@ public class DefaultWikiComponentInvocationHandler implements InvocationHandler
             XDOM xdom = this.wikiComponent.getHandledMethods().get(method.getName());
             methodContext.put(METHOD_CONTEXT_COMPONENT_KEY, proxy);
             this.injectComponentDependencies(methodContext);
-            return methodExecutor.execute(method, args, wikiComponent.getDocumentReference(), xdom,
-                wikiComponent.getSyntax(), methodContext);
+
+            return this.authorExecutor.call(
+                () -> methodExecutor.execute(method, args, wikiComponent.getDocumentReference(), xdom,
+                    wikiComponent.getSyntax(), methodContext),
+                this.wikiComponent.getAuthorReference(), this.wikiComponent.getDocumentReference());
         }
     }
 }

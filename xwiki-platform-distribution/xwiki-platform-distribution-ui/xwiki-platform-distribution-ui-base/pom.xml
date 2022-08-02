@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-ui</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-ui-base</artifactId>
   <name>XWiki Platform - Distribution - UI - Flavor Base</name>
@@ -36,6 +36,8 @@
         <!-- Make sure to replace the old platform base flavor -->
         org.xwiki.platform:xwiki-platform-distribution-flavor
     </xwiki.extension.features>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Base Flavor Application</xwiki.extension.name>
   </properties>
   <dependencies>
     <!-- JAR dependencies -->
@@ -178,6 +180,18 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-captcha-jcaptcha-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-authentication-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-model-validation-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>

@@ -1,0 +1,95 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>FlamingoThemesCode</web>
+  <name>Translations</name>
+  <language>mr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>FlamingoThemesCode.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>platform.flamingo.themes.home.title=फ्लेमिंगो साठी थीम्स
+platform.flamingo.themes.home.currenttheme=वर्तमान थीम
+platform.flamingo.themes.home.otherthemes=इतर उपलब्ध थीम्स
+platform.flamingo.themes.home.warningOldColorThemeInstalled=फ्लेमिंगो थीम्स व्यवस्थापित करण्यासाठी हा अप्लिकेशन आहे. फ्लेमिंगो थीम फ्लेमिंगोवर आधारित कोणत्याही स्किनमध्ये बदल करण्यास सानुकूल आहे. आपण कोलिब्री-आधारित स्किनसाठी रंग थीम व्यवस्थापित करू इच्छित असल्यास आपण {0} कोलिब्री रंग थीम अप्लिकेशन वर जावे {1}.
+platform.flamingo.themes.home.warningCurrentOldColorTheme=सद्य थीम कोलिब्री रंगाची थीम आहे जी फ्लेमिंगोवर आधारित स्किनसह कार्य करण्यास अनुकूलित नाही. आम्ही ते सुसंगत बनविण्यासाठी सर्वतोपरी प्रयत्न केले आहेत, परंतु परीणाम कदाचित अनुकूल ठरणार नाही.
+platform.flamingo.themes.home.useThisTheme=ही थीम वापरा
+platform.flamingo.themes.home.newThemeName=थीमचे नाव ...
+platform.flamingo.themes.home.create=नवीन थीम तयार करा
+platform.flamingo.themes.home.create.invalid=अवैध थीम नाव!
+platform.flamingo.themes.home.create.csrf=सुरक्षिततेच्या कारणास्तव, कृपया आपण "{0}" नावाची थीम तयार करू इच्छित असल्याची पुष्टी करा.
+platform.flamingo.themes.home.create.confirm=खात्री करा
+platform.flamingo.themes.home.set.success=थीम  "{0}" वर सेट केली.
+platform.flamingo.themes.title.variables=व्हेरिएबल्स
+platform.flamingo.themes.title.preview=पूर्वावलोकन
+platform.flamingo.themes.autorefresh=स्वयं रीफ्रेश
+platform.flamingo.themes.refresh=रीफ्रेश
+platform.flamingo.themes.refreshwarning=रीफ्रेशला काही सेकंद लागू शकतात.
+platform.flamingo.themes.loading=लोड करीत आहे...
+platform.flamingo.themes.category.logos=लोगो
+platform.flamingo.themes.category.base-colors=बेस रंग
+platform.flamingo.themes.category.typography=टायपोग्राफी
+platform.flamingo.themes.category.forms=फॉर्म
+platform.flamingo.themes.category.buttons=बटन
+platform.flamingo.themes.category.tables=सारण्या
+platform.flamingo.themes.category.navbar=पथदर्शक बार
+platform.flamingo.themes.category.dropdowns=ड्रॉप डाउन
+platform.flamingo.themes.category.panels=पॅनेल
+platform.flamingo.themes.category.breadcrumb=ब्रेडक्रंब
+platform.flamingo.themes.category.advanced=प्रगत
+platform.flamingo.themes.defaultvalue=डीफॉल्ट
+platform.flamingo.themes.lessCode.description=या फील्डमध्ये आपण थेट LESS कोड लिहू शकता जो skin मध्ये जोडला जाईल.
+platform.flamingo.themes.local=लोकॅल
+platform.flamingo.themes.global=वैश्विक
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+@deprecatedstart
+
+#######################################
+## until 7.3M1
+#######################################
+platform.flamingo.themes.lessCode.warning=दुर्दैवाने, हे फील्ड थेट पूर्वावलोकनात घेतले जात नाही.
+
+#######################################
+## until 12.9RC1
+#######################################
+platform.flamingo.themes.incompatiblebrowser=क्षमस्व, इंटरनेट एक्सप्लोररच्या या आवृत्तीसह पूर्वावलोकन कार्य करत नाही. आपल्याला नवीन ब्राउझर वापरण्याची आवश्यकता आहे.
+
+#@deprecatedend</content>
+</xwikidoc>

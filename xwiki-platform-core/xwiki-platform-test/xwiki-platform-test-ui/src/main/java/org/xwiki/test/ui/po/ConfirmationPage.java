@@ -81,9 +81,12 @@ public class ConfirmationPage extends ViewPage
     }
 
     /**
-     * Confirm the deletion of the page
+     * Confirm the deletion of the page.
      * @return an object representing the UI displayed when a page is deleted
+     * @deprecated since 12.8RC1. The method {@link DeletePageConfirmationPage#confirmDeletePage()} should be used
+     * instead.
      */
+    @Deprecated
     public DeletingPage confirmDeletePage()
     {
         clickYes();

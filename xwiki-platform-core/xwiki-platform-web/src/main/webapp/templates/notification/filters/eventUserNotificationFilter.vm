@@ -1,5 +1,0 @@
-## Renderer for the usersNotificationFilters
-## Parameters :
-## $filter : the filter to render
-## $filterPreference : the preference to use
-#displayUser($filterPreference.user)

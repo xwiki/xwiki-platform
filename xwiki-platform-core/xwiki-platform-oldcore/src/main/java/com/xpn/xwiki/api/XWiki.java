@@ -41,6 +41,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.PageReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
@@ -163,15 +164,6 @@ public class XWiki extends Api
         }
 
         return this.documentRevisionProvider;
-    }
-
-    private ContextualAuthorizationManager getContextualAuthorizationManager()
-    {
-        if (this.contextualAuthorizationManager == null) {
-            this.contextualAuthorizationManager = Utils.getComponent(ContextualAuthorizationManager.class);
-        }
-
-        return this.contextualAuthorizationManager;
     }
 
     /**
@@ -301,7 +293,6 @@ public class XWiki extends Api
      * @throws XWikiException
      * @since 10.6RC1
      */
-    @Unstable
     public Document getEntityDocument(String reference, EntityType type) throws XWikiException
     {
         XWikiDocument doc = this.xwiki.getDocument(reference, type, getXWikiContext());
@@ -579,6 +570,20 @@ public class XWiki extends Api
     }
 
     /**
+     * Returns whether a page exists or not.
+     *
+     * @param reference the reference of the page to check for its existence
+     * @return true if the page exists, false if not
+     * @since 13.3RC1
+     * @since 12.10.7
+     */
+    @Unstable
+    public boolean exists(PageReference reference)
+    {
+        return this.xwiki.exists(reference, getXWikiContext());
+    }
+
+    /**
      * Verify the rights the current user has on a document. If the document requires rights and the user is not
      * authenticated he will be redirected to the login page.
      *
@@ -813,17 +818,17 @@ public class XWiki extends Api
      *
      * <pre>
      * &lt;code&gt;
-     * #set($orphans = $xwiki.searchDocuments(&quot; where doc.fullName &lt;&gt; ? and (doc.parent = ? or &quot;
-     *     + &quot;(doc.parent = ? and doc.space = ?))&quot;,
+     * #set($orphans = $xwiki.searchDocuments(&quot; where doc.fullName &lt;&gt; ?1 and (doc.parent = ?2 or &quot;
+     *     + &quot;(doc.parent = ?3 and doc.space = ?4))&quot;,
      *     [&quot;${doc.fullName}as&quot;, ${doc.fullName}, ${doc.name}, ${doc.space}]))
      * &lt;/code&gt;
      * </pre>
      *
      * @param parameterizedWhereClause the HQL where clause. For example
-     *            {@code where doc.fullName <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))}
+     *            {@code where doc.fullName <> ?1 and (doc.parent = ?2 or (doc.parent = ?3 and doc.space = ?4))}
      * @param maxResults the number of rows to return. If 0 then all rows are returned
      * @param startOffset the number of rows to skip. If 0 don't skip any row
-     * @param parameterValues the where clause values that replace the question marks (?)
+     * @param parameterValues the where clause values that replace the question marks (?1, ?2, etc.)
      * @return a list of document names
      * @throws XWikiException in case of error while performing the query
      * @deprecated use query service instead
@@ -854,7 +859,7 @@ public class XWiki extends Api
      *
      * @param wikiName the name of the wiki where to search.
      * @param parameterizedWhereClause the HQL where clause. For example
-     *            {@code where doc.fullName <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))}
+     *            {@code where doc.fullName <> ?1 and (doc.parent = ?2 or (doc.parent = ?3 and doc.space = ?4))}
      * @param maxResults the number of rows to return. If 0 then all rows are returned
      * @param startOffset the number of rows to skip. If 0 don't skip any row
      * @param parameterValues the where clause values that replace the question marks (?)
@@ -883,7 +888,7 @@ public class XWiki extends Api
      * {@link #searchDocuments(String, int, int, List)} for more about parameterized hql clauses.
      *
      * @param parametrizedSqlClause the HQL where clause. For example
-     *            {@code where doc.fullName <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))}
+     *            {@code where doc.fullName <> ?1 and (doc.parent = ?2 or (doc.parent = ?3 and doc.space = ?4))}
      * @param nb the number of rows to return. If 0 then all rows are returned
      * @param start the number of rows to skip. If 0 don't skip any row
      * @param parameterValues the where clause values that replace the question marks (?)
@@ -903,7 +908,7 @@ public class XWiki extends Api
      * properties of attach (the attachment) or doc (the document it is attached to)
      *
      * @param parametrizedSqlClause The HQL where clause. For example
-     *            {@code where doc.fullName <> ? and (attach.author = ? or (attach.filename = ? and doc.space = ?))}
+     *            {@code where doc.fullName <> ?1 and (doc.parent = ?2 or (doc.parent = ?3 and doc.space = ?4))}
      * @param nb The number of rows to return. If 0 then all rows are returned
      * @param start The number of rows to skip at the beginning.
      * @param parameterValues A {@link java.util.List} of the where clause values that replace the question marks (?)
@@ -1003,18 +1008,6 @@ public class XWiki extends Api
     public String renderTemplate(String template)
     {
         return this.xwiki.renderTemplate(template, getXWikiContext());
-    }
-
-    /**
-     * Designed to include dynamic content, such as Servlets or JSPs, inside Velocity templates; works by creating a
-     * RequestDispatcher, buffering the output, then returning it as a string.
-     *
-     * @param url URL of the servlet
-     * @return text result of the servlet
-     */
-    public String invokeServletAndReturnAsString(String url)
-    {
-        return this.xwiki.invokeServletAndReturnAsString(url, getXWikiContext());
     }
 
     /**
@@ -1397,6 +1390,17 @@ public class XWiki extends Api
     }
 
     /**
+     * Get the available locales according to the preferences.
+     *
+     * @return the list of available locales
+     * @since 12.4RC1
+     */
+    public List<Locale> getAvailableLocales()
+    {
+        return this.xwiki.getAvailableLocales(getXWikiContext());
+    }
+
+    /**
      * @return the list of all wiki names, including the main wiki, corresponding to the available wiki descriptors.
      *         Example: the descriptor for the wiki <i>wikiname</i> is a document in the main wiki, named
      *         <i>XWiki.XWikiServerWikiname</i>, containing an XWiki.XWikiServerClass object.
@@ -1589,6 +1593,43 @@ public class XWiki extends Api
         if (hasProgrammingRights()) {
             this.xwiki.sendConfirmationEmail(xwikiname, password, email, "", contentfield, getXWikiContext());
         }
+    }
+
+    /**
+     * API to rename a document to another document.
+     * Note that the list of backlinks can be retrieved with {@link Document#getBackLinkedReferences()}
+     * and the list of children with {@link Document#getChildrenReferences()}.
+     *
+     * <strong>Warning:</strong> Be aware that this method never triggers any event related to the rename
+     * of the document. If you want the right events to be sent for the event, please use the dedicated Refactoring
+     * Module API (see
+     * {@link org.xwiki.refactoring.script.RequestFactory#createRenameRequest(EntityReference, EntityReference)}
+     * and {@link org.xwiki.refactoring.job.MoveRequest}).
+     *
+     * @param sourceDocumentReference the source document to rename.
+     * @param targetDocumentReference the target reference to rename the document to.
+     * @param overwrite if {@code true} the target document reference will be overwritten if it exists
+     *                  (deleted to the recycle bin before the rename). If {@code false} and the target document exist
+     *                  the rename won't be performed.
+     * @param backlinkDocumentReferences the list of references of documents to parse and for which links will be
+     *                                  modified to point to the new document reference
+     * @param childDocumentReferences the list of references of document whose parent field will be set to the new
+     *                                 document reference
+     * @return {@code true} if the rename succeeded. {@code false} if there was any issue.
+     * @throws XWikiException if the document cannot be renamed properly.
+     * @since 12.5RC1
+     */
+    public boolean renameDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
+        boolean overwrite, List<DocumentReference> backlinkDocumentReferences,
+        List<DocumentReference> childDocumentReferences) throws XWikiException
+    {
+        if (hasAccess(Right.DELETE, sourceDocumentReference)
+            && ((overwrite && hasAccess(Right.DELETE, targetDocumentReference))
+            || (!overwrite && hasAccess(Right.EDIT, targetDocumentReference)))) {
+            return this.xwiki.renameDocument(sourceDocumentReference, targetDocumentReference, overwrite,
+                backlinkDocumentReferences, childDocumentReferences, getXWikiContext());
+        }
+        return false;
     }
 
     /**
@@ -1977,8 +2018,8 @@ public class XWiki extends Api
     /**
      * API to retrieve the URL of an a Wiki Document in any mode. The URL is generated differently depending on the
      * environment (Servlet, Portlet, PDF, etc..). The URL generation can be modified by implementing a new
-     * XWikiURLFactory object For compatibility with any target environment (and especially the portlet environment).
-     * It is important to always use the URL functions to generate URL and never hardcode URLs.
+     * XWikiURLFactory object For compatibility with any target environment (and especially the portlet environment). It
+     * is important to always use the URL functions to generate URL and never hardcode URLs.
      *
      * @param fullname the page name which includes the attached file
      * @param action the mode in which to access the document (view/edit/save/..). Any valid XWiki action is possible.
@@ -2233,6 +2274,18 @@ public class XWiki extends Api
     public User getUser(String username)
     {
         return this.xwiki.getUser(username, getXWikiContext());
+    }
+
+    /**
+     * Retrieve a user from its document reference.
+     *
+     * @param userReference the reference of the user.
+     * @return the user corresponding to the reference.
+     * @since 11.8RC1
+     */
+    public User getUser(DocumentReference userReference)
+    {
+        return this.xwiki.getUser(userReference, getXWikiContext());
     }
 
     /**
@@ -2588,31 +2641,6 @@ public class XWiki extends Api
     }
 
     /**
-     * API to rename a page (experimental) Rights are necessary to edit the source and target page All objects and
-     * attachments ID are modified in the process to link to the new page name
-     *
-     * @param doc page to rename
-     * @param newFullName target page name to move the information to
-     */
-    public boolean renamePage(Document doc, String newFullName)
-    {
-        try {
-            if (this.xwiki.exists(newFullName, getXWikiContext()) && !this.xwiki.getRightService()
-                .hasAccessLevel("delete", getXWikiContext().getUser(), newFullName, getXWikiContext())) {
-                return false;
-            }
-            if (this.xwiki.getRightService().hasAccessLevel("edit", getXWikiContext().getUser(), doc.getFullName(),
-                getXWikiContext())) {
-                this.xwiki.renamePage(doc.getFullName(), newFullName, getXWikiContext());
-            }
-        } catch (XWikiException e) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
      * Retrieves the current editor preference for the request The preference is first looked up in the user preference
      * and then in the space and wiki preference
      *
@@ -2829,6 +2857,29 @@ public class XWiki extends Api
         // TODO: The implementation should be done in com.xpn.xwiki.XWiki as this class should
         // delegate all implementations to that Class.
         DocumentReference docReference = getCurrentMixedDocumentReferenceResolver().resolve(documentName);
+        return getClass(docReference);
+    }
+
+    /**
+     * Get the XWiki Class object defined in the passed Document name.
+     * <p>
+     * Note: This method doesn't require any rights for accessing the passed Document (as opposed to the
+     * {@link com.xpn.xwiki.api.Document#getClass()} method which does require to get a Document object first. This is
+     * thus useful in cases where the calling code doesn't have the access right to the specified Document. It is safe
+     * because there are no sensitive data stored in a Class definition.
+     * </p>
+     *
+     * @param docReference the reference of the document for which to get the Class object.
+     * @return the XWiki Class object defined in the passed Document reference. If the passed Document name points to a
+     *         Document with no Class defined then an empty Class object is returned (i.e. a Class object with no
+     *         properties).
+     * @throws XWikiException if the reference doesn't exist.
+     * @since 10.11.10
+     * @since 11.8RC1
+     * @since 11.3.4
+     */
+    public Class getClass(EntityReference docReference) throws XWikiException
+    {
         return new Class(this.xwiki.getDocument(docReference, this.context).getXClass(), this.context);
     }
 
@@ -2859,7 +2910,7 @@ public class XWiki extends Api
      */
     public XWikiUser checkAuth() throws XWikiException
     {
-        return this.context.getWiki().getAuthService().checkAuth(this.context);
+        return this.context.getWiki().checkAuth(this.context);
     }
 
     /**
@@ -2874,7 +2925,13 @@ public class XWiki extends Api
      */
     public XWikiUser checkAuth(String username, String password, String rememberme) throws XWikiException
     {
-        return this.context.getWiki().getAuthService().checkAuth(username, password, rememberme, this.context);
+        XWikiUser user =
+            this.context.getWiki().getAuthService().checkAuth(username, password, rememberme, this.context);
+        if (user.isDisabled(this.context)) {
+            this.context.put(XWikiContext.INACTIVE_USER_REFERENCE, user.getUserReference());
+            user = null;
+        }
+        return user;
     }
 
     /**
@@ -2899,19 +2956,8 @@ public class XWiki extends Api
     }
 
     /**
-     * @return the ids of configured syntaxes for this wiki (eg "xwiki/1.0", "xwiki/2.0", "mediawiki/1.0", etc)
-     * @deprecated since 8.2M1, use the XWiki Rendering Configuration component or the Rendering Script Service one
-     *             instead
-     */
-    @Deprecated
-    public List<String> getConfiguredSyntaxes()
-    {
-        return this.xwiki.getConfiguredSyntaxes();
-    }
-
-    /**
      * API to get the Servlet path for a given wiki. In mono wiki this is "bin/" or "xwiki/". In virtual mode and if
-     * <tt>xwiki.virtual.usepath</tt> is enabled in xwiki.cfg, it is "wiki/wikiname/".
+     * {@code xwiki.virtual.usepath} is enabled in xwiki.cfg, it is "wiki/wikiname/".
      *
      * @param wikiName wiki for which to get the path
      * @return The servlet path
@@ -2923,7 +2969,7 @@ public class XWiki extends Api
 
     /**
      * API to get the Servlet path for the current wiki. In mono wiki this is "bin/" or "xwiki/". In virtual mode and if
-     * <tt>xwiki.virtual.usepath</tt> is enabled in xwiki.cfg, it is "wiki/wikiname/".
+     * {@code xwiki.virtual.usepath} is enabled in xwiki.cfg, it is "wiki/wikiname/".
      *
      * @return The servlet path
      */
@@ -2934,7 +2980,7 @@ public class XWiki extends Api
 
     /**
      * API to get the webapp path for the current wiki. This usually is "xwiki/". It can be configured in xwiki.cfg with
-     * the config <tt>xwiki.webapppath</tt>.
+     * the config {@code xwiki.webapppath}.
      *
      * @return The servlet path
      */

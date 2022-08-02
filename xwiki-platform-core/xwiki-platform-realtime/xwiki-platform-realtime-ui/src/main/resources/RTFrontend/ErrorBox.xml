@@ -1,0 +1,278 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="RTFrontend.ErrorBox" locale="">
+  <web>RTFrontend</web>
+  <name>ErrorBox</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>xwiki:XWiki.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Realtime WYSIWYG Error Handler</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{info}}
+This page contains code for notifying the user when an error occurs in a Realtime Editor.
+{{/info}}
+
+(% class="hidden" %)(((
+
+(% class="realtime-error" %)(((
+= Oops, something went wrong! =
+
+The Realtime Editor has encountered a non-recoverable error and must stop.
+Some of your work may not be saved but it is below and you may save it now and re-integrate it into the Realtime session.
+
+{{html clean=false}}&lt;textarea class="realtime-content" cols="60" rows="10"&gt;&lt;/textarea&gt;{{/html}}
+
+Please consider [[reporting a bug&gt;&gt;https://jira.xwiki.org/browse/XWIKI]], including the following content (Privacy note: This contains the history of the document you were working on).
+
+{{html clean=false}}&lt;textarea class="realtime-debug" cols="60" rows="10"&gt;&lt;/textarea&gt;{{/html}}
+)))
+
+(% class="realtime-disconnected" %)(((
+= Disconnected =
+
+Your connection to the Realtime Editor has been lost, you may try refreshing the page to get the connection back but some of your most recent work may be lost. To return to the page and continue in **non** realtime mode, simply close this box.
+)))
+
+(% class="realtime-unavailable" %)(((
+= Unavailable =
+
+The Realtime Editor's back-end does not seem to be available. You can reload the page and attempt to reconnect, or close this box and continue in **non** realtime mode.
+)))
+
+(% class="realtime-debuglog" %)(((
+{{html clean=false}}
+&lt;hr&gt;
+Please consider [[reporting a bug&gt;&gt;https://jira.xwiki.org/browse/XWIKI||target="_blank" rel="noopener noreferrer"]], including the following content.&lt;br&gt;
+&lt;b&gt;Privacy note&lt;/b&gt;: This contains data about the document you were working on, including its content.
+&lt;textarea class="realtime-debug" cols="60" rows="4"&gt;&lt;/textarea&gt;
+{{/html}}
+)))
+
+(% class="realtime-merge" %)(((
+= Merge Error =
+
+It looks like someone saved this document outside of the realtime session, and we were unable to merge your work with theirs.
+)))
+
+(% class="realtime-parse" %)(((
+= Parse Error =
+
+We were unable to parse the server's response.
+)))
+
+(% class="realtime-save" %)(((
+= Save Error =
+
+We were unable to save your document. Try again shortly.
+If this message is displayed everytime you try to save the document, you should consider **disabling the realtime engine** (uncheck the "Allow Realtime Collaboration" checkbox) and **save** again.
+)))
+
+(% class="realtime-velocity" %)(((
+= Critical Save Error =
+
+The realtime saver/merger script has encountered an unexpected error and **the save was not performed**.
+If this message is displayed everytime you try to save the document, you should consider **disabling the realtime engine** (uncheck the "Allow Realtime Collaboration" checkbox) and **save** again.
+)))
+
+(% class="realtime-updateversion" %)(((
+= Update version error =
+
+We were unable to update the version of the document, which could create important merge error and loss of content.
+To avoid that, **Realtime has been disabled** and you are now editing this document //offline//.
+)))
+
+(% class="realtime-keepremote" %)(((
+= Merge error =
+
+We were unable to get the **remote** content into the realtime session.
+**Realtime has been disabled** so that you can fix the merge conflict manually //offline//.
+)))
+
+(% class="realtime-converthtml" %)(((
+= WYSIWYG error =
+
+We were unable to update the WYSIWYG editor with the merged content.
+**Realtime has been disabled** so that you can fix the merge manually.
+)))
+
+)))</content>
+  <object>
+    <name>RTFrontend.ErrorBox</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>79522418-fcc8-4dd1-8559-a352c1177c4a</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>define(['jquery'], function($) {
+  // VELOCITY
+  var PAGE_CONTENT = $jsontool.serialize($doc.getRenderedContent());
+  // END VELOCITY
+
+  // FIXME: Use Bootstrap modals instead.
+  var ModalPopup = Class.create(XWiki.widgets.ModalPopup, {
+    initialize: function($super, interactionParameters) {
+      this.interactionParameters = $.extend({}, interactionParameters);
+      $super(this.createContent(this.interactionParameters), {
+        show: {method: this.showDialog, keys: []},
+        close: {method: this.closeDialog, keys: ['Esc']}
+      }, {
+        displayCloseButton : true,
+        verticalPosition : 'top',
+        backgroundColor : '#FFF'
+      });
+      this.showDialog();
+    },
+
+    createContent: function (data) {
+      var modalContent = $('&lt;div class="modal-popup"/&gt;');
+      setTimeout(function() {
+        data.then(modalContent[0]);
+      }, 0);
+      return modalContent[0];
+    }
+  });
+
+  var errorMessages = {};
+  // FIXME: Load the error messages in a separate request instead of including them in the JavaScript code (which
+  // prevents the code from being cached and also creates problems if we want to translate the error messages).
+  $('&lt;div/&gt;').html(PAGE_CONTENT).find('div.hidden &gt; div[class^="realtime-"]').each(function() {
+    errorMessages[this.className.substring('realtime-'.length)] = this;
+  });
+
+  var modal;
+  var show = function(errorType, debugLog) {
+    modal = new ModalPopup({then: function(modalContent) {
+      var errorMessage = errorMessages[errorType] || document.createTextNode(`error of unknown type [${errorType}]`);
+      $(modalContent).append(errorMessage);
+      if (debugLog) {
+        $(modalContent).append(errorMessages['debuglog']).find('.realtime-debug').val(debugLog);
+      }
+    }});
+  };
+
+  var hide = function() {
+    return modal &amp;&amp; modal.closeDialog();
+  };
+
+  return {show, hide};
+});</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+</xwikidoc>

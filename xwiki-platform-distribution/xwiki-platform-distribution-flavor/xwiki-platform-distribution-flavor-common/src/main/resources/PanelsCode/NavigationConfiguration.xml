@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="PanelsCode.NavigationConfiguration" locale="">
+<xwikidoc version="1.5" reference="PanelsCode.NavigationConfiguration" locale="">
   <web>PanelsCode</web>
   <name>NavigationConfiguration</name>
   <language/>
@@ -51,6 +51,21 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <excludeTopLevelApplicationPages>
+        <customDisplay/>
+        <defaultValue>1</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <hint>This dynamic filter removes from the navigation tree the top level pages that belong to an application created with App Within Minutes.</hint>
+        <name>excludeTopLevelApplicationPages</name>
+        <number>2</number>
+        <prettyName>Exclude Top Level Application Pages</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </excludeTopLevelApplicationPages>
       <excludeTopLevelExtensionPages>
         <customDisplay/>
         <defaultValue>1</defaultValue>
@@ -70,13 +85,15 @@
         <cache>0</cache>
         <classname/>
         <customDisplay/>
+        <defaultValue/>
         <disabled>0</disabled>
         <displayType>input</displayType>
+        <freeText/>
         <hint>The list of pages to exclude from the navigation tree.</hint>
         <idField/>
         <multiSelect>1</multiSelect>
         <name>exclusions</name>
-        <number>2</number>
+        <number>3</number>
         <picker>1</picker>
         <prettyName>Exclusions</prettyName>
         <relationalStorage>1</relationalStorage>
@@ -95,13 +112,15 @@
         <cache>0</cache>
         <classname/>
         <customDisplay/>
+        <defaultValue/>
         <disabled>0</disabled>
         <displayType>input</displayType>
+        <freeText/>
         <hint>The list of pages to include in the navigation tree even if they were excluded by a previous filter.</hint>
         <idField/>
         <multiSelect>1</multiSelect>
         <name>inclusions</name>
-        <number>3</number>
+        <number>4</number>
         <picker>1</picker>
         <prettyName>Inclusions</prettyName>
         <relationalStorage>1</relationalStorage>
@@ -118,11 +137,15 @@
       </inclusions>
     </class>
     <property>
+      <excludeTopLevelApplicationPages>1</excludeTopLevelApplicationPages>
+    </property>
+    <property>
       <excludeTopLevelExtensionPages>1</excludeTopLevelExtensionPages>
     </property>
     <property>
       <exclusions>
         <value>Sandbox.WebHome</value>
+        <value>Dashboard.WebHome</value>
       </exclusions>
     </property>
     <property>

@@ -187,6 +187,16 @@ public abstract class AbstractHTML5Validator extends AbstractXMLValidator
     protected static final String ATTR_HREF = "href";
 
     /**
+     * Title attribute.
+     */
+    protected static final String ATTR_TITLE = "title";
+
+    /**
+     * Role attribute.
+     */
+    protected static final String ATTR_ROLE = "role";
+
+    /**
      * Blur attribute.
      */
     protected static final String ATTR_BLUR = "onblur";
@@ -255,6 +265,11 @@ public abstract class AbstractHTML5Validator extends AbstractXMLValidator
      * Charset attribute.
      */
     protected static final String ATTR_CHARSET = "charset";
+
+    /**
+     * Source attribute.
+     */
+    protected static final String ATTR_SRC = "src";
 
     /**
      * Document parsed with JSoup.
@@ -408,7 +423,7 @@ public abstract class AbstractHTML5Validator extends AbstractXMLValidator
      */
     public List<String> getChildrenTagNames(Element element)
     {
-        List<String> childrenTagNames = new ArrayList<String>();
+        List<String> childrenTagNames = new ArrayList<>();
         for (Element child : element.getAllElements()) {
             childrenTagNames.add(child.tagName());
         }
@@ -436,7 +451,7 @@ public abstract class AbstractHTML5Validator extends AbstractXMLValidator
      */
     public static List<String> getAttributeNames(Element element)
     {
-        List<String> attributeNames = new ArrayList<String>();
+        List<String> attributeNames = new ArrayList<>();
 
         for (Attribute attribute : element.attributes()) {
             attributeNames.add(attribute.getKey());
@@ -466,7 +481,7 @@ public abstract class AbstractHTML5Validator extends AbstractXMLValidator
      */
     public static List<String> getAttributeValues(Elements elements, String attributeName)
     {
-        List<String> results = new ArrayList<String>();
+        List<String> results = new ArrayList<>();
         for (Element element : elements) {
             results.add(element.attr(attributeName));
         }

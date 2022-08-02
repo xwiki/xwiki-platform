@@ -35,17 +35,21 @@ public class XARAttachmentModel extends XarAttachmentModel
 {
     // Utils
 
-    public static final Map<String, EventParameter> ATTACHMENT_PARAMETERS = new HashMap<String, EventParameter>()
-    {
-        {
-            put(ELEMENT_MIMETYPE, new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_MIMETYPE));
-            put(ELEMENT_CHARSET, new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_CHARSET));
-            put(ELEMENT_REVISION, new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_REVISION));
-            put(ELEMENT_REVISION_AUTHOR, new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_REVISION_AUTHOR));
-            put(ELEMENT_REVISION_DATE,
-                new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_REVISION_DATE, Date.class));
-            put(ELEMENT_REVISION_COMMENT, new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_REVISION_COMMENT));
-            put(ELEMENT_REVISIONS, new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_JRCSREVISIONS));
-        }
-    };
+    public static final Map<String, EventParameter> ATTACHMENT_PARAMETERS = new HashMap<>();
+
+    static {
+        ATTACHMENT_PARAMETERS.put(ELEMENT_MIMETYPE, new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_MIMETYPE));
+        ATTACHMENT_PARAMETERS.put(ELEMENT_CHARSET, new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_CHARSET));
+        ATTACHMENT_PARAMETERS.put(ELEMENT_VERSION, new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_REVISION));
+        ATTACHMENT_PARAMETERS.put(ELEMENT_REVISION_AUTHOR,
+            new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_REVISION_AUTHOR));
+        ATTACHMENT_PARAMETERS.put(ELEMENT_REVISION_DATE,
+            new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_REVISION_DATE, Date.class));
+        ATTACHMENT_PARAMETERS.put(ELEMENT_REVISION_COMMENT,
+            new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_REVISION_COMMENT));
+        ATTACHMENT_PARAMETERS.put(ELEMENT_REVISION_CONTENT_ALIAS,
+            new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_REVISION_CONTENT_ALIAS));
+        ATTACHMENT_PARAMETERS.put(ELEMENT_JRCSVERSIONS,
+            new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_JRCSREVISIONS));
+    }
 }

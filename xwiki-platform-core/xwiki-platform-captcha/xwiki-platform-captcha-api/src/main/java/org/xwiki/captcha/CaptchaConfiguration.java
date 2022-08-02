@@ -20,7 +20,6 @@
 package org.xwiki.captcha;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Configuration of the CAPTCHA module.
@@ -28,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 10.8RC1
  */
-@Unstable
 @Role
 public interface CaptchaConfiguration
 {

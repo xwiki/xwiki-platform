@@ -45,7 +45,7 @@
 
 |=Fonctionnalité|=Syntaxe XWiki 1.0|=Résultat
 |Image d'une pièce jointe à la page courante|(((
-{{info}}Allez à [[Image Macro&gt;&gt;http://code.xwiki.org/xwiki/bin/view/Macros/ImageMacro]] pour savoir plus.{{/info}}
+{{info}}Allez à [[Image Macro&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Image%20Macro%20%28Radeox%29]] pour savoir plus.{{/info}}
 {{{{image:img.png}}}}
 )))|[[image:XWiki.XWikiSyntaxImages@img.png]]
 |Image d'une pièce jointe à un autre document|{{{{image:img.png|
@@ -74,6 +74,5 @@ width="25" height="25"]]}}}|[[image:XWiki.XWikiSyntaxImages@img.png||height="25"
 |Image avec des paramètres|{{{[[image:img.png||
 width="25" height="25"]]}}}|[[image:XWiki.XWikiSyntaxImages@img.png||height="25" width="25"]]
 |Images localisées dans un URL|{{{image:http://some/url/img.png}}}|[[image:XWiki.XWikiSyntaxImages@img.png]]
-|Icons|{{{image:icon:accept}}}|image:icon:accept
-</content>
+|Icônes|{{{image:icon:accept}}}|image:icon:accept</content>
 </xwikidoc>

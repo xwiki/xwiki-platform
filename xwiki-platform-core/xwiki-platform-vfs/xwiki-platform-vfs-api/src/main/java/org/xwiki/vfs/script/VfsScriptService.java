@@ -58,4 +58,22 @@ public class VfsScriptService implements ScriptService
             return null;
         }
     }
+
+    /**
+     * Generate a relative VFS URL to access a resource inside an archive.
+     *
+     * @param reference the reference to a file inside a an archive. For example
+     *            {@code attach:space.page@my.zip/path/to/file}.
+     * @param contentType the Content-Type to return with the response
+     * @return a relative URL that can be used to access the content of a file inside an archive (ZIP, EAR, TAR.GZ, etc)
+     *         or null if the URL couldn't be constructed
+     * @since 12.3RC1
+     */
+    public String url(VfsResourceReference reference, String contentType)
+    {
+        VfsResourceReference finalReference = new VfsResourceReference(reference);
+        finalReference.setContentType(contentType);
+
+        return url(finalReference);
+    }
 }

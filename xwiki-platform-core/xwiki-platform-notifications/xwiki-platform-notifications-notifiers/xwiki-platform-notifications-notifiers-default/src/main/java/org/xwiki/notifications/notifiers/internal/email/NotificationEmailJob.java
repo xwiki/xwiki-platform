@@ -29,8 +29,8 @@ import org.quartz.JobExecutionException;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationConfiguration;
-import org.xwiki.notifications.notifiers.email.NotificationEmailInterval;
 import org.xwiki.notifications.notifiers.internal.ModelBridge;
+import org.xwiki.notifications.preferences.NotificationEmailInterval;
 
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseObjectReference;

@@ -32,6 +32,9 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
+/**
+ * @version $Id$
+ */
 public class BaseObjectsResource extends XWikiResource
 {
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver =

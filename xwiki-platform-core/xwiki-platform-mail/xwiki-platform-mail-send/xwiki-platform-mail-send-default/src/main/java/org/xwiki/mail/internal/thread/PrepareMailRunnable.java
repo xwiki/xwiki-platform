@@ -175,7 +175,7 @@ public class PrepareMailRunnable extends AbstractMailRunnable
         } catch (Exception e) {
             // An error occurred, notify the user if a listener has been provided
             if (listener != null) {
-                listener.onPrepareMessageError(message, e, Collections.<String, Object>emptyMap());
+                listener.onPrepareMessageError(message, e, Collections.emptyMap());
             }
             return;
         }

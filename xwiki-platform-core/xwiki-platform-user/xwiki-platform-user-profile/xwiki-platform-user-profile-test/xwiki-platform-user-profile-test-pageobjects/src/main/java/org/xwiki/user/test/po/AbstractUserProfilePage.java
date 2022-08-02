@@ -19,8 +19,13 @@
  */
 package org.xwiki.user.test.po;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -47,6 +52,19 @@ public class AbstractUserProfilePage extends ViewPage
     public String getUsername()
     {
         return this.username;
+    }
+
+    /**
+     * Retrieve the list of menu categories available. Note that if a category is not displayed in the menu, then it
+     * cannot be displayed at all.
+     * @return the list of menu items available.
+     * @since 13.2RC1
+     */
+    @Unstable
+    public List<String> getAvailableCategories()
+    {
+        return getDriver().findElementsWithoutWaiting(By.className("category-tab"))
+            .stream().map(WebElement::getText).collect(Collectors.toList());
     }
 
     public ProfileUserProfilePage switchToProfile()

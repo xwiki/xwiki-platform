@@ -36,7 +36,7 @@ public class GlobalRightsAdministrationSectionPage extends AdministrationSection
     private WebElement captchaCheckBox;
 
     @FindBy(id = "authenticate_view")
-    WebElement forceAuthenticatedViewLink;
+    private WebElement forceAuthenticatedViewLink;
 
     private EditRightsPane editRightsPane = new EditRightsPane();
 

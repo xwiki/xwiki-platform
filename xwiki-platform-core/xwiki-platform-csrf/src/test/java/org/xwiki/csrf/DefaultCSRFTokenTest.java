@@ -19,7 +19,6 @@
  */
 package org.xwiki.csrf;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.regex.Matcher;
@@ -30,20 +29,33 @@ import java.security.SecureRandom;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.junit.Assert;
-
-import org.jmock.Expectations;
-import org.junit.Before;
-import org.junit.Test;
-import org.slf4j.Logger;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.csrf.internal.DefaultCSRFToken;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
-import static org.hamcrest.Matchers.*;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for the {@link DefaultCSRFToken} component.
@@ -51,8 +63,8 @@ import static org.hamcrest.Matchers.*;
  * @version $Id$
  * @since 2.5M2
  */
-@MockingRequirement(DefaultCSRFTokenTest.InsecureCSRFToken.class)
-public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
+@ComponentTest
+public class DefaultCSRFTokenTest
 {
     /** URL of the current document. */
     private static final String mockDocumentUrl = "http://host/xwiki/bin/save/Main/Test";
@@ -61,7 +73,14 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
     private static final String resubmitUrl = mockDocumentUrl;
 
     /** Tested CSRF token component. */
-    private CSRFToken csrf;
+    @InjectMockComponents
+    private DefaultCSRFToken csrf;
+
+    @MockComponent
+    private DocumentAccessBridge mockDocumentAccessBridge;
+
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     /**
      * This class is here because it doesn't require a SecureRandom generator
@@ -85,79 +104,33 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
         }
     }
 
-    @Before
-    public void configure() throws Exception
+    @BeforeEach
+    public void configure(MockitoComponentManager componentManager) throws Exception
     {
         // set up mocked dependencies
-
-        // document access bridge
-        final DocumentAccessBridge mockDocumentAccessBridge =
-            getComponentManager().getInstance(DocumentAccessBridge.class);
         final CopyStringMatcher returnValue = new CopyStringMatcher(resubmitUrl + "?", "");
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockDocumentAccessBridge).getDocumentURL(with(aNonNull(DocumentReference.class)),
-                    with("view"), with(returnValue), with(aNull(String.class)));
-                will(returnValue);
-                allowing(mockDocumentAccessBridge).getDocumentURL(with(aNull(DocumentReference.class)), with("view"),
-                    with(aNull(String.class)), with(aNull(String.class)));
-                will(returnValue(mockDocumentUrl));
-                allowing(mockDocumentAccessBridge).getCurrentDocumentReference();
-                will(returnValue(null));
-            }
-        });
-        // configuration
-        final CSRFTokenConfiguration mockConfiguration =
-            getComponentManager().getInstance(CSRFTokenConfiguration.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockConfiguration).isEnabled();
-                will(returnValue(true));
-            }
-        });
-        // request
-        final HttpSession mockSession = getMockery().mock(HttpSession.class);
-        final HttpServletRequest httpRequest = getMockery().mock(HttpServletRequest.class);
-        final ServletRequest servletRequest = new ServletRequest(httpRequest);
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(httpRequest).getRequestURL();
-                will(returnValue(new StringBuffer(mockDocumentUrl)));
-                allowing(httpRequest).getRequestURI();
-                will(returnValue(mockDocumentUrl));
-                allowing(httpRequest).getParameterMap();
-                will(returnValue(new HashMap<String, String[]>()));
-                allowing(httpRequest).getSession();
-                will(returnValue(mockSession));
-            }
-        });
-        // session
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockSession).getAttribute(with(any(String.class)));
-                will(returnValue(new HashMap<String, Object>()));
-            }
-        });
-        // container
-        final Container mockContainer = getComponentManager().getInstance(Container.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockContainer).getRequest();
-                will(returnValue(servletRequest));
-            }
-        });
-        // logging
-        getMockery().checking(new Expectations() {{
-            // Ignore all calls to debug()
-            ignoring(any(Logger.class)).method("debug");
-        }});
+        when(mockDocumentAccessBridge.getDocumentURL(any(DocumentReference.class), eq("view"), argThat(returnValue),
+            anyString())).thenAnswer(returnValue);
+        when(mockDocumentAccessBridge.getDocumentURL(isNull(), eq("view"), isNull(), isNull()))
+            .thenReturn(mockDocumentUrl);
 
-        this.csrf = getComponentManager().getInstance(CSRFToken.class);
+        // configuration
+        final CSRFTokenConfiguration mockConfiguration = componentManager.getInstance(CSRFTokenConfiguration.class);
+        when(mockConfiguration.isEnabled()).thenReturn(true);
+
+        // request
+        final HttpSession mockSession = mock(HttpSession.class);
+        final HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+        final ServletRequest servletRequest = new ServletRequest(httpRequest);
+
+        when(httpRequest.getRequestURL()).thenReturn(new StringBuffer(mockDocumentUrl));
+        when(httpRequest.getRequestURI()).thenReturn(mockDocumentUrl);
+        when(httpRequest.getParameterMap()).thenReturn(new HashMap<>());
+        when(httpRequest.getSession()).thenReturn(mockSession);
+        when(mockSession.getAttribute(anyString())).thenReturn(new HashMap<>());
+        // container
+        final Container mockContainer = componentManager.getInstance(Container.class);
+        when(mockContainer.getRequest()).thenReturn(servletRequest);
     }
 
     /**
@@ -167,15 +140,8 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
     private void userIsLogged() throws Exception
     {
         // document access bridge
-        final DocumentAccessBridge mockDocumentAccessBridge =
-                getComponentManager().getInstance(DocumentAccessBridge.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockDocumentAccessBridge).getCurrentUserReference();
-                will(returnValue(new DocumentReference("mainWiki", "XWiki", "Admin")));
-            }
-        });
+        when(mockDocumentAccessBridge.getCurrentUserReference())
+            .thenReturn(new DocumentReference("mainWiki", "XWiki", "Admin"));
     }
 
     /**
@@ -187,9 +153,9 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
         userIsLogged();
 
         String token = this.csrf.getToken();
-        Assert.assertNotNull("CSRF token is null", token);
-        Assert.assertNotSame("CSRF token is empty string", "", token);
-        Assert.assertTrue("CSRF token is too short: \"" + token + "\"", token.length() > 20);
+        assertNotNull(token, "CSRF token is null");
+        assertNotSame("", token, "CSRF token is empty string");
+        assertTrue(token.length() > 20, "CSRF token is too short: \"" + token + "\"");
     }
 
     /**
@@ -198,20 +164,10 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
     @Test
     public void testTokenForGuestUser() throws Exception
     {
-        // document access bridge
-        final DocumentAccessBridge mockDocumentAccessBridge =
-                getComponentManager().getInstance(DocumentAccessBridge.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockDocumentAccessBridge).getCurrentUserReference();
-                will(returnValue(null));
-            }
-        });
         String token = this.csrf.getToken();
-        Assert.assertNotNull("CSRF token is null", token);
-        Assert.assertNotSame("CSRF token is empty string", "", token);
-        Assert.assertTrue("CSRF token is too short: \"" + token + "\"", token.length() > 20);
+        assertNotNull(token, "CSRF token is null");
+        assertNotSame("", token, "CSRF token is empty string");
+        assertTrue(token.length() > 20, "CSRF token is too short: \"" + token + "\"");
     }
 
     /**
@@ -224,9 +180,9 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
 
         String token1 = this.csrf.getToken();
         String token2 = this.csrf.getToken();
-        Assert.assertNotNull("CSRF token is null", token1);
-        Assert.assertNotSame("CSRF token is empty string", "", token1);
-        Assert.assertEquals("Subsequent calls returned different tokens", token1, token2);
+        assertNotNull(token1, "CSRF token is null");
+        assertNotSame("", token1, "CSRF token is empty string");
+        assertEquals(token1, token2, "Subsequent calls returned different tokens");
     }
 
     /**
@@ -238,7 +194,7 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
         userIsLogged();
 
         String token = this.csrf.getToken();
-        Assert.assertTrue("Valid token did not pass the check", this.csrf.isTokenValid(token));
+        assertTrue(this.csrf.isTokenValid(token), "Valid token did not pass the check");
     }
 
     /**
@@ -248,16 +204,9 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
     public void testNullNotValid() throws Exception
     {
         userIsLogged();
-
-        // Verify that the correct message is logged
-        final Logger logger = getMockLogger();
-
-        getMockery().checking(new Expectations() {{
-            oneOf(logger).warn(with(startsWith("CSRFToken: Secret token verification failed, token: \"null\", stored "
-                + "token:")));
-        }});
-
-        Assert.assertFalse("Null passed validity check", this.csrf.isTokenValid(null));
+        assertFalse(this.csrf.isTokenValid(null), "Null passed validity check");
+        assertTrue(logCapture.getMessage(0).startsWith("CSRFToken: Secret token verification failed, token: "
+            + "\"null\", stored token:"));
     }
 
     /**
@@ -267,16 +216,9 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
     public void testEmptyNotValid() throws Exception
     {
         userIsLogged();
-
-        // Verify that the correct message is logged
-        final Logger logger = getMockLogger();
-
-        getMockery().checking(new Expectations() {{
-            oneOf(logger).warn(with(startsWith("CSRFToken: Secret token verification failed, token: \"\", stored "
-                + "token:")));
-        }});
-
-        Assert.assertFalse("Empty string passed validity check", this.csrf.isTokenValid(""));
+        assertFalse(this.csrf.isTokenValid(""), "Empty string passed validity check");
+        assertTrue(logCapture.getMessage(0).startsWith("CSRFToken: Secret token verification failed, token: "
+            + "\"\", stored token:"));
     }
 
     /**
@@ -287,18 +229,12 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
     {
         userIsLogged();
 
-        // Verify that the correct message is logged
-        final Logger logger = getMockLogger();
-
-        getMockery().checking(new Expectations() {{
-            oneOf(logger).warn(with(startsWith("CSRFToken: Secret token verification failed, token:")));
-        }});
-
         String token = this.csrf.getToken();
         if (token != null) {
             token = token.substring(0, token.length() - 2);
         }
-        Assert.assertFalse("Null passed validity check", this.csrf.isTokenValid(token));
+        assertFalse(this.csrf.isTokenValid(token), "Null passed validity check");
+        assertTrue(logCapture.getMessage(0).startsWith("CSRFToken: Secret token verification failed, token: "));
     }
 
     /**
@@ -310,17 +246,29 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
         userIsLogged();
 
         String url = this.csrf.getResubmissionURL();
-        try {
-            // srid is random, extract it from the url
-            Matcher matcher = Pattern.compile(".*srid%3D([a-zA-Z0-9]+).*").matcher(url);
-            String srid = matcher.matches() ? matcher.group(1) : "asdf";
-            String resubmit = URLEncoder.encode(mockDocumentUrl + "?srid=" + srid, "utf-8");
-            String back = URLEncoder.encode(mockDocumentUrl, "utf-8");
-            String expected = resubmitUrl + "?resubmit=" + resubmit + "&xback=" + back + "&xpage=resubmit";
-            Assert.assertEquals("Invalid resubmission URL", expected, url);
-        } catch (UnsupportedEncodingException exception) {
-            Assert.fail("Should not happen: " + exception.getMessage());
-        }
+        // srid is random, extract it from the url
+        Matcher matcher = Pattern.compile(".*srid%3D([a-zA-Z0-9]+).*").matcher(url);
+        String srid = matcher.matches() ? matcher.group(1) : "asdf";
+        String resubmit = URLEncoder.encode(mockDocumentUrl + "?srid=" + srid, "utf-8");
+        String back = URLEncoder.encode(mockDocumentUrl, "utf-8");
+        String expected = resubmitUrl + "?resubmit=" + resubmit + "&xback=" + back + "&xpage=resubmit";
+        assertEquals(expected, url, "Invalid resubmission URL");
+    }
+
+    /**
+     * Test that the request URI is correct.
+     */
+    @Test
+    public void testRequestURI() throws Exception
+    {
+        userIsLogged();
+
+        String requestURI = this.csrf.getRequestURI();
+        // srid is random, extract it from the url
+        Matcher matcher = Pattern.compile(".*srid=([a-zA-Z0-9]+)$").matcher(requestURI);
+        String srid = matcher.matches() ? matcher.group(1) : "asdf";
+        String resubmit = mockDocumentUrl + "?srid=" + srid;
+        assertEquals(resubmit, requestURI, "Invalid request URI URL");
     }
 
     /**
@@ -338,8 +286,8 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
         for (int i = 0; i < 30; ++i) {
             this.csrf.clearToken();
             String token = this.csrf.getToken();
-            Assert.assertFalse("The token \"" + token + "\" contains a character that might break the layout",
-                token.matches(".*[&?*_/#^,.({\\[\\]})~!=+-].*"));
+            assertFalse(token.matches(".*[&?*_/#^,.({\\[\\]})~!=+-].*"),
+                "The token \"" + token + "\" contains a character that might break the layout");
         }
     }
 }

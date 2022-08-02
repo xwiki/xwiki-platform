@@ -19,17 +19,16 @@
  */
 package com.xpn.xwiki.internal;
 
-import java.util.Collections;
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
+import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.EventListener;
-import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.web.Utils;
@@ -45,7 +44,7 @@ import com.xpn.xwiki.web.Utils;
 @Component
 @Singleton
 @Named("componentManagerBridge")
-public class ComponentManagerBridgeEventListener implements EventListener
+public class ComponentManagerBridgeEventListener extends AbstractEventListener implements EventListener, Initializable
 {
     /**
      * Provided to {@link Utils#setComponentManager(ComponentManager)}.
@@ -53,21 +52,24 @@ public class ComponentManagerBridgeEventListener implements EventListener
     @Inject
     private ComponentManager componentManager;
 
-    @Override
-    public List<Event> getEvents()
+    /**
+     * The default constructor.
+     */
+    public ComponentManagerBridgeEventListener()
     {
-        return Collections.singletonList((Event) new ApplicationStartedEvent());
+        super("Component Manager Bridge Listener");
     }
 
     @Override
-    public String getName()
+    public void initialize() throws InitializationException
     {
-        return "Component Manager Bridge Listener";
+        // Inject the component manager as soon as possible
+        Utils.setComponentManager(this.componentManager);
     }
 
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        Utils.setComponentManager(this.componentManager);
+        // The work is done in the listener initialization
     }
 }

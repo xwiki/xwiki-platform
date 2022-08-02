@@ -25,23 +25,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
 import javax.mail.MessagingException;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.mail.MimeBodyPartFactory;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -53,45 +54,49 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.1RC1
  */
+@ComponentTest
 public class TemplateMimeBodyPartFactoryTest
 {
     private DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
 
-    @Rule
-    public MockitoComponentMockingRule<TemplateMimeBodyPartFactory> mocker =
-        new MockitoComponentMockingRule<>(TemplateMimeBodyPartFactory.class);
+    @InjectMockComponents
+    private TemplateMimeBodyPartFactory templateMimeBodyPartFactory;
 
-    @Before
-    public void setUp() throws Exception
+    @MockComponent
+    private MailTemplateManager templateManager;
+
+    @MockComponent
+    @Named("text/html")
+    private MimeBodyPartFactory<String> htmlMimeBodyPartFactory;
+
+    @MockComponent
+    private DocumentAccessBridge dab;
+
+    @MockComponent
+    private AttachmentConverter attachmentConverter;
+
+    @BeforeEach
+    void setUp() throws Exception
     {
-        MailTemplateManager mailTemplateManager = this.mocker.getInstance(MailTemplateManager.class);
-        when(mailTemplateManager.evaluate(this.documentReference, "text", new HashMap<String, Object>(), null))
-            .thenReturn(
-                "Hello John Doe, john@doe.com");
-        when(mailTemplateManager.evaluate(this.documentReference, "html", new HashMap<String, Object>(), null))
-            .thenReturn(
-                "Hello <b>John Doe</b> <br />john@doe.com");
+        when(this.templateManager.evaluate(this.documentReference, "text", new HashMap<>(), null))
+            .thenReturn("Hello John Doe, john@doe.com");
+        when(this.templateManager.evaluate(this.documentReference, "html", new HashMap<>(), null))
+            .thenReturn("Hello <b>John Doe</b> <br />john@doe.com");
     }
 
     @Test
-    public void createWithoutAttachment() throws Exception
+    void createWithoutAttachment() throws Exception
     {
-        MimeBodyPartFactory<String> htmlMimeBodyPartFactory = this.mocker.getInstance(
-            new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class), "text/html");
+        this.templateMimeBodyPartFactory.create(this.documentReference,
+            Collections.singletonMap("velocityVariables", new HashMap<String, String>()));
 
-        this.mocker.getComponentUnderTest().create(this.documentReference,
-            Collections.<String, Object>singletonMap("velocityVariables", new HashMap<String, String>()));
-
-        verify(htmlMimeBodyPartFactory).create("Hello <b>John Doe</b> <br />john@doe.com",
-            Collections.<String, Object>singletonMap("alternate", "Hello John Doe, john@doe.com"));
+        verify(this.htmlMimeBodyPartFactory).create("Hello <b>John Doe</b> <br />john@doe.com",
+            Collections.singletonMap("alternate", "Hello John Doe, john@doe.com"));
     }
 
     @Test
-    public void createWithAttachment() throws Exception
+    void createWithAttachment() throws Exception
     {
-        MimeBodyPartFactory<String> htmlMimeBodyPartFactory = this.mocker.getInstance(
-            new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class), "text/html");
-
         Attachment attachment = mock(Attachment.class);
         List<Attachment> attachments = Collections.singletonList(attachment);
 
@@ -99,21 +104,18 @@ public class TemplateMimeBodyPartFactoryTest
         bodyPartParameters.put("velocityVariables", new HashMap<String, String>());
         bodyPartParameters.put("attachments", attachments);
 
-        this.mocker.getComponentUnderTest().create(this.documentReference, bodyPartParameters);
+        this.templateMimeBodyPartFactory.create(this.documentReference, bodyPartParameters);
 
         Map<String, Object> htmlParameters = new HashMap<>();
         htmlParameters.put("alternate", "Hello John Doe, john@doe.com");
         htmlParameters.put("attachments", attachments);
 
-        verify(htmlMimeBodyPartFactory).create("Hello <b>John Doe</b> <br />john@doe.com", htmlParameters);
+        verify(this.htmlMimeBodyPartFactory).create("Hello <b>John Doe</b> <br />john@doe.com", htmlParameters);
     }
 
     @Test
-    public void createWithAttachmentAndTemplateAttachments() throws Exception
+    void createWithAttachmentAndTemplateAttachments() throws Exception
     {
-        MimeBodyPartFactory<String> htmlMimeBodyPartFactory = this.mocker.getInstance(
-            new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class), "text/html");
-
         Attachment attachment1 = mock(Attachment.class, "attachment1");
         Map<String, Object> bodyPartParameters = new HashMap<>();
         bodyPartParameters.put("velocityVariables", new HashMap<String, String>());
@@ -121,31 +123,26 @@ public class TemplateMimeBodyPartFactoryTest
         bodyPartParameters.put("includeTemplateAttachments", true);
 
         // Mock the retrieval and conversion of attachments from the Template document
-        DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
         XWikiDocument xwikiDocument = mock(XWikiDocument.class);
-        when(dab.getDocumentInstance(this.documentReference)).thenReturn(xwikiDocument);
+        when(this.dab.getDocumentInstance(this.documentReference)).thenReturn(xwikiDocument);
         XWikiAttachment xwikiAttachment = mock(XWikiAttachment.class);
         when(xwikiDocument.getAttachmentList()).thenReturn(Collections.singletonList(xwikiAttachment));
-        AttachmentConverter attachmentConverter = this.mocker.getInstance(AttachmentConverter.class);
         Attachment attachment2 = mock(Attachment.class, "attachment2");
-        when(attachmentConverter.convert(Collections.singletonList(xwikiAttachment))).thenReturn(
+        when(this.attachmentConverter.convert(Collections.singletonList(xwikiAttachment))).thenReturn(
             Collections.singletonList(attachment2));
 
-        this.mocker.getComponentUnderTest().create(this.documentReference, bodyPartParameters);
+        this.templateMimeBodyPartFactory.create(this.documentReference, bodyPartParameters);
 
         Map<String, Object> htmlParameters = new HashMap<>();
         htmlParameters.put("alternate", "Hello John Doe, john@doe.com");
         htmlParameters.put("attachments", Arrays.asList(attachment1, attachment2));
 
-        verify(htmlMimeBodyPartFactory).create("Hello <b>John Doe</b> <br />john@doe.com", htmlParameters);
+        verify(this.htmlMimeBodyPartFactory).create("Hello <b>John Doe</b> <br />john@doe.com", htmlParameters);
     }
 
     @Test
-    public void createWithAttachmentAndTemplateAttachmentsWhenError() throws Exception
+    void createWithAttachmentAndTemplateAttachmentsWhenError() throws Exception
     {
-        MimeBodyPartFactory<String> htmlMimeBodyPartFactory = this.mocker.getInstance(
-            new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class), "text/html");
-
         Attachment attachment1 = mock(Attachment.class, "attachment1");
         Map<String, Object> bodyPartParameters = new HashMap<>();
         bodyPartParameters.put("velocityVariables", new HashMap<String, String>());
@@ -153,17 +150,13 @@ public class TemplateMimeBodyPartFactoryTest
         bodyPartParameters.put("includeTemplateAttachments", true);
 
         // Mock the retrieval and conversion of attachments from the Template document
-        DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
-        when(dab.getDocumentInstance(this.documentReference)).thenThrow(new Exception("error"));
+        when(this.dab.getDocumentInstance(this.documentReference)).thenThrow(new Exception("error"));
 
-        try {
-            this.mocker.getComponentUnderTest().create(this.documentReference, bodyPartParameters);
-            fail("Should have thrown an exception here");
-        } catch (MessagingException expected) {
-            assertEquals("Failed to include attachments from the Mail Template [wiki:space.page]",
-                expected.getMessage());
-        }
+        Throwable exception = assertThrows(MessagingException.class, () -> {
+            this.templateMimeBodyPartFactory.create(this.documentReference, bodyPartParameters);
+        });
+        assertEquals("Failed to include attachments from the Mail Template [wiki:space.page]", exception.getMessage());
 
-        verifyNoMoreInteractions(htmlMimeBodyPartFactory);
+        verifyNoMoreInteractions(this.htmlMimeBodyPartFactory);
     }
 }

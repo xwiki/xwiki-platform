@@ -20,6 +20,7 @@
 package org.xwiki.rendering.macro.formula;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.formula.FormulaRenderer;
 
 /**
  * Configuration properties for the {@link org.xwiki.rendering.internal.macro.formula.FormulaMacro formula macro}.
@@ -50,4 +51,26 @@ public interface FormulaMacroConfiguration
      * @return the hint of the "safe" renderer
      */
     String getSafeRenderer();
+
+    /**
+     * The default image type to use when rendering formulas.
+     *
+     * @return the image type
+     * @since 13.10RC1
+     */
+    default FormulaRenderer.Type getDefaultType()
+    {
+        return FormulaRenderer.Type.DEFAULT;
+    }
+
+    /**
+     * The default font size to be used when rendering formulas.
+     *
+     * @return the font size
+     * @since 14.3RC1
+     */
+    default FormulaRenderer.FontSize getDefaultFontSize()
+    {
+        return FormulaRenderer.FontSize.DEFAULT;
+    }
 }

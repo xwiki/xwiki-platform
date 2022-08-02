@@ -1,0 +1,60 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+############################################################################
+## Render current document content with some possible
+## URL parameters:
+## * outputSyntax: the syntax name to use to render the XDOM,
+##                 if not provided use xhtml/1.0
+## * outputVersion: the syntax version to use to render the XDOM
+##                  if not provided use the last version of the outputSyntax
+## * outputTitle: if true then also output the title
+## 
+############################################################################
+#if ($request.outputTitle == 'true')
+  $services.progress.pushLevel(3)
+#else
+  $services.progress.pushLevel(1)
+#end
+$services.progress.startStep('Compute the content to display')
+## Make sure we don't escape the content since we want HTML to be rendered
+#set ($noEscapeContent = true)
+#template("contentvars.vm")
+$services.progress.endStep()
+#if ($request.outputTitle == 'true')
+  $services.progress.startStep('Compute title to display and modify rendered content accordingly')
+  #template("titlevars.vm")
+  $services.progress.endStep()
+  <div class="xcontent">
+    $xcontext.dropPermissions()
+    <div class="document-info">
+      <div id="document-title"><h1>$titleToDisplay</h1></div>
+    </div>
+    <div id="xwikicontent">
+#end
+#if ("$!exception" != '')
+  $exceptiontool.getStackTrace($exception)
+#else
+  $renderedContent
+#end
+#if ($request.outputTitle == 'true')
+    </div>
+  </div>
+#end
+$services.progress.popLevel()

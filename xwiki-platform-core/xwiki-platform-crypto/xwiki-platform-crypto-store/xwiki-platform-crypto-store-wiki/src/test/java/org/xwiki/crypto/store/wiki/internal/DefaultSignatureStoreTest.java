@@ -27,7 +27,6 @@ import org.junit.Test;
 import org.xwiki.crypto.BinaryStringEncoder;
 import org.xwiki.crypto.store.SignatureStore;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.reference.BlockReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;

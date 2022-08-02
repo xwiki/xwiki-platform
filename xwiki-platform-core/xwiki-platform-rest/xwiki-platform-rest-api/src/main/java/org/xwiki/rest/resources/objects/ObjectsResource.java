@@ -20,6 +20,7 @@
 package org.xwiki.rest.resources.objects;
 
 import javax.ws.rs.DefaultValue;
+import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -39,7 +40,7 @@ public interface ObjectsResource
 {
     @GET Objects getObjects(
             @PathParam("wikiName") String wikiName,
-            @PathParam("spaceName") String spaceName,
+            @PathParam("spaceName") @Encoded String spaceName,
             @PathParam("pageName") String pageName,
             @QueryParam("start") @DefaultValue("0") Integer start,
             @QueryParam("number") @DefaultValue("-1") Integer number,
@@ -48,7 +49,7 @@ public interface ObjectsResource
 
     @POST Response addObject(
             @PathParam("wikiName") String wikiName,
-            @PathParam("spaceName") String spaceName,
+            @PathParam("spaceName") @Encoded String spaceName,
             @PathParam("pageName") String pageName,
             @QueryParam("minorRevision") Boolean minorRevision,
             Object object

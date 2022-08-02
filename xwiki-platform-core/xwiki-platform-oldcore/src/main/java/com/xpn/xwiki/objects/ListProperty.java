@@ -23,19 +23,20 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.dom4j.Element;
-import org.dom4j.dom.DOMElement;
-import org.hibernate.collection.PersistentCollection;
-import org.xwiki.xar.internal.property.ListXarObjectPropertySerializer;
+import org.hibernate.collection.internal.PersistentList;
+import org.hibernate.collection.spi.PersistentCollection;
+import org.xwiki.store.merge.MergeManagerResult;
 
+import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.internal.AbstractNotifyOnUpdateList;
-import com.xpn.xwiki.internal.merge.MergeUtils;
 import com.xpn.xwiki.internal.objects.ListPropertyPersistentList;
 import com.xpn.xwiki.objects.classes.ListClass;
 
 public class ListProperty extends BaseProperty implements Cloneable
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * We make this a notifying list, because we must propagate any value updates to the owner document.
      */
@@ -204,17 +205,17 @@ public class ListProperty extends BaseProperty implements Cloneable
             return;
         }
 
-        if (this.list instanceof ListPropertyPersistentList) {
-            ListPropertyPersistentList persistentList = (ListPropertyPersistentList) this.list;
+        if (this.list instanceof PersistentList) {
+            PersistentList persistentList = (PersistentList) this.list;
             if (persistentList.isWrapper(list)) {
                 // Accept a caller that sets the already existing list instance.
                 return;
             }
         }
 
-        if (list instanceof ListPropertyPersistentList) {
+        if (list instanceof PersistentList) {
             // This is the list wrapper we are using for hibernate.
-            ListPropertyPersistentList persistentList = (ListPropertyPersistentList) list;
+            PersistentList persistentList = (PersistentList) list;
             this.list = persistentList;
             persistentList.setOwner(this);
             return;
@@ -222,7 +223,7 @@ public class ListProperty extends BaseProperty implements Cloneable
 
         if (list == null) {
             setValueDirty(true);
-            this.actualList = new ArrayList();
+            this.actualList = new ArrayList<>();
             this.list = new NotifyList(this.actualList, this);
         } else {
             this.list.clear();
@@ -259,7 +260,15 @@ public class ListProperty extends BaseProperty implements Cloneable
     @Override
     protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
     {
-        MergeUtils.mergeList((List<String>) previousValue, (List<String>) newValue, this.list, mergeResult);
+        MergeManagerResult<List<String>, String> listStringMergeManagerResult = getMergeManager()
+            .mergeList((List<String>) previousValue, (List<String>) newValue, this.list, new MergeConfiguration());
+        mergeResult.getLog().addAll(listStringMergeManagerResult.getLog());
+        mergeResult.setModified(mergeResult.isModified() || listStringMergeManagerResult.isModified());
+
+        if (listStringMergeManagerResult.isModified()) {
+            this.list.clear();
+            this.list.addAll(listStringMergeManagerResult.getMergeResult());
+        }
     }
 
     /**
@@ -303,11 +312,13 @@ public class ListProperty extends BaseProperty implements Cloneable
          */
         public void setOwner(ListProperty owner)
         {
-            if (this.dirty) {
-                owner.setValueDirty(true);
+            if (this.owner != owner) {
+                if (this.dirty) {
+                    owner.setValueDirty(true);
+                }
+                this.owner = owner;
+                owner.actualList = this.actualList;
             }
-            this.owner = owner;
-            owner.actualList = this.actualList;
         }
 
         /**

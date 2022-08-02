@@ -274,6 +274,8 @@ public class FilesystemAttachmentStoreTest extends AbstractFilesystemAttachmentS
 
                             final String output = new String(baos.toByteArray(), "UTF-8");
 
+                            Assert.assertEquals(HELLO.length(), content.getLongSize());
+                            Assert.assertEquals(HELLO.length(), content.getSize());
                             Assert.assertEquals("Not the same attachment content.", HELLO, output);
                             return null;
                         } catch (IOException e) {

@@ -38,6 +38,8 @@ import com.xpn.xwiki.objects.classes.StaticListClass;
 @Singleton
 public class NumberMetaClass extends PropertyMetaClass
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * Default constructor. Initializes the default meta properties of a Number XClass property.
      */

@@ -20,7 +20,6 @@
 package org.xwiki.notifications.filters.internal.status;
 
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 
 /**
  * Special node to filter on events that has been read by the given user.
@@ -28,25 +27,16 @@ import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
  * @version $Id$
  * @since 10.1RC1
  */
-public class InListOfReadEventsNode extends AbstractOperatorNode
+public class InListOfReadEventsNode extends ForUserNode
 {
-    private DocumentReference user;
-
     /**
      * Construct an InListOfReadEventsNode.
+     * 
      * @param user the user
      */
     public InListOfReadEventsNode(DocumentReference user)
     {
-        this.user = user;
-    }
-
-    /**
-     * @return the user
-     */
-    public DocumentReference getUser()
-    {
-        return user;
+        super(user, true);
     }
 
     @Override

@@ -54,13 +54,13 @@ import org.xwiki.rest.model.jaxb.Page;
 @Singleton
 public class FormUrlEncodedPageReader implements MessageBodyReader<Page>, XWikiRestComponent
 {
-    private static String TITLE_FIELD_NAME = "title";
+    private static final String TITLE_FIELD_NAME = "title";
 
-    private static String PARENT_FIELD_NAME = "parent";
+    private static final String PARENT_FIELD_NAME = "parent";
 
-    private static String HIDDEN_FIELD_NAME = "hidden";
+    private static final String HIDDEN_FIELD_NAME = "hidden";
 
-    private static String CONTENT_FIELD_NAME = "content";
+    private static final String CONTENT_FIELD_NAME = "content";
 
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType)

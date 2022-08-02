@@ -21,14 +21,16 @@ package org.xwiki.notifications.sources;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.preferences.NotificationPreference;
+import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * Parameters to fill to retrieve notifications using {@link ParametrizedNotificationManager}.
@@ -59,6 +61,14 @@ public class NotificationParameters
     public Date endDate;
 
     /**
+     * True if the end date should be included.
+     * 
+     * @since 12.6.1
+     * @since 12.7RC1
+     */
+    public boolean endDateIncluded = true;
+
+    /**
      * Don't get notification that have been triggered before the following date.
      */
     public Date fromDate;
@@ -76,15 +86,79 @@ public class NotificationParameters
     /**
      * List of preferences to apply.
      */
-    public Collection<NotificationPreference> preferences = Collections.emptyList();
+    public Collection<NotificationPreference> preferences = new ArrayList<>();
 
     /**
      * List of filter preferences to apply.
      */
-    public Collection<NotificationFilterPreference> filterPreferences = Collections.emptyList();
+    public Collection<NotificationFilterPreference> filterPreferences = new ArrayList<>();
 
     /**
      * List of filters to apply.
      */
-    public Collection<NotificationFilter> filters = Collections.emptyList();
+    public Collection<NotificationFilter> filters = new ArrayList<>();
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        NotificationParameters that = (NotificationParameters) o;
+
+        return new EqualsBuilder()
+            .append(expectedCount, that.expectedCount)
+            .append(user, that.user)
+            .append(format, that.format)
+            .append(endDate, that.endDate)
+            .append(endDateIncluded, that.endDateIncluded)
+            .append(fromDate, that.fromDate)
+            .append(onlyUnread, that.onlyUnread)
+            .append(blackList, that.blackList)
+            .append(preferences, that.preferences)
+            .append(filterPreferences, that.filterPreferences)
+            .append(filters, that.filters)
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37)
+            .append(user)
+            .append(format)
+            .append(expectedCount)
+            .append(endDate)
+            .append(endDateIncluded)
+            .append(fromDate)
+            .append(onlyUnread)
+            .append(blackList)
+            .append(preferences)
+            .append(filterPreferences)
+            .append(filters)
+            .toHashCode();
+    }
+
+    @Override
+    public String toString()
+    {
+        return new XWikiToStringBuilder(this)
+            .append("user", user)
+            .append("format", format)
+            .append("expectedCount", expectedCount)
+            .append("endDate", endDate)
+            .append("endDateIncluded", endDateIncluded)
+            .append("fromDate", fromDate)
+            .append("onlyUnread", onlyUnread)
+            .append("blackList", blackList)
+            .append("preferences", preferences)
+            .append("filterPreferences", filterPreferences)
+            .append("filters", filters)
+            .toString();
+    }
 }

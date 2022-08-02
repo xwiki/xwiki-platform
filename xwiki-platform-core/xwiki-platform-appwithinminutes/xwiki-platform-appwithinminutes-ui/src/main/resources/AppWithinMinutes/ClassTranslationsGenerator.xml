@@ -62,8 +62,13 @@ $escapetool.h Class fields
 #end
 #end
 
-$escapetool.h Live table generic keys
+$escapetool.h Sheet keys
 #set ($appName = $doc.documentReference.name.replaceAll('Class', '').toLowerCase())
+#map("${appName}.sheet.description" "This page controls how $appTitle pages are displayed in both view and edit modes.")
+#map("${appName}.sheet.noObject" "The current page doesn't have the expected $appTitle object.")
+#map("${appName}.sheet.noFields" "The $appTitle application doesn't have any fields to display.")
+
+$escapetool.h Live table generic keys
 #set ($prefix = "${appName}.livetable.")
 #set ($liveTableGenericKeys = {
   'doc.title': 'liveTableEditorDocTitleColumnName',

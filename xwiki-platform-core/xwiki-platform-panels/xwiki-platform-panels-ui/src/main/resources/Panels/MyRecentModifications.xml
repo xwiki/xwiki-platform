@@ -154,7 +154,7 @@
       </type>
     </class>
     <property>
-      <async_cached>0</async_cached>
+      <async_cached>1</async_cached>
     </property>
     <property>
       <async_context>

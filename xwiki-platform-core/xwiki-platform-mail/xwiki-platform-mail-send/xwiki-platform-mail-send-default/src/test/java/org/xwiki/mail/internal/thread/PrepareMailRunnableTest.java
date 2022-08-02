@@ -39,6 +39,7 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailListener;
+import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MailStatusResult;
@@ -46,6 +47,7 @@ import org.xwiki.mail.MailStoreException;
 import org.xwiki.mail.internal.MemoryMailListener;
 import org.xwiki.mail.internal.UpdateableMailStatusResult;
 import org.xwiki.test.AllLogRule;
+import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
@@ -78,6 +80,14 @@ public class PrepareMailRunnableTest
     @Rule
     public MockitoComponentMockingRule<PrepareMailRunnable> mocker = new MockitoComponentMockingRule<>(
         PrepareMailRunnable.class);
+
+    @BeforeComponent
+    public void beforeInitializable() throws Exception
+    {
+        MailSenderConfiguration configuration =
+            this.mocker.registerMockComponent(MailSenderConfiguration.class);
+        when(configuration.getPrepareQueueCapacity()).thenReturn(10);
+    }
 
     @Before
     public void setUp() throws Exception

@@ -1,0 +1,74 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>SkinsCode</web>
+  <name>Translations</name>
+  <language>pl</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>SkinsCode.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>skin.sheet.title=skórka
+skin.sheet.properties=właściwości skórki
+skin.sheet.deprecatedProperties=przestarzałe właściwości
+skin.sheet.overriddenTemplates=Przesłonięte szablony
+skin.sheet.addTemplate=Dodaj nowy nadpisujący szablon
+skin.sheet.add=Dodaj
+skin.sheet.overrideTemplateWarning=W tej sekcji możesz zastąpić szablon skóry. Jest to kwestia techniczna i powinieneś zdawać sobie sprawę z konsekwencji.
+skin.sheet.deprecatedPropertiesWarning=Ta sekcja jest tutaj ze względu na kompatybilność wsteczną. Powinieneś użyć powyższego mechanizmu „przesłonięcia szablonów”.
+skin.sheet.nojs=Bez JavaScript nie możesz korzystać z tej sekcji. Możesz jednak zamiast tego użyć Edytora obiektów {0} i ręcznie dodać obiekty {2}.
+
+skin.sheet.js.deleting=Usuwam ...
+skin.sheet.js.deletingDone=Szablon został usunięty!
+skin.sheet.js.error.csrf=Sprawdzanie poprawności CSRF nie powiodło się podczas zapisywania. Odśwież przeglądarkę, aby spróbować ponownie.
+skin.sheet.js.error.rights=Nie udało się zapisać skórek z powodu niewystarczających uprawnień.
+skin.sheet.js.deleteConfirmationText=Czy na pewno chcesz usunąć ten szablon?
+skin.sheet.js.deleteConfirmationYes=Tak, usuń to
+skin.sheet.js.deleteConfirmationNo=Nie, anuluj
+skin.sheet.js.adding=Dodawanie ...
+skin.sheet.js.addingDone=Szablon został dodany!
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 7.1M1
+#######################################
+### Missing: skin.sheet.overridedTemplates=Overridden templates
+
+## Used to indicate where deprecated keys end
+#@deprecatedend</content>
+</xwikidoc>

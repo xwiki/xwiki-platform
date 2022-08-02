@@ -1,6 +1,13 @@
 org.xwiki.extension.xar.internal.DefaultXarExtensionConfiguration
 org.xwiki.extension.xar.internal.delete.DocumentsDeletingListener
 org.xwiki.extension.xar.internal.doc.XarDocumentRevisionProvider
+org.xwiki.extension.xar.internal.doc.InstalledExtensionDocumentCustomizationDetector
+org.xwiki.extension.xar.internal.doc.InstalledExtensionDocumentListener
+org.xwiki.extension.xar.internal.doc.InstalledExtensionDocumentTree
+org.xwiki.extension.xar.internal.doc.InstalledExtensionDocumentTreeFilter
+org.xwiki.extension.xar.internal.doc.MandatoryDocumentInitializerListener
+org.xwiki.extension.xar.internal.doc.NestedPageCounter
+org.xwiki.extension.xar.internal.doc.PristineInstalledExtensionDocumentTreeFilter
 org.xwiki.extension.xar.internal.handler.XarExtensionHandler
 org.xwiki.extension.xar.internal.handler.WikiEventListener
 org.xwiki.extension.xar.internal.handler.XarExtensionJobFinishedListener

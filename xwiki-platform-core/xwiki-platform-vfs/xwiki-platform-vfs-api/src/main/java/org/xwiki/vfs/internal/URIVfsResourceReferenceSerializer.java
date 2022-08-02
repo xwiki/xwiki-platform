@@ -61,7 +61,7 @@ public class URIVfsResourceReferenceSerializer implements ResourceReferenceSeria
             ResourceReferenceSerializer<VfsResourceReference, URI> serializer =
                 this.componentManagerProvider.get().getInstance(new DefaultParameterizedType(null,
                         ResourceReferenceSerializer.class, VfsResourceReference.class, URI.class),
-                    String.format("truevfs/%s", reference.getURI().getScheme()));
+                    String.format("truevfs/%s", reference.getScheme()));
             resultURI = serializer.serialize(reference);
         } catch (ComponentLookupException e) {
             // No serializer exist, we just don't perform any conversion!

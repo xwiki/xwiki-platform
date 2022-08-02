@@ -276,7 +276,7 @@
   var submitButton = $('#wizard-next').prop('disabled', true);
 
   var errorMessage = appNameInput.closest('dd').prev('dt').find('.xErrorMsg');
-  if (errorMessage.size() == 0) {
+  if (!errorMessage.length) {
     errorMessage = $(document.createElement('span')).addClass('xErrorMsg').hide().appendTo(errorMessage.addBack());
   }
 
@@ -293,7 +293,7 @@
   var updatePreview = function(content) {
     preview.removeClass('loading').html(content);
     var error = preview.find('.xErrorMsg');
-    submitButton.prop('disabled', error.size() &gt; 0);
+    submitButton.prop('disabled', error.length);
     toggleValidationError(error.remove().text());
   };
 
@@ -315,12 +315,17 @@
 
   appNameInput.add(appParentInput)
     .on('input', schedulePreviewUpdate)
-    .keyup(function(event) {
+    .on('keyup', function(event) {
       // Show the error message if the user presses Enter before typing anything.
       if (event.which == 13 &amp;&amp; appNameInput.val() == '' &amp;&amp; !appNameInput.hasClass('xErrorField')) {
         fetchPreviewUpdate();
       }
     });
+  submitButton.closest('form').on('submit', function (event) {
+    if (appNameInput.hasClass('xErrorField')) {
+      event.preventDefault();
+    }
+  });
 });</code>
     </property>
     <property>

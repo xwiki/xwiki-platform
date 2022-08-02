@@ -56,7 +56,7 @@ Parola 1 | Parola 2
 |Parola 1|Parola 2
 )))
 |Tabella con Parametri|(((
-&lt;table style="background-color:red;align:center"&gt;
+&lt;table style="background-color:red;text-align:center"&gt;
 &lt;tbody&gt;
 &lt;tr&gt;
 &lt;td&gt;Titolo 1&lt;/td&gt;
@@ -92,7 +92,7 @@ $xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
 &lt;/table&gt;
 }}}
 
-{{info}}Per caratteristiche avanzate vedere la [[Livetable Macro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Livetable+Macro]].{{/info}}
+{{info}}Per caratteristiche avanzate vedere la [[Livetable Macro&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Livetable+Macro]].{{/info}}
 )))|(((
 {{velocity}}
 $xwiki.ssfx.use("js/xwiki/table/table.css")
@@ -121,7 +121,7 @@ $xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
 |Parola 1|Parola 2
 )))
 |Tabella con Parametri|((({{{
-(% style="background-color:red;align:center" %)
+(% style="background-color:red;text-align:center" %)
 |=Titolo 1|=(% style="background-color:yellow" %)Titolo 2
 |Parola 1|Parola 2
 }}})))|(((
@@ -141,7 +141,7 @@ $xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
 |Cella 21|Cella 22
 }}}
 
-{{info}}Per caratteristiche avanzate vedere la [[Livetable Macro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Livetable+Macro]].{{/info}}
+{{info}}Per caratteristiche avanzate vedere la [[Livetable Macro&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Livetable+Macro]].{{/info}}
 )))|(((
 {{velocity}}
 $xwiki.ssfx.use("js/xwiki/table/table.css")

@@ -23,7 +23,6 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.store.filesystem.internal.migration.FileStringEntityReferenceSerializer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -32,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * 
  * @version $Id$
  */
-public class FileStringEntityReferenceSerializerTest
+class FileStringEntityReferenceSerializerTest
 {
     private FileStringEntityReferenceSerializer serializer = new FileStringEntityReferenceSerializer();
 
@@ -59,13 +58,13 @@ public class FileStringEntityReferenceSerializerTest
     // Tests
 
     @Test
-    public void simple()
+    void simple()
     {
         testAttachment("wiki", "space", "page", "attachment", "wiki/space/page/attachment");
     }
 
     @Test
-    public void forbiddenCharacters()
+    void forbiddenCharacters()
     {
         testAttachment("wi+%<>:\"/\\|?*ki", "Spa+%<>:\"/\\|?*ce", "Pa+%<>:\"/\\|?*ge", "Att+%<>:\"/\\|?*achement",
             "wi%2B%25%3C%3E%3A%22%2F%5C%7C%3F%2Aki/" + "Spa%2B%25%3C%3E%3A%22%2F%5C%7C%3F%2Ace/"
@@ -73,37 +72,37 @@ public class FileStringEntityReferenceSerializerTest
     }
 
     @Test
-    public void dotAtTheBeginning()
+    void dotAtTheBeginning()
     {
         testAttachment(".wiki", ".space", ".page", ".attachment", "%2Ewiki/%2Espace/%2Epage/%2Eattachment");
     }
 
     @Test
-    public void dotAtTheEnd()
+    void dotAtTheEnd()
     {
         testAttachment("wiki.", "space.", "page.", "attachment.", "wiki%2E/space%2E/page%2E/attachment%2E");
     }
 
     @Test
-    public void whiteSpaceAtTheBeginning()
+    void whiteSpaceAtTheBeginning()
     {
         testAttachment(" wiki", " space", " page", " attachment", "+wiki/+space/+page/+attachment");
     }
 
     @Test
-    public void whiteSpaceAtTheEnd()
+    void whiteSpaceAtTheEnd()
     {
         testAttachment("wiki ", "space ", "page ", "attachment ", "wiki+/space+/page+/attachment+");
     }
 
     @Test
-    public void file()
+    void file()
     {
         testAttachment("wiki", "file.ext", "file.ext", "file.ext", "wiki/file.ext/file.ext/file.ext");
     }
 
     @Test
-    public void caseInsensitive()
+    void caseInsensitive()
     {
         testAttachment("wiKi", "Spa.ce", "Pa.ge", "FiLe.ext", "wi%4Bi/%53pa.ce/%50a.ge/%46i%4Ce.ext", true);
     }

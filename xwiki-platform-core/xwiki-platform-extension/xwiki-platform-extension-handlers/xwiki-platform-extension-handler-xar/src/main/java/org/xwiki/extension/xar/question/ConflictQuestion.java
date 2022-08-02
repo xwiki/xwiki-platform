@@ -19,9 +19,17 @@
  */
 package org.xwiki.extension.xar.question;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+import org.xwiki.diff.Conflict;
+import org.xwiki.diff.ConflictDecision;
+import org.xwiki.diff.internal.DefaultConflictDecision;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -149,6 +157,8 @@ public class ConflictQuestion
 
     private final XWikiDocument mergedDocument;
 
+    private List<Conflict<?>> documentConflicts;
+
     // Answer datas
 
     private GlobalAction globalAction;
@@ -156,6 +166,8 @@ public class ConflictQuestion
     private XWikiDocument customDocument;
 
     private boolean always;
+
+    private Map<Conflict<?>, ConflictDecision<?>> conflictDecisions;
 
     /**
      * @deprecated since 9.2RC1, use
@@ -173,6 +185,15 @@ public class ConflictQuestion
     public ConflictQuestion(XWikiDocument currentDocument, XWikiDocument previousDocument, XWikiDocument nextDocument,
         XWikiDocument mergedDocument, ConflictType type)
     {
+        this(currentDocument, previousDocument, nextDocument, mergedDocument, type, null);
+    }
+
+    /**
+     * @since 11.8RC1
+     */
+    public ConflictQuestion(XWikiDocument currentDocument, XWikiDocument previousDocument, XWikiDocument nextDocument,
+        XWikiDocument mergedDocument, ConflictType type, List<Conflict<?>> documentConflicts)
+    {
         this.currentDocument = currentDocument;
         this.previousDocument = previousDocument;
         this.nextDocument = nextDocument;
@@ -188,6 +209,9 @@ public class ConflictQuestion
         } else {
             setGlobalAction(GlobalAction.MERGED);
         }
+
+        this.documentConflicts = documentConflicts;
+        this.conflictDecisions = new HashMap<>();
     }
 
     /**
@@ -217,6 +241,15 @@ public class ConflictQuestion
     public XWikiDocument getMergedDocument()
     {
         return this.mergedDocument;
+    }
+
+    /**
+     * @since 11.8RC1
+     * @return the conflicts occured during the merge of documents.
+     */
+    public List<Conflict<?>> getDocumentConflicts()
+    {
+        return documentConflicts;
     }
 
     // Answer
@@ -266,5 +299,34 @@ public class ConflictQuestion
     public void setAlways(boolean always)
     {
         this.always = always;
+    }
+
+    public void setConflictDecision(String conflictReference, String decisionType, String customValue)
+    {
+        Conflict conflict = this.findConflictFromReference(conflictReference);
+
+        ConflictDecision.DecisionType type = ConflictDecision.DecisionType.valueOf(decisionType.toUpperCase());
+        ConflictDecision decision = new DefaultConflictDecision<>(conflict);
+        decision.setType(type);
+        if (!StringUtils.isEmpty(customValue)) {
+            decision.setCustom(Collections.singletonList(customValue));
+        }
+        this.conflictDecisions.put(conflict, decision);
+    }
+
+    private Conflict findConflictFromReference(String reference)
+    {
+        for (Conflict<?> documentConflict : this.documentConflicts) {
+            if (documentConflict.getReference().equals(reference)) {
+                return documentConflict;
+            }
+        }
+        throw
+            new IllegalArgumentException(String.format("The conflict [%s] cannot be found.", reference));
+    }
+
+    public List<ConflictDecision> getDecisions()
+    {
+        return new ArrayList(this.conflictDecisions.values());
     }
 }

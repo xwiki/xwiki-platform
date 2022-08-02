@@ -19,14 +19,15 @@
  */
 package org.xwiki.officeimporter.script;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.Collections;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.model.reference.AttachmentReference;
@@ -34,36 +35,30 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxType;
-import org.xwiki.script.service.ScriptService;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.XWikiTempDir;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 /**
  * Unit test for {@link org.xwiki.officeimporter.script.OfficeImporterScriptService}.
  * 
  * @version $Id$
  */
+@ComponentTest
 public class OfficeImporterScriptServiceTest
 {
     /**
      * A component manager that automatically mocks all dependencies of the component under test.
      */
-    @Rule
-    public MockitoComponentMockingRule<ScriptService> mocker = new MockitoComponentMockingRule<ScriptService>(
-        OfficeImporterScriptService.class, ScriptService.class, "officeimporter");
-
-    /**
-     * The component being tested.
-     */
+    @InjectMockComponents
     private OfficeImporterScriptService officeImporterScriptService;
 
+    @MockComponent
     private DocumentAccessBridge documentAccessBridge;
 
-    @Before
-    public void setUp() throws Exception
-    {
-        officeImporterScriptService = (OfficeImporterScriptService) mocker.getComponentUnderTest();
-        documentAccessBridge = mocker.getInstance(DocumentAccessBridge.class);
-    }
+    @XWikiTempDir
+    private File tempDir;
 
     @Test
     public void saveWithOverwrite() throws Exception
@@ -76,10 +71,14 @@ public class OfficeImporterScriptServiceTest
         String content = "Office Document Content";
         String fileName = "logo.png";
         byte[] fileContent = new byte[] {65, 82};
+        File artifact = new File(tempDir, fileName);
+        try (FileOutputStream fos = new FileOutputStream(artifact)) {
+            IOUtils.write(fileContent, fos);
+        }
 
         when(documentAccessBridge.isDocumentEditable(documentReference)).thenReturn(true);
         when(doc.getContentAsString(syntaxId)).thenReturn(content);
-        when(doc.getArtifacts()).thenReturn(Collections.singletonMap(fileName, fileContent));
+        when(doc.getArtifactsFiles()).thenReturn(Collections.singleton(artifact));
 
         assertTrue(officeImporterScriptService.save(doc, documentReference, syntaxId, parentReference, title, false));
 

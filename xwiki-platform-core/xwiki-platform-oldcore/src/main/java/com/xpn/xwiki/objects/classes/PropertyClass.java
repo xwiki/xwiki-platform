@@ -35,7 +35,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.security.authorization.AuthorExecutor;
-import org.xwiki.stability.Unstable;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
 
@@ -62,6 +61,8 @@ import com.xpn.xwiki.web.Utils;
 public class PropertyClass extends BaseCollection<ClassPropertyReference>
     implements PropertyClassInterface, Comparable<PropertyClass>
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * Logging helper object.
      */
@@ -141,12 +142,19 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
         this.xclass = (BaseClass) object;
     }
 
+    /**
+     * Computes the field full name using this format: {@code parentName_fieldName}. There are 2 main cases:
+     * <ul>
+     * <li>this is a class property: the prefix is the class reference (e.g. XWiki.TagClass_tags)</li>
+     * <li>this is a meta property: the prefix is the property type (e.g. TextArea_editor)</li>
+     * </ul>
+     * 
+     * @return the field full name
+     */
     public String getFieldFullName()
     {
-        if (getObject() == null) {
-            return getName();
-        }
-        return getObject().getName() + "_" + getName();
+        String prefix = getObject() != null ? getObject().getName() : getClassName();
+        return prefix + "_" + getName();
     }
 
     @Override
@@ -360,7 +368,6 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
      * 
      * @since 10.11RC1
      */
-    @Unstable
     protected String renderContentInContext(final String content, final String syntax,
         DocumentReference authorReference, DocumentReference secureDocument, final XWikiContext context)
         throws Exception
@@ -643,8 +650,12 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     public BaseProperty fromValue(Object value)
     {
         BaseProperty property = newProperty();
-        property.setValue(value);
-        return property;
+        if (property != null) {
+            property.setValue(value);
+            return property;
+        }
+
+        return null;
     }
 
     @Override

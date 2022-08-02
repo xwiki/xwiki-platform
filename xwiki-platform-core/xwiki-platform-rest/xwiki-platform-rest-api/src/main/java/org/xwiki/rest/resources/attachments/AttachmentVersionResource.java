@@ -19,6 +19,7 @@
  */
 package org.xwiki.rest.resources.attachments;
 
+import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -36,7 +37,7 @@ public interface AttachmentVersionResource
 {
     @GET Response getAttachment(
             @PathParam("wikiName") String wikiName,
-            @PathParam("spaceName") String spaceName,
+            @PathParam("spaceName") @Encoded String spaceName,
             @PathParam("pageName") String pageName,
             @PathParam("attachmentName") String attachmentName,
             @PathParam("attachmentVersion") String attachmentVersion

@@ -36,12 +36,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.struts.upload.MultipartRequestWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -111,7 +111,7 @@ public class Utils
         // See: http://docs.oracle.com/javaee/6/api/javax/servlet/http/HttpServletResponse.html#sendRedirect(String)
         // "After using this method, the response should be considered to be committed and should not be written
         // to."
-        if (response.getStatus() == HttpServletResponse.SC_FOUND) {
+        if (response.getStatus() == HttpServletResponse.SC_FOUND || context.isResponseSent()) {
             return;
         }
 
@@ -608,19 +608,10 @@ public class Utils
     {
         FileUploadPlugin fileupload = null;
         try {
-            if (request instanceof MultipartRequestWrapper) {
+            if (ServletFileUpload.isMultipartContent(request)) {
                 fileupload = new FileUploadPlugin("fileupload", "fileupload", context);
                 context.put("fileuploadplugin", fileupload);
                 fileupload.loadFileList(context);
-                MultipartRequestWrapper mpreq = (MultipartRequestWrapper) request;
-                List<FileItem> fileItems = fileupload.getFileItems(context);
-                for (FileItem item : fileItems) {
-                    if (item.isFormField()) {
-                        String sName = item.getFieldName();
-                        String sValue = item.getString(context.getWiki().getEncoding());
-                        mpreq.setParameter(sName, sValue);
-                    }
-                }
             }
         } catch (Exception e) {
             if ((e instanceof XWikiException)

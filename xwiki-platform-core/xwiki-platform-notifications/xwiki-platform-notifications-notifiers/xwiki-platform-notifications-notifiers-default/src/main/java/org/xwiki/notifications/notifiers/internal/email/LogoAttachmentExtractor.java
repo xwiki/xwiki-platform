@@ -19,8 +19,6 @@
  */
 package org.xwiki.notifications.notifiers.internal.email;
 
-import java.io.InputStream;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -140,9 +138,9 @@ public class LogoAttachmentExtractor
         InputSource inputSource = sourceImageIS.getInputSource();
 
         if (inputSource instanceof InputStreamInputSource) {
-            try (InputStream inputStream = ((InputStreamInputSource) inputSource).getInputStream()) {
+            try (InputStreamInputSource inputStreamSource = (InputStreamInputSource) inputSource) {
                 XWikiAttachmentContent content = new XWikiAttachmentContent();
-                content.setContent(inputStream);
+                content.setContent(inputStreamSource.getInputStream());
 
                 return newLogoAttachment(mimeType, content, xcontext);
             }

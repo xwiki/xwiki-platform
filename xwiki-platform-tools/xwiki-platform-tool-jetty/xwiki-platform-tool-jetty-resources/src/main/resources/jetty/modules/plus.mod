@@ -18,9 +18,10 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-#
-# Jetty Plus module
-#
+DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
+
+[description]
+Enables Servlet 3.1 resource injection.
 
 [depend]
 server
@@ -30,6 +31,4 @@ webapp
 
 [lib]
 lib/jetty-plus-${jetty.version}.jar
-
-[xml]
-etc/jetty-plus.xml
+lib/jakarta.transaction-api-*.jar

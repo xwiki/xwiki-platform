@@ -286,4 +286,23 @@ public class XWQLtoHQLTranslatorTest
             "select doc from XWikiDocument as doc , BaseObject as c , Custom.Mapping as cCM1, StringProperty as c_prop2 " +
                 "where ( cCM1.cmprop = 'some' and c_prop2.value = 1 ) and doc.fullName=c.name and c.id=cCM1.id and c_prop2.id.id=c.id and c_prop2.id.name='prop'");
     }
+
+    @Test
+    public void parseMethodsInLike() throws Exception
+    {
+        assertTranslate(
+            "SELECT doc.fullName FROM Document doc, doc.object(XWiki.XWikiUsers) obj "
+                + "where obj.first_name like LOWER('%DMIN%')",
+            "SELECT doc.fullName FROM XWikiDocument as doc , BaseObject as obj , StringProperty as obj_first_name1 "
+                + "where ( obj_first_name1.value like LOWER ( '%DMIN%' ) ) "
+                + "and doc.fullName=obj.name and obj.className='XWiki.XWikiUsers' "
+                + "and obj_first_name1.id.id=obj.id and obj_first_name1.id.name='first_name'");
+        assertTranslate(
+            "SELECT doc.fullName FROM Document doc, doc.object(XWiki.XWikiUsers) obj "
+                + "where obj.first_name like LOWER(CONCAT('%', 'DMIN%'))",
+            "SELECT doc.fullName FROM XWikiDocument as doc , BaseObject as obj , StringProperty as obj_first_name1 "
+                + "where ( obj_first_name1.value like LOWER ( CONCAT ( '%' , 'DMIN%' ) ) ) "
+                + "and doc.fullName=obj.name and obj.className='XWiki.XWikiUsers' "
+                + "and obj_first_name1.id.id=obj.id and obj_first_name1.id.name='first_name'");
+    }
 }

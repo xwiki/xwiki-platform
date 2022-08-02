@@ -31,8 +31,6 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.filters.NotificationFilterManager;
-import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.notifications.sources.NotificationManager;
@@ -59,17 +57,13 @@ public class DefaultNotificationManager implements NotificationManager
     private NotificationPreferenceManager notificationPreferenceManager;
 
     @Inject
-    private NotificationFilterManager notificationFilterManager;
-
-    @Inject
-    private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
-
-    @Inject
     private ParametrizedNotificationManager parametrizedNotificationManager;
 
+    @Inject
+    private DefaultNotificationParametersFactory parametersFactory;
+
     @Override
-    public List<CompositeEvent> getEvents(String userId, int expectedCount)
-            throws NotificationException
+    public List<CompositeEvent> getEvents(String userId, int expectedCount) throws NotificationException
     {
         NotificationParameters parameters = new NotificationParameters();
         parameters.user = documentReferenceResolver.resolve(userId);
@@ -80,7 +74,7 @@ public class DefaultNotificationManager implements NotificationManager
 
     @Override
     public List<CompositeEvent> getEvents(String userId, int count, Date untilDate, List<String> blackList)
-            throws NotificationException
+        throws NotificationException
     {
         NotificationParameters parameters = new NotificationParameters();
         parameters.user = documentReferenceResolver.resolve(userId);
@@ -93,29 +87,31 @@ public class DefaultNotificationManager implements NotificationManager
 
     @Override
     public List<CompositeEvent> getEvents(String userId, int expectedCount, Date untilDate, Date fromDate,
-            List<String> blackList) throws NotificationException
+        List<String> blackList) throws NotificationException
     {
-        NotificationParameters parameters = new NotificationParameters();
-        parameters.user = documentReferenceResolver.resolve(userId);
-        parameters.format = NotificationFormat.ALERT;
-        parameters.expectedCount = expectedCount;
-        parameters.endDate = untilDate;
-        parameters.fromDate = fromDate;
-        parameters.blackList = blackList;
-        return getEvents(parameters);
+        return getEvents(userId, NotificationFormat.ALERT, expectedCount, untilDate, true, fromDate, blackList);
     }
 
     @Override
     public List<CompositeEvent> getEvents(String userId, NotificationFormat format, int expectedCount, Date untilDate,
-            Date fromDate, List<String> blackList) throws NotificationException
+        Date fromDate, List<String> blackList) throws NotificationException
+    {
+        return getEvents(userId, format, expectedCount, untilDate, true, fromDate, blackList);
+    }
+
+    @Override
+    public List<CompositeEvent> getEvents(String userId, NotificationFormat format, int expectedCount, Date untilDate,
+        boolean untilDateIncluded, Date fromDate, List<String> blackList) throws NotificationException
     {
         NotificationParameters parameters = new NotificationParameters();
         parameters.user = documentReferenceResolver.resolve(userId);
         parameters.format = format;
         parameters.expectedCount = expectedCount;
         parameters.endDate = untilDate;
+        parameters.endDateIncluded = untilDateIncluded;
         parameters.fromDate = fromDate;
         parameters.blackList = blackList;
+
         return getEvents(parameters);
     }
 
@@ -130,21 +126,17 @@ public class DefaultNotificationManager implements NotificationManager
         return getEvents(parameters).size();
     }
 
-    private List<CompositeEvent> getEvents(NotificationParameters parameters)
-            throws NotificationException
+    private List<CompositeEvent> getEvents(NotificationParameters parameters) throws NotificationException
     {
-        parameters.preferences = notificationPreferenceManager.getPreferences(parameters.user, true,
-                parameters.format);
-        parameters.filters = notificationFilterManager.getAllFilters(parameters.user, true);
-        parameters.filterPreferences = notificationFilterPreferenceManager.getFilterPreferences(parameters.user);
+        this.parametersFactory.useUserPreferences(parameters);
+
         return parametrizedNotificationManager.getEvents(parameters);
     }
 
     @Override
     public List<NotificationPreference> getPreferences() throws NotificationException
     {
-        return notificationPreferenceManager.getAllPreferences(
-                documentAccessBridge.getCurrentUserReference());
+        return notificationPreferenceManager.getAllPreferences(documentAccessBridge.getCurrentUserReference());
     }
 
     @Override

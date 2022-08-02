@@ -20,6 +20,7 @@
 package org.xwiki.rest.resources.spaces;
 
 import javax.ws.rs.DefaultValue;
+import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -36,7 +37,7 @@ public interface SpaceAttachmentsResource
 {
     @GET Attachments getAttachments(
             @PathParam("wikiName") String wikiName,
-            @PathParam("spaceName") String spaceName,
+            @PathParam("spaceName") @Encoded String spaceName,
             @QueryParam("name") @DefaultValue("") String name,
             @QueryParam("page") @DefaultValue("") String page,
             @QueryParam("author") @DefaultValue("") String author,

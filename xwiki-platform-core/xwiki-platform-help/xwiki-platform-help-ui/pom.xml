@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-help</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-help-ui</artifactId>
   <name>XWiki Platform - Help - UI</name>
@@ -33,6 +33,12 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Help Application</xwiki.extension.name>
+    <xwiki.extension.features>
+      <!-- The Help Center contrib app was moved inside this extension and thus we use this so that upgrades will
+           remove the old Help Center extension (in favor of this Help extension) -->
+      org.xwiki.contrib:application-help-center
+    </xwiki.extension.features>
+    <help.base.path>${basedir}/src/main/resources/Help</help.base.path>
   </properties>
   <dependencies>
     <dependency>
@@ -61,7 +67,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-macro-html</artifactId>
+      <artifactId>xwiki-rendering-macro-comment</artifactId>
       <version>${rendering.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -73,18 +79,241 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-macro-comment</artifactId>
+      <artifactId>xwiki-rendering-macro-html</artifactId>
       <version>${rendering.version}</version>
       <scope>runtime</scope>
     </dependency>
-
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-include</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-icon-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-skin-skinx</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <!-- Required for the Example Macro -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-wikimacro-store</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <!-- Some help pages use the Sandbox to let the user try editing content. That doesn't require the Sandbox
+           application per see, which is why this dependency is optional. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-sandbox</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <optional>true</optional>
+      <type>xar</type>
+    </dependency>
+    <dependency>
+      <!-- Some links point to the Administration pages. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-administration-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <type>xar</type>
+    </dependency>
+    <dependency>
+      <!-- Link to the Extension Manager to browse macros and applications. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <type>xar</type>
+    </dependency>
+    <dependency>
+      <!-- Examples with the Gallery macro. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-gallery</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <!-- Examples with the Chart macro. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-chart-macro</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <!-- Examples with the Document Tree macro. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-index-tree-macro</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <type>xar</type>
+    </dependency>
+    <dependency>
+      <!-- Examples with the Notifications macro. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-notifications-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <type>xar</type>
+    </dependency>
+    <dependency>
+      <!-- Demo application for App Within Minutes. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-appwithinminutes-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <type>xar</type>
+    </dependency>
+    <dependency>
+      <!-- Link to the Page Index for Content Organization example. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-index-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <type>xar</type>
+    </dependency>
     <!-- Test Dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-page</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Provides the component list for RenderingScriptService. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-xwiki</artifactId>
+      <version>${project.version}</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
+        <configuration>
+          <visibleTechnicalPages>
+            <visibleTechnicalPage>.*/Help/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Applications/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Applications/Contributors/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Applications/Movies/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Macros/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Macros/Box/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Macros/Chart/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Macros/Gallery/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Macros/Notifications/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Macros/ToC/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Macros/Tree/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Videos/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Templates/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/XWiki/XWikiSyntax\.xml</visibleTechnicalPage>
+          </visibleTechnicalPages>
+          <contentPages>
+            <contentPage>.*/Help/Applications/Contributors/Charlie Chaplin\.xml</contentPage>
+            <contentPage>.*/Help/Applications/Contributors/Frank Capra\.xml</contentPage>
+            <contentPage>.*/Help/Applications/Movies/Meet John Doe\.xml</contentPage>
+            <contentPage>.*/Help/Applications/Movies/Modern Times\.xml</contentPage>
+          </contentPages>
+        </configuration>
+      </plugin>
+      <!-- Attach resources to the corresponding wiki pages. -->
+      <plugin>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-tool-xmldoc-update-plugin</artifactId>
+        <version>${project.version}</version>
+        <executions>
+          <execution>
+            <id>attach-applications-videos</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>attach</goal>
+            </goals>
+            <configuration>
+              <files>
+                <file>${help.base.path}/Applications/AWM.mp4</file>
+                <file>${help.base.path}/Applications/AWM.webm</file>
+                <file>${help.base.path}/Applications/EM.mp4</file>
+                <file>${help.base.path}/Applications/EM.webm</file>
+                <file>${help.base.path}/Applications/blog.png</file>
+                <file>${help.base.path}/Applications/filemanager.png</file>
+                <file>${help.base.path}/Applications/forum.png</file>
+                <file>${help.base.path}/Applications/ideas.png</file>
+                <file>${help.base.path}/Applications/meeting.png</file>
+                <file>${help.base.path}/Applications/menu.png</file>
+              </files>
+              <sourceDocument>${project.build.outputDirectory}/Help/Applications/WebHome.xml</sourceDocument>
+              <outputDirectory>${project.build.outputDirectory}/Help</outputDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>attach-macros-videos</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>attach</goal>
+            </goals>
+            <configuration>
+              <files>
+                <file>${help.base.path}/Macros/EM.mp4</file>
+                <file>${help.base.path}/Macros/EM.webm</file>
+                <file>${help.base.path}/Macros/Macro.mp4</file>
+                <file>${help.base.path}/Macros/Macro.webm</file>
+              </files>
+              <sourceDocument>${project.build.outputDirectory}/Help/Macros/WebHome.xml</sourceDocument>
+              <outputDirectory>${project.build.outputDirectory}/Help</outputDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>attach-templates-videos</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>attach</goal>
+            </goals>
+            <configuration>
+              <files>
+                <file>${help.base.path}/Templates/Administration.mp4</file>
+                <file>${help.base.path}/Templates/Administration.webm</file>
+                <file>${help.base.path}/Templates/Template.mp4</file>
+                <file>${help.base.path}/Templates/Template.webm</file>
+              </files>
+              <sourceDocument>${project.build.outputDirectory}/Help/Templates/WebHome.xml</sourceDocument>
+              <outputDirectory>${project.build.outputDirectory}/Help</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <profiles>
+    <profile>
+      <id>clover</id>
+      <build>
+        <plugins>
+          <!-- Add the Clover JAR to the XMLDoc Update plugin runtime classpath since the XMLDoc Update plugin uses java
+               classes that have been instrumented with Clover (XWiki oldcore for example) -->
+          <plugin>
+            <groupId>org.xwiki.platform</groupId>
+            <artifactId>xwiki-platform-tool-xmldoc-update-plugin</artifactId>
+            <version>${project.version}</version>
+            <dependencies>
+              <dependency>
+                <groupId>org.openclover</groupId>
+                <artifactId>clover</artifactId>
+                <version>${clover.version}</version>
+              </dependency>
+            </dependencies>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

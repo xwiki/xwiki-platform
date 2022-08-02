@@ -24,4 +24,5 @@ package com.xpn.xwiki.objects;
 // mecanism from Hibernate
 public class DBStringListProperty extends ListProperty
 {
+    private static final long serialVersionUID = 1L;
 }

@@ -195,9 +195,6 @@ public class ImageFilter extends AbstractHTMLFilter
                 // We have to decode the image file name in case it contains URL special characters.
                 fileName = URLDecoder.decode(fileName, UTF_8);
 
-                // we also need to replace the "&amp;" by "&" since HtmlCleaner replace them automatically to &amp;
-                fileName = fileName.replaceAll("&amp;", "&");
-
                 // '@' must also be escaped in order to resolve properly the path in XWiki
                 fileName = fileName.replaceAll("@", "\\\\@");
             } catch (Exception e) {

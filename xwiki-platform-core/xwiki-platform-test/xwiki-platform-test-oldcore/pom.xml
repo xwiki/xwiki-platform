@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-test</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-test-oldcore</artifactId>
   <name>XWiki Platform - Test - Oldcore</name>
@@ -52,6 +52,33 @@
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
       <scope>compile</scope>
+    </dependency>
+
+    <!-- To be remove if we stop declaring hibernate validator as oldcore runtime dependency -->
+    <dependency>
+      <groupId>org.mortbay.jasper</groupId>
+      <artifactId>apache-el</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <!-- To be removed as soon as we get rid of AbstractXWikiComponentTestCase -->
+    <dependency>
+      <groupId>jmock</groupId>
+      <artifactId>jmock</artifactId>
+      <version>1.2.0</version>
+    </dependency>
+    <!-- To be removed as soon as we get rid of AbstractXWikiComponentTestCase -->
+    <dependency>
+      <groupId>jmock</groupId>
+      <artifactId>jmock-cglib</artifactId>
+      <version>1.2.0</version>
+      <exclusions>
+        <!-- We use cglib:cglig instead -->
+        <exclusion>
+          <groupId>cglib</groupId>
+          <artifactId>cglib-nodep</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 </project>

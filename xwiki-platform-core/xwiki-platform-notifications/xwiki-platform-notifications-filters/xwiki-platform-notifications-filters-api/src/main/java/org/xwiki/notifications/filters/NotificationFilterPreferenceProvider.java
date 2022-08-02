@@ -19,12 +19,15 @@
  */
 package org.xwiki.notifications.filters;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.stability.Unstable;
 
 /**
  * Provide {@link NotificationFilterPreference} from multiple sources.
@@ -45,6 +48,21 @@ public interface NotificationFilterPreferenceProvider
     Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user) throws NotificationException;
 
     /**
+     * Get every registered {@link NotificationFilterPreference} for the given user.
+     *
+     * @param wikiReference the wiki for which to retrieve the notification preferences
+     * @return a list of notification filter preferences
+     * @throws NotificationException if an error happened
+     * @since 13.3RC1
+     */
+    @Unstable
+    default Set<NotificationFilterPreference> getFilterPreferences(WikiReference wikiReference)
+        throws NotificationException
+    {
+        return Collections.emptySet();
+    }
+
+    /**
      * Save a given set of filter preferences.
      *
      * @param user the user for which to save the notification preferences
@@ -60,7 +78,7 @@ public interface NotificationFilterPreferenceProvider
 
     /**
      * Delete a filter preference.
-     * @param user the user for which to save the notification preferences
+     * @param user the user for which to delete the notification preferences
      * @param filterPreferenceId id of the filter preference
      * @throws NotificationException if an error happens
      *
@@ -69,6 +87,21 @@ public interface NotificationFilterPreferenceProvider
      * @since 9.11.9
      */
     void deleteFilterPreference(DocumentReference user, String filterPreferenceId) throws NotificationException;
+
+    /**
+     * Delete a filter preference.
+     * @param wikiReference the wiki for which to delete the notification preferences
+     * @param filterPreferenceId id of the filter preference
+     * @throws NotificationException if an error happens
+     *
+     * @since 13.3RC1
+     */
+    @Unstable
+    default void deleteFilterPreference(WikiReference wikiReference, String filterPreferenceId)
+        throws NotificationException
+    {
+        // do nothing
+    }
 
     /**
      * Enable or disable a filter preference.
@@ -83,6 +116,22 @@ public interface NotificationFilterPreferenceProvider
      */
     void setFilterPreferenceEnabled(DocumentReference user, String filterPreferenceId, boolean enabled)
             throws NotificationException;
+
+    /**
+     * Enable or disable a filter preference.
+     * @param wikiReference the wiki for which to save the notification preferences
+     * @param filterPreferenceId id of the filter preference
+     * @param enabled either or not the filter preference should be enabled
+     * @throws NotificationException if an error happens
+     *
+     * @since 13.3RC1
+     */
+    @Unstable
+    default void setFilterPreferenceEnabled(WikiReference wikiReference, String filterPreferenceId, boolean enabled)
+        throws NotificationException
+    {
+        // do nothing
+    }
 
     /**
      * Update the start date for every notification preference that the user has.

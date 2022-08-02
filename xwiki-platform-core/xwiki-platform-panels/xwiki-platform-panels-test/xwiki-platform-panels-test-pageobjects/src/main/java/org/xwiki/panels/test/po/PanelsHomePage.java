@@ -21,11 +21,12 @@ package org.xwiki.panels.test.po;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.livedata.test.po.LiveDataElement;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
  * Represents the Panels.WebHome page.
- * 
+ *
  * @version $Id$
  * @since 4.3.1
  */
@@ -58,7 +59,7 @@ public class PanelsHomePage extends ViewPage
 
     /**
      * Creates a panel with the specified title.
-     * 
+     *
      * @param title the name of the new panel
      * @return the edit mode for the specified panel
      */
@@ -68,5 +69,13 @@ public class PanelsHomePage extends ViewPage
         panelTitleInput.sendKeys(title);
         panelTitleInput.submit();
         return new PanelEditPage();
+    }
+
+    /**
+     * @return the live data page object for the panels home page listing
+     */
+    public LiveDataElement getLiveData()
+    {
+        return new LiveDataElement("panels");
     }
 }

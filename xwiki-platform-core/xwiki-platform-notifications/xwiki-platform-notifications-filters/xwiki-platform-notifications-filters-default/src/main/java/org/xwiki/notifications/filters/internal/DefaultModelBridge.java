@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.filters.internal;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -37,7 +38,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
@@ -61,15 +62,8 @@ import com.xpn.xwiki.objects.BaseObject;
 @Singleton
 public class DefaultModelBridge implements ModelBridge
 {
-    private static final SpaceReference NOTIFICATION_CODE_SPACE = new SpaceReference("Code",
-            new SpaceReference("Notifications",
-                    new SpaceReference("XWiki", new WikiReference("xwiki"))
-            )
-    );
-
-    private static final DocumentReference TOGGLEABLE_FILTER_PREFERENCE_CLASS = new DocumentReference(
-            "ToggleableFilterPreferenceClass", NOTIFICATION_CODE_SPACE
-    );
+    private static final LocalDocumentReference TOGGLEABLE_FILTER_PREFERENCE_CLASS =
+        new LocalDocumentReference(Arrays.asList("XWiki", "Notifications", "Code"), "ToggleableFilterPreferenceClass");
 
     private static final String FIELD_FILTER_NAME = "filterName";
 
@@ -101,13 +95,17 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
+    public Set<NotificationFilterPreference> getFilterPreferences(WikiReference wikiReference)
+        throws NotificationException
+    {
+        return new HashSet<>(this.notificationFilterPreferenceStore.getPreferencesOfWiki(wikiReference));
+    }
+
+    @Override
     public Map<String, Boolean> getToggeableFilterActivations(DocumentReference user) throws NotificationException
     {
         XWikiContext context = contextProvider.get();
         XWiki xwiki = context.getWiki();
-
-        final DocumentReference notificationPreferencesScopeClass
-                = TOGGLEABLE_FILTER_PREFERENCE_CLASS.setWikiReference(user.getWikiReference());
 
         Map<String, Boolean> filterStatus = new HashMap<>();
 
@@ -118,8 +116,8 @@ public class DefaultModelBridge implements ModelBridge
                 if (filter instanceof ToggleableNotificationFilter) {
                     ToggleableNotificationFilter toggleableFilter = (ToggleableNotificationFilter) filter;
                     boolean status = toggleableFilter.isEnabledByDefault();
-                    BaseObject obj = doc.getXObject(notificationPreferencesScopeClass, FIELD_FILTER_NAME,
-                            filter.getName());
+                    BaseObject obj = doc.getXObject(TOGGLEABLE_FILTER_PREFERENCE_CLASS, FIELD_FILTER_NAME,
+                            filter.getName(), false);
                     if (obj != null) {
                         status = obj.getIntValue(FIELD_IS_ENABLED, status ? 1 : 0) != 0;
                     }
@@ -142,6 +140,25 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
+    public void deleteFilterPreferences(DocumentReference user) throws NotificationException
+    {
+        this.notificationFilterPreferenceStore.deleteFilterPreferences(user);
+    }
+
+    @Override
+    public void deleteFilterPreference(WikiReference wikiReference, String filterPreferenceId)
+        throws NotificationException
+    {
+        notificationFilterPreferenceStore.deleteFilterPreference(wikiReference, filterPreferenceId);
+    }
+
+    @Override
+    public void deleteFilterPreferences(WikiReference wikiReference) throws NotificationException
+    {
+        this.notificationFilterPreferenceStore.deleteFilterPreference(wikiReference);
+    }
+
+    @Override
     public void setFilterPreferenceEnabled(DocumentReference user, String filterPreferenceId, boolean enabled)
             throws NotificationException
     {
@@ -154,10 +171,29 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
+    public void setFilterPreferenceEnabled(WikiReference wikiReference, String filterPreferenceId, boolean enabled)
+        throws NotificationException
+    {
+        NotificationFilterPreference preference = notificationFilterPreferenceStore.getFilterPreference(wikiReference,
+            filterPreferenceId);
+        if (preference != null && enabled != preference.isEnabled()) {
+            preference.setEnabled(enabled);
+            saveFilterPreferences(wikiReference, Collections.singletonList(preference));
+        }
+    }
+
+    @Override
     public void saveFilterPreferences(DocumentReference user,
             Collection<NotificationFilterPreference> filterPreferences) throws NotificationException
     {
         notificationFilterPreferenceStore.saveFilterPreferences(user, filterPreferences);
+    }
+
+    @Override
+    public void saveFilterPreferences(WikiReference wikiReference,
+        Collection<NotificationFilterPreference> filterPreferences) throws NotificationException
+    {
+        notificationFilterPreferenceStore.saveFilterPreferences(wikiReference, filterPreferences);
     }
 
     @Override
@@ -183,10 +219,29 @@ public class DefaultModelBridge implements ModelBridge
             NotificationFilterType type, Set<NotificationFormat> formats,
             List<String> eventTypes, EntityReference reference) throws NotificationException
     {
+        saveFilterPreferences(user,
+            Collections.singletonList(getScopeFilterPreference(type, formats, eventTypes, reference)));
+    }
+
+    @Override
+    public void createScopeFilterPreference(WikiReference wikiReference,
+        NotificationFilterType type, Set<NotificationFormat> formats,
+        List<String> eventTypes, EntityReference reference) throws NotificationException
+    {
+        saveFilterPreferences(wikiReference,
+            Collections.singletonList(getScopeFilterPreference(type, formats, eventTypes, reference)));
+    }
+
+    private NotificationFilterPreference getScopeFilterPreference(NotificationFilterType type,
+        Set<NotificationFormat> formats,
+        List<String> eventTypes, EntityReference reference) throws NotificationException
+    {
         DefaultNotificationFilterPreference preference = new DefaultNotificationFilterPreference();
         preference.setFilterType(type);
         preference.setNotificationFormats(formats);
-        preference.setEventTypes(new HashSet<>(eventTypes));
+        if (eventTypes != null && !eventTypes.isEmpty()) {
+            preference.setEventTypes(new HashSet<>(eventTypes));
+        }
         preference.setEnabled(true);
         preference.setActive(false);
         preference.setFilterName(ScopeNotificationFilter.FILTER_NAME);
@@ -205,7 +260,6 @@ public class DefaultModelBridge implements ModelBridge
             default:
                 break;
         }
-
-        saveFilterPreferences(user, Collections.singletonList(preference));
+        return preference;
     }
 }

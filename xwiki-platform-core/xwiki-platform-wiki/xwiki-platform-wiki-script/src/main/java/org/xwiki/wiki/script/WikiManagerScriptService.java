@@ -190,10 +190,7 @@ public class WikiManagerScriptService implements ScriptService
             }
 
             // Create the wiki
-            descriptor = wikiManager.create(wikiId, wikiAlias, failOnExist);
-            // Set the owner
-            descriptor.setOwnerId(ownerId);
-            wikiDescriptorManager.saveDescriptor(descriptor);
+            descriptor = wikiManager.create(wikiId, wikiAlias, ownerId, failOnExist);
         } catch (Exception e) {
             error(e);
         }
@@ -407,6 +404,15 @@ public class WikiManagerScriptService implements ScriptService
     public String getCurrentWikiId()
     {
         return wikiDescriptorManager.getCurrentWikiId();
+    }
+
+    /**
+     * @return the reference of the current wiki.
+     * @since 12.7RC1
+     */
+    public WikiReference getCurrentWikiReference()
+    {
+        return wikiDescriptorManager.getCurrentWikiReference();
     }
 
     /**

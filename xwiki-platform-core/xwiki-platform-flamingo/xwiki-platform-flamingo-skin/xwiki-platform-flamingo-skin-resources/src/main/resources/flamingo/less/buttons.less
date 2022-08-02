@@ -142,8 +142,45 @@ input.button, .buttonwrapper button, .buttonwrapper a {
 }
 
 // Buttons on the navbar ==================================================
+.nav > li > .btn-link {
+  position: relative;
+  display: block;
+  padding: @nav-link-padding;
+
+  &:hover,
+  &:focus {
+    text-decoration: none;
+    background-color: @nav-link-hover-bg;
+  }
+}
+
 .navbar-nav {
   .btn-group {
     margin: 0;
+  }
+
+  > li > .btn-link {
+    border: 0;
+    line-height: @line-height-computed;
+    margin: 0;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  @media (min-width: @grid-float-breakpoint) {
+    > li > .btn-link {
+      padding-top: @navbar-padding-vertical;
+      padding-bottom: @navbar-padding-vertical;
+    }
+  }
+}
+
+.navbar-default .navbar-nav > li > .btn-link {
+  color: @navbar-default-link-color;
+
+  &:hover,
+  &:focus {
+    color: @navbar-default-link-hover-color;
+    background-color: @navbar-default-link-hover-bg;
   }
 }

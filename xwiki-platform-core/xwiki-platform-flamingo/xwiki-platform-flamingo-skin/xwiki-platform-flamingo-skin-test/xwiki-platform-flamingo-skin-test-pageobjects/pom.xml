@@ -24,7 +24,7 @@
   <parent>
     <artifactId>xwiki-platform-flamingo-skin-test</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -39,6 +39,11 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-tree-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-test-pageobjects</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

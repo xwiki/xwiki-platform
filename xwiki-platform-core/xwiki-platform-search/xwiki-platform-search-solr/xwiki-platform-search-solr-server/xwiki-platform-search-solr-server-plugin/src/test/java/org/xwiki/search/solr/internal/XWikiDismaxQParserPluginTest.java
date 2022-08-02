@@ -19,8 +19,6 @@
  */
 package org.xwiki.search.solr.internal;
 
-import static org.junit.Assert.*;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,7 +27,10 @@ import java.util.Map;
 
 import org.apache.solr.common.params.MapSolrParams;
 import org.apache.solr.common.params.SolrParams;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Unit tests for {@link XWikiDismaxQParserPlugin}.
@@ -37,7 +38,7 @@ import org.junit.Test;
  * @version $Id$
  * @since 5.3RC1
  */
-public class XWikiDismaxQParserPluginTest
+class XWikiDismaxQParserPluginTest
 {
     /**
      * The object being tested.
@@ -45,7 +46,7 @@ public class XWikiDismaxQParserPluginTest
     private XWikiDismaxQParserPlugin plugin = new XWikiDismaxQParserPlugin();
 
     @Test
-    public void extractFieldNames()
+    void extractFieldNames()
     {
         assertEquals(Collections.emptySet(), plugin.extractFieldNames(""));
         assertEquals(Collections.emptySet(), plugin.extractFieldNames("text"));
@@ -62,16 +63,16 @@ public class XWikiDismaxQParserPluginTest
             plugin.extractFieldNames("property.Blog.Blog..Post$5EClass.title:value"));
 
         assertEquals(
-            new HashSet<String>(Arrays.asList("abc", "g_h.i", "m$n-o",
+            new HashSet<>(Arrays.asList("abc", "g_h.i", "m$n-o",
                 "_\u0103\u00EE\u00E2\u0219\u021B\u00E8\u00E9\u00EA\u00EB")),
             plugin.extractFieldNames("+abc:def AND -g_h.i:jkl AND (m$n-o:pqr OR "
                 + "_\u0103\u00EE\u00E2\u0219\u021B\u00E8\u00E9\u00EA\u00EB:stu^3)"));
     }
 
     @Test
-    public void withFieldAliases()
+    void withFieldAliases()
     {
-        Map<String, String> parameters = new HashMap<String, String>();
+        Map<String, String> parameters = new HashMap<>();
         parameters.put("qf", "title^0.4 comment^0.40 date^1.0");
         parameters.put("xwiki.multilingualFields", "title, property.*, foo, comment");
         parameters.put("xwiki.supportedLocales", "en, fr, zh_TW");
@@ -102,9 +103,9 @@ public class XWikiDismaxQParserPluginTest
     }
 
     @Test
-    public void withFieldAliasesWhenNoSupportedLocales()
+    void withFieldAliasesWhenNoSupportedLocales()
     {
-        Map<String, String> parameters = new HashMap<String, String>();
+        Map<String, String> parameters = new HashMap<>();
         parameters.put("qf", "comment^0.40");
         parameters.put("xwiki.multilingualFields", "title, comment");
 
@@ -116,9 +117,9 @@ public class XWikiDismaxQParserPluginTest
     }
 
     @Test
-    public void withFieldAliasesWhenNoMultilingualFields()
+    void withFieldAliasesWhenNoMultilingualFields()
     {
-        Map<String, String> parameters = new HashMap<String, String>();
+        Map<String, String> parameters = new HashMap<>();
         parameters.put("qf", "title^0.4 comment^0.40 date^1.0");
         parameters.put("xwiki.supportedLocales", "en, ro");
 
@@ -131,9 +132,9 @@ public class XWikiDismaxQParserPluginTest
     }
 
     @Test
-    public void withFieldAliasesWhenNoFieldsInQuery()
+    void withFieldAliasesWhenNoFieldsInQuery()
     {
-        Map<String, String> parameters = new HashMap<String, String>();
+        Map<String, String> parameters = new HashMap<>();
         parameters.put("qf", "title^0.4 comment^0.40");
         parameters.put("xwiki.multilingualFields", "title, foo");
         parameters.put("xwiki.supportedLocales", "en, fr");

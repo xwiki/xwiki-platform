@@ -26,5 +26,7 @@ package com.xpn.xwiki.objects;
  */
 public class StringProperty extends BaseStringProperty
 {
+    private static final long serialVersionUID = 1L;
+
     // No different from BaseStringProperty, only exists for Hibernate mapping.
 }

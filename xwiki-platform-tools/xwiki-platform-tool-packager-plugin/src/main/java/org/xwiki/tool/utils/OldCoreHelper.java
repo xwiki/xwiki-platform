@@ -28,7 +28,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.maven.plugin.MojoExecutionException;
-import org.hibernate.cfg.Environment;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -38,12 +37,15 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.ApplicationStartedEvent;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.store.hibernate.HibernateConfiguration;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 import com.xpn.xwiki.web.XWikiServletResponseStub;
@@ -71,8 +73,6 @@ public class OldCoreHelper implements AutoCloseable
     private boolean disposeComponentManager;
 
     private String wikiId;
-
-    private File hibernateConfig;
 
     private XWikiContext xcontext;
 
@@ -123,6 +123,17 @@ public class OldCoreHelper implements AutoCloseable
     public static OldCoreHelper create(ComponentManager componentManager, String wikiId, File hibernateConfig)
         throws MojoExecutionException
     {
+        // Set the Hibernate config before the initialization of the HibernateStore component
+        // The XWikiConfig object requires path to be in unix format (i.e. with forward slashes)
+        String hibernateConfigInUnixFormat = hibernateConfig.getPath().replace('\\', '/');
+        HibernateConfiguration hibernateConfiguration;
+        try {
+            hibernateConfiguration = componentManager.getInstance(HibernateConfiguration.class);
+        } catch (ComponentLookupException e) {
+            throw new MojoExecutionException("Failed to get lookup HibernateConfiguration component", e);
+        }
+        hibernateConfiguration.setPath(hibernateConfigInUnixFormat);
+
         // Lookup OldCoreHelper
         OldCoreHelper oldcoreHelper;
         try {
@@ -131,9 +142,18 @@ public class OldCoreHelper implements AutoCloseable
             throw new MojoExecutionException("Failed to get OldCoreHelper component", e);
         }
 
+        // Give a chance to various listeners to register Hibernate mapping and other pre XWiki instance init actions
+        ObservationManager observation;
+        try {
+            observation = componentManager.getInstance(ObservationManager.class);
+        } catch (ComponentLookupException e) {
+            throw new MojoExecutionException("Failed to get lookup ObservationManager component", e);
+        }
+        observation.notify(new ApplicationStartedEvent(), null);
+
         // Initialize OldCoreHelper
         try {
-            oldcoreHelper.initialize(wikiId, hibernateConfig);
+            oldcoreHelper.initialize(wikiId);
         } catch (Exception e) {
             throw new MojoExecutionException("Failed to get initialize OldCoreHelper component", e);
         }
@@ -141,10 +161,9 @@ public class OldCoreHelper implements AutoCloseable
         return oldcoreHelper;
     }
 
-    private void initialize(String wikiId, File hibernateConfig) throws Exception
+    private void initialize(String wikiId) throws Exception
     {
         this.wikiId = wikiId;
-        this.hibernateConfig = hibernateConfig;
 
         this.xcontext = createXWikiContext();
     }
@@ -214,13 +233,6 @@ public class OldCoreHelper implements AutoCloseable
         this.xcontext.setDoc(new XWikiDocument(new DocumentReference(wikiId, "dummySpace", "dummyPage")));
 
         XWikiConfig config = new XWikiConfig();
-        config.put("xwiki.store.class", "com.xpn.xwiki.store.XWikiHibernateStore");
-
-        // The XWikiConfig object requires path to be in unix format (i.e. with forward slashes)
-        String hibernateConfigInUnixFormat = hibernateConfig.getPath().replace('\\', '/');
-        config.put("xwiki.store.hibernate.path", hibernateConfigInUnixFormat);
-
-        config.put("xwiki.store.hibernate.updateschema", "1");
 
         // Enable backlinks so that when documents are imported their backlinks will be saved too
         config.put("xwiki.backlinks", "1");

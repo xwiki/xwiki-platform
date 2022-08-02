@@ -18,9 +18,10 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-#
-# JMX Module
-#
+DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
+
+[description]
+Enables local JMX support for Jetty components.
 
 [depend]
 server
@@ -30,4 +31,3 @@ lib/jetty-jmx-${jetty.version}.jar
 
 [xml]
 etc/jetty-jmx.xml
-

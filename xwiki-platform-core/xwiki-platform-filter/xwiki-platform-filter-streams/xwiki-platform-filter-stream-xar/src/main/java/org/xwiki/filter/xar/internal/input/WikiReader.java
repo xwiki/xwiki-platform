@@ -50,14 +50,14 @@ import org.xwiki.xar.internal.model.XarModel;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class WikiReader
 {
-    private static final TranslationMarker LOG_DOCUMENT_SKIPPED = new TranslationMarker(
-        "filter.xar.log.document.skipped", WikiDocumentFilter.LOG_DOCUMENT_SKIPPED);
+    private static final TranslationMarker LOG_DOCUMENT_SKIPPED =
+        new TranslationMarker("filter.xar.log.document.skipped", WikiDocumentFilter.LOG_DOCUMENT_SKIPPED);
 
-    private static final TranslationMarker LOG_DOCUMENT_FAILREAD = new TranslationMarker(
-        "filter.xar.log.document.failread", WikiDocumentFilter.LOG_DOCUMENT_ERROR);
+    private static final TranslationMarker LOG_DOCUMENT_FAILREAD =
+        new TranslationMarker("filter.xar.log.document.failread", WikiDocumentFilter.LOG_DOCUMENT_ERROR);
 
-    private static final TranslationMarker LOG_DESCRIPTOR_FAILREAD = new TranslationMarker(
-        "filter.xar.log.descriptor.failread");
+    private static final TranslationMarker LOG_DESCRIPTOR_FAILREAD =
+        new TranslationMarker("filter.xar.log.descriptor.failread");
 
     @Inject
     private DocumentLocaleReader documentReader;

@@ -177,7 +177,8 @@ public class DocumentTreeElement extends TreeElement
     private String getSpaceNodeId(String... path)
     {
         if (path.length > 0) {
-            DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList(path), "WebHome");
+            DocumentReference documentReference =
+                new DocumentReference(getUtil().getCurrentWiki(), Arrays.asList(path), "WebHome");
             return getNodeId(documentReference.getParent());
         } else {
             throw new IllegalArgumentException("Incomplete path: it should have at least 1 element (space)");
@@ -190,7 +191,7 @@ public class DocumentTreeElement extends TreeElement
             List<String> pathElements = Arrays.asList(path);
             List<String> spaces = pathElements.subList(0, path.length - 1);
             String document = path[path.length - 1];
-            return getNodeId(new DocumentReference("xwiki", spaces, document));
+            return getNodeId(new DocumentReference(getUtil().getCurrentWiki(), spaces, document));
         } else {
             throw new IllegalArgumentException("Incomplete path: it should have at least 2 elements (space/page)");
         }
@@ -203,7 +204,8 @@ public class DocumentTreeElement extends TreeElement
             List<String> spaces = pathElements.subList(0, path.length - 2);
             String document = path[path.length - 2];
             String fileName = path[path.length - 1];
-            return getNodeId(new AttachmentReference(fileName, new DocumentReference("xwiki", spaces, document)));
+            return getNodeId(
+                new AttachmentReference(fileName, new DocumentReference(getUtil().getCurrentWiki(), spaces, document)));
         } else {
             throw new IllegalArgumentException("Incomplete path: it should have at least 3 elements (space/page/file)");
         }

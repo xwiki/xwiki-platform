@@ -39,7 +39,6 @@ import org.xwiki.store.TransactionRunnable;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.internal.FileSystemStoreUtils;
 import org.xwiki.store.legacy.doc.internal.FilesystemAttachmentContent;
-import org.xwiki.store.legacy.doc.internal.ListAttachmentArchive;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -47,6 +46,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 import com.xpn.xwiki.doc.XWikiAttachmentContent;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.doc.ListAttachmentArchive;
 import com.xpn.xwiki.store.AttachmentVersioningStore;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore;
@@ -211,14 +211,24 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
 
         if (!attachFile.exists()) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_FILENOTFOUND,
-                String.format("The attachment [%s] could not be found in the filesystem attachment store.",
-                    attachFile));
+                String.format("The attachment [%s] (file %s) could not be found in the filesystem attachment store.",
+                    attachment.getReference(), attachFile));
         }
 
         FilesystemAttachmentContent content = new FilesystemAttachmentContent(attachFile);
         content.setContentDirty(false);
         attachment.setAttachment_content(content);
         attachment.setContentStore(FileSystemStoreUtils.HINT);
+    }
+
+    @Override
+    public boolean attachmentContentExists(XWikiAttachment attachment, XWikiContext context, boolean bTransaction)
+        throws XWikiException
+    {
+        File attachFile =
+            this.fileTools.getAttachmentFileProvider(attachment.getReference()).getAttachmentContentFile();
+
+        return attachFile.exists();
     }
 
     @Override
@@ -276,14 +286,17 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
     private class AttachmentSaveTransactionRunnable extends TransactionRunnable<XWikiHibernateTransaction>
     {
         /**
-         * Construct a TransactionRunnable for saving the attachment content. @param attachment the XWikiAttachment
-         * whose content should be saved. @param updateDocument whether or not to update the document at the same
-         * time. @param context the XWikiContext for the request. @param attachFile the File to store the attachment
-         * in. @param tempFile the File to put the attachment content in until the transaction is complete. @param
-         * backupFile the File to backup the content of the existing attachment in. @param lock this Lock will be locked
-         * while the attachment file is being written to. @throws XWikiException if thrown by
-         * {@link XWikiAttachment#updateContentArchive(XWikiContext)} or
-         * {@link FilesystemAttachmentVersioningStore# getArchiveSaveRunnable(XWikiAttachmentArchive, XWikiContext)
+         * Construct a TransactionRunnable for saving the attachment content.
+         * 
+         * @param attachment the XWikiAttachment whose content should be saved.
+         * @param updateDocument whether or not to update the document at the same time.
+         * @param context the XWikiContext for the request.
+         * @param attachFile the File to store the attachment in.
+         * @param tempFile the File to put the attachment content in until the transaction is complete.
+         * @param backupFile the File to backup the content of the existing attachment in.
+         * @param lock this Lock will be locked while the attachment file is being written to.
+         * @throws XWikiException if thrown by {@link XWikiAttachment#updateContentArchive(XWikiContext)} or
+         *             {@link FilesystemAttachmentVersioningStore# getArchiveSaveRunnable(XWikiAttachmentArchive, XWikiContext)}
          */
         AttachmentSaveTransactionRunnable(final XWikiAttachment attachment, final boolean updateDocument,
             final XWikiContext context, final File attachFile, final File tempFile, final File backupFile,

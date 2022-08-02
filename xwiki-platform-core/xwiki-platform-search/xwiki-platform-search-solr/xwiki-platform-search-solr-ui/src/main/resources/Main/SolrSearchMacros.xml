@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -252,7 +252,7 @@
 
 #macro (displaySearchFacetValuesLimited $facetValues $customQueryStringParameters $customValueDisplayer)
   #set ($limitRequestParameter = "l_$facetField.name")
-  #set ($limit = $mathtool.toInteger($request.getParameter($limitRequestParameter)))
+  #set ($limit = $numbertool.toNumber($request.getParameter($limitRequestParameter)).intValue())
   #if ("$!limit" == '')
     #set ($limit = $solrConfig.facetPaginationStep)
   #end
@@ -336,9 +336,9 @@
   (% class="search-options" %)
   * {{translation key="solr.options"/}}
   #if($highlightEnabled)#extendQueryString($url {'highlight': [false]})#else#extendQueryString($url {'highlight': [true]})#end
-  * [[{{translation key="solr.options.highlight"/}}&gt;&gt;path:$url||class="options-item#if($highlightEnabled) active#end" title="$services.localization.render('solr.options.highlight.title')"]]
+  * [[{{translation key="solr.options.highlight"/}}&gt;&gt;path:${url}||class="options-item#if($highlightEnabled) active#end" title="$services.localization.render('solr.options.highlight.title')"]]
   #if($facetEnabled)#extendQueryString($url {'facet': [false]})#else#extendQueryString($url {'facet': [true]})#end
-  * [[{{translation key="solr.options.facet"/}}&gt;&gt;path:$url||class="options-item#if($facetEnabled) active#end" title="$services.localization.render('solr.options.facet.title')"]]
+  * [[{{translation key="solr.options.facet"/}}&gt;&gt;path:${url}||class="options-item#if($facetEnabled) active#end" title="$services.localization.render('solr.options.facet.title')"]]
 
   (% class="search-results-sort" %)
   * {{translation key="solr.sortBy"/}}
@@ -353,7 +353,7 @@
       #set ($targetSortOrder = "#if ($sortOrder == 'asc')desc#{else}asc#end")
     #end
     #extendQueryString($url {'sort': [$entry.key], 'sortOrder': [$targetSortOrder]})
-    * [[{{translation key="solr.sortBy.$entry.key"/}}$!sortOrderIndicator&gt;&gt;path:$url||class="$class"]]
+    * [[{{translation key="solr.sortBy.$entry.key"/}}$!sortOrderIndicator&gt;&gt;path:${url}||class="$class"]]
   #end
 #end
 
@@ -599,7 +599,7 @@ $services.localization.render('core.users.unknownUser')##
       'matches': $matches
     }))
   #end
-  #set ($highlighting = $sorttool.sort($highlighting, 'priority:desc'))
+  #set ($highlighting = $collectiontool.sort($highlighting, 'priority:desc'))
   #set ($return = $NULL)
   #setVariable("$return" $highlighting)
 #end
@@ -753,7 +753,7 @@ $services.localization.render('core.users.unknownUser')##
       #set ($discard = $filters.put($fieldName, $escapedValues))
       #if ($prefixFacets.contains($fieldName))
         #set ($parts = $parameter.value.get(0).split('/', 2))
-        #set ($length = $mathtool.toInteger($parts.get(0)) + 1)
+        #set ($length = $numbertool.toNumber($parts.get(0)).intValue() + 1)
         #set ($prefix = "$length/$parts.get(1)")
         #set ($discard = $query.bindValue("f.${fieldName}.facet.prefix", $prefix))
         #set ($discard = $prefixFacets.remove($fieldName))
@@ -817,11 +817,11 @@ $value##
   #end
   ##
   ## Pagination
-  #set ($rows = $mathtool.toInteger($request.rows))
+  #set ($rows = $numbertool.toNumber($request.rows).intValue())
   #if ("$!rows" == '')
     #set ($rows = 10)
   #end
-  #set ($start = $mathtool.toInteger($request.firstIndex))
+  #set ($start = $numbertool.toNumber($request.firstIndex).intValue())
   #if ("$!start" == '')
     #set ($start = 0)
   #end

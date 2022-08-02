@@ -28,10 +28,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -108,14 +108,23 @@ public final class RightsManager
     private static final String RIGHTSLISTFIELD_SEP = ",|";
 
     /**
-     * Join symbol of the list fields for the {@link #RIGHTS_CLASS} and {@link #GLOBAL_RIGHTS_CLASS} classes.
+     * Separator symbol of the list fields used for users and groups fields.
      */
-    private static final String RIGHTSLISTFIELD_JOIN = "|";
+    private static final String USERGROUPLISTFIELD_SEP = ",";
 
     /**
      * Symbol use in HQL "like" command that means "all characters".
      */
     private static final String HQLLIKE_ALL_SYMBOL = "%";
+
+    /**
+     * Use to retrieve documents concerned by a specific user or group rights.
+     * See {@link #removeUserOrGroupFromAllRights(String, String, String, boolean, XWikiContext)}
+     * and {@link #replaceUserOrGroupFromAllRights(DocumentReference, DocumentReference, boolean, XWikiContext)}.
+     */
+    private static final String ALL_RIGHTS_QUERY = ", BaseObject as obj, %s as prop "
+        + "where doc.fullName=obj.name and (obj.className=?1 or obj.className=?2) "
+        + "and obj.id=prop.id.id and prop.name=?3 and prop.value like ?4";
 
     // ////////////////////////////////////////////////////////////////////////////
 
@@ -127,14 +136,20 @@ public final class RightsManager
     /**
      * Used to resolve document reference based on another reference.
      */
-    private DocumentReferenceResolver<String> explicitDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.TYPE_STRING, "explicit");
+    private DocumentReferenceResolver<String> explicitDocumentReferenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "explicit");
 
     /**
      * Used to resolve reference based on context.
      */
-    private DocumentReferenceResolver<String> currentDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.TYPE_STRING, "current");
+    private DocumentReferenceResolver<String> currentDocumentReferenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+
+    private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
+
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local");
 
     /**
      * Hidden constructor of RightsManager only access via getInstance().
@@ -293,7 +308,7 @@ public final class RightsManager
             return getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails, limit, order, context);
         }
 
-        List<Object> userOrGroupList = new ArrayList<Object>();
+        List<Object> userOrGroupList = new ArrayList<>();
 
         int nbGlobalUsersOrGroups = countAllGlobalUsersOrGroups(user, null, context);
 
@@ -301,8 +316,8 @@ public final class RightsManager
 
         // Get global groups
         if (newstart < nbGlobalUsersOrGroups) {
-            userOrGroupList.addAll(getAllMatchedGlobalUsersOrGroups(user, matchFields, withdetails, new RequestLimit(
-                limit.getNb(), newstart), order, context));
+            userOrGroupList.addAll(getAllMatchedGlobalUsersOrGroups(user, matchFields, withdetails,
+                new RequestLimit(limit.getNb(), newstart), order, context));
             newstart = 0;
         } else {
             newstart = newstart - nbGlobalUsersOrGroups;
@@ -310,11 +325,11 @@ public final class RightsManager
 
         // Get local groups
         if (limit.getNb() > userOrGroupList.size()) {
-            userOrGroupList.addAll(getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails, new RequestLimit(
-                limit.getNb() - userOrGroupList.size(), newstart), order, context));
+            userOrGroupList.addAll(getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails,
+                new RequestLimit(limit.getNb() - userOrGroupList.size(), newstart), order, context));
         } else if (limit.getNb() <= 0) {
-            userOrGroupList.addAll(getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails, new RequestLimit(0,
-                newstart), order, context));
+            userOrGroupList.addAll(getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails,
+                new RequestLimit(0, newstart), order, context));
         }
 
         return userOrGroupList;
@@ -394,7 +409,7 @@ public final class RightsManager
                 getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails, limit, order, context);
 
             if (localGroupList != null && !withdetails) {
-                List<String> wikiGroupList = new ArrayList<String>(localGroupList.size());
+                List<String> wikiGroupList = new ArrayList<>(localGroupList.size());
                 for (Object groupName : localGroupList) {
                     wikiGroupList.add(wikiName + WIKIFULLNAME_SEP + groupName);
                 }
@@ -435,11 +450,11 @@ public final class RightsManager
         RequestLimit limit, Object[][] order, XWikiContext context) throws XWikiException
     {
         if (user) {
-            return context.getWiki().getGroupService(context)
-                .getAllMatchedUsers(matchFields, withdetails, limit.getNb(), limit.getStart(), order, context);
+            return context.getWiki().getGroupService(context).getAllMatchedUsers(matchFields, withdetails,
+                limit.getNb(), limit.getStart(), order, context);
         } else {
-            return context.getWiki().getGroupService(context)
-                .getAllMatchedGroups(matchFields, withdetails, limit.getNb(), limit.getStart(), order, context);
+            return context.getWiki().getGroupService(context).getAllMatchedGroups(matchFields, withdetails,
+                limit.getNb(), limit.getStart(), order, context);
         }
     }
 
@@ -495,8 +510,8 @@ public final class RightsManager
     public Collection<String> getAllMatchedMembersNamesForGroup(String group, String matchField, int nb, int start,
         Boolean orderAsc, XWikiContext context) throws XWikiException
     {
-        return context.getWiki().getGroupService(context)
-            .getAllMatchedMembersNamesForGroup(group, matchField, nb, start, orderAsc, context);
+        return context.getWiki().getGroupService(context).getAllMatchedMembersNamesForGroup(group, matchField, nb,
+            start, orderAsc, context);
     }
 
     /**
@@ -562,7 +577,7 @@ public final class RightsManager
     private Map<String, LevelTree> getLevelTreeMap(XWikiDocument preferences, List<String> levelsToMatch,
         boolean global, XWikiContext context) throws XWikiException
     {
-        Map<String, LevelTree> rightsMap = new HashMap<String, LevelTree>();
+        Map<String, LevelTree> rightsMap = new HashMap<>();
 
         fillLevelTreeMap(rightsMap, preferences, levelsToMatch, global, true, context);
 
@@ -665,7 +680,7 @@ public final class RightsManager
         if (parentPreferences != null) {
             // Fill levels where to find inheritance
             if (levelInherited == null) {
-                levelInherited = new ArrayList<String>();
+                levelInherited = new ArrayList<>();
             }
 
             for (String levelName : levelsToMatch) {
@@ -697,13 +712,12 @@ public final class RightsManager
     {
         List<String> levelInherited = null;
         if (levelsToMatch == null) {
-            levelInherited = new ArrayList<String>();
+            levelInherited = new ArrayList<>();
         }
 
         if (!preferences.isNew()) {
             EntityReference rightClassReference =
-                global ? XWikiRightServiceImpl.GLOBALRIGHTCLASS_REFERENCE
-                    : XWikiRightServiceImpl.RIGHTCLASS_REFERENCE;
+                global ? XWikiRightServiceImpl.GLOBALRIGHTCLASS_REFERENCE : XWikiRightServiceImpl.RIGHTCLASS_REFERENCE;
             List<BaseObject> rightObjects = preferences.getXObjects(rightClassReference);
             if (rightObjects != null) {
                 for (BaseObject bobj : rightObjects) {
@@ -732,9 +746,8 @@ public final class RightsManager
         if (currentGlobal) {
             if (currentPreference.getFullName().equals(WIKI_PREFERENCES)) {
                 if (!context.isMainWiki()) {
-                    parentPreferences =
-                        context.getWiki().getDocument(context.getMainXWiki() + WIKIFULLNAME_SEP + WIKI_PREFERENCES,
-                            context);
+                    parentPreferences = context.getWiki()
+                        .getDocument(context.getMainXWiki() + WIKIFULLNAME_SEP + WIKI_PREFERENCES, context);
                 }
             } else if (currentPreference.getName().equals(SPACE_PREFERENCES)) {
                 String parentspace = currentPreference.getStringValue(WIKI_PREFERENCES, "parent");
@@ -750,9 +763,8 @@ public final class RightsManager
                 }
             }
         } else {
-            parentPreferences =
-                context.getWiki().getDocument(currentPreference.getSpace() + SPACEPAGENAME_SEP + SPACE_PREFERENCES,
-                    context);
+            parentPreferences = context.getWiki()
+                .getDocument(currentPreference.getSpace() + SPACEPAGENAME_SEP + SPACE_PREFERENCES, context);
         }
 
         return parentPreferences;
@@ -792,7 +804,7 @@ public final class RightsManager
             return null;
         }
 
-        List<String> rights = new ArrayList<String>();
+        List<String> rights = new ArrayList<>();
         rights.add(levelName);
 
         Map<String, LevelTree> rightsMap = getLevelTreeMap(doc, rights, global, context);
@@ -910,10 +922,10 @@ public final class RightsManager
     {
         boolean needUpdate = false;
 
-        String userOrGroupField = user ? RIGHTSFIELD_USERS : RIGHTSFIELD_GROUPS;
+        String userOrGroupField = getUserOrGroupField(user);
 
         List<String> usersOrGroups =
-            ListClass.getListFromString(right.getStringValue(userOrGroupField), RIGHTSLISTFIELD_SEP, false);
+            ListClass.getListFromString(right.getLargeStringValue(userOrGroupField), USERGROUPLISTFIELD_SEP, false);
 
         if (userOrGroupWiki != null) {
             needUpdate |= usersOrGroups.remove(userOrGroupWiki + WIKIFULLNAME_SEP + userOrGroupName);
@@ -928,10 +940,16 @@ public final class RightsManager
         }
 
         if (needUpdate) {
-            right.setStringValue(userOrGroupField, StringUtils.join(usersOrGroups.toArray(), RIGHTSLISTFIELD_JOIN));
+            right.setLargeStringValue(userOrGroupField,
+                ListClass.getStringFromList(usersOrGroups, USERGROUPLISTFIELD_SEP));
         }
 
         return needUpdate;
+    }
+
+    private String getUserOrGroupField(boolean user)
+    {
+        return user ? RIGHTSFIELD_USERS : RIGHTSFIELD_GROUPS;
     }
 
     /**
@@ -963,8 +981,8 @@ public final class RightsManager
                 needUpdate |=
                     removeUserOrGroupFromRight(bobj, userOrGroupWiki, userOrGroupSpace, userOrGroupName, user, context);
 
-                if (needUpdate && bobj.getStringValue(RIGHTSFIELD_USERS).trim().length() == 0
-                    && bobj.getStringValue(RIGHTSFIELD_GROUPS).trim().length() == 0) {
+                if (needUpdate && bobj.getLargeStringValue(RIGHTSFIELD_USERS).trim().length() == 0
+                    && bobj.getLargeStringValue(RIGHTSFIELD_GROUPS).trim().length() == 0) {
                     rightsDocument.removeXObject(bobj);
                 }
             }
@@ -1006,7 +1024,7 @@ public final class RightsManager
     public void removeUserOrGroupFromAllRights(String userOrGroupWiki, String userOrGroupSpace, String userOrGroupName,
         boolean user, XWikiContext context) throws XWikiException
     {
-        List<String> parameterValues = new ArrayList<String>();
+        List<String> parameterValues = new ArrayList<>();
 
         String fieldName;
         if (user) {
@@ -1020,37 +1038,166 @@ public final class RightsManager
 
         String fieldTypeName = ((PropertyClass) rightClass.get(fieldName)).newProperty().getClass().getSimpleName();
 
-        StringBuilder where =
-            new StringBuilder(", BaseObject as obj" + ", " + fieldTypeName + " as prop where doc.fullName=obj.name"
-                + " and (obj.className=? or obj.className=?)");
+        String where = String.format(ALL_RIGHTS_QUERY, fieldTypeName);
+
         parameterValues.add(rightClass.getName());
         parameterValues.add(globalRightClass.getName());
-
-        where.append(" and obj.id=prop.id.id");
-
-        where.append(" and prop.name=?");
         parameterValues.add(fieldName);
-
-        where.append(" and prop.value like ?");
 
         if (context.getWikiId() == null || context.getWikiId().equalsIgnoreCase(userOrGroupWiki)) {
             if (userOrGroupSpace == null || userOrGroupSpace.equals(DEFAULT_USERORGROUP_SPACE)) {
                 parameterValues.add(HQLLIKE_ALL_SYMBOL + userOrGroupName + HQLLIKE_ALL_SYMBOL);
             } else {
-                parameterValues.add(HQLLIKE_ALL_SYMBOL + userOrGroupSpace + SPACEPAGENAME_SEP + userOrGroupName
-                    + HQLLIKE_ALL_SYMBOL);
+                parameterValues.add(
+                    HQLLIKE_ALL_SYMBOL + userOrGroupSpace + SPACEPAGENAME_SEP + userOrGroupName + HQLLIKE_ALL_SYMBOL);
             }
         } else {
-            parameterValues.add(HQLLIKE_ALL_SYMBOL + userOrGroupWiki + WIKIFULLNAME_SEP + userOrGroupName
-                + HQLLIKE_ALL_SYMBOL);
+            parameterValues
+                .add(HQLLIKE_ALL_SYMBOL + userOrGroupWiki + WIKIFULLNAME_SEP + userOrGroupName + HQLLIKE_ALL_SYMBOL);
         }
 
         List<XWikiDocument> documentList =
-            context.getWiki().getStore().searchDocuments(where.toString(), parameterValues, context);
+            context.getWiki().getStore().searchDocuments(where, parameterValues, context);
 
         for (XWikiDocument groupDocument : documentList) {
             if (removeUserOrGroupFromAllRights(groupDocument, userOrGroupWiki, userOrGroupSpace, userOrGroupName, user,
                 context)) {
+                context.getWiki().saveDocument(groupDocument, context);
+            }
+        }
+    }
+
+    /**
+     * Replace a user or a group reference with another one on a right object.
+     * @param right the right to change.
+     * @param userOrGroupSourceReference the reference of the user or group that we need to replace
+     * @param userOrGroupTargetReference the reference of the user or group that will be used as replacement
+     * @param user if {@code true} the reference will be looked in the users properties, else in the groups one
+     * @return {@code true} if the right has been changed
+     * @since 11.9RC1
+     */
+    private boolean replaceUserOrGroupFromRight(BaseObject right, DocumentReference userOrGroupSourceReference,
+        DocumentReference userOrGroupTargetReference, boolean user)
+    {
+        boolean needUpdate = false;
+
+        String userOrGroupField = getUserOrGroupField(user);
+        List<String> usersOrGroups =
+            ListClass.getListFromString(right.getLargeStringValue(userOrGroupField), USERGROUPLISTFIELD_SEP, false);
+
+        String userOrGroupSource = this.compactWikiEntityReferenceSerializer.serialize(userOrGroupSourceReference);
+        String userOrGroupTarget = this.compactWikiEntityReferenceSerializer.serialize(userOrGroupTargetReference);
+
+        if (usersOrGroups.remove(userOrGroupSource)) {
+            usersOrGroups.add(userOrGroupTarget);
+            needUpdate = true;
+        }
+
+        if (needUpdate) {
+            right.setLargeStringValue(userOrGroupField, ListClass.getStringFromList(usersOrGroups,
+                USERGROUPLISTFIELD_SEP));
+        }
+
+        return needUpdate;
+    }
+
+    /**
+     * Replace a user or a group reference with another one on either the global or local rights
+     * of a {@link XWikiDocument}.
+     *
+     * @param rightsDocument the document where to update the rights
+     * @param userOrGroupSourceReference the reference of the user or group that we need to replace
+     * @param userOrGroupTargetReference the reference of the user or group that will be used as replacement
+     * @param user if {@code true} the reference will be looked in the users properties, else in the groups one
+     * @param global if {@code true} update the XWikiGlobalRights objects, else update the XWikiRights objects
+     * @return {@code true} if some rights have changed
+     * @since 11.9RC1
+     */
+    private boolean replaceUserOrGroupFromRights(XWikiDocument rightsDocument,
+        DocumentReference userOrGroupSourceReference, DocumentReference userOrGroupTargetReference, boolean user,
+        boolean global)
+    {
+        boolean needUpdate = false;
+
+        EntityReference rightClassReference =
+            global ? XWikiRightServiceImpl.GLOBALRIGHTCLASS_REFERENCE : XWikiRightServiceImpl.RIGHTCLASS_REFERENCE;
+
+        List<BaseObject> rightObjects = rightsDocument.getXObjects(rightClassReference);
+        if (rightObjects != null) {
+            for (BaseObject bobj : rightObjects) {
+                if (bobj == null) {
+                    continue;
+                }
+                needUpdate |=
+                    replaceUserOrGroupFromRight(bobj, userOrGroupSourceReference, userOrGroupTargetReference, user);
+            }
+        }
+
+        return needUpdate;
+    }
+
+    /**
+     * Replace a user or a group reference with another one on both the local and global
+     * rights of a {@link XWikiDocument}.
+     *
+     * @param rightsDocument the document where to update the rights
+     * @param userOrGroupSourceReference the reference of the user or group that we need to replace
+     * @param userOrGroupTargetReference the reference of the user or group that will be used as replacement
+     * @param user if {@code true} the reference will be looked in the users properties, else in the groups one
+     * @return {@code true} if some rights have changed
+     * @since 11.9RC1
+     */
+    private boolean replaceUserOrGroupFromAllRights(XWikiDocument rightsDocument,
+        DocumentReference userOrGroupSourceReference, DocumentReference userOrGroupTargetReference, boolean user)
+    {
+        return replaceUserOrGroupFromRights(rightsDocument, userOrGroupSourceReference, userOrGroupTargetReference,
+            user, true)
+            || replaceUserOrGroupFromRights(rightsDocument, userOrGroupSourceReference, userOrGroupTargetReference,
+            user, false);
+    }
+
+    /**
+     * Replace a user or a group reference with another one on all rights of the current wiki.
+     *
+     * @param userOrGroupSourceReference the reference of the user or group that we need to replace
+     * @param userOrGroupTargetReference the reference of the user or group that will be used as replacement
+     * @param user if {@code true} the reference will be looked in the users properties, else in the groups one
+     * @param context the current context
+     * @throws XWikiException in case of errors
+     * @since 11.9RC1
+     */
+    public void replaceUserOrGroupFromAllRights(DocumentReference userOrGroupSourceReference,
+        DocumentReference userOrGroupTargetReference, boolean user, XWikiContext context) throws XWikiException
+    {
+        List<String> parameterValues = new ArrayList<>();
+
+        String fieldName;
+        if (user) {
+            fieldName = RIGHTSFIELD_USERS;
+        } else {
+            fieldName = RIGHTSFIELD_GROUPS;
+        }
+
+        BaseClass rightClass = context.getWiki().getRightsClass(context);
+        BaseClass globalRightClass = context.getWiki().getGlobalRightsClass(context);
+
+        String fieldTypeName = ((PropertyClass) rightClass.get(fieldName)).newProperty().getClass().getSimpleName();
+
+        String where = String.format(ALL_RIGHTS_QUERY, fieldTypeName);
+
+        parameterValues.add(this.localEntityReferenceSerializer.serialize(rightClass.getReference()));
+        parameterValues.add(this.localEntityReferenceSerializer.serialize(globalRightClass.getReference()));
+        parameterValues.add(fieldName);
+        parameterValues.add(HQLLIKE_ALL_SYMBOL
+            + this.compactWikiEntityReferenceSerializer.serialize(userOrGroupSourceReference)
+            + HQLLIKE_ALL_SYMBOL);
+
+        List<XWikiDocument> documentList =
+            context.getWiki().getStore().searchDocuments(where, parameterValues, context);
+
+        for (XWikiDocument groupDocument : documentList) {
+            if (replaceUserOrGroupFromAllRights(groupDocument, userOrGroupSourceReference, userOrGroupTargetReference,
+                user)) {
                 context.getWiki().saveDocument(groupDocument, context);
             }
         }
@@ -1099,7 +1246,7 @@ public final class RightsManager
 
         Map<String, Collection<String>> groupCache = groupCacheIn;
         if (groupCache == null) {
-            groupCache = new HashMap<String, Collection<String>>();
+            groupCache = new HashMap<>();
         }
 
         Collection<String> memberList = groupCache.get(groupName);

@@ -38,6 +38,8 @@ import com.xpn.xwiki.objects.classes.UsersClass;
 @Singleton
 public class UsersMetaClass extends ListMetaClass
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * Default constructor. Initializes the default meta properties of a List of Users XClass property.
      */

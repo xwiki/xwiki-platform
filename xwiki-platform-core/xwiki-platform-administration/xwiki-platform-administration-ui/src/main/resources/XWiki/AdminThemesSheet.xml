@@ -166,10 +166,10 @@ $xwiki.jsx.use('XWiki.AdminThemesSheet')
     self.init = function () {
       self.update();
       // Update the button everytime the value of the input changes
-      self.input.change(function () {
+      self.input.on('change', function() {
         self.update();
       });
-      self.input.keyup(function () {
+      self.input.on('keyup', function() {
         self.update();
       });
     };

@@ -1,3 +1,22 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
   'use strict';
 
@@ -45,13 +64,13 @@ define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
   var findNode = function(event, data) {
     this.deselect_all();
     this.close_all();
-    this.openTo(data.id, $.proxy(function(node) {
+    this.openTo(data.id, node => {
       if (this.select_node(node) !== false) {
         // Scroll only the node label into view because the entire node may take a lot of vertical space due to its
         // descendants (when the node is expanded).
         this.get_node(node, true).children('.jstree-anchor')[0].scrollIntoView(false);
       }
-    }, this));
+    });
   };
 
   // Move the icon inside the value container because it's easier to style it like that.
@@ -67,7 +86,7 @@ define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
     this.init = function (element, options) {
       parent.init.call(this, element, options);
 
-      $(createSuggestInput(options)).insertBefore(element).on('xwiki:suggest:selected', $.proxy(findNode, this));
+      $(createSuggestInput(options)).insertBefore(element).on('xwiki:suggest:selected', findNode.bind(this));
     };
   };
 });

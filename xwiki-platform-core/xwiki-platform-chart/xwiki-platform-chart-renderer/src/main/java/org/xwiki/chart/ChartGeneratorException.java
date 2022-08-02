@@ -47,7 +47,8 @@ public class ChartGeneratorException extends Exception
      * 
      * @param throwable The underlying cause for this exception.
      */
-    public ChartGeneratorException(Throwable throwable) {
+    public ChartGeneratorException(Throwable throwable)
+    {
         super(throwable);
     }
 

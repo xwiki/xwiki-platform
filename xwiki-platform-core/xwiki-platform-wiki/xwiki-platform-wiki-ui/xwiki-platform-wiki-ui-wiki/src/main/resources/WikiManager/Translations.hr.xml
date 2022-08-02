@@ -133,6 +133,5 @@ admin.xwiki.members.title=Trenutni članovi
 ### Missing: admin.xwiki.users.title=All Users
     
 # DRAWER ITEM
-platform.wiki.drawer.homeWiki=Početni wiki
-</content>
+platform.wiki.drawer.homeWiki=Početni wiki</content>
 </xwikidoc>

@@ -102,6 +102,8 @@ public class XWikiExecutor
     private static final int VERIFY_RUNNING_XWIKI_AT_START_TIMEOUT =
         Integer.valueOf(System.getProperty("xwiki.test.verifyRunningXWikiAtStartTimeout", "15"));
 
+    private static final int DEBUG_PORT = 5005;
+
     private int port;
 
     private int stopPort;
@@ -128,7 +130,9 @@ public class XWikiExecutor
 
     private XWikiWatchdog watchdog = new XWikiWatchdog();
 
-    private long startTimeout = 120;
+    private long startTimeout = Long.valueOf(System.getProperty("xwikiExecutionStartTimeout", "120"));
+
+    private int debugPort ;
 
     public XWikiExecutor(int index)
     {
@@ -141,6 +145,7 @@ public class XWikiExecutor
         String rmiPortString = System.getProperty("rmiPort" + index);
         this.rmiPort =
             rmiPortString != null ? Integer.valueOf(rmiPortString) : (Integer.valueOf(DEFAULT_RMIPORT) + index);
+        this.debugPort = DEBUG_PORT + index;
 
         // Resolve the execution directory, which should point to a location where an XWiki distribution is located
         // and can be started (directory where the start_xwiki.sh|bat files are located).
@@ -153,7 +158,7 @@ public class XWikiExecutor
                 } else {
                     this.executionDirectory = "";
                 }
-                this.executionDirectory += "target/xwiki";
+                this.executionDirectory = findXWikiDirectoryInTarget(this.executionDirectory);
             }
             if (index > 0) {
                 this.executionDirectory += "-" + index;
@@ -180,6 +185,11 @@ public class XWikiExecutor
     public int getRMIPort()
     {
         return this.rmiPort;
+    }
+
+    public int getDebugPort()
+    {
+        return this.debugPort;
     }
 
     public String getExecutionDirectory()
@@ -265,17 +275,18 @@ public class XWikiExecutor
         CommandLine command = CommandLine.parse(commandLine);
 
         // Execute the process asynchronously so that we don't block.
-        DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
+        DefaultExecuteResultHandler resultHandler = new XWikiDefaultExecuteResultHandler(commandLine);
 
         // Send Process output and error streams to our logger.
-        PumpStreamHandler streamHandler = new PumpStreamHandler(new XWikiLogOutputStream(XWikiLogOutputStream.STDOUT),
-            new XWikiLogOutputStream(XWikiLogOutputStream.STDERR));
+        PumpStreamHandler streamHandler = new PumpStreamHandler(new XWikiLogOutputStream());
 
         // Make sure we end the process when the JVM exits
         ShutdownHookProcessDestroyer processDestroyer = new ShutdownHookProcessDestroyer();
 
         // Prevent the process from running indefinitely and kill it after 1 hour...
-        ExecuteWatchdog watchDog = new ExecuteWatchdog(60L * 60L * 1000L);
+        // FIXME: some tests requires XWiki to run more than 1 hour (escaping and webstandards tests)
+        // so increasing this to 2 hours
+        ExecuteWatchdog watchDog = new ExecuteWatchdog(120L * 60L * 1000L);
 
         // The executor to execute the command
         DefaultExecutor executor = new DefaultExecutor();
@@ -289,11 +300,7 @@ public class XWikiExecutor
         Map<String, String> newEnvironment = EnvironmentUtils.getProcEnvironment();
         newEnvironment.putAll(this.environment);
 
-        try {
-            executor.execute(command, newEnvironment, resultHandler);
-        } catch (Exception e) {
-            throw new Exception(String.format("Failed to execute command [%s]", commandLine), e);
-        }
+        executor.execute(command, newEnvironment, resultHandler);
 
         return resultHandler;
     }
@@ -305,7 +312,7 @@ public class XWikiExecutor
     {
         File dir = new File(getExecutionDirectory());
         if (dir.exists()) {
-            String startCommand = getDefaultStartCommand(getPort(), getStopPort(), getRMIPort());
+            String startCommand = getDefaultStartCommand(getPort(), getStopPort(), getRMIPort(), getDebugPort());
             LOGGER.debug("Executing command: [{}]", startCommand);
             this.startedProcessHandler = executeCommand(startCommand);
         } else {
@@ -325,10 +332,13 @@ public class XWikiExecutor
         // Wait till the main page becomes available which means the server is started fine
         LOGGER.info("Checking that XWiki is up and running...");
 
-        WatchdogResponse response = this.watchdog.isXWikiStarted(getURL(), this.startTimeout);
+        // If we're in debug mode then don't use a timeout (or rather use a very long one - we use 1 day) since we'll
+        // start XWiki in debug mode and wait to connect to it (suspend = true).
+        long timeout = DEBUG ? 60*60*24 : this.startTimeout;
+        WatchdogResponse response = this.watchdog.isXWikiStarted(getURL(), timeout);
         if (response.timedOut) {
             String message = String.format("Failed to start XWiki in [%s] seconds, last error code [%s], message [%s]",
-                this.startTimeout, response.responseCode, new String(response.responseBody));
+                timeout, response.responseCode, response.responseBody);
             LOGGER.info(message);
             stop();
             throw new RuntimeException(message);
@@ -506,7 +516,7 @@ public class XWikiExecutor
         return URL + ":" + getPort() + DEFAULT_CONTEXT + "/bin/get/Main/";
     }
 
-    private String getDefaultStartCommand(int port, int stopPort, int rmiPort)
+    private String getDefaultStartCommand(int port, int stopPort, int rmiPort, int debugPort)
     {
         String startCommand = START_COMMAND;
         if (startCommand == null) {
@@ -514,7 +524,9 @@ public class XWikiExecutor
             if (SystemUtils.IS_OS_WINDOWS) {
                 startCommand = String.format("cmd /c %s.bat %s %s", scriptNamePrefix, port, stopPort);
             } else {
-                startCommand = String.format("bash %s.sh -p %s -sp %s", scriptNamePrefix, port, stopPort);
+                String debugParams = DEBUG ? String.format("-dp %d --suspend", debugPort) : "";
+                startCommand =
+                    String.format("bash %s.sh -p %s -sp %s %s -ni", scriptNamePrefix, port, stopPort, debugParams);
             }
         } else {
             startCommand = startCommand.replaceFirst(DEFAULT_PORT, String.valueOf(port));
@@ -540,5 +552,27 @@ public class XWikiExecutor
         }
 
         return stopCommand;
+    }
+
+    private String findXWikiDirectoryInTarget(String baseDirectory)
+    {
+        // Try the standard location first
+        File defaultDirectory = new File(String.format("%starget/xwiki", baseDirectory));
+        if (defaultDirectory.exists()) {
+            return defaultDirectory.getPath();
+        }
+
+        // Find all directories starting with "xwiki" and look for a file inside named "start_xwiki.sh". Return the
+        // first such directory found.
+        File targetFile = new File(String.format("%starget", baseDirectory));
+        File[] directories = targetFile.listFiles(
+            file -> file.isDirectory() && file.getName().startsWith("xwiki"));
+        for (File directory : directories) {
+            File[] startFiles = directory.listFiles(file -> file.getName().equals("start_xwiki.sh"));
+            if (startFiles != null && startFiles.length > 0) {
+                return directory.getPath();
+            }
+        }
+        return "target/xwiki";
     }
 }

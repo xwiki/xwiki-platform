@@ -69,7 +69,7 @@
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <values>edit|saveandedit</values>
+        <values>edit|saveandedit|saveandview</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </action>
       <creationRestrictions>

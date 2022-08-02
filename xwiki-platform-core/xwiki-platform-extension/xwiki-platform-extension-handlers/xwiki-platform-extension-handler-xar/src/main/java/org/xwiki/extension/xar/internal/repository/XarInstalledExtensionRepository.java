@@ -34,7 +34,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -51,6 +50,7 @@ import org.xwiki.extension.xar.internal.handler.UnsupportedNamespaceException;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.extension.xar.internal.handler.XarHandlerUtils;
 import org.xwiki.extension.xar.job.diff.DocumentVersionReference;
+import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
@@ -79,7 +79,7 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
     private transient XarEntryTypeResolver typeResolver;
 
     @Inject
-    private transient Logger logger;
+    private EntityReferenceFactory referenceFactory;
 
     /**
      * Index used to find extensions owners of a document installed on a specific wiki.
@@ -139,7 +139,7 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
                                 newSet.remove(installedExtension);
                             }
 
-                            this.documents.put(reference, newSet);
+                            this.documents.put(this.referenceFactory.getReference(reference), newSet);
                         }
                     }
                 } else {
@@ -167,7 +167,7 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
     {
         InstalledExtension installedExtension = this.installedRepository.getInstalledExtension(extensionId);
 
-        if (installedExtension != null && installedExtension.getType().equals(XarExtensionHandler.TYPE)) {
+        if (installedExtension != null && XarExtensionHandler.TYPE.equals(installedExtension.getType())) {
             if (getInstalledExtension(installedExtension.getId()) == null) {
                 try {
                     addCacheXarExtension(installedExtension);
@@ -202,7 +202,7 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
     private void loadExtensions()
     {
         for (InstalledExtension localExtension : this.installedRepository.getInstalledExtensions()) {
-            if (localExtension.getType().equalsIgnoreCase(XarExtensionHandler.TYPE)) {
+            if (XarExtensionHandler.TYPE.equalsIgnoreCase(localExtension.getType())) {
                 try {
                     // Add XAR extension to the cache
                     XarInstalledExtension xarInstalledExtension = addCacheXarExtension(localExtension);
@@ -311,7 +311,7 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
         InstalledExtension extension = this.installedRepository.getInstalledExtension(id, namespace);
 
         if (extension != null) {
-            if (extension.getType().equals(XarExtensionHandler.TYPE)) {
+            if (XarExtensionHandler.TYPE.equals(extension.getType())) {
                 extension = this.extensions.get(extension.getId());
             } else {
                 extension = null;
@@ -335,21 +335,22 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
     }
 
     @Override
-    public Collection<InstalledExtension> getBackwardDependencies(String id, String namespace) throws ResolveException
+    public Collection<InstalledExtension> getBackwardDependencies(String id, String namespace, boolean withOptional)
+        throws ResolveException
     {
         InstalledExtension extension = this.installedRepository.getInstalledExtension(id, namespace);
 
-        return extension.getType().equals(XarExtensionHandler.TYPE)
-            ? this.installedRepository.getBackwardDependencies(id, namespace) : null;
+        return XarExtensionHandler.TYPE.equals(extension.getType())
+            ? this.installedRepository.getBackwardDependencies(id, namespace, withOptional) : null;
     }
 
     @Override
-    public Map<String, Collection<InstalledExtension>> getBackwardDependencies(ExtensionId extensionId)
-        throws ResolveException
+    public Map<String, Collection<InstalledExtension>> getBackwardDependencies(ExtensionId extensionId,
+        boolean withOptional) throws ResolveException
     {
         InstalledExtension extension = this.installedRepository.resolve(extensionId);
 
-        return extension.getType().equals(XarExtensionHandler.TYPE)
+        return XarExtensionHandler.TYPE.equals(extension.getType())
             ? this.installedRepository.getBackwardDependencies(extensionId) : null;
     }
 }

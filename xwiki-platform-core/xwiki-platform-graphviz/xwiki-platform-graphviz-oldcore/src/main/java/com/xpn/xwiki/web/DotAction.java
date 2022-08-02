@@ -21,6 +21,11 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.graphviz.GraphVizPlugin;
@@ -31,6 +36,9 @@ import com.xpn.xwiki.util.Util;
  *
  * @version $Id$
  */
+@Component
+@Named("dot")
+@Singleton
 @Deprecated
 public class DotAction extends XWikiAction
 {

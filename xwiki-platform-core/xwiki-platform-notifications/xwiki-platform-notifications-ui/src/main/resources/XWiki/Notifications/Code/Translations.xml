@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.Notifications.Code.Translations" locale="">
+<xwikidoc version="1.4" reference="XWiki.Notifications.Code.Translations" locale="">
   <web>XWiki.Notifications.Code</web>
   <name>Translations</name>
   <language/>
@@ -30,15 +30,13 @@
   <parent>XWiki.Notifications.Code.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <parent>XWiki.Notifications.Code.WebHome</parent>
   <version>1.1</version>
   <title/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>
-platform.core.profile.category.notifications=Notifications
+  <content>platform.core.profile.category.notifications=Notifications
 notifications.filters.cancel=Cancel
 notifications.filters.submit=Save
 notifications.filters.type.label=Filter type:
@@ -56,9 +54,9 @@ notifications.filters.advanced.modal.close=Close
 
 ## Filters names
 notifications.filters.name.systemUserNotificationFilter=System Filter
-notifications.filters.description.systemUserNotificationFilter=Hide notifications from the System user
+notifications.filters.description.systemUserNotificationFilter=Hide notifications from the System user unless the event specifically targets you
 notifications.filters.name.ownEventsNotificationFilter=Own Events Filter
-notifications.filters.description.ownEventsNotificationFilter=Hide notifications about your own activity
+notifications.filters.description.ownEventsNotificationFilter=Hide notifications about your own activity unless the event specifically targets you
 notifications.filters.name.eventReadAlertFilter=Read Event Filter (Alert)
 notifications.filters.description.eventReadAlertFilter=Hide notifications that you have marked as read
 notifications.filters.name.eventReadEmailFilter=Read Event Filter (Email)
@@ -68,32 +66,11 @@ notifications.filters.description.minorEventAlertNotificationFilter=Hide notific
 notifications.filters.name.minorEventEmailNotificationFilter=Minor Event (Email)
 notifications.filters.description.minorEventEmailNotificationFilter=Hide notifications concerning minor changes on pages
 
-## Filter Types
-notifications.filters.type.inclusive=Inclusive
-notifications.filters.type.exclusive=Exclusive
-
 ## Translation keys for the scopeNotificationFilter
 notifications.filters.preferences.scopeNotificationFilter.name=Scope Notification Filter
 notifications.filters.preferences.scopeNotificationFilter.page=Page only
 notifications.filters.preferences.scopeNotificationFilter.space=Page and children
 notifications.filters.preferences.scopeNotificationFilter.wiki=Wiki
-
-notifications.filters.preferences.allEvents=-
-
-notifications.filters.preferences.addPreference.filterType.inclusive=Inclusive
-notifications.filters.preferences.addPreference.filterType.exclusive=Exclusive
-notifications.filters.preferences.addPreference.notificationFormat.label=Notification format
-notifications.filters.preferences.addPreference.notificationFormat.hint=On which format of notification the filter should apply?
-notifications.filters.preferences.addPreference.eventType.label=Event Type
-notifications.filters.preferences.addPreference.eventType.hint=Which event type should be targeted by the filter?
-notifications.filters.preferences.addPreference.location.label=Filter Scope
-notifications.filters.preferences.addPreference.location.hint=Which page should be targeted by the filter?
-notifications.filters.preferences.delete.inProgress=Deleting...
-notifications.filters.preferences.delete.done=Filter preference deleted!
-notifications.filters.preferences.delete.error=Failed to delete the filter preference
-notifications.filters.preferences.setEnabled.inProgress=Saving...
-notifications.filters.preferences.setEnabled.done=Filter preference saved!
-notifications.filters.preferences.setEnabled.error=Failed to save the filter preference
 
 ## Notifications toggles
 notifications.toggle.disabled.hint=You need to enable notifications in your settings if you wish to watch these locations
@@ -103,17 +80,55 @@ notifications.format.alert=Alert
 notifications.format.email=Email
 
 ## Filter preferences settings
-notifications.settings.filters.preferences.title=Filters
-notifications.settings.filters.preferences.hint=Create filters to more precisely control when the active events should trigger notifications.
-notifications.settings.filters.preferences.forGuest=Log in or register to handle your notification filters.
+notifications.filters.preferences.delete.inProgress=Deleting...
+notifications.filters.preferences.delete.done=Filter preference deleted!
+notifications.filters.preferences.delete.error=Failed to delete the filter preference
+notifications.filters.preferences.setEnabled.inProgress=Saving...
+notifications.filters.preferences.setEnabled.done=Filter preference saved!
+notifications.filters.preferences.setEnabled.error=Failed to save the filter preference
 
+notifications.filters.preferences.allEvents=All events (even disabled)
+
+## System Filter preferences settings
+notifications.settings.filters.preferences.system.title=System Filters
+notifications.settings.filters.preferences.system.hint=System filters that you can switches to have a more fine-grained control of the notifications you want to receive.
 ## Header definition for notification filter preferences
-notifications.settings.filters.preferences.table.name=Name
-notifications.settings.filters.preferences.table.filterType=Filter Type
-notifications.settings.filters.preferences.table.eventTypes=Events
-notifications.settings.filters.preferences.table.notificationFormats=Formats
-notifications.settings.filters.preferences.table.isEnabled=Is enabled?
-notifications.settings.filters.preferences.table._actions=Actions
+notifications.settings.filters.preferences.system.table.name=Name
+notifications.settings.filters.preferences.system.table.filterType=Description
+notifications.settings.filters.preferences.system.table.notificationFormats=Formats
+notifications.settings.filters.preferences.system.table.isEnabled=Is enabled?
+
+## Custom Filter preferences settings
+notifications.settings.filters.preferences.custom.title=Custom Filters
+notifications.settings.filters.preferences.custom.hint=Create filters to control the notifications you want to receive.
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.custom.table.name=Location
+notifications.settings.filters.preferences.custom.table.filterType=Filter Action
+notifications.settings.filters.preferences.custom.table.eventTypes=Events
+notifications.settings.filters.preferences.custom.table.notificationFormats=Formats
+notifications.settings.filters.preferences.custom.table.isEnabled=Is enabled?
+notifications.settings.filters.preferences.custom.table._actions=Actions
+notifications.filters.type.custom.inclusive=Notify of the event
+notifications.filters.type.custom.exclusive=Ignore the event
+
+
+## Add filter modal
+notifications.settings.addFilter=Add filter
+notifications.settings.addFilter.hint=Create a filter for events happening on specific locations. The filter can trigger the sending of a notification or prevent one from being sent, depending on the event and the notification channel.
+
+notifications.filters.preferences.custom.addFilter.location.label=Location
+notifications.filters.preferences.custom.addFilter.location.hint=This filter applies on the events happening on the locations selected here. Select one or more locations.
+
+notifications.filters.preferences.custom.addFilter.type.label=Action
+notifications.filters.preferences.custom.addFilter.type.hint=This filter can either notify of or ignore the events happening on the selected locations. Choose the action you want to take for the events.
+notifications.filters.preferences.custom.addFilter.filterType.inclusive=Notify of the event
+notifications.filters.preferences.custom.addFilter.filterType.exclusive=Ignore the event
+
+notifications.filters.preferences.custom.addFilter.notificationFormat.label=Channel
+notifications.filters.preferences.custom.addFilter.notificationFormat.hint=This filter applies only to the notifications sent on the communication channels selected below. Choose one or more communication channels.
+
+notifications.filters.preferences.custom.addFilter.eventType.label=Events
+notifications.filters.preferences.custom.addFilter.eventType.hint=This filter applies to the events selected here, in the locations selected above. Choose one or more events.
 
 notifications.menu.header=Notifications
 notifications.menu.header.settings=Settings
@@ -136,7 +151,6 @@ notifications.settings.saving=Your settings are being saved...
 notifications.settings.saved=Saved!
 notifications.settings.savingfailed=Failed to save your settings
 notifications.settings.filters=Filters ({0})
-notifications.settings.addFilter=Add filter
 notifications.settings.errorFilterWiki=Error: you must select a wiki, not a page
 notifications.settings.preferences=Preferences
 notifications.settings.preferences.hint=Capture what events are happening and deliver them in the stream or by email.
@@ -166,6 +180,8 @@ notifications.rss.feedLinkDescription=Event feed for notifications
 notifications.rss.feedTitle=Notifications RSS feed
 notifications.rss.feedDescription=This RSS feed can be customized on your profile page.
 notifications.rss.seeChanges=Changes: {0}
+notifications.rss.defaultTitleWithPage=New event on {0}
+notifications.rss.defaultTitle=New event
 notifications.globalsettings.email=Notifications Email
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily=Daily
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly=Hourly
@@ -180,6 +196,12 @@ XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NONE=Never
 XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_ALL=Every time I make a modification
 XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_MAJOR=Every time I make a major modification
 XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NEW=Only when I create a new page
+
+## Common notification settings errors
+notifications.settings.error.userReferenceNotSupported=The given user reference is not supported, only DocumentUserReference are supported for now.
+notifications.settings.error.userReferenceAdminForbidden=You don't have administration right for the given user: {0}.
+notifications.settings.error.badCSRF=Bad CSRF token.
+notifications.settings.badParameters=Bad request parameters.
 
 ## User profile
 notifications.userprofile.following=Following
@@ -212,7 +234,38 @@ notifications.switches.tooltip.pageAndChildren=Watch this page and its children
 notifications.switches.tooltip.space=Watch the parent page and its children
 notifications.switches.tooltip.wiki=Watch this wiki
 notifications.switches.changeStatusError=Failed to change the status of the notifications.
-</content>
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## until 13.2RC1
+notifications.settings.filters.preferences.title=Filters
+notifications.settings.filters.preferences.hint=Create filters to more precisely control when the active events should trigger notifications.
+notifications.settings.filters.preferences.forGuest=Log in or register to handle your notification filters.
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.table.name=Name
+notifications.settings.filters.preferences.table.filterType=Filter Type
+notifications.settings.filters.preferences.table.eventTypes=Events
+notifications.settings.filters.preferences.table.notificationFormats=Formats
+notifications.settings.filters.preferences.table.isEnabled=Is enabled?
+notifications.settings.filters.preferences.table._actions=Actions
+
+notifications.filters.preferences.addPreference.filterType.inclusive=Inclusive
+notifications.filters.preferences.addPreference.filterType.exclusive=Exclusive
+notifications.filters.preferences.addPreference.notificationFormat.label=Notification format
+notifications.filters.preferences.addPreference.notificationFormat.hint=On which format of notification the filter should apply?
+notifications.filters.preferences.addPreference.eventType.label=Event Type
+notifications.filters.preferences.addPreference.eventType.hint=Which event type should be targeted by the filter?
+notifications.filters.preferences.addPreference.location.label=Filter Scope
+notifications.filters.preferences.addPreference.location.hint=Which page should be targeted by the filter?
+
+
+## Filter Types
+notifications.filters.type.inclusive=Inclusive
+notifications.filters.type.exclusive=Exclusive
+
+## Used to indicate where deprecated keys end
+#@deprecatedend</content>
   <object>
     <name>XWiki.Notifications.Code.Translations</name>
     <number>0</number>
@@ -231,6 +284,8 @@ notifications.switches.changeStatusError=Failed to change the status of the noti
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>scope</name>
         <number>1</number>

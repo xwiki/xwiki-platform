@@ -19,7 +19,8 @@
  */
 package com.xpn.xwiki;
 
-import java.sql.Timestamp;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -46,7 +47,6 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.environment.Environment;
 import org.xwiki.localization.ContextualLocalizationManager;
-import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectReference;
@@ -58,27 +58,37 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.refactoring.internal.batch.DefaultBatchOperationExecutor;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.resource.ResourceReferenceManager;
+import org.xwiki.skin.Resource;
+import org.xwiki.skin.Skin;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.doc.DocumentRevisionProvider;
-import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.ReadOnlyXWikiContextProvider;
+import com.xpn.xwiki.internal.debug.DebugConfiguration;
+import com.xpn.xwiki.internal.render.groovy.ParseGroovyFromString;
+import com.xpn.xwiki.internal.skin.InternalSkinManager;
 import com.xpn.xwiki.internal.store.StoreConfiguration;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.store.AttachmentRecycleBinStore;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
+import com.xpn.xwiki.test.mockito.OldcoreMatchers;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -97,19 +107,19 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-@ComponentList({ DefaultBatchOperationExecutor.class, DefaultExecution.class })
+@ComponentList({ DefaultBatchOperationExecutor.class, DefaultExecution.class, ReadOnlyXWikiContextProvider.class })
 @ReferenceComponentList
 public class XWikiMockitoTest
 {
-    @MockComponent
-    private EntityReferenceFactory entityReferenceFactory;
-
     @MockComponent
     private DocumentRevisionProvider documentRevisionProvider;
 
     @MockComponent
     @Named("xwikicfg")
     private ConfigurationSource xwikiCfgConfigurationSource;
+
+    @MockComponent
+    private WikiDescriptorManager wikis;
 
     @InjectComponentManager
     private MockitoComponentManager componentManager;
@@ -135,9 +145,6 @@ public class XWikiMockitoTest
         this.componentManager.registerMockComponent(Environment.class);
         this.componentManager.registerMockComponent(ObservationManager.class);
         this.componentManager.registerMockComponent(StoreConfiguration.class);
-        this.componentManager.registerMockComponent(WikiDescriptorManager.class);
-
-        when(this.entityReferenceFactory.getReference(any())).thenAnswer((invocation) -> invocation.getArgument(0));
 
         Utils.setComponentManager(this.componentManager);
         xwiki = new XWiki();
@@ -151,6 +158,7 @@ public class XWikiMockitoTest
 
         Execution execution = this.componentManager.getInstance(Execution.class);
         ExecutionContext executionContext = new ExecutionContext();
+        executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, this.context);
         execution.setContext(executionContext);
 
         when(this.store.loadXWikiDoc(any(XWikiDocument.class), any(XWikiContext.class)))
@@ -185,20 +193,24 @@ public class XWikiMockitoTest
     public void copyDocumentPreservesAttachmentsVersion() throws Exception
     {
         DocumentReference targetReference = new DocumentReference("bar", "Space", "Target");
+        DocumentReference targetReferenceWithLocale = new DocumentReference("bar", "Space", "Target", Locale.ROOT);
         XWikiDocument target = mock(XWikiDocument.class);
         when(target.isNew()).thenReturn(true);
         when(target.getDocumentReference()).thenReturn(targetReference);
+        when(target.getDocumentReferenceWithLocale()).thenReturn(targetReferenceWithLocale);
+        when(target.getLocalReferenceMaxLength()).thenReturn(255);
+        when(target.getOriginalDocument()).thenReturn(new XWikiDocument(targetReference));
 
         DocumentReference sourceReference = new DocumentReference("foo", "Space", "Source");
         XWikiDocument source = mock(XWikiDocument.class);
-        when(source.copyDocument(targetReference, context)).thenReturn(target);
+        when(source.copyDocument(targetReference, false, context)).thenReturn(target);
 
-        when(xwiki.getStore().loadXWikiDoc(any(XWikiDocument.class), same(context))).thenReturn(source, target);
+        when(xwiki.getStore().loadXWikiDoc(OldcoreMatchers.isDocument(sourceReference), same(context)))
+            .thenReturn(source);
+        when(xwiki.getStore().loadXWikiDoc(OldcoreMatchers.isDocument(targetReferenceWithLocale), same(context)))
+            .thenReturn(target);
 
         assertTrue(xwiki.copyDocument(sourceReference, targetReference, context));
-
-        // The target document needs to be new in order for the attachment version to be preserved on save.
-        verify(target).setNew(true);
 
         verify(xwiki.getStore()).saveXWikiDoc(target, context);
     }
@@ -211,80 +223,30 @@ public class XWikiMockitoTest
     {
         ObservationManager observationManager = this.componentManager.getInstance(ObservationManager.class);
 
-        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
-        XWikiDocument document = mock(XWikiDocument.class);
-        when(document.getDocumentReference()).thenReturn(documentReference);
-
         XWikiDocument originalDocument = mock(XWikiDocument.class);
         // Mark the document as existing so that the roll-back method will fire an update event.
         when(originalDocument.isNew()).thenReturn(false);
 
-        XWikiDocument result = mock(XWikiDocument.class);
-        when(result.clone()).thenReturn(result);
-        when(result.getDocumentReference()).thenReturn(documentReference);
-        when(result.getOriginalDocument()).thenReturn(originalDocument);
-
-        String revision = "3.5";
-        when(this.documentRevisionProvider.getRevision(document, revision)).thenReturn(result);
-
-        this.componentManager.registerMockComponent(ContextualLocalizationManager.class);
-
-        xwiki.rollback(document, revision, context);
-
-        verify(observationManager).notify(new DocumentRollingBackEvent(documentReference, revision), result, context);
-        verify(observationManager).notify(new DocumentUpdatingEvent(documentReference), result, context);
-        verify(observationManager).notify(new DocumentUpdatedEvent(documentReference), result, context);
-        verify(observationManager).notify(new DocumentRolledBackEvent(documentReference, revision), result, context);
-    }
-
-    /**
-     * @see "XWIKI-9399: Attachment version is incremented when a document is rolled back even if the attachment did not
-     *      change"
-     */
-    @Test
-    public void rollbackDoesNotSaveUnchangedAttachment() throws Exception
-    {
-        String version = "1.1";
-        String fileName = "logo.png";
-        Date date = new Date();
-        XWikiAttachment currentAttachment = mock(XWikiAttachment.class);
-        when(currentAttachment.getAttachmentRevision(version, context)).thenReturn(currentAttachment);
-        when(currentAttachment.getDate()).thenReturn(new Timestamp(date.getTime()));
-        when(currentAttachment.getVersion()).thenReturn(version);
-        when(currentAttachment.getFilename()).thenReturn(fileName);
-
-        XWikiAttachment oldAttachment = mock(XWikiAttachment.class);
-        when(oldAttachment.getFilename()).thenReturn(fileName);
-        when(oldAttachment.getVersion()).thenReturn(version);
-        when(oldAttachment.getDate()).thenReturn(date);
-
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         XWikiDocument document = mock(XWikiDocument.class);
+        when(document.clone()).thenReturn(document);
         when(document.getDocumentReference()).thenReturn(documentReference);
-        when(document.getAttachmentList()).thenReturn(Arrays.asList(currentAttachment));
-        when(document.getAttachment(fileName)).thenReturn(currentAttachment);
+        when(document.getOriginalDocument()).thenReturn(originalDocument);
 
         XWikiDocument result = mock(XWikiDocument.class);
-        when(result.clone()).thenReturn(result);
         when(result.getDocumentReference()).thenReturn(documentReference);
-        when(result.getAttachmentList()).thenReturn(Arrays.asList(oldAttachment));
-        when(result.getAttachment(fileName)).thenReturn(oldAttachment);
 
         String revision = "3.5";
         when(this.documentRevisionProvider.getRevision(document, revision)).thenReturn(result);
 
-        AttachmentRecycleBinStore attachmentRecycleBinStore = mock(AttachmentRecycleBinStore.class);
-        xwiki.setAttachmentRecycleBinStore(attachmentRecycleBinStore);
-
-        XWikiDocument emptyDocument = new XWikiDocument(document.getDocumentReference());
         this.componentManager.registerMockComponent(ContextualLocalizationManager.class);
-        when(xwiki.getStore().loadXWikiDoc(any(XWikiDocument.class), same(context))).thenReturn(emptyDocument);
 
         xwiki.rollback(document, revision, context);
 
-        verify(attachmentRecycleBinStore, never()).saveToRecycleBin(same(currentAttachment), any(String.class),
-            any(Date.class), same(context), eq(true));
-        verify(oldAttachment, never()).setMetaDataDirty(true);
+        verify(observationManager).notify(new DocumentRollingBackEvent(documentReference, revision), document, context);
+        verify(observationManager).notify(new DocumentUpdatingEvent(documentReference), document, context);
+        verify(observationManager).notify(new DocumentUpdatedEvent(documentReference), document, context);
+        verify(observationManager).notify(new DocumentRolledBackEvent(documentReference, revision), document, context);
     }
 
     @Test
@@ -559,5 +521,142 @@ public class XWikiMockitoTest
             this.xwiki.getDocument(pageReference, this.context).getDocumentReference());
         assertEquals(webhomeDocumentReference,
             this.xwiki.getDocument(pageObjectReference, this.context).getDocumentReference());
+    }
+
+    @Test
+    public void getExistsWithPageReference() throws Exception
+    {
+        PageReference pageReference = new PageReference("wiki", "Main", "Space");
+        DocumentReference webhomeDocumentReference =
+            new DocumentReference("wiki", Arrays.asList("Main", "Space"), "WebHome");
+        DocumentReference finalDocumentReference = new DocumentReference("wiki", "Main", "Space");
+
+        assertFalse(this.xwiki.exists(pageReference, this.context));
+
+        when(this.store.exists(OldcoreMatchers.isDocument(finalDocumentReference), same(context))).thenReturn(true);
+
+        assertTrue(this.xwiki.exists(pageReference, this.context));
+
+        when(this.store.exists(OldcoreMatchers.isDocument(finalDocumentReference), same(context))).thenReturn(false);
+
+        assertFalse(this.xwiki.exists(pageReference, this.context));
+
+        when(this.store.exists(OldcoreMatchers.isDocument(webhomeDocumentReference), same(context))).thenReturn(true);
+
+        assertTrue(this.xwiki.exists(pageReference, this.context));
+    }
+
+    @Test
+    public void parseGroovyFromPage() throws Exception
+    {
+        ParseGroovyFromString parser = this.componentManager.registerMockComponent(ParseGroovyFromString.class);
+
+        this.context.setWikiId("wiki");
+        XWikiDocument document =
+            new XWikiDocument(new DocumentReference(this.context.getWikiId(), "Space", "Document"));
+        document.setContent("source");
+
+        this.documents.put(document.getDocumentReference(), document);
+
+        String result = "result";
+
+        when(parser.parseGroovyFromString(document.getContent(), this.context)).then(new Answer<Object>()
+        {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable
+            {
+                assertSame(document, ((XWikiContext) invocation.getArgument(1)).get(XWikiDocument.CKEY_SDOC));
+
+                return result;
+            }
+        });
+
+        assertEquals(result, this.xwiki.parseGroovyFromPage("Space.Document", this.context));
+        assertEquals(result, this.xwiki.parseGroovyFromPage("Space.Document", "page", this.context));
+    }
+
+    @Test
+    public void getServerURLWhenPathBased() throws MalformedURLException, WikiManagerException
+    {
+        this.context.setMainXWiki("mainwiki");
+        this.context.setWikiId("mainwiki");
+
+        when(this.xwikiCfgConfigurationSource.getProperty("xwiki.virtual.usepath", "1")).thenReturn("1");
+
+        assertNull(this.xwiki.getServerURL("subwiki", this.context));
+
+        WikiDescriptor subwikiDescriptor = new WikiDescriptor("subwiki", "subwiki");
+        when(this.wikis.getById(subwikiDescriptor.getId())).thenReturn(subwikiDescriptor);
+        WikiDescriptor mainwikiDescriptor = new WikiDescriptor(this.context.getMainXWiki(), "mainwiki.com");
+        when(this.wikis.getById(mainwikiDescriptor.getId())).thenReturn(mainwikiDescriptor);
+        when(this.wikis.getMainWikiDescriptor()).thenReturn(mainwikiDescriptor);
+
+        assertEquals(new URL("http://mainwiki.com"), this.xwiki.getServerURL("subwiki", this.context));
+
+        mainwikiDescriptor.setSecure(null);
+        mainwikiDescriptor.setPort(8080);
+
+        assertEquals(new URL("http://mainwiki.com:8080"), this.xwiki.getServerURL("subwiki", this.context));
+    }
+
+    @Test
+    void getSkinFileWithMinification() throws Exception
+    {
+        DebugConfiguration debugConfig = this.componentManager.registerMockComponent(DebugConfiguration.class);
+
+        InternalSkinManager skinManager = this.componentManager.registerMockComponent(InternalSkinManager.class);
+        Skin currentSkin = mock(Skin.class, "current");
+        when(skinManager.getCurrentSkin(true)).thenReturn(currentSkin);
+
+        Resource jsSource = mock(Resource.class, "jsSource");
+        when(jsSource.getURL(false)).thenReturn("path/to/test.js");
+
+        Resource jsMinified = mock(Resource.class, "jsMinified");
+        when(jsMinified.getURL(false)).thenReturn("path/to/test.min.js");
+
+        Resource cssSource = mock(Resource.class, "cssSource");
+        when(cssSource.getURL(false)).thenReturn("path/to/test.css");
+
+        Resource cssMinified = mock(Resource.class, "cssMinified");
+        when(cssMinified.getURL(false)).thenReturn("path/to/test.min.css");
+
+        XWikiURLFactory urlFactory = mock(XWikiURLFactory.class);
+        this.context.setURLFactory(urlFactory);
+
+        // minify = false
+
+        when(currentSkin.getResource("test.min.js")).thenReturn(jsMinified);
+        // test.js is missing so it should fall-back on test.min.js
+        assertEquals("path/to/test.min.js", this.xwiki.getSkinFile("test.js", this.context));
+
+        when(currentSkin.getResource("test.js")).thenReturn(jsSource);
+        // test.js is available so it should be returned.
+        assertEquals("path/to/test.js", this.xwiki.getSkinFile("test.js", this.context));
+
+        // Expect the version indicated by the debug configuration.
+        assertEquals("path/to/test.js", this.xwiki.getSkinFile("test.min.js", this.context));
+
+        // minify = true
+        when(debugConfig.isMinify()).thenReturn(true);
+
+        when(currentSkin.getResource("test.css")).thenReturn(cssSource);
+        // test.min.css is missing so it should fall-back on test.css
+        assertEquals("path/to/test.css", this.xwiki.getSkinFile("test.css", this.context));
+
+        when(currentSkin.getResource("test.min.css")).thenReturn(cssMinified);
+        // test.min.css is available so it should be returned.
+        assertEquals("path/to/test.min.css", this.xwiki.getSkinFile("test.css", this.context));
+
+        // Expect the version indicated by the debug configuration.
+        assertEquals("path/to/test.min.css", this.xwiki.getSkinFile("test.min.css", this.context));
+
+        when(currentSkin.getResource("test.min.css")).thenReturn(null);
+        assertEquals("path/to/test.css", this.xwiki.getSkinFile("test.min.css", this.context));
+
+        // Verify that the debug configuration is used only for JavaScript and CSS.
+        Resource pngMinified = mock(Resource.class, "pngMinified");
+        when(pngMinified.getURL(false)).thenReturn("path/to/test.min.png");
+        when(currentSkin.getResource("test.min.png")).thenReturn(pngMinified);
+        assertNull(this.xwiki.getSkinFile("test.png", this.context));
     }
 }

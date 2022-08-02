@@ -27,17 +27,17 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.servlet.http.Cookie;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.container.Container;
 import org.xwiki.container.servlet.HttpServletUtils;
-import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.context.internal.concurrent.AbstractContextStore;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
@@ -50,9 +50,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.XWikiRequest;
-import com.xpn.xwiki.web.XWikiServletRequestStub;
-import com.xpn.xwiki.web.XWikiServletURLFactory;
-import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
  * Save and restore well known {@link XWikiContext} entries.
@@ -94,6 +91,13 @@ public class XWikiContextContextStore extends AbstractContextStore
     public static final String PROP_LOCALE = "locale";
 
     /**
+     * Name of the entry containing the action.
+     * 
+     * @since 12.10
+     */
+    public static final String PROP_ACTION = "action";
+
+    /**
      * The prefix of the entries containing request related informations.
      */
     public static final String PREFIX_PROP_REQUEST = "request.";
@@ -122,6 +126,11 @@ public class XWikiContextContextStore extends AbstractContextStore
      * The suffix of the entry containing the request parameters.
      */
     public static final String SUFFIX_PROP_REQUEST_PARAMETERS = "parameters";
+
+    /**
+     * The suffix of the entry containing the request cookies.
+     */
+    public static final String SUFFIX_PROP_REQUEST_COOKIES = "cookies";
 
     /**
      * The suffix of the entry containing the request wiki.
@@ -154,6 +163,11 @@ public class XWikiContextContextStore extends AbstractContextStore
     public static final String PROP_REQUEST_PARAMETERS = PREFIX_PROP_REQUEST + SUFFIX_PROP_REQUEST_PARAMETERS;
 
     /**
+     * Name of the entry containing the request cookies.
+     */
+    public static final String PROP_REQUEST_COOKIES = PREFIX_PROP_REQUEST + SUFFIX_PROP_REQUEST_COOKIES;
+
+    /**
      * Name of the entry containing the request wiki.
      * 
      * @since 10.11RC1
@@ -181,11 +195,6 @@ public class XWikiContextContextStore extends AbstractContextStore
     private static final DocumentReference SUPERADMIN_REFERENCE =
         new DocumentReference("xwiki", XWiki.SYSTEM_SPACE, XWikiRightService.SUPERADMIN_USER);
 
-    protected interface SubContextStore
-    {
-        void save(String key, String subkey);
-    }
-
     @Inject
     private Provider<XWikiContext> writeProvider;
 
@@ -194,10 +203,10 @@ public class XWikiContextContextStore extends AbstractContextStore
     private Provider<XWikiContext> readProvider;
 
     @Inject
-    private Container container;
+    private WikiDescriptorManager wikis;
 
     @Inject
-    private WikiDescriptorManager wikis;
+    private RequestInitializer requestInitializer;
 
     @Inject
     private Logger logger;
@@ -207,8 +216,8 @@ public class XWikiContextContextStore extends AbstractContextStore
      */
     public XWikiContextContextStore()
     {
-        super(PROP_WIKI, PROP_USER, PROP_LOCALE, PROP_REQUEST_BASE, PROP_REQUEST_URL, PROP_REQUEST_PARAMETERS,
-            PROP_REQUEST_WIKI, PROP_DOCUMENT_REFERENCE);
+        super(PROP_WIKI, PROP_USER, PROP_LOCALE, PROP_ACTION, PROP_REQUEST_BASE, PROP_REQUEST_URL,
+            PROP_REQUEST_PARAMETERS, PROP_REQUEST_COOKIES, PROP_REQUEST_WIKI, PROP_DOCUMENT_REFERENCE);
     }
 
     @Override
@@ -222,6 +231,7 @@ public class XWikiContextContextStore extends AbstractContextStore
             save(contextStore, PROP_USER, xcontext.getUserReference(), entries);
             save(contextStore, PROP_SECURE_AUTHOR, xcontext.getAuthorReference(), entries);
             save(contextStore, PROP_LOCALE, xcontext.getLocale(), entries);
+            save(contextStore, PROP_ACTION, xcontext.getAction(), entries);
 
             save(contextStore, PREFIX_PROP_DOCUMENT, xcontext.getDoc(), entries);
 
@@ -255,15 +265,19 @@ public class XWikiContextContextStore extends AbstractContextStore
             save((key, subkey) -> {
                 switch (subkey) {
                     case SUFFIX_PROP_REQUEST_BASE:
-                        saveRequestBase(contextStore, key, request);
+                        saveRequestBase(contextStore, request);
                         break;
 
                     case SUFFIX_PROP_REQUEST_URL:
-                        saveRequestURL(contextStore, key, request);
+                        saveRequestURL(contextStore, request);
                         break;
 
                     case SUFFIX_PROP_REQUEST_PARAMETERS:
-                        saveRequestParameters(contextStore, key, request);
+                        saveRequestParameters(contextStore, request);
+                        break;
+
+                    case SUFFIX_PROP_REQUEST_COOKIES:
+                        saveRequestCookies(contextStore, request);
                         break;
 
                     case SUFFIX_PROP_REQUEST_WIKI:
@@ -279,12 +293,12 @@ public class XWikiContextContextStore extends AbstractContextStore
         }
     }
 
-    private void saveRequestBase(Map<String, Serializable> contextStore, String key, XWikiRequest request)
+    private void saveRequestBase(Map<String, Serializable> contextStore, XWikiRequest request)
     {
         URL url = HttpServletUtils.getSourceURL(request);
 
         try {
-            contextStore.put(key, new URL(url.getProtocol(), url.getHost(), url.getPort(), ""));
+            contextStore.put(PROP_REQUEST_BASE, new URL(url.getProtocol(), url.getHost(), url.getPort(), ""));
         } catch (MalformedURLException e) {
             // Cannot happen
         }
@@ -292,9 +306,9 @@ public class XWikiContextContextStore extends AbstractContextStore
         saveRequestContextPath(contextStore, request);
     }
 
-    private void saveRequestURL(Map<String, Serializable> contextStore, String key, XWikiRequest request)
+    private void saveRequestURL(Map<String, Serializable> contextStore, XWikiRequest request)
     {
-        contextStore.put(key, HttpServletUtils.getSourceURL(request));
+        contextStore.put(PROP_REQUEST_URL, HttpServletUtils.getSourceURL(request));
 
         saveRequestContextPath(contextStore, request);
     }
@@ -304,15 +318,26 @@ public class XWikiContextContextStore extends AbstractContextStore
         contextStore.put(PROP_REQUEST_CONTEXTPATH, request.getContextPath());
     }
 
-    private void saveRequestParameters(Map<String, Serializable> contextStore, String key, XWikiRequest request)
+    private void saveRequestParameters(Map<String, Serializable> contextStore, XWikiRequest request)
     {
-        contextStore.put(key, new LinkedHashMap<>(request.getParameterMap()));
+        contextStore.put(PROP_REQUEST_PARAMETERS, new LinkedHashMap<>(request.getParameterMap()));
+    }
+
+    private void saveRequestCookies(Map<String, Serializable> contextStore, XWikiRequest request)
+    {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            // Clone the cookies.
+            cookies = Stream.of(cookies).map(Cookie::clone).toArray(Cookie[]::new);
+        }
+        contextStore.put(PROP_REQUEST_COOKIES, cookies);
     }
 
     private void saveRequestAll(Map<String, Serializable> contextStore, String key, XWikiRequest request)
     {
-        saveRequestURL(contextStore, key, request);
-        saveRequestParameters(contextStore, key, request);
+        saveRequestURL(contextStore, request);
+        saveRequestParameters(contextStore, request);
+        saveRequestCookies(contextStore, request);
     }
 
     @Override
@@ -346,6 +371,11 @@ public class XWikiContextContextStore extends AbstractContextStore
             xcontext.setLocale((Locale) contextStore.get(PROP_LOCALE));
         }
 
+        // Action
+        if (contextStore.containsKey(PROP_ACTION)) {
+            xcontext.setAction((String) contextStore.get(PROP_ACTION));
+        }
+
         // Document
         restoreDocument(storedWikiId, contextStore, xcontext);
 
@@ -353,7 +383,7 @@ public class XWikiContextContextStore extends AbstractContextStore
         restoreAuthor(contextStore, xcontext);
 
         // Request
-        restoreRequest(storedWikiId, contextStore, xcontext);
+        this.requestInitializer.restoreRequest(storedWikiId, contextStore, xcontext);
     }
 
     private void restoreAuthor(Map<String, Serializable> contextStore, XWikiContext xcontext)
@@ -429,7 +459,13 @@ public class XWikiContextContextStore extends AbstractContextStore
     private void restoreDocument(String storedWikiId, Map<String, Serializable> contextStore, XWikiContext xcontext)
     {
         if (contextStore.containsKey(PROP_DOCUMENT_REFERENCE)) {
-            restoreDocument((DocumentReference) contextStore.get(PROP_DOCUMENT_REFERENCE), xcontext);
+            DocumentReference document = (DocumentReference) contextStore.get(PROP_DOCUMENT_REFERENCE);
+            restoreDocument(document, xcontext);
+
+            // Set the document's wiki when it's not explicitly set
+            if (storedWikiId == null) {
+                xcontext.setWikiReference(document.getWikiReference());
+            }
         } else if (storedWikiId != null) {
             // If no document reference is provided get the wiki home page
             try {
@@ -460,94 +496,4 @@ public class XWikiContextContextStore extends AbstractContextStore
         xcontext.setDoc(document);
     }
 
-    private URL restoreURL(String storedWikiId, Map<String, Serializable> contextStore, XWikiContext xcontext)
-    {
-        // Find and set the wiki corresponding to the request
-        String requestWiki = (String) contextStore.get(PROP_REQUEST_WIKI);
-        if (requestWiki == null) {
-            requestWiki = storedWikiId;
-        } else {
-            xcontext.setOriginalWikiId(requestWiki);
-        }
-
-        // Find the URL to put in the context request
-        URL url = (URL) contextStore.get(PROP_REQUEST_URL);
-        if (url == null) {
-            url = (URL) contextStore.get(PROP_REQUEST_BASE);
-        }
-
-        // Try to deduce missing URL from the request wiki (if provided)
-        if (url == null && requestWiki != null) {
-            try {
-                url = xcontext.getWiki().getServerURL(requestWiki, xcontext);
-            } catch (MalformedURLException e) {
-                this.logger.warn("Failed to get the URL for stored context wiki [{}]", requestWiki);
-            }
-
-            // Assume we always want to behave as a HTTP request when the wiki request is provided
-            if (url == null) {
-                url = HttpServletUtils.getSourceURL(xcontext.getRequest());
-            }
-        }
-
-        return url;
-    }
-
-    private void restoreRequest(String storedWikiId, Map<String, Serializable> contextStore, XWikiContext xcontext)
-    {
-        URL url = restoreURL(storedWikiId, contextStore, xcontext);
-
-        Map<String, String[]> parameters = (Map<String, String[]>) contextStore.get(PROP_REQUEST_PARAMETERS);
-
-        boolean daemon;
-
-        String contextPath = null;
-
-        // Fallback on the first request URL
-        if (url == null) {
-            XWikiRequest request = xcontext.getRequest();
-
-            if (request != null) {
-                url = HttpServletUtils.getSourceURL(request);
-
-                contextPath = request.getContextPath();
-
-                if (parameters == null) {
-                    parameters = request.getParameterMap();
-                }
-            }
-
-            // We don't want to take into account the context request URL when generating URLs
-            daemon = true;
-        } else {
-            // Find the request context path
-            contextPath = (String) contextStore.get(PROP_REQUEST_CONTEXTPATH);
-
-            // We want to take into account the context request URL when generating URLs
-            daemon = false;
-        }
-
-        // Set the context request
-        if (url != null) {
-            restoreRequest(url, contextPath, parameters, daemon, xcontext);
-        }
-    }
-
-    private void restoreRequest(URL url, String contextPath, Map<String, String[]> parameters, boolean daemon,
-        XWikiContext xcontext)
-    {
-        XWikiServletRequestStub stubRequest = new XWikiServletRequestStub(url, contextPath, parameters);
-        xcontext.setRequest(stubRequest);
-        // Indicate that the URL should be taken into account when generating a URL
-        stubRequest.setDaemon(daemon);
-        this.container.setRequest(new ServletRequest(stubRequest));
-
-        // Update to create the URL factory
-        XWikiURLFactory urlFactory = xcontext.getURLFactory();
-        if (urlFactory == null) {
-            urlFactory = new XWikiServletURLFactory();
-            xcontext.setURLFactory(urlFactory);
-        }
-        urlFactory.init(xcontext);
-    }
 }

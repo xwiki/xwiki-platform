@@ -48,10 +48,12 @@ public class WikiCreationPage extends ExtendedViewPage
     {
         // The finalize button is not visible until the provisioning is done, so we wait for it
         getDriver().waitUntilElementIsVisible(By.id("finalize"), 30);
+        // We add a reload marker to be sure the page is left when clicking on the button.
+        getDriver().addPageNotYetReloadedMarker();
         // Now we can click
         finalizeButton.click();
         // And wait for the page to be loaded
-        waitUntilPageIsLoaded();
+        getDriver().waitUntilPageIsReloaded();
         // And now we are in the home page of the new created wiki
         return new WikiHomePage();
     }
@@ -73,7 +75,6 @@ public class WikiCreationPage extends ExtendedViewPage
 
     public void waitForFinalizeButton(int timeout)
     {
-
         // The finalize button is not visible until the provisioning is done, so we wait for it
         getDriver().waitUntilElementIsVisible(By.id("finalize"), timeout);
     }

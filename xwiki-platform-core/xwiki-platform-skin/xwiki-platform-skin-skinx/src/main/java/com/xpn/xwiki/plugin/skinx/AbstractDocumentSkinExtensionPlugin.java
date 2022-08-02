@@ -83,7 +83,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     /**
      * Used to match events on "use" property.
      */
-    private final List<Event> events = new ArrayList<Event>(3);
+    private final List<Event> events = new ArrayList<>(3);
 
     /**
      * XWiki plugin constructor.
@@ -138,7 +138,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     {
         super.init(context);
 
-        this.alwaysUsedExtensions = new HashMap<String, Set<DocumentReference>>();
+        this.alwaysUsedExtensions = new HashMap<>();
         getExtensionClass(context);
 
         Utils.getComponent(ObservationManager.class).addListener(this);
@@ -163,7 +163,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     /**
      * {@inheritDoc}
      * <p>
-     * For this kind of resources, an XObject property (<tt>use</tt>) with the value <tt>always</tt> indicates always
+     * For this kind of resources, an XObject property ({@code use}) with the value {@code always} indicates always
      * used extensions. The list of extensions for each wiki is lazily placed in a cache: if the extension set for the
      * context wiki is null, then they will be looked up in the database and added to it. The cache is invalidated using
      * the notification mechanism.
@@ -176,7 +176,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     {
         EntityReferenceSerializer<String> serializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
         Set<DocumentReference> references = getAlwaysUsedExtensions();
-        Set<String> names = new HashSet<String>(references.size());
+        Set<String> names = new HashSet<>(references.size());
         for (DocumentReference reference : references) {
             names.add(serializer.serialize(reference));
         }
@@ -185,7 +185,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
 
     /**
      * Returns the list of always used extensions of this type as a set of document references. For this kind of
-     * resources, an XObject property (<tt>use</tt>) with the value <tt>always</tt> indicates always used extensions.
+     * resources, an XObject property ({@code use}) with the value {@code always} indicates always used extensions.
      * The list of extensions for each wiki is lazily placed in a cache: if the extension set for the context wiki is
      * null, then they will be looked up in the database and added to it. The cache is invalidated using the
      * notification mechanism. Note that this method is called for each request, as the list might change in time, and
@@ -203,7 +203,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
             return this.alwaysUsedExtensions.get(currentWiki);
         } else {
             // Otherwise, we look them up in the database.
-            Set<DocumentReference> extensions = new HashSet<DocumentReference>();
+            Set<DocumentReference> extensions = new HashSet<>();
             String query =
                 ", BaseObject as obj, StringProperty as use where obj.className='" + getExtensionClassName() + "'"
                     + " and obj.name=doc.fullName and use.id.id=obj.id and use.id.name='use' and use.value='always'";
@@ -215,7 +215,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
                         // Only add the extension as being "always used" if the page holding it has been saved with
                         // programming rights.
                         if (Utils.getComponent(AuthorizationManager.class).hasAccess(Right.PROGRAM,
-                            doc.getContentAuthorReference(), doc.getDocumentReference())) {
+                            doc.getAuthorReference(), doc.getDocumentReference())) {
                             extensions.add(extension);
                         }
                     } catch (XWikiException e1) {
@@ -236,14 +236,16 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     public boolean hasPageExtensions(XWikiContext context)
     {
         XWikiDocument doc = context.getDoc();
-        List<BaseObject> objects = doc.getObjects(getExtensionClassName());
-        if (objects != null) {
-            for (BaseObject obj : objects) {
-                if (obj == null) {
-                    continue;
-                }
-                if (obj.getStringValue(USE_FIELDNAME).equals("currentPage")) {
-                    return true;
+        if (doc != null) {
+            List<BaseObject> objects = doc.getObjects(getExtensionClassName());
+            if (objects != null) {
+                for (BaseObject obj : objects) {
+                    if (obj == null) {
+                        continue;
+                    }
+                    if (obj.getStringValue(USE_FIELDNAME).equals("currentPage")) {
+                        return true;
+                    }
                 }
             }
         }
@@ -315,7 +317,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
         if (event instanceof WikiDeletedEvent) {
             this.alwaysUsedExtensions.remove(((WikiDeletedEvent) event).getWikiId());
         } else {
-            onDocumentEvent((XWikiDocument) source, (XWikiContext) data);
+            onDocumentEvent((XWikiDocument) source);
         }
     }
 
@@ -323,16 +325,15 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
      * A document related event has been received.
      * 
      * @param document the modified document
-     * @param context the XWiki context
      */
-    private void onDocumentEvent(XWikiDocument document, XWikiContext context)
+    private void onDocumentEvent(XWikiDocument document)
     {
         boolean remove = false;
         if (document.getObject(getExtensionClassName()) != null) {
             // new or already existing object
             if (document.getObject(getExtensionClassName(), USE_FIELDNAME, "always", false) != null) {
                 if (Utils.getComponent(AuthorizationManager.class).hasAccess(Right.PROGRAM,
-                    document.getContentAuthorReference(), document.getDocumentReference())) {
+                    document.getAuthorReference(), document.getDocumentReference())) {
                     getAlwaysUsedExtensions().add(document.getDocumentReference());
 
                     return;
@@ -454,13 +455,11 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     protected String getDocumentSkinExtensionURL(DocumentReference documentReference, String documentName,
             String pluginName, XWikiContext context)
     {
-        String queryString = String.format("%s&amp;%s%s",
+        String queryString = String.format("%s&%s%s",
                 getLanguageQueryString(context),
                 getDocumentVersionQueryString(documentReference, context),
                 parametersAsQueryString(documentName, context));
 
         return context.getWiki().getURL(documentReference, pluginName, queryString, "", context);
     }
-    
-    
 }

@@ -185,7 +185,8 @@ public class SOLRSearchSource extends AbstractSearchSource
                 Locale docLocale = LocaleUtils.toLocale((String) document.get(FieldUtils.DOCUMENT_LOCALE));
                 Locale locale = LocaleUtils.toLocale((String) document.get(FieldUtils.LOCALE));
 
-                searchResult.setTitle((String) document.getFirstValue(FieldUtils.getFieldName(FieldUtils.TITLE, locale)));
+                searchResult.setTitle((String) document.getFirstValue(
+                    FieldUtils.getFieldName(FieldUtils.TITLE, locale)));
 
                 List<String> spaces = Utils.getSpacesHierarchy(documentReference.getLastSpaceReference());
 

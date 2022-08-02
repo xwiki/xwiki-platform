@@ -71,5 +71,5 @@ def var = "cokolwiek"
 {{groovy}}
 def var = "cokolwiek"
 {{/groovy}}
-}}}))) </content>
+}}})))</content>
 </xwikidoc>

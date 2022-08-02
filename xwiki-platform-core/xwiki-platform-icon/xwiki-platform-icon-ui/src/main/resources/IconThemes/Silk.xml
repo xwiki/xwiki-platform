@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -192,6 +192,12 @@ download=application_put
 log-in=user_go
 log-out=user_go
 th=application_view_tile
+translate=page_white_world
+minus-square = bullet_toggle_minus
+plus-square = bullet_toggle_plus
+filter = find
+fast-backward = control_rewind
+arrow_in = arrow_in
 
 ## Silk icons for backward compatibility (see: http://design.xwiki.org/xwiki/bin/view/Proposal/Silk+Mapping).
 accept = accept

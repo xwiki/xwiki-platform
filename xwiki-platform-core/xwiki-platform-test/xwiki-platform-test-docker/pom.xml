@@ -25,51 +25,38 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-test</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-test-docker</artifactId>
   <name>XWiki Platform - Test - Docker UI Test Framework</name>
   <packaging>jar</packaging>
   <description>Uses Docker to start/stop browsers and XWiki</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.10</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>7</xwiki.pitest.mutationThreshold>
-    <testcontainers.version>1.10.6</testcontainers.version>
-
-    <!-- Force a version of Selenium more recent than the one coming from xwiki-platform-test-ui -->
-    <!-- FIXME: upgrade it in xwiki-platform-test-ui to avoid this hack -->
-    <selenium.version>3.14.0</selenium.version>
-
-    <!-- selenium requires Guava 25.0-jre+ but XWiki uses Guava 20.0, see xwiki-commons top level POM for more
-         details as to why we cannot use a more recent version. Thus we need to force a more recent version of Guava
-         here. Note that the version needs to be checked when we change the version of selenium -->
-    <guava.version>25.0-jre</guava.version>
+    <xwiki.jacoco.instructionRatio>0.21</xwiki.jacoco.instructionRatio>
+    <!-- TODO: Put back when the XWikiBrowserWebDriverContainer class is removed or when we find a construct that makes
+         Spoon pass on it. -->
+    <xwiki.spoon.skip>true</xwiki.spoon.skip>
   </properties>
+  <dependencyManagement>
+    <!-- Force our version of Selenium (so that the one coming from TC isn't used for example) -->
+    <dependencies>
+      <dependency>
+        <groupId>org.seleniumhq.selenium</groupId>
+        <artifactId>selenium-chrome-driver</artifactId>
+        <version>${selenium.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.seleniumhq.selenium</groupId>
+        <artifactId>selenium-remote-driver</artifactId>
+        <version>${selenium.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-ui</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <!-- Force a version of Selenium more recent than the one coming from xwiki-platform-test-ui -->
-    <!-- FIXME: upgrade it in xwiki-platform-test-ui to avoid this hack -->
-    <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-java</artifactId>
-      <version>${selenium.version}</version>
-      <exclusions>
-        <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-        <!-- It has a dependency on testng which we need to exclude to prevent
-             Maven Surefire plugin to think we're executing TestNG tests. -->
-        <exclusion>
-          <groupId>org.testng</groupId>
-          <artifactId>testng</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
@@ -84,12 +71,20 @@
           <groupId>javax.xml.bind</groupId>
           <artifactId>jaxb-api</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>javax.annotation</groupId>
+          <artifactId>javax.annotation-api</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
-    <!-- Replace the version triggered by testcontainers by a more accurate one -->
+    <!-- Replace the versions triggered by testcontainers by a more accurate one -->
     <dependency>
       <groupId>jakarta.xml.bind</groupId>
       <artifactId>jakarta.xml.bind-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.annotation</groupId>
+      <artifactId>jakarta.annotation-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
@@ -111,11 +106,21 @@
       <artifactId>oracle-xe</artifactId>
       <version>${testcontainers.version}</version>
     </dependency>
-    <!-- Needed by TestContainers, apparently to verify the the MySQL DB is started -->
+    <!-- Needed by TestContainers, to verify that the DBs are started -->
     <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <version>5.1.24</version>
+      <groupId>${mysql.groupId}</groupId>
+      <artifactId>${mysql.artifactId}</artifactId>
+      <version>${mysql.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${mariadb.groupId}</groupId>
+      <artifactId>${mariadb.artifactId}</artifactId>
+      <version>${mariadb.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${oracle.groupId}</groupId>
+      <artifactId>${oracle.artifactId}</artifactId>
+      <version>${oracle.version}</version>
     </dependency>
     <!-- Dependencies for WARBuilder -->
     <dependency>
@@ -124,7 +129,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.velocity</groupId>
-      <artifactId>velocity</artifactId>
+      <artifactId>velocity-engine-core</artifactId>
     </dependency>
     <!-- Deps for the extension provisioning -->
     <dependency>
@@ -162,6 +167,31 @@
       <artifactId>xwiki-commons-tool-extension-plugin</artifactId>
       <version>${commons.version}</version>
     </dependency>
+    <!-- Used to create wikis during tests -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-creationjob</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- Since the minimal dependency list doesn't include the Flamingo resources JAR (see the comment in it for
+     more explanations), we need to add a dependency to it since we need to unpack it -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
+      <version>${project.version}</version>
+      <!-- Using provided even though it's not strictly required but in case some other module depend on this one, to
+           stop the chain -->
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
+      <version>${project.version}</version>
+      <type>zip</type>
+      <!-- Using provided even though it's not strictly required but in case some other module depend on this one, to
+           stop the chain -->
+      <scope>provided</scope>
+    </dependency>
     <!-- Dependencies that are not needed for this module but that we need for functional tests modules so that
          they get all the required dependencies in the local maven repository where the tests execute -->
     <dependency>
@@ -197,16 +227,39 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-      <type>zip</type>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-tool-configuration-resources</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- Needed by TestUtils#setPropertyInXWikiCfg. The dependency is added in ArtifactResolver. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-component-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
+            <id>default</id>
+            <configuration>
+              <excludes>
+                <!-- Cyclomatic complexity > 10 -->
+                **/WARBuilder.java,
+                <!-- Class Fan-Out Complexity > 20 -->
+                **/DockerTestUtils.java
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

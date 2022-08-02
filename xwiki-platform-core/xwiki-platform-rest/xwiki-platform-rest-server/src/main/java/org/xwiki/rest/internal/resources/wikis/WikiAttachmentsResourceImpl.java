@@ -19,9 +19,13 @@
  */
 package org.xwiki.rest.internal.resources.wikis;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.resources.BaseAttachmentsResource;
 import org.xwiki.rest.model.jaxb.Attachments;
@@ -35,9 +39,16 @@ import org.xwiki.rest.resources.wikis.WikiAttachmentsResource;
 public class WikiAttachmentsResourceImpl extends BaseAttachmentsResource implements WikiAttachmentsResource
 {
     @Override
-    public Attachments getAttachments(String wikiName, String name, String page, String space, String author,
-            String types, Integer start, Integer number, Boolean withPrettyNames) throws XWikiRestException
+    public Attachments getAttachments(String wiki, String name, String page, String space, String author,
+        String fileTypes, Integer offset, Integer limit, Boolean withPrettyNames) throws XWikiRestException
     {
-        return super.getAttachments(wikiName, name, page, space, author, types, start, number, withPrettyNames);
+        Map<String, String> filters = new HashMap<>();
+        filters.put("space", space);
+        filters.put("page", page);
+        filters.put("name", name);
+        filters.put("author", author);
+        filters.put("fileTypes", fileTypes);
+
+        return super.getAttachments(new WikiReference(wiki), filters, offset, limit, withPrettyNames);
     }
 }

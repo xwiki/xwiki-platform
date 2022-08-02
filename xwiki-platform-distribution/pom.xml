@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution</artifactId>
   <name>XWiki Platform - Distribution - Parent POM</name>
@@ -45,8 +45,8 @@
   </modules>
   <properties>
     <!-- The version of Maven used during XWiki runtime (more recent than the one used during the build to benefit from bugfixes and improvements)-->
-    <maven.version>3.6.0</maven.version>
-    <maven.resolver.version>1.3.1</maven.resolver.version>
+    <maven.version>3.8.6</maven.version>
+    <maven.resolver.version>1.6.3</maven.resolver.version>
 
     <!-- Flavors known to be valid with the current distribution -->
     <!-- Using ${platform.version} on purpose here. An XWiki distribution with a different version might inherit this. -->
@@ -69,11 +69,12 @@
 
     <!-- Hibernate configuration -->
     <xwiki.db.common.extraMappings>
-      eventstream.hbm.xml,instance.hbm.xml,notification-filter-preferences.hbm.xml
+      instance.hbm.xml,notification-filter-preferences.hbm.xml
     </xwiki.db.common.extraMappings>
     <xwiki.db.default.extraMappings>mailsender.hbm.xml</xwiki.db.default.extraMappings>
     <xwiki.db.oracle.extraMappings>mailsender.oracle.hbm.xml</xwiki.db.oracle.extraMappings>
     <xwiki.db.mysql.extraMappings>mailsender.hbm.xml</xwiki.db.mysql.extraMappings>
+    <xwiki.db.mariadb.extraMappings>mailsender.hbm.xml</xwiki.db.mariadb.extraMappings>
     <xwiki.db.hsqldb.extraMappings>mailsender.hbm.xml</xwiki.db.hsqldb.extraMappings>
     <xwiki.db.pgsql.extraMappings>mailsender.hbm.xml</xwiki.db.pgsql.extraMappings>
     <xwiki.db.derby.extraMappings>mailsender.hbm.xml</xwiki.db.derby.extraMappings>
@@ -137,13 +138,6 @@
     <!-- Default location for XWiki's Data directory -->
     <xwikiDataDir>data</xwikiDataDir>
 
-    <!-- Version of JDBC connectors we want to use in our distribution and when using build tools -->
-    <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
-    <hsqldb.artifactId>hsqldb</hsqldb.artifactId>
-    <mysql.version>5.1.45</mysql.version>
-    <derby.version>10.14.1.0</derby.version>
-    <pgsql.version>42.1.4</pgsql.version>
-
     <!-- Set HSQLDB by default -->
     <xwiki.db>hsqldb</xwiki.db>
     <xwiki.db.jdbc.groupId>${hsqldb.groupId}</xwiki.db.jdbc.groupId>
@@ -153,7 +147,6 @@
     <xwiki.db.connection.username>sa</xwiki.db.connection.username>
     <xwiki.db.connection.password />
     <xwiki.db.connection.driver_class>org.hsqldb.jdbcDriver</xwiki.db.connection.driver_class>
-    <xwiki.db.dialect>org.hibernate.dialect.HSQLDialect</xwiki.db.dialect>
     <xwiki.db.hbm.xwiki>xwiki.hbm.xml</xwiki.db.hbm.xwiki>
     <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
 
@@ -164,89 +157,31 @@
     <!-- The child modules don't provide APIs (those should be in xwiki-platform-core) so we don't need to check for
       backward compatibility breakages. -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
+
+    <!-- TODO: remove when https://jira.xwiki.org/browse/XWIKI-19932 is fixed -->
+    <xwiki.enforcer.no-legacy-dependencies.exclude>.*xwiki.*:.*-legacy-(?!events-hibernate-api).*</xwiki.enforcer.no-legacy-dependencies.exclude>
   </properties>
 
   <!-- Avoid enforce-upper-bounds rule complains (they're actually false positives since Extension Manager is not
        affected by that) -->
   <dependencyManagement>
     <dependencies>
-      <!-- application-help-center -->
-      <dependency>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-icon-script</artifactId>
-        <version>11.1-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-skin-skinx</artifactId>
-        <version>11.1-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-rendering-wikimacro-store</artifactId>
-        <version>11.1-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-administration-ui</artifactId>
-        <version>11.1-SNAPSHOT</version>
-        <type>xar</type>
-      </dependency>
-      <dependency>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-extension-ui</artifactId>
-        <version>11.1-SNAPSHOT</version>
-        <type>xar</type>
-      </dependency>
-      <dependency>
-        <groupId>org.xwiki.rendering</groupId>
-        <artifactId>xwiki-rendering-macro-toc</artifactId>
-        <version>${rendering.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-rendering-macro-gallery</artifactId>
-        <version>11.1-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-chart-macro</artifactId>
-        <version>11.1-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-index-tree-macro</artifactId>
-        <version>11.1-SNAPSHOT</version>
-        <type>xar</type>
-      </dependency>
-      <dependency>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-index-ui</artifactId>
-        <version>11.1-SNAPSHOT</version>
-        <type>xar</type>
-      </dependency>
-      <dependency>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-help-ui</artifactId>
-        <version>11.1-SNAPSHOT</version>
-        <type>xar</type>
-      </dependency>
-      <dependency>
-        <groupId>org.xwiki.rendering</groupId>
-        <artifactId>xwiki-rendering-macro-velocity</artifactId>
-        <version>${rendering.version}</version>
-      </dependency>
       <!-- application-tour-ui -->
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-appwithinminutes-ui</artifactId>
-        <version>11.1-SNAPSHOT</version>
+        <version>14.7-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-security-script</artifactId>
-        <version>11.1-SNAPSHOT</version>
+        <artifactId>xwiki-platform-security-authorization-script</artifactId>
+        <version>14.7-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-webjars-api</artifactId>
+        <version>14.7-SNAPSHOT</version>
       </dependency>
       <!-- application-ckeditor-ui -->
       <dependency>
@@ -254,9 +189,22 @@
         <artifactId>xwiki-rendering-macro-html</artifactId>
         <version>${rendering.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-tree-webjar</artifactId>
+        <version>14.7-SNAPSHOT</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>
+    <extensions>
+      <!-- Needed to add support for the "xip" packaging -->
+      <extension>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-extension-plugin</artifactId>
+        <version>${commons.version}</version>
+      </extension>
+    </extensions>
     <pluginManagement>
       <plugins>
         <plugin>
@@ -297,6 +245,7 @@
                   <xwikiDbHbmDefaultExtraMappings>${xwiki.db.default.extraMappings}</xwikiDbHbmDefaultExtraMappings>
                   <xwikiDbHbmHSQLDBExtraMappings>${xwiki.db.hsqldb.extraMappings}</xwikiDbHbmHSQLDBExtraMappings>
                   <xwikiDbHbmMySQLExtraMappings>${xwiki.db.mysql.extraMappings}</xwikiDbHbmMySQLExtraMappings>
+                  <xwikiDbHbmMariaDBExtraMappings>${xwiki.db.mariadb.extraMappings}</xwikiDbHbmMariaDBExtraMappings>
                   <xwikiDbHbmPostgreSQLExtraMappings>${xwiki.db.pgsql.extraMappings}</xwikiDbHbmPostgreSQLExtraMappings>
                   <xwikiDbHbmOracleExtraMappings>${xwiki.db.oracle.extraMappings}</xwikiDbHbmOracleExtraMappings>
                   <xwikiDbHbmDerbyExtraMappings>${xwiki.db.derby.extraMappings}</xwikiDbHbmDerbyExtraMappings>
@@ -327,7 +276,7 @@
         <plugin>
           <groupId>org.basepom.maven</groupId>
           <artifactId>duplicate-finder-maven-plugin</artifactId>
-          <version>1.3.0</version>
+          <version>1.5.1</version>
           <executions>
             <execution>
               <id>war-check-duplicates</id>
@@ -337,69 +286,10 @@
               </goals>
               <configuration>
                 <failBuildInCaseOfConflict>true</failBuildInCaseOfConflict>
+                <!-- All we care about is duplicate in the JARs ending up in the WAR -->
+                <checkCompileClasspath>false</checkCompileClasspath>
+                <checkTestClasspath>false</checkTestClasspath>
                 <exceptions>
-                  <!-- Xalan bundles a lot of other projects: org/apache/xml/**, org/apache/bcel/**, JLex/**,
-                       java_cup/**, org/apache/regexp/**. In addition, it even has these jars in its source tree without
-                       any indication about their versions... Thus there's isn't much we can do ATM but it means there's
-                       an uncertainty about which version of those classes are used at runtime.
-                       TODO: Find an alternative to Xalan or find a good maven packaging of it -->
-                  <exception>
-                    <conflictingDependencies>
-                      <dependency>
-                        <groupId>xalan</groupId>
-                        <artifactId>xalan</artifactId>
-                      </dependency>
-                      <dependency>
-                        <groupId>jakarta-regexp</groupId>
-                        <artifactId>jakarta-regexp</artifactId>
-                      </dependency>
-                    </conflictingDependencies>
-                    <packages>
-                      <package>org.apache.regexp</package>
-                    </packages>
-                  </exception>
-                  <!-- None of these should bundle org.w3c classes but at least they seem compatible.
-                       See https://issues.apache.org/bugzilla/show_bug.cgi?id=49897,
-                       https://issues.apache.org/bugzilla/show_bug.cgi?id=49206 and http://bugs.jython.org/issue2121 -->
-                  <exception>
-                    <conflictingDependencies>
-                      <dependency>
-                        <groupId>org.apache.xmlgraphics</groupId>
-                        <artifactId>batik-ext</artifactId>
-                      </dependency>
-                      <dependency>
-                        <groupId>xml-apis</groupId>
-                        <artifactId>xml-apis</artifactId>
-                      </dependency>
-                    </conflictingDependencies>
-                    <classes>
-                      <class>org.w3c.dom.ElementTraversal</class>
-                      <class>org.w3c.dom.events.DocumentEvent</class>
-                      <class>org.w3c.dom.events.Event</class>
-                      <class>org.w3c.dom.events.EventException</class>
-                      <class>org.w3c.dom.events.EventListener</class>
-                      <class>org.w3c.dom.events.EventTarget</class>
-                      <class>org.w3c.dom.events.MouseEvent</class>
-                      <class>org.w3c.dom.events.MutationEvent</class>
-                      <class>org.w3c.dom.events.UIEvent</class>
-                    </classes>
-                  </exception>
-                  <!-- None of these should bundle org.w3c classes... Hoping that they are compatible... -->
-                  <exception>
-                    <conflictingDependencies>
-                      <dependency>
-                        <groupId>jaxen</groupId>
-                        <artifactId>jaxen</artifactId>
-                      </dependency>
-                      <dependency>
-                        <groupId>xml-apis</groupId>
-                        <artifactId>xml-apis</artifactId>
-                      </dependency>
-                    </conflictingDependencies>
-                    <classes>
-                      <class>org.w3c.dom.UserDataHandler</class>
-                    </classes>
-                  </exception>
                   <!-- This is a PITA. The classes are actually incompatible! We should do something about it but I
                        don't see a solution ATM... -->
                   <exception>
@@ -439,44 +329,6 @@
                       <resource>META-INF/BCKEY.SF</resource>
                     </resources>
                   </exception>
-                  <!-- XStream includes both xapp and xmlpull and XAPP bundle somes classes of xmlpull.
-                       See http://x-stream.github.io/jira/689/ for more.
-                   -->
-                  <exception>
-                    <conflictingDependencies>
-                      <dependency>
-                        <groupId>xmlpull</groupId>
-                        <artifactId>xmlpull</artifactId>
-                      </dependency>
-                      <dependency>
-                        <groupId>xpp3</groupId>
-                        <artifactId>xpp3_min</artifactId>
-                      </dependency>
-                      <dependency>
-                        <groupId>xpp3</groupId>
-                        <artifactId>xpp3</artifactId>
-                      </dependency>
-                    </conflictingDependencies>
-                    <packages>
-                      <package>org.xmlpull</package>
-                    </packages>
-                  </exception>
-                  <!-- Seems to be the same thing -->
-                  <exception>
-                    <conflictingDependencies>
-                      <dependency>
-                        <groupId>xpp3</groupId>
-                        <artifactId>xpp3</artifactId>
-                      </dependency>
-                      <dependency>
-                        <groupId>xml-apis</groupId>
-                        <artifactId>xml-apis</artifactId>
-                      </dependency>
-                    </conflictingDependencies>
-                    <packages>
-                      <package>javax.xml.namespace</package>
-                    </packages>
-                  </exception>
                   <!-- Does not seems to be an issue -->
                   <exception>
                     <conflictingDependencies>
@@ -508,6 +360,33 @@
                     <resources>
                       <resource>PropertyList-1.0.dtd</resource>
                       <resource>properties.dtd</resource>
+                    </resources>
+                  </exception>
+                  <!-- Remove when https://issues.redhat.com/browse/IPROTO-177 is fixed -->
+                  <exception>
+                    <conflictingDependencies>
+                      <dependency>
+                        <groupId>com.google.protobuf</groupId>
+                        <artifactId>protobuf-java</artifactId>
+                      </dependency>
+                      <dependency>
+                        <groupId>org.infinispan.protostream</groupId>
+                        <artifactId>protostream</artifactId>
+                      </dependency>
+                    </conflictingDependencies>
+                    <resources>
+                      <resource>google/protobuf/any.proto</resource>
+                      <resource>google/protobuf/api.proto</resource>
+                      <resource>google/protobuf/compiler/plugin.proto</resource>
+                      <resource>google/protobuf/descriptor.proto</resource>
+                      <resource>google/protobuf/duration.proto</resource>
+                      <resource>google/protobuf/empty.proto</resource>
+                      <resource>google/protobuf/field_mask.proto</resource>
+                      <resource>google/protobuf/source_context.proto</resource>
+                      <resource>google/protobuf/struct.proto</resource>
+                      <resource>google/protobuf/timestamp.proto</resource>
+                      <resource>google/protobuf/type.proto</resource>
+                      <resource>google/protobuf/wrappers.proto</resource>
                     </resources>
                   </exception>
                 </exceptions>
@@ -544,7 +423,31 @@
                 <ignoredClassPatterns>
                   <!-- Java 9 modules descriptor (should probably be fixed in the plugin) -->
                   <ignoredClassPattern>module-info</ignoredClassPattern>
+                  <ignoredClassPattern>META-INF.versions.9.module-info</ignoredClassPattern>
                 </ignoredClassPatterns>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>enforce-platform-rendering-isolation</id>
+              <goals>
+                <goal>enforce</goal>
+              </goals>
+              <configuration>
+                <rules>
+                  <bannedDependencies>
+                    <excludes>
+                      <!-- Ensure that emory-util-classloader and dependencies using it are not bundled anymore -->
+                      <exclude>org.xwiki.commons:xwiki-commons-legacy-classloader-api:*</exclude>
+                      <exclude>edu.emory.mathcs.util:emory-util-classloader:*</exclude>
+                    </excludes>
+                  </bannedDependencies>
+                </rules>
               </configuration>
             </execution>
           </executions>
@@ -569,14 +472,28 @@
       <id>mysql</id>
       <properties>
         <xwiki.db>mysql</xwiki.db>
-        <xwiki.db.jdbc.groupId>mysql</xwiki.db.jdbc.groupId>
-        <xwiki.db.jdbc.artifactId>mysql-connector-java</xwiki.db.jdbc.artifactId>
+        <xwiki.db.jdbc.groupId>${mysql.groupId}</xwiki.db.jdbc.groupId>
+        <xwiki.db.jdbc.artifactId>${mysql.artifactId}</xwiki.db.jdbc.artifactId>
         <xwiki.db.jdbc.version>${mysql.version}</xwiki.db.jdbc.version>
         <xwiki.db.connection.url>jdbc:mysql://localhost/xwiki?useSSL=false</xwiki.db.connection.url>
         <xwiki.db.connection.username>xwiki</xwiki.db.connection.username>
         <xwiki.db.connection.password>xwiki</xwiki.db.connection.password>
-        <xwiki.db.connection.driver_class>com.mysql.jdbc.Driver</xwiki.db.connection.driver_class>
-        <xwiki.db.dialect>org.hibernate.dialect.MySQL5InnoDBDialect</xwiki.db.dialect>
+        <xwiki.db.connection.driver_class>com.mysql.cj.jdbc.Driver</xwiki.db.connection.driver_class>
+        <xwiki.db.hbm.xwiki>xwiki.hbm.xml</xwiki.db.hbm.xwiki>
+        <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
+      </properties>
+    </profile>
+    <profile>
+      <id>mariadb</id>
+      <properties>
+        <xwiki.db>mariadb</xwiki.db>
+        <xwiki.db.jdbc.groupId>${mariadb.groupId}</xwiki.db.jdbc.groupId>
+        <xwiki.db.jdbc.artifactId>${mariadb.artifactId}</xwiki.db.jdbc.artifactId>
+        <xwiki.db.jdbc.version>${mariadb.version}</xwiki.db.jdbc.version>
+        <xwiki.db.connection.url>jdbc:mariadb://localhost/xwiki?useSSL=false</xwiki.db.connection.url>
+        <xwiki.db.connection.username>xwiki</xwiki.db.connection.username>
+        <xwiki.db.connection.password>xwiki</xwiki.db.connection.password>
+        <xwiki.db.connection.driver_class>org.mariadb.jdbc.Driver</xwiki.db.connection.driver_class>
         <xwiki.db.hbm.xwiki>xwiki.hbm.xml</xwiki.db.hbm.xwiki>
         <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
       </properties>
@@ -585,14 +502,13 @@
       <id>pgsql</id>
       <properties>
         <xwiki.db>pgsql</xwiki.db>
-        <xwiki.db.jdbc.groupId>org.postgresql</xwiki.db.jdbc.groupId>
-        <xwiki.db.jdbc.artifactId>postgresql</xwiki.db.jdbc.artifactId>
+        <xwiki.db.jdbc.groupId>${pgsql.groupId}</xwiki.db.jdbc.groupId>
+        <xwiki.db.jdbc.artifactId>${pgsql.artifactId}</xwiki.db.jdbc.artifactId>
         <xwiki.db.jdbc.version>${pgsql.version}</xwiki.db.jdbc.version>
         <xwiki.db.connection.url>jdbc:postgresql:xwiki</xwiki.db.connection.url>
         <xwiki.db.connection.username>xwiki</xwiki.db.connection.username>
         <xwiki.db.connection.password>xwiki</xwiki.db.connection.password>
         <xwiki.db.connection.driver_class>org.postgresql.Driver</xwiki.db.connection.driver_class>
-        <xwiki.db.dialect>org.hibernate.dialect.PostgreSQLDialect</xwiki.db.dialect>
         <xwiki.db.hbm.xwiki>xwiki.postgresql.hbm.xml</xwiki.db.hbm.xwiki>
         <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
         <xwiki.db.hbm.virtualMode>schema</xwiki.db.hbm.virtualMode>
@@ -602,14 +518,13 @@
       <id>derby</id>
       <properties>
         <xwiki.db>derby</xwiki.db>
-        <xwiki.db.jdbc.groupId>org.apache.derby</xwiki.db.jdbc.groupId>
-        <xwiki.db.jdbc.artifactId>derby</xwiki.db.jdbc.artifactId>
+        <xwiki.db.jdbc.groupId>${derby.groupId}</xwiki.db.jdbc.groupId>
+        <xwiki.db.jdbc.artifactId>${derby.artifactId}</xwiki.db.jdbc.artifactId>
         <xwiki.db.jdbc.version>${derby.version}</xwiki.db.jdbc.version>
         <xwiki.db.connection.url>jdbc:derby:database;create=true</xwiki.db.connection.url>
         <xwiki.db.connection.username />
         <xwiki.db.connection.password />
         <xwiki.db.connection.driver_class>org.apache.derby.jdbc.EmbeddedDriver</xwiki.db.connection.driver_class>
-        <xwiki.db.dialect>org.hibernate.dialect.DerbyDialect</xwiki.db.dialect>
         <xwiki.db.hbm.xwiki>xwiki.derby.hbm.xml</xwiki.db.hbm.xwiki>
         <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
       </properties>

@@ -21,15 +21,17 @@ package org.xwiki.mail.internal.configuration;
 
 import javax.inject.Provider;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.properties.ConverterManager;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
@@ -38,8 +40,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
 
 /**
  * Unit tests for {@link org.xwiki.mail.internal.configuration.SendMailConfigClassDocumentConfigurationSource}.
@@ -47,24 +49,37 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @since 6.4M2
  */
+@ComponentTest
 public class SendMailConfigClassDocumentConfigurationSourceTest
 {
-    @Rule
-    public MockitoComponentMockingRule<SendMailConfigClassDocumentConfigurationSource> mocker =
-        new MockitoComponentMockingRule<>(SendMailConfigClassDocumentConfigurationSource.class);
+    @InjectMockComponents
+    private SendMailConfigClassDocumentConfigurationSource source;
+
+    @MockComponent
+    private ConverterManager converterManager;
+
+    @MockComponent
+    private CacheManager cacheManager;
+
+    @MockComponent
+    private WikiDescriptorManager wikiDescriptorManager;
+
+    @MockComponent
+    private Provider<XWikiContext> xcontextProvider;
+
+    @BeforeComponent
+    public void before() throws Exception
+    {
+        Cache<Object> cache = mock(Cache.class);
+        when(this.cacheManager.createNewCache(any(CacheConfiguration.class))).thenReturn(cache);
+    }
 
     @Test
-    public void getPropertyWhenSendMailConfigClassXObjectExists() throws Exception
+    void getPropertyWhenSendMailConfigClassXObjectExists() throws Exception
     {
-        ConverterManager converterManager = this.mocker.getInstance(ConverterManager.class);
-        when(converterManager.convert(String.class, "value")).thenReturn("value");
+        when(this.converterManager.convert(String.class, "value")).thenReturn("value");
 
-        Cache<Object> cache = mock(Cache.class);
-        CacheManager cacheManager = this.mocker.getInstance(CacheManager.class);
-        when(cacheManager.createNewCache(any(CacheConfiguration.class))).thenReturn(cache);
-
-        WikiDescriptorManager wikiDescriptorManager = this.mocker.getInstance(WikiDescriptorManager.class);
-        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki");
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki");
 
         LocalDocumentReference classReference = new LocalDocumentReference("Mail", "SendMailConfigClass");
 
@@ -84,21 +99,18 @@ public class SendMailConfigClassDocumentConfigurationSourceTest
         XWikiContext xcontext = mock(XWikiContext.class);
         when(xcontext.getWiki()).thenReturn(xwiki);
 
-        Provider<XWikiContext> xcontextProvider = this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        when(xcontextProvider.get()).thenReturn(xcontext);
+        when(this.xcontextProvider.get()).thenReturn(xcontext);
 
-        assertEquals("value", this.mocker.getComponentUnderTest().getProperty("key", "defaultValue"));
+        assertEquals("value", this.source.getProperty("key", "defaultValue"));
     }
 
     @Test
-    public void getPropertyWhenNoSendMailConfigClassXObject() throws Exception
+    void getPropertyWhenNoSendMailConfigClassXObject() throws Exception
     {
         Cache<Object> cache = mock(Cache.class);
-        CacheManager cacheManager = this.mocker.getInstance(CacheManager.class);
-        when(cacheManager.createNewCache(any(CacheConfiguration.class))).thenReturn(cache);
+        when(this.cacheManager.createNewCache(any(CacheConfiguration.class))).thenReturn(cache);
 
-        WikiDescriptorManager wikiDescriptorManager = this.mocker.getInstance(WikiDescriptorManager.class);
-        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki");
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki");
 
         LocalDocumentReference classReference = new LocalDocumentReference("Mail", "SendMailConfigClass");
 
@@ -112,9 +124,8 @@ public class SendMailConfigClassDocumentConfigurationSourceTest
         XWikiContext xcontext = mock(XWikiContext.class);
         when(xcontext.getWiki()).thenReturn(xwiki);
 
-        Provider<XWikiContext> xcontextProvider = this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        when(xcontextProvider.get()).thenReturn(xcontext);
+        when(this.xcontextProvider.get()).thenReturn(xcontext);
 
-        assertEquals("defaultValue", this.mocker.getComponentUnderTest().getProperty("key", "defaultValue"));
+        assertEquals("defaultValue", this.source.getProperty("key", "defaultValue"));
     }
 }

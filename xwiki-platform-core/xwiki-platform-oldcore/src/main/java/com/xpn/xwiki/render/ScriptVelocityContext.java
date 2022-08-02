@@ -27,6 +27,7 @@ import javax.script.ScriptContext;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.runtime.directive.Scope;
+import org.xwiki.velocity.XWikiVelocityContext;
 
 /**
  * Maintains the current ScriptContext in sync with any modification of the VelocityContext.
@@ -34,7 +35,7 @@ import org.apache.velocity.runtime.directive.Scope;
  * @version $Id$
  * @since 8.3M1
  */
-public class ScriptVelocityContext extends VelocityContext
+public class ScriptVelocityContext extends XWikiVelocityContext
 {
     private final Set<String> reservedBindings;
 
@@ -47,6 +48,20 @@ public class ScriptVelocityContext extends VelocityContext
     public ScriptVelocityContext(VelocityContext parent, Set<String> reservedBindings)
     {
         super(parent);
+
+        this.reservedBindings = reservedBindings;
+    }
+
+    /**
+     * @param parent the initial Velocity context
+     * @param logDeprecated true if use of deprecated binding should be logged
+     * @param reservedBindings the binding that should not be synchronized
+     * @since 12.10
+     * @since 12.6.5
+     */
+    public ScriptVelocityContext(VelocityContext parent, boolean logDeprecated, Set<String> reservedBindings)
+    {
+        super(parent, logDeprecated);
 
         this.reservedBindings = reservedBindings;
     }
@@ -101,7 +116,7 @@ public class ScriptVelocityContext extends VelocityContext
     }
 
     @Override
-    public Object internalRemove(Object key)
+    public Object internalRemove(String key)
     {
         try {
             return super.internalRemove(key);

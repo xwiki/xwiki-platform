@@ -59,6 +59,12 @@ public class DefaultWikiCreator implements WikiCreator
     @Override
     public WikiDescriptor create(String wikiId, String wikiAlias) throws WikiManagerException
     {
+        return create(wikiId, wikiAlias, null);
+    }
+
+    @Override
+    public WikiDescriptor create(String wikiId, String wikiAlias, String ownerId) throws WikiManagerException
+    {
         XWikiContext context = xcontextProvider.get();
         XWiki xwiki = context.getWiki();
 
@@ -72,7 +78,7 @@ public class DefaultWikiCreator implements WikiCreator
         // Create the descriptor
         // Since XWiki#updateDatabase is generating documents it needs the wiki to actually exist
         // from XWiki point of view as otherwise various codes are going to be lost
-        WikiDescriptor descriptor = createDescriptor(wikiId, wikiAlias);
+        WikiDescriptor descriptor = createDescriptor(wikiId, wikiAlias, ownerId);
 
         // Init database/schema
         try {
@@ -84,10 +90,10 @@ public class DefaultWikiCreator implements WikiCreator
         return descriptor;
     }
 
-    private WikiDescriptor createDescriptor(String wikiId, String wikiAlias) throws WikiManagerException
+    private WikiDescriptor createDescriptor(String wikiId, String wikiAlias, String ownerId) throws WikiManagerException
     {
         // Create the descriptor
-        WikiDescriptor descriptor = new DefaultWikiDescriptor(wikiId, wikiAlias);
+        WikiDescriptor descriptor = new DefaultWikiDescriptor(wikiId, wikiAlias, ownerId);
 
         try {
             // Build the document

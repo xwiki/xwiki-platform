@@ -19,8 +19,7 @@
  */
 package org.xwiki.refactoring.job;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
@@ -75,9 +74,9 @@ public class XClassBreakingQuestion
     public XClassBreakingQuestion(Map<EntityReference, EntitySelection> concernedEntities)
     {
         this.concernedEntities = concernedEntities;
-        this.impactedObjects = new HashMap<>();
-        this.freePages = new HashSet<>();
-        this.xclassPages = new HashSet<>();
+        this.impactedObjects = new LinkedHashMap<>();
+        this.freePages = new LinkedHashSet<>();
+        this.xclassPages = new LinkedHashSet<>();
     }
 
     /**

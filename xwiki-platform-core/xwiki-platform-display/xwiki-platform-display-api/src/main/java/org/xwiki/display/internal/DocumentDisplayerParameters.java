@@ -20,6 +20,7 @@
 package org.xwiki.display.internal;
 
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.util.IdGenerator;
 
 /**
  * {@link DocumentDisplayer} parameters.
@@ -75,6 +76,15 @@ public class DocumentDisplayerParameters implements Cloneable
      * The target syntax to put in the transformation context.
      */
     private Syntax targetSyntax;
+
+    private boolean asyncAllowed = true;
+
+    /**
+     * The id generator to generate ids that are unique also in the parent document.
+     *
+     * @since 14.2RC1
+     */
+    private IdGenerator idGenerator;
 
     /**
      * @return the id of the document section to display
@@ -164,7 +174,7 @@ public class DocumentDisplayerParameters implements Cloneable
      * Set the flag indicating whether the transformation context should be restricted or not.
      *
      * @param transformationContextRestricted {@code true} to indicate that potentially harmful transformations should
-     * not be executed.
+     *            not be executed.
      */
     public void setTransformationContextRestricted(boolean transformationContextRestricted)
     {
@@ -226,6 +236,42 @@ public class DocumentDisplayerParameters implements Cloneable
         this.targetSyntax = targetSyntax;
     }
 
+    /**
+     * @return false if the document should be always executed synchronously
+     * @since 11.8RC1
+     */
+    public boolean isAsyncAllowed()
+    {
+        return this.asyncAllowed;
+    }
+
+    /**
+     * @param asyncAllowed false if the document should be always executed synchronously
+     * @since 11.8RC1
+     */
+    public void setAsyncAllowed(boolean asyncAllowed)
+    {
+        this.asyncAllowed = asyncAllowed;
+    }
+
+    /**
+     * @return the id generator to use for unique ids
+     * @since 14.2RC1
+     */
+    public IdGenerator getIdGenerator()
+    {
+        return this.idGenerator;
+    }
+
+    /**
+     * @param idGenerator the id generator to make sure ids are unique
+     * @since 14.2RC1
+     */
+    public void setIdGenerator(IdGenerator idGenerator)
+    {
+        this.idGenerator = idGenerator;
+    }
+
     @Override
     public DocumentDisplayerParameters clone()
     {
@@ -242,6 +288,8 @@ public class DocumentDisplayerParameters implements Cloneable
         clone.setSectionId(sectionId);
         clone.setTitleDisplayed(titleDisplayed);
         clone.setTransformationContextIsolated(transformationContextIsolated);
+        // No copy of the id generator as we explicitly want that it is shared.
+        clone.setIdGenerator(this.idGenerator);
         return clone;
     }
 }

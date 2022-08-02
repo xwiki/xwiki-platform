@@ -23,6 +23,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.LocalDocumentReference;
+
+import com.xpn.xwiki.XWiki;
 
 /**
  * Update XWiki.XWikiGlobalRights document with all required informations.
@@ -31,15 +34,40 @@ import org.xwiki.component.annotation.Component;
  * @since 4.3M1
  */
 @Component
-@Named("XWiki.XWikiGlobalRights")
+@Named(XWikiGlobalRightsDocumentInitializer.CLASS_REFERENCE_STRING)
 @Singleton
 public class XWikiGlobalRightsDocumentInitializer extends AbstractRightsDocumentInitializer
 {
+    /**
+     * The name of the document containing the class.
+     * 
+     * @since 11.7RC1
+     * @since 10.11.10
+     */
+    public static final String CLASS_NAME = "XWikiGlobalRights";
+
+    /**
+     * The local reference of the class as a String.
+     * 
+     * @since 11.7RC1
+     * @since 10.11.10
+     */
+    public static final String CLASS_REFERENCE_STRING = XWiki.SYSTEM_SPACE + '.' + CLASS_NAME;
+
+    /**
+     * The local reference of the class as a String.
+     * 
+     * @since 11.7RC1
+     * @since 10.11.10
+     */
+    public static final LocalDocumentReference CLASS_REFERENCE =
+        new LocalDocumentReference(XWiki.SYSTEM_SPACE, CLASS_NAME);
+
     /**
      * Default constructor.
      */
     public XWikiGlobalRightsDocumentInitializer()
     {
-        super("XWikiGlobalRights");
+        super(CLASS_NAME);
     }
 }

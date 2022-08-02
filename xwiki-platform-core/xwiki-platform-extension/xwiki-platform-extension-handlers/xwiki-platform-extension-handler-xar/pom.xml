@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-extension-handlers</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-extension-handler-xar</artifactId>
   <name>XWiki Platform - Extension - Handler - XAR</name>
@@ -33,15 +33,14 @@
   <description>XWiki Platform - Extension - Handler - XAR</description>
   <properties>
     <!-- TODO: Add unit tests ASAP to bring the ratio back to 0.70! -->
-    <xwiki.jacoco.instructionRatio>0.54</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>44</xwiki.pitest.mutationThreshold>
+    <xwiki.jacoco.instructionRatio>0.66</xwiki.jacoco.instructionRatio>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-model</artifactId>
+      <artifactId>xwiki-platform-model-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -62,6 +61,11 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-refactoring-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-tree-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -91,6 +95,14 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-compress</artifactId>
     </dependency>
+    <!-- The merge manager implem is needed for the DefaultXWikiDocumentMerger and this module should be able
+     to run independently for the extension manager.
+     -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-store-merge-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- Test dependencies -->
     <dependency>
@@ -98,6 +110,13 @@
       <artifactId>xwiki-platform-test-oldcore</artifactId>
       <version>${project.version}</version>
       <type>pom</type>
+      <scope>test</scope>
+    </dependency>
+    <!-- XWikiDocument needs UserReferenceSerializer and UserReferenceResolver components -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-user-default</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -113,7 +132,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-security-bridge</artifactId>
+      <artifactId>xwiki-platform-security-authorization-bridge</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
@@ -131,33 +150,20 @@
             <configuration>
               <excludes>
                 **/ConflictQuestion.java,
-                **/UnsupportedNamespaceException.java,
                 **/XarExtensionHandler.java,
                 **/XarExtensionJobFinishedListener.java,
-                **/DefaultPackageConfiguration.java,
-                **/NotADocumentException.java,
                 **/PackageConfiguration.java,
                 **/Packager.java,
-                **/PackagerException.java,
-                **/XarEntry.java,
                 **/XarEntryMergeResult.java,
-                **/XarFile.java,
-                **/XarMergeResult.java,
                 **/AbstractHandler.java,
-                **/AttachmentHandler.java,
-                **/DocumentHandler.java,
-                **/DocumentImporterHandler.java,
-                **/RootHandler.java,
-                **/UnknownRootElement.java,
-                **/XarPageLimitedHandler.java,
                 **/XarInstalledExtension.java,
                 **/XarInstalledExtensionRepository.java,
-                **/DocumentScriptSafeProvider.java,
                 **/SafeConflictQuestion.java,
                 **/DefaultXWikiDocumentMerger.java,
                 **/WikiEventListener.java,
                 **/XarExtensionPlan.java,
-                **/XarExtensionScriptService.java
+                **/XarExtensionScriptService.java,
+                **/RepairXarJob.java
               </excludes>
             </configuration>
           </execution>

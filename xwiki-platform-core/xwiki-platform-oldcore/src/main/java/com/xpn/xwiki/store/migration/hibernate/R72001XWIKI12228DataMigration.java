@@ -23,7 +23,6 @@ package com.xpn.xwiki.store.migration.hibernate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -31,8 +30,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -111,10 +110,10 @@ public class R72001XWIKI12228DataMigration extends AbstractHibernateDataMigratio
 
     private Collection<SpaceReference> getVisibleSpaces(Session session)
     {
-        Query query = session.createQuery(createSpaceQuery(false));
+        Query<String> query = session.createQuery(createSpaceQuery(false), String.class);
 
         Collection<SpaceReference> databaseSpaces = new ArrayList<>();
-        for (String space : (List<String>) query.list()) {
+        for (String space : query.list()) {
             databaseSpaces.add(this.spaceResolver.resolve(space, WIKI));
         }
 
@@ -132,10 +131,10 @@ public class R72001XWIKI12228DataMigration extends AbstractHibernateDataMigratio
 
     private Collection<SpaceReference> getHiddenSpaces(Collection<SpaceReference> visibleSpaces, Session session)
     {
-        Query query = session.createQuery(createSpaceQuery(true));
+        Query<String> query = session.createQuery(createSpaceQuery(true), String.class);
 
         Collection<SpaceReference> databaseSpaces = new ArrayList<>();
-        for (String space : (List<String>) query.list()) {
+        for (String space : query.list()) {
             databaseSpaces.add(this.spaceResolver.resolve(space, WIKI));
         }
 

@@ -74,8 +74,8 @@ platform.wiki.currentwiki.inviteSuccess=L''utilisateur {0} a été invité avec 
 platform.wiki.currentwiki.invitationCancelSaveComment=Annuler l''invitation {0} ({1})
 platform.wiki.currentwiki.invitationCancelNotification=Votre invitation a été annulée et n'est plus valide.
 platform.wiki.currentwiki.invitationCancelSuccess=Invitation annulée avec succès.
-platform.wiki.currentwiki.invitationCancelFailure=Erreur : impossible d'annuler l'invitation.
-platform.wiki.currentwiki.candidateReviewFailure=Erreur, vous ne pouvez pas annuler l'invitation.
+platform.wiki.currentwiki.invitationCancelFailure=Erreur, vous ne pouvez pas annuler l'invitation.
+platform.wiki.currentwiki.candidateReviewFailure=Erreur, vous ne pouvez pas annuler cette invitation.
 
 # LABELS
 platform.wiki.currentwiki.prop.wikiprettyname.label=Nom d'affichage
@@ -127,11 +127,11 @@ platform.wiki.currentwiki.candidates.empty=Aucun utilisateur n'a demandé, ou n'
 
 # ADMIN
 admin.xwiki.manageworkspace.description=Gérer les paramètres comme le nom du wiki, sa description, son propriétaire et le type de ses membres.
-admin.xwiki.workspaceusers.description=Gérer les membres de ce wiki: ajouter, supprimer, inviter, accepter ou rejeter des membres de ce wiki.
+admin.xwiki.workspaceusers.description=Gérer les membres de ce wiki : ajouter, supprimer, inviter, accepter ou rejeter des membres de ce wiki.
 admin.xwiki.usersconfiguration.title=Configuration
 admin.xwiki.members.title=Membres actuels
 admin.xwiki.users.title=Tous les utilisateurs
-    
+
 # DRAWER ITEM
 platform.wiki.drawer.homeWiki=Accueil
 </content>

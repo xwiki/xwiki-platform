@@ -168,14 +168,10 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
     {
         DefaultWikiDescriptor descriptor = null;
 
-        // If the server property is empty then consider we have an invalid Wiki
-        String serverProperty = extractWikiAlias(serverClassObject);
-        if (!StringUtils.isBlank(serverProperty)) {
-            // If the page name doesn't start with "XWikiServer" then consider we have an invalid Wiki
-            String wikiId = extractWikiId(document);
-            if (wikiId != null) {
-                descriptor = new DefaultWikiDescriptor(wikiId, serverProperty);
-            }
+        // If the page name doesn't start with "XWikiServer" then consider we have an invalid Wiki
+        String wikiId = extractWikiId(document);
+        if (wikiId != null) {
+            descriptor = new DefaultWikiDescriptor(wikiId, extractWikiAlias(serverClassObject));
         }
 
         return descriptor;
@@ -225,8 +221,15 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
             List<String> aliases = descriptor.getAliases();
             for (int i = 1; i < aliases.size(); ++i) {
                 String alias = aliases.get(i);
+                // We use failover = false, otherwise it fall backs to the first SERVER_CLASS object of the document
+                // instead of creating a new one.
                 BaseObject objAlias = descriptorDoc.getXObject(DefaultWikiDescriptor.SERVER_CLASS,
-                    XWikiServerClassDocumentInitializer.FIELD_SERVER, alias, true);
+                    XWikiServerClassDocumentInitializer.FIELD_SERVER, alias, false);
+                if (objAlias == null) {
+                    // Manually create a new alias
+                    objAlias = descriptorDoc.getXObject(DefaultWikiDescriptor.SERVER_CLASS,
+                        descriptorDoc.createXObject(DefaultWikiDescriptor.SERVER_CLASS, context));
+                }
                 objAlias.set(XWikiServerClassDocumentInitializer.FIELD_SERVER, alias, context);
             }
 

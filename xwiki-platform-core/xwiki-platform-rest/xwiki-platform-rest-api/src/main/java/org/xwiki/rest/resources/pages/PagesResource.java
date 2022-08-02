@@ -20,6 +20,7 @@
 package org.xwiki.rest.resources.pages;
 
 import javax.ws.rs.DefaultValue;
+import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -36,7 +37,7 @@ public interface PagesResource
 {
     @GET Pages getPages(
             @PathParam("wikiName") String wikiName,
-            @PathParam("spaceName") String spaceName,
+            @PathParam("spaceName") @Encoded String spaceName,
             @QueryParam("start") @DefaultValue("0") Integer start,
             @QueryParam("number") @DefaultValue("-1") Integer number,
             @QueryParam("parentId") String parentFilterExpression,

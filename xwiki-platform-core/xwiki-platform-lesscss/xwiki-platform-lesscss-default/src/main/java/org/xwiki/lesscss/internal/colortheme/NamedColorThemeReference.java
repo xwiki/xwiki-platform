@@ -40,7 +40,8 @@ public class NamedColorThemeReference implements ColorThemeReference
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(Object o)
+    {
         if (o instanceof NamedColorThemeReference) {
             NamedColorThemeReference namedColorThemeReference = (NamedColorThemeReference) o;
             return colorThemeName.equals(namedColorThemeReference.colorThemeName);
@@ -49,7 +50,8 @@ public class NamedColorThemeReference implements ColorThemeReference
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         return colorThemeName.hashCode();
     }
 

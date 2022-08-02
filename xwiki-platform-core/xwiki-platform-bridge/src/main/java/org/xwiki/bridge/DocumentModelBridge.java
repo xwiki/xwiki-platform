@@ -19,9 +19,13 @@
  */
 package org.xwiki.bridge;
 
+import java.util.Date;
+
+import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.stability.Unstable;
 
 /**
  * Exposes methods for accessing Documents. This is temporary until we remodel the Model classes and the Document
@@ -34,7 +38,7 @@ import org.xwiki.rendering.syntax.Syntax;
 public interface DocumentModelBridge
 {    
     /**
-     * Retrieve the full name of the document, in the <code>Space.Name</code> format, for example <tt>Main.WebHome</tt>.
+     * Retrieve the full name of the document, in the <code>Space.Name</code> format, for example {@code Main.WebHome}.
      * 
      * @return A <code>String</code> representation of the document's full name.
      * @deprecated use {@link #getDocumentReference} instead
@@ -130,6 +134,50 @@ public interface DocumentModelBridge
     /**
      * @return the document's content author user reference
      * @since 7.2M1
+     * @deprecated since 14.0RC1 rely on {@link #getAuthors()}.
      */
+    @Deprecated
     DocumentReference getContentAuthorReference();
+
+    /**
+     * @return the various authors information of a document.
+     * @since 14.0RC1
+     */
+    @Unstable
+    default DocumentAuthors getAuthors()
+    {
+        return null;
+    }
+
+    /**
+     * @return the creation date of the current document.
+     * @since 12.8RC1
+     * @since 12.6.3
+     */
+    default Date getCreationDate()
+    {
+        return null;
+    }
+
+    /**
+     * @return {@code true} if the document is hidden.
+     * @since 13.1
+     * @since 12.10.5
+     * @since 12.6.8
+     */
+    @Unstable
+    default Boolean isHidden()
+    {
+        return false;
+    }
+
+    /**
+     * @return the last save date of the current document.
+     * @since 14.0RC1
+     */
+    @Unstable
+    default Date getDate()
+    {
+        return null;
+    }
 }

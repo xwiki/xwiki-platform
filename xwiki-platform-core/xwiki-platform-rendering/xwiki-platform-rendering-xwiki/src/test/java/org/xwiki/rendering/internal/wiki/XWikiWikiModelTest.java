@@ -26,6 +26,7 @@ import java.util.Map;
 import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatcher;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.bridge.SkinAccessBridge;
@@ -47,7 +48,11 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -59,7 +64,7 @@ import static org.mockito.Mockito.when;
  * @since 2.0M1
  */
 @ComponentTest
-public class XWikiWikiModelTest
+class XWikiWikiModelTest
 {
     @InjectMockComponents
     private XWikiWikiModel wikiModel;
@@ -81,7 +86,7 @@ public class XWikiWikiModelTest
     private SkinAccessBridge skinAccessBridge;
 
     @Test
-    public void getDocumentEditURLWhenNoQueryStringSpecified() throws Exception
+    void getDocumentEditURLWhenNoQueryStringSpecified()
     {
         DocumentResourceReference reference = new DocumentResourceReference("TargetSpace.TargetPage");
         reference.setAnchor("anchor");
@@ -109,9 +114,9 @@ public class XWikiWikiModelTest
      * @throws Exception if an exception occurs while running the test
      */
     @Test
-    public void getImageURLWhenBothWidthAndHeightAttributesAreSpecified() throws Exception
+    void getImageURLWhenBothWidthAndHeightAttributesAreSpecified()
     {
-        Map<String, String> parameters = new HashMap<String, String>();
+        Map<String, String> parameters = new HashMap<>();
         parameters.put("width", "100px");
         parameters.put("height", "50");
 
@@ -125,9 +130,9 @@ public class XWikiWikiModelTest
      * @throws Exception if an exception occurs while running the test
      */
     @Test
-    public void getImageURLWhenIncludingImageDimensionsIsForbidden() throws Exception
+    void getImageURLWhenIncludingImageDimensionsIsForbidden()
     {
-        Map<String, String> parameters = new HashMap<String, String>();
+        Map<String, String> parameters = new HashMap<>();
         parameters.put("width", "101px");
         parameters.put("height", "55px");
 
@@ -140,9 +145,9 @@ public class XWikiWikiModelTest
      * @throws Exception if an exception occurs while running the test
      */
     @Test
-    public void getImageURLWhenBothWidthAndHeightCSSPropertiesAreSpecified() throws Exception
+    void getImageURLWhenBothWidthAndHeightCSSPropertiesAreSpecified()
     {
-        Map<String, String> parameters = new HashMap<String, String>();
+        Map<String, String> parameters = new HashMap<>();
         parameters.put("style", "border: 1px; height: 30px; margin-top: 2em; width: 70px");
 
         testImageURL(new AttachmentResourceReference("attachmentReference"), parameters, true, "width=70&height=30");
@@ -154,9 +159,9 @@ public class XWikiWikiModelTest
      * @throws Exception if an exception occurs while running the test
      */
     @Test
-    public void getImageURLWhenOnlyWidthAttributeIsSpecified() throws Exception
+    void getImageURLWhenOnlyWidthAttributeIsSpecified()
     {
-        Map<String, String> parameters = new HashMap<String, String>();
+        Map<String, String> parameters = new HashMap<>();
         parameters.put("width", "150");
         parameters.put("height", "30%");
 
@@ -169,9 +174,9 @@ public class XWikiWikiModelTest
      * @throws Exception if an exception occurs while running the test
      */
     @Test
-    public void getImageURLWhenOnlyHeightCSSPropertyIsSpecified() throws Exception
+    void getImageURLWhenOnlyHeightCSSPropertyIsSpecified()
     {
-        Map<String, String> parameters = new HashMap<String, String>();
+        Map<String, String> parameters = new HashMap<>();
         parameters.put("style", "width: 5cm; height: 80px");
 
         testImageURL(new AttachmentResourceReference("attachmentReference"), parameters, true, "height=80");
@@ -184,7 +189,7 @@ public class XWikiWikiModelTest
      * @throws Exception if an exception occurs while running the test
      */
     @Test
-    public void getImageURLWhenBothWidthAndHeightAreUnspecifiedAndImageSizeIsLimited() throws Exception
+    void getImageURLWhenBothWidthAndHeightAreUnspecifiedAndImageSizeIsLimited()
     {
         when(configuration.getImageWidthLimit()).thenReturn(200);
         when(configuration.getImageHeightLimit()).thenReturn(170);
@@ -201,11 +206,11 @@ public class XWikiWikiModelTest
      * @throws Exception if an exception occurs while running the test
      */
     @Test
-    public void getImageURLWhenBothWidthAndHeightAreUnspecifiedAndOnlyImageWidthIsLimited() throws Exception
+    void getImageURLWhenBothWidthAndHeightAreUnspecifiedAndOnlyImageWidthIsLimited()
     {
         when(configuration.getImageWidthLimit()).thenReturn(25);
         when(configuration.getImageHeightLimit()).thenReturn(-1);
-        Map<String, String> parameters = new HashMap<String, String>();
+        Map<String, String> parameters = new HashMap<>();
         parameters.put("width", "45%");
         parameters.put("style", "height:10em");
 
@@ -219,11 +224,11 @@ public class XWikiWikiModelTest
      * @throws Exception if an exception occurs while running the test
      */
     @Test
-    public void getImageURLWhenBothWidthAndHeightAreUnspecifiedAndImageSizeIsNotLimited() throws Exception
+    void getImageURLWhenBothWidthAndHeightAreUnspecifiedAndImageSizeIsNotLimited()
     {
         when(configuration.getImageWidthLimit()).thenReturn(-1);
         when(configuration.getImageHeightLimit()).thenReturn(-1);
-        Map<String, String> parameters = new HashMap<String, String>();
+        Map<String, String> parameters = new HashMap<>();
         parameters.put("style", "bad CSS declaration");
 
         testImageURL(new AttachmentResourceReference("attachmentReference"), parameters, true, null);
@@ -236,9 +241,9 @@ public class XWikiWikiModelTest
      * @throws Exception if an exception occurs while running the test
      */
     @Test
-    public void getImageURLWhenImageReferenceHasQueryString() throws Exception
+    void getImageURLWhenImageReferenceHasQueryString()
     {
-        Map<String, String> parameters = new HashMap<String, String>();
+        Map<String, String> parameters = new HashMap<>();
         parameters.put("height", "17");
         parameters.put("width", "23");
 
@@ -253,9 +258,9 @@ public class XWikiWikiModelTest
      * @throws Exception if an exception occurs while running the test
      */
     @Test
-    public void getImageURLWhenBothStyleAndDimensionParametersAreSpecified() throws Exception
+    void getImageURLWhenBothStyleAndDimensionParametersAreSpecified()
     {
-        Map<String, String> parameters = new HashMap<String, String>();
+        Map<String, String> parameters = new HashMap<>();
         parameters.put("height", "46");
         parameters.put("width", "101px");
         parameters.put("style", "width: 20%; height:75px");
@@ -266,16 +271,16 @@ public class XWikiWikiModelTest
     }
 
     @Test
-    public void getImageURLWhenIcon() throws Exception
+    void getImageURLWhenIcon()
     {
         ResourceReference reference = new ResourceReference("iconname", ResourceType.ICON);
         when(skinAccessBridge.getIconURL("iconname")).thenReturn("/path/to/icon");
 
-        assertEquals("/path/to/icon", this.wikiModel.getImageURL(reference, Collections.<String, String>emptyMap()));
+        assertEquals("/path/to/icon", this.wikiModel.getImageURL(reference, Collections.emptyMap()));
     }
 
     @Test
-    public void getDocumentViewURLWhenNoBaseReference() throws Exception
+    void getDocumentViewURLWhenNoBaseReference()
     {
         ResourceReference reference = new ResourceReference("reference", ResourceType.DOCUMENT);
         EntityReference documentReference = new DocumentReference("wiki", "space", "page");
@@ -286,7 +291,7 @@ public class XWikiWikiModelTest
     }
 
     @Test
-    public void getDocumentViewURLWhenPage() throws Exception
+    void getDocumentViewURLWhenPage()
     {
         ResourceReference reference = new PageResourceReference("page");
         PageReference pageReference = new PageReference("wiki", "page");
@@ -297,7 +302,7 @@ public class XWikiWikiModelTest
     }
 
     @Test
-    public void getDocumentViewURLWhenBaseReferenceSpecified() throws Exception
+    void getDocumentViewURLWhenBaseReferenceSpecified()
     {
         ResourceReference reference = new ResourceReference("reference", ResourceType.DOCUMENT);
         reference.addBaseReference("base");
@@ -309,7 +314,7 @@ public class XWikiWikiModelTest
     }
 
     @Test
-    public void getXDOM() throws Exception
+    void getXDOM() throws Exception
     {
         ResourceReference reference = new ResourceReference("reference", ResourceType.DOCUMENT);
         EntityReference documentReference = new DocumentReference("wiki", "space", "page");
@@ -323,16 +328,46 @@ public class XWikiWikiModelTest
     }
 
     private void testImageURL(final ResourceReference imageReference, Map<String, String> parameters,
-        final boolean expectedIsImageDimensionsIncludedInImageURL, final String expectedQueryString) throws Exception
+        final boolean expectedIsImageDimensionsIncludedInImageURL, final String expectedQueryString)
     {
         AttachmentReference attachmentReference =
             new AttachmentReference("image", new DocumentReference("wiki", "space", "page"));
         when(configuration.isImageDimensionsIncludedInImageURL())
             .thenReturn(expectedIsImageDimensionsIncludedInImageURL);
-        when(this.referenceResolver.resolve(imageReference, EntityType.ATTACHMENT)).thenReturn(attachmentReference);
+        when(this.referenceResolver.resolve(argThat(new ArgumentMatcher<ResourceReference>()
+        {
+            public boolean matches(ResourceReference argument)
+            {
+                return argument.getReference().equals(imageReference.getReference());
+            }
+        }), same(EntityType.ATTACHMENT))).thenReturn(attachmentReference);
         when(this.documentAccessBridge.getAttachmentURL(attachmentReference, expectedQueryString, false))
             .thenReturn("?" + expectedQueryString);
 
         assertEquals("?" + expectedQueryString, this.wikiModel.getImageURL(imageReference, parameters));
+    }
+
+    @Test
+    void isDocumentAvailable()
+    {
+        DocumentResourceReference documentResourcereference = new DocumentResourceReference("wiki:space.document");
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "document");
+        PageResourceReference pageResourcereference = new PageResourceReference("wiki:space.document");
+        PageReference pageReference = new PageReference("wiki", "space", "document");
+
+        when(this.referenceResolver.resolve(documentResourcereference, EntityType.DOCUMENT))
+            .thenReturn(documentReference);
+        when(this.referenceResolver.resolve(pageResourcereference, EntityType.PAGE))
+            .thenReturn(pageReference);
+        when(this.documentAccessBridge.getDocumentReference(documentReference)).thenReturn(documentReference);
+        when(this.documentAccessBridge.getDocumentReference(pageReference)).thenReturn(documentReference);
+
+        when(this.documentAccessBridge.exists(documentReference)).thenReturn(true);
+        assertTrue(this.wikiModel.isDocumentAvailable(documentResourcereference));
+        assertTrue(this.wikiModel.isDocumentAvailable(pageResourcereference));
+
+        when(this.documentAccessBridge.exists(documentReference)).thenReturn(false);
+        assertFalse(this.wikiModel.isDocumentAvailable(documentResourcereference));
+        assertFalse(this.wikiModel.isDocumentAvailable(pageResourcereference));
     }
 }

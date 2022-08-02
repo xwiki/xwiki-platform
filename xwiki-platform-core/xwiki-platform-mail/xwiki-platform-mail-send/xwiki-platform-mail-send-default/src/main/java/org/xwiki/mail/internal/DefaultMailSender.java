@@ -20,6 +20,7 @@
 package org.xwiki.mail.internal;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -50,6 +51,8 @@ import com.xpn.xwiki.XWikiContext;
 public class DefaultMailSender implements MailSender
 {
     private static final String SESSION_BATCHID_KEY = "xwiki.batchId";
+
+    private static final int TIMEOUT = 60;
 
     @Inject
     private Execution execution;
@@ -85,8 +88,15 @@ public class DefaultMailSender implements MailSender
                 ((XWikiContext) executionContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY)).getWikiId()));
         }
 
-        this.prepareMailQueueManager.addToQueue(new PrepareMailQueueItem(messages, session, listener, batchId,
-            clonedExecutionContext));
+        try {
+            this.prepareMailQueueManager.addMessage(new PrepareMailQueueItem(messages, session, listener, batchId,
+                clonedExecutionContext), TIMEOUT, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            // Since the prepare queue is still full after waiting 1 minute, report an error in order to not make XWiki
+            // become overloaded by using threads waiting up.
+            throw new RuntimeException(String.format("Mail prepare queue is still full after waiting [%s] [%s]",
+                TIMEOUT, TimeUnit.SECONDS), e);
+        }
 
         return new DefaultMailResult(batchId);
     }

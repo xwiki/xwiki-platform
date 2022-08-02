@@ -20,7 +20,9 @@
 package org.xwiki.rendering.macro.useravatar;
 
 import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyDisplayType;
 import org.xwiki.properties.annotation.PropertyMandatory;
+import org.xwiki.user.UserReference;
 
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.useravatar.UserAvatarMacro} Macro.
@@ -58,6 +60,7 @@ public class UserAvatarMacroParameters
      */
     @PropertyMandatory
     @PropertyDescription("the name of the user whose avatar is to be displayed")
+    @PropertyDisplayType(UserReference.class)
     public void setUsername(String username)
     {
         this.username = username;

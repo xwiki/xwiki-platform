@@ -24,10 +24,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.dom4j.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -35,14 +39,13 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.store.merge.MergeManagerResult;
 
-import com.google.common.base.Objects;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
-import com.xpn.xwiki.internal.merge.MergeUtils;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -65,6 +68,10 @@ import com.xpn.xwiki.web.Utils;
  */
 public class BaseClass extends BaseCollection<DocumentReference> implements ClassInterface
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseClass.class);
+
+    private static final long serialVersionUID = 1L;
+
     private String customMapping;
 
     private String customClass;
@@ -183,16 +190,20 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     @Override
     public void addField(String name, PropertyInterface element)
     {
-        Set<String> properties = getPropertyList();
-        if (!properties.contains(name)) {
-            if (((BaseCollection) element).getNumber() == 0) {
-                ((BaseCollection) element).setNumber(properties.size() + 1);
+        if (element != null) {
+            Set<String> properties = getPropertyList();
+            if (!properties.contains(name)) {
+                if (((BaseCollection) element).getNumber() == 0) {
+                    ((BaseCollection) element).setNumber(properties.size() + 1);
+                }
             }
+
+            super.addField(name, element);
+
+            setDirty(true);
+        } else {
+            LOGGER.warn("Cannot add null field with name [{}] in [{}].", name, this);
         }
-
-        super.addField(name, element);
-
-        setDirty(true);
     }
 
     /**
@@ -354,11 +365,14 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             if (safeget(property.getName()) == null) {
                 deprecatedObjectProperties.add(property);
             } else {
-                String propertyClass = ((PropertyClass) safeget(property.getName())).newProperty().getClassType();
-                String objectPropertyClass = property.getClassType();
+                BaseProperty emptyProperty = ((PropertyClass) safeget(property.getName())).newProperty();
+                if (emptyProperty != null) {
+                    String propertyClass = emptyProperty.getClassType();
+                    String objectPropertyClass = property.getClassType();
 
-                if (!propertyClass.equals(objectPropertyClass)) {
-                    deprecatedObjectProperties.add(property);
+                    if (!propertyClass.equals(objectPropertyClass)) {
+                        deprecatedObjectProperties.add(property);
+                    }
                 }
             }
         }
@@ -475,7 +489,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             return false;
         }
 
-        if (!Objects.equal(this.customMapping, bclass.customMapping)
+        if (!Objects.equals(this.customMapping, bclass.customMapping)
             && !getCustomMapping().equals(bclass.getCustomMapping())) {
             return false;
         }
@@ -880,6 +894,17 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public boolean addStaticListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
         boolean relationalStorage, String values, String displayType, String separators, String defaultValue)
     {
+        return addStaticListField(fieldName, fieldPrettyName, size, multiSelect, relationalStorage, values,
+            displayType, separators, defaultValue, ListClass.FREE_TEXT_FORBIDDEN, false);
+    }
+
+    /**
+     * @since 11.5RC1
+     */
+    public boolean addStaticListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
+        boolean relationalStorage, String values, String displayType, String separators, String defaultValue,
+        String freeText, boolean largeStorage)
+    {
         if (get(fieldName) == null) {
             StaticListClass list_class = new StaticListClass();
             list_class.setName(fieldName);
@@ -898,6 +923,11 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             if (defaultValue != null) {
                 list_class.setDefaultValue(defaultValue);
             }
+            list_class.setFreeText(freeText);
+            if (!ListClass.FREE_TEXT_FORBIDDEN.equals(freeText)) {
+                list_class.setPicker(true);
+            }
+            list_class.setLargeStorage(largeStorage);
             list_class.setObject(this);
             put(fieldName, list_class);
 
@@ -905,6 +935,33 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         }
 
         return false;
+    }
+
+    /**
+     * Adds a new Static List xproperty to this xclass. This allows calling the various methods on
+     * the returned {@link StaticListClass}.
+     *
+     * @param fieldName the id of the Static List xproperty to add
+     * @return the added Static List xproperty or the existing xproperty if it was already existing
+     * @since 12.8RC1
+     */
+    public StaticListClass addStaticListField(String fieldName)
+    {
+        // Return the existing class if it exists, otherwise create a new one.
+        StaticListClass result = (StaticListClass) get(fieldName);
+        if (result == null) {
+            result = new StaticListClass();
+            result.setName(fieldName);
+            // Set default values which can be overridden by the caller
+            result.setSize(1);
+            result.setMultiSelect(false);
+            result.setRelationalStorage(false);
+            result.setFreeText(ListClass.FREE_TEXT_FORBIDDEN);
+            result.setLargeStorage(false);
+            result.setObject(this);
+            put(fieldName, result);
+        }
+        return result;
     }
 
     public boolean addNumberField(String fieldName, String fieldPrettyName, int size, String type)
@@ -1195,19 +1252,39 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     public BaseObject newCustomClassInstance(XWikiContext context) throws XWikiException
     {
+        return newCustomClassInstance(false);
+    }
+
+    /**
+     * @param fallback if true, fallback on BaseObject if there is any problem with the configured custom class
+     * @return a new Java instance of an object represented by this XWiki class
+     * @throws XWikiException if there is a problem when creating an new instance and {@code fallback} is false
+     * @since 12.4RC1
+     * @since 11.10.5
+     */
+    public BaseObject newCustomClassInstance(boolean fallback) throws XWikiException
+    {
         String customClass = getCustomClass();
+
         try {
-            if ((customClass == null) || (customClass.equals(""))) {
+            if (StringUtils.isEmpty(customClass)) {
                 return new BaseObject();
             } else {
                 return (BaseObject) Class
-                    .forName(getCustomClass(), true, Thread.currentThread().getContextClassLoader()).newInstance();
+                    .forName(customClass, true, Thread.currentThread().getContextClassLoader()).newInstance();
             }
         } catch (Exception e) {
-            Object[] args = { customClass };
-            throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,
-                XWikiException.ERROR_XWIKI_CLASSES_CUSTOMCLASSINVOCATIONERROR, "Cannot instanciate custom class {0}", e,
-                args);
+            if (fallback) {
+                LOGGER.warn("Failed to create a new custom class instance ([{}]). Fallbacking on BaseObject.",
+                    ExceptionUtils.getRootCauseMessage(e));
+
+                return new BaseObject();
+            } else {
+                Object[] args = { customClass };
+                throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,
+                    XWikiException.ERROR_XWIKI_CLASSES_CUSTOMCLASSINVOCATIONERROR, "Cannot instanciate custom class {0}", e,
+                    args);
+            }
         }
     }
 
@@ -1217,8 +1294,23 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public static BaseObject newCustomClassInstance(DocumentReference classReference, XWikiContext context)
         throws XWikiException
     {
+        return newCustomClassInstance(classReference, false, context);
+    }
+
+    /**
+     * @param classReference the reference of the document containing the XWiki class for which to create a new object
+     * @param fallback if true, fallback on BaseObject if there is any problem with the configured custom class
+     * @param context the XWiki context used to load the {@link BaseClass}
+     * @return a new Java instance of an object represented by this XWiki class
+     * @throws XWikiException if there is a problem when creating an new instance and {@code fallback} is false
+     * @since 12.4RC1
+     * @since 11.10.5
+     */
+    public static BaseObject newCustomClassInstance(DocumentReference classReference, boolean fallback,
+        XWikiContext context) throws XWikiException
+    {
         BaseClass bclass = context.getWiki().getXClass(classReference, context);
-        BaseObject object = (bclass == null) ? new BaseObject() : bclass.newCustomClassInstance(context);
+        BaseObject object = (bclass == null) ? new BaseObject() : bclass.newCustomClassInstance(fallback);
         object.setXClassReference(classReference);
 
         return object;
@@ -1398,26 +1490,52 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         BaseClass previousClass = (BaseClass) previousElement;
         BaseClass newClass = (BaseClass) newElement;
 
-        setCustomClass(MergeUtils.mergeOject(previousClass.getCustomClass(), newClass.getCustomClass(),
-            getCustomClass(), mergeResult));
+        MergeManagerResult<String, String> customClassMergeResult =
+            getMergeManager().mergeObject(previousClass.getCustomClass(),
+                newClass.getCustomClass(), getCustomClass(), configuration);
+        mergeResult.getLog().addAll(customClassMergeResult.getLog());
+        mergeResult.setModified(mergeResult.isModified() || customClassMergeResult.isModified());
+        setCustomClass(customClassMergeResult.getMergeResult());
 
-        setCustomMapping(MergeUtils.mergeOject(previousClass.getCustomMapping(), newClass.getCustomMapping(),
-            getCustomMapping(), mergeResult));
+        MergeManagerResult<String, String> customMappingMergeResult = getMergeManager().mergeObject(previousClass.getCustomMapping(),
+            newClass.getCustomMapping(), getCustomMapping(), configuration);
+        mergeResult.getLog().addAll(customMappingMergeResult.getLog());
+        mergeResult.setModified(mergeResult.isModified() || customMappingMergeResult.isModified());
+        setCustomMapping(customMappingMergeResult.getMergeResult());
 
-        setDefaultWeb(MergeUtils.mergeOject(previousClass.getDefaultWeb(), newClass.getDefaultWeb(), getDefaultWeb(),
-            mergeResult));
+        MergeManagerResult<String, String> defaultWebMergeResult = getMergeManager().mergeObject(previousClass.getDefaultWeb(),
+            newClass.getDefaultWeb(), getDefaultWeb(), configuration);
+        mergeResult.getLog().addAll(defaultWebMergeResult.getLog());
+        mergeResult.setModified(mergeResult.isModified() || defaultWebMergeResult.isModified());
+        setDefaultWeb(defaultWebMergeResult.getMergeResult());
 
-        setDefaultViewSheet(MergeUtils.mergeOject(previousClass.getDefaultViewSheet(), newClass.getDefaultViewSheet(),
-            getDefaultViewSheet(), mergeResult));
+        MergeManagerResult<String, String> defaultViewSheetMergeResult =
+            getMergeManager().mergeObject(previousClass.getDefaultViewSheet(), newClass.getDefaultViewSheet(),
+                getDefaultViewSheet(), configuration);
+        mergeResult.getLog().addAll(defaultViewSheetMergeResult.getLog());
+        mergeResult.setModified(mergeResult.isModified() || defaultViewSheetMergeResult.isModified());
+        setDefaultViewSheet(defaultViewSheetMergeResult.getMergeResult());
 
-        setDefaultEditSheet(MergeUtils.mergeOject(previousClass.getDefaultEditSheet(), newClass.getDefaultEditSheet(),
-            getDefaultEditSheet(), mergeResult));
+        MergeManagerResult<String, String> defaultEditSheetMergeResult =
+            getMergeManager().mergeObject(previousClass.getDefaultEditSheet(), newClass.getDefaultEditSheet(),
+                getDefaultEditSheet(), configuration);
+        mergeResult.getLog().addAll(defaultEditSheetMergeResult.getLog());
+        mergeResult.setModified(mergeResult.isModified() || defaultEditSheetMergeResult.isModified());
+        setDefaultEditSheet(defaultEditSheetMergeResult.getMergeResult());
 
-        setDefaultEditSheet(MergeUtils.mergeOject(previousClass.getValidationScript(), newClass.getValidationScript(),
-            getValidationScript(), mergeResult));
+        MergeManagerResult<String, String> validationScriptMergeResult =
+            getMergeManager().mergeObject(previousClass.getValidationScript(), newClass.getValidationScript(),
+                getValidationScript(), configuration);
+        mergeResult.getLog().addAll(validationScriptMergeResult.getLog());
+        mergeResult.setModified(mergeResult.isModified() || validationScriptMergeResult.isModified());
+        setValidationScript(validationScriptMergeResult.getMergeResult());
 
-        setNameField(
-            MergeUtils.mergeOject(previousClass.getNameField(), newClass.getNameField(), getNameField(), mergeResult));
+        MergeManagerResult<String, String> nameFieldMergeResult =
+            getMergeManager().mergeObject(previousClass.getNameField(), newClass.getNameField(), getNameField(),
+                configuration);
+        mergeResult.getLog().addAll(nameFieldMergeResult.getLog());
+        mergeResult.setModified(mergeResult.isModified() || nameFieldMergeResult.isModified());
+        setNameField(nameFieldMergeResult.getMergeResult());
 
         // Properties
 
@@ -1478,14 +1596,16 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     @Override
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
-        super.setOwnerDocument(ownerDocument);
+        if (this.ownerDocument != ownerDocument) {
+            super.setOwnerDocument(ownerDocument);
 
-        if (this.ownerDocument != null) {
-            setDocumentReference(this.ownerDocument.getDocumentReference());
-        }
+            if (this.ownerDocument != null) {
+                setDocumentReference(this.ownerDocument.getDocumentReference());
+            }
 
-        if (ownerDocument != null && this.isDirty) {
-            ownerDocument.setMetaDataDirty(true);
+            if (ownerDocument != null && this.isDirty) {
+                ownerDocument.setMetaDataDirty(true);
+            }
         }
     }
 

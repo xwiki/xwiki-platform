@@ -113,7 +113,7 @@ public class DefaultModelBridge implements ModelBridge
     @Override
     public Map<String, Object> pushDocumentInContext(DocumentModelBridge document)
     {
-        Map<String, Object> backupObjects = new HashMap<String, Object>();
+        Map<String, Object> backupObjects = new HashMap<>();
 
         // Backup the current context state.
         XWikiDocument.backupContext(backupObjects, this.xcontextProvider.get());

@@ -1,2 +1,0 @@
-#template('editors/xdom_macros.vm')
-#textArea

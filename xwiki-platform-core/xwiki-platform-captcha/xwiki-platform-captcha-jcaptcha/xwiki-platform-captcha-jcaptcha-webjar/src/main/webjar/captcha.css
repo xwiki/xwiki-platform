@@ -1,0 +1,11 @@
+.captcha.captcha-refresh {
+  /* Align the refresh button to top. */
+  vertical-align: top;
+}
+
+iframe.captcha-challenge {
+  /* Align the iframe (text captcha) with the Refresh button. */
+  margin-top: 0.4em;
+  /* Min height needed in order for the browser to be able to show vertical scroll bars, if the content needs it. */
+  height: 4.5em;
+}

@@ -64,4 +64,16 @@ public interface CSRFToken
      * @return URL of the resubmission page with correct parameters
      */
     String getResubmissionURL();
+
+    /**
+     * Get the URI to call to trigger back the failed request. It is the "resubmit" part of
+     * {@link #getResubmissionURL()}.
+     * @return the URI to call to trigger back the failed request.
+     * @since 11.3RC1
+     */
+    default String getRequestURI()
+    {
+        // Avoid revapi complaints.
+        throw new RuntimeException("Method not implemented.");
+    }
 }

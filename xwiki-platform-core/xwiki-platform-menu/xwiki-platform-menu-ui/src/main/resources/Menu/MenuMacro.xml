@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="Menu.MenuMacro" locale="">
+<xwikidoc version="1.5" reference="Menu.MenuMacro" locale="">
   <web>Menu</web>
   <name>MenuMacro</name>
   <language/>
@@ -41,9 +41,11 @@
 = Horizontal Menu =
 
 {{velocity}}
+#set ($menuTemplateDoc = $xwiki.getDocument('MenuTemplate'))
 {{code language="none"}}
 {{menu type="horizontal fixedWidth"}}
-$xwiki.getDocument('MenuTemplate').content
+## No way to escape content in the code macro, so just remove {, see https://jira.xwiki.org/browse/XRENDERING-13.
+$menuTemplateDoc.content.replace('{', '')
 {{/menu}}
 {{/code}}
 {{/velocity}}
@@ -81,8 +83,11 @@ $xwiki.getDocument('MenuTemplate').content
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -96,7 +101,9 @@ $xwiki.getDocument('MenuTemplate').content
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -128,6 +135,8 @@ $xwiki.getDocument('MenuTemplate').content
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -202,11 +211,14 @@ $xwiki.getDocument('MenuTemplate').content
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
-        <number>6</number>
+        <number>5</number>
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -217,9 +229,11 @@ $xwiki.getDocument('MenuTemplate').content
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
-        <number>3</number>
+        <number>2</number>
         <prettyName>Code</prettyName>
         <rows>20</rows>
         <size>50</size>
@@ -230,9 +244,11 @@ $xwiki.getDocument('MenuTemplate').content
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
-        <number>1</number>
+        <number>6</number>
         <prettyName>Content Type</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -245,7 +261,7 @@ $xwiki.getDocument('MenuTemplate').content
       <name>
         <disabled>0</disabled>
         <name>name</name>
-        <number>2</number>
+        <number>1</number>
         <prettyName>Name</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
@@ -256,7 +272,7 @@ $xwiki.getDocument('MenuTemplate').content
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
         <name>parse</name>
-        <number>5</number>
+        <number>4</number>
         <prettyName>Parse content</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -265,9 +281,11 @@ $xwiki.getDocument('MenuTemplate').content
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
-        <number>4</number>
+        <number>3</number>
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -485,11 +503,14 @@ $xwiki.getDocument('MenuTemplate').content
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
-        <number>6</number>
+        <number>5</number>
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -500,9 +521,11 @@ $xwiki.getDocument('MenuTemplate').content
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
-        <number>3</number>
+        <number>2</number>
         <prettyName>Code</prettyName>
         <rows>20</rows>
         <size>50</size>
@@ -513,9 +536,11 @@ $xwiki.getDocument('MenuTemplate').content
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
-        <number>1</number>
+        <number>6</number>
         <prettyName>Content Type</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -528,7 +553,7 @@ $xwiki.getDocument('MenuTemplate').content
       <name>
         <disabled>0</disabled>
         <name>name</name>
-        <number>2</number>
+        <number>1</number>
         <prettyName>Name</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
@@ -539,7 +564,7 @@ $xwiki.getDocument('MenuTemplate').content
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
         <name>parse</name>
-        <number>5</number>
+        <number>4</number>
         <prettyName>Parse content</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -548,9 +573,11 @@ $xwiki.getDocument('MenuTemplate').content
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
-        <number>4</number>
+        <number>3</number>
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -693,7 +720,6 @@ $xwiki.getDocument('MenuTemplate').content
         font-size: @font-size-base;
         text-align: left; // Ensures proper alignment if parent has it changed (e.g., modal footer)
         background-color: @dropdown-bg;
-        border: 1px solid @dropdown-fallback-border; // IE8 fallback
         border: 1px solid @dropdown-border;
         border-radius: @border-radius-base;
         .box-shadow(0 6px 12px rgba(0,0,0,.175));
@@ -874,6 +900,33 @@ $xwiki.getDocument('MenuTemplate').content
     padding-left: 15px;
     &amp; .icon-bar {
       background-color: @navbar-default-link-color;
+      transition: .3s ease all;
+      &amp;:nth-of-type(2) {
+        opacity: 0;
+      }
+      &amp;:nth-of-type(3) {
+        transform: rotate(45deg);
+      }
+      &amp;:nth-of-type(4) {
+        transform: rotate(-45deg);
+        margin-top: -2px;
+        margin-bottom: 6px;
+      }
+    }
+    &amp;.collapsed {
+      .icon-bar {
+        &amp;:nth-of-type(2) {
+          opacity: 1;
+        }
+        &amp;:nth-of-type(3) {
+          transform: rotate(0);
+        }
+        &amp;:nth-of-type(4) {
+          transform: rotate(0);
+          margin-top: 4px;
+          margin-bottom: 0;
+        }
+      }
     }
   }
 }</code>
@@ -905,10 +958,51 @@ $xwiki.getDocument('MenuTemplate').content
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>13</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>14</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>, </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>12</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
       <code>
         <disabled>0</disabled>
+        <editor>Text</editor>
         <name>code</name>
-        <number>9</number>
+        <number>10</number>
         <prettyName>Macro code</prettyName>
         <rows>20</rows>
         <size>40</size>
@@ -916,23 +1010,47 @@ $xwiki.getDocument('MenuTemplate').content
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
       <contentDescription>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>contentDescription</name>
-        <number>8</number>
+        <number>9</number>
         <prettyName>Content description (Not applicable for "No content" type)</prettyName>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </contentDescription>
+      <contentJavaType>
+        <cache>0</cache>
+        <defaultValue>Unknown</defaultValue>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>1</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentJavaType</name>
+        <number>8</number>
+        <picker>1</picker>
+        <prettyName>Macro content type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Unknown|Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentJavaType>
       <contentType>
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>7</number>
-        <prettyName>Macro content type</prettyName>
+        <prettyName>Macro content availability</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator>|</separator>
         <separators>|</separators>
@@ -941,17 +1059,28 @@ $xwiki.getDocument('MenuTemplate').content
         <values>Optional|Mandatory|No content</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </contentType>
-      <defaultCategory>
+      <defaultCategories>
+        <cache>0</cache>
         <disabled>0</disabled>
-        <name>defaultCategory</name>
+        <displayType>input</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>defaultCategories</name>
         <number>4</number>
-        <prettyName>Default category</prettyName>
-        <size>30</size>
+        <prettyName>Default categories</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </defaultCategory>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </defaultCategories>
       <description>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>description</name>
         <number>3</number>
         <prettyName>Macro description</prettyName>
@@ -978,6 +1107,16 @@ $xwiki.getDocument('MenuTemplate').content
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <priority>
+        <disabled>0</disabled>
+        <name>priority</name>
+        <number>11</number>
+        <numberType>integer</numberType>
+        <prettyName>Priority</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </priority>
       <supportsInlineMode>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -992,6 +1131,8 @@ $xwiki.getDocument('MenuTemplate').content
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>visibility</name>
         <number>6</number>
@@ -1006,6 +1147,15 @@ $xwiki.getDocument('MenuTemplate').content
       </visibility>
     </class>
     <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
       <code>{{velocity}}
 #set ($id = $xcontext.macro.params.id)
 #set ($type = $xcontext.macro.params.type)
@@ -1017,10 +1167,14 @@ $xwiki.getDocument('MenuTemplate').content
 #set ($discard = $xwiki.ssx.use("$xcontext.macro.doc.prefixedFullName", {'colorTheme': $colorTheme}))
 #set ($discard = $xwiki.jsx.use("$xcontext.macro.doc.prefixedFullName"))
 #if($type.contains('horizontal'))
+  ## Make sure the id is non-empty for horizontal menus as otherwise the toggle doesn't work.
+  #if ($stringtool.isBlank("$!id"))
+    #set ($id = $wikimacro.context.getXDOM().getIdGenerator().generateUniqueId("M", "GeneratedMenuId"))
+  #end
   (% role="navigation" class="menu-horizontal-toggle" %)(((
     (% class="navbar-header" %)(((
       {{html}}
-        &lt;button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#$!{id}" aria-expanded="false"&gt;
+        &lt;button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#$!{escapetool.xml($id)}" aria-expanded="false"&gt;
           &lt;span class="sr-only"&gt;&lt;/span&gt;
           &lt;span class="icon-bar"&gt;&lt;/span&gt;
           &lt;span class="icon-bar"&gt;&lt;/span&gt;
@@ -1028,13 +1182,13 @@ $xwiki.getDocument('MenuTemplate').content
         &lt;/button&gt;
       {{/html}}
     )))
-    (% id="${id}" class="menu menu-$!type collapse navbar-collapse" %)(((
-      $xcontext.macro.content
+    (% id="$!{services.rendering.escape($id, 'xwiki/2.1')}" class="menu menu-${services.rendering.escape($!type, 'xwiki/2.1')} collapse navbar-collapse" %)(((
+      {{wikimacrocontent/}}
     )))
   )))
 #else
-  (% #if ("$!id" != '') id="$id"#end class="menu menu-$!type" %)(((
-    $xcontext.macro.content
+  (% #if ("$!id" != '') id="${services.rendering.escape($id, 'xwiki/2.1')}"#end class="menu menu-${services.rendering.escape($!type, 'xwiki/2.1')}" %)(((
+    {{wikimacrocontent/}}
   )))
 #end
 {{/velocity}}</code>
@@ -1043,10 +1197,15 @@ $xwiki.getDocument('MenuTemplate').content
       <contentDescription>Define the menu structure using wiki syntax. Each menu item should be a list item and should contain the menu item label or link. You can use nested lists for sub-menu items.</contentDescription>
     </property>
     <property>
+      <contentJavaType>Wiki</contentJavaType>
+    </property>
+    <property>
       <contentType>Mandatory</contentType>
     </property>
     <property>
-      <defaultCategory>Navigation</defaultCategory>
+      <defaultCategories>
+        <value>Navigation</value>
+      </defaultCategories>
     </property>
     <property>
       <description>Displays a menu created using simple wiki syntax (nested lists and links).</description>
@@ -1056,6 +1215,9 @@ $xwiki.getDocument('MenuTemplate').content
     </property>
     <property>
       <name>Menu</name>
+    </property>
+    <property>
+      <priority/>
     </property>
     <property>
       <supportsInlineMode>0</supportsInlineMode>
@@ -1116,6 +1278,15 @@ $xwiki.getDocument('MenuTemplate').content
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue>horizontal</defaultValue>
@@ -1128,6 +1299,9 @@ $xwiki.getDocument('MenuTemplate').content
     </property>
     <property>
       <name>type</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -1182,6 +1356,15 @@ $xwiki.getDocument('MenuTemplate').content
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -1194,6 +1377,9 @@ $xwiki.getDocument('MenuTemplate').content
     </property>
     <property>
       <name>id</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
 </xwikidoc>

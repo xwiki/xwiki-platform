@@ -1,0 +1,46 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+#template('job/question/macros.vm')
+
+#questionHeader()
+
+#set ($jobStatus = $job.status)
+#set ($question = $jobStatus.question)
+
+<div class="warningmessage deleteWarningExtensions">
+  <p><strong>$services.icon.renderHTML('warning') $escapetool.xml($services.localization.render("job.question.ExtensionBreakingQuestion.${job.type}.title"))</strong></p>
+  <p>$escapetool.xml($services.localization.render("job.question.ExtensionBreakingQuestion.${job.type}.explanation"))</p>
+  #set ($url = $xwiki.getURL($services.model.createDocumentReference('', 'XWiki', 'XWikiPreferences'), 'admin', 'section=XWiki.Extensions&search=&repo=installed'))
+  #set ($link = '<a href="' + $url + '">')
+  ## We cannot escape the following line because it contains an HTML link
+  <p>$services.localization.render("job.question.ExtensionBreakingQuestion.${job.type}.help", [$link, '</a>'])</p>
+  <p>$escapetool.xml($services.localization.render('job.question.ExtensionBreakingQuestion.confirm'))</p>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <p class="panel-title">$escapetool.xml($services.localization.render("job.question.ExtensionBreakingQuestion.${job.type}.title"))</p>
+    </div>
+    <div class="panel-body">
+      <p><a href="#" class="btSelectAllTree">$escapetool.xml($services.localization.render('job.question.ExtensionBreakingQuestion.tree.selectAll'))</a> / <a href="#" class="btUnselectAllTree">$escapetool.xml($services.localization.render('job.question.ExtensionBreakingQuestion.tree.selectNone'))</a></p>
+      <div class="deleteTree" data-url="$escapetool.xml($xwiki.relativeRequestURL)?qaction=data" />
+    </div>
+  </div>
+  #questionButtons($jobStatus)
+</div>
+#questionFooter()

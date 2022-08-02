@@ -22,7 +22,10 @@ package org.xwiki.notifications.filters.internal.scope;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * A hierarchy of scope notification filter preferences.
@@ -82,5 +85,39 @@ public class ScopeNotificationFilterPreferencesHierarchy
     public boolean isEmpty()
     {
         return preferences.isEmpty();
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        ScopeNotificationFilterPreferencesHierarchy that = (ScopeNotificationFilterPreferencesHierarchy) o;
+
+        return new EqualsBuilder()
+            .append(preferences, that.preferences)
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(23, 37)
+            .append(preferences)
+            .toHashCode();
+    }
+
+    @Override
+    public String toString()
+    {
+        return new XWikiToStringBuilder(this)
+            .append("preferences", preferences)
+            .toString();
     }
 }

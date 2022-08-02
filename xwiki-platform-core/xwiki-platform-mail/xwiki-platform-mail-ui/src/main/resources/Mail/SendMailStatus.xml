@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.4" reference="Mail.SendMailStatus" locale="">
   <web>Mail</web>
   <name>SendMailStatus</name>
   <language/>
@@ -42,7 +42,7 @@
 ##
 #if ($request.mailsendingaction_resend &amp;&amp; $request.mail_id &amp;&amp; $request.batch_id)
   ## resending email
-  #set($mailResult = $services.mailstorage.resend($request.batch_id, $request.mail_id))
+  #set($mailResult = $services.mail.storage.resend($request.batch_id, $request.mail_id))
   #set ($mailError = false)
   #macro (displayError $description)
 
@@ -58,7 +58,7 @@
   #end
   #if ("$!services.mailstorage.lastError" != '')
     #set ($mailError = true)
-    #displayError($exceptiontool.getStackTrace($services.mailstorage.lastError))
+    #displayError($exceptiontool.getStackTrace($services.mail.storage.lastError))
   #end
   #set ($statuses = $mailResult.statusResult.getAllErrors())
   #if ($statuses.hasNext())
@@ -76,32 +76,31 @@
 {{translation key="admin.emailstatus.hint" /}}
 
 ##
-## Livetable #
+## Live Data #
 ##
 #set($columns = ['date', 'batchId', 'type', 'recipients', 'state', 'error', 'actions'])
-#set($columnsProperties = {
-    'date' : { 'type' : 'date' },
-    'batchId' : { 'type' : 'text' },
-    'type' : { 'type' : 'text' },
-    'recipients' : { 'type' : 'text' , 'html' : 'true' },
-    'state' : { 'type' : 'text', 'size' : 6 },
-    'error' : { 'type' : 'text' },
-    'actions' : { 'type' : 'text', 'html' : 'true', 'filterable' : 'false', 'sortable' : 'false' }
-})
 #if ($xcontext.isMainWiki())
-  #set($discard = $columns.add(5, 'wiki'))
-  #set($discard = $columnsProperties.put('wiki', { 'type' : 'text', 'size' : 6 }))
+  #set ($discard = $columns.add(5, 'wiki'))
 #end
-#set($options = {
-   'resultPage': 'Mail.SendMailStatusJSON',
-   'translationPrefix' : 'Mail.SendMailStatus_livetable.',
-   'tagCloud' : false,
-   'selectedColumn' : 'date',
-   'defaultOrder' : 'desc',
-   'outputOnlyHtml': true
+#set ($liveDataConfig = {
+  'meta': {
+    'propertyDescriptors': [
+      { 'id': 'date', 'filterable': false },
+      { 'id': 'recipients', 'displayer': 'html' },
+      { 'id': 'actions', 'displayer': 'html', 'filterable': false, 'sortable': false }
+    ]
+  }
 })
-{{html clean="false"}}
-#livetable('sendmailstatus' $columns $columnsProperties $options)
-{{/html}}
+#set ($sourceParameters = $escapetool.url({
+  'resultPage': 'Mail.SendMailStatusJSON',
+  'translationPrefix': 'Mail.SendMailStatus_livetable.'
+}))
+{{liveData 
+  id='sendmailstatus'
+  source='liveTable'
+  sourceParameters="$sourceParameters"
+  properties="$stringtool.join($columns, ',')"
+  sort='date:desc'
+}}$jsontool.serialize($liveDataConfig){{/liveData}}
 {{/velocity}}</content>
 </xwikidoc>

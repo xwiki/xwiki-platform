@@ -64,8 +64,8 @@ public class DefaultWikiUserConfigurationHelper implements WikiUserConfiguration
 
             return xwiki.getDocument(reference, context);
         } catch (XWikiException e) {
-            throw new WikiUserManagerException(String.format("Fail to get the configuration document for wiki [%s].",
-                    wikiId));
+            throw new WikiUserManagerException(String.format("Failed to get the configuration document for wiki [%s]",
+                wikiId), e);
         }
     }
 

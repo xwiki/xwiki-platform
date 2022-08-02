@@ -21,6 +21,8 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -44,16 +46,16 @@ import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
  * XHTML form has only one target URL. In previous versions of XWiki this was accomplished using javascript code, with a
  * fall-back on a pseudo-dispatcher inside the {@link PreviewAction}, which was on obvious case of bad code design.
  * <p>
- * The filter dispatches requests based on the presence of a request parameter starting with <tt>action_</tt> followed
+ * The filter dispatches requests based on the presence of a request parameter starting with {@code action_} followed
  * by the name of the struts action that should actually process the request. For example, the button that does
- * <tt>Save and Continue</tt> looks like:
+ * {@code Save and Continue} looks like:
  *
  * <pre>
  * &lt;input type=&quot;submit&quot; name=&quot;action_saveandcontinue&quot; value=&quot;...&quot;/&gt;
  * </pre>
  *
- * As a result, when clicking the button, the request is not sent to the form's target (<tt>preview</tt>), but is
- * actually forwarded internally to <tt>/bin/saveandcontinue/The/Document</tt>.
+ * As a result, when clicking the button, the request is not sent to the form's target ({@code preview}), but is
+ * actually forwarded internally to {@code /bin/saveandcontinue/The/Document}.
  *
  * @version $Id$
  * @since 1.8M1
@@ -88,12 +90,20 @@ public class ActionFilter implements Filter
     {
         // Only HTTP requests can be dispatched.
         if (request instanceof HttpServletRequest
-            && !Boolean.valueOf((String) request.getAttribute(ATTRIBUTE_ACTION_DISPATCHED))) {
+            && !Boolean.parseBoolean((String) request.getAttribute(ATTRIBUTE_ACTION_DISPATCHED)))
+        {
             HttpServletRequest hrequest = (HttpServletRequest) request;
             Enumeration<String> parameterNames = hrequest.getParameterNames();
             while (parameterNames.hasMoreElements()) {
                 String parameter = parameterNames.nextElement();
-                if (parameter.startsWith(ACTION_PREFIX)) {
+                
+                // If some xactions are passed as parameter, the parameters prefixed with 'action_' are only taken into
+                // account if they are part of the xaction list. Otherwise, all the parameters prefixed with 'action_'
+                // are accepted.
+                String[] xactions = request.getParameterValues("xaction");
+                if (parameter.startsWith(ACTION_PREFIX) && (xactions == null || Stream.of(xactions)
+                    .anyMatch(it -> Objects.equals(parameter, String.format("action_%s", it)))))
+                {
                     String targetURL = getTargetURL(hrequest, parameter);
                     RequestDispatcher dispatcher = hrequest.getRequestDispatcher(targetURL);
                     if (dispatcher != null) {
@@ -121,11 +131,11 @@ public class ActionFilter implements Filter
     /**
      * Compose a new URL path based on the original request and the specified action. The result is relative to the
      * application context, so that it can be used with {@link HttpServletRequest#getRequestDispatcher(String)}. For
-     * example, calling this method with a request for <tt>/xwiki/bin/edit/Some/Document</tt> and <tt>action_save</tt>,
-     * the result is <tt>/bin/save/Some/Document</tt>.
+     * example, calling this method with a request for {@code /xwiki/bin/edit/Some/Document} and {@code action_save},
+     * the result is {@code /bin/save/Some/Document}.
      *
      * @param request the original request
-     * @param action the action parameter, starting with <tt>action_</tt>
+     * @param action the action parameter, starting with {@code action_}
      * @return The rebuilt URL path, with the specified action in place of the original Struts action. Note that unlike
      *         the HTTP path, this does not contain the application context part.
      */
@@ -154,7 +164,8 @@ public class ActionFilter implements Filter
             Utils.getComponent(ConfigurationSource.class, XWikiCfgConfigurationSource.ROLEHINT);
         if ("1".equals(configuration.getProperty("xwiki.virtual.usepath", "1"))) {
             if (servletPath.equals(PATH_SEPARATOR
-                + configuration.getProperty("xwiki.virtual.usepath.servletpath", "wiki"))) {
+                + configuration.getProperty("xwiki.virtual.usepath.servletpath", "wiki")))
+            {
                 // Move the wiki name together with the servlet path
                 servletPath += path.substring(0, index);
                 index = path.indexOf(PATH_SEPARATOR, index + 1);

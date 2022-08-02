@@ -19,25 +19,26 @@
  */
 package org.xwiki.office.viewer.internal;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.jodconverter.document.DocumentFamily;
-import org.jodconverter.document.DocumentFormat;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.cache.Cache;
@@ -50,8 +51,12 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.PageAttachmentReference;
+import org.xwiki.model.reference.PageAttachmentReferenceResolver;
 import org.xwiki.office.viewer.OfficeResourceViewer;
+import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
 import org.xwiki.officeimporter.converter.OfficeConverter;
@@ -72,7 +77,11 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
 import org.xwiki.resource.temporary.TemporaryResourceStore;
+import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import org.xwiki.url.ExtendedURL;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiAttachment;
 
 /**
  * Default implementation of {@link org.xwiki.office.viewer.OfficeResourceViewer}.
@@ -102,7 +111,8 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
 
     @Inject
     @Named("standard/tmp")
-    private ResourceReferenceSerializer<TemporaryResourceReference, ExtendedURL> urlTemporaryResourceReferenceSerializer;
+    private ResourceReferenceSerializer<TemporaryResourceReference, ExtendedURL>
+        urlTemporaryResourceReferenceSerializer;
 
     /**
      * Used for serializing {@link AttachmentReference}s.
@@ -116,6 +126,16 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
     @Inject
     @Named("current")
     private AttachmentReferenceResolver<String> attachmentResolver;
+
+    @Inject
+    @Named("current")
+    private PageAttachmentReferenceResolver<String> pageAttachmentResolver;
+
+    @Inject
+    private AttachmentReferenceResolver<EntityReference> attachmentConverter;
+
+    @Inject
+    private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
 
     /**
      * Used to initialize the view cache.
@@ -154,6 +174,9 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
     @Inject
     private ConverterManager converter;
 
+    @Inject
+    private Provider<XWikiContext> contextProvider;
+
     /**
      * The logger to log.
      */
@@ -165,8 +188,8 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
      * images that are view artifacts.
      * 
      * @param xdom the XDOM whose image blocks are to be processed
-     * @param artifacts specify which of the image blocks should be processed; only the image blocks that were generated
-     *            during the office import process should be processed
+     * @param artifactFiles specify which of the image blocks should be processed; only the image blocks
+     *          that were generated during the office import process should be processed
      * @param ownerDocumentReference specifies the document that owns the office file
      * @param resourceReference a reference to the office file that is being viewed; this reference is used to compute
      *            the path to the temporary directory holding the image artifacts
@@ -174,50 +197,60 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
      *            it means that styles will be filtered to the maximum and the focus will be put on importing only the
      * @return the set of temporary files corresponding to image artifacts
      */
-    private Set<File> processImages(XDOM xdom, Map<String, byte[]> artifacts, DocumentReference ownerDocumentReference,
+    private Set<File> processImages(XDOM xdom, Set<File> artifactFiles, DocumentReference ownerDocumentReference,
         String resourceReference, Map<String, ?> parameters)
     {
         // Process all image blocks.
         Set<File> temporaryFiles = new HashSet<File>();
         List<ImageBlock> imgBlocks = xdom.getBlocks(new ClassBlockMatcher(ImageBlock.class), Block.Axes.DESCENDANT);
-        for (ImageBlock imgBlock : imgBlocks) {
-            String imageReference = imgBlock.getReference().getReference();
+        if (!imgBlocks.isEmpty()) {
+            Map<String, File> fileMap = new HashMap<>();
+            for (File file : artifactFiles) {
+                fileMap.put(file.getName(), file);
+            }
 
-            // Check whether there is a corresponding artifact.
-            if (artifacts.containsKey(imageReference)) {
-                try {
-                    List<String> resourcePath = Arrays.asList(String.valueOf(parameters.hashCode()), imageReference);
-                    TemporaryResourceReference temporaryResourceReference =
-                        new TemporaryResourceReference(MODULE_NAME, resourcePath, ownerDocumentReference);
+            for (ImageBlock imgBlock : imgBlocks) {
+                String imageReference = imgBlock.getReference().getReference();
 
-                    // Write the image into a temporary file.
-                    File tempFile = this.temporaryResourceStore.createTemporaryFile(temporaryResourceReference,
-                        new ByteArrayInputStream(artifacts.get(imageReference)));
+                // Check whether there is a corresponding artifact.
+                if (fileMap.containsKey(imageReference)) {
+                    try {
+                        List<String> resourcePath =
+                            Arrays.asList(String.valueOf(parameters.hashCode()), imageReference);
+                        TemporaryResourceReference temporaryResourceReference =
+                            new TemporaryResourceReference(MODULE_NAME, resourcePath, ownerDocumentReference);
 
-                    // Create a URL image reference which links to above temporary image file.
-                    String temporaryResourceURL =
-                        this.urlTemporaryResourceReferenceSerializer.serialize(temporaryResourceReference).serialize();
-                    ResourceReference urlImageReference =
-                        new ResourceReference(temporaryResourceURL, ResourceType.PATH);
-                    urlImageReference.setTyped(true);
+                        // Write the image into a temporary file.
+                        File artifact = fileMap.get(imageReference);
 
-                    // Replace the old image block with a new one that uses the above URL image reference.
-                    Block newImgBlock = new ImageBlock(urlImageReference, false, imgBlock.getParameters());
-                    imgBlock.getParent().replaceChild(Arrays.asList(newImgBlock), imgBlock);
+                        File tempFile = this.temporaryResourceStore.createTemporaryFile(temporaryResourceReference,
+                            new FileInputStream(artifact));
 
-                    // Make sure the new image block is not inside an ExpandedMacroBlock whose's content syntax doesn't
-                    // support relative path resource references (we use relative paths to refer the temporary files).
-                    maybeFixExpandedMacroAncestor(newImgBlock);
+                        // Create a URL image reference which links to above temporary image file.
+                        String temporaryResourceURL =
+                            this.urlTemporaryResourceReferenceSerializer.serialize(temporaryResourceReference)
+                                .serialize();
+                        ResourceReference urlImageReference =
+                            new ResourceReference(temporaryResourceURL, ResourceType.PATH);
+                        urlImageReference.setTyped(true);
 
-                    // Collect the temporary file so that it can be cleaned up when the view is disposed from cache.
-                    temporaryFiles.add(tempFile);
-                } catch (Exception ex) {
-                    String message = "Error while processing artifact image [%s].";
-                    this.logger.error(String.format(message, imageReference), ex);
+                        // Replace the old image block with a new one that uses the above URL image reference.
+                        Block newImgBlock = new ImageBlock(urlImageReference, false, imgBlock.getParameters());
+                        imgBlock.getParent().replaceChild(Arrays.asList(newImgBlock), imgBlock);
+
+                        // Make sure the new image block is not inside an ExpandedMacroBlock whose's content syntax doesn't
+                        // support relative path resource references (we use relative paths to refer the temporary files).
+                        maybeFixExpandedMacroAncestor(newImgBlock);
+
+                        // Collect the temporary file so that it can be cleaned up when the view is disposed from cache.
+                        temporaryFiles.add(tempFile);
+                    } catch (Exception ex) {
+                        String message = "Error while processing artifact image [%s].";
+                        this.logger.error(String.format(message, imageReference), ex);
+                    }
                 }
             }
         }
-
         return temporaryFiles;
     }
 
@@ -252,7 +285,19 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
     private XDOMOfficeDocument createXDOM(AttachmentReference attachmentReference, Map<String, ?> parameters)
         throws Exception
     {
-        InputStream officeFileStream = this.documentAccessBridge.getAttachmentContent(attachmentReference);
+        InputStream officeFileStream;
+        if (this.documentAccessBridge.getAttachmentVersion(attachmentReference) != null) {
+            officeFileStream = this.documentAccessBridge.getAttachmentContent(attachmentReference);
+        } else {
+            Optional<XWikiAttachment> uploadedAttachment =
+                this.temporaryAttachmentSessionsManager.getUploadedAttachment(attachmentReference);
+            if (uploadedAttachment.isPresent()) {
+                officeFileStream = uploadedAttachment.get().getContentInputStream(this.contextProvider.get());
+            } else {
+                throw new OfficeImporterException(
+                    String.format("Error when loading temporary attachment [%s]", attachmentReference));
+            }
+        }
         String officeFileName = attachmentReference.getName();
 
         return createXDOM(attachmentReference.getDocumentReference(), officeFileStream, officeFileName, parameters);
@@ -298,11 +343,9 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
      */
     private boolean isPresentation(String fileName)
     {
-        String extension = fileName.substring(fileName.lastIndexOf('.') + 1);
         OfficeConverter officeConverter = this.officeServer.getConverter();
         if (officeConverter != null) {
-            DocumentFormat format = officeConverter.getFormatRegistry().getFormatByExtension(extension);
-            return format != null && format.getInputFamily() == DocumentFamily.PRESENTATION;
+            return officeConverter.isPresentation(fileName);
         }
 
         return false;
@@ -330,10 +373,13 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
         String cacheKey =
             getCacheKey(attachmentReference.getDocumentReference(), attachmentReference.getName(), parameters);
         AttachmentOfficeDocumentView view = this.attachmentCache.get(cacheKey);
+        Optional<XWikiAttachment> uploadedAttachment =
+            this.temporaryAttachmentSessionsManager.getUploadedAttachment(attachmentReference);
 
         // It's possible that the attachment has been deleted. We need to catch such events and cleanup the cache.
         DocumentReference documentReference = attachmentReference.getDocumentReference();
-        if (!this.documentAccessBridge.getAttachmentReferences(documentReference).contains(attachmentReference)) {
+        if (!this.documentAccessBridge.getAttachmentReferences(documentReference).contains(attachmentReference) &&
+            !uploadedAttachment.isPresent()) {
             // If a cached view exists, flush it.
             if (view != null) {
                 this.attachmentCache.remove(cacheKey);
@@ -343,7 +389,7 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
 
         // Check if the view has expired.
         String currentVersion = this.documentAccessBridge.getAttachmentVersion(attachmentReference);
-        if (view != null && !currentVersion.equals(view.getVersion())) {
+        if (view != null && !StringUtils.equals(currentVersion, view.getVersion())) {
             // Flush the cached view.
             this.attachmentCache.remove(cacheKey);
             view = null;
@@ -351,19 +397,23 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
 
         // If a view in not available, build one and cache it.
         if (view == null) {
-            XDOMOfficeDocument xdomOfficeDocument = createXDOM(attachmentReference, parameters);
-            String attachmentVersion = this.documentAccessBridge.getAttachmentVersion(attachmentReference);
-            XDOM xdom = xdomOfficeDocument.getContentDocument();
-            // We use only the file name from the resource reference because the rest of the information is specified by
-            // the owner document reference. This way we ensure the path to the temporary files doesn't contain
-            // redundant information and so it remains as small as possible (considering that the path length is limited
-            // on some environments).
-            Set<File> temporaryFiles = processImages(xdom, xdomOfficeDocument.getArtifacts(),
-                attachmentReference.getDocumentReference(), attachmentReference.getName(), parameters);
-            view = new AttachmentOfficeDocumentView(reference, attachmentReference, attachmentVersion, xdom,
-                temporaryFiles);
+            try (XDOMOfficeDocument xdomOfficeDocument = createXDOM(attachmentReference, parameters)) {
+                String attachmentVersion = this.documentAccessBridge.getAttachmentVersion(attachmentReference);
+                if (attachmentVersion == null && uploadedAttachment.isPresent()) {
+                    attachmentVersion = "temp";
+                }
+                XDOM xdom = xdomOfficeDocument.getContentDocument();
+                // We use only the file name from the resource reference because the rest of the information is specified by
+                // the owner document reference. This way we ensure the path to the temporary files doesn't contain
+                // redundant information and so it remains as small as possible (considering that the path length is limited
+                // on some environments).
+                Set<File> temporaryFiles = processImages(xdom, xdomOfficeDocument.getArtifactsFiles(),
+                    attachmentReference.getDocumentReference(), attachmentReference.getName(), parameters);
+                view = new AttachmentOfficeDocumentView(reference, attachmentReference, attachmentVersion, xdom,
+                    temporaryFiles);
 
-            this.attachmentCache.set(cacheKey, view);
+                this.attachmentCache.set(cacheKey, view);
+            }
         }
 
         // We have to clone the cached XDOM to protect it from the rendering transformations. For instance, macro
@@ -382,13 +432,15 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
 
         // If a view in not available, build one and cache it.
         if (view == null) {
-            XDOMOfficeDocument xdomOfficeDocument = createXDOM(ownerDocument, resourceReference, parameters);
-            XDOM xdom = xdomOfficeDocument.getContentDocument();
-            Set<File> temporaryFiles = processImages(xdom, xdomOfficeDocument.getArtifacts(), ownerDocument,
-                serializedResourceReference, parameters);
-            view = new OfficeDocumentView(resourceReference, xdom, temporaryFiles);
+            try (XDOMOfficeDocument xdomOfficeDocument = createXDOM(ownerDocument, resourceReference, parameters))
+            {
+                XDOM xdom = xdomOfficeDocument.getContentDocument();
+                Set<File> temporaryFiles = processImages(xdom, xdomOfficeDocument.getArtifactsFiles(), ownerDocument,
+                    serializedResourceReference, parameters);
+                view = new OfficeDocumentView(resourceReference, xdom, temporaryFiles);
 
-            this.externalCache.set(cacheKey, view);
+                this.externalCache.set(cacheKey, view);
+            }
         }
 
         return view;
@@ -403,6 +455,10 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
             AttachmentReference attachmentReference = this.attachmentResolver.resolve(reference.getReference());
 
             view = getView(reference, attachmentReference, parameters);
+        } else if (reference.getType().equals(ResourceType.PAGE_ATTACHMENT)) {
+            PageAttachmentReference attachmentReference = this.pageAttachmentResolver.resolve(reference.getReference());
+
+            view = getView(reference, this.attachmentConverter.resolve(attachmentReference), parameters);
         } else {
             view = getView(reference, parameters);
         }
@@ -422,7 +478,7 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
         DocumentReference ownerDocument =
             this.converter.convert(DocumentReference.class, parameters.get("ownerDocument"));
         if (ownerDocument == null) {
-            this.documentAccessBridge.getCurrentDocumentReference();
+            ownerDocument = this.documentAccessBridge.getCurrentDocumentReference();
         }
 
         return ownerDocument;

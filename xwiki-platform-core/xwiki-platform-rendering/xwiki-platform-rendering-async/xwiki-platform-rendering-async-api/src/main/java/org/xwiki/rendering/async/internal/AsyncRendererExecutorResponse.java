@@ -22,10 +22,9 @@ package org.xwiki.rendering.async.internal;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
- * Used as return value for {@link AsyncRendererExecutor#render(AsyncRenderer, java.util.Set)}.
+ * Used as return value for {@link AsyncRendererExecutor#render(AsyncRenderer, AsyncRendererConfiguration)}.
  * 
  * @version $Id$
  * @since 10.10RC1
@@ -34,7 +33,7 @@ public class AsyncRendererExecutorResponse
 {
     private final AsyncRendererJobStatus status;
 
-    private final Long asyncClientId;
+    private final String asyncClientId;
 
     /**
      * @param status the status of the execution
@@ -48,13 +47,15 @@ public class AsyncRendererExecutorResponse
     /**
      * @param status the status of the execution
      * @param clientId the generated client identifier
+     * @since 10.11.5
+     * @since 11.3RC1
      */
-    public AsyncRendererExecutorResponse(AsyncRendererJobStatus status, long clientId)
+    public AsyncRendererExecutorResponse(AsyncRendererJobStatus status, String clientId)
     {
         this.status = status;
         this.asyncClientId = clientId;
 
-        status.addClient(asyncClientId);
+        status.addClient(this.asyncClientId);
     }
 
     /**
@@ -67,8 +68,10 @@ public class AsyncRendererExecutorResponse
 
     /**
      * @return the generated client identifier
+     * @since 10.11.5
+     * @since 11.3RC1
      */
-    public Long getAsyncClientId()
+    public String getAsyncClientId()
     {
         return this.asyncClientId;
     }
@@ -80,7 +83,27 @@ public class AsyncRendererExecutorResponse
     {
         List<String> id = getStatus().getRequest().getId();
 
-        return id != null ? id.stream().map(this::encodeURL).collect(Collectors.joining("/")) : null;
+        if (id == null) {
+            return null;
+        }
+
+        StringBuilder builder = new StringBuilder();
+
+        for (String element : id) {
+            if (builder.length() > 0) {
+                builder.append('/');
+            }
+
+            String encodedElement = encodeURL(element);
+
+            // Encode again the path segments which have been double escaped to avoid problems with the ridiculous
+            // default behavior of Tomcat regarding / and \
+            encodedElement = encodeURL(encodedElement);
+
+            builder.append(encodedElement);
+        }
+
+        return builder.toString();
     }
 
     private String encodeURL(String element)

@@ -24,10 +24,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.xwiki.component.internal.ContextComponentManagerProvider;
 import org.xwiki.component.internal.embed.EmbeddableComponentManagerFactory;
@@ -55,37 +55,46 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.internal.DefaultObservationManager;
 import org.xwiki.rendering.internal.parser.plain.PlainTextBlockParser;
+import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentManagerRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ComponentList({JARTranslationBundleFactory.class, MessageToolTranslationMessageParser.class,
-PlainTextBlockParser.class, ContextComponentManagerProvider.class, DefaultLocalizationManager.class,
-DefaultTranslationBundleContext.class, DefaultModelContext.class, DefaultExecution.class,
-DefaultObservationManager.class, JARTranslationBundleFactoryListener.class, DefaultComponentManagerManager.class,
-EmbeddableComponentManagerFactory.class})
-public class JARTranslationBundleFactoryTest
+    PlainTextBlockParser.class, ContextComponentManagerProvider.class, DefaultLocalizationManager.class,
+    DefaultTranslationBundleContext.class, DefaultModelContext.class, DefaultExecution.class,
+    DefaultObservationManager.class, JARTranslationBundleFactoryListener.class, DefaultComponentManagerManager.class,
+    EmbeddableComponentManagerFactory.class})
+@ComponentTest
+class JARTranslationBundleFactoryTest
 {
-    @Rule
-    public final MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
+    @MockComponent
+    @Named("plain/1.0")
+    private BlockRenderer plainRenderer;
+
+    @MockComponent
+    private InstalledExtensionRepository mockInstalledExtensionRepository;
 
     private LocalizationManager localizationManager;
 
     private ObservationManager observationManager;
 
-    private InstalledExtensionRepository mockInstalledExtensionRepository;
-
     private ExtensionPackager extensionPackager;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    public void beforeEach() throws Exception
     {
         this.extensionPackager = new ExtensionPackager(null, new File("target/test-" + new Date().getTime()));
         this.extensionPackager.generateExtensions();
-
-        // Mocks
-
-        this.mockInstalledExtensionRepository =
-            this.componentManager.registerMockComponent(InstalledExtensionRepository.class);
 
         // Components
 
@@ -142,30 +151,29 @@ public class JARTranslationBundleFactoryTest
         Translation translation = this.localizationManager.getTranslation(key, locale);
 
         if (message != null) {
-            Assert.assertNotNull("Could not find translation for key [" + key + "] and locale [" + locale + "]",
-                translation);
-            Assert.assertEquals(message, translation.getRawSource());
+            assertNotNull(translation, "Could not find translation for key [" + key + "] and locale [" + locale + "]");
+            assertEquals(message, translation.getRawSource());
         } else {
-            Assert.assertNull("Found translation for key [" + key + "] and locale [" + locale + "]", translation);
+            assertNull(translation, "Found translation for key [" + key + "] and locale [" + locale + "]");
         }
     }
 
     // tests
 
     @Test
-    public void installEmptyJar() throws TranslationBundleDoesNotExistsException,
+    void installEmptyJar() throws TranslationBundleDoesNotExistsException,
         TranslationBundleFactoryDoesNotExistsException, ComponentLookupException
     {
         ExtensionId extensionId = new ExtensionId("emptyjar", "1.0");
 
         mockInstallExtension(extensionId, null);
 
-        Assert.assertNotNull(this.localizationManager.getTranslationBundle("jar", this.extensionPackager
-            .getExtensionFile(extensionId).toURI().toString()));
+        assertNotNull(this.localizationManager.getTranslationBundle("jar",
+            this.extensionPackager.getExtensionFile(extensionId).toURI().toString()));
     }
 
     @Test
-    public void installJar() throws ComponentLookupException
+    void installJar() throws ComponentLookupException
     {
         ExtensionId extensionId = new ExtensionId("jar", "1.0");
 
@@ -177,7 +185,7 @@ public class JARTranslationBundleFactoryTest
     }
 
     @Test
-    public void upgradeJar() throws ComponentLookupException
+    void upgradeJar() throws ComponentLookupException
     {
         ExtensionId previousExtensionId = new ExtensionId("jar", "1.0");
 
@@ -197,7 +205,7 @@ public class JARTranslationBundleFactoryTest
     }
 
     @Test
-    public void uninstallExtension() throws ComponentLookupException
+    void uninstallExtension() throws ComponentLookupException
     {
         ExtensionId extensionId = new ExtensionId("jar", "1.0");
 
@@ -211,12 +219,12 @@ public class JARTranslationBundleFactoryTest
     }
 
     @Test
-    public void getInstalledJarTranslations() throws ComponentLookupException
+    void getInstalledJarTranslations() throws ComponentLookupException
     {
         ExtensionId extensionId = new ExtensionId("jar", "1.0");
 
-        Mockito.when(mockInstalledExtensionRepository.getInstalledExtensions()).thenReturn(
-            Arrays.<InstalledExtension> asList(mockInstalledExtension(extensionId, null)));
+        Mockito.when(mockInstalledExtensionRepository.getInstalledExtensions())
+            .thenReturn(Arrays.<InstalledExtension>asList(mockInstalledExtension(extensionId, null)));
 
         // Trigger initialization
         this.componentManager.getInstance(EventListener.class, JARTranslationBundleFactoryListener.NAME);

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -39,7 +39,7 @@
   <content>{{velocity output="false"}}
 #macro (databaseSearchForm)
   {{html clean="false"}}
-  &lt;form action="$doc.getURL()" id="searchBar"&gt;
+  &lt;form action="$doc.getURL()" id="searchBar" role="search"&gt;
     &lt;div&gt;
       &lt;label for="text" class="hidden"&gt;$services.localization.render('search.page.query.label')&lt;/label&gt;
       &lt;input type="text" id="text" name="text" class="searchQuery" value="$!escapetool.xml($request.text)"
@@ -94,7 +94,7 @@
   #databaseAddResults(", BaseObject as obj, StringProperty as prop where $matchLocation obj.name = doc.fullName and prop.id.id = obj.id and upper(prop.value) like upper(:text) escape '!'" $params $results)
   ## Search in big text fields (textarea properties)
   #databaseAddResults(", BaseObject as obj, LargeStringProperty as prop where $matchLocation obj.name = doc.fullName and prop.id.id = obj.id and upper(prop.value) like upper(:text) escape '!'" $params $results)
-  #set ($discard = $list.addAll($sorttool.sort($results, ['date'])))
+  #set ($discard = $list.addAll($collectiontool.sort($results, ['date'])))
 #end
 {{/velocity}}
 

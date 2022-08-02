@@ -22,13 +22,9 @@ package org.xwiki.wiki.internal.descriptor.builder;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Named;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -63,7 +59,7 @@ import static org.mockito.Mockito.when;
  */
 @OldcoreTest
 @ReferenceComponentList
-public class DefaultWikiDescriptorBuilderTest
+class DefaultWikiDescriptorBuilderTest
 {
     @RegisterExtension
     public LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.ERROR);
@@ -72,17 +68,13 @@ public class DefaultWikiDescriptorBuilderTest
     private MockitoOldcore oldcore;
 
     @MockComponent
-    @Named("user")
-    private DocumentReferenceResolver<String> userReferenceResolver;
-
-    @MockComponent
     private WikiPropertyGroupManager wikiPropertyGroupManager;
 
     @InjectMockComponents
     private DefaultWikiDescriptorBuilder builder;
 
     @Test
-    public void buildDescriptorObject() throws Exception
+    void buildDescriptorObject() throws Exception
     {
         // Mocks
         List<BaseObject> objects = new ArrayList<>();
@@ -113,9 +105,6 @@ public class DefaultWikiDescriptorBuilderTest
         when(object1.getStringValue(XWikiServerClassDocumentInitializer.FIELD_OWNER)).thenReturn("myOwner");
         when(object1.getStringValue(XWikiServerClassDocumentInitializer.FIELD_DESCRIPTION)).thenReturn("myDescription");
 
-        DocumentReference ownerRef = new DocumentReference("subwiki1", "XWiki", "myOwner");
-        when(userReferenceResolver.resolve("myOwner", new WikiReference("subwiki1"))).thenReturn(ownerRef);
-
         // Test
         WikiDescriptor result = this.builder.buildDescriptorObject(objects, document);
 
@@ -134,7 +123,44 @@ public class DefaultWikiDescriptorBuilderTest
     }
 
     @Test
-    public void buildDescriptorObjectWhenInvalidWiki() throws Exception
+    void buildDescriptorObjectWhenNoAlias() throws Exception
+    {
+        // Mocks
+        List<BaseObject> objects = new ArrayList<>();
+        BaseObject object = mock(BaseObject.class);
+        objects.add(object);
+
+        XWikiDocument document = mock(XWikiDocument.class);
+        DocumentReference documentReference = new DocumentReference("mainWiki", "XWiki", "XWikiServerSubwiki1");
+        when(document.getDocumentReference()).thenReturn(documentReference);
+
+        when(object.getStringValue(XWikiServerClassDocumentInitializer.FIELD_SERVER)).thenReturn("");
+
+        DocumentReference mainPageReference = new DocumentReference("subwiki1", "Space", "MainPage");
+
+        when(object.getStringValue(XWikiServerClassDocumentInitializer.FIELD_HOMEPAGE)).thenReturn("Space.MainPage");
+        when(object.getStringValue(XWikiServerClassDocumentInitializer.FIELD_WIKIPRETTYNAME))
+            .thenReturn("myPrettyName");
+        when(object.getStringValue(XWikiServerClassDocumentInitializer.FIELD_OWNER)).thenReturn("myOwner");
+        when(object.getStringValue(XWikiServerClassDocumentInitializer.FIELD_DESCRIPTION)).thenReturn("myDescription");
+
+        // Test
+        WikiDescriptor result = this.builder.buildDescriptorObject(objects, document);
+
+        assertEquals("subwiki1", result.getId());
+        assertEquals(1, result.getAliases().size());
+        assertEquals("", result.getAliases().get(0));
+        assertEquals(mainPageReference, result.getMainPageReference());
+        assertEquals("myPrettyName", result.getPrettyName());
+        assertEquals("subwiki1:XWiki.myOwner", result.getOwnerId());
+        assertEquals("myDescription", result.getDescription());
+
+        // Verify
+        wikiPropertyGroupManager.loadForDescriptor(any(WikiDescriptor.class));
+    }
+
+    @Test
+    void buildDescriptorObjectWhenInvalidName() throws Exception
     {
         // Mocks
         List<BaseObject> objects = new ArrayList<>();
@@ -143,14 +169,15 @@ public class DefaultWikiDescriptorBuilderTest
         when(object1.getStringValue(XWikiServerClassDocumentInitializer.FIELD_SERVER)).thenReturn(" ");
 
         XWikiDocument document = mock(XWikiDocument.class);
+        DocumentReference documentReference = new DocumentReference("mainWiki", "XWiki", "Subwiki1");
+        when(document.getDocumentReference()).thenReturn(documentReference);
 
         // Test
-        WikiDescriptor result = this.builder.buildDescriptorObject(objects, document);
-        assertNull(result);
+        assertNull(this.builder.buildDescriptorObject(objects, document));
     }
 
     @Test
-    public void buildDescriptorObjectWhenException() throws Exception
+    void buildDescriptorObjectWhenException() throws Exception
     {
         // Mocks
         List<BaseObject> objects = new ArrayList<>();

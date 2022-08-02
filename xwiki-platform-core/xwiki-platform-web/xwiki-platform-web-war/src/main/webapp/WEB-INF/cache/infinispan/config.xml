@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<infinispan
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="urn:infinispan:config:11.0 https://infinispan.org/schemas/infinispan-config-11.0.xsd"
+      xmlns="urn:infinispan:config:11.0">
+
+   <!--
+      *****************************************************************************************************************
+
+      A summary of the format of this XML file and all available options can be see online:
+
+         https://infinispan.org/docs/11.0.x/titles/configuring/configuring.html
+
+      *****************************************************************************************************************
+   -->
+
+   <cache-container name="xwiki" statistics="true" default-cache="default" shutdown-hook="DEFAULT">
+     <!--
+         The default serializer since Infinispan 10 is Protostream which unfortunately support a very
+         limited set of type and more importantly not Serializable classes anymore.
+         Since this change is an important regression from XWiki point of view we switch back to
+         the deprecated JavaSerializationMarshaller (until they remove it completely...).
+         We don't use JBossUserMarshaller (the previous default) because it's now deprecated.
+     -->
+     <serialization marshaller="org.infinispan.commons.marshall.JavaSerializationMarshaller"/>
+
+     <!-- Expose Infinispan caches in the JMX server -->
+     <jmx enabled="true" domain="org.xwiki.infinispan" />
+
+     <!--
+         **************************************************************************************************************
+         All caches are named caches, and one of those is the default cache,
+         according to the default-cache attribute in the cache container.
+         Its configuration is inherited by all other named caches
+         **************************************************************************************************************
+     -->
+
+     <!--
+         The default cache.
+     -->
+     <local-cache-configuration name="default" statistics="true">
+        <memory max-count="10000"/>
+     </local-cache-configuration>
+
+     <!--
+         **************************************************************************************************************
+         Specific XWiki caches
+         **************************************************************************************************************
+     -->
+
+     <!-- Formula Renderer cache -->
+     <local-cache-configuration name="xwiki.plugin.formula">
+        <persistence>
+           <!-- Let XWiki cache module set the proper path -->
+           <file-store segmented="false" purge="true" path="" />
+        </persistence>
+     </local-cache-configuration>
+
+     <!-- LESS CSS cache -->
+     <local-cache-configuration name="lesscss.skinfiles.cache">
+        <persistence>
+           <!-- Let XWiki cache module set the proper path -->
+           <file-store segmented="false" purge="false" path="" />
+        </persistence>
+     </local-cache-configuration>
+
+   </cache-container>
+</infinispan>

@@ -21,6 +21,9 @@ package com.xpn.xwiki.doc;
 
 import java.util.Date;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.xwiki.text.XWikiToStringBuilder;
+
 public class XWikiLock
 {
     protected String userName;
@@ -71,5 +74,15 @@ public class XWikiLock
     public void setDate(Date date)
     {
         this.date = date;
+    }
+
+    @Override
+    public String toString()
+    {
+        ToStringBuilder builder = new XWikiToStringBuilder(this);
+        builder.append("userName", getUserName());
+        builder.append("docId", getDocId());
+        builder.append("date", getDate());
+        return builder.toString();
     }
 }

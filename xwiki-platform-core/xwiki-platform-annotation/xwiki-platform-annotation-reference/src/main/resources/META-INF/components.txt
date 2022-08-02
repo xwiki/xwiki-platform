@@ -1,0 +1,4 @@
+org.xwiki.annotation.reference.internal.CurrentTypedStringEntityReferenceResolver
+org.xwiki.annotation.reference.internal.DefaultTypedStringEntityReferenceResolver
+org.xwiki.annotation.reference.internal.DefaultTypedStringEntityReferenceSerializer
+org.xwiki.annotation.reference.internal.LocalTypedStringEntityReferenceSerializer

@@ -1,0 +1,46 @@
+#template('colorThemeInit.vm')
+/* Attachment form style */
+.attachmentActionButton {
+  background-color: transparent;
+  border: none;
+  padding: 2px 4px;
+  font-size: 80%;
+  margin-bottom: 4px;
+  background: transparent 2px center no-repeat;
+  padding-left: 20px;
+  cursor: pointer;
+}
+.add-file-input {
+  color: $theme.linkColor;
+  background-position: 2px top;
+  background-image: url("$xwiki.getSkinFile('icons/silk/textfield_add.png')");
+}
+.remove-file-input {
+  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
+  width: 16px;
+  text-indent: 30px;
+}
+.uploadFileInput {
+  margin: 5px 10px 5px 0 !important; /* !important is needed for Toucan. */
+}
+/* Attachment "toolbox" style */
+.skin-colibri #AddAttachment {
+  border-top: 1px solid $theme.borderColor;
+}
+#AddAttachment legend {
+  font-size: 1em;
+}
+#attachform {
+  margin-top: 2%;
+}
+.attachmentMimeType {
+  color: $theme.textSecondaryColor;
+  font-size: 32px;
+  height: 32px;
+  line-height: 32px;
+  text-align: center;
+}
+.attachmentMimeType img {
+  max-height: 32px;
+  max-width: 48px;
+}

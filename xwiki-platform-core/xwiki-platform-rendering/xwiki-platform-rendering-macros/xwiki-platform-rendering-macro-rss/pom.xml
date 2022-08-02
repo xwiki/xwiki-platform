@@ -25,14 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-rss</artifactId>
   <name>XWiki Platform - Rendering - Macro - RSS</name>
   <description>Displays the contents of a RSS feed</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.8</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>80</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>RSS Macro</xwiki.extension.name>
   </properties>
@@ -52,9 +51,22 @@
       <version>${rendering.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-xml</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-bridge</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <!-- For the HTMLCleaner component list. -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-xml</artifactId>
+      <version>${commons.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

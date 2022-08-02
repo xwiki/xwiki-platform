@@ -19,17 +19,18 @@
  */
 package org.xwiki.test.docker.junit5;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+import org.xwiki.test.docker.internal.junit5.configuration.PropertiesMerger;
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
-import org.xwiki.test.docker.junit5.servletEngine.ServletEngine;
-import org.xwiki.text.StringUtils;
+import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
+import org.xwiki.test.integration.maven.ArtifactCoordinate;
+import org.xwiki.tool.extension.ExtensionOverride;
 
 /**
  * Configuration options for the test.
@@ -39,39 +40,7 @@ import org.xwiki.text.StringUtils;
  */
 public class TestConfiguration
 {
-    private static final Pattern ARTIFACT_COORD_PATTERN = Pattern.compile("([^: ]+):([^: ]+)");
-
     private static final String DEFAULT = "default";
-
-    private static final String BROWSER_PROPERTY = "xwiki.test.ui.browser";
-
-    private static final String DATABASE_PROPERTY = "xwiki.test.ui.database";
-
-    private static final String SERVLETENGINE_PROPERTY = "xwiki.test.ui.servletEngine";
-
-    private static final String VERBOSE_PROPERTY = "xwiki.test.ui.verbose";
-
-    private static final String DEBUG_PROPERTY = "xwiki.test.ui.debug";
-
-    private static final String SAVEDBDATA_PROPERTY = "xwiki.test.ui.saveDatabaseData";
-
-    private static final String OFFLINE_PROPERTY = "xwiki.test.ui.offline";
-
-    private static final String DATABASETAG_PROPERTY = "xwiki.test.ui.databaseTag";
-
-    private static final String SERVLETENGINETAG_PROPERTY = "xwiki.test.ui.servletEngineTag";
-
-    private static final String JDBCDRIVERVERSION_PROPERTY = "xwiki.test.ui.jdbcDriverVersion";
-
-    private static final String VNC_PROPERTY = "xwiki.test.ui.vnc";
-
-    private static final String PROPERTIES_PREFIX_PROPERTY = "xwiki.test.ui.properties.";
-
-    private static final String PROFILES_PROPERTY = "xwiki.test.ui.profiles";
-
-    private static final String OFFICE_PROPERTY = "xwiki.test.ui.office";
-
-    private UITest uiTestAnnotation;
 
     private Browser browser;
 
@@ -83,9 +52,7 @@ public class TestConfiguration
 
     private boolean debug;
 
-    private boolean saveDatabaseData;
-
-    private boolean isOffline;
+    private boolean offline;
 
     private String servletEngineTag;
 
@@ -97,7 +64,11 @@ public class TestConfiguration
 
     private Properties properties;
 
-    private List<List<String>> extraJARs;
+    private List<ExtensionOverride> extensionOverrides;
+
+    private Set<ArtifactCoordinate> extraJARs;
+
+    private boolean resolveExtraJARs;
 
     private List<Integer> sshPorts;
 
@@ -107,211 +78,242 @@ public class TestConfiguration
 
     private List<ServletEngine> forbiddenServletEngines;
 
-    /**
-     * @param uiTestAnnotation the annotation from which to extract the configuration
-     */
-    public TestConfiguration(UITest uiTestAnnotation)
-    {
-        this.uiTestAnnotation = uiTestAnnotation;
-        resolveBrowser();
-        resolveDatabase();
-        resolveServletEngine();
-        resolveVerbose();
-        resolveDebug();
-        resolveSaveDatabaseData();
-        resolveOffline();
-        resolveDatabaseTag();
-        resolveServletEngineTag();
-        resolveJDBCDriverVersion();
-        resolveVNC();
-        resolveProperties();
-        resolveExtraJARs();
-        resolveSSHPorts();
-        resolveProfiles();
-        resolveOffice();
-        resolveForbiddenServletEngines();
-    }
+    private Properties databaseCommands;
+
+    private PropertiesMerger propertiesMerger = new PropertiesMerger();
+
+    private boolean saveDatabaseData;
+
+    private boolean savePermanentDirectoryData;
 
     /**
-     * Resolve the passed Enum property by getting the value from the System property and if not found, from the
-     * {@link UITest} annotation, and fallbacking to the passed default value if not found.
-     *
-     * @param enumType the type of the enum for which we want to resolve the value.
-     * @param annotationValue the {@link UITest} annotation parameter value to use if no System property is defined
-     * @param propertyName the name of the System property key which might contain a value for this enum.
-     * @param <T> type of the value necessarily extends enum.
-     * @return the resolved value following the strategy described above.
+     * @param testConfiguration the configuration to merge with the current one
+     * @throws DockerTestException when a merge error occurs
      */
-    private <T extends Enum> T resolve(Class<T> enumType, T annotationValue, String propertyName)
+    public void merge(TestConfiguration testConfiguration) throws DockerTestException
     {
-        T result = annotationValue;
-        String propertyValue = System.getProperty(propertyName);
-        if (propertyValue != null) {
-            result = (T) Enum.valueOf(enumType, propertyValue.toUpperCase());
-        }
-        return result;
+        mergeBrowser(testConfiguration.getBrowser());
+        mergeDatabase(testConfiguration.getDatabase());
+        mergeServletEngine(testConfiguration.getServletEngine());
+        mergeVerbose(testConfiguration.isVerbose());
+        mergeDebug(testConfiguration.isDebug());
+        mergeOffline(testConfiguration.isOffline());
+        mergeDatabaseTag(testConfiguration.getDatabaseTag());
+        mergeServletEngineTag(testConfiguration.getServletEngineTag());
+        mergeJDBCDriverVersion(testConfiguration.getJDBCDriverVersion());
+        mergeVNC(testConfiguration.vnc());
+        mergeProperties(testConfiguration.getProperties());
+        mergeExtraJARs(testConfiguration.getExtraJARs());
+        mergeResolveExtraJARs(testConfiguration.isResolveExtraJARs());
+        mergeExtensionOverrides(testConfiguration.getExtensionOverrides());
+        mergeSSHPorts(testConfiguration.getSSHPorts());
+        mergeProfiles(testConfiguration.getProfiles());
+        mergeOffice(testConfiguration.isOffice());
+        mergeForbiddenServletEngines(testConfiguration.getForbiddenServletEngines());
+        mergeDatabaseCommands(testConfiguration.getDatabaseCommands());
+        mergeSaveDatabaseData(testConfiguration.isDatabaseDataSaved());
+        mergeSavePermanentDirectoryData(testConfiguration.isPermanentDirectoryDataSaved());
     }
 
-    /**
-     * Resolve the passed Boolean property by getting the value from the System property and if not found, from the
-     * {@link UITest} annotation, and fallbacking to the passed default value if not found.
-     *
-     * @param annotationValue the {@link UITest} annotation parameter value to use if no System property is defined
-     * @param propertyName the name of the System property key which might contain a value for this boolean.
-     * @return the resolved value following the strategy described above.
-     */
-    private Boolean resolve(Boolean annotationValue, String propertyName)
+    private void mergeBrowser(Browser browser) throws DockerTestException
     {
-        Boolean result = annotationValue;
-        String propertyValue = System.getProperty(propertyName);
-        if (propertyValue != null) {
-            result = Boolean.valueOf(propertyValue);
-        }
-        return result;
-    }
-
-    /**
-     * Resolve the passed String property by getting the value from the System property and if not found, from the
-     * {@link UITest} annotation, and fallbacking to the passed default value if not found.
-     *
-     * @param annotationValue the {@link UITest} annotation parameter value to use if no System property is defined
-     * @param propertyName the name of the System property key which might contain a value for this string.
-     * @return the resolved value following the strategy described above.
-     */
-    private String resolve(String annotationValue, String propertyName)
-    {
-        String result = StringUtils.isEmpty(annotationValue) ? null : annotationValue;
-        String propertyValue = System.getProperty(propertyName);
-        if (!StringUtils.isEmpty(propertyValue)) {
-            result = propertyValue;
-        }
-        return result;
-    }
-
-    private void resolveBrowser()
-    {
-        this.browser = resolve(Browser.class, this.uiTestAnnotation.browser(), BROWSER_PROPERTY);
-    }
-
-    private void resolveDatabase()
-    {
-        this.database = resolve(Database.class, this.uiTestAnnotation.database(), DATABASE_PROPERTY);
-    }
-
-    private void resolveServletEngine()
-    {
-        this.servletEngine = resolve(ServletEngine.class, this.uiTestAnnotation.servletEngine(),
-            SERVLETENGINE_PROPERTY);
-    }
-
-    private void resolveVerbose()
-    {
-        this.verbose = resolve(this.uiTestAnnotation.verbose(), VERBOSE_PROPERTY);
-    }
-
-    private void resolveDebug()
-    {
-        this.debug = resolve(this.uiTestAnnotation.debug(), DEBUG_PROPERTY);
-    }
-
-    private void resolveSaveDatabaseData()
-    {
-        this.saveDatabaseData = resolve(this.uiTestAnnotation.saveDatabaseData(), SAVEDBDATA_PROPERTY);
-    }
-
-    private void resolveOffline()
-    {
-        this.isOffline = resolve(this.uiTestAnnotation.offline(), OFFLINE_PROPERTY);
-    }
-
-    private void resolveDatabaseTag()
-    {
-        this.databaseTag = resolve(this.uiTestAnnotation.databaseTag(), DATABASETAG_PROPERTY);
-    }
-
-    private void resolveServletEngineTag()
-    {
-        this.servletEngineTag = resolve(this.uiTestAnnotation.servletEngineTag(), SERVLETENGINETAG_PROPERTY);
-    }
-
-    private void resolveJDBCDriverVersion()
-    {
-        this.jdbcDriverVersion = resolve(this.uiTestAnnotation.jdbcDriverVersion(), JDBCDRIVERVERSION_PROPERTY);
-    }
-
-    private void resolveVNC()
-    {
-        this.vnc = resolve(this.uiTestAnnotation.vnc(), VNC_PROPERTY);
-    }
-
-    private void resolveOffice()
-    {
-        this.office = resolve(this.uiTestAnnotation.office(), OFFICE_PROPERTY);
-    }
-
-    private void resolveProperties()
-    {
-        String[] propertiesAsArray = this.uiTestAnnotation.properties();
-        Properties newProperties = new Properties();
-        for (String propertyAsString : propertiesAsArray) {
-            int pos = propertyAsString.indexOf('=');
-            if (pos > -1) {
-                newProperties.setProperty(propertyAsString.substring(0, pos), propertyAsString.substring(pos + 1));
+        if (getBrowser() != null) {
+            if (browser != null && !getBrowser().equals(browser)) {
+                throw new DockerTestException(
+                    String.format("Cannot merge browser [%s] since it was already specified as [%s]", browser,
+                        getBrowser()));
+            } else {
+                this.browser = getBrowser();
             }
-        }
-        for (String key : System.getProperties().stringPropertyNames()) {
-            if (key.startsWith(PROPERTIES_PREFIX_PROPERTY)) {
-                String propertyAsString = StringUtils.substringAfter(key, PROPERTIES_PREFIX_PROPERTY);
-                newProperties.setProperty(propertyAsString, System.getProperty(key));
-            }
-        }
-        this.properties = newProperties;
-    }
-
-    private void resolveExtraJARs()
-    {
-        List<List<String>> newExtraJARs = new ArrayList<>();
-        for (String coordinate : this.uiTestAnnotation.extraJARs()) {
-            Matcher matcher = ARTIFACT_COORD_PATTERN.matcher(coordinate);
-            if (!matcher.matches()) {
-                throw new IllegalArgumentException(String.format("Bad artifact coordinates [%s]", coordinate));
-            }
-            List<String> jarCoordinates = new ArrayList<>();
-            jarCoordinates.add(matcher.group(1));
-            jarCoordinates.add(matcher.group(2));
-            newExtraJARs.add(jarCoordinates);
-        }
-        this.extraJARs = newExtraJARs;
-    }
-
-    private void resolveSSHPorts()
-    {
-        List<Integer> newSSHPorts = new ArrayList<>();
-        newSSHPorts.add(8080);
-        for (int sshPort : this.uiTestAnnotation.sshPorts()) {
-            newSSHPorts.add(sshPort);
-        }
-        this.sshPorts = newSSHPorts;
-    }
-
-    private void resolveProfiles()
-    {
-        List<String> newProfiles = new ArrayList<>();
-        if (this.uiTestAnnotation.profiles().length > 0) {
-            newProfiles.addAll(Arrays.asList(this.uiTestAnnotation.profiles()));
         } else {
-            newProfiles.addAll(Arrays.asList(System.getProperty(PROFILES_PROPERTY, "").split(",")));
+            this.browser = browser;
         }
-        this.profiles = newProfiles;
     }
 
-    private void resolveForbiddenServletEngines()
+    private void mergeDatabase(Database database) throws DockerTestException
     {
-        List<ServletEngine> newForbiddenServletEngines = new ArrayList<>();
-        if (this.uiTestAnnotation.forbiddenEngines().length > 0) {
-            newForbiddenServletEngines.addAll(Arrays.asList(this.uiTestAnnotation.forbiddenEngines()));
+        if (getDatabase() != null) {
+            if (database != null && !getDatabase().equals(database)) {
+                throw new DockerTestException(
+                    String.format("Cannot merge database [%s] since it was already specified as [%s]", database,
+                        getDatabase()));
+            } else {
+                this.database = getDatabase();
+            }
+        } else {
+            this.database = database;
         }
-        this.forbiddenServletEngines = newForbiddenServletEngines;
+    }
+
+    private void mergeServletEngine(ServletEngine servletEngine) throws DockerTestException
+    {
+        if (getServletEngine() != null) {
+            if (servletEngine != null && !getServletEngine().equals(servletEngine)) {
+                throw new DockerTestException(
+                     String.format("Cannot merge Servlet engine [%s] since it was already specified as [%s]",
+                     servletEngine, getServletEngine()));
+            } else {
+                this.servletEngine = getServletEngine();
+            }
+        } else {
+            this.servletEngine = servletEngine;
+        }
+    }
+
+    private void mergeVerbose(boolean verbose)
+    {
+        if (!isVerbose() && verbose) {
+            this.verbose = true;
+        }
+    }
+
+    private void mergeDebug(boolean debug)
+    {
+        if (!isDebug() && debug) {
+            this.debug = true;
+        }
+    }
+
+    private void mergeOffline(boolean offline)
+    {
+        if (!isOffline() && offline) {
+            this.offline = true;
+        }
+    }
+
+    private void mergeDatabaseTag(String databaseTag) throws DockerTestException
+    {
+        if (getDatabaseTag() != null) {
+            if (databaseTag != null && !getDatabaseTag().equals(databaseTag)) {
+                throw new DockerTestException(
+                    String.format("Cannot merge database tag [%s] since it was already specified as [%s]",
+                        databaseTag, getDatabaseTag()));
+            } else {
+                this.databaseTag = getDatabaseTag();
+            }
+        } else {
+            this.databaseTag = databaseTag;
+        }
+    }
+
+    private void mergeServletEngineTag(String servletEngineTag) throws DockerTestException
+    {
+        if (getServletEngineTag() != null) {
+            if (servletEngineTag != null && !getServletEngineTag().equals(servletEngineTag)) {
+                throw new DockerTestException(
+                    String.format("Cannot merge Servlet engine tag [%s] since it was already specified as [%s]",
+                        servletEngineTag, getServletEngineTag()));
+            } else {
+                this.servletEngineTag = getServletEngineTag();
+            }
+        } else {
+            this.servletEngineTag = servletEngineTag;
+        }
+    }
+
+    private void mergeJDBCDriverVersion(String jdbcDriverVersion) throws DockerTestException
+    {
+        if (getJDBCDriverVersion() != null) {
+            if (jdbcDriverVersion != null && !getJDBCDriverVersion().equals(jdbcDriverVersion)) {
+                throw new DockerTestException(
+                    String.format("Cannot merge JDBC driver version [%s] since it was already specified as [%s]",
+                        jdbcDriverVersion, getJDBCDriverVersion()));
+            } else {
+                this.jdbcDriverVersion = getJDBCDriverVersion();
+            }
+        } else {
+            this.jdbcDriverVersion = jdbcDriverVersion;
+        }
+    }
+
+    private void mergeVNC(boolean vnc)
+    {
+        if (!vnc() && vnc) {
+            this.vnc = true;
+        }
+    }
+
+    private void mergeOffice(boolean office)
+    {
+        if (!isOffice() && office) {
+            this.office = true;
+        }
+    }
+
+    private void mergeProperties(Properties properties) throws DockerTestException
+    {
+        this.properties = this.propertiesMerger.merge(getProperties(), properties, false);
+    }
+
+    private void mergeDatabaseCommands(Properties databaseCommands) throws DockerTestException
+    {
+        this.databaseCommands = this.propertiesMerger.merge(getDatabaseCommands(), databaseCommands, false);
+    }
+
+    private void mergeExtraJARs(Collection<ArtifactCoordinate> extraJARs)
+    {
+        Set<ArtifactCoordinate> mergedExtraJARs = getExtraJARs();
+        if (extraJARs != null) {
+            mergedExtraJARs.addAll(extraJARs);
+        }
+        this.extraJARs = mergedExtraJARs;
+    }
+
+    private void mergeResolveExtraJARs(boolean resolveExtraJARs)
+    {
+        if (!isResolveExtraJARs() && resolveExtraJARs) {
+            this.resolveExtraJARs = true;
+        }
+    }
+
+    private void mergeExtensionOverrides(List<ExtensionOverride> extensionOverrides)
+    {
+        List<ExtensionOverride> mergedExtensionOverrides = getExtensionOverrides();
+        if (extensionOverrides != null) {
+            mergedExtensionOverrides.addAll(extensionOverrides);
+        }
+        this.extensionOverrides = mergedExtensionOverrides;
+    }
+
+    private void mergeSSHPorts(List<Integer> sshPorts)
+    {
+        List<Integer> mergedSSHPorts = getSSHPorts();
+        if (sshPorts != null) {
+            mergedSSHPorts.addAll(sshPorts);
+        }
+        this.sshPorts = mergedSSHPorts;
+    }
+
+    private void mergeProfiles(List<String> profiles)
+    {
+        List<String> mergedProfiles = getProfiles();
+        if (profiles != null) {
+            mergedProfiles.addAll(profiles);
+        }
+        this.profiles = mergedProfiles;
+    }
+
+    private void mergeForbiddenServletEngines(List<ServletEngine> forbiddenServletEngines)
+    {
+        List<ServletEngine> mergedForbiddenServletEngines = getForbiddenServletEngines();
+        if (forbiddenServletEngines != null) {
+            mergedForbiddenServletEngines.addAll(forbiddenServletEngines);
+        }
+        this.forbiddenServletEngines = mergedForbiddenServletEngines;
+    }
+
+    private void mergeSaveDatabaseData(boolean saveDatabaseData)
+    {
+        if (!isDatabaseDataSaved() && saveDatabaseData) {
+            this.saveDatabaseData = true;
+        }
+    }
+
+    private void mergeSavePermanentDirectoryData(boolean savePermanentDirectoryData)
+    {
+        if (!isPermanentDirectoryDataSaved() && savePermanentDirectoryData) {
+            this.savePermanentDirectoryData = true;
+        }
     }
 
     /**
@@ -323,6 +325,14 @@ public class TestConfiguration
     }
 
     /**
+     * @param browser see {@link #getBrowser()}
+     */
+    public void setBrowser(Browser browser)
+    {
+        this.browser = browser;
+    }
+
+    /**
      * @return the database to use
      */
     public Database getDatabase()
@@ -330,6 +340,13 @@ public class TestConfiguration
         return this.database;
     }
 
+    /**
+     * @param database see {@link #getDatabase()}
+     */
+    public void setDatabase(Database database)
+    {
+        this.database = database;
+    }
     /**
      * @return the Servlet engine to use
      */
@@ -339,11 +356,27 @@ public class TestConfiguration
     }
 
     /**
+     * @param servletEngine see {@link #getServletEngine()}
+     */
+    public void setServletEngine(ServletEngine servletEngine)
+    {
+        this.servletEngine = servletEngine;
+    }
+
+    /**
      * @return true if the test should output verbose console logs or not
      */
     public boolean isVerbose()
     {
         return this.verbose;
+    }
+
+    /**
+     * @param verbose see {@link #isVerbose()}
+     */
+    public void setVerbose(boolean verbose)
+    {
+        this.verbose = verbose;
     }
 
     /**
@@ -356,24 +389,30 @@ public class TestConfiguration
     }
 
     /**
-     * @return true true if the database data should be mapped to a local directory on the host computer so that it can
-     *         be saved and reused for another run
-     * @since 10.10RC1
+     * @param debug see {@link #isDebug()}
      */
-    public boolean isDatabaseDataSaved()
+    public void setDebug(boolean debug)
     {
-        return this.saveDatabaseData;
+        this.debug = debug;
     }
 
     /**
-     * @return true if the Maven resolving is done in offline mode (i.e. you need to have the required artifacts in
-     *         your local repository). False by default to avoid developer problems but should be set to true in the
-     *         CI to improve performance of functional tests
+     * @return true if the Maven resolving is done in offline mode (i.e. you need to have the required artifacts in your
+     * local repository). False by default to avoid developer problems but should be set to true in the CI to improve
+     * performance of functional tests
      * @since 10.10RC1
      */
     public boolean isOffline()
     {
-        return this.isOffline;
+        return this.offline;
+    }
+
+    /**
+     * @param offline see {@link #isOffline()}
+     */
+    public void setOffline(boolean offline)
+    {
+        this.offline = offline;
     }
 
     /**
@@ -386,6 +425,14 @@ public class TestConfiguration
     }
 
     /**
+     * @param databaseTag see {@link #getDatabaseTag()}
+     */
+    public void setDatabaseTag(String databaseTag)
+    {
+        this.databaseTag = databaseTag;
+    }
+
+    /**
      * @return the docker image tag to use (if not specified, uses the "latest" tag)
      * @since 10.10RC1
      */
@@ -395,13 +442,29 @@ public class TestConfiguration
     }
 
     /**
+     * @param servletEngineTag see {@link #getServletEngineTag()}
+     */
+    public void setServletEngineTag(String servletEngineTag)
+    {
+        this.servletEngineTag = servletEngineTag;
+    }
+
+    /**
      * @return the version of the JDBC driver to use for the selected database (if not specified, uses a default version
-     *         depending on the database)
+     * depending on the database)
      * @since 10.10RC1
      */
     public String getJDBCDriverVersion()
     {
         return this.jdbcDriverVersion;
+    }
+
+    /**
+     * @param jdbcDriverVersion see {@link #getJDBCDriverVersion()}
+     */
+    public void setJDBCDriverVersion(String jdbcDriverVersion)
+    {
+        this.jdbcDriverVersion = jdbcDriverVersion;
     }
 
     /**
@@ -414,8 +477,16 @@ public class TestConfiguration
     }
 
     /**
-     * @return the list of configuration properties to use when generating the XWiki configuration files such as
-     *         as {@code xwiki.properties} (check {@code xwiki.properties.vm} to find the list of supported properties)
+     * @param vnc see {@link #vnc()}
+     */
+    public void setVNC(boolean vnc)
+    {
+        this.vnc = vnc;
+    }
+
+    /**
+     * @return the list of configuration properties to use when generating the XWiki configuration files such as as
+     * {@code xwiki.properties} (check {@code xwiki.properties.vm} to find the list of supported properties)
      * @since 10.10RC1
      */
     public Properties getProperties()
@@ -424,25 +495,100 @@ public class TestConfiguration
     }
 
     /**
-     * @return the list of extra JARs to add to the {@code WEB-INF/lib} directory, specified as a List of Strings in
-     *         the following order: group id, artifact id.
+     * @param properties see {@link #getProperties()}
+     */
+    public void setProperties(Properties properties)
+    {
+        this.properties = properties;
+    }
+
+    /**
+     * @return the list of database docker commands to use and that will override default commands (example of command
+     * {@code character-set-server=utf8mb4}
+     * @since 11.2RC1
+     */
+    public Properties getDatabaseCommands()
+    {
+        return this.databaseCommands;
+    }
+
+    /**
+     * @param databaseCommands see {@link #getDatabaseCommands()}
+     */
+    public void setDatabaseCommands(Properties databaseCommands)
+    {
+        this.databaseCommands = databaseCommands;
+    }
+
+    /**
+     * @return the list of extra JARs to add to the {@code WEB-INF/lib} directory
      * @since 10.11RC1
      */
-    public List<List<String>> getExtraJARs()
+    public Set<ArtifactCoordinate> getExtraJARs()
     {
         return this.extraJARs;
     }
 
     /**
-     * @return the list of ports that should be SSH-forwarded when connecting from a Docker container to the
-     *         host (i.e. when using the {@code host.testcontainers.internal} host name). This is in addition to port
-     *         {@code 8080} which is always added. For example if you need XWiki to send a mail to a SMTP server
-     *         running on port 3025 on the host, you should add port 3025 to the list.
+     * @param extraJARs see {@link #getExtraJARs()}
+     */
+    public void setExtraJARs(Set<ArtifactCoordinate> extraJARs)
+    {
+        this.extraJARs = extraJARs;
+    }
+
+    /**
+     * @return true if extra JARs version should be resolved when missing, see {@link UITest#resolveExtraJARs()}
+     * @since 12.5RC1
+     */
+    public boolean isResolveExtraJARs()
+    {
+        return this.resolveExtraJARs;
+    }
+
+    /**
+     * @param resolveExtraJARs see {@link #isResolveExtraJARs()}
+     */
+    public void setResolveExtraJARs(boolean resolveExtraJARs)
+    {
+        this.resolveExtraJARs = resolveExtraJARs;
+    }
+
+    /**
+     * @return the overrides of the extensions descriptors
+     * @since 11.6RC1
+     */
+    public List<ExtensionOverride> getExtensionOverrides()
+    {
+        return this.extensionOverrides;
+    }
+
+    /**
+     * @param extensionOverrides see {@link #getExtensionOverrides()}
+     */
+    public void setExtensionOverrides(List<ExtensionOverride> extensionOverrides)
+    {
+        this.extensionOverrides = extensionOverrides;
+    }
+
+    /**
+     * @return the list of ports that should be SSH-forwarded when connecting from a Docker container to the host (i.e.
+     * when using the {@code host.testcontainers.internal} host name). This is in addition to port {@code 8080} which is
+     * always added. For example if you need XWiki to send a mail to a SMTP server running on port 3025 on the host, you
+     * should add port 3025 to the list.
      * @since 10.11RC1
      */
     public List<Integer> getSSHPorts()
     {
         return this.sshPorts;
+    }
+
+    /**
+     * @param sshPorts see {@link #getSSHPorts()}
+     */
+    public void setSSHPorts(List<Integer> sshPorts)
+    {
+        this.sshPorts = sshPorts;
     }
 
     /**
@@ -455,8 +601,16 @@ public class TestConfiguration
     }
 
     /**
+     * @param profiles see {@link #getProfiles()}
+     */
+    public void setProfiles(List<String> profiles)
+    {
+        this.profiles = profiles;
+    }
+
+    /**
      * @return the String representation of the configuration (used for example as a directory name where to save the
-     *         generated XWiki configuration - XWiki WAR file, etc)
+     * generated XWiki configuration - XWiki WAR file, etc)
      * @since 10.10RC1
      */
     public String getName()
@@ -472,10 +626,10 @@ public class TestConfiguration
 
     /**
      * @return the output directory where to output files required for running the tests. If the {@code maven.build.dir}
-     *         system property is not defined then construct an output directory name based on the defined configuration
-     *         so that we can run different configurations one after another without them overriding each other.
-     *         The {@code maven.build.dir} system property is there to allow controlling where the Maven output
-     *         directory is located when running from Maven.
+     * system property is not defined then construct an output directory name based on the defined configuration so that
+     * we can run different configurations one after another without them overriding each other. The {@code
+     * maven.build.dir} system property is there to allow controlling where the Maven output directory is located when
+     * running from Maven.
      */
     public String getOutputDirectory()
     {
@@ -499,6 +653,14 @@ public class TestConfiguration
     }
 
     /**
+     * @param office see {@link #isOffice()}
+     */
+    public void setOffice(boolean office)
+    {
+        this.office = office;
+    }
+
+    /**
      * @return the list of Servlet Engines on which this test must not be executed. If the Servlet Engine is selected
      *         then the test will be skipped
      * @since 10.11RC1
@@ -506,5 +668,50 @@ public class TestConfiguration
     public List<ServletEngine> getForbiddenServletEngines()
     {
         return this.forbiddenServletEngines;
+    }
+
+    /**
+     * @param forbiddenServletEngines see {@link #getForbiddenServletEngines()}
+     */
+    public void setForbiddenServletEngines(List<ServletEngine> forbiddenServletEngines)
+    {
+        this.forbiddenServletEngines = forbiddenServletEngines;
+    }
+
+    /**
+     * @return true true if the database data should be mapped to a local directory on the host computer so that it can
+     *         be saved and reused for another run
+     * @since 10.10RC1
+     */
+    public boolean isDatabaseDataSaved()
+    {
+        return this.saveDatabaseData;
+    }
+
+    /**
+     * @param saveDatabaseData see {@link #isDatabaseDataSaved()}
+     */
+    public void setSaveDatabaseData(boolean saveDatabaseData)
+    {
+        this.saveDatabaseData = saveDatabaseData;
+    }
+
+    /**
+     * @return true if the XWiki permanent directory should be mapped to a local directory on the host computer so that
+     *         it can be accessed once the test is finished, for debugging purposes
+     * @since 14.5
+     */
+    public boolean isPermanentDirectoryDataSaved()
+    {
+        return this.savePermanentDirectoryData;
+    }
+
+    /**
+     * @param savePermanentDirectoryData see {@link #isPermanentDirectoryDataSaved()}
+     * @since 14.5
+     */
+    public void setSavePermanentDirectoryData(boolean savePermanentDirectoryData)
+    {
+        this.savePermanentDirectoryData = savePermanentDirectoryData;
     }
 }

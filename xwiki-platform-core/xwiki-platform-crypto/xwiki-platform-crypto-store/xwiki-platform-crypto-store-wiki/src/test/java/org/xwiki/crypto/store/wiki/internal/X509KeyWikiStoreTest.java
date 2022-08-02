@@ -41,7 +41,6 @@ import org.xwiki.crypto.store.KeyStore;
 import org.xwiki.crypto.store.StoreReference;
 import org.xwiki.crypto.store.WikiStoreReference;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;

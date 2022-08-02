@@ -22,6 +22,7 @@ package org.xwiki.rendering.macro.script;
 import java.io.StringReader;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -30,7 +31,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.context.Execution;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.AbstractSignableMacro;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -110,7 +110,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     {
         super(macroName, null, ScriptMacroParameters.class);
 
-        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_DEVELOPMENT));
     }
 
     /**
@@ -121,7 +121,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     {
         super(macroName, macroDescription, ScriptMacroParameters.class);
 
-        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_DEVELOPMENT));
     }
 
     /**
@@ -133,7 +133,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     {
         super(macroName, macroDescription, contentDescriptor, ScriptMacroParameters.class);
 
-        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_DEVELOPMENT));
     }
 
     /**
@@ -146,7 +146,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     {
         super(macroName, macroDescription, parametersBeanClass);
 
-        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_DEVELOPMENT));
     }
 
     /**
@@ -160,7 +160,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     {
         super(macroName, macroDescription, contentDescriptor, parametersBeanClass);
 
-        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_DEVELOPMENT));
     }
 
     @Override
@@ -222,14 +222,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
 
         // 3) If in inline mode remove any top level paragraph
         if (context.isInline()) {
-            this.parserUtils.removeTopLevelParagraph(result);
-
-            // Make sure included macro is inline when script macro itself is inline
-            // TODO: use inline parser instead
-            if (!result.isEmpty() && result.get(0) instanceof MacroBlock && !((MacroBlock) result.get(0)).isInline()) {
-                MacroBlock macro = (MacroBlock) result.get(0);
-                result.set(0, new MacroBlock(macro.getId(), macro.getParameters(), macro.getContent(), true));
-            }
+            this.parserUtils.convertToInline(result);
         }
 
         return result;

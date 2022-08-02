@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-localization-sources</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-localization-source-wiki</artifactId>
   <name>XWiki Platform - Localization - Source - Wiki</name>
@@ -33,7 +33,6 @@
   <description>XWiki Platform - Localization - Source - Wiki</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.68</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>59</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>
@@ -43,7 +42,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-security-api</artifactId>
+      <artifactId>xwiki-platform-security-authorization-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

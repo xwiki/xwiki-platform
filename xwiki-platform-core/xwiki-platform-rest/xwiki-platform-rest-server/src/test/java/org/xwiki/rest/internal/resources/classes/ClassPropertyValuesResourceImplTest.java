@@ -22,18 +22,17 @@ package org.xwiki.rest.internal.resources.classes;
 import java.net.URI;
 import java.util.Arrays;
 
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.ReflectionUtils;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -42,10 +41,15 @@ import org.xwiki.rest.Relations;
 import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.PropertyValues;
 import org.xwiki.rest.resources.classes.ClassPropertyValuesProvider;
-import org.xwiki.rest.resources.classes.ClassPropertyValuesResource;
+import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -53,8 +57,13 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.DBListClass;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link ClassPropertyValuesResourceImpl}.
@@ -62,58 +71,63 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  * @since 9.8RC1
  */
-public class ClassPropertyValuesResourceImplTest
+@ComponentTest
+class ClassPropertyValuesResourceImplTest
 {
-    @Rule
-    public MockitoComponentMockingRule<ClassPropertyValuesResource> mocker =
-        new MockitoComponentMockingRule<ClassPropertyValuesResource>(ClassPropertyValuesResourceImpl.class);
+    @InjectMockComponents
+    private ClassPropertyValuesResourceImpl resource;
 
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
+    @MockComponent
+    @Named("currentmixed")
     private DocumentReferenceResolver<String> resolver;
 
+    @MockComponent
     private ContextualAuthorizationManager authorization;
+
+    @MockComponent
+    private Provider<XWikiContext> xcontextProvider;
 
     private ClassPropertyReference propertyReference =
         new ClassPropertyReference("status", new DocumentReference("wiki", Arrays.asList("Path", "To"), "Class"));
 
-    private BaseClass xclass = mock(BaseClass.class);
+    @Mock
+    private BaseClass xclass;
 
-    private ClassPropertyValuesResource resource;
+    XWikiContext xcontext;
 
-    @Before
-    public void configure() throws Exception
+    @BeforeComponent
+    void beforeComponent() throws Exception
     {
-        this.resolver = this.mocker.getInstance(DocumentReferenceResolver.TYPE_STRING);
-        this.authorization = this.mocker.getInstance(ContextualAuthorizationManager.class);
+        this.xcontext = mock(XWikiContext.class);
+        when(this.xcontextProvider.get()).thenReturn(this.xcontext);
+        componentManager.registerComponent(ComponentManager.class, "context", componentManager);
+    }
 
+    @BeforeEach
+    void configure() throws Exception
+    {
         when(this.resolver.resolve("Path.To.Class", propertyReference.extractReference(EntityType.WIKI)))
             .thenReturn((DocumentReference) propertyReference.getParent());
 
-        XWikiContext xcontext = mock(XWikiContext.class);
         XWiki xwiki = mock(XWiki.class);
         XWikiDocument classDocument = mock(XWikiDocument.class);
         when(xcontext.getWiki()).thenReturn(xwiki);
         when(xwiki.getDocument(propertyReference, xcontext)).thenReturn(classDocument);
         when(classDocument.getXClass()).thenReturn(this.xclass);
 
-        ExecutionContext executionContext = new ExecutionContext();
-        executionContext.setProperty("xwikicontext", xcontext);
-        Execution execution = mock(Execution.class);
-        ComponentManager componentManager = this.mocker.getInstance(ComponentManager.class, "context");
-        when(componentManager.getInstance(Execution.class)).thenReturn(execution);
-        when(execution.getContext()).thenReturn(executionContext);
-
-        Provider<XWikiContext> xcontextProvider = this.mocker.getInstance(XWikiContext.TYPE_PROVIDER);
-        when(xcontextProvider.get()).thenReturn(xcontext);
-
         UriInfo uriInfo = mock(UriInfo.class);
         when(uriInfo.getBaseUri()).thenReturn(new URI("/xwiki/rest"));
-        this.resource = this.mocker.getComponentUnderTest();
         ReflectionUtils.setFieldValue(resource, "uriInfo", uriInfo);
     }
 
     @Test
-    public void getClassPropertyValuesUnauthorized() throws Exception
+    void getClassPropertyValuesUnauthorized() throws Exception
     {
+        doThrow(new AccessDeniedException(xcontext.getUserReference(), this.propertyReference)).when(
+            authorization).checkAccess(eq(Right.VIEW), eq(this.propertyReference));
         try {
             this.resource.getClassPropertyValues("wiki", "Path.To.Class", "status", 6, Arrays.asList("text"), false);
             fail();
@@ -123,10 +137,8 @@ public class ClassPropertyValuesResourceImplTest
     }
 
     @Test
-    public void getClassPropertyValuesNotFound() throws Exception
+    void getClassPropertyValuesNotFound() throws Exception
     {
-        when(this.authorization.hasAccess(Right.VIEW, this.propertyReference)).thenReturn(true);
-
         try {
             this.resource.getClassPropertyValues("wiki", "Path.To.Class", "status", 6, Arrays.asList("text"), false);
             fail();
@@ -136,13 +148,13 @@ public class ClassPropertyValuesResourceImplTest
     }
 
     @Test
-    public void getClassPropertyValues() throws Exception
+    void getClassPropertyValues() throws Exception
     {
-        when(this.authorization.hasAccess(Right.VIEW, this.propertyReference)).thenReturn(true);
         when(this.xclass.get("status")).thenReturn(new DBListClass());
 
         PropertyValues values = new PropertyValues();
-        ClassPropertyValuesProvider propertyValuesProvider = this.mocker.getInstance(ClassPropertyValuesProvider.class);
+        ClassPropertyValuesProvider propertyValuesProvider = this.componentManager
+            .getInstance(ClassPropertyValuesProvider.class);
         when(propertyValuesProvider.getValues(this.propertyReference, 6, "one", "two")).thenReturn(values);
 
         assertSame(values,

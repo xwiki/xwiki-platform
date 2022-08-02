@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-mail-send</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <packaging>jar</packaging>
   <artifactId>xwiki-platform-mail-send-default</artifactId>
@@ -33,11 +33,16 @@
   <description>Default implementation of the API to send emails</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.76</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>68</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Mail Sender Implementation</xwiki.extension.name>
+    <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
   </properties>
   <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-mail-general</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-mail-send-api</artifactId>
@@ -63,15 +68,15 @@
       <artifactId>xwiki-commons-text</artifactId>
       <version>${commons.version}</version>
     </dependency>
-    <!-- Needed for working with XWikiStubContextProvider and XWikiRequest and by the Extension Manager to properly load some
-      components (e.g. DefaultXWikiStubContextProvider) -->
+    <!-- Needed for working with XWikiStubContextProvider and XWikiRequest and by the Extension Manager to properly
+         load some components (e.g. DefaultXWikiStubContextProvider) -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-model</artifactId>
+      <artifactId>xwiki-platform-model-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -91,9 +96,15 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>com.icegreen</groupId>
-      <artifactId>greenmail</artifactId>
-      <version>1.5.8</version>
+      <artifactId>greenmail-junit5</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

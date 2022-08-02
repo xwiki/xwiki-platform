@@ -19,9 +19,12 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -34,8 +37,25 @@ import com.xpn.xwiki.XWikiException;
  *
  * @version $Id$
  */
+@Component
+@Named("loginsubmit")
+@Singleton
 public class LoginSubmitAction extends XWikiAction
 {
+    private static final String LOGIN = "login";
+
+    @Override
+    public boolean action(XWikiContext context) throws XWikiException
+    {
+        // Disallow template override with xpage parameter.
+        if (!LOGIN.equals(Utils.getPage(context.getRequest(), LOGIN))) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                String.format("Template may not be overriden with 'xpage' in [%s] action.", LOGIN));
+        }
+
+        return super.action(context);
+    }
+
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
@@ -43,6 +63,6 @@ public class LoginSubmitAction extends XWikiAction
         if (StringUtils.isNotBlank(msg)) {
             context.getResponse().setStatus(HttpServletResponse.SC_FORBIDDEN);
         }
-        return "login";
+        return LOGIN;
     }
 }

@@ -21,29 +21,31 @@ package com.xpn.xwiki.web;
 
 import java.util.Locale;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.environment.Environment;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+@OldcoreTest
 @AllComponents
-public class XWikiMessageToolBridgeTest
+class XWikiMessageToolBridgeTest
 {
-    @Rule
-    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+    private static final String TRANSLATION_FULLNAME = "XWiki.Translations";
+
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
 
     private XWikiMessageTool tool;
 
@@ -51,25 +53,14 @@ public class XWikiMessageToolBridgeTest
 
     private DocumentReference defaultWikiTranslationReference;
 
-    private static final String TRANSLATION_FULLNAME = "XWiki.Translations";
-
-    public XWikiMessageToolBridgeTest()
+    @BeforeEach
+    public void setUp() throws Exception
     {
+
         this.oldcore.notifyDocumentCreatedEvent(true);
         this.oldcore.notifyDocumentUpdatedEvent(true);
         this.oldcore.notifyDocumentDeletedEvent(true);
-    }
 
-    @AfterComponent
-    public void afterComponent() throws Exception
-    {
-        // Register a mock Environment since we're in a test and we don't want spurious logs in the console.
-        this.oldcore.getMocker().registerMockComponent(Environment.class);
-    }
-
-    @Before
-    public void before() throws Exception
-    {
         Locale.setDefault(Locale.ROOT);
 
         // checking
@@ -149,94 +140,94 @@ public class XWikiMessageToolBridgeTest
     // tests
 
     @Test
-    public void getInvalidTranslation()
+    void getInvalidTranslation()
     {
-        Assert.assertEquals("doesnotexists.translation", this.tool.get("doesnotexists.translation"));
+        assertEquals("doesnotexists.translation", this.tool.get("doesnotexists.translation"));
     }
 
     @Test
-    public void getResourceTranslation()
+    void getResourceTranslation()
     {
-        Assert.assertEquals("Language", this.tool.get("language"));
+        assertEquals("Language", this.tool.get("language"));
     }
 
     @Test
-    public void getWikiTranslation() throws XWikiException, ComponentLookupException
+    void getWikiTranslation() throws Exception
     {
         addWikiTranslation("wiki.translation", "Wiki translation", Locale.ROOT);
 
-        Assert.assertEquals("Wiki translation", this.tool.get("wiki.translation"));
+        assertEquals("Wiki translation", this.tool.get("wiki.translation"));
     }
 
     @Test
-    public void getTranslatedWikiTranslation() throws XWikiException, ComponentLookupException
+    void getTranslatedWikiTranslation() throws Exception
     {
         addWikiTranslation("wiki.translation", "English translation", Locale.ENGLISH);
         addWikiTranslation("wiki.translation", "French translation", Locale.FRENCH);
 
         this.oldcore.getXWikiContext().setLocale(Locale.FRENCH);
 
-        Assert.assertEquals("French translation", this.tool.get("wiki.translation"));
+        assertEquals("French translation", this.tool.get("wiki.translation"));
 
         this.oldcore.getXWikiContext().setLocale(Locale.ENGLISH);
 
-        Assert.assertEquals("English translation", this.tool.get("wiki.translation"));
+        assertEquals("English translation", this.tool.get("wiki.translation"));
     }
 
     @Test
-    public void fallackOnParentLocale() throws XWikiException, ComponentLookupException
+    void fallackOnParentLocale() throws Exception
     {
         addWikiTranslation("wiki.defaulttranslation", "Default translation", Locale.ROOT);
 
-        Assert.assertEquals("Default translation", this.tool.get("wiki.defaulttranslation"));
+        assertEquals("Default translation", this.tool.get("wiki.defaulttranslation"));
 
         this.oldcore.getXWikiContext().setLocale(Locale.ENGLISH);
 
-        Assert.assertEquals("Default translation", this.tool.get("wiki.defaulttranslation"));
+        assertEquals("Default translation", this.tool.get("wiki.defaulttranslation"));
 
         this.oldcore.getXWikiContext().setLocale(Locale.US);
 
-        Assert.assertEquals("Default translation", this.tool.get("wiki.defaulttranslation"));
+        assertEquals("Default translation", this.tool.get("wiki.defaulttranslation"));
 
         this.oldcore.getXWikiContext().setLocale(Locale.FRENCH);
         addWikiTranslation("wiki.frenchtranslation", "French translation", Locale.FRENCH);
 
-        Assert.assertEquals("Default translation", this.tool.get("wiki.defaulttranslation"));
-        Assert.assertEquals("French translation", this.tool.get("wiki.frenchtranslation"));
+        assertEquals("Default translation", this.tool.get("wiki.defaulttranslation"));
+        assertEquals("French translation", this.tool.get("wiki.frenchtranslation"));
 
         this.oldcore.getXWikiContext().setLocale(Locale.FRANCE);
 
-        Assert.assertEquals("Default translation", this.tool.get("wiki.defaulttranslation"));
-        Assert.assertEquals("French translation", this.tool.get("wiki.frenchtranslation"));
+        assertEquals("Default translation", this.tool.get("wiki.defaulttranslation"));
+        assertEquals("French translation", this.tool.get("wiki.frenchtranslation"));
     }
 
     @Test
-    public void updateWikiTranslationCache() throws XWikiException, ComponentLookupException
+    void updateWikiTranslationCache() throws Exception
     {
         setBundles(TRANSLATION_FULLNAME);
 
-        Assert.assertEquals("wiki.defaulttranslation", this.tool.get("wiki.defaulttranslation"));
+        assertEquals("wiki.defaulttranslation", this.tool.get("wiki.defaulttranslation"));
 
         addWikiTranslation("wiki.defaulttranslation", "Default translation", Locale.ROOT);
 
-        Assert.assertEquals("Default translation", this.tool.get("wiki.defaulttranslation"));
+        assertEquals("Default translation", this.tool.get("wiki.defaulttranslation"));
 
         addWikiTranslation("wiki.anothertranslation", "Another translation", Locale.ROOT);
 
-        Assert.assertEquals("Another translation", this.tool.get("wiki.anothertranslation"));
+        assertEquals("Another translation", this.tool.get("wiki.anothertranslation"));
 
         deleteWikiTranslation();
 
-        Assert.assertEquals("wiki.defaulttranslation", this.tool.get("wiki.defaulttranslation"));
-        Assert.assertEquals("wiki.anothertranslation", this.tool.get("wiki.anothertranslation"));
+        assertEquals("wiki.defaulttranslation", this.tool.get("wiki.defaulttranslation"));
+        assertEquals("wiki.anothertranslation", this.tool.get("wiki.anothertranslation"));
     }
 
     @Test
-    public void updateWikiPreferencesCache() throws XWikiException, ComponentLookupException
+    void updateWikiPreferencesCache() throws Exception
     {
         addWikiTranslation("wiki.defaulttranslation", "Default translation", Locale.ROOT);
 
-        Assert.assertEquals("Default translation", this.tool.get("wiki.defaulttranslation"));
+        assertEquals("Default translation", this.tool.get("wiki.defaulttranslation"));
 
         XWikiDocument otherWikiTranslation = new XWikiDocument(
             new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "XWiki", "OtherTranslations"));
@@ -246,31 +237,31 @@ public class XWikiMessageToolBridgeTest
 
         setBundles(" " + otherWikiTranslation.getFullName());
 
-        Assert.assertEquals("Other translation", this.tool.get("wiki.othertranslation"));
+        assertEquals("Other translation", this.tool.get("wiki.othertranslation"));
 
-        Assert.assertEquals("wiki.defaulttranslation", this.tool.get("wiki.defaulttranslation"));
+        assertEquals("wiki.defaulttranslation", this.tool.get("wiki.defaulttranslation"));
     }
 
     @Test
-    public void getTranslationWithParameters() throws XWikiException, ComponentLookupException
+    void getTranslationWithParameters() throws Exception
     {
         addWikiTranslation("wiki.translation", "{1} {0}", Locale.ROOT);
 
-        Assert.assertEquals("Parameter translation", this.tool.get("wiki.translation", "translation", "Parameter"));
+        assertEquals("Parameter translation", this.tool.get("wiki.translation", "translation", "Parameter"));
     }
 
     @Test
-    public void getEmptyWikiTranslation() throws XWikiException, ComponentLookupException
+    void getEmptyWikiTranslation() throws Exception
     {
         addWikiTranslation("wiki.translation", "", Locale.ROOT);
 
-        Assert.assertEquals("", this.tool.get("wiki.translation"));
+        assertEquals("", this.tool.get("wiki.translation"));
     }
 
     @Test
-    public void fallbackOnResource() throws XWikiException, ComponentLookupException
+    void fallbackOnResource() throws Exception
     {
-        Assert.assertEquals("Language", this.tool.get("language"));
+        assertEquals("Language", this.tool.get("language"));
 
         XWikiDocument defaultWikiTranslation = this.oldcore.getSpyXWiki()
             .getDocument(this.defaultWikiTranslationReference, this.oldcore.getXWikiContext());
@@ -280,18 +271,18 @@ public class XWikiMessageToolBridgeTest
 
         // ROOT language has been overwritten
         this.oldcore.getXWikiContext().setLocale(Locale.ROOT);
-        Assert.assertEquals("Overwritten language", this.tool.get("language"));
+        assertEquals("Overwritten language", this.tool.get("language"));
 
         // The real locale of ROOT version in FRENCH so it's overwritten too
         this.oldcore.getXWikiContext().setLocale(Locale.FRENCH);
-        Assert.assertEquals("Overwritten language", this.tool.get("language"));
+        assertEquals("Overwritten language", this.tool.get("language"));
 
         // GERMAN hasn't been overwritten
         this.oldcore.getXWikiContext().setLocale(Locale.GERMAN);
-        Assert.assertEquals("Sprache", this.tool.get("language"));
+        assertEquals("Sprache", this.tool.get("language"));
 
         // There is no ENGLISH translation for this key so it fallback on ROOT
         this.oldcore.getXWikiContext().setLocale(Locale.ENGLISH);
-        Assert.assertEquals("Overwritten language", this.tool.get("language"));
+        assertEquals("Overwritten language", this.tool.get("language"));
     }
 }

@@ -25,12 +25,25 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tool-jetty</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
   <name>XWiki Platform - Tools - Jetty - Jetty Configuration Resources</name>
   <packaging>pom</packaging>
   <description>Packages a Jetty installation</description>
+  <properties>
+    <!-- Jetty does not work with the Jakarta Annotation API version for some reason (it does not seems to load it without much explanation in the log) -->
+    <xwiki.enforcer.enforce-jakarta.annotation-api.skip>true</xwiki.enforcer.enforce-jakarta.annotation-api.skip>
+    <!-- Use a different version of Jetty the one used for the Jetty client JARs packaged inside the XWiki WAR.
+         The reason is because our dependencies (mainly Solr) are not necessarily compatibles with this version of Jetty.
+
+         Following versions of some specific Jetty dependencies should be kept in sync when upgrading Jetty.
+    -->
+    <jetty.version>10.0.7</jetty.version>
+    <!-- Jetty requires an alpha version of slf4j -->
+    <slf4j.version>2.0.0-alpha5</slf4j.version>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -38,6 +51,7 @@
       <version>${project.version}</version>
       <optional>true</optional>
     </dependency>
+    <!-- Needed for the org.apache.commons.io.output.TeeOutputStream class used to split the Jetty logs -->
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
@@ -55,8 +69,9 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
-      <!-- In addition we need to specify the version so that it's the one that is required by the version of Jetty used. -->
-      <version>3.1.0</version>
+      <!-- In addition we need to specify the version so that it's the one that is required by the version of Jetty
+           used. -->
+      <version>4.0.1</version>
       <optional>true</optional>
       <scope>compile</scope>
     </dependency>
@@ -76,6 +91,7 @@
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-start</artifactId>
       <version>${jetty.version}</version>
+      <classifier>shaded</classifier>
       <optional>true</optional>
     </dependency>
     <dependency>
@@ -101,6 +117,38 @@
       <artifactId>jetty-jndi</artifactId>
       <version>${jetty.version}</version>
       <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-slf4j-impl</artifactId>
+      <version>${jetty.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-client</artifactId>
+      <version>${jetty.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <!-- Note: We don't provide Jetty Websocket API only JSR356 -->
+    <dependency>
+      <groupId>org.eclipse.jetty.websocket</groupId>
+      <artifactId>websocket-javax-server</artifactId>
+      <version>${jetty.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.websocket</groupId>
+      <artifactId>websocket-javax-client</artifactId>
+      <version>${jetty.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <!-- We need a EL implementation for Hibernate Validator -->
+    <dependency>
+      <groupId>org.mortbay.jasper</groupId>
+      <artifactId>apache-el</artifactId>
+      <optional>true</optional>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
   <build>

@@ -17,23 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package com.xpn.xwiki.criteria.impl;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for the {@link com.xpn.xwiki.criteria.impl.RangeFactory} class.
  */
-public class RangeFactoryTest
+class RangeFactoryTest
 {
     /**
      * Test for {@link RangeFactory#ALL}
      */
     @Test
-    public void testAll()
+    void all()
     {
         doRangeTest(RangeFactory.ALL, 0, 0);
     }
@@ -42,7 +41,7 @@ public class RangeFactoryTest
      * Test for {@link RangeFactory#FIRST}
      */
     @Test
-    public void testFirst()
+    void first()
     {
         doRangeTest(RangeFactory.FIRST, 0, 1);
     }
@@ -51,7 +50,7 @@ public class RangeFactoryTest
      * Test for {@link RangeFactory#LAST}
      */
     @Test
-    public void testLast()
+    void last()
     {
         doRangeTest(RangeFactory.LAST, 0, -1);
     }
@@ -60,7 +59,7 @@ public class RangeFactoryTest
      * Test for {@link RangeFactory#createRange(int, int)}
      */
     @Test
-    public void testCreateRange()
+    void createRange()
     {
         doCreateRangeTest(0, 0);
         doCreateRangeTest(0, 3);
@@ -79,7 +78,7 @@ public class RangeFactoryTest
      * Test for {@link RangeFactory#createHeadRange(int)}
      */
     @Test
-    public void testCreateHeadRange()
+    void createHeadRange()
     {
         doCreateHeadRangeTest(0);
         doCreateHeadRangeTest(3);
@@ -95,7 +94,7 @@ public class RangeFactoryTest
      * Test for {@link RangeFactory#createTailRange(int)}
      */
     @Test
-    public void testCreateTailRange()
+    void createTailRange()
     {
         doCreateTailRangeTest(0);
         doCreateTailRangeTest(3);

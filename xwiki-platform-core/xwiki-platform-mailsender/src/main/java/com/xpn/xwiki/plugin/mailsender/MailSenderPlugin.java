@@ -60,7 +60,9 @@ import org.apache.velocity.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.localization.LocaleUtils;
+import org.xwiki.logging.LoggerConfiguration;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.XWikiVelocityContext;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -499,9 +501,13 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         properties.put("mail.host", "localhost");
         properties.put("mail.debug", "false");
 
-        if (mailConfiguration.getFrom() != null) {
-            properties.put("mail.smtp.from", mailConfiguration.getFrom());
-        }
+        // Important: We don't set the "mail.smtp.from" property because the default behavior of JavaMail is to get
+        // it from the MimeMessage's FROM field  when it's not set (see
+        // https://javaee.github.io/javamail/docs/api/com/sun/mail/smtp/package-summary.html), which is the behavior
+        // we want.
+        // This also avoids setting a bad email address. Indeed, must not have any pretty name or "<" and ">" characters
+        // as that wouldn't obey the RFC5321 (see section 4.1.2 from https://tools.ietf.org/html/rfc5321). Thus if
+        // we were setting the address we would need to get internal address and not the full "pretty" one.
 
         if (mailConfiguration.usesAuthentication()) {
             properties.put("mail.smtp.auth", "true");
@@ -528,7 +534,9 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         if (vcontext == null) {
             // Use the original velocity context as a starting point
             VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
-            vcontext = new VelocityContext(velocityManager.getVelocityContext());
+            LoggerConfiguration loggerConfiguration = Utils.getComponent(LoggerConfiguration.class);
+            vcontext = new XWikiVelocityContext(velocityManager.getVelocityContext(),
+                loggerConfiguration.isDeprecatedLogEnabled());
         }
 
         vcontext.put("from.name", fromAddr);
@@ -556,7 +564,9 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         Map<String, Object> parameters, XWikiContext context)
     {
         VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
-        VelocityContext vcontext = new VelocityContext(velocityManager.getVelocityContext());
+        LoggerConfiguration loggerConfiguration = Utils.getComponent(LoggerConfiguration.class);
+        VelocityContext vcontext = new XWikiVelocityContext(velocityManager.getVelocityContext(),
+            loggerConfiguration.isDeprecatedLogEnabled());
 
         if (parameters != null) {
             for (Map.Entry<String, Object> entry : parameters.entrySet()) {

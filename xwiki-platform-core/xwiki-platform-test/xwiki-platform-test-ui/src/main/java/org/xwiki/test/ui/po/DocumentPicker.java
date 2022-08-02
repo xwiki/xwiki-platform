@@ -22,7 +22,9 @@ package org.xwiki.test.ui.po;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -43,12 +45,14 @@ public class DocumentPicker extends BaseElement
      */
     public DocumentPicker()
     {
-        this.container = getDriver().findElementByClassName("location-picker");
+        this.container = getDriver().findElement(By.className("location-picker"));
+        waitUntilReady();
     }
 
     public DocumentPicker(WebElement container)
     {
         this.container = container;
+        waitUntilReady();
     }
 
     public String getTitle()
@@ -59,6 +63,22 @@ public class DocumentPicker extends BaseElement
     public DocumentPicker setTitle(String title)
     {
         getDriver().setTextInputValue(getTitleInput(), title);
+        return this;
+    }
+
+    /**
+     * Wait until the name field has been changed.
+     * @param name the new name
+     * @return this.
+     */
+    public DocumentPicker waitForName(String name)
+    {
+        try {
+            getDriver().waitUntilCondition(webDriver -> name.equals(getName()));
+        } catch (TimeoutException e) {
+            throw new WebDriverException(String.format("Expecting name: [%s] and obtained name [%s]", name, getName()),
+                e);
+        }
         return this;
     }
 
@@ -117,6 +137,19 @@ public class DocumentPicker extends BaseElement
         return this;
     }
 
+    public DocumentPicker setWiki(String wikiName)
+    {
+        WebElement selectWebElement = this.container.findElement(By.className("location-wiki-field"));
+        if (!selectWebElement.isDisplayed())
+        {
+            toggleLocationAdvancedEdit();
+        }
+
+        Select wikiSelect = new Select(selectWebElement);
+        wikiSelect.selectByValue(wikiName);
+        return this;
+    }
+
     /**
      * Clicks the "pick document" button that triggers a modal pop-up to be displayed.
      * <p>
@@ -131,7 +164,7 @@ public class DocumentPicker extends BaseElement
 
     /**
      * Wait for the Breadcrumb to display the passed path string and throw an exception if the timeout is reached. Note
-     * that we need to wait since the Breadcrumb is udated live and asserting its content without waiting would lead to
+     * that we need to wait since the Breadcrumb is updated live and asserting its content without waiting would lead to
      * false positives.
      * <p>
      * Note: This method can not be implemented inside {@link BreadcrumbElement} because a change of parent replaces
@@ -173,7 +206,7 @@ public class DocumentPicker extends BaseElement
 
     /**
      * Wait for the Breadcrumb to display the passed path and throw an exception if the timeout is reached. Note that we
-     * need to wait since the Breadcrumb is udated live and asserting its content without waiting would lead to false
+     * need to wait since the Breadcrumb is updated live and asserting its content without waiting would lead to false
      * positives.
      * <p>
      * Note: This method can not be implemented inside {@link BreadcrumbElement} because a change of parent replaces
@@ -210,5 +243,43 @@ public class DocumentPicker extends BaseElement
             // Display a nicer error message than would be displayed otherwise
             throw new WebDriverException(String.format("Found %s, was expecting %s", currentPath, expectedPath), e);
         }
+    }
+
+    /**
+     * In order to use the document picker we need to wait for the JavaScript code to initialize it (e.g. to add its
+     * event listeners).
+     */
+    private void waitUntilReady()
+    {
+        List<WebElement> pickAction =
+            getDriver().findElementsWithoutWaiting(this.container, By.className("location-action-pick"));
+        List<WebElement> editAction =
+            getDriver().findElementsWithoutWaiting(this.container, By.className("location-action-edit"));
+        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
+        {
+            @Override
+            public @Nullable Boolean apply(@Nullable WebDriver driver)
+            {
+                // Wait until the document picker JavaScript initialization code is executed.
+                // The pick action is available only if the document tree is available.
+                return (pickAction.isEmpty() || getJQueryListenerCount(pickAction.get(0), "click") > 1)
+                    // The edit action is available only for advanced users.
+                    && (editAction.isEmpty() || getJQueryListenerCount(editAction.get(0), "click") > 0);
+            }
+        });
+    }
+
+    private int getJQueryListenerCount(WebElement element, String event)
+    {
+        StringBuilder script = new StringBuilder();
+        script.append("var element = arguments[0];\n");
+        script.append("var event = arguments[1];\n");
+        script.append("var callback = arguments[2];\n");
+        script.append("require(['jquery'], function($) {\n");
+        // This is internal jQuery API but we'll notice if they change it: the test will fail.
+        script.append("  var listeners = $._data(element, 'events') || {};\n");
+        script.append("  callback((listeners[event] || []).length);\n");
+        script.append("});\n");
+        return ((Long) getDriver().executeAsyncScript(script.toString(), element, event)).intValue();
     }
 }

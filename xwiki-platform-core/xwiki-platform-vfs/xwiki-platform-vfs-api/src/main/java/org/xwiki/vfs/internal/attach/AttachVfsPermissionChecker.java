@@ -61,7 +61,7 @@ public class AttachVfsPermissionChecker implements VfsPermissionChecker
         // request.
 
         AttachmentReference attachmentReference =
-            this.defaultAttachmentReferenceresolver.resolve(resourceReference.getURI().getSchemeSpecificPart());
+            this.defaultAttachmentReferenceresolver.resolve(resourceReference.getReference());
 
         if (!this.authorizationManager.hasAccess(Right.VIEW, attachmentReference)) {
             throw new VfsException(String.format("No View permission for attachment [%s]", attachmentReference));

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-administration</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-administration-ui</artifactId>
   <name>XWiki Platform - Administration - UI</name>
@@ -77,7 +77,7 @@
       <version>${rendering.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- Needed by the template provider UI and probably others in the future. -->
+    <!-- Needed by the Export and Page Templates administration sections, and probably others in the future. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-index-tree-macro</artifactId>
@@ -92,4 +92,24 @@
       <scope>runtime</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
+        <configuration>
+          <entries>
+            <entry>
+              <document>XWiki.ForgotUsernameMailContent</document>
+              <type>customizable</type>
+            </entry>
+            <entry>
+              <document>XWiki.ResetPasswordMailContent</document>
+              <type>customizable</type>
+            </entry>
+          </entries>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

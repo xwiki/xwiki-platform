@@ -1,0 +1,74 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1" locale="de">
+  <web>SkinsCode</web>
+  <name>Translations</name>
+  <language>de</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>SkinsCode.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>skin.sheet.title=Skin
+skin.sheet.properties=Eigenschaften Skin
+skin.sheet.deprecatedProperties=Veraltete Eigenschaften
+skin.sheet.overriddenTemplates=Überschriebene Vorlagen
+skin.sheet.addTemplate=Fügen Sie eine neue überschreibende Vorlage hinzu
+skin.sheet.add=Hinzufügen
+skin.sheet.overrideTemplateWarning=In diesem Abschnitt können Sie eine Skin-Vorlage überschreiben. Dies ist technisch und Sie sollten sich der Konsequenzen bewusst sein.
+skin.sheet.deprecatedPropertiesWarning=Dieser Abschnitt dient der Retrokompatibilität. Sie sollten den obigen Mechanismus „überschriebene Vorlagen“ verwenden.
+skin.sheet.nojs=Ohne JavaScript können Sie diesen Abschnitt nicht verwenden. Aber Sie können stattdessen den {0}Objekt-Editor{1} verwenden und manuell {2}-Objekte hinzufügen.
+skin.sheet.js.deleting=Löschen...
+skin.sheet.js.deletingDone=Die Vorlage wurde gelöscht!
+skin.sheet.js.error.csrf=CSRF-Validierung beim Speichern fehlgeschlagen. Aktualisieren Sie Ihren Browser, um es erneut zu versuchen.
+skin.sheet.js.error.rights=Die Skins konnten aufgrund unzureichender Berechtigungen nicht gespeichert werden.
+skin.sheet.js.deleteConfirmationText=Möchten Sie diese Vorlage wirklich löschen?
+skin.sheet.js.deleteConfirmationYes=Ja, löschen
+skin.sheet.js.deleteConfirmationNo=Nein, abbrechen
+skin.sheet.js.adding=Hinzufügen...
+skin.sheet.js.addingDone=Die Vorlage wurde hinzugefügt!
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 7.1M1
+#######################################
+skin.sheet.overridedTemplates=Überschriebene Vorlagen
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+</xwikidoc>

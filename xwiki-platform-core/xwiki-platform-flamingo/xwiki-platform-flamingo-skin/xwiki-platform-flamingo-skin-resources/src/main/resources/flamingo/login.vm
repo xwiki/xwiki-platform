@@ -1,3 +1,22 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
 #if ($xcontext.user != 'XWiki.XWikiGuest')
   #if ($request.xredirect)
     $response.sendRedirect($request.xredirect)
@@ -31,11 +50,17 @@
   <!-- previous login errors -->
   #error($services.localization.render($message))
 #end
+#set($authFailureStrategyMessage = $services.security.authentication.getErrorMessage($request.j_username))
+#if ("$!authFailureStrategyMessage" != '')
+  #error($authFailureStrategyMessage)
+#end
+#set ($supplementaryForm = $services.security.authentication.getForm($request.j_username))
 <dl>
   <dt>
     <label for="j_username">$services.localization.render('username')</label>
-    #if($xwiki.exists('XWiki.ForgotUsername') && $xwiki.hasAccessLevel('view', 'XWiki.ForgotUsername'))
-      <span class="xAdditional"><a href="$xwiki.getURL('XWiki.ForgotUsername')" tabindex="500">$services.localization.render('xe.admin.forgotUsername.loginMessage')</a></span>
+    #set ($forgotUsernameURL = $services.security.authentication.getAuthenticationURL('retrieveusername', $NULL))
+    #if("$!forgotUsernameURL" != "")
+      <span class="xAdditional"><a href="$forgotUsernameURL" tabindex="500">$services.localization.render('xe.admin.forgotUsername.loginMessage')</a></span>
     #end
   </dt>
   <dd class="input-group">
@@ -44,8 +69,9 @@
   </dd>
   <dt>
     <label for="j_password">$services.localization.render('password')</label>
-    #if($xwiki.exists('XWiki.ResetPassword') && $xwiki.hasAccessLevel('view', 'XWiki.ResetPassword'))
-      <span class="xAdditional"><a href="$xwiki.getURL('XWiki.ResetPassword')" tabindex="600">$services.localization.render('xe.admin.passwordReset.loginMessage')</a></span>
+    #set ($resetPasswordUrl = $services.security.authentication.getAuthenticationURL('resetpassword', $NULL))
+    #if("$!resetPasswordUrl" != '')
+      <span class="xAdditional"><a href="$resetPasswordUrl" tabindex="600">$services.localization.render('xe.admin.passwordReset.loginMessage')</a></span>
     #end
   </dt>
   <dd class="input-group">
@@ -58,6 +84,11 @@
       <input id="rememberme" type="checkbox" name="j_rememberme" value="true" tabindex="300"/> $services.localization.render('remembermeonthiscomp')
     </label>
   </dd>
+  #if ("$!supplementaryForm" != "")
+    <div id="dedicated-auth-failures-field">
+      $supplementaryForm
+    </div>
+  #end
   <dt><input type="submit" class="btn btn-primary col-xs-12" value="$services.localization.render('login')" tabindex="400"/></dt>
 </dl>
 #xwikimessageboxend()
@@ -65,7 +96,7 @@
 </div>## mainContentArea
 </div>## main
 ## Ensure that the username field of the login form has the focus to make it easy for users to log in quickly
-<script type="text/javascript">
+<script>
 //<![CDATA[
   document.forms.loginForm.j_username.focus();
 //]]>

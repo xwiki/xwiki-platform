@@ -31,7 +31,8 @@ import org.xwiki.rest.model.jaxb.SearchResults;
 import org.xwiki.rest.resources.wikis.WikisSearchQueryResource;
 
 /**
- * 
+ * Farm-wide search (across all wikis).
+ *
  * @version $Id$
  * @since 6.4M1
  */
@@ -40,7 +41,8 @@ import org.xwiki.rest.resources.wikis.WikisSearchQueryResource;
 public class WikisSearchQueryResourceImpl extends BaseSearchResult implements WikisSearchQueryResource
 {
     private static final String MULTIWIKI_QUERY_TEMPLATE_INFO =
-        "q={solrquery}(&number={number})(&start={start})(&orderField={fieldname}(&order={asc|desc}))(&distinct=1)(&prettyNames={false|true})(&wikis={wikis})(&className={classname})";
+        "q={solrquery}(&number={number})(&start={start})(&orderField={fieldname}(&order={asc|desc}))(&distinct=1)"
+        + "(&prettyNames={false|true})(&wikis={wikis})(&className={classname})";
 
     @Inject
     @Named("solr")
@@ -60,9 +62,9 @@ public class WikisSearchQueryResourceImpl extends BaseSearchResult implements Wi
                     query,
                     getXWikiContext().getWikiId(),
                     searchWikis,
-                    Utils.getXWiki(componentManager).getRightService()
-                        .hasProgrammingRights(Utils.getXWikiContext(componentManager)), orderField, order, distinct,
-                    number, start, withPrettyNames, className, uriInfo));
+                    Utils.getXWiki(componentManager).getRightService().hasProgrammingRights(
+                        Utils.getXWikiContext(componentManager)), orderField, order, distinct, number, start,
+                        withPrettyNames, className, uriInfo));
 
             return searchResults;
         } catch (Exception e) {

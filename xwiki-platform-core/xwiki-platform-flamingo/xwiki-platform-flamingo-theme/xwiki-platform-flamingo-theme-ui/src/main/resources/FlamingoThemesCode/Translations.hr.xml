@@ -1,0 +1,92 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="FlamingoThemesCode.Translations" locale="hr">
+  <web>FlamingoThemesCode</web>
+  <name>Translations</name>
+  <language>hr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>FlamingoThemesCode.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>platform.flamingo.themes.home.title=Teme za Flamingo
+platform.flamingo.themes.home.currenttheme=Trenutna tema
+platform.flamingo.themes.home.otherthemes=Ostale dostupne teme
+platform.flamingo.themes.home.warningOldColorThemeInstalled=Ovo je aplikacija za upravljanje Flamingo temama. Flamingo tema je prilagodljiva varijanta bilo koje kože koja se temelji na Flamingu. Ako želite upravljati temama boja za kože koje se temelje na Colibriju, trebali biste otići na {0}aplikaciju za Colibri teme za boje{1}.
+platform.flamingo.themes.home.warningCurrentOldColorTheme=Trenutna tema je Colibri tema boja koja nije optimizirana za rad s kožom koja se temelji na Flamingu. Napravili smo najbolje što možemo da bude kompatibilna, ali rezultati bi mogli biti ispod optimalnih.
+platform.flamingo.themes.home.useThisTheme=Upotrijebi ovu temu
+platform.flamingo.themes.home.newThemeName=Ime teme...
+platform.flamingo.themes.home.create=Izradi novu temu
+platform.flamingo.themes.home.create.invalid=Ime teme nije valjano\!
+platform.flamingo.themes.home.create.csrf=Iz sigurnosnih razloga, molim potvrdite da želite izraditi temu imena "{0}".
+platform.flamingo.themes.home.create.confirm=Potvrdi
+platform.flamingo.themes.home.set.success=Tema postavljena na "{0}".
+platform.flamingo.themes.title.variables=Varijable
+platform.flamingo.themes.title.preview=Pretpregled
+platform.flamingo.themes.autorefresh=Automatsko osvježavanje
+platform.flamingo.themes.refresh=Osvježi
+platform.flamingo.themes.refreshwarning=Osvježavanje može potrajati nekoliko sekundi
+platform.flamingo.themes.loading=Učitavanje...
+platform.flamingo.themes.category.logos=Logotipovi
+platform.flamingo.themes.category.base-colors=Osnovne boje
+platform.flamingo.themes.category.typography=Tipografija
+platform.flamingo.themes.category.forms=Forme
+platform.flamingo.themes.category.buttons=Gumbi
+platform.flamingo.themes.category.tables=Tablice
+platform.flamingo.themes.category.navbar=Navigacijska traka
+platform.flamingo.themes.category.dropdowns=Padajući izbornici
+platform.flamingo.themes.category.panels=Paneli
+platform.flamingo.themes.category.breadcrumb=Mrvica
+platform.flamingo.themes.category.advanced=Napredno
+platform.flamingo.themes.defaultvalue=Pretpostavljeno
+platform.flamingo.themes.lessCode.description=U ovo polje možete izravno unijeti LESS kod koji će biti dodan koži.
+platform.flamingo.themes.local=Lokalno
+platform.flamingo.themes.global=Globalno
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+@deprecatedstart
+
+#######################################
+## until 7.3M1
+#######################################
+platform.flamingo.themes.lessCode.warning=Nažalost, ovo polje se ne uzima u obzir kod pretpregleda.
+
+#######################################
+## until 12.9RC1
+#######################################
+platform.flamingo.themes.incompatiblebrowser=Isprike, pretpregled ne radi na ovoj verziji Internet Explorera. Trebate koristiti ažurniji preglednik.
+
+#@deprecatedend</content>
+</xwikidoc>

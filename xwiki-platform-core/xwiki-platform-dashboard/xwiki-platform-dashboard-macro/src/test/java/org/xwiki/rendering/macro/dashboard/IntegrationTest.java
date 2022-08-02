@@ -77,8 +77,6 @@ public class IntegrationTest
             {
                 allowing(mockSsfx).use(with("uicomponents/container/columns.css"), with(any(Map.class)));
                 allowing(mockSsfx).use(with("uicomponents/dashboard/dashboard.css"), with(any(Map.class)));
-                allowing(mockJsfx).use(with("js/scriptaculous/dragdrop.js"));
-                allowing(mockJsfx).use(with("js/scriptaculous/effects.js"));
                 allowing(mockJsfx).use(with("uicomponents/dashboard/dashboard.js"), with(any(Map.class)));
             }
         });

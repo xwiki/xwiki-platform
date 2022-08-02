@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="Main.MessageSenderMacro" locale="">
+<xwikidoc version="1.5" reference="Main.MessageSenderMacro" locale="">
   <web>Main</web>
   <name>MessageSenderMacro</name>
   <language/>
@@ -53,8 +53,11 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -102,6 +105,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -122,9 +127,10 @@
       <code>var XWiki = (function (XWiki) {
 // Start XWiki augmentation.
 XWiki.MessageStream = Class.create({
-  initialize : function() {
-    this.prepareForms();
-    this.enhanceSelect();
+  initialize : function(container) {
+    container = container || $(document.body);
+    this.prepareForms(container);
+    this.enhanceSelect(container);
   },
   prepareTargetInput : function(event, element) {
     var targetType = element.options[element.selectedIndex].value;
@@ -151,14 +157,14 @@ XWiki.MessageStream = Class.create({
       }
     });
   },
-  enhanceSelect: function () {
-    $$('.messagestream select[name="visibilityLevel"]').each(function(element) {
+  enhanceSelect: function (container) {
+    container.select('.messagestream select[name="visibilityLevel"]').each(function(element) {
       element.observe('change', this.prepareTargetInput.bindAsEventListener(this, element));
       this.prepareTargetInput(null, element);
     }.bind(this));
   },
-  prepareForms: function() {
-    $$('.messagestream form').each(function(msForm) {
+  prepareForms: function(container) {
+    container.select('.messagestream form').each(function(msForm) {
       msForm.action = msForm.action.replace(/xredirect=.*$/, 'xpage=plain')
       msForm.observe('submit', function(event) {
         event.stop();
@@ -184,12 +190,7 @@ XWiki.MessageStream = Class.create({
               document.fire('xwiki:activity:newActivity', msForm);
             },
             onFailure: function(response) {
-              var failureReason = '';
-              if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-                failureReason = 'Server not responding';
-              } else {
-                failureReason = response.statusText;
-              }
+              var failureReason = response.statusText || 'Server not responding';
               if (msForm) {
                 msForm._disabled = false
                 if (msForm._notification) {
@@ -197,9 +198,6 @@ XWiki.MessageStream = Class.create({
                 }
                 msForm._notification = new XWiki.widgets.Notification("$services.localization.render('xe.activity.messages.submit.failed'): " + failureReason, 'error');
               }
-            },
-            on1223 : function(response) { /*SUCCESS*/
-              response.request.options.onSuccess(response);
             },
             on0 : function(response) {  /*FAILURE*/
               response.request.options.onFailure(response);
@@ -214,10 +212,20 @@ XWiki.MessageStream = Class.create({
   }
 });
 
-var init = function() {
-  return new XWiki.MessageStream();
+var init = function (event) {
+  var elements = (event &amp;&amp; event.memo.elements) || [$(document.body)];
+  elements.forEach(function(container) {
+    new XWiki.MessageStream(container);
+  });
+  return true;
 };
-(XWiki.domIsLoaded &amp;&amp; init()) || document.observe('xwiki:dom:loaded', init);
+
+// Initialize the message sender macro when the page is loaded.
+(XWiki.domIsLoaded &amp;&amp; init())
+|| document.observe('xwiki:dom:loaded', init);
+
+// Initialize the message sender macro when it is added after the page is loaded.
+document.observe('xwiki:dom:updated', init);
 
 // End XWiki augmentation.
 return XWiki;
@@ -249,11 +257,14 @@ return XWiki;
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
-        <number>6</number>
+        <number>5</number>
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -268,7 +279,7 @@ return XWiki;
         <disabled>0</disabled>
         <editor>PureText</editor>
         <name>code</name>
-        <number>3</number>
+        <number>2</number>
         <prettyName>Code</prettyName>
         <rows>20</rows>
         <size>50</size>
@@ -279,9 +290,11 @@ return XWiki;
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
-        <number>1</number>
+        <number>6</number>
         <prettyName>Content Type</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -294,7 +307,7 @@ return XWiki;
       <name>
         <disabled>0</disabled>
         <name>name</name>
-        <number>2</number>
+        <number>1</number>
         <prettyName>Name</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
@@ -305,7 +318,7 @@ return XWiki;
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
         <name>parse</name>
-        <number>5</number>
+        <number>4</number>
         <prettyName>Parse content</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -314,9 +327,11 @@ return XWiki;
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
-        <number>4</number>
+        <number>3</number>
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -407,11 +422,51 @@ return XWiki;
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>13</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>14</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>, </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>12</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
       <code>
         <disabled>0</disabled>
         <editor>Text</editor>
         <name>code</name>
-        <number>9</number>
+        <number>10</number>
         <prettyName>Macro code</prettyName>
         <rows>20</rows>
         <size>40</size>
@@ -423,21 +478,43 @@ return XWiki;
         <disabled>0</disabled>
         <editor>PureText</editor>
         <name>contentDescription</name>
-        <number>8</number>
+        <number>9</number>
         <prettyName>Content description (Not applicable for "No content" type)</prettyName>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </contentDescription>
+      <contentJavaType>
+        <cache>0</cache>
+        <defaultValue>Unknown</defaultValue>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>1</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentJavaType</name>
+        <number>8</number>
+        <picker>1</picker>
+        <prettyName>Macro content type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Unknown|Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentJavaType>
       <contentType>
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>7</number>
-        <prettyName>Macro content type</prettyName>
+        <prettyName>Macro content availability</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator>|</separator>
         <separators>|</separators>
@@ -446,15 +523,24 @@ return XWiki;
         <values>Optional|Mandatory|No content</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </contentType>
-      <defaultCategory>
+      <defaultCategories>
+        <cache>0</cache>
         <disabled>0</disabled>
-        <name>defaultCategory</name>
+        <displayType>input</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>defaultCategories</name>
         <number>4</number>
-        <prettyName>Default category</prettyName>
-        <size>30</size>
+        <prettyName>Default categories</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </defaultCategory>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </defaultCategories>
       <description>
         <contenttype>PureText</contenttype>
         <disabled>0</disabled>
@@ -485,6 +571,16 @@ return XWiki;
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <priority>
+        <disabled>0</disabled>
+        <name>priority</name>
+        <number>11</number>
+        <numberType>integer</numberType>
+        <prettyName>Priority</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </priority>
       <supportsInlineMode>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -499,6 +595,8 @@ return XWiki;
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>visibility</name>
         <number>6</number>
@@ -512,6 +610,15 @@ return XWiki;
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </visibility>
     </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
     <property>
       <code>{{velocity output='false'}}
 #* Duplicate code (from Main.Activity) START *#
@@ -713,10 +820,15 @@ return XWiki;
       <contentDescription/>
     </property>
     <property>
+      <contentJavaType/>
+    </property>
+    <property>
       <contentType>No content</contentType>
     </property>
     <property>
-      <defaultCategory>Social</defaultCategory>
+      <defaultCategories>
+        <value>Social</value>
+      </defaultCategories>
     </property>
     <property>
       <description>A control that allows users to enter messages that are handled by the MessageStream module.</description>
@@ -726,6 +838,9 @@ return XWiki;
     </property>
     <property>
       <name>Message Sender</name>
+    </property>
+    <property>
+      <priority/>
     </property>
     <property>
       <supportsInlineMode>0</supportsInlineMode>
@@ -758,7 +873,6 @@ return XWiki;
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
       <description>
-        <contenttype/>
         <disabled>0</disabled>
         <name>description</name>
         <number>2</number>
@@ -787,6 +901,15 @@ return XWiki;
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -803,6 +926,9 @@ Valid values are: 'everyone', 'followers', 'group' or 'user'. </description>
     </property>
     <property>
       <name>visibility</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -829,7 +955,6 @@ Valid values are: 'everyone', 'followers', 'group' or 'user'. </description>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
       <description>
-        <contenttype/>
         <disabled>0</disabled>
         <name>description</name>
         <number>2</number>
@@ -858,6 +983,15 @@ Valid values are: 'everyone', 'followers', 'group' or 'user'. </description>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -870,6 +1004,9 @@ Valid values are: 'everyone', 'followers', 'group' or 'user'. </description>
     </property>
     <property>
       <name>visibilityParameter</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -896,7 +1033,6 @@ Valid values are: 'everyone', 'followers', 'group' or 'user'. </description>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
       <description>
-        <contenttype/>
         <disabled>0</disabled>
         <name>description</name>
         <number>2</number>
@@ -925,6 +1061,15 @@ Valid values are: 'everyone', 'followers', 'group' or 'user'. </description>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -932,13 +1077,16 @@ Valid values are: 'everyone', 'followers', 'group' or 'user'. </description>
     <property>
       <description>Comma separated list of visibility options that the macro should allow the user to choose from.
 
-This list should be a sublist of the defualt ones: 'everyone', 'followers', 'group', 'user'.</description>
+This list should be a sublist of the default ones: 'everyone', 'followers', 'group', 'user'.</description>
     </property>
     <property>
       <mandatory/>
     </property>
     <property>
       <name>visibilityOptions</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
 </xwikidoc>

@@ -23,13 +23,15 @@ import java.util.Collections;
 
 import javax.mail.MessagingException;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 /**
@@ -38,26 +40,25 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  * @since 6.1RC1
  */
+@ComponentTest
 public class SecureMailTemplateManagerTest
 {
-    @Rule
-    public MockitoComponentMockingRule<SecureMailTemplateManager> mocker =
-        new MockitoComponentMockingRule<>(SecureMailTemplateManager.class);
+    @InjectMockComponents
+    private SecureMailTemplateManager mailTemplateManager;
+
+    @MockComponent
+    private DocumentAccessBridge dab;
 
     @Test
-    public void evaluateWhenNotAuthorized() throws Exception
+    void evaluateWhenNotAuthorized()
     {
         DocumentReference reference = new DocumentReference("wiki", "space", "page");
+        when(this.dab.getCurrentUserReference()).thenReturn(new DocumentReference("userwiki", "userspace", "userpage"));
 
-        DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
-        when(dab.getCurrentUserReference()).thenReturn(new DocumentReference("userwiki", "userspace", "userpage"));
-
-        try {
-            this.mocker.getComponentUnderTest().evaluate(reference, "property", Collections.<String, Object>emptyMap());
-            fail("Should have thrown an exception");
-        } catch (MessagingException expected) {
-            assertEquals("Current user [userwiki:userspace.userpage] has no permission to view Mail Template "
-                + "Document [wiki:space.page]", expected.getMessage());
-        }
+        Throwable exception = assertThrows(MessagingException.class, () -> {
+            this.mailTemplateManager.evaluate(reference, "property", Collections.emptyMap());
+        });
+        assertEquals("Current user [userwiki:userspace.userpage] has no permission to view Mail Template "
+            + "Document [wiki:space.page]", exception.getMessage());
     }
 }

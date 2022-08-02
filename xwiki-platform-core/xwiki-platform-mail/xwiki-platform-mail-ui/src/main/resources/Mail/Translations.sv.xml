@@ -75,6 +75,5 @@ Mail.GeneralMailConfigClass_obfuscate=Förvräng epostadresser
 ### Missing: Mail.SendMailStatus_livetable.actions=Actions
 ### Missing: Mail.SendMailStatus_livetable.resend=Resend
 ### Missing: mailSender.admin.resendSuccess=The mail has been resent successfully
-### Missing: mailSender.admin.resendFailure=Failed to resend. Click for more details.
-</content>
+### Missing: mailSender.admin.resendFailure=Failed to resend. Click for more details.</content>
 </xwikidoc>

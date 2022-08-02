@@ -44,7 +44,7 @@ public class XWikiSpace
     private static final LocalStringEntityReferenceSerializer SERIALIZER =
         new LocalStringEntityReferenceSerializer(new DefaultSymbolScheme());
 
-    private final XWikiStoreInterface store;
+    private XWikiStoreInterface store;
 
     /**
      * Synthetic id.
@@ -113,12 +113,35 @@ public class XWikiSpace
     }
 
     /**
+     * Set the store of the space.
+     *
+     * @param store the store to set.
+     * @since 12.5RC1
+     */
+    public void setStore(XWikiStoreInterface store)
+    {
+        this.store = store;
+    }
+
+    /**
+     * Compute a XWikiSpace ID based on a reference.
+     *
+     * @param spaceReference the reference from which to compute the ID
+     * @return an ID that can be used to retrieve the space in DB.
+     * @since 12.5RC1
+     */
+    public static long getId(SpaceReference spaceReference)
+    {
+        return Util.getHash(LocalUidStringEntityReferenceSerializer.INSTANCE.serialize(spaceReference));
+    }
+
+    /**
      * @return the synthetic id of this deleted document. unique only for document.
      */
     public long getId()
     {
         if (this.id == null) {
-            this.id = Util.getHash(LocalUidStringEntityReferenceSerializer.INSTANCE.serialize(getSpaceReference()));
+            this.id = getId(getSpaceReference());
         }
 
         return this.id;

@@ -34,11 +34,10 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
-import org.xwiki.refactoring.internal.LinkRefactoring;
 import org.xwiki.refactoring.internal.ModelBridge;
+import org.xwiki.refactoring.internal.ReferenceUpdater;
 import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.CoreConfiguration;
@@ -84,6 +83,7 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
         // Make sure response.encodeURL() calls don't fail
         Mock xwikiResponse = mock(XWikiResponse.class);
         xwikiResponse.stubs().method("setLocale");
+        xwikiResponse.stubs().method("addCookie");
         xwikiResponse.stubs().method("encodeURL").will(
             new CustomStub("Implements XWikiResponse.encodeURL")
             {
@@ -172,7 +172,7 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
 
         // Avoid error when loading components for refactoring-api
         registerMockComponent(ModelBridge.class);
-        registerMockComponent(LinkRefactoring.class);
+        registerMockComponent(ReferenceUpdater.class);
     }
 
     @Override

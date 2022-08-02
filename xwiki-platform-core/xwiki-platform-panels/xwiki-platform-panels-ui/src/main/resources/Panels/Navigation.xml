@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="Panels.Navigation" locale="">
+<xwikidoc version="1.5" reference="Panels.Navigation" locale="">
   <web>Panels</web>
   <name>Navigation</name>
   <language/>
@@ -57,7 +57,7 @@
         <displayFormType>select</displayFormType>
         <displayType/>
         <name>async_cached</name>
-        <number>2</number>
+        <number>7</number>
         <prettyName>Cached</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -66,16 +66,18 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>1</multiSelect>
         <name>async_context</name>
-        <number>3</number>
+        <number>8</number>
         <prettyName>Context elements</prettyName>
         <relationalStorage>0</relationalStorage>
-        <separator> </separator>
+        <separator>, </separator>
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>author|doc.reference|wiki|request.parameters|request.url|locale|user</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -84,7 +86,7 @@
         <displayFormType>select</displayFormType>
         <displayType/>
         <name>async_enabled</name>
-        <number>1</number>
+        <number>6</number>
         <prettyName>Asynchronous rendering</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -93,9 +95,11 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>category</name>
-        <number>5</number>
+        <number>1</number>
         <prettyName>Category</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -109,7 +113,7 @@
         <disabled>0</disabled>
         <editor>Text</editor>
         <name>content</name>
-        <number>4</number>
+        <number>5</number>
         <prettyName>Executed Content</prettyName>
         <rows>25</rows>
         <size>120</size>
@@ -120,7 +124,7 @@
         <disabled>0</disabled>
         <editor>Text</editor>
         <name>description</name>
-        <number>6</number>
+        <number>2</number>
         <prettyName>Description</prettyName>
         <rows>5</rows>
         <size>40</size>
@@ -130,7 +134,7 @@
       <name>
         <disabled>0</disabled>
         <name>name</name>
-        <number>7</number>
+        <number>3</number>
         <prettyName>Name</prettyName>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -140,9 +144,11 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>type</name>
-        <number>8</number>
+        <number>4</number>
         <prettyName>Panel type</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -159,8 +165,8 @@
     <property>
       <async_context>
         <value>doc.reference</value>
-        <value>wiki</value>
         <value>locale</value>
+        <value>wiki</value>
       </async_context>
     </property>
     <property>
@@ -176,27 +182,54 @@
 #set ($openToDoc = $doc.documentReference.toString().replaceAll('([~"])', '~$1'))
 ## Apply the configured page exclusions.
 #set ($config = $xwiki.getDocument('PanelsCode.NavigationConfiguration'))
-#set ($exclusions = $collectionstool.set)
+#set ($exclusions = $collectiontool.set)
+#set ($defaultDocumentName = $services.model.getEntityReference('DOCUMENT', 'default').name)
+## Exclude top level extension pages.
 #if ($config.getValue('excludeTopLevelExtensionPages') == 1)
   #set ($query = $services.query.hql('select space.name from XWikiSpace space where space.parent is null'))
   #set ($discard = $query.addFilter('hidden/space'))
-  #set ($defaultDocumentName = $services.model.getEntityReference('DOCUMENT', 'default').name)
   #foreach ($result in $query.execute())
     #set ($documentReference = $services.model.createDocumentReference($NULL, $result, $defaultDocumentName))
     #set ($installedExtensions = $services.extension.xar.getInstalledExtensions($documentReference))
     #if ($installedExtensions &amp;&amp; $installedExtensions.size() &gt; 0
         &amp;&amp; !$services.extension.xar.isEditAllowed($documentReference))
-      #set ($discard = $exclusions.add("document:$documentReference"))
+      #set ($discard = $exclusions.add("space:$services.model.escape($result, 'SPACE')"))
     #end
   #end
-  #foreach ($inclusion in $config.getValue('inclusions'))
-    #set ($documentReference = $services.model.resolveDocument($inclusion))
-    #set ($discard = $exclusions.remove("document:$documentReference"))
+#end
+## Exclude top level application pages.
+#if ($config.getValue('excludeTopLevelApplicationPages') == 1)
+  #set ($statement = 'select space.name '
+    + 'from XWikiSpace as space, Document as doc, doc.object(AppWithinMinutes.LiveTableClass) as app '
+    + 'where space.parent is null and doc.space = space.reference')
+  #set ($query = $services.query.xwql($statement).addFilter('hidden/space'))
+  #foreach ($result in $query.execute())
+    #set ($discard = $exclusions.add("space:$services.model.escape($result, 'SPACE')"))
   #end
 #end
+## Inclusions are treated as exceptions to the dynamic exclusion filters.
+#if ($config.getValue('excludeTopLevelExtensionPages') == 1 || $config.getValue('excludeTopLevelApplicationPages') == 1)
+  ## FIXME: This panel is cached and the cache is not invalidated by default when an extension is installed or
+  ## uninstalled and neither when an application is created, deleted or renamed. Ideally we should invalidate the cache
+  ## whenever a top level page is created or modified but we can't do this ATM so the next best thing is to invalidate
+  ## the cache whenever a page (anywhere in the page hierarchy) is modified.
+  #set ($discard = $services.async.useEntity("wiki:$xcontext.database"))
+  #foreach ($inclusion in $config.getValue('inclusions'))
+    #set ($documentReference = $services.model.resolveDocument($inclusion))
+    ## Dynamic exclusion filters target only top level pages and thus inclusions, which are treated as exceptions to
+    ## those filters, should target also top level pages.
+    #set ($discard = $exclusions.remove("space:$services.model.serialize($documentReference.lastSpaceReference,
+      'local')"))
+  #end
+#end
+## Other page exclusions.
 #foreach ($exclusion in $config.getValue('exclusions'))
-  #set ($documentReference = $services.model.resolveDocument($exclusion))
-  #set ($discard = $exclusions.add("document:$documentReference"))
+  #set ($exclusionReference = $services.model.resolveDocument($exclusion))
+  #if ($exclusionReference.name == $defaultDocumentName)
+    #set ($exclusionReference = $exclusionReference.lastSpaceReference)
+  #end
+  #set ($discard = $exclusions.add($exclusionReference.type.lowerCase + ':'
+    + $services.model.serialize($exclusionReference, 'local')))
 #end
 #set ($exclusions = $stringtool.join($exclusions, ','))
 {{documentTree showTranslations="false" showAttachments="false" compact="true" openTo="document:$openToDoc"

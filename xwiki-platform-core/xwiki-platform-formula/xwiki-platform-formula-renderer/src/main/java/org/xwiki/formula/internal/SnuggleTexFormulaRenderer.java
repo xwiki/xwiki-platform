@@ -22,6 +22,8 @@ package org.xwiki.formula.internal;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -60,6 +62,9 @@ public final class SnuggleTexFormulaRenderer extends AbstractFormulaRenderer
     /** Logging helper object. */
     private static final Logger LOGGER = LoggerFactory.getLogger(SnuggleTexFormulaRenderer.class);
 
+    /** The list of image types supported by the renderer. */
+    private static final List<Type> ALLOWED_TYPES = Arrays.asList(Type.JPEG, Type.PNG, Type.GIF);
+
     /** The SnuggleTeX engine responsible for rendering the formulae. */
     private SnuggleEngine engine = new SnuggleEngine();
 
@@ -67,6 +72,11 @@ public final class SnuggleTexFormulaRenderer extends AbstractFormulaRenderer
     protected ImageData renderImage(String formula, boolean inline, FormulaRenderer.FontSize size,
         FormulaRenderer.Type type) throws IllegalArgumentException, IOException
     {
+        if (!ALLOWED_TYPES.contains(type)) {
+            throw new IllegalArgumentException(String.format("The image type [%s] is not supported by the SnuggleTeX "
+                + "formula renderer.", type.getMimetype()));
+        }
+
         SnuggleSession session = this.engine.createSession();
 
         SnuggleInput input = new SnuggleInput(wrapFormula(formula, inline));

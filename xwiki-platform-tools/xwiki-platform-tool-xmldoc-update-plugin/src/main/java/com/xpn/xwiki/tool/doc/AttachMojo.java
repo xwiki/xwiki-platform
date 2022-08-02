@@ -113,6 +113,7 @@ public class AttachMojo extends AbstractDocumentMojo
 
             attachment.setAuthor(author);
             attachment.setFilename(file.getName());
+            attachment.resetMimeType(null);
 
             return attachment;
         } catch (Exception e) {

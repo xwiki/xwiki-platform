@@ -35,6 +35,7 @@ import org.xwiki.job.AbstractJobStatus;
 import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceProvider;
@@ -44,20 +45,25 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.refactoring.internal.job.PermanentlyDeleteJob;
+import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.parentchild.ParentChildConfiguration;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.web.Utils;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -87,7 +93,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class DefaultModelBridgeTest
+class DefaultModelBridgeTest
 {
     @RegisterExtension
     LogCaptureExtension logCapture = new LogCaptureExtension();
@@ -102,9 +108,15 @@ public class DefaultModelBridgeTest
     @MockComponent
     @Named("compact")
     private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
-  
+
     @MockComponent
     private JobProgressManager progressManager;
+
+    @MockComponent
+    private AuthorizationManager authorization;
+
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
 
     @Mock
     private XWikiContext xcontext;
@@ -116,18 +128,28 @@ public class DefaultModelBridgeTest
     private XWikiRecycleBinStoreInterface recycleBin;
 
     @Mock
+    private XWikiStoreInterface store;
+
+    @Mock
     private AbstractCheckRightsRequest request;
 
-    @BeforeEach
-    public void configure(MockitoComponentManager mocker) throws Exception
-    {
-        when(this.xcontext.getWiki()).thenReturn(xwiki);
-        when(xwiki.getRecycleBinStore()).thenReturn(recycleBin);
+    @Mock
+    private XWikiRightService xWikiRightService;
 
-        Provider<XWikiContext> xcontextProvider = mocker.getInstance(XWikiContext.TYPE_PROVIDER);
+    @BeforeEach
+    void configure(MockitoComponentManager componentManager) throws Exception
+    {
+        when(this.xcontext.getWiki()).thenReturn(this.xwiki);
+        when(xwiki.getRecycleBinStore()).thenReturn(this.recycleBin);
+        when(xwiki.getStore()).thenReturn(this.store);
+        when(xwiki.getRightService()).thenReturn(this.xWikiRightService);
+
+        Provider<XWikiContext> xcontextProvider = componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
         when(xcontextProvider.get()).thenReturn(this.xcontext);
 
-        EntityReferenceProvider entityReferenceProvider = mocker.getInstance(EntityReferenceProvider.class);
+        Utils.setComponentManager(this.componentManager);
+
+        EntityReferenceProvider entityReferenceProvider = componentManager.getInstance(EntityReferenceProvider.class);
         when(entityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
             .thenReturn(new DocumentReference("what", "ever", "WebHome"));
         when(entityReferenceProvider.getDefaultReference(EntityType.SPACE))
@@ -137,8 +159,8 @@ public class DefaultModelBridgeTest
     private void assertLog(Level level, String message, Object... arguments)
     {
         ILoggingEvent log = this.logCapture.getLogEvent(0);
-        assertEquals(level, log.getLevel());
         assertEquals(message, log.getMessage());
+        assertEquals(level, log.getLevel());
         assertArrayEquals(arguments, log.getArgumentArray());
     }
 
@@ -151,7 +173,7 @@ public class DefaultModelBridgeTest
     }
 
     @Test
-    public void create(MockitoComponentManager mocker) throws Exception
+    void create() throws Exception
     {
         XWikiDocument document = mock(XWikiDocument.class);
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
@@ -164,7 +186,18 @@ public class DefaultModelBridgeTest
     }
 
     @Test
-    public void copy() throws Exception
+    void createWithException() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
+        when(this.xcontext.getWiki().getDocument(documentReference, this.xcontext)).thenThrow(new XWikiException());
+
+        this.modelBridge.create(documentReference);
+
+        assertLog(Level.ERROR, "Failed to create document [{}].", documentReference);
+    }
+
+    @Test
+    void copy() throws Exception
     {
         DocumentReference sourceReference = new DocumentReference("wiki", "Space", "Page", Locale.FRENCH);
         DocumentReference copyReference = new DocumentReference("wiki", "Space", "Copy");
@@ -177,7 +210,7 @@ public class DefaultModelBridgeTest
     }
 
     @Test
-    public void deleteTranslation() throws Exception
+    void deleteTranslation() throws Exception
     {
         XWikiDocument sourceDocument = mock(XWikiDocument.class);
         DocumentReference sourceReference = new DocumentReference("wiki", "Space", "Page", Locale.FRENCH);
@@ -186,12 +219,40 @@ public class DefaultModelBridgeTest
 
         this.modelBridge.delete(sourceReference);
 
-        verify(this.xcontext.getWiki()).deleteDocument(sourceDocument, this.xcontext);
-        assertLog(Level.INFO, "Document [{}] has been deleted.", sourceReference);
+        verify(this.xcontext.getWiki()).deleteDocument(sourceDocument, true, this.xcontext);
+        assertLog(Level.INFO, "Document [{}] has been deleted (to the recycle bin: [{}]).", sourceReference, true);
     }
 
     @Test
-    public void deleteAllTranslations() throws Exception
+    void deleteAndSkipTheRecycleBin() throws Exception
+    {
+        XWikiDocument sourceDocument = mock(XWikiDocument.class);
+        DocumentReference sourceReference = new DocumentReference("wiki", "Space", "Page", Locale.FRENCH);
+        when(this.xcontext.getWiki().getDocument(sourceReference, this.xcontext)).thenReturn(sourceDocument);
+        when(sourceDocument.getTranslation()).thenReturn(1);
+
+        this.modelBridge.delete(sourceReference, true);
+
+        verify(this.xcontext.getWiki()).deleteDocument(sourceDocument, false, this.xcontext);
+        assertLog(Level.INFO, "Document [{}] has been deleted (to the recycle bin: [{}]).", sourceReference, false);
+    }
+
+    @Test
+    void deleteAndThrowException() throws Exception
+    {
+        XWikiDocument sourceDocument = mock(XWikiDocument.class);
+        DocumentReference sourceReference = new DocumentReference("wiki", "Space", "Page", Locale.FRENCH);
+        when(this.xcontext.getWiki().getDocument(sourceReference, this.xcontext)).thenThrow(new XWikiException());
+        when(sourceDocument.getTranslation()).thenReturn(1);
+
+        boolean actual = this.modelBridge.delete(sourceReference, false);
+
+        assertFalse(actual);
+        assertLog(Level.ERROR, "Failed to delete document [{}] (to the recycle bin: [{}]).", sourceReference, true);
+    }
+
+    @Test
+    void deleteAllTranslations() throws Exception
     {
         DocumentReference sourceReference = new DocumentReference("wiki", "Space", "Page");
 
@@ -201,12 +262,13 @@ public class DefaultModelBridgeTest
 
         this.modelBridge.delete(sourceReference);
 
-        verify(this.xcontext.getWiki()).deleteAllDocuments(sourceDocument, this.xcontext);
-        assertLog(Level.INFO, "Document [{}] has been deleted with all its translations.", sourceReference);
+        verify(this.xcontext.getWiki()).deleteAllDocuments(sourceDocument, true, this.xcontext);
+        assertLog(Level.INFO, "Document [{}] has been deleted with all its translations (to the recycle bin: [{}]).",
+            sourceReference, true);
     }
 
     @Test
-    public void createRedirect() throws Exception
+    void createRedirect() throws Exception
     {
         DocumentReference oldReference = new DocumentReference("wiki", "Space", "Old");
         DocumentReference newReference = new DocumentReference("wiki", "Space", "New");
@@ -226,22 +288,22 @@ public class DefaultModelBridgeTest
     }
 
     @Test
-    public void getDocumentReferences(MockitoComponentManager mocker) throws Exception
+    void getDocumentReferences(MockitoComponentManager componentManager) throws Exception
     {
         SpaceReference spaceReference = new SpaceReference("wiki", "Space");
 
         Query query = mock(Query.class);
-        QueryManager queryManager = mocker.getInstance(QueryManager.class);
+        QueryManager queryManager = componentManager.getInstance(QueryManager.class);
         when(queryManager.createQuery(any(), any())).thenReturn(query);
 
         EntityReferenceSerializer<String> localEntityReferenceSerializer =
-            mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
+            componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
         when(localEntityReferenceSerializer.serialize(spaceReference)).thenReturn("Space");
 
         when(query.execute()).thenReturn(Arrays.<Object>asList("Page"));
 
         DocumentReferenceResolver<String> explicitDocumentReferenceResolver =
-            mocker.getInstance(DocumentReferenceResolver.TYPE_STRING, "explicit");
+            componentManager.getInstance(DocumentReferenceResolver.TYPE_STRING, "explicit");
         DocumentReference documentReference = new DocumentReference("Page", spaceReference);
         when(explicitDocumentReferenceResolver.resolve("Page", spaceReference)).thenReturn(documentReference);
 
@@ -253,7 +315,7 @@ public class DefaultModelBridgeTest
     }
 
     @Test
-    public void updateParentFields(MockitoComponentManager mocker) throws Exception
+    void updateParentFields(MockitoComponentManager componentManager) throws Exception
     {
         DocumentReference oldParentReference = new DocumentReference("wiki", "Space", "Old");
         DocumentReference newParentReference = new DocumentReference("wiki", "Space", "New");
@@ -266,7 +328,7 @@ public class DefaultModelBridgeTest
         when(oldParentDocument.getChildrenReferences(this.xcontext))
             .thenReturn(Arrays.asList(child1Reference, child2Reference));
 
-        JobProgressManager mockProgressManager = mocker.getInstance(JobProgressManager.class);
+        JobProgressManager mockProgressManager = componentManager.getInstance(JobProgressManager.class);
 
         XWikiDocument child1Document = mock(XWikiDocument.class);
         when(this.xcontext.getWiki().getDocument(child1Reference, this.xcontext)).thenReturn(child1Document);
@@ -288,7 +350,7 @@ public class DefaultModelBridgeTest
     }
 
     @Test
-    public void updateParentFieldsNoChildren(MockitoComponentManager mocker) throws Exception
+    void updateParentFieldsNoChildren(MockitoComponentManager componentManager) throws Exception
     {
         DocumentReference oldParentReference = new DocumentReference("wiki", "Space", "Old");
         DocumentReference newParentReference = new DocumentReference("wiki", "Space", "New");
@@ -299,7 +361,7 @@ public class DefaultModelBridgeTest
         when(oldParentDocument.getChildrenReferences(this.xcontext))
             .thenReturn(Collections.<DocumentReference>emptyList());
 
-        JobProgressManager mockProgressManager = mocker.getInstance(JobProgressManager.class);
+        JobProgressManager mockProgressManager = componentManager.getInstance(JobProgressManager.class);
 
         this.modelBridge.updateParentField(oldParentReference, newParentReference);
 
@@ -309,7 +371,7 @@ public class DefaultModelBridgeTest
     }
 
     @Test
-    public void updateTitle() throws Exception
+    void updateTitle() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
         XWikiDocument document = mock(XWikiDocument.class);
@@ -317,7 +379,8 @@ public class DefaultModelBridgeTest
 
         DocumentReference hierarchicalParent = new DocumentReference("wiki", Arrays.asList("Path", "To"), "WebHome");
         String serializedParent = "xwiki:Path.To.WebHome";
-        when(this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference)).thenReturn(serializedParent);
+        when(this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference))
+            .thenReturn(serializedParent);
         when(this.relativeStringEntityReferenceResolver.resolve(serializedParent, EntityType.DOCUMENT))
             .thenReturn(hierarchicalParent);
 
@@ -329,7 +392,7 @@ public class DefaultModelBridgeTest
     }
 
     @Test
-    public void updateParentWhenPageIsTerminal() throws Exception
+    void updateParentWhenPageIsTerminal() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
         XWikiDocument document = mock(XWikiDocument.class);
@@ -337,7 +400,8 @@ public class DefaultModelBridgeTest
         when(document.getParentReference()).thenReturn(new DocumentReference("wiki", "What", "Ever"));
         DocumentReference hierarchicalParent = new DocumentReference("wiki", Arrays.asList("Path", "To"), "WebHome");
         String serializedParent = "xwiki:Path.To.WebHome";
-        when(this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference)).thenReturn(serializedParent);
+        when(this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference))
+            .thenReturn(serializedParent);
         when(this.relativeStringEntityReferenceResolver.resolve(serializedParent, EntityType.DOCUMENT))
             .thenReturn(hierarchicalParent.getLocalDocumentReference());
 
@@ -349,7 +413,7 @@ public class DefaultModelBridgeTest
     }
 
     @Test
-    public void dontUpdateParentDifferentWikiSameSpace() throws Exception
+    void dontUpdateParentDifferentWikiSameSpace() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
         XWikiDocument document = mock(XWikiDocument.class);
@@ -361,7 +425,8 @@ public class DefaultModelBridgeTest
 
         DocumentReference hierarchicalParent = new DocumentReference("wiki", Arrays.asList("Path", "To"), "WebHome");
         String serializedParent = "wiki:Path.To.WebHome";
-        when(this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference)).thenReturn(serializedParent);
+        when(this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference))
+            .thenReturn(serializedParent);
         when(this.relativeStringEntityReferenceResolver.resolve(serializedParent, EntityType.DOCUMENT))
             .thenReturn(hierarchicalParent.getLocalDocumentReference());
 
@@ -369,11 +434,12 @@ public class DefaultModelBridgeTest
 
         // no need to update the parent: different wiki but same relative reference
         verify(document, never()).setParentReference(hierarchicalParent.getLocalDocumentReference());
-        verify(this.xcontext.getWiki(), never()).saveDocument(document, "Update document after refactoring.", true, xcontext);
+        verify(this.xcontext.getWiki(), never()).saveDocument(document, "Update document after refactoring.", true,
+            xcontext);
     }
 
     @Test
-    public void dontUpdateParentInCaseOfPageRename() throws Exception
+    void dontUpdateParentInCaseOfPageRename() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "Foo"), "WebHome");
         XWikiDocument document = mock(XWikiDocument.class);
@@ -385,7 +451,8 @@ public class DefaultModelBridgeTest
 
         DocumentReference hierarchicalParent = new DocumentReference("wiki", Arrays.asList("Path"), "WebHome");
         String serializedParent = "wiki:Path.WebHome";
-        when(this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference)).thenReturn(serializedParent);
+        when(this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference))
+            .thenReturn(serializedParent);
         when(this.relativeStringEntityReferenceResolver.resolve(serializedParent, EntityType.DOCUMENT))
             .thenReturn(hierarchicalParent.getLocalDocumentReference());
 
@@ -393,11 +460,12 @@ public class DefaultModelBridgeTest
 
         // no need to update the parent: different name but same parents
         verify(document, never()).setParentReference(hierarchicalParent.getLocalDocumentReference());
-        verify(this.xcontext.getWiki(), never()).saveDocument(document, "Update document after refactoring.", true, xcontext);
+        verify(this.xcontext.getWiki(), never()).saveDocument(document, "Update document after refactoring.", true,
+            xcontext);
     }
 
     @Test
-    public void updateParentWhenPageIsNested() throws Exception
+    void updateParentWhenPageIsNested() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "WebHome");
         XWikiDocument document = mock(XWikiDocument.class);
@@ -405,7 +473,8 @@ public class DefaultModelBridgeTest
         when(document.getParentReference()).thenReturn(new DocumentReference("wiki", "What", "Ever"));
         DocumentReference hierarchicalParent = new DocumentReference("wiki", "Path", "WebHome");
         String serializedParent = "xwiki:Path.WebHome";
-        when(this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference)).thenReturn(serializedParent);
+        when(this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference))
+            .thenReturn(serializedParent);
         when(this.relativeStringEntityReferenceResolver.resolve(serializedParent, EntityType.DOCUMENT))
             .thenReturn(hierarchicalParent.getLocalDocumentReference());
 
@@ -417,7 +486,7 @@ public class DefaultModelBridgeTest
     }
 
     @Test
-    public void updateParentWhenPageIsTopLevel() throws Exception
+    void updateParentWhenPageIsTopLevel() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Path", "WebHome");
         XWikiDocument document = mock(XWikiDocument.class);
@@ -426,7 +495,8 @@ public class DefaultModelBridgeTest
 
         DocumentReference hierarchicalParent = new DocumentReference("wiki", "Main", "WebHome");
         String serializedParent = "xwiki:Main.WebHome";
-        when(this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference)).thenReturn(serializedParent);
+        when(this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference))
+            .thenReturn(serializedParent);
         when(this.relativeStringEntityReferenceResolver.resolve(serializedParent, EntityType.DOCUMENT))
             .thenReturn(hierarchicalParent.getLocalDocumentReference());
 
@@ -438,14 +508,15 @@ public class DefaultModelBridgeTest
     }
 
     @Test
-    public void dontUpdateParentWhenLegacyMode(MockitoComponentManager mocker) throws Exception
+    void dontUpdateParentWhenLegacyMode(MockitoComponentManager componentManager) throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
         XWikiDocument document = mock(XWikiDocument.class);
-        when(this.xcontext.getWiki().getDocument(documentReference, xcontext)).thenReturn(document);
+        when(this.xcontext.getWiki().getDocument(documentReference, this.xcontext)).thenReturn(document);
         when(document.getParentReference()).thenReturn(new DocumentReference("wiki", "What", "Ever"));
 
-        ParentChildConfiguration parentChildConfiguration = mocker.getInstance(ParentChildConfiguration.class);
+        ParentChildConfiguration parentChildConfiguration =
+            componentManager.getInstance(ParentChildConfiguration.class);
         when(parentChildConfiguration.isParentChildMechanismEnabled()).thenReturn(true);
 
         this.modelBridge.update(documentReference, Collections.emptyMap());
@@ -456,14 +527,11 @@ public class DefaultModelBridgeTest
     }
 
     @Test
-    public void getBackLinkedReferences() throws Exception
+    void getBackLinkedReferences() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("alice", Arrays.asList("Path", "To"), "Page");
-        XWikiDocument document = mock(XWikiDocument.class);
-        when(this.xcontext.getWiki().getDocument(documentReference, this.xcontext)).thenReturn(document);
-
         List<DocumentReference> backLinks = Arrays.asList(new DocumentReference("bob", "One", "Two"));
-        when(document.getBackLinkedReferences(this.xcontext)).thenReturn(backLinks);
+        when(xwiki.getStore().loadBacklinks(documentReference, true, this.xcontext)).thenReturn(backLinks);
 
         this.xcontext.setWikiId("carol");
 
@@ -474,7 +542,47 @@ public class DefaultModelBridgeTest
     }
 
     @Test
-    public void restoreDeletedDocument() throws Exception
+    void getBackLinkedReferencesAttachment() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        AttachmentReference attachmentReference = new AttachmentReference("image.png", documentReference);
+        List<DocumentReference> backlinks = List.of(new DocumentReference("bob", "One", "Two"));
+
+        when(this.xwiki.getStore().loadBacklinks(attachmentReference, true, this.xcontext))
+            .thenReturn(backlinks);
+
+        this.xcontext.setWikiId("wiki0");
+
+        assertEquals(backlinks, this.modelBridge.getBackLinkedReferences(attachmentReference, "wiki"));
+
+        verify(this.xcontext).setWikiId("wiki");
+        verify(this.xcontext).setWikiId("wiki0");
+    }
+
+    @Test
+    void getBackLinkedReferencesAttachmentXWikiException() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        AttachmentReference attachmentReference = new AttachmentReference("image.png", documentReference);
+
+        when(this.xwiki.getStore().loadBacklinks(attachmentReference, true, this.xcontext))
+            .thenThrow(XWikiException.class);
+
+        this.xcontext.setWikiId("wiki0");
+
+        assertEquals(List.of(), this.modelBridge.getBackLinkedReferences(attachmentReference, "wiki"));
+
+        verify(this.xcontext).setWikiId("wiki");
+        verify(this.xcontext).setWikiId("wiki0");
+
+        assertEquals(1, this.logCapture.size());
+        assertEquals("Failed to retrieve the back-links for attachment "
+            + "[Attachment wiki:space.page@image.png] on wiki [wiki].", this.logCapture.getMessage(0));
+        assertEquals(Level.ERROR, this.logCapture.getLogEvent(0).getLevel());
+    }
+
+    @Test
+    void restoreDeletedDocument() throws Exception
     {
         long deletedDocumentId = 42;
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
@@ -495,7 +603,7 @@ public class DefaultModelBridgeTest
     }
 
     @Test
-    public void permanentlyDeleteDeletedDocument() throws Exception
+    void permanentlyDeleteDeletedDocument() throws Exception
     {
         long deletedDocumentId = 42;
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
@@ -516,7 +624,41 @@ public class DefaultModelBridgeTest
     }
 
     @Test
-    public void restoreDeletedDocumentInvalidId() throws Exception
+    void permanentlyDeleteDeletedDocumentWrongRights() throws Exception
+    {
+        long deletedDocumentId = 42;
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+
+        XWikiDeletedDocument deletedDocument = mock(XWikiDeletedDocument.class);
+        when(deletedDocument.getDocumentReference()).thenReturn(documentReference);
+        when(deletedDocument.getId()).thenReturn(deletedDocumentId);
+        String documentFullName = "fullName";
+        when(deletedDocument.getFullName()).thenReturn("");
+        when(xwiki.getDeletedDocument(deletedDocumentId, xcontext)).thenReturn(deletedDocument);
+
+        when(xwiki.exists(documentReference, xcontext)).thenReturn(false);
+        when(request.isCheckAuthorRights()).thenReturn(true);
+        when(request.isCheckRights()).thenReturn(false);
+        String username = "myUser";
+        when(this.xcontext.getUser()).thenReturn(username);
+        when(this.xWikiRightService.hasAccessLevel("delete", username, documentFullName, this.xcontext))
+            .thenReturn(false);
+
+        assertFalse(this.modelBridge.permanentlyDeleteDocument(deletedDocumentId, request));
+
+        verify(recycleBin, never()).deleteFromRecycleBin(deletedDocumentId, xcontext, true);
+
+        assertLog(1, Level.ERROR, "The author [{}] of this script is not allowed to permanently deleted document [{}] "
+            + "with id [{}]", null, documentReference, deletedDocumentId);
+
+        // this could be improved later: right now we don't get the rights in the test because the components are not
+        // all properly loaded from oldcore.
+        assertLog(0, Level.WARN, "Exception while checking if entry [{}] can be removed from the recycle bin",
+            deletedDocumentId);
+    }
+
+    @Test
+    void restoreDeletedDocumentInvalidId() throws Exception
     {
         long deletedDocumentId = 42;
 
@@ -532,7 +674,7 @@ public class DefaultModelBridgeTest
     }
 
     @Test
-    public void permanentlyDeleteDeletedDocumentInvalidId() throws Exception
+    void permanentlyDeleteDeletedDocumentInvalidId() throws Exception
     {
         long deletedDocumentId = 42;
 
@@ -548,7 +690,7 @@ public class DefaultModelBridgeTest
     }
 
     @Test
-    public void restoreDeletedDocumentAlreadyExists() throws Exception
+    void restoreDeletedDocumentAlreadyExists() throws Exception
     {
         long deletedDocumentId = 42;
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
@@ -576,7 +718,7 @@ public class DefaultModelBridgeTest
      * @see "XWIKI-9567: Cannot restore document translations from recycle bin"
      */
     @Test
-    public void restoreDocumentTranslation() throws Exception
+    void restoreDocumentTranslation() throws Exception
     {
         long deletedDocumentId = 42;
         Locale locale = new Locale("ro");
@@ -604,7 +746,7 @@ public class DefaultModelBridgeTest
     }
 
     @Test
-    public void permanentlyDeleteDocumentTranslation() throws Exception
+    void permanentlyDeleteDocumentTranslation() throws Exception
     {
         long deletedDocumentId = 42;
         Locale locale = new Locale("ro");
@@ -627,7 +769,7 @@ public class DefaultModelBridgeTest
     }
 
     @Test
-    public void canRestoreDeletedDocument() throws Exception
+    void canRestoreDeletedDocument() throws Exception
     {
         long deletedDocumentId = 42;
         String deletedDocumentFullName = "Space.DeletedDocument";
@@ -655,7 +797,7 @@ public class DefaultModelBridgeTest
     }
 
     @Test
-    public void restoreDeletedDocumentNoRights() throws Exception
+    void restoreDeletedDocumentNoRights() throws Exception
     {
         long deletedDocumentId = 42;
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
@@ -687,7 +829,7 @@ public class DefaultModelBridgeTest
     }
 
     @Test
-    public void permanentlyDeleteDeletedDocumentNoRights() throws Exception
+    void permanentlyDeleteDeletedDocumentNoRights() throws Exception
     {
         long deletedDocumentId = 42;
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
@@ -719,7 +861,7 @@ public class DefaultModelBridgeTest
     }
 
     @Test
-    public void getDeletedDocumentIds() throws Exception
+    void getDeletedDocumentIds() throws Exception
     {
         String batchId = "abc123";
         long id1 = 1;
@@ -730,7 +872,7 @@ public class DefaultModelBridgeTest
         XWikiDeletedDocument deletedDocument2 = mock(XWikiDeletedDocument.class);
         when(deletedDocument2.getId()).thenReturn(id2);
 
-        XWikiDeletedDocument[] deletedDocuments = {deletedDocument1, deletedDocument2};
+        XWikiDeletedDocument[] deletedDocuments = { deletedDocument1, deletedDocument2 };
 
         when(recycleBin.getAllDeletedDocuments(batchId, false, xcontext, true)).thenReturn(deletedDocuments);
         when(xwiki.getRecycleBinStore()).thenReturn(recycleBin);
@@ -743,7 +885,7 @@ public class DefaultModelBridgeTest
     }
 
     @Test
-    public void canOverwriteSilently() throws Exception
+    void canOverwriteSilently() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
         XWikiDocument document = mock(XWikiDocument.class);
@@ -758,7 +900,7 @@ public class DefaultModelBridgeTest
     }
 
     @Test
-    public void permanentlyDeleteAllDocuments() throws Exception
+    void permanentlyDeleteAllDocuments() throws Exception
     {
         int nbDocs = 12;
         PermanentlyDeleteJob deleteJob = mock(PermanentlyDeleteJob.class);
@@ -774,12 +916,9 @@ public class DefaultModelBridgeTest
         when(xwiki.exists(documentReference, xcontext)).thenReturn(false);
         when(xwiki.getRecycleBinStore()).thenReturn(recycleBin);
 
-        when(recycleBin.getNumberOfDeletedDocuments(any())).thenReturn((long)nbDocs);
-        when(recycleBin.getAllDeletedDocumentsIds(eq(this.xcontext), anyInt())).thenReturn(new Long[]{
-            1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L
-        }).thenReturn(new Long[]{
-            11L, 12L
-        });
+        when(recycleBin.getNumberOfDeletedDocuments(any())).thenReturn((long) nbDocs);
+        when(recycleBin.getAllDeletedDocumentsIds(eq(this.xcontext), anyInt()))
+            .thenReturn(new Long[]{ 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L }).thenReturn(new Long[]{ 11L, 12L });
         when(request.isCheckRights()).thenReturn(false);
         when(request.isCheckAuthorRights()).thenReturn(false);
 
@@ -789,7 +928,9 @@ public class DefaultModelBridgeTest
         verify(this.progressManager, times(12)).endStep(deleteJob);
         for (int i = 1; i <= 12; i++) {
             verify(recycleBin).deleteFromRecycleBin(i, xcontext, true);
-            assertLog(i-1, Level.INFO, "Document [{}] has been permanently deleted.", documentReference);
+            assertLog(i - 1, Level.INFO, "Document [{}] has been permanently deleted.", documentReference);
         }
     }
+    
+    
 }

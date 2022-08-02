@@ -1,5 +1,0 @@
-## Default renderer for any kind of notification filter.
-## Each filter should have its own filter template.
-## The available context variables are declared in
-## org.xwiki.notifications.filters.internal.AbstractNotificationFilterDisplayer
-$filter.id

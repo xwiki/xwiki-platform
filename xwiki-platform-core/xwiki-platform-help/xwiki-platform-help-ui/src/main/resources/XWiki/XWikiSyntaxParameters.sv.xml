@@ -56,7 +56,7 @@
 
 Med XWiki syntax  {{velocity}}$crtSyntaxVer{{/velocity}} är det möjligt att ange parametrar till syntaktiska element och textblock.  Detta används exempelvis för att ändra stil på elementen.  Det går att ange nyckel/värde-par så att XHTML-renderaren infogar motsvarande attribut i den underliggande XHTML-representationen av syntaxelementen. 
 
-|=XWiki syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Genererad XHTML
+|=(% style="width:60%" %)XWiki syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Genererad XHTML
 |((({{{
 (% class="minKlass" style="minStil" id="mittId" %)
 = rubrik =

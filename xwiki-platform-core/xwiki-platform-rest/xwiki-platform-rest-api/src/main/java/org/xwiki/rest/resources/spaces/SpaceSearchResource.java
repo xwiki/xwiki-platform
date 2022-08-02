@@ -22,6 +22,7 @@ package org.xwiki.rest.resources.spaces;
 import java.util.List;
 
 import javax.ws.rs.DefaultValue;
+import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -35,7 +36,7 @@ public interface SpaceSearchResource
 {
     @GET SearchResults search(
             @PathParam("wikiName") String wikiName,
-            @PathParam("spaceName") String spaceName,
+            @PathParam("spaceName") @Encoded String spaceName,
             @QueryParam("q") String keywords,
             @QueryParam("scope") List<String> searchScopeStrings,
             @QueryParam("number") @DefaultValue("-1") Integer number,

@@ -7,7 +7,6 @@ Depends: xwiki-common (= [[version]]), tomcat8
 Provides: xwiki-tomcat-common
 Replaces: xwiki-tomcat-common, xwiki-enterprise-tomcat-common
 Conflicts: xwiki-tomcat-common, xwiki-enterprise-tomcat-common
-Suggests: xwiki-tomcat8-mysql | xwiki-tomcat8-pgsql
 Maintainer: [[debian.maintainer]]
 License: [[debian.license]]
 Description: [[debian.description]]

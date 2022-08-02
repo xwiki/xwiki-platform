@@ -66,7 +66,6 @@ public class SaveWikiMetaDataStep implements WikiCreationStep
             WikiDescriptor descriptor = wikiDescriptorManager.getById(wikiId);
             descriptor.setDescription(request.getDescription());
             descriptor.setPrettyName(request.getPrettyName());
-            descriptor.setOwnerId(request.getOwnerId());
             wikiDescriptorManager.saveDescriptor(descriptor);
 
             // Meta data about the templates

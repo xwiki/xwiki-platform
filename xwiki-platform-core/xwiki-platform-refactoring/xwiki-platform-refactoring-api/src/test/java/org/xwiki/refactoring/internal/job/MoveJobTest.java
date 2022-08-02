@@ -316,9 +316,7 @@ public class MoveJobTest extends AbstractMoveJobTest
 
         DocumentReference userReference = new DocumentReference("wiki", "Users", "Alice");
 
-        when(this.modelBridge.delete(newReference)).thenReturn(true);
-        when(this.modelBridge.copy(oldReference, newReference)).thenReturn(true);
-        when(this.modelBridge.delete(oldReference)).thenReturn(true);
+        when(this.modelBridge.rename(oldReference, newReference)).thenReturn(true);
 
         MoveRequest request = createRequest(oldReference, newReference.getParent());
         request.setCheckRights(false);
@@ -331,7 +329,7 @@ public class MoveJobTest extends AbstractMoveJobTest
         verify(this.observationManager).notify(new DocumentRenamingEvent(oldReference, newReference), job, request);
 
         verify(this.modelBridge).setContextUserReference(userReference);
-        verify(this.modelBridge).delete(oldReference);
+        verify(this.modelBridge).rename(oldReference, newReference);
 
         verify(this.observationManager).notify(new DocumentRenamedEvent(oldReference, newReference), job, request);
         verify(this.observationManager).notify(any(EntitiesRenamedEvent.class), same(job), same(request));
@@ -384,8 +382,7 @@ public class MoveJobTest extends AbstractMoveJobTest
             new DocumentReference("Alice", new SpaceReference("Source", destinationReference));
         DocumentReference newBobReference =
             new DocumentReference("Bob", new SpaceReference("Source", destinationReference));
-        when(this.modelBridge.copy(oldBobReference, newBobReference)).thenReturn(true);
-        when(this.modelBridge.delete(oldBobReference)).thenReturn(true);
+        when(this.modelBridge.rename(oldBobReference, newBobReference)).thenReturn(true);
 
         MoveRequest request = createRequest(sourceReference, destinationReference);
         request.setCheckRights(false);
@@ -405,16 +402,14 @@ public class MoveJobTest extends AbstractMoveJobTest
         // The rename of the first document is canceled.
         verify(this.observationManager).notify(new DocumentRenamingEvent(oldAliceReference, newAliceReference), job,
             request);
-        verify(this.modelBridge, never()).copy(oldAliceReference, newAliceReference);
-        verify(this.modelBridge, never()).delete(oldAliceReference);
+        verify(this.modelBridge, never()).rename(oldAliceReference, newAliceReference);
         verify(this.observationManager, never()).notify(new DocumentRenamedEvent(oldAliceReference, newAliceReference),
             job, request);
 
         // The second document is still renamed.
         verify(this.observationManager).notify(new DocumentRenamingEvent(oldBobReference, newBobReference), job,
             request);
-        verify(this.modelBridge).copy(oldBobReference, newBobReference);
-        verify(this.modelBridge).delete(oldBobReference);
+        verify(this.modelBridge).rename(oldBobReference, newBobReference);
         verify(this.observationManager).notify(new DocumentRenamedEvent(oldBobReference, newBobReference), job,
             request);
 
@@ -428,14 +423,14 @@ public class MoveJobTest extends AbstractMoveJobTest
         when(this.modelBridge.exists(source)).thenReturn(true);
         DocumentReference destination = new DocumentReference("wiki", "C", "WebHome");
 
-        when(this.modelBridge.copy(source, new DocumentReference("wiki", "C", "B"))).thenReturn(true);
+        when(this.modelBridge.rename(source, new DocumentReference("wiki", "C", "B"))).thenReturn(true);
 
         MoveRequest request = createRequest(source, destination);
         request.setCheckRights(false);
         request.setCheckAuthorRights(false);
         run(request);
 
-        verify(this.modelBridge).delete(source);
+        verify(this.modelBridge).rename(source, new DocumentReference("wiki", "C", "B"));
     }
 
     @Test
@@ -455,7 +450,7 @@ public class MoveJobTest extends AbstractMoveJobTest
         request.setDeep(true);
         run(request);
 
-        verify(this.modelBridge).copy(docFromSpace, new DocumentReference("tennis", "C", "X"));
+        verify(this.modelBridge).rename(docFromSpace, new DocumentReference("tennis", "C", "X"));
 
         verify(this.observationManager).notify(any(DocumentsDeletingEvent.class), any(MoveJob.class),
             eq(Collections.singletonMap(docFromSpace, new EntitySelection(docFromSpace))));
@@ -476,7 +471,7 @@ public class MoveJobTest extends AbstractMoveJobTest
         request.setCheckAuthorRights(false);
         run(request);
 
-        verify(this.modelBridge).copy(sourceDoc, new DocumentReference("wiki", Arrays.asList("C", "B"), "X"));
+        verify(this.modelBridge).rename(sourceDoc, new DocumentReference("wiki", Arrays.asList("C", "B"), "X"));
     }
 
     @Test

@@ -1,3 +1,22 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
 ##
 ## Globals
 ##
@@ -9,7 +28,16 @@
 ## permissions on the whole wiki (including subwiki) is costly. Thus FTM we
 ## only check for view permissions.
 #set ($canCopy = $canView)
-#set ($canDelete = !$doc.isNew() && $xwiki.hasAccessLevel('delete'))
+
+#set ($nbUsers = $doc.getObjectNumbers("XWiki.XWikiUsers"))
+#set ($nbGroups = $doc.getObjectNumbers("XWiki.XWikiGroups"))
+#set ($hasAdminRights = $xwiki.hasAccessLevel('admin'))
+
+#if ($nbUsers == 0 && $nbGroups == 0 || $hasAdminRights)
+  #set ($canDelete = !$doc.isNew() && $xwiki.hasAccessLevel('delete'))
+#else
+  #set ($canDelete = false)
+#end
 #set ($canShare = $canView && $xwiki.exists('XWiki.SharePage') && !$isGuest)
 ## Add rel='nofollow' to prevent search crawler from navigating the links and indexing them in search results
 #set ($extraAttributes = 'rel="nofollow"')
@@ -21,6 +49,28 @@
   #template("menus_macros.vm")
   ##
   #set ($topStaticExtensions = [])
+  ##
+  ## TRANSLATE menu
+  ##
+  #define ($translateMenu)
+    ## Output the translate menu if all the following conditions are met:
+    ## * multilingual is on
+    ## * the user can edit the current document
+    ## * the user is viewing the original document version
+    ## * the document is translatable (either has a default locale specified or it has existing translations)
+    ## * the current UI locale doesn't match the original document locale
+    #if (
+      $displayTranslateMenu &&
+      $xwiki.isMultiLingual() &&
+      $hasEdit && !$isReadOnly &&
+      $xcontext.action == 'view' && $tdoc.realLocale == $doc.realLocale &&
+      ("$!doc.realLocale" != '' || !$doc.translationLocales.isEmpty()) &&
+      $doc.realLocale != $xcontext.locale
+    )
+      #displayTranslateMenu()
+    #end
+  #end
+  #set ($discard = $topStaticExtensions.add( { 'content': "$!translateMenu", 'order': 5000}))
   ##
   ## EDIT menu
   ##
@@ -141,7 +191,7 @@
   #foreach($uix in $services.uix.getExtensions($name))
     #if ($services.security.authorization.hasAccess('admin', $uix.authorReference, $services.wiki.currentWikiDescriptor.reference))
       #set ($separator = ("$!uix.getParameters().separator" == 'true'))
-      #set ($order = $mathtool.toInteger($uix.getParameters().order))
+      #set ($order = $numbertool.toNumber($uix.getParameters().order).intValue())
       #if ("$!order" == '')
         ## Fallback for incomplete/invalid extension orders to avoid breaking the display.
         #set ($order = 0)
@@ -154,7 +204,7 @@
   #end
   ## Display them, sorted by order
   #set ($canHaveMenuSeparator = false)
-  #foreach($uix in $sorttool.sort($extensions, 'order'))
+  #foreach($uix in $collectiontool.sort($extensions, 'order'))
     ## Maybe display a menu separator
     #if ("$!uix.separator" == 'true' && $canHaveMenuSeparator)
       #submenuseparator()
@@ -179,6 +229,23 @@
  *#
 #macro(displayCreateButton)
   #displayMenu('tmCreate', 'add', '', 'core.menu.create', true, $doc.getURL('create'), $extraAttributes)
+#end
+
+#**
+ * Display the Translate button used to translate the current document in the current locale.
+ *#
+#macro(displayTranslateMenu)
+  #set ($translateHint = $services.localization.render('core.menu.translate.hint',
+    [$xcontext.locale.getDisplayName($xcontext.locale)]))
+  #set ($translateDetails = $services.localization.render('core.menu.translate.details', [
+    $doc.realLocale.getDisplayName($xcontext.locale),
+    $xcontext.locale.getDisplayName($xcontext.locale)
+  ]))
+  #set ($translateAttrs = "$!extraAttributes tabindex='0' data-toggle='popover' data-trigger='hover' " +
+    "data-container='body' data-placement='bottom' data-title='$escapetool.xml($translateHint)' " +
+    "data-content='$escapetool.xml($translateDetails)'")
+  #set ($translateURL = $doc.getURL('edit', $escapetool.url({'language': $xcontext.locale})))
+  #displayMenu('tmTranslate', 'translate', '', 'core.menu.translate', true, $translateURL, $translateAttrs)
 #end
 
 #**
@@ -229,11 +296,11 @@
     ##
     ## OBJECTS EDITOR
     ##
-    #set ($discard = $staticExtensions.add( { 'content': "#submenuitem($doc.getURL('edit', 'editor=object') $services.localization.render('core.menu.edit.object') 'tmEditObject', '', 'drive', $extraAttributes)", 'order': 60000}))
+    #set ($discard = $staticExtensions.add( { 'content': "#submenuitem($doc.getURL('edit', 'editor=object') $services.localization.render('core.menu.edit.object') 'tmEditObject', '', 'bricks', $extraAttributes)", 'order': 60000}))
     ##
     ## CLASS EDITOR
     ##
-    #set ($discard = $staticExtensions.add( { 'content': "#submenuitem($doc.getURL('edit', 'editor=class') $services.localization.render('core.menu.edit.class') 'tmEditClass', '', 'drive', $extraAttributes)", 'order': 70000}))
+    #set ($discard = $staticExtensions.add( { 'content': "#submenuitem($doc.getURL('edit', 'editor=class') $services.localization.render('core.menu.edit.class') 'tmEditClass', '', 'box', $extraAttributes)", 'order': 70000}))
   #end
   ##
   ## Display all the extensions points, including the static ones
@@ -263,7 +330,7 @@
   ##
   #if ($canDelete)
     #define ($rename)
-      #submenuitem($xwiki.getURL($doc.documentReference, 'view', 'xpage=rename&amp;step=1') $services.localization.render('core.menu.rename') 'tmActionRename', '' 'move', $extraAttributes)
+      #submenuitem($xwiki.getURL($doc.documentReference, 'view', 'xpage=rename&amp;step=1') $services.localization.render('core.menu.rename') 'tmActionRename', '' 'edit', $extraAttributes)
     #end
     #set ($discard = $staticExtensions.add( { 'content': $rename, 'order': 30000}))
     #define ($delete)
@@ -287,12 +354,14 @@
   ##
   #if ($canView)
     ##
-    ## EXPORT
+    ## EXPORT (only if we are not in the pdfoptions to export the page)
     ##
-    #define ($export)
-      #submenuitem('' $services.localization.render('core.menu.export') 'tmExport', '', 'download', 'data-toggle="modal" data-target="#exportModal"')
+    #if ("$!request.xpage" != 'pdfoptions')
+      #define ($export)
+        #submenuitem('' $services.localization.render('core.menu.export') 'tmExport', '', 'download', 'data-toggle="modal" data-target="#exportModal"')
+      #end
+      #set ($discard = $staticExtensions.add( { 'content': $export, 'order': 80000}))
     #end
-    #set ($discard = $staticExtensions.add( { 'content': $export, 'order': 80000}))
     ##
     ## PRINT
     ##
@@ -300,16 +369,6 @@
       #submenuitem($doc.getURL('view', "xpage=print&amp;$!escapetool.html($request.getQueryString())") $services.localization.render('core.menu.preview') 'tmPrintPreview', '', 'print', $extraAttributes)
     #end
     #set ($discard = $staticExtensions.add( { 'content': $print, 'order': 90000}))
-    ##
-    ## VIEW SOURCE
-    ##
-    #define ($viewSource)
-      #if ("$!request.rev" != '')
-        #set ($revisionParameter = "&rev=$request.rev")
-      #end
-      #submenuitem($doc.getURL('view', "viewer=code$!{revisionParameter}") $services.localization.render('core.menu.view.source') 'tmViewSource', '', 'search', $extraAttributes)
-    #end
-    #set ($discard = $staticExtensions.add( { 'content': $viewSource, 'order': 100000}))
     ##
     ## SHARE BY EMAIL
     ##
@@ -363,16 +422,22 @@
       ## ----------------------------
       #if($xwiki.hasAccessLevel('view') && $displayShortcuts)
         #set ($viewersContent = "#template('shortcuts.vm')")
-        ## Only show the Viewers section if it contains something to display.
-        #if ($stringtool.isNotBlank("$!viewersContent"))
-          ## Only display a separator if at least one menu entry has been displayed before
-          #if ($needsSeparator)
-            #submenuseparator()
-          #end
-          #submenuheader('core.menu.actions.viewers')
-          $viewersContent
-          #set ($needsSeparator = true)
+        ## Only display a separator if at least one menu entry has been displayed before
+        #if ($needsSeparator)
+          #submenuseparator()
         #end
+        #submenuheader('core.menu.actions.viewers')
+        ##
+        ## VIEW SOURCE
+        ##
+        #if ("$!request.rev" != '')
+          #set ($revisionParameter = "&rev=$request.rev")
+        #end
+        #submenuitem($doc.getURL('view', "viewer=code$!{revisionParameter}") $services.localization.render('core.menu.view.source') 'tmViewSource', '', 'search', $extraAttributes)
+        $viewersContent
+        ## Display Viewers menu UIX..
+        #displaySecureUIX('org.xwiki.platform.template.menu.viewers', [])
+        #set ($needsSeparator = true)
       #end
     #end
   #end
@@ -386,10 +451,18 @@
  * Add keyboard shortcuts
  *#
 #macro(keyboardShortcuts)
-  <script type="text/javascript">
+  <script>
   //<![CDATA[
     #if ($hasEdit && !$isReadOnly)
-      shortcut.add("$services.localization.render('core.shortcuts.view.edit')",function() { location.href=$('tmEdit').down('a').href; }, { 'disable_in_input':true });
+      shortcut.add("$services.localization.render('core.shortcuts.view.edit')", function() {
+        var editLink = $('tmEdit').down('a');
+        // Make sure the shortcut doesn't work when the edit link is disabled.
+        if (editLink && !editLink.classList.contains('disabled')) {
+          // Simulate the user click because the edit link can have click listeners registered (which aren't executed if
+          // we simply change the window location using the link URL).
+          editLink.click();
+        }
+      }, {'disable_in_input': true});
       #if($isAdvancedUser)
         shortcut.add("$services.localization.render('core.shortcuts.view.wiki')",function() { location.href=$('tmEditWiki').href; }, { 'disable_in_input':true });
         shortcut.add("$services.localization.render('core.shortcuts.view.wysiwyg')",function() { location.href=$('tmEditWysiwyg').href; }, { 'disable_in_input':true });

@@ -24,6 +24,8 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.pagefactory.AjaxElementLocatorFactory;
 import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.test.ui.PersistentTestContext;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
@@ -36,6 +38,8 @@ import org.xwiki.test.ui.XWikiWebDriver;
  */
 public class BaseElement
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseElement.class);
+
     private static PersistentTestContext context;
 
     /** Used so that AllTests can set the persistent test context. */
@@ -88,6 +92,14 @@ public class BaseElement
     }
 
     /**
+     * @since 11.3RC1
+     */
+    public void waitForNotificationInProgressMessage(String message)
+    {
+        waitForNotificationMessage("inprogress", message);
+    }
+
+    /**
      * Waits for a notification message of the specified type with the given message to be displayed.
      * 
      * @param level the notification type (one of error, warning, done)
@@ -102,10 +114,10 @@ public class BaseElement
         // In order to improve test speed, clicking on the notification will make it disappear. This also ensures that
         // this method always waits for the last notification message of the specified level.
         try {
-            // The notification message may disappear before we get to click on it.
             getDriver().findElementWithoutWaiting(notificationMessageLocator).click();
         } catch (WebDriverException e) {
-            // Ignore.
+            // The notification message may disappear before we get to click on it and thus we ignore in case there's
+            // an error.
         }
     }
 
@@ -116,5 +128,16 @@ public class BaseElement
     protected boolean isElementVisible(By by)
     {
         return getDriver().findElementWithoutWaiting(by).isDisplayed();
+    }
+
+    /**
+     * Wait until the page is ready for user interaction. The page is ready when there are no pending HTTP requests
+     * (e.g. to load resources or data) and no pending promises (e.g. no asynchronous code that waits to be executed).
+     * 
+     * @since 14.2RC1
+     */
+    public void waitUntilPageIsReady()
+    {
+        getDriver().waitUntilElementHasAttributeValue(By.tagName("html"), "data-xwiki-page-ready", "true");
     }
 }

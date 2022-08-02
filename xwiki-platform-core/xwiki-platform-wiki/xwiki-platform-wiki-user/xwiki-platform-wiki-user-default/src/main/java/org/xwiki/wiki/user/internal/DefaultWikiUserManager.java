@@ -127,7 +127,8 @@ public class DefaultWikiUserManager implements WikiUserManager
         }
     }
 
-    private void saveGroupDocument(XWikiDocument document, String message) throws WikiUserManagerException {
+    private void saveGroupDocument(XWikiDocument document, String message) throws WikiUserManagerException
+    {
         // Get the XWiki objects
         XWikiContext xcontext = xcontextProvider.get();
         XWiki xwiki = xcontext.getWiki();

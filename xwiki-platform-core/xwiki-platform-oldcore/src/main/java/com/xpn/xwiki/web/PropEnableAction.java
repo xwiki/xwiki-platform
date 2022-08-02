@@ -19,6 +19,11 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -32,6 +37,9 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  * @version $Id$
  * @since 2.4M2
  */
+@Component
+@Named("propenable")
+@Singleton
 public class PropEnableAction extends AbstractPropChangeAction
 {
     @Override
@@ -39,10 +47,15 @@ public class PropEnableAction extends AbstractPropChangeAction
         throws XWikiException
     {
         XWiki xwiki = context.getWiki();
-        XWikiDocument doc = context.getDoc();
+        XWikiDocument doc = xclass.getOwnerDocument();
 
         xclass.enableField(propertyName);
-        xwiki.saveDocument(doc,
-            localizePlainOrKey("core.model.xclass.enableClassProperty.versionSummary", propertyName), true, context);
+
+        String comment = localizePlainOrKey("core.model.xclass.enableClassProperty.versionSummary", propertyName);
+
+        // Make sure the user is allowed to make this modification
+        context.getWiki().checkSavingDocument(context.getUserReference(), doc, comment, true, context);
+
+        xwiki.saveDocument(doc, comment, true, context);
     }
 }

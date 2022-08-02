@@ -148,6 +148,8 @@ public class XWikiException extends Exception
 
     public static final int ERROR_XWIKI_STORE_HIBERNATE_UNEXISTANT_VERSION = 3205;
 
+    public static final int ERROR_XWIKI_STORE_HIBERNATE_RENAMING_DOC = 3206;
+
     public static final int ERROR_XWIKI_STORE_HIBERNATE_SAVING_OBJECT = 3211;
 
     public static final int ERROR_XWIKI_STORE_HIBERNATE_LOADING_OBJECT = 3212;
@@ -210,6 +212,8 @@ public class XWikiException extends Exception
 
     public static final int ERROR_XWIKI_USER_INACTIVE = 8003;
 
+    public static final int ERROR_XWIKI_USER_DISABLED = 8004;
+
     public static final int ERROR_XWIKI_ACCESS_DENIED = 9001;
 
     public static final int ERROR_XWIKI_ACCESS_TOKEN_INVALID = 9002;
@@ -265,6 +269,10 @@ public class XWikiException extends Exception
     public static final int ERROR_XWIKI_APP_EXPORT = 11015;
 
     public static final int ERROR_XWIKI_APP_TEMPLATE_NOT_AVAILABLE = 11016;
+
+    public static final int ERROR_XWIKI_APP_DOCUMENT_PATH_TOO_LONG = 11017;
+
+    public static final int ERROR_XWIKI_APP_DOCUMENT_NAME_INVALID = 11018;
 
     public static final int ERROR_XWIKI_EXPORT_XSL_FILE_NOT_FOUND = 12001;
 

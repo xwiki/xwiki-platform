@@ -18,14 +18,13 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-#
-# JNDI Support
-#
+DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
+
+[description]
+Adds the Jetty JNDI implementation to the classpath.
 
 [depend]
 server
 
 [lib]
 lib/jetty-jndi-${jetty.version}.jar
-lib/javax.mail*.jar
-lib/javax.transaction*.jar

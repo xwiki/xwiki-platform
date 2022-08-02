@@ -1,6 +1,0 @@
-########################################################
-## Default behavior of get action
-########################################################
-#template("xwikivars.vm")
-$response.setContentType("text/plain")##
-#template("displaycontent.vm")

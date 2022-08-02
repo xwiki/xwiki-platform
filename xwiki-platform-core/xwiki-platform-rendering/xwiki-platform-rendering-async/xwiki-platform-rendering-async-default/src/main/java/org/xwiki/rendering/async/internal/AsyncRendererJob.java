@@ -22,12 +22,17 @@ package org.xwiki.rendering.async.internal;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.AbstractJob;
+import org.xwiki.job.GroupedJob;
+import org.xwiki.job.JobGroupPath;
 import org.xwiki.job.Request;
 import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.async.internal.DefaultAsyncContext.ContextUse;
 import org.xwiki.template.TemplateManager;
+
+import com.xpn.xwiki.internal.context.XWikiContextContextStore;
 
 /**
  * Default implementation of {@link AsyncRendererJob}.
@@ -37,7 +42,7 @@ import org.xwiki.template.TemplateManager;
  */
 @Component
 @Named(AsyncRendererJobStatus.JOBTYPE)
-public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, AsyncRendererJobStatus>
+public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, AsyncRendererJobStatus> implements GroupedJob
 {
     @Inject
     private AsyncRendererCache cache;
@@ -47,6 +52,9 @@ public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, Async
 
     @Inject
     private TemplateManager templateManager;
+
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
 
     @Override
     protected AsyncRendererJobRequest castRequest(Request request)
@@ -76,27 +84,54 @@ public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, Async
     @Override
     protected void runInternal() throws Exception
     {
-        // Enable async execution since we are already in an asynchronous context
-        this.asyncContext.setEnabled(true);
+        AsyncRenderer renderer = getRequest().getRenderer();
+
+        // Enable async execution only if cache is disabled as otherwise we could end up with place holders not
+        // associated to any job since it was not really executed the following times
+        this.asyncContext.setEnabled(!renderer.isCacheAllowed());
+
         // Prepare to catch stuff to invalidate the cache
-        ((DefaultAsyncContext) this.asyncContext).pushContextUse();
+        if (this.asyncContext instanceof DefaultAsyncContext) {
+            ((DefaultAsyncContext) this.asyncContext).pushContextUse();
+        }
 
         // Many UI elements expect xwikivars.vm result to be in the context so we execute it
         // FIXME: not very happy with that but can't find a better place yet
         // (other than executing it at the beginning of every single element which might be executed asynchronously...)
         this.templateManager.execute("xwikivars.vm");
 
-        AsyncRenderer renderer = getRequest().getRenderer();
+        // Mark the context document as used if it was explicitly set in the context
+        if (this.request.getContext() != null
+            && this.request.getContext().containsKey(XWikiContextContextStore.PROP_DOCUMENT_REFERENCE)) {
+            this.asyncContext.useEntity(this.documentAccessBridge.getCurrentDocumentReference());
+        }
+
         AsyncRendererResult result = renderer.render(true, renderer.isCacheAllowed());
 
         getStatus().setResult(result);
-        // Remember various elements used during the execution (ro invalidate the cache or restore them when needed)
-        ContextUse contextUse = ((DefaultAsyncContext) this.asyncContext).popContextUse();
-        getStatus().setReferences(contextUse.getReferences());
-        getStatus().setRoles(contextUse.getRoles());
-        getStatus().setRoleTypes(contextUse.getRoleTypes());
-        getStatus().setUses(contextUse.getUses());
 
+        if (this.asyncContext instanceof DefaultAsyncContext) {
+            // Remember various elements used during the execution (to invalidate the cache or restore them when needed)
+            ContextUse contextUse = ((DefaultAsyncContext) this.asyncContext).popContextUse();
+            getStatus().setReferences(contextUse.getReferences());
+            getStatus().setRoles(contextUse.getRoles());
+            getStatus().setRoleTypes(contextUse.getRoleTypes());
+            getStatus().setUses(contextUse.getUses());
+        }
+    }
+
+    @Override
+    protected void jobFinished(Throwable error)
+    {
+        super.jobFinished(error);
+
+        // Cache the result
         this.cache.put(getStatus());
+    }
+
+    @Override
+    public JobGroupPath getGroupPath()
+    {
+        return getRequest().getJobGroupPath();
     }
 }

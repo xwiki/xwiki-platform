@@ -22,12 +22,12 @@ package org.xwiki.query.internal;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.phase.Initializable;
-import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserPropertiesResolver;
 
 /**
  * Base class for filtering hidden entities.
@@ -42,13 +42,12 @@ public abstract class AbstractHiddenFilter extends AbstractWhereQueryFilter impl
      * Used to retrieve user preference regarding hidden documents.
      */
     @Inject
-    @Named("user")
-    private ConfigurationSource userPreferencesSource;
+    private UserPropertiesResolver userPropertiesResolver;
 
     /**
      * @see #initialize()
      */
-    private boolean isActive;
+    private boolean displayHiddenDocuments;
 
     /**
      * Sets the #isActive property, based on the user configuration.
@@ -56,15 +55,15 @@ public abstract class AbstractHiddenFilter extends AbstractWhereQueryFilter impl
     @Override
     public void initialize()
     {
-        Integer preference = userPreferencesSource.getProperty("displayHiddenDocuments", Integer.class);
-        isActive = preference == null || preference != 1;
+        this.displayHiddenDocuments =
+            this.userPropertiesResolver.resolve(CurrentUserReference.INSTANCE).displayHiddenDocuments();
     }
 
     @Override
     public String filterStatement(String statement, String language)
     {
         String result = statement;
-        if (isActive) {
+        if (!this.displayHiddenDocuments) {
             result = filterHidden(statement, language);
         }
         return result;

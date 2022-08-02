@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-search-solr</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr-api</artifactId>
   <name>XWiki Platform - Search - Solr - API</name>
@@ -34,10 +34,13 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Solr Search API</xwiki.extension.name>
-    <xwiki.jacoco.instructionRatio>0.58</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>74</xwiki.pitest.mutationThreshold>
+    <xwiki.jacoco.instructionRatio>0.62</xwiki.jacoco.instructionRatio>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+
+    <!-- The Solr framework is designed to be shared for the whole farm -->
+    <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
+    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
   </properties>
   <dependencies>
     <!-- Solr -->
@@ -50,6 +53,16 @@
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-core</artifactId>
     </dependency>
+    <!-- Solr core depends on a different version of Jetty which we exclude and thus we need to
+      pull the right version here. -->
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-alpn-java-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.http2</groupId>
+      <artifactId>http2-http-client-transport</artifactId>
+    </dependency>
     <!-- Solr core depends on a different version of Restlet (than our Rest module) which we exclude and thus we need to
       pull the right version here. -->
     <dependency>
@@ -60,11 +73,6 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-    </dependency>
-    <!-- Apache xalan used for Solr's internal XML operations. -->
-    <dependency>
-      <groupId>xalan</groupId>
-      <artifactId>xalan</artifactId>
     </dependency>
     <!-- Extract data from attachments -->
     <dependency>
@@ -86,7 +94,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-model</artifactId>
+      <artifactId>xwiki-platform-model-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -107,8 +115,15 @@
     <!-- Embedded in the JAR to be used as default SOLR configuration -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-search-solr-server-data</artifactId>
+      <artifactId>xwiki-platform-search-solr-server-core</artifactId>
       <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-solr-server-core-minimal</artifactId>
+      <version>${project.version}</version>
+      <type>zip</type>
       <scope>provided</scope>
     </dependency>
 
@@ -137,6 +152,24 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>test-jar</id>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>**/test/**.class</include>
+                <include>META-INF/**</include>
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
         <executions>
           <execution>
@@ -146,22 +179,21 @@
               <excludes>
                 **/DefaultSolrIndexer.java,
                 **/SolrIndexEventListener.java,
-                **/AbstractSolrMetadataExtractor.java
+                **/AbstractSolrMetadataExtractor.java,
+                **/EmbeddedSolr.java
               </excludes>
             </configuration>
           </execution>
         </executions>
       </plugin>
       <!-- Attach default configuration package -->
-      <!-- We require the jar in both test and package but we don't want to get it if we don't need it (for example
-           with backward-compatibility check) -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
-            <id>attach-default-configuration-test</id>
-            <phase>process-test-resources</phase>
+            <id>attach-search-core</id>
+            <phase>process-resources</phase>
             <goals>
               <goal>copy</goal>
             </goals>
@@ -169,18 +201,18 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xwiki.platform</groupId>
-                  <artifactId>xwiki-platform-search-solr-server-data</artifactId>
+                  <artifactId>xwiki-platform-search-solr-server-core</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
-                  <destFileName>xwiki-platform-search-solr-server-data.zip</destFileName>
+                  <destFileName>xwiki-platform-search-solr-server-core.zip</destFileName>
                 </artifactItem>
               </artifactItems>
               <outputDirectory>${project.build.outputDirectory}/</outputDirectory>
             </configuration>
           </execution>
           <execution>
-            <id>attach-default-configuration-package</id>
-            <phase>prepare-package</phase>
+            <id>attach-minimal-core</id>
+            <phase>process-resources</phase>
             <goals>
               <goal>copy</goal>
             </goals>
@@ -188,10 +220,10 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xwiki.platform</groupId>
-                  <artifactId>xwiki-platform-search-solr-server-data</artifactId>
+                  <artifactId>xwiki-platform-search-solr-server-core-minimal</artifactId>
                   <version>${project.version}</version>
-                  <type>jar</type>
-                  <destFileName>xwiki-platform-search-solr-server-data.zip</destFileName>
+                  <type>zip</type>
+                  <destFileName>xwiki-platform-search-solr-server-core-minimal.zip</destFileName>
                 </artifactItem>
               </artifactItems>
               <outputDirectory>${project.build.outputDirectory}/</outputDirectory>

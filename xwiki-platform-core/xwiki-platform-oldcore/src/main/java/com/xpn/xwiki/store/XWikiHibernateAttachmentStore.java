@@ -26,7 +26,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -131,10 +130,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                 }
                 Session session = getSession(context);
 
-                Query query =
-                    session.createQuery("select attach.id from XWikiAttachmentContent as attach where attach.id = :id");
-                query.setLong("id", content.getId());
-                boolean exist = query.uniqueResult() != null;
+                boolean exist = exists(content, session);
 
                 AttachmentVersioningStore store = resolveAttachmentVersioningStore(attachment, context);
 
@@ -239,7 +235,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
 
             if (bTransaction) {
                 checkHibernate(context);
-                bTransaction = beginTransaction(false, context);
+                bTransaction = beginTransaction(context);
             }
             Session session = getSession(context);
 
@@ -253,7 +249,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
             attachment.setContentStore(null);
 
             if (bTransaction) {
-                endTransaction(context, false, false);
+                endTransaction(context, false);
             }
         } catch (Exception e) {
             Object[] args = { attachment.getReference() };
@@ -263,7 +259,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
         } finally {
             try {
                 if (bTransaction) {
-                    endTransaction(context, false, false);
+                    endTransaction(context, false);
                 }
             } catch (Exception e) {
             }
@@ -273,6 +269,60 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
 
             restoreExecutionXContext();
         }
+    }
+
+    @Override
+    public boolean attachmentContentExists(XWikiAttachment attachment, XWikiContext inputxcontext, boolean bTransaction)
+        throws XWikiException
+    {
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
+
+        String currentWiki = context.getWikiId();
+
+        try {
+            // Switch context wiki to attachment wiki
+            String attachmentWiki = (attachment.getReference() == null) ? null
+                : attachment.getReference().getDocumentReference().getWikiReference().getName();
+            if (attachmentWiki != null) {
+                context.setWikiId(attachmentWiki);
+            }
+
+            if (bTransaction) {
+                checkHibernate(context);
+                bTransaction = beginTransaction(context);
+            }
+            Session session = getSession(context);
+
+            XWikiAttachmentContent content = new XWikiAttachmentContent(attachment);
+
+            return exists(content, session);
+        } catch (Exception e) {
+            Object[] args = { attachment.getReference() };
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_ATTACHMENT, "Exception while loading attachment {0}",
+                e, args);
+        } finally {
+            try {
+                if (bTransaction) {
+                    endTransaction(context, false);
+                }
+            } catch (Exception e) {
+            }
+
+            // Restore context wiki
+            context.setWikiId(currentWiki);
+
+            restoreExecutionXContext();
+        }
+    }
+
+    private boolean exists(XWikiAttachmentContent content, Session session)
+    {
+        org.hibernate.query.Query<Long> query = session.createQuery(
+            "select attach.id from XWikiAttachmentContent as attach where attach.id = :id", Long.class);
+        query.setParameter("id", content.getId());
+
+        return query.uniqueResult() != null;
     }
 
     @Override

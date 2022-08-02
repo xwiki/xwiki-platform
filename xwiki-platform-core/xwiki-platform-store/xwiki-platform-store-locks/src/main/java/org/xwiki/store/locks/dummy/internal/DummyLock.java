@@ -68,7 +68,8 @@ public class DummyLock implements Lock
     }
 
     @Override
-    public Condition newCondition() {
+    public Condition newCondition()
+    {
         throw new UnsupportedOperationException();
     }
 }

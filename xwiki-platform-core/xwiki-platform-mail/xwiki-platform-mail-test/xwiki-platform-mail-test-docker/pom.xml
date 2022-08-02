@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-mail-test</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-mail-test-docker</artifactId>
   <name>XWiki Platform - Mail - Tests - Functional Tests</name>
@@ -36,7 +36,7 @@
   <properties>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
-    <selenium.version>3.14.0</selenium.version>
+    <!-- START: Required to fix conflicts resolution between XWiki & TestContainers -->
   </properties>
   <dependencies>
     <!-- ================================
@@ -47,6 +47,11 @@
       <artifactId>xwiki-platform-mail-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-mail-send-storage</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <!-- ================================
          Test only dependencies
@@ -65,14 +70,19 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-scheduler-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-mail-test-pageobjects</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.icegreen</groupId>
-      <artifactId>greenmail</artifactId>
-      <version>1.5.8</version>
+      <artifactId>greenmail-junit5</artifactId>
       <scope>test</scope>
     </dependency>
     <!-- Make sure we have the Logback SLF4J binding for client side logging for our tests and make sure other logging
@@ -92,39 +102,6 @@
       <artifactId>log4j-over-slf4j</artifactId>
       <scope>test</scope>
     </dependency>
-    <!-- START: Required to fix conflicts resolution between XWiki & TestContainers -->
-    <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-java</artifactId>
-      <version>${selenium.version}</version>
-      <exclusions>
-        <!-- XWiki uses a more recent version of bytebuddy -->
-        <exclusion>
-          <groupId>net.bytebuddy</groupId>
-          <artifactId>byte-buddy</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <!-- selenium-server requires Guava 25.0-jre+ but XWiki uses Guava 20.0, see xwiki-commons top level POM for more
-      details as to why we cannot use a more recent version. Thus we need to force a more recent version of Guava
-      here. Note that the version needs to be checked when we change the version of selenium-server -->
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>25.0-jre</version>
-      <exclusions>
-        <!-- Use the version from TestContainers which is newer -->
-        <exclusion>
-          <groupId>com.google.code.findbugs</groupId>
-          <artifactId>jsr305</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <!-- END: Required to fix conflicts resolution between XWiki & TestContainers -->
   </dependencies>
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>

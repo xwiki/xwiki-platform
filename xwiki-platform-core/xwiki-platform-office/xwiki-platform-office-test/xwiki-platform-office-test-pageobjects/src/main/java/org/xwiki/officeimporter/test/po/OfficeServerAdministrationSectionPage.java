@@ -19,6 +19,7 @@
  */
 package org.xwiki.officeimporter.test.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.administration.test.po.AdministrationSectionPage;
@@ -29,7 +30,10 @@ import org.xwiki.administration.test.po.AdministrationSectionPage;
  */
 public class OfficeServerAdministrationSectionPage extends AdministrationSectionPage
 {
-    @FindBy(xpath = "//label[contains(text(), 'Server state')]/../following-sibling::dd")
+    private static final String SERVERSTATE_XPATH =
+        "//label[contains(text(), 'Server state')]/../following-sibling::dd";
+
+    @FindBy(xpath = SERVERSTATE_XPATH)
     private WebElement serverState;
 
     @FindBy(css = "input[name='action'][value='start']")
@@ -58,6 +62,9 @@ public class OfficeServerAdministrationSectionPage extends AdministrationSection
     {
         startServerOption.click();
         updateButton.click();
+
+        // Wait for the state to be connected
+        getDriver().waitUntilElementHasTextContent(By.xpath(SERVERSTATE_XPATH), "Connected");
     }
 
     public void stopServer()

@@ -47,7 +47,7 @@ Det finns två typer av makron i XWiki syntax 1.0:
 * Velocity-makron, vilka anropas med syntaxen ###makronamn(parameter1 ... parameterN)##.
 * Radeox-makron, vilka anropas med syntaxen ##{makronamn:parameter1=värde1|...|parameterN=värdeN}##.
 
-{{info}}En fullständig lista över tillgängliga makron finns på [[makroreferenssidan&gt;&gt;http://code.xwiki.org/xwiki/bin/view/Macros/]].{{/info}}
+{{info}}En fullständig lista över tillgängliga makron finns på [[makroreferenssidan&gt;&gt;https://extensions.xwiki.org/]].{{/info}}
 
 |=Formateringstyp|=XWiki syntax 1.0
 |Velocity-makro|((({{{#info("Lite text")}}})))
@@ -72,5 +72,5 @@ System.out.println("Hello World!");
 
 {{info}}Radeox-makron kan ej användas i XWiki syntax 2.0 och har därför skrivits om som XWiki-makron.{{/info}}
 
-{{info}}En fullständig lista över tillgängliga makron finns på [[makroreferenssidan&gt;&gt;http://code.xwiki.org/xwiki/bin/view/Macros/]].{{/info}}</content>
+{{info}}En fullständig lista över tillgängliga makron finns på [[makroreferenssidan&gt;&gt;https://extensions.xwiki.org/]].{{/info}}</content>
 </xwikidoc>

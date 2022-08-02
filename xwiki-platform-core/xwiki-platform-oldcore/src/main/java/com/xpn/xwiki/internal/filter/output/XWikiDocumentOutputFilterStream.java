@@ -42,6 +42,7 @@ import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.event.model.WikiDocumentFilter;
 import org.xwiki.filter.event.xwiki.XWikiWikiDocumentFilter;
+import org.xwiki.filter.input.InputSource;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -51,6 +52,7 @@ import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
+import org.xwiki.user.UserReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -232,18 +234,20 @@ public class XWikiDocumentOutputFilterStream extends AbstractEntityOutputFilterS
         }
 
         // Find default author
-        DocumentReference defaultAuthorReference;
+        DocumentReference defaultAuthorDocumentReference;
+        // TODO: move to UserReference based APIs in DocumentInstanceOutputProperties
         if (this.properties.isAuthorSet()) {
-            defaultAuthorReference = this.properties.getAuthor();
+            defaultAuthorDocumentReference = this.properties.getAuthor();
         } else {
             XWikiContext xcontext = xcontextProvider.get();
-            defaultAuthorReference = xcontext != null ? xcontext.getUserReference() : null;
+            defaultAuthorDocumentReference = xcontext != null ? xcontext.getUserReference() : null;
         }
+        UserReference defaultAuthorReference = this.userDocumentResolver.resolve(defaultAuthorDocumentReference);
 
         this.entity
             .setCreationDate(getDate(WikiDocumentFilter.PARAMETER_CREATION_DATE, this.currentLocaleParameters, null));
 
-        this.entity.setCreatorReference(getUserReference(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR,
+        this.entity.getAuthors().setCreator(getUserReference(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR,
             this.currentLocaleParameters, defaultAuthorReference));
         this.entity.setDefaultLocale(this.currentDefaultLocale);
 
@@ -258,9 +262,15 @@ public class XWikiDocumentOutputFilterStream extends AbstractEntityOutputFilterS
 
         this.entity.setMinorEdit(getBoolean(WikiDocumentFilter.PARAMETER_REVISION_MINOR, parameters, false));
 
-        this.entity.setAuthorReference(
-            getUserReference(WikiDocumentFilter.PARAMETER_REVISION_AUTHOR, parameters, defaultAuthorReference));
-        this.entity.setContentAuthorReference(
+        this.entity.getAuthors().setEffectiveMetadataAuthor(getUserReference(
+            WikiDocumentFilter.PARAMETER_REVISION_EFFECTIVEMETADATA_AUTHOR, parameters, defaultAuthorReference));
+        // Use effectuve metadata author as default as this value used to be used both both original and effective
+        // metadata authors
+        this.entity.getAuthors()
+            .setOriginalMetadataAuthor(getUserReference(WikiDocumentFilter.PARAMETER_REVISION_ORIGINALMETADATA_AUTHOR,
+                parameters, this.entity.getAuthors().getEffectiveMetadataAuthor()));
+
+        this.entity.getAuthors().setContentAuthor(
             getUserReference(WikiDocumentFilter.PARAMETER_CONTENT_AUTHOR, parameters, defaultAuthorReference));
 
         String revisions =
@@ -426,7 +436,19 @@ public class XWikiDocumentOutputFilterStream extends AbstractEntityOutputFilterS
     public void onWikiAttachment(String name, InputStream content, Long size, FilterEventParameters parameters)
         throws FilterException
     {
-        this.entity.addAttachment(getXWikiAttachmentOutputFilterStream().getEntity());
+        endAttachment();
+    }
+
+    @Override
+    public void endWikiDocumentAttachment(String name, InputSource content, Long size, FilterEventParameters parameters)
+        throws FilterException
+    {
+        endAttachment();
+    }
+
+    private void endAttachment()
+    {
+        this.entity.setAttachment(getXWikiAttachmentOutputFilterStream().getEntity());
 
         // Reset attachment
         getXWikiAttachmentOutputFilterStream().setEntity(null);

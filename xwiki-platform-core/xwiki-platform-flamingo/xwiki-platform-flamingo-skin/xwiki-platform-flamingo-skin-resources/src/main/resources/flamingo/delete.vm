@@ -1,3 +1,22 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
 #######################################################
 ###              DELETE PAGE ACTION
 ###              ------------------
@@ -13,10 +32,13 @@
 #######################################################
 ##                     DISPLAY
 #######################################################
+#set ($discard = $xwiki.jsfx.use('js/xwiki/delete.js'))
 #template('refactoringStatus_macros.vm')
+#template('refactoring_macros.vm')
+#template('xwikivars.vm')
 
 #controller()
-#macro(displayContent $content)
+#macro(displayContent $deletecontent)
 #template("startpage.vm")
 <div class="main">
   <div id="mainContentArea">
@@ -24,7 +46,7 @@
     #set($titleToDisplay = $services.localization.render('core.delete.title', [$title]))
     <div class="xcontent">
       #template('contentheader.vm')
-      $content
+      $deletecontent
       <div class="clearfloats"></div>
     </div> ## xcontent
   </div>## mainContentArea
@@ -66,7 +88,7 @@
 ##            DISPLAY RUNNING JOB
 #######################################################
 #macro (displayDeleteJobStatus $deleteJobStatus)
-  #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js', true))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js'))
   ## TODO: allows question templates to inject the web resources they need
   #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css',
     {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
@@ -98,7 +120,7 @@
 ##            DISPLAY CONFIRMATION PAGE
 #######################################################
 #macro(displayConfirmationPage)
-  <form action="$doc.getURL('delete', "$!{languageparams}")" method="post">
+  <form id="delete" class="xform" action="$doc.getURL('delete', "$!{languageparams}")" method="post">
     #getChildren()
     #getBacklinks()
     #getChildren_legacy()
@@ -136,7 +158,7 @@
         #set ($forceAffectChildren = " checked='checked'")
       #end
       #define($heading)
-        <input name="affectChildren" id="affectChildren" type="checkbox" $!{forceAffectChildren}/><label for="affectChildren">Affect children</label> ($childCount)
+        <input name="affectChildren" id="affectChildren" type="checkbox" $!{forceAffectChildren}/><label for="affectChildren">$services.localization.render('core.delete.affectChildren')</label> ($childCount)
       #end
       #define($body)
         ##
@@ -199,7 +221,7 @@
   #set($links = $doc.getBacklinks())
   #if($links && $links.size() > 0)
     #define($heading)
-     <strong>Backlinks</strong> ($links.size())
+     <strong>$services.localization.render('core.delete.backlinks')</strong> ($links.size())
     #end
     #define($message)
       <ul>
@@ -209,7 +231,39 @@
       #end
       </ul>
     #end
-    #set($body = $services.localization.render('core.delete.backlinksWarning', [$message]))
+    #define($body)
+      <p class="noitems">
+        $escapetool.xml($services.localization.render('core.delete.backlinksInfo', [$doc.backlinks.size()]))
+      </p>
+      <dl>
+        <dt>
+          <label for="newBacklinkTarget">
+            $escapetool.xml($services.localization.render('core.delete.backlinkTarget.label'))
+          </label>
+          <span class="xHint">$escapetool.xml($services.localization.render('core.delete.backlinkTarget.hint'))</span>
+        </dt>
+        <dd>
+          #set ($pagePickerParams = {
+            'id': 'newBacklinkTarget',
+            'name': 'newBacklinkTarget'
+          })
+          #pagePicker($pagePickerParams)
+        </dd>
+        ##------------
+        ## Links field
+        ##------------
+        #displayLinksCheckbox({
+          'label': 'core.delete.updateLinks.label',
+          'hint': 'core.delete.updateLinks.hint',
+          'hidden': true
+        })
+        #displayAutoRedirectCheckbox({
+          'label': 'core.delete.autoRedirect.label',
+          'hint': 'core.delete.autoRedirect.hint',
+          'hidden': true
+        })
+      </dl>
+    #end
     #displayPanel('panel-backlinks', 'panel-default', $heading, $body)
     #set($hasInlinks = true)
   #end
@@ -219,16 +273,36 @@
 #######################################################
 #macro(displayConfirmMessage)
   #if($xwiki.hasRecycleBin())
-    #if($hasInlinks)
-      <p><strong>$services.localization.render('core.recyclebin.confirmWithInlinks')</strong></p>
+    #if($services.refactoring.isRecycleBinSkippingAllowed())
+      <div class="xform">
+        <dl>
+          <dt>
+            $escapetool.xml($services.localization.render('core.recycleBin.shouldSkip.label'))
+          </dt>
+          <dd>
+            <label class="xwiki-form-listclass">
+              <input name="shouldSkipRecycleBin" type="radio" value="false" checked/>
+              $escapetool.xml($services.localization.render('core.recycleBin.shouldSkip.no'))
+            </label>
+            <label class="xwiki-form-listclass">
+              <input name="shouldSkipRecycleBin" type="radio" value="true"/>
+              $escapetool.xml($services.localization.render('core.recycleBin.shouldSkip.yes'))
+            </label>
+          </dd>
+        </dl>
+      </div>
     #else
-      <p>$services.localization.render('core.recyclebin.confirm')</p>
+      #if($hasInlinks)
+        <p><strong>$escapetool.xml($services.localization.render('core.recyclebin.confirmWithInlinks'))</strong></p>
+      #else
+        <p>$escapetool.xml($services.localization.render('core.recyclebin.confirm'))</p>
+      #end
     #end
   #else
     #if($hasInlinks)
-      <p><strong>$services.localization.render('core.delete.confirmWithInlinks')</strong></p>
+      <p><strong>$escapetool.xml($services.localization.render('core.delete.confirmWithInlinks'))</strong></p>
     #else
-      <p>$services.localization.render('core.delete.confirm')</p>
+      <p>$escapetool.xml($services.localization.render('core.delete.confirm'))</p>
     #end
   #end
   <div class="hidden">
@@ -239,13 +313,13 @@
       <input type="hidden" name="xredirect" value="$!{escapetool.xml($request.xredirect)}"/>
     #end
   </div>
-  <button class="btn btn-danger confirm">$services.localization.render('delete')</button>
+  <button class="btn btn-danger confirm">$escapetool.xml($services.localization.render('delete'))</button>
   #if("$!{request.xredirect}" != '')
     #set($cancelUrl = "$request.xredirect")
   #else
     #set($cancelUrl = $doc.getURL())
   #end
-  <a class="btn btn-default cancel" href="$!{escapetool.xml(${cancelUrl})}">$services.localization.render('cancel')</a>
+  <a class="btn btn-default cancel" href="$!{escapetool.xml(${cancelUrl})}">$escapetool.xml($services.localization.render('cancel'))</a>
 #end
 #######################################################
 ##      DISPLAY DELETE COMPLETELY CONFIRM MESSAGE

@@ -114,7 +114,7 @@ public class JARTranslationBundleFactoryListener implements EventListener, Initi
         ExtensionEvent extensionEvent = (ExtensionEvent) event;
         InstalledExtension extension = (InstalledExtension) source;
 
-        if (extension.getType().equals(EXTENSION_TYPE)) {
+        if (EXTENSION_TYPE.equals(extension.getType())) {
             if (event instanceof ExtensionInstalledEvent) {
                 extensionAdded(extension, extensionEvent.getNamespace());
             } else if (event instanceof ExtensionUninstalledEvent) {
@@ -142,7 +142,7 @@ public class JARTranslationBundleFactoryListener implements EventListener, Initi
     {
         // Load installed extensions
         for (InstalledExtension extension : this.installedRepository.getInstalledExtensions()) {
-            if (extension.getType().equals(EXTENSION_TYPE)) {
+            if (EXTENSION_TYPE.equals(extension.getType())) {
                 if (extension.isInstalled(null)) {
                     extensionAdded(extension, null);
                 } else {

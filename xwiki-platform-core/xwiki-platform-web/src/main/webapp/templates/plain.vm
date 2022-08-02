@@ -1,9 +1,0 @@
-#if ("$!request.getParameter('raw')" == '1')
-<pre>$services.xml.escapeForElementContent($cdoc.getTranslatedContent())</pre>
-#elseif ("$!request.getParameter('raw')" == '2')
-$response.setContentType('text/plain')##
-$cdoc.getTranslatedContent()
-#else
-#template('xwikivars.vm')
-#template('displaycontent.vm')
-#end

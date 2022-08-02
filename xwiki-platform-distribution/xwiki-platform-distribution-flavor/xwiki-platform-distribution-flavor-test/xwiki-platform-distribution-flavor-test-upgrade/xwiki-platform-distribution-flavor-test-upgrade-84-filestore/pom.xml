@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor-test-upgrade</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test-upgrade-84-filestore</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Upgrade - From ${upgradetest.previousflavor.version} - Filestore</name>
@@ -37,13 +37,17 @@
     <upgradetest.previousflavor.artifactId>xwiki-enterprise-ui-mainwiki</upgradetest.previousflavor.artifactId>
     <upgradetest.previousflavor.version>8.4.6</upgradetest.previousflavor.version>
     <upgradetest.previousdata.artifactId>xwiki-enterprise-data-hsqldb</upgradetest.previousdata.artifactId>
-    <upgradetest.previousdata.classifier>custom-filestore-1</upgradetest.previousdata.classifier>
+    <upgradetest.previousdata.classifier>custom-filestore-6</upgradetest.previousdata.classifier>
   </properties>
   <dependencies>
     <dependency>
       <groupId>${upgradetest.previousdata.groupId}</groupId>
       <artifactId>${upgradetest.previousdata.artifactId}</artifactId>
-      <classifier>custom-filestore</classifier>
+      <classifier>${upgradetest.previousdata.classifier}</classifier>
+      <!-- Using a fixed version instead of ${upgradetest.previousflavor.version} because of
+           https://issues.apache.org/jira/browse/MRELEASE-799, causing "The artifact (...) requires a different
+           version (...) than what is found (...) for the expression (upgradetest.previousflavor.version) in the
+           project (...)" otherwise, when using the release plugin -->
       <version>8.4.6</version>
       <type>zip</type>
       <scope>test</scope>

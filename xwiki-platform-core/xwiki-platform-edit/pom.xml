@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-edit</artifactId>
   <name>XWiki Platform - Edit</name>
@@ -34,5 +34,14 @@
   <modules>
     <module>xwiki-platform-edit-api</module>
     <module>xwiki-platform-edit-default</module>
+    <module>xwiki-platform-edit-ui</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-edit-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

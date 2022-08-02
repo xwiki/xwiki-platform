@@ -77,6 +77,7 @@ public class PreferencesEditPage extends EditPage
         // When it's fixed use instead:
         //   Select select = new Select(this.timezone);
         //   select.selectByValue(value);
+        getDriver().scrollTo(this.timezone);
         this.timezone.clear();
         this.timezone.sendKeys(value);
     }

@@ -21,7 +21,6 @@ package org.xwiki.job.api;
 
 import org.xwiki.job.AbstractRequest;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Define a request that have rights to check.
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @since 10.8.2
  * @since 9.11.9
  */
-@Unstable
 public abstract class AbstractCheckRightsRequest extends AbstractRequest
 {
     /**

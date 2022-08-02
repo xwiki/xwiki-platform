@@ -19,19 +19,21 @@
  */
 package com.xpn.xwiki.internal.template;
 
-import java.io.PrintWriter;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.AbstractSet;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,31 +65,27 @@ import org.xwiki.properties.PropertyException;
 import org.xwiki.properties.RawProperties;
 import org.xwiki.properties.annotation.PropertyHidden;
 import org.xwiki.properties.annotation.PropertyId;
+import org.xwiki.rendering.async.internal.AsyncRendererConfiguration;
+import org.xwiki.rendering.async.internal.block.BlockAsyncRendererExecutor;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.GroupBlock;
+import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.rendering.block.RawBlock;
-import org.xwiki.rendering.block.VerbatimBlock;
-import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.renderer.printer.WriterWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
-import org.xwiki.rendering.transformation.TransformationContext;
-import org.xwiki.rendering.transformation.TransformationManager;
-import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.rendering.util.ErrorBlockGenerator;
 import org.xwiki.skin.Resource;
 import org.xwiki.skin.ResourceRepository;
 import org.xwiki.skin.Skin;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateContent;
-import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.internal.skin.AbstractEnvironmentResource;
+import com.xpn.xwiki.internal.skin.AbstractSkinResource;
 import com.xpn.xwiki.internal.skin.InternalSkinManager;
 import com.xpn.xwiki.internal.skin.WikiResource;
 import com.xpn.xwiki.user.api.XWikiRightService;
@@ -102,13 +100,13 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 @Singleton
 public class InternalTemplateManager implements Initializable
 {
-    private static final Pattern PROPERTY_LINE = Pattern.compile("^##!(.+)=(.*)$\r?\n?", Pattern.MULTILINE);
-
     /**
      * The reference of the superadmin user.
      */
-    private static final DocumentReference SUPERADMIN_REFERENCE =
+    public static final DocumentReference SUPERADMIN_REFERENCE =
         new DocumentReference("xwiki", XWiki.SYSTEM_SPACE, XWikiRightService.SUPERADMIN_USER);
+
+    private static final Pattern PROPERTY_LINE = Pattern.compile("^##!(.+)=(.*)$\r?\n?", Pattern.MULTILINE);
 
     private static final String TEMPLATE_RESOURCE_SUFFIX = "/templates/";
 
@@ -117,15 +115,6 @@ public class InternalTemplateManager implements Initializable
 
     @Inject
     private ContentParser parser;
-
-    @Inject
-    private VelocityManager velocityManager;
-
-    /**
-     * Used to execute transformations.
-     */
-    @Inject
-    private TransformationManager transformationManager;
 
     @Inject
     @Named("context")
@@ -157,13 +146,25 @@ public class InternalTemplateManager implements Initializable
     private ConverterManager converter;
 
     @Inject
-    private AuthorExecutor authorExecutor;
-
-    @Inject
     private InternalSkinManager skins;
 
     @Inject
     private JobProgressManager progress;
+
+    @Inject
+    private Provider<TemplateAsyncRenderer> rendererProvider;
+
+    @Inject
+    private BlockAsyncRendererExecutor asyncExecutor;
+
+    @Inject
+    private TemplateContext templateContext;
+
+    @Inject
+    private VelocityTemplateEvaluator evaluator;
+
+    @Inject
+    private Provider<ErrorBlockGenerator> errorBlockGeneratorProvider;
 
     @Inject
     private Logger logger;
@@ -230,9 +231,9 @@ public class InternalTemplateManager implements Initializable
         }
     }
 
-    private class EnvironmentTemplate extends AbtractTemplate<FilesystemTemplateContent, AbstractEnvironmentResource>
+    private class EnvironmentTemplate extends AbtractTemplate<FilesystemTemplateContent, AbstractSkinResource>
     {
-        EnvironmentTemplate(AbstractEnvironmentResource resource)
+        EnvironmentTemplate(AbstractSkinResource resource)
         {
             super(resource);
         }
@@ -280,12 +281,14 @@ public class InternalTemplateManager implements Initializable
 
     private class StringTemplate extends DefaultTemplate
     {
-        StringTemplate(String content, DocumentReference authorReference) throws Exception
+        StringTemplate(String content, DocumentReference authorReference, DocumentReference documentReference)
+            throws Exception
         {
             super(new StringResource(content));
-            // Initialize the template content
+
             // As StringTemplate extends DefaultTemplate, the TemplateContent is DefaultTemplateContent
             ((DefaultTemplateContent) this.getContent()).setAuthorReference(authorReference);
+            ((DefaultTemplateContent) this.getContent()).setDocumentReference(documentReference);
         }
     }
 
@@ -305,6 +308,14 @@ public class InternalTemplateManager implements Initializable
 
         @PropertyId("raw.syntax")
         public Syntax rawSyntax;
+
+        public boolean cacheAllowed;
+
+        public boolean asyncAllowed;
+
+        public Set<String> contextEntries;
+
+        public UniqueContext unique;
 
         protected Map<String, Object> properties = new HashMap<>();
 
@@ -339,6 +350,38 @@ public class InternalTemplateManager implements Initializable
         public Syntax getRawSyntax()
         {
             return this.rawSyntax;
+        }
+
+        @Override
+        public boolean isAsyncAllowed()
+        {
+            return this.asyncAllowed;
+        }
+
+        @Override
+        public boolean isCacheAllowed()
+        {
+            return this.cacheAllowed;
+        }
+
+        @Override
+        public UniqueContext getUnique()
+        {
+            return this.unique;
+        }
+
+        @Override
+        public Set<String> getContextEntries()
+        {
+            if (this.contextEntries == null) {
+                return Collections.emptySet();
+            }
+
+            if (this.contextEntries instanceof AbstractSet) {
+                this.contextEntries = Collections.unmodifiableSet(this.contextEntries);
+            }
+
+            return this.contextEntries;
         }
 
         @Override
@@ -529,46 +572,26 @@ public class InternalTemplateManager implements Initializable
         return templatePath;
     }
 
-    private void renderError(Throwable throwable, Writer writer)
+    private void renderError(Throwable throwable, boolean inline, Writer writer)
     {
-        XDOM xdom = generateError(throwable);
+        Block block = generateError(throwable, inline);
 
-        render(xdom, writer);
+        render(block, writer);
     }
 
-    private XDOM generateError(Throwable throwable)
+    private Block generateError(Throwable throwable, boolean inline)
     {
-        List<Block> errorBlocks = new ArrayList<Block>();
+        List<Block> errorBlocks = this.errorBlockGeneratorProvider.get().generateErrorBlocks(inline, null,
+            "Failed to execute template", null, throwable);
 
-        // Add short message
-        Map<String, String> errorBlockParams = Collections.singletonMap("class", "xwikirenderingerror");
-        errorBlocks.add(
-            new GroupBlock(Arrays.<Block>asList(new WordBlock("Failed to render step content")), errorBlockParams));
-
-        // Add complete error
-        StringWriter writer = new StringWriter();
-        throwable.printStackTrace(new PrintWriter(writer));
-        Block descriptionBlock = new VerbatimBlock(writer.toString(), false);
-        Map<String, String> errorDescriptionBlockParams =
-            Collections.singletonMap("class", "xwikirenderingerrordescription hidden");
-        errorBlocks.add(new GroupBlock(Arrays.asList(descriptionBlock), errorDescriptionBlockParams));
-
-        return new XDOM(errorBlocks);
-    }
-
-    private void transform(Block block)
-    {
-        TransformationContext txContext =
-            new TransformationContext(block instanceof XDOM ? (XDOM) block : new XDOM(Arrays.asList(block)),
-                this.renderingContext.getDefaultSyntax(), this.renderingContext.isRestricted());
-
-        txContext.setId(this.renderingContext.getTransformationId());
-        txContext.setTargetSyntax(getTargetSyntax());
-
-        try {
-            this.transformationManager.performTransformations(block, txContext);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        if (inline) {
+            if (errorBlocks.size() == 1) {
+                return errorBlocks.get(0);
+            } else {
+                return new CompositeBlock(errorBlocks);
+            }
+        } else {
+            return new XDOM(errorBlocks);
         }
     }
 
@@ -585,7 +608,7 @@ public class InternalTemplateManager implements Initializable
         } catch (Throwable e) {
             this.logger.error("Error while getting template [{}] XDOM", templateName, e);
 
-            xdom = generateError(e);
+            xdom = (XDOM) generateError(e, false);
         }
 
         return xdom;
@@ -605,7 +628,7 @@ public class InternalTemplateManager implements Initializable
         } catch (Throwable e) {
             this.logger.error("Error while getting template [{}] XDOM", template.getId(), e);
 
-            xdom = generateError(e);
+            xdom = (XDOM) generateError(e, false);
         }
 
         return xdom;
@@ -635,8 +658,8 @@ public class InternalTemplateManager implements Initializable
             if (StringUtils.isEmpty(result)) {
                 xdom = new XDOM(Collections.emptyList());
             } else {
-                xdom = new XDOM(Arrays.asList(new RawBlock(result,
-                    content.getRawSyntax() != null ? content.getRawSyntax() : renderingContext.getTargetSyntax())));
+                xdom = new XDOM(Arrays.asList(new RawBlock(result, content.getRawSyntax() != null
+                    ? content.getRawSyntax() : this.renderingContext.getTargetSyntax())));
             }
         }
 
@@ -650,68 +673,68 @@ public class InternalTemplateManager implements Initializable
         return getXDOM(template);
     }
 
-    public String renderNoException(String template)
+    public String renderNoException(String template, boolean inline)
     {
         Writer writer = new StringWriter();
 
-        renderNoException(template, writer);
+        renderNoException(template, inline, writer);
 
         return writer.toString();
     }
 
-    public void renderNoException(String templateName, Writer writer)
+    public void renderNoException(String templateName, boolean inline, Writer writer)
     {
         try {
-            render(templateName, writer);
+            render(templateName, inline, writer);
         } catch (Exception e) {
             this.logger.error("Error while rendering template [{}]", templateName, e);
 
-            renderError(e, writer);
+            renderError(e, inline, writer);
         }
     }
 
     /**
      * @since 8.3RC1
      */
-    public void renderNoException(Template template, Writer writer)
+    public void renderNoException(Template template, boolean inline, Writer writer)
     {
         try {
-            render(template, writer);
+            render(template, inline, writer);
         } catch (Exception e) {
             this.logger.error("Error while rendering template [{}]", template, e);
 
-            renderError(e, writer);
+            renderError(e, inline, writer);
         }
     }
 
-    public String render(String templateName) throws Exception
+    public String render(String templateName, boolean inline) throws Exception
     {
-        return renderFromSkin(templateName, (Skin) null);
+        return renderFromSkin(templateName, (Skin) null, inline);
     }
 
-    public String renderFromSkin(String templateName, String skinId) throws Exception
+    public String renderFromSkin(String templateName, String skinId, boolean inline) throws Exception
     {
         Skin skin = this.skins.getSkin(skinId);
 
-        return skin != null ? renderFromSkin(templateName, skin) : null;
+        return skin != null ? renderFromSkin(templateName, skin, inline) : null;
     }
 
-    public String renderFromSkin(String templateName, Skin skin) throws Exception
+    public String renderFromSkin(String templateName, Skin skin, boolean inline) throws Exception
     {
         Writer writer = new StringWriter();
 
-        renderFromSkin(templateName, skin, writer);
+        renderFromSkin(templateName, skin, inline, writer);
 
         return writer.toString();
     }
 
-    public void render(String templateName, Writer writer) throws Exception
+    public void render(String templateName, boolean inline, Writer writer) throws Exception
     {
-        renderFromSkin(templateName, null, writer);
+        renderFromSkin(templateName, null, inline, writer);
     }
 
-    public void renderFromSkin(final String templateName, ResourceRepository repository, final Writer writer)
-        throws Exception
+    public void renderFromSkin(final String templateName, ResourceRepository repository, boolean inline,
+        final Writer writer) throws Exception
     {
         this.progress.startStep(templateName, "template.render.message", "Render template [{}]", templateName);
 
@@ -720,38 +743,45 @@ public class InternalTemplateManager implements Initializable
                 repository != null ? getTemplate(templateName, repository) : getTemplate(templateName);
 
             if (template != null) {
-                if (template.getContent().isAuthorProvided()) {
-                    this.authorExecutor.call(() -> {
-                        render(template, template.getContent(), writer);
-
-                        return null;
-                    }, template.getContent().getAuthorReference(), template.getContent().getDocumentReference());
-                } else {
-                    render(template, template.getContent(), writer);
-                }
+                render(template, inline, writer);
             }
         } finally {
             this.progress.endStep(templateName);
         }
     }
 
-    public void render(Template template, Writer writer) throws Exception
+    public void render(Template template, boolean inline, Writer writer) throws Exception
     {
-        render(template, template.getContent(), writer);
-    }
-
-    private void render(Template template, TemplateContent content, Writer writer) throws Exception
-    {
-        if (content.getSourceSyntax() != null) {
-            XDOM xdom = execute(template, content);
-
-            render(xdom, writer);
-        } else {
-            evaluateContent(template, content, writer);
+        if (!shouldExecute(template)) {
+            return;
         }
+
+        TemplateAsyncRenderer renderer = this.rendererProvider.get();
+
+        Set<String> contextEntries = renderer.initialize(template, inline, false);
+
+        AsyncRendererConfiguration configuration = new AsyncRendererConfiguration();
+
+        configuration.setContextEntries(contextEntries);
+
+        TemplateContent templateContent = template.getContent();
+        if (templateContent.isAuthorProvided()) {
+            configuration.setSecureReference(templateContent.getDocumentReference(),
+                templateContent.getAuthorReference());
+        }
+
+        String result = this.asyncExecutor.render(renderer, configuration);
+
+        writer.append(result);
     }
 
-    private void render(XDOM xdom, Writer writer)
+    private boolean shouldExecute(Template template) throws Exception
+    {
+        return template != null
+            && (template.getContent().getUnique() == null || !this.templateContext.isExecuted(template));
+    }
+
+    private void render(Block block, Writer writer)
     {
         WikiPrinter printer = new WriterWikiPrinter(writer);
 
@@ -763,123 +793,94 @@ public class InternalTemplateManager implements Initializable
             blockRenderer = this.plainRenderer;
         }
 
-        blockRenderer.render(xdom, printer);
+        blockRenderer.render(block, printer);
     }
 
-    public XDOM executeNoException(String templateName)
+    public Block executeNoException(String templateName, boolean inline)
     {
-        XDOM xdom;
+        Block block;
 
         try {
-            xdom = execute(templateName);
+            block = execute(templateName, inline);
         } catch (Throwable e) {
             this.logger.error("Error while executing template [{}]", templateName, e);
 
-            xdom = generateError(e);
+            block = generateError(e, inline);
         }
 
-        return xdom;
+        return block;
     }
 
     /**
-     * @since 8.3RC1
+     * @since 14.0RC1
      */
-    public XDOM executeNoException(Template template)
+    public Block executeNoException(Template template, boolean inline)
     {
-        XDOM xdom;
+        Block block;
 
         try {
-            xdom = execute(template);
+            block = execute(template, inline);
         } catch (Throwable e) {
             this.logger.error("Error while executing template [{}]", template.getId(), e);
 
-            xdom = generateError(e);
+            block = generateError(e, inline);
         }
 
-        return xdom;
+        return block;
     }
 
-    private XDOM execute(Template template, TemplateContent content) throws Exception
-    {
-        XDOM xdom = getXDOM(template, content);
-
-        transform(xdom);
-
-        return xdom;
-    }
-
-    public XDOM execute(String templateName) throws Exception
+    /**
+     * @since 14.0RC1
+     */
+    public Block execute(String templateName, boolean inline) throws Exception
     {
         final Template template = getTemplate(templateName);
 
-        if (template != null) {
-            if (template.getContent().isAuthorProvided()) {
-                return this.authorExecutor.call(() -> execute(template, template.getContent()),
-                    template.getContent().getAuthorReference(), template.getContent().getDocumentReference());
-            } else {
-                return execute(template, template.getContent());
-            }
-        }
-
-        return null;
+        return execute(template, inline);
     }
 
-    public XDOM execute(Template template) throws Exception
+    /**
+     * @since 14.0RC1
+     */
+    public Block execute(Template template, boolean inline) throws Exception
     {
-        if (template != null) {
-            if (template.getContent().isAuthorProvided()) {
-                return this.authorExecutor.call(() -> execute(template, template.getContent()),
-                    template.getContent().getAuthorReference(), template.getContent().getDocumentReference());
-            } else {
-                return execute(template, template.getContent());
-            }
+        if (!shouldExecute(template)) {
+            return new XDOM(Collections.emptyList());
         }
 
-        return null;
+        TemplateAsyncRenderer renderer = this.rendererProvider.get();
+
+        Set<String> contextEntries = renderer.initialize(template, inline, true);
+
+        AsyncRendererConfiguration configuration = new AsyncRendererConfiguration();
+
+        configuration.setContextEntries(contextEntries);
+
+        if (template.getContent().isAuthorProvided()) {
+            configuration.setSecureReference(template.getContent().getDocumentReference(),
+                template.getContent().getAuthorReference());
+        }
+
+        Block block = this.asyncExecutor.execute(renderer, configuration);
+
+        if (inline) {
+            return block;
+        }
+
+        if (block instanceof XDOM) {
+            return (XDOM) block;
+        }
+
+        return new XDOM(Collections.singletonList(block));
     }
 
     private String evaluateContent(Template template, TemplateContent content) throws Exception
     {
         Writer writer = new StringWriter();
 
-        evaluateContent(template, content, writer);
+        this.evaluator.evaluateContent(template, content, writer);
 
         return writer.toString();
-    }
-
-    private void evaluateContent(Template template, TemplateContent content, Writer writer) throws Exception
-    {
-        // Use the Transformation id as the name passed to the Velocity Engine. This name is used internally
-        // by Velocity as a cache index key for caching macros.
-        String namespace = this.renderingContext.getTransformationId();
-
-        boolean renderingContextPushed = false;
-        if (namespace == null) {
-            namespace = template.getId() != null ? template.getId() : "unknown namespace";
-
-            if (this.renderingContext instanceof MutableRenderingContext) {
-                // Make the current velocity template id available
-                ((MutableRenderingContext) this.renderingContext).push(this.renderingContext.getTransformation(),
-                    this.renderingContext.getXDOM(), this.renderingContext.getDefaultSyntax(), namespace,
-                    this.renderingContext.isRestricted(), this.renderingContext.getTargetSyntax());
-
-                renderingContextPushed = true;
-            }
-        }
-
-        this.progress.startStep(template, "template.evaluateContent.message",
-            "Evaluate content of template with id [{}]", template.getId());
-
-        try {
-            this.velocityManager.evaluate(writer, namespace, new StringReader(content.getContent()));
-        } finally {
-            // Get rid of temporary rendering context
-            if (renderingContextPushed) {
-                ((MutableRenderingContext) this.renderingContext).pop();
-            }
-
-            this.progress.endStep(template);
-        }
     }
 
     private Syntax getTargetSyntax()
@@ -893,18 +894,27 @@ public class InternalTemplateManager implements Initializable
     {
         String path = getTemplateResourcePath(templateName);
 
-        return path != null
-            ? new EnvironmentTemplate(new TemplateEnvironmentResource(path, templateName, this.environment)) : null;
+        return path != null ? new EnvironmentTemplate(new TemplateSkinResource(path, templateName, this.environment))
+            : null;
     }
 
-    private Template getClassloaderTemplate(String suffixPath, String templateName)
+    private Template getClassloaderTemplate(String prefixPath, String templateName)
     {
-        return getClassloaderTemplate(Thread.currentThread().getContextClassLoader(), suffixPath, templateName);
+        return getClassloaderTemplate(Thread.currentThread().getContextClassLoader(), prefixPath, templateName);
     }
 
-    private Template getClassloaderTemplate(ClassLoader classloader, String suffixPath, String templateName)
+    private Template getClassloaderTemplate(ClassLoader classloader, String prefixPath, String templateName)
     {
-        String templatePath = suffixPath + templateName;
+        String templatePath = prefixPath + templateName;
+
+        // Prevent access to resources from other directories
+        Path normalizedResource = Paths.get(templatePath).normalize();
+        // Protect against directory attacks.
+        if (!normalizedResource.startsWith(prefixPath)) {
+            this.logger.warn("Direct access to skin file [{}] refused. Possible break-in attempt!", normalizedResource);
+
+            return null;
+        }
 
         URL url = classloader.getResource(templatePath);
 
@@ -915,8 +925,8 @@ public class InternalTemplateManager implements Initializable
     {
         Template template;
 
-        if (resource instanceof AbstractEnvironmentResource) {
-            template = new EnvironmentTemplate((AbstractEnvironmentResource) resource);
+        if (resource instanceof AbstractSkinResource) {
+            template = new EnvironmentTemplate((AbstractSkinResource) resource);
         } else {
             template = new DefaultTemplate(resource);
         }
@@ -976,15 +986,19 @@ public class InternalTemplateManager implements Initializable
     }
 
     /**
-     * Create a DefaultTemplate with the given content and the given author.
+     * Create a new template using a given content and a specific author and source document.
      *
-     * @since 9.6RC1
      * @param content the template content
      * @param author the template author
+     * @param sourceReference the reference of the document associated with the {@link Callable} (which will be used to
+     *            test the author right)
      * @return the template
+     * @throws Exception if an error occurred during template instantiation
+     * @since 14.0RC1
      */
-    public Template createStringTemplate(String content, DocumentReference author) throws Exception
+    public Template createStringTemplate(String content, DocumentReference author, DocumentReference sourceReference)
+        throws Exception
     {
-        return new StringTemplate(content, author);
+        return new StringTemplate(content, author, sourceReference);
     }
 }

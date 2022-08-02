@@ -20,6 +20,7 @@
 package org.xwiki.notifications.script.internal;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -29,7 +30,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventStatus;
-import org.xwiki.eventstream.EventStatusManager;
+import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.eventstream.internal.DefaultEventStatus;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -50,7 +51,7 @@ import org.xwiki.notifications.script.NotificationScriptService;
 public class NotificationScriptEventHelper
 {
     @Inject
-    private EventStatusManager eventStatusManager;
+    private EventStore eventStore;
 
     @Inject
     private CompositeEventStatusManager compositeEventStatusManager;
@@ -72,8 +73,8 @@ public class NotificationScriptEventHelper
      */
     public List<EventStatus> getEventStatuses(List<Event> events) throws Exception
     {
-        return eventStatusManager.getEventStatus(events,
-                Arrays.asList(entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference())));
+        return this.eventStore.getEventStatuses(events,
+            Arrays.asList(entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference())));
     }
 
     /**
@@ -104,6 +105,19 @@ public class NotificationScriptEventHelper
         DefaultEvent event = new DefaultEvent();
         event.setId(eventId);
         String userId = entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference());
-        eventStatusManager.saveEventStatus(new DefaultEventStatus(event, userId, isRead));
+        this.eventStore.saveEventStatus(new DefaultEventStatus(event, userId, isRead));
+    }
+
+    /**
+     * Remove all event status entries associated with current user.
+     *
+     * @param startDate date before which to remove event status
+     * @throws Exception if an error occurs
+     * @since 12.1RC1
+     */
+    public void clearAllStatus(Date startDate) throws Exception
+    {
+        String userId = this.entityReferenceSerializer.serialize(this.documentAccessBridge.getCurrentUserReference());
+        this.eventStore.deleteEventStatuses(userId, startDate);
     }
 }

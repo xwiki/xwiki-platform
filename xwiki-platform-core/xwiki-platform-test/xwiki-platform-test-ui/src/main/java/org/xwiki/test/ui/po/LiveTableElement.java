@@ -19,17 +19,19 @@
  */
 package org.xwiki.test.ui.po;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.Select;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents the actions possible on a livetable.
@@ -39,6 +41,8 @@ import org.openqa.selenium.support.ui.Select;
  */
 public class LiveTableElement extends BaseElement
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LiveTableElement.class);
+
     private String livetableId;
 
     public LiveTableElement(String livetableId)
@@ -51,9 +55,13 @@ public class LiveTableElement extends BaseElement
      */
     public boolean isReady()
     {
-        Object result = getDriver().executeJavascript("return Element.hasClassName('"
-            + StringEscapeUtils.escapeEcmaScript(livetableId) + "-ajax-loader','hidden')");
-        return result instanceof Boolean ? (Boolean) result : false;
+        try {
+            Object result = getDriver().executeJavascript("return (Element.hasClassName) && Element.hasClassName('"
+                + StringEscapeUtils.escapeEcmaScript(livetableId) + "-ajax-loader','hidden')");
+            return result instanceof Boolean ? (Boolean) result : false;
+        } catch (JavascriptException e) {
+            return false;
+        }
     }
 
     /**
@@ -91,9 +99,14 @@ public class LiveTableElement extends BaseElement
         getDriver().executeJavascript("return $('" + StringEscapeUtils.escapeEcmaScript(livetableId)
             + "-ajax-loader').removeClassName('hidden')");
 
-        WebElement element = getDriver().findElement(By.id(inputId));
+        WebElement element = getDriver().findElement(By.id(livetableId)).findElement(By.id(inputId));
         if ("select".equals(element.getTagName())) {
-            new Select(element).selectByVisibleText(filterValue);
+            if (element.getAttribute("class").contains("selectized")) {
+                SuggestInputElement suggestInputElement = new SuggestInputElement(element);
+                suggestInputElement.sendKeys(filterValue).selectTypedText();
+            } else {
+                new Select(element).selectByVisibleText(filterValue);
+            }
         } else {
             element.clear();
             element.sendKeys(filterValue);
@@ -202,11 +215,39 @@ public class LiveTableElement extends BaseElement
     }
 
     /**
+     * Get the row index of an element, relative to the number of currently displayed rows.
+     *
+     * @param by the selector of the searched element
+     * @return the row index where the element was found
+     * @since 14.4.2
+     * @since 14.5
+     */
+    public int getRowNumberForElement(By by)
+    {
+        WebElement livetableRowElement =
+            getDriver().findElement(By.xpath("//tbody[@id='" + this.livetableId + "-display']/tr/td")).findElement(by);
+        if (livetableRowElement.isDisplayed()) {
+            // Count the preceding rows.
+            return livetableRowElement.findElements(By.xpath("./ancestor::tr[1]/preceding-sibling::tr")).size() + 1;
+        }
+        return 0;
+    }
+
+    /**
      * @since 5.3RC1
      */
     public WebElement getCell(WebElement rowElement, int columnNumber)
     {
         return getDriver().findElementWithoutWaiting(rowElement, By.xpath("td[" + columnNumber + "]"));
+    }
+
+    /**
+     * @since 11.6RC1
+     * @since 11.5
+     */
+    public WebElement getCell(int rowNumber, int columnNumber)
+    {
+        return getCell(getRow(rowNumber), columnNumber);
     }
 
     /**
@@ -216,7 +257,7 @@ public class LiveTableElement extends BaseElement
     {
         WebElement tdElement = getCell(getRow(rowNumber), columnNumber);
         // First scroll the element into view, if needed, by moving the mouse to the top left corner of the element.
-        new Actions(getDriver()).moveToElement(tdElement, 0, 0).perform();
+        new Actions(getDriver().getWrappedDriver()).moveToElement(tdElement, 0, 0).perform();
         // Find the first A element and click it!
         tdElement.findElement(By.tagName("a")).click();
         return new ViewPage();
@@ -228,16 +269,31 @@ public class LiveTableElement extends BaseElement
     public void waitUntilRowCountGreaterThan(int minimalExpectedRowCount)
     {
         final By by = By.xpath("//tbody[@id = '" + this.livetableId + "-display']//tr");
-        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
-        {
-            @Override
-            public Boolean apply(WebDriver driver)
-            {
+        // TODO: Remove the try/catch and the logging once we understand the issue. This is done to debug an issue
+        //  with the MailIT test where the timeout is not the issue since the CI screenshots shows that the number of
+        //  rows displayed is correct and yet this method returns less than the expected count. Thus we suppose that
+        //  the refresh() might not be working. We thus also try to navigate to the same page in the hope to get better
+        //  results.
+        try {
+            getDriver().waitUntilCondition(driver -> {
                 // Refresh the current page since we need the livetable to fetch the JSON again
                 driver.navigate().refresh();
-                return driver.findElements(by).size() >= minimalExpectedRowCount;
-            }
-        });
+                this.waitUntilReady();
+                int count = driver.findElements(by).size();
+                LOGGER.info("LiveTableElement#waitUntilRowCountGreaterThan/refresh(): count = [{}]", count);
+                return count >= minimalExpectedRowCount;
+            });
+        } catch (TimeoutException e) {
+            // Try again but this time with driver.get(), in case refresh() doesn't work.
+            getDriver().waitUntilCondition(driver -> {
+                // Refresh the current page since we need the livetable to fetch the JSON again
+                driver.get(driver.getCurrentUrl());
+                this.waitUntilReady();
+                int count = driver.findElements(by).size();
+                LOGGER.info("LiveTableElement#waitUntilRowCountGreaterThan/get(): count = [{}]", count);
+                return count >= minimalExpectedRowCount;
+            });
+        }
     }
 
     /**
@@ -246,7 +302,7 @@ public class LiveTableElement extends BaseElement
      *
      * @since 9.1RC1
      */
-    // We need to decide if it's bettter to introduce this method or to globally increase the default timeout.
+    // We need to decide if it's better to introduce this method or to globally increase the default timeout.
     public void waitUntilRowCountGreaterThan(int minimalExpectedRowCount, int timeout)
     {
         int originalTimeout = getDriver().getTimeout();
@@ -270,10 +326,88 @@ public class LiveTableElement extends BaseElement
         getDriver().executeJavascript("return $('" + StringEscapeUtils.escapeEcmaScript(livetableId)
             + "-ajax-loader').removeClassName('hidden')");
 
-        String xpath = String.format("//table[@id = '%s']//th[contains(@class, 'xwiki-livetable-display-header-text')"
-            + " and contains(@class, 'sortable') and normalize-space(.) = '%s']", this.livetableId, columnTitle);
-        getDriver().findElement(By.xpath(xpath)).click();
+        getHeaderByColumnTitle(columnTitle).click();
 
         waitUntilReady();
+    }
+
+    /**
+     * Sorts the live table on the specified column, by ascending order.
+     *
+     * @param columnTitle the column to sort on
+     * @since 13.3RC1
+     * @since 12.10.6
+     */
+    public void sortAscending(String columnTitle)
+    {
+        WebElement element = getHeaderByColumnTitle(columnTitle);
+        List<String> strings = Arrays.asList(element.getAttribute("class").split("\\w+"));
+        boolean isSelected = strings.contains("selected");
+        boolean isAsc = strings.contains("asc");
+
+        /*
+         * isSelected indicates if the column is the one currently sorted.
+         * If the column is the one currently sorted, and is in ascending order, we do nothing.
+         * If the column is already sorted in descending order, or if it is not the one currently sorted, but was
+         * previously sorted in ascending order, we sort only once.
+         * If the column is not already sorted, and was previously sorted in descending order, clicking sorting twice
+         * is required to sort in ascending order.
+         */
+        if (isSelected && !isAsc || (!isSelected && isAsc)) {
+            sortBy(columnTitle);
+        } else if (!isSelected) {
+            sortBy(columnTitle);
+            sortBy(columnTitle);
+        }
+    }
+
+    /**
+     * Sorts the live table on the specified column, by ascending order.
+     *
+     * @param columnTitle the column to sort on
+     * @since 13.3RC1
+     * @since 12.10.6
+     */
+    public void sortDescending(String columnTitle)
+    {
+        WebElement element = getHeaderByColumnTitle(columnTitle);
+        List<String> strings = Arrays.asList(element.getAttribute("class").split("\\w+"));
+        boolean isSelected = strings.contains("selected");
+        boolean isDesc = strings.contains("desc");
+
+        /*
+         * isSelected indicates if the column is the one currently sorted.
+         * If the column is the one currently sorted, and is in descending order, we do nothing.
+         * If the column is already sorted in ascending order, or if it is not the one currently sorted, but was
+         * previously sorted in descending order, we sort only once.
+         * If the column is not already sorted, and was previously sorted in ascending order, clicking sorting twice
+         * is required to sort in descending order.
+         */
+        if (isSelected && !isDesc || (!isSelected && isDesc)) {
+            sortBy(columnTitle);
+        } else if (!isSelected) {
+            sortBy(columnTitle);
+            sortBy(columnTitle);
+        }
+    }
+
+    /**
+     * Clicks a form element (usually a button) with the passed name at the passed row number.
+     *
+     * @param actionName the HTML form element name attribute value
+     * @param rowNumber the LT row number (starts at 1)
+     * @since 12.10
+     */
+    public void clickAction(String actionName, int rowNumber)
+    {
+        WebElement rowElement = getRow(rowNumber);
+        rowElement.findElement(By.xpath("td/form//input[@name = '" + actionName + "']")).click();
+    }
+
+    private WebElement getHeaderByColumnTitle(String columnTitle)
+    {
+        String xpath = String.format("//table[@id = '%s']//th[contains(@class, 'xwiki-livetable-display-header-text')"
+            + " and contains(@class, 'sortable') and normalize-space(.) = '%s']", this.livetableId, columnTitle);
+        return getDriver().findElement(By.xpath(xpath));
     }
 }

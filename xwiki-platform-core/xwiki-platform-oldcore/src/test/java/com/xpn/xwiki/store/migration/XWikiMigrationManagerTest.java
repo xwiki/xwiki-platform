@@ -33,7 +33,6 @@ import org.xwiki.component.descriptor.ComponentDescriptor;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
 /**
@@ -87,7 +86,7 @@ public class XWikiMigrationManagerTest extends AbstractBridgedXWikiComponentTest
         @Override
         protected List<DataMigration> getAllMigrations()
         {
-            List<DataMigration> lst = new ArrayList<DataMigration>();
+            List<DataMigration> lst = new ArrayList<>();
             lst.add(createMigrator(345));
             lst.add(createMigrator(123));
             lst.add(createMigrator(456));
@@ -99,7 +98,7 @@ public class XWikiMigrationManagerTest extends AbstractBridgedXWikiComponentTest
         XWikiDBVersion curversion;
 
         @Override
-        protected void initializeEmptyDB() throws DataMigrationException
+        protected void initializeEmptyDB()
         {
         }
 
@@ -118,7 +117,7 @@ public class XWikiMigrationManagerTest extends AbstractBridgedXWikiComponentTest
     private void registerComponent(Class<?> klass) throws Exception
     {
         ComponentAnnotationLoader loader = new ComponentAnnotationLoader();
-        List<ComponentDescriptor> descriptors = loader.getComponentsDescriptors(klass);
+        List<ComponentDescriptor<?>> descriptors = loader.getComponentsDescriptors(klass);
 
         for (ComponentDescriptor<?> descriptor : descriptors) {
             getComponentManager().registerComponent(descriptor);
@@ -131,7 +130,7 @@ public class XWikiMigrationManagerTest extends AbstractBridgedXWikiComponentTest
         super.setUp();
         getContext().setWiki(new XWiki() {
             @Override
-            public List<String> getVirtualWikisDatabaseNames(XWikiContext context) throws XWikiException
+            public List<String> getVirtualWikisDatabaseNames(XWikiContext context)
             {
                 return Arrays.asList("xwiki");
             }
@@ -143,8 +142,7 @@ public class XWikiMigrationManagerTest extends AbstractBridgedXWikiComponentTest
     /** test migration if there are no data version */
     public void testMigrationWhenNoVersion() throws Exception
     {
-        TestDataMigrationManager mm = (TestDataMigrationManager) getComponentManager().getInstance(
-            DataMigrationManager.class,"TestDataMigration");
+        TestDataMigrationManager mm = getComponentManager().getInstance(DataMigrationManager.class,"TestDataMigration");
         Collection neededMigration = mm.getNeededMigrations();
         assertEquals(0, neededMigration.size());
         mm.startMigrations();
@@ -198,7 +196,7 @@ public class XWikiMigrationManagerTest extends AbstractBridgedXWikiComponentTest
         }
 
         @Override
-        public void migrate() throws DataMigrationException
+        public void migrate()
         {
         }
     }

@@ -1,0 +1,11 @@
+{{velocity}}
+#if ($type == 'edit')
+  {{html clean="false"}}
+  <textarea name="content">$!escapetool.xml($tdoc.content)</textarea>
+  {{/html}}
+#elseif ("$!type" != '')
+  {{include reference="" /}}
+#else
+  The display mode is not specified!
+#end
+{{/velocity}}

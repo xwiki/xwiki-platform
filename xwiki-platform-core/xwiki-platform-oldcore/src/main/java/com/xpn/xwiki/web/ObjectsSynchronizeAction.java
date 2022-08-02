@@ -21,7 +21,11 @@ package com.xpn.xwiki.web;
 
 import java.util.List;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.servlet.http.HttpServletResponse;
+
+import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -36,6 +40,9 @@ import com.xpn.xwiki.objects.BaseProperty;
  * @version $Id$
  * @since 2.4M2
  */
+@Component
+@Named("objectsync")
+@Singleton
 public class ObjectsSynchronizeAction extends XWikiAction
 {
     @Override

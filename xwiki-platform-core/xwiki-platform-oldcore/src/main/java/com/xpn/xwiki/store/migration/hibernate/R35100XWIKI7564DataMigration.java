@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.sql.BatchUpdateException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -109,14 +110,16 @@ public class R35100XWIKI7564DataMigration extends AbstractHibernateDataMigration
         @Override
         public void execute(Connection connection) throws SQLException
         {
-            try {
-                Statement stmt = connection.createStatement();
-                BufferedReader in = new BufferedReader(new InputStreamReader(
-                    this.getClass().getResourceAsStream("R35100XWIKI7564.sql"), "UTF-8"));
-                String line;
-                while ((line = in.readLine()) != null) {
-                    stmt.addBatch(line);
+            try (Statement stmt = connection.createStatement()) {
+                try (BufferedReader in = new BufferedReader(
+                    new InputStreamReader(this.getClass().getResourceAsStream("R35100XWIKI7564.sql"),
+                        StandardCharsets.UTF_8))) {
+                    String line;
+                    while ((line = in.readLine()) != null) {
+                        stmt.addBatch(line);
+                    }
                 }
+
                 stmt.executeBatch();
             } catch (BatchUpdateException ex) {
                 if (ex.getNextException() != null

@@ -1,3 +1,22 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
 ###
 ### Copy document template
 ###
@@ -41,8 +60,12 @@
         ## Target Page
         ##------------
         #template('locationPicker_macros.vm')
-        #set ($parentReference = $doc.pageReference.parent)
-        #set ($name = $doc.pageReference.name)
+        #set ($parentReference = $doc.documentReference.parent)
+        #set ($name = $doc.documentReference.name)
+        #if ($doc.documentReference.name == $defaultDocumentName)
+          #set ($name = $parentReference.name)
+          #set ($parentReference = $parentReference.parent)
+        #end
         #locationPicker({
           'id': 'target',
           'title': {
@@ -143,7 +166,7 @@
       #if ($xwiki.exists($targetDocReference) && "$!request.overwrite" != 'true'
           && !$xwiki.getDocument($targetDocReference).getObject('XWiki.RedirectClass'))
         #warning($services.localization.render('core.copy.alreadyExists',
-          [$services.model.serialize($targetDocReference, 'compactwiki')]))
+          [$escapetool.xml($services.model.serialize($targetDocReference, 'compactwiki'))]))
         <form action="$xwiki.relativeRequestURL" id="copy" class="xform third" method="post">
           ## The field values are specified in the URL. We use POST to append the "overwrite" value.
           <input type="hidden" name="overwrite" value="true" />
@@ -161,6 +184,19 @@
             </span>
           </div>
         </form>
+      #elseif (!$services.security.authorization.hasAccess('edit', $targetDocReference))
+        #warning($services.localization.render('core.copy.editRightsForbidden',
+        [$escapetool.xml($services.model.serialize($targetDocReference, 'compactwiki'))]))
+        <div class="buttons">
+          <span class="buttonwrapper">
+              <a class="secondary button" href="$doc.getURL('view', 'xpage=copy')">
+                $services.localization.render('core.copy.changeTarget')
+              </a>
+            </span>
+          <span class="buttonwrapper">
+              <a class="secondary button" href="$doc.getURL()">$services.localization.render('core.copy.cancel')</a>
+            </span>
+        </div>
       #else
         #set ($copyAsRequest = $services.refactoring.requestFactory.createCopyAsRequest($sourceDocReference,
           $targetDocReference))
@@ -220,7 +256,7 @@
 #end
 
 #macro (displayCopyJobStatus $copyJobStatus)
-  #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js', true))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js'))
   #set ($copyJobState = $copyJobStatus.state)
   #set ($finished = $copyJobState == 'FINISHED')
   #set ($copyJobRequest = $copyJobStatus.request)
@@ -230,9 +266,7 @@
     'copyId': $copyJobRequest.id.get($mathtool.sub($copyJobRequest.id.size(), 1))
   })))
   <div class="xcontent job-status" data-url="$jobStatusURL">
-    <h2>$services.localization.render('core.copy.status.label')</h2>
-    <p class="text-muted small">$services.localization.render('core.copy.status.hint',
-      [$xwiki.getUserName($copyJobRequest.userReference), $xwiki.formatDate($copyJobStatus.startDate)])</p>
+    #displayDocumentTitle($services.localization.render('core.copy.status.label'), $services.localization.render('core.copy.status.hint', [$xwiki.getUserName($copyJobRequest.userReference), $xwiki.formatDate($copyJobStatus.startDate)]))
     #displayCopyJobRequest($copyJobRequest)
     #if (!$finished)
       #displayJobProgressBar($copyJobStatus)

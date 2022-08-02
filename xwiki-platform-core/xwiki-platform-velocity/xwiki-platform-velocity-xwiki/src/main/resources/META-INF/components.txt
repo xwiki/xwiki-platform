@@ -1,1 +1,4 @@
+org.xwiki.velocity.internal.XWikiDateTool
+org.xwiki.velocity.internal.XWikiMathTool
+org.xwiki.velocity.internal.XWikiNumberTool
 500:org.xwiki.velocity.internal.XWikiVelocityConfiguration

@@ -25,14 +25,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-office</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-office-viewer</artifactId>
   <name>XWiki Platform - Office - Viewer</name>
   <description>A module providing support for viewing office documents attached to wiki pages.</description>
   <properties>
+    <!-- Skipping revapi since xwiki-platform-legacy-office-viewer wraps this module and runs checks on it -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
     <xwiki.jacoco.instructionRatio>0.79</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>90</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>
@@ -65,12 +66,24 @@
       <artifactId>xwiki-commons-cache-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- Test Dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-tool-test-component</artifactId>
       <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-oldcore</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
       <scope>test</scope>
     </dependency>
   </dependencies>

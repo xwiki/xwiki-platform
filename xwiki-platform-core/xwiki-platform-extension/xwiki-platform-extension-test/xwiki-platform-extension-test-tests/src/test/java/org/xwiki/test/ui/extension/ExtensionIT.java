@@ -192,8 +192,9 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         // Check that the results match the search query.
         for (int i = 0; i < searchResults.getPagination().getPageCount(); i++) {
             ExtensionPane extension = searchResults.getExtension(i);
-            assertTrue("Can't find [commons] in the summary/id/name parts of extension [" + extension.getId() + "] ("
-                + extension.getSummary() + ")",
+            assertTrue(
+                "Can't find [commons] in the summary/id/name parts of extension [" + extension.getId() + "] ("
+                    + extension.getSummary() + ")",
                 extension.getSummary().toLowerCase().contains("commons")
                     || extension.getId().getId().toLowerCase().contains("commons")
                     || extension.getName().toLowerCase().contains("commons"));
@@ -293,16 +294,17 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         // Check that the Recommended Extensions are displayed by default.
         ExtensionAdministrationPage adminPage = ExtensionAdministrationPage.gotoPage();
         Select repositorySelect = adminPage.getSearchBar().getRepositorySelect();
-        assertEquals("Recommended Extensions", repositorySelect.getFirstSelectedOption().getText());
+        assertEquals("Available Extensions", repositorySelect.getFirstSelectedOption().getText());
 
         // Check that a remote extension appears only in the list of "All Extensions".
         adminPage.getSearchBar().selectRepository("installed");
         SearchResultsPane searchResults = adminPage.getSearchBar().search("alice");
         assertNull(searchResults.getExtension(extensionId));
 
-        adminPage.getSearchBar().getRepositorySelect().selectByVisibleText("All Extensions");
+        adminPage.getSearchBar().selectRepository("");
         adminPage = new ExtensionAdministrationPage();
-        adminPage.waitUntilPageIsLoaded();
+        // Test direct search
+        adminPage = adminPage.setIndexed(false);
         // The value of the search input must be preserved when we switch the repository.
         assertEquals("alice", adminPage.getSearchBar().getSearchInput().getAttribute("value"));
         assertNotNull(adminPage.getSearchResults().getExtension(extensionId));
@@ -315,7 +317,12 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         searchResults = adminPage.getSearchBar().search("alice");
         assertNotNull(searchResults.getExtension(extensionId));
         assertNotNull(new SimpleSearchPane().selectRepository("local").getExtension(extensionId));
-        assertNotNull(new SimpleSearchPane().selectRepository("").getExtension(extensionId));
+
+        adminPage.getSearchBar().selectRepository("");
+        adminPage = new ExtensionAdministrationPage();
+        // Test direct search
+        adminPage = adminPage.setIndexed(false);
+        assertNotNull(adminPage.getSearchBar().selectRepository("").getExtension(extensionId));
 
         // Check local extension.
         getExtensionTestUtils().uninstall(extensionId.getId(), true);
@@ -324,7 +331,12 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         searchResults = adminPage.getSearchBar().search("alice");
         assertNull(searchResults.getExtension(extensionId));
         assertNotNull(new SimpleSearchPane().selectRepository("local").getExtension(extensionId));
-        assertNotNull(new SimpleSearchPane().selectRepository("").getExtension(extensionId));
+
+        adminPage.getSearchBar().selectRepository("");
+        adminPage = new ExtensionAdministrationPage();
+        // Test direct search
+        adminPage = adminPage.setIndexed(false);
+        assertNotNull(adminPage.getSearchBar().selectRepository("").getExtension(extensionId));
     }
 
     /**
@@ -624,8 +636,7 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         assertEquals("Resolving extension [bob-xar-extension 2.5-milestone-2] from namespace [Home]",
             log.get(2).getMessage());
         assertEquals("info", log.get(log.size() - 1).getLevel());
-        assertEquals(
-            "Finished job of type [uninstall] with identifier " + "[extension/action/bob-xar-extension/wiki:xwiki]",
+        assertEquals("Finished job of type [uninstall] with identifier [extension/action/bob-xar-extension/wiki:xwiki]",
             log.get(log.size() - 1).getMessage());
 
         // Check if the uninstalled pages have been deleted.
@@ -830,9 +841,11 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
 
         changesPane = mergeConflictPane.getChanges();
         List<String> expectedDiff = new ArrayList<>();
-        expectedDiff.add("@@ -1,9 +1,9 @@");
+        expectedDiff.add("@@ -1,1 +1,1 @@");
         expectedDiff.add("-= Usage =");
         expectedDiff.add("+=<ins>=</ins> Usage =<ins>=</ins>");
+        expectedDiff.add("[Conflict Resolution]");
+        expectedDiff.add("@@ -2,8 +2,8 @@");
         expectedDiff.add(" ");
         expectedDiff.add("-{{code}}");
         expectedDiff.add("+{{code<ins> language=\"none\"</ins>}}");
@@ -908,7 +921,8 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         assertEquals("Version 2.1.4 is installed", downgradePlan.get(0).getStatusMessage());
 
         // Finish the downgrade and check the downgrade log.
-        extensionPane = extensionPane.confirm();
+        // Using 20s for the timeout since 10s seems to not always be enough
+        extensionPane = extensionPane.confirm(20);
         assertEquals("installed", extensionPane.getStatus());
         assertEquals("Installed", extensionPane.getStatusMessage());
         List<LogItemPane> log = extensionPane.openProgressSection().getJobLog();
@@ -977,6 +991,9 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         getRepositoryTestUtils().waitUntilReady();
 
         ExtensionAdministrationPage adminPage = ExtensionAdministrationPage.gotoPage();
+
+        // Test direct search
+        adminPage = adminPage.setIndexed(false);
 
         // Empty search
         SearchResultsPane searchResults = adminPage.getSearchResults();

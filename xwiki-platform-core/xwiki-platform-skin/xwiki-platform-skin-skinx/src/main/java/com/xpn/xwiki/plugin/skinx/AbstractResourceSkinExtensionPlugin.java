@@ -58,7 +58,7 @@ public abstract class AbstractResourceSkinExtensionPlugin extends AbstractSkinEx
      * @param url String representation of the url to load (eg: {@code /res/url.js})
      * @param resourceName name of the pulled resource
      * @param context the current request context
-     * @return HTML code linking to the pulled resource (eg: {@code <script type="text/javascript" src="/res/url.js"/>})
+     * @return HTML code linking to the pulled resource (eg: {@code <script src="/res/url.js"/>})
      */
     protected abstract String generateLink(String url, String resourceName, XWikiContext context);
 

@@ -66,6 +66,8 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.xpn.xwiki.plugin.feed.internal.AggregatorURLClassDocumentInitializer;
+import com.xpn.xwiki.plugin.feed.internal.FeedEntryClassDocumentInitializer;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 
@@ -160,18 +162,6 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
         prepareCache(context);
         this.refreshPeriod = (int) context.getWiki().ParamAsLong("xwiki.plugins.feed.cacherefresh", 3600);
-
-        // Make sure we have this class
-        try {
-            getAggregatorURLClass(context);
-        } catch (XWikiException e) {
-        }
-
-        // Make sure we have this class
-        try {
-            getFeedEntryClass(context);
-        } catch (XWikiException e) {
-        }
     }
 
     public void initCache(XWikiContext context) throws XWikiException
@@ -349,9 +339,6 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     public int updateFeeds(String feedDoc, boolean fullContent, boolean oneDocPerEntry, boolean force, String space,
         XWikiContext context) throws XWikiException
     {
-        // Make sure we have this class
-        getAggregatorURLClass(context);
-
         XWikiDocument doc = context.getWiki().getDocument(feedDoc, context);
         Vector<BaseObject> objs = doc.getObjects("XWiki.AggregatorURLClass");
         if (objs == null) {
@@ -395,9 +382,6 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     public int updateFeedsInSpace(String spaceReference, boolean fullContent, boolean oneDocPerEntry, boolean force,
         XWikiContext context) throws XWikiException
     {
-        // Make sure we have this class
-        getAggregatorURLClass(context);
-
         String sql =
             ", BaseObject as obj where doc.fullName=obj.name and obj.className='XWiki.AggregatorURLClass' and doc.space='"
                 + spaceReference + "'";
@@ -495,9 +479,6 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         boolean oneDocPerEntry, boolean force, String space, XWikiContext context)
     {
         try {
-            // Make sure we have this class
-            getFeedEntryClass(context);
-
             SyndFeed feed = getFeedForce(feedurl, true, context);
             if (feed != null) {
                 if (feed.getImage() != null) {
@@ -636,131 +617,34 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         document.setSyntaxId(syntaxId);
     }
 
+    /**
+     * This method was originally used to create the {@code AggregatorURLClass} but the code has been moved to
+     * {@link AggregatorURLClassDocumentInitializer}.
+     * 
+     * @param context the XWiki context
+     * @return the definition of the {@code AggregatorURLClass}
+     * @throws XWikiException if loading the class definition fails
+     * @deprecated since 11.10RC1
+     */
+    @Deprecated
     public BaseClass getAggregatorURLClass(XWikiContext context) throws XWikiException
     {
-        XWikiDocument doc;
-        boolean needsUpdate = false;
-
-        doc = context.getWiki().getDocument("XWiki.AggregatorURLClass", context);
-
-        BaseClass bclass = doc.getXClass();
-        if (context.get("initdone") != null) {
-            return bclass;
-        }
-
-        bclass.setName("XWiki.AggregatorURLClass");
-        if (!"internal".equals(bclass.getCustomMapping())) {
-            needsUpdate = true;
-            bclass.setCustomMapping("internal");
-        }
-
-        needsUpdate |= bclass.addTextField("name", "Name", 80);
-        needsUpdate |= bclass.addTextField("url", "url", 80);
-        needsUpdate |= bclass.addTextField("imgurl", "Image url", 80);
-        needsUpdate |= bclass.addDateField("date", "date", "dd/MM/yyyy HH:mm:ss");
-        needsUpdate |= bclass.addNumberField("nb", "nb", 5, "integer");
-
-        if (doc.getCreatorReference() == null) {
-            needsUpdate = true;
-            doc.setCreator(XWikiRightService.SUPERADMIN_USER);
-        }
-        if (doc.getAuthorReference() == null) {
-            needsUpdate = true;
-            doc.setAuthorReference(doc.getCreatorReference());
-        }
-        if (StringUtils.isBlank(doc.getTitle())) {
-            needsUpdate = true;
-            doc.setTitle("XWiki Aggregator URL Class");
-        }
-        if (StringUtils.isBlank(doc.getContent()) || !Syntax.XWIKI_2_0.equals(doc.getSyntax())) {
-            needsUpdate = true;
-            doc.setContent("{{include reference=\"XWiki.ClassSheet\" /}}");
-            doc.setSyntax(Syntax.XWIKI_2_0);
-        }
-        if (StringUtils.isBlank(doc.getParent())) {
-            needsUpdate = true;
-            doc.setParent("XWiki.XWikiClasses");
-        }
-        if (!doc.isHidden()) {
-            needsUpdate = true;
-            doc.setHidden(true);
-        }
-
-        if (needsUpdate) {
-            context.getWiki().saveDocument(doc, context);
-        }
-
-        return bclass;
+        return context.getWiki().getDocument(AggregatorURLClassDocumentInitializer.REFERENCE, context).getXClass();
     }
 
+    /**
+     * This method was originally used to create the {@code FeedEntryClass} but the code has been moved to
+     * {@link FeedEntryClassDocumentInitializer}.
+     * 
+     * @param context the XWiki context
+     * @return the definition of the {@code FeedEntryClass}
+     * @throws XWikiException if loading the class definition fails
+     * @deprecated since 11.10RC1
+     */
+    @Deprecated
     public BaseClass getFeedEntryClass(XWikiContext context) throws XWikiException
     {
-        XWikiDocument doc;
-        boolean needsUpdate = false;
-
-        doc = context.getWiki().getDocument("XWiki.FeedEntryClass", context);
-
-        BaseClass bclass = doc.getXClass();
-        if (context.get("initdone") != null) {
-            return bclass;
-        }
-
-        bclass.setName("XWiki.FeedEntryClass");
-        if (!"internal".equals(bclass.getCustomMapping())) {
-            needsUpdate = true;
-            bclass.setCustomMapping("internal");
-        }
-
-        needsUpdate |= bclass.addTextField("title", "Title", 80);
-        needsUpdate |= bclass.addUsersField("author", "Author", 40, false);
-        needsUpdate |= bclass.addTextField("feedurl", "Feed URL", 80);
-        needsUpdate |= bclass.addTextField("feedname", "Feed Name", 40);
-        needsUpdate |= bclass.addTextField("url", "URL", 80);
-        needsUpdate |= bclass.addTextField("category", "Category", 255);
-        needsUpdate |= bclass.addTextAreaField("content", "Content", 80, 10);
-        needsUpdate |= bclass.addTextAreaField("fullContent", "Full Content", 80, 10);
-        needsUpdate |= bclass.addTextAreaField("xml", "XML", 80, 10);
-        needsUpdate |= bclass.addDateField("date", "date", "dd/MM/yyyy HH:mm:ss");
-        needsUpdate |= bclass.addNumberField("flag", "Flag", 5, "integer");
-        needsUpdate |= bclass.addNumberField("read", "Read", 5, "integer");
-        needsUpdate |= bclass.addStaticListField("tags", "Tags", 1, true, true, "", null, null);
-
-        if (doc.getCreatorReference() == null) {
-            needsUpdate = true;
-            doc.setCreator(XWikiRightService.SUPERADMIN_USER);
-        }
-
-        if (doc.getAuthorReference() == null) {
-            needsUpdate = true;
-            doc.setAuthorReference(doc.getCreatorReference());
-        }
-
-        if (StringUtils.isBlank(doc.getTitle())) {
-            needsUpdate = true;
-            doc.setTitle("XWiki Feed Entry Class");
-        }
-
-        if (StringUtils.isBlank(doc.getContent()) || !Syntax.XWIKI_2_0.equals(doc.getSyntax())) {
-            needsUpdate = true;
-            doc.setContent("{{include reference=\"XWiki.ClassSheet\" /}}");
-            doc.setSyntax(Syntax.XWIKI_2_0);
-        }
-
-        if (StringUtils.isBlank(doc.getParent())) {
-            needsUpdate = true;
-            doc.setParent("XWiki.XWikiClasses");
-        }
-
-        if (!doc.isHidden()) {
-            needsUpdate = true;
-            doc.setHidden(true);
-        }
-
-        if (needsUpdate) {
-            context.getWiki().saveDocument(doc, context);
-        }
-        return bclass;
-
+        return context.getWiki().getDocument(FeedEntryClassDocumentInitializer.REFERENCE, context).getXClass();
     }
 
     private void saveEntry(String feedname, String feedurl, SyndEntry entry, XWikiDocument doc, boolean fullContent,

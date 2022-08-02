@@ -33,7 +33,7 @@ import junit.framework.TestSuite;
  * A class listing all the Functional tests to execute. We need such a class (rather than letting the JUnit Runner
  * discover the different TestCases classes by itself) because we want to start/stop XWiki before and after the tests
  * start (but only once).
- * 
+ *
  * @version $Id$
  */
 public class AllTests extends TestCase
@@ -49,7 +49,6 @@ public class AllTests extends TestCase
         // think the tests are all running fine. I haven't found a simple solution to this yet
         // (there are complex solutions like searching for all tests by parsing the source tree).
         // I think there are TestSuite that do this out there but I haven't looked for them yet.
-
         HTML5Validator html5Validator = new HTML5Validator();
         addTest(suite, DefaultValidationTest.suite(DefaultValidationTest.class, html5Validator),
             DefaultValidationTest.class);
@@ -64,11 +63,11 @@ public class AllTests extends TestCase
         XWikiValidator xwikiValidator = new XWikiValidator();
         addTest(suite, DefaultValidationTest.suite(DefaultValidationTest.class, xwikiValidator),
             DefaultValidationTest.class);
-        
+
         return new XWikiTestSetup(suite);
     }
 
-    private static void addTest(TestSuite suite, Test test, Class< ? > testClass) throws Exception
+    private static void addTest(TestSuite suite, Test test, Class<?> testClass) throws Exception
     {
         if (testClass.getName().matches(PATTERN)) {
             suite.addTest(test);

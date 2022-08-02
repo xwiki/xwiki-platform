@@ -52,7 +52,11 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 import org.xwiki.text.StringUtils;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.internal.document.DocumentUserReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -86,8 +90,7 @@ public class NotificationPreferenceScriptService implements ScriptService
     private NotificationEmailUserPreferenceManager emailUserPreferenceManager;
 
     private void saveNotificationPreferences(String json, String providerHint, EntityReference target,
-            NotificationPreferenceCategory category)
-            throws NotificationException
+        NotificationPreferenceCategory category) throws NotificationException
     {
         /*
             The JSON we get is a "snapshot" of the states of the buttons the user has in front of her eyes when she is
@@ -133,19 +136,23 @@ public class NotificationPreferenceScriptService implements ScriptService
             List<Map<String, Object>> preferences = objectMapper.reader().forType(List.class).readValue(json);
             for (Map<String, Object> item : preferences) {
                 String eventType = (String) item.get("eventType");
+                Map<NotificationPreferenceProperty, Object> propertyMap = Collections.emptyMap();
+
+                if (!StringUtils.isEmpty(eventType)) {
+                    propertyMap = Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, eventType);
+                }
+
                 NotificationFormat format = NotificationFormat.valueOf(((String) item.get("format")).toUpperCase());
                 boolean enabled = (Boolean) item.get("enabled");
 
-                targetableNotificationPreferenceBuilder.prepare();
-                targetableNotificationPreferenceBuilder.setEnabled(enabled);
-                targetableNotificationPreferenceBuilder.setFormat(format);
-                targetableNotificationPreferenceBuilder.setProviderHint(providerHint);
-                targetableNotificationPreferenceBuilder.setProperties(
-                        Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, eventType));
-                targetableNotificationPreferenceBuilder.setTarget(target);
-                targetableNotificationPreferenceBuilder.setCategory(category);
-
-                TargetableNotificationPreference newPreference = targetableNotificationPreferenceBuilder.build();
+                TargetableNotificationPreference newPreference = targetableNotificationPreferenceBuilder.prepare()
+                    .setEnabled(enabled)
+                    .setFormat(format)
+                    .setProviderHint(providerHint)
+                    .setProperties(propertyMap)
+                    .setTarget(target)
+                    .setCategory(category)
+                    .build();
 
                 // This part is explained by the long comment below
                 NotificationPreference correspondingPreference = getCorrespondingPreference(existingPreferences,
@@ -164,7 +171,8 @@ public class NotificationPreferenceScriptService implements ScriptService
     }
 
     private NotificationPreference getCorrespondingPreference(List<NotificationPreference> existingPreferences,
-            TargetableNotificationPreference newPreference) {
+        TargetableNotificationPreference newPreference)
+    {
         for (NotificationPreference pref: existingPreferences) {
             // This code heavily
             // depends on org.xwiki.notifications.preferences.internal.AbstractNotificationPreference.equals()
@@ -216,7 +224,7 @@ public class NotificationPreferenceScriptService implements ScriptService
      * @throws AccessDeniedException if the current user has not the right to administrate the current wiki
      */
     public void saveNotificationPreferencesForCurrentWiki(String json)
-            throws NotificationException, AccessDeniedException
+        throws NotificationException, AccessDeniedException
     {
         WikiReference currentWiki = documentAccessBridge.getCurrentDocumentReference().getWikiReference();
         authorizationManager.checkAccess(Right.ADMIN, currentWiki);
@@ -296,19 +304,13 @@ public class NotificationPreferenceScriptService implements ScriptService
      * @throws AccessDeniedException if the current user has not the admin right on the wiki
      */
     public boolean isEventTypeEnabled(String eventType, NotificationFormat format, String wiki)
-            throws NotificationException, AccessDeniedException
+        throws NotificationException, AccessDeniedException
     {
         WikiReference wikiReference = new WikiReference(wiki);
         authorizationManager.checkAccess(Right.ADMIN, wikiReference);
 
-        for (NotificationPreference preference : notificationPreferenceManager.getAllPreferences(wikiReference)) {
-            Object prefEventType = preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE);
-            if (prefEventType != null && StringUtils.equals((String) prefEventType, eventType)
-                    && preference.getFormat() == format) {
-                return preference.isNotificationEnabled();
-            }
-        }
-        return false;
+        List<NotificationPreference> allPreferences = notificationPreferenceManager.getAllPreferences(wikiReference);
+        return this.isEventTypeEnabled(eventType, format, allPreferences);
     }
 
     /**
@@ -319,11 +321,43 @@ public class NotificationPreferenceScriptService implements ScriptService
      */
     public boolean isEventTypeEnabled(String eventType, NotificationFormat format) throws NotificationException
     {
-        for (NotificationPreference preference : notificationPreferenceManager.getAllPreferences(
-                documentAccessBridge.getCurrentUserReference())) {
+        return this.isEventTypeEnabledForUser(eventType, format, CurrentUserReference.INSTANCE);
+    }
+
+    /**
+     * @param eventType an event type
+     * @param format a notification format
+     * @param userReference the reference of the user for which to check the event type
+     * @return either or not the given event type is enabled for the given user in the given format
+     * @throws NotificationException if an error happens
+     * @since 13.2RC1
+     */
+    @Unstable
+    public boolean isEventTypeEnabledForUser(String eventType, NotificationFormat format, UserReference userReference)
+        throws NotificationException
+    {
+        DocumentReference userDocumentReference;
+        if (userReference == CurrentUserReference.INSTANCE) {
+            userDocumentReference = documentAccessBridge.getCurrentUserReference();
+        } else if (userReference instanceof DocumentUserReference) {
+            userDocumentReference = ((DocumentUserReference) userReference).getReference();
+        } else {
+            throw new NotificationException(
+                String.format("The method isEventTypeEnabledForUser should only be used with DocumentUserReference, "
+                    + "the given reference was a [%s]", userReference.getClass().getSimpleName()));
+        }
+        List<NotificationPreference> allPreferences =
+            notificationPreferenceManager.getAllPreferences(userDocumentReference);
+        return this.isEventTypeEnabled(eventType, format, allPreferences);
+    }
+
+    private boolean isEventTypeEnabled(String eventType, NotificationFormat format,
+        List<NotificationPreference> allPreferences)
+    {
+        for (NotificationPreference preference : allPreferences) {
             Object prefEventType = preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE);
             if (prefEventType != null && StringUtils.equals((String) prefEventType, eventType)
-                    && preference.getFormat() == format) {
+                && preference.getFormat() == format) {
                 return preference.isNotificationEnabled();
             }
         }

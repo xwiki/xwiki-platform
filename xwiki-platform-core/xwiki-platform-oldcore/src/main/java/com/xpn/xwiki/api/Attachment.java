@@ -29,6 +29,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.model.reference.AttachmentReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -155,11 +156,15 @@ public class Attachment extends Api
     public byte[] getContentAsBytes() throws XWikiException
     {
         try {
-            return IOUtils.toByteArray(this.attachment.getContentInputStream(getXWikiContext()));
+            // the input stream can be null if the attachment has been deleted for example.
+            InputStream contentInputStream = this.attachment.getContentInputStream(getXWikiContext());
+            if (contentInputStream != null) {
+                return IOUtils.toByteArray(contentInputStream);
+            }
         } catch (IOException ex) {
-            // This really shouldn't happen, but it's not nice to throw exceptions from scriptable APIs
-            return new byte[0];
+            // This really shouldn't happen.
         }
+        return new byte[0];
     }
 
     public InputStream getContentInputStream()
@@ -254,12 +259,21 @@ public class Attachment extends Api
      * Allow to easily access any revision of an attachment.
      *
      * @param rev Version to access, in the "Major.minor" format.
-     * @return Attachment API object, or <tt>null</tt> if the requested version does not exist.
+     * @return Attachment API object, or {@code null} if the requested version does not exist.
      * @throws XWikiException In case of an error.
      */
     public Attachment getAttachmentRevision(String rev) throws XWikiException
     {
         XWikiAttachment att = this.attachment.getAttachmentRevision(rev, getXWikiContext());
         return att == null ? null : new Attachment(getDocument(), att, this.context);
+    }
+
+    /**
+     * @return the reference of this attachment
+     * @since 11.5RC1
+     */
+    public AttachmentReference getReference()
+    {
+        return this.attachment.getReference();
     }
 }

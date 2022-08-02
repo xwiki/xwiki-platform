@@ -20,6 +20,7 @@
 package com.xpn.xwiki.objects.classes;
 
 import org.apache.ecs.xhtml.input;
+import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -31,6 +32,8 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public class StringClass extends PropertyClass
 {
+    private static final long serialVersionUID = 1L;
+
     private static final String XCLASSNAME = "string";
 
     public StringClass(String name, String prettyname, PropertyMetaClass wclass)
@@ -121,4 +124,13 @@ public class StringClass extends PropertyClass
         buffer.append(input.toString());
     }
 
+    @Override
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
+    {
+        BaseProperty property = (BaseProperty) object.safeget(name);
+        if (property != null) {
+            buffer.append(XMLUtils.escapeElementText(property.toText()));
+        }
+    }
 }

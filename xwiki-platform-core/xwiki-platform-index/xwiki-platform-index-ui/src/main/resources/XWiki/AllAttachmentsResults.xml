@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -37,100 +37,7 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{template name="hierarchy_macros.vm" /}}
-
-{{velocity output="false"}}
-#macro (maybeApplyStringFilter $fieldName $defaultMatchType $constraints $queryParameters)
-  #if ("$!request.getParameter($fieldName)" != '')
-    #set ($fieldNameWithAlias = $fieldName)
-    #if ($fieldName.indexOf('.') &lt; 0)
-      #set ($fieldNameWithAlias = 'attachment.' + $fieldName)
-    #end
-    #set ($matchType = $request.getParameter("${fieldName}_match"))
-    #if ("$!matchType" == '')
-      #set ($matchType = $defaultMatchType)
-    #end
-    #set ($parameterName = $fieldNameWithAlias.replace('.', '_'))
-    #if ($matchType == 'exact')
-      #set ($discard = $constraints.add("$fieldNameWithAlias = :$parameterName"))
-      #set ($parameterValue = $request.getParameter($fieldName))
-    #else
-      #set ($discard = $constraints.add("lower($fieldNameWithAlias) like lower(:$parameterName)"))
-      #set ($parameterValue = $request.getParameter($fieldName).trim())
-    #end
-    #set ($discard = $queryParameters.add({
-      'name': $parameterName,
-      'match': $matchType,
-      'value': $parameterValue
-    }))
-  #end
-#end
-
-#macro (maybeApplyIntegerRangeFilter $fieldName $constraints $queryParameters)
-  #set ($fieldValue = $request.getParameter($fieldName))
-  #if ("$!fieldValue" != '')
-    #set ($range = $fieldValue.split('-'))
-    #set ($range = [$mathtool.toInteger($range.get(0)), $mathtool.toInteger($range.get(1))])
-    #applyRangeFilter($fieldName $range $constraints $queryParameters)
-  #end
-#end
-
-#macro (maybeApplyDateRangeFilter $fieldName $constraints $queryParameters)
-  #set ($fieldValue = $request.getParameter($fieldName))
-  #if ("$!fieldValue" != '')
-    #set ($range = $fieldValue.split('-'))
-    #set ($range = [
-      $datetool.toDate($mathtool.toNumber($range.get(0))),
-      $datetool.toDate($mathtool.toNumber($range.get(1)))
-    ])
-    #applyRangeFilter($fieldName $range $constraints $queryParameters)
-  #end
-#end
-
-#macro (applyRangeFilter $fieldName $range $constraints $queryParameters)
-  #set ($fieldNameWithAlias = $fieldName)
-  #if ($fieldName.indexOf('.') &lt; 0)
-    #set ($fieldNameWithAlias = 'attachment.' + $fieldName)
-  #end
-  #set ($parameterNamePrefix = $fieldNameWithAlias.replace('.', '_'))
-  #set ($start = $range.get(0))
-  #if ($start)
-    #set ($startParameterName = $parameterNamePrefix + '_start')
-    #set ($discard = $constraints.add("$fieldNameWithAlias &gt;= :$startParameterName"))
-    #set ($discard = $queryParameters.add({
-      'name': $startParameterName,
-      'match': 'exact',
-      'value': $start
-    }))
-  #end
-  #set ($end = $range.get(1))
-  #if ($end)
-    #set ($endParameterName = $parameterNamePrefix + '_end')
-    #set ($discard = $constraints.add("$fieldNameWithAlias &lt; :$endParameterName"))
-    #set ($discard = $queryParameters.add({
-      'name': $endParameterName,
-      'match': 'exact',
-      'value': $end
-    }))
-  #end
-#end
-
-#macro (displayAttachmentMimeType $attachment)
-  &lt;div class="mime" data-type="$!escapetool.xml($attachment.mimeType)"&gt;
-    #if ($attachment.isImage())
-      &lt;span title="$escapetool.xml($services.localization.render('core.viewers.attachments.mime.image'))"&gt;
-        &lt;img src="$xwiki.getURL($attachmentReference, 'download', 'width=48')"
-          alt="$escapetool.xml($attachment.filename)" /&gt;
-      &lt;/span&gt;
-    #else
-      #mimetypeimg($attachment.mimeType.toLowerCase() $attachment.filename.toLowerCase())
-    #end
-  &lt;/div&gt;
-#end
-
-#macro (displayAttachmentSize $attachment)
-  &lt;span class="size" data-size="$!escapetool.xml($attachment.longSize)"&gt;#dynamicsize($attachment.longSize)&lt;/span&gt;
-#end
-{{/velocity}}
+{{template name="attachment_macros.vm" /}}
 
 {{velocity wiki="false"}}
 ## ========================================================================================
@@ -138,13 +45,13 @@
 ## results serialized in JSON format.
 ## ========================================================================================
 #if ($xcontext.action == 'get')
-  #set ($offset = $mathtool.toInteger($request.offset))
+  #set ($offset = $numbertool.toNumber($request.offset).intValue())
   ## The offset sent by the live table starts at 1.
   #set ($offset = $offset - 1)
   #if (!$offset || $offset &lt; 0)
     #set ($offset = 0)
   #end
-  #set ($limit = $mathtool.toInteger($request.limit))
+  #set ($limit = $numbertool.toNumber($request.limit).intValue())
   #if (!$limit)
     #set ($limit = 15)
   #end
@@ -205,7 +112,7 @@
     "totalrows": $query.count(),
     "returnedrows": $mathtool.min($attachmentReferences.size(), $limit),
     "offset": $mathtool.add($offset, 1),
-    "reqNo": $mathtool.toInteger($request.reqNo),
+    "reqNo": $numbertool.toNumber($request.reqNo).intValue(),
     "rows": []
   })
   #foreach ($attachmentReference in $attachmentReferences)
@@ -228,9 +135,9 @@
       #set ($authorReference = $services.model.resolveDocument($attachment.author))
       #set ($discard = $row.putAll({
         'mimeType': "#displayAttachmentMimeType($attachment)",
-        'filesize': "#displayAttachmentSize($attachment)",
+        'filesize': "#displayAttachmentSize($attachment.longSize)",
         'date': $xwiki.formatDate($attachment.date),
-        'author': $xwiki.getUserName($attachment.author)
+        'author': "#displayUserNameWithAvatar($attachment.author)"
       }))
     #end
     #set ($discard = $results.rows.add($row))

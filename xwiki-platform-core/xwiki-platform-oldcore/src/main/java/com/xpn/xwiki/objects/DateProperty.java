@@ -30,6 +30,8 @@ import org.xwiki.xar.internal.property.DateXarObjectPropertySerializer;
  */
 public class DateProperty extends BaseProperty implements Cloneable
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * The property value.
      */
@@ -58,9 +60,7 @@ public class DateProperty extends BaseProperty implements Cloneable
     @Override
     public String toText()
     {
-        // FIXME: The value of a date property should be serialized using the date timestamp or the date format
-        // specified in the XClass the date property belongs to.
-        return getValue() == null ? "" : DateXarObjectPropertySerializer.DEFAULT_FORMAT.format(getValue());
+        return DateXarObjectPropertySerializer.serializeDate(getValue());
     }
 
     @Override
@@ -101,6 +101,9 @@ public class DateProperty extends BaseProperty implements Cloneable
     protected void cloneInternal(BaseProperty clone)
     {
         DateProperty property = (DateProperty) clone;
-        property.setValue(getValue());
+
+        if (property.value != null) {
+            property.value = (Date) property.value.clone();
+        }
     }
 }

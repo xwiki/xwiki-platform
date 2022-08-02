@@ -49,4 +49,17 @@ public class DefaultWikiDescriptor extends WikiDescriptor
     {
         super(wikiId, wikiAlias);
     }
+
+    /**
+     * Constructor.
+     * @param wikiId ID of the wiki
+     * @param wikiAlias Alias of the wiki
+     * @param ownerId the identifier of the owner of the wiki (generally a serialized user reference)
+     * @since 11.3
+     * @since 10.11.8
+     */
+    public DefaultWikiDescriptor(String wikiId, String wikiAlias, String ownerId)
+    {
+        super(wikiId, wikiAlias, ownerId);
+    }
 }

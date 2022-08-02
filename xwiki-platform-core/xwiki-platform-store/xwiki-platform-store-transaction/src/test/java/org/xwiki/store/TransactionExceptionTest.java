@@ -20,9 +20,15 @@
 package org.xwiki.store;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for TransactionException
@@ -33,6 +39,7 @@ import org.junit.Test;
 public class TransactionExceptionTest
 {
     private static final String SIMPLE_TEST_OUT =
+    // @formatter:off
         "Caused by:\n"
       + "java.lang.Exception\n"
       + "\t" + "One exception.\n"
@@ -40,8 +47,10 @@ public class TransactionExceptionTest
       + "\t" + "Number 2\n"
       + "java.lang.OutOfMemoryError\n"
       + "\t" + "Ut oh\n";
+      // @formatter:on
 
     private static final String COMPOUND_TEST_OUT =
+    // @formatter:off
         "Caused by:\n"
       + "java.lang.Exception\n"
       + "\t" + "something bad happened.\n"
@@ -56,8 +65,10 @@ public class TransactionExceptionTest
       + "\t" + "\n"
       + "java.lang.Error\n"
       + "\t" + "SEGFAULT!\n";
+      // @formatter:on
 
     private static final String NONRECOVERABLE_TEST_OUT =
+    // @formatter:off
         "Caused by:\n"
       + "java.lang.Exception\n"
       + "\t" + "something bad happened.\n"
@@ -69,7 +80,16 @@ public class TransactionExceptionTest
       + "\t" + "\n"
       + "java.lang.Error\n"
       + "\t" + "SEGFAULT!\n";
+      // @formatter:on
 
+    @Test
+    private void emptyException()
+    {
+        TransactionException exception =  new TransactionException(Collections.emptyList());
+
+        assertNull(exception.getCause());
+    }
+    
     /**
      * Make sure the messages from the underlying throwables are preserved.
      */
@@ -77,47 +97,58 @@ public class TransactionExceptionTest
     public void simpleExceptionTest()
     {
         TransactionException te = this.getException();
-        Assert.assertFalse(te.isNonRecoverable());
-        Assert.assertEquals("Wrong number of exceptions reported", 3, te.exceptionCount());
-        Assert.assertEquals("The wrong exception message was given", SIMPLE_TEST_OUT, te.getMessage());
+        assertFalse(te.isNonRecoverable());
+        assertEquals(3, te.exceptionCount(), "Wrong number of exceptions reported");
+        assertEquals(SIMPLE_TEST_OUT, te.getMessage(), "The wrong exception message was given");
+        assertNotNull(te.getCause());
     }
 
     @Test
     public void compoundExceptionTest()
     {
-        TransactionException te = new TransactionException(new ArrayList<Throwable>() {{
-            add(new Exception("something bad happened."));
-            add(getException());
-            add(new Error("SEGFAULT!"));
-        }});
-        Assert.assertFalse(te.isNonRecoverable());
-        Assert.assertEquals("Wrong number of exceptions reported", 5, te.exceptionCount());
-        Assert.assertEquals("The wrong exception message was given", COMPOUND_TEST_OUT, te.getMessage());
+        TransactionException te = new TransactionException(new ArrayList<Throwable>()
+        {
+            {
+                add(new Exception("something bad happened."));
+                add(getException());
+                add(new Error("SEGFAULT!"));
+            }
+        });
+        assertFalse(te.isNonRecoverable());
+        assertEquals(5, te.exceptionCount(), "Wrong number of exceptions reported");
+        assertEquals(COMPOUND_TEST_OUT, te.getMessage(), "The wrong exception message was given");
     }
 
     @Test
     public void nonRecoverableTest()
     {
-        TransactionException te = new TransactionException(new ArrayList<Throwable>() {{
-            add(new Exception("something bad happened."));
-            add(new TransactionException("This means there is db corruption",
-                    new ArrayList<Throwable>() {{
+        TransactionException te = new TransactionException(new ArrayList<Throwable>()
+        {
+            {
+                add(new Exception("something bad happened."));
+                add(new TransactionException("This means there is db corruption", new ArrayList<Throwable>()
+                {
+                    {
                         add(new Error("Corruption!!"));
-                    }}, true));
-            add(new Error("SEGFAULT!"));
-        }});
-        Assert.assertTrue(te.isNonRecoverable());
-        Assert.assertEquals("Wrong number of exceptions reported", 3, te.exceptionCount());
-        Assert.assertEquals("The wrong exception message was given",
-            NONRECOVERABLE_TEST_OUT, te.getMessage());
+                    }
+                }, true));
+                add(new Error("SEGFAULT!"));
+            }
+        });
+        assertTrue(te.isNonRecoverable());
+        assertEquals(3, te.exceptionCount(), "Wrong number of exceptions reported");
+        assertEquals(NONRECOVERABLE_TEST_OUT, te.getMessage(), "The wrong exception message was given");
     }
 
     private TransactionException getException()
     {
-        return new TransactionException(new ArrayList<Throwable>() {{
-            add(new Exception("One exception."));
-            add(new RuntimeException("Number 2"));
-            add(new OutOfMemoryError("Ut oh"));
-        }});
+        return new TransactionException(new ArrayList<Throwable>()
+        {
+            {
+                add(new Exception("One exception."));
+                add(new RuntimeException("Number 2"));
+                add(new OutOfMemoryError("Ut oh"));
+            }
+        });
     }
 }

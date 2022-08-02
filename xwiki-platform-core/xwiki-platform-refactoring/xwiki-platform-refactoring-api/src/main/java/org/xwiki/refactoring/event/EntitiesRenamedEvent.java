@@ -21,7 +21,6 @@ package org.xwiki.refactoring.event;
 
 import org.xwiki.observation.event.EndFoldEvent;
 import org.xwiki.refactoring.internal.event.AbstractEvent;
-import org.xwiki.stability.Unstable;
 
 /**
  * Event fired after multiple entities have been renamed.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 11.1RC1
  */
-@Unstable
 public class EntitiesRenamedEvent extends AbstractEvent implements EndFoldEvent
 {
 }

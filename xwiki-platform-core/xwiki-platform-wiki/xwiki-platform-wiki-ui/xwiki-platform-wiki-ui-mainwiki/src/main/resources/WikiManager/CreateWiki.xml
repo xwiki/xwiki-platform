@@ -577,16 +577,16 @@
           #if (!$percent)
             #set ($percent = 0)
           #end
-          #set ($percent = $mathtool.toInteger($mathtool.mul($percent, 100)))
+          #set ($percent = $numbertool.toNumber($mathtool.mul($percent, 100)).intValue())
           &lt;div class="ui-progress-bar green" style="width:${percent}%" id="wikicreation-progress-bar"&gt;&lt;/div&gt;
         &lt;/div&gt;
       &lt;/div&gt;
       #end
-      #set($errorlogs = $status.log.getLogs('ERROR'))
+      #set($hasErrors = $status.logTail.hasLogLevel('ERROR'))
       &lt;p class="successmessage box #if($status.error || $state != 'FINISHED')hidden#end" id="successMessage"&gt;
         $services.localization.render('platform.wiki.create.wizard.step.creation.complete', ["&lt;strong&gt;$escapetool.xml($request.wikiname)&lt;/strong&gt;"])
       &lt;/p&gt;
-      &lt;p class="warningmessage box #if($errorlogs.isEmpty() || $state != 'FINISHED')hidden#end" id="errorlogMessage"&gt;
+      &lt;p class="warningmessage box #if(!$hasErrors || $state != 'FINISHED')hidden#end" id="errorlogMessage"&gt;
         $services.localization.render('platform.wiki.create.wizard.step.creation.errorlog', ["&lt;strong&gt;$escapetool.xml($request.wikiname)&lt;/strong&gt;"])
       &lt;/p&gt;
       &lt;p class="errormessage box #if(!$status.error || $state != 'FINISHED')hidden#end" id="errorMessage"&gt;
@@ -601,7 +601,7 @@
     #set($doc = $xwiki.getDocument('XWiki.AddExtensions'))
     #set($loading = $status.state != 'FINISHED')
     &lt;div id="creation-log"&gt;
-      #printLogs($status.log, $loading)
+      #printLogs($status.logTail, $loading)
     &lt;/div&gt;
     #set($doc = $olddoc)
     #if($status.state == 'FINISHED')
@@ -610,7 +610,7 @@
         #set($cleanUpHidden = false)
       #else
         #set($finalizeHidden = false)
-        #set($cleanUpHidden = $errorlogs.isEmpty())
+        #set($cleanUpHidden = !$hasErrors)
       #end
     #else
       #set($finalizeHidden = true)
@@ -1133,6 +1133,7 @@ XWiki.WikiCreationStatusBar = Class.create({
         $('successMessage').removeClassName('hidden');
         if (response.hasErrorLog) {
           $('errorlogMessage').removeClassName('hidden');
+          $('cleanUp').removeClassName('hidden');
         }
         $('finalize').removeClassName('hidden');
       }
@@ -1265,8 +1266,8 @@ return XWiki;
  * Code to make the dynamic "flavor/template" tab bar
  **************************************************************/
 require(['jquery'], function($) {
-  $(window).ready(function(){
-    $('.flavor_template  &gt; .xwikitabbar &gt; li &gt; a').click(function(event) {
+  $(function(){
+    $('.flavor_template  &gt; .xwikitabbar &gt; li &gt; a').on('click', function(event) {
       var thisTabWidget = $(this).parents('.flavor_template');
       // Change the tab bar
       var activeTab = thisTabWidget.find('.xwikitabbar .active');
@@ -1289,25 +1290,25 @@ require(['jquery'], function($) {
  * Code to only have a flavor or a template used, never both
  **************************************************************/
 require(['jquery'], function($) {
-  $(window).ready(function(){
+  $(function(){
     /**
      * When a template is selected, unselect the flavor
      */
-    $('#'+'template').change(function(event) {
+    $('#'+'template').on('change', function(event) {
       if (this.value != 'xwikinotemplate') {
         $('.xwiki-flavor-picker-option-selected').removeClass('xwiki-flavor-picker-option-selected');
         $('input[name="flavor"]:radio:checked').prop('checked', false);
       }
     });
-    
+
     /**
      * When a flavor is selected, unselect the template
      */
     var onFlavorChanged = function(event) {
       $('#'+'template').val('xwikinotemplate');
     }
-    $('input[name="flavor"]:radio').change(onFlavorChanged);
-    $('.xwiki-flavor-picker-option').click(onFlavorChanged);
+    $('input[name="flavor"]:radio').on('change', onFlavorChanged);
+    $('.xwiki-flavor-picker-option').on('click', onFlavorChanged);
   });
 });
 #end

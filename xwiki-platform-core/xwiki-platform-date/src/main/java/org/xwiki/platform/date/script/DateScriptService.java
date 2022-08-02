@@ -30,7 +30,6 @@ import org.ocpsoft.prettytime.PrettyTime;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
  * Script service to display dates in a pretty way.
@@ -42,7 +41,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Singleton
 @Named("date")
-@Unstable
 public class DateScriptService implements ScriptService
 {
     @Inject

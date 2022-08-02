@@ -49,6 +49,5 @@ extension.repository.rating=Ocjena
 extension.repository.installedCount=Broj instalacija
 
 ## Administration UI
-admin.repository=Repozitorij ekstenzija
-</content>
+admin.repository=Repozitorij ekstenzija</content>
 </xwikidoc>

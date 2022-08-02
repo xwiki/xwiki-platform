@@ -75,6 +75,5 @@ Mail.SendMailStatus_livetable.error=Chyba
 Mail.SendMailStatus_livetable.actions=Akcie
 Mail.SendMailStatus_livetable.resend=Znovu poslať
 ### Missing: mailSender.admin.resendSuccess=The mail has been resent successfully
-### Missing: mailSender.admin.resendFailure=Failed to resend. Click for more details.
-</content>
+### Missing: mailSender.admin.resendFailure=Failed to resend. Click for more details.</content>
 </xwikidoc>

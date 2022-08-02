@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-url-schemes</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-url-scheme-reference</artifactId>
   <name>XWiki Platform - URL - Scheme - Reference Implementation</name>
@@ -34,11 +34,12 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Reference URL Scheme</xwiki.extension.name>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-url-api</artifactId>
+      <artifactId>xwiki-platform-url-default</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

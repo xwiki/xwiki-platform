@@ -110,7 +110,6 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
         xclass.addTextField("default_language", "Default Language", 5);
         xclass.addBooleanField("authenticate_edit", "Authenticated Edit", "yesno");
         xclass.addBooleanField("authenticate_view", "Authenticated View", "yesno");
-        xclass.addBooleanField("auth_active_check", "Authentication Active Check", "yesno");
 
         xclass.addPageField("skin", "Skin", 30, false, false, ", BaseObject obj"
                         + " where doc.fullName = obj.name and obj.className = 'XWiki.XWikiSkins'",

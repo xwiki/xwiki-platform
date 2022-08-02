@@ -26,6 +26,8 @@ import java.lang.annotation.Target;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import com.xpn.xwiki.api.XWiki;
+
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
@@ -44,4 +46,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Inherited
 public @interface OldcoreTest
 {
+    /**
+     * @return false if none of the {@link XWiki} instance methods should be mocked
+     * @since 12.0RC1
+     */
+    boolean mockXWiki() default true;
 }

@@ -22,6 +22,7 @@ package org.xwiki.test.ui.po;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -83,7 +84,7 @@ public class DeletePageOutcomePage extends ViewPage
      */
     public boolean hasTerminalPagesInRecycleBin()
     {
-        List<WebElement> messages = getDriver().findElementsByClassName("recyclebin-message");
+        List<WebElement> messages = getDriver().findElements(By.className("recyclebin-message"));
         for (WebElement message : messages) {
             if (StringUtils.equals(message.getText(),
                     "The following versions of terminal pages are in the recycle bin:")) {
@@ -102,7 +103,7 @@ public class DeletePageOutcomePage extends ViewPage
      */
     public DeletePageOutcomePage clickDeletePage()
     {
-        List<WebElement> elements = getDriver().findElementsByCssSelector(".docs .action-delete");
+        List<WebElement> elements = getDriver().findElements(By.cssSelector(".docs .action-delete"));
         if (!elements.isEmpty()) {
             getDriver().makeConfirmDialogSilent(true);
             elements.get(0).click();
@@ -118,11 +119,28 @@ public class DeletePageOutcomePage extends ViewPage
      */
     public DeletePageOutcomePage clickDeleteTerminalPage()
     {
-        List<WebElement> elements = getDriver().findElementsByCssSelector(".terminal-docs .action-delete");
+        List<WebElement> elements = getDriver().findElements(By.cssSelector(".terminal-docs .action-delete"));
         if (!elements.isEmpty()) {
             getDriver().makeConfirmDialogSilent(true);
             elements.get(0).click();
         }
         return new DeletePageOutcomePage();
-    }   
+    }
+
+    /**
+     * Click on the link to view the deleted page.
+     *
+     * @param row the revision row for which to view the deleted page, starting at 1
+     * @return the view page of the deleted page
+     * @since 13.10.4
+     * @since 14.2RC1
+     */
+    public ViewPage clickViewDocument(int row)
+    {
+        WebElement link = getDriver()
+            .findElementWithoutWaiting(
+                By.cssSelector(String.format("table tbody tr:nth-child(%d) a.link-view", row)));
+        link.click();
+        return new ViewPage();
+    }
 }

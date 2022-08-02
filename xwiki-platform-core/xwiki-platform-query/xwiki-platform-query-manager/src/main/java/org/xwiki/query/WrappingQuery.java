@@ -99,6 +99,12 @@ public class WrappingQuery implements Query
     }
 
     @Override
+    public Query bindValues(Map<String, ?> values)
+    {
+        return getWrappedQuery().bindValues(values);
+    }
+
+    @Override
     public Map<String, Object> getNamedParameters()
     {
         return getWrappedQuery().getNamedParameters();

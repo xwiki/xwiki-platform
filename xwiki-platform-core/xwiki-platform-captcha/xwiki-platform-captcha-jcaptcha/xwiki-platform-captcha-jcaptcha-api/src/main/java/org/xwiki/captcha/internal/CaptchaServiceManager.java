@@ -19,8 +19,6 @@
  */
 package org.xwiki.captcha.internal;
 
-import java.util.Map;
-
 import javax.inject.Singleton;
 
 import org.xwiki.captcha.CaptchaException;
@@ -63,15 +61,13 @@ public class CaptchaServiceManager implements Initializable
     }
 
     /**
-     * @param parameters CAPTCHA parameters
+     * @param engine the actual name of the service we want.
      * @return the JCaptcha CaptchaService initialized with the requested engine
      * @throws CaptchaException if the requested engine does not exist
      */
-    public CaptchaService getCaptchaService(Map<String, Object> parameters) throws CaptchaException
+    public CaptchaService getCaptchaService(String engine) throws CaptchaException
     {
         CaptchaService result = null;
-
-        String engine = (String) parameters.get("engine");
 
         CaptchaEngine captchaEngine = null;
 

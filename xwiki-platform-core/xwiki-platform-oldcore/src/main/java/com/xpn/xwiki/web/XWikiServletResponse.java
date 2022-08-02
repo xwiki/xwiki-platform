@@ -21,8 +21,10 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
@@ -31,10 +33,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.url.URLSecurityManager;
 
 public class XWikiServletResponse implements XWikiResponse
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiServletResponse.class);
+    private static final Pattern ABSOLUTE_URL_PATTERN = Pattern.compile("[a-z0-9]+://.*");
 
     private HttpServletResponse response;
 
@@ -66,7 +70,24 @@ public class XWikiServletResponse implements XWikiResponse
             LOGGER.warn("Possible HTTP Response Splitting attack, attempting to redirect to [{}]", redirect);
             return;
         }
+
+        // check for trusted domains, only if the given location is an absolute URL.
+        if (ABSOLUTE_URL_PATTERN.matcher(redirect).matches()) {
+            if (!getURLSecurityManager().isDomainTrusted(new URL(redirect))) {
+                LOGGER.warn(
+                    "Possible phishing attack, attempting to redirect to [{}], this request has been blocked. "
+                        + "If the request was legitimate, add the domain related to this request in the list "
+                        + "of trusted domains in the configuration: it can be configured in xwiki.properties in "
+                        + "url.trustedDomains.", redirect);
+                return;
+            }
+        }
         this.response.sendRedirect(redirect);
+    }
+
+    private URLSecurityManager getURLSecurityManager()
+    {
+        return Utils.getComponent(URLSecurityManager.class);
     }
 
     @Override
@@ -115,6 +136,12 @@ public class XWikiServletResponse implements XWikiResponse
     public void setContentLength(int length)
     {
         this.response.setContentLength(length);
+    }
+
+    @Override
+    public void setContentLengthLong(long len)
+    {
+        this.response.setContentLengthLong(len);
     }
 
     @Override

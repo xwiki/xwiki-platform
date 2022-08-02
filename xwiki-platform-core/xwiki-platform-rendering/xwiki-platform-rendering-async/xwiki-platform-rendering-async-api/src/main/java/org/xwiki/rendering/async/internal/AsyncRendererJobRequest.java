@@ -20,6 +20,7 @@
 package org.xwiki.rendering.async.internal;
 
 import org.xwiki.job.AbstractRequest;
+import org.xwiki.job.JobGroupPath;
 import org.xwiki.job.Request;
 
 /**
@@ -31,6 +32,8 @@ import org.xwiki.job.Request;
 public class AsyncRendererJobRequest extends AbstractRequest
 {
     private transient AsyncRenderer renderer;
+
+    private JobGroupPath jobGroupPath;
 
     /**
      * The default constructor.
@@ -64,5 +67,24 @@ public class AsyncRendererJobRequest extends AbstractRequest
     public void setRenderer(AsyncRenderer renderer)
     {
         this.renderer = renderer;
+    }
+
+    /**
+     * Set the {@link JobGroupPath} to use for the AsyncRendererJob. If this path is not specified the single job
+     * pool will be used.
+     * @param jobGroupPath the path to be used for the GroupedJob.
+     */
+    public void setJobGroupPath(JobGroupPath jobGroupPath)
+    {
+        this.jobGroupPath = jobGroupPath;
+    }
+
+    /**
+     * @return the {@link JobGroupPath} to be used for the {@link org.xwiki.job.GroupedJob}. This can be null, in which
+     *          case the job will be executed with a single job pool.
+     */
+    public JobGroupPath getJobGroupPath()
+    {
+        return jobGroupPath;
     }
 }

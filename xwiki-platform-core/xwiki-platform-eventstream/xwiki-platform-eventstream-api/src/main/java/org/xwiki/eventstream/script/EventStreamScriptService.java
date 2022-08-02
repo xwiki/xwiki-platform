@@ -65,7 +65,7 @@ public class EventStreamScriptService implements ScriptService
      * @since 9.10RC1
      */
     public RecordableEventDescriptor getDescriptorForEventType(String eventType, boolean allWikis)
-            throws EventStreamException
+        throws EventStreamException
     {
         return recordableEventDescriptorManager.getDescriptorForEventType(eventType, allWikis);
     }

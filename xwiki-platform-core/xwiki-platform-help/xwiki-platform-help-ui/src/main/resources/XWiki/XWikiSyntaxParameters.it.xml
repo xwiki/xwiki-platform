@@ -56,7 +56,7 @@
 
 Con la Sintassi XWiki {{velocity}}$crtSyntaxVer{{/velocity}} è possibile passare dei parametri tra i diversi elementi sintattici ed anche a blocchi di testo. Si usa questo per esempio per applicare uno stile. Si può impostare qualunque parametro chiave/valore. Il motore di render XHTML passerà questi parametri come attributi XHTML della sottostante rappresentazione XHTML dei differenti elementi sintattici.
 
-|=(% style="width="60%" %)Sintassi XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=XHTML Generato
+|=(% style="width:60%" %)Sintassi XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=XHTML Generato
 |((({{{
 (% class="miaClasse" style="mioStile" id="myId" %)
 = titolo =

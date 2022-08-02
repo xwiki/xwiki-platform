@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-minimaldependencies</artifactId>
   <name>XWiki Platform - Minimal WAR Dependencies</name>
@@ -37,7 +37,7 @@
 
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-web</artifactId>
+      <artifactId>xwiki-platform-web-war</artifactId>
       <version>${project.version}</version>
       <type>war</type>
       <scope>runtime</scope>
@@ -64,10 +64,34 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- JavaScript code from platform-web-war that needs translation messages should use the xwiki-l10n JavaScript
+      module provided by localization-webjar (see https://extensions.xwiki.org/xwiki/bin/view/Extension/Localization/#HFromJavaScript).
+      Translation messages are fetched using REST so we also need an implementation of the localizaion-rest-api. Note
+      that currently it's not easy to move JavaScript code outside platform-web-war (e.g. in a WebJar module that
+      properly declares its dependencies) because we're missing XWIKI-12788: "Introduce skin extension plugins for webjar
+      resources". This is the case with job.js that depends on 'xwiki-l10n' module. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-webjar</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-rest-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Security -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-security-bridge</artifactId>
+      <artifactId>xwiki-platform-security-authorization-bridge</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-xml-security</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -111,6 +135,26 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- Components for Jobs execution -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-job-default</artifactId>
+      <version>${commons.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- User management -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-user-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-user-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Refactoring API implementation -->
     <!-- Copy/Delete/Rename/Move actions are currently in the Refactoring module and for now we consider them as
          core actions. -->
@@ -126,6 +170,13 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Most templates are written in Velocity and need macros.vm to be injected -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-velocity-webapp</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -161,10 +212,10 @@
      Velocity templates. Most of these templates are located in platform-web and currently we don't declare the
      dependencies of platform-web (they are declared in the distribution) thus we need to bundle this script service
      here. In the future we may want to create a separate module to hold the Velocity templates from platform-web
-     and this module should have a dependency on platform-security-script. -->
+     and this module should have a dependency on platform-security-authorization-script. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-security-script</artifactId>
+      <artifactId>xwiki-platform-security-authorization-script</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -183,6 +234,12 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-icon-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-icon-rest-default</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -235,10 +292,42 @@
       <artifactId>log4j-over-slf4j</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-to-slf4j</artifactId>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Filesystem store is the default so we want to test it as much as possible -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-store-filesystem-oldcore</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Merge script service is used by the merging conflict window, so we need to render it in case of conflict. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-store-merge-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- The authentication modules are used in the login form and auth to enable some security checks -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-authentication-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-authentication-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- The default name strategies components to enable checks and transformation on page names -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-model-validation-default</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -257,15 +346,16 @@
     <!-- ********************************************************************** -->
     <!-- Skin -->
 
-    <!-- Skins
-         Note: even though the dependency plugin below doesn't need explicit dependencies set to work it's a best
-         practice to put them here since they are real dependencies -->
+    <!-- Flamingo Skin -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
       <version>${project.version}</version>
-      <type>zip</type>
-      <scope>runtime</scope>
+      <!-- Use the pom type so that transitive dependencies are included in modules depending on this module and at the
+           same time the flamingo resources won't be included in WEB-INF/lib in any WAR packaging module depending on
+           it. OTOH this means that any module building an XWiki distribution will need to add a JAR dependency on
+           xwiki-platform-flamingo-skin-resources and unjar it in the WAR. -->
+      <type>pom</type>
     </dependency>
 
     <!-- ********************************************************************** -->
@@ -277,12 +367,10 @@
     <dependency>
       <groupId>org.ow2.asm</groupId>
       <artifactId>asm</artifactId>
-      <version>${asm.version}</version>
     </dependency>
     <dependency>
       <groupId>org.ow2.asm</groupId>
       <artifactId>asm-commons</artifactId>
-      <version>${asm.version}</version>
     </dependency>
 
     <!-- Some optional Maven dependencies that we don't want the Extension Manager to resolve/install. This is

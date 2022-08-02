@@ -30,8 +30,8 @@ import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.script.ScriptContextManager;
 
 /**
- * Abstract definition of {@link NotificationFilterDisplayer}. This definition provides basic methods for setting
- * up a proper velocity context before template rendering.
+ * Abstract definition of {@link NotificationFilterDisplayer}. This definition provides basic methods for setting up a
+ * proper velocity context before template rendering.
  *
  * @version $Id$
  * @since 9.7RC1
@@ -42,33 +42,26 @@ public abstract class AbstractNotificationFilterDisplayer implements Notificatio
 
     private static final String FILTER_PREFERENCE = "filterPreference";
 
-    private Map<String, Object> oldContextValues;
-
-    private ScriptContext currentScriptContext;
-
-    protected void setUpContext(ScriptContextManager scriptContextManager, NotificationFilter filter,
-            NotificationFilterPreference preference)
+    protected Map<String, Object> setUpContext(ScriptContextManager scriptContextManager, NotificationFilter filter,
+        NotificationFilterPreference preference)
     {
-        currentScriptContext = scriptContextManager.getCurrentScriptContext();
+        ScriptContext currentScriptContext = scriptContextManager.getCurrentScriptContext();
 
-        oldContextValues = new HashMap<>();
+        Map<String, Object> oldContextValues = new HashMap<>();
 
         oldContextValues.put(FILTER, currentScriptContext.getAttribute(FILTER));
         currentScriptContext.setAttribute(FILTER, filter, ScriptContext.ENGINE_SCOPE);
 
         oldContextValues.put(FILTER_PREFERENCE, currentScriptContext.getAttribute(FILTER_PREFERENCE));
         currentScriptContext.setAttribute(FILTER_PREFERENCE, preference, ScriptContext.ENGINE_SCOPE);
+
+        return oldContextValues;
     }
 
-    protected void cleanUpContext()
+    protected void cleanUpContext(ScriptContextManager scriptContextManager, Map<String, Object> oldContextValues)
     {
-        if (oldContextValues.get(FILTER) != null) {
-            currentScriptContext.setAttribute(FILTER, oldContextValues.get(FILTER), ScriptContext.ENGINE_SCOPE);
-        }
-
-        if (oldContextValues.get(FILTER_PREFERENCE) != null) {
-            currentScriptContext.setAttribute(FILTER_PREFERENCE, oldContextValues.get(FILTER_PREFERENCE),
-                    ScriptContext.ENGINE_SCOPE);
-        }
+        ScriptContext currentScriptContext = scriptContextManager.getCurrentScriptContext();
+        oldContextValues.entrySet().forEach(
+            entry -> currentScriptContext.setAttribute(entry.getKey(), entry.getValue(), ScriptContext.ENGINE_SCOPE));
     }
 }

@@ -45,7 +45,7 @@ public class AbstractDistributionPage extends BaseElement
     {
         List<WebElement> listItems = getDriver().findElementsWithoutWaiting(this.icons, By.tagName("li"));
 
-        List<DistributionStepIcon> result = new ArrayList<DistributionStepIcon>(listItems.size());
+        List<DistributionStepIcon> result = new ArrayList<>(listItems.size());
 
         for (WebElement listItem : listItems) {
             result.add(new DistributionStepIcon(listItem));
@@ -61,6 +61,9 @@ public class AbstractDistributionPage extends BaseElement
 
     public void clickCompleteStep()
     {
+        // FIXME: workaround for https://github.com/mozilla/geckodriver/issues/1026
+        getDriver().addPageNotYetReloadedMarker();
         this.completeStepButton.click();
+        getDriver().waitUntilPageIsReloaded();
     }
 }

@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -56,6 +57,7 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.DefaultExtensionDependency;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionAuthor;
+import org.xwiki.extension.ExtensionComponent;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionIssueManagement;
@@ -63,6 +65,7 @@ import org.xwiki.extension.ExtensionNotFoundException;
 import org.xwiki.extension.ExtensionScm;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.internal.ExtensionFactory;
+import org.xwiki.extension.internal.converter.ExtensionComponentConverter;
 import org.xwiki.extension.internal.converter.ExtensionIdConverter;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
@@ -101,6 +104,7 @@ import com.xpn.xwiki.internal.event.XObjectPropertyDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.StringProperty;
 
 @Component(roles = RepositoryManager.class)
 @Singleton
@@ -179,6 +183,10 @@ public class RepositoryManager implements Initializable, Disposable
     @Inject
     private Logger logger;
 
+    private int maxTitleSize = -1;
+
+    private int maxStringPropertySize = -1;
+
     /**
      * Link extension id to document reference. The tabe contains null if the id link to no extension.
      */
@@ -230,6 +238,7 @@ public class RepositoryManager implements Initializable, Disposable
     public void dispose() throws ComponentLifecycleException
     {
         this.observation.removeListener(listener.getName());
+        this.documentReferenceCache.dispose();
     }
 
     public <T> XWikiDocument getDocument(T[] data) throws XWikiException
@@ -262,7 +271,7 @@ public class RepositoryManager implements Initializable, Disposable
 
             if (!documentNames.isEmpty()) {
                 cachedDocumentReference =
-                    new DocumentReference[] { this.currentStringResolver.resolve(documentNames.get(0)) };
+                    new DocumentReference[] {this.currentStringResolver.resolve(documentNames.get(0))};
             } else {
                 cachedDocumentReference = new DocumentReference[1];
             }
@@ -307,9 +316,9 @@ public class RepositoryManager implements Initializable, Disposable
         XWikiContext xcontext = this.xcontextProvider.get();
 
         // Update last version field
-        String lastVersion = findLastVersion(document);
+        String lastVersion = StringUtils.defaultString(findLastVersion(document));
 
-        if (lastVersion != null && !StringUtils.equals(lastVersion,
+        if (!StringUtils.equals(lastVersion,
             getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION, (String) null))) {
             BaseObject extensionObjectToSave = document.getXObject(extensionObject.getReference());
             extensionObjectToSave.set(XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION, lastVersion, xcontext);
@@ -319,12 +328,17 @@ public class RepositoryManager implements Initializable, Disposable
 
         // Update valid extension field
 
-        boolean valid = isValid(document, extensionObject, xcontext);
+        boolean valid;
+        if (StringUtils.isEmpty(lastVersion)) {
+            valid = false;
+        } else {
+            valid = isValid(document, extensionObject, xcontext);
+        }
 
         if (valid) {
-            this.logger.debug("The extension in the document [{}] is not valid", document.getDocumentReference());
-        } else {
             this.logger.debug("The extension in the document [{}] is valid", document.getDocumentReference());
+        } else {
+            this.logger.debug("The extension in the document [{}] is not valid", document.getDocumentReference());
         }
 
         int currentValue = getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_VALIDEXTENSION, 0);
@@ -416,7 +430,7 @@ public class RepositoryManager implements Initializable, Disposable
                 if (extensionVersions != null) {
                     for (BaseObject extensionVersionObject : extensionVersions) {
                         if (extensionVersionObject != null) {
-                            valid = isVersionValid(document, extensionVersionObject, context);
+                            valid = isVersionValid(document, type, extensionVersionObject, context);
 
                             if (!valid) {
                                 return false;
@@ -430,7 +444,8 @@ public class RepositoryManager implements Initializable, Disposable
         return valid;
     }
 
-    private boolean isVersionValid(XWikiDocument document, BaseObject extensionVersionObject, XWikiContext context)
+    private boolean isVersionValid(XWikiDocument document, String type, BaseObject extensionVersionObject,
+        XWikiContext context)
     {
         // Has a version
         String extensionVersion = getValue(extensionVersionObject, XWikiRepositoryModel.PROP_VERSION_VERSION);
@@ -443,48 +458,57 @@ public class RepositoryManager implements Initializable, Disposable
 
         boolean valid;
 
-        ResourceReference resourceReference = null;
-        try {
-            resourceReference = getDownloadReference(document, extensionVersion);
-        } catch (ResolveException e) {
-            logger.debug("Cannot obtain download source reference for object [{}({})]",
-                XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE, extensionVersionObject.getNumber());
-            return false;
-        }
+        if (StringUtils.isEmpty(type)) {
+            // We don't care about the file when type is "no file"
+            valid = true;
+        } else {
+            ResourceReference resourceReference = null;
+            try {
+                resourceReference = getDownloadReference(document, extensionVersion);
+            } catch (ResolveException e) {
+                logger.debug("Cannot obtain download source reference for object [{}({})]",
+                    XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE, extensionVersionObject.getNumber());
+                return false;
+            }
 
-        if (resourceReference != null) {
-            if (ResourceType.ATTACHMENT.equals(resourceReference.getType())) {
-                AttachmentReference attachmentReference =
-                    this.attachmentResolver.resolve(resourceReference.getReference(), document.getDocumentReference());
+            if (resourceReference != null) {
+                if (ResourceType.ATTACHMENT.equals(resourceReference.getType())) {
+                    AttachmentReference attachmentReference = this.attachmentResolver
+                        .resolve(resourceReference.getReference(), document.getDocumentReference());
 
-                XWikiDocument attachmentDocument;
-                try {
-                    attachmentDocument =
-                        context.getWiki().getDocument(attachmentReference.getDocumentReference(), context);
+                    XWikiDocument attachmentDocument;
+                    try {
+                        if (attachmentReference.getDocumentReference().equals(document.getDocumentReference())) {
+                            attachmentDocument = document;
+                        } else {
+                            attachmentDocument =
+                                context.getWiki().getDocument(attachmentReference.getDocumentReference(), context);
+                        }
 
-                    valid = attachmentDocument.getAttachment(attachmentReference.getName()) != null;
-                } catch (XWikiException e) {
-                    this.logger.error("Failed to get document [{}]", attachmentReference.getDocumentReference(), e);
+                        valid = attachmentDocument.getAttachment(attachmentReference.getName()) != null;
+                    } catch (XWikiException e) {
+                        this.logger.error("Failed to get document [{}]", attachmentReference.getDocumentReference(), e);
 
+                        valid = false;
+                    }
+
+                    if (!valid) {
+                        this.logger.debug("Attachment [{}] does not exists", attachmentReference);
+                    }
+                } else if (ResourceType.URL.equals(resourceReference.getType())
+                    || ExtensionResourceReference.TYPE.equals(resourceReference.getType())) {
+                    valid = true;
+                } else {
                     valid = false;
-                }
 
-                if (!valid) {
-                    this.logger.debug("Attachment [{}] does not exists", attachmentReference);
+                    this.logger.debug("Unknown resource type [{}]", resourceReference.getType());
                 }
-            } else if (ResourceType.URL.equals(resourceReference.getType())
-                || ExtensionResourceReference.TYPE.equals(resourceReference.getType())) {
-                valid = true;
             } else {
                 valid = false;
 
-                this.logger.debug("Unknown resource type [{}]", resourceReference.getType());
+                this.logger.debug("No actual download provided for object [{}({})]",
+                    XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE, extensionVersionObject.getNumber());
             }
-        } else {
-            valid = false;
-
-            this.logger.debug("No actual download provided for object [{}({})]",
-                XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE, extensionVersionObject.getNumber());
         }
 
         return valid;
@@ -690,7 +714,7 @@ public class RepositoryManager implements Initializable, Disposable
                         if (!extensionVersions.containsKey(new DefaultVersion(version))
                             && featureVersions.containsKey(new DefaultVersion(version))) {
                             // The version does not exist on remote repository
-                            if (!isVersionValid(document, versionObject, xcontext)) {
+                            if (!isVersionValid(document, extension.getType(), versionObject, xcontext)) {
                                 // The version is invalid, removing it to not make the whole extension invalid
                                 document.removeXObject(versionObject);
                                 needSave = true;
@@ -804,7 +828,8 @@ public class RepositoryManager implements Initializable, Disposable
         // Update properties
 
         // Type
-        needSave |= update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE, extension.getType());
+        needSave |= update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE,
+            StringUtils.defaultString(extension.getType()));
 
         // Name
         needSave |= update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_NAME, extension.getName());
@@ -880,7 +905,7 @@ public class RepositoryManager implements Initializable, Disposable
             extension.getAllowedNamespaces(), xcontext);
 
         // Properties
-        needSave |= updateProperties(extensionObject, extension.getProperties());
+        needSave |= updateProperties(extensionObject, extension);
 
         return needSave;
     }
@@ -900,15 +925,40 @@ public class RepositoryManager implements Initializable, Disposable
                     break;
                 }
             }
-            // truncated to 255 in case it's too long, TODO: should probably be handled at a lower level)
-            if (summary.length() > 255) {
-                summary = summary.substring(0, 255);
+            // truncated to max title size in case it's too long, TODO: should probably be handled at a lower level)
+            if (summary.length() > getMaxTitleSize()) {
+                summary = summary.substring(0, getMaxTitleSize());
             }
         } else {
             summary = "";
         }
 
         return summary;
+    }
+
+    private int getMaxTitleSize()
+    {
+        if (this.maxTitleSize == -1) {
+            XWikiContext xcontext = this.xcontextProvider.get();
+            if (xcontext != null) {
+                this.maxTitleSize = xcontext.getWiki().getStore().getLimitSize(xcontext, XWikiDocument.class, "title");
+            }
+        }
+
+        return this.maxTitleSize != -1 ? this.maxTitleSize : 768;
+    }
+
+    private int getMaxStringPropertySize()
+    {
+        if (this.maxStringPropertySize == -1) {
+            XWikiContext xcontext = this.xcontextProvider.get();
+            if (xcontext != null) {
+                this.maxStringPropertySize =
+                    xcontext.getWiki().getStore().getLimitSize(xcontext, StringProperty.class, "value");
+            }
+        }
+
+        return this.maxStringPropertySize != -1 ? this.maxStringPropertySize : 768;
     }
 
     private String getDescription(Extension extension)
@@ -1198,8 +1248,10 @@ public class RepositoryManager implements Initializable, Disposable
         needSave |= updateExtensionVersionDependencies(document, extension);
 
         // Download
-        String download = getDownloadURL(extension);
-        needSave |= update(versionObject, XWikiRepositoryModel.PROP_VERSION_DOWNLOAD, download);
+        if (!StringUtils.isEmpty(extension.getType())) {
+            String download = getDownloadURL(extension);
+            needSave |= update(versionObject, XWikiRepositoryModel.PROP_VERSION_DOWNLOAD, download);
+        }
 
         return needSave;
     }
@@ -1211,14 +1263,25 @@ public class RepositoryManager implements Initializable, Disposable
         return this.resourceReferenceSerializer.serialize(resource);
     }
 
-    protected boolean updateProperties(BaseObject object, Map<String, ?> map)
+    protected boolean updateProperties(BaseObject object, Extension extension)
     {
+        Map<String, Object> map = extension.getProperties();
+
+        // [Retro compatibility] Reinject extension components as "unknow" properties since that's what XWiki version
+        // between 13.3 and 14.5 expect to find
+        Collection<ExtensionComponent> components = extension.getComponents();
+        if (!components.isEmpty()) {
+            map = new LinkedHashMap<>(map);
+            map.put(Extension.IKEYPREFIX + Extension.FIELD_COMPONENTS,
+                StringUtils.join(ExtensionComponentConverter.toStringList(components), '\n'));
+        }
+
         List<String> list = new ArrayList<>(map.size());
         for (Map.Entry<String, ?> entry : map.entrySet()) {
             String entryString = entry.getKey() + '=' + entry.getValue();
-            if (entryString.length() > 255) {
+            if (entryString.length() > getMaxStringPropertySize()) {
                 // Protect against properties too big
-                entryString = entryString.substring(0, 255);
+                entryString = entryString.substring(0, getMaxStringPropertySize());
             }
             list.add(entryString);
         }

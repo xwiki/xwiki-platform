@@ -46,6 +46,5 @@ rendering.macro.iconPicker.parameter.id.description=DOM identifikator ulaznog po
 rendering.macro.iconPicker.parameter.class.name=Klasa
 rendering.macro.iconPicker.parameter.class.description=CSS klasa ulaza gdje će odabirač primjenjivati
 rendering.macro.iconPicker.parameter.prefix.name=Prefiks
-rendering.macro.iconPicker.parameter.prefix.description=Prefiks za dodavanje prije imena ikone u ulaznom polju (pretpostavljeno\: "image\:icon")
-</content>
+rendering.macro.iconPicker.parameter.prefix.description=Prefiks za dodavanje prije imena ikone u ulaznom polju (pretpostavljeno\: "image\:icon")</content>
 </xwikidoc>

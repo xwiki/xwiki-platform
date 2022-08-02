@@ -37,6 +37,9 @@ import org.xwiki.rest.model.jaxb.Tags;
 import org.xwiki.rest.resources.tags.PagesForTagsResource;
 import org.xwiki.rest.resources.tags.TagsResource;
 
+/**
+ * @version $Id$
+ */
 @Component
 @Named("org.xwiki.rest.internal.resources.tags.TagsResourceImpl")
 public class TagsResourceImpl extends XWikiResource implements TagsResource

@@ -31,6 +31,7 @@ import javax.inject.Singleton;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.bridge.event.DocumentVersionRangeDeletedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.reference.DocumentReference;
@@ -67,6 +68,7 @@ public class DocumentEventConverter extends AbstractXWikiEventConverter
             add(DocumentDeletedEvent.class);
             add(DocumentCreatedEvent.class);
             add(DocumentUpdatedEvent.class);
+            add(DocumentVersionRangeDeletedEvent.class);
         }
     };
 
@@ -98,7 +100,7 @@ public class DocumentEventConverter extends AbstractXWikiEventConverter
                     localEvent.setEvent((Event) remoteEvent.getEvent());
 
                     if (remoteEvent.getEvent() instanceof DocumentDeletedEvent) {
-                        localEvent.setSource(unserializeDeletdDocument(remoteEvent.getSource(), xcontext));
+                        localEvent.setSource(unserializeDeletedDocument(remoteEvent.getSource(), xcontext));
                     } else {
                         localEvent.setSource(unserializeDocument(remoteEvent.getSource()));
                     }
@@ -113,7 +115,7 @@ public class DocumentEventConverter extends AbstractXWikiEventConverter
         return false;
     }
 
-    private XWikiDocument unserializeDeletdDocument(Serializable remoteData, XWikiContext xcontext)
+    private XWikiDocument unserializeDeletedDocument(Serializable remoteData, XWikiContext xcontext)
         throws XWikiException
     {
         Map<String, Serializable> remoteDataMap = (Map<String, Serializable>) remoteData;

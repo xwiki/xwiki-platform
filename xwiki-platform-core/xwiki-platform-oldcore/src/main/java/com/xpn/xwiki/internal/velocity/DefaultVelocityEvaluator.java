@@ -19,17 +19,21 @@
  */
 package com.xpn.xwiki.internal.velocity;
 
+import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
-import org.xwiki.rendering.transformation.RenderingContext;
 import org.apache.velocity.VelocityContext;
-import org.xwiki.velocity.VelocityManager;
-import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
+import org.xwiki.rendering.transformation.RenderingContext;
+import org.xwiki.rendering.util.ErrorBlockGenerator;
+import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiException;
 
@@ -48,7 +52,10 @@ public class DefaultVelocityEvaluator implements VelocityEvaluator
 
     @Inject
     private VelocityManager velocityManager;
-    
+
+    @Inject
+    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
+
     @Override
     public String evaluateVelocity(String content, String namespace, VelocityContext vcontext) throws XWikiException
     {
@@ -62,8 +69,8 @@ public class DefaultVelocityEvaluator implements VelocityEvaluator
                 if (renderingContext instanceof MutableRenderingContext) {
                     // Make the current velocity template id available
                     ((MutableRenderingContext) renderingContext).push(renderingContext.getTransformation(),
-                            renderingContext.getXDOM(), renderingContext.getDefaultSyntax(), namespace,
-                            renderingContext.isRestricted(), renderingContext.getTargetSyntax());
+                        renderingContext.getXDOM(), renderingContext.getDefaultSyntax(), namespace,
+                        renderingContext.isRestricted(), renderingContext.getTargetSyntax());
 
                     renderingContextPushed = true;
                 }
@@ -73,10 +80,10 @@ public class DefaultVelocityEvaluator implements VelocityEvaluator
 
             return writer.toString();
         } catch (Exception e) {
-            Object[] args = { namespace };
+            Object[] args = {namespace};
             throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
-                    XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION, "Error while parsing velocity page {0}", e,
-                    args);
+                XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION, "Error while parsing velocity page {0}", e,
+                args);
         } finally {
             // Get rid of temporary rendering context
             if (renderingContextPushed) {
@@ -84,4 +91,47 @@ public class DefaultVelocityEvaluator implements VelocityEvaluator
             }
         }
     }
+
+    @Override
+    public String evaluateVelocityNoException(String content, DocumentReference namespaceDocument)
+    {
+        String namespace =
+            namespaceDocument != null ? this.defaultEntityReferenceSerializer.serialize(namespaceDocument)
+                : this.renderingContext.getTransformationId();
+
+        try {
+            return evaluateVelocity(content, namespace, this.velocityManager.getVelocityContext());
+        } catch (XWikiException e) {
+            return renderError(e);
+        }
+    }
+
+    private String renderError(Throwable throwable)
+    {
+        StringBuilder builder = new StringBuilder();
+
+        beginDiv(builder, ErrorBlockGenerator.CLASS_ATTRIBUTE_MESSAGE_VALUE);
+        builder.append("Failed to execute textarea");
+
+        beginDiv(builder, ErrorBlockGenerator.CLASS_ATTRIBUTE_DESCRIPTION_VALUE);
+        StringWriter writer = new StringWriter();
+        throwable.printStackTrace(new PrintWriter(writer));
+        builder.append(writer.toString().replace("\n", "<br/>"));
+        endDiv(builder);
+
+        endDiv(builder);
+
+        return builder.toString();
+    }
+
+    private void beginDiv(StringBuilder builder, String cssClass)
+    {
+        builder.append("<div class=\"" + cssClass + "\">");        
+    }
+
+    private void endDiv(StringBuilder builder)
+    {
+        builder.append("</div>");        
+    }
+    
 }

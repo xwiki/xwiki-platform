@@ -20,6 +20,9 @@
 package org.xwiki.notifications.filters;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.eventstream.Event;
@@ -66,6 +69,44 @@ public interface NotificationFilter extends Comparable
          */
         NO_EFFECT
     }
+
+    /**
+     * The different phases when a filter can be called.
+     *
+     * @since 12.9RC1
+     * @since 12.6.3
+     */
+    enum FilteringPhase
+    {
+        /**
+         * If the filter is used during post-filtering.
+         */
+        POST_FILTERING,
+
+        /**
+         * If the filter is used during pre-filtering.
+         */
+        PRE_FILTERING
+    }
+
+    /**
+     * A static set containing both {@link FilteringPhase#POST_FILTERING} and {@link FilteringPhase#PRE_FILTERING}.
+     * To be used in overrides of {@link #getFilteringPhases()} for performance reasons.
+     */
+    Set<FilteringPhase> SUPPORT_BOTH_FILTERING_PHASE =
+        EnumSet.of(FilteringPhase.PRE_FILTERING, FilteringPhase.POST_FILTERING);
+
+    /**
+     * A static set containing only {@link FilteringPhase#POST_FILTERING}.
+     * To be used in overrides of {@link #getFilteringPhases()} for performance reasons.
+     */
+    Set<FilteringPhase> SUPPORT_ONLY_POST_FILTERING_PHASE = Collections.singleton(FilteringPhase.POST_FILTERING);
+
+    /**
+     * A static set containing only {@link FilteringPhase#PRE_FILTERING}.
+     * To be used in overrides of {@link #getFilteringPhases()} for performance reasons.
+     */
+    Set<FilteringPhase> SUPPORT_ONLY_PRE_FILTERING_PHASE = Collections.singleton(FilteringPhase.PRE_FILTERING);
 
     /**
      * Enable or disable an event in the notification list (post-filter).
@@ -158,7 +199,8 @@ public interface NotificationFilter extends Comparable
      * @since 9.11.5
      * @since 10.3
      */
-    default int getPriority() {
+    default int getPriority()
+    {
         return 1000;
     }
 
@@ -170,5 +212,15 @@ public interface NotificationFilter extends Comparable
             return other.getPriority() - this.getPriority();
         }
         return 0;
+    }
+
+    /**
+     * @return the set of pĥase(s) when the filter can be used.
+     * @since 12.9RC1
+     * @since 12.6.3
+     */
+    default Set<FilteringPhase> getFilteringPhases()
+    {
+        return SUPPORT_BOTH_FILTERING_PHASE;
     }
 }

@@ -11,7 +11,7 @@ set -e
 if [ -f /usr/share/dbconfig-common/dpkg/postinst.mysql ]; then
   . /usr/share/dbconfig-common/dpkg/postinst.mysql
 
-  extrasql=" CHARACTER SET utf8 COLLATE utf8_bin"
+  extrasql=" CHARACTER SET utf8mb4 COLLATE utf8mb4_bin"
 
   dbc_generate_include='template:/etc/xwiki/hibernate.cfg.xml'
   dbc_generate_include_perms='644'

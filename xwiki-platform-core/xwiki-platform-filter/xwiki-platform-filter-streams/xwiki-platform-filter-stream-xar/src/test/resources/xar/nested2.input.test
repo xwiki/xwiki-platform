@@ -35,6 +35,7 @@
                   <type>
                     <name>XWiki</name>
                     <id>xwiki</id>
+                    <variants class="empty-list"/>
                   </type>
                   <version>2.0</version>
                 </org.xwiki.rendering.syntax.Syntax>
@@ -127,6 +128,7 @@
                   <type>
                     <name>XWiki</name>
                     <id>xwiki</id>
+                    <variants class="empty-list"/>
                   </type>
                   <version>2.0</version>
                 </org.xwiki.rendering.syntax.Syntax>

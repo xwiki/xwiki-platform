@@ -88,8 +88,8 @@ public interface MailSenderConfiguration
     boolean usesAuthentication();
 
     /**
-     * @return the hint of the {@link org.xwiki.mail.script.ScriptServicePermissionChecker} component to use to check if a
-     *         mail is allowed to be sent or not when using the Mail Sender Script Service API. For example:
+     * @return the hint of the {@link org.xwiki.mail.script.ScriptServicePermissionChecker} component to use to check
+     *         if a mail is allowed to be sent or not when using the Mail Sender Script Service API. For example:
      *         "alwaysallow", "programmingrights".
      * @since 6.4M2
      */
@@ -101,4 +101,24 @@ public interface MailSenderConfiguration
      * @since 6.4RC1
      */
     long getSendWaitTime();
+
+    /**
+     * @return the max size of the prepare queue. When this size is reached calls to put new elements on the queue will
+     *         block
+     * @since 11.6RC1
+     */
+    default int getPrepareQueueCapacity()
+    {
+        return 1000;
+    }
+
+    /**
+     * @return the max size of the send queue. When this size is reached calls to put new elements on the queue will
+     *         block
+     * @since 11.6RC1
+     */
+    default int getSendQueueCapacity()
+    {
+        return 1000;
+    }
 }

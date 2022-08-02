@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * 
  * @version $Id$
  */
-public class XarFileTest
+class XarFileTest
 {
     private static final LocalDocumentReference A_PAGE = new LocalDocumentReference("a", "page", Locale.ROOT);
 
@@ -56,14 +56,14 @@ public class XarFileTest
     private ExtensionPackager extensionPackager;
 
     @BeforeEach
-    public void beforeEach() throws IOException
+    void beforeEach() throws IOException
     {
         this.extensionPackager = new ExtensionPackager(null, new File("target/test-" + new Date().getTime()));
         this.extensionPackager.generateExtensions();
     }
 
     @Test
-    public void XarFile() throws XarException, IOException
+    void XarFile() throws XarException, IOException
     {
         try (XarFile file = new XarFile(extensionPackager.getExtensionFile(new ExtensionId("xar1", "1.0")))) {
             assertEquals(6, file.getEntries().size());

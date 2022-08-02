@@ -81,15 +81,16 @@ public class DefaultWikiManagerREST extends XWikiResource implements WikiManager
         WikiDescriptor descriptor = null;
 
         try {
-            // Create the wiki
-            descriptor = wikiManager.create(wiki.getId(), wiki.getId(), true);
-
-            // Change the descriptor
-            if (wiki.getOwner() != null) {
-                descriptor.setOwnerId(wiki.getOwner());
-            } else {
-                descriptor.setOwnerId(entityReferenceSerializer.serialize(xcontext.getUserReference()));
+            // Find the wiki owner
+            String ownerId = wiki.getOwner();
+            if (ownerId == null) {
+                ownerId = entityReferenceSerializer.serialize(xcontext.getUserReference());
             }
+
+            // Create the wiki
+            descriptor = wikiManager.create(wiki.getId(), wiki.getId(), ownerId, true);
+
+            // Update the descriptor
             descriptor.setPrettyName(wiki.getName());
             descriptor.setDescription(wiki.getDescription());
 

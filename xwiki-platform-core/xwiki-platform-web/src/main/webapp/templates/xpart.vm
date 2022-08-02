@@ -1,3 +1,0 @@
-#set ($vm = $request.vm)
-#template("xwikivars.vm")
-#template($vm)

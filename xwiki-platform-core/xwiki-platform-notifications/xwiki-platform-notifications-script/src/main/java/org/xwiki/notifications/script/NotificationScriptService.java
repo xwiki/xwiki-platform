@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.script;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -132,5 +133,17 @@ public class NotificationScriptService implements ScriptService
     public void saveEventStatus(String eventId, boolean isRead) throws Exception
     {
         notificationScriptEventHelper.saveEventStatus(eventId, isRead);
+    }
+
+    /**
+     * Remove all event statues for the current user.
+     * 
+     * @param startDate date before which to remove event status
+     * @throws Exception if an error occurs
+     * @since 12.1RC1
+     */
+    public void clearAllStatus(Date startDate) throws Exception
+    {
+        this.notificationScriptEventHelper.clearAllStatus(startDate);
     }
 }

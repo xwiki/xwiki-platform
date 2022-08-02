@@ -21,20 +21,21 @@ package org.xwiki.officeimporter.internal.cleaner;
 
 import java.io.StringReader;
 
-import org.junit.Assert;
-
+import org.junit.jupiter.api.BeforeEach;
 import org.w3c.dom.Document;
 import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLUtils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * Abstract class for all HTML cleaner tests.
- * 
+ *
  * @version $Id$
  * @since 1.8M2
  */
-public abstract class AbstractHTMLCleaningTest extends AbstractOfficeImporterTest
+abstract class AbstractHTMLCleaningTest extends AbstractOfficeImporterTest
 {
     /**
      * Beginning of the test html document.
@@ -56,23 +57,22 @@ public abstract class AbstractHTMLCleaningTest extends AbstractOfficeImporterTes
      */
     protected HTMLCleaner wysiwygHTMLCleaner;
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception
     {
-        super.setUp();
-        this.officeHTMLCleaner = getComponentManager().getInstance(HTMLCleaner.class, "openoffice");
-        this.wysiwygHTMLCleaner = getComponentManager().getInstance(HTMLCleaner.class, "wysiwyg");
+        this.officeHTMLCleaner = this.componentManager.getInstance(HTMLCleaner.class, "openoffice");
+        this.wysiwygHTMLCleaner = this.componentManager.getInstance(HTMLCleaner.class, "wysiwyg");
     }
 
     /**
      * Asserts that the given dirty HTML fragment equals the expected clean HTML after the cleaning process.
-     * 
-     * @param dirtyHTML the HTML fragment to be cleaned
+     *
+     * @param dirtyHTML         the HTML fragment to be cleaned
      * @param expectedCleanHTML expected clean HTML
      */
     protected void assertCleanHTML(String dirtyHTML, String expectedCleanHTML)
     {
         Document document = officeHTMLCleaner.clean(new StringReader(header + dirtyHTML + footer));
-        Assert.assertEquals(header + expectedCleanHTML + footer, HTMLUtils.toString(document, true, true).trim());
+        assertEquals(header + expectedCleanHTML + footer, HTMLUtils.toString(document, true, true).trim());
     }
 }

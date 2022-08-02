@@ -19,6 +19,9 @@
  */
 package org.xwiki.extension.xar.internal.security;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.security.GroupSecurityReference;
@@ -26,10 +29,11 @@ import org.xwiki.security.UserSecurityReference;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authorization.RuleState;
 import org.xwiki.security.authorization.SecurityRule;
+import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * Xar document oriented implementation of {@link XarSecurityRule}.
- * 
+ *
  * @version $Id$
  * @since 10.5RC1
  */
@@ -77,5 +81,40 @@ public class XarSecurityRule implements SecurityRule
     public RuleState getState()
     {
         return RuleState.DENY;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder().append(right).append(simple).toHashCode();
+    }
+
+    @Override
+    public boolean equals(Object object)
+    {
+        if (object == this) {
+            return true;
+        }
+        if (!(object instanceof XarSecurityRule)) {
+            return false;
+        }
+
+        XarSecurityRule rhs = (XarSecurityRule) object;
+
+        EqualsBuilder builder = new EqualsBuilder();
+        builder.append(this.right, rhs.right);
+        builder.append(this.simple, rhs.simple);
+
+        return builder.isEquals();
+    }
+
+    @Override
+    public String toString()
+    {
+        ToStringBuilder builder = new XWikiToStringBuilder(this);
+        builder.append("right", this.right);
+        builder.append("simple", this.simple);
+
+        return builder.toString();
     }
 }

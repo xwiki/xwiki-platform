@@ -21,6 +21,7 @@ package org.xwiki.rendering.async.internal.block;
 
 import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.async.internal.AsyncRenderer;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Block based asynchronous renderer.
@@ -37,4 +38,9 @@ public interface BlockAsyncRenderer extends AsyncRenderer
      * @return true if the renderer come from an inline context
      */
     boolean isInline();
+
+    /**
+     * @return the syntax in which to render the result
+     */
+    Syntax getTargetSyntax();
 }

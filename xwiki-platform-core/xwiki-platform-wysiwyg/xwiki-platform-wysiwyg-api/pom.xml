@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wysiwyg</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wysiwyg-api</artifactId>
   <name>XWiki Platform - WYSIWYG Editor - API</name>
@@ -33,7 +33,8 @@
   <description>Generic API for all WYSIWYG content editors.</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.32</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>24</xwiki.pitest.mutationThreshold>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>WYSIWYG Editor Module</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>
@@ -48,7 +49,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-syntax-annotatedxhtml</artifactId>
+      <artifactId>xwiki-rendering-syntax-annotatedhtml5</artifactId>
       <version>${rendering.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -64,7 +65,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-model</artifactId>
+      <artifactId>xwiki-platform-model-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -113,23 +114,6 @@
             <exclude>**/HTMLCleanerTest.java</exclude>
           </excludes>
         </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <executions>
-          <execution>
-            <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
-            <id>default</id>
-            <configuration>
-              <!-- New code should follow checkstyle rules. -->
-              <excludes>
-                <!-- Class Fan-Out Complexity is 24 (max allowed is 20) -->
-                org/xwiki/wysiwyg/filter/XWikiContextInitializationFilter.java
-              </excludes>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>

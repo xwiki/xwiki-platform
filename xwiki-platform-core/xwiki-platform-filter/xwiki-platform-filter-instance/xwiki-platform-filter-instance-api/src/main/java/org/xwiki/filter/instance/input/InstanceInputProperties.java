@@ -60,12 +60,14 @@ public class InstanceInputProperties extends HashMap<String, Object> implements 
         put(PROPNAME_ENTITIES, entities);
     }
 
+    @PropertyName("Verbose")
+    @PropertyDescription("Indicate if the filter should produce verbose log")
     @Override
     public boolean isVerbose()
     {
         Boolean verbose = (Boolean) get(PROPNAME_VERBOSE);
 
-        return verbose == Boolean.FALSE ? false : true;
+        return verbose != Boolean.FALSE;
     }
 
     @Override

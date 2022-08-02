@@ -19,9 +19,12 @@
  */
 package org.xwiki.rest.internal.resources.job;
 
+import java.io.IOException;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.rest.XWikiJobResource;
 import org.xwiki.rest.XWikiRestException;
@@ -33,6 +36,7 @@ import org.xwiki.rest.resources.job.JobLogResource;
  * @version $Id$
  * @since 7.2M3
  */
+@Component
 @Named("org.xwiki.rest.internal.resources.job.JobLogResourceImpl")
 public class JobLogResourceImpl extends XWikiJobResource implements JobLogResource
 {
@@ -44,6 +48,10 @@ public class JobLogResourceImpl extends XWikiJobResource implements JobLogResour
     {
         JobStatus jobStatus = getRealJobStatus(jobId);
 
-        return this.factory.toRestJobLog(jobStatus.getLog(), this.uriInfo.getAbsolutePath(), level, fromLevel);
+        try {
+            return this.factory.toRestJobLog(jobStatus.getLogTail(), this.uriInfo.getAbsolutePath(), level, fromLevel);
+        } catch (IOException e) {
+            throw new XWikiRestException("Failed to load the log for job [" + jobId + "]", e);
+        }
     }
 }

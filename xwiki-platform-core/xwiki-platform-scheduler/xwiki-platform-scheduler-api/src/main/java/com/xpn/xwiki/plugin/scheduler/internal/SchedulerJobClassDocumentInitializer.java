@@ -41,7 +41,7 @@ import com.xpn.xwiki.objects.classes.TextAreaClass;
  * @since 6.1M1
  */
 @Component
-@Named("XWiki.SchedulerJobSheet")
+@Named("XWiki.SchedulerJobClass")
 @Singleton
 public class SchedulerJobClassDocumentInitializer extends AbstractMandatoryClassInitializer
 {

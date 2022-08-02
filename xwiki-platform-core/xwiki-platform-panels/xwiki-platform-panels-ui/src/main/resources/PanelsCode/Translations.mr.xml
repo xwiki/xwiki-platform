@@ -1,0 +1,68 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="PanelsCode.Translations" locale="mr">
+  <web>PanelsCode</web>
+  <name>Translations</name>
+  <language>mr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Panels.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>platform.panels.applications.helper=येथे आपण अ‍ॅप्लिकेशन बारमध्ये कोणते अनुप्रयोग प्रदर्शित केले आहेत ते निवडू शकता (डीफॉल्टनुसार डावीकडे). कोणताही नवीन अनुप्रयोग तेथे प्रदर्शित केला जाईल. आपण त्यातील काही काढू इच्छित असल्यास, आपल्याला त्याच्या आयकॉनला पहिल्या बॉक्समधून दुसर्‍याकडे ड्रॅग आणि ड्रॉप करणे आवश्यक आहे. आपण आपल्या इच्छेनुसार अनुप्रयोगांचे ऑर्डर देखील करू शकता. आपले बदल जतन करण्यास विसरू नका!
+platform.panels.applications.displayedapps=बार मधील अनुप्रयोग
+platform.panels.applications.blacklistedapps=बारमध्ये नसलेले अनुप्रयोग
+platform.panels.applications.save=जतन करा
+platform.panels.applications.revert=रीसेट करा
+platform.panels.applications.ajax.success=कॉन्फिगरेशन सेव्ह केले गेले आहे.
+platform.panels.applications.ajax.csrf=सीएसआरएफ प्रमाणीकरण अयशस्वी. पृष्ठ रीलोड करून पहा.
+platform.panels.applications.ajax.noright=आपल्याला  PanelsCode.ApplicationsPanelConfiguration संपादित करण्याचा अधिकार नाही.
+platform.panels.applications.ajax.error=Failed to save your changes.
+admin.panels.applications=अनुप्रयोग पॅनेल
+admin.panels.applications.description=अ‍ॅप्लीकेशन पॅनेलमध्ये कोणते अ‍ॅप्लिकेशन्स दाखवले जातात ते व्यवस्थापित करा.
+
+admin.panels.navigation=पथदर्शक पॅनेल
+admin.panels.navigation.description=नॅव्हिगेशन पॅनेलमध्ये कोणती पृष्ठे प्रदर्शित केली जातील हे व्यवस्थापित करा.
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=उच्च स्तरीय विस्तार पृष्ठे वगळा
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint=हे डायनॅमिक फिल्टर नेव्हिगेशन ट्रीमधून स्थापित केलेल्या विस्ताराशी संबंधित शीर्ष स्तरीय पृष्ठे हटविते, जर ती सुधारित केली गेली नाहीत तर.
+PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages=शीर्ष स्तरीय अनुप्रयोग पृष्ठे वगळा
+PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages.hint=हे डायनॅमिक फिल्टर नेव्हिगेशन ट्री वरून अव्वल स्तराची पाने जी काही मिनिटांत अ‍ॅपसह तयार केलेल्या अनुप्रयोगाशी संबंधित आहेत ती काढून टाकते.
+PanelsCode.NavigationConfigurationClass_exclusions=अपवाद
+PanelsCode.NavigationConfigurationClass_exclusions.hint=नॅव्हिगेशन ट्रीमधून वगळण्यासाठी पृष्ठांची यादी.
+PanelsCode.NavigationConfigurationClass_inclusions=समावेश
+PanelsCode.NavigationConfigurationClass_inclusions.hint=मागील फिल्टरद्वारे वगळले गेले असले तरीही, नेव्हिगेशन ट्रीमध्ये समाविष्ट करण्यासाठी पृष्ठांची यादी.
+platform.panels.navigation.configuration.excludedPages=वगळलेली पृष्ठे
+platform.panels.navigation.configuration.excludedPages.hint=नेव्हिगेशनच्या झाडाच्या बाहेर पृष्ठे हलविण्यासाठी किंवा ती परत ठेवण्यासाठी ड्रॅग आणि ड्रॉप वापरा.
+platform.panels.navigation.configuration.excludedPages.empty=कोणतेही नाही
+platform.panels.navigation.configuration.topLevelExtensionPages=उच्च स्तरीय विस्तार पृष्ठे
+platform.panels.navigation.configuration.topLevelApplicationPages=शीर्ष स्तरीय अनुप्रयोग पृष्ठे
+platform.panels.navigation.configuration.otherPages=इतर पृष्ठे
+platform.panels.navigation.configuration.saveComment=प्रशासनाकडून नेव्हिगेशन पॅनेल कॉन्फिगरेशन अद्यतनित केले</content>
+</xwikidoc>

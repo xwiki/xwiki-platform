@@ -105,6 +105,7 @@
           <element name="space" type="string"></element>
           <element name="name" type="string"></element>
           <element name="title" type="string"></element>
+          <element name="rawTitle" type="string"></element>
           <element name="parent" type="string"></element>
           <element name="parentId" type="string"></element>
           <element name="version" type="string"></element>
@@ -133,11 +134,14 @@
           <element name="modified" type="dateTime"></element>
           <element name="modifier" type="string"></element>
           <element name="modifierName" type="string"></element>
+          <element name="originalMetadataAuthor" type="string"></element>
+          <element name="originalMetadataAuthorName" type="string"></element>
           <element name="comment" type="string"></element>
           <element name="content" type="string"></element>
           <element name="class" type="xwiki:Class" minOccurs="0" maxOccurs="1"></element>
           <element name="objects" type="xwiki:Objects" minOccurs="0" maxOccurs="1"></element>
           <element name="attachments" type="xwiki:Attachments" minOccurs="0" maxOccurs="1"></element>
+          <element name="hierarchy" type="xwiki:Hierarchy" minOccurs="0"></element>
         </sequence>
       </extension>
     </complexContent>
@@ -181,6 +185,7 @@
           <element name="date" type="dateTime"></element>
           <element name="xwikiRelativeUrl" type="string"></element>
           <element name="xwikiAbsoluteUrl" type="string"></element>
+          <element name="hierarchy" type="xwiki:Hierarchy" minOccurs="0"></element>
         </sequence>
       </extension>
     </complexContent>

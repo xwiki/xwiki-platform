@@ -19,8 +19,7 @@
  */
 package com.xpn.xwiki.api;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.annotation.AllComponents;
 
@@ -28,10 +27,12 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.doReturn;
 
 /**
  * Unit tests for {@link Context}.
@@ -39,11 +40,12 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  * @since 4.4RC1
  */
+@OldcoreTest
 @AllComponents
-public class ContextTest
+class ContextTest
 {
-    @Rule
-    public MockitoOldcoreRule oldcoreRule = new MockitoOldcoreRule();
+    @InjectMockitoOldcore
+    private MockitoOldcore oldCore;
 
     /**
      * Tests that pages can override the default property display mode using {@code $xcontext.setDisplayMode}.
@@ -51,16 +53,16 @@ public class ContextTest
      * @see "XWIKI-2436"
      */
     @Test
-    public void setDisplayMode() throws Exception
+    void setDisplayMode() throws Exception
     {
-        XWikiContext xcontext = this.oldcoreRule.getXWikiContext();
+        XWikiContext xcontext = this.oldCore.getXWikiContext();
 
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         XWikiDocument document = new XWikiDocument(documentReference);
         BaseClass baseClass = document.getXClass();
 
-        doReturn("xwiki/2.1").when(this.oldcoreRule.getSpyXWiki()).getCurrentContentSyntaxId("xwiki/2.1", xcontext);
-        doReturn(baseClass).when(this.oldcoreRule.getSpyXWiki()).getXClass(documentReference, xcontext);
+        doReturn("xwiki/2.1").when(this.oldCore.getSpyXWiki()).getCurrentContentSyntaxId("xwiki/2.1", xcontext);
+        doReturn(baseClass).when(this.oldCore.getSpyXWiki()).getXClass(documentReference, xcontext);
 
         baseClass.addTextField("prop", "prop", 5);
         BaseObject obj = (BaseObject) document.getXClass().newObject(xcontext);
@@ -71,7 +73,9 @@ public class ContextTest
         context.setDisplayMode("edit");
 
         // We verify that the result contains a form input
-        assertEquals("<input size='5' id='space.page_0_prop' value='value' name='space.page_0_prop' "
-            + "type='text'/>", document.display("prop", xcontext));
+        assertEquals("<input size='5' id='space.page_0_prop' value='value' name='space.page_0_prop' " + "type='text'/>",
+            document.display("prop", xcontext));
+
+        assertEquals("edit", context.getDisplayMode());
     }
 }

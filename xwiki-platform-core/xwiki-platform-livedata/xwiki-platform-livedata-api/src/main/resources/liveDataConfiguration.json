@@ -1,0 +1,74 @@
+{
+  "query": {
+    "offset": 0,
+    "limit": 15
+  },
+  "meta": {
+    "layouts": [
+      {"id": "table", "icon": "table"},
+      {"id": "cards", "icon": "th"}
+    ],
+
+    "defaultLayout": "table",
+
+    "filters": [
+      {
+        "id": "text",
+        "operators": ["contains", "startsWith", "equals"]
+      },
+      {
+        "id": "number",
+        "operators": [
+          {"id": "equals", "name": "="},
+          {"id": "less", "name": "<"},
+          {"id": "greater", "name": ">"}
+        ]
+      },
+      {
+        "id": "boolean",
+        "operators": ["equals"]
+      },
+      {
+        "id": "date",
+        "operators": ["between", "before", "after", "contains"],
+        "dateFormat": "yyyy/MM/dd HH:mm"
+      },
+      {
+        "id": "list",
+        "operators": ["equals", "startsWith", "contains", "empty"]
+      }
+    ],
+
+    "defaultFilter": "text",
+
+    "displayers": [
+      {"id": "text"},
+      {"id": "link"},
+      {"id": "html"},
+      {"id": "actions"},
+      {"id": "boolean"}
+    ],
+
+    "defaultDisplayer": "text",
+
+    "pagination": {
+      "maxShownPages": 10,
+      "pageSizes": [15, 25, 50, 100],
+      "showEntryRange": true,
+      "showNextPrevious": true
+    },
+
+    "selection": {
+      "enabled": false
+    },
+
+    "actions": [
+      {"id": "view", "icon": "eye"},
+      {"id": "edit", "icon": "pencil"},
+      {"id": "delete", "icon": "cross"},
+      {"id": "copy", "icon": "copy"},
+      {"id": "rename", "icon": "move"},
+      {"id": "rights", "icon": "lock"}
+    ]
+  }
+}

@@ -1,5 +1,0 @@
-###
-### Generic error message
-###
-#set($messageType = $services.localization.render('platform.core.errorMessageType'))
-#template("message.vm")

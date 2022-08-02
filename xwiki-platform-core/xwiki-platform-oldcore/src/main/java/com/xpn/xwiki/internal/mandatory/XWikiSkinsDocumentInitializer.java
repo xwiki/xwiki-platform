@@ -44,6 +44,10 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Singleton
 public class XWikiSkinsDocumentInitializer extends AbstractMandatoryClassInitializer
 {
+    private static final String CLASS_REFERENCE_SPACE = "SkinsCode";
+
+    private static final String CLASS_REFERENCE_NAME = "XWikiSkinsSheet";
+
     /**
      * Used to bind a class to a document sheet.
      */
@@ -79,10 +83,15 @@ public class XWikiSkinsDocumentInitializer extends AbstractMandatoryClassInitial
     {
         boolean needsUpdate = super.updateDocument(document);
 
+        String wikiName = document.getDocumentReference().getWikiReference().getName();
+
+        // The skin sheet used to be located in XWiki space, removing it if it exist
+        needsUpdate |= this.classSheetBinder.unbind(document,
+            new DocumentReference(wikiName, XWiki.SYSTEM_SPACE, CLASS_REFERENCE_NAME));
+
         // Use XWikiSkinsSheet to display documents having XWikiSkins objects if no other class sheet is specified.
         if (this.classSheetBinder.getSheets(document).isEmpty()) {
-            String wikiName = document.getDocumentReference().getWikiReference().getName();
-            DocumentReference sheet = new DocumentReference(wikiName, "SkinsCode", "XWikiSkinsSheet");
+            DocumentReference sheet = new DocumentReference(wikiName, CLASS_REFERENCE_SPACE, CLASS_REFERENCE_NAME);
             needsUpdate |= this.classSheetBinder.bind(document, sheet);
         }
 

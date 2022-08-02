@@ -61,7 +61,7 @@ beginMacroMarkerStandalone [code] [language=javascript] [// getJSON function by 
 })();]
 beginGroup [[class]=[box]]
 beginGroup [[class]=[code]]
-beginFormat [NONE] [[style]=[font-weight: italic; color: #408080; ]]
+beginFormat [NONE] [[style]=[font-style: italic; color: #408080; ]]
 onSpecialSymbol [/]
 onSpecialSymbol [/]
 onSpace
@@ -101,7 +101,7 @@ onWord [json]
 onSpecialSymbol [.]
 onWord [js]
 onNewLine
-endFormat [NONE] [[style]=[font-weight: italic; color: #408080; ]]
+endFormat [NONE] [[style]=[font-style: italic; color: #408080; ]]
 onSpecialSymbol [(]
 beginFormat [NONE] [[style]=[font-weight: bold; color: #008000; ]]
 onWord [function]
@@ -237,7 +237,7 @@ onSpace
 onSpace
 onSpace
 onSpace
-beginFormat [NONE] [[style]=[font-weight: italic; color: #408080; ]]
+beginFormat [NONE] [[style]=[font-style: italic; color: #408080; ]]
 onSpecialSymbol [/]
 onSpecialSymbol [/]
 onSpace
@@ -253,7 +253,7 @@ onWord [global]
 onSpace
 onWord [function]
 onNewLine
-endFormat [NONE] [[style]=[font-weight: italic; color: #408080; ]]
+endFormat [NONE] [[style]=[font-style: italic; color: #408080; ]]
 onSpace
 onSpace
 onSpace
@@ -276,7 +276,7 @@ onSpace
 onSpace
 onSpace
 onSpace
-beginFormat [NONE] [[style]=[font-weight: italic; color: #408080; ]]
+beginFormat [NONE] [[style]=[font-style: italic; color: #408080; ]]
 onSpecialSymbol [/]
 onSpecialSymbol [/]
 onSpace
@@ -312,7 +312,7 @@ onWord [callback]
 onSpace
 onWord [name]
 onNewLine
-endFormat [NONE] [[style]=[font-weight: italic; color: #408080; ]]
+endFormat [NONE] [[style]=[font-style: italic; color: #408080; ]]
 onSpace
 onSpace
 onSpace
@@ -375,7 +375,7 @@ onSpace
 onSpace
 onSpace
 onSpace
-beginFormat [NONE] [[style]=[font-weight: italic; color: #408080; ]]
+beginFormat [NONE] [[style]=[font-style: italic; color: #408080; ]]
 onSpecialSymbol [/]
 onSpecialSymbol [/]
 onSpace
@@ -411,7 +411,7 @@ onWord [callback]
 onSpace
 onWord [function]
 onNewLine
-endFormat [NONE] [[style]=[font-weight: italic; color: #408080; ]]
+endFormat [NONE] [[style]=[font-style: italic; color: #408080; ]]
 onSpace
 onSpace
 onSpace
@@ -503,7 +503,7 @@ onSpace
 onSpace
 onSpace
 onSpace
-beginFormat [NONE] [[style]=[font-weight: italic; color: #408080; ]]
+beginFormat [NONE] [[style]=[font-style: italic; color: #408080; ]]
 onSpecialSymbol [/]
 onSpecialSymbol [/]
 onSpace
@@ -517,7 +517,7 @@ onWord [be]
 onSpace
 onWord [unique]
 onNewLine
-endFormat [NONE] [[style]=[font-weight: italic; color: #408080; ]]
+endFormat [NONE] [[style]=[font-style: italic; color: #408080; ]]
 onSpace
 onSpace
 onSpace

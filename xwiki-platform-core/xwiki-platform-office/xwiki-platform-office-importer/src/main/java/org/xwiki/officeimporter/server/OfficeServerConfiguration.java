@@ -60,8 +60,19 @@ public interface OfficeServerConfiguration
 
     /**
      * @return the port number used for connecting to the office server instance
+     * @deprecated Since 12.1RC1. Now use {@link #getServerPorts()}.
      */
+    @Deprecated
     int getServerPort();
+
+    /**
+     * @return all ports that can be used for connecting to the office server instance.
+     * @since 12.1RC1
+     */
+    default int[] getServerPorts()
+    {
+        return new int[0];
+    }
 
     /**
      * @return whether office server should be started / connected automatically with XWiki Enterprise

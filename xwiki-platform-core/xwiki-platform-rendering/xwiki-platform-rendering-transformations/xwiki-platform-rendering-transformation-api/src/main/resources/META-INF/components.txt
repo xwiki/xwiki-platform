@@ -1,1 +1,2 @@
 500:org.xwiki.rendering.internal.transformation.XWikiRenderingContext
+500:org.xwiki.rendering.internal.transformation.XWikiTransformationManager

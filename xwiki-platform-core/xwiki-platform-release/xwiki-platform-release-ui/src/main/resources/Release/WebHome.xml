@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,22 +20,18 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.4" reference="Release.WebHome" locale="">
   <web>Release</web>
   <name>WebHome</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Main.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
   <title>Releases</title>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
@@ -45,7 +41,7 @@
   #set ($shortVersion = $stringtool.replaceChars($request.version, ".-", ""))
   #set ($shortVersion = $stringtool.upperCase($shortVersion))
   #set ($shortVersion = $shortVersion.replace('MILESTONE', 'M'))
-  $response.sendRedirect($xwiki.getURL("Release.Release${shortVersion}", "inline", "$!{request.queryString}&amp;title=New Release for version $shortVersion&amp;version=${request.version}"))
+  $response.sendRedirect($xwiki.getURL("Release.Release${shortVersion}", "edit", "$!{request.queryString}&amp;editor=inline&amp;title=New Release for version $shortVersion&amp;version=${request.version}"))
 #end
 = Create Release =
 
@@ -63,19 +59,19 @@
 {{/html}}
 
 = Existing Releases =
-#set($columns = ["version", "releaseManagers", "releaseDate", "releaseNotes"])
-#set($columnsProperties = {
-    "version" : { "type" : "text" , "link" : "view"},
-    "releaseManagers" : { "html" : true },
-    "releaseDate" : { "type" : "text" }
+
+#set($liveDataConfig = {
+  'meta': {
+    'propertyDescriptors': [
+       { 'id': 'version', 'displayer': 'link' }
+    ]
+  }
 })
-#set($options = { 
-   "className":"ReleaseCode.ReleaseClass",
-   "selectedColumn" : "releaseDate",
-   "defaultOrder" : "desc",
-   "rowCount": 15,
-   "translationPrefix":"release.livetable."
-})
-#livetable("releases" $columns $columnsProperties $options)
+{{liveData id='releases'
+  source='liveTable'
+  sourceParameters='className=ReleaseCode.ReleaseClass&amp;translationPrefix=release.livetable.'
+  properties='version,releaseManagers,releaseDate,releaseNotes'
+  sort='releaseDate:desc'
+}}$jsontool.serialize($liveDataConfig){{/liveData}}
 {{/velocity}}</content>
 </xwikidoc>

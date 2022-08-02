@@ -19,14 +19,17 @@
  */
 package org.xwiki.search.solr.internal;
 
+import java.io.File;
 import java.io.InputStream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.environment.Environment;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
 
 /**
@@ -40,9 +43,26 @@ import org.xwiki.search.solr.internal.api.SolrConfiguration;
 public class DefaultSolrConfiguration implements SolrConfiguration
 {
     /**
-     * Default component type.
+     * The name of the configuration property containing the batch size.
+     * 
+     * @since 11.9RC1
      */
-    public static final String DEFAULT_SOLR_TYPE = "embedded";
+    public static final String SOLR_TYPE_PROPERTY = "solr.type";
+
+    /**
+     * The name of the configuration property containing the batch size.
+     * 
+     * @since 11.9RC1
+     */
+    public static final String SOLR_TYPE_DEFAULT = "embedded";
+
+    /**
+     * Default component type.
+     * 
+     * @deprecated since 11.9RC1, use {@link #SOLR_TYPE_DEFAULT} instead.
+     */
+    @Deprecated
+    public static final String DEFAULT_SOLR_TYPE = SOLR_TYPE_DEFAULT;
 
     /**
      * The classpath location prefix to use when looking for the default solr configuration files.
@@ -115,16 +135,30 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     public static final boolean SOLR_SYNCHRONIZE_AT_STARTUP_DEFAULT = true;
 
     /**
+     * The name of the configuration property indicating which synchronization mode should be used at startup.
+     */
+    public static final String SOLR_SYNCHRONIZE_AT_STARTUP_MODE = "solr.synchronizeAtStartupMode";
+
+    /**
+     * Indicate which mode to use for synchronize at startup by default.
+     */
+    public static final SynchronizeAtStartupMode SOLR_SYNCHRONIZE_AT_STARTUP_MODE_DEFAULT =
+        SynchronizeAtStartupMode.FARM;
+
+    /**
      * The Solr configuration source.
      */
     @Inject
     @Named("xwikiproperties")
     private ConfigurationSource configuration;
 
+    @Inject
+    private Environment environment;
+
     @Override
     public String getServerType()
     {
-        return this.configuration.getProperty("solr.type", DEFAULT_SOLR_TYPE);
+        return this.configuration.getProperty(SOLR_TYPE_PROPERTY, SOLR_TYPE_DEFAULT);
     }
 
     @Override
@@ -135,9 +169,15 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     }
 
     @Override
-    public InputStream getHomeDirectoryConfiguration()
+    public InputStream getSearchCoreDefaultContent()
     {
-        return getClass().getResourceAsStream("/xwiki-platform-search-solr-server-data.zip");
+        return getClass().getResourceAsStream("/xwiki-platform-search-solr-server-core.zip");
+    }
+
+    @Override
+    public InputStream getMinimalCoreDefaultContent()
+    {
+        return getClass().getResourceAsStream("/xwiki-platform-search-solr-server-core-minimal.zip");
     }
 
     @Override
@@ -149,20 +189,53 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     @Override
     public int getIndexerBatchMaxLengh()
     {
-        return this.configuration
-            .getProperty(SOLR_INDEXER_BATCH_MAXLENGH_PROPERTY, SOLR_INDEXER_BATCH_MAXLENGH_DEFAULT);
+        return this.configuration.getProperty(SOLR_INDEXER_BATCH_MAXLENGH_PROPERTY,
+            SOLR_INDEXER_BATCH_MAXLENGH_DEFAULT);
     }
 
     @Override
     public int getIndexerQueueCapacity()
     {
-        return this.configuration
-            .getProperty(SOLR_INDEXER_QUEUE_CAPACITY_PROPERTY, SOLR_INDEXER_QUEUE_CAPACITY_DEFAULT);
+        return this.configuration.getProperty(SOLR_INDEXER_QUEUE_CAPACITY_PROPERTY,
+            SOLR_INDEXER_QUEUE_CAPACITY_DEFAULT);
     }
 
     @Override
     public boolean synchronizeAtStartup()
     {
         return this.configuration.getProperty(SOLR_SYNCHRONIZE_AT_STARTUP, SOLR_SYNCHRONIZE_AT_STARTUP_DEFAULT);
+    }
+
+    @Override
+    public String getHomeDirectory()
+    {
+        String defaultValue = getDefaultHomeDirectory();
+
+        String home = getInstanceConfiguration(EmbeddedSolr.TYPE, "home", defaultValue);
+
+        return StringUtils.isEmpty(home) ? defaultValue : home;
+    }
+
+    @Override
+    public String getDefaultHomeDirectory()
+    {
+        File solrStoreDirectory = new File(this.environment.getPermanentDirectory(), "store/solr");
+
+        return solrStoreDirectory.getPath();
+    }
+
+    @Override
+    public SynchronizeAtStartupMode synchronizeAtStartupMode()
+    {
+        String value = this.configuration.getProperty(SOLR_SYNCHRONIZE_AT_STARTUP_MODE,
+            SOLR_SYNCHRONIZE_AT_STARTUP_MODE_DEFAULT.name());
+
+        SynchronizeAtStartupMode result;
+        try {
+            result = SynchronizeAtStartupMode.valueOf(value.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            result = SOLR_SYNCHRONIZE_AT_STARTUP_MODE_DEFAULT;
+        }
+        return result;
     }
 }

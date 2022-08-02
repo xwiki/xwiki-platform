@@ -19,9 +19,6 @@
  */
 package org.xwiki.notifications.filters.internal.status;
 
-import java.util.Collections;
-import java.util.List;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -50,12 +47,6 @@ public class EventReadAlertFilter extends AbstractEventReadFilter
     public EventReadAlertFilter()
     {
         super(FILTER_NAME, NotificationFormat.ALERT);
-    }
-
-    @Override
-    public List<NotificationFormat> getFormats()
-    {
-        return Collections.singletonList(NotificationFormat.ALERT);
     }
 
     @Override

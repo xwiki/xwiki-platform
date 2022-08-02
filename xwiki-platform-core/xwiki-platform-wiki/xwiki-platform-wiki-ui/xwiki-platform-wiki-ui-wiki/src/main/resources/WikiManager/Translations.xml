@@ -133,8 +133,7 @@ admin.xwiki.members.title=Current Members
 admin.xwiki.users.title=All Users
     
 # DRAWER ITEM
-platform.wiki.drawer.homeWiki=Home
-</content>
+platform.wiki.drawer.homeWiki=Home</content>
   <object>
     <name>WikiManager.Translations</name>
     <number>0</number>

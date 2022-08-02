@@ -1,37 +1,58 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
 ##################################
 ##        LANGUAGE MENU
 ##################################
 #if ($displayLanguageChoice && $xwiki.isMultiLingual())
-  #set($currentLanguage = "$!{tdoc.realLocale}")
-  #set($originalLanguage = "$!{doc.realLocale}")
-  #set ($availtrans = $doc.translationList)
-  #set ($discard = $availtrans.add($originalLanguage))
-  #set ($wikiSettingsLanguages = $!xwiki.getXWikiPreference('languages').trim().split('\s*[,| ]\s*'))
+  #set ($currentLocale = $tdoc.realLocale)
+  #set ($availableTranslations = [])
+  #set ($discard = $availableTranslations.addAll($doc.translationLocales))
+  #set ($discard = $availableTranslations.add($doc.realLocale))
+  #set ($wikiSettingsLanguages = $xwiki.availableLocales)
   #set ($hasLanguagesSet = $wikiSettingsLanguages.size() > 1 || "$!wikiSettingsLanguages.get(0)" != '')
-  #set ($additionallangs = [])
-  #foreach($lang in $availtrans)
-    #if((!$hasLanguagesSet || $wikiSettingsLanguages.contains($lang)) && $currentLanguage != $lang)
-      #set ($discard = $additionallangs.add($lang))
+  #set ($additionalLocales = [])
+  #foreach ($locale in $availableTranslations)
+    #if ((!$hasLanguagesSet || $wikiSettingsLanguages.contains($locale)) && $currentLocale != $locale)
+      #set ($discard = $additionalLocales.add($locale))
     #end
   #end
-  ## Get the query string as a map to preserve the values except the language (see: https://jira.xwiki.org/browse/XWIKI-11314)
-  #set($queryStringMap = {})
-  #set($discard = $queryStringMap.putAll($request.parameterMap))
-  #set($discard = $queryStringMap.put('language', $currentLanguage))
+  ## Get the query string as a map to preserve the values except the language.
+  ## See: https://jira.xwiki.org/browse/XWIKI-11314
+  #set ($queryStringMap = {})
+  #set ($discard = $queryStringMap.putAll($request.parameterMap))
+  #set ($discard = $queryStringMap.put('language', $currentLocale))
   #drawerTopItemStart('flag', $services.localization.render('languages'), 'tmLanguages')
-  #drawerItem($!doc.getURL('view', $escapetool.url($queryStringMap)), 'flag', "#displayLanguagePrettyName($currentLanguage) $services.icon.renderHTML('tick')")
-  #foreach($lang in $additionallangs)
-    #set($discard = $queryStringMap.put('language', $lang))
-    #drawerItem($!doc.getURL('view', $escapetool.url($queryStringMap)), 'flag', "#displayLanguagePrettyName($lang)")
+  #drawerItem($!doc.getURL('view', $escapetool.url($queryStringMap)), 'flag',
+    "#displayLocalePrettyName($currentLocale) $services.icon.renderHTML('tick')")
+  #foreach ($locale in $additionalLocales)
+    #set ($discard = $queryStringMap.put('language', $locale))
+    #drawerItem($!doc.getURL('view', $escapetool.url($queryStringMap)), 'flag', "#displayLocalePrettyName($locale)")
   #end
   #drawerTopItemStop()
 #end
 ##########################################
-## Display the pretty name of a language
+## Display the pretty name of a locale
 ##########################################
-#macro(displayLanguagePrettyName $language)
-#if ($language != '')
-#set($languageLocale = $services.localization.toLocale($language))$escapetool.xml($stringtool.capitalize($languageLocale.getDisplayName($languageLocale)))
+#macro (displayLocalePrettyName $locale)
+#if ("$!locale" != '')
+$escapetool.xml($stringtool.capitalize($locale.getDisplayName($locale)))
 #else
 $services.localization.render('defaultlanguage')
 #end

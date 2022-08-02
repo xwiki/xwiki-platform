@@ -1,3 +1,22 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
 ###
 ### Code page in the "view" mode
 ###
@@ -22,6 +41,14 @@ $xwiki.ssfx.use('uicomponents/viewers/code.css', true)##
 #end
 <div class="wiki-code">
   <table class="revision">
+    <thead class="hidden">
+      <tr>
+        <th scope="col">author</th>
+        <th scope="col">version</th>
+        <th scope="col">line-number</th>
+        <th scope="col">content</th>
+      </tr>
+    </thead>
     <tbody class="group">
 #if ($showLastAuthors)
   ## Initialiaze the annotated content with the latest content of the document
@@ -76,7 +103,7 @@ $xwiki.ssfx.use('uicomponents/viewers/code.css', true)##
       #set ($startNewGroup = false)
     #end
 
-    #set ($lineNumber = $velocityCount)
+    #set ($lineNumber = $foreach.count)
 
     #if ($startNewGroup)
       </tbody>
@@ -94,8 +121,11 @@ $xwiki.ssfx.use('uicomponents/viewers/code.css', true)##
   #if ($content.length() > 0)
     #set ($lines = $content.split('\n'))
     #foreach ($line in $lines)
-      #set ($lineNumber = $velocityCount)
+      #set ($lineNumber = $foreach.count)
       <tr class="line" id="$lineNumber">
+        ## Even though empty we still need the first 2 TD to make the HTML valid
+        <td class="author avatar_16 hidden"></td>
+        <td class="version hidden"></td>
         <td class="line-number unselectable"><a href="$doc.getURL('view', "viewer=code#${lineNumber}")">$lineNumber</a></td>
         <td class="content">$escapetool.xml($line)</td>
       </tr>

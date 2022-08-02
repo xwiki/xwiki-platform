@@ -19,15 +19,12 @@
  */
 package org.xwiki.user.group;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * The wikis where to search.
  * 
  * @version $Id$
  * @since 10.8RC1
  */
-@Unstable
 public enum WikiTarget
 {
     /**

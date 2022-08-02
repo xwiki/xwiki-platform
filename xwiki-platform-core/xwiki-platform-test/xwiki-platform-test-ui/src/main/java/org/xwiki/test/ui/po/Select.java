@@ -25,6 +25,8 @@ import org.openqa.selenium.support.ui.UnexpectedTagNameException;
 
 /**
  * Extends {@link org.openqa.selenium.support.ui.Select} in order to fix some bugs.
+ * Note that this select might not be work properly within modals since it's hitting Escape key which close the modal
+ * by default.
  * 
  * @version $Id$
  * @since 6.0M1

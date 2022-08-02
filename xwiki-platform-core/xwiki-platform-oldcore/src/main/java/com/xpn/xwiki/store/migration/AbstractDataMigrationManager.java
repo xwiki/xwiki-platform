@@ -22,7 +22,6 @@ package com.xpn.xwiki.store.migration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -49,6 +48,7 @@ import org.xwiki.observation.event.Event;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.internal.store.hibernate.HibernateConfiguration;
 
 /**
  * Template for {@link DataMigrationManager}.
@@ -72,6 +72,9 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
 
     @Inject
     protected JobProgressManager progress;
+
+    @Inject
+    protected HibernateConfiguration hibernateConfiguration;
 
     /**
      * Ordered list of migrators that may be applied.
@@ -242,7 +245,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
     /**
      * A cache of wiki database version.
      */
-    private final Map<String, MigrationStatus> statusCache = new HashMap<String, MigrationStatus>();
+    private final Map<String, MigrationStatus> statusCache = new HashMap<>();
 
     /**
      * The final database version when the migration process finishes. This is use to compute the DBVersion of an empty
@@ -342,12 +345,10 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
             if (!forcedMigrations.isEmpty()) {
                 availableMigrations.putAll(forcedMigrations);
             } else {
-                Set<String> ignoredMigrations = new HashSet<String>(Arrays.asList(getXWikiConfig()
-                    .getPropertyAsList("xwiki.store.migration.ignored")));
+                Set<String> ignoredMigrations = new HashSet<>(this.hibernateConfiguration.getIgnoredMigrations());
                 for (DataMigration migrator : getAllMigrations()) {
                     if (ignoredMigrations.contains(migrator.getClass().getName())
-                        || ignoredMigrations.contains(migrator.getVersion().toString()))
-                    {
+                        || ignoredMigrations.contains(migrator.getVersion().toString())) {
                         continue;
                     }
                     XWikiMigration migration = new XWikiMigration(migrator, false);
@@ -355,8 +356,8 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
                 }
             }
 
-            this.targetVersion = (availableMigrations.size() > 0) ? availableMigrations.lastKey()
-                : new XWikiDBVersion(0);
+            this.targetVersion =
+                (availableMigrations.size() > 0) ? availableMigrations.lastKey() : new XWikiDBVersion(0);
             this.migrations = availableMigrations.values();
         } catch (Exception e) {
             throw new InitializationException("Migration Manager initialization failed", e);
@@ -372,7 +373,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
      */
     protected XWikiDBVersion getDBVersionFromConfig()
     {
-        String ver = getXWikiConfig().getProperty("xwiki.store.migration.version");
+        String ver = this.hibernateConfiguration.getMigrationVersion();
         return ver == null ? null : new XWikiDBVersion(Integer.parseInt(ver));
     }
 
@@ -549,9 +550,9 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
         try {
             initNewDB();
         } catch (DataMigrationException e) {
-            String message = String.format(
-                "The empty database %s seems to be not writable, please check your configuration!",
-                getXWikiContext().getWikiId());
+            String message =
+                String.format("The empty database %s seems to be not writable, please check your configuration!",
+                    getXWikiContext().getWikiId());
             this.logger.error(message, e);
             throw new DataMigrationException(message, e);
         }
@@ -563,8 +564,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
         try {
             status = getDataMigrationStatus();
         } catch (DataMigrationException e) {
-            String message = String.format(
-                "Database %s seems to be inaccessible, please check your configuration!",
+            String message = String.format("Database %s seems to be inaccessible, please check your configuration!",
                 getXWikiContext().getWikiId());
             this.logger.error(message, e);
             throw new DataMigrationException(message, e);
@@ -578,8 +578,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
      * @throws DataMigrationException when a database has failed to migrate.
      * @throws MigrationRequiredException when a database has not been migrated and require migration.
      */
-    private void preventAccessToOutdatedDb()
-        throws DataMigrationException, MigrationRequiredException
+    private void preventAccessToOutdatedDb() throws DataMigrationException, MigrationRequiredException
     {
         DataMigrationStatus status = getDataMigrationStatus();
 
@@ -588,18 +587,14 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
                 String message = String.format(
                     "Migration of database [%s] has failed, it could not be safely used! Database is currently in"
                         + " version [%d] while the required version is [%d].",
-                    getXWikiContext().getWikiId(),
-                    status.getDBVersion().getVersion(),
-                    getLatestVersion().getVersion());
+                    getXWikiContext().getWikiId(), status.getDBVersion().getVersion(), getLatestVersion().getVersion());
                 throw new DataMigrationException(message, status.getLastMigrationException());
             } else {
                 String message = String.format(
                     "Since database [%s] needs to be migrated, it couldn't be safely used! Please check your"
                         + " configuration to enable required migration for upgrading database from version [%d]"
                         + " to version [%d].",
-                    getXWikiContext().getWikiId(),
-                    status.getDBVersion().getVersion(),
-                    getLatestVersion().getVersion());
+                    getXWikiContext().getWikiId(), status.getDBVersion().getVersion(), getLatestVersion().getVersion());
                 throw new MigrationRequiredException(message);
             }
         }
@@ -612,16 +607,14 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
      */
     private void tryToProcceedToMigration() throws DataMigrationException
     {
-        XWikiConfig config = getXWikiConfig();
-        if ("1".equals(config.getProperty("xwiki.store.migration", "0"))
-            && !"0".equals(config.getProperty("xwiki.store.hibernate.updateschema"))) {
+        if (this.hibernateConfiguration.isMigrationEnabled()) {
             // Run migrations
             this.logger.info("Storage schema updates and data migrations are enabled");
 
             startMigrationsOnlyOnce();
 
             // TODO: Improve or remove this which is inappropriate in a container environment
-            if ("1".equals(config.getProperty("xwiki.store.migration.exitAfterEnd", "0"))) {
+            if (this.hibernateConfiguration.isExitAfterMigration()) {
                 this.logger.error("Exiting because xwiki.store.migration.exitAfterEnd is set");
                 System.exit(0);
             }
@@ -699,17 +692,17 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
      */
     private Set<String> getDatabasesToMigrate() throws DataMigrationException
     {
-        Set<String> databasesToMigrate = new HashSet<String>();
+        Set<String> databasesToMigrate = new HashSet<>();
 
         // Add the databases listed by the user (if any). If there's no database name or
         // a single database named and if it's "all" or "ALL" then automatically add all the registered databases.
-        String[] databases = getXWikiConfig().getPropertyAsList("xwiki.store.migration.databases");
-        if ((databases.length == 0) || ((databases.length == 1) && databases[0].equalsIgnoreCase("all"))) {
+        List<String> databases = this.hibernateConfiguration.getMigrationDatabases();
+        if (databases.isEmpty() || (databases.size() == 1 && databases.get(0).equals("all"))) {
             // The main wiki will also be included, but, since we are using a Set, it should not be a problem.
             List<String> allwikis = getVirtualWikisDatabaseNames();
             databasesToMigrate.addAll(allwikis);
         } else {
-            Collections.addAll(databasesToMigrate, databases);
+            databasesToMigrate.addAll(databases);
         }
 
         // Remove the main wiki if listed since it should have already been migrated.
@@ -764,12 +757,11 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
     protected Collection<XWikiMigration> getNeededMigrations() throws DataMigrationException
     {
         XWikiDBVersion curversion = getDBVersion();
-        Collection<XWikiMigration> neededMigrations = new ArrayList<XWikiMigration>();
+        Collection<XWikiMigration> neededMigrations = new ArrayList<>();
 
         for (XWikiMigration migration : this.migrations) {
             if (migration.isForced || (migration.dataMigration.getVersion().compareTo(curversion) > 0
-                && migration.dataMigration.shouldExecute(curversion)))
-            {
+                && migration.dataMigration.shouldExecute(curversion))) {
                 neededMigrations.add(migration);
             }
         }
@@ -781,13 +773,11 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
         return neededMigrations;
     }
 
-    private void logNeededMigrationReport(XWikiDBVersion curversion,
-        Collection<XWikiMigration> neededMigrations)
+    private void logNeededMigrationReport(XWikiDBVersion curversion, Collection<XWikiMigration> neededMigrations)
     {
         String database = getXWikiContext().getWikiId();
         if (!neededMigrations.isEmpty()) {
-            this.logger.info(
-                "The following data migration(s) will be applied for wiki [{}] currently in version [{}]:",
+            this.logger.info("The following data migration(s) will be applied for wiki [{}] currently in version [{}]:",
                 database, curversion);
             for (XWikiMigration migration : neededMigrations) {
                 this.logger.info("  {} - {}{}", migration.dataMigration.getName(),
@@ -795,11 +785,10 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
             }
         } else {
             if (curversion != null) {
-                this.logger.info("No data migration to apply for wiki [{}] currently in version [{}]",
-                    database, curversion);
+                this.logger.info("No data migration to apply for wiki [{}] currently in version [{}]", database,
+                    curversion);
             } else {
-                this.logger.info("No data migration to apply for empty wiki [{}]",
-                    database);
+                this.logger.info("No data migration to apply for empty wiki [{}]", database);
             }
         }
     }
@@ -810,8 +799,8 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
      */
     protected Map<XWikiDBVersion, XWikiMigration> getForcedMigrations() throws DataMigrationException
     {
-        SortedMap<XWikiDBVersion, XWikiMigration> forcedMigrations = new TreeMap<XWikiDBVersion, XWikiMigration>();
-        for (String hint : getXWikiConfig().getPropertyAsList("xwiki.store.migration.force")) {
+        SortedMap<XWikiDBVersion, XWikiMigration> forcedMigrations = new TreeMap<>();
+        for (String hint : this.hibernateConfiguration.getForcedMigrations()) {
             try {
                 DataMigration dataMigration = this.componentManager.getInstance(DataMigration.class, hint);
                 forcedMigrations.put(dataMigration.getVersion(), new XWikiMigration(dataMigration, true));

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ *
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+-->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.xwiki.org/liveData"
+  xmlns:liveData="http://www.xwiki.org/liveData" xmlns:xwiki="http://www.xwiki.org" elementFormDefault="qualified">
+
+  <!-- Import the xwiki.rest.model.xsd because we reuse the xwiki:LinkCollection and xwiki:Map types. -->
+  <import namespace="http://www.xwiki.org"/>
+
+  <!--
+  *
+  * Types
+  *
+  -->
+
+  <complexType name="Sources">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <sequence>
+          <element name="source" type="liveData:Source" minOccurs="0" maxOccurs="unbounded"></element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <complexType name="Source">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <attribute name="hint" type="string"></attribute>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <complexType name="Entries">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <sequence>
+          <element name="entry" type="liveData:Entry" minOccurs="0" maxOccurs="unbounded"></element>
+        </sequence>
+        <attribute name="count" type="long"></attribute>
+        <attribute name="offset" type="long"></attribute>
+        <attribute name="limit" type="int"></attribute>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <complexType name="Entry">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <sequence>
+          <!-- We replace "anyType" with the actual type in the separate bindings file. We do this because we want to
+            control how the value (a Map) is serialized in JSON format. -->
+          <element name="values" type="anyType"></element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <complexType name="Properties">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <sequence>
+          <element name="property" type="liveData:PropertyDescriptor" minOccurs="0"
+            maxOccurs="unbounded"></element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <complexType name="PropertyDescriptor">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <sequence>
+          <element name="description" type="string"></element>
+          <!-- We replace "anyType" with the actual type in the separate bindings file. We do this because we want to
+            control how the value (a Map) is serialized in JSON format. -->
+          <element name="icon" type="anyType"></element>
+          <element name="displayer" type="anyType"></element>
+          <element name="filter" type="anyType"></element>
+        </sequence>
+        <attribute name="id" type="string"></attribute>
+        <attribute name="name" type="string"></attribute>
+        <attribute name="type" type="string"></attribute>
+        <attribute name="visible" type="boolean" default="true"></attribute>
+        <attribute name="sortable" type="boolean" default="false"></attribute>
+        <attribute name="filterable" type="boolean" default="false"></attribute>
+        <attribute name="styleName" type="string"></attribute>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <complexType name="PropertyTypes">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <sequence>
+          <element name="type" type="liveData:PropertyDescriptor" minOccurs="0"
+            maxOccurs="unbounded"></element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <!--
+  *
+  * Elements
+  *
+  -->
+
+  <element name="sources" type="liveData:Sources"></element>
+
+  <element name="source" type="liveData:Source"></element>
+
+  <element name="entries" type="liveData:Entries"></element>
+
+  <element name="entry" type="liveData:Entry"></element>
+
+  <element name="properties" type="liveData:Properties"></element>
+
+  <element name="property" type="liveData:PropertyDescriptor"></element>
+
+  <element name="types" type="liveData:PropertyTypes"></element>
+
+  <element name="type" type="liveData:PropertyDescriptor"></element>
+</schema>

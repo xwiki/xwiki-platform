@@ -34,7 +34,6 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.script.internal.safe.ScriptSafeProvider;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
  * Exposes {@link Captcha}s to scripts.
@@ -42,7 +41,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 10.8RC1
  */
-@Unstable
 @Component
 @Named("captcha")
 @Singleton

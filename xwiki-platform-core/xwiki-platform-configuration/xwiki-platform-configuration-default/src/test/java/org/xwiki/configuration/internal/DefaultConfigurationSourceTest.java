@@ -19,13 +19,16 @@
  */
 package org.xwiki.configuration.internal;
 
-import org.junit.Rule;
-import org.junit.Test;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 /**
@@ -34,28 +37,32 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  * @since 6.1M2
  */
-public class DefaultConfigurationSourceTest
+@ComponentTest
+class DefaultConfigurationSourceTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DefaultConfigurationSource> mocker =
-        new MockitoComponentMockingRule<>(DefaultConfigurationSource.class);
+    @InjectMockComponents
+    private DefaultConfigurationSource source;
+
+    @MockComponent
+    @Named("documents")
+    private ConfigurationSource documentsSource;
+
+    @MockComponent
+    @Named("xwikiproperties")
+    private ConfigurationSource xwikiPropertiesSource;
 
     @Test
-    public void containsKey() throws Exception
+    void containsKey()
     {
-        ConfigurationSource documentsSource = this.mocker.getInstance(ConfigurationSource.class, "documents");
-        when(documentsSource.containsKey("key")).thenReturn(false);
+        when(this.documentsSource.containsKey("key")).thenReturn(false);
+        when(this.xwikiPropertiesSource.containsKey("key")).thenReturn(true);
 
-        ConfigurationSource xwikiPropertiesSource =
-            this.mocker.getInstance(ConfigurationSource.class, "xwikiproperties");
-        when(xwikiPropertiesSource.containsKey("key")).thenReturn(true);
+        assertTrue(this.source.containsKey("key"));
 
-        assertTrue(this.mocker.getComponentUnderTest().containsKey("key"));
-
-        // Verify that the order call is correct
-        InOrder inOrder = inOrder(xwikiPropertiesSource, documentsSource);
+        // Verify that the call order is correct
+        InOrder inOrder = inOrder(xwikiPropertiesSource, this.documentsSource);
         // First call
-        inOrder.verify(documentsSource).containsKey("key");
+        inOrder.verify(this.documentsSource).containsKey("key");
         // Second call
         inOrder.verify(xwikiPropertiesSource).containsKey("key");
     }

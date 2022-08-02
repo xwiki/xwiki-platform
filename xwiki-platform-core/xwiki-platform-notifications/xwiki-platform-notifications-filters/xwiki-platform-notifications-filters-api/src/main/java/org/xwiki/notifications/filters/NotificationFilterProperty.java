@@ -19,8 +19,6 @@
  */
 package org.xwiki.notifications.filters;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Define a list of properties supported by {@link org.xwiki.notifications.filters.expression.PropertyValueNode}.
  * Those properties can be used in order to create specific filters on notifications.
@@ -28,7 +26,6 @@ import org.xwiki.stability.Unstable;
  * @since 9.7RC1
  * @version $Id$
  */
-@Unstable
 public enum NotificationFilterProperty
 {
     /**

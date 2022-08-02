@@ -25,12 +25,12 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor-test</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test-misc</artifactId>
-  <name>XWiki Platform - Distribution - Flavor - Functional Tests - Misc.</name>
+  <name>XWiki Platform - Distribution - Flavor - Functional Tests - Misc</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Distribution - Flavor - Functional Tests - Misc.</description>
+  <description>XWiki Platform - Distribution - Flavor - Functional Tests - Misc</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -39,21 +39,10 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.w3c.css</groupId>
-      <artifactId>css-validator</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-export-pdf-test-pageobjects</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.pdfbox</groupId>
-      <artifactId>pdfbox</artifactId>
-      <scope>test</scope>
-      <exclusions>
-        <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>

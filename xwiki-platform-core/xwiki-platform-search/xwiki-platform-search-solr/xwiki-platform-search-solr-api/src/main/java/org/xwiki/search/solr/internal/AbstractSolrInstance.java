@@ -28,6 +28,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.StreamingResponseCallback;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.SolrParams;
 import org.slf4j.Logger;
@@ -67,6 +68,12 @@ public abstract class AbstractSolrInstance implements SolrInstance
         this.logger.debug("Add Solr documents [{}] to index", solrDocuments);
 
         this.server.add(solrDocuments);
+    }
+
+    @Override
+    public SolrDocument get(String id) throws IOException, SolrServerException
+    {
+        return server.getById(id);
     }
 
     @Override

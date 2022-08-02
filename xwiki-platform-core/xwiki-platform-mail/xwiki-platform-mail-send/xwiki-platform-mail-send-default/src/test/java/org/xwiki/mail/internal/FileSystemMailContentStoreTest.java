@@ -32,21 +32,17 @@ import java.util.UUID;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.Validate;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.environment.Environment;
 import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MailStoreException;
 import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -64,23 +60,17 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 public class FileSystemMailContentStoreTest
 {
-    private static final String TEMPORARY_DIRECTORY = "target/" + FileSystemMailContentStoreTest.class.getSimpleName();
+    @XWikiTempDir
+    private File tmpDir;
 
     @InjectMockComponents
     private FileSystemMailContentStore store;
-
-    @BeforeEach
-    public void deleteMailStore() throws Exception
-    {
-        // Delete content of the mails store directory
-        FileUtils.deleteDirectory(new File(TEMPORARY_DIRECTORY, this.store.ROOT_DIRECTORY));
-    }
 
     @BeforeComponent
     public void registerMockComponents(MockitoComponentManager componentManager) throws Exception
     {
         Environment environment = componentManager.registerMockComponent(Environment.class);
-        when(environment.getPermanentDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
+        when(environment.getPermanentDirectory()).thenReturn(this.tmpDir);
     }
 
     @Test
@@ -94,9 +84,8 @@ public class FileSystemMailContentStoreTest
         this.store.save(batchId, message);
         String messageId = message.getMessageID();
 
-        File tempDir = new File(TEMPORARY_DIRECTORY);
         File batchDirectory =
-            new File(new File(tempDir, this.store.ROOT_DIRECTORY), URLEncoder.encode(batchId, "UTF-8"));
+            new File(new File(this.tmpDir, this.store.ROOT_DIRECTORY), URLEncoder.encode(batchId, "UTF-8"));
         File messageFile = new File(batchDirectory, URLEncoder.encode(message.getUniqueMessageId(), "UTF-8"));
         InputStream in = new FileInputStream(messageFile);
         String messageContent = IOUtils.toString(in, "UTF-8");
@@ -117,9 +106,8 @@ public class FileSystemMailContentStoreTest
 
         this.store.save(batchId, message);
 
-        File tempDir = new File(TEMPORARY_DIRECTORY);
         File batchDirectory =
-            new File(new File(tempDir, this.store.ROOT_DIRECTORY), URLEncoder.encode(batchId, "UTF-8"));
+            new File(new File(this.tmpDir, this.store.ROOT_DIRECTORY), URLEncoder.encode(batchId, "UTF-8"));
         File messageFile = new File(batchDirectory, URLEncoder.encode(message.getUniqueMessageId(), "UTF-8"));
         InputStream in = new FileInputStream(messageFile);
         String messageContent = IOUtils.toString(in, "UTF-8");
@@ -140,9 +128,8 @@ public class FileSystemMailContentStoreTest
 
         this.store.save(batchId, message);
 
-        File tempDir = new File(TEMPORARY_DIRECTORY);
         File batchDirectory =
-            new File(new File(tempDir, this.store.ROOT_DIRECTORY), URLEncoder.encode(batchId, "UTF-8"));
+            new File(new File(this.tmpDir, this.store.ROOT_DIRECTORY), URLEncoder.encode(batchId, "UTF-8"));
         File messageFile = new File(batchDirectory, URLEncoder.encode(message.getUniqueMessageId(), "UTF-8"));
         InputStream in = new FileInputStream(messageFile);
         String messageContent = IOUtils.toString(in, "UTF-8");
@@ -152,11 +139,8 @@ public class FileSystemMailContentStoreTest
     }
 
     @Test
-    public void saveMessageThrowsMailStoreExceptionWhenError(ComponentManager componentManager) throws Exception
+    public void saveMessageThrowsMailStoreExceptionWhenError() throws Exception
     {
-        Environment environment = componentManager.getInstance(Environment.class);
-        when(environment.getPermanentDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
-
         String batchId = UUID.randomUUID().toString();
         String messageId = "ar1vm0Wca42E/dDn3dsH8ogs3/s=";
 
@@ -180,9 +164,8 @@ public class FileSystemMailContentStoreTest
         String messageId = "ar1vm0Wca42E/dDn3dsH8ogs3/s=";
         String mimeMessageId = "<1128820400.0.1419205781342.JavaMail.contact@xwiki.org>";
 
-        File tempDir = new File(TEMPORARY_DIRECTORY);
         File batchDirectory =
-            new File(new File(tempDir, this.store.ROOT_DIRECTORY), URLEncoder.encode(batchId,"UTF-8"));
+            new File(new File(this.tmpDir, this.store.ROOT_DIRECTORY), URLEncoder.encode(batchId,"UTF-8"));
         batchDirectory.mkdirs();
         File messageFile = new File(batchDirectory, URLEncoder.encode(messageId,"UTF-8"));
         messageFile.createNewFile();
@@ -220,17 +203,13 @@ public class FileSystemMailContentStoreTest
     }
 
     @Test
-    public void deleteMessage(ComponentManager componentManager) throws Exception
+    public void deleteMessage() throws Exception
     {
-        Environment environment = componentManager.getInstance(Environment.class);
-        when(environment.getPermanentDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
-
         String batchId = UUID.randomUUID().toString();
         String messageId = "ar1vm0Wca42E/dDn3dsH8ogs3/s=";
 
-        File tempDir = new File(TEMPORARY_DIRECTORY);
         File batchDirectory =
-            new File(new File(tempDir, this.store.ROOT_DIRECTORY), URLEncoder.encode(batchId, "UTF-8"));
+            new File(new File(this.tmpDir, this.store.ROOT_DIRECTORY), URLEncoder.encode(batchId, "UTF-8"));
         batchDirectory.mkdirs();
         File messageFile = new File(batchDirectory, URLEncoder.encode(messageId, "UTF-8"));
         messageFile.createNewFile();

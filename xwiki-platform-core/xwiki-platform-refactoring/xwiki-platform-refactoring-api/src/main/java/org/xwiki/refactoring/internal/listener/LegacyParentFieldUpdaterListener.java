@@ -25,7 +25,7 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.observation.AbstractEventListener;
+import org.xwiki.observation.event.AbstractLocalEventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
 import org.xwiki.refactoring.internal.ModelBridge;
@@ -41,7 +41,7 @@ import org.xwiki.refactoring.job.MoveRequest;
 @Component
 @Named(LegacyParentFieldUpdaterListener.NAME)
 @Singleton
-public class LegacyParentFieldUpdaterListener extends AbstractEventListener
+public class LegacyParentFieldUpdaterListener extends AbstractLocalEventListener
 {
     /**
      * The name of this event listener.
@@ -63,20 +63,18 @@ public class LegacyParentFieldUpdaterListener extends AbstractEventListener
     }
 
     @Override
-    public void onEvent(Event event, Object source, Object data)
+    public void processLocalEvent(Event event, Object source, Object data)
     {
-        if (event instanceof DocumentRenamedEvent) {
-            boolean updateParentField = true;
-            if (data instanceof MoveRequest) {
-                updateParentField = ((MoveRequest) data).isUpdateParentField();
-            }
-            if (updateParentField) {
-                DocumentRenamedEvent documentRenamedEvent = (DocumentRenamedEvent) event;
-                this.logger.info("Updating the document parent fields from [{}] to [{}].",
-                    documentRenamedEvent.getSourceReference(), documentRenamedEvent.getTargetReference());
-                this.modelBridge.updateParentField(documentRenamedEvent.getSourceReference(),
-                    documentRenamedEvent.getTargetReference());
-            }
+        boolean updateParentField = true;
+        if (data instanceof MoveRequest) {
+            updateParentField = ((MoveRequest) data).isUpdateParentField();
+        }
+        if (updateParentField) {
+            DocumentRenamedEvent documentRenamedEvent = (DocumentRenamedEvent) event;
+            this.logger.info("Updating the document parent fields from [{}] to [{}].",
+                documentRenamedEvent.getSourceReference(), documentRenamedEvent.getTargetReference());
+            this.modelBridge.updateParentField(documentRenamedEvent.getSourceReference(),
+                documentRenamedEvent.getTargetReference());
         }
     }
 }

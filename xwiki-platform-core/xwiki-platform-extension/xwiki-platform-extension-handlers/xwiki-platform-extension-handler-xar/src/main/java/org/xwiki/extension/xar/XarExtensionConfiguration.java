@@ -20,7 +20,6 @@
 package org.xwiki.extension.xar;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Various configuration related to XAR extensions support.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @since 10.5RC1
  */
 @Role
-@Unstable
 public interface XarExtensionConfiguration
 {
     /**

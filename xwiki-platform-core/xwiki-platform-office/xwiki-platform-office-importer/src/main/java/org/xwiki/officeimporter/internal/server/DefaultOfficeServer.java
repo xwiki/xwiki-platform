@@ -25,12 +25,12 @@ import java.io.InputStream;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.jodconverter.LocalConverter;
-import org.jodconverter.document.JsonDocumentFormatRegistry;
-import org.jodconverter.filter.text.LinkedImagesEmbedderFilter;
-import org.jodconverter.office.LocalOfficeManager;
-import org.jodconverter.office.ExternalOfficeManagerBuilder;
-import org.jodconverter.office.OfficeManager;
+import org.jodconverter.core.document.JsonDocumentFormatRegistry;
+import org.jodconverter.core.office.OfficeManager;
+import org.jodconverter.local.LocalConverter;
+import org.jodconverter.local.filter.text.LinkedImagesEmbedderFilter;
+import org.jodconverter.local.office.ExternalOfficeManager;
+import org.jodconverter.local.office.LocalOfficeManager;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.environment.Environment;
@@ -110,7 +110,7 @@ public class DefaultOfficeServer implements OfficeServer
     {
         if (this.config.getServerType() == OfficeServerConfiguration.SERVER_TYPE_INTERNAL) {
             LocalOfficeManager.Builder configuration = LocalOfficeManager.builder();
-            configuration.portNumbers(this.config.getServerPort());
+            configuration.portNumbers(this.config.getServerPorts());
 
             String homePath = this.config.getHomePath();
             if (homePath != null) {
@@ -134,9 +134,9 @@ public class DefaultOfficeServer implements OfficeServer
                 throw new OfficeServerException("Failed to start Office server. Reason: " + e.getMessage(), e);
             }
         } else if (this.config.getServerType() == OfficeServerConfiguration.SERVER_TYPE_EXTERNAL_LOCAL) {
-            ExternalOfficeManagerBuilder externalProcessOfficeManager = new ExternalOfficeManagerBuilder();
-            externalProcessOfficeManager.setPortNumber(this.config.getServerPort());
-            externalProcessOfficeManager.setConnectOnStart(true);
+            ExternalOfficeManager.Builder externalProcessOfficeManager = ExternalOfficeManager.builder();
+            externalProcessOfficeManager.portNumbers(this.config.getServerPorts());
+            externalProcessOfficeManager.connectOnStart(true);
             this.jodManager = externalProcessOfficeManager.build();
         } else {
             setState(ServerState.CONF_ERROR);
@@ -144,22 +144,22 @@ public class DefaultOfficeServer implements OfficeServer
         }
 
         this.jodConverter = null;
+
         // Try to use the JSON document format registry to configure the office document conversion.
-        InputStream input = getClass().getResourceAsStream(DOCUMENT_FORMATS_PATH);
-        if (input != null) {
-            try {
+        try (InputStream input = getClass().getResourceAsStream(DOCUMENT_FORMATS_PATH)) {
+            if (input != null) {
                 this.jodConverter = LocalConverter.builder().officeManager(this.jodManager)
                     .formatRegistry(JsonDocumentFormatRegistry.create(input))
-                    .filterChain(new LinkedImagesEmbedderFilter())
-                    .build();
-            } catch (Exception e) {
-                this.logger.warn("Failed to parse {} . The default document format registry will be used instead.",
-                    DOCUMENT_FORMATS_PATH, e);
+                    .filterChain(new LinkedImagesEmbedderFilter()).build();
+            } else {
+                this.logger.debug("{} is missing. The default document format registry will be used instead.",
+                    DOCUMENT_FORMATS_PATH);
             }
-        } else {
-            this.logger.debug("{} is missing. The default document format registry will be used instead.",
-                DOCUMENT_FORMATS_PATH);
+        } catch (Exception e) {
+            this.logger.warn("Failed to parse {} . The default document format registry will be used instead.",
+                DOCUMENT_FORMATS_PATH, e);
         }
+
         if (this.jodConverter == null) {
             // Use the default document format registry.
             this.jodConverter = LocalConverter.builder().officeManager(this.jodManager)
@@ -168,6 +168,20 @@ public class DefaultOfficeServer implements OfficeServer
 
         File workDir = this.environment.getTemporaryDirectory();
         this.converter = new DefaultOfficeConverter(this.jodConverter, workDir);
+    }
+
+    @Override
+    public void refreshState()
+    {
+        if (this.jodManager == null) {
+            setState(ServerState.NOT_CONNECTED);
+        } else {
+            if (this.jodManager.isRunning()) {
+                setState(ServerState.CONNECTED);
+            } else {
+                setState(ServerState.NOT_CONNECTED);
+            }
+        }
     }
 
     @Override

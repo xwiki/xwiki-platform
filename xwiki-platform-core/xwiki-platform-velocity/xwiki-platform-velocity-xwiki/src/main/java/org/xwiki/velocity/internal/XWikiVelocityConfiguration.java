@@ -20,13 +20,13 @@
 package org.xwiki.velocity.internal;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.InitializationException;
-
-import com.xpn.xwiki.XWikiContext;
 
 /**
  * Override the default {@link org.xwiki.velocity.VelocityConfiguration} implementation in order to replace some of the
@@ -41,7 +41,19 @@ import com.xpn.xwiki.XWikiContext;
 public class XWikiVelocityConfiguration extends DefaultVelocityConfiguration
 {
     @Inject
-    private Provider<XWikiContext> contextProvider;
+    private XWikiNumberTool numberTool;
+
+    @Inject
+    private XWikiDateTool dateTool;
+
+    @Inject
+    private XWikiMathTool mathTool;
+
+    @Inject
+    private ComponentManager componentManager;
+
+    @Inject
+    private Logger logger;
 
     @Override
     public void initialize() throws InitializationException
@@ -49,8 +61,23 @@ public class XWikiVelocityConfiguration extends DefaultVelocityConfiguration
         super.initialize();
 
         // Override some tools
-        this.defaultTools.put("numbertool", new XWikiNumberTool(this.contextProvider));
-        this.defaultTools.put("datetool", new XWikiDateTool(this.contextProvider));
-        this.defaultTools.put("mathttool", new XWikiMathTool(this.contextProvider));
+        this.defaultTools.put("numbertool", this.numberTool);
+        this.defaultTools.put("datetool", this.dateTool);
+        this.defaultTools.put("mathttool", this.mathTool);
+
+        if (this.componentManager.hasComponent(ResourceLoaderInitializer.class)) {
+            try {
+                // Try to find a ResourceLoaderInitializer implementation
+                ResourceLoaderInitializer resourceLoader =
+                    this.componentManager.getInstance(ResourceLoaderInitializer.class);
+
+                // Initialize the ResourceLoader
+                resourceLoader.initialize(this.defaultProperties);
+            } catch (ComponentLookupException e) {
+                throw new InitializationException("Failed to lookup the ResourceLoader implementation", e);
+            }
+        } else {
+            this.logger.debug("Could not find any ResourceLoader implementation");
+        }
     }
 }

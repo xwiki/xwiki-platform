@@ -25,19 +25,18 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-url</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-url-api</artifactId>
   <name>XWiki Platform - URL - API</name>
   <packaging>jar</packaging>
-  <description>Allows configuration of the URL scheme used by XWiki to parse/serialize URLs</description>
+  <description>Allows configuration of the URL scheme used by XWiki to parse/serialize URLs and security management of external URLs</description>
   <properties>
-    <!-- The reason for this low TPC value is because this module is tested using integration tests in the various
-         URL Scheme modules -->
-    <xwiki.jacoco.instructionRatio>0.45</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>43</xwiki.pitest.mutationThreshold>
+    <xwiki.jacoco.instructionRatio>0.57</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>URL API</xwiki.extension.name>
+    <!-- Category to display in the Extension Manager -->
+    <xwiki.extension.category>api</xwiki.extension.category>
   </properties>
   <dependencies>
     <dependency>

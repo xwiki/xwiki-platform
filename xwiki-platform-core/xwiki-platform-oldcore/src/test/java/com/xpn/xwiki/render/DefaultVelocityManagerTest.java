@@ -25,6 +25,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.logging.internal.DefaultLoggerConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.internal.DefaultScriptContextManager;
 import org.xwiki.test.annotation.ComponentList;
@@ -48,7 +49,7 @@ import static org.junit.Assert.assertSame;
  * @version $Id$
  */
 @ComponentList(value = { DefaultScriptContextManager.class, XWikiScriptContextInitializer.class,
-DefaultVelocityConfiguration.class })
+DefaultVelocityConfiguration.class, DefaultLoggerConfiguration.class })
 public class DefaultVelocityManagerTest
 {
     public MockitoComponentMockingRule<VelocityManager> mocker =

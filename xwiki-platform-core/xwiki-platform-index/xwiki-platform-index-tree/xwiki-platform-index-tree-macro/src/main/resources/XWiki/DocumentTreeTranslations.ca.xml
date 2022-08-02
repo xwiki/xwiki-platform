@@ -90,6 +90,5 @@ index.documentTree.more={0} més ...
 
 ## Until 7.2M2
 rendering.macro.documentTree.parameter.showChildDocuments.name=Mostra els documents fills
-### Missing: rendering.macro.documentTree.parameter.showChildDocuments.description=Whether to show the child documents based on the document parent field.
-</content>
+### Missing: rendering.macro.documentTree.parameter.showChildDocuments.description=Whether to show the child documents based on the document parent field.</content>
 </xwikidoc>

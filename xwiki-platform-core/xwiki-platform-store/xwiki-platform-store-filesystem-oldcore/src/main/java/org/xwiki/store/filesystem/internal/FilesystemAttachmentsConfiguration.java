@@ -19,8 +19,9 @@
  */
 package org.xwiki.store.filesystem.internal;
 
-import org.xwiki.component.annotation.Role;
+import java.io.File;
 
+import org.xwiki.component.annotation.Role;
 
 /**
  * All configuration options for Filesystem Attachment Store.
@@ -31,6 +32,14 @@ import org.xwiki.component.annotation.Role;
 @Role
 public interface FilesystemAttachmentsConfiguration
 {
-    /** @return whether to clean up empty directories on startup. */
+    /**
+     * @return whether to clean up empty directories on startup.
+     */
     boolean cleanOnStartup();
+
+    /**
+     * @return the directory where to store data of "file" store components
+     * @since 11.4RC1
+     */
+    File getDirectory();
 }

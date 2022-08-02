@@ -32,11 +32,10 @@
            - When size > 4000 Hibernates maps it to LONG. However LONG is deprecated in Oracle and shouldn't be used
              since Oracle imposes a limitation on it: there can be only be one LONG column per table. Thus when
              size > 4000 chars we must use a "materialized_clob" type
-             See https://hibernate.onjira.com/browse/HHH-5569
+             See https://hibernate.atlassian.net/browse/HHH-5569
          - Thus, use the following strategy: use the "string" type when size<4000 and materialized_clob when size>40000
          - Lots of columns have not-null="false", since Oracle treats the empty string as NULL
          - Numeric index columns have an explicit sql-type="integer"
-         - materialized_clob mapping to a org.hibernate.type.StringClobType type
     -->
 
     <!--
@@ -50,47 +49,40 @@
           entering content differing only by trailing spaces).
     -->
 
-    <!-- JDBC driver will try to map a materialized_clob type to a java.sql.Clob Java type when loading objects from
-         the DB thus causing a Class Cast Exception since we use String types in Java and not java.sql.Clob
-         (see https://hibernate.onjira.com/browse/HHH-5659).
-         See also https://community.jboss.org/wiki/HibernateCoreMigrationGuide36
-         Thus we need to tell Hibernate to map materialized_clob to String.
-    -->
-    <typedef name="materialized_clob" class="org.hibernate.type.StringClobType" />
-
     <!-- com.xpn.xwiki.doc.XWikiDocument root -->
     <class name="com.xpn.xwiki.doc.XWikiDocument" table="xwikidoc">
         <id name="id" type="long" unsaved-value="undefined">
             <column name="XWD_ID" not-null="true" sql-type="integer" />
             <generator class="assigned" />
         </id>
-        <property name="fullName" type="string" column="XWD_FULLNAME" length="255" index="DOC_FULLNAME" not-null="true" />
-        <property name="name" type="string" column="XWD_NAME" length="255" index="DOC_NAME" />
-        <property name="title" type="string" column="XWD_TITLE" length="255" index="DOC_TITLE" />
+        <property name="fullName" type="string" column="XWD_FULLNAME" length="768" index="DOC_FULLNAME" not-null="true" />
+        <property name="name" type="string" column="XWD_NAME" length="768" index="DOC_NAME" />
+        <property name="title" type="string" column="XWD_TITLE" length="768" index="DOC_TITLE" />
         <property name="language" type="string" column="XWD_LANGUAGE" index="DOC_LANGUAGE" length="5" />
         <property name="defaultLanguage" type="string" column="XWD_DEFAULT_LANGUAGE" index="DOC_DEFAULT_LANGUAGE" length="5" />
         <property name="translation" type="integer" column="XWD_TRANSLATION" not-null="true" />
         <property name="date" type="timestamp" column="XWD_DATE" index="DOC_DATE" not-null="true" />
         <property name="contentUpdateDate" type="timestamp" column="XWD_CONTENT_UPDATE_DATE" index="DOC_CONTENT_UPDATE_DATE" not-null="true" />
         <property name="creationDate" type="timestamp" column="XWD_CREATION_DATE" index="DOC_CREATION_DATE" />
-        <property name="author" type="string" column="XWD_AUTHOR" length="255" index="DOC_AUTHOR" />
-        <property name="contentAuthor" type="string" column="XWD_CONTENT_AUTHOR" length="255" index="DOC_CONTENT_AUTHOR" />
-        <property name="creator" type="string" column="XWD_CREATOR" length="255" index="DOC_CREATOR" />
+        <property name="author" type="string" column="XWD_AUTHOR" length="768" index="DOC_AUTHOR" />
+        <property name="contentAuthor" type="string" column="XWD_CONTENT_AUTHOR" length="768" index="DOC_CONTENT_AUTHOR" />
+        <property name="creator" type="string" column="XWD_CREATOR" length="768" index="DOC_CREATOR" />
         <!-- This property is deprecated and should not be used anymore. Use .space instead. -->
-        <property name="web" type="string" update="false" insert="false" column="XWD_WEB" length="255" not-null="true" />
-        <property name="space" type="string" column="XWD_WEB" length="255" index="DOC_SPACE" not-null="true" />
+        <property name="web" type="string" update="false" insert="false" column="XWD_WEB" length="768" not-null="true" />
+        <property name="space" type="string" column="XWD_WEB" length="768" index="DOC_SPACE" not-null="true" />
         <property name="content" type="materialized_clob" column="XWD_CONTENT" length="200000" not-null="false" />
         <property name="version" type="string" column="XWD_VERSION" length="255" not-null="true" />
-        <property name="customClass" type="string" column="XWD_CUSTOM_CLASS" length="255" />
-        <property name="parent" type="string" column="XWD_PARENT" length="511" />
+        <property name="customClass" type="string" column="XWD_CUSTOM_CLASS" length="768" />
+        <property name="parent" type="string" column="XWD_PARENT" length="768" />
         <property name="xWikiClassXML" type="materialized_clob" column="XWD_CLASS_XML" length="60000" not-null="false" />
         <property name="elements" type="integer" not-null="true" column="XWD_ELEMENTS" />
-        <property name="defaultTemplate" type="string" column="XWD_DEFAULT_TEMPLATE" />
-        <property name="validationScript" type="string" column="XWD_VALIDATION_SCRIPT" />
+        <property name="defaultTemplate" type="string" column="XWD_DEFAULT_TEMPLATE" length="768" />
+        <property name="validationScript" type="string" column="XWD_VALIDATION_SCRIPT" length="768" />
         <property name="comment" type="string" column="XWD_COMMENT" length="1023" />
         <property name="minorEdit1" type="boolean" column="XWD_MINOREDIT" index="DOC_MINOREDIT" not-null="true" />
         <property name="syntaxId" type="string" column="XWD_SYNTAX_ID" length="50" />
         <property name="hidden" type="boolean" column="XWD_HIDDEN" index="DOC_HIDDEN" not-null="true" />
+        <property name="originalMetadataAuthorReference" type="string" column="XWD_ORIGINAL_METADATA" length="768" index="DOC_ORIGINAL_METADATA" />
     </class>
 
     <!-- com.xpn.xwiki.doc.XWikiSpace root -->
@@ -101,9 +93,9 @@
         </id>
         <!-- Note: We don't create an index explicity for this column since Hibernate/Oracle will create one by default
              since we have a unique constraint -->
-        <property name="reference" type="string" column="XWS_REFERENCE" length="255" not-null="true" />
-        <property name="name" type="string" column="XWS_NAME" length="255" index="SPACE_NAME" not-null="true" />
-        <property name="parent" type="string" column="XWS_PARENT" length="255" index="SPACE_PARENT" />
+        <property name="reference" type="string" column="XWS_REFERENCE" length="768" not-null="true" />
+        <property name="name" type="string" column="XWS_NAME" length="768" index="SPACE_NAME" not-null="true" />
+        <property name="parent" type="string" column="XWS_PARENT" length="768" index="SPACE_PARENT" />
         <property name="hidden" type="boolean" column="XWS_HIDDEN" index="SPACE_HIDDEN" not-null="true" />
     </class>
 
@@ -117,7 +109,7 @@
         <!-- Note: Length must be the same one as XWD_COMMENT since it's the same content being put in history -->
         <property name="comment" type="string" column="XWR_COMMENT" length="1023" />
         <!-- Note: Length must be the same one as XWD_COMMENT since it's the same content being put in history -->
-        <property name="author" type="string" column="XWR_AUTHOR" length="255" index="REV_AUTHOR" />
+        <property name="author" type="string" column="XWR_AUTHOR" length="768" index="REV_AUTHOR" />
         <property name="diff" type="boolean" column="XWR_ISDIFF" index="REV_ISDIFF" not-null="false" update="false" insert="false" />
     </class>
 
@@ -138,11 +130,11 @@
             <generator class="native" />
         </id>
         <natural-id mutable="false">
-            <property name="fullName" column="XDD_FULLNAME" type="string" length="255" />
+            <property name="fullName" column="XDD_FULLNAME" type="string" length="768" />
             <property name="language" column="XDD_LANGUAGE" type="string" length="5" index="XDD_LANGUAGE" not-null="false" />
             <property name="date" type="timestamp" column="XDD_DATE" index="XDD_DATE" />
         </natural-id>
-        <property name="deleter" type="string" column="XDD_DELETER" index="XDD_DELETER" />
+        <property name="deleter" type="string" column="XDD_DELETER" length="768" index="XDD_DELETER" />
         <property name="xmlStore" type="string" column="XDD_XMLSTORE" length="50" />
         <property name="xml" type="materialized_clob" column="XDD_XML" length="1000000000" />
         <property name="batchId" type="string" column="XDD_BATCH_ID" index="XDD_BATCH_ID" />
@@ -155,11 +147,11 @@
         <natural-id mutable="false">
             <!-- We use docId because most databases do not support indexes on lengthy columns. -->
             <property name="docId" column="XDA_DOCID" type="long" />
-            <property name="filename" column="XDA_FILENAME" type="string" length="255" index="XDA_FILENAME" />
+            <property name="filename" column="XDA_FILENAME" type="string" length="768" index="XDA_FILENAME" />
             <property name="date" type="timestamp" column="XDA_DATE" index="XDA_DATE" />
         </natural-id>
-        <property name="docName" column="XDA_DOC_NAME" type="string" length="255" index="XDA_DOC_NAME" />
-        <property name="deleter" type="string" column="XDA_DELETER" index="XDA_DELETER" />
+        <property name="docName" column="XDA_DOC_NAME" type="string" length="768" index="XDA_DOC_NAME" />
+        <property name="deleter" type="string" column="XDA_DELETER" length="768" index="XDA_DELETER" />
         <property name="contentStore" type="string" column="XDD_CONTENTSTORE" length="50" />
         <property name="xml" type="materialized_clob" column="XDA_XML" length="1000000000" />
     </class>
@@ -169,18 +161,20 @@
             <column name="XWL_DOC_ID" not-null="true" sql-type="integer" />
             <generator class="assigned" />
         </id>
-        <property name="userName" type="string" column="XWL_AUTHOR" length="255" />
+        <property name="userName" type="string" column="XWL_AUTHOR" length="768" />
         <property name="date" type="timestamp" column="XWL_DATE" not-null="true" />
     </class>
 
     <class name="com.xpn.xwiki.doc.XWikiLink" table="xwikilinks">
-        <composite-id unsaved-value="undefined">
-            <key-property name="docId" column="XWL_DOC_ID" type="long" />
-            <key-property name="link" type="string" length="255">
-                <column name="XWL_LINK" index="XWLNK_LINK" />
-            </key-property>
-        </composite-id>
-        <property name="fullName" type="string" column="XWL_FULLNAME" length="255" />
+        <id name="id" column="XWL_ID">
+            <generator class="native"/>
+        </id>
+        <property name="docId" column="XWL_DOC_ID" type="long" unique-key="XWL_UNIQUE_CONSTRAINT"/>
+        <property name="link" type="string" column="XWL_LINK" length="768" unique-key="XWL_UNIQUE_CONSTRAINT"/>
+        <property name="type" type="string" column="XWL_TYPE" length="768" unique-key="XWL_UNIQUE_CONSTRAINT"/>
+        <property name="fullName" type="string" column="XWL_FULLNAME" length="768" unique-key="XWL_UNIQUE_CONSTRAINT"/>
+        <property name="attachmentName" type="string" column="XWL_ATTACHMENT_NAME" length="768"
+          unique-key="XWL_UNIQUE_CONSTRAINT"/>
     </class>
 
     <class name="com.xpn.xwiki.doc.XWikiAttachment" table="xwikiattachment">
@@ -191,7 +185,7 @@
         <property name="docId" type="long">
             <column name="XWA_DOC_ID" sql-type="integer" index="ATT_DOC_ID" />
         </property>
-        <property name="filename" type="string" column="XWA_FILENAME" length="255" not-null="true" />
+        <property name="filename" type="string" column="XWA_FILENAME" length="768" not-null="true" />
         <property name="longSize" type="long" not-null="true">
           <!-- XWikiDocument#setLongSize() does not support null so we need to indicated a default value to use
                when the column is added during migrations  -->
@@ -201,7 +195,7 @@
         <property name="filesize" type="integer" column="XWA_SIZE"/>
         <property name="mimeType" type="string" column="XWA_MIMETYPE" length="255"/>
         <property name="date" type="timestamp" column="XWA_DATE" index="ATT_DATE" not-null="true" />
-        <property name="author" type="string" column="XWA_AUTHOR" length="255" index="ATT_AUTHOR" />
+        <property name="author" type="string" column="XWA_AUTHOR" length="768" index="ATT_AUTHOR" />
         <property name="version" type="string" column="XWA_VERSION" length="255" not-null="true" />
         <!-- Align the max comment size with the document max comment size (i.e. XWD_COMMENT) -->
         <property name="comment" type="string" column="XWA_COMMENT" length="1023" />
@@ -235,7 +229,7 @@
                 <column name="XWP_NAME" index="PROP_NAME" />
             </key-property>
         </composite-id>
-        <property name="classType" type="string" column="XWP_CLASSTYPE" length="255" />
+        <property name="classType" type="string" column="XWP_CLASSTYPE" length="768" />
 
         <joined-subclass name="com.xpn.xwiki.objects.IntegerProperty" table="xwikiintegers">
             <key>
@@ -276,7 +270,7 @@
                 <column name="XWS_ID" />
                 <column name="XWS_NAME" index="XWSTR_NAME" />
             </key>
-            <property name="value" type="string" column="XWS_VALUE" length="255" index="XWSTR_VALUE" />
+            <property name="value" type="string" column="XWS_VALUE" length="768" index="XWSTR_VALUE" />
         </joined-subclass>
 
         <joined-subclass name="com.xpn.xwiki.objects.DateProperty" table="xwikidates">
@@ -315,7 +309,7 @@
                 </key>
                 <index column="XWL_NUMBER" />
                 <element type="string">
-                    <column name="XWL_VALUE" index="XWLI_VALUE" />
+                    <column name="XWL_VALUE" index="XWLI_VALUE" length="768" />
                 </element>
             </list>
         </joined-subclass>
@@ -327,8 +321,8 @@
             <generator class="assigned" />
         </id>
         <property name="number" type="integer" column="XWO_NUMBER" index="OBJ_NUMBER" not-null="false" />
-        <property name="name" type="string" column="XWO_NAME" index="OBJ_NAME" not-null="true" length="255" />
-        <property name="className" type="string" column="XWO_CLASSNAME" index="OBJ_CLASSNAME" not-null="true" length="255" />
+        <property name="name" type="string" column="XWO_NAME" index="OBJ_NAME" not-null="true" length="768" />
+        <property name="className" type="string" column="XWO_CLASSNAME" index="OBJ_CLASSNAME" not-null="true" length="768" />
         <property name="guid" type="string" column="XWO_GUID" not-null="false" length="255" />
     </class>
 
@@ -338,7 +332,7 @@
             <generator class="assigned" />
         </id>
         <property name="number" type="integer" column="XWS_NUMBER" />
-        <property name="name" type="string" column="XWS_NAME" length="255" index="XWDS_NAME" />
+        <property name="name" type="string" column="XWS_NAME" length="768" index="XWDS_NAME" />
         <!-- Before XWiki 2.2M2 this column was always containing the "internal" string to tell the storage
              implementation Stats objects were special. Starting with XWiki 2.2M2 the check is now on whether the class
              name is empty ("") or null. Thus this column can now contain both "internal" (old stats) and ""
@@ -357,7 +351,7 @@
             <generator class="assigned" />
         </id>
         <property name="number" type="integer" column="XWR_NUMBER" not-null="false" />
-        <property name="name" type="string" column="XWR_NAME" not-null="true" length="255" index="XWRS_NAME" />
+        <property name="name" type="string" column="XWR_NAME" not-null="true" length="768" index="XWRS_NAME" />
         <!-- Before XWiki 2.2M2 this column was always containing the "internal" string to tell the storage
              implementation Stats objects were special. Starting with XWiki 2.2M2 the check is now on whether the class
              name is empty ("") or null. Thus this column can now contain both "internal" (old stats) and ""
@@ -374,7 +368,7 @@
             <generator class="assigned" />
         </id>
         <property name="number" type="integer" column="XWV_NUMBER" not-null="false" />
-        <property name="name" type="string" column="XWV_NAME" not-null="true" length="255" index="XWVS_NAME" />
+        <property name="name" type="string" column="XWV_NAME" not-null="true" length="768" index="XWVS_NAME" />
         <!-- Before XWiki 2.2M2 this column was always containing the "internal" string to tell the storage
              implementation Stats objects were special. Starting with XWiki 2.2M2 the check is now on whether the class
              name is empty ("") or null. Thus this column can now contain both "internal" (old stats) and ""
@@ -383,7 +377,7 @@
         <property name="IP" type="string" column="XWV_IP" not-null="true" length="255" index="XWVS_IP" />
         <property name="userAgent" type="materialized_clob" column="XWV_USER_AGENT" not-null="true" length="8192" />
         <property name="cookie" type="materialized_clob" column="XWV_COOKIE" not-null="true" length="8192" />
-        <property name="uniqueID" type="string" column="XWV_UNIQUE_ID" index="XWVS_UNIQUE_ID" not-null="true" length="255" />
+        <property name="uniqueID" type="string" column="XWV_UNIQUE_ID" index="XWVS_UNIQUE_ID" not-null="true" length="768" />
         <property name="pageViews" type="integer" column="XWV_PAGE_VIEWS" index="XWVS_PAGE_VIEWS" not-null="false" />
         <property name="pageSaves" type="integer" column="XWV_PAGE_SAVES" index="XWVS_PAGE_SAVES" not-null="false" />
         <property name="downloads" type="integer" column="XWV_DOWNLOADS" index="XWVS_DOWNLOADS" not-null="false" />
@@ -473,5 +467,20 @@
             <column name="XWV_VERSION" not-null="true" />
             <generator class="assigned" />
         </id>
+    </class>
+
+    <!-- XWikiDocumentIndexingTask custom mapping-->
+    <class name="org.xwiki.doc.tasks.XWikiDocumentIndexingTask" table="xwikidocumentindexingqueue">
+        <id name="id" column="XWT_ID">
+            <generator class="native"/>
+        </id>
+        <!-- Stores the queued tasks as well as the running tasks. -->
+        <property name="docId" column="XWT_DOC_ID" type="long"/>
+        <property name="version" column="XWT_VERSION" type="string" length="39" not-null="false"/>
+        <property name="type" column="XWT_TYPE" type="string" length="100"/>
+        <property name="instanceId" column="XWT_INSTANCE_ID" type="string" length="100"/>
+
+        <!-- The timestamp of creation of the task. Used to prioritize tasks. -->
+        <property name="timestamp" type="timestamp" column="XWT_TIMESTAMP" index="TASK_TIMESTAMP" not-null="true"/>
     </class>
 </hibernate-mapping>

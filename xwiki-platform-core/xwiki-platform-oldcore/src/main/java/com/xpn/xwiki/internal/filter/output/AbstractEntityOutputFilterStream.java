@@ -33,6 +33,7 @@ import javax.inject.Named;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
+import org.xwiki.filter.input.InputSource;
 import org.xwiki.filter.instance.output.DocumentInstanceOutputProperties;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -41,6 +42,8 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.properties.ConverterManager;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.internal.filter.XWikiDocumentFilter;
 import com.xpn.xwiki.internal.filter.XWikiDocumentFilterCollection;
@@ -74,8 +77,20 @@ public abstract class AbstractEntityOutputFilterStream<E> implements EntityOutpu
     protected DocumentReferenceResolver<EntityReference> documentEntityResolver;
 
     @Inject
+    @Named("user/current")
+    protected DocumentReferenceResolver<EntityReference> userEntityResolver;
+
+    @Inject
     @Named("current")
     protected DocumentReferenceResolver<String> documentStringResolver;
+
+    @Inject
+    @Named("user/current")
+    protected DocumentReferenceResolver<String> userStringResolver;
+
+    @Inject
+    @Named("document")
+    protected UserReferenceResolver<DocumentReference> userDocumentResolver;
 
     @Inject
     protected ConverterManager converter;
@@ -255,15 +270,56 @@ public abstract class AbstractEntityOutputFilterStream<E> implements EntityOutpu
         return (DocumentReference) reference;
     }
 
-    protected DocumentReference getUserReference(String key, FilterEventParameters parameters, DocumentReference def)
+    protected UserReference getUserReference(String key, FilterEventParameters parameters, UserReference def)
     {
-        DocumentReference userReference = getDocumentReference(key, parameters, def);
+        UserReference userReference = def;
 
-        if (userReference != null && userReference.getName().equals(XWikiRightService.GUEST_USER)) {
-            userReference = null;
+        Object reference = get(Object.class, key, parameters, def, false, false);
+
+        if (reference != null && !(reference instanceof UserReference)) {
+            if (reference instanceof DocumentReference) {
+                userReference = this.userDocumentResolver.resolve((DocumentReference) reference);
+            } else {
+                userReference = this.userDocumentResolver.resolve(toUserDocumentReference(reference));
+            }
         }
 
         return userReference;
+    }
+
+    protected DocumentReference getUserDocumentReference(String key, FilterEventParameters parameters,
+        DocumentReference def)
+    {
+        DocumentReference userReference = def;
+
+        Object reference = get(Object.class, key, parameters, def, false, false);
+
+        if (reference != null && !(reference instanceof DocumentReference)) {
+            userReference = toUserDocumentReference(reference);
+        }
+
+        return userReference;
+    }
+
+    protected DocumentReference toUserDocumentReference(Object reference)
+    {
+        DocumentReference userDocumentReference;
+
+        if (reference instanceof EntityReference) {
+            userDocumentReference =
+                this.userEntityResolver.resolve((EntityReference) reference, this.currentEntityReference != null
+                    ? this.currentEntityReference.extractReference(EntityType.WIKI) : null);
+        } else {
+            userDocumentReference =
+                this.userStringResolver.resolve(reference.toString(), this.currentEntityReference != null
+                    ? this.currentEntityReference.extractReference(EntityType.WIKI) : null);
+        }
+
+        if (userDocumentReference != null && userDocumentReference.getName().equals(XWikiRightService.GUEST_USER)) {
+            userDocumentReference = null;
+        }
+
+        return userDocumentReference;
     }
 
     // XWikiDocumentFilter
@@ -331,6 +387,46 @@ public abstract class AbstractEntityOutputFilterStream<E> implements EntityOutpu
     @Override
     public void onWikiAttachment(String name, InputStream content, Long size, FilterEventParameters parameters)
         throws FilterException
+    {
+
+    }
+
+    @Override
+    public void beginWikiDocumentAttachment(String name, InputSource content, Long size,
+        FilterEventParameters parameters) throws FilterException
+    {
+
+    }
+
+    @Override
+    public void endWikiDocumentAttachment(String name, InputSource content, Long size, FilterEventParameters parameters)
+        throws FilterException
+    {
+
+    }
+
+    @Override
+    public void beginWikiAttachmentRevisions(FilterEventParameters parameters) throws FilterException
+    {
+
+    }
+
+    @Override
+    public void endWikiAttachmentRevisions(FilterEventParameters parameters) throws FilterException
+    {
+
+    }
+
+    @Override
+    public void beginWikiAttachmentRevision(String revision, InputSource content, Long size,
+        FilterEventParameters parameters) throws FilterException
+    {
+
+    }
+
+    @Override
+    public void endWikiAttachmentRevision(String revision, InputSource content, Long size,
+        FilterEventParameters parameters) throws FilterException
     {
 
     }

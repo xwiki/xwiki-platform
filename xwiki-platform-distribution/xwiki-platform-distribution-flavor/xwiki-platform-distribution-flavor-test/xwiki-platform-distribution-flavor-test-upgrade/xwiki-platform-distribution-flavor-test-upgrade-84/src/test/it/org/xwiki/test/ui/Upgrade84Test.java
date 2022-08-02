@@ -26,4 +26,22 @@ package org.xwiki.test.ui;
  */
 public class Upgrade84Test extends UpgradeTest
 {
+    @Override
+    protected void setupLogs()
+    {
+        validateConsole.getLogCaptureConfiguration().registerExpected(
+            // Caused by the fact that we upgrade from an old version of XWiki having these deprecated uses
+            "Deprecated usage of getter [com.xpn.xwiki.api.Document.getName]",
+
+            // The currently installed flavor is not valid anymore before the upgrade
+            "Invalid extension [org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki/8.4.6] on namespace [wiki:xwiki] "
+                + "(InvalidExtensionException: Dependency [org.xwiki.platform:xwiki-platform-oldcore-[8.4.6]] is "
+                + "incompatible with the core extension [org.xwiki.platform:xwiki-platform-legacy-oldcore/",
+
+            // Deprecated are related to the Velocity upgrade performed in 12.0 (XCOMMONS-1529)
+            "Deprecated usage of method [org.apache.velocity.tools.generic.SortTool.sort]",
+            "Deprecated usage of method [org.apache.velocity.tools.generic.MathTool.toInteger]",
+            "Deprecated usage of method [org.xwiki.velocity.tools.CollectionsTool.sort]"
+        );
+    }
 }

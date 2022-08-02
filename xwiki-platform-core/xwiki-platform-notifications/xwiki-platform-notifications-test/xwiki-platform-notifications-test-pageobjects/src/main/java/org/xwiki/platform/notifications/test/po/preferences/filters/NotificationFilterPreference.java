@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.xwiki.platform.notifications.test.po.NotificationsUserProfilePage;
+import org.xwiki.platform.notifications.test.po.AbstractNotificationsSettingsPage;
 import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.BootstrapSwitch;
 import org.xwiki.test.ui.po.ConfirmationBox;
@@ -35,12 +35,17 @@ import org.xwiki.test.ui.po.ConfirmationBox;
  * @version $Id$
  * @since 10.8RC1
  * @since 9.11.8
+ * @deprecated Since 13.2RC1: this page object is related to the usage of the deprecated XWiki macro
+ *              {@code NotificationsFiltersPreferences} which was mixing system filters and custom filters. You should
+ *              now use either {@link CustomNotificationFilterPreference} or {@link SystemNotificationFilterPreference}.
  */
+@Deprecated
 public class NotificationFilterPreference
 {
     private static final String LIST_HTML_TAG = "li";
+    private static final String EVENT_TYPES = "eventTypes";
 
-    private NotificationsUserProfilePage parentPage;
+    private AbstractNotificationsSettingsPage parentPage;
 
     private WebElement livetableRow;
 
@@ -60,7 +65,7 @@ public class NotificationFilterPreference
      * @param webElement the livetable row
      * @param driver the current webdriver in used
      */
-    public NotificationFilterPreference(NotificationsUserProfilePage parentPage, WebElement webElement,
+    public NotificationFilterPreference(AbstractNotificationsSettingsPage parentPage, WebElement webElement,
             XWikiWebDriver driver)
     {
         this.parentPage = parentPage;
@@ -69,12 +74,15 @@ public class NotificationFilterPreference
         this.filterName = webElement.findElement(By.className("name")).getText();
         this.filterType = webElement.findElement(By.className("filterType")).getText();
 
-        List<WebElement> eventTypeElements = webElement.findElement(By.className("eventTypes")).findElements(
+        // Since the changes performed in 13.2RC1, not all filters LT have the event types.
+        if (driver.hasElement(webElement, By.className(EVENT_TYPES))) {
+            List<WebElement> eventTypeElements = webElement.findElement(By.className(EVENT_TYPES)).findElements(
                 By.tagName(LIST_HTML_TAG));
-        for (WebElement eventType : eventTypeElements) {
-            String text = eventType.getText();
-            if (!"-".equals(text)) {
-                this.eventTypes.add(text);
+            for (WebElement eventType : eventTypeElements) {
+                String text = eventType.getText();
+                if (!"-".equals(text)) {
+                    this.eventTypes.add(text);
+                }
             }
         }
 
@@ -169,5 +177,15 @@ public class NotificationFilterPreference
     {
         return String.format("NotificationFilterPreference{filterName='%s', filterType='%', evenTypes=%s, formats=%s,"
                 + " enabled=%s", filterName, filterName, eventTypes, formats, isEnabled());
+    }
+
+    /**
+     * @return the ID of the filter.
+     * @since 12.4
+     */
+    public String getID()
+    {
+        return this.livetableRow.findElement(By.className("notificationFilterPreferenceCheckbox"))
+            .getAttribute("data-preferenceid");
     }
 }

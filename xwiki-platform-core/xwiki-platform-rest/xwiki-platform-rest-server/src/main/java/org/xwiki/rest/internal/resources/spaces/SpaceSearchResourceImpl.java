@@ -30,29 +30,33 @@ import org.xwiki.rest.internal.resources.BaseSearchResult;
 import org.xwiki.rest.model.jaxb.SearchResults;
 import org.xwiki.rest.resources.spaces.SpaceSearchResource;
 
+/**
+ * @version $Id$
+ */
 @Component
 @Named("org.xwiki.rest.internal.resources.spaces.SpaceSearchResourceImpl")
 public class SpaceSearchResourceImpl extends BaseSearchResult implements SpaceSearchResource
 {
     @Override
     public SearchResults search(String wikiName, String spaceName, String keywords, List<String> searchScopeStrings,
-            Integer number, Integer start, String orderField, String order, Boolean withPrettyNames,
-            Boolean isLocaleAware) throws XWikiRestException
+        Integer number, Integer start, String orderField, String order, Boolean withPrettyNames, Boolean isLocaleAware)
+        throws XWikiRestException
     {
         List<String> spaces = parseSpaceSegments(spaceName);
-        
+
         try {
             SearchResults searchResults = objectFactory.createSearchResults();
-            searchResults.setTemplate(String.format("%s?%s", Utils.createURI(uriInfo.getBaseUri(),
-                SpaceSearchResource.class, wikiName, spaces).toString(), SEARCH_TEMPLATE_INFO));
+            searchResults.setTemplate(String.format("%s?%s",
+                Utils.createURI(uriInfo.getBaseUri(), SpaceSearchResource.class, wikiName, spaces).toString(),
+                SEARCH_TEMPLATE_INFO));
 
             List<SearchScope> searchScopes = parseSearchScopeStrings(searchScopeStrings);
 
-            searchResults.getSearchResults().addAll(
-                    search(searchScopes, keywords, wikiName, Utils.getLocalSpaceId(spaces),
-                            Utils.getXWiki(componentManager).getRightService().hasProgrammingRights(
-                                    Utils.getXWikiContext(componentManager)), number, start, true, orderField, order,
-                            withPrettyNames, isLocaleAware));
+            searchResults.getSearchResults()
+                .addAll(search(searchScopes, keywords, wikiName, Utils.getLocalSpaceId(spaces),
+                    Utils.getXWiki(componentManager).getRightService()
+                        .hasProgrammingRights(Utils.getXWikiContext(componentManager)),
+                    number, start, true, orderField, order, withPrettyNames, isLocaleAware));
 
             return searchResults;
         } catch (Exception e) {

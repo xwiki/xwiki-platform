@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-captcha-jcaptcha</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-captcha-jcaptcha-ui</artifactId>
   <packaging>xar</packaging>
@@ -38,6 +38,11 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-captcha-ui</artifactId>
       <type>xar</type>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-captcha-jcaptcha-webjar</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

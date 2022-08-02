@@ -23,24 +23,20 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.descriptor.ComponentRole;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.renderer.BlockRenderer;
-import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
-import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.TransformationContext;
+import org.xwiki.rendering.util.ErrorBlockGenerator;
+import org.xwiki.rendering.util.ParserUtils;
 
 /**
  * Helper to execute Block based asynchronous renderer.
@@ -51,12 +47,15 @@ import org.xwiki.rendering.transformation.TransformationContext;
 @Component(roles = DefaultBlockAsyncRenderer.class)
 public class DefaultBlockAsyncRenderer extends AbstractBlockAsyncRenderer
 {
-    @Inject
-    @Named("context")
-    private Provider<ComponentManager> componentManager;
+    private static final String TM_FAILEDASYNC = "rendering.async.error.failed";
+
+    private static final ParserUtils PARSERUTILS = new ParserUtils();
 
     @Inject
     private AsyncContext asyncContext;
+
+    @Inject
+    private ErrorBlockGenerator errorBlockGenerator;
 
     private BlockAsyncRendererConfiguration configuration;
 
@@ -93,56 +92,58 @@ public class DefaultBlockAsyncRenderer extends AbstractBlockAsyncRenderer
     }
 
     @Override
-    public BlockAsyncRendererResult render(boolean async, boolean cached) throws RenderingException
+    public Syntax getTargetSyntax()
     {
-        // Register the known involved references and components
-        for (EntityReference reference : this.configuration.getReferences()) {
-            this.asyncContext.useEntity(reference);
-        }
-        for (ComponentRole<?> role : this.configuration.getRoles()) {
-            this.asyncContext.useComponent(role.getRoleType(), role.getRoleHint());
-        }
+        return this.configuration.getTargetSyntax();
+    }
 
-        Block block = this.configuration.getBlock();
-        XDOM xdom;
-        if (block instanceof XDOM) {
-            xdom = (XDOM) block;
-        } else {
-            Block rootBlock = block.getRoot();
+    @Override
+    public Block execute(boolean async, boolean cached) throws RenderingException
+    {
+        Block resultBlock;
 
-            if (rootBlock instanceof XDOM) {
-                xdom = (XDOM) rootBlock;
+        try {
+            // Register the known involved references and components
+            for (EntityReference reference : this.configuration.getReferences()) {
+                this.asyncContext.useEntity(reference);
+            }
+            for (ComponentRole<?> role : this.configuration.getRoles()) {
+                this.asyncContext.useComponent(role.getRoleType(), role.getRoleHint());
+            }
+
+            // Get the block to transform
+            Block block = this.configuration.getBlock();
+
+            // Make sure the source is inline if needed
+            if (this.configuration.isInline()) {
+                block = PARSERUTILS.convertToInline(block, true);
+            }
+
+            // Create a XDOM instance for the transformation context
+            XDOM xdom;
+            if (block instanceof XDOM) {
+                xdom = (XDOM) block;
             } else {
-                xdom = new XDOM(Collections.singletonList(rootBlock));
-            }
-        }
+                Block rootBlock = block.getRoot();
 
-        ///////////////////////////////////////
-        // Transformations
-
-        Block resultBlock = tranform(xdom, block);
-
-        ///////////////////////////////////////
-        // Rendering
-
-        String resultString = null;
-
-        if (async || cached) {
-            Syntax targetSyntax = this.configuration.getTargetSyntax();
-            BlockRenderer renderer;
-            try {
-                renderer = this.componentManager.get().getInstance(BlockRenderer.class, targetSyntax.toIdString());
-            } catch (ComponentLookupException e) {
-                throw new RenderingException("Failed to lookup renderer for syntax [" + targetSyntax + "]", e);
+                if (rootBlock instanceof XDOM) {
+                    xdom = (XDOM) rootBlock;
+                } else {
+                    xdom = new XDOM(Collections.singletonList(rootBlock));
+                }
             }
 
-            WikiPrinter printer = new DefaultWikiPrinter();
-            renderer.render(resultBlock, printer);
+            ///////////////////////////////////////
+            // Transformations
 
-            resultString = printer.toString();
+            resultBlock = tranform(xdom, block);
+        } catch (Exception e) {
+            // Display the error in the result
+            resultBlock = new CompositeBlock(this.errorBlockGenerator.generateErrorBlocks(this.configuration.isInline(),
+                TM_FAILEDASYNC, "Failed to execute asynchronous content", null, e));
         }
 
-        return new BlockAsyncRendererResult(resultString, resultBlock);
+        return resultBlock;
     }
 
     private Block tranform(XDOM xdom, Block block) throws RenderingException

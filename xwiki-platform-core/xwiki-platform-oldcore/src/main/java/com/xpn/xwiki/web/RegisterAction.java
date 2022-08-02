@@ -19,6 +19,11 @@
  */
 package com.xpn.xwiki.web;
 
+import java.util.Arrays;
+import java.util.List;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -26,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.captcha.Captcha;
 import org.xwiki.captcha.CaptchaConfiguration;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
@@ -38,6 +44,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
  *
  * @version $Id$
  */
+@Component
+@Named("register")
+@Singleton
 public class RegisterAction extends XWikiAction
 {
     /** Name of the corresponding template and URL parameter. */
@@ -49,12 +58,21 @@ public class RegisterAction extends XWikiAction
     /** Space where the registration config and class are stored. */
     private static final String WIKI_SPACE = "XWiki";
 
+    /** Allowed templates for this action. */
+    private static final List<String> ALLOWED_TEMPLATES = Arrays.asList(REGISTER, "registerinline");
+
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
+
+        // Limit template overrides with xpage to allowed templates.
+        if (!ALLOWED_TEMPLATES.contains(Utils.getPage(context.getRequest(), REGISTER))) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                String.format("Forbidden template override with 'xpage' in [%s] action.", REGISTER));
+        }
 
         String register = request.getParameter(REGISTER);
         if (register != null && register.equals("1")) {

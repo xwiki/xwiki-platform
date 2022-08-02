@@ -49,7 +49,12 @@ import org.xwiki.formula.ImageData;
  * results, but requires the presence of external programs, and involves a slight overhead for starting new processes
  * and for working with the disk.
  * <p>
- * Required commands: latex, dvips and convert (ImageMagick)
+ * Required commands:
+ * <ul>
+ *     <li>latex</li>
+ *     <li>dvips and convert (ImageMagick) when building a PNG, JPEG or GIF image</li>
+ *     <li>dvisvgm when building an SVG image</li>
+ * </ul>
  * </p>
  * <p>
  * Performance tip: Try to mount a RAM drive/tmpfs on the folder where this component creates its temporary files
@@ -66,6 +71,8 @@ public class NativeFormulaRenderer extends AbstractFormulaRenderer implements In
 {
     /** Logging helper object. */
     private static final Logger LOGGER = LoggerFactory.getLogger(NativeFormulaRenderer.class);
+
+    private static final String ARG_O = "-o";
 
     /** Application container, needed for retrieving the work directory where temporary files can be created. */
     @Inject
@@ -112,11 +119,18 @@ public class NativeFormulaRenderer extends AbstractFormulaRenderer implements In
             // TeX to DVI
             String[] commandLine = new String[] {"latex", "--interaction=nonstopmode", texFileName};
             executeCommand(commandLine, tmpDirectory);
-            // DVI to PS
-            commandLine = new String[] {"dvips", "-E", dviFileName, "-o", psFileName};
-            executeCommand(commandLine, tmpDirectory);
-            // PS to image
-            commandLine = new String[] {"convert", "-density", "120", psFileName, imageFileName};
+
+            if (Type.SVG.equals(type)) {
+                commandLine = new String[] {"dvisvgm",  "-n", ARG_O, imageFileName, dviFileName};
+            } else {
+                // DVI to PS
+                commandLine = new String[] {"dvips", "-E", dviFileName, ARG_O, psFileName};
+                executeCommand(commandLine, tmpDirectory);
+                // PS to image
+                commandLine = new String[] {"convert", "-density", "120", "-size", "120x120", psFileName,
+                    imageFileName};
+            }
+
             executeCommand(commandLine, tmpDirectory);
             return new ImageData(FileUtils.readFileToByteArray(new File(imageFileName)), type);
         } finally {

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.5" reference="XWiki.AttachmentSelector" locale="">
   <web>XWiki</web>
   <name>AttachmentSelector</name>
   <language/>
@@ -37,19 +37,23 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
+#set ($translationPrefix = 'xe.attachmentSelector')
+
 #if ($request.xaction == 'postUpload')
   #set ($targetDocument = $xwiki.getDocument($request.get('docname')))
   #set ($targetAttachDocument = $xwiki.getDocument($request.get('targetdocname')))
 
   #set ($fieldname = $request.get('fieldname'))
+  #set ($comment = $services.localization.render("${translationPrefix}.postUpload.comment", [$fieldname]))
   #set ($docAction = $request.get('docAction'))
   #set ($attachmentList = $targetAttachDocument.getAttachmentList())
   #if ($attachmentList &amp;&amp; $attachmentList.size() &gt; 0)
-    #set ($sortedAttachments = $sorttool.sort($attachmentList, 'date:desc'))
+    #set ($sortedAttachments = $collectiontool.sort($attachmentList, 'date:desc'))
     #set ($lastAttachment = $sortedAttachments.get(0))
   #end
   $response.sendRedirect($targetDocument.getURL($docAction, $escapetool.url({
     $fieldname: $lastAttachment.filename,
+    'comment': $comment,
     'form_token': $request.form_token
   })))
   #stop
@@ -60,7 +64,6 @@
 ##
 ## Macros
 ##
-#set ($translationPrefix = 'xe.attachmentSelector')
 #set ($attachmentPickerDocName = 'XWiki.AttachmentSelector')
 
 $xwiki.ssx.use($attachmentPickerDocName)
@@ -84,7 +87,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
     #attachmentPicker_displayUploadForm($targetDocument, $targetAttachDocument, $options)
   #end
   #attachmentPicker_displayAttachmentGalleryEmptyValue($targetDocument, $targetAttachDocument, $options, $currentValue)
-  #set ($sortedAttachments = $sorttool.sort($targetAttachDocument.getAttachmentList(), "${options.sortAttachmentsBy}") )
+  #set ($sortedAttachments = $collectiontool.sort($targetAttachDocument.getAttachmentList(), "${options.sortAttachmentsBy}") )
   #foreach ($attachment in $sortedAttachments)
     #set ($extension = $attachment.getFilename())
     #set ($extension = $extension.substring($mathtool.add($extension.lastIndexOf('.'), 1)).toLowerCase())
@@ -114,7 +117,10 @@ $xwiki.jsx.use($attachmentPickerDocName)
   #set ($returnURL = $escapetool.url($doc.getURL('view', $request.queryString)))
   #set ($deleteURL = $targetAttachDocument.getAttachmentURL($attachment.filename, 'delattachment', "xredirect=${returnURL}&amp;form_token=$!{services.csrf.getToken()}") )
   #set ($viewURL = $targetAttachDocument.getAttachmentURL($attachment.filename) )##{'name' : 'download', 'url' : $viewURL, 'rel' : '__blank'}
-  #set ($selectURL = $targetDocument.getURL(${options.get('docAction')}, "${options.get('classname')}_${options.get('object')}_${options.get('property')}=${attachment.filename}&amp;form_token=$!{services.csrf.getToken()}"))
+  #set ($selectURL = $targetDocument.getURL(${options.get('docAction')}, $escapetool.url({
+    "${options.get('classname')}_${options.get('object')}_${options.get('property')}": ${attachment.filename},
+    'form_token': $!{services.csrf.getToken()}
+  })))
   #attachmentPicker_displayEndFrame ([{'name' : 'select', 'url' : $selectURL}, {'name' : 'delete', 'url' : $deleteURL}])
 #end
 
@@ -127,7 +133,9 @@ $xwiki.jsx.use($attachmentPickerDocName)
  *#
 #macro (attachmentPicker_displayStartFrame $boxOptions $currentValue)
   (% class="gallery_attachmentbox $!{boxOptions.cssClass} #if ("$!{boxOptions.value}" == $currentValue) current#{end}" %)(((
-    (% class="gallery_attachmenttitle" title="$!{boxOptions.value}" %)((($boxOptions.text)))
+    (% class="gallery_attachmenttitle" title="$services.rendering.escape($!{boxOptions.value}, 'xwiki/2.1')" %)(((
+      $services.rendering.escape($boxOptions.text, 'xwiki/2.1')
+    )))
     (% class="gallery_attachmentframe" %)(((
 #end
 
@@ -143,16 +151,16 @@ $xwiki.jsx.use($attachmentPickerDocName)
     ## Compute the attachment reference because there's no getter.
     #set ($attachmentReference = $services.model.createAttachmentReference($attachment.document.documentReference,
       $attachment.filename))
-    #set ($attachmentStringReference = $services.model.serialize($attachmentReference, 'default'))
+    #set ($attachmentStringReference = $services.rendering.escape($services.model.serialize($attachmentReference, 'default'), 'xwiki/2.1'))
     #if ($attachment.isImage() &amp;&amp; $options.displayImage)
       ## We add the version to the query string in order to invalidate the cache when an image attachment is replaced.
       #set ($queryString = $escapetool.url({'version': $attachment.version}))
-      [[[[image:$attachmentStringReference||width=180 queryString="$queryString"]]&gt;&gt;attach:$attachmentStringReference]]
+      [[[[image:${attachmentStringReference}||width=180 queryString="$queryString"]]&gt;&gt;attach:$attachmentStringReference]]
     #else
-      * (% class="mime" %){{html wiki=false clean=false}}#mimetypeimg($attachment.getMimeType().toLowerCase() $attachment.getFilename().toLowerCase()){{/html}}(%%) (% class="filename" %)$attachment.getFilename()(% %)
+      * (% class="mime" %){{html wiki=false clean=false}}#mimetypeimg($attachment.getMimeType().toLowerCase() $attachment.getFilename().toLowerCase()){{/html}}(%%) (% class="filename" %)$services.rendering.escape($attachment.getFilename(), 'xwiki/2.1')(% %)
       * v$attachment.getVersion() (#dynamicsize($attachment.longSize))
       * $services.localization.render('core.viewers.attachments.author', [$!{xwiki.getUserName($attachment.author, false)}]) $services.localization.render('core.viewers.attachments.date', [$!{xwiki.formatDate($attachment.date, 'dd/MM/yyyy hh:mm')}])
-      * (% class="buttonwrapper" %)[[${services.localization.render("${translationPrefix}.actions.download")}&gt;&gt;attach:$attachmentStringReference||title="$services.localization.render("${translationPrefix}.actions.download")" rel="__blank" class="button"]](%%)
+      * (% class="buttonwrapper" %)[[${services.localization.render("${translationPrefix}.actions.download")}&gt;&gt;attach:${attachmentStringReference}||title="$services.localization.render("${translationPrefix}.actions.download")" rel="__blank" class="button"]](%%)
     #end
   #end
 #end
@@ -320,7 +328,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
   #end
   #set ($options = {
     'classname' : ${request.get('classname')},
-    'object' : $!{mathtool.toInteger($request.object)},
+    'object' : $!{numbertool.toNumber($request.object).intValue()},
     'property' : ${request.property},
     'displayImage' : ${displayImage},
     'docAction' : ${docAction},
@@ -334,7 +342,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
   #attachmentPicker_displayAttachmentGallery($targetDocument, $targetAttachDocument, $options)
 
   (% class="gallery_buttons buttons" %)(((
-  (% class="buttonwrapper secondary" %)[[$services.localization.render("${translationPrefix}.cancel")&gt;&gt;$targetDocument||class="button secondary" id="attachment-picker-close"]]
+  (% class="buttonwrapper secondary" %)[[$services.localization.render("${translationPrefix}.cancel")&gt;&gt;${targetDocument}||class="button secondary" id="attachment-picker-close"]]
   )))
 #end
 {{/velocity}}</content>
@@ -354,8 +362,11 @@ $xwiki.jsx.use($attachmentPickerDocName)
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -369,7 +380,9 @@ $xwiki.jsx.use($attachmentPickerDocName)
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -401,6 +414,8 @@ $xwiki.jsx.use($attachmentPickerDocName)
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -593,18 +608,12 @@ $xwiki.jsx.use($attachmentPickerDocName)
               this.dialog.closeDialog();
             }.bindAsEventListener(this),
             onFailure : function(response) {
-              var failureReason = response.statusText;
-              if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-                failureReason = 'Server not responding';
-              }
+              var failureReason = response.statusText || 'Server not responding';
               if (targetElement._x_notif) {
                 targetElement._x_notif.replace(new XWiki.widgets.Notification("$services.localization.render('core.widgets.confirmationBox.notification.failed')" + failureReason, "error"));
               } else {
                 new XWiki.widgets.Notification(this.interactionParameters.failureMessageText + failureReason, "error");
               }
-            },
-            on1223 : function(response) {
-              response.request.options.onSuccess(response);
             },
             on0 : function(response) {
               response.request.options.onFailure(response);
@@ -746,8 +755,11 @@ $xwiki.jsx.use($attachmentPickerDocName)
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -761,7 +773,9 @@ $xwiki.jsx.use($attachmentPickerDocName)
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -793,6 +807,8 @@ $xwiki.jsx.use($attachmentPickerDocName)
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -871,8 +887,11 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -886,7 +905,9 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -899,6 +920,8 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -934,6 +957,8 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -1093,9 +1118,6 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
   ## Make this box twice as large as the others
   width: ${uploadBoxSize}px;
 }
-* html .gallery_upload {
-  width: ${mathtool.add($uploadBoxSize, 2)}px;
-}
 .gallery_upload, .gallery_upload:hover {
   background-color: $theme.backgroundSecondaryColor;
 }
@@ -1148,6 +1170,9 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
 }</code>
     </property>
     <property>
+      <contentType/>
+    </property>
+    <property>
       <name>Attachment galery styling</name>
     </property>
     <property>
@@ -1171,113 +1196,285 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
       <defaultWeb/>
       <nameField/>
       <validationScript/>
-      <code>
+      <async_cached>
+        <customDisplay/>
+        <defaultValue>0</defaultValue>
         <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <hint/>
+        <name>async_cached</name>
+        <number>13</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <hint/>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>14</number>
+        <picker>1</picker>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>, </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <sort/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <customDisplay/>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <hint/>
+        <name>async_enabled</name>
+        <number>12</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
+      <code>
+        <contenttype>---</contenttype>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <hint/>
         <name>code</name>
-        <number>9</number>
+        <number>10</number>
+        <picker>1</picker>
         <prettyName>Macro code</prettyName>
         <rows>20</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
       <contentDescription>
+        <contenttype>PureText</contenttype>
+        <customDisplay/>
         <disabled>0</disabled>
+        <editor>PureText</editor>
+        <hint/>
         <name>contentDescription</name>
-        <number>8</number>
+        <number>9</number>
+        <picker>1</picker>
         <prettyName>Content description (Not applicable for "No content" type)</prettyName>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </contentDescription>
-      <contentType>
+      <contentJavaType>
         <cache>0</cache>
+        <customDisplay/>
+        <defaultValue>Unknown</defaultValue>
         <disabled>0</disabled>
-        <displayType>select</displayType>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <hint/>
+        <largeStorage>1</largeStorage>
         <multiSelect>0</multiSelect>
-        <name>contentType</name>
-        <number>7</number>
+        <name>contentJavaType</name>
+        <number>8</number>
+        <picker>1</picker>
         <prettyName>Macro content type</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator>|</separator>
         <separators>|</separators>
         <size>1</size>
+        <sort/>
         <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>Unknown|Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentJavaType>
+      <contentType>
+        <cache>0</cache>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <hint/>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>7</number>
+        <picker>1</picker>
+        <prettyName>Macro content availability</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <sort/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
         <values>Optional|Mandatory|No content</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </contentType>
-      <defaultCategory>
+      <defaultCategories>
+        <cache>0</cache>
+        <customDisplay/>
+        <defaultValue/>
         <disabled>0</disabled>
-        <name>defaultCategory</name>
+        <displayType>input</displayType>
+        <freeText>forbidden</freeText>
+        <hint/>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>defaultCategories</name>
         <number>4</number>
-        <prettyName>Default category</prettyName>
-        <size>30</size>
+        <picker>0</picker>
+        <prettyName>Default categories</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <sort/>
         <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </defaultCategory>
+        <validationMessage/>
+        <validationRegExp/>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </defaultCategories>
       <description>
+        <contenttype>PureText</contenttype>
+        <customDisplay/>
         <disabled>0</disabled>
+        <editor>PureText</editor>
+        <hint/>
         <name>description</name>
         <number>3</number>
+        <picker>1</picker>
         <prettyName>Macro description</prettyName>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </description>
       <id>
+        <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>id</name>
         <number>1</number>
+        <picker>1</picker>
         <prettyName>Macro id</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </id>
       <name>
+        <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>name</name>
         <number>2</number>
+        <picker>1</picker>
         <prettyName>Macro name</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <priority>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <hint/>
+        <name>priority</name>
+        <number>11</number>
+        <numberType>integer</numberType>
+        <prettyName>Priority</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </priority>
       <supportsInlineMode>
+        <customDisplay/>
+        <defaultValue/>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
+        <hint/>
         <name>supportsInlineMode</name>
         <number>5</number>
         <prettyName>Supports inline mode</prettyName>
         <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </supportsInlineMode>
       <visibility>
         <cache>0</cache>
+        <customDisplay/>
+        <defaultValue/>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <hint/>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>visibility</name>
         <number>6</number>
+        <picker>1</picker>
         <prettyName>Macro visibility</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator>|</separator>
         <separators>|</separators>
         <size>1</size>
+        <sort/>
         <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
         <values>Current User|Current Wiki|Global</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </visibility>
     </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
     <property>
       <code>{{velocity output="false"}}
 $xwiki.jsfx.use('js/xwiki/widgets/modalPopup.js', true)##
 $xwiki.ssfx.use('js/xwiki/widgets/modalPopup.css', true)##
 $xwiki.jsx.use($xcontext.macro.doc.fullName)##
 $xwiki.ssx.use($xcontext.macro.doc.fullName)##
-$xwiki.jsfx.use('js/scriptaculous/builder.js')##
 ## Integrates the optional Lightbox widget (from http://extensions.xwiki.org/xwiki/bin/view/Extension/Lightbox+Application )
 #if ($xwiki.exists('XWiki.Lightbox'))
   $xwiki.jsx.use('XWiki.Lightbox')
@@ -1306,7 +1503,7 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
 #end
 #set ($classname = "$!{xcontext.macro.params.classname}")
 #set ($property = "$!{xcontext.macro.params.property}")
-#set ($object = $mathtool.toInteger("$!{xcontext.macro.params.object}"))
+#set ($object = $numbertool.toNumber("$!{xcontext.macro.params.object}").intValue())
 #if ("$!{object}" != $!{xcontext.macro.params.object})
   #set ($object = ${doc.getObject($classname).number})
   #if ("$!{object}" == '')
@@ -1320,9 +1517,18 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
   #set ($displayImage = false)
 #end
 #if ($displayImage)
-  #set ($alt = "$!{xcontext.macro.params.alternateText}")
-  #set ($width = "$!{xcontext.macro.params.width}")
-  #set ($height = "$!{xcontext.macro.params.height}")
+  #set ($alt = '')
+  #set ($width = '')
+  #set ($height = '')
+  #if ($xcontext.macro.params.alternateText)
+    #set ($alt = "$services.rendering.escape($!{xcontext.macro.params.alternateText}, 'xwiki/2.1')")
+  #end
+  #if ($xcontext.macro.params.width)
+    #set ($width = "$services.rendering.escape($!{xcontext.macro.params.width}, 'xwiki/2.1')")
+  #end
+  #if ($xcontext.macro.params.height)
+    #set ($height = "$services.rendering.escape($!{xcontext.macro.params.height}, 'xwiki/2.1')")
+  #end
   #set ($imageParams = '')
   #if ("${width}" != '')
     #set($imageParams = "$!{imageParams} width=${width}")
@@ -1387,9 +1593,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     #set ($attachmentResource = '')
   #end
   #if ($displayImage)
-    (% class="$!{cssClass}#if (!$attachment) hidden#end" %)(((#if ("$!{attachmentResource}" != '' || $forceElement)#if($withLink)[[#end[[image:${attachmentResource}$!{imageParams}]]#if($withLink)&gt;&gt;attach:${attachmentResource}||rel=lightbox]]#{end}#end)))##
+    (% class="$!{cssClass}#if (!$attachment) hidden#end" %)(((#if ("$!{attachmentResource}" != '' || $forceElement)#if($withLink)[[#end[[image:$services.rendering.escape(${attachmentResource}, 'xwiki/2.1')$!{imageParams}]]#if($withLink)&gt;&gt;attach:$services.rendering.escape(${attachmentResource},'xwiki/2.1')||rel=lightbox]]#{end}#end)))##
   #else
-    (% class="$!{cssClass}" %)#if ("$!{attachmentResource}" != '' || $forceElement)#if ($withLink)[[attach:${attachmentResource}||rel=__blank]]#{else}(% class="displayed" %)#if($targetPermView)$!{attachmentName}#{else}Access Denied#{end}(% %)#{end}#end(%%)##
+    (% class="$!{cssClass}" %)#if ("$!{attachmentResource}" != '' || $forceElement)#if ($withLink)[[attach:${attachmentResource}||rel=__blank]]#{else}(% class="displayed" %)#if($targetPermView)$services.rendering.escape($!{attachmentName}, 'xwiki/2.1')#{else}Access Denied#{end}(% %)#{end}#end(%%)##
   #end
 #end
 
@@ -1412,8 +1618,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     #if ($hasTargetDoc)
       #set ($queryString.targetdocname = $targetdoc.fullName)
     #end
-    (% class="buttonwrapper" %)[[$buttontext&gt;&gt;$xcontext.macro.doc.fullName||queryString="$escapetool.url($queryString)"
-      class="attachment-picker-start button" title="$buttontext"]](%%)##
+    #set ($linkLabel = $services.rendering.escape($services.rendering.escape($buttontext, 'xwiki/2.1'), 'xwiki/2.1'))
+    (% class="buttonwrapper" %)[[$linkLabel&gt;&gt;${xcontext.macro.doc.fullName}||queryString="$escapetool.url($queryString)"
+      class="attachment-picker-start button" title="$services.rendering.escape($buttontext, 'xwiki/2.1')"]](%%)##
   #end
 #end
 {{/velocity}}
@@ -1435,10 +1642,15 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
       <contentDescription/>
     </property>
     <property>
+      <contentJavaType/>
+    </property>
+    <property>
       <contentType>No content</contentType>
     </property>
     <property>
-      <defaultCategory>Development</defaultCategory>
+      <defaultCategories>
+        <value>Development</value>
+      </defaultCategories>
     </property>
     <property>
       <description>A control to be used for object properties of the current document that are supposed to contain the name of an attachment from the current (or target) document. Allows uploading new attachments, and deleting attachments from the target document.  If no target document is specified, the current document will be used. Object properties are only saved to the current document.</description>
@@ -1448,6 +1660,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>Attachment Selector</name>
+    </property>
+    <property>
+      <priority/>
     </property>
     <property>
       <supportsInlineMode>1</supportsInlineMode>
@@ -1508,6 +1723,15 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -1520,6 +1744,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>classname</name>
+    </property>
+    <property>
+      <type>org.xwiki.model.reference.DocumentReference</type>
     </property>
   </object>
   <object>
@@ -1574,6 +1801,15 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -1586,6 +1822,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>property</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -1640,6 +1879,15 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -1652,6 +1900,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>object</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -1706,6 +1957,15 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -1718,6 +1978,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>cssClass</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -1772,6 +2035,15 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue>form</defaultValue>
@@ -1784,6 +2056,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>savemode</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -1838,6 +2113,15 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -1850,6 +2134,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>buttontext</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -1904,6 +2191,15 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -1916,6 +2212,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>defaultValue</name>
+    </property>
+    <property>
+      <type>org.xwiki.model.reference.AttachmentReference</type>
     </property>
   </object>
   <object>
@@ -1970,6 +2269,15 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -1982,6 +2290,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>filter</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -2036,6 +2347,15 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue>false</defaultValue>
@@ -2048,6 +2368,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>displayImage</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -2102,6 +2425,15 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -2114,6 +2446,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>width</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -2168,6 +2503,15 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -2180,6 +2524,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>height</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -2234,6 +2581,15 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -2246,6 +2602,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>alternateText</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -2300,6 +2659,15 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue>false</defaultValue>
@@ -2312,6 +2680,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>link</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -2366,6 +2737,15 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -2378,6 +2758,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>targetdocname</name>
+    </property>
+    <property>
+      <type>org.xwiki.model.reference.DocumentReference</type>
     </property>
   </object>
   <object>
@@ -2432,6 +2815,15 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue>false</defaultValue>
@@ -2444,6 +2836,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>versionSummary</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
 </xwikidoc>

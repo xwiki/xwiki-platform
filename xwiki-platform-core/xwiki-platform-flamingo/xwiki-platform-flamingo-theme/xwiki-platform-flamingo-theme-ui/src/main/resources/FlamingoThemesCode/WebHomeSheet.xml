@@ -1,0 +1,629 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>FlamingoThemesCode</web>
+  <name>WebHomeSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>$services.localization.render('platform.flamingo.themes.home.title')</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+################################
+## Globals
+################################
+#set ($discard = $xwiki.ssx.use('FlamingoThemesCode.WebHomeSheet'))
+####################################
+## CONTROLLER
+####################################
+#if($request.action == 'setTheme')
+  #setTheme()
+#elseif($request.action == 'setThemeSuccess')
+  #prepareView()
+  #setThemeSuccess()
+  #view()
+#elseif($request.action == 'create')
+  #create()
+#else
+  #prepareView()
+  #view()
+#end
+####################################
+## PREPARE VIEW
+####################################
+#macro(prepareView)
+  #set ($currentTheme = $xwiki.getXWikiPreference('colorTheme'))
+  #if ("$!currentTheme" == '')
+    #set ($currentTheme = 'FlamingoThemes.Charcoal')
+  #end
+  #set ($currentThemeDoc = $xwiki.getDocument($currentTheme))
+  #set ($isSubWiki = $services.wiki.currentWikiId != $services.wiki.mainWikiId)
+  #set ($flamingoThemesFromThisWiki = [])
+  #getFlamingoThemes($services.wiki.currentWikiId, $flamingoThemesFromThisWiki)
+  #if ($isSubWiki)
+    #set ($flamingoThemesFromMainWiki = [])
+    #getFlamingoThemes($services.wiki.mainWikiId,  $flamingoThemesFromMainWiki)
+  #end
+  #set ($currentScope = 'local')
+  #if ("$!currentTheme" != '' &amp;&amp; $services.model.resolveDocument($currentTheme).wikiReference.name == $services.wiki.mainWikiId)
+    #set ($currentScope = 'global')
+  #end
+#end
+################################
+## Get Flamingo themes
+################################
+#macro(getFlamingoThemes $wiki $return)
+  #set ($results = [])
+  #set ($xwql = "from doc.object(FlamingoThemesCode.ThemeClass) obj WHERE doc.fullName &lt;&gt; 'FlamingoThemesCode.ThemeTemplate' ORDER BY doc.name")
+  #getThemesFromQuery ($xwql, $wiki, $results)
+  #set ($return = $NULL)
+  #setVariable ("$return", $results)
+#end
+################################
+## Get themes from a query
+################################
+#macro(getThemesFromQuery $xwql $wiki $return)
+  #set ($wikiReference = $services.model.createWikiReference($wiki))
+  #set ($themes = $services.query.xwql($xwql).setWiki($wiki).execute())
+  #set ($themesRef = [])
+  #foreach ($theme in $themes)
+    #set ($themeRef = $services.model.resolveDocument($theme, 'default', $wikiReference))
+    #if ($services.security.authorization.hasAccess('view', $xcontext.userReference, $themeRef))
+      #set ($discard = $themesRef.add($themeRef))
+    #end
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $themesRef)
+#end
+####################################
+## VIEW
+####################################
+#macro(view)
+  (% class="theme-viewer" %)
+  (((
+    ## Display a warning about old color themes (if any)
+    #if($xwiki.exists($services.model.createDocumentReference('', 'ColorThemes', 'ColorThemeClass')) &amp;&amp; $xwiki.exists($services.model.createDocumentReference('', 'ColorThemes', 'WebHome')))
+      {{info}}
+        $services.localization.render('platform.flamingo.themes.home.warningOldColorThemeInstalled', ["[[", "&gt;&gt;ColorThemes.WebHome]]"])
+      {{/info}}
+    #end
+    
+    ## Display the current theme
+    == $services.localization.render('platform.flamingo.themes.home.currenttheme') ==
+    #if($currentThemeDoc.getObject('ColorThemes.ColorThemeClass'))
+      {{warning}}
+        $services.localization.render('platform.flamingo.themes.home.warningCurrentOldColorTheme')
+      {{/warning}}
+    #end
+    #displayTheme($currentThemeDoc.documentReference, $currentScope)
+    
+    ## Display the other themes
+    ## Creation form
+    #creationForm()
+    
+    == $services.localization.render('platform.flamingo.themes.home.otherthemes') ==
+    #if ($isSubWiki &amp;&amp; !$flamingoThemesFromMainWiki.isEmpty())
+      {{html}}
+      &lt;ul class="nav nav-tabs" role="tablist"&gt;
+        &lt;li role="presentation" class="active"&gt;&lt;a href="#local" role="tab" data-toggle="tab"&gt;$escapetool.xml($services.localization.render('platform.flamingo.themes.local'))&lt;/a&gt;&lt;/li&gt;
+        &lt;li role="presentation"&gt;&lt;a href="#global" role="tab" data-toggle="tab"&gt;$escapetool.xml($services.localization.render('platform.flamingo.themes.global'))&lt;/a&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+      {{/html}}
+      
+      (% class="tab-content" %)
+      (((
+        (% class="tab-pane active" id="local" %)
+        (((
+          #foreach($themeRef in $flamingoThemesFromThisWiki)
+            #displayTheme($themeRef, 'local')
+          #end
+        )))
+        
+        (% class="tab-pane" id="global" %)
+        (((
+          #foreach($themeRef in $flamingoThemesFromMainWiki)
+            #displayTheme($themeRef, 'global')
+          #end
+        )))
+      )))
+    #else
+      #foreach($themeRef in $flamingoThemesFromThisWiki)
+        #displayTheme($themeRef, 'local')
+      #end
+    #end
+  )))
+#end
+####################################
+## DISPLAY THEME
+####################################
+#macro(displayTheme $themeReference $scope)
+  #if ($scope == 'local')
+    #set ($fullName = $services.model.serialize($themeReference, 'local'))
+  #else
+    #set ($fullName = $services.model.serialize($themeReference, 'default'))
+  #end
+  #set ($isCurrentTheme = ($currentThemeDoc.documentReference == $themeReference))
+  #set ($themeDoc = $xwiki.getDocument($themeReference))
+  #set ($themeObj = $themeDoc.getObject('FlamingoThemesCode.ThemeClass'))
+  (% class="theme #if($isCurrentTheme) current-theme#end" %)
+  (((
+    ## Display the mockup
+    #themeMockup($themeObj)
+    ## Display the informations
+    (% class="theme-info" %)
+    (((
+      === [[$themeDoc.displayTitle&gt;&gt;$fullName]] #if ($isSubWiki &amp;&amp; $scope == 'local') ($services.wiki.currentWikiId)#end===
+      #if ($hasAdmin &amp;&amp; !$isCurrentTheme)
+        $services.icon.render('bullet_go') [[$services.localization.render('platform.flamingo.themes.home.useThisTheme')&gt;&gt;path:$doc.getURL('view', "action=setTheme&amp;theme=${fullName}&amp;form_token=$services.csrf.token")]]
+      #end
+    )))
+  )))
+#end
+####################################
+## THEME MOCKUP
+####################################
+#macro(themeMockup $themeObj)
+  #macro(displayValue $variableName $fallback)
+    #set($value = $themeObj.getValue($variableName))
+    #if("$!value" == '')
+      #set($value = $fallback)
+    #end
+    $value##
+  #end
+
+  {{html}}
+    &lt;div class="mockup-page" style="background-color: #displayValue('body-bg', '#fff')"&gt;
+      ## A fake navbar
+      &lt;div class="mockup-navbar" style="background-color: #displayValue('navbar-default-bg', '#eee')"&gt;
+        ## A fake logo
+        &lt;div class="mockup-logo"&gt;&lt;/div&gt;
+        ## A fake menu
+        &lt;div class="mockup-navbar-menu" style="border-color: #displayValue('navbar-default-color', '#000')"&gt;&lt;/div&gt;
+        ## A fake add button
+        &lt;div class="mockup-add-button" style="background-color: #displayValue('btn-success-bg', '#4D9244')"&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      
+      ## A fake page content
+      &lt;div class="mockup-page-content" style="background-color: #displayValue('xwiki-page-content-bg', '#fff')"&gt;
+        &lt;div class="mockup-title" style="border-color: #displayValue('text-color', '#000')"&gt;&lt;/div&gt;
+        &lt;div class="mockup-text1" style="border-color: #displayValue('text-color', '#000')"&gt;&lt;/div&gt;
+        &lt;div class="mockup-text2" style="border-color: #displayValue('text-color', '#000')"&gt;&lt;/div&gt;
+        &lt;div class="mockup-text3" style="border-color: #displayValue('text-color', '#000')"&gt;&lt;/div&gt;
+        &lt;div class="mockup-text4" style="border-color: #displayValue('link-color', '#000')"&gt;&lt;/div&gt;
+        &lt;div class="mockup-text5" style="border-color: #displayValue('text-color', '#0000ff')"&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      
+      ## A fake app bar 
+      &lt;div class="mockup-left-panel" style="color: #displayValue('link-color', '#0000ff')"&gt;&lt;/div&gt;
+      
+      ## A fake right panel
+      &lt;div class="mockup-right-panel"&gt;
+        &lt;div class="mockup-right-panel-header" style="color: #displayValue('panel-default-text', '#000'); background-color: #displayValue('panel-bg', '#fff')"&gt;
+          &lt;div class="mockup-right-panel-header-text" style="border-color: #displayValue('panel-default-text', '#000')"&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="mockup-right-panel-contents" style="background-color: #displayValue('panel-bg', '#fff')"&gt;
+          &lt;div class="mockup-right-panel-text1" style="background-color: #displayValue('panel-default-text', '#000')"&gt; &lt;/div&gt;
+          &lt;div class="mockup-right-panel-text2" style="background-color: #displayValue('panel-default-text', '#000')"&gt; &lt;/div&gt;
+          &lt;div class="mockup-right-panel-text3" style="background-color: #displayValue('link-color', '#0000ff')"&gt; &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      
+      ## A fake footer
+      &lt;div class="mockup-footer" style="background-color: #displayValue('navbar-default-bg', '#fff')"&gt;
+        &lt;div class="mockup-footer-content" style="border-color: #displayValue('navbar-default-link-color', '#000')"&gt;
+      &lt;/div&gt;
+      
+    &lt;/div&gt;
+  {{/html}}
+  
+#end
+####################################
+## CREATION FORM
+####################################
+#macro(creationForm)
+  #if($xwiki.hasAccessLevel('edit', $xcontext.user, 'FlamingoThemes.AnyPage____________'))
+    (% class="clearfix" %)
+    (((
+  
+    {{html}}
+      &lt;div class="theme-creation-form" &gt;
+        &lt;form action="$doc.getURL()" method="post" class="form-inline"&gt;
+          &lt;input type="hidden" name="form_token" value="$services.csrf.token" /&gt;
+          &lt;input type="hidden" name="action" value="create"/&gt;
+          &lt;label for="newThemeName" class="hidden"&gt;$services.localization.render('platform.flamingo.themes.home.newThemeName')&lt;/label&gt;
+          &lt;input type="text" name="newThemeName" id="newThemeName" value="$services.localization.render('platform.flamingo.themes.home.newThemeName')" class="withTip" size="30"/&gt;
+          &lt;input type="submit" value="$services.localization.render('platform.flamingo.themes.home.create')" class="button"/&gt;
+        &lt;/form&gt;
+      &lt;/div&gt;
+    {{/html}}
+    
+    )))
+  #end
+#end
+####################################
+## CREATE A NEW THEME
+####################################
+#macro(create)
+  #if("$!request.newThemeName" == '')
+    {{error}}
+      {{translation key="platform.flamingo.themes.home.create.invalid" /}}
+    {{/error}}
+    
+    #creationForm()
+  #elseif(!$services.csrf.isTokenValid($request.form_token))
+    {{error}}
+      {{translation key="platform.flamingo.themes.home.create.csrf" parameters="$request.newThemeName" /}}
+    {{/error}}
+    
+    {{html}}
+      &lt;form action="$doc.getURL()" method="post"&gt;
+        &lt;input type="hidden" name="form_token" value="$services.csrf.token" /&gt;
+        &lt;input type="hidden" name="action" value="create"/&gt;
+        &lt;input type="hidden" name="newThemeName" id="newThemeName" value="$escapetool.xml($request.newThemeName)" /&gt;
+        &lt;input type="submit" value="$services.localization.render('platform.flamingo.themes.home.create.confirm')" class="button"/&gt;
+      &lt;/form&gt;
+    {{/html}}
+  #else
+    ## Let's do it
+    $response.sendRedirect($xwiki.getDocument($services.model.createDocumentReference('', 'FlamingoThemes', $request.newThemeName)).getURL('edit', "template=FlamingoThemesCode.ThemeTemplate&amp;title=$escapetool.url($request.newThemeName)&amp;parent=$doc.fullName&amp;xhidden=1"))
+  #end
+#end
+####################################
+## SET THEME
+####################################
+#macro(setTheme)
+  #if("$!request.theme" != '' &amp;&amp; $hasAdmin &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+    #set($preferencesDoc = $xwiki.getDocument('XWiki.XWikiPreferences'))
+    #set($preferencesObj = $preferencesDoc.getObject('XWiki.XWikiPreferences'))
+    $preferencesObj.set('colorTheme', $request.theme)
+    $preferencesDoc.save()
+    $response.sendRedirect($doc.getURL('view', "theme=$escapetool.url($request.theme)&amp;action=setThemeSuccess"))
+  #end
+#end
+####################################
+## SET THEME SUCCESS
+####################################
+#macro(setThemeSuccess)
+  #if("$!request.theme" != '')
+  
+    {{success}}
+      $services.localization.render('platform.flamingo.themes.home.set.success', [$xwiki.getDocument($request.theme).displayTitle])
+    {{/success}}
+    
+  #end
+#end
+{{/velocity}}
+</content>
+  <object>
+    <name>FlamingoThemesCode.WebHomeSheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>36837eed-1247-4e50-9e0d-0abc7f698eed</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#template('colorThemeInit.vm')
+.theme {
+  border: 1px dotted $theme.borderColor;
+  float: left;
+  margin: 0 1em 1em 0;
+  padding: 2px 4px;
+  width: 300px;
+}
+
+.current-theme {
+  background-color: $theme.highlightColor;
+}
+
+.theme-info {
+  margin-left: 60px;
+  color: $theme.textSecondaryColor;
+  font-size: .9em;
+}
+
+.theme-info h3{
+  margin-top: 0;
+  border-bottom: 1px solid $theme.borderColor;
+}
+
+/* Clear the floatting strategy after the display of all themes */
+.theme-viewer h2, .theme-creation-form {
+  clear: both;
+}
+
+.mockup-page {
+  border: 1px solid #aaa;
+  float: left;
+  height: 47px;
+  margin: 0 4px;
+  position: relative;
+  width: 50px;
+}
+
+.mockup-page * {
+  line-height: 1px;
+  overflow: hidden;
+  position: absolute;
+}
+
+/* Pretend to be the navbar */
+.mockup-navbar {
+  left: 0;
+  height: 3px;
+  top: 0;
+  width: 49px;
+}
+
+/* Pretend to be a logo */
+.mockup-logo {
+  background-color: orange;
+  top: 1px;
+  left: 1px;
+  height: 1px;
+  width: 6px;
+}
+
+/* Pretend to be menu inside the navbar */
+.mockup-navbar-menu {
+  width: 16px;
+  height: 1px;
+  border-style: dashed;
+  border-width: 1px;
+  left: 12px;
+}
+
+/* Pretend to be the add button */
+.mockup-add-button {
+  left: 30px;
+  height: 2px;
+  width: 5px;
+  top: 0px;
+}
+
+/* Pretend to be the page content */
+.mockup-page-content {
+  height: 40px;
+  left: 6px;
+  overflow: hidden;
+  top: 3px;
+  width: 32px;
+}
+
+.mockup-title, .mockup-text1, .mockup-text2, .mockup-text3, .mockup-text4, .mockup-text5{
+  left: 2px;
+  height: 1px;
+  width: 28px;
+  border-style: dotted;
+  border-width: 1px;
+}
+
+.mockup-title {
+  top: 4px;
+}
+
+.mockup-text1 {
+  top: 10px;
+}
+
+.mockup-text2 {
+  top: 13px;
+}
+
+.mockup-text3 {
+  top: 16px;
+}
+
+.mockup-text4 {
+  top: 19px;
+}
+
+.mockup-text5 {
+  top: 22px;
+}
+
+/* Pretend to be the app bar */
+.mockup-left-panel, .mockup-left-panel:before{
+  height: 40px;
+  top: 3px;
+  width: 4px;
+  left: 2px;
+}
+
+.mockup-left-panel:before{
+  content: "@ @ @ @ @";
+  font-size: 2px;
+}
+
+/* Pretend to be the right panel */
+.mockup-right-panel {
+  height: 24px;
+  top: 7px;
+  width: 7px;
+  right: 2px;
+}
+
+.mockup-right-panel-header-text, .mockup-right-panel-text1, .mockup-right-panel-text2, .mockup-right-panel-text3 {
+  height: 1px;
+  left: 2px;
+  top: 1px;
+  width: 8px;
+  border-style: dotted;
+  border-width: 1px;
+}
+
+.mockup-right-panel-header {
+  border-bottom: 1px dotted;
+  width: 12px;
+}
+
+.mockup-right-panel-contents{
+  top: 5px;
+  width: 8px;
+  height: 20px;
+}
+
+.mockup-right-panel-text1 {
+  top: 0px;
+}
+
+.mockup-right-panel-text2 {
+  top: 3px;
+}
+
+.mockup-right-panel-text3 {
+  top: 6px;
+}
+
+/* Pretend to be the footer */
+.mockup-footer {
+  top: 43px;
+  height: 3px;
+  width: 49px;
+  left: 0px;
+}
+
+.mockup-footer-content {
+  width: 25px;
+  height: 1px;
+  border-style: dashed;
+  border-width: 1px;
+  left: 12px;
+}
+
+.theme-creation-form form {
+  background: url("$xwiki.getSkinFile('icons/silk/add.png')") no-repeat .2em center $theme.backgroundSecondaryColor;
+  border: 1px dotted $theme.borderColor;
+  display: inline-block;
+  padding: .5em .5em .5em 22px;
+  margin-bottom: 1em;
+}
+
+</code>
+    </property>
+    <property>
+      <name>CSS</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+</xwikidoc>

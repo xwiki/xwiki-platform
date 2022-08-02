@@ -35,11 +35,13 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailListener;
+import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MailStoreException;
 import org.xwiki.mail.internal.MemoryMailListener;
 import org.xwiki.mail.internal.UpdateableMailStatusResult;
+import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
@@ -70,6 +72,14 @@ public class SendMailRunnableTest
 
     @InjectComponentManager
     private MockitoComponentManager componentManager;
+
+    @BeforeComponent
+    public void beforeInitializable() throws Exception
+    {
+        MailSenderConfiguration configuration =
+            this.componentManager.registerMockComponent(MailSenderConfiguration.class);
+        when(configuration.getSendQueueCapacity()).thenReturn(10);
+    }
 
     @BeforeEach
     public void setUp() throws Exception

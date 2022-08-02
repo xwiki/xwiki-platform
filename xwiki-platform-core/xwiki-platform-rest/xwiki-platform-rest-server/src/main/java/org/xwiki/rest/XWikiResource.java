@@ -19,6 +19,8 @@
  */
 package org.xwiki.rest;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -66,14 +68,6 @@ public class XWikiResource implements XWikiRestComponent, Initializable
      */
     @Context
     protected UriInfo uriInfo;
-
-    /**
-     * The logger to be used to output log messages.
-     * 
-     * @deprecated since 7.3M1, use {@link #slf4Jlogger} instead
-     */
-    @Deprecated
-    protected java.util.logging.Logger logger;
 
     /**
      * The logger to be used to output log messages.
@@ -144,16 +138,15 @@ public class XWikiResource implements XWikiRestComponent, Initializable
     @Override
     public void initialize() throws InitializationException
     {
-        logger = java.util.logging.Logger.getLogger(this.getClass().getName());
-
         objectFactory = new ObjectFactory();
 
         this.slf4Jlogger.trace("Resource {} initialized. Serving user: '{}'\n", getClass().getName(),
-            Utils.getXWikiUser(componentManager));
+            this.xcontextProvider.get().getUserReference());
     }
 
     /**
-     * @param spaceSegments the space segments of the URL
+     * @param spaceSegments the space segments of the URL (the <b>URL-encoded</b> value of the {@code /spaces/...} URL
+     *            path parameter)
      * @return the list of parent spaces
      * @throws XWikiRestException if the URL is malformed
      */
@@ -161,21 +154,24 @@ public class XWikiResource implements XWikiRestComponent, Initializable
     {
         // The URL format is: "spaces/A/spaces/B/spaces/C" to actually point to the space "A.B.C".
         List<String> spaces = new ArrayList<>();
-        // We actually don't get the first "spaces/" segment so we start from the first space
+        // We actually don't get the first "spaces/" segment so we start from the first space.
         int i = 1;
         for (String space : spaceSegments.split("/")) {
-            if (i % 2 == 0) {
+            if (i++ % 2 == 0) {
                 // Every 2 segments, we should have "spaces". If not, the URL is malformed
                 if (!"spaces".equals(space)) {
                     throw new XWikiRestException("Malformed URL: the spaces section is invalid.");
                 }
+            } else if (!space.isEmpty()) {
+                try {
+                    spaces.add(URLDecoder.decode(space, "UTF-8"));
+                } catch (UnsupportedEncodingException e) {
+                    // Shouldn't happen.
+                    throw new XWikiRestException("Unable to decode space name.", e);
+                }
             } else {
-                spaces.add(space);
+                throw new XWikiRestException("Malformed URL: a space name cannot be empty.");
             }
-            i++;
-        }
-        if (spaces.isEmpty()) {
-            throw new XWikiRestException("Malformed URL: the spaces section is empty.");
         }
         return spaces;
     }

@@ -19,6 +19,7 @@
  */
 package org.xwiki.extension.test.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -47,10 +48,40 @@ public class SimpleSearchPane extends BaseElement
     private WebElement repositorySelect;
 
     /**
+     * The checkbox used to enable/disable recommended extensions filtering.
+     */
+    @FindBy(id = "switch_recommended")
+    private WebElement recommendedSwitch;
+
+    /**
+     * The checkbox used to enable/disable the use of the extensions index.
+     */
+    @FindBy(id = "switch_indexed")
+    private WebElement indexedSwitch;
+
+    /**
+     * The checkbox used to enable/disable compatible extensions filtering.
+     */
+    @FindBy(id = "switch_compatible")
+    private WebElement compatibleSwitch;
+
+    /**
+     * The button to reload the search.
+     */
+    @FindBy(id = "extensionSearchButton")
+    private WebElement button;
+
+    /**
      * The link to open the advanced search pane.
      */
     @FindBy(linkText = "Advanced search")
     private WebElement advancedSearchLink;
+
+    /**
+     * The button to show/hide the advanced search options.
+     */
+    @FindBy(id = "extensionMoreButton")
+    private WebElement moreButton;
 
     /**
      * @return the text input used to specify the search keywords
@@ -77,7 +108,7 @@ public class SimpleSearchPane extends BaseElement
     public SearchResultsPane selectRepository(String repositoryId)
     {
         getRepositorySelect().selectByValue(repositoryId);
-        new BasePage().waitUntilPageIsLoaded();
+        new BasePage();
         return new SearchResultsPane();
     }
 
@@ -88,8 +119,37 @@ public class SimpleSearchPane extends BaseElement
      */
     public AdvancedSearchPane clickAdvancedSearch()
     {
+        // Make sure advanced search is visible
+        showMore();
+
         advancedSearchLink.click();
         return new AdvancedSearchPane();
+    }
+
+    /**
+     * Make sure advanced search options are hidden.
+     * 
+     * @since 13.3
+     * @since 12.10.7
+     */
+    public void showMore()
+    {
+        if (getDriver().findElements(By.linkText("Advanced search")).isEmpty()) {
+            this.moreButton.click();
+        }
+    }
+
+    /**
+     * Make sure advanced search options are hidden.
+     * 
+     * @since 13.3
+     * @since 12.10.7
+     */
+    public void hideMore()
+    {
+        if (!getDriver().findElements(By.linkText("Advanced search")).isEmpty()) {
+            this.moreButton.click();
+        }
     }
 
     /**
@@ -101,7 +161,66 @@ public class SimpleSearchPane extends BaseElement
     public SearchResultsPane search(CharSequence keywords)
     {
         searchInput.clear();
+
+        // FIXME: workaround for https://github.com/mozilla/geckodriver/issues/1026
+        // Since sendKeys is not waiting anymore and bulletproof it
+        getDriver().addPageNotYetReloadedMarker();
         searchInput.sendKeys(keywords, Keys.ENTER);
+        getDriver().waitUntilPageIsReloaded();
+
         return new SearchResultsPane();
+    }
+
+    private void setChecked(WebElement checkBox, boolean enabled)
+    {
+        // Make sure advanced search is visible
+        showMore();
+
+        if (enabled) {
+            if (checkBox.getAttribute("checked") == null) {
+                checkBox.click();
+            }
+        } else {
+            if (checkBox.getAttribute("checked") != null) {
+                checkBox.click();
+            }
+        }
+    }
+
+    /**
+     * @param enabled true if recommended extensions filter should be enabled
+     * @since 12.10
+     */
+    public void setRecommended(boolean enabled)
+    {
+        setChecked(this.recommendedSwitch, enabled);
+    }
+
+    /**
+     * @param enabled true if search should be based on the extensions index
+     * @since 12.10
+     */
+    public void setIndexed(boolean enabled)
+    {
+        setChecked(this.indexedSwitch, enabled);
+    }
+
+    /**
+     * @param enabled true if compatible extensions filter should be enabled
+     * @since 12.10
+     */
+    public void setCompatible(boolean enabled)
+    {
+        setChecked(this.compatibleSwitch, enabled);
+    }
+
+    /**
+     * Click the simple search button.
+     * 
+     * @since 12.10
+     */
+    public void clickButton()
+    {
+        this.button.click();
     }
 }

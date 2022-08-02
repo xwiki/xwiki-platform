@@ -165,6 +165,18 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     }
 
     @Override
+    public DocumentModelBridge getTranslatedDocumentInstance(DocumentModelBridge document) throws Exception
+    {
+        XWikiContext xcontext = getContext();
+
+        if (document instanceof XWikiDocument) {
+            return ((XWikiDocument) document).getTranslatedDocument(xcontext);
+        } else {
+            return getTranslatedDocumentInstance(document.getDocumentReference());
+        }
+    }
+
+    @Override
     public DocumentReference getCurrentDocumentReference()
     {
         XWikiDocument currentDocument = null;
@@ -527,7 +539,14 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
                 ExceptionUtils.getRootCauseMessage(e));
         }
 
-        return pc == null ? null : pc.newProperty().getClass().getName();
+        if (pc != null) {
+            BaseProperty property = pc.newProperty();
+            if (property != null) {
+                return property.getClass().getName();
+            }
+        }
+
+        return null;
     }
 
     @Override
@@ -583,8 +602,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         XWikiContext xcontext = getContext();
         XWikiDocument attachmentDocument =
             xcontext.getWiki().getDocument(attachmentReference.getDocumentReference(), xcontext);
-        return new ByteArrayInputStream(
-            attachmentDocument.getAttachment(attachmentReference.getName()).getContent(xcontext));
+        return attachmentDocument.getAttachment(attachmentReference.getName()).getContentInputStream(xcontext);
     }
 
     @Override
@@ -915,13 +933,14 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     public String getCurrentWiki()
     {
         XWikiContext xcontext = getContext();
-        return xcontext.getWikiId();
+        return xcontext != null ? xcontext.getWikiId() : null;
     }
 
     @Override
     public DocumentReference getCurrentAuthorReference()
     {
-        return getContext().getAuthorReference();
+        XWikiContext xcontext = this.readonlyContextProvider.get();
+        return xcontext != null ? xcontext.getAuthorReference() : null;
     }
 
     /**

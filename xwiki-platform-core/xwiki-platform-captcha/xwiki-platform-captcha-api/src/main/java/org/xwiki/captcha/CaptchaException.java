@@ -19,15 +19,12 @@
  */
 package org.xwiki.captcha;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Exception in the CAPTCHA module's operations.
  *
  * @version $Id$
  * @since 10.8RC1
  */
-@Unstable
 public class CaptchaException extends Exception
 {
     private static final long serialVersionUID = -3676401099689936641L;

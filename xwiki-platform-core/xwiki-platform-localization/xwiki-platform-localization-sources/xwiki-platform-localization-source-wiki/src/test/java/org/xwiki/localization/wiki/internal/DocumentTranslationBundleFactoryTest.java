@@ -22,6 +22,7 @@ package org.xwiki.localization.wiki.internal;
 import java.util.Collections;
 import java.util.Locale;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,7 +37,6 @@ import org.xwiki.localization.TranslationBundleFactoryDoesNotExistsException;
 import org.xwiki.localization.internal.DefaultTranslationBundleContext;
 import org.xwiki.localization.wiki.internal.TranslationDocumentModel.Scope;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.observation.EventListener;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.rendering.syntax.Syntax;
@@ -49,8 +49,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
-
-import org.junit.Assert;
 
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;

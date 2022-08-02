@@ -93,7 +93,7 @@ public class PreviewTest extends AbstractTest
         getUtil().rest().deletePage(getTestClassName(), getTestMethodName());
         getUtil().gotoPage(getTestClassName(), getTestMethodName(), "edit",
             "template=" + getTestClassName() + "." + getTestMethodName() + "Template");
-        objectEditPane = new ObjectEditPane(new InlinePage().getForm(), classFullName, 0);
+        objectEditPane = new ObjectEditPane(new InlinePage().getFormLocator(), classFullName, 0);
         objectEditPane.setFieldValue(objectEditPane.byPropertyName("color"), "green");
 
         // Test the preview when the page is not yet saved.

@@ -22,22 +22,22 @@ package com.xpn.xwiki.criteria.impl;
 import java.util.List;
 import java.util.Arrays;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.criteria.impl.Range}.
  *
  * @version $Id$
  */
-public class RangeTest
+class RangeTest
 {
     /**
      * Test for {@link com.xpn.xwiki.criteria.impl.Range#Range(int, int)}
      */
     @Test
-    public void testConstructor()
+    void constructor()
     {
         doConstructorTest(0, 0);
         doConstructorTest(0, 5);
@@ -60,21 +60,21 @@ public class RangeTest
         Arrays.asList(new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8"});
 
     @Test
-    public void testSubListWithStartZeroAndSizeZero()
+    void subListWithStartZeroAndSizeZero()
     {
         Range range = new Range(0, 0);
         assertEquals(range.subList(zeroToHeight), zeroToHeight);
     }
 
     @Test
-    public void testSubListWithStartZeroAndSizeOneThousand()
+    void subListWithStartZeroAndSizeOneThousand()
     {
         Range range = new Range(0, 1000);
         assertEquals(range.subList(zeroToHeight), zeroToHeight);
     }
 
     @Test
-    public void testSubListWithHeadIntervalOne()
+    void subListWithHeadIntervalOne()
     {
         Range range = RangeFactory.createHeadRange(1);
         List<String> zero = Arrays.asList(new String[]{"0"});
@@ -82,7 +82,7 @@ public class RangeTest
     }
 
     @Test
-    public void testSubListWithTailIntervalOne()
+    void subListWithTailIntervalOne()
     {
         Range range = RangeFactory.createTailRange(1);
         List<String> height = Arrays.asList(new String[]{"8"});
@@ -90,7 +90,7 @@ public class RangeTest
     }
 
     @Test
-    public void testSubListWithStartZeroAndPositiveSize()
+    void subListWithStartZeroAndPositiveSize()
     {
         Range range = new Range(0, 4);
         List<String> zeroToThree = Arrays.asList(new String[]{"0", "1", "2", "3"});
@@ -98,7 +98,7 @@ public class RangeTest
     }
 
     @Test
-    public void testSubListWithStartZeroAndNegativeSize()
+    void subListWithStartZeroAndNegativeSize()
     {
         Range range = new Range(0, -4);
         List<String> fiveToHeight = Arrays.asList(new String[]{"5", "6", "7", "8"});
@@ -106,7 +106,7 @@ public class RangeTest
     }
 
     @Test
-    public void testSubListWithStartMinusTwoAndSizeFour()
+    void subListWithStartMinusTwoAndSizeFour()
     {
         Range range = new Range(-2, 4);
         List<String> sevenToHeight = Arrays.asList(new String[]{"7", "8"});
@@ -114,7 +114,7 @@ public class RangeTest
     }
 
     @Test
-    public void testSubListWithStartMinusTwoAndSizeMinusFour()
+    void subListWithStartMinusTwoAndSizeMinusFour()
     {
         Range range = new Range(-2, -4);
         List<String> threeToSix = Arrays.asList(new String[]{"3", "4", "5", "6"});
@@ -122,7 +122,7 @@ public class RangeTest
     }
 
     @Test
-    public void testSubListWithStartTwoAndSizeMinusFour()
+    void subListWithStartTwoAndSizeMinusFour()
     {
         Range range = new Range(2, -4);
         List<String> zeroToOne = Arrays.asList(new String[]{"0", "1"});

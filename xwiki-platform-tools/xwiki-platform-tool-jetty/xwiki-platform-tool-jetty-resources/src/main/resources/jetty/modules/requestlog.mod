@@ -18,9 +18,13 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-#
-# Request Log module
-#
+DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
+
+[description]
+Logs requests using CustomRequestLog and AsyncRequestLogWriter.
+
+[tags]
+requestlog
 
 [depend]
 server
@@ -31,20 +35,27 @@ etc/jetty-requestlog.xml
 [files]
 logs/
 
-[ini-template]
-## Request Log Configuration
-# Filename for Request Log output (relative to jetty.base)
-# requestlog.filename=/logs/yyyy_mm_dd.request.log
-# Date format for rollovered files (uses SimpleDateFormat syntax)
-# requestlog.filenameDateFormat=yyyy_MM_dd
-# How many days to retain the logs
-# requestlog.retain=90
-# If an existing log with the same name is found, just append to it
-# requestlog.append=true
-# Use the extended log output
-# requestlog.extended=true
-# Log http cookie information as well
-# requestlog.cookies=true
-# Set the log output timezone
-# requestlog.timezone=GMT
+[ini]
+jetty.requestlog.dir?=logs
 
+[ini-template]
+## Format string
+# jetty.requestlog.formatString=%a - %u %{dd/MMM/yyyy:HH:mm:ss ZZZ|GMT}t "%r" %s %B "%{Referer}i" "%{User-Agent}i" "%C"
+
+## Logging directory (relative to $jetty.base)
+# jetty.requestlog.dir=logs
+
+## File path
+# jetty.requestlog.filePath=${jetty.requestlog.dir}/yyyy_mm_dd.request.log
+
+## Date format for rollovered files (uses SimpleDateFormat syntax)
+# jetty.requestlog.filenameDateFormat=yyyy_MM_dd
+
+## How many days to retain old log files
+# jetty.requestlog.retainDays=90
+
+## Whether to append to existing file
+# jetty.requestlog.append=false
+
+## Timezone of the log file rollover
+# jetty.requestlog.timezone=GMT

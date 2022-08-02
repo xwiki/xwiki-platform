@@ -1,0 +1,7 @@
+org.xwiki.model.validation.internal.DefaultEntityNameValidationConfiguration
+org.xwiki.model.validation.internal.DefaultEntityNameValidationManager
+org.xwiki.model.validation.internal.EntityNameValidationConfigurationSource
+org.xwiki.model.validation.internal.ReplaceCharacterEntityNameValidation
+org.xwiki.model.validation.internal.ReplaceCharacterEntityNameValidationConfiguration
+org.xwiki.model.validation.internal.SlugEntityNameValidation
+org.xwiki.model.validation.script.ModelValidationScriptService

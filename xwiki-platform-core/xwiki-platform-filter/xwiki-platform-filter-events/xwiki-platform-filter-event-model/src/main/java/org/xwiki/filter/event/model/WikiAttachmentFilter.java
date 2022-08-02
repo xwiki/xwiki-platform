@@ -24,6 +24,7 @@ import java.io.InputStream;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.annotation.Default;
+import org.xwiki.filter.input.InputSource;
 
 /**
  * Attachment related events.
@@ -86,6 +87,17 @@ public interface WikiAttachmentFilter
     String PARAMETER_REVISION_COMMENT = "revision_comment";
 
     /**
+     * @type {@link String}
+     * @since 12.0RC1
+     */
+    String PARAMETER_REVISION_CONTENT_ALIAS = "revision_content_alias";
+
+    /**
+     * @since 12.0RC1
+     */
+    String VALUE_REVISION_CONTENT_ALIAS_CURRENT = "";
+
+    /**
      * @param name the name of the attachment
      * @param content the binary content of the attachment
      * @param size the size of the attachment
@@ -93,6 +105,77 @@ public interface WikiAttachmentFilter
      * @throws FilterException when failing to send event
      */
     void onWikiAttachment(String name, InputStream content, Long size,
-        @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters)
-        throws FilterException;
+        @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters) throws FilterException;
+
+    /**
+     * @param name the name of the attachment
+     * @param content the binary content of the attachment
+     * @param size the size of the attachment
+     * @param parameters the properties of the attachment
+     * @throws FilterException when failing to send event
+     * @since 12.0RC1
+     */
+    default void beginWikiDocumentAttachment(String name, InputSource content, Long size,
+        @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters) throws FilterException
+    {
+    }
+
+    /**
+     * @param name the name of the attachment
+     * @param content the binary content of the attachment
+     * @param size the size of the attachment
+     * @param parameters the properties of the attachment
+     * @throws FilterException when failing to send event
+     * @since 12.0RC1
+     */
+    default void endWikiDocumentAttachment(String name, InputSource content, Long size,
+        @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters) throws FilterException
+    {
+    }
+
+    /**
+     * @param parameters the properties of the attachment
+     * @throws FilterException when failing to send event
+     * @since 12.0RC1
+     */
+    default void beginWikiAttachmentRevisions(@Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters)
+        throws FilterException
+    {
+    }
+
+    /**
+     * @param parameters the properties of the attachment
+     * @throws FilterException when failing to send event
+     * @since 12.0RC1
+     */
+    default void endWikiAttachmentRevisions(@Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters)
+        throws FilterException
+    {
+    }
+
+    /**
+     * @param version the revision of the attachment
+     * @param content the binary content of the attachment
+     * @param size the size of the attachment
+     * @param parameters the properties of the attachment
+     * @throws FilterException when failing to send event
+     * @since 12.0RC1
+     */
+    default void beginWikiAttachmentRevision(String version, InputSource content, Long size,
+        @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters) throws FilterException
+    {
+    }
+
+    /**
+     * @param version the revision of the attachment
+     * @param content the binary content of the attachment
+     * @param size the size of the attachment
+     * @param parameters the properties of the attachment
+     * @throws FilterException when failing to send event
+     * @since 12.0RC1
+     */
+    default void endWikiAttachmentRevision(String version, InputSource content, Long size,
+        @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters) throws FilterException
+    {
+    }
 }

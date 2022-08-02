@@ -101,14 +101,12 @@ public class XWikiCfgConfigurationSource implements ConfigurationSource, Initial
     {
         this.configurationLocation = getConfigPath();
 
-        InputStream xwikicfgis = loadConfiguration();
-
-        if (xwikicfgis != null) {
-            try {
+        try (InputStream xwikicfgis = loadConfiguration()) {
+            if (xwikicfgis != null) {
                 this.properties.load(xwikicfgis);
-            } catch (Exception e) {
-                this.logger.error("Failed to load configuration", e);
             }
+        } catch (Exception e) {
+            this.logger.error("Failed to load configuration", e);
         }
     }
 
@@ -131,11 +129,12 @@ public class XWikiCfgConfigurationSource implements ConfigurationSource, Initial
 
         // Second, try loading it as a resource from the environment
         InputStream xwikicfgis = this.environment.getResourceAsStream(this.configurationLocation);
-        this.logger.debug("Failed to load the file [{}] as a resource using the Servlet Context."
-            + " Trying to load it as classpath resource...", this.configurationLocation);
 
         // Third, try loading it from the classloader used to load this current class
         if (xwikicfgis == null) {
+            this.logger.debug("Failed to load the file [{}] as a resource using the Servlet Context."
+                + " Trying to load it as classpath resource...", this.configurationLocation);
+
             xwikicfgis = Thread.currentThread().getContextClassLoader().getResourceAsStream("xwiki.cfg");
         }
 

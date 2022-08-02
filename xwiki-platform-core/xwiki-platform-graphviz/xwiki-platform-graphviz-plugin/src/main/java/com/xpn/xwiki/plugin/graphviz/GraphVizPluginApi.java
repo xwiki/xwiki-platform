@@ -25,7 +25,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.PluginApi;
 
 /**
- * Plugin which wraps the <a href="http://graphviz.org/">GraphViz</a> <tt>dot</tt> executable; transforming dot source
+ * Plugin which wraps the <a href="http://graphviz.org/">GraphViz</a> {@code dot} executable; transforming dot source
  * files (representing graphs) into images, image maps, or other output formats supported by GraphViz.
  * <p>
  * See http://www.graphviz.org/doc/info/lang.html for the dot language specification. See

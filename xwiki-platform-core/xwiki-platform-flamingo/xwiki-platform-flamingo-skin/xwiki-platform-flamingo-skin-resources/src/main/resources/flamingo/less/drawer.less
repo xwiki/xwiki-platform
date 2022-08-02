@@ -2,6 +2,7 @@
 
 // We introduce some variables with default values that a theme can override
 @xwiki-drawer-bg:                        @xwiki-page-content-bg;
+@xwiki-drawer-width:                     280px;
 @xwiki-drawer-brand-bg:                  @navbar-default-bg;
 @xwiki-drawer-brand-border:              @navbar-default-border;
 @xwiki-drawer-brand-link-color:          @navbar-default-link-color;
@@ -19,17 +20,29 @@
 @xwiki-drawer-menu-category-bg:          @xwiki-drawer-menu-item-seperator-color;
 @xwiki-drawer-menu-category-color:       lighten(@xwiki-drawer-menu-item-color, 10%);
 
+.drawer-overlay {
+  z-index: 5200;
+}
 
-.drawer-default {
+.drawer--right .drawer-nav {
+  right: -@xwiki-drawer-width;
+}
+
+.drawer-nav {
   background-color: @xwiki-drawer-bg;
+  width: @xwiki-drawer-width;
+  z-index: 5300;
 
   // Brand =================================================================
   .drawer-brand {
     background-color: @xwiki-drawer-brand-bg;
     border-bottom: 1px solid @xwiki-drawer-brand-border;
+    font-weight: 400;
+    line-height: inherit;
     padding: 20px 16px;
 
     a {
+      display: block;
       color: @xwiki-drawer-brand-link-color;
       padding: 0;
 
@@ -73,30 +86,31 @@
 
 
   // Menu Item =============================================================
-  .drawer-menu-item {
-    padding: 0;
+  a.drawer-menu-item {
+    font-size: @xwiki-drawer-menu-item-size;
+    font-weight: 400;
+    margin-top: 0;
+    padding: @xwiki-drawer-menu-item-padding;
 
-    a {
-      font-size: @xwiki-drawer-menu-item-size;
-      font-weight: 400;
-      margin-top: 0;
-      padding: @xwiki-drawer-menu-item-padding;
+    &, &:hover, &:focus {
+      background-color: @xwiki-drawer-menu-item-bg;
+      color: @xwiki-drawer-menu-item-color;
+      text-decoration: none;
+    }
 
-      &, &:hover, &:focus {
-        background-color: @xwiki-drawer-menu-item-bg;
-        color: @xwiki-drawer-menu-item-color;
-        text-decoration: none;
-      }
-
-      &:hover {
-        background-color: @xwiki-drawer-menu-item-hover-bg;
-        color: @xwiki-drawer-menu-item-hover-color;
-      }
+    &:hover {
+      background-color: @xwiki-drawer-menu-item-hover-bg;
+      color: @xwiki-drawer-menu-item-hover-color;
     }
   }
 
   // Sub Item =============================================================
-  .drawer-menu-sub-item {
+  .drawer-dropdown-menu {
+    &.collapsing {
+      /* Overwrite display:none from drawer.js in order to enable the collapse transition. */
+      display: block;
+    }
+
     a {
       padding-left: @xwiki-drawer-menu-subitem-indent;
     }
@@ -107,6 +121,7 @@
     background-color: @xwiki-drawer-menu-category-bg;
     color: @xwiki-drawer-menu-category-color;
     padding: @xwiki-drawer-menu-item-padding;
+    font-size: larger;
   }
 }
 

@@ -21,18 +21,17 @@ package org.xwiki.csrf;
 
 import java.util.List;
 
-import org.junit.Assert;
-
-import org.jmock.Expectations;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.event.ActionExecutingEvent;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.csrf.internal.CSRFTokenInvalidator;
-import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
 
 /**
  * Tests for the {@link CSRFTokenInvalidator} component.
@@ -40,17 +39,15 @@ import org.xwiki.test.jmock.annotation.MockingRequirement;
  * @version $Id$
  * @since 4.0M1
  */
-@MockingRequirement(CSRFTokenInvalidator.class)
-public class CSRFTokenInvalidatorTest extends AbstractMockingComponentTestCase
+@ComponentTest
+public class CSRFTokenInvalidatorTest
 {
     /** Tested component. */
-    private EventListener invalidator;
+    @InjectMockComponents
+    private CSRFTokenInvalidator invalidator;
 
-    @Before
-    public void configure() throws Exception
-    {
-        this.invalidator = getComponentManager().getInstance(EventListener.class, "csrf-token-invalidator");
-    }
+    @MockComponent
+    private CSRFToken mockCSRFTokenManager;
 
     /**
      * Test that the list of monitored events contains an ActionExecutingEvent for the /logout/ action.
@@ -59,8 +56,8 @@ public class CSRFTokenInvalidatorTest extends AbstractMockingComponentTestCase
     public void testEvents()
     {
         List<Event> events = this.invalidator.getEvents();
-        Assert.assertTrue("Invalidator doesn't listen to /logout/ events",
-            events.contains(new ActionExecutingEvent("logout")));
+        assertTrue(events.contains(new ActionExecutingEvent("logout")),
+            "Invalidator doesn't listen to /logout/ events");
     }
 
     /**
@@ -69,15 +66,9 @@ public class CSRFTokenInvalidatorTest extends AbstractMockingComponentTestCase
      * @throws Exception
      */
     @Test
-    public void testInvalidationOnLogout() throws ComponentLookupException, Exception
+    public void testInvalidationOnLogout()
     {
-        final CSRFToken mockCSRFTokenManager = getComponentManager().getInstance(CSRFToken.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                one(mockCSRFTokenManager).clearToken();
-            }
-        });
         this.invalidator.onEvent(new ActionExecutingEvent("logout"), null, null);
+        verify(mockCSRFTokenManager, atLeastOnce()).clearToken();
     }
 }

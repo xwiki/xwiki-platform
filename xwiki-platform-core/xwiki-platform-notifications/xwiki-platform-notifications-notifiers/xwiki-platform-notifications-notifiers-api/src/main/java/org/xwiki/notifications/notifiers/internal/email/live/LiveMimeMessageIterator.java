@@ -46,6 +46,6 @@ public interface LiveMimeMessageIterator extends Iterator<MimeMessage>, Iterable
      * @param event the event that has to be sent to every user
      * @param templateReference reference to the mail template
      */
-    void initialize(NotificationUserIterator userIterator, Map<String, Object> factoryParameters,
-            CompositeEvent event, DocumentReference templateReference);
+    void initialize(NotificationUserIterator userIterator, Map<String, Object> factoryParameters, CompositeEvent event,
+        DocumentReference templateReference);
 }

@@ -39,7 +39,8 @@ import org.xwiki.resource.CreateResourceReferenceException;
 import org.xwiki.velocity.tools.EscapeTool;
 
 /**
- * Extend a {@link URL} by providing access to the URL path segments (URL-decoded).
+ * Extend a {@link URL} by providing access to the URL path segments (URL-decoded). Allows representing both a full
+ * URL or a relative one.
  *
  * @version $Id$
  * @since 6.1M2
@@ -86,7 +87,7 @@ public class ExtendedURL implements Cloneable
      */
     public ExtendedURL(List<String> segments)
     {
-        this(segments, Collections.<String, List<String>>emptyMap());
+        this(segments, Collections.emptyMap());
     }
 
     /**
@@ -106,8 +107,8 @@ public class ExtendedURL implements Cloneable
      * @param url the URL being wrapped
      * @param ignorePrefix the ignore prefix must start with "/" (eg "/xwiki"). It can be empty or null too in which
      *        case it's not used
-     * @throws org.xwiki.resource.CreateResourceReferenceException if the passed URL is invalid which can happen if it
-     *         has incorrect encoding
+     * @throws CreateResourceReferenceException if the passed URL is invalid which can happen if it has incorrect
+     *         encoding
      */
     public ExtendedURL(URL url, String ignorePrefix) throws CreateResourceReferenceException
     {
@@ -224,7 +225,7 @@ public class ExtendedURL implements Cloneable
      */
     private List<String> extractPathSegments(String rawPath)
     {
-        List<String> urlSegments = new ArrayList<String>();
+        List<String> urlSegments = new ArrayList<>();
 
         if (StringUtils.isEmpty(rawPath)) {
             return urlSegments;
@@ -266,6 +267,7 @@ public class ExtendedURL implements Cloneable
         return new HashCodeBuilder(7, 7)
             .append(getURI())
             .append(getSegments())
+            .append(getParameters())
             .toHashCode();
     }
 
@@ -285,6 +287,7 @@ public class ExtendedURL implements Cloneable
         return new EqualsBuilder()
             .append(getURI(), rhs.getURI())
             .append(getSegments(), rhs.getSegments())
+            .append(getParameters(), rhs.getParameters())
             .isEquals();
     }
 

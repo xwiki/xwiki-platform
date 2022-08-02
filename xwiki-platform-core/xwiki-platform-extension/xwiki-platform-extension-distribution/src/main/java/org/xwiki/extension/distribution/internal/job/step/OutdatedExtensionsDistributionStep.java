@@ -124,43 +124,29 @@ public class OutdatedExtensionsDistributionStep extends AbstractExtensionDistrib
     @Override
     public void executeNonInteractive() throws Exception
     {
+        // Handle the extensions installed at the root level
         if (isMainWiki()) {
-            Collection<InstalledExtension> installedExtensions = this.installedRepository.getInstalledExtensions();
-
-            // Upgrade outdated extensions only when there is invalid extensions
-            for (InstalledExtension extension : installedExtensions) {
-                Collection<String> installedNamespaces = extension.getNamespaces();
-                if (installedNamespaces == null) {
-                    if (!extension.isValid(null)) {
-                        // Upgrade/repair invalid extensions
-                        repair(extension.getId(), null);
-                    }
-                } else {
-                    for (String installedNamespace : installedNamespaces) {
-                        if (!extension.isValid(installedNamespace)) {
-                            // Upgrade/repair invalid extensions
-                            repair(extension.getId(), installedNamespace);
-                        }
-                    }
-                }
-            }
-        } else {
-            String currentNamespace = getNamespace().toString();
-
-            Collection<InstalledExtension> installedExtensions =
-                this.installedRepository.getInstalledExtensions(currentNamespace);
-
-            // Upgrade outdated extensions only when there is invalid extensions
-            for (InstalledExtension extension : installedExtensions) {
-                if (!extension.isValid(currentNamespace)) {
-                    // Upgrade/repair invalid extensions
-                    repair(extension.getId(), currentNamespace);
-                }
-            }
+            upgradeOutdatedExtensions(null);
         }
+
+        // Handle the extensions installed on the current namespace
+        upgradeOutdatedExtensions(getNamespace().toString());
 
         // Complete task
         setState(State.COMPLETED);
+    }
+
+    private void upgradeOutdatedExtensions(String namespace) throws JobException, InterruptedException
+    {
+        Collection<InstalledExtension> installedExtensions = this.installedRepository.getInstalledExtensions(namespace);
+
+        // Upgrade outdated extensions only when there is invalid extensions
+        for (InstalledExtension extension : installedExtensions) {
+            if (!extension.isValid(namespace)) {
+                // Upgrade/repair invalid extensions
+                repair(extension.getId(), namespace);
+            }
+        }
     }
 
     private void repair(ExtensionId invalidExtension, String namespace) throws JobException, InterruptedException

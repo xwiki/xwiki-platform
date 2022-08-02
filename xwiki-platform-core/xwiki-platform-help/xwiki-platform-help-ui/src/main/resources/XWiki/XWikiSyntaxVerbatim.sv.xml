@@ -46,7 +46,7 @@
 Det går att ange att text ej skall formateras av wiki syntaxen, dvs, symbolerna för wikisyntax kommer att visas istället för att texten formateras.
 
 {{info}}
-I XWiki syntax 1.0 [[Pre-makrot&gt;&gt;http://code.xwiki.org/xwiki/bin/view/Macros/PreMacro]] bevarar endast wiki syntax och Radeox makron.  HTML-kod och Groovy- och Velocity-skript exekveras fortfarande.
+I XWiki syntax 1.0 [[Pre-makrot&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Pre%20Macro%20%28Radeox%29]] bevarar endast wiki syntax och Radeox makron.  HTML-kod och Groovy- och Velocity-skript exekveras fortfarande.
 {{/info}}
 
 |=Formateringstyp|=XWiki syntax 1.0|=Resultat
@@ -58,7 +58,7 @@ flerradigt
 innehåll
 {/pre}
 }}}
-{{info}}Man kan även använda [[kodmakrot&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Code+Macro+%28Radeox%29]], men det visar sitt inehåll i en box, om inget annat anges.{{/info}}
+{{info}}Man kan även använda [[kodmakrot&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Code%20Macro%20%28Radeox%29]], men det visar sitt inehåll i en box, om inget annat anges.{{/info}}
 )))|((({{{
 flerradigt
 *ej renderat*

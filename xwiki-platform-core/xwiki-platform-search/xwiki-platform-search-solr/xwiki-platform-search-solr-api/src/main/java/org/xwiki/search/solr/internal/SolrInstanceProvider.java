@@ -24,11 +24,6 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
-import org.xwiki.search.solr.internal.api.SolrConfiguration;
 import org.xwiki.search.solr.internal.api.SolrInstance;
 
 /**
@@ -39,38 +34,18 @@ import org.xwiki.search.solr.internal.api.SolrInstance;
  */
 @Component
 @Singleton
-public class SolrInstanceProvider implements Provider<SolrInstance>, Initializable
+@Deprecated
+public class SolrInstanceProvider implements Provider<SolrInstance>
 {
     /**
      * Solr configuration.
      */
     @Inject
-    private SolrConfiguration configuration;
-
-    /**
-     * The component manager used to lookup the configured component.
-     */
-    @Inject
-    private ComponentManager componentManager;
-
-    /** The Solr instance configured. Since the configuration is read only once at startup, it can be cached. */
-    private SolrInstance configuredInstance;
-
-    @Override
-    public void initialize() throws InitializationException
-    {
-        String type = this.configuration.getServerType();
-        try {
-            this.configuredInstance = this.componentManager.getInstance(SolrInstance.class, type);
-        } catch (ComponentLookupException e) {
-            throw new InitializationException(
-                String.format("Failed to lookup configured Solr instance type [%s]", type), e);
-        }
-    }
+    private SolrInstance solrInstance;
 
     @Override
     public SolrInstance get()
     {
-        return this.configuredInstance;
+        return this.solrInstance;
     }
 }

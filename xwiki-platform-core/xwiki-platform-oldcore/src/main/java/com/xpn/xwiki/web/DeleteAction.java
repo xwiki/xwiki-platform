@@ -23,13 +23,19 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.refactoring.job.EntityRequest;
+import org.xwiki.refactoring.job.DeleteRequest;
 import org.xwiki.refactoring.job.PermanentlyDeleteRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
 import org.xwiki.refactoring.script.RefactoringScriptService;
@@ -47,6 +53,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
  *
  * @version $Id$
  */
+@Component
+@Named("delete")
+@Singleton
 public class DeleteAction extends XWikiAction
 {
     /** confirm parameter name. */
@@ -59,6 +68,10 @@ public class DeleteAction extends XWikiAction
     protected static final String RECYCLED_DOCUMENT_ID_PARAM = "id";
 
     protected static final String EMPTY_RECYCLE_BIN = "emptybin";
+
+    @Inject
+    @Named("current")
+    private DocumentReferenceResolver<String> currentStringDocumentReferenceResolver;
 
     private boolean isAsync(XWikiRequest request)
     {
@@ -147,8 +160,17 @@ public class DeleteAction extends XWikiAction
             sendRedirect(response, Utils.getRedirect("view", context));
             return true;
         } else {
-            // Delete to recycle bin.
-            return deleteToRecycleBin(context);
+            // The document skips the recycle bin only if the user has explicitly made the choice to skip it.
+            // The verification of whether the user actually has the right to skip the recycle bin is checked later.
+            // If the user is not allowed to skip the recycle bin, but still requested it, his choice is ignored and the
+            // document is sent to the recycle bin.
+            boolean shouldSkipRecycleBin =
+                Boolean.parseBoolean(request.getParameter(DeleteRequest.SHOULD_SKIP_RECYCLE_BIN));
+            DocumentReference newBacklinkTarget =
+                currentStringDocumentReferenceResolver.resolve(request.getParameter("newBacklinkTarget"));
+            boolean updateLinks = Boolean.parseBoolean(request.getParameter(DeleteRequest.UPDATE_LINKS));
+            boolean autoRedirect = Boolean.parseBoolean(request.getParameter(DeleteRequest.AUTO_REDIRECT));
+            return deleteDocument(context, shouldSkipRecycleBin, newBacklinkTarget, updateLinks, autoRedirect);
         }
     }
 
@@ -156,8 +178,8 @@ public class DeleteAction extends XWikiAction
     {
         RefactoringScriptService refactoring =
             (RefactoringScriptService) Utils.getComponent(ScriptService.class, "refactoring");
-        PermanentlyDeleteRequest deleteRequest = refactoring.getRequestFactory()
-            .createPermanentlyDeleteRequest(Collections.emptyList());
+        PermanentlyDeleteRequest deleteRequest =
+            refactoring.getRequestFactory().createPermanentlyDeleteRequest(Collections.emptyList());
         deleteRequest.setInteractive(isAsync(context.getRequest()));
         deleteRequest.setCheckAuthorRights(false);
 
@@ -214,21 +236,55 @@ public class DeleteAction extends XWikiAction
         sendRedirect(response, Utils.getRedirect("view", context));
     }
 
-    private boolean deleteToRecycleBin(XWikiContext context) throws XWikiException
+    private boolean deleteDocument(XWikiContext context, boolean shouldSkipRecycleBin,
+        DocumentReference newBacklinkTarget, boolean updateLinks, boolean autoRedirect) throws XWikiException
     {
         XWikiRequest request = context.getRequest();
         XWikiDocument doc = context.getDoc();
 
-        EntityReference documentReference =
-            doesAffectChildren(request, doc.getDocumentReference()) ? doc.getDocumentReference()
-                .getLastSpaceReference() : doc.getTranslatedDocument(context).getDocumentReferenceWithLocale();
+        // Make sure the user is allowed to make this modification
+        context.getWiki().checkDeletingDocument(context.getUserReference(), doc, context);
 
-        return deleteToRecycleBin(documentReference, context);
+        EntityReference documentReference =
+            doesAffectChildren(request, doc.getDocumentReference()) ? doc.getDocumentReference().getLastSpaceReference()
+                : doc.getTranslatedDocument(context).getDocumentReferenceWithLocale();
+
+        return deleteDocument(documentReference, context, shouldSkipRecycleBin, newBacklinkTarget, updateLinks,
+            autoRedirect);
     }
 
-    protected boolean deleteToRecycleBin(EntityReference entityReference, XWikiContext context) throws XWikiException
+    /**
+     * Create a job to delete an entity.
+     *
+     * An entity can either be deleted permanently or moved to the recycle bin.
+     * The preference of the user deleting the entity is stored in the {@code shouldSkipRecycleBin} parameter.
+     * When {@code shouldSkipRecycleBin} is {@code true} the entity is preferably permanently deleted.
+     * Otherwise, the entity is preferably moved to the recycle bin.
+     * Note that it only express a choice made by the user.
+     * If the user does not have the right to remove an entity permanently, the entity might still be saved in the
+     * recycle bin.
+     * If the wiki does not have access to a recycle bin, the entity might be permanently removed, regardless of the
+     * user's preferences.
+     *
+     * @param entityReference the entity to delete
+     * @param context the current context, used to access the user's request
+     * @param shouldSkipRecycleBin if {@code false} the entity is preferably sent to the recycle bin, if {@code true},
+     *            the entity is preferably deleted permanently
+     * @param newBacklinkTarget reference of an existing document to be used as new backlink target
+     * @param updateLinks {@code true} if the links that target the deleted document should be updated to target the new
+     *            reference, {@code false} to preserve the old link
+     * @param autoRedirect if {@code true}, a redirection will be set from the deleted document location to the new
+     *            target
+     * @return {@code true} if the user is redirected, {@code false} otherwise
+     * @throws XWikiException if anything goes wrong during the document deletion
+     * @since 12.8RC1
+     */
+    protected boolean deleteDocument(EntityReference entityReference, XWikiContext context,
+        boolean shouldSkipRecycleBin, DocumentReference newBacklinkTarget, boolean updateLinks, boolean autoRedirect)
+        throws XWikiException
     {
-        Job deleteJob = startDeleteJob(entityReference, context);
+        Job deleteJob =
+            startDeleteJob(entityReference, context, shouldSkipRecycleBin, newBacklinkTarget, updateLinks, autoRedirect);
 
         // If the user have asked for an asynchronous delete action...
         if (isAsync(context.getRequest())) {
@@ -259,14 +315,20 @@ public class DeleteAction extends XWikiAction
         return StringUtils.join(jobId, "/");
     }
 
-    private Job startDeleteJob(EntityReference entityReference, XWikiContext context) throws XWikiException
+    private Job startDeleteJob(EntityReference entityReference, XWikiContext context, boolean shouldSkipRecycleBin,
+        DocumentReference newBacklinkTarget, boolean updateLinks, boolean autoRedirect) throws XWikiException
     {
         RefactoringScriptService refactoring =
             (RefactoringScriptService) Utils.getComponent(ScriptService.class, "refactoring");
-        EntityRequest deleteRequest = refactoring.getRequestFactory()
-            .createDeleteRequest(Arrays.asList(entityReference));
+        DeleteRequest deleteRequest =
+            (DeleteRequest) refactoring.getRequestFactory().createDeleteRequest(Arrays.asList(entityReference));
         deleteRequest.setInteractive(isAsync(context.getRequest()));
         deleteRequest.setCheckAuthorRights(false);
+        deleteRequest.setShouldSkipRecycleBin(shouldSkipRecycleBin);
+        deleteRequest.setNewBacklinkTargets(Collections.singletonMap(context.getDoc().getDocumentReference(),
+            newBacklinkTarget));
+        deleteRequest.setUpdateLinks(updateLinks);
+        deleteRequest.setAutoRedirect(autoRedirect);
 
         try {
             JobExecutor jobExecutor = Utils.getComponent(JobExecutor.class);

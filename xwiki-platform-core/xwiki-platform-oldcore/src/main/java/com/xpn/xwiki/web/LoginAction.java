@@ -19,6 +19,11 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
@@ -27,8 +32,13 @@ import com.xpn.xwiki.XWikiException;
  *
  * @version $Id$
  */
+@Component
+@Named("login")
+@Singleton
 public class LoginAction extends XWikiAction
 {
+    private static final String LOGIN = "login";
+
     /**
      * Default constructor.
      */
@@ -38,9 +48,25 @@ public class LoginAction extends XWikiAction
     }
 
     @Override
+    public boolean action(XWikiContext context) throws XWikiException
+    {
+        // Disallow template override with xpage parameter.
+        if (!LOGIN.equals(Utils.getPage(context.getRequest(), LOGIN))) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                String.format("Template may not be overriden with 'xpage' in [%s] action.", LOGIN));
+        }
+
+        return super.action(context);
+    }
+
+    @Override
     public String render(XWikiContext context) throws XWikiException
     {
-        context.getResponse().setStatus(401);
-        return "login";
+        // if the request does not come from an explicit login link (such as the login button)
+        // then we consider it's coming from a redirect because a guest user tries to access a protected resource
+        if (!"1".equals(context.getRequest().getParameter("loginLink"))) {
+            context.getResponse().setStatus(401);
+        }
+        return LOGIN;
     }
 }

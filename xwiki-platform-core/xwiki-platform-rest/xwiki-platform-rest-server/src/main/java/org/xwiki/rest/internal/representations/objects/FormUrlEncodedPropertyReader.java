@@ -92,12 +92,13 @@ public class FormUrlEncodedPropertyReader implements MessageBodyReader<Property>
                 }
             }
         } else {
-            for (String name : form.getNames())
+            for (String name : form.getNames()) {
                 if (name.startsWith(PROPERTY_PREFIX)) {
                     property.setName(name.replace(PROPERTY_PREFIX, ""));
                     property.setValue(form.getFirstValue(name));
                     break;
                 }
+            }
         }
 
         return property;

@@ -60,13 +60,8 @@ import com.xpn.xwiki.objects.BaseObject;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class EditorWikiComponent<D> extends AbstractEditor<D> implements WikiComponent
 {
-    private static final LocalDocumentReference EDITOR_CLASS_REFERENCE = new LocalDocumentReference(XWiki.SYSTEM_SPACE,
-        "EditorClass");
-
-    /**
-     * The {@link XWikiContext} key that holds the security document.
-     */
-    private static final String SECURITY_DOCUMENT = "sdoc";
+    private static final LocalDocumentReference EDITOR_CLASS_REFERENCE =
+        new LocalDocumentReference(XWiki.SYSTEM_SPACE, "EditorClass");
 
     @Inject
     private Logger logger;

@@ -19,9 +19,6 @@
  */
 package org.xwiki.notifications.filters.internal.status;
 
-import java.util.Collections;
-import java.util.List;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -50,11 +47,5 @@ public class EventReadEmailFilter extends AbstractEventReadFilter
     public EventReadEmailFilter()
     {
         super(FILTER_NAME, NotificationFormat.EMAIL);
-    }
-
-    @Override
-    public List<NotificationFormat> getFormats()
-    {
-        return Collections.singletonList(NotificationFormat.EMAIL);
     }
 }

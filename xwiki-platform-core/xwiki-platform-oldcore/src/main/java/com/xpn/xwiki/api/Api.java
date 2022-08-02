@@ -27,6 +27,8 @@ import javax.inject.Provider;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -53,6 +55,8 @@ public class Api
     private Provider<XWikiContext> xcontextProvider;
 
     private AuthorizationManager authorizationManager;
+
+    private ContextualAuthorizationManager contextualAuthorizationManager;
 
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
 
@@ -101,6 +105,20 @@ public class Api
         return this.authorizationManager;
     }
 
+    /**
+     * @return the {@link ContextualAuthorizationManager} component
+     * @since 12.5RC1
+     * @since 11.10.6
+     */
+    protected ContextualAuthorizationManager getContextualAuthorizationManager()
+    {
+        if (this.contextualAuthorizationManager == null) {
+            this.contextualAuthorizationManager = Utils.getComponent(ContextualAuthorizationManager.class);
+        }
+
+        return this.contextualAuthorizationManager;
+    }
+
     private EntityReferenceSerializer<String> getDefaultEntityReferenceSerializer()
     {
         if (this.defaultEntityReferenceSerializer == null) {
@@ -114,7 +132,7 @@ public class Api
      * Check if the current document has programming rights, meaning that it was last saved by a user with the
      * programming right globally granted.
      *
-     * @return <tt>true</tt> if the current document has the Programming right or <tt>false</tt> otherwise.
+     * @return {@code true} if the current document has the Programming right or {@code false} otherwise.
      */
     public boolean hasProgrammingRights()
     {
@@ -151,13 +169,28 @@ public class Api
      *
      * @param right The name of the right to verify (eg "programming", "admin", "register", etc).
      * @param docname The document for which to verify the right.
-     * @return <tt>true</tt> if the current user has the specified right, <tt>false</tt> otherwise.
+     * @return {@code true} if the current user has the specified right, {@code false} otherwise.
      * @exception XWikiException In case of an error finding the document or accessing groups information.
      */
     public boolean hasAccessLevel(String right, String docname) throws XWikiException
     {
         com.xpn.xwiki.XWiki xwiki = this.context.getWiki();
         return xwiki.getRightService().hasAccessLevel(right, this.context.getUser(), docname, this.context);
+    }
+
+    /**
+     * Verifies if the context user has the access identified by {@code right} on the entity identified by
+     * {@code entityReference}. Note that some rights may be checked higher in hierarchy of the provided entity if such
+     * right is not enabled at lowest hierarchy level provided.
+     * 
+     * @param right the right to check
+     * @param entityReference the entity on which to check the right
+     * @return {@code true} if the user has the specified right on the entity, {@code false} otherwise
+     * @since 11.5RC1
+     */
+    protected boolean hasAccess(Right right, DocumentReference entityReference)
+    {
+        return getAuthorizationManager().hasAccess(right, this.context.getUserReference(), entityReference);
     }
 
     /**

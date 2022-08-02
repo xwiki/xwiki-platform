@@ -19,7 +19,6 @@
  */
 package org.xwiki.xar.type;
 
-import org.xwiki.stability.Unstable;
 import org.xwiki.xar.XarEntryType;
 
 /**
@@ -28,7 +27,6 @@ import org.xwiki.xar.XarEntryType;
  * @version $Id$
  * @since 10.3
  */
-@Unstable
 public abstract class AbstractXarEntryType implements XarEntryType
 {
     private String name;

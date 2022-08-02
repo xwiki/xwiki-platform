@@ -19,8 +19,6 @@
  */
 package org.xwiki.user.test.po;
 
-import java.net.URL;
-
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.BasePage;
@@ -37,10 +35,9 @@ public class ChangeAvatarPage extends BasePage
     @FindBy(xpath = "//*[@id='attachment-picker-close']")
     private WebElement cancelButton;
 
-    public void setAvatarImage(String imageName)
+    public void setAvatarImage(String filePath)
     {
-        URL fileUrl = this.getClass().getResource("/" + imageName);
-        this.avatarInput.sendKeys(fileUrl.getPath());
+        this.avatarInput.sendKeys(filePath);
     }
 
     public void submit()

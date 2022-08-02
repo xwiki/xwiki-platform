@@ -46,37 +46,20 @@
 ## Setting categories
 #########################
 #set($categories = [])
-#set($discard = $categories.add({'id':'profile', 'sheet':'XWiki.XWikiUserProfileSheet', 'glyphicon': 'user'}))
-#set($isMyProfile = ($services.model.resolveDocument($xcontext.user) == $doc.documentReference))
-#if($isMyProfile || $hasAdmin)
-  #set($discard = $categories.add({'id':'preferences', 'sheet':'XWiki.XWikiUserPreferencesSheet', 'glyphicon': 'wrench'}))
-#end
-#set($discard = $categories.add({'id':'groups', 'sheet':'XWiki.XWikiUserMembershipSheet', 'glyphicon': 'group'}))
-## TODO: add APIs to be able to display users watchlists to admins
-#if($isMyProfile &amp;&amp; $hasWatch)
-  #set($discard = $categories.add({'id':'watchlist', 'sheet':'XWiki.XWikiUserWatchListSheet', 'glyphicon': 'eye'}))
-#end
-#if($isMyProfile)
-  #if ("$!services.notification.watch" != '' || $hasWatch)
-    #set($discard = $categories.add({'id':'network', 'sheet':'XWiki.XWikiUserNetworkSheet', 'glyphicon': 'world'}))
+
+## load the user menu from the 'org.xwiki.plaftorm.user.profile.menu' UIXP.
+#foreach ($uix in $services.uix.getExtensions('org.xwiki.plaftorm.user.profile.menu', {'sortByParameter': 'priority'}))
+  #if(!$uix.parameters.containsKey('isActive') || $uix.parameters.get('isActive') != 'false')
+    #if (!$uix.parameters.containsKey('id'))
+      ## when no id is explicitly provided, we use the id of the UIX.
+      #set ($discard = $uix.parameters.put('id', $uix.id))
+    #end
+    #if ($uix.parameters.containsKey('icon'))
+      #set ($discard = $uix.parameters.put('glyphicon', $uix.parameters.get('icon')))
+    #end
+    #set ($discard = $uix.parameters.put('uix', $uix))
+    #set($discard = $categories.add($uix.parameters))
   #end
-  ## TODO: add an enhancement system instead
-  #set($notificationsSheet = $services.model.createDocumentReference('', ['XWiki', 'Notifications', 'Code'], 'XWikiUserNotificationsSheet'))
-  #if ($xwiki.exists($notificationsSheet))
-    #set($discard = $categories.add({'id':'notifications', 'sheet':'XWiki.Notifications.Code.XWikiUserNotificationsSheet', 'glyphicon': 'bell'}))
-  #end
-#end
-#set($userWikiSheet = 'WikiManager.UserWikiSheet')
-#if($xcontext.isMainWiki() &amp;&amp; $xwiki.exists($userWikiSheet))
-  #set($discard = $categories.add({
-    'id': 'wikis',
-    'name': $services.localization.render('platform.wiki.menu.userwikis'),
-    'sheet': $userWikiSheet,
-    'glyphicon': 'list'
-  }))
-#end
-#if($isMyProfile &amp;&amp; $hasDashboard)
-  #set($discard = $categories.add({'id':'dashboard', 'sheet':'Dashboard.XWikiUserDashboardSheet', 'glyphicon': 'th'}))
 #end
 #########################
 ## Current category
@@ -120,6 +103,7 @@
       ## By specifying the image width we enable server side resizing. The width value we use is greater than the
       ## available space because we don't want to loose too much of the image quality (we rely on the browser to fit the
       ## image in the available space).
+      #set($isMyProfile = ($services.model.resolveDocument($xcontext.user) == $doc.documentReference))
       {{attachmentSelector classname="XWiki.XWikiUsers" object="$obj.number" property="avatar" #if ($isMyProfile) savemode="direct" #end defaultValue="XWiki.XWikiUserSheet@noavatar.png" width="180" alternateText="$xwiki.getUserName($doc.fullName, false)" buttontext="$services.localization.render('platform.core.profile.changePhoto')" displayImage="true" filter="png,jpg,jpeg,gif"/}}
     #end
   )))
@@ -141,8 +125,7 @@
       #set($tabKey = $subcategory.get('id')) 
       (% id="${tabKey}Pane" class="user-page-pane#if($tabKey != $currentCategory) hidden#end" %)
       (((
-        #set($tabInclude = $subcategory.get('sheet'))
-        {{include reference="${tabInclude}" /}}
+        {{html}}$services.rendering.render($subcategory.uix.execute(), 'html/5.0'){{/html}}
       )))
     #end
   #end
@@ -311,7 +294,7 @@ Object.extend(XWiki, {
       if (history.pushState) {
         var params = window.location.search.toQueryParams();
         params.category = category;
-        newQueryString = Object.toQueryString(params);
+        var newQueryString = Object.toQueryString(params);
 
         var newURL = window.location.protocol + '//' + window.location.host + window.location.pathname + '?' + newQueryString;
         window.history.pushState({category : category}, '', newURL);
@@ -320,14 +303,14 @@ Object.extend(XWiki, {
 
     updateField : function (fieldName, value) {
       var element = $$('input[name=' + fieldName + ']');
-      if (element &amp;&amp; element.size() &gt; 0) {
+      if (element &amp;&amp; element.length) {
         element[0].value = value;
       }
     },
 
     handleCancelAction : function() {
       var elements = $$('form .buttons input[type=submit][name=action_cancel]');
-      if (elements &amp;&amp; elements.size() &gt; 0) {
+      if (elements &amp;&amp; elements.length) {
         var button = elements[0];
         Event.stopObserving(button, 'click');
         button.observe('click', function(event){
@@ -574,10 +557,6 @@ div.userInfo, div.userPreferences, div.watchlistManagement, div.userDashboard {
   background-color: $theme.backgroundSecondaryColor;
 }
 
-.userInfo {
-  -ms-word-break: break-all; /* IE8, IE9 */
-}
-
 .userInfo a {
   word-wrap: break-word;
 }
@@ -585,7 +564,13 @@ div.userInfo, div.userPreferences, div.watchlistManagement, div.userDashboard {
 .userInfo img {
   max-width: 100%;
 }
-
+        
+.userInfo h2 {
+  font-size: larger;
+  font-weight: bolder;
+  margin-top: 10px;
+}
+        
 div.userInfo input[type="text"], div.userInfo input[type="password"], div.userInfo textarea, div.userInfo select, div.userPreferences select {
   width: 100%;
 }
@@ -594,12 +579,21 @@ div.editProfileCategory {
   float:right;
 }
 
-div.editProfileCategory a {
-  display:block;
-  width: 16px;
-  height: 16px;
-  background: url("$xwiki.getSkinFile('icons/silk/pencil.png')") no-repeat;
+div.editProfileCategory {
+  float:right;
+  a.btn-xs {
+    background-color: @xwiki-page-content-bg;
+    border: 1px solid @xwiki-border-color;
+    .action-icon {
+      font-size: larger;
+      color: @btn-default-color;
+    }
+    &amp;:hover, &amp;:active, &amp;:focus {
+      border-color: darken(@dropdown-divider-bg, 10%);
+    }
+  }
 }
+
 
 /* Watchlist */
 
@@ -689,6 +683,9 @@ span#avatarUpload {
 .dashboard .clearfloats:after, .dashboard .clearfloats:before {
   clear: right;
 }</code>
+    </property>
+    <property>
+      <contentType>LESS</contentType>
     </property>
     <property>
       <name>userprofile</name>

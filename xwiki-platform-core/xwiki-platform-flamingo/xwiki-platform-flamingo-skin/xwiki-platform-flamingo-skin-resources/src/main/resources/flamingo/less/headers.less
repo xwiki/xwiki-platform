@@ -2,34 +2,45 @@
 // Headers
 // --------------------------------------------------
 
+// Display flex can cause problems while editing in-place so we use it only when viewing the headings.
+#xwikicontent:not([contenteditable]) > h1,
+#xwikicontent:not([contenteditable]) > h2,
+#xwikicontent:not([contenteditable]) > h3,
+#xwikicontent:not([contenteditable]) > h4,
+#xwikicontent:not([contenteditable]) > h5,
+#xwikicontent:not([contenteditable]) > h6 {
+  // We use display flex because we want the section edit link to be displayed at the end of the heading row without
+  // overflowing an existing floating box.
+  display: flex;
+  // Make sure the heading text doesn't overflow a previous sibling that is floated with 100% width.
+  min-width: 1px;
+}
+
+#xwikicontent:not([contenteditable]) > h1 > span:first-child,
+#xwikicontent:not([contenteditable]) > h2 > span:first-child,
+#xwikicontent:not([contenteditable]) > h3 > span:first-child,
+#xwikicontent:not([contenteditable]) > h4 > span:first-child,
+#xwikicontent:not([contenteditable]) > h5 > span:first-child,
+#xwikicontent:not([contenteditable]) > h6 > span:first-child {
+  // We want the heading text to take all the available space, while the section edit link takes only what is needed.
+  flex: 1 1 auto;
+}
+
+// The height of the section edit link relative to the height of the parent heading.
+@edit-section-relative-height: .7;
+
 .edit_section {
-  display: block;
-  height: @font-size-h1;
-  line-height: @font-size-h1;
-  margin: -@font-size-h1 0 0;
-  overflow: hidden;
-  position: relative;
-  visibility:hidden;
+  color: inherit;
+  // We decrease a bit the font size in case the section edit link uses a font icon.
+  font-size: percentage(@edit-section-relative-height);
+  // We increase the line height because we decreased the font size, so that the edit icon is aligned vertically.
+  line-height: (@headings-line-height / @edit-section-relative-height);
+  // Leave some space on the left so that we distinguish the section edit link from the heading text.
+  margin-left: 1em;
+  // We can have many section edit links on a page so they should have a low profile.
+  opacity: .3;
 }
 
-.edit_section a, .edit_section span {
-  background-color: @xwiki-page-content-bg;
-  background: @xwiki-page-content-bg linear-gradient(45deg, @xwiki-page-content-bg 50%, @xwiki-background-secondary-color 50%);
-  color: @text-color;
-  height: 20px;
-  margin: 0;
-  overflow: hidden;
-  padding: 3px 5px;
-  position: absolute;
-  right: 0;
-  text-indent: 0;
-  top: 0;
-  visibility:visible;
-  width: 20px;
-}
-
-.edit_section a:before {
-  content: @xwiki-icon-edit-section;
-  font: normal normal normal 12px/1 FontAwesome;
-  display: block;
+.edit_section:not(.disabled):hover {
+  opacity: 1;
 }

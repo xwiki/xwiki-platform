@@ -70,6 +70,5 @@ skin.sheet.js.addingDone=Le modèle a été ajouté
 skin.sheet.overridedTemplates=Modèles écrasés
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend
-</content>
+#@deprecatedend</content>
 </xwikidoc>

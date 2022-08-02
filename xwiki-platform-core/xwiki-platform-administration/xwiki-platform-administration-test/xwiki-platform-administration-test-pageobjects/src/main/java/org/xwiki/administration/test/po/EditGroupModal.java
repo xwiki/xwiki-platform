@@ -34,7 +34,7 @@ public class EditGroupModal extends BaseModal
     private static class ModalContent extends GroupEditPage
     {
         @Override
-        public void waitUntilPageJSIsLoaded()
+        public void waitUntilPageIsReady()
         {
             // There's no need to wait for any JavaScript here because the group edit form is loaded with AJAX inside
             // the modal body, after the page has been loaded.
@@ -65,6 +65,24 @@ public class EditGroupModal extends BaseModal
     public EditGroupModal addMember(String member, boolean isUser)
     {
         this.groupEditPage.addMemberToGroup(member, isUser);
+        return this;
+    }
+
+    public EditGroupModal addUsers(String... users)
+    {
+        this.groupEditPage.addUsers(users);
+        return this;
+    }
+
+    public EditGroupModal addGroups(String... groups)
+    {
+        this.groupEditPage.addGroups(groups);
+        return this;
+    }
+
+    public EditGroupModal removeMembers(String... members)
+    {
+        this.groupEditPage.removeMembers(members);
         return this;
     }
 

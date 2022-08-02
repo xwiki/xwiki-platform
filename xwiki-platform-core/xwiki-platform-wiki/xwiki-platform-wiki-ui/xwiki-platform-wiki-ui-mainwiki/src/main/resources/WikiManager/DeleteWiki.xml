@@ -59,10 +59,10 @@
   #set ($wiki = $services.wiki.getById($wikiId))
   ##
   #if (!$wiki)
-    #if (!$services.wiki.lastException)
+    #if (!$services.wiki.lastError)
       {{error}}{{translation key="platform.wiki.error.wikidoesnotexist" parameters="$wikiId"/}}{{/error}}
     #else
-      #printException($services.wiki.lastException)
+      #printException($services.wiki.lastError)
     #end
   #else
     #set ($currentUser = "${services.wiki.mainWikiId}:${xcontext.user}")
@@ -115,8 +115,8 @@
       #else
         ## The form_token is valid
         #set ($temp = $services.wiki.deleteWiki($wikiId))
-        #if ($services.wiki.lastException)
-          #printException($services.wiki.lastException)
+        #if ($services.wiki.lastError)
+          #printException($services.wiki.lastError)
         #else
           {{success}}$services.localization.render('platform.wiki.delete.success', ['[[', $currentUser, "&gt;&gt;$currentUser]]", $wikiId]){{/success}}
         #end

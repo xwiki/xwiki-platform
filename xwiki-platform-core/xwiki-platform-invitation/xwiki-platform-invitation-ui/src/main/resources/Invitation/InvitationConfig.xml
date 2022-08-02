@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="Invitation.InvitationConfig" locale="">
+<xwikidoc version="1.4" reference="Invitation.InvitationConfig" locale="">
   <web>Invitation</web>
   <name>InvitationConfig</name>
   <language/>
@@ -98,10 +98,10 @@
         <number>5</number>
         <picker>1</picker>
         <prettyName>Email message XClass</prettyName>
-        <size>30</size>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <separators/>
+        <size>30</size>
         <sort>none</sort>
         <sql/>
         <unmodifiable>0</unmodifiable>
@@ -123,10 +123,10 @@
         <number>9</number>
         <picker>1</picker>
         <prettyName>Document containing email XObjects</prettyName>
-        <size>30</size>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <separators/>
+        <size>30</size>
         <sort>none</sort>
         <sql/>
         <unmodifiable>0</unmodifiable>
@@ -446,6 +446,7 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
       <categoryIcon>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>categoryIcon</name>
         <number>11</number>
         <picker>0</picker>
@@ -457,9 +458,11 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </categoryIcon>
       <codeToExecute>
+        <contenttype>VelocityWiki</contenttype>
         <customDisplay/>
         <disabled>0</disabled>
         <editor>---</editor>
+        <hint/>
         <name>codeToExecute</name>
         <number>7</number>
         <picker>0</picker>
@@ -475,19 +478,22 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
         <cache>0</cache>
         <classname/>
         <customDisplay/>
+        <defaultValue/>
         <disabled>0</disabled>
         <displayType>input</displayType>
+        <freeText/>
         <hint/>
         <idField/>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>configurationClass</name>
         <number>3</number>
         <picker>1</picker>
         <prettyName>configurationClass</prettyName>
-        <size>30</size>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <separators/>
+        <size>30</size>
         <sort>none</sort>
         <sql/>
         <unmodifiable>0</unmodifiable>
@@ -496,23 +502,10 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
         <valueField/>
         <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </configurationClass>
-      <configureGlobally>
-        <customDisplay/>
-        <defaultValue/>
-        <disabled>0</disabled>
-        <displayFormType>checkbox</displayFormType>
-        <displayType/>
-        <name>configureGlobally</name>
-        <number>4</number>
-        <prettyName>configureGlobally</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </configureGlobally>
       <displayBeforeCategory>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>displayBeforeCategory</name>
         <number>10</number>
         <picker>0</picker>
@@ -526,6 +519,7 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
       <displayInCategory>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>displayInCategory</name>
         <number>9</number>
         <picker>0</picker>
@@ -539,6 +533,7 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
       <displayInSection>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>displayInSection</name>
         <number>1</number>
         <picker>0</picker>
@@ -552,6 +547,7 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
       <heading>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>heading</name>
         <number>2</number>
         <picker>0</picker>
@@ -565,6 +561,7 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
       <iconAttachment>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>iconAttachment</name>
         <number>8</number>
         <picker>0</picker>
@@ -578,6 +575,7 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
       <linkPrefix>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>linkPrefix</name>
         <number>5</number>
         <picker>0</picker>
@@ -591,8 +589,12 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
       <propertiesToShow>
         <cache>0</cache>
         <customDisplay/>
+        <defaultValue/>
         <disabled>0</disabled>
         <displayType>input</displayType>
+        <freeText/>
+        <hint/>
+        <largeStorage>0</largeStorage>
         <multiSelect>1</multiSelect>
         <name>propertiesToShow</name>
         <number>6</number>
@@ -609,9 +611,35 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
         <values/>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </propertiesToShow>
+      <scope>
+        <cache>0</cache>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText/>
+        <hint/>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>12</number>
+        <picker>1</picker>
+        <prettyName>scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <sort/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>WIKI|SPACE|ALL_SPACES|WIKI+ALL_SPACES</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
       <sectionOrder>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>sectionOrder</name>
         <number>12</number>
         <numberType>integer</numberType>
@@ -631,9 +659,6 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
     </property>
     <property>
       <configurationClass>Invitation.WebHome</configurationClass>
-    </property>
-    <property>
-      <configureGlobally>1</configureGlobally>
     </property>
     <property>
       <displayBeforeCategory/>
@@ -667,6 +692,9 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
       </propertiesToShow>
     </property>
     <property>
+      <scope>WIKI</scope>
+    </property>
+    <property>
       <sectionOrder>600</sectionOrder>
     </property>
   </object>
@@ -687,6 +715,7 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
       <categoryIcon>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>categoryIcon</name>
         <number>11</number>
         <picker>0</picker>
@@ -698,9 +727,11 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </categoryIcon>
       <codeToExecute>
+        <contenttype>VelocityWiki</contenttype>
         <customDisplay/>
         <disabled>0</disabled>
         <editor>---</editor>
+        <hint/>
         <name>codeToExecute</name>
         <number>7</number>
         <picker>0</picker>
@@ -716,19 +747,22 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
         <cache>0</cache>
         <classname/>
         <customDisplay/>
+        <defaultValue/>
         <disabled>0</disabled>
         <displayType>input</displayType>
+        <freeText/>
         <hint/>
         <idField/>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>configurationClass</name>
         <number>3</number>
         <picker>1</picker>
         <prettyName>configurationClass</prettyName>
-        <size>30</size>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <separators/>
+        <size>30</size>
         <sort>none</sort>
         <sql/>
         <unmodifiable>0</unmodifiable>
@@ -737,23 +771,10 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
         <valueField/>
         <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </configurationClass>
-      <configureGlobally>
-        <customDisplay/>
-        <defaultValue/>
-        <disabled>0</disabled>
-        <displayFormType>checkbox</displayFormType>
-        <displayType/>
-        <name>configureGlobally</name>
-        <number>4</number>
-        <prettyName>configureGlobally</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </configureGlobally>
       <displayBeforeCategory>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>displayBeforeCategory</name>
         <number>10</number>
         <picker>0</picker>
@@ -767,6 +788,7 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
       <displayInCategory>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>displayInCategory</name>
         <number>9</number>
         <picker>0</picker>
@@ -780,6 +802,7 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
       <displayInSection>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>displayInSection</name>
         <number>1</number>
         <picker>0</picker>
@@ -793,6 +816,7 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
       <heading>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>heading</name>
         <number>2</number>
         <picker>0</picker>
@@ -806,6 +830,7 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
       <iconAttachment>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>iconAttachment</name>
         <number>8</number>
         <picker>0</picker>
@@ -819,6 +844,7 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
       <linkPrefix>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>linkPrefix</name>
         <number>5</number>
         <picker>0</picker>
@@ -832,8 +858,12 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
       <propertiesToShow>
         <cache>0</cache>
         <customDisplay/>
+        <defaultValue/>
         <disabled>0</disabled>
         <displayType>input</displayType>
+        <freeText/>
+        <hint/>
+        <largeStorage>0</largeStorage>
         <multiSelect>1</multiSelect>
         <name>propertiesToShow</name>
         <number>6</number>
@@ -850,9 +880,35 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
         <values/>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </propertiesToShow>
+      <scope>
+        <cache>0</cache>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText/>
+        <hint/>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>12</number>
+        <picker>1</picker>
+        <prettyName>scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <sort/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>WIKI|SPACE|ALL_SPACES|WIKI+ALL_SPACES</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
       <sectionOrder>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>sectionOrder</name>
         <number>12</number>
         <numberType>integer</numberType>
@@ -872,9 +928,6 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
     </property>
     <property>
       <configurationClass>Invitation.WebHome</configurationClass>
-    </property>
-    <property>
-      <configureGlobally>1</configureGlobally>
     </property>
     <property>
       <displayBeforeCategory/>
@@ -902,6 +955,9 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
         <value>smtp_server</value>
         <value>javamail_extra_props</value>
       </propertiesToShow>
+    </property>
+    <property>
+      <scope>WIKI</scope>
     </property>
     <property>
       <sectionOrder/>

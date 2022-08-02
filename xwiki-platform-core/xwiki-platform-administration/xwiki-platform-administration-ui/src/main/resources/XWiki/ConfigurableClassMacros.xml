@@ -81,19 +81,40 @@
  *                             a safety measure because macros can't return values.
  *###
 #macro(findNamesOfAppsToConfigure, $section, $globaladmin, $space, $outputList)
-  #set ($fromClause = [
+  ## We keep looking in the old configureGlobally property since we do not provide a migration for it:
+  ## this choice has been made to avoid any problem during the upgrade of old wikis.
+  ## And we are doing this look in a separate query for performance reason: adding a or statement is very bad
+  ## in terms of performance. This all should be improved in the future with proper caching.
+  ##
+  #set ($fromClauseWithoutGlobal = [
     'BaseObject as obj',
     'StringProperty as category',
-    'IntegerProperty as sectionOrder',
-    'IntegerProperty as global'
+    'IntegerProperty as sectionOrder'
   ])
-  #set ($whereClause = [
-    "obj.name = doc.fullName and obj.className = ?",
+  ##
+  #set ($fromClause = [])
+  #set ($discard = $fromClause.addAll($fromClauseWithoutGlobal))
+  #set ($discard = $fromClause.add('StringProperty as global'))
+  ##
+  #set ($fromClauseDeprecated = [])
+  #set ($discard = $fromClauseDeprecated.addAll($fromClauseWithoutGlobal))
+  #set ($discard = $fromClauseDeprecated.add('IntegerProperty as deprecatedGlobal'))
+  ##
+  #set ($whereClauseWithoutGlobal = [
+    "obj.name = doc.fullName and obj.className = :className",
     "category.id = obj.id and category.name = 'displayInCategory'",
-    "sectionOrder.id = obj.id and sectionOrder.name = 'sectionOrder'",
-    "global.id = obj.id and global.name = 'configureGlobally' and global.value = ?"
+    "sectionOrder.id = obj.id and sectionOrder.name = 'sectionOrder'"
   ])
-  #set ($params = [$nameOfThisDocument])
+  ##
+  #set ($whereClause = [])
+  #set ($discard = $whereClause.addAll($whereClauseWithoutGlobal))
+  #set ($discard = $whereClause.add("global.id = obj.id and global.name = 'scope' and global.value in (:global)"))
+  ##
+  #set ($whereClauseDeprecated = [])
+  #set ($discard = $whereClauseDeprecated.addAll($whereClauseWithoutGlobal))
+  #set ($discard = $whereClauseDeprecated.add("deprecatedGlobal.id = obj.id and deprecatedGlobal.name = 'configureGlobally' and deprecatedGlobal.value = :deprecatedGlobal"))
+  ##
+  #set ($params = {'className' : $nameOfThisDocument})
   ## Order by category and section priority, leaving empty/null category at the end, because we want to read the
   ## category meta data from the first (most important) section in each category.
   #set ($orderByClause = [
@@ -102,27 +123,50 @@
     'sectionOrder.value'
   ])
   #if ($globaladmin == true)
-    #set ($discard = $params.add(1))
+    #set ($discard = $params.put('deprecatedGlobal', 1))
+    #set ($discard = $params.put('global', ['WIKI','WIKI+ALL_SPACES']))
   #else
-    #set ($discard = $params.add(0))
+    #set ($discard = $params.put('deprecatedGlobal', 0))
     #if ("$!space" != '')
-      #set ($discard = $whereClause.add('doc.space = ?'))
-      #set ($discard = $params.add($space))
+      #set ($discard = $params.put('global', ['SPACE']))
+      #set ($discard = $whereClause.add('doc.space = :space'))
+      #set ($discard = $params.put('space', $space))
+    #else
+      #set ($discard = $params.put('global', ['ALL_SPACES','WIKI+ALL_SPACES']))
     #end
   #end
   #if ("$!section" != '')
     #set ($discard = $fromClause.add('StringProperty as section'))
-    #set ($discard = $whereClause.add("section.id = obj.id and section.name = 'displayInSection' and section.value = ?"))
-    #set ($discard = $params.add($section))
+    #set ($discard = $fromClauseDeprecated.add('StringProperty as section'))
+    #set ($discard = $whereClause.add("section.id = obj.id and section.name = 'displayInSection' and section.value = :section"))
+    #set ($discard = $whereClauseDeprecated.add("section.id = obj.id and section.name = 'displayInSection' and section.value = :section"))
+    #set ($discard = $params.put('section', $section))
   #end
   #set ($statement = ', ' + $stringtool.join($fromClause, ', ') +
     ' where ' + $stringtool.join($whereClause, ' and ') +
     ' order by ' + $stringtool.join($orderByClause, ', '))
+  #set ($statementDeprecated = ', ' + $stringtool.join($fromClauseDeprecated, ', ') +
+    ' where ' + $stringtool.join($whereClauseDeprecated, ' and ') +
+    ' order by ' + $stringtool.join($orderByClause, ', '))
+  ##
+  #set ($deprecatedParams = {})
+  #set ($discard = $deprecatedParams.putAll($params))
+  #set ($discard = $deprecatedParams.remove('global'))
+  #set ($discard = $deprecatedParams.remove('space'))
+  #set ($discard = $params.remove('deprecatedGlobal'))
+  ##
   ## We can't remove duplicates using the unique filter because the select clause will be extended with the information
   ## needed by the order by clause. Thus we remove the duplicates after we get the results.
-  #set ($orderedSetOfAppNames = $collectionstool.orderedSet)
+  #set ($orderedSetOfAppNames = $collectiontool.orderedSet)
   #set ($discard = $orderedSetOfAppNames.addAll($services.query.hql($statement).bindValues($params).execute()))
+  #set ($discard = $orderedSetOfAppNames.addAll($services.query.hql($statementDeprecated).bindValues($deprecatedParams).execute()))
   #set ($discard = $outputList.addAll($orderedSetOfAppNames))
+  #if ($globaladmin == false &amp;&amp; "$!space" != '')
+    ## If we are looking for the apps of a specific space, we should also get the one configured for all spaces.
+    ## Note that we're doing that call at the end to avoid polluting the different velocity variables during the
+    ## execution.
+    #findNamesOfAppsToConfigure($section, false, '', $outputList)
+  #end
 #end
 
 #*
@@ -267,7 +311,7 @@
       #break
     #end
   #end
-  #set ($adminMenu = $sorttool.sort($adminMenu, 'score:desc'))
+  #set ($adminMenu = $collectiontool.sort($adminMenu, 'score:desc'))
 #end
 
 
@@ -330,6 +374,9 @@
         &lt;/dt&gt;
         #if ($out != '')
           &lt;dd&gt;$out&lt;/dd&gt;
+        #else
+          ## We always display a dd element to avoid having a last dt element alone, which would lead to an invalid html.
+          &lt;dd class="hidden"&gt;$out&lt;/dd&gt;
         #end
       #end## If property is in propertiesToShow
     #end## Foreach property in this class

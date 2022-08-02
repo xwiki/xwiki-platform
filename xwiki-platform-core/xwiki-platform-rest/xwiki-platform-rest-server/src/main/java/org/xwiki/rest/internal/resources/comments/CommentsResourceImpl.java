@@ -85,8 +85,9 @@ public class CommentsResourceImpl extends XWikiResource implements CommentsResou
 
             Document doc = documentInfo.getDocument();
 
-            int id = doc.createNewObject("XWiki.XWikiComments");
-            com.xpn.xwiki.api.Object commentObject = doc.getObject("XWiki.XWikiComments", id);
+            String commentsClassName = "XWiki.XWikiComments";
+            int id = doc.createNewObject(commentsClassName);
+            com.xpn.xwiki.api.Object commentObject = doc.getObject(commentsClassName, id);
             commentObject.set("author", Utils.getXWikiUser(componentManager));
             commentObject.set("date", new Date());
 

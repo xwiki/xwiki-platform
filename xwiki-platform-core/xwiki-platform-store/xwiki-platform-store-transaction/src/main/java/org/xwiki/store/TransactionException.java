@@ -155,6 +155,7 @@ public class TransactionException extends Exception
      *
      * @see java.lang.Throwable#getMessage()
      */
+    @Override
     public String getMessage()
     {
         final Writer writer = new StringWriter();

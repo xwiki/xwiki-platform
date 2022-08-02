@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-legacy-rendering-macros</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-legacy-rendering-macro-include</artifactId>
   <name>XWiki Platform - Legacy - Rendering - Macros - Include Macro</name>
@@ -34,7 +34,7 @@
     <xwiki.extension.features>
       org.xwiki.platform:xwiki-platform-rendering-macro-include
     </xwiki.extension.features>
-    <xwiki.jacoco.instructionRatio>0.78</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <!-- Trigger xwiki-platform-rendering-macro-include dependencies (but without xwiki-platform-rendering-macro-include jar itself) -->

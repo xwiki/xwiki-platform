@@ -31,6 +31,7 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.displayer.HTMLDisplayerException;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
@@ -120,9 +121,10 @@ public class DefaultTemplateHTMLDisplayerTest
     @Test
     public void getTemplateWithNullValueAndSpecialTypeTest() throws Exception
     {
-        this.defaultTemplateHTMLDisplayer.display(new DefaultParameterizedType(List.class, String.class), null);
-        verify(this.templateManager).getTemplate("html_displayer/java.util.list.java.lang.string/view.vm");
-        verify(this.templateManager).getTemplate("html_displayer/java.util.list.java.lang.string.vm");
+        this.defaultTemplateHTMLDisplayer.display(new DefaultParameterizedType(null, List.class, Block.class), null);
+        verify(this.templateManager)
+            .getTemplate("html_displayer/java.util.list(org.xwiki.rendering.block.block)/view.vm");
+        verify(this.templateManager).getTemplate("html_displayer/java.util.list(org.xwiki.rendering.block.block).vm");
         verify(this.templateManager).getTemplate("html_displayer/view.vm");
         verify(this.templateManager).getTemplate("html_displayer/default.vm");
     }

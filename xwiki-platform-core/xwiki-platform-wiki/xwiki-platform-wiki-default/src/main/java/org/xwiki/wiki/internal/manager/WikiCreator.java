@@ -40,4 +40,17 @@ public interface WikiCreator
      * @throws WikiManagerException if problems occur
      */
     WikiDescriptor create(String wikiId, String wikiAlias) throws WikiManagerException;
+
+    /**
+     * Create a new empty wiki.
+     *
+     * @param wikiId id of the wiki to create
+     * @param wikiAlias default alias of the wiki to create
+     * @param ownerId the identifier of the owner of the wiki
+     * @return the descriptor of the new wiki
+     * @throws WikiManagerException if problems occur
+     * @since 11.3
+     * @since 10.11.8
+     */
+    WikiDescriptor create(String wikiId, String wikiAlias, String ownerId) throws WikiManagerException;
 }

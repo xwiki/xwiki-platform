@@ -48,11 +48,25 @@ public class XarDocumentModel
     public static final String VERSION_13 = "1.3";
 
     /**
+     * Introduce new way to serialize attachment history.
+     * 
+     * @since 12.0RC1
+     */
+    public static final String VERSION_14 = "1.4";
+
+    /**
+     * Introduce the concept of original metadata document author.
+     * 
+     * @since 14.0RC1
+     */
+    public static final String VERSION_15 = "1.5";
+
+    /**
      * The current version.
      * 
      * @since 9.0RC1
      */
-    public static final String VERSION_CURRENT = VERSION_13;
+    public static final String VERSION_CURRENT = VERSION_15;
 
     public static final String ELEMENT_DOCUMENT = "xwikidoc";
 
@@ -103,6 +117,16 @@ public class XarDocumentModel
 
     public static final String ELEMENT_DEFAULTTEMPLATE = "defaultTemplate";
 
+    /**
+     * TODO: https://jira.xwiki.org/browse/XWIKI-16289
+     * 
+     * @since 12.0RC1
+     * @since 11.10.3
+     * @since 11.3.7
+     * @since 10.11.11
+     */
+    public static final String ELEMENT_TEMPLATE = "template";
+
     public static final String ELEMENT_VALIDATIONSCRIPT = "validationScript";
 
     public static final String ELEMENT_SYNTAX = "syntaxId";
@@ -129,7 +153,15 @@ public class XarDocumentModel
 
     public static final String ELEMENT_REVISION = "version";
 
-    public static final String ELEMENT_REVISION_AUTHOR = "author";
+    /**
+     * @since 14.0RC1
+     */
+    public static final String ELEMENT_REVISION_EFFECTIVEMEDATAAUTHOR = "author";
+
+    /**
+     * @since 14.0RC1
+     */
+    public static final String ELEMENT_REVISION_ORIGINALMEDATAAUTHOR = "originalMetadataAuthor";
 
     public static final String ELEMENT_REVISION_COMMENT = "comment";
 

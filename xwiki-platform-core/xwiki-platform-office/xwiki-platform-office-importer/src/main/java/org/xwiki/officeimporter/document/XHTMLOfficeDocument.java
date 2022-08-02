@@ -19,9 +19,13 @@
  */
 package org.xwiki.officeimporter.document;
 
-import java.util.Map;
+import java.io.File;
+import java.io.IOException;
+import java.util.Set;
 
 import org.w3c.dom.Document;
+import org.xwiki.officeimporter.converter.OfficeConverterResult;
+import org.xwiki.stability.Unstable;
 import org.xwiki.xml.html.HTMLUtils;
 
 /**
@@ -40,18 +44,24 @@ public class XHTMLOfficeDocument implements OfficeDocument
     /**
      * Artifacts for this office document.
      */
-    private Map<String, byte[]> artifacts;
+    private Set<File> artifactFiles;
+
+    private OfficeConverterResult converterResult;
 
     /**
      * Creates a new {@link XHTMLOfficeDocument}.
-     * 
+     *
      * @param document the w3c dom representing the office document.
-     * @param artifacts artifacts for this office document.
+     * @param artifactFiles artifacts for this office document.
+     * @param converterResult the {@link OfficeConverterResult} used to build that object.
+     * @since 13.1RC1
      */
-    public XHTMLOfficeDocument(Document document, Map<String, byte[]> artifacts)
+    @Unstable
+    public XHTMLOfficeDocument(Document document, Set<File> artifactFiles, OfficeConverterResult converterResult)
     {
         this.document = document;
-        this.artifacts = artifacts;
+        this.artifactFiles = artifactFiles;
+        this.converterResult = converterResult;
     }
 
     @Override
@@ -67,8 +77,22 @@ public class XHTMLOfficeDocument implements OfficeDocument
     }
 
     @Override
-    public Map<String, byte[]> getArtifacts()
+    public Set<File> getArtifactsFiles()
     {
-        return this.artifacts;
+        return this.artifactFiles;
+    }
+
+    @Override
+    public void close() throws IOException
+    {
+        if (this.converterResult != null) {
+            this.converterResult.close();
+        }
+    }
+
+    @Override
+    public OfficeConverterResult getConverterResult()
+    {
+        return this.converterResult;
     }
 }

@@ -80,7 +80,7 @@
         }
       }
     }
-    // // Left panels are large
+    // Left panels are large
     &.panel-left-width-Large {
       .main {
         .make-md-column-push(3);
@@ -255,7 +255,7 @@
 }
 
 #mainContentArea > .xcontent {
-  margin-top: @line-height-computed / 2;
+  margin-top: (@line-height-computed / 2);
 }
 
 #xwikicontent {
@@ -266,7 +266,6 @@
   margin-top: -@line-height-computed;
   margin-bottom: @line-height-computed;
   #document-title h1 {
-    margin-top: 0;
     word-wrap: break-word;
   }
   .document-menu, .document-info {
@@ -275,7 +274,8 @@
 }
 
 #xdocAuthors {
-  text-align: right;
+  /* Leave some space above and below in the case the footer wraps on multiple lines. */
+  padding: 3px 0;
 }
 
 #footerglobal {
@@ -312,9 +312,11 @@
 }
 
 #xdocFooter {
-  .clearfix;
   border-bottom-left-radius: @border-radius-base;
   border-bottom-right-radius: @border-radius-base;
+  display: flex;
+  /* Display the footer items one below the other on small screens. */
+  flex-wrap: wrap;
   margin-bottom: floor((@grid-gutter-width / 2));
   padding-top: 0;
 }

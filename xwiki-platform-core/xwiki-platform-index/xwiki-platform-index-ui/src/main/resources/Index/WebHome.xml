@@ -31,10 +31,10 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>Index Application Home</title>
+  <title>Index</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>This space contains technical pages for the Index Application.</content>
+  <content>This page and children contain technical pages for the Index Application.</content>
 </xwikidoc>

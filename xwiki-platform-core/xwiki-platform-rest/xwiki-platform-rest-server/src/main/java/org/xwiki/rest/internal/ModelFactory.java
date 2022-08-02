@@ -19,16 +19,18 @@
  */
 package org.xwiki.rest.internal;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Formatter;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -37,20 +39,26 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.DefaultRequest;
 import org.xwiki.job.Request;
 import org.xwiki.logging.LogLevel;
-import org.xwiki.logging.LogQueue;
 import org.xwiki.logging.event.LogEvent;
+import org.xwiki.logging.tail.LogTail;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.Attachment;
 import org.xwiki.rest.model.jaxb.Attribute;
 import org.xwiki.rest.model.jaxb.Class;
+import org.xwiki.rest.model.jaxb.Hierarchy;
+import org.xwiki.rest.model.jaxb.HierarchyItem;
 import org.xwiki.rest.model.jaxb.JobId;
 import org.xwiki.rest.model.jaxb.JobLog;
 import org.xwiki.rest.model.jaxb.JobProgress;
@@ -70,6 +78,7 @@ import org.xwiki.rest.model.jaxb.Translations;
 import org.xwiki.rest.model.jaxb.Wiki;
 import org.xwiki.rest.resources.ModificationsResource;
 import org.xwiki.rest.resources.SyntaxesResource;
+import org.xwiki.rest.resources.attachments.AttachmentMetadataResource;
 import org.xwiki.rest.resources.attachments.AttachmentResource;
 import org.xwiki.rest.resources.attachments.AttachmentVersionResource;
 import org.xwiki.rest.resources.attachments.AttachmentsAtPageVersionResource;
@@ -101,7 +110,13 @@ import org.xwiki.rest.resources.spaces.SpaceSearchResource;
 import org.xwiki.rest.resources.spaces.SpacesResource;
 import org.xwiki.rest.resources.wikis.WikiSearchQueryResource;
 import org.xwiki.rest.resources.wikis.WikiSearchResource;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.user.UserReferenceSerializer;
+import org.xwiki.wiki.descriptor.WikiDescriptor;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
@@ -111,6 +126,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.ComputedFieldClass;
 import com.xpn.xwiki.objects.classes.ListClass;
 
 /**
@@ -123,6 +139,8 @@ import com.xpn.xwiki.objects.classes.ListClass;
 @Singleton
 public class ModelFactory
 {
+    private static final String PASSWORD_TYPE = "Password";
+
     private final ObjectFactory objectFactory;
 
     @Inject
@@ -133,6 +151,21 @@ public class ModelFactory
 
     @Inject
     private JAXBConverter jaxbConverter;
+
+    @Inject
+    private Provider<ContextualAuthorizationManager> authorizationManagerProvider;
+
+    @Inject
+    private Logger logger;
+
+    @Inject
+    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
+
+    @Inject
+    private UserReferenceSerializer<String> userReferenceSerializer;
 
     public ModelFactory()
     {
@@ -248,7 +281,7 @@ public class ModelFactory
         String propertiesUri;
         if (useVersion) {
             propertiesUri = Utils.createURI(baseUri, ObjectPropertiesAtPageVersionResource.class, doc.getWiki(),
-                Utils.getSpacesFromSpaceId(doc.getSpace()),doc.getDocumentReference().getName(), doc.getVersion(),
+                Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName(), doc.getVersion(),
                 xwikiObject.getClassName(), xwikiObject.getNumber()).toString();
         } else {
             propertiesUri = Utils.createURI(baseUri, ObjectPropertiesResource.class, doc.getWiki(),
@@ -325,18 +358,24 @@ public class ModelFactory
 
             property.setName(propertyClass.getName());
             property.setType(propertyClass.getClassType());
-            try {
-                property.setValue(serializePropertyValue(xwikiObject.get(propertyClass.getName())));
-            } catch (XWikiException e) {
-                // Should never happen
+            if (hasAccess(property)) {
+                try {
+                    property.setValue(
+                        serializePropertyValue(xwikiObject.get(propertyClass.getName()), propertyClass, xwikiContext));
+                } catch (XWikiException e) {
+                    // Should never happen
+                    logger.error("Unexpected exception when accessing property [{}]", propertyClass.getName(), e);
+                }
             }
 
             String propertyUri;
 
             if (useVersion) {
-                propertyUri = Utils.createURI(baseUri, ObjectPropertyAtPageVersionResource.class, doc.getWiki(),
-                    Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName(), doc.getVersion(),
-                    xwikiObject.getClassName(), xwikiObject.getNumber(), propertyClass.getName()).toString();
+                propertyUri = Utils
+                    .createURI(baseUri, ObjectPropertyAtPageVersionResource.class, doc.getWiki(),
+                        Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName(),
+                        doc.getVersion(), xwikiObject.getClassName(), xwikiObject.getNumber(), propertyClass.getName())
+                    .toString();
             } else {
                 propertyUri = Utils.createURI(baseUri, ObjectPropertyResource.class, doc.getWiki(),
                     Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName(),
@@ -437,8 +476,9 @@ public class ModelFactory
         space.getLinks().add(pagesLink);
 
         if (home != null) {
-            String homeUri = Utils.createURI(baseUri, PageResource.class, wikiName, spaces,
-                home.getDocumentReference().getName()).toString();
+            String homeUri =
+                Utils.createURI(baseUri, PageResource.class, wikiName, spaces, home.getDocumentReference().getName())
+                    .toString();
             Link homeLink = this.objectFactory.createLink();
             homeLink.setHref(homeUri);
             homeLink.setRel(Relations.HOME);
@@ -457,50 +497,49 @@ public class ModelFactory
     public Translations toRestTranslations(URI baseUri, Document doc) throws XWikiException
     {
         Translations translations = this.objectFactory.createTranslations();
+        Locale defaultLocale = getDefaultLocale(doc);
+        translations.setDefault(defaultLocale.toString());
 
-        List<String> languages = doc.getTranslationList();
+        List<Locale> locales = doc.getTranslationLocales();
 
         List<String> spaces = Utils.getSpacesFromSpaceId(doc.getSpace());
 
-        if (!languages.isEmpty()) {
-            if (!doc.getDefaultLanguage().equals("")) {
-                translations.setDefault(doc.getDefaultLanguage());
+        // Add the default (original) page translation, if it makes sense.
+        if (!locales.isEmpty() && !Locale.ROOT.equals(defaultLocale)) {
+            Translation translation = this.objectFactory.createTranslation();
+            translation.setLanguage(translations.getDefault());
 
-                Translation translation = this.objectFactory.createTranslation();
-                translation.setLanguage(doc.getDefaultLanguage());
+            String pageTranslationUri = Utils
+                .createURI(baseUri, PageResource.class, doc.getWiki(), spaces, doc.getDocumentReference().getName())
+                .toString();
+            Link pageTranslationLink = this.objectFactory.createLink();
+            pageTranslationLink.setHref(pageTranslationUri);
+            pageTranslationLink.setRel(Relations.PAGE);
+            translation.getLinks().add(pageTranslationLink);
 
-                /* Add the default page with the default translation explicitely */
-                String pageTranslationUri = Utils.createURI(baseUri, PageResource.class, doc.getWiki(), spaces,
-                    doc.getDocumentReference().getName()).toString();
-                Link pageTranslationLink = this.objectFactory.createLink();
-                pageTranslationLink.setHref(pageTranslationUri);
-                pageTranslationLink.setRel(Relations.PAGE);
-                translation.getLinks().add(pageTranslationLink);
+            String historyUri = Utils.createURI(baseUri, PageHistoryResource.class, doc.getWiki(), spaces,
+                doc.getDocumentReference().getName()).toString();
+            Link historyLink = this.objectFactory.createLink();
+            historyLink.setHref(historyUri);
+            historyLink.setRel(Relations.HISTORY);
+            translation.getLinks().add(historyLink);
 
-                String historyUri = Utils.createURI(baseUri, PageHistoryResource.class, doc.getWiki(), spaces,
-                    doc.getDocumentReference().getName()).toString();
-                Link historyLink = this.objectFactory.createLink();
-                historyLink.setHref(historyUri);
-                historyLink.setRel(Relations.HISTORY);
-                translation.getLinks().add(historyLink);
-
-                translations.getTranslations().add(translation);
-            }
+            translations.getTranslations().add(translation);
         }
 
-        for (String language : languages) {
+        for (Locale locale : locales) {
             Translation translation = this.objectFactory.createTranslation();
-            translation.setLanguage(language);
+            translation.setLanguage(locale.toString());
 
             String pageTranslationUri = Utils.createURI(baseUri, PageTranslationResource.class, doc.getWiki(), spaces,
-                doc.getDocumentReference().getName(), language).toString();
+                doc.getDocumentReference().getName(), locale).toString();
             Link pageTranslationLink = this.objectFactory.createLink();
             pageTranslationLink.setHref(pageTranslationUri);
             pageTranslationLink.setRel(Relations.PAGE);
             translation.getLinks().add(pageTranslationLink);
 
             String historyUri = Utils.createURI(baseUri, PageTranslationHistoryResource.class, doc.getWiki(), spaces,
-                doc.getDocumentReference().getName(), language).toString();
+                doc.getDocumentReference().getName(), locale).toString();
             Link historyLink = this.objectFactory.createLink();
             historyLink.setHref(historyUri);
             historyLink.setRel(Relations.HISTORY);
@@ -510,6 +549,31 @@ public class ModelFactory
         }
 
         return translations;
+    }
+
+    private Locale getDefaultLocale(Document document)
+    {
+        if (document.isTranslation()) {
+            // The default locale field is not always set on document translations:
+            //
+            // * it is empty for translation pages created by the user because the save action doesn't set it and the
+            // edit form doesn't include this field;
+            // * it may be set for translation pages that are part of an XWiki extension because the XAR Maven plugin
+            // used to build the extension has a rule to enforce it;
+            //
+            // So we should take the default locale from the original document.
+            try {
+                XWikiContext xcontext = this.xcontextProvider.get();
+                return xcontext.getWiki().getDocument(document.getDocumentReference(), xcontext).getRealLocale();
+            } catch (XWikiException e) {
+                this.logger.warn("Failed to get the default locale from [{}]. Root cause is [{}].",
+                    document.getDocumentReference(), ExceptionUtils.getRootCauseMessage(e));
+                // Fall-back on the default locale specified on the translation page, which may not be accurate.
+                return document.getDefaultLocale();
+            }
+        } else {
+            return document.getRealLocale();
+        }
     }
 
     /**
@@ -526,6 +590,7 @@ public class ModelFactory
         pageSummary.setSpace(doc.getSpace());
         pageSummary.setName(doc.getDocumentReference().getName());
         pageSummary.setTitle(doc.getDisplayTitle());
+        pageSummary.setRawTitle(doc.getTitle());
         pageSummary.setXwikiRelativeUrl(doc.getURL("view"));
         pageSummary.setXwikiAbsoluteUrl(doc.getExternalURL("view"));
         pageSummary.setTranslations(toRestTranslations(baseUri, doc));
@@ -686,12 +751,21 @@ public class ModelFactory
             page.setModifierName(xwikiContext.getWiki().getUserName(doc.getContentAuthor(), null, false, xwikiContext));
         }
 
+        String originalAuthor = this.userReferenceSerializer.serialize(doc.getAuthors().getOriginalMetadataAuthor());
+        page.setOriginalMetadataAuthor(originalAuthor);
+        if (withPrettyNames) {
+            page.setOriginalMetadataAuthorName(
+                xwikiContext.getWiki().getUserName(originalAuthor, null, false, xwikiContext));
+        }
+
+
         calendar = Calendar.getInstance();
         calendar.setTime(doc.getContentUpdateDate());
         page.setModified(calendar);
 
         page.setComment(doc.getComment());
         page.setContent(doc.getContent());
+        page.setHierarchy(toRestHierarchy(doc.getDocumentReference(), withPrettyNames));
 
         if (self != null) {
             Link pageLink = this.objectFactory.createLink();
@@ -818,22 +892,33 @@ public class ModelFactory
     }
 
     public Attachment toRestAttachment(URI baseUri, com.xpn.xwiki.api.Attachment xwikiAttachment,
+        Boolean withPrettyNames, boolean versionURL)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        String relativeURL = xcontext.getWiki().getURL(xwikiAttachment.getReference(), xcontext);
+        String absoluteURL = xcontext.getWiki().getExternalAttachmentURL(xwikiAttachment.getDocument().getFullName(),
+            xwikiAttachment.getFilename(), xcontext);
+        return toRestAttachment(baseUri, xwikiAttachment, relativeURL, absoluteURL, withPrettyNames, versionURL);
+    }
+
+    public Attachment toRestAttachment(URI baseUri, com.xpn.xwiki.api.Attachment xwikiAttachment,
         String xwikiRelativeUrl, String xwikiAbsoluteUrl, Boolean withPrettyNames, boolean versionURL)
     {
         Attachment attachment = this.objectFactory.createAttachment();
 
-        Document doc = xwikiAttachment.getDocument();
+        DocumentReference documentReference = xwikiAttachment.getReference().getDocumentReference();
+        attachment.setPageId(this.defaultEntityReferenceSerializer.serialize(documentReference));
+        attachment.setPageVersion(xwikiAttachment.getDocument().getVersion());
 
-        attachment.setId(String.format("%s@%s", doc.getPrefixedFullName(), xwikiAttachment.getFilename()));
+        attachment.setId(this.defaultEntityReferenceSerializer.serialize(xwikiAttachment.getReference()));
         attachment.setName(xwikiAttachment.getFilename());
-        attachment.setSize(xwikiAttachment.getFilesize());
+        attachment.setLongSize(xwikiAttachment.getLongSize());
+        attachment.setSize((int) xwikiAttachment.getLongSize());
         attachment.setVersion(xwikiAttachment.getVersion());
-        attachment.setPageId(doc.getPrefixedFullName());
-        attachment.setPageVersion(doc.getVersion());
         attachment.setMimeType(xwikiAttachment.getMimeType());
         attachment.setAuthor(xwikiAttachment.getAuthor());
         if (withPrettyNames) {
-            XWikiContext xcontext = xcontextProvider.get();
+            XWikiContext xcontext = this.xcontextProvider.get();
             attachment
                 .setAuthorName(xcontext.getWiki().getUserName(xwikiAttachment.getAuthor(), null, false, xcontext));
         }
@@ -844,36 +929,80 @@ public class ModelFactory
 
         attachment.setXwikiRelativeUrl(xwikiRelativeUrl);
         attachment.setXwikiAbsoluteUrl(xwikiAbsoluteUrl);
+        attachment.setHierarchy(toRestHierarchy(xwikiAttachment.getReference(), withPrettyNames));
 
-        String pageUri = Utils.createURI(baseUri, PageResource.class, doc.getWiki(),
-            Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName()).toString();
-        Link pageLink = objectFactory.createLink();
+        String wiki = documentReference.getWikiReference().getName();
+        List<String> spaces = Utils.getSpacesHierarchy(documentReference.getLastSpaceReference());
+
+        String pageUri =
+            Utils.createURI(baseUri, PageResource.class, wiki, spaces, documentReference.getName()).toString();
+        Link pageLink = this.objectFactory.createLink();
         pageLink.setHref(pageUri);
         pageLink.setRel(Relations.PAGE);
         attachment.getLinks().add(pageLink);
 
         String attachmentUri;
         if (versionURL) {
-            attachmentUri = Utils.createURI(baseUri, AttachmentVersionResource.class, doc.getWiki(),
-                Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName(),
-                xwikiAttachment.getFilename(), xwikiAttachment.getVersion()).toString();
+            attachmentUri = Utils.createURI(baseUri, AttachmentVersionResource.class, wiki, spaces,
+                documentReference.getName(), xwikiAttachment.getFilename(), xwikiAttachment.getVersion()).toString();
         } else {
-            attachmentUri = Utils.createURI(baseUri, AttachmentResource.class, doc.getWiki(),
-                Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName(),
-                xwikiAttachment.getFilename()).toString();
+            attachmentUri = Utils.createURI(baseUri, AttachmentResource.class, wiki, spaces,
+                documentReference.getName(), xwikiAttachment.getFilename()).toString();
         }
 
-        Link attachmentLink = objectFactory.createLink();
+        Link attachmentLink = this.objectFactory.createLink();
         attachmentLink.setHref(attachmentUri);
         attachmentLink.setRel(Relations.ATTACHMENT_DATA);
         attachment.getLinks().add(attachmentLink);
 
+        Link attachmentMetadataLink = this.objectFactory.createLink();
+        attachmentMetadataLink.setHref(Utils.createURI(baseUri, AttachmentMetadataResource.class, wiki, spaces,
+            documentReference.getName(), xwikiAttachment.getFilename()).toString());
+        attachmentMetadataLink.setRel(Relations.ATTACHMENT_METADATA);
+        attachment.getLinks().add(attachmentMetadataLink);
+
         return attachment;
     }
 
+    public Hierarchy toRestHierarchy(EntityReference targetEntityReference, Boolean withPrettyNames)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        XWiki xwiki = xcontext.getWiki();
+        Hierarchy hierarchy = new Hierarchy();
+        for (EntityReference entityReference : targetEntityReference.getReversedReferenceChain()) {
+            HierarchyItem hierarchyItem = new HierarchyItem();
+            hierarchyItem.setName(entityReference.getName());
+            hierarchyItem.setLabel(entityReference.getName());
+            hierarchyItem.setType(entityReference.getType().getLowerCase());
+            hierarchyItem.setUrl(xwiki.getURL(entityReference, xcontext));
+            if (withPrettyNames) {
+                try {
+                    if (entityReference.getType() == EntityType.SPACE
+                        || entityReference.getType() == EntityType.DOCUMENT) {
+                        XWikiDocument document =
+                            xwiki.getDocument(entityReference, xcontext).getTranslatedDocument(xcontext);
+                        hierarchyItem.setLabel(document.getRenderedTitle(Syntax.PLAIN_1_0, xcontext));
+                        hierarchyItem.setUrl(xwiki.getURL(document.getDocumentReferenceWithLocale(), xcontext));
+                    } else if (entityReference.getType() == EntityType.WIKI) {
+                        WikiDescriptor wikiDescriptor = this.wikiDescriptorManager.getById(entityReference.getName());
+                        if (wikiDescriptor != null) {
+                            hierarchyItem.setLabel(wikiDescriptor.getPrettyName());
+                        }
+                    }
+                } catch (Exception e) {
+                    this.logger.warn(
+                        "Failed to get the pretty name of entity [{}]. Continue using the entity name. Root cause is [{}].",
+                        entityReference, ExceptionUtils.getRootCauseMessage(e));
+                }
+            }
+            hierarchy.withItems(hierarchyItem);
+        }
+        return hierarchy;
+    }
+
     /**
-     * Serializes the value of the given XObject property.
-     * 
+     * Serializes the value of the given XObject property. {@link ComputedFieldClass} properties are not evaluated.
+     *
      * @param property an XObject property
      * @return the String representation of the property value
      */
@@ -890,6 +1019,39 @@ public class ModelFactory
             return value.toString();
         } else {
             return "";
+        }
+    }
+
+    /**
+     * Serializes the value of the given XObject property. In case the property is an instance of
+     * {@link ComputedFieldClass}, the serialized value is the computed property value.
+     * 
+     * @param property an XObject property
+     * @param propertyClass the PropertyClass of that XObject proprety
+     * @param context the XWikiContext
+     * @return the String representation of the property value
+     */
+    private String serializePropertyValue(PropertyInterface property,
+        com.xpn.xwiki.objects.classes.PropertyClass propertyClass, XWikiContext context)
+    {
+        if (propertyClass instanceof ComputedFieldClass) {
+            // TODO: the XWikiDocument needs to be explicitely set in the context, otherwise method
+            // PropertyClass.renderInContext fires a null pointer exception: bug?
+            XWikiDocument document = context.getDoc();
+            try {
+                context.setDoc(property.getObject().getOwnerDocument());
+                ComputedFieldClass computedFieldClass = (ComputedFieldClass) propertyClass;
+                return computedFieldClass.getComputedValue(propertyClass.getName(), "", property.getObject(), context);
+            } catch (Exception e) {
+                logger.error("Error while computing property value [{}] of [{}]", propertyClass.getName(),
+                    property.getObject(), e);
+                return serializePropertyValue(property);
+            } finally {
+                // Reset the context document to its original value, even if an exception is raised.
+                context.setDoc(document);
+            }
+        } else {
+            return serializePropertyValue(property);
         }
     }
 
@@ -990,7 +1152,11 @@ public class ModelFactory
 
         // Log
         if (log) {
-            status.setLog(toRestJobLog(jobStatus.getLog(), self, null, logFromLevel));
+            try {
+                status.setLog(toRestJobLog(jobStatus.getLogTail(), self, null, logFromLevel));
+            } catch (IOException e) {
+                this.logger.error("Failed to access the log of job {}", jobStatus.getRequest().getId(), e);
+            }
         }
 
         // Link
@@ -1021,14 +1187,16 @@ public class ModelFactory
         return restJobProgress;
     }
 
-    public JobLog toRestJobLog(LogQueue logQueue, URI self, String level, String fromLevel)
+    public JobLog toRestJobLog(LogTail logQueue, URI self, String level, String fromLevel) throws IOException
     {
         // Filter log
-        Collection<LogEvent> logs;
+        Iterable<LogEvent> logs;
         if (level != null) {
-            logs = logQueue.getLogs(LogLevel.valueOf(level.toUpperCase()));
+            LogLevel logLevel = LogLevel.valueOf(level.toUpperCase());
+            logs = logQueue.getLogEvents(logLevel).stream().filter(log -> log.getLevel() == logLevel)
+                .collect(Collectors.toList());
         } else if (fromLevel != null) {
-            logs = logQueue.getLogsFrom(LogLevel.valueOf(fromLevel.toUpperCase()));
+            logs = logQueue.getLogEvents(LogLevel.valueOf(fromLevel.toUpperCase()));
         } else {
             logs = logQueue;
         }
@@ -1036,7 +1204,7 @@ public class ModelFactory
         return toRestJobLog(logs, self);
     }
 
-    public JobLog toRestJobLog(Collection<LogEvent> logs, URI self)
+    public JobLog toRestJobLog(Iterable<LogEvent> logs, URI self)
     {
         JobLog log = this.objectFactory.createJobLog();
 
@@ -1062,5 +1230,20 @@ public class ModelFactory
         }
 
         return log;
+    }
+
+    /**
+     * Check if the given property should be exposed via REST.
+     * 
+     * @param restProperty the property to be read/written
+     * @return true if the property is considered accessible
+     */
+    private boolean hasAccess(Property restProperty)
+    {
+        if (PASSWORD_TYPE.equals(restProperty.getType())) {
+            return authorizationManagerProvider.get().hasAccess(Right.ADMIN, xcontextProvider.get().getWikiReference());
+        }
+
+        return true;
     }
 }

@@ -19,9 +19,13 @@
  */
 package org.xwiki.test.ui.po.editor;
 
+import java.util.Optional;
+
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
-import org.xwiki.test.ui.po.FormElement;
+import org.xwiki.stability.Unstable;
+import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.SuggestInputElement;
 
 /**
@@ -30,7 +34,7 @@ import org.xwiki.test.ui.po.SuggestInputElement;
  * @version $Id$
  * @since 5.1RC1
  */
-public class ObjectEditPane extends FormElement
+public class ObjectEditPane extends FormContainerElement
 {
     /**
      * The object type.
@@ -41,6 +45,22 @@ public class ObjectEditPane extends FormElement
      * The object number (identifies the object in the set of objects of the same type).
      */
     private int objectNumber;
+
+    /**
+     * Creates a new edit pane for an object of the specified type. The form fields from the given container should
+     * correspond to properties of the specified type.
+     *
+     * @param containerLocator the element that locates the form fields used to edit the object
+     * @param className the object type
+     * @param objectNumber the object number (identifies the object in the set of objects of the same type)
+     */
+    public ObjectEditPane(By containerLocator, String className, int objectNumber)
+    {
+        super(containerLocator);
+
+        this.className = className;
+        this.objectNumber = objectNumber;
+    }
 
     /**
      * Creates a new edit pane for an object of the specified type. The form fields from the given container should
@@ -59,15 +79,59 @@ public class ObjectEditPane extends FormElement
     }
 
     /**
+     * Helper to retrieve the xobject content div. This method returns an empty optional if the information have not
+     * been loaded.
+     */
+    private Optional<WebElement> getObjectContent()
+    {
+        String xobjectContentId = String.format("xobject_%s_%s_content", this.className, this.objectNumber);
+        try {
+            return Optional.of(getDriver().findElementWithoutWaiting(By.id(xobjectContentId)));
+        } catch (NoSuchElementException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Checks if the information are loaded and displayed.
+     *
+     * @return {@code true} if the object information are displayed (i.e. the object is expanded)
+     * @since 13.1RC1
+     */
+    @Unstable
+    public boolean isObjectDisplayed()
+    {
+        Optional<WebElement> objectContent = getObjectContent();
+        return objectContent.map(WebElement::isDisplayed).orElse(false);
+    }
+
+    /**
+     * Click on the xobject div to expand it, and waits until the information are loaded and displayed.
+     * This method checks if the information are already displayed to avoid collapsing them if it's already the case.
+     *
+     * @since 13.1RC1
+     */
+    @Unstable
+    public void displayObject()
+    {
+        String xobjectId = String.format("xobject_%s_%s_title", this.className, this.objectNumber);
+
+        if (!isObjectDisplayed()) {
+            getDriver().findElementWithoutWaiting(By.id(xobjectId)).click();
+            getDriver().waitUntilCondition(driver -> isObjectDisplayed());
+        }
+    }
+
+    /**
      * Opens the date picker for the specified date property of the edited object.
      * 
      * @param datePropertyName the name of a date property of the edited object
      * @return the date picker
      */
-    public DatePicker openDatePicker(String datePropertyName)
+    public BootstrapDateTimePicker openDatePicker(String datePropertyName)
     {
-        getDriver().findElementWithoutWaiting(getForm(), byPropertyName(datePropertyName)).click();
-        return new DatePicker();
+        getDriver().findElementWithoutWaiting(getFormElement(), byPropertyName(datePropertyName)).click();
+        return new BootstrapDateTimePicker();
     }
 
     /**
@@ -77,7 +141,7 @@ public class ObjectEditPane extends FormElement
     public SuggestInputElement getSuggestInput(String userPropertyName)
     {
         return new SuggestInputElement(
-            getDriver().findElementWithoutWaiting(getForm(), byPropertyName(userPropertyName)));
+            getDriver().findElementWithoutWaiting(getFormElement(), byPropertyName(userPropertyName)));
     }
 
     /**
@@ -89,5 +153,62 @@ public class ObjectEditPane extends FormElement
     public By byPropertyName(String propertyName)
     {
         return By.id(this.className + "_" + this.objectNumber + "_" + propertyName);
+    }
+
+    /**
+     * Helper to fill property values quickly.
+     *
+     * @param propertyName the name of the property to set
+     * @param propertyValue the value of the property
+     * @return the current instance.
+     */
+    public ObjectEditPane setPropertyValue(String propertyName, String propertyValue)
+    {
+        this.setFieldValue(byPropertyName(propertyName), propertyValue);
+        return this;
+    }
+
+    /**
+     * @return the div container of the current object edit. Note that this should only be used in the case of
+     * ObjectEditor.
+     */
+    private WebElement getXobjectContainer()
+    {
+        return getDriver().findElement(By.id(String.format("%s_%s_%s", "xobject", className, objectNumber)));
+    }
+
+    /**
+     * @return {@code true} if the delete link is displayed for this object.
+     * @since 12.4RC1
+     */
+    public boolean isDeleteLinkDisplayed()
+    {
+        try {
+            return getXobjectContainer().findElement(By.className("delete")).isDisplayed();
+        } catch (NoSuchElementException e) {
+            return false;
+        }
+    }
+
+    /**
+     * @return {@code true} if the edit link is displayed for this object.
+     * @since 12.4RC1
+     */
+    public boolean isEditLinkDisplayed()
+    {
+        try {
+            return getXobjectContainer().findElement(By.className("edit")).isDisplayed();
+        } catch (NoSuchElementException e) {
+            return false;
+        }
+    }
+
+    /**
+     * @return the current object number.
+     * @since 12.4RC1
+     */
+    public int getObjectNumber()
+    {
+        return objectNumber;
     }
 }

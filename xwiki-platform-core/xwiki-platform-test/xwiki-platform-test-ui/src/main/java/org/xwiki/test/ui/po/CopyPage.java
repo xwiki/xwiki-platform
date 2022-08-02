@@ -25,7 +25,6 @@ import org.openqa.selenium.support.FindBy;
 /**
  * Represents the common actions possible on the Copy Page page.
  * <p>
- * TODO: Refactor using the {@link DocumentPicker} and drop the org.xwiki.index.test.po.CopyPage workaround.
  *
  * @version $Id$
  * @since 3.2M3
@@ -43,6 +42,12 @@ public class CopyPage extends ViewPage
     private BreadcrumbElement sourceBreadcrumb;
 
     /**
+     * The element that contains the document picker used to select the target document.
+     */
+    @FindBy(className = "location-picker")
+    private WebElement documentPickerElement;
+
+    /**
      * The hidden input containing the space name of the source page.
      */
     @FindBy(xpath = "//input[@type='hidden' and @name = 'sourceSpaceName']")
@@ -55,22 +60,13 @@ public class CopyPage extends ViewPage
     private WebElement sourcePageName;
 
     /**
-     * The text input field to enter the name of the target space.
-     */
-    @FindBy(xpath = "//input[@name = 'targetSpaceName']")
-    private WebElement targetSpaceName;
-
-    /**
-     * The text input field to enter the name of the target page.
-     */
-    @FindBy(xpath = "//input[@name = 'targetPageName']")
-    private WebElement targetPageName;
-
-    /**
      * The copy button.
      */
     @FindBy(xpath = "//input[@class = 'button' and @value = 'Copy']")
     private WebElement copyButton;
+
+    @FindBy(xpath = "//input[@type='checkbox' and @name = 'terminal']")
+    private WebElement terminalCheckbox;
 
     /**
      * @return the breadcrumb that specified the location of the source document
@@ -105,7 +101,7 @@ public class CopyPage extends ViewPage
      */
     public String getTargetSpaceName()
     {
-        return this.targetSpaceName.getAttribute(VALUE);
+        return getDocumentPicker().getParent();
     }
 
     /**
@@ -115,8 +111,7 @@ public class CopyPage extends ViewPage
      */
     public void setTargetSpaceName(String targetSpaceName)
     {
-        this.targetSpaceName.clear();
-        this.targetSpaceName.sendKeys(targetSpaceName);
+        getDocumentPicker().setParent(targetSpaceName);
     }
 
     /**
@@ -124,7 +119,16 @@ public class CopyPage extends ViewPage
      */
     public String getTargetPageName()
     {
-        return this.targetPageName.getAttribute(VALUE);
+        return getDocumentPicker().getName();
+    }
+
+    /**
+     * @return {@code true} if the checkbox for copying terminal page is checked.
+     * @since 12.0RC1
+     */
+    public boolean isTerminal()
+    {
+        return this.terminalCheckbox.isSelected();
     }
 
     /**
@@ -134,8 +138,7 @@ public class CopyPage extends ViewPage
      */
     public void setTargetPageName(String targetPageName)
     {
-        this.targetPageName.clear();
-        this.targetPageName.sendKeys(targetPageName);
+        getDocumentPicker().setName(targetPageName);
     }
 
     /**
@@ -156,7 +159,19 @@ public class CopyPage extends ViewPage
      */
     public CopyOverwritePromptPage clickCopyButtonExpectingOverwritePrompt()
     {
+        // The WebElement#submit method does not wait anymore for the page to load,
+        // cf: https://github.com/mozilla/geckodriver/issues/1026
+        getDriver().addPageNotYetReloadedMarker();
         this.copyButton.submit();
+        getDriver().waitUntilPageIsReloaded();
         return new CopyOverwritePromptPage();
+    }
+
+    /**
+     * @return the document picker used to select the target document
+     */
+    public DocumentPicker getDocumentPicker()
+    {
+        return new DocumentPicker(this.documentPickerElement);
     }
 }

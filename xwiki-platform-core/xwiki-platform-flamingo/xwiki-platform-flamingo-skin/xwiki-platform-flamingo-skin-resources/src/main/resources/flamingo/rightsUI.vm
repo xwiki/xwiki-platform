@@ -1,5 +1,25 @@
-#set ($formname = 'update')
-#set ($saveaction = 'save')
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+#if($xcontext.getAction() != 'edit' && $xcontext.getAction() != 'admin')
+  $response.sendRedirect($doc.getURL('edit', 'editor=rights'))
+#end
 ##
 ## Set on which document the rights should be saved
 ##
@@ -20,19 +40,37 @@ $xwiki.ssfx.use('js/xwiki/usersandgroups/usersandgroups.css', true)
 $xwiki.jsfx.use('js/xwiki/table/livetable.js', true)
 $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
 ## for admin, register, programming and createwiki, allow preceedes over deny
-#if("$!request.section"=='wikis.rights')
+#set ($standardRights = ['view', 'comment', 'edit', 'script', 'delete', 'admin', 'register', 'programming', 'login',
+  'createwiki', 'creator'])
+#set ($sectionWikiRights = 'wikis.rights')
+#set ($sectionExtensionRights = 'usersgroups.extensionrights')
+#set ($isStandardRights = false)
+#if("$!request.section"==$sectionWikiRights)
   #set ($rightsLevels = {'createwiki': 0})
   #set ($allowWins = [0])
+#elseif ("$!request.section"==$sectionExtensionRights)
+  #set ($allRights = $services.security.authorization.allRightsNames)
+  #set ($rightsLevels = {})
+  #set ($allowWins = [])
+  #set ($index = 0)
+  #foreach ($right in $allRights)
+    #if (!$standardRights.contains($right))
+      #set ($discard = $rightsLevels.put($right, $index))
+      #set ($discard = $allowWins.add($index))
+      #set ($index = $index + 1)
+    #end
+  #end
 #else
   #set ($rightsLevels = {'view': 0, 'comment': 1, 'edit': 2, 'script': 3, 'delete': 4, 'admin': 5, 'register': 6, 'programming': 7})
   #set ($allowWins = [5, 6, 7])
+  #set ($isStandardRights = true)
 #end
 #set ($levelsRights = {})
 #foreach ($r in $rightsLevels.keySet())
   #set ($discard = $levelsRights.put($rightsLevels.get($r), $r))
 #end
 #set ($maxlevel = $rightsLevels.get('delete')) ## Default: view, comment, edit, script, delete
-#if("$!request.section"=='wikis.rights')
+#if("$!request.section"==$sectionWikiRights)
   #set ($maxlevel = $rightsLevels.get('createwiki'))
   #set ($clsname = 'XWiki.XWikiGlobalRights')
 #else
@@ -57,6 +95,15 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
   #else
     #set ($clsname = 'XWiki.XWikiRights')
   #end
+#end
+#if ("$!request.section"==$sectionExtensionRights)
+  #set ($maxlevel = $index - 1)
+#end
+## Get rights allowed for the current user
+#set ($currentAllowed = {})
+#foreach ($i in [0..$maxlevel])
+  #set ($right = $levelsRights.get($i))
+  #set ($void = $currentAllowed.put($i, $services.security.authorization.hasAccess($right)))
 #end
 
 ## url to take the users and groups to display in the ajax-based table
@@ -153,14 +200,18 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
               </th>
               ## Column headers for each configurable access right
               #foreach ($i in [0..$maxlevel])
-                <th scope="col" class="rights">$services.localization.render("rightsmanager.${levelsRights.get($i)}")</th>
+                #if ($currentAllowed[$i])
+                  <th scope="col" class="rights">$services.localization.render("rightsmanager.${levelsRights.get($i)}")</th>
+                #end
               #end
             </tr>
             <tr id="unregistered">
               ## Rights for guests, statically displayed outside the livetable
               <td id="unreguser" data-title="$escapetool.xml($services.localization.render('rightsmanager.username'))">$services.localization.render('rightsmanager.unregisteredusers')</td>
               #foreach ($i in [0..$maxlevel])
-                <td class="rights" id="td${levelsRights.get($i)}" data-title="$escapetool.xml($services.localization.render("rightsmanager.${levelsRights.get($i)}"))"></td>
+                #if ($currentAllowed[$i])
+                  <td class="rights" id="td${levelsRights.get($i)}" data-title="$escapetool.xml($services.localization.render("rightsmanager.${levelsRights.get($i)}"))"></td>
+                #end
               #end
             </tr>
             <tr id="usersandgroupstable-filters">
@@ -185,14 +236,23 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
             </tr>
           </thead>
           ## Livetable placeholder, will be filled in from Javascript
-          <tbody id="usersandgroupstable-display" class="xwiki-livetable-display-body"><tr><td>&nbsp;</td></tr></tbody>
+          <tbody id="usersandgroupstable-display" class="xwiki-livetable-display-body">
+            <tr>
+              ## Have the same number of TD than there are TH, in order to have valid HTML
+              <td>&nbsp;</td>
+              #foreach ($i in [0..$maxlevel])
+                <td>&nbsp;</td>
+              #end
+            </tr>
+          </tbody>
         </table>
       </td>
     </tr>
   </table>
   ## Global settings: mandatory authentication for view/edit, captcha
   #set ($guest_comment_captcha_prop = $targetDocument.getObject('XWiki.XWikiPreferences').getxWikiClass().get('guest_comment_requires_captcha'))
-  #if (("$!request.editor" == 'globaladmin' || "$!editor" == 'globaladmin' || $guest_comment_captcha_prop) && $request.section != 'wikis.rights')
+  #if (("$!request.editor" == 'globaladmin' || "$!editor" == 'globaladmin' || $guest_comment_captcha_prop)
+  && $isStandardRights)
     <dl class="rights-settings">
       #if ("$!request.editor" == 'globaladmin' || "$!editor" == 'globaladmin')
         #set ($auth_view = $targetDocument.getObject('XWiki.XWikiPreferences').getProperty('authenticate_view').getValue())
@@ -252,7 +312,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
     </dl>
   #end
 
-    <script type="text/javascript">
+    <script>
     //<![CDATA[
 (function() {
   function hideScopeForUsers() {
@@ -276,7 +336,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
       hideScopeForUsers() || Event.observe(window, 'load', hideScopeForUsers);
     #end
 
-      window.activeRights = [#foreach($i in [0..$maxlevel])"$levelsRights.get($i)",#end];
+      window.activeRights = [#foreach($i in [0..$maxlevel])#if ($currentAllowed[$i])"$levelsRights.get($i)",#end#end];
       window.saveUrl = "$saveUrl";
       window.saveUrl.replace(/&amp;/g, "&");
 
@@ -288,7 +348,9 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
       var callback = function(row, i, table, idx) { return displayUsersAndGroups(row, i, table, idx, "$!{services.csrf.getToken()}", targetDocument) };
       var ta = new XWiki.widgets.LiveTable("$url", "usersandgroupstable", callback, {"filtersNode": $('usersandgroupstable')});
     #foreach($i in [0..$maxlevel])
-      var chbx${i} = new MSCheckbox($("td${levelsRights.get($i)}"), "${levelsRights.get($i)}", window.saveUrl, "${r.get($i)}");
+      #if ($currentAllowed[$i])
+        var chbx${i} = new MSCheckbox($("td${levelsRights.get($i)}"), "${levelsRights.get($i)}", window.saveUrl, "${r.get($i)}");
+      #end
     #end
       Event.observe(window, 'load', function() {
         if($('uorgg').checked && !$('unregistered').hasClassName('hidden')) {
@@ -297,11 +359,11 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
           $('unregistered').removeClassName('hidden');
         }
       });
-    #if("$!editor" == 'globaladmin' && $request.section != 'wikis.rights')
+    #if("$!editor" == 'globaladmin' && $isStandardRights)
       Event.observe($('authenticate_view'), 'click', setBooleanPropertyFromLiveCheckbox($('authenticate_view'), '$xwiki.getURL('XWiki.XWikiPreferences', 'save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
       Event.observe($('authenticate_edit'), 'click', setBooleanPropertyFromLiveCheckbox($('authenticate_edit'), '$xwiki.getURL('XWiki.XWikiPreferences', 'save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
     #end
-    #if($guest_comment_captcha_prop && $request.section != 'wikis.rights')
+    #if($guest_comment_captcha_prop && $isStandardRights)
       Event.observe($('guest_comment_requires_captcha'), 'click', setBooleanPropertyFromLiveCheckbox($('guest_comment_requires_captcha'), '$targetDocument.getURL('save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
     #end
       return true;

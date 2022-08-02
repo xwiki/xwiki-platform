@@ -21,6 +21,11 @@
 
   .navbar-nav {
     float: right;
+    &.navbar-left > li {
+      float: left;
+    }
+    // Should be explicitly defined as "&.navbar-right > li", but leaving this implicit (i.e. as it was)
+    // in order to not increase specificity and break any customizations
     > li {
       float: right;
     }
@@ -40,6 +45,37 @@
       float: left;
       margin-left: @navbar-padding-horizontal;
       margin-right: @navbar-padding-horizontal;
+    }
+  }
+}
+
+@media (max-width: @screen-sm) {
+  // FIX Bootstrap: Reset custom display for dropdowns inside navbars
+  #xwikimainmenu {
+    & .open .dropdown-menu {
+      /* Replace the custom embedded display by having the dropdown outside the nav. */
+      position: absolute;
+
+      /* Reset overwritten properties with Bootstrap variables. */
+      border: 1px solid @dropdown-border;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+
+      & > li > a {
+        color: inherit;
+
+        &:hover, &:focus {
+          background-color: @dropdown-link-hover-bg;
+        }
+      }
+
+      & .divider {
+        background-color: @dropdown-divider-bg;
+      }
+    }
+
+    & .navbar-nav {
+      /* Fix the alignment of the dropdown with the end of the topmenu. */
+      margin-bottom: 0;
     }
   }
 }
@@ -135,10 +171,10 @@
     max-height: @navbar-height;
 
     > img {
-      @avatar-size: floor(ceil(@navbar-height/2)/2)*2;
+      @avatar-size: floor((ceil((@navbar-height / 2)) / 2)) * 2;
       border-radius: @thumbnail-border-radius;
       height: @avatar-size;
-      margin-top: -@navbar-padding-vertical+@navbar-height/2-@avatar-size/2;
+      margin-top: -@navbar-padding-vertical + (@navbar-height / 2) - (@avatar-size / 2);
       vertical-align: middle;
       width: @avatar-size;
     }
@@ -189,7 +225,7 @@
     }
     > .dropdown-split-left {
       /* Display it closer to the menu toggle. */
-      padding-right: ceil(@navbar-padding-horizontal / 2);
+      padding-right: ceil((@navbar-padding-horizontal / 2));
       > .caret {
         /* Hide the caret used for extra small screens. */
         display: none;
@@ -217,7 +253,7 @@
     }
     > .dropdown-split-right {
       /* Display it closer to the menu label. */
-      padding-left: ceil(@navbar-padding-horizontal / 2);
+      padding-left: ceil((@navbar-padding-horizontal / 2));
       > .caret {
         /* Reset the left margin for the caret used on large screens. */
         margin-left: 0;
@@ -248,6 +284,24 @@
 
 // Content menu  ======================================================
 
+// Used a mix of LESS variables in order to assure the content buttons
+// have a styling more similar to breadcrumbs than buttons, while looking
+// decent across the bundled color themes
+.flat-buttons {
+  .btn-default {
+    background-color: @breadcrumb-bg;
+    background-image: none;
+    border-color: @dropdown-divider-bg;
+    box-shadow: none;
+    color: @dropdown-link-color;
+    text-shadow: none;
+  }
+
+ .btn-default:hover, .btn-default:active, .btn-default:focus, .open .dropdown-toggle {
+    border-color: darken(@dropdown-divider-bg, 10%);
+  }
+}
+
 #contentmenu {
   .text-right();
 
@@ -262,19 +316,5 @@
     }
   }
 
-  // Used a mix of LESS variables in order to assure the content buttons
-  // have a styling more similar to breadcrumbs than buttons, while looking
-  // decent across the bundled color themes
-  .btn-default {
-    background-color: @breadcrumb-bg;
-    background-image: none;
-    border-color: @dropdown-divider-bg;
-    box-shadow: none;
-    color: @dropdown-link-color;
-    text-shadow: none;
-  }
-
- .btn-default:hover, .btn-default:active, .open .dropdown-toggle {
-    border-color: darken(@dropdown-divider-bg, 10%);
-  }
+  .flat-buttons();
 }

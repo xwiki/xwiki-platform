@@ -42,11 +42,9 @@ solr.admin.error.action={0} feilet:
 solr.admin.error.notallowed=Du har ikke rettigheter til å utføre denne handlingen.
 solr.admin.error.norights=Administrasjonsrettigheter kreves for å få tilgang til denne delen.
 solr.admin.success.action={0} vellykket utløst.
-
 solr.admin.status.title=Status
 solr.admin.status.queueSize.label=Køstørrelse
 solr.admin.status.queueSize.hint=Antall enheter som gjenstår å indeksere, omindeksere eller fjerne fra indeksen (avhengig av utført handling).
-
 solr.admin.indexing.title=Indekserer
 solr.admin.indexing.action.label=Handling
 solr.admin.indexing.action.hint=Handlingen som skal utføres på indeksen.
@@ -58,9 +56,7 @@ solr.admin.indexing.wiki.hint=Den valgte handlingen vil påvirke alle dokumenter
 solr.admin.indexing.wiki.select_farm=Hele farmen
 solr.admin.indexing.query.label=Egendefinert spørring (Query)
 solr.admin.indexing.query.hint=Valgfri forespørsel for å begrense dokumentene som vil bli påvirket av den valgte handlingen på indeksen.
-
 solr.admin.info.affectedDocuments=Berørte dokumenter i indeksen:
-
 solr.sortBy=Sorter etter:
 solr.sortBy.score=Relevanse
 solr.sortBy.title_sort=Tittel
@@ -72,20 +68,17 @@ solr.sortBy.attdate_sort=Dato opplastet
 solr.sortBy.attauthor_display_sort=Lastet opp av
 solr.sortOrder.asc=Stigende
 solr.sortOrder.desc=Synkende
-
 solr.options=Vis:
 solr.options.highlight=Utheving
 solr.options.highlight.title=Vis et utdrag av det som ble matchet i hvert resultat
 solr.options.facet=Fasetter
 solr.options.facet.title=Tillat ekstra filtrering av resultatet
-
 solr.result.language=Språk
 solr.result.locatedIn=Lokalisert i
 solr.result.author=Endret av {0} den {1}
 solr.result.mediaType=Fil av typen {0}
 solr.result.uploadedBy=Lastet opp av {0} den {1} ({2})
 solr.result.highlightAll=Uthev alle treff
-
 solr.facets.title=Avgrens søket ditt
 solr.facets.hint=Velg en kategori og aktiver filtre på de nåværende resultatene
 solr.facets.resetAll=Tilbakestill alle
@@ -93,12 +86,10 @@ solr.facets.expandAll=Utvid alle
 solr.facets.collapseAll=Folde sammen alle
 solr.facets.emptyValue=Tom verdi
 solr.facets.moreValues={0} fler
-
 solr.filterBy.type.document=Dokument
 solr.filterBy.type.attachment=Vedlegg
 solr.filterBy.type.object=Objekt
 solr.filterBy.type.object_property=Objektegenskap
-
 solr.filterBy.fileType.image=Bilde
 solr.filterBy.fileType.audio=Lyd
 solr.filterBy.fileType.video=Video
@@ -118,7 +109,6 @@ solr.facet.fileType.image.icon=Ikon
 solr.facet.fileType.archive.java-archive=JAR
 solr.facet.fileType.archive.xara=XAR
 solr.facet.fileType.other.octet-stream=Binærdata
-
 solr.facet.date.today=I dag
 solr.facet.date.last7Days=Siste 7 dager
 solr.facet.date.last30Days=Siste 30 dager
@@ -131,7 +121,6 @@ solr.facet.date.between=Fra {0} til {1}
 solr.facet.date.after=Etter {0}
 solr.facet.date.before=Før {0}
 solr.facet.date.any=Vilkårlig dato
-
 solr.facet.size.tiny=Ekstra liten
 solr.facet.size.small=Liten
 solr.facet.size.medium=Medium
@@ -140,7 +129,6 @@ solr.facet.size.between=Mellom {0} og {1}
 solr.facet.size.lessThan=Mindre enn {0}
 solr.facet.size.moreThan=Mer enn {0}
 solr.facet.size.any=Alle størrelser
-
 solr.field.type=Resultattype
 solr.field.locale=Språk
 solr.field.locale.emptyValue=Ingen språk
@@ -173,7 +161,6 @@ solr.field.attauthor=Lastet opp av
 solr.field.attauthor_display=Lastet opp av
 solr.field.attdate=Dato opplastet
 solr.field.attsize=Filstørrelse
-
 solr.uix.docdoesnotexist.title=Kanskje du ser etter disse sidene?
 solr.uix.attachmentdoesnotexist.title=Kanskje du ser etter disse vedleggene i stedet?
 
@@ -181,10 +168,10 @@ solr.uix.attachmentdoesnotexist.title=Kanskje du ser etter disse vedleggene i st
 #@deprecatedstart
 
 ## until 7.2M3
-### Missing: solr.result.location=Located in {0} \u00BB {1} \u00BB {2}
+solr.result.location=Funnet i {0} » {1} » {2}
 
 ## until 7.2RC1
-### Missing: solr.field.space=Location
+solr.field.space=Plassering
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

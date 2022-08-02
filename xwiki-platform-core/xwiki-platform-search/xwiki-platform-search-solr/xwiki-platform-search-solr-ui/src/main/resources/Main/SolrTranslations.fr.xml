@@ -42,11 +42,9 @@ solr.admin.error.action={0} a échoué :
 solr.admin.error.notallowed=Vous n'êtes pas autorisé(e) à effectuer cette action.
 solr.admin.error.norights=Les droits d'administration sont nécessaires pour accéder à cette section.
 solr.admin.success.action=Le traitement {0} a été déclenché.
-
 solr.admin.status.title=Statut
 solr.admin.status.queueSize.label=Taille de la file d'attente
 solr.admin.status.queueSize.hint=Nombre d'éléments restants à indexer, ré-indexer ou à supprimer de l'index (selon l'action demandée).
-
 solr.admin.indexing.title=Gestion de l'index
 solr.admin.indexing.action.label=Action
 solr.admin.indexing.action.hint=L'action à effectuer sur l'index.
@@ -58,9 +56,7 @@ solr.admin.indexing.wiki.hint=Le wiki dont tous les documents seront affectés p
 solr.admin.indexing.wiki.select_farm=Ferme entière
 solr.admin.indexing.query.label=Recherche avancée
 solr.admin.indexing.query.hint=Requête optionnelle limitant les documents affectés par l'indexation.
-
 solr.admin.info.affectedDocuments=Documents concernés dans l'index :
-
 solr.sortBy=Trier par :
 solr.sortBy.score=Pertinence
 solr.sortBy.title_sort=Titre
@@ -72,20 +68,17 @@ solr.sortBy.attdate_sort=Date d'enregistrement
 solr.sortBy.attauthor_display_sort=Enregistré par
 solr.sortOrder.asc=Ascendant
 solr.sortOrder.desc=Descendant
-
 solr.options=Afficher :
 solr.options.highlight=Surligner
 solr.options.highlight.title=Afficher un extrait dans chaque résultat
 solr.options.facet=Facettes
 solr.options.facet.title=Autoriser le fitrage dans les résultats
-
 solr.result.language=Langue
 solr.result.locatedIn=Situé dans
 solr.result.author=Modifié par {0} le {1}
 solr.result.mediaType=Ficher de type {0}
 solr.result.uploadedBy=Enregistré par {0} le {1} ({2})
 solr.result.highlightAll=Afficher et surligner toutes les occurrences
-
 solr.facets.title=Affinez les résultats
 solr.facets.hint=Sélectionnez des éléments pour filtrer les résultats
 solr.facets.resetAll=Tout réinitialiser
@@ -93,12 +86,10 @@ solr.facets.expandAll=Tout étendre
 solr.facets.collapseAll=Tout réduire
 solr.facets.emptyValue=Valeur vide
 solr.facets.moreValues={0} restants
-
 solr.filterBy.type.document=Document
 solr.filterBy.type.attachment=Fichier joint
 solr.filterBy.type.object=Objet
 solr.filterBy.type.object_property=Propriété de l'objet
-
 solr.filterBy.fileType.image=Image
 solr.filterBy.fileType.audio=Audio
 solr.filterBy.fileType.video=Vidéo
@@ -113,12 +104,11 @@ solr.filterBy.fileType.other=Autre
 solr.facet.fileType.text.plain=Plein texte
 solr.facet.fileType.text.javascript=JavaScript
 solr.facet.fileType.text.java-source=Code source Java
-solr.facet.fileType.text.sh=Script  Shell
+solr.facet.fileType.text.sh=Shell Script
 solr.facet.fileType.image.icon=Icône
 solr.facet.fileType.archive.java-archive=JAR
 solr.facet.fileType.archive.xara=XAR
 solr.facet.fileType.other.octet-stream=Données binaires
-
 solr.facet.date.today=Aujourd'hui
 solr.facet.date.last7Days=Ces 7 derniers jours
 solr.facet.date.last30Days=Ces 30 derniers jours
@@ -131,7 +121,6 @@ solr.facet.date.between=Entre le {0} et le {1}
 solr.facet.date.after=Après le {0}
 solr.facet.date.before=Avant le {0}
 solr.facet.date.any=Toutes les dates
-
 solr.facet.size.tiny=Minuscule
 solr.facet.size.small=Petit
 solr.facet.size.medium=Moyen
@@ -140,7 +129,6 @@ solr.facet.size.between=Entre {0} et {1}
 solr.facet.size.lessThan=Inférieur à {0}
 solr.facet.size.moreThan=Plus de {0}
 solr.facet.size.any=Toutes les tailles
-
 solr.field.type=Type de résultat
 solr.field.locale=Langue
 solr.field.locale.emptyValue=Sans langue
@@ -173,7 +161,6 @@ solr.field.attauthor=Enregistré par
 solr.field.attauthor_display=Enregistré par
 solr.field.attdate=Date d'enregistrement
 solr.field.attsize=Taille de fichier
-
 solr.uix.docdoesnotexist.title=Recherchez-vous plutôt une de ces pages ?
 solr.uix.attachmentdoesnotexist.title=Recherchez-vous plutôt une de ces pièces jointes ?
 

@@ -28,7 +28,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.web.Utils;
 
@@ -50,6 +49,8 @@ public class ComputedFieldClass extends PropertyClass
      * Constant defining the name of the script field.
      **/
     protected static final String FIELD_SCRIPT = "script";
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * Constructor for ComputedFieldClass.
@@ -90,39 +91,54 @@ public class ComputedFieldClass extends PropertyClass
         return sValue;
     }
 
+    /**
+     * Computes and returns the raw value of this property for a given object.
+     *
+     * @param name property name
+     * @param prefix prefix to be added
+     * @param object object for which the property value has to get computed
+     * @param context current context
+     * @return the computed property value
+     * @throws Exception in case an error occurs
+     * @since 11.8RC1
+     */
+    public String getComputedValue(String name, String prefix, BaseCollection object, XWikiContext context) throws
+            Exception
+    {
+        String script = getScript();
+
+        ScriptContext scontext = Utils.getComponent(ScriptContextManager.class).getCurrentScriptContext();
+        scontext.setAttribute("name", name, ScriptContext.ENGINE_SCOPE);
+        scontext.setAttribute("prefix", prefix, ScriptContext.ENGINE_SCOPE);
+        scontext.setAttribute("object", new com.xpn.xwiki.api.Object((BaseObject) object, context),
+                ScriptContext.ENGINE_SCOPE);
+
+        XWikiDocument classDocument = object.getXClass(context).getOwnerDocument();
+
+        return renderContentInContext(script, classDocument.getSyntax().toIdString(),
+                classDocument.getAuthorReference(), classDocument.getDocumentReference(), context);
+    }
+
     @Override
     public BaseProperty fromString(String value)
     {
+        // There is no content in a computed field
         return null;
     }
 
     @Override
     public BaseProperty newProperty()
     {
-        BaseProperty property = new StringProperty();
-        property.setName(getName());
-        return property;
+        // There is no content in a computed field
+        return null;
     }
 
     @Override
     public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object,
         XWikiContext context)
     {
-        String script = getScript();
-
         try {
-            ScriptContext scontext = Utils.getComponent(ScriptContextManager.class).getCurrentScriptContext();
-            scontext.setAttribute("name", name, ScriptContext.ENGINE_SCOPE);
-            scontext.setAttribute("prefix", prefix, ScriptContext.ENGINE_SCOPE);
-            scontext.setAttribute("object", new com.xpn.xwiki.api.Object((BaseObject) object, context),
-                ScriptContext.ENGINE_SCOPE);
-
-            XWikiDocument classDocument = object.getXClass(context).getOwnerDocument();
-
-            String result = renderContentInContext(script, classDocument.getSyntax().toIdString(),
-                classDocument.getAuthorReference(), classDocument.getDocumentReference(), context);
-
-            buffer.append(result);
+            buffer.append(getComputedValue(name, prefix, object, context));
         } catch (Exception e) {
             // TODO: append a rendering style complete error instead
             buffer.append(e.getMessage());

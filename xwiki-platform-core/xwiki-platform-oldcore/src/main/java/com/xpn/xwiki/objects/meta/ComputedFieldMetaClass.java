@@ -40,6 +40,8 @@ import com.xpn.xwiki.objects.classes.TextAreaClass;
 @Singleton
 public class ComputedFieldMetaClass extends PropertyMetaClass
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * Constructor for ComputerFieldMetaClass.
      */

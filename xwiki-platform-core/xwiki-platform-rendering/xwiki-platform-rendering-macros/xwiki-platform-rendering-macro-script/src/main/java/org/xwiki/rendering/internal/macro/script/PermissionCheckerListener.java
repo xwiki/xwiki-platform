@@ -27,6 +27,10 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.observation.event.CancelableEvent;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.MetaDataBlock;
+import org.xwiki.rendering.block.match.MetadataBlockMatcher;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.MacroLookupException;
 import org.xwiki.rendering.macro.MacroManager;
@@ -78,9 +82,16 @@ public class PermissionCheckerListener extends AbstractScriptCheckerListener
             MacroPermissionPolicy mpp =
                 this.componentManager.getInstance(MacroPermissionPolicy.class, currentMacroId.getId());
             if (!mpp.hasPermission(parameters, context)) {
-                event.cancel(String.format("The execution of the [%s] script macro is not allowed."
+                String sourceContentReference = extractSourceContentReference(context.getCurrentMacroBlock());
+                String sourceText = "";
+                if (sourceContentReference != null) {
+                    sourceText = String.format(" in [%s]", sourceContentReference);
+                } else {
+                    sourceText = "";
+                }
+                event.cancel(String.format("The execution of the [%s] script macro is not allowed%s."
                     + " Check the rights of its last author or the parameters if it's rendered from another script.",
-                    currentMacroId));
+                    currentMacroId, sourceText));
             }
         } catch (ComponentLookupException e) {
             // Policy not found for macro, check permission using backward compatibility check
@@ -114,5 +125,15 @@ public class PermissionCheckerListener extends AbstractScriptCheckerListener
             // should not happen, this method was called from that macro
         }
     }
-}
 
+    private String extractSourceContentReference(Block source)
+    {
+        String contentSource = null;
+        MetaDataBlock metaDataBlock =
+                source.getFirstBlock(new MetadataBlockMatcher(MetaData.SOURCE), Block.Axes.ANCESTOR);
+        if (metaDataBlock != null) {
+            contentSource = (String) metaDataBlock.getMetaData().getMetaData(MetaData.SOURCE);
+        }
+        return contentSource;
+    }
+}

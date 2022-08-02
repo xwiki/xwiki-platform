@@ -58,6 +58,8 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
      */
     private final MacroDescriptor descriptor;
 
+    private final int macroPriority;
+
     /**
      * Constructs a new {@link DefaultWikiMacro}.
      * 
@@ -74,6 +76,7 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
         super(baseObject, Macro.class, descriptor.getId().getId(), componentManager);
 
         this.descriptor = descriptor;
+        this.macroPriority = baseObject.getIntValue(MACRO_PRIORITY_PROPERTY, 1000);
     }
 
     @Override
@@ -83,11 +86,9 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
     }
 
     @Override
-    public List<Block> execute(WikiMacroParameters parameters, String macroContent, MacroTransformationContext context)
-        throws MacroExecutionException
+    public List<Block> execute(WikiMacroParameters parameters, String macroContent,
+        MacroTransformationContext context) throws MacroExecutionException
     {
-        validate(parameters, macroContent);
-
         // Create renderer
         DefaultWikiMacroRenderer renderer;
         try {
@@ -95,7 +96,7 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
         } catch (ComponentLookupException e) {
             throw new MacroExecutionException("Failed to create wiki macro rendeder", e);
         }
-
+        validate(parameters, macroContent);
         // Initialize the renderer
         renderer.initialize(this, parameters, macroContent, context);
 
@@ -158,7 +159,7 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
     @Override
     public int getPriority()
     {
-        return 1000;
+        return this.macroPriority;
     }
 
     @Override
@@ -181,12 +182,12 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
 
     boolean isAsyncAllowed()
     {
-        return this.async;
+        return this.asyncAllowed;
     }
 
-    boolean isCachedAllowed()
+    boolean isCacheAllowed()
     {
-        return this.cached;
+        return this.cacheAllowed;
     }
 
     XDOM getContent()

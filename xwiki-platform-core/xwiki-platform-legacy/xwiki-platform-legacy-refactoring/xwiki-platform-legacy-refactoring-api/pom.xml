@@ -24,19 +24,18 @@
   <parent>
     <artifactId>xwiki-platform-legacy-refactoring</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-
   <artifactId>xwiki-platform-legacy-refactoring-api</artifactId>
   <name>XWiki Platform - Refactoring - API</name>
   <description>Provides APIs to refactor XWiki entities</description>
-
   <properties>
     <!-- The features provided by this module -->
     <xwiki.extension.features>
       org.xwiki.platform:xwiki-platform-refactoring-api
     </xwiki.extension.features>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <!-- Trigger xwiki-platform-refactoring-api dependencies (but without xwiki-platform-refactoring-api jar itself) -->
@@ -64,7 +63,6 @@
       <artifactId>xwiki-platform-wiki-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <!-- Build tools -->
     <!-- Needed for backward compatibility Aspects -->
     <dependency>
@@ -116,5 +114,4 @@
       </plugin>
     </plugins>
   </build>
-
 </project>

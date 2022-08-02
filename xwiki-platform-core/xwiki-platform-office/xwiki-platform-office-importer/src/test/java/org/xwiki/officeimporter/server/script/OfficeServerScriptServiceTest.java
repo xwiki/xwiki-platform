@@ -21,6 +21,7 @@ package org.xwiki.officeimporter.server.script;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.context.Execution;
@@ -29,10 +30,13 @@ import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.officeimporter.server.OfficeServerException;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doThrow;
@@ -46,9 +50,8 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class OfficeServerScriptServiceTest
+class OfficeServerScriptServiceTest
 {
-
     private final static String ERROR_PRIVILEGES = "Inadequate privileges.";
 
     private static final String ERROR_FORBIDDEN = "Office server administration is forbidden for sub-wikis.";
@@ -71,14 +74,17 @@ public class OfficeServerScriptServiceTest
     @Mock
     private ExecutionContext executionContext;
 
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
+
     @BeforeEach
-    private void setUp()
+    void setUp()
     {
         when (this.execution.getContext()).thenReturn(executionContext);
     }
 
     @Test
-    public void startServer() throws OfficeServerException
+    void startServer() throws OfficeServerException
     {
         when(this.modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("xwiki"));
         when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(true);
@@ -87,7 +93,7 @@ public class OfficeServerScriptServiceTest
     }
 
     @Test
-    public void startServerForbidden() throws OfficeServerException
+    void startServerForbidden() throws OfficeServerException
     {
         when(this.modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("subwiki"));
         when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(true);
@@ -98,7 +104,7 @@ public class OfficeServerScriptServiceTest
     }
 
     @Test
-    public void startServerPrivileges() throws OfficeServerException
+    void startServerPrivileges() throws OfficeServerException
     {
         when(this.modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("xwiki"));
         when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(false);
@@ -109,7 +115,7 @@ public class OfficeServerScriptServiceTest
     }
 
     @Test
-    public void startServerError() throws OfficeServerException
+    void startServerError() throws OfficeServerException
     {
         when(this.modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("xwiki"));
         when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(true);
@@ -118,10 +124,12 @@ public class OfficeServerScriptServiceTest
         verify(this.officeServer).start();
         verify(this.executionContext).setProperty(OfficeServerScriptService.OFFICE_MANAGER_ERROR,
             "Error while starting");
+
+        assertEquals("Error while starting", logCapture.getMessage(0));
     }
 
     @Test
-    public void stopServer() throws OfficeServerException
+    void stopServer() throws OfficeServerException
     {
         when(this.modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("xwiki"));
         when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(true);
@@ -130,7 +138,7 @@ public class OfficeServerScriptServiceTest
     }
 
     @Test
-    public void stopServerForbidden() throws OfficeServerException
+    void stopServerForbidden() throws OfficeServerException
     {
         when(this.modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("subwiki"));
         when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(true);
@@ -141,7 +149,7 @@ public class OfficeServerScriptServiceTest
     }
 
     @Test
-    public void stopServerPrivileges() throws OfficeServerException
+    void stopServerPrivileges() throws OfficeServerException
     {
         when(this.modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("xwiki"));
         when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(false);
@@ -152,7 +160,7 @@ public class OfficeServerScriptServiceTest
     }
 
     @Test
-    public void stopServerError() throws OfficeServerException
+    void stopServerError() throws OfficeServerException
     {
         when(this.modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("xwiki"));
         when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(true);
@@ -161,5 +169,7 @@ public class OfficeServerScriptServiceTest
         verify(this.officeServer).stop();
         verify(this.executionContext).setProperty(OfficeServerScriptService.OFFICE_MANAGER_ERROR,
             "Error while stopping");
+
+        assertEquals("Error while stopping", logCapture.getMessage(0));
     }
 }

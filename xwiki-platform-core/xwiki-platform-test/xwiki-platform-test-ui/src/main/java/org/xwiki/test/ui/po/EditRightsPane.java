@@ -19,6 +19,9 @@
  */
 package org.xwiki.test.ui.po;
 
+import java.util.Locale;
+
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -43,9 +46,10 @@ public class EditRightsPane extends BaseElement
         REGISTER,
         PROGRAM;
 
-        int getColumnIndex()
+        @Override
+        public String toString()
         {
-            return this.ordinal() + 2;
+            return StringUtils.capitalize(this.name().toLowerCase(Locale.ROOT));
         }
     }
 
@@ -103,26 +107,72 @@ public class EditRightsPane extends BaseElement
 
     public State getGuestRight(Right right)
     {
-        final By iconLocator = By.xpath("//tr[@id='unregistered']/td[" + right.getColumnIndex() + "]/img");
+        return getGuestRight(right.toString());
+    }
+
+    /**
+     * Allow to get the state of the given right for guest user.
+     *
+     * @param rightName the actual name of the right displayed in the header of the column.
+     * @return the state for this given right.
+     * @since 13.6RC1
+     */
+    public State getGuestRight(String rightName)
+    {
+        final By iconLocator = By.xpath(String.format("//tr[@id='unregistered']/td[@data-title='%s']/img", rightName));
         final WebElement icon = getDriver().findElement(iconLocator);
         return State.getButtonState(icon);
     }
 
     public State getRight(String entityName, Right right)
     {
+        return getRight(entityName, right.toString());
+    }
+
+    /**
+     * Allow to get the state of the given right for the given entityName.
+     *
+     * @param entityName name of the entity for which to get the right state.
+     * @param rightName the actual name of the right displayed in the header of the column.
+     * @return the state for this given right.
+     * @since 13.6RC1
+     */
+    public State getRight(String entityName, String rightName)
+    {
         final By iconLocator =
-            By.xpath("//*[@id='usersandgroupstable-display']//td[@class='username']/a[contains(@href, '" + entityName
-                + "')]/../../td[" + right.getColumnIndex() + "]/img");
+            By.xpath(String.format(
+                "//*[@id='usersandgroupstable-display']//td[@class='username']/a[contains(@href, '%s')]"
+                    + "/../../td[@data-title='%s']/img",
+                entityName, rightName));
         final WebElement icon = getDriver().findElement(iconLocator);
         return State.getButtonState(icon);
     }
 
+    public boolean hasEntity(String entityName)
+    {
+        return getDriver().hasElementWithoutWaiting(
+            By.xpath("//*[@id='usersandgroupstable-display']//td[@class='username']/a[contains(@href, '" + entityName
+            + "')]"));
+    }
+
     public void clickGuestRight(Right right)
+    {
+        clickGuestRight(right.toString());
+    }
+
+    /**
+     * Click once on a right button for guest user, waiting for the next state to appear.
+     *
+     * @param rightName the actual name of the right displayed in the header of the column.
+     * @since 13.6RC1
+     */
+    public void clickGuestRight(String rightName)
     {
         try {
             getDriver().executeJavascript(
                 "window.__oldConfirm = window.confirm; window.confirm = function() { return true; };");
-            final By buttonLocator = By.xpath("*//tr[@id='unregistered']/td[" + right.getColumnIndex() + "]/img");
+            final By buttonLocator = By.xpath(
+                String.format("*//tr[@id='unregistered']/td[@data-title='%s']/img", rightName));
             final WebElement button = getDriver().findElement(buttonLocator);
             State currentState = State.getButtonState(button);
             button.click();
@@ -144,12 +194,25 @@ public class EditRightsPane extends BaseElement
      */
     public void clickRight(String entityName, Right right)
     {
+        clickRight(entityName, right.toString());
+    }
+
+    /**
+     * Click once on a right button, waiting for the next state to appear.
+     *
+     * @param entityName the target user or group name
+     * @param rightName the actual name of the right displayed in the header of the column.
+     * @since 13.6RC1
+     */
+    public void clickRight(String entityName, String rightName)
+    {
         try {
             getDriver().executeJavascript(
                 "window.__oldConfirm = window.confirm; window.confirm = function() { return true; };");
             final By buttonLocator =
-                By.xpath("//*[@id='usersandgroupstable-display']//td[@class='username']/a[contains(@href, '"
-                    + entityName + "')]/../../td[" + right.getColumnIndex() + "]/img");
+                By.xpath(
+                    String.format("//*[@id='usersandgroupstable-display']//td[@class='username']"
+                        + "/a[contains(@href, '%s')]/../../td[@data-title='%s']/img", entityName, rightName));
             final WebElement button = getDriver().findElement(buttonLocator);
             State currentState = State.getButtonState(button).getNextState();
             button.click();

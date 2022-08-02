@@ -1,10 +1,29 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
 #set ($defaultTreeOptions = {
   'checkboxes': false,
   'class': 'xtree',
   'contextMenu': false,
   'dragAndDrop': false,
   'edges': true,
-  'exclusions': $collectionstool.set,
+  'exclusions': $collectiontool.set,
   'finder': false,
   'icons': true,
   'limit': 15,
@@ -12,6 +31,7 @@
   'openTo': '',
   'reference': '',
   'root': '',
+  'rootData': {},
   'showRoot': false
 })
 
@@ -24,7 +44,7 @@
   #getTreeAttributes($options $attributes)
   #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css',
     {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
-  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/tree.min.js', true))
+  #set ($discard = $xwiki.jsfx.use("uicomponents/widgets/tree#if ($services.debug.minify).min#end.js", true))
   #if ($attributes.get('data-finder'))
     #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar',
       'finder.min.css', {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
@@ -44,6 +64,9 @@
   #set ($macro.options = {})
   #set ($discard = $macro.options.putAll($defaultTreeOptions))
   #set ($discard = $macro.options.putAll($options))
+  #if ($macro.options.id)
+    #set ($discard = $attributes.put('id', $macro.options.id))
+  #end
   #set ($classes = ["$!macro.options.get('class')"])
   #set ($noLinks = $macro.options.links != 'true')
   #if ($noLinks)
@@ -73,7 +96,17 @@
       #set ($resourceParams.outputSyntax = 'plain')
       #set ($resourceURL = $xwiki.getURL($reference, 'get', $escapetool.url($resourceParams)))
     #end
+    ## The tree data is retrieved asynchronously from the specified URL.
     #set ($discard = $attributes.put('data-url', $resourceURL))
+  #end
+  ## Feed the tree data as JSON. See https://www.jstree.com/docs/json/ .
+  #if ($macro.options.data)
+    #set ($discard = $attributes.put('data-json', $jsontool.serialize($macro.options.data)))
+  #end
+  ## If the root node is shown then the root data is retrieved using data-url. Otherwise, the root data can be specified
+  ## using the rootData option which translates into the data-root attribute.
+  #if (!$macro.options.showRoot)
+    #set ($discard = $attributes.put('data-root', $jsontool.serialize($macro.options.rootData)))
   #end
   #set ($dragAndDrop = $macro.options.dragAndDrop == 'true')
   #set ($discard = $attributes.put('data-dragAndDrop', $dragAndDrop))
@@ -88,13 +121,17 @@
   #set ($discard = $attributes.put('data-openTo', $macro.options.openTo))
   #set ($finder = $macro.options.finder == 'true')
   #set ($discard = $attributes.put('data-finder', $finder))
+  ## Custom jsTree configuration. See https://www.jstree.com/docs/config/ .
+  #if ($macro.options.config)
+    #set ($discard = $attributes.put('data-config', $jsontool.serialize($macro.options.config)))
+  #end
 #end
 
 #macro (prepareTreeOptions $options)
   ## TODO: Add support for escaping the comma in the node id.
   #set ($exclusions = $stringtool.split($options.exclusions, ','))
   #if ($exclusions && $exclusions.size() > 0)
-    #set ($options.exclusions = $collectionstool.set)
+    #set ($options.exclusions = $collectiontool.set)
     ## We need to convert the String[] to a List<String> before calling addAll (which expects a collection).
     #set ($discard = $options.exclusions.addAll($exclusions.subList(0, $exclusions.size())))
   #end

@@ -19,12 +19,12 @@
  */
 package org.xwiki.test.ui.appwithinminutes;
 
+import java.time.Duration;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.xwiki.appwithinminutes.test.po.ApplicationClassEditPage;
@@ -35,7 +35,10 @@ import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.browser.IgnoreBrowsers;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
+import org.xwiki.test.ui.po.editor.ObjectEditPane;
 import org.xwiki.xclass.test.po.ClassSheetPage;
+
+import static org.xwiki.appwithinminutes.test.po.ApplicationClassEditPage.EMPTY_CANVAS_HINT;
 
 /**
  * Tests the application class editor.
@@ -45,11 +48,6 @@ import org.xwiki.xclass.test.po.ClassSheetPage;
  */
 public class ClassEditorTest extends AbstractClassEditorTest
 {
-    /**
-     * The message displayed when the canvas is empty.
-     */
-    public static final String EMPTY_CANVAS_HINT = "Drag fields from the palette and drop them in this area.";
-
     /**
      * Tests that the hint is displayed only when the canvas is empty.
      */
@@ -79,7 +77,7 @@ public class ClassEditorTest extends AbstractClassEditorTest
             new LongTextClassFieldEditPane(editor.addField("Long Text").getName());
         longTextField.openConfigPanel();
         longTextField.setRows(3);
-        longTextField.setEditor("Text");
+        longTextField.setEditor("Wiki");
         longTextField.closeConfigPanel();
         Assert.assertEquals(3, longTextField.getPreviewRows());
     }
@@ -114,6 +112,9 @@ public class ClassEditorTest extends AbstractClassEditorTest
         // Edit the class template and see if the deleted field is now deprecated.
         ObjectEditPage objectEditor = new ClassSheetPage().clickTemplateLink().editObjects();
         String className = String.format("%s.%s", getTestClassName(), getTestMethodName());
+        List<ObjectEditPane> objectsOfClass = objectEditor.getObjectsOfClass(className);
+        Assert.assertEquals(1, objectsOfClass.size());
+        objectsOfClass.get(0).displayObject();
         Assert.assertTrue(objectEditor.isPropertyDeprecated(className, "boolean1"));
         Assert.assertFalse(objectEditor.isPropertyDeprecated(className, "date1"));
     }
@@ -141,9 +142,7 @@ public class ClassEditorTest extends AbstractClassEditorTest
         Assert.assertEquals("date2", fieldNames.get(1));
 
         // Go back to the class editor.
-        getDriver().navigate().back();
-        getDriver().navigate().back();
-        new ViewPage().edit();
+        goToEditor();
         editor = new ApplicationClassEditPage();
 
         // Change the order of the class fields.
@@ -214,7 +213,7 @@ public class ClassEditorTest extends AbstractClassEditorTest
         editor.getSaveAndViewButton().click();
         waitForPageSourceContains(invalidFieldNameErrorMessage);
 
-        getDriver().navigate().back();
+        goToEditor();
         editor = new ApplicationClassEditPage();
         field = editor.addField("User");
         field.openConfigPanel();
@@ -225,7 +224,7 @@ public class ClassEditorTest extends AbstractClassEditorTest
         editor.getSaveAndViewButton().click();
         waitForPageSourceContains(invalidFieldNameErrorMessage);
 
-        getDriver().navigate().back();
+        goToEditor();
         editor = new ApplicationClassEditPage();
         field = editor.addField("Group");
         field.openConfigPanel();
@@ -426,13 +425,7 @@ public class ClassEditorTest extends AbstractClassEditorTest
      */
     private void waitForPageSourceContains(final String text)
     {
-        new WebDriverWait(getDriver(), getDriver().getTimeout()).until(new ExpectedCondition<Boolean>()
-        {
-            @Override
-            public Boolean apply(WebDriver driver)
-            {
-                return StringUtils.contains(getDriver().getPageSource(), text);
-            }
-        });
+        new WebDriverWait(getDriver(), Duration.ofSeconds(getDriver().getTimeout())).until(
+            (ExpectedCondition<Boolean>) driver -> StringUtils.contains(getDriver().getPageSource(), text));
     }
 }

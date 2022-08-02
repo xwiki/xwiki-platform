@@ -30,10 +30,10 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.mail.Session;
 
-import org.quartz.JobExecutionException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.mail.CompositeMailListener;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.SessionFactory;
@@ -68,26 +68,26 @@ public class NotificationEmailSender
 
     /**
      * Send notifications emails for specified users.
+     * 
      * @param fromDate only send notifications about events that happened after this date
      * @param notificationUserIterator iterator for users interested in the notifications emails
-     * @throws JobExecutionException if error happens
      */
     public void sendEmails(Date fromDate, NotificationUserIterator notificationUserIterator)
-            throws JobExecutionException
     {
         Map<String, Object> emailFactoryParameters = new HashMap<>();
 
         DocumentReference templateReference = new DocumentReference(wikiDescriptorManager.getCurrentWikiId(),
-                Arrays.asList("XWiki", "Notifications"), "MailTemplate");
+            Arrays.asList("XWiki", "Notifications"), "MailTemplate");
 
         PeriodicMimeMessageIterator periodicMimeMessageIterator = notificationMimeMessageIteratorProvider.get();
         periodicMimeMessageIterator.initialize(notificationUserIterator, emailFactoryParameters, fromDate,
-                templateReference);
+            templateReference);
 
         Session session = this.sessionFactory.create(Collections.emptyMap());
         MailListener mailListener = mailListenerProvider.get();
 
         // Pass it to the message sender to send it asynchronously.
-        mailSender.sendAsynchronously(periodicMimeMessageIterator, session, mailListener);
+        this.mailSender.sendAsynchronously(periodicMimeMessageIterator, session,
+            new CompositeMailListener(mailListener, periodicMimeMessageIterator.getMailListener()));
     }
 }

@@ -21,17 +21,27 @@ package org.xwiki.release.test.po;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.LiveTableElement;
+import org.xwiki.livedata.test.po.LiveDataElement;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
  * Represents actions that can be done on the Release.WebHome page.
- * 
+ *
  * @version $Id$
  * @since 5.0M1
  */
 public class ReleaseHomePage extends ViewPage
 {
+    /**
+     * The release application space.
+     */
+    public static final String RELEASE_SPACE = "Release";
+
+    /**
+     * The release application page withing {@link #RELEASE_SPACE}.
+     */
+    public static final String RELEASE_PAGE = "WebHome";
+
     @FindBy(id = "versionid")
     private WebElement releaseNameField;
 
@@ -40,21 +50,13 @@ public class ReleaseHomePage extends ViewPage
 
     /**
      * Opens the home page.
+     *
+     * @return a release application home page object
      */
     public static ReleaseHomePage gotoPage()
     {
-        getUtil().gotoPage(getSpace(), getPage());
+        getUtil().gotoPage(RELEASE_SPACE, RELEASE_PAGE);
         return new ReleaseHomePage();
-    }
-
-    public static String getSpace()
-    {
-        return "Release";
-    }
-
-    public static String getPage()
-    {
-        return "WebHome";
     }
 
     /**
@@ -72,15 +74,8 @@ public class ReleaseHomePage extends ViewPage
     /**
      * @return the Release live table element
      */
-    public LiveTableElement getReleaseLiveTable()
+    public LiveDataElement getReleaseLiveData()
     {
-        return new LiveTableElement("releases");
-    }
-
-    @Override
-    public ReleaseHomePage waitUntilPageIsLoaded()
-    {
-        getReleaseLiveTable().waitUntilReady();
-        return this;
+        return new LiveDataElement("releases");
     }
 }

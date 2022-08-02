@@ -38,6 +38,8 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public class BooleanClass extends PropertyClass
 {
+    private static final long serialVersionUID = 1L;
+
     private static final String XCLASSNAME = "boolean";
 
     /** Other string values that might be used to represent "true" values. */

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="XWiki.DocumentTreeMacros" locale="">
+<xwikidoc version="1.3" reference="XWiki.DocumentTreeMacros" locale="">
   <web>XWiki</web>
   <name>DocumentTreeMacros</name>
   <language/>
@@ -132,11 +132,16 @@
       #getSuggestions($data)
     #end
     #if ($data)
+      #postProcessDocumentTreeData($data)
       #jsonResponse($data)
     #else
       $response.sendError(404)
     #end
   #end
+#end
+
+#macro (postProcessDocumentTreeData $data)
+  ## This is just a hook to allow post processing the document tree data.
 #end
 
 ##------------------------------------------------------------
@@ -152,11 +157,11 @@
     ## Return the children of the specified node.
     #set ($actualNodeId = $nodeId)
   #end
-  #set ($offset = $mathtool.max($mathtool.toInteger($request.offset), 0))
+  #set ($offset = $mathtool.max($numbertool.toNumber($request.offset).intValue(), 0))
   #if ("$!offset" == '')
     #set ($offset = 0)
   #end
-  #set ($limit = $mathtool.max($mathtool.toInteger($request.limit), 1))
+  #set ($limit = $mathtool.max($numbertool.toNumber($request.limit).intValue(), 1))
   #if ("$!limit" == '')
     #set ($limit = 15)
   #end
@@ -516,7 +521,8 @@
       'canDelete': $canEditDoc,
       'canMove': $canEditDoc,
       'canCopy': true,
-      'deleteURL': $attachment.document.getAttachmentURL($attachment.filename, 'delattachment')
+      'deleteURL': $attachment.document.getAttachmentURL($attachment.filename, 'delattachment'),
+      'mimetype': $attachment.mimeType
     },
     'a_attr': {
       'href': $attachment.document.getAttachmentURL($attachment.filename)
@@ -710,8 +716,8 @@
   ## Object name is: Space.Class[index]
   #set ($separatorIndex = $objectReference.name.lastIndexOf('['))
   #set ($classId = $objectReference.name.substring(0, $separatorIndex))
-  #set ($objectNumber = $mathtool.toInteger($objectReference.name.substring($mathtool.add($separatorIndex, 1),
-    $mathtool.sub($objectReference.name.length(), 1))))
+  #set ($objectNumber = $numbertool.toNumber($objectReference.name.substring($mathtool.add($separatorIndex, 1),
+    $mathtool.sub($objectReference.name.length(), 1))).intValue())
   #set ($document = $xwiki.getDocument($objectReference))
   #set ($object = $document.getObject($classId, $objectNumber))
 #end
@@ -1302,7 +1308,7 @@
   #set ($input = [])
   #foreach ($list in $lists)
     ## We use queues to be able to easily remove items from the start.
-    #set ($queue = $collectionstool.queue)
+    #set ($queue = $collectiontool.queue)
     #set ($discard = $queue.addAll($list))
     #set ($discard = $input.add($queue))
     ## We will add (part of) the items back later.

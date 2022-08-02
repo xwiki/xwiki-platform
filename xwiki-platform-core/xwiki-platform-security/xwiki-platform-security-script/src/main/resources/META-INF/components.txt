@@ -1,3 +1,0 @@
-org.xwiki.security.authorization.script.internal.RightConverter
-org.xwiki.security.authorization.script.SecurityAuthorizationScriptService
-org.xwiki.security.script.SecurityScriptService

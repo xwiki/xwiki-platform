@@ -35,8 +35,8 @@ import org.xwiki.model.reference.DocumentReference;
  * Tests the {@link PropertyChangedRule} in the notification mechanism. <br>
  * The tests are done for the {@link DocChangeRule#verify(XWikiDocument, XWikiDocument, XWikiContext)} function and,
  * since this function should be symmetric with respect to its two document parameters, all the tests are done symmetric
- * too: each test function contains two asserttions, one for the result of <tt>verify(newdoc, olddoc, context)</tt>
- * and the other one for <tt>verify(olddoc, newdoc, context)</tt>; some tests cases might be duplicated by the
+ * too: each test function contains two asserttions, one for the result of {@code verify(newdoc, olddoc, context)}
+ * and the other one for {@code verify(olddoc, newdoc, context)}; some tests cases might be duplicated by the
  * symmetric call in another test function.
  */
 @Deprecated

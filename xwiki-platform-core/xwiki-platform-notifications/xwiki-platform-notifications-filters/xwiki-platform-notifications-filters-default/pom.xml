@@ -25,15 +25,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-notifications-filters</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-notifications-filters-default</artifactId>
   <name>XWiki Platform - Notifications - Filters - Default implementation</name>
   <description>Default bridge to oldcore for the notifications filters API module.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.33</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>16</xwiki.pitest.mutationThreshold>
-  </properties>
+    <xwiki.jacoco.instructionRatio>0.50</xwiki.jacoco.instructionRatio>
+    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
+    </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -45,11 +45,7 @@
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-eventstream-store</artifactId>
-      <version>${project.version}</version>
-    </dependency>
+
     <!-- Test Dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>

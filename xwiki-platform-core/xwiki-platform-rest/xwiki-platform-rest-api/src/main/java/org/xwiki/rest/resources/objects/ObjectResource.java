@@ -21,6 +21,7 @@ package org.xwiki.rest.resources.objects;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
+import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -39,7 +40,7 @@ public interface ObjectResource
 {
     @GET Object getObject(
             @PathParam("wikiName") String wikiName,
-            @PathParam("spaceName") String spaceName,
+            @PathParam("spaceName") @Encoded String spaceName,
             @PathParam("pageName") String pageName,
             @PathParam("className") String className,
             @PathParam("objectNumber") Integer objectNumber,
@@ -48,7 +49,7 @@ public interface ObjectResource
 
     @PUT Response updateObject(
             @PathParam("wikiName") String wikiName,
-            @PathParam("spaceName") String spaceName,
+            @PathParam("spaceName") @Encoded String spaceName,
             @PathParam("pageName") String pageName,
             @PathParam("className") String className,
             @PathParam("objectNumber") Integer objectNumber,
@@ -58,7 +59,7 @@ public interface ObjectResource
 
     @DELETE void deleteObject(
             @PathParam("wikiName") String wikiName,
-            @PathParam("spaceName") String spaceName,
+            @PathParam("spaceName") @Encoded String spaceName,
             @PathParam("pageName") String pageName,
             @PathParam("className") String className,
             @PathParam("objectNumber") Integer objectNumber

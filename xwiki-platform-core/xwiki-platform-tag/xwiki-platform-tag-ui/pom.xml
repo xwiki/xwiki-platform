@@ -25,12 +25,16 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tag</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tag-ui</artifactId>
   <name>XWiki Platform - Tag - UI</name>
   <packaging>xar</packaging>
   <description>Tag application for XWiki</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Tag Application</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -38,7 +42,7 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- Needed when viewing individual tags -->
+    <!-- Needed when viewing individual tags for the Activity Stream for the tag -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-notifications-ui</artifactId>

@@ -35,4 +35,13 @@ public interface MailStorageConfiguration
      *         they should be kept (for tracability purpose for example)
      */
     boolean discardSuccessStatuses();
+
+    /**
+     * @return true if XWiki should resend automatically mails in the prepare + error states at restart
+     * @since 12.9RC1
+     */
+    default boolean resendAutomaticallyAtStartup()
+    {
+        return true;
+    }
 }

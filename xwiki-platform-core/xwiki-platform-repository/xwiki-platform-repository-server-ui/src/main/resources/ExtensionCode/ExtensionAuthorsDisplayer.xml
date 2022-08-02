@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -37,7 +37,7 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
+#if ($xcontext.action == 'edit')
   #set($isEditMode = true)
 #else
   #set($isViewMode = true)
@@ -60,7 +60,7 @@
     &lt;input id="pagepicker-${pagePickerCounter}-input" type="hidden" name="${prefix}${name}" value="$!pageListValue" /&gt;
     &lt;ul id="pagepicker-${pagePickerCounter}-items" class="pagepicker-list"&gt;
     &lt;/ul&gt;
-    &lt;script type="text/javascript"&gt;
+    &lt;script&gt;
     // &lt;![CDATA[
     function suggest${pagePickerCounter}(field) {
       if (!field.suggest${pagePickerCounter}) {
@@ -88,7 +88,7 @@
     &lt;/script&gt;
   {{/html}}
 #else
-  #foreach($page in $pageList)#if($velocityCount &gt; 1), #end#if($xwiki.exists($page))[[${xwiki.getUserName($page, false)}&gt;&gt;$page]]#else$page#end#end
+  #foreach($page in $pageList)#if($foreach.count &gt; 1), #end#if($xwiki.exists($page))[[${xwiki.getUserName($page, false)}&gt;&gt;$page]]#else$page#end#end
 #end
 {{/velocity}}</content>
   <object>

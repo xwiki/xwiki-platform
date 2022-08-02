@@ -39,6 +39,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrIndexer;
+import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
@@ -288,32 +289,25 @@ public class SolrIndexScriptService implements ScriptService
      * Check the current user's access to alter the index of the wiki owning the given referenced entity.
      * 
      * @param reference the reference whose owning wiki to check.
-     * @throws IllegalAccessException if the user is not allowed or if problems occur.
+     * @throws AccessDeniedException if the current user or author is not allowed
      */
-    private void checkAccessToWikiIndex(EntityReference reference) throws IllegalAccessException
+    private void checkAccessToWikiIndex(EntityReference reference) throws AccessDeniedException
     {
         EntityReference wikiReference = reference.extractReference(EntityType.WIKI);
 
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        DocumentReference userReference = xcontext.getUserReference();
-        DocumentReference programmingUserReference = xcontext.getDoc().getContentAuthorReference();
-
-        if (!this.authorization.hasAccess(Right.ADMIN, userReference, wikiReference)
-            || !this.authorization.hasAccess(Right.PROGRAM, programmingUserReference, wikiReference)) {
-            throw new IllegalAccessException(String.format(
-                "The user '%s' is not allowed to alter the index for the entity '%s'", userReference, reference));
-        }
+        this.authorization.checkAccess(Right.ADMIN, xcontext.getUserReference(), wikiReference);
+        this.authorization.checkAccess(Right.PROGRAM, xcontext.getAuthorReference(), null);
     }
 
     /**
      * Check the current user's access to alter the index of the wikis owning the given referenced entities.
      * 
      * @param references the references whose owning wikis to check.
-     * @throws IllegalAccessException if the user is not allowed for at least one of the passed references or if
-     *             problems occur.
+     * @throws AccessDeniedException if the current user or author is not allowed
      */
-    private void checkAccessToWikiIndex(List<EntityReference> references) throws IllegalAccessException
+    private void checkAccessToWikiIndex(List<EntityReference> references) throws AccessDeniedException
     {
         Set<EntityReference> representatives = new HashSet<EntityReference>();
         for (EntityReference reference : references) {

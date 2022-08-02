@@ -35,6 +35,8 @@ import com.xpn.xwiki.stats.impl.StatsUtil.PeriodType;
  */
 public class RefererStats extends XWikiStats
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * Logging tools.
      */

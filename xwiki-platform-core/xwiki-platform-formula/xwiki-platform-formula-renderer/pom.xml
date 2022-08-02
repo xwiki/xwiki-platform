@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-formula</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-formula-renderer</artifactId>
   <name>XWiki Platform - Formula - Renderer</name>
@@ -94,12 +94,6 @@
           <artifactId>commons-logging</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <!-- JEuclid needs a XPath implementation. Since we're already using xalan, we should just list it here instead of Saxon -->
-    <dependency>
-      <groupId>xalan</groupId>
-      <artifactId>xalan</artifactId>
-      <scope>runtime</scope>
     </dependency>
   </dependencies>
 </project>

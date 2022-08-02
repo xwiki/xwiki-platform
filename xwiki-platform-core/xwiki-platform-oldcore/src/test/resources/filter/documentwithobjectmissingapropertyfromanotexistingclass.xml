@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<wikiFarm>
+  <wiki name="wiki">
+    <wikiSpace name="space">
+      <wikiDocument name="page">
+        <wikiObject name="missingspace.missingclass">
+          <wikiClass>
+            <wikiClassProperty name="prop" type="String"/>
+            <wikiClassProperty name="missingprop" type="String"/>
+          </wikiClass>
+          <wikiObjectProperty name="prop" value="propvalue"/>
+        </wikiObject>
+      </wikiDocument>
+    </wikiSpace>
+  </wiki>
+</wikiFarm>

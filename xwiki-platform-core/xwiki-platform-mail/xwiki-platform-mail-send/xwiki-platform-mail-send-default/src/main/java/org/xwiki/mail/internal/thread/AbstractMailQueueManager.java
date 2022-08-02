@@ -19,28 +19,30 @@
  */
 package org.xwiki.mail.internal.thread;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
+
+import org.xwiki.component.phase.Initializable;
 
 /**
  * Handles all operations on the Mail Queues.
  *
+ * @param <T> the type of the Mail Queue Item managed by the Queue Manager
  * @version $Id$
  * @since 6.4
- * @param <T> the type of the Mail Queue Item managed by the Queue Manager
  */
-public abstract class AbstractMailQueueManager<T extends MailQueueItem> implements MailQueueManager<T>
+public abstract class AbstractMailQueueManager<T extends MailQueueItem> implements MailQueueManager<T>, Initializable
 {
     /**
-     * The Mail queue that the mail sender thread will use to send mails. We use a separate thread to allow sending
-     * mail asynchronously.
+     * The Mail queue that the mail prepare & sender threads will use to send mails. We use separate threads to allow
+     * preaparing and sending mail asynchronously.
      */
-    private Queue<T> mailQueue = new ConcurrentLinkedQueue<>();
+    protected BlockingQueue<T> mailQueue;
 
     /**
      * @return the mail queue containing all pending mails to be sent
      */
-    private Queue<T> getMailQueue()
+    private BlockingQueue<T> getMailQueue()
     {
         return this.mailQueue;
     }
@@ -49,6 +51,12 @@ public abstract class AbstractMailQueueManager<T extends MailQueueItem> implemen
     public void addToQueue(T mailQueueItem)
     {
         getMailQueue().add(mailQueueItem);
+    }
+
+    @Override
+    public void addMessage(T mailQueueItem, long timeout, TimeUnit unit) throws InterruptedException
+    {
+        getMailQueue().offer(mailQueueItem, timeout, unit);
     }
 
     @Override

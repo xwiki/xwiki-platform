@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-common</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Common</name>
@@ -44,6 +44,8 @@
     </xwiki.extension.features>
     <!-- We bundle legacy modules in the Flavor distribution, thus we allow depending on legacy dependencies. -->
     <xwiki.enforcer.no-legacy-dependencies.skip>true</xwiki.enforcer.no-legacy-dependencies.skip>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>XWiki Standard Common Application</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>
@@ -163,27 +165,76 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-edit-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-distribution-flavor-tour</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.contrib.templates</groupId>
-      <artifactId>application-templates-ui</artifactId>
-      <version>1.0.2</version>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-mentions-ui</artifactId>
+      <version>${project.version}</version>
       <type>xar</type>
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.contrib</groupId>
-      <artifactId>application-ckeditor-ui</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-like-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-refactoring-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-image-lightbox-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-image-style-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-attachment-picker-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.contrib.templates</groupId>
+      <artifactId>application-templates-ui</artifactId>
+      <version>1.0.7</version>
+      <type>xar</type>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-ckeditor-ui</artifactId>
+      <version>${project.version}</version>
       <type>xar</type>
     </dependency>
     <dependency>
       <groupId>org.xwiki.contrib.editortool</groupId>
       <artifactId>editor-tool-highlighting-ui</artifactId>
-      <version>4.4</version>
+      <version>4.6</version>
       <type>xar</type>
       <optional>true</optional>
       <exclusions>
@@ -199,6 +250,21 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-webjars-api</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <!-- Temporary dependency until we migrate recommended extensions to jQuery 3.x -->
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery-migrate</artifactId>
+      <version>3.3.2</version>
+      <optional>true</optional>
+    </dependency>
+    <!-- Inject the legacy event migrator in the administration -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-legacy-events-hibernate-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <optional>true</optional>
     </dependency>
   </dependencies>
   <profiles>
@@ -217,4 +283,27 @@
       </dependencies>
     </profile>
   </profiles>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
+        <configuration>
+          <contentPages>
+            <contentPage>.*/Main/WebHome.*\.xml</contentPage>
+          </contentPages>
+          <entries>
+            <entry>
+              <document>PanelsCode.ApplicationsPanelConfiguration</document>
+              <type>customizable</type>
+            </entry>
+            <entry>
+              <document>PanelsCode.NavigationConfiguration</document>
+              <type>customizable</type>
+            </entry>
+          </entries>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

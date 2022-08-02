@@ -59,7 +59,7 @@ public class DefaultVfsPermissionChecker implements VfsPermissionChecker
         if (!this.authorizationManager.hasAccess(Right.PROGRAM, xcontext.getUserReference(), null)) {
             throw new VfsException(
                 String.format("Current logged-in user ([%s]) needs to have Programming Rights to use the [%s] VFS",
-                    xcontext.getUserReference(), resourceReference.getURI().getScheme()));
+                    xcontext.getUserReference(), resourceReference.getScheme()));
         }
     }
 }

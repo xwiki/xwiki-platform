@@ -25,8 +25,10 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.icon.Icon;
 import org.xwiki.icon.IconException;
 import org.xwiki.icon.IconRenderer;
@@ -39,6 +41,8 @@ import org.xwiki.skinx.SkinExtension;
  * @version $Id$
  * @since 6.2M1
  */
+@Component
+@Singleton
 public class DefaultIconRenderer implements IconRenderer
 {
     @Inject

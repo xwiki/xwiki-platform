@@ -38,6 +38,8 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public class PasswordClass extends StringClass
 {
+    private static final long serialVersionUID = 1L;
+
     private static final String XCLASSNAME = "password";
 
     protected static Logger LOGGER = LoggerFactory.getLogger(PasswordClass.class);

@@ -56,7 +56,7 @@ In XWiki Syntax 1.0 gibt es keine Syntax für das Übergeben von Parametern und 
 
 Mit der XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} ist es möglich Parameter an die verschiedenen Syntaxelemente und auch an Textblöcke weiterzugeben. Dies wird beispielsweise benutzt um diese zu gestalten. Sie können jegliche Parameterschlüssel/Wertepaare verwenden, die Sie möchten. Der XHTML Renderer wird diese Parameter als XHTML Attribute an die zugrundeliegende XHTML Representation der verschiedenen Syntaxelemente weitergeben. 
 
-|=(% style="width="60%" %)XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Generiertes XHTML
+|=(% style="width:60%" %)XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Generiertes XHTML
 |((({{{
 (% class="meineKlasse" style="meinStil" id="meineID" %)
 = Überschrift =

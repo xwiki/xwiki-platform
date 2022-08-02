@@ -1,0 +1,307 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="WikiManager.Translations" locale="no">
+  <web>WikiManager</web>
+  <name>Translations</name>
+  <language>no</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>WikiManager.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>###############################################################################
+# WikiManager Manager translation page
+#
+# The translations contained in this page are used in the default UI (see xwiki-platform-web),
+# that can be displayed in subwikis too. That is why the scope of this page is GLOBAL.
+#
+# This contains the translations of the module in the default language
+# (generally English).
+# 
+# Translation key syntax:
+#   &lt;short top level project name&gt;.&lt;short module name&gt;.&lt;propertyName&gt;
+#   where:
+#   * &lt;short top level project name&gt; = top level project name without the "xwiki-" prefix,
+#                                     for example: commons, rendering, platform, enterprise, manager, etc
+#   * &lt;short module name&gt; = the name of the Maven module without the &lt;short top level project name&gt; prefix,
+#                           for example: oldcore, scheduler, activitystream, etc
+#   * &lt;propertyName&gt; = the name of the property using camel case,
+#                      for example updateJobClassCommitComment
+#
+# Comments: it's possible to add some detail about a key to make easier to
+#   translate it by adding a comment before it. To make sure a comment is not
+#   assigned to the following key use at least three sharps (###) for the comment
+#   or after it.
+# 
+# Deprecated keys:
+#   * when deleting a key it should be moved to deprecated section at the end
+#     of the file (between #@deprecatedstart and #@deprecatedend) and associated to the
+#     first version in which it started to be deprecated
+#   * when renaming a key, it should be moved to the same deprecated section
+#     and a comment should be added with the following syntax:
+#     #@deprecated new.key.name
+#     old.key.name=Some translation
+###############################################################################
+
+## Menus
+platform.wiki.menu.wikiindex=Wikiliste
+platform.wiki.menu.deletewiki=Slett wiki
+platform.wiki.menu.userwikis=Wikier
+
+## Dependencies
+platform.wiki.dependencies.wiki.missing="Wiki" Java-komponenten er ikke installert. Denne siden fungerer ikke som den skal. Forsikre deg om at "Wiki API" og "Wiki Script"-utvidelsene er installert (ved hjelp av utvidelsesbehandleren) eller at filene 'xwiki-platform-wiki-api-&lt;version&gt;.jar' og 'xwiki-platform-wiki-script-&lt;versjon&gt;.jar er tilstede under mappen "WEB-INF/lib/" (hvis manuell installasjon).
+platform.wiki.dependencies.template.missing=Java-komponenten "Wiki Template" er ikke installert. Denne siden fungerer ikke som den skal. Forsikre deg om at "Wiki Template API" og "Wiki Template Script"-utvidelsene er installert (ved hjelp av Utvidelsesbehandleren) eller at filene 'xwiki-platform-wiki-template-api-&lt;version&gt;.jar' og 'xwiki-platform-wiki-mal-skript-&lt;versjon&gt;.jar 'er tilstede i mappen "WEB-INF/lib/" (hvis manuell installasjon).
+platform.wiki.dependencies.user.missing=Java-komponenten "Wiki-bruker" er ikke installert. Denne siden fungerer ikke som den skal. Forsikre deg om at "Wiki User API" og "Wiki User Script"-utvidelsene er installert (ved hjelp av Utvidelsesbehandleren) eller at filene 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' og 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar' er tilstede under mappen "WEB-INF/lib/" (hvis manuell installasjon).
+
+## Create
+platform.wiki.create.button=Opprett Wiki
+platform.wiki.create.title=Opprett en ny wiki
+platform.wiki.create.members=Medlemmer
+platform.wiki.create.prettyname.empty=Navn kan ikke være tomt
+platform.wiki.create.error=Opprettelsen av Wiki "{0}" mislyktes: {1}.
+platform.wiki.create.error.wikiname.databasealreadyexists=En database med denne identifikatoren eksisterer allerede
+platform.wiki.create.error.wikiname.wikialreadyexists=Denne identifikatoren er allerede brukt
+platform.wiki.create.error.wikiname.empty=Identifikator kan ikke være tom
+
+## Common errors and messages
+platform.wiki.error.wikidoesnotexist=Wiki [{0}] eksisterer ikke
+platform.wiki.error.oneParameterNotSpecified=Parameteren {0} ble ikke spesifisert.
+platform.wiki.error.parameterAcceptsMultipleValues=Flere verdier akseptert.
+platform.wiki.error.exceptionWithMessage=Unntak: {0}
+platform.wiki.form.requiredField=Påkrevd
+platform.wiki.csrf.error=Ugyldig sikkerhetstoken. Prøv på nytt.
+
+## Users
+platform.wiki.users.userAlreadyMemberOfWiki=Brukeren {0}{1}{2} er allerede medlem av wiki {3}{4}{5}.
+platform.wiki.users.userNotMemberOfWiki=Brukeren {0}{1}{2} er ikke medlem av wiki {3}{4}{5}.
+platform.wiki.users.logInToContinue=For å fortsette må du først {0}logge på{1}.
+platform.wiki.users.invitation.userAcceptedNotification=Brukeren ''{0}'' ({1}) har godtatt invitasjonen om å bli med i wiki ''{2}'' ({3}).
+platform.wiki.users.invitation.userAcceptedSuccess=Brukeren {0}{1}{2} godtok invitasjonen og ble med i wiki {3}{4}{5}.
+platform.wiki.users.invitation.userRejectedSuccess=Brukeren {0}{1}{2} avviste invitasjonen om å bli med i wiki {3}{4}{5}.
+platform.wiki.users.join.error.needInvitation=Denne wikien er bare for inviterte brukere. For å delta må du motta en invitasjon fra en av administratorene.
+platform.wiki.users.join.request.pendingRequestExists=Brukeren {0}{1}{2} har allerede en ventende forespørsel om å bli med i wiki {3}{4}{5}. Vent til en administrator vurderer den.
+platform.wiki.users.join.request.cancelConfirmation=Er du sikker på at du vil avbryte forespørselen om å bli med i wiki {0}{1}{2}?
+platform.wiki.users.join.request.cancelYes=Ja
+platform.wiki.users.join.request.cancelNo=Nei
+platform.wiki.users.join.request.cancelSuccess=Brukeren {0}{1}{2} kansellerte forespørselen om å bli med i wiki {3}{4}{5}.
+platform.wiki.users.join.request.saveNotification=Brukeren ''{0}'' ({1}) har bedt om å få bli med i wikien ''{2}'' ({3}).
+platform.wiki.users.join.request.success=Brukeren {0}{1}{2} sendte forespørsel om å bli med i wiki {3}{4}{5}.
+platform.wiki.users.join.confirmation=Er du sikker på at du vil bli med i wiki {0}{1}{2}?
+platform.wiki.users.join.yes=Ja
+platform.wiki.users.join.no=Nei
+platform.wiki.users.join.success=Brukeren {0}{1}{2} ble medlem i wiki {3}{4}{5}.
+platform.wiki.users.leave.error.userIsOwner=Brukeren {0}{1}{2} er eieren av wikien {3}{4}{5}. Eieren av en wiki kan ikke forlate den med mindre wikien er slettet eller eieren er endret.
+platform.wiki.users.leave.confirmation=Er du sikker på at du vil forlate wiki {0}{1}{2}?
+platform.wiki.users.leave.confirmation.yes=Ja
+platform.wiki.users.leave.confirmation.no=Nei
+platform.wiki.users.leave.success=Brukeren {0}{1}{2} forlot wiki {3}{4}{5}.
+platform.wiki.users.join.title=Bli med i Wiki
+platform.wiki.users.leave.title=Forlat Wiki "{0}"
+platform.wiki.users.leave.empty=Forlat Wiki
+platform.wiki.users.delete.title=Slett wiki "{0}"
+platform.wiki.users.delete.empty=Slett wiki
+platform.wiki.users.invitation.reply.hint=En melding som svar som administratorer kan lese og hvor du kan begrunne din beslutning.
+platform.wiki.users.join.request.hint=For å bli med på wiki {0}{1}{2}, må du først sende en forespørsel om å bli med. Etter å ha gjort det, vil en administrator vurdere forespørselen din.
+platform.wiki.users.join.request.message.hint=Melding til administratoren hvor du kan begrunne forespørselen om å bli med.
+platform.wiki.users.invitation.title=Du er invitert til å bli med i wikien {0}{1}{2}.
+platform.wiki.users.invitation.message.label=Invitasjonsmelding
+platform.wiki.users.invitation.reply.title=Svar
+platform.wiki.users.invitation.accept.label=Aksepter
+platform.wiki.users.invitation.reject.label=Avvise
+platform.wiki.users.invitation.postpone.label=Senere
+platform.wiki.users.join.request.message.label=Melding
+platform.wiki.users.join.request.send.label=Send forespørsel
+platform.wiki.users.join.request.cancel.label=Tilbake
+
+## User profile
+platform.wiki.users.profile.joinedwikis.label=Wiki-medlemskap
+platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=Du er ikke medlem av noen wikier ennå.
+platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=Brukeren er ikke medlem av noen wikier ennå.
+platform.wiki.users.profile.activity.title=Aktiviteter i wiki {0}
+platform.wiki.users.profile.activity.hint=Genererer en liste over aktiviteter for de angitte wikiene.
+platform.wiki.users.profile.activity.multipletitle=Aktiviteter i wikier {0}
+platform.wiki.users.profile.activity.show=vis aktivitet
+
+## Wiki Deletion
+platform.wiki.delete.confirmation=Er du sikker på at du vil slette wikien {0}{1}{2}? Denne handlingen kan ikke angres!
+platform.wiki.delete.confirmation.retypeWikiId=Gjenta identifikatoren for wikien her:
+platform.wiki.delete.error.wikiIdDoesNotMatch=Skriv inn den nøyaktige Wiki-identifikatoren til wikien som skal slettes.
+platform.wiki.delete.success=Brukeren {0}{1}{2} slettet wikien ''{3}''.
+
+## Wiki macro
+platform.wiki.macro.noWikis=Det er for øyeblikket ingen wikier opprettet (bortsett fra hovedwikien).
+rendering.macro.wikis.name=Wikier
+rendering.macro.wikis.description=List alle wikier
+
+## LegacyWorkspaces macro
+rendering.macro.workspaces.name=Arbeidsområder (Legacy)
+rendering.macro.workspaces.description=Utdatert makro som ikke skal brukes av kompatibilitetsårsaker. Bruk "wikis"-makroen i stedet.
+
+## Browse
+platform.wiki.browse=Vis wikier
+platform.wiki.browse.emptyvalue=I/T
+platform.wiki.browse.wikiprettyname=Navn
+platform.wiki.browse.description=Beskrivelse
+platform.wiki.browse.owner=Eier
+platform.wiki.browse.membershipType=Medlemskapstype
+platform.wiki.browse.doc.creationDate=Dato opprettet
+platform.wiki.browse._actions=Handlinger
+platform.wiki.browse._actions.join=Bli medlem
+platform.wiki.browse._actions.requestJoin=Forespørsel for å delta
+platform.wiki.browse._actions.viewInvitation=Vis invitasjon
+platform.wiki.browse._actions.cancelJoinRequest=Avbryt forespørsel
+platform.wiki.browse._actions.leave=Forlat
+platform.wiki.browse._actions.delete=Slett
+
+## Classes
+WikiManager.WikiUserClass_membershipType_open=Åpent for alle brukere å delta
+WikiManager.WikiUserClass_membershipType_request=Enhver global bruker kan be om å bli med, men en administrator må godkjenne
+WikiManager.WikiUserClass_membershipType_invite=Bare en administrator kan sende invitasjoner til å bli med i denne wikien
+WikiManager.WikiUserClass_userScope_local_only=Bare lokale brukere er tilgjengelige på wikien
+WikiManager.WikiUserClass_userScope_global_only=Bare globale brukere er tilgjengelige på wikien
+WikiManager.WikiUserClass_userScope_local_and_global=Både globale og lokale brukere er tilgjengelige på wikien
+platform.wiki.prop.wikiname=Wiki identifikator
+platform.wiki.prop.wikiprettyname=Navn
+platform.wiki.prop.wikialias=Alias
+platform.wiki.prop.description=Beskrivelse
+platform.wiki.prop.owner=Eier
+platform.wiki.prop.membershipType.label=Medlemskapstype
+platform.wiki.prop.membershipType.hint=Måten brukerne kan bli medlem av denne wikien.
+
+## Wizard
+platform.wiki.create.wizard.desc.wikiname=Den unike identifikatoren for den nye wikien.
+platform.wiki.create.wizard.desc.wikiprettyname=Visningsnavnet på wikien.
+platform.wiki.create.wizard.desc.wikialias=Domenenavnet som vil peke på wikien.
+platform.wiki.create.wizard.desc.newTemplateHint=Mal som skal brukes på denne nye wikien (alle sider blir klonet).
+platform.wiki.create.wizard.desc.description=En kort beskrivelse av wikien og dens formål.
+platform.wiki.create.wizard.desc.owner=En bruker som alltid vil ha alle rettighetene på denne wikien, uavhengig av rettighetene som er konfigurert i administrasjonen.
+platform.wiki.create.wizard.desc.members=Brukerne som blir medlem i wikien.
+platform.wiki.create.wizard.step.nameAndType=Steg 1 - velg et navn
+platform.wiki.create.wizard.step.nameAndType.shortname=Navn
+platform.wiki.create.wizard.step.users=Steg 2 - velg medlemmer
+platform.wiki.create.wizard.step.users.shortname=Brukere
+platform.wiki.create.wizard.step.cleaningUp=Rydder
+platform.wiki.create.wizard.step.provisioning.cleanUp=Rengjør og slett denne wikien
+platform.wiki.create.wizard.step.cleaningup.success=Wikien {0} er slettet.
+platform.wiki.create.wizard.step.cleaningup.error=Feil, wikien {0} ble ikke slettet.
+platform.wiki.create.wizard.step.cleaningUp.confirmmessage=Du er i ferd med å slette wikien {0}. Vennligst bekreft.
+platform.wiki.create.wizard.step.cleaningUp.confirm=Godkjenn
+platform.wiki.create.wizard.setAsTemplate.label=Denne wikien vil være en mal
+platform.wiki.create.wizard.template.noTemplate=Ingen mal (standard)
+platform.wiki.create.wizard.userScope.label=Brukertype
+platform.wiki.create.wizard.userScope.hint=Velg hva slags brukere som kan få tilgang til wikien
+platform.wiki.create.wizard.template.label=Mal
+platform.wiki.create.wizard.flavortemplate.label=Flavør / Mal
+platform.wiki.create.wizard.flavortemplate.hint=Flavør eller mal som skal brukes som det første innholdet i den nye wikien
+platform.wiki.create.wizard.flavortemplate.flavorTab=Flavør
+platform.wiki.create.wizard.flavortemplate.templateTab=Mal
+platform.wiki.create.wizard.step.dw=Etter å ha klikket på "Opprett" -knappen, blir wikien opprettet og distribusjonsveiviseren starter for å hjelpe deg med å initialisere wikien. Hvis du hopper over veiviseren, vil wikien din være tom.
+platform.wiki.create.wizard.step.previous=Forrige steg
+platform.wiki.create.wizard.step.next=Neste steg
+platform.wiki.create.wizard.step.create=Opprett
+platform.wiki.create.wizard.step.creation=Wiki opprettelse
+platform.wiki.create.wizard.step.creation.wait=Vennligst vent til wikien er opprettet.
+platform.wiki.create.wizard.step.creation.complete=Wiki {0} er opprettet. Du kan nå bruke den.
+platform.wiki.create.wizard.step.creation.errorlog=Imidlertid er det generert feil under prosessen, og du vil kanskje se gjennom dem.
+platform.wiki.create.wizard.step.creation.error=Opprettelsen av wiki {0} mislyktes. Det anbefales å slette den.
+platform.wiki.create.wizard.step.creation.go=Gå til wikien
+
+## Admin
+admin.wikis.description=Wiki-administrasjon.
+admin.wikis.templates=Wiki-maler
+admin.wikis.templates.description=Administrer wiki-malene
+admin.wikis.templates.hint=En mal er en wiki som vil bli betraktet som en modell for å lage nye wikier. Når en bruker velger en mal for å opprette en ny wiki, kopieres alt innholdet i malen i den nye wikien.
+admin.wikis.rights=Tillatelse til å lage wikier
+
+## XWikiServer Sheet
+platform.wiki.sheet.title=Beskrivelse av wiki "{0}"
+platform.wiki.sheet.erroraliasalreadynotexists=Wiki-aliaset "{0}" eksisterer allerede.
+platform.wiki.sheet.erroraliasdoesnotexists=Wiki-aliaset "{0}" eksisterer ikke.
+platform.wiki.sheet.title.settings=Wiki-egenskaper
+platform.wiki.sheet.title.createnewalias=Opprett nytt alias
+platform.wiki.sheet.title.viewaliases=Vis aliaser
+platform.wiki.sheet.desc.wikiprettyname=Visningsnavnet til wikien.
+platform.wiki.sheet.desc.owner=En bruker som har alle rettighetene på wikien.
+platform.wiki.sheet.desc.secure=Hvis aktivert, vil alle wiki-genererte eksterne URL-adresser starte med "https".
+platform.wiki.sheet.desc.port=Porten som skal brukes for alle denne wikis genererte eksterne nettadresser. Hvis ikke angitt, arves den fra konfigurasjonen og hovedwiki. Bare tatt i betraktning for domenebaserte nettadresser.
+platform.wiki.sheet.desc.iswikitemplate=Angi om denne wiki kan brukes som mal når du oppretter en ny wiki.
+platform.wiki.sheet.desc.server=Aliaset som brukes for å få nå wikien.
+platform.wiki.sheet.desc.description=En kort beskrivelse av wikien.
+platform.wiki.sheet.desc.homepage=Hjemmesiden til wikien.
+platform.wiki.sheet.prop.wikiprettyname=Navn
+platform.wiki.sheet.prop.owner=Eier
+platform.wiki.sheet.prop.secure=Sikker (SSL)
+platform.wiki.sheet.prop.port=Port
+platform.wiki.sheet.prop.description=Beskrivelse
+platform.wiki.sheet.prop.server=Alias
+platform.wiki.sheet.prop.homepage=Hjemmeside
+platform.wiki.sheet.prop.iswikitemplate=Wiki mal
+platform.wiki.sheet.descriptor=Denne siden definerer hvordan du får tilgang til "{0}" wiki og noen egenskaper om den. For flere konfigurasjoner, vennligst gå til
+platform.wiki.sheet.descriptor.admin=administrasjonssiden til wikien.
+platform.wiki.sheet.aliases=Et alias er et annet navn på wikien. Du kan legge til aliaser for å opprette forskjellige nettadresser til wikien.
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 6.1
+#######################################
+platform.wiki.dependencies.applicationmanager.missing={0}Application Manager-programtillegget{1} er ikke installert. Installer det og prøv igjen.
+
+#######################################
+## until 6.4RC1
+#######################################
+admin.wikis=Wikier
+### Missing: admin.wikis.template=Wiki Template
+
+#######################################
+## until 7.0M2
+#######################################
+platform.wiki.create.wizard.step.provisioning=Systemet klargjør wikien.
+platform.wiki.create.wizard.step.provisioning.wait=Vent mens systemet klargjør wiki-en.
+platform.wiki.create.wizard.step.provisioning.complete=Wikien er nesten klar. Klikk på "fullfør" for å utføre den siste operasjonen.
+platform.wiki.create.wizard.step.provisioning.error=Wikien {0} er opprettet, men noen av sidene i malen er ikke kopiert. Du burde sannsynligvis slette den.
+platform.wiki.create.wizard.step.provisioning.finalize=Fullfør
+
+#######################################
+## until 9.5-rc-1
+#######################################
+platform.wiki.delete.confirmation.yes=Ja, slett denne wiki-en!
+platform.wiki.delete.confirmation.no=Nei, ta meg tilbake!
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+</xwikidoc>

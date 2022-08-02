@@ -19,10 +19,13 @@
  */
 package org.xwiki.filter.xar.internal;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.xwiki.filter.event.xwiki.XWikiWikiDocumentFilter;
 import org.xwiki.filter.xar.internal.XARFilterUtils.EventParameter;
@@ -65,14 +68,20 @@ public class XARDocumentModel extends XarDocumentModel
             put(ELEMENT_DEFAULTTEMPLATE, new EventParameter(XWikiWikiDocumentFilter.PARAMETER_DEFAULTTEMPLATE));
             put(ELEMENT_HIDDEN, new EventParameter(XWikiWikiDocumentFilter.PARAMETER_HIDDEN, Boolean.class));
             put(ELEMENT_PARENT, new EventParameter(XWikiWikiDocumentFilter.PARAMETER_PARENT, EntityReference.class));
-            put(ELEMENT_REVISION_AUTHOR, new EventParameter(XWikiWikiDocumentFilter.PARAMETER_REVISION_AUTHOR));
+            put(ELEMENT_REVISION_EFFECTIVEMEDATAAUTHOR,
+                new EventParameter(XWikiWikiDocumentFilter.PARAMETER_REVISION_EFFECTIVEMETADATA_AUTHOR));
+            put(ELEMENT_REVISION_ORIGINALMEDATAAUTHOR,
+                new EventParameter(XWikiWikiDocumentFilter.PARAMETER_REVISION_ORIGINALMETADATA_AUTHOR));
             put(ELEMENT_REVISION_COMMENT, new EventParameter(XWikiWikiDocumentFilter.PARAMETER_REVISION_COMMENT));
             put(ELEMENT_REVISION_DATE, new EventParameter(XWikiWikiDocumentFilter.PARAMETER_REVISION_DATE, Date.class));
-            put(ELEMENT_REVISION_MINOR, new EventParameter(XWikiWikiDocumentFilter.PARAMETER_REVISION_MINOR,
-                Boolean.class));
+            put(ELEMENT_REVISION_MINOR,
+                new EventParameter(XWikiWikiDocumentFilter.PARAMETER_REVISION_MINOR, Boolean.class));
             put(ELEMENT_SYNTAX, new EventParameter(XWikiWikiDocumentFilter.PARAMETER_SYNTAX, Syntax.class));
             put(ELEMENT_TITLE, new EventParameter(XWikiWikiDocumentFilter.PARAMETER_TITLE));
             put(ELEMENT_VALIDATIONSCRIPT, new EventParameter(XWikiWikiDocumentFilter.PARAMETER_VALIDATIONSCRIPT));
         }
     };
+
+    public static final Set<String> DOCUMENT_SKIPPEDPARAMETERS =
+        new HashSet<>(Arrays.asList(ELEMENT_ISTRANSLATION, ELEMENT_TEMPLATE));
 }

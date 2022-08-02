@@ -174,9 +174,16 @@ public class EscapeLikeParametersQuery extends WrappingQuery
             if (modifiedPositionalParameters == null) {
                 modifiedPositionalParameters = new ArrayList<>();
             }
-            // Remove one to the index since we're using a JPQL parser and JPQL starts at 1
-            // but HQL positional parameters start a 0.
-            modifiedPositionalParameters.add(parameter.getIndex() - 1);
+
+            Integer index = parameter.getIndex();
+
+            if (parameter.isUseFixedIndex()) {
+                modifiedPositionalParameters.add(index);
+            } else {
+                // Remove one to the index since we're using a JPQL parser and JPQL starts at 1
+                // but HQL positional parameters start a 0.
+                modifiedPositionalParameters.add(index - 1);
+            }
         }
 
         @Override

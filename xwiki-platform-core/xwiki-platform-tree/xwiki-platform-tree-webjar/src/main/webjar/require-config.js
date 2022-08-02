@@ -1,19 +1,43 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 /*!
 #set ($minified = '.min')
-#if ($request.minify == 'false')
+#if (!$services.debug.minify)
   #set ($minified = '')
 #end
-*/
-require.config({
-  paths: {
-    jsTree: "$!services.webjars.url('jstree', 'jstree.min')",
-    JobRunner: '$!services.webjars.url("org.xwiki.platform:xwiki-platform-job-webjar", "jobRunner${minified}")',
-    'tree-finder': '$!services.webjars.url("org.xwiki.platform:xwiki-platform-tree-webjar", "finder${minified}")',
-    tree: '$!services.webjars.url("org.xwiki.platform:xwiki-platform-tree-webjar", "tree${minified}")'
-  },
-  shim: {
-    jsTree: {
-      deps: ['jquery']
+#set ($paths = {
+  'jsTree': $services.webjars.url('jstree', "jstree${minified}"),
+  'tree-finder': $services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', "finder${minified}"),
+  'tree': $services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', "tree${minified}")
+})
+#[[*/
+// Start JavaScript-only code.
+(function(paths) {
+  "use strict";
+
+  require.config({
+    paths,
+    shim: {
+      jsTree: ['jquery']
     }
-  }
-});
+  });
+
+// End JavaScript-only code.
+}).apply(']]#', $jsontool.serialize([$paths]));

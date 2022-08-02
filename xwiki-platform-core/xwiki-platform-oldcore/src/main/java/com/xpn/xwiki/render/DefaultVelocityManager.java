@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -36,14 +35,13 @@ import javax.script.ScriptContext;
 
 import org.apache.commons.io.output.NullWriter;
 import org.apache.velocity.VelocityContext;
-import org.apache.velocity.runtime.RuntimeConstants;
-import org.apache.velocity.runtime.RuntimeSingleton;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.logging.LoggerConfiguration;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
@@ -56,12 +54,11 @@ import org.xwiki.template.TemplateManager;
 import org.xwiki.template.event.TemplateDeletedEvent;
 import org.xwiki.template.event.TemplateEvent;
 import org.xwiki.template.event.TemplateUpdatedEvent;
-import org.xwiki.velocity.VelocityConfiguration;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityFactory;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.XWikiVelocityContext;
 import org.xwiki.velocity.XWikiVelocityException;
-import org.xwiki.velocity.XWikiWebappResourceLoader;
 import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
 
 import com.xpn.xwiki.XWikiContext;
@@ -80,18 +77,6 @@ import com.xpn.xwiki.api.DeprecatedContext;
 // TODO: refactor to move it in xwiki-commons, the dependencies on the model are actually quite minor
 public class DefaultVelocityManager implements VelocityManager, Initializable
 {
-    /**
-     * The name of the Velocity configuration property that specifies the ResourceLoader name that Velocity should use
-     * when locating templates.
-     */
-    private static final String RESOURCE_LOADER = "resource.loader";
-
-    /**
-     * The name of the Velocity configuration property that specifies the ResourceLoader class to use to locate Velocity
-     * templates.
-     */
-    private static final String RESOURCE_LOADER_CLASS = "xwiki.resource.loader.class";
-
     private static final String VELOCITYENGINE_CACHEKEY_NAME = "velocity.engine.key";
 
     private static final List<Event> EVENTS =
@@ -116,10 +101,10 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
     private ScriptContextManager scriptContextManager;
 
     @Inject
-    private VelocityFactory velocityFactory;
+    private LoggerConfiguration loggerConfiguration;
 
     @Inject
-    private VelocityConfiguration velocityConfiguration;
+    private VelocityFactory velocityFactory;
 
     /**
      * Accessing it trough {@link Provider} since {@link TemplateManager} depends on {@link VelocityManager}.
@@ -181,10 +166,6 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
         this.reservedBindings.add("macro");
         // Foreach directive
         this.reservedBindings.add("foreach");
-        this.reservedBindings.add(this.velocityConfiguration.getProperties().getProperty(RuntimeConstants.COUNTER_NAME,
-            RuntimeSingleton.getString(RuntimeConstants.COUNTER_NAME)));
-        this.reservedBindings.add(this.velocityConfiguration.getProperties().getProperty(RuntimeConstants.HAS_NEXT_NAME,
-            RuntimeSingleton.getString(RuntimeConstants.HAS_NEXT_NAME)));
         // Evaluate directive
         this.reservedBindings.add("evaluate");
         // TryCatch directive
@@ -206,7 +187,8 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
         if (currentVelocityContext instanceof ScriptVelocityContext) {
             velocityContext = (ScriptVelocityContext) currentVelocityContext;
         } else {
-            velocityContext = new ScriptVelocityContext(currentVelocityContext, this.reservedBindings);
+            velocityContext = new ScriptVelocityContext(currentVelocityContext,
+                this.loggerConfiguration.isDeprecatedLogEnabled(), this.reservedBindings);
             this.execution.getContext().setProperty(VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID,
                 velocityContext);
         }
@@ -302,26 +284,7 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
             synchronized (this) {
                 velocityEngine = this.velocityFactory.getVelocityEngine(cacheKey);
                 if (velocityEngine == null) {
-                    // Gather the global Velocity macros that we want to have. These are skin dependent.
-                    Properties properties = new Properties();
-
-                    // If the user hasn't specified any custom Velocity Resource Loader to use, use the XWiki Resource
-                    // Loader
-                    if (!this.velocityConfiguration.getProperties().containsKey(RESOURCE_LOADER)) {
-                        properties.setProperty(RESOURCE_LOADER, "xwiki");
-                        properties.setProperty(RESOURCE_LOADER_CLASS, XWikiWebappResourceLoader.class.getName());
-                    }
-
-                    if (xcontext != null && xcontext.getWiki() != null) {
-                        // Note: if you don't want any template to be used set the property named
-                        // xwiki.render.velocity.macrolist to an empty string value.
-                        String macroList = xcontext.getWiki().Param("xwiki.render.velocity.macrolist");
-                        if (macroList == null) {
-                            macroList = "/templates/macros.vm";
-                        }
-                        properties.put(RuntimeConstants.VM_LIBRARY, macroList);
-                    }
-                    velocityEngine = this.velocityFactory.createVelocityEngine(cacheKey, properties);
+                    velocityEngine = this.velocityFactory.createVelocityEngine(cacheKey, null);
 
                     if (template != null) {
                         // Local macros template
@@ -331,7 +294,7 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
                             final VelocityEngine finalVelocityEngine = velocityEngine;
 
                             this.authorExecutor.call(() -> {
-                                finalVelocityEngine.evaluate(new VelocityContext(), NullWriter.NULL_WRITER, "",
+                                finalVelocityEngine.evaluate(new XWikiVelocityContext(), NullWriter.NULL_WRITER, "",
                                     template.getContent().getContent());
 
                                 return null;

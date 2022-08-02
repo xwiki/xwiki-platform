@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-war-dependencies</artifactId>
   <name>XWiki Platform - Distribution - War - Dependencies</name>
@@ -109,6 +109,12 @@
       <version>${commons.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-diff-xml</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Blame Script Services -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -123,17 +129,17 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- Velocity add-on for Platform -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-velocity-xwiki</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
     <!-- XML -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-xml-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- WebSocket -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-websocket</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -183,6 +189,12 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-handler-jar</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-extension-script</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
@@ -208,6 +220,12 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-extension-distribution</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-index</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -287,9 +305,9 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-macro-toc</artifactId>
-      <version>${rendering.version}</version>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-toc</artifactId>
+      <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -400,23 +418,16 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- User management -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-user-default</artifactId>
+      <artifactId>xwiki-platform-rendering-async-macro</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- Active Installs 2 -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-user-script</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- Active Installs -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-activeinstalls-client-api</artifactId>
+      <artifactId>xwiki-platform-activeinstalls2-api</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -472,10 +483,10 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- Mailsender -->
+    <!-- Mail Module -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-mail-send-storage</artifactId>
+      <artifactId>xwiki-platform-mail-script</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -510,7 +521,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-eventstream-store</artifactId>
+      <artifactId>xwiki-platform-eventstream-store-solr</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -539,7 +550,7 @@
     <!-- Image plugin -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-image-plugin</artifactId>
+      <artifactId>xwiki-platform-image-processing-plugin</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -598,6 +609,14 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- We need it in the WAR so that the migration is properly applied. This could be moved once we have an
+        appropriate way to run DB migrations from extension -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-ratings-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
 
     <!-- ********************************************************************** -->
     <!-- Plugins, hard to install as extensions (we need to get rid of all that) -->
@@ -638,21 +657,15 @@
       <scope>runtime</scope>
     </dependency>
 
-    <!-- ********************************************************************** -->
-    <!-- Skin -->
-
-    <!-- Skins
-         Note: even though the dependency plugin below doesn't need explicit dependencies set to work it's a best
-         practice to put them here since they are real dependencies
-
-         Note: This dependency is already present in the minimal war but it's not inherited (most likely because of
-         the zip type) -->
+    <!-- TODO: remove when https://jira.xwiki.org/browse/XWIKI-19932 is fixed
+        In the non-legacy WAR because:
+           * the migration UI is in part of the default flavor
+           * it's currently too complex for installed extensions to inject tables
+     -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
+      <artifactId>xwiki-platform-legacy-events-hibernate-api</artifactId>
       <version>${project.version}</version>
-      <type>zip</type>
-      <scope>runtime</scope>
     </dependency>
 
     <!-- ********************************************************************** -->
@@ -663,6 +676,13 @@
       <version>${project.version}</version>
       <type>pom</type>
       <scope>runtime</scope>
+      <exclusions>
+        <!-- Make sure to not package contrib extensions since they need to remain upgradeable -->
+        <exclusion>
+          <groupId>org.xwiki.contrib</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 </project>

@@ -24,8 +24,10 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -58,6 +60,9 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
  */
 // TODO: could be optimized a bit by listening to XClassUpdatedEvent and redoing the comparison between the two
 // classes in case there is several changes to the class
+@Component
+@Singleton
+@Named("XClassMigratorListener")
 public class XClassMigratorListener extends AbstractEventListener
 {
     @Inject
@@ -106,11 +111,13 @@ public class XClassMigratorListener extends AbstractEventListener
         if (newPropertyClass != null) {
             BaseProperty<?> newProperty = newPropertyClass.newProperty();
 
-            if (previousPropertyClass != null) {
+            if (newProperty == null) {
+                migrate = false;                
+            } else if (previousPropertyClass != null) {
                 BaseProperty<?> previousProperty = previousPropertyClass.newProperty();
 
                 // New and previous class property generate different kind of properties
-                migrate = newProperty.getClass() != previousProperty.getClass();
+                migrate = previousProperty == null || newProperty.getClass() != previousProperty.getClass();
             } else {
                 migrate = true;
             }
@@ -133,8 +140,8 @@ public class XClassMigratorListener extends AbstractEventListener
 
         // Get all the documents containing at least one object of the modified class
         Query query = this.queryManager
-            .createQuery("select distinct obj.name from BaseObject as obj where obj.className = ?", Query.HQL);
-        query.bindValue(0, this.localSerializer.serialize(classReference));
+            .createQuery("select distinct obj.name from BaseObject as obj where obj.className = :className", Query.HQL);
+        query.bindValue("className", this.localSerializer.serialize(classReference));
         query.setWiki(wikiReference.getName());
 
         List<String> documents = query.execute();
@@ -205,7 +212,7 @@ public class XClassMigratorListener extends AbstractEventListener
     private boolean convert(BaseObject xobject, BaseProperty<?> property, BaseProperty<?> newProperty,
         PropertyClass newPropertyClass)
     {
-        if (property.getClass() != newProperty.getClass()) {
+        if (newProperty != null && property.getClass() != newProperty.getClass()) {
             BaseProperty<?> convertedProperty = this.propertyConverter.convertProperty(property, newPropertyClass);
 
             // Set new field

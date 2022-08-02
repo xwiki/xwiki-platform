@@ -1,5 +1,0 @@
-###
-### Generic warning message
-###
-#set($messageType = $services.localization.render('platform.core.warningMessageType'))
-#template("message.vm")

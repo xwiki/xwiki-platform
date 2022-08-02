@@ -25,12 +25,12 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-help</artifactId>
   <name>XWiki Platform - Help - Parent POM</name>
   <packaging>pom</packaging>
-  <description>Provides help within your wiki</description>
+  <description>Provides help within your wiki and showcases the main XWiki features through demo content</description>
   <modules>
     <module>xwiki-platform-help-ui</module>
   </modules>

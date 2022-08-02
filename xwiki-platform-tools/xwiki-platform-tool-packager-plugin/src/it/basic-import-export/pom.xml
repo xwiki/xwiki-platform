@@ -53,7 +53,6 @@
                 <xwikiDbConnectionUsername>sa</xwikiDbConnectionUsername>
                 <xwikiDbConnectionPassword />
                 <xwikiDbConnectionDriverClass>org.hsqldb.jdbcDriver</xwikiDbConnectionDriverClass>
-                <xwikiDbDialect>org.hibernate.dialect.HSQLDialect</xwikiDbDialect>
                 <xwikiDbHbmXwiki>xwiki.hbm.xml</xwikiDbHbmXwiki>
                 <xwikiDbHbmFeeds>feeds.hbm.xml</xwikiDbHbmFeeds>
               </properties>
@@ -67,6 +66,12 @@
         <version>${project.version}</version>
         <configuration>
           <hibernateConfig>${project.build.directory}/maven-shared-archive-resources/hibernate.cfg.xml</hibernateConfig>
+          <disabledComponents>
+            <disabledComponent>
+              <type>com.xpn.xwiki.doc.MandatoryDocumentInitializer</type>
+              <role>XWiki.XWikiServerXwiki</role>
+            </disabledComponent>
+          </disabledComponents>
         </configuration>
         <executions>
           <execution>

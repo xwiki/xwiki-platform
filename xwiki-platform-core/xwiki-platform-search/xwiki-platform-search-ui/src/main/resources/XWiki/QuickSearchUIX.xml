@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -124,7 +124,7 @@
     var windowWidth = window.innerWidth;
     return windowWidth &lt; 768;
   }
-  $(document).ready(function() {
+  $(function() {
 
     // Some variables used in the next 2 functions
     var globalSearch = $('#globalsearch');
@@ -134,7 +134,7 @@
     var avatar = $('li.navbar-avatar');
 
     // Open the global search when the user click on the global search button
-    globalSearchButton.click(function(event) {
+    globalSearchButton.on('click', function(event) {
       if (!globalSearch.hasClass('globalsearch-close') &amp;&amp; globalSearchInput.val().length &gt; 0) {
         return true;
       }
@@ -149,7 +149,7 @@
     });
 
     // Close the global search when the focus is lost
-    globalSearchInput.focusout(function() {
+    globalSearchInput.on('focusout', function() {
       // In order to let the main thread setting the focus to the new element, we execute the following code
       // in a callback.
       setTimeout( function () {
@@ -169,9 +169,9 @@
         }
       }, 1);
     });
-    
+
     // Close dropdown menus when the search button is clicked
-    globalSearchButton.click(function(event) {
+    globalSearchButton.on('click', function(event) {
       $('[data-toggle="dropdown"][aria-expanded="true"]').dropdown('toggle');
     });
 
@@ -261,8 +261,14 @@
       <content>{{velocity}}{{html clean="false"}} ## we need clean="false" because we want to display the raw content
   #if ($displayQuickSearch &amp;&amp; ($xwiki.exists('Main.Search') || $xwiki.exists('Main.WebSearch')))
     #set ($discard = $xwiki.jsx.use('XWiki.QuickSearchUIX'))
+    #if ($xwiki.exists('Main.Search'))
+      #set ($searchURL = $xwiki.getURL('Main.Search'))
+    #else
+      #set ($searchURL = $xwiki.getURL('Main.WebSearch'))
+    #end
     &lt;li&gt;
-      &lt;form class="navbar-form globalsearch globalsearch-close form-inline" id="globalsearch" action="#if($xwiki.exists('Main.Search'))$xwiki.getURL('Main.Search')#else$xwiki.getURL('Main.WebSearch')#end"&gt;
+      &lt;form class="navbar-form globalsearch globalsearch-close form-inline" id="globalsearch" action="$searchURL" 
+          role="search"&gt;
         &lt;label class="hidden" for="headerglobalsearchinput"&gt;$services.localization.render('search')&lt;/label&gt;
         &lt;input type="text" name="text" placeholder="$services.localization.render('panels.search.inputText')" id="headerglobalsearchinput" /&gt;
         &lt;button type="submit" class="btn" title="$services.localization.render('search')"&gt;$services.icon.renderHTML('search')&lt;/button&gt;

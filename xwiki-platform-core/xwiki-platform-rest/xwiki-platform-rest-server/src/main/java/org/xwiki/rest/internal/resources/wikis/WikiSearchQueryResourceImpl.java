@@ -28,6 +28,9 @@ import org.xwiki.rest.internal.resources.BaseSearchResult;
 import org.xwiki.rest.model.jaxb.SearchResults;
 import org.xwiki.rest.resources.wikis.WikiSearchQueryResource;
 
+/**
+ * @version $Id$
+ */
 @Component
 @Named("org.xwiki.rest.internal.resources.wikis.WikiSearchQueryResourceImpl")
 public class WikiSearchQueryResourceImpl extends BaseSearchResult implements WikiSearchQueryResource

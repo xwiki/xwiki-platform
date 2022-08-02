@@ -23,6 +23,8 @@ import com.xpn.xwiki.objects.classes.ListClass;
 
 public class StringListProperty extends ListProperty
 {
+    private static final long serialVersionUID = 1L;
+
     @Override
     public Object getCustomMappingValue()
     {

@@ -19,10 +19,9 @@
  */
 package org.xwiki.csrf;
 
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
-import org.jmock.api.Action;
-import org.jmock.api.Invocation;
+import org.mockito.ArgumentMatcher;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 /**
  * A matcher that acts as an action and returns the matched argument in the mocked method, allowing small modifications
@@ -31,7 +30,7 @@ import org.jmock.api.Invocation;
  * @version $Id$
  * @since 2.5M2
  */
-public final class CopyStringMatcher extends BaseMatcher<String> implements Action
+public final class CopyStringMatcher implements ArgumentMatcher<String>, Answer<String>
 {
     /** The string to copy. */
     private String value = null;
@@ -54,34 +53,18 @@ public final class CopyStringMatcher extends BaseMatcher<String> implements Acti
         this.suffix = suffix;
     }
 
-    /**
-     * @see org.hamcrest.Matcher#matches(java.lang.Object)
-     */
     @Override
-    public boolean matches(Object argument)
+    public boolean matches(String argument)
     {
-        if (argument instanceof String) {
-            this.value = (String) argument;
+        if (argument.startsWith(this.prefix) && argument.endsWith(suffix)) {
+            this.value = argument;
             return true;
         }
         return false;
     }
 
-    /**
-     * @see org.hamcrest.SelfDescribing#describeTo(org.hamcrest.Description)
-     */
     @Override
-    public void describeTo(Description d)
-    {
-        d.appendText("COPY VALUE: ");
-        d.appendValue(this.value);
-    }
-
-    /**
-     * @see org.jmock.api.Invokable#invoke(org.jmock.api.Invocation)
-     */
-    @Override
-    public String invoke(Invocation invocation) throws Throwable
+    public String answer(InvocationOnMock invocationOnMock) throws Throwable
     {
         if (this.value == null) {
             return this.prefix + this.suffix;

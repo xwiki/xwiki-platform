@@ -29,6 +29,7 @@ import java.io.OutputStream;
 import java.util.Arrays;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
@@ -250,7 +251,7 @@ public class BatikSVGRasterizerTest
         Response r = Mockito.mock(Response.class);
         when(this.container.getResponse()).thenReturn(r);
         this.mocker.getComponentUnderTest().rasterizeToResponse(VALID_SVG, 100, 200);
-        Mockito.verifyZeroInteractions(r);
+        Mockito.verifyNoInteractions(r);
     }
 
     @Test
@@ -308,6 +309,18 @@ public class BatikSVGRasterizerTest
         public void write(int b) throws IOException
         {
             this.out.write(b);
+        }
+
+        @Override
+        public boolean isReady()
+        {
+            return true;
+        }
+
+        @Override
+        public void setWriteListener(WriteListener writeListener)
+        {
+            // Not needed
         }
     }
 }

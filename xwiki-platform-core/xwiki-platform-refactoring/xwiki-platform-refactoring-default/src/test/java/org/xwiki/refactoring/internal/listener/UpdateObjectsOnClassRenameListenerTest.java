@@ -26,6 +26,7 @@ import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -35,6 +36,8 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
 import org.xwiki.refactoring.job.MoveRequest;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -45,6 +48,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -57,7 +61,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class UpdateObjectsOnClassRenameListenerTest
+class UpdateObjectsOnClassRenameListenerTest
 {
     @InjectMockComponents
     private UpdateObjectsOnClassRenameListener listener;
@@ -81,6 +85,9 @@ public class UpdateObjectsOnClassRenameListenerTest
     @Mock
     private XWiki wiki;
 
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
+
     private DocumentReference oldClassReference = new DocumentReference("foo", "Code", "OldClass");
 
     private DocumentReference newClassReference = new DocumentReference("foo", "Code", "NewClass");
@@ -95,7 +102,7 @@ public class UpdateObjectsOnClassRenameListenerTest
     }
 
     @Test
-    public void onClassRenamed() throws Exception
+    void onClassRenamed() throws Exception
     {
         Query query = mock(Query.class);
         when(this.queryManager.createQuery(any(), any())).thenReturn(query);
@@ -131,10 +138,13 @@ public class UpdateObjectsOnClassRenameListenerTest
         verify(document).removeXObject(oldObject);
         verify(this.wiki).saveDocument(document, "Rename [foo:Code.OldClass] objects into [foo:Code.NewClass]",
             this.xcontext);
+
+        assertEquals("Updating the xobjects of type [foo:Code.OldClass] after the xclass has been renamed to "
+            + "[foo:Code.NewClass].", logCapture.getMessage(0));
     }
 
     @Test
-    public void onClassMovedToDifferentWiki() throws Exception
+    void onClassMovedToDifferentWiki() throws Exception
     {
         this.listener.onEvent(
             new DocumentRenamedEvent(this.oldClassReference, new DocumentReference("bar", "Code", "NewClass")), null,
@@ -145,22 +155,13 @@ public class UpdateObjectsOnClassRenameListenerTest
     }
 
     @Test
-    public void onClassRenamedWithoutUpdateLinks() throws Exception
+    void onClassRenamedWithoutUpdateLinks() throws Exception
     {
         MoveRequest moveRequest = new MoveRequest();
         moveRequest.setUpdateLinks(false);
 
         this.listener.onEvent(new DocumentRenamedEvent(this.oldClassReference, this.newClassReference), null,
             moveRequest);
-
-        verify(this.queryManager, never()).createQuery(any(), any());
-        verify(this.wiki, never()).saveDocument(any(), any());
-    }
-
-    @Test
-    public void onOtherEvents() throws Exception
-    {
-        this.listener.onEvent(null, null, null);
 
         verify(this.queryManager, never()).createQuery(any(), any());
         verify(this.wiki, never()).saveDocument(any(), any());

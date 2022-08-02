@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.Notifications.Code.NotificationsPreferencesMacros" locale="">
+<xwikidoc version="1.4" reference="XWiki.Notifications.Code.NotificationsPreferencesMacros" locale="">
   <web>XWiki.Notifications.Code</web>
   <name>NotificationsPreferencesMacros</name>
   <language/>
@@ -55,7 +55,7 @@
 #end
 #set ($apps = [])
 #set ($lastAppId = '')
-#foreach ($type in $sorttool.sort($types, ['applicationName', 'eventType']))
+#foreach ($type in $collectiontool.sort($types, ['applicationName', 'eventType']))
   #if ($lastAppId != $type.applicationId)
     #set ($lastAppId = $type.applicationId)
     #set ($lastApp = [])
@@ -63,6 +63,32 @@
   #end
   #set ($discard = $lastApp.add($type))
 #end
+#end
+
+##
+## Check that the macro preferences parameters are ok and the current user have proper permissions.
+##
+#macro (checkMacroNotificationPreferencesParameters $checkResult)
+  #set ($checkResult = false)
+  #if (!$xcontext.userReference &amp;&amp; $wikimacro.parameters.target == 'user')
+    {{info}}
+      {{translation key="notifications.settings.applications.forGuest" /}}
+    {{/info}}
+  #elseif ($wikimacro.parameters.target == 'wiki' &amp;&amp; !$services.security.authorization.hasAccess('admin', $services.model.createWikiReference($services.wiki.currentWikiId)))
+    {{error}}
+      {{translation key="notifications.settings.error.notAdmin" /}}
+    {{/error}}
+  #elseif ($wikimacro.parameters.target == 'user' &amp;&amp; "$!wikimacro.parameters.user" != ""  &amp;&amp; $wikimacro.parameters.user.class.simpleName != 'DocumentUserReference')
+    {{error}}
+      {{translation key="notifications.settings.error.userReferenceNotSupported" /}}
+    {{/error}}
+  #elseif ($wikimacro.parameters.target == 'user' &amp;&amp; "$!wikimacro.parameters.user" != "" &amp;&amp; !$services.security.authorization.hasAccess('admin', $wikimacro.parameters.user.reference) &amp;&amp; !$xcontext.userReference.equals($wikimacro.parameters.user.reference))
+    {{error}}
+      {{translation key="notifications.settings.error.userReferenceAdminForbidden" /}}
+    {{/error}}
+  #else
+    #set ($checkResult = true)
+  #end
 #end
 {{/velocity}}</content>
 </xwikidoc>

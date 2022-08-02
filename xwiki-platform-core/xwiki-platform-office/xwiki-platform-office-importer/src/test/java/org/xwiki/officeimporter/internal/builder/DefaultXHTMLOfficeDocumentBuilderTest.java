@@ -20,28 +20,38 @@
 package org.xwiki.officeimporter.internal.builder;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.Reader;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import javax.inject.Named;
+
+import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.officeimporter.builder.XHTMLOfficeDocumentBuilder;
 import org.xwiki.officeimporter.converter.OfficeConverter;
+import org.xwiki.officeimporter.converter.OfficeConverterResult;
 import org.xwiki.officeimporter.document.XHTMLOfficeDocument;
 import org.xwiki.officeimporter.server.OfficeServer;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.XWikiTempDir;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -51,41 +61,61 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  * @since 2.1M1
  */
+@ComponentTest
 public class DefaultXHTMLOfficeDocumentBuilderTest
 {
-    @Rule
-    public MockitoComponentMockingRule<XHTMLOfficeDocumentBuilder> mocker =
-        new MockitoComponentMockingRule<XHTMLOfficeDocumentBuilder>(DefaultXHTMLOfficeDocumentBuilder.class);
+    @InjectMockComponents
+    private DefaultXHTMLOfficeDocumentBuilder officeDocumentBuilder;
 
+    @MockComponent
     private OfficeConverter officeConverter;
 
+    @MockComponent
+    @Named("openoffice")
     private HTMLCleaner officeHTMLCleaner;
 
+    @MockComponent
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
-    @Before
+    @XWikiTempDir
+    private File outputDirectory;
+
+    @MockComponent
+    private OfficeServer officeServer;
+
+    @BeforeEach
     public void configure() throws Exception
     {
-        this.officeConverter = mock(OfficeConverter.class);
-        OfficeServer officeServer = this.mocker.getInstance(OfficeServer.class);
-        when(officeServer.getConverter()).thenReturn(this.officeConverter);
-
-        this.officeHTMLCleaner = this.mocker.getInstance(HTMLCleaner.class, "openoffice");
-        this.entityReferenceSerializer = this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
+        when(this.officeServer.getConverter()).thenReturn(this.officeConverter);
     }
 
     @Test
-    public void testXHTMLOfficeDocumentBuilding() throws Exception
+    public void xhtmlOfficeDocumentBuilding() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
         when(this.entityReferenceSerializer.serialize(documentReference)).thenReturn("wiki:Path.To.Page");
 
         InputStream officeFileStream = new ByteArrayInputStream("office content".getBytes());
-        Map<String, byte[]> artifacts = new HashMap<String, byte[]>();
-        artifacts.put("file.html", "HTML content".getBytes());
-        artifacts.put("file.txt", "Text content".getBytes());
-        when(this.officeConverter.convert(Collections.singletonMap("file.odt", officeFileStream), "file.odt",
-            "file.html")).thenReturn(artifacts);
+
+        OfficeConverterResult converterResult = mock(OfficeConverterResult.class);
+        when(converterResult.getOutputDirectory()).thenReturn(this.outputDirectory);
+        File outputFile = new File(this.outputDirectory, "file.html");
+        when(converterResult.getOutputFile()).thenReturn(outputFile);
+        Set<File> allFiles = new HashSet<>();
+        allFiles.add(outputFile);
+        File otherArtifact = new File(this.outputDirectory, "file.txt");
+        allFiles.add(otherArtifact);
+
+        for (File file : allFiles) {
+            Files.createFile(file.toPath());
+        }
+        try (FileOutputStream fos = new FileOutputStream(outputFile)) {
+            IOUtils.write("HTML content".getBytes(), fos);
+        }
+        when(converterResult.getAllFiles()).thenReturn(allFiles);
+
+        when(this.officeConverter.convertDocument(Collections.singletonMap("file.odt", officeFileStream), "file.odt",
+            "file.html")).thenReturn(converterResult);
 
         Map<String, byte[]> embeddedImages = Collections.singletonMap("image.png", "Image content".getBytes());
         Document xhtmlDoc = mock(Document.class);
@@ -96,7 +126,7 @@ public class DefaultXHTMLOfficeDocumentBuilderTest
         when(this.officeHTMLCleaner.clean(any(Reader.class), eq(config))).thenReturn(xhtmlDoc);
 
         XHTMLOfficeDocument result =
-            this.mocker.getComponentUnderTest().build(officeFileStream, "file.odt", documentReference, true);
+            this.officeDocumentBuilder.build(officeFileStream, "file.odt", documentReference, true);
 
         Map<String, String> params = new HashMap<String, String>();
         params.put("targetDocument", "wiki:Path.To.Page");
@@ -106,9 +136,9 @@ public class DefaultXHTMLOfficeDocumentBuilderTest
 
         assertEquals(xhtmlDoc, result.getContentDocument());
 
-        Map<String, byte[]> expectedArtifacts = new HashMap<String, byte[]>();
-        expectedArtifacts.put("file.txt", artifacts.get("file.txt"));
-        expectedArtifacts.put("image.png", embeddedImages.get("image.png"));
-        assertEquals(expectedArtifacts, result.getArtifacts());
+        Set<File> expectedFileArtifacts = new HashSet<>();
+        expectedFileArtifacts.add(otherArtifact);
+        expectedFileArtifacts.add(new File(this.outputDirectory, "image.png"));
+        assertEquals(expectedFileArtifacts, result.getArtifactsFiles());
     }
 }

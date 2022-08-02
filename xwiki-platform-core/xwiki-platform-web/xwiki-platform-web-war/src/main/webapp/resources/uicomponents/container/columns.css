@@ -1,0 +1,56 @@
+#set ($maxColumns = "$!request.maxColumns")
+#set ($maxColumnsNumber = $numbertool.toNumber($maxColumns).intValue())
+#if (!$maxColumnsNumber || $maxColumnsNumber <= 0)
+  #set ($maxColumnsNumber = 50)
+#end
+#set($columnsTotalWidth = 100)
+/* 1.5% padding right to all the columns except last one. */
+#set($columnPadding = 0.75)
+
+/* Render generic css first */
+
+/* FIXME: this style should not be here, it's style for the container overall, not for the columns layout. For the moment
+   it's here to minimize the number of requested css, since there are no other container rules at the moment (like
+   border, title, or other decoration). */
+.container-justified {
+  text-align: justify;
+}
+
+.container-columns .column {
+  float: left;
+}
+
+/* Make sure that the columns take space when they're empty: if height is auto, and they are floated, they will collapse
+   as if they didn't exist, which breaks the layout */
+.container-columns .column {
+  min-height: 10px;
+}
+
+.container-columns .first-column {
+  padding-left: 0;
+}
+.container-columns .last-column {
+  padding-right: 0;
+}
+
+
+/* Generate column-specific css classes */
+#foreach($columns in [1..$maxColumnsNumber])
+  /* Compute the percent of the screen width of a column. Round because 2 decimals should be enough for everyone. */
+  #set($rawComputedColumnWidth = (($columnsTotalWidth - $columnPadding * 2 * ($columns - 1)) / $columns))
+  #set($computedColumnWidth = $mathtool.roundTo(2, $rawComputedColumnWidth))
+  .container-columns-$columns .column{
+    width: $computedColumnWidth%;
+    padding-right: $columnPadding%;
+    padding-left: $columnPadding%;
+  }
+#end
+
+/* Responsiveness, upon the same limit than Twitter Bootstrap (768px) */
+@media (max-width: 768px) {
+  .container-columns .column {
+    width: 100%;
+    padding-right: 0;
+    padding-left: 0;
+  }
+}

@@ -19,13 +19,26 @@
  */
 package org.xwiki.rendering.async.internal.block;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.CompositeBlock;
+import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
+import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
@@ -41,6 +54,10 @@ import org.xwiki.rendering.transformation.TransformationManager;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public abstract class AbstractBlockAsyncRenderer implements BlockAsyncRenderer
 {
+    @Inject
+    @Named("context")
+    protected Provider<ComponentManager> componentManagerProvider;
+
     @Inject
     protected TransformationManager transformationManager;
 
@@ -59,5 +76,118 @@ public abstract class AbstractBlockAsyncRenderer implements BlockAsyncRenderer
             ((MutableRenderingContext) this.renderingContext).transformInContext(this.macroTransformation,
                 transformationContext, block);
         }
+    }
+
+    /**
+     * Removes any top level paragraph since for example for the following use case we don't want an extra paragraph
+     * block: <code>= hello {{velocity}}world{{/velocity}}</code>.
+     *
+     * @param block the blocks to check and convert
+     */
+    protected Block removeTopLevelParagraph(Block block)
+    {
+        List<Block> blocks = block.getChildren();
+
+        // Remove any top level paragraph so that the result of a macro can be used inline for example.
+        // We only remove the paragraph if there's only one top level element and if it's a paragraph.
+        if ((block.getChildren().size() == 1) && block.getChildren().get(0) instanceof ParagraphBlock) {
+            Block paragraphBlock = blocks.remove(0);
+            blocks.addAll(0, paragraphBlock.getChildren());
+
+            return new CompositeBlock(blocks);
+        }
+
+        return block;
+    }
+
+    /**
+     * @param block the block to render
+     * @return the result of the block rendering
+     * @throws RenderingException when failing to renderer the block
+     * @since 11.8RC1
+     */
+    protected String render(Block block) throws RenderingException
+    {
+        BlockRenderer renderer;
+        try {
+            Syntax targetSyntax = getTargetSyntax();
+            if (targetSyntax == null) {
+                targetSyntax = this.renderingContext.getTargetSyntax();
+            }
+
+            renderer = this.componentManagerProvider.get().getInstance(BlockRenderer.class, targetSyntax.toIdString());
+        } catch (ComponentLookupException e) {
+            throw new RenderingException("Failed to lookup renderer for syntax [" + getTargetSyntax() + "]", e);
+        }
+
+        WikiPrinter printer = new DefaultWikiPrinter();
+        renderer.render(block, printer);
+
+        return printer.toString();
+    }
+
+    /**
+     * @since 11.8RC1
+     */
+    protected List<String> createId(Object... values)
+    {
+        List<String> id = new ArrayList<>(values.length);
+
+        for (Object value : values) {
+            if (value == null) {
+                id.add("");
+            } else {
+                id.add(value.toString());
+            }
+        }
+
+        return id;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.async.internal.block.BlockAsyncRenderer#render(boolean, boolean)
+     * @since 11.10
+     */
+    @Override
+    public BlockAsyncRendererResult render(boolean async, boolean cached) throws RenderingException
+    {
+        // Parse the wiki macro content.
+        Block block = execute(async, cached);
+
+        ///////////////////////////////////////
+        // Rendering
+
+        String resultString = null;
+
+        if (isRendered(async, cached)) {
+            resultString = render(block);
+        }
+
+        return new BlockAsyncRendererResult(resultString, block);
+    }
+
+    /**
+     * @param async true if the renderer is executed asynchronously
+     * @param cached true of the result of the renderer will be cached
+     * @return true if the result of the execution should be rendered
+     * @since 11.10
+     */
+    protected boolean isRendered(boolean async, boolean cached)
+    {
+        return async;
+    }
+
+    /**
+     * @param async true if the renderer is executed asynchronously
+     * @param cached true of the result of the renderer will be cached
+     * @return the result of the execution
+     * @throws RenderingException when failing to execute the renderer
+     * @since 11.10
+     */
+    protected Block execute(boolean async, boolean cached) throws RenderingException
+    {
+        return null;
     }
 }

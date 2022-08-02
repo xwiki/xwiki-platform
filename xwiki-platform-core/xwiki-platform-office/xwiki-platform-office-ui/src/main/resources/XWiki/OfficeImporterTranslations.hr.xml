@@ -45,5 +45,8 @@ office.config.serverType.hint=Tip Office poslužitelja. Može biti interno uprav
 office.config.serverPort.hint=Broj priključka za spajanje na instancu Office poslužitelja
 office.config.autoStart.hint=Naznačite bi li Office poslužitelj trebao biti pokrenut / automatski povezan pri pokretanju XWikija
 office.config.serverPath.hint=Putanja prema Office instalaciji
-</content>
+### Missing: office.config.serverState.connected=Connected
+### Missing: office.config.serverState.notConnected=Not Connected
+### Missing: office.config.serverState.confError=Invalid Configuration
+### Missing: office.config.serverState.error=Error</content>
 </xwikidoc>

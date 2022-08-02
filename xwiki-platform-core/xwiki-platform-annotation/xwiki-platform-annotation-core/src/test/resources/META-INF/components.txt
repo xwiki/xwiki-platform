@@ -1,0 +1,3 @@
+org.xwiki.rendering.internal.transformation.TestGeneratedContentMacro
+org.xwiki.rendering.internal.transformation.TestEmptyXHTMLRawBlockMacro
+org.xwiki.rendering.internal.transformation.TestSpacesXHTMLRawBlockMacro

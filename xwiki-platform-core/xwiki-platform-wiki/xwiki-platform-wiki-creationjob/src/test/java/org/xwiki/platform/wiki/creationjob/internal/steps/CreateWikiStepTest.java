@@ -57,20 +57,21 @@ public class CreateWikiStepTest
         WikiCreationRequest request = new WikiCreationRequest();
         request.setWikiId("wikiId");
         request.setAlias("wikiAlias");
+        request.setOwnerId("owner");
         request.setFailOnExist(true);
 
         // Test
         mocker.getComponentUnderTest().execute(request);
 
         // Verify
-        verify(wikiManager).create("wikiId", "wikiAlias", true);
+        verify(wikiManager).create("wikiId", "wikiAlias", "owner", true);
 
         // Test 2
         request.setFailOnExist(false);
         mocker.getComponentUnderTest().execute(request);
 
         // Verify
-        verify(wikiManager).create("wikiId", "wikiAlias", false);
+        verify(wikiManager).create("wikiId", "wikiAlias", "owner", false);
     }
 
     @Test
@@ -79,10 +80,11 @@ public class CreateWikiStepTest
         WikiCreationRequest request = new WikiCreationRequest();
         request.setWikiId("wikiId");
         request.setAlias("wikiAlias");
+        request.setOwnerId("owner");
         request.setFailOnExist(true);
 
-        Exception exception = new WikiManagerException("Execption in WikiManager.");
-        doThrow(exception).when(wikiManager).create(any(), any(), anyBoolean());
+        Exception exception = new WikiManagerException("Exception in WikiManager.");
+        doThrow(exception).when(wikiManager).create(any(), any(), any(), anyBoolean());
 
         // Test
         WikiCreationException caughtException = null;

@@ -20,22 +20,25 @@
 package com.xpn.xwiki.web;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.UUID;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.mime.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.event.model.WikiDocumentFilter;
 import org.xwiki.filter.input.BeanInputFilterStream;
 import org.xwiki.filter.input.BeanInputFilterStreamFactory;
-import org.xwiki.filter.input.DefaultInputStreamInputSource;
 import org.xwiki.filter.input.InputFilterStreamFactory;
+import org.xwiki.filter.input.InputSource;
 import org.xwiki.filter.instance.output.DocumentInstanceOutputProperties;
 import org.xwiki.filter.instance.output.InstanceOutputProperties;
 import org.xwiki.filter.output.BeanOutputFilterStream;
@@ -65,6 +68,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.XARImportedEvent;
 import com.xpn.xwiki.internal.event.XARImportingEvent;
+import com.xpn.xwiki.internal.filter.input.XWikiAttachmentContentInputSource;
 import com.xpn.xwiki.plugin.packaging.DocumentInfo;
 import com.xpn.xwiki.plugin.packaging.DocumentInfoAPI;
 import com.xpn.xwiki.plugin.packaging.Package;
@@ -76,6 +80,9 @@ import com.xpn.xwiki.util.Util;
  *
  * @version $Id$
  */
+@Component
+@Named("import")
+@Singleton
 public class ImportAction extends XWikiAction
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportAction.class);
@@ -255,8 +262,8 @@ public class ImportAction extends XWikiAction
 
                     String documentReference = getDocumentReference(pageEntry);
                     if (iAction == DocumentInfo.ACTION_OVERWRITE) {
-                        entities.includes(new LocalDocumentReference(resolver.resolve(documentReference, EntityType.DOCUMENT),
-                            LocaleUtils.toLocale(locale)));
+                        entities.includes(new LocalDocumentReference(
+                            resolver.resolve(documentReference, EntityType.DOCUMENT), LocaleUtils.toLocale(locale)));
                     }
                 }
             }
@@ -299,8 +306,8 @@ public class ImportAction extends XWikiAction
         // Notify all the listeners about import
         ObservationManager observation = Utils.getComponent(ObservationManager.class);
 
-        InputStream source = packFile.getContentInputStream(context);
-        xarProperties.setSource(new DefaultInputStreamInputSource(source));
+        InputSource source = new XWikiAttachmentContentInputSource(packFile.getAttachmentContent(context));
+        xarProperties.setSource(source);
 
         // Setup log
         xarProperties.setVerbose(true);
@@ -336,7 +343,7 @@ public class ImportAction extends XWikiAction
                 }
             }
 
-            // Close the input source
+            // Make sure to free any resource use by the input source in case the input filter does not do it
             source.close();
 
             observation.notify(new XARImportedEvent(), null, context);
@@ -357,17 +364,16 @@ public class ImportAction extends XWikiAction
             if (marker != null) {
                 if (marker.contains(WikiDocumentFilter.LOG_DOCUMENT_CREATED.getName())
                     || marker.contains(WikiDocumentFilter.LOG_DOCUMENT_UPDATED.getName())) {
-                    oldImporter.getInstalled(context).add(
-                        serializer.serialize((EntityReference) log.getArgumentArray()[0]));
+                    oldImporter.getInstalled(context)
+                        .add(serializer.serialize((EntityReference) log.getArgumentArray()[0]));
                 } else if (marker.contains(WikiDocumentFilter.LOG_DOCUMENT_SKIPPED.getName())) {
-                    oldImporter.getSkipped(context).add(
-                        serializer.serialize((EntityReference) log.getArgumentArray()[0]));
+                    oldImporter.getSkipped(context)
+                        .add(serializer.serialize((EntityReference) log.getArgumentArray()[0]));
                 } else if (marker.contains(WikiDocumentFilter.LOG_DOCUMENT_ERROR.getName())) {
                     Object entity = log.getArgumentArray()[0];
                     if (entity != null) {
-                        oldImporter.getErrors(context).add(
-                            entity instanceof EntityReference ? serializer.serialize((EntityReference) log
-                                .getArgumentArray()[0]) : entity.toString());
+                        oldImporter.getErrors(context).add(entity instanceof EntityReference
+                            ? serializer.serialize((EntityReference) log.getArgumentArray()[0]) : entity.toString());
                     }
                 }
             }

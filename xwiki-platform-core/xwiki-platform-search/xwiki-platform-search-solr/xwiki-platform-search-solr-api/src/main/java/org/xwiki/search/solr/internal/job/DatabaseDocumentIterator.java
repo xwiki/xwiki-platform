@@ -137,9 +137,8 @@ public class DatabaseDocumentIterator extends AbstractDocumentIterator<String>
         String name = (String) result[1];
         String locale = (String) result[2];
         String version = (String) result[3];
-        SpaceReference spaceReference =
-            new SpaceReference(this.explicitEntityReferenceResolver.resolve(localSpaceReference, EntityType.SPACE,
-                new WikiReference(wiki)));
+        SpaceReference spaceReference = new SpaceReference(this.explicitEntityReferenceResolver
+            .resolve(localSpaceReference, EntityType.SPACE, new WikiReference(wiki)));
         DocumentReference documentReference = new DocumentReference(name, spaceReference);
         if (!StringUtils.isEmpty(locale)) {
             documentReference = new DocumentReference(documentReference, LocaleUtils.toLocale(locale));
@@ -159,7 +158,7 @@ public class DatabaseDocumentIterator extends AbstractDocumentIterator<String>
                 size += (long) countQuery.setWiki(wikiName).execute().get(0);
             }
         } catch (QueryException e) {
-            logger.error("Failed to count the documents.", e);
+            throw new IllegalStateException("Failed to count the documents.", e);
         }
 
         return size;
@@ -202,8 +201,7 @@ public class DatabaseDocumentIterator extends AbstractDocumentIterator<String>
             results = getQuery().setWiki(wiki).setOffset(offset).execute();
             offset += LIMIT;
         } catch (QueryException e) {
-            results = Collections.emptyList();
-            logger.error("Failed to query the database.", e);
+            throw new IllegalStateException("Failed to query the database.", e);
         }
     }
 
@@ -276,9 +274,7 @@ public class DatabaseDocumentIterator extends AbstractDocumentIterator<String>
             try {
                 wikis = new ArrayList<String>(wikiDescriptorManager.getAllIds());
             } catch (WikiManagerException e) {
-                logger.error("Failed to get the list of available wikis.", e);
-
-                wikis = Collections.emptyList();
+                throw new IllegalStateException("Failed to get the list of available wikis.", e);
             }
 
             return wikis;

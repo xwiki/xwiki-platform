@@ -25,9 +25,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.httpclient.HttpMethod;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.xwiki.test.integration.XWikiExecutor;
+import org.xwiki.test.integration.junit4.ValidateConsoleRule;
 import org.xwiki.test.ui.TestUtils;
 
 /**
@@ -42,6 +44,12 @@ public class AbstractTest
 
     @Rule
     public TestName testName = new TestName();
+
+    /**
+     * Validate stdout/stderr for problems.
+     */
+    @ClassRule
+    public static final ValidateConsoleRule validateConsole = new ValidateConsoleRule();
 
     /** Cached secret token. TODO cache for each user. */
     private String secretToken = null;

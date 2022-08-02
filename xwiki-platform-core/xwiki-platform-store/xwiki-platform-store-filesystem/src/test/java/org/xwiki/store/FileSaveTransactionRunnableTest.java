@@ -22,13 +22,15 @@ package org.xwiki.store;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.xwiki.test.junit5.XWikiTempDir;
+import org.xwiki.test.junit5.XWikiTempDirExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -41,6 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 3.0M2
  */
+@ExtendWith(XWikiTempDirExtension.class)
 public class FileSaveTransactionRunnableTest
 {
     private static final String[] FILE_PATH = { "path", "to", "file" };
@@ -61,11 +64,13 @@ public class FileSaveTransactionRunnableTest
 
     private FileSaveTransactionRunnable runnable;
 
+    @XWikiTempDir
+    private File testDirectory;
+
     @BeforeEach
     public void beforeEach() throws Exception
     {
-        File testDirectory = new File("target/test-" + new Date().getTime()).getAbsoluteFile();
-        File storageLocation = new File(testDirectory, "test-storage" + System.identityHashCode(this.getClass()));
+        File storageLocation = new File(this.testDirectory, "test-storage" + System.identityHashCode(this.getClass()));
 
         this.toSave = storageLocation;
         for (int i = 0; i < FILE_PATH.length; i++) {

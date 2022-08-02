@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.DeletedDocumentsJSON" locale="">
+<xwikidoc version="1.4" reference="XWiki.DeletedDocumentsJSON" locale="">
   <web>XWiki</web>
   <name>DeletedDocumentsJSON</name>
   <language/>
@@ -46,13 +46,13 @@
 ## ============================================================================================
 #if("$!{request.get('xpage')}" == 'plain')
 $response.setContentType('application/json')
-#set($offset = $mathtool.toInteger($request.get('offset')))
+#set($offset = $numbertool.toNumber($request.get('offset')).intValue())
 ## offset starts from 0 in velocity and 1 in javascript
 #set($offset = $offset - 1)
 #if (!$offset || $offset &lt; 0)
   #set ($offset = 0)
 #end
-#set($limit = $mathtool.toInteger($request.get('limit')))
+#set($limit = $numbertool.toNumber($request.get('limit')).intValue())
 #if (!$limit)
   #set ($limit = 15)
 #end
@@ -60,7 +60,7 @@ $response.setContentType('application/json')
 #set($dateFilter = $request.get('ddoc.date'))
 #set($deleterFilter = $request.get('ddoc.deleter'))
 #set($sql = '')
-#set($params = [])
+#set($params = {})
 #if("$!{docNameFilter}" != '')
   #set($sql = "and lower(ddoc.fullName) like '%${docNameFilter.trim().toLowerCase()}%' ")
 #end
@@ -68,13 +68,13 @@ $response.setContentType('application/json')
   #set($dates = $dateFilter.split('-'))
   #if($dates.size() == 2)
     ## Date range matching
-    #set($sql = "${sql} and ddoc.date between ? and ? ")
-    #set($discard = $params.add($datetool.toDate($mathtool.toNumber($dates[0]))))
-    #set($discard = $params.add($datetool.toDate($mathtool.toNumber($dates[1]))))
+    #set($sql = "${sql} and ddoc.date between :ddoc_date_before and :ddoc_date_after ")
+    #set($discard = $params.put('ddoc_date_before', $datetool.toDate($numbertool.toNumber($dates[0]))))
+    #set($discard = $params.put('ddoc_date_after', $datetool.toDate($numbertool.toNumber($dates[1]))))
   #else
     ## Single value matching
-    #set($sql = "${sql} and upper(str(ddoc.date)) like upper(str(?)) ")
-    #set($discard = $params.add($dateFilter))
+    #set($sql = "${sql} and upper(str(ddoc.date)) like upper(str(:ddoc_date)) ")
+    #set($discard = $params.put('ddoc_date', $dateFilter))
   #end
 #end
 #if("$!{deleterFilter}" != '')
@@ -110,35 +110,33 @@ $response.setContentType('application/json')
 "rows": [
 #foreach($item in $items)
   #set($ddoc = $xwiki.getDeletedDocument($item))
-  #if($velocityCount &gt; 1) , #end
+  #if($foreach.count &gt; 1) , #end
   {
      #set($originalDocument = $ddoc.getDocument())
-     "fullname"  : "$escapetool.javascript($originalDocument.fullName)",
-     "title"  : "$escapetool.javascript($originalDocument.displayTitle)",
-     "url" : "$escapetool.javascript($originalDocument.getURL('viewrev', $escapetool.url({'rev' : "deleted:${item}"})))",
-     "originalUrl" : "$escapetool.javascript($originalDocument.getURL())",
+     "fullname"  : "$escapetool.javascript($ddoc.fullName)",
+     "title"  : #if ($originalDocument)"$escapetool.javascript($originalDocument.displayTitle)"#else"$escapetool.javascript($ddoc.documentReference.name)"#end,
+     "url" : "$escapetool.javascript($xwiki.getURL($ddoc.documentReference, 'view', $escapetool.url({'rev' : "deleted:${item}"})))",
+     "originalUrl" : "$escapetool.javascript($xwiki.getURL($ddoc.documentReference))",
      "canDelete" : $ddoc.canDelete(),
-     "deleteUrl" : "$escapetool.javascript($originalDocument.getURL('delete', "id=${item}&amp;form_token=$!{services.csrf.getToken()}"))",
-     "canRestore" : $ddoc.canUndelete(),
-     #set ($ddocReferenceWithLocale = $services.model.createDocumentReference($originalDocument.documentReference, $originalDocument.locale))
-     #set ($exists = $xwiki.exists($ddocReferenceWithLocale))
+     "deleteUrl" : "$escapetool.javascript($xwiki.getURL($ddoc.documentReference, 'delete', "id=${item}&amp;form_token=$!{services.csrf.getToken()}"))",
+     "canRestore" : #if($originalDocument)$ddoc.canUndelete()#{else}false#end,
+     #set ($exists = $xwiki.exists($ddoc.documentReference))
      "alreadyExists" : ${exists},
      ## If a document to be undeleted is a translation and the main document of that translation is not yet created or undeleted, restoring this translation 
      ## will leave it inaccessible from the UI, thus "orphaned", until the main document is created or undeleted.
      #set ($causesOrphanedTranslation = false)
-     #if (!$exists)
-       #set ($mainDocumentExists = $xwiki.exists($originalDocument.documentReference))
-       #set ($causesOrphanedTranslation = $originalDocument.isTranslation() &amp;&amp; !$mainDocumentExists)
+     #if (!$exists &amp;&amp; $ddoc.documentReference.locale &amp;&amp; $ddoc.documentReference.locale != $services.localization.toLocale(''))
+       #set ($causesOrphanedTranslation = !$xwiki.exists($ddoc.documentReference.withoutLocale()))
      #end
      "causesOrphanedTranslation" : $causesOrphanedTranslation,
-     "restoreUrl" : "$escapetool.javascript($originalDocument.getURL('undelete', "id=${item}&amp;form_token=$!{services.csrf.getToken()}"))",
+     "restoreUrl" : "$escapetool.javascript($xwiki.getURL($ddoc.documentReference, 'undelete', "id=${item}&amp;form_token=$!{services.csrf.getToken()}"))",
      "date" : "$escapetool.javascript($xwiki.formatDate($ddoc.date, $dateFormat))",
      "deleter" : "$escapetool.javascript($ddoc.deleter)",
      "deletername" : "$escapetool.javascript($xwiki.getUserName($ddoc.deleter, false))",
      "deleterurl" : "$escapetool.javascript($xwiki.getURL($ddoc.deleter, 'view'))",
      "language" : "$ddoc.locale",
      "batchId" : "$!ddoc.batchId",
-     "batchId_url" : "$escapetool.javascript($originalDocument.getURL('undelete', "id=${item}&amp;showBatch=true"))"
+     "batchId_url" : "$escapetool.javascript($xwiki.getURL($ddoc.documentReference, 'undelete', "id=${item}&amp;showBatch=true"))"
    }
 #end
 ]}
@@ -226,6 +224,9 @@ $response.setContentType('application/json')
     </property>
     <property>
       <levels>view,edit</levels>
+    </property>
+    <property>
+      <users/>
     </property>
   </object>
 </xwikidoc>

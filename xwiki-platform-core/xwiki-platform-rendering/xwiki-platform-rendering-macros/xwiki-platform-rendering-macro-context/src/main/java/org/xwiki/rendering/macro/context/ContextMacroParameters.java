@@ -19,7 +19,9 @@
  */
 package org.xwiki.rendering.macro.context;
 
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyDisplayType;
 
 /**
  * Parameters for the Context macro.
@@ -53,6 +55,7 @@ public class ContextMacroParameters
      * @param documentReference refer to {@link #getDocument()}
      */
     @PropertyDescription("The reference to the document serving as the current document")
+    @PropertyDisplayType(DocumentReference.class)
     public void setDocument(String documentReference)
     {
         this.documentReference = documentReference;

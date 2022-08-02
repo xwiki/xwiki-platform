@@ -1,3 +1,22 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
 ###
 ### Rename document template, step 1: choose new name + updated backlinks + updated parents
 ###
@@ -7,7 +26,15 @@
 #template('contentheader.vm')
 #template('refactoring_macros.vm')
 #template('locationPicker_macros.vm')
-<form action="?xpage=rename&amp;step=2" method="post" id="rename" class="xform">
+#set ($sourcePageIsTerminal = $doc.documentReference.name != $services.model.getEntityReference('DOCUMENT', 'default').name)
+## Warn in case of user/group renaming without programming rights
+#set ($nbUsers = $doc.getObjectNumbers("XWiki.XWikiUsers"))
+#set ($nbGroups = $doc.getObjectNumbers("XWiki.XWikiGroups"))
+#set ($hasAdminRights = $xwiki.hasAccessLevel('admin'))
+#if (($nbUsers > 0 || $nbGroups > 0) && !$hasAdminRights)
+  #warning($services.localization.render('core.rename.warningRenameUser'))
+#end
+  <form action="?xpage=rename&amp;step=2" method="post" id="rename" class="xform">
   <div class="hidden">
     ## CSRF prevention
     <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
@@ -38,40 +65,22 @@
           'label': 'core.rename.links.label',
           'hint': 'core.rename.links.hint'
         })
-        ##--------------------
-        ## Auto redirect field
-        ##--------------------
-        ## We set Autoredirect to off by default for the following reasons:
-        ## - Several users have reported a usability issue about automatic redirects. The way they express it is the
-        ##   following: "I have duplicates pages in my wiki. I don't understand why this is happening. I'm choosing to
-        ##   rename pages and not to copy them but I still get duplicates in the Navigation panel".
-        ## - Automatic redirects are especially useful for public wikis where users can have bookmark on pages and you
-        ##   don't want to break them. It can also be useful for internal wikis but it's less an issue.
-        ## - Even for public wikis not all pages need automatic redirects. Technical pages don't need them for example.
-        ## - We don't have management UIs for redirects FTM and reducing the number of redirects make the wiki easier
-        ##   to manage.
-        ## In the future we'll offer a config option to define the default behavior, see
-        ## http://jira.xwiki.org/browse/XWIKI-13384
-        #set ($checked = $request.autoRedirect == 'true')
-        <dt>
-          <label>
-            <input type="checkbox" name="autoRedirect" value="true" #if ($checked)checked="checked"#end />
-            $services.localization.render('core.rename.autoRedirect.label')
-          </label>
-          ## The value submitted when the checkbox is not checked, used to preserve the form state.
-          <input type="hidden" name="autoRedirect" value="false" />
-        </dt>
-        <dd>
-          <span class="xHint">$services.localization.render('core.rename.autoRedirect.hint')</span>
-        </dd>
+        #displayAutoRedirectCheckbox({
+          'label': 'core.rename.autoRedirect.label',
+          'hint': 'core.rename.autoRedirect.hint'
+        })
       </dl>
     </div>
     <div class="col-xs-12 col-lg-6">
       ##------------
       ## Target Page
       ##------------
-      #set ($parentReference = $doc.pageReference.parent)
-      #set ($name = $doc.pageReference.name)
+      #set ($parentReference = $doc.documentReference.parent)
+      #set ($name = $doc.documentReference.name)
+      #if (!$sourcePageIsTerminal)
+        #set ($name = $parentReference.name)
+        #set ($parentReference = $parentReference.parent)
+      #end
       #locationPicker({
         'id': 'target',
         'title': {

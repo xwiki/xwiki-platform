@@ -47,24 +47,26 @@ public class DeletedDocumentRevisionProvider implements DocumentRevisionProvider
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
-    private XWikiDocument getRevision(String revision) throws XWikiException
+    @Override
+    public XWikiDocument getRevision(DocumentReference reference, String revision) throws XWikiException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
         XWikiDeletedDocument deletedDocument = xcontext.getWiki().getDeletedDocument(Long.valueOf(revision), xcontext);
 
-        return deletedDocument != null ? deletedDocument.restoreDocument(xcontext) : null;
-    }
+        // Only local the document if it matches the asked document reference
+        if (deletedDocument != null
+            && (reference == null || deletedDocument.getDocumentReference().equals(reference))) {
+            return deletedDocument.restoreDocument(xcontext);
+        }
 
-    @Override
-    public XWikiDocument getRevision(DocumentReference reference, String revision) throws XWikiException
-    {
-        return getRevision(revision);
+        return null;
+
     }
 
     @Override
     public XWikiDocument getRevision(XWikiDocument document, String revision) throws XWikiException
     {
-        return getRevision(revision);
+        return getRevision(document != null ? document.getDocumentReferenceWithLocale() : null, revision);
     }
 }

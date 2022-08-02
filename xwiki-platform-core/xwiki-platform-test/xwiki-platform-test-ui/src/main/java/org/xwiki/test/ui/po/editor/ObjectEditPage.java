@@ -20,14 +20,17 @@
 package org.xwiki.test.ui.po.editor;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.xwiki.test.ui.po.FormElement;
+import org.xwiki.stability.Unstable;
+import org.xwiki.test.ui.po.SuggestInputElement;
 
 /**
  * Represents the common actions possible on all Pages when using the "edit" action with the "object" editor.
@@ -37,16 +40,11 @@ import org.xwiki.test.ui.po.FormElement;
  */
 public class ObjectEditPage extends EditPage
 {
-    @FindBy(id = "update")
-    private WebElement objectForm;
-
     @FindBy(id = "classname")
     private WebElement classNameField;
 
     @FindBy(name = "action_objectadd")
     private WebElement classNameSubmit;
-
-    private FormElement form;
 
     /**
      * Go to the passed page in object edit mode.
@@ -59,7 +57,9 @@ public class ObjectEditPage extends EditPage
 
     public ObjectEditPane addObject(String className)
     {
-        getForm().setFieldValue(this.classNameField, className);
+        // Ensure to scroll to the action button, in case we where below in the page.
+        getDriver().scrollTo(classNameSubmit);
+        new SuggestInputElement(this.classNameField).click().waitForSuggestions().selectByValue(className);
 
         final By objectsLocator = By.cssSelector("[id='xclass_" + className + "'] .xobject");
         final int initialObjectCount = getDriver().findElementsWithoutWaiting(objectsLocator).size();
@@ -162,14 +162,6 @@ public class ObjectEditPage extends EditPage
         return false;
     }
 
-    private FormElement getForm()
-    {
-        if (this.form == null) {
-            this.form = new FormElement(this.objectForm);
-        }
-        return this.form;
-    }
-
     public String getURL(String space, String page)
     {
         return getUtil().getURL(space, page, "edit", "editor=object");
@@ -178,19 +170,39 @@ public class ObjectEditPage extends EditPage
     /** className will look something like "XWiki.XWikiRights" */
     public List<ObjectEditPane> getObjectsOfClass(String className)
     {
-        List<WebElement> titles =
-            getDriver().findElement(By.id("xclass_" + className)).findElements(By.className("xobject-title"));
+        return getObjectsOfClass(className, true);
+    }
+
+    /**
+     * Retrieve all objects of the given class name, and expand them if needed.
+     * Note that if {@code displayAllObjects} is set to {@code false} then you need to be careful to call
+     * {@link ObjectEditPane#displayObject()} to load the xobjects information if you need to access them.
+     *
+     * @param className the name of the class for which to retrieve the object (e.g. XWiki.XWikiRights)
+     * @param displayAllObjects if {@code true} expand the objects before returning them.
+     * @return the list of {@link ObjectEditPane} corresponding to all objects of the given class.
+     * @since 13.1RC1
+     */
+    @Unstable
+    public List<ObjectEditPane> getObjectsOfClass(String className, boolean displayAllObjects)
+    {
+        WebElement classElement;
+        try {
+            classElement = getDriver().findElementWithoutWaiting(By.id("xclass_" + className));
+        } catch (NoSuchElementException e) {
+            // if we cannot find the class elements it means there's no object of this class.
+            return Collections.emptyList();
+        }
         List<WebElement> elements =
-            getDriver().findElement(By.id("xclass_" + className)).findElements(By.className("xobject-content"));
+            classElement.findElements(By.className("xobject-content"));
         List<ObjectEditPane> objects = new ArrayList<ObjectEditPane>(elements.size());
-        for (int i = 0; i < elements.size(); i++) {
-            WebElement element = elements.get(i);
-            // Make sure all forms are displayed otherwise we can't interact with them.
-            if (!element.isDisplayed()) {
-                titles.get(i).click();
-            }
+        for (WebElement element : elements) {
             int objectNumber = Integer.parseInt(element.getAttribute("id").split("_")[2]);
-            objects.add(new ObjectEditPane(element, className, objectNumber));
+            ObjectEditPane editPane = new ObjectEditPane(By.id(element.getAttribute("id")), className, objectNumber);
+            if (displayAllObjects) {
+                editPane.displayObject();
+            }
+            objects.add(editPane);
         }
         return objects;
     }

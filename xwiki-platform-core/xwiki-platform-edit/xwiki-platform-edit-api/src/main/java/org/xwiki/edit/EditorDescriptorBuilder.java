@@ -19,14 +19,7 @@
  */
 package org.xwiki.edit;
 
-import javax.inject.Inject;
-
-import org.apache.commons.lang3.StringUtils;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.edit.internal.DefaultEditorDescriptor;
-import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Builds an {@link EditorDescriptor} instance.
@@ -34,40 +27,16 @@ import org.xwiki.localization.ContextualLocalizationManager;
  * @version $Id$
  * @since 8.2RC1
  */
-@Component(roles = EditorDescriptorBuilder.class)
-@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class EditorDescriptorBuilder implements EditorDescriptor
+@Role
+public interface EditorDescriptorBuilder extends EditorDescriptor
 {
-    private String id;
-
-    private String name;
-
-    private String description;
-
-    private String icon;
-
-    private String category;
-
-    @Inject
-    private ContextualLocalizationManager localization;
-
     /**
      * Sets the editor id.
      * 
      * @param id the editor id
      * @return this builder
      */
-    public EditorDescriptorBuilder setId(String id)
-    {
-        this.id = id;
-        return this;
-    }
-
-    @Override
-    public String getId()
-    {
-        return this.id;
-    }
+    EditorDescriptorBuilder setId(String id);
 
     /**
      * Sets the editor name.
@@ -75,17 +44,7 @@ public class EditorDescriptorBuilder implements EditorDescriptor
      * @param name the editor name
      * @return this builder
      */
-    public EditorDescriptorBuilder setName(String name)
-    {
-        this.name = name;
-        return this;
-    }
-
-    @Override
-    public String getName()
-    {
-        return this.name;
-    }
+    EditorDescriptorBuilder setName(String name);
 
     /**
      * Sets the editor description.
@@ -93,17 +52,7 @@ public class EditorDescriptorBuilder implements EditorDescriptor
      * @param description the editor description
      * @return this builder
      */
-    public EditorDescriptorBuilder setDescription(String description)
-    {
-        this.description = description;
-        return this;
-    }
-
-    @Override
-    public String getDescription()
-    {
-        return this.description;
-    }
+    EditorDescriptorBuilder setDescription(String description);
 
     /**
      * Sets the editor icon.
@@ -111,17 +60,7 @@ public class EditorDescriptorBuilder implements EditorDescriptor
      * @param icon the editor icon
      * @return this builder
      */
-    public EditorDescriptorBuilder setIcon(String icon)
-    {
-        this.icon = icon;
-        return this;
-    }
-
-    @Override
-    public String getIcon()
-    {
-        return this.icon;
-    }
+    EditorDescriptorBuilder setIcon(String icon);
 
     /**
      * Sets the editor category.
@@ -129,38 +68,12 @@ public class EditorDescriptorBuilder implements EditorDescriptor
      * @param category the editor category
      * @return this builder
      */
-    public EditorDescriptorBuilder setCategory(String category)
-    {
-        this.category = category;
-        return this;
-    }
-
-    @Override
-    public String getCategory()
-    {
-        return this.category;
-    }
+    EditorDescriptorBuilder setCategory(String category);
 
     /**
      * Builds the editor descriptor.
      * 
      * @return the editor descriptor
      */
-    public EditorDescriptor build()
-    {
-        if (StringUtils.isEmpty(this.id)) {
-            throw new RuntimeException("The editor id is mandatory.");
-        }
-        if (StringUtils.isEmpty(this.name)) {
-            this.name = this.localization.getTranslationPlain(String.format("edit.editor.%s.name", this.id));
-            if (StringUtils.isEmpty(this.name)) {
-                this.name = this.id;
-            }
-        }
-        if (this.description == null) {
-            this.description =
-                this.localization.getTranslationPlain(String.format("edit.editor.%s.description", this.id));
-        }
-        return new DefaultEditorDescriptor(this.id, this.name, this.description, this.icon, this.category);
-    }
+    EditorDescriptor build();
 }

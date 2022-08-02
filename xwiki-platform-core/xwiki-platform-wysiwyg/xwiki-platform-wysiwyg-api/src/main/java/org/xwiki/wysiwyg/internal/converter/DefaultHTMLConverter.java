@@ -28,9 +28,12 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.listener.MetaData;
+import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.StreamParser;
@@ -73,14 +76,14 @@ public class DefaultHTMLConverter implements HTMLConverter
      * The component used to parse the XHTML obtained after cleaning.
      */
     @Inject
-    @Named("xhtml/1.0")
+    @Named("xhtml/5")
     private Parser xhtmlParser;
 
     /**
      * The component used to parse the XHTML obtained after cleaning, when transformations are not executed.
      */
     @Inject
-    @Named("xhtml/1.0")
+    @Named("xhtml/5")
     private StreamParser xhtmlStreamParser;
 
     /**
@@ -88,6 +91,9 @@ public class DefaultHTMLConverter implements HTMLConverter
      */
     @Inject
     private RenderingContext renderingContext;
+
+    @Inject
+    private ContentParser contentParser;
 
     /**
      * The component used to execute the XDOM macro transformations before rendering to XHTML.
@@ -107,7 +113,7 @@ public class DefaultHTMLConverter implements HTMLConverter
      * The component used to render a XDOM to XHTML.
      */
     @Inject
-    @Named("annotatedxhtml/1.0")
+    @Named("annotatedhtml/5.0")
     private BlockRenderer xhtmlRenderer;
 
     /**
@@ -117,6 +123,9 @@ public class DefaultHTMLConverter implements HTMLConverter
     @Inject
     @Named("context")
     private ComponentManager contextComponentManager;
+
+    @Inject
+    private EntityReferenceSerializer<String> serializer;
 
     @Override
     public String fromHTML(String dirtyHTML, String syntaxId)
@@ -149,13 +158,18 @@ public class DefaultHTMLConverter implements HTMLConverter
     @Override
     public String toHTML(String source, String syntaxId)
     {
+        return toHTML(source, getSyntax(syntaxId), null);
+    }
+
+    @Override
+    public String toHTML(String source, Syntax syntax, EntityReference sourceReference)
+    {
         try {
             // Parse
-            Parser parser = this.contextComponentManager.getInstance(Parser.class, syntaxId);
-            XDOM xdom = parser.parse(new StringReader(source));
+            XDOM xdom = this.contentParser.parse(source, syntax, sourceReference);
 
             // Execute the macro transformation
-            executeMacroTransformation(xdom, Syntax.valueOf(syntaxId));
+            executeMacroTransformation(xdom, syntax);
 
             // Render
             WikiPrinter printer = new DefaultWikiPrinter();
@@ -171,16 +185,26 @@ public class DefaultHTMLConverter implements HTMLConverter
     @Override
     public String parseAndRender(String dirtyHTML, String syntaxId)
     {
+        return parseAndRender(dirtyHTML, getSyntax(syntaxId), null);
+    }
+
+    @Override
+    public String parseAndRender(String dirtyHTML, Syntax syntax, EntityReference sourceReference)
+    {
         boolean renderingContextPushed = false;
         try {
             // Clean
             String html = this.htmlCleaner.clean(dirtyHTML);
 
-            Syntax syntax = Syntax.valueOf(syntaxId);
             renderingContextPushed = maybeSetRenderingContextSyntax(syntax);
 
             // Parse
             XDOM xdom = this.xhtmlParser.parse(new StringReader(html));
+
+            // Add the source reference to be a good citizen
+            if (sourceReference != null) {
+                xdom.getMetaData().addMetaData(MetaData.SOURCE, this.serializer.serialize(sourceReference));
+            }
 
             // The XHTML parser sets the "syntax" meta data property of the created XDOM to "xhtml/1.0". The syntax meta
             // data is used as the default syntax for macro content. We have to change this to the specified syntax
@@ -205,6 +229,15 @@ public class DefaultHTMLConverter implements HTMLConverter
         }
     }
 
+    private Syntax getSyntax(String syntaxId)
+    {
+        try {
+            return Syntax.valueOf(syntaxId);
+        } catch (ParseException e) {
+            throw new RuntimeException(String.format("Invalid syntax [%s]", syntaxId), e);
+        }
+    }
+
     private boolean maybeSetRenderingContextSyntax(Syntax syntax)
     {
         if (this.renderingContext instanceof MutableRenderingContext) {
@@ -223,6 +256,7 @@ public class DefaultHTMLConverter implements HTMLConverter
         TransformationContext txContext = new TransformationContext();
         txContext.setXDOM(xdom);
         txContext.setSyntax(syntax);
+        txContext.setTargetSyntax(Syntax.ANNOTATED_HTML_5_0);
 
         // It's very important to set a Transformation id as otherwise if any Velocity Macro is executed it'll be
         // executed in isolation (and if you have, say, 2 velocity macros, the second one will not 'see' what's defined

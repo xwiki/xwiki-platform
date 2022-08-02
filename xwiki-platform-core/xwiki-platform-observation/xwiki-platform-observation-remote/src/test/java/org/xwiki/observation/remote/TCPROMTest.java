@@ -41,7 +41,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @AllComponents
-public class TCPROMTest extends AbstractROMTestCase
+class TCPROMTest extends AbstractROMTestCase
 {
     static class Unserializable
     {
@@ -64,7 +64,7 @@ public class TCPROMTest extends AbstractROMTestCase
      * Validate sharing a simple Serializable event between two instances of {@link RemoteObservationManager}.
      */
     @Test
-    public void testSerializableEvent() throws InterruptedException
+    void serializableEvent() throws InterruptedException
     {
         EventListener localListener = mock(EventListener.class, "local");
         EventListener remoteListener = mock(EventListener.class, "remote");

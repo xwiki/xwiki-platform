@@ -19,6 +19,8 @@
  */
 package org.xwiki.test.ui;
 
+import java.time.Duration;
+
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -26,13 +28,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.xwiki.test.po.xe.HomePage;
-import org.xwiki.test.ui.po.FormElement;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
+import org.xwiki.test.ui.po.editor.ObjectEditPane;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 /**
@@ -65,7 +66,7 @@ public class SkinxTest extends AbstractTest
 
         // Add an XWikiGroups object
         ObjectEditPage oep = vp.editObjects();
-        FormElement objectForm = oep.addObject("XWiki.JavaScriptExtension");
+        ObjectEditPane objectForm = oep.addObject("XWiki.JavaScriptExtension");
         objectForm.setFieldValue(By.id("XWiki.JavaScriptExtension_0_code"), SCRIPT);
         objectForm.getSelectElement(By.id("XWiki.JavaScriptExtension_0_use")).select("always");
         oep.clickSaveAndView();
@@ -75,6 +76,7 @@ public class SkinxTest extends AbstractTest
 
         oep = ObjectEditPage.gotoPage("Test", "SkinxTest");
         objectForm = oep.getObjectsOfClass("XWiki.JavaScriptExtension").get(0);
+        objectForm.displayObject();
         objectForm.getSelectElement(By.id("XWiki.JavaScriptExtension_0_use")).select("currentPage");
         oep.clickSaveAndView();
         waitForScriptResult();
@@ -87,6 +89,7 @@ public class SkinxTest extends AbstractTest
 
         oep = ObjectEditPage.gotoPage("Test", "SkinxTest");
         objectForm = oep.getObjectsOfClass("XWiki.JavaScriptExtension").get(0);
+        objectForm.displayObject();
         objectForm.getSelectElement(By.id("XWiki.JavaScriptExtension_0_use")).select("onDemand");
         oep.clickSaveAndView();
         try {
@@ -102,13 +105,7 @@ public class SkinxTest extends AbstractTest
      */
     private void waitForScriptResult()
     {
-        new WebDriverWait(getDriver(), getDriver().getTimeout()).until(new ExpectedCondition<Boolean>()
-        {
-            @Override
-            public Boolean apply(WebDriver driver)
-            {
-                return StringUtils.equals("script active", driver.getTitle());
-            }
-        });
+        new WebDriverWait(getDriver(), Duration.ofSeconds(getDriver().getTimeout())).until(
+            (ExpectedCondition<Boolean>) driver -> StringUtils.equals("script active", driver.getTitle()));
     }
 }

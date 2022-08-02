@@ -164,6 +164,8 @@ notifications.rss.feedLink=RSS tijek
 notifications.rss.feedTitle=Obavijesti RSS tijeka
 notifications.rss.feedDescription=Ovaj RSS tijek možete prilagoditi na vašoj profilnoj stranici.
 notifications.rss.seeChanges=Izmjene\: ({0})
+### Missing: notifications.rss.defaultTitleWithPage=New event on {0}
+### Missing: notifications.rss.defaultTitle=New event
 ### Missing: notifications.globalsettings.email=Notifications Email
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily=Dnevno
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly=Svaki sat
@@ -209,6 +211,5 @@ XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_exclus
 ### Missing: notifications.switches.tooltip.pageAndChildren=Watch this page and its children
 ### Missing: notifications.switches.tooltip.space=Watch the parent page and its children
 ### Missing: notifications.switches.tooltip.wiki=Watch this wiki
-### Missing: notifications.switches.changeStatusError=Failed to change the status of the notifications.
-</content>
+### Missing: notifications.switches.changeStatusError=Failed to change the status of the notifications.</content>
 </xwikidoc>

@@ -54,7 +54,7 @@ public class XWQLtoHQLTranslator implements QueryTranslator
         JPQLParser parser = new JPQLParser();
         Start tree = parser.parse(input);
         QueryContext context = new QueryContext(tree, getDocumentAccessBridge());
-        // analize query and store info in context
+        // analyze query and store info in context
         tree.apply(new QueryAnalyzer(context));
 
         Printer printer = getPrinter(context);

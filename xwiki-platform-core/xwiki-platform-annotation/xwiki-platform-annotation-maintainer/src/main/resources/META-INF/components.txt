@@ -1,0 +1,3 @@
+org.xwiki.annotation.maintainer.internal.DefaultAnnotationMaintainer
+org.xwiki.annotation.maintainer.internal.CharacterDiffService
+org.xwiki.annotation.maintainer.internal.DocumentContentAnnotationUpdateListener

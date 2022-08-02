@@ -19,20 +19,24 @@
  */
 package org.xwiki.wysiwyg.internal.importer;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.jodconverter.document.DocumentFamily;
-import org.jodconverter.document.DocumentFormat;
+import org.apache.commons.io.IOUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
@@ -40,7 +44,11 @@ import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.officeimporter.server.OfficeServer.ServerState;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import org.xwiki.wysiwyg.importer.AttachmentImporter;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiAttachment;
 
 /**
  * Component used to import office attachments into the content of a WYSIWYG editor.
@@ -86,6 +94,12 @@ public class OfficeAttachmentImporter implements AttachmentImporter
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
+    @Inject
+    private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
+
+    @Inject
+    private Provider<XWikiContext> contextProvider;
+
     @Override
     public String toHTML(AttachmentReference attachmentReference, Map<String, Object> parameters) throws Exception
     {
@@ -102,11 +116,12 @@ public class OfficeAttachmentImporter implements AttachmentImporter
         throws Exception
     {
         if (this.authorization.hasAccess(Right.EDIT, attachmentReference)) {
-            if (this.documentAccessBridge.getAttachmentVersion(attachmentReference) != null) {
+            if (this.documentAccessBridge.getAttachmentVersion(attachmentReference) != null
+                || this.temporaryAttachmentSessionsManager.getUploadedAttachment(attachmentReference).isPresent()) {
                 if (this.officeServer.getState() == ServerState.CONNECTED) {
                     return convertAttachmentContent(attachmentReference, filterStyles);
                 } else {
-                    throw new RuntimeException(String.format("The office server is not connected."));
+                    throw new RuntimeException("The office server is not connected.");
                 }
             } else {
                 throw new RuntimeException(String.format("Attachment not found: [%s].",
@@ -130,7 +145,19 @@ public class OfficeAttachmentImporter implements AttachmentImporter
     private String convertAttachmentContent(AttachmentReference attachmentReference, boolean filterStyles)
         throws Exception
     {
-        InputStream officeFileStream = documentAccessBridge.getAttachmentContent(attachmentReference);
+        InputStream officeFileStream;
+        if (this.documentAccessBridge.getAttachmentVersion(attachmentReference) != null) {
+            officeFileStream = documentAccessBridge.getAttachmentContent(attachmentReference);
+        } else {
+            Optional<XWikiAttachment> uploadedAttachment =
+                this.temporaryAttachmentSessionsManager.getUploadedAttachment(attachmentReference);
+            if (uploadedAttachment.isPresent()) {
+                officeFileStream = uploadedAttachment.get().getContentInputStream(this.contextProvider.get());
+            } else {
+                throw new OfficeImporterException(
+                    String.format("Cannot find temporary uplodaded attachment [%s]", attachmentReference));
+            }
+        }
         String officeFileName = attachmentReference.getName();
         DocumentReference targetDocRef = attachmentReference.getDocumentReference();
         XDOMOfficeDocument xdomOfficeDocument;
@@ -140,11 +167,16 @@ public class OfficeAttachmentImporter implements AttachmentImporter
             xdomOfficeDocument = documentBuilder.build(officeFileStream, officeFileName, targetDocRef, filterStyles);
         }
         // Attach the images extracted from the imported office document to the target wiki document.
-        for (Map.Entry<String, byte[]> artifact : xdomOfficeDocument.getArtifacts().entrySet()) {
-            AttachmentReference artifactReference = new AttachmentReference(artifact.getKey(), targetDocRef);
-            documentAccessBridge.setAttachmentContent(artifactReference, artifact.getValue());
+        for (File artifact : xdomOfficeDocument.getArtifactsFiles()) {
+
+            AttachmentReference artifactReference = new AttachmentReference(artifact.getName(), targetDocRef);
+            try (FileInputStream fis = new FileInputStream(artifact)) {
+                documentAccessBridge.setAttachmentContent(artifactReference, IOUtils.toByteArray(fis));
+            }
         }
-        return xdomOfficeDocument.getContentAsString("annotatedxhtml/1.0");
+        String result = xdomOfficeDocument.getContentAsString("annotatedxhtml/1.0");
+        xdomOfficeDocument.close();
+        return result;
     }
 
     /**
@@ -153,10 +185,8 @@ public class OfficeAttachmentImporter implements AttachmentImporter
      */
     private boolean isPresentation(String fileName)
     {
-        String extension = fileName.substring(fileName.lastIndexOf('.') + 1);
         if (officeServer.getConverter() != null) {
-            DocumentFormat format = officeServer.getConverter().getFormatRegistry().getFormatByExtension(extension);
-            return format != null && format.getInputFamily() == DocumentFamily.PRESENTATION;
+            return officeServer.getConverter().isPresentation(fileName);
         }
         return false;
     }

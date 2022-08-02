@@ -29,6 +29,7 @@ import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -141,7 +142,7 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
      * @param filename the name of the attachment
      * @param revision an optional attachment version
      * @param context the current request context
-     * @return a {@code file://} URL where the attachment has been stored
+     * @return a {@code file://} URL where the attachment has been stored or null if the attachment wasn't found
      * @throws Exception if the attachment can't be retrieved from the database and stored on the filesystem
      */
     private URL getURL(String wiki, String spaces, String name, String filename, String revision, XWikiContext context)
@@ -155,13 +156,23 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
             LOGGER.debug("Temporary PDF export file [{}]", file.toString());
             XWikiDocument doc = context.getWiki().getDocument(new DocumentReference(
                 StringUtils.defaultString(wiki, context.getWikiId()), spaceNames, name), context);
+
             XWikiAttachment attachment = doc.getAttachment(filename);
+            if (attachment == null) {
+                LOGGER.warn("Attachment [{}] doesn't exist in [{}]. Generated content will have invalid content ("
+                    + "empty image or broken link)", filename, doc.getDocumentReference());
+                // By returning null, the generated HTML will have empty IMG SRC or empty A HREF which leads to
+                // good degraded results for the LO office export.
+                return null;
+            }
+
             if (StringUtils.isNotEmpty(revision)) {
                 attachment = attachment.getAttachmentRevision(revision, context);
             }
-            FileOutputStream fos = new FileOutputStream(file);
-            IOUtils.copy(attachment.getContentInputStream(context), fos);
-            fos.close();
+
+            try (FileOutputStream fos = new FileOutputStream(file)) {
+                IOUtils.copy(attachment.getContentInputStream(context), fos);
+            }
             usedFiles.put(key, file);
         }
         return usedFiles.get(key).toURI().toURL();
@@ -182,15 +193,15 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
     private boolean copyResource(String resourceName, String key, Map<String, File> usedFiles, XWikiContext context)
     {
         try {
-            InputStream data = context.getWiki().getResourceAsStream(resourceName);
-            if (data != null) {
-                // Copy the resource to a temporary file
-                File file = getTemporaryFile(key, context);
-                FileOutputStream fos = new FileOutputStream(file);
-                IOUtils.copy(data, fos);
-                fos.close();
-                usedFiles.put(key, file);
-                return true;
+            try (InputStream data = context.getWiki().getResourceAsStream(resourceName)) {
+                if (data != null) {
+                    // Copy the resource to a temporary file
+                    File file = getTemporaryFile(key, context);
+                    FileUtils.copyInputStreamToFile(data, file);
+                    usedFiles.put(key, file);
+
+                    return true;
+                }
             }
         } catch (Exception ex) {
             // Can't access the resource, let's hope FOP can handle the http:// URL

@@ -25,19 +25,19 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-parser</artifactId>
   <name>XWiki Platform - Rendering - Parser</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Rendering - Parser</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.92</xwiki.jacoco.instructionRatio>
-  </properties>
+    <xwiki.jacoco.instructionRatio>0.83</xwiki.jacoco.instructionRatio>
+    </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-model</artifactId>
+      <artifactId>xwiki-platform-model-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- Testing dependencies -->

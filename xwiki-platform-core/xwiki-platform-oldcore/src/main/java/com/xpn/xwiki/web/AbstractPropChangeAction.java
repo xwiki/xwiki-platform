@@ -35,6 +35,12 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  */
 public abstract class AbstractPropChangeAction extends XWikiAction
 {
+    @Override
+    protected Class<? extends XWikiForm> getFormClass()
+    {
+        return PropChangeForm.class;
+    }
+
     /**
      * Tries to change the specified property, and redirect back to the class editor (or the specified {@code xredirect}
      * location). If the property does not exist, forward to the exception page.
@@ -58,7 +64,11 @@ public abstract class AbstractPropChangeAction extends XWikiAction
             if (!csrfTokenCheck(context)) {
                 return false;
             }
-            changePropertyDefinition(xclass, propertyName, context);
+            // We need to clone this document first, since a cached storage would return the same object for the
+            // following requests, so concurrent request might get a partially modified object, or worse, if an error
+            // occurs during the save, the cached object will not reflect the actual document at all.
+            doc = doc.clone();
+            changePropertyDefinition(doc.getXClass(), propertyName, context);
         } else {
             return true;
         }

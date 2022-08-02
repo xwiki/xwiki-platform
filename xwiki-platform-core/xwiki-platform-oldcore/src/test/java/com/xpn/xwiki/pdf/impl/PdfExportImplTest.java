@@ -19,21 +19,22 @@
  */
 package com.xpn.xwiki.pdf.impl;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.test.AllLogRule;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.pdf.XSLFORenderer;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -42,13 +43,14 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
+@ComponentList({
+    org.xwiki.xml.internal.DefaultXMLReaderFactory.class,
+})
+@OldcoreTest
 public class PdfExportImplTest
 {
-    @Rule
-    public AllLogRule logRule = new AllLogRule();
-
-    @Rule
-    public MockitoOldcoreRule oldcoreRule = new MockitoOldcoreRule();
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
 
     /**
      * Verify that PDF Export can apply some CSS on the XHTML when that XHTML already has some style defined and in
@@ -57,14 +59,14 @@ public class PdfExportImplTest
     @Test
     public void applyCSSWhenExistingStyleDefinedUsingShorthandNotation() throws Exception
     {
-        this.oldcoreRule.getMocker().registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
-        this.oldcoreRule.getMocker().registerMockComponent(EntityReferenceSerializer.TYPE_STRING);
-        this.oldcoreRule.getMocker().registerMockComponent(DocumentAccessBridge.class);
-        this.oldcoreRule.getMocker().registerMockComponent(DocumentAccessBridge.class);
-        this.oldcoreRule.getMocker().registerMockComponent(PDFResourceResolver.class);
-        this.oldcoreRule.getMocker().registerMockComponent(Environment.class);
-        this.oldcoreRule.getMocker().registerMockComponent(VelocityManager.class);
-        this.oldcoreRule.getMocker().registerMockComponent(XSLFORenderer.class, "fop");
+        this.oldcore.getMocker().registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+        this.oldcore.getMocker().registerMockComponent(EntityReferenceSerializer.TYPE_STRING);
+        this.oldcore.getMocker().registerMockComponent(DocumentAccessBridge.class);
+        this.oldcore.getMocker().registerMockComponent(DocumentAccessBridge.class);
+        this.oldcore.getMocker().registerMockComponent(PDFResourceResolver.class);
+        this.oldcore.getMocker().registerMockComponent(Environment.class);
+        this.oldcore.getMocker().registerMockComponent(VelocityManager.class);
+        this.oldcore.getMocker().registerMockComponent(XSLFORenderer.class, "fop");
 
         PdfExportImpl pdfExport = new PdfExportImpl();
 
@@ -98,7 +100,7 @@ public class PdfExportImplTest
 
         String css = "span { color:red; }";
 
-        XWikiContext xcontext = this.oldcoreRule.getXWikiContext();
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
         XWikiDocument doc = mock(XWikiDocument.class);
         when(doc.getExternalURL("view", xcontext)).thenReturn("http://localhost:8080/export");
         xcontext.setDoc(doc);
@@ -108,31 +110,29 @@ public class PdfExportImplTest
         //   TODO: right now we output the DOM with DOM4J and use the default of converting entities when using the
         //   XMLWriter. We need to decide if that's correct or if we should call XMLWriter#setResolveEntityRefs(false)
         //   instead.
+
         String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
             + "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
                 + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">"
-                + "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head style=\"display: none; \">"
-            + "<title style=\"display: none; \">\n"
+                + "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head>\n"
+            + "<title>\n"
             + "  Main.ttt - ttt\n"
-            + "</title>"
-            + "<meta content=\"text/html; charset=UTF-8\" http-equiv=\"Content-Type\" style=\"display: none; \"/>"
-            + "<meta content=\"en\" name=\"language\" style=\"display: none; \"/>"
-            + "</head><body class=\"exportbody\" id=\"body\" pdfcover=\"0\" pdftoc=\"0\" "
-                + "style=\"display: block; margin-top: 8px; margin-right: 8px; margin-bottom: 8px; margin-left: 8px; "
-                + "unicode-bidi: embed; \">"
-            + "<div id=\"xwikimaincontainer\" style=\"display: block; unicode-bidi: embed; \">\n"
-            + "<div id=\"xwikimaincontainerinner\" style=\"display: block; unicode-bidi: embed; \">\n"
-            + "\n"
-            + "<div id=\"xwikicontent\" style=\"display: block; unicode-bidi: embed; \">\n"
-            + "      <p style=\"display: block; margin-top: 3pt; margin-bottom: 3pt; unicode-bidi: embed; \">"
-                + "<span style=\"color: #f00; background-color: #fff; background-image: none; "
+            + "</title>\n"
+            + "<meta content=\"text/html; charset=UTF-8\" http-equiv=\"Content-Type\"/>\n"
+            + "<meta content=\"en\" name=\"language\"/>\n\n"
+            + "</head><body class=\"exportbody\" id=\"body\" pdfcover=\"0\" pdftoc=\"0\">\n\n"
+            + "<div id=\"xwikimaincontainer\">\n"
+            + "<div id=\"xwikimaincontainerinner\">\n\n"
+            + "<div id=\"xwikicontent\">\n"
+                + "      <p><span style=\"color: #f00; background-color: #fff; background-image: none; "
                 + "background-position: 0% 0%; background-size: auto auto; background-origin: padding-box; "
                 + "background-clip: border-box; background-repeat: repeat repeat; "
                 + "background-attachment: scroll; \">Hello Clément</span></p>\n"
             + "          </div>\n"
             + "</div>\n"
-            + "</div>"
+            + "</div>\n\n"
             + "</body></html>";
+
         assertEquals(expected, pdfExport.applyCSS(html, css, xcontext));
     }
 }

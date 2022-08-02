@@ -25,16 +25,15 @@
   <parent>
     <artifactId>xwiki-platform-rendering</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-signature</artifactId>
   <name>XWiki Platform - Rendering - Signature</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Rendering - Signature</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.64</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>92</xwiki.pitest.mutationThreshold>
-  </properties>
+    <xwiki.jacoco.instructionRatio>0.62</xwiki.jacoco.instructionRatio>
+    </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -64,7 +63,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-model</artifactId>
+      <artifactId>xwiki-platform-model-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 

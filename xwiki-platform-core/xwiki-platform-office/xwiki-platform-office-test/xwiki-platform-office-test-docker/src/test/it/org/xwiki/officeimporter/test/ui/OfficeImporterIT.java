@@ -35,19 +35,18 @@ import org.xwiki.officeimporter.test.po.OfficeImporterResultPage;
 import org.xwiki.officeimporter.test.po.OfficeServerAdministrationSectionPage;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.servletEngine.ServletEngine;
+import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.AttachmentsPane;
-import org.xwiki.test.ui.po.BasePage;
 import org.xwiki.test.ui.po.ConfirmationPage;
 import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.DeletingPage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Functional tests for the office importer.
@@ -63,13 +62,8 @@ import static org.junit.Assert.assertTrue;
         ServletEngine.JETTY_STANDALONE
     },
     properties = {
-        // Overridden to add the FileUploadPlugin which is needed by the test to upload some office files to import
-        "xwikiCfgPlugins=com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,"
-            + "com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,"
-            + "com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,"
-            + "com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,"
-            + "com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin,"
-            + "com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"
+        // Add the FileUploadPlugin which is needed by the test to upload some office files to import
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"
     }
 )
 public class OfficeImporterIT
@@ -92,7 +86,6 @@ public class OfficeImporterIT
             new OfficeServerAdministrationSectionPage();
         if (!"Connected".equals(officeServerAdministrationSectionPage.getServerState())) {
             officeServerAdministrationSectionPage.startServer();
-            assertEquals("Connected", officeServerAdministrationSectionPage.getServerState());
         }
     }
 
@@ -162,10 +155,10 @@ public class OfficeImporterIT
         deletePage(testName);
 
         // Test ODT file with accents
-        resultPage = importFile(testName, "ooffice.3.0/Test_accents & é$ù <!-_.+*();?:@=.odt");
+        resultPage = importFile(testName, "ooffice.3.0/Test_accents & é$ù !-_.+();@=.odt");
         assertTrue(StringUtils.contains(resultPage.getContent(), "This is a test document."));
         wikiEditPage = resultPage.editWiki();
-        regex = "(?<imageName>Test_accents & e\\$u <!-_\\.\\+\\*\\(\\);\\?:\\\\@=_html_[\\w]+\\.png)";
+        regex = "(?<imageName>Test_accents & e\\$u !-_\\.\\+\\(\\);\\\\@=_html_[\\w]+\\.png)";
         pattern = Pattern.compile(regex, Pattern.MULTILINE);
         matcher = pattern.matcher(wikiEditPage.getContent());
         assertTrue(matcher.find());
@@ -173,9 +166,20 @@ public class OfficeImporterIT
         resultPage = wikiEditPage.clickCancel();
         attachmentsPane = resultPage.openAttachmentsDocExtraPane();
         assertEquals(4, attachmentsPane.getNumberOfAttachments());
-
         // the \ before the @ needs to be removed as it's not in the filename
         assertTrue(attachmentsPane.attachmentExistsByFileName(imageName.replaceAll("\\\\@", "@")));
+        deletePage(testName);
+
+        // Test power point file with accents
+        resultPage = importFile(testName, "msoffice.97-2003/Test_accents & é$ù !-_.+();@=.ppt");
+        attachmentsPane = resultPage.openAttachmentsDocExtraPane();
+        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & e$u !-_.+();@=-slide0.jpg"));
+        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & e$u !-_.+();@=-slide1.jpg"));
+        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & e$u !-_.+();@=-slide2.jpg"));
+        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & e$u !-_.+();@=-slide3.jpg"));
+        wikiEditPage = resultPage.editWiki();
+        assertTrue(wikiEditPage.getContent().contains("[[image:Test_accents & e$u !-_.+();\\@=-slide0.jpg]]"));
+        resultPage = wikiEditPage.clickCancel();
         deletePage(testName);
     }
 

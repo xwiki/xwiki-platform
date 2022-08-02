@@ -19,13 +19,15 @@
  */
 package org.xwiki.rendering.wikimacro.internal;
 
+import java.util.Arrays;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.wiki.internal.AbstractAsyncClassDocumentInitializer;
-import org.xwiki.model.reference.LocalDocumentReference;
 
+import com.xpn.xwiki.internal.mandatory.AbstractAsyncClassDocumentInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
@@ -49,7 +51,7 @@ public class WikiMacroClassDocumentInitializer extends AbstractAsyncClassDocumen
      */
     public WikiMacroClassDocumentInitializer()
     {
-        super(new LocalDocumentReference(WIKI_MACRO_CLASS_SPACE, WIKI_MACRO_CLASS_PAGE));
+        super(WIKI_MACRO_CLASS_REFERENCE);
     }
 
     @Override
@@ -60,17 +62,23 @@ public class WikiMacroClassDocumentInitializer extends AbstractAsyncClassDocumen
         // The Macro description is using plain text (same as for Java Macros).
         xclass.addTextAreaField(MACRO_DESCRIPTION_PROPERTY, "Macro description", 40, 5,
             TextAreaClass.ContentType.PURE_TEXT);
-        xclass.addTextField(MACRO_DEFAULT_CATEGORY_PROPERTY, "Default category", 30);
+        xclass.addStaticListField(MACRO_DEFAULT_CATEGORIES_PROPERTY, "Default categories", 1, true, "", "input");
         xclass.addBooleanField(MACRO_INLINE_PROPERTY, "Supports inline mode", "yesno");
         xclass.addStaticListField(MACRO_VISIBILITY_PROPERTY, "Macro visibility", 1, false,
             "Current User|Current Wiki|Global", ListClass.DISPLAYTYPE_SELECT, PROPERTY_PIPE);
-        xclass.addStaticListField(MACRO_CONTENT_TYPE_PROPERTY, "Macro content type", 1, false,
+        xclass.addStaticListField(MACRO_CONTENT_TYPE_PROPERTY, "Macro content availability", 1, false,
             "Optional|Mandatory|No content", ListClass.DISPLAYTYPE_SELECT, PROPERTY_PIPE);
+
+        xclass.addStaticListField(MACRO_CONTENT_JAVA_TYPE_PROPERTY, "Macro content type", 1, false, false,
+            StringUtils.join(Arrays.asList(MACRO_CONTENT_TYPE_UNKNOWN, MACRO_CONTENT_TYPE_WIKI), PROPERTY_PIPE),
+            ListClass.DISPLAYTYPE_INPUT, PROPERTY_PIPE, MACRO_CONTENT_TYPE_UNKNOWN, ListClass.FREE_TEXT_ALLOWED, true);
         // The Macro content description is using plain text (same as for Java Macros).
         xclass.addTextAreaField(MACRO_CONTENT_DESCRIPTION_PROPERTY,
             "Content description (Not applicable for \"No content\" type)", 40, 5, TextAreaClass.ContentType.PURE_TEXT);
         // The code property contains wiki markup
         xclass.addTextAreaField(MACRO_CODE_PROPERTY, "Macro code", 40, 20, TextAreaClass.EditorType.TEXT);
+
+        xclass.addNumberField(MACRO_PRIORITY_PROPERTY, "Priority", 10, "integer");
 
         super.createClass(xclass);
     }

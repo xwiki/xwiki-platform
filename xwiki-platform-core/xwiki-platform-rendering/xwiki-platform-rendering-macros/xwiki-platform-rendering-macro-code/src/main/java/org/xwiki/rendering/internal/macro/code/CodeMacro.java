@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -38,6 +39,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.FormatBlock;
 import org.xwiki.rendering.block.GroupBlock;
+import org.xwiki.rendering.internal.code.layout.CodeLayoutHandler;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.box.AbstractBoxMacro;
@@ -99,7 +101,7 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
     public CodeMacro()
     {
         super("Code", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION, false), CodeMacroParameters.class);
-        setDefaultCategory(DEFAULT_CATEGORY_FORMATTING);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_FORMATTING));
     }
 
     @Override
@@ -121,13 +123,21 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
             throw new MacroExecutionException("Failed to highlight content", e);
         }
 
-        Map<String, String> formatParameters = new LinkedHashMap<String, String>();
+        Map<String, String> formatParameters = new LinkedHashMap<>();
         formatParameters.put("class", "code");
 
         if (context.isInline()) {
-            result = Arrays.<Block> asList(new FormatBlock(result, Format.NONE, formatParameters));
+            result = Arrays.asList(new FormatBlock(result, Format.NONE, formatParameters));
         } else {
-            result = Arrays.<Block> asList(new GroupBlock(result, formatParameters));
+            try {
+                CodeLayoutHandler layoutHandler =
+                    this.componentManager.getInstance(CodeLayoutHandler.class, parameters.getLayout().getHint());
+                result = layoutHandler.layout(result, content);
+            } catch (ComponentLookupException e) {
+                this.logger.error("Failed to load code layout handler for layout type [{}], no layout will be applied",
+                    parameters.getLayout().name(), e);
+            }
+            result = Arrays.asList(new GroupBlock(result, formatParameters));
         }
 
         return result;
@@ -142,8 +152,8 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
      * @throws ParseException the highlight parser failed.
      * @throws ComponentLookupException failed to find highlight parser for provided language.
      */
-    protected List<Block> highlight(CodeMacroParameters parameters, String content) throws ParseException,
-        ComponentLookupException
+    protected List<Block> highlight(CodeMacroParameters parameters, String content)
+        throws ParseException, ComponentLookupException
     {
         HighlightParser parser;
 

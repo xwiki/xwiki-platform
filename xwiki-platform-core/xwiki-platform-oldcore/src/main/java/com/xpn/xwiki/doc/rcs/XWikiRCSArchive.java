@@ -21,14 +21,10 @@ package com.xpn.xwiki.doc.rcs;
 
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,10 +38,15 @@ import org.suigeneris.jrcs.rcs.impl.NodeNotFoundException;
 import org.suigeneris.jrcs.rcs.impl.TrunkNode;
 import org.suigeneris.jrcs.rcs.parse.ParseException;
 import org.suigeneris.jrcs.util.ToString;
+import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.user.UserReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.doc.rcs.XWikiTrunkNode;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Class for String [de]serialization for {@link com.xpn.xwiki.doc.XWikiDocumentArchive}.
@@ -55,14 +56,16 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 public class XWikiRCSArchive extends Archive
 {
-    /** logger. */
+    /**
+     * logger.
+     */
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiRCSArchive.class);
 
     /**
      * Used to serialize {@link com.xpn.xwiki.doc.XWikiDocumentArchive}.
      *
      * @param nodeInfos - collection of {@link XWikiRCSNodeInfo} in any order
-     * @param context - for loading nodes content
+     * @param context   - for loading nodes content
      * @throws XWikiException if can't load nodes content
      */
     public XWikiRCSArchive(Collection<XWikiRCSNodeInfo> nodeInfos, XWikiContext context) throws XWikiException
@@ -83,7 +86,7 @@ public class XWikiRCSArchive extends Archive
                 this.nodes.put(node.getVersion(), node);
             }
             XWikiJRCSNode last = null;
-            for (Iterator it = this.nodes.keySet().iterator(); it.hasNext();) {
+            for (Iterator it = this.nodes.keySet().iterator(); it.hasNext(); ) {
                 Version ver = (Version) it.next();
                 XWikiJRCSNode node = (XWikiJRCSNode) this.nodes.get(ver);
                 if (last != null) {
@@ -111,20 +114,21 @@ public class XWikiRCSArchive extends Archive
     /**
      * Helper class for convert from {@link XWikiRCSNodeInfo} to JRCS {@link Node}.
      */
-    private static class XWikiJRCSNode extends TrunkNode
+    private static class XWikiJRCSNode extends XWikiTrunkNode
     {
-        /** bug if author=="". see http://www.suigeneris.org/issues/browse/JRCS-24 */
-        public static String sauthorIfEmpty = "_";
-
-        /** mark that node contains full text, not diff. */
+        /**
+         * mark that node contains full text, not diff.
+         */
         public static String sfullVersion = "full";
 
-        /** mark that node contains diff. */
+        /**
+         * mark that node contains diff.
+         */
         public static String sdiffVersion = "diff";
 
         /**
          * @param vernum - version of node
-         * @param next - next node (with smaller version) in history
+         * @param next   - next node (with smaller version) in history
          * @throws InvalidTrunkVersionNumberException if version is invalid
          */
         public XWikiJRCSNode(Version vernum, TrunkNode next)
@@ -133,7 +137,9 @@ public class XWikiRCSArchive extends Archive
             super(vernum, next);
         }
 
-        /** @param other - create class from copying this node */
+        /**
+         * @param other - create class from copying this node
+         */
         public XWikiJRCSNode(Node other)
         {
             this(other.version, null);
@@ -146,65 +152,8 @@ public class XWikiRCSArchive extends Archive
         }
 
         /**
-         * @param date - date of modification.
-         * @see Node#setDate(int[])
+         * @return is this node store diff or full version
          */
-        public void setDate(Date date)
-        {
-            this.date = date;
-        }
-
-        /** bitset of chars allowed in author field */
-        static BitSet safeAuthorChars = new BitSet();
-        static {
-            safeAuthorChars.set('-');
-            for (char c = 'A', c1 = 'a'; c <= 'Z'; c++, c1++) {
-                safeAuthorChars.set(c);
-                safeAuthorChars.set(c1);
-            }
-        }
-
-        /** @param user - user of modification */
-        @Override
-        public void setAuthor(String user)
-        {
-            // empty author is error in jrcs
-            if (user == null || "".equals(user)) {
-                super.setAuthor(sauthorIfEmpty);
-            } else {
-                byte[] enc = URLCodec.encodeUrl(safeAuthorChars, user.getBytes());
-                String senc = new String(enc).replace('%', '_');
-                super.setAuthor(senc);
-            }
-        }
-
-        /**
-         * @return user of modification can't override getAuthor, so getAuthor1
-         * @see Node#getAuthor()
-         */
-        public String getAuthor1()
-        {
-            String result = super.getAuthor();
-            if (sauthorIfEmpty.equals(result)) {
-                return "";
-            } else {
-                result = result.replace('_', '%');
-                try {
-                    byte[] dec = URLCodec.decodeUrl(result.getBytes());
-                    result = new String(dec);
-                } catch (DecoderException e) {
-                    // Probably the archive was created before introducing this encoding (1.2M1/M2).
-                    result = super.getAuthor();
-                    if (!result.matches("^(\\w|\\d|\\.)++$")) {
-                        // It's safer to use an empty author than to use an invalid value.
-                        result = "";
-                    }
-                }
-            }
-            return result;
-        }
-
-        /** @return is this node store diff or full version */
         public boolean isDiff()
         {
             boolean isdiff = !sfullVersion.equals(getState());
@@ -216,7 +165,9 @@ public class XWikiRCSArchive extends Archive
             return isdiff;
         }
 
-        /** @param isdiff - true if node stores a diff, false - if full version */
+        /**
+         * @param isdiff - true if node stores a diff, false - if full version
+         */
         public void setDiff(boolean isdiff)
         {
             if (getTextString() != null && isdiff != !getTextString().startsWith("<")) {
@@ -227,7 +178,9 @@ public class XWikiRCSArchive extends Archive
             setState(isdiff ? sdiffVersion : sfullVersion);
         }
 
-        /** @return is this revision has old format. (xwiki-core<1.2, without author,comment,state fields) */
+        /**
+         * @return is this revision has old format. (xwiki-core<1.2, without author,comment,state fields)
+         */
         public boolean hasOldFormat()
         {
             return !sfullVersion.equals(getState()) && !sdiffVersion.equals(getState());
@@ -260,24 +213,43 @@ public class XWikiRCSArchive extends Archive
     }
 
     /**
-     * @return Collection of pairs [{@link XWikiRCSNodeInfo}, {@link XWikiRCSNodeContent}]
      * @param docId - docId which will be wrote in {@link XWikiRCSNodeId#setDocId(long)}
+     * @return Collection of pairs [{@link XWikiRCSNodeInfo}, {@link XWikiRCSNodeContent}]
      * @throws PatchFailedException
      * @throws InvalidFileFormatException
      * @throws NodeNotFoundException
+     * @deprecated since 13.10.7, 14.4.1, 14.5, use {@link #getNodes(WikiReference, long)} instead
      */
+    @Deprecated(since = "13.10.7")
     public Collection getNodes(long docId) throws NodeNotFoundException, InvalidFileFormatException,
         PatchFailedException
     {
+        return getNodes(null, docId);
+    }
+
+    /**
+     * @param wikiReference the wiki of the document
+     * @param docId the local identifier of the document
+     * @return Collection of pairs [{@link XWikiRCSNodeInfo}, {@link XWikiRCSNodeContent}]
+     * @throws PatchFailedException
+     * @throws InvalidFileFormatException
+     * @throws NodeNotFoundException
+     * @since 13.10.7
+     * @since 14.4.1
+     * @since 14.5
+     */
+    public Collection getNodes(WikiReference wikiReference, long docId) throws NodeNotFoundException, InvalidFileFormatException,
+        PatchFailedException
+    {
         Collection result = new ArrayList(this.nodes.values().size());
-        for (Iterator it = this.nodes.values().iterator(); it.hasNext();) {
+        for (Iterator it = this.nodes.values().iterator(); it.hasNext(); ) {
             XWikiJRCSNode node = new XWikiJRCSNode((Node) it.next());
             XWikiRCSNodeInfo nodeInfo = new XWikiRCSNodeInfo();
-            nodeInfo.setId(new XWikiRCSNodeId(docId, node.getVersion()));
+            nodeInfo.setId(new XWikiRCSNodeId(wikiReference, docId, node.getVersion()));
             nodeInfo.setDiff(node.isDiff());
 
             if (!node.hasOldFormat()) {
-                nodeInfo.setAuthor(node.getAuthor1());
+                nodeInfo.setAuthor(node.getExtendedAuthor());
                 nodeInfo.setComment(node.getLog());
                 nodeInfo.setDate(node.getDate());
             } else {
@@ -288,7 +260,9 @@ public class XWikiRCSArchive extends Archive
                     XWikiDocument doc = new XWikiDocument();
                     doc.fromXML(xml);
                     // set this fields from old document
-                    nodeInfo.setAuthor(doc.getAuthor());
+                    UserReferenceSerializer<String> userReferenceSerializer = Utils.getComponent(
+                        new DefaultParameterizedType(null, UserReferenceSerializer.class, String.class));
+                    nodeInfo.setAuthor(userReferenceSerializer.serialize(doc.getAuthors().getOriginalMetadataAuthor()));
                     nodeInfo.setComment(doc.getComment());
                     nodeInfo.setDate(doc.getDate());
                 } catch (Exception e) {
@@ -319,11 +293,11 @@ public class XWikiRCSArchive extends Archive
     }
 
     /**
-     * @return The text of the revision if found.
      * @param version - the version number.
-     * @throws NodeNotFoundException if the revision could not be found.
+     * @return The text of the revision if found.
+     * @throws NodeNotFoundException      if the revision could not be found.
      * @throws InvalidFileFormatException if any of the deltas cannot be parsed.
-     * @throws PatchFailedException if any of the deltas could not be applied
+     * @throws PatchFailedException       if any of the deltas could not be applied
      */
     public String getRevisionAsString(Version version) throws NodeNotFoundException,
         InvalidFileFormatException, PatchFailedException

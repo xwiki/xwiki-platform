@@ -64,6 +64,8 @@ public class XWikiStats extends BaseCollection
         pageViews
     }
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * The name of the XML node <code>object</code>.
      */

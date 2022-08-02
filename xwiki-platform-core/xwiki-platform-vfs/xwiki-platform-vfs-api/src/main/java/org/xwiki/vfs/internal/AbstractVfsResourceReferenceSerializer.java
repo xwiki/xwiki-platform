@@ -19,7 +19,6 @@
  */
 package org.xwiki.vfs.internal;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,7 +56,7 @@ public abstract class AbstractVfsResourceReferenceSerializer
         segments.add("vfs");
 
         // Add the VFS URI part
-        segments.add(makeAbsolute(resourceReference.getURI()).toString());
+        segments.add(getAbsoluteReference(resourceReference));
 
         // Add the VFS path
         segments.addAll(resourceReference.getPathSegments());
@@ -70,10 +69,10 @@ public abstract class AbstractVfsResourceReferenceSerializer
     }
 
     /**
-     * Converts the passed URI into a URI containing an absolute reference to the VFS.
+     * Get an absolute reference to the VFS from the resource reference.
      *
-     * @param uri the URI containing a relative reference to the VFS
-     * @return a URI with an absolute reference to the VFS
+     * @param resourceReference the reference to the VFS
+     * @return a String with an absolute reference to the VFS
      */
-    protected abstract URI makeAbsolute(URI uri);
+    protected abstract String getAbsoluteReference(VfsResourceReference resourceReference);
 }

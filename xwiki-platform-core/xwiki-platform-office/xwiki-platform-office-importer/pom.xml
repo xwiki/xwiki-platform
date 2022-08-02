@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-office</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-office-importer</artifactId>
   <name>XWiki Platform - Office - Importer</name>
@@ -34,7 +34,7 @@
     <!-- Skipping revapi since xwiki-platform-legacy-office-importer wraps this module and runs checks on it -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
     <xwiki.jacoco.instructionRatio>0.63</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>57</xwiki.pitest.mutationThreshold>
+    <jodconverter.version>4.4.2</jodconverter.version>
   </properties>
   <dependencies>
     <dependency>
@@ -80,7 +80,16 @@
     <dependency>
       <groupId>org.jodconverter</groupId>
       <artifactId>jodconverter-local</artifactId>
-      <version>4.2.2</version>
+      <version>${jodconverter.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-text</artifactId>
     </dependency>
     <dependency>
       <!--
@@ -122,12 +131,26 @@
       <version>${rendering.version}</version>
       <scope>runtime</scope>
     </dependency>
-
+    <!-- Some office content will generate usage of the Id macro when converted from HTML to XWiki Syntax. -->
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-macro-id</artifactId>
+      <version>${rendering.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Test Dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-tool-test-component</artifactId>
       <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Needed, as otherwise mockito fails with a NPE (checker-qual brings the @NonNull annotation used in
+         JODConverter's LocalConverter class and if not present at runtime it makes Mockito fail), see
+         https://github.com/sbraconnier/jodconverter/issues/264 -->
+    <dependency>
+      <groupId>org.checkerframework</groupId>
+      <artifactId>checker-qual</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

@@ -351,8 +351,12 @@ public class Packager
     {
         if (reference != null) {
             if (extensionId != null) {
-                return getXWikiDocument(reference,
-                    (XarInstalledExtension) this.installedXARs.getInstalledExtension(extensionId));
+                XarInstalledExtension extension =
+                    (XarInstalledExtension) this.installedXARs.getInstalledExtension(extensionId);
+
+                if (extension != null) {
+                    return getXWikiDocument(reference, extension);
+                }
             }
 
             return getXWikiDocument(reference);

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -77,8 +77,8 @@
       #set ($rangeMatcher = $rangePattern.matcher($selectedValue))
       #if ($rangeMatcher.matches())
         #set ($discard = $intervals.add({
-          'start': $mathtool.toInteger($rangeMatcher.group(1)),
-          'end'  : $mathtool.toInteger($rangeMatcher.group(2)),
+          'start': $numbertool.toNumber($rangeMatcher.group(1)).intValue(),
+          'end'  : $numbertool.toNumber($rangeMatcher.group(2)).intValue(),
           'name' : $selectedValue,
           'count': 0
         }))
@@ -89,7 +89,7 @@
   ## Count matches for each date interval.
   ##
   #foreach ($facetValue in $facetValues)
-    #set ($size = $mathtool.toInteger($facetValue.name))
+    #set ($size = $numbertool.toNumber($facetValue.name).intValue())
     #foreach ($interval in $intervals)
       #if ((!$interval.start || $interval.start &lt;= $size)
           &amp;&amp; (!$interval.end || $size &lt; $interval.end))
@@ -105,7 +105,7 @@
     #end
   #end
   ## Make sure we sort the intervals based on the number of matches.
-  #set ($intervals = $sorttool.sort($intervalsWithMatches, 'count:desc'))
+  #set ($intervals = $collectiontool.sort($intervalsWithMatches, 'count:desc'))
   ##
   ## Display the size intervals.
   ##

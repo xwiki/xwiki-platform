@@ -34,6 +34,7 @@ import org.xwiki.rendering.async.internal.AsyncRendererWrapper;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.FormatBlock;
 import org.xwiki.rendering.block.GroupBlock;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Default implementation of {@link BlockAsyncRendererExecutor}.
@@ -72,6 +73,11 @@ public class DefaultBlockAsyncRendererExecutor implements BlockAsyncRendererExec
             return ((BlockAsyncRenderer) this.renderer).isInline();
         }
 
+        @Override
+        public Syntax getTargetSyntax()
+        {
+            return ((BlockAsyncRenderer) this.renderer).getTargetSyntax();
+        }
     }
 
     @Inject
@@ -121,7 +127,7 @@ public class DefaultBlockAsyncRendererExecutor implements BlockAsyncRendererExec
         // Get result
         BlockAsyncRendererResult result = (BlockAsyncRendererResult) response.getStatus().getResult();
 
-        if (result != null) {
+        if (result != null && !configuration.isPlaceHolderForced()) {
             return result.getBlock();
         }
 
@@ -135,8 +141,40 @@ public class DefaultBlockAsyncRendererExecutor implements BlockAsyncRendererExec
         placeholder.setParameter("class", "xwiki-async");
         // Provide it directly as it's going to be used in the client side (the URL fragment to use in the ajax request)
         placeholder.setParameter("data-xwiki-async-id", response.getJobIdHTTPPath());
-        placeholder.setParameter("data-xwiki-async-client-id", response.getAsyncClientId().toString());
+        placeholder.setParameter("data-xwiki-async-client-id", response.getAsyncClientId());
 
         return placeholder;
+    }
+
+    @Override
+    public String render(BlockAsyncRenderer renderer, AsyncRendererConfiguration configuration)
+        throws JobException, RenderingException
+    {
+        // Start renderer execution if there is none already running/available
+        AsyncRendererExecutorResponse response = this.executor.render(renderer, configuration);
+
+        // Get result
+        BlockAsyncRendererResult result = (BlockAsyncRendererResult) response.getStatus().getResult();
+
+        if (result != null && !configuration.isPlaceHolderForced()) {
+            return result.getResult();
+        }
+
+        // Return a placeholder waiting for the result
+        StringBuilder str = new StringBuilder();
+
+        if (renderer.isInline()) {
+            str.append("<span ");
+        } else {
+            str.append("<div ");
+        }
+
+        str.append("class=xwiki-async");
+        // Provide it directly as it's going to be used in the client side (the URL fragment to use in the ajax request)
+        str.append("data-xwiki-async-id=").append(response.getJobIdHTTPPath());
+        str.append("data-xwiki-async-client-id=").append(response.getAsyncClientId());
+        str.append("/>");
+
+        return str.toString();
     }
 }

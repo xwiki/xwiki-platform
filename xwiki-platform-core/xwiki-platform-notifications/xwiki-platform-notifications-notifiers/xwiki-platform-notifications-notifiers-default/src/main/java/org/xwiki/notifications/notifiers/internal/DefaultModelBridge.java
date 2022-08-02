@@ -52,7 +52,7 @@ public class DefaultModelBridge implements ModelBridge
 
     @Override
     public void savePropertyInHiddenDocument(BaseObjectReference objectReference, String property, Object value)
-            throws NotificationException
+        throws NotificationException
     {
         try {
             XWikiContext xcontext = contextProvider.get();
@@ -78,7 +78,8 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
-    public String getDocumentURL(DocumentReference documentReference, String action, String parameters) {
+    public String getDocumentURL(DocumentReference documentReference, String action, String parameters)
+    {
         XWikiContext context = contextProvider.get();
         return context.getWiki().getExternalURL(documentReference, action, parameters, null, context);
     }

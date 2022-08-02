@@ -44,6 +44,5 @@ administration.templateProvider.creationRestrictions=Ustaw ograniczenia
 administration.templateProvider.creationRestrictions.hint=Lista lokalizacji (w tym ich dzieci), w których ten szablon może tworzyć strony
 administration.templateProvider.creationRestrictions.none=Ten szablon można używać wszędzie
 administration.templateProvider.creationRestrictionsAreSuggestions=Ograniczenia tworzenia jako sugestie
-administration.templateProvider.creationRestrictionsAreSuggestions.hint=Pozwala użytkownikowi wybrać dowolną lokalizację, aby utworzyć stronę z tym szablonem, przy użyciu pierwszego ograniczenia tworzenia jako wstępnie wypełnionej domyślnej lokalizacji, gdy szablon zostanie wybrany z listy.
-</content>
+administration.templateProvider.creationRestrictionsAreSuggestions.hint=Pozwala użytkownikowi wybrać dowolną lokalizację, aby utworzyć stronę z tym szablonem, przy użyciu pierwszego ograniczenia tworzenia jako wstępnie wypełnionej domyślnej lokalizacji, gdy szablon zostanie wybrany z listy.</content>
 </xwikidoc>

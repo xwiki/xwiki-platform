@@ -41,47 +41,47 @@ import org.xwiki.rendering.syntax.Syntax;
 public class DefaultWikiComponent implements WikiComponent
 {
     /**
-     * @see {@link #getDocumentReference()}
+     * @see #getDocumentReference()
      */
     private DocumentReference documentReference;
 
     /**
-     * @see {@link #getAuthorReference()}
+     * @see #getAuthorReference()
      */
     private DocumentReference authorReference;
 
     /**
-     * @see {@link #getHandledMethods()}
+     * @see #getHandledMethods()
      */
-    private Map<String, XDOM> handledMethods = new HashMap<String, XDOM>();
+    private Map<String, XDOM> handledMethods = new HashMap<>();
 
     /**
-     * @see {@link #getRoleType()}
+     * @see #getRoleType()
      */
     private Type roleType;
 
     /**
-     * @see {@link #getRoleHint()}
+     * @see #getRoleHint()
      */
     private String roleHint;
 
     /**
-     * @see {@link #getScope()}
+     * @see #getScope()
      */
     private WikiComponentScope scope;
 
     /**
-     * @see {@link #getImplementedInterfaces()}
+     * @see #getImplementedInterfaces()
      */
-    private List<Class< ? >> implementedInterfaces = new ArrayList<Class< ? >>();
+    private List<Class< ? >> implementedInterfaces = new ArrayList<>();
 
     /**
-     * @see {@link #getDependencies()}
+     * @see #getDependencies()
      */
-    private Map<String, ComponentDescriptor> dependencies = new HashMap<String, ComponentDescriptor>();
+    private Map<String, ComponentDescriptor> dependencies = new HashMap<>();
 
     /**
-     * @see {@link #getSyntax()}
+     * @see #getSyntax()
      */
     private Syntax syntax;
 

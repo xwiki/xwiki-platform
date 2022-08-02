@@ -187,6 +187,5 @@ solr.result.location=Gelegen in {0} » {1} » {2}
 ### Missing: solr.field.space=Location
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend
-</content>
+#@deprecatedend</content>
 </xwikidoc>

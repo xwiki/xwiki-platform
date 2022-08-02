@@ -43,6 +43,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.stability.Unstable;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
 
@@ -100,6 +101,16 @@ public class XWikiContext extends Hashtable<Object, Object>
     @Deprecated
     public static final String KEY_LEGACY_VELOCITYCONTEXT = "vcontext";
 
+    /**
+     * The reference of a logged-in inactive user: in such case the context user reference is guest, so we store
+     * the actual logged-in user with that key.
+     *
+     * @since 14.3RC1
+     * @since 13.10.5
+     */
+    @Unstable
+    public static final String INACTIVE_USER_REFERENCE = "inactiveUserReference";
+
     /** Logging helper object. */
     protected static final Logger LOGGER = LoggerFactory.getLogger(XWikiContext.class);
 
@@ -133,6 +144,8 @@ public class XWikiContext extends Hashtable<Object, Object>
     private Execution execution;
 
     private boolean finished = false;
+
+    private boolean responseSent = false;
 
     private XWiki wiki;
 
@@ -509,6 +522,9 @@ public class XWikiContext extends Hashtable<Object, Object>
         return StringUtils.equalsIgnoreCase(wikiName, getMainXWiki());
     }
 
+    /**
+     * @return the current document handled in the context or {@code null}.
+     */
     public XWikiDocument getDoc()
     {
         return (XWikiDocument) get("doc");
@@ -688,15 +704,6 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @deprecated since 6.0M1, use {@link #setInterfaceLocale(Locale)} instead
-     */
-    @Deprecated
-    public void setInterfaceLanguage(String interfaceLanguage)
-    {
-        setInterfaceLocale(LocaleUtils.toLocale(Util.normalizeLanguage(interfaceLanguage)));
-    }
-
-    /**
      * @param interfaceLocale the {@link Locale} to use to display the content
      * @since 6.0M1
      */
@@ -745,38 +752,47 @@ public class XWikiContext extends Hashtable<Object, Object>
         this.form = form;
     }
 
+    /**
+     * Define if a response has been already sent or not.
+     * Note that contrary to {@link #isResponseSent()} this method will ensure that the template is executed even if the
+     * result of the execution is not sent. See {@link Utils#parseTemplate(String, boolean, XWikiContext)} for details.
+     * @return {@code true} if the response has been sent and no new reponse should be sent anymore.
+     */
     public boolean isFinished()
     {
         return this.finished;
     }
 
+    /**
+     * See {@link #isFinished()}.
+     * @param finished Set to {@code true} if the response has been sent.
+     */
     public void setFinished(boolean finished)
     {
         this.finished = finished;
     }
 
     /**
-     * @deprecated never made any sense since the context wiki can change any time
+     * Define if a response has been already sent or not and if the template parsing should be done.
+     * Note that contrary to {@link #isFinished()} this method will always prevent the execution of the template.
+     * See {@link Utils#parseTemplate(String, boolean, XWikiContext)} for details.
+     * @return {@code true} if the response has been sent, no new reponse should be sent anymore
+     *          and the template should not be parsed.
+     * @since 13.3RC1
      */
-    @Deprecated
-    public void setWikiOwner(String wikiOwner)
+    @Unstable
+    public boolean isResponseSent()
     {
-        // Cannot do anything
+        return this.responseSent;
     }
 
     /**
-     * @deprecated use {@link XWiki#getWikiOwner(String, XWikiContext)} instead
+     * See {@link #isResponseSent()}.
+     * @param responseSent Set to {@code true} if the response has been sent and the template should not be executed.
      */
-    @Deprecated
-    public String getWikiOwner()
+    public void setResponseSent(boolean responseSent)
     {
-        try {
-            return getWiki().getWikiOwner(getWikiId(), this);
-        } catch (XWikiException e) {
-            LOGGER.error("Failed to get owner for wiki [{}]", getWikiId(), e);
-        }
-
-        return null;
+        this.responseSent = responseSent;
     }
 
     public XWikiDocument getWikiServer()

@@ -36,21 +36,24 @@ public interface ToggleableNotificationFilter
     /**
      * @return either or not this filter should be enabled by default
      */
-    default boolean isEnabledByDefault() {
+    default boolean isEnabledByDefault()
+    {
         return true;
     }
 
     /**
      * @return the formats handled by this filter
      */
-    default List<NotificationFormat> getFormats() {
+    default List<NotificationFormat> getFormats()
+    {
         return Arrays.asList(NotificationFormat.values());
     }
 
     /**
      * @return the events handled by this filter
      */
-    default List<String> getEventTypes() {
+    default List<String> getEventTypes()
+    {
         return Collections.emptyList();
     }
 }

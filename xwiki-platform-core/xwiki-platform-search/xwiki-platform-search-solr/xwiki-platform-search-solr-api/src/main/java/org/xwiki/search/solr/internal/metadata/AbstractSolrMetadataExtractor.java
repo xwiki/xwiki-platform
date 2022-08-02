@@ -34,7 +34,7 @@ import javax.inject.Provider;
 
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.tika.metadata.Metadata;
-import org.apache.tika.metadata.TikaMetadataKeys;
+import org.apache.tika.metadata.TikaCoreProperties;
 import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -52,8 +52,10 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.BooleanClass;
 import com.xpn.xwiki.objects.classes.ListItem;
@@ -74,13 +76,6 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * The format used when indexing the objcontent field: "&lt;propertyName&gt;:&lt;propertyValue&gt;".
      */
     private static final String OBJCONTENT_FORMAT = "%s : %s";
-
-    /**
-     * The maximum number of characters allowed in a short text. This should be the same as the maximum length of a
-     * StringProperty, as specified by xwiki.hbm.xml. We need this limit to be able to handle differently short strings
-     * and large strings when indexing XObject properties.
-     */
-    protected static final int SHORT_TEXT_LIMIT = 255;
 
     /**
      * Logging framework.
@@ -113,6 +108,29 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      */
     @Inject
     protected ComponentManager componentManager;
+
+    private int shortTextLimit = -1;
+
+    /**
+     * @return the maximum size of a short text as defined by the database
+     * @since 13.2RC1
+     */
+    protected int getShortTextLimit()
+    {
+        if (this.shortTextLimit == -1) {
+            try {
+                this.shortTextLimit = this.componentManager.<HibernateStore>getInstance(HibernateStore.class)
+                    .getLimitSize(StringProperty.class, "value");
+            } catch (ComponentLookupException e) {
+                this.logger.debug("Failed to get the max short text size", e);
+
+                // Fallback on the expected default
+                return 768;
+            }
+        }
+
+        return this.shortTextLimit;
+    }
 
     @Override
     public LengthSolrInputDocument getSolrDocument(EntityReference entityReference)
@@ -201,7 +219,8 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
                 return originalDocument;
             }
 
-            XWikiDocument translatedDocument = originalDocument.getTranslatedDocument(locale, this.xcontextProvider.get());
+            XWikiDocument translatedDocument =
+                originalDocument.getTranslatedDocument(locale, this.xcontextProvider.get());
 
             // XWikiDocument#getTranslatedDocument returns the default document when the locale does not exist
             if (translatedDocument.getRealLocale().equals(locale)) {
@@ -377,7 +396,8 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
             setStaticListPropertyValue(solrDocument, property, (StaticListClass) propertyClass, locale);
         } else if (propertyClass instanceof TextAreaClass
             || (propertyClass != null && "String".equals(propertyClass.getClassType()))
-            || (propertyValue instanceof CharSequence && String.valueOf(propertyValue).length() > SHORT_TEXT_LIMIT)) {
+            || (propertyValue instanceof CharSequence
+                && String.valueOf(propertyValue).length() > getShortTextLimit())) {
             // Index TextArea and String properties as text, based on the document locale. We didn't check if the
             // property class is an instance of StringClass because it has subclasses that don't store free text (like
             // the EmailClass). Plus we didn't want to include the PasswordClass (which extends StringClass).
@@ -393,7 +413,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
                 locale);
 
             if (!(propertyClass instanceof TextAreaClass)
-                && String.valueOf(propertyValue).length() <= SHORT_TEXT_LIMIT) {
+                && String.valueOf(propertyValue).length() <= getShortTextLimit()) {
                 // Also index the raw value that is saved in the database. This provide a stable field name and also
                 // allows exact matching
                 setPropertyValue(solrDocument, property, new TypedValue(propertyValue), locale);
@@ -495,13 +515,12 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * 
      * @param attachment the attachment to extract the content from
      * @return the text representation of the attachment's content
-     * @throws SolrIndexerException if problems occur
      */
     protected String getContentAsText(XWikiAttachment attachment)
     {
         try {
             Metadata metadata = new Metadata();
-            metadata.set(TikaMetadataKeys.RESOURCE_NAME_KEY, attachment.getFilename());
+            metadata.set(TikaCoreProperties.RESOURCE_NAME_KEY, attachment.getFilename());
 
             InputStream in = attachment.getContentInputStream(this.xcontextProvider.get());
 

@@ -39,7 +39,7 @@
   <content>{{velocity output="false"}}
 ### Globally administrate the registration of new users in a wiki.
 #set ($params = {
-  'registration': ['use_email_verification', 'auth_active_check', 'validation_email_content',
+  'registration': ['use_email_verification', 'validation_email_content',
                   'confirmation_email_content', 'invitation_email_content']
 })
 {{/velocity}}

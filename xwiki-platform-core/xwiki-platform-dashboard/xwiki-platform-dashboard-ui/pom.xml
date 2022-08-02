@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-dashboard</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-dashboard-ui</artifactId>
   <name>XWiki Platform - Dashboard - UI</name>
@@ -51,8 +51,9 @@
     </dependency>
     <dependency>
       <!-- Required for the Macro Wizard that is used by the Gadget Wizard. -->
-      <groupId>org.xwiki.contrib</groupId>
-      <artifactId>application-ckeditor-ui</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-ckeditor-ui</artifactId>
+      <version>${project.version}</version>
       <type>xar</type>
     </dependency>
   </dependencies>

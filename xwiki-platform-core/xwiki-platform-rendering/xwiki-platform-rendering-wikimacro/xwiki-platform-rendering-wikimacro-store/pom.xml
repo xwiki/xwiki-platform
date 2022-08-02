@@ -25,16 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-wikimacro</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-wikimacro-store</artifactId>
   <name>XWiki Platform - Rendering - Wiki Macro Bridge - Store</name>
   <description>Defines the ability to store macros into wiki pages</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.41</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>45</xwiki.pitest.mutationThreshold>
-    <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
-    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+    <xwiki.jacoco.instructionRatio>0.60</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Wiki Macro Store</xwiki.extension.name>
   </properties>
@@ -98,6 +95,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-event</artifactId>
+      <version>${rendering.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-groovy</artifactId>
       <version>${project.version}</version>
@@ -105,7 +108,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-security-bridge</artifactId>
+      <artifactId>xwiki-platform-security-authorization-bridge</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
@@ -129,6 +132,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-macro-html</artifactId>
+      <version>${rendering.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-observation-local</artifactId>
       <version>${commons.version}</version>
@@ -148,8 +157,13 @@
     </dependency>
     <!-- Macro parameters validation -->
     <dependency>
-      <groupId>org.hibernate</groupId>
+      <groupId>org.hibernate.validator</groupId>
       <artifactId>hibernate-validator</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mortbay.jasper</groupId>
+      <artifactId>apache-el</artifactId>
       <scope>test</scope>
     </dependency>
     <!-- Used to mock XWiki class -->
@@ -172,7 +186,9 @@
               <excludes>
                 **/DefaultWikiMacroInitializer.java,
                 **/DefaultWikiMacroRenderer.java,
-                **/WikiMacroConstants.java
+                **/WikiMacroConstants.java,
+                org/xwiki/rendering/wikimacro/internal/DefaultWikiMacro.java,
+                org/xwiki/rendering/wikimacro/internal/DefaultWikiMacroFactory.java
               </excludes>
             </configuration>
           </execution>

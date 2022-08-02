@@ -19,10 +19,14 @@
  */
 package com.xpn.xwiki;
  
+import java.util.Locale;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.util.Util;
+import org.xwiki.localization.LocaleUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -117,6 +121,39 @@ public privileged aspect XWikiContextCompatibilityAspect
             baseClass = this.classCache.get(this.currentMixedDocumentReferenceResolver.resolve(name));
         }
         return baseClass;
+    }
+
+    /**
+     * @deprecated never made any sense since the context wiki can change any time
+     */
+    @Deprecated
+    public void XWikiContext.setWikiOwner(String wikiOwner)
+    {
+        // Cannot do anything
+    }
+
+    /**
+     * @deprecated use {@link XWiki#getWikiOwner(String, XWikiContext)} instead
+     */
+    @Deprecated
+    public String XWikiContext.getWikiOwner()
+    {
+        try {
+            return getWiki().getWikiOwner(getWikiId(), this);
+        } catch (XWikiException e) {
+            LOGGER.error("Failed to get owner for wiki [{}]", getWikiId(), e);
+        }
+
+        return null;
+    }
+
+    /**
+     * @deprecated since 6.0M1, use {@link #setInterfaceLocale(Locale)} instead
+     */
+    @Deprecated
+    public void XWikiContext.setInterfaceLanguage(String interfaceLanguage)
+    {
+        setInterfaceLocale(LocaleUtils.toLocale(Util.normalizeLanguage(interfaceLanguage)));
     }
 
     /**

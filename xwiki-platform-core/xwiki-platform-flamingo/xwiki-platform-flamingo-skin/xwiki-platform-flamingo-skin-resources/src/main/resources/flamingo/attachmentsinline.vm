@@ -1,3 +1,25 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+#template('attachment_macros.vm')
+#template('display_macros.vm')
+#initRequiredSkinExtensions()
 $xwiki.jsfx.use('uicomponents/widgets/upload.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})
 $xwiki.ssfx.use('uicomponents/widgets/upload.css', true)
 $xwiki.jsfx.use('js/xwiki/viewers/attachments.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})
@@ -13,14 +35,11 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
 <div id="_attachments" class="attachments">
 #template("attachmentslist.vm")
 </div> ## attachments
-#deleteAttachmentModal
 #if($hasEdit || $hasAdmin)
   <form action="$doc.getURL("upload")" enctype="multipart/form-data" method="post" id="AddAttachment">
   <div>
   ## CSRF prevention
   <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
-  ## $redirect is defined in attachmentslist.vm
-  <input type="hidden" name="xredirect" value="$escapetool.xml($redirect)" />
   <fieldset id="attachform">
     <legend>$services.localization.render('core.viewers.attachments.upload.title')</legend>
     ## Temporarily disabled, until we fix attachment name handling
@@ -37,3 +56,5 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
 #end
 </div> ## attw
 </div> ## attachmentscontent
+#getRequiredSkinExtensions($requiredSkinExtensions)
+#set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))

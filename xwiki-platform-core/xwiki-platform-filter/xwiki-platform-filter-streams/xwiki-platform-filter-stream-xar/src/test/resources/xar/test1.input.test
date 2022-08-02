@@ -34,6 +34,7 @@
                   <type>
                     <name>XWiki</name>
                     <id>xwiki</id>
+                    <variants class="empty-list"/>
                   </type>
                   <version>2.0</version>
                 </org.xwiki.rendering.syntax.Syntax>
@@ -45,6 +46,10 @@
               <entry>
                 <string>revision_author</string>
                 <string>XWiki.author</string>
+              </entry>
+              <entry>
+                <string>revision_original_author</string>
+                <string>XWiki.originalMetadataAuthor</string>
               </entry>
               <entry>
                 <string>customclass</string>
@@ -415,6 +420,7 @@
                 <type>
                   <name>XWiki</name>
                   <id>xwiki</id>
+                  <variants class="empty-list"/>
                 </type>
                 <version>2.0</version>
               </org.xwiki.rendering.syntax.Syntax>
@@ -426,6 +432,10 @@
             <entry>
               <string>revision_author</string>
               <string>XWiki.author</string>
+            </entry>
+            <entry>
+              <string>revision_original_author</string>
+              <string>XWiki.originalMetadataAuthor</string>
             </entry>
             <entry>
               <string>customclass</string>

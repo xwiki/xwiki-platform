@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +46,8 @@ public class DefaultQuery implements SecureQuery
      * Used to log possible warnings.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultQuery.class);
+
+    private static final Pattern LEGACY_HQL_MATCHER = Pattern.compile("\\?($|[^\\d])");
 
     /**
      * field for {@link #isNamed()}.
@@ -184,17 +187,24 @@ public class DefaultQuery implements SecureQuery
     {
         for (int i = 0; i < values.size(); i++) {
             // There's a difference in the way positional parameters are handled:
-            // - HQL (jdbc-like), the index of positional parameters must start at 0
-            // - XWQL (jpql-like), the index of positional parameters must start at 1
+            // - HQL legacy ? ordinal parameters, the index of positional parameters must start at 0
+            // - JPQL ?1 ordinal parameters, the index of positional parameters must start at 1
             //
-            // This difference is also hardcoded in HqlQueryExecutor#populateParameters(), a better solution could
-            // be to replace the current DefaultQuery with distinct implementations: XwqlQuery, HqlQuery, NamedQuery.
-            if (Query.HQL.equals(getLanguage())) {
+            // FIXME: a better solution would be to replace the current DefaultQuery with distinct implementations:
+            // XWQLQuery, HQLQuery, NamedQuery.
+            if (Query.HQL.equals(getLanguage()) && LEGACY_HQL_MATCHER.matcher(this.statement).find()) {
                 bindValue(i, values.get(i));
             } else {
                 bindValue(i + 1, values.get(i));
             }
         }
+        return this;
+    }
+
+    @Override
+    public Query bindValues(Map<String, ?> values)
+    {
+        values.forEach(this::bindValue);
         return this;
     }
 

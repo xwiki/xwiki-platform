@@ -44,6 +44,5 @@ Invitation.WebHome_smtp_server_password.hint=Lozinka za povezivanje sa SMTP posl
 Invitation.WebHome_smtp_server_username.hint=Korisničko ime za povezivanje na SMTP poslužitelj, samo kada je potrebna autentikacija.
 Invitation.WebHome_smtp_port.hint=Priključak SMTP poslužitelja za koristiti.
 Invitation.WebHome_smtp_server.hint=SMTP poslužitelj na koji slati.
-Invitation.WebHome_javamail_extra_props.hint=Lista dodatnih Java Mail svojstava za koristiti.
-</content>
+Invitation.WebHome_javamail_extra_props.hint=Lista dodatnih Java Mail svojstava za koristiti.</content>
 </xwikidoc>

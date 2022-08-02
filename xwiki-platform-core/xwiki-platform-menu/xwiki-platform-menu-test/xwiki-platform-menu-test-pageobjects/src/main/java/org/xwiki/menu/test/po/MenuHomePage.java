@@ -20,10 +20,11 @@
 package org.xwiki.menu.test.po;
 
 import org.xwiki.appwithinminutes.test.po.ApplicationHomePage;
+import org.xwiki.livedata.test.po.LiveDataElement;
 
 /**
  * Represents the Menu.WebHome page.
- * 
+ *
  * @version $Id$
  * @since 10.6RC1
  */
@@ -46,5 +47,14 @@ public class MenuHomePage extends ApplicationHomePage
     public static String getPage()
     {
         return "WebHome";
+    }
+
+    /**
+     * @return the Live Data page object of the Menu home page
+     * @since 13.5RC1
+     */
+    public LiveDataElement getLiveData()
+    {
+        return new LiveDataElement("menu");
     }
 }

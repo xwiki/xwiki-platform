@@ -49,6 +49,8 @@ public class SerializableEventConverterTest
     public void toRemote()
     {
         assertFalse(this.remoteConverter.toRemote(new LocalEventData(null, null, null), null));
+        assertFalse(this.remoteConverter.toRemote(new LocalEventData(new LogEvent(), this, this), null));
+
         assertTrue(
             this.remoteConverter.toRemote(new LocalEventData(new LogEvent(), null, null), new RemoteEventData()));
     }

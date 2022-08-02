@@ -19,22 +19,24 @@
  */
 package org.xwiki.panels.test.po;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.administration.test.po.AdministrationPage;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.ui.po.ViewPage;
 
 import static org.junit.Assert.assertTrue;
 
 /**
  * Represents the navigation panel administration page (PanelsCode.NavigationConfiguration).
- * 
+ *
  * @version $Id$
  * @since 10.5RC1
  */
@@ -49,15 +51,43 @@ public class NavigationPanelAdministrationPage extends ViewPage
     @FindBy(css = ".exclusion-filter.topLevelExtensionPages input[type=\"checkbox\"]")
     private WebElement excludeTopLevelExtensionPagesCheckbox;
 
+    @FindBy(css = ".exclusion-filter.topLevelApplicationPages input[type=\"checkbox\"]")
+    private WebElement excludeTopLevelApplicationPagesCheckbox;
+
     @FindBy(name = "action_saveandcontinue")
     private WebElement saveButton;
 
-    public static NavigationPanelAdministrationPage gotoPage()
+    /**
+     * Navigates to the navigation panel administration page using the administration menu.
+     *
+     * @return a navigation panel administration page object
+     */
+    public static NavigationPanelAdministrationPage navigate()
     {
         AdministrationPage administrationPage = AdministrationPage.gotoPage();
         assertTrue(administrationPage.hasSection("panels.navigation"));
         administrationPage.clickSection("Look & Feel", "Navigation Panel");
-        return new NavigationPanelAdministrationPage().waitUntilPageIsLoaded();
+        return new NavigationPanelAdministrationPage();
+    }
+
+    /**
+     * Goes to the navigation panel administration page, with the {@code force} and {@code forceEdit} url parameters 
+     * set to {@code true}.
+     *
+     * @return a navigation panel administration page object
+     */
+    public static NavigationPanelAdministrationPage gotoPage()
+    {
+        Map<String, Object> queryParameters = new HashMap<>();
+        queryParameters.put("editor", "globaladmin");
+        queryParameters.put("section", "panels.navigation");
+        // Forces the access to the administration when XWikiPreferences is locked (admin.vm)
+        queryParameters.put("force", true);
+        // Forces the access to the administration when XWiki preferences is locked (ConfigurableClass) 
+        queryParameters.put("forceEdit", true);
+        getUtil()
+            .gotoPage(new DocumentReference("xwiki", "XWiki", "XWikiPreferences"), "admin", queryParameters);
+        return new NavigationPanelAdministrationPage();
     }
 
     public List<String> getExclusions()
@@ -74,12 +104,11 @@ public class NavigationPanelAdministrationPage extends ViewPage
                 By.xpath(".//*[@class = 'jstree-anchor' and . = '" + page + "']"));
             // If there is more than one page to include we need to select all of them first.
             if (pages.length > 1) {
-                new Actions(getDriver()).keyDown(Keys.LEFT_CONTROL).click(source).keyUp(Keys.LEFT_CONTROL).build()
-                    .perform();
+                getDriver().createActions().keyDown(Keys.SHIFT).click(source).keyUp(Keys.SHIFT).build().perform();
             }
         }
         if (source != null) {
-            new Actions(getDriver()).dragAndDrop(source, this.excludedPagesPane).build().perform();
+            getDriver().dragAndDrop(source, this.excludedPagesPane);
         }
     }
 
@@ -103,7 +132,7 @@ public class NavigationPanelAdministrationPage extends ViewPage
             }
         }
         if (source != null) {
-            new Actions(getDriver()).dragAndDrop(source, this.treeElement).build().perform();
+            getDriver().dragAndDrop(source, this.treeElement);
         }
     }
 
@@ -120,6 +149,19 @@ public class NavigationPanelAdministrationPage extends ViewPage
         }
     }
 
+    public boolean isExcludingTopLevelApplicationPages()
+    {
+        return this.excludeTopLevelApplicationPagesCheckbox.isSelected();
+    }
+
+    public void excludeTopLevelApplicationPages(boolean exclude)
+    {
+        boolean excluded = isExcludingTopLevelApplicationPages();
+        if (exclude != excluded) {
+            this.excludeTopLevelApplicationPagesCheckbox.click();
+        }
+    }
+
     public NavigationTreeElement getNavigationTree()
     {
         return (NavigationTreeElement) new NavigationTreeElement(this.treeElement).waitForIt();
@@ -129,13 +171,5 @@ public class NavigationPanelAdministrationPage extends ViewPage
     {
         this.saveButton.click();
         waitForNotificationSuccessMessage("Saved");
-    }
-
-    @Override
-    public NavigationPanelAdministrationPage waitUntilPageIsLoaded()
-    {
-        getNavigationTree();
-
-        return this;
     }
 }

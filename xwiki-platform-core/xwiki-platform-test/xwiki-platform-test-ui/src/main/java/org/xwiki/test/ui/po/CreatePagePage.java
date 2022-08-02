@@ -19,7 +19,6 @@
  */
 package org.xwiki.test.ui.po;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -39,6 +38,8 @@ import org.xwiki.test.ui.po.editor.EditPage;
  */
 public class CreatePagePage extends ViewPage
 {
+    private static final By errorMessageLocator = By.className("errormessage");
+
     /**
      * The element that contains the document picker used to select the target document.
      */
@@ -47,8 +48,13 @@ public class CreatePagePage extends ViewPage
 
     private DocumentPicker documentPicker;
 
+    private PageTypePicker pageTypePicker = new PageTypePicker();
+
     @FindBy(id = "terminal")
     private WebElement isTerminalCheckbox;
+
+    @FindBy(css = "form#create input[type='submit']")
+    private WebElement createButton;
 
     public static CreatePagePage gotoPage()
     {
@@ -68,73 +74,32 @@ public class CreatePagePage extends ViewPage
         return this.documentPicker;
     }
 
-    private List<WebElement> getAvailableTemplateInputs()
-    {
-        return getDriver().findElementsWithoutWaiting(By.xpath("//input[@name = 'type' and @data-type = 'template']"));
-    }
-
-    private List<WebElement> getAvailableTypeInputs()
-    {
-        return getDriver().findElementsWithoutWaiting(By.xpath("//input[@name = 'type']"));
-    }
-
     /**
      * @since 3.2M3
      */
     public int getAvailableTemplateSize()
     {
-        return getAvailableTemplateInputs().size();
+        return this.pageTypePicker.countAvailableTemplates();
     }
 
     public List<String> getAvailableTemplates()
     {
-        List<String> availableTemplates = new ArrayList<String>();
-        List<WebElement> templateInputs = getAvailableTemplateInputs();
-        for (WebElement input : templateInputs) {
-            if (input.getAttribute("value").length() > 0) {
-                availableTemplates.add(input.getAttribute("value"));
-            }
-        }
-
-        return availableTemplates;
+        return this.pageTypePicker.getAvailableTemplates();
     }
 
     public void setTemplate(String template)
     {
-        List<WebElement> templates = getAvailableTemplateInputs();
-        for (WebElement templateInput : templates) {
-            if (templateInput.getAttribute("value").equals(template)) {
-                // Get the label corresponding to the input so we can click on it
-                WebElement label =
-                    getDriver().findElementWithoutWaiting(
-                        By.xpath("//label[@for = '" + templateInput.getAttribute("id") + "']"));
-                label.click();
-                return;
-            }
-        }
-        throw new RuntimeException("Failed to find template [" + template + "]");
+        this.pageTypePicker.selectTemplateByValue(template);
     }
 
     public void setType(String type)
     {
-        List<WebElement> types = getAvailableTypeInputs();
-        for (WebElement typeInput : types) {
-            if (typeInput.getAttribute("value").equals(type)) {
-                // Get the label corresponding to the input so we can click on it
-                WebElement label =
-                    getDriver().findElementWithoutWaiting(
-                        By.xpath("//label[@for = '" + typeInput.getAttribute("id") + "']"));
-                label.click();
-                return;
-            }
-        }
-        throw new RuntimeException("Failed to find type [" + type + "]");
+        this.pageTypePicker.selectTypeByValue(type);
     }
 
     public void clickCreate()
     {
-        // Submit the create form. Don`t use the DocumentPicker element since it might not always be there.
-        getDriver().findElementWithoutWaiting(By.id("create")).submit();
+        this.createButton.click();
     }
 
     public EditPage createPage(String spaceValue, String pageValue)
@@ -199,6 +164,7 @@ public class CreatePagePage extends ViewPage
     {
         if (title != null) {
             getDocumentPicker().setTitle(title);
+            getDocumentPicker().waitForName(title);
         }
 
         if (spaceReference != null) {
@@ -224,7 +190,16 @@ public class CreatePagePage extends ViewPage
      */
     public void waitForErrorMessage()
     {
-        getDriver().waitUntilElementIsVisible(By.className("errormessage"));
+        getDriver().waitUntilElementIsVisible(errorMessageLocator);
+    }
+
+    /**
+     * @return the content of the error message.
+     * @since 11.4RC1
+     */
+    public String getErrorMessage()
+    {
+        return getDriver().findElement(errorMessageLocator).getText();
     }
 
     /**
@@ -269,7 +244,7 @@ public class CreatePagePage extends ViewPage
 
     /**
      * Wait for the location preview to display the passed path string and throw an exception if the timeout is reached.
-     * Note that we need to wait since the Breadcrumb is udated live and asserting its content without waiting would
+     * Note that we need to wait since the Breadcrumb is updated live and asserting its content without waiting would
      * lead to false positives.
      * <p>
      * Note: This method can not be implemented inside {@link BreadcrumbElement} because a change of parent replaces
@@ -306,8 +281,8 @@ public class CreatePagePage extends ViewPage
             });
         } catch (WebDriverException e) {
             // Display a nicer error message than would be displayed otherwise
-            throw new WebDriverException(String.format("Found [%s], was expecting [%s]", currentValue.toString(),
-                expectedPathString), e);
+            throw new WebDriverException(
+                String.format("Found [%s], was expecting [%s]", currentValue.toString(), expectedPathString), e);
         }
     }
 }

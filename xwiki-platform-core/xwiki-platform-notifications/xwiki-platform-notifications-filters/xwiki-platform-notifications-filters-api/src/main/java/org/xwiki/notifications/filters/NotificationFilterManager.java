@@ -20,15 +20,18 @@
 package org.xwiki.notifications.filters;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Stream;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.internal.ToggleableNotificationFilter;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.stability.Unstable;
 
 /**
  * Provide an interface for interacting with user notification filters.
@@ -49,6 +52,19 @@ public interface NotificationFilterManager
     Collection<NotificationFilter> getAllFilters(boolean allWikis) throws NotificationException;
 
     /**
+     * Get all notifications filters from the given wikis.
+     * @param wikiReference include filters from the given wiki.
+     * @return a collection of notification filters
+     * @throws NotificationException if error happens
+     * @since 13.3RC1
+     */
+    @Unstable
+    default Collection<NotificationFilter> getAllFilters(WikiReference wikiReference) throws NotificationException
+    {
+        return Collections.emptyList();
+    }
+
+    /**
      * Get all notifications filters that are enabled to the given user.
      * @param user reference to the user
      * @param onlyEnabled either or not only filters enabled for the user should be collected
@@ -58,6 +74,24 @@ public interface NotificationFilterManager
      */
     Collection<NotificationFilter> getAllFilters(DocumentReference user, boolean onlyEnabled)
         throws NotificationException;
+
+    /**
+     * Get all notifications filters that are enabled to the given user and matching the requested filtering moment.
+     *
+     * @param user reference to the user
+     * @param onlyEnabled either or not only filters enabled for the user should be collected
+     * @param filteringPhase when the filter should be used ({@code null} means any phase)
+     * @return the collection of notification filters enabled to the user.
+     * @throws NotificationException if an error happens
+     * @since 12.9RC1
+     * @since 12.6.3
+     */
+    default Collection<NotificationFilter> getAllFilters(DocumentReference user, boolean onlyEnabled,
+        NotificationFilter.FilteringPhase filteringPhase)
+        throws NotificationException
+    {
+        return getAllFilters(user, onlyEnabled);
+    }
 
     /**
      * Get from the filters the one that match the given notification preference.

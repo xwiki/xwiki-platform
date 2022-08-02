@@ -37,6 +37,5 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>application.index.title=Liste des applications
-application.index.drawer=Liste des applications
-</content>
+application.index.drawer=Liste des applications</content>
 </xwikidoc>

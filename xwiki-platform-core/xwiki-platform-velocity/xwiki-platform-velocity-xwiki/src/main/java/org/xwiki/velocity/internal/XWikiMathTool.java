@@ -21,11 +21,13 @@ package org.xwiki.velocity.internal;
 
 import java.util.Locale;
 
-import javax.inject.Provider;
+import javax.inject.Inject;
 
 import org.apache.velocity.tools.generic.MathTool;
-
-import com.xpn.xwiki.XWikiContext;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.localization.LocalizationContext;
 
 /**
  * Extend the Velocity Tool-provided MathTool to use the current context locale.
@@ -33,17 +35,12 @@ import com.xpn.xwiki.XWikiContext;
  * @version $Id$
  * @since 8.2RC1
  */
+@Component(roles = XWikiMathTool.class)
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class XWikiMathTool extends MathTool
 {
-    private Provider<XWikiContext> contextProvider;
-
-    /**
-     * @param contextProvider the provider to get the {@link XWikiContext} dynamically at runtime
-     */
-    public XWikiMathTool(Provider<XWikiContext> contextProvider)
-    {
-        this.contextProvider = contextProvider;
-    }
+    @Inject
+    private LocalizationContext localizationContext;
 
     /**
      * @return the current locale from the XWiki context
@@ -51,6 +48,6 @@ public class XWikiMathTool extends MathTool
     @Override
     public Locale getLocale()
     {
-        return this.contextProvider.get().getLocale();
+        return this.localizationContext.getCurrentLocale();
     }
 }

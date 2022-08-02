@@ -19,18 +19,22 @@
  */
 package org.xwiki.test.ui.po.editor;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.LocaleUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 import org.xwiki.test.ui.po.BasePage;
+import org.xwiki.test.ui.po.BootstrapSelect;
 import org.xwiki.test.ui.po.InlinePage;
 import org.xwiki.test.ui.po.ViewPage;
 
@@ -63,6 +67,9 @@ public class EditPage extends BasePage
     @FindBy(id = "xwikidoctitleinput")
     private WebElement titleField;
 
+    @FindBy(id = "xwikidoclanguageinput2")
+    private WebElement defaultLanguageField;
+
     /**
      * The top floating edit menu bar.
      */
@@ -74,6 +81,15 @@ public class EditPage extends BasePage
      */
     @FindBy(id = "tmCurrentEditor")
     private WebElement currentEditorMenu;
+
+    @FindBy(id = "csrf-warning-modal")
+    private WebElement csrfWarningModal;
+
+    @FindBy(id = "cancel-save-csrf")
+    private WebElement cancelCSRFWarningButton;
+
+    @FindBy(id = "force-save-csrf")
+    private WebElement forceSaveCSRFButton;
 
     /**
      * Enumerates the available editors.
@@ -264,23 +280,9 @@ public class EditPage extends BasePage
         return this.titleField.getAttribute("value");
     }
 
-    /**
-     * @since 7.4M2
-     */
-    @Override
-    public void waitUntilPageJSIsLoaded()
+    protected Set<Locale> getExistingLocales(List<WebElement> elements)
     {
-        super.waitUntilPageJSIsLoaded();
-
-        // // Actionbuttons javascript for saving the page.
-        getDriver().waitUntilJavascriptCondition(
-            "return XWiki.actionButtons != undefined && " + "XWiki.actionButtons.EditActions != undefined && "
-                + "XWiki.actionButtons.AjaxSaveAndContinue != undefined");
-    }
-
-    protected List<Locale> getExistingLocales(List<WebElement> elements)
-    {
-        List<Locale> locales = new ArrayList<>(elements.size());
+        Set<Locale> locales = new HashSet<>(elements.size());
         for (WebElement element : elements) {
             locales.add(LocaleUtils.toLocale(element.getText()));
         }
@@ -292,7 +294,7 @@ public class EditPage extends BasePage
      * @return a list of the locales already translated for this document
      * @since 9.0RC1
      */
-    public List<Locale> getExistingLocales()
+    public Set<Locale> getExistingLocales()
     {
         List<WebElement> elements =
             getDriver().findElementsWithoutWaiting(By.xpath("//p[starts-with(text(), 'Existing translations:')]//a"));
@@ -304,7 +306,7 @@ public class EditPage extends BasePage
      * @return a list of the supported locales not yet translated for this document
      * @since 9.0RC1
      */
-    public List<Locale> getNotExistingLocales()
+    public Set<Locale> getNotExistingLocales()
     {
         List<WebElement> elements =
             getDriver().findElementsWithoutWaiting(By.xpath("//p[starts-with(text(), 'Translate this page in:')]//a"));
@@ -319,11 +321,67 @@ public class EditPage extends BasePage
      */
     public WikiEditPage clickTranslate(String locale)
     {
-        WebElement element = getDriver().findElementWithoutWaiting(
-            By.xpath("//p[starts-with(text(), 'Translate this page in:')]//a[text()='" + locale + "']"));
+        WebElement element;
+        if ("default".equals(locale)) {
+            element = getDriver().findElement(By.linkText("default"));
+        } else {
+            element = getDriver().findElementWithoutWaiting(
+                By.xpath("//p[starts-with(text(), 'Translate this page in:')]//a[text()='" + locale + "']"));
+        }
 
         element.click();
 
         return new WikiEditPage();
+    }
+
+    /**
+     * Set the default language input field.
+     * 
+     * @param defaultLanguage the string to fill the input.
+     * @since 11.3RC1
+     */
+    public void setDefaultLanguage(String defaultLanguage)
+    {
+        // Select the parent of the default language field because we're using the Bootstrap select widget.
+        WebElement parent = this.defaultLanguageField.findElement(By.xpath("./.."));
+        BootstrapSelect select = new BootstrapSelect(parent, getDriver());
+        select.selectByValue(defaultLanguage);
+    }
+
+    public String getDefaultLanguage()
+    {
+        return new Select(this.defaultLanguageField).getFirstSelectedOption().getAttribute("value");
+    }
+
+    public boolean isCSRFWarningDisplayed()
+    {
+        try {
+            return this.csrfWarningModal.isDisplayed();
+        } catch (NoSuchElementException e) {
+            return false;
+        }
+    }
+
+    public void clickCancelCSRFWarningButton()
+    {
+        this.cancelCSRFWarningButton.click();
+    }
+
+    public void clickForceSaveCSRFButton()
+    {
+        this.forceSaveCSRFButton.click();
+    }
+
+    /**
+     * Cancel the edition by using keyboard shortcut.
+     * @return a new {@link ViewPage}
+     * @since 11.9RC1
+     */
+    public ViewPage useShortcutKeyForCancellingEdition()
+    {
+        getDriver().addPageNotYetReloadedMarker();
+        getDriver().createActions().keyDown(Keys.ALT).sendKeys("c").keyUp(Keys.ALT).perform();
+        getDriver().waitUntilPageIsReloaded();
+        return new ViewPage();
     }
 }

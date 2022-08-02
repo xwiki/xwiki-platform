@@ -1,0 +1,3 @@
+org.xwiki.security.authentication.api.internal.LegacyAuthenticationConfiguration
+org.xwiki.security.authentication.api.internal.LegacyAuthenticationFailureManager
+org.xwiki.security.authentication.api.internal.LegacyAuthenticationFailureStrategy

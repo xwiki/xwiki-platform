@@ -19,9 +19,6 @@
  */
 package org.xwiki.vfs.internal;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.resource.CreateResourceReferenceException;
@@ -42,9 +40,9 @@ import org.xwiki.vfs.VfsResourceReference;
  * Transform VFS URLs into a typed Resource Reference. The URL format handled is {@code http://server/<servlet
  * context>/vfs/<vfs reference as URI>/path/inside/zip}. For example:
  * <ul>
- *   <li>{@code http://localhost:8080/xwiki/vfs/encoded(attach:space.page@attachment)/some/path/file.txt}.</li>
- *   <li>{@code http://localhost:8080/xwiki/vfs/encoded(http://server/path/to/zip)/some/path/file.txt}.</li>
- *   <li>{@code http://localhost:8080/xwiki/vfs/encoded(file://server/path/to/zip)/some/path/file.txt}.</li>
+ * <li>{@code http://localhost:8080/xwiki/vfs/encoded(attach:space.page@attachment)/some/path/file.txt}.</li>
+ * <li>{@code http://localhost:8080/xwiki/vfs/encoded(http://server/path/to/zip)/some/path/file.txt}.</li>
+ * <li>{@code http://localhost:8080/xwiki/vfs/encoded(file://server/path/to/zip)/some/path/file.txt}.</li>
  * </ul>
  *
  * @version $Id$
@@ -65,20 +63,7 @@ public class VfsResourceReferenceResolver extends AbstractResourceReferenceResol
     {
         List<String> segments = extendedURL.getSegments();
 
-        // First segment is the url-encoded VFS reference, defined as URI
-        URI vfsUri;
-        try {
-            vfsUri = new URI(segments.get(0));
-        } catch (URISyntaxException e) {
-            throw new CreateResourceReferenceException(
-                String.format("Invalid VFS URI [%s] for URL [%s]", segments.get(0), extendedURL));
-        }
-
-        // Other segments are the path to the archive resource
-        List<String> vfsPathSegments = new ArrayList<>(segments);
-        vfsPathSegments.remove(0);
-
-        VfsResourceReference vfsReference = new VfsResourceReference(vfsUri, vfsPathSegments);
+        VfsResourceReference vfsReference = new VfsResourceReference(StringUtils.join(segments, "/"));
         copyParameters(extendedURL, vfsReference);
         return vfsReference;
     }

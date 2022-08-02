@@ -19,9 +19,14 @@
  */
 package org.xwiki.administration.test.po;
 
+import java.util.Map;
+
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.ui.po.ViewPage;
+
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonMap;
 
 /**
  * Represents the actions possible on the main Administration Page.
@@ -33,9 +38,33 @@ public class AdministrationPage extends ViewPage
 {
     private AdministrationMenu menu = new AdministrationMenu();
 
+    /**
+     * Goes to the administration main page.
+     *
+     * @return an administration main page object
+     * @see #gotoPage(boolean) to access the administration main page while forcing the edition lock
+     */
     public static AdministrationPage gotoPage()
     {
-        getUtil().gotoPage(getSpace(), getPage(), "admin");
+        return gotoPage(false);
+    }
+
+    /**
+     * Goes to the administration main page.
+     *
+     * @param force when {@code true} forces the administration lock, otherwise does nothing
+     * @return an administration main page object
+     * @see #gotoPage()
+     */
+    public static AdministrationPage gotoPage(boolean force)
+    {
+        Map<String, Boolean> parameters;
+        if (force) {
+            parameters = singletonMap("force", force);
+        } else {
+            parameters = emptyMap();
+        }
+        getUtil().gotoPage(getSpace(), getPage(), "admin", parameters);
         return new AdministrationPage();
     }
 
@@ -166,5 +195,14 @@ public class AdministrationPage extends ViewPage
     public boolean hasNotSection(String sectionId)
     {
         return this.menu.hasNotSectionWithId(sectionId);
+    }
+
+    /**
+     * @return the administration menu
+     * @since 12.8RC1
+     */
+    public AdministrationMenu getAdministrationMenu()
+    {
+        return this.menu;
     }
 }

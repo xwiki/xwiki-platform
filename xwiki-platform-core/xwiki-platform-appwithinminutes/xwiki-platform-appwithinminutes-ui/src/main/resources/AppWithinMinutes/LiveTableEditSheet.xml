@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="AppWithinMinutes.LiveTableEditSheet" locale="">
+<xwikidoc version="1.5" reference="AppWithinMinutes.LiveTableEditSheet" locale="">
   <web>AppWithinMinutes</web>
   <name>LiveTableEditSheet</name>
   <language/>
@@ -208,7 +208,6 @@
   {{html clean="false"}}
   #set ($liveTableObj = $doc.getObject('AppWithinMinutes.LiveTableClass', true))
   #set ($discard = $doc.use($liveTableObj))
-  #set ($discard = $xwiki.jsfx.use('js/scriptaculous/dragdrop.js'))
   #set ($discard = $xwiki.ssx.use('AppWithinMinutes.LiveTableEditSheet'))
   #set ($discard = $xwiki.jsx.use('AppWithinMinutes.LiveTableEditSheet'))
   #if ("$!request.wizard" == 'true')
@@ -266,7 +265,10 @@
   #set ($displayParameters = $services.display.createDocumentDisplayerParameters())
   #set ($discard = $displayParameters.setExecutionContextIsolated(false))
   #set ($discard = $displayParameters.setContentTranslated(true))
-  #set ($generatedLiveTableContent = $services.display.content($liveTableGeneratorDoc, { 'outputSyntaxId' : 'plain/1.0', 'displayerParameters' : $displayParameters }))
+  #set ($generatedLiveTableContent = $services.display.content($liveTableGeneratorDoc, {
+    'outputSyntaxId': 'plain/1.0',
+    'displayerParameters': $displayParameters
+  }))
 
   ## Use the generated LiveTable content for the data home page.
   #set ($dataSpaceReference = $services.model.resolveSpace($doc.getValue('dataSpace')))
@@ -292,6 +294,10 @@
     #set ($discard = $doc.setContent($homePageContent))
   #end
   #set ($discard = $dataHomePage.setContent($generatedLiveTableContent))
+  ## We assume for now that the output produced by the live table generator uses the same syntax as the code of the live
+  ## table generator. We have to set the syntax because the default wiki syntax (used when creating new wiki pages)
+  ## could be different than the one used by the live table generator.
+  #set ($discard = $dataHomePage.setSyntax($liveTableGeneratorDoc.syntax))
 
   #set ($minorEdit = "$!request.minorEdit" != '')
   #set ($comment = $request.comment)
@@ -323,27 +329,10 @@
   #set ($discard = $doc.save('Updated application icon', true))
 #end
 
-#macro (excludeFromNavigationPanel)
-  #set ($navigationPanelConfig = $xwiki.getDocument($navigationPanelConfigReference))
-  #set ($exclusions = $navigationPanelConfig.getValue('exclusions'))
-  #if ($exclusions.add($doc.fullName))
-    #set ($discard = $navigationPanelConfig.set('exclusions', $exclusions))
-    #set ($discard = $navigationPanelConfig.save("Exclude the $doc.pageReference.name application"))
-  #end
-#end
-
 #macro (doSave)
-  ## Exclude the application home page from the Navigation panel if the application is created at the top level by an
-  ## user that has edit right on the Navigation panel configuration.
-  #set ($navigationPanelConfigReference = 'PanelsCode.NavigationConfiguration')
-  #set ($shouldExcludeFromNavigationPanel = $doc.isNew() &amp;&amp; $doc.pageReference.parent.type == 'WIKI'
-    &amp;&amp; $services.security.authorization.hasAccess('edit', $navigationPanelConfigReference))
   #maybeGrantSpaceAdminRights()
   #updateAndSaveLiveTable()
   #updateAndSaveIcon()
-  #if ($shouldExcludeFromNavigationPanel)
-    #excludeFromNavigationPanel
-  #end
   #if ($action == 'save')
     #if ($errorMessage)
       {{html clean="false"}}
@@ -407,6 +396,8 @@
         <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -454,6 +445,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -594,11 +587,7 @@ XWiki.LiveTableEditor = Class.create({
   }
 });
 
-function init() {
-  var form = $('inline');
-  if (!form) {
-    return false;
-  }
+function initForm(form) {
   // Let the sheet handle the form submit. The form is submitted by default to the preview action which dispatches the
   // request to the save action if the save button is detected on the request parameters. By submitting to the edit
   // action the edit sheet is evaluated and thus it can handle the save by itself.
@@ -627,9 +616,18 @@ function init() {
   }.bindAsEventListener(window));
 
   new XWiki.LiveTableEditor();
-
-  return true;
 }
+
+function init() {
+  var form = $('inline');
+  if (form) {
+    require(['scriptaculous/dragdrop'], function() {
+      initForm(form);
+    });
+  }
+  return form;
+}
+
 (XWiki.domIsLoaded &amp;&amp; init()) || document.observe('xwiki:dom:loaded', init);
 
 // Allow widgets to catch the save event before the form is submitted when the 'Save &amp; Continue' button is clicked. We
@@ -742,6 +740,8 @@ return XWiki;
         <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -770,6 +770,8 @@ return XWiki;
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -805,6 +807,8 @@ return XWiki;
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>

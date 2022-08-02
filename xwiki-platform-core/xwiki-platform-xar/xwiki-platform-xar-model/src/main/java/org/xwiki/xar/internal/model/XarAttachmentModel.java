@@ -43,7 +43,15 @@ public class XarAttachmentModel
 
     public static final String ELEMENT_CONTENT = "content";
 
-    public static final String ELEMENT_REVISION = "version";
+    /**
+     * @since 12.0RC1
+     */
+    public static final String ELEMENT_VERSION = "version";
+
+    /**
+     * @since 12.0RC1
+     */
+    public static final String ELEMENT_REVISION = "revision";
 
     public static final String ELEMENT_REVISION_AUTHOR = "author";
 
@@ -51,5 +59,18 @@ public class XarAttachmentModel
 
     public static final String ELEMENT_REVISION_COMMENT = "comment";
 
-    public static final String ELEMENT_REVISIONS = "versions";
+    /**
+     * @since 12.0RC1
+     */
+    public static final String ELEMENT_REVISION_CONTENT_ALIAS = "contentAlias";
+
+    /**
+     * @since 12.0RC1
+     */
+    public static final String ELEMENT_JRCSVERSIONS = "versions";
+
+    /**
+     * @since 12.0RC1
+     */
+    public static final String ELEMENT_REVISIONS = "revisions";
 }

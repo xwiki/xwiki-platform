@@ -7,4 +7,4 @@
 .#-----------------------------------------------------
 .expect|annotatedxhtml/1.0
 .#-----------------------------------------------------
-<p><!--startimage:false|-|attach|-|Space.ExistingPage@my.png--><img src="imageurl" alt="my.png"/><!--stopimage--></p>
+<p><!--startimage:false|-|attach|-|Space.ExistingPage@my.png--><img src="imageurl" id="ISpace.ExistingPage40my.png" class="wikigeneratedid" alt="my.png"/><!--stopimage--></p>

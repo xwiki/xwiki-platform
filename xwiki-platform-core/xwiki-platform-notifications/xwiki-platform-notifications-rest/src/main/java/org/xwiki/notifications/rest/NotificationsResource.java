@@ -19,13 +19,12 @@
  */
 package org.xwiki.notifications.rest;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
-
-import org.xwiki.stability.Unstable;
 
 /**
  * Retrieve notifications.
@@ -34,7 +33,6 @@ import org.xwiki.stability.Unstable;
  * @since 10.4RC1
  */
 @Path("/notifications")
-@Unstable
 public interface NotificationsResource
 {
     /**
@@ -47,6 +45,7 @@ public interface NotificationsResource
             @QueryParam("useUserPreferences") String useUserPreferences,
             @QueryParam("userId") String userId,
             @QueryParam("untilDate") String untilDate,
+            @QueryParam("untilDateIncluded") @DefaultValue("true") boolean untilDateIncluded,
             @QueryParam("blackList") String blackList,
             @QueryParam("pages") String pages,
             @QueryParam("spaces") String spaces,
@@ -59,7 +58,37 @@ public interface NotificationsResource
             @QueryParam("displayReadEvents") String displayReadEvents,
             @QueryParam("displayReadStatus") String displayReadStatus,
             @QueryParam("tags") String tags,
-            @QueryParam("currentWiki") String currentWiki
+            @QueryParam("currentWiki") String currentWiki,
+            @QueryParam("async") String async,
+            @QueryParam("asyncId") String asyncId
+            ) throws Exception;
+
+    /**
+     * Get the number of notifications for the given parameters.
+     * @return notifications
+     * @throws Exception if an error occurs
+     * @since 10.11.4
+     * @since 11.2
+     */
+    @GET
+    @Path("/count")
+    Response getNotificationsCount(
+            @QueryParam("useUserPreferences") String useUserPreferences,
+            @QueryParam("userId") String userId,
+            @QueryParam("pages") String pages,
+            @QueryParam("spaces") String spaces,
+            @QueryParam("wikis") String wikis,
+            @QueryParam("users") String users,
+            @QueryParam("count") String count,
+            @QueryParam("displayOwnEvents") String displayOwnEvents,
+            @QueryParam("displayMinorEvents") String displayMinorEvents,
+            @QueryParam("displaySystemEvents") String displaySystemEvents,
+            @QueryParam("displayReadEvents") String displayReadEvents,
+            @QueryParam("displayReadStatus") String displayReadStatus,
+            @QueryParam("tags") String tags,
+            @QueryParam("currentWiki") String currentWiki,
+            @QueryParam("async") String async,
+            @QueryParam("asyncId") String asyncId
             ) throws Exception;
 
     /**

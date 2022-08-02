@@ -31,9 +31,11 @@ import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.environment.Environment;
+import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.api.Attachment;
 
@@ -51,10 +53,13 @@ import static org.mockito.Mockito.when;
  * @since 6.1M2
  */
 @ComponentTest
-public class AttachmentMimeBodyPartFactoryTest
+class AttachmentMimeBodyPartFactoryTest
 {
-    private static final String TEMPORARY_DIRECTORY = "target/"
-        + AttachmentMimeBodyPartFactoryTest.class.getSimpleName();
+    private static final String TEMPORARY_DIRECTORY =
+        "target/" + AttachmentMimeBodyPartFactoryTest.class.getSimpleName();
+
+    @MockComponent
+    private Environment environment;
 
     @InjectMockComponents
     private AttachmentMimeBodyPartFactory attachmentMimeBodyPartFactory;
@@ -62,12 +67,19 @@ public class AttachmentMimeBodyPartFactoryTest
     @InjectComponentManager
     private ComponentManager componentManager;
 
-    @Test
-    public void createAttachmentBodyPart() throws Exception
+    @BeforeComponent
+    void beforeComponent()
     {
-        Environment environment = this.componentManager.getInstance(Environment.class);
-        when(environment.getTemporaryDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
+        // The mail attachment temporary directory is set when the Initializable phase of AttachmentMimeBodyPartFactory
+        // is called. Thus we need to set up the the temporary directory we wish to use before the components are
+        // instantiated, and especially before the AttachmentMimeBodyPartFactory component has its components
+        // instantiated.
+        when(this.environment.getTemporaryDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
+    }
 
+    @Test
+    void createAttachmentBodyPart() throws Exception
+    {
         Attachment attachment = mock(Attachment.class);
         when(attachment.getContentInputStream()).thenReturn(new ByteArrayInputStream("Lorem Ipsum".getBytes()));
         when(attachment.getFilename()).thenReturn("image.png");
@@ -86,17 +98,14 @@ public class AttachmentMimeBodyPartFactoryTest
     }
 
     @Test
-    public void createAttachmentBodyPartWithHeader() throws Exception
+    void createAttachmentBodyPartWithHeader() throws Exception
     {
-        Environment environment = this.componentManager.getInstance(Environment.class);
-        when(environment.getTemporaryDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
-
         Attachment attachment = mock(Attachment.class);
         when(attachment.getContentInputStream()).thenReturn(new ByteArrayInputStream("Lorem Ipsum".getBytes()));
         when(attachment.getFilename()).thenReturn("image.png");
         when(attachment.getMimeType()).thenReturn("image/png");
 
-        Map<String, Object> parameters = Collections.singletonMap("headers", (Object)
+        Map<String, Object> parameters = Collections.singletonMap("headers",
             Collections.singletonMap("Content-Transfer-Encoding", "quoted-printable"));
 
         MimeBodyPart part = this.attachmentMimeBodyPartFactory.create(attachment, parameters);
@@ -108,24 +117,20 @@ public class AttachmentMimeBodyPartFactoryTest
         // We verify that the Content-Disposition has the correct file name
         assertTrue(part.getFileName().matches("image\\.png"));
 
-        assertArrayEquals(new String[]{ "quoted-printable" }, part.getHeader("Content-Transfer-Encoding"));
+        assertArrayEquals(new String[] { "quoted-printable" }, part.getHeader("Content-Transfer-Encoding"));
 
         assertEquals("Lorem Ipsum", IOUtils.toString(part.getDataHandler().getInputStream(), "UTF-8"));
     }
 
     @Test
-    public void createAttachmentBodyPartWhenWriteError() throws Exception
+    void createAttachmentBodyPartWhenWriteError()
     {
-        Environment environment = this.componentManager.getInstance(Environment.class);
-        when(environment.getTemporaryDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
-
         Attachment attachment = mock(Attachment.class);
         when(attachment.getFilename()).thenReturn("image.png");
-        when(attachment.getContent()).thenThrow(new RuntimeException("error"));
+        when(attachment.getContentInputStream()).thenThrow(new RuntimeException("error"));
 
-        Throwable exception = assertThrows(MessagingException.class, () -> {
-            this.attachmentMimeBodyPartFactory.create(attachment, Collections.emptyMap());
-        });
+        Throwable exception = assertThrows(MessagingException.class,
+            () -> this.attachmentMimeBodyPartFactory.create(attachment, Collections.emptyMap()));
         assertEquals("Failed to save attachment [image.png] to the file system", exception.getMessage());
     }
 }

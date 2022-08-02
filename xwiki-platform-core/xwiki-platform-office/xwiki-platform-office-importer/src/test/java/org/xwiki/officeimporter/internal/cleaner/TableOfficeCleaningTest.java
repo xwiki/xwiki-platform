@@ -19,7 +19,8 @@
  */
 package org.xwiki.officeimporter.internal.cleaner;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.xwiki.test.junit5.mockito.ComponentTest;
 
 /**
  * Test case for cleaning html tables in {@link OfficeHTMLCleaner}.
@@ -27,13 +28,14 @@ import org.junit.Test;
  * @version $Id$
  * @since 1.8
  */
+@ComponentTest
 public class TableOfficeCleaningTest extends AbstractHTMLCleaningTest
 {
     /**
      * An isolated paragraph inside a table cell item should be replaced with paragraph's content.
      */
     @Test
-    public void testTableCellItemIsolatedParagraphCleaning()
+    public void tableCellItemIsolatedParagraphCleaning()
     {
         assertCleanHTML("<table><tbody><tr><td><p>Test</p></td></tr></tbody></table>",
             "<table><tbody><tr><td>Test</td></tr></tbody></table>");
@@ -43,7 +45,7 @@ public class TableOfficeCleaningTest extends AbstractHTMLCleaningTest
      * An isolated paragraph inside a table header item should be replaced with paragraph's content.
      */
     @Test
-    public void testTableHeaderItemIsolatedParagraphCleaning()
+    public void tableHeaderItemIsolatedParagraphCleaning()
     {
         assertCleanHTML("<table><thead><tr><th><p>Test</p></th></tr></thead><tbody><tr><td></td></tr></tbody></table>",
             "<table><thead><tr><th>Test</th></tr></thead><tbody><tr><td></td></tr></tbody></table>");
@@ -53,7 +55,7 @@ public class TableOfficeCleaningTest extends AbstractHTMLCleaningTest
      * Tests that empty cells (e.g. those that contains just a line break) are preserved (i.e. are left unchanged).
      */
     @Test
-    public void testEmptyCellsArePreserved()
+    public void emptyCellsArePreserved()
     {
         String html =
             "<table><thead><tr><th><br /></th><th></th></tr></thead>"
@@ -65,7 +67,7 @@ public class TableOfficeCleaningTest extends AbstractHTMLCleaningTest
      * Empty rows should be removed.
      */
     @Test
-    public void testEmptyRowRemoving()
+    public void emptyRowRemoving()
     {
         assertCleanHTML("<table><tbody><tr><td>cell</td></tr><tr></tr></tbody></table>",
             "<table><tbody><tr><td>cell</td></tr></tbody></table>");

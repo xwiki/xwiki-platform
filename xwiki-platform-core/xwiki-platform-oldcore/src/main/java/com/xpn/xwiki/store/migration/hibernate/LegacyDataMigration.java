@@ -63,7 +63,7 @@ public class LegacyDataMigration extends AbstractHibernateDataMigration
     public void hibernateMigrate() throws DataMigrationException, XWikiException
     {
         // migrate data
-        getStore().executeWrite(getXWikiContext(), true, new XWikiHibernateBaseStore.HibernateCallback<Object>()
+        getStore().executeWrite(getXWikiContext(), new XWikiHibernateBaseStore.HibernateCallback<Object>()
         {
             /** Update SQL command. */
             private static final String UPDATE = "update ";

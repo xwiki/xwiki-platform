@@ -23,23 +23,28 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.xwiki.administration.test.po.AdministrationPage;
+import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.mail.test.po.MailStatusAdministrationSectionPage;
 import org.xwiki.mail.test.po.SendMailAdministrationSectionPage;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.scheduler.test.po.SchedulerHomePage;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
-import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
 
 import com.icegreen.greenmail.util.GreenMail;
@@ -54,29 +59,39 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 6.4M2
  */
-@UITest(sshPorts = {
-    // Open the GreenMail port so that the XWiki instance inside a Docker container can use the SMTP server provided
-    // by GreenMail running on the host.
-    3025
-},
+@UITest(
+    sshPorts = {
+        // Open the GreenMail port so that the XWiki instance inside a Docker container can use the SMTP server provided
+        // by GreenMail running on the host.
+        3025
+    },
     properties = {
-        // The Mail module contribures a Hibernate mapping that needs to be added to hibernate.cfg.xml
+        // The Mail module contributes a Hibernate mapping that needs to be added to hibernate.cfg.xml
         "xwikiDbHbmCommonExtraMappings=mailsender.hbm.xml",
         // Pages created in the tests need to have PR since we ask for PR to send mails so we need to exclude them from
         // the PR checker.
-        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:MailIT\\..*"
+        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:MailIT\\..*\n"
+            + "mail.sender.database.resendAutomaticallyAtStartup=false",
+        // Add the Scheduler plugin used by Mail Resender Scheduler Job
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.scheduler.SchedulerPlugin"
     },
     extraJARs = {
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
-        // we need to provide the JAR inside WEB-INF/lib -->
-        "org.xwiki.platform:xwiki-platform-mail-send-storage"
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
+        "org.xwiki.platform:xwiki-platform-mail-send-storage",
+        // Because of https://jira.xwiki.org/browse/XWIKI-17972 we need to install the jython jar manually in
+        // WEB-INF/lib.
+        "org.python:jython-slim:2.7.2",
+        // The Scheduler plugin needs to be in WEB-INF/lib since it's defined in xwiki.properties and plugins are loaded
+        // by XWiki at startup, i.e. before extensions are provisioned for the tests
+        "org.xwiki.platform:xwiki-platform-scheduler-api"
     }
 )
-public class MailIT
+class MailIT
 {
     private GreenMail mail;
 
-    private List<String> alreadyAssertedMessages = new ArrayList<>();
+    private final List<String> alreadyAssertedMessages = new ArrayList<>();
 
     private String testClassName;
 
@@ -94,15 +109,21 @@ public class MailIT
     }
 
     @AfterEach
-    public void stopMail()
+    public void stopMail(LogCaptureConfiguration logCaptureConfiguration)
     {
         if (this.mail != null) {
             this.mail.stop();
         }
+
+        // TODO: Fix the following errors in the logs
+        logCaptureConfiguration.registerExcludes(
+            "meta.js?cache-version="
+        );
     }
 
     @Test
-    public void verifyMail(TestUtils setup, XWikiWebDriver webDriver, TestConfiguration testConfiguration)
+    @Order(1)
+    void verifyMail(TestUtils setup, XWikiWebDriver webDriver, TestConfiguration testConfiguration)
         throws Exception
     {
         // Log in as superadmin
@@ -110,7 +131,7 @@ public class MailIT
 
         // Step 0: Delete all pre-existing mails to start clean. This also verifies the deleteAll() script service
         //         API.
-        String content = "{{velocity}}$services.mailstorage.deleteAll(){{/velocity}}";
+        String content = "{{velocity}}$services.mail.storage.deleteAll(){{/velocity}}";
         ViewPage deleteAllPage = setup.createPage(this.testClassName, "DeleteAll", content, "");
         // Verify that the page doesn't display any content (unless there's an error!)
         assertEquals("", deleteAllPage.getContent());
@@ -130,6 +151,7 @@ public class MailIT
         // setup is not correct
 
         // Make sure there's an invalid mail server set.
+        // Also verifies that the mail sending page works in general.
         wikiAdministrationPage.clickSection("Mail", "Mail Sending");
         SendMailAdministrationSectionPage sendMailPage = new SendMailAdministrationSectionPage();
         sendMailPage.setHost("invalidmailserver");
@@ -140,6 +162,8 @@ public class MailIT
 
         // Step 3: Navigate to each mail section and set the mail sending parameters (SMTP host/port)
         wikiAdministrationPage = AdministrationPage.gotoPage();
+        // Also verifies that the Mail Sending section works. From now on below, we'll navigate directly to that page
+        // without navigation since navigation is validated here.
         wikiAdministrationPage.clickSection("Mail", "Mail Sending");
         sendMailPage = new SendMailAdministrationSectionPage();
         sendMailPage.setHost(testConfiguration.getServletEngine().getHostIP());
@@ -197,37 +221,73 @@ public class MailIT
         setup.attachFile(this.testClassName, "MailTemplate", "something.txt", bais, true,
             new UsernamePasswordCredentials("superadmin", "pass"));
 
-        String xwikiURLPrefix = String.format("http://%s:%s/xwiki/bin/view",
+        String requestURLPrefix = String.format("http://%s:%s/xwiki/bin/view",
             testConfiguration.getServletEngine().getInternalIP(),
             testConfiguration.getServletEngine().getInternalPort());
 
         // Step 5: Send a template email (with an attachment) to a single email address
-        sendTemplateMailToEmail(setup, xwikiURLPrefix);
+        sendTemplateMailToEmail(setup, requestURLPrefix);
 
         // Step 6: Send a template email to all the users in the XWikiAllGroup Group (we'll create 2 users) + to
         // two other users (however since they're part of the group they'll receive only one mail each, we thus test
-        // deduplicatio!).
-        sendTemplateMailToUsersAndGroup(setup, xwikiURLPrefix);
+        // deduplication!).
+        sendTemplateMailToUsersAndGroup(setup, requestURLPrefix);
 
         // Step 7: Navigate to the Mail Sending Status Admin page and assert that the Livetable displays the entry for
         // the sent mails
-        wikiAdministrationPage = AdministrationPage.gotoPage();
-        wikiAdministrationPage.clickSection("Mail", "Mail Sending Status");
-        MailStatusAdministrationSectionPage statusPage = new MailStatusAdministrationSectionPage();
-        LiveTableElement liveTableElement = statusPage.getLiveTable();
-        liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-3", "Test");
-        liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-5", "send_success");
-        liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-6", "xwiki");
+        MailStatusAdministrationSectionPage statusPage = MailStatusAdministrationSectionPage.gotoPage();
+        TableLayoutElement tableLayout = statusPage.getLiveData().getTableLayout();
+        // We don't wait for the first filters because we don't need to inspect the content of the live data before 
+        // the last filter is set.
+        tableLayout.filterColumn("Type", "Test", false);
+        tableLayout.filterColumn("Status", "send_success", false);
+        tableLayout.filterColumn("Wiki", "xwiki", false);
+        tableLayout.filterColumn("Recipients", "john@doe.com");
+        assertTrue(tableLayout.countRows() > 0);
+        tableLayout.assertRow("Error", "");
 
-        // Let's wait till we have at least 3 rows. Note that we wait because we could have received the mails above
-        // but the last mail's status in the database may not have been updated yet. Note that The first 2 are
-        // guaranteed to have been updated since we send mail in one thread one after another and we update the
-        // database after sending each mail.
-        liveTableElement.waitUntilRowCountGreaterThan(3);
+        // Step 8: Verify that the Resend button in the Mail Status LT works fine by trying to resend the mail in error
+        // now that the mail server is set correctly.
+        verifyIndividualResend();
 
-        liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-4", "john@doe.com");
-        assertTrue(liveTableElement.getRowCount() > 0);
-        assertTrue(liveTableElement.hasRow("Error", ""));
+        // Step 9: Try to resend the failed email by scheduling and triggering the Resend Scheduler Job
+        verifyMailResenderSchedulerJob(setup);
+    }
+
+    private void verifyIndividualResend()
+    {
+        MailStatusAdministrationSectionPage statusPage = MailStatusAdministrationSectionPage.gotoPage();
+        TableLayoutElement tableLayout = statusPage.getLiveData().getTableLayout();
+        tableLayout.filterColumn("Status", "send_error");
+        tableLayout.clickAction(1, "mailsendingaction_resend");
+
+        // Refresh the page and verify the mail to to@doe.com is in send_success state now
+        statusPage = MailStatusAdministrationSectionPage.gotoPage();
+        tableLayout = statusPage.getLiveData().getTableLayout();
+        tableLayout.filterColumn("Recipients", "to@doe.com");
+        assertEquals(1, tableLayout.countRows());
+        assertEquals("send_success", tableLayout.getCell("Status", 1).getText());
+    }
+
+    private void verifyMailResenderSchedulerJob(TestUtils setup) throws Exception
+    {
+        // Send a mail that we set in prepare_error state for the test below. This is achieved using a custom
+        // Test DatabaseMailListener component.
+        sendMailWithPrepareSuccessState(setup);
+
+        // Navigate to the scheduler job UI, schedule and then trigger the mail resender job
+        SchedulerHomePage shp = SchedulerHomePage.gotoPage();
+        shp.clickJobActionSchedule("Mail Resender");
+        shp.clickJobActionTrigger("Mail Resender");
+
+        // Wait and assert the received email due to the resend.
+        this.mail.waitForIncomingEmail(30000L, 1);
+        assertEquals(1, this.mail.getReceivedMessages().length);
+        assertReceivedMessages(1,
+            "\\QSubject: Subject\\E",
+            "\\Qtest not sent message\\E"
+        );
+        this.mail.purgeEmailFromAllMailboxes();
     }
 
     private void sendMailWithInvalidMailSetup(TestUtils setup)
@@ -239,9 +299,9 @@ public class MailIT
         // Note that we don't set the type and thus this message should not appear in the LiveTable filter at the end
         // of the test.
         String velocity = "{{velocity}}\n"
-            + "#set ($message = $services.mailsender.createMessage('from@doe.com', 'to@doe.com', 'Subject'))\n"
+            + "#set ($message = $services.mail.sender.createMessage('from@doe.com', 'to@doe.com', 'Subject'))\n"
             + "#set ($discard = $message.addPart('text/plain', 'text message'))\n"
-            + "#set ($result = $services.mailsender.send([$message], 'database'))\n"
+            + "#set ($result = $services.mail.sender.send([$message], 'database'))\n"
             + "#foreach ($status in $result.statusResult.getAllErrors())\n"
             + "  MSGID $status.messageId SUMMARY $status.errorSummary DESCRIPTION $status.errorDescription\n"
             + "#end\n"
@@ -255,7 +315,39 @@ public class MailIT
         assertTrue(vp.getContent().matches("(?s)MSGID.*SUMMARY.*DESCRIPTION.*"));
     }
 
-    private void sendTemplateMailToEmail(TestUtils setup, String xwikiURLPrefix) throws Exception
+    private void sendMailWithPrepareSuccessState(TestUtils setup) throws Exception
+    {
+        // Remove existing page so that we can re-run the test
+        setup.deletePage(this.testClassName, "SendPrepareSuccessState");
+
+        // Send a mail and change its state to be prepare_success so that it'll be resent by the scheduler job.
+        String velocity = "{{velocity}}\n"
+            + "#set ($message = $services.mail.sender.createMessage('from@doe.com', 'error@doe.com', 'Subject'))\n"
+            + "#set ($discard = $message.addPart('text/plain', 'test not sent message'))\n"
+            + "#set ($discard = $message.setType('Test Not Sent'))\n"
+            + "#set ($result = $services.mail.sender.send([$message], 'database'))\n"
+            + "{{/velocity}}";
+
+        // This will create the page and execute its content and thus send the mail
+        ViewPage vp = setup.createPage(this.testClassName, "SendPrepareSuccessState", velocity, "");
+
+        // Verify that the page is  empty (and thus no error message is displayed).
+        assertEquals("", vp.getContent());
+
+        // Verify that the mail has been received. It's received since there's no problem with being sent, we just
+        // change it's mail status in the database.
+        this.mail.waitForIncomingEmail(30000L, 1);
+        this.mail.purgeEmailFromAllMailboxes();
+
+        // Verify that we have a mail in the prepare_success state
+        MailStatusAdministrationSectionPage statusPage = MailStatusAdministrationSectionPage.gotoPage();
+        TableLayoutElement tableLayout = statusPage.getLiveData().getTableLayout();
+        tableLayout.filterColumn("Status", "prepare_success");
+        assertEquals(1, tableLayout.countRows());
+    }
+
+    private void sendTemplateMailToEmail(TestUtils setup, String requestURLPrefix)
+        throws Exception
     {
         // Remove existing pages (for pages that we create below)
         setup.deletePage(this.testClassName, "SendMail");
@@ -269,13 +361,13 @@ public class MailIT
                 + "', 'MailTemplate'))\n"
             + "#set ($parameters = {'velocityVariables' : { 'name' : 'John' }, 'language' : 'en', "
                 + "'includeTemplateAttachments' : true})\n"
-            + "#set ($message = $services.mailsender.createMessage('template', $templateReference, $parameters))\n"
+            + "#set ($message = $services.mail.sender.createMessage('template', $templateReference, $parameters))\n"
             + "#set ($discard = $message.setFrom('localhost@xwiki.org'))\n"
             + "#set ($discard = $message.addRecipients('to', 'john@doe.com'))\n"
             + "#set ($discard = $message.setType('Test'))\n"
-            + "#set ($result = $services.mailsender.send([$message], 'database'))\n"
-            + "#if ($services.mailsender.lastError)\n"
-            + "  {{error}}$exceptiontool.getStackTrace($services.mailsender.lastError){{/error}}\n"
+            + "#set ($result = $services.mail.sender.send([$message], 'database'))\n"
+            + "#if ($services.mail.sender.lastError)\n"
+            + "  {{error}}$exceptiontool.getStackTrace($services.mail.sender.lastError){{/error}}\n"
             + "#end\n"
             + "#foreach ($status in $result.statusResult.getByState('SEND_ERROR'))\n"
             + "  {{error}}\n"
@@ -294,18 +386,20 @@ public class MailIT
         this.mail.waitForIncomingEmail(30000L, 1);
         assertEquals(1, this.mail.getReceivedMessages().length);
         assertReceivedMessages(1,
-            "Subject: Status for John on " + this.testClassName + ".SendMail",
-            "Hello John from superadmin - Served from " + xwikiURLPrefix + "/MailIT/SendMail",
-            "<strong>Hello John from superadmin - Served from " + xwikiURLPrefix + "/MailIT/SendMail - "
-                + "url: " + xwikiURLPrefix + "/Main/</strong>",
-            "X-MailType: Test",
-            "Content-Type: text/plain; name=something.txt",
-            "Content-ID: <something.txt>",
-            "Content-Disposition: attachment; filename=something.txt",
-            "Content of attachment");
+            "\\QSubject: Status for John on " + this.testClassName + ".SendMail\\E",
+            "\\QHello John from superadmin - Served from " + requestURLPrefix + "/MailIT/SendMail\\E",
+            "\\Q<strong>Hello John from superadmin - Served from " + requestURLPrefix + "/MailIT/SendMail - "
+                + "url: http://\\E.*\\Q/Main/</strong>\\E",
+            "\\QX-MailType: Test\\E",
+            "\\QContent-Type: text/plain; name=something.txt\\E",
+            "\\QContent-ID: <something.txt>\\E",
+            "\\QContent-Disposition: attachment; filename=something.txt\\E",
+            "\\QContent of attachment\\E");
+        this.mail.purgeEmailFromAllMailboxes();
     }
 
-    private void sendTemplateMailToUsersAndGroup(TestUtils setup, String xwikiURLPrefix) throws Exception
+    private void sendTemplateMailToUsersAndGroup(TestUtils setup, String requestURLPrefix)
+        throws Exception
     {
         // Remove existing pages (for pages that we create below)
         setup.deletePage(this.testClassName, "SendMailGroupAndUsers");
@@ -329,10 +423,10 @@ public class MailIT
             + "#set ($user1Reference = $services.model.createDocumentReference('', 'XWiki', 'user1'))\n"
             + "#set ($user2Reference = $services.model.createDocumentReference('', 'XWiki', 'user2'))\n"
             + "#set ($source = {'groups' : [$groupReference], 'users' : [$user1Reference, $user2Reference]})\n"
-            + "#set ($messages = $services.mailsender.createMessages('usersandgroups', $source, $parameters))\n"
-            + "#set ($result = $services.mailsender.send($messages, 'database'))\n"
-            + "#if ($services.mailsender.lastError)\n"
-            + "  {{error}}$exceptiontool.getStackTrace($services.mailsender.lastError){{/error}}\n"
+            + "#set ($messages = $services.mail.sender.createMessages('usersandgroups', $source, $parameters))\n"
+            + "#set ($result = $services.mail.sender.send($messages, 'database'))\n"
+            + "#if ($services.mail.sender.lastError)\n"
+            + "  {{error}}$exceptiontool.getStackTrace($services.mail.sender.lastError){{/error}}\n"
             + "#end\n"
             + "#foreach ($status in $result.statusResult.getByState('SEND_ERROR'))\n"
             + "  {{error}}\n"
@@ -348,12 +442,13 @@ public class MailIT
         assertEquals("", vp.getContent());
 
         // Verify that the mails have been received (first mail above + the 2 mails sent to the group)
-        this.mail.waitForIncomingEmail(30000L, 3);
-        assertEquals(3, this.mail.getReceivedMessages().length);
+        this.mail.waitForIncomingEmail(30000L, 2);
+        assertEquals(2, this.mail.getReceivedMessages().length);
         assertReceivedMessages(2,
-            "Subject: Status for John on " + this.testClassName + ".SendMailGroupAndUsers",
-            "Hello John from superadmin - Served from " + xwikiURLPrefix + "/MailIT/SendMailGroupAndUsers - "
-                + "url: " + xwikiURLPrefix + "/Main/");
+            "\\QSubject: Status for John on " + this.testClassName + ".SendMailGroupAndUsers\\E",
+            "\\QHello John from superadmin - Served from " + requestURLPrefix + "/MailIT/SendMailGroupAndUsers - "
+                + "url: http://\\E.*\\Q/Main/\\E");
+        this.mail.purgeEmailFromAllMailboxes();
     }
 
     private void assertReceivedMessages(int expectedMatchingCount, String... expectedLines) throws Exception
@@ -369,7 +464,9 @@ public class MailIT
             String fullContent = baos.toString();
             boolean match = true;
             for (int i = 0; i < expectedLines.length; i++) {
-                if (!fullContent.contains(expectedLines[i])) {
+                Pattern pattern = Pattern.compile(expectedLines[i]);
+                Matcher matcher = pattern.matcher(fullContent);
+                if (!matcher.find()) {
                     match = false;
                     break;
                 }

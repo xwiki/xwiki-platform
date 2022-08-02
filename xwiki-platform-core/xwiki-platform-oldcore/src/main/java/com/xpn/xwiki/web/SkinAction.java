@@ -24,10 +24,14 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.Date;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -57,8 +61,12 @@ import com.xpn.xwiki.util.Util;
  * @version $Id$
  * @since 1.0
  */
+@Component
+@Named("skin")
+@Singleton
 public class SkinAction extends XWikiAction
 {
+
     /** Logging helper. */
     private static final Logger LOGGER = LoggerFactory.getLogger(SkinAction.class);
 
@@ -76,6 +84,20 @@ public class SkinAction extends XWikiAction
      */
     private static final String ENCODING = "UTF-8";
 
+    private static final String DOCDOESNOTEXIST = "docdoesnotexist";
+
+    @Override
+    public boolean action(XWikiContext context) throws XWikiException
+    {
+        // Disallow template override with xpage parameter.
+        if (!DOCDOESNOTEXIST.equals(Utils.getPage(context.getRequest(), DOCDOESNOTEXIST))) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                "Template may not be overriden with 'xpage' in [skin] action.");
+        }
+
+        return super.action(context);
+    }
+
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
@@ -83,7 +105,7 @@ public class SkinAction extends XWikiAction
             return render(context.getRequest().getPathInfo(), context);
         } catch (IOException e) {
             context.getResponse().setStatus(404);
-            return "docdoesnotexist";
+            return DOCDOESNOTEXIST;
         }
     }
 
@@ -170,7 +192,7 @@ public class SkinAction extends XWikiAction
         }
         if (!found) {
             context.getResponse().setStatus(404);
-            return "docdoesnotexist";
+            return DOCDOESNOTEXIST;
         }
         return null;
     }
@@ -212,19 +234,19 @@ public class SkinAction extends XWikiAction
     }
 
     /**
-     * Tries to serve a skin file using <tt>doc</tt> as a skin document. The file is searched in the following places:
+     * Tries to serve a skin file using {@code doc} as a skin document. The file is searched in the following places:
      * <ol>
      * <li>As the content of a property with the same name as the requested filename, from an XWikiSkins object attached
      * to the document.</li>
      * <li>As the content of an attachment with the same name as the requested filename.</li>
      * <li>As a file located on the filesystem, in the directory with the same name as the current document (in case the
-     * URL was actually pointing to <tt>/skins/directory/file</tt>).</li>
+     * URL was actually pointing to {@code /skins/directory/file}).</li>
      * </ol>
      *
      * @param filename The name of the skin file that should be rendered.
      * @param doc The skin {@link XWikiDocument document}.
      * @param context The current {@link XWikiContext request context}.
-     * @return <tt>true</tt> if the attachment was found and the content was successfully sent.
+     * @return {@code true} if the attachment was found and the content was successfully sent.
      * @throws XWikiException If the attachment cannot be loaded.
      * @throws IOException if the filename is invalid
      */
@@ -253,7 +275,7 @@ public class SkinAction extends XWikiAction
      *
      * @param path Path of the file that should be rendered.
      * @param context The current {@link XWikiContext request context}.
-     * @return <tt>true</tt> if the file was found and its content was successfully sent.
+     * @return {@code true} if the file was found and its content was successfully sent.
      * @throws XWikiException If the response cannot be sent.
      */
     private boolean renderFileFromFilesystem(String path, XWikiContext context) throws XWikiException
@@ -318,7 +340,7 @@ public class SkinAction extends XWikiAction
      * @param filename The name of the skin file that should be rendered.
      * @param doc The skin {@link XWikiDocument document}.
      * @param context The current {@link XWikiContext request context}.
-     * @return <tt>true</tt> if the object exists, and the field is set to a non-empty value, and its content was
+     * @return {@code true} if the object exists, and the field is set to a non-empty value, and its content was
      *         successfully sent.
      * @throws IOException If the response cannot be sent.
      */
@@ -398,7 +420,7 @@ public class SkinAction extends XWikiAction
      * @param filename The name of the skin file that should be rendered.
      * @param doc The skin {@link XWikiDocument document}.
      * @param context The current {@link XWikiContext request context}.
-     * @return <tt>true</tt> if the attachment was found and its content was successfully sent.
+     * @return {@code true} if the attachment was found and its content was successfully sent.
      * @throws IOException If the response cannot be sent.
      * @throws XWikiException If the attachment cannot be loaded.
      */
@@ -433,7 +455,7 @@ public class SkinAction extends XWikiAction
                 response.getOutputStream().write(data);
             } else {
                 // Otherwise, return the raw content.
-                setupHeaders(response, mimetype, attachment.getDate(), attachment.getContentSize(context));
+                setupHeaders(response, mimetype, attachment.getDate(), attachment.getContentLongSize(context));
                 IOUtils.copy(attachment.getContentInputStream(context), response.getOutputStream());
             }
 
@@ -449,7 +471,7 @@ public class SkinAction extends XWikiAction
      * Checks if a mimetype indicates a javascript file.
      *
      * @param mimetype The mime type to check.
-     * @return <tt>true</tt> if the mime type represents a javascript file.
+     * @return {@code true} if the mime type represents a javascript file.
      */
     public boolean isJavascriptMimeType(String mimetype)
     {
@@ -464,7 +486,7 @@ public class SkinAction extends XWikiAction
      * Checks if a mimetype indicates a CSS file.
      *
      * @param mimetype The mime type to check.
-     * @return <tt>true</tt> if the mime type represents a css file.
+     * @return {@code true} if the mime type represents a css file.
      */
     public boolean isCssMimeType(String mimetype)
     {
@@ -475,7 +497,7 @@ public class SkinAction extends XWikiAction
      * Checks if a file is a LESS file that should be parsed by velocity.
      *
      * @param filename name of the file to check.
-     * @return <tt>true</tt> if the filename represents a LESS.vm file.
+     * @return {@code true} if the filename represents a LESS.vm file.
      */
     private boolean isLessCssFile(String filename)
     {
@@ -489,8 +511,26 @@ public class SkinAction extends XWikiAction
      * @param mimetype The mimetype of the file. Used in the "Content-Type" header.
      * @param lastChanged The date of the last change of the file. Used in the "Last-Modified" header.
      * @param length The length of the content (in bytes). Used in the "Content-Length" header.
+     * @deprecated since 11.10RC1, use {@link #setupHeaders(XWikiResponse, String, Date, long)} instead
      */
+    @Deprecated
     protected void setupHeaders(XWikiResponse response, String mimetype, Date lastChanged, int length)
+    {
+        setupHeaders(response, mimetype, lastChanged, (long) length);
+    }
+
+    /**
+     * Sets several headers to properly identify the response.
+     *
+     * @param response The servlet response object, where the headers should be set.
+     * @param mimetype The mimetype of the file. Used in the "Content-Type" header.
+     * @param lastChanged The date of the last change of the file. Used in the "Last-Modified" header.
+     * @param length The length of the content (in bytes). Used in the "Content-Length" header.
+     * @since 11.10
+     * @since 11.3.6
+     * @since 10.11.10
+     */
+    protected void setupHeaders(XWikiResponse response, String mimetype, Date lastChanged, long length)
     {
         if (!StringUtils.isBlank(mimetype)) {
             response.setContentType(mimetype);
@@ -501,6 +541,6 @@ public class SkinAction extends XWikiAction
         // Cache for one month (30 days)
         response.setHeader("Cache-Control", "public");
         response.setDateHeader("Expires", (new Date()).getTime() + 30 * 24 * 3600 * 1000L);
-        response.setContentLength(length);
+        setContentLength(response, length);
     }
 }

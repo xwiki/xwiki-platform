@@ -23,16 +23,12 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.configuration.internal.AbstractDocumentConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.LocalDocumentReference;
-
-import com.xpn.xwiki.XWikiException;
 
 /**
- * Provides configuration from the Mail.SendMailConfigClass document in the current wiki.
- * If the Mail.SendMailConfigClass xobject exists in the Mail.MailConfig document then always use configuration
- * values from it and if it doesn't then use the passed default values (if a default value is passed).
+ * Provides configuration from the {@code Mail.MailConfig} document in the current wiki.
+ * If the {@code Mail.SendMailConfigClass} xobject exists in the {@code Mail.MailConfig} document then always use
+ * configuration values from it and if it doesn't then use the passed default values (if a default value is passed).
  *
  * @version $Id$
  * @since 6.4M2
@@ -40,61 +36,21 @@ import com.xpn.xwiki.XWikiException;
 @Component
 @Named("mailsend")
 @Singleton
-public class SendMailConfigClassDocumentConfigurationSource extends AbstractDocumentConfigurationSource
+public class SendMailConfigClassDocumentConfigurationSource
+    extends AbstractSendMailConfigClassDocumentConfigurationSource
 {
-    private static final String MAIL_SPACE = "Mail";
-
-    /**
-     * The local reference of the Mail.SendMailConfigClass xclass.
-     */
-    private static final LocalDocumentReference CLASS_REFERENCE =
-        new LocalDocumentReference(MAIL_SPACE, "SendMailConfigClass");
-
-    /**
-     * The local reference of the Mail.MailConfig document.
-     */
-    private static final LocalDocumentReference DOC_REFERENCE =
-        new LocalDocumentReference(MAIL_SPACE, "MailConfig");
-
     @Override
     protected String getCacheId()
     {
+        // Note: we use a single cache id because this module is installed on the root namespace and thus there's
+        // only a single SendMailConfigClassDocumentConfigurationSource component in the farm (and thus a single
+        // cache).
         return "configuration.document.mail.send";
     }
 
     @Override
     protected DocumentReference getDocumentReference()
     {
-        return new DocumentReference(DOC_REFERENCE, getCurrentWikiReference());
-    }
-
-    @Override
-    protected LocalDocumentReference getClassReference()
-    {
-        return CLASS_REFERENCE;
-    }
-
-    @Override
-    public <T> T getProperty(String key, T defaultValue)
-    {
-        T result;
-        if (defaultValue != null) {
-            try {
-                if (getBaseObject() == null) {
-                    // No Mail.SendMailConfigClass xobject in the Mail.MailConfig document, use the default value!
-                    result = super.getProperty(key, defaultValue);
-                } else {
-                    // A Mail.SendMailConfigClass xobject exists in the Mail.MailConfig document, always use the
-                    // value from it.
-                    result = super.getProperty(key, (Class<? extends T>) defaultValue.getClass());
-                }
-            } catch (XWikiException e) {
-                this.logger.error("Failed to access configuration property [{}]", key, e);
-                result = null;
-            }
-        } else {
-            result = super.getProperty(key);
-        }
-        return result;
+        return new DocumentReference(MAILCONFIG_REFERENCE, getCurrentWikiReference());
     }
 }

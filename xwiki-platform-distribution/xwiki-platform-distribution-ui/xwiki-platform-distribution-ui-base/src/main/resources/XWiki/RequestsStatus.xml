@@ -56,8 +56,8 @@
   #else
     == {{translation key="xe.monitor.consolidateddata"/}} ==
 
-    #set($dur = $mathtool.toInteger("${monitor.duration}"))
-    #set($nbreq = $mathtool.toInteger("${monitor.requests}"))
+    #set($dur = $numbertool.toNumber("${monitor.duration}").intValue())
+    #set($nbreq = $numbertool.toNumber("${monitor.requests}").intValue())
     #set($avg = ($dur/$nbreq))
 
     * {{translation key="xe.monitor.duration"/}} ${monitor.getDuration()} ms
@@ -65,8 +65,8 @@
     * {{translation key="xe.monitor.average"/}} ${avg} ms
 
     #foreach($timer in $monitor.getTimerSummaries())
-      #set($dur = $mathtool.toInteger("${timer.duration}"))
-      #set($nbreq = $mathtool.toInteger("${timer.requests}"))
+      #set($dur = $numbertool.toNumber("${timer.duration}").intValue())
+      #set($nbreq = $numbertool.toNumber("${timer.requests}").intValue())
       #set($avg = ($dur/$nbreq))
       * $timer.name {{translation key="xe.monitor.duration.small"/}} ${timer.duration} {{translation key="xe.monitor.ms"/}} {{translation key="xe.monitor.calls"/}} $timer.nbCalls {{translation key="xe.monitor.requests"/}} $timer.requests {{translation key="xe.monitor.average"/}} ${avg} {{translation key="xe.monitor.ms"/}}
     #end

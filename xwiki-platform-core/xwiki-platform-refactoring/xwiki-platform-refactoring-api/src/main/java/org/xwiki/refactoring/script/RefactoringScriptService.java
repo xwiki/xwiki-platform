@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.job.Job;
@@ -38,12 +39,14 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.refactoring.RefactoringConfiguration;
 import org.xwiki.refactoring.job.CopyRequest;
 import org.xwiki.refactoring.job.CreateRequest;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.refactoring.job.PermanentlyDeleteRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
+import org.xwiki.refactoring.job.ReplaceUserRequest;
 import org.xwiki.refactoring.job.RestoreRequest;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -77,6 +80,9 @@ public class RefactoringScriptService implements ScriptService
     @Inject
     private JobExecutor jobExecutor;
 
+    @Inject
+    private RefactoringConfiguration configuration;
+
     /**
      * Used to check user rights.
      */
@@ -88,6 +94,9 @@ public class RefactoringScriptService implements ScriptService
 
     @Inject
     private RequestFactory requestFactory;
+
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
 
     /**
      * @return the standard request factory for creating the different refactoring requests.
@@ -389,7 +398,9 @@ public class RefactoringScriptService implements ScriptService
 
         // Make sure that only the PR users can change the rights and context properties from the request.
         if (!this.authorization.hasAccess(Right.PROGRAM)) {
-            getRequestFactory().setRightsProperties(request);
+            request.setCheckRights(true);
+            request.setUserReference(this.documentAccessBridge.getCurrentUserReference());
+            request.setAuthorReference(this.documentAccessBridge.getCurrentAuthorReference());
         }
 
         try {
@@ -498,5 +509,48 @@ public class RefactoringScriptService implements ScriptService
     public Job permanentlyDelete(List<Long> deletedDocumentIds)
     {
         return this.permanentlyDelete(getRequestFactory().createPermanentlyDeleteRequest(deletedDocumentIds));
+    }
+
+    /**
+     * Schedules an asynchronous job for replacing the author and the content author of the existing wiki pages. If the
+     * old author is from the main wiki then the entire wiki farm is updated. Otherwise only the subwiki of the old
+     * author is updated.
+     * 
+     * @param oldAuthorReference the old author reference
+     * @param newAuthorReference the new author reference
+     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
+     *         {@code null} in case of failure
+     * @since 11.8RC1
+     */
+    public Job changeDocumentAuthor(DocumentReference oldAuthorReference, DocumentReference newAuthorReference)
+    {
+        ReplaceUserRequest request =
+            getRequestFactory().createReplaceUserRequest(oldAuthorReference, newAuthorReference);
+        request.setReplaceDocumentAuthor(true);
+        request.setReplaceDocumentContentAuthor(true);
+        return this.replaceUser(request);
+    }
+
+    /**
+     * Schedules an asynchronous job to perform the given request.
+     *
+     * @param request the request to perform (specifies the old user reference and the new user reference)
+     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
+     *         {@code null} in case of failure
+     * @since 11.8RC1
+     */
+    public Job replaceUser(ReplaceUserRequest request)
+    {
+        return this.execute(RefactoringJobs.REPLACE_USER, request);
+    }
+
+    /**
+     * @return {@code true} if the current user can be given the option to choose between sending a document to the
+     * recycle bin or deleting it permanently. {@code false} otherwise.
+     * @since 12.8RC1
+     */
+    public boolean isRecycleBinSkippingAllowed()
+    {
+        return this.configuration.isRecycleBinSkippingActivated() && this.documentAccessBridge.isAdvancedUser();
     }
 }

@@ -35,6 +35,8 @@ public class EmailClass extends StringClass
      **/
     protected static final String XCLASSNAME = "email";
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Default value for the email validation regular expression.
      */

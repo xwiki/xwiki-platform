@@ -31,6 +31,7 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.io.OutputFormat;
 import org.xwiki.model.reference.DocumentReference;
@@ -53,6 +54,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
+import com.xpn.xwiki.web.EditForm;
 import com.xpn.xwiki.web.Utils;
 
 /**
@@ -425,5 +427,75 @@ privileged public aspect XWikiDocumentCompatibilityAspect
         } else {
             setParentReference((EntityReference) null);
         }
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #rename(DocumentReference, XWikiContext)}
+     */
+    @Deprecated
+    public void XWikiDocument.rename(String newDocumentName, XWikiContext context) throws XWikiException
+    {
+        rename(newDocumentName, getBackLinkedPages(context), context);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #rename(DocumentReference, java.util.List, com.xpn.xwiki.XWikiContext)}
+     */
+    @Deprecated
+    public void XWikiDocument.rename(String newDocumentName, List<String> backlinkDocumentNames, XWikiContext context)
+        throws XWikiException
+    {
+        rename(newDocumentName, backlinkDocumentNames, getChildren(context), context);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #rename(DocumentReference, List, List, com.xpn.xwiki.XWikiContext)}
+     */
+    @Deprecated
+    public void XWikiDocument.rename(String newDocumentName, List<String> backlinkDocumentNames,
+        List<String> childDocumentNames, XWikiContext context) throws XWikiException
+    {
+        List<DocumentReference> backlinkDocumentReferences = new ArrayList<DocumentReference>();
+        for (String backlinkDocumentName : backlinkDocumentNames) {
+            backlinkDocumentReferences.add(getCurrentMixedDocumentReferenceResolver().resolve(backlinkDocumentName));
+        }
+
+        List<DocumentReference> childDocumentReferences = new ArrayList<DocumentReference>();
+        for (String childDocumentName : childDocumentNames) {
+            childDocumentReferences.add(getCurrentMixedDocumentReferenceResolver().resolve(childDocumentName));
+        }
+
+        rename(getCurrentMixedDocumentReferenceResolver().resolve(newDocumentName), backlinkDocumentReferences,
+            childDocumentReferences, context);
+    }
+
+    /**
+     * Read the document data from the template without performing permission check on the template.
+     *
+     * @param eform the form containing a template information.
+     * @param context current context
+     * @throws XWikiException in case of problem to read the information.
+     * @deprecated Since 14.1RC1 prefer using {@link #readFromTemplate(DocumentReference, XWikiContext)} and be careful
+     *             to check the template rights before.
+     */
+    @Deprecated
+    public void XWikiDocument.readFromTemplate(EditForm eform, XWikiContext context) throws XWikiException
+    {
+        String template = eform.getTemplate();
+        readFromTemplate(template, context);
+    }
+
+    /**
+     * @deprecated since 2.2M1 use {@link #readFromTemplate(DocumentReference, XWikiContext)} instead
+     */
+    @Deprecated
+    public void XWikiDocument.readFromTemplate(String template, XWikiContext context) throws XWikiException
+    {
+        // Keep the same behavior for backward compatibility
+        DocumentReference templateDocumentReference = null;
+        if (StringUtils.isNotEmpty(template)) {
+            templateDocumentReference = getCurrentMixedDocumentReferenceResolver().resolve(template);
+        }
+        readFromTemplate(templateDocumentReference, context);
     }
 }

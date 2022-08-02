@@ -36,6 +36,7 @@ import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxRegistry;
 
 import com.xpn.xwiki.CoreConfiguration;
 
@@ -79,6 +80,9 @@ public class DefaultExtendedRenderingConfiguration implements ExtendedRenderingC
     @Inject
     @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
+
+    @Inject
+    private SyntaxRegistry syntaxRegistry;
 
     @Override
     public int getImageWidthLimit()
@@ -158,7 +162,7 @@ public class DefaultExtendedRenderingConfiguration implements ExtendedRenderingC
         List<Syntax> syntaxes = new ArrayList<>();
         for (String syntaxAsString : syntaxesAsStrings) {
             try {
-                syntaxes.add(Syntax.valueOf(syntaxAsString));
+                syntaxes.add(this.syntaxRegistry.resolveSyntax(syntaxAsString));
             } catch (ParseException e) {
                 throw new RuntimeException(String.format("Failed to convert [%s] into Syntax object", syntaxAsString),
                     e);

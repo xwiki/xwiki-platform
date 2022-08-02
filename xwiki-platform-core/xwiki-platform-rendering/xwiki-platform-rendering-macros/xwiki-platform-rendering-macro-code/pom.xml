@@ -25,14 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-code</artifactId>
   <name>XWiki Platform - Rendering - Macro - Code</name>
   <description>Highlights code</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.84</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>0</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Code Macro</xwiki.extension.name>
   </properties>
@@ -48,12 +47,20 @@
     </dependency>
     <dependency>
       <groupId>org.python</groupId>
-      <artifactId>jython-standalone</artifactId>
+      <artifactId>jython-slim</artifactId>
     </dependency>
+    <!-- We can't upgrade to version higher than 2.4.2 for two reasons:
+         - 2.5.1 and above presents and issue with the auto-detection of the language of the code (MIME and SQL 
+         syntaxes are too often detected).
+         - Pygments 2.6.0 and above requires Python 3. 
+         Pygments 2.8.0 presents a fix, but requires Python 3.
+         And upgrade to Pygments 2.5.2 is possible by backporting the fix from 
+         Pygments 2.8.0 (https://jira.xwiki.org/browse/XWIKI-18369).   
+         See https://jira.xwiki.org/browse/XWIKI-18363 -->
     <dependency>
       <groupId>org.pygments</groupId>
       <artifactId>pygments</artifactId>
-      <version>2.3.1</version>
+      <version>2.4.2</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

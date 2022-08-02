@@ -22,7 +22,6 @@ package org.xwiki.captcha;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Describes a CAPTCHA that is able to display a challenge and validate and answer for the current context (i.e. user,
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 10.8RC1
  */
-@Unstable
 @Role
 public interface Captcha
 {

@@ -1,0 +1,73 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+#template('refactoringStatus_macros.vm')
+
+#macro (displayMoveJobRequest $moveJobRequest)
+<div class="refactoring-job-request row xform">
+  <div class="col-xs-12 col-lg-6">
+    <dl>
+      #displayLocations('attachment.move.source.label' 'attachment.move.source.hint' $moveJobRequest.entityReferences)
+        #displayBooleanConfigParam('attachment.move.autoRedirect.label', 'attachment.move.autoRedirect.hint'
+      $moveJobRequest.isAutoRedirect())
+    </dl>
+  </div>
+  <div class="col-xs-12 col-lg-6">
+    <dl>
+      #displayLocations('attachment.move.newLocation.label' 'attachment.move.newLocation.hint'
+      [$moveJobRequest.destination])
+    </dl>
+  </div>
+</div>
+#end
+
+#macro (displayMoveJobStatus $moveJobStatus)
+  #set ($moveJobRequest = $moveJobStatus.request)
+<div class="xcontent">
+  <h2>$escapetool.xml($services.localization.render('attachment.move.status.label'))</h2>
+  <p class="text-muted small">
+    $escapetool.xml($services.localization.render('attachment.move.status.hint', 
+      ['__username__', $xwiki.formatDate($moveJobStatus.startDate)])).replace('__username__', 
+        $xwiki.getUserName($moveJobRequest.userReference))
+  </p>
+  #displayMoveJobRequest($moveJobRequest)
+  #template('job_macros.vm')
+  #displayJobStatus($moveJobStatus)
+</div>
+#end
+
+#macro (outputmoveJobStatusJSON $moveJobStatus)
+  #getJobStatusJSON($moveJobStatus $json)
+  $response.setContentType('application/json')
+  $jsontool.serialize($json)
+#end
+
+#set ($moveJobStatus = $services.job.getJobStatus(['refactoring', 'moveAttachment', $request.moveId]))
+#if ($moveJobStatus)
+  #if ($xcontext.action == 'get')
+    #outputmoveJobStatusJSON($moveJobStatus)
+  #else
+    #displayMoveJobStatus($moveJobStatus)
+  #end
+#else
+  $response.setStatus(404)
+<div class="box errormessage">
+  $escapetool.xml($services.localization.render('attachment.move.status.notFound'))
+</div>
+#end

@@ -69,23 +69,27 @@ public class XarModel
      * @deprecated kept for retro compatibility reason (since this used to exist in XAR format) but this method never
      *             really been used in XWiki Standard.
      */
+    @Deprecated
     public static final int ACTION_NOT_DEFINED = -1;
 
     /**
      * @deprecated kept for retro compatibility reason (since this used to exist in XAR format) but this method never
      *             really been used in XWiki Standard.
      */
+    @Deprecated
     public static final int ACTION_OVERWRITE = 0;
 
     /**
      * @deprecated kept for retro compatibility reason (since this used to exist in XAR format) but this method never
      *             really been used in XWiki Standard.
      */
+    @Deprecated
     public static final int ACTION_SKIP = 1;
 
     /**
      * @deprecated kept for retro compatibility reason (since this used to exist in XAR format) but this method never
      *             really been used in XWiki Standard.
      */
+    @Deprecated
     public static final int ACTION_MERGE = 2;
 }

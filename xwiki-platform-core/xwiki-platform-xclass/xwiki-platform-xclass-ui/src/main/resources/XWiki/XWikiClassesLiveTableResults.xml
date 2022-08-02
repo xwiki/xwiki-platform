@@ -42,7 +42,7 @@
 #if ($xcontext.action == 'get' &amp;&amp; $request.outputSyntax == 'plain')
   ## Include only the pages that have a class definition.
   #set ($extra = "and (doc.xWikiClassXML is not null and doc.xWikiClassXML like '&lt;%')")
-  #set ($params = [])
+  #set ($params = {})
   #addLivetableLocationFilter($extra $params $!request.location)
   #set ($output = {})
   #gridresultwithfilter_buildJSON('' $request.collist.split(',') '' $extra $params $output)

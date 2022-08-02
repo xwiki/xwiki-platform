@@ -19,19 +19,20 @@
  */
 package com.xpn.xwiki.doc;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
- * Unit tests for the {@link XWikiList} class.
+ * Unit tests for the {@link XWikiLink} class.
  *
  * @version $Id$
  */
-public class XWikiLinkTest
+class XWikiLinkTest
 {
-
     @Test
-    public void testXWikiListEquals()
+    void testXWikiLinkEquals()
     {
         final long docId = 101;
         final String link = "test link";
@@ -42,18 +43,37 @@ public class XWikiLinkTest
         XWikiLink l3 = new XWikiLink(docId, link, fullName);
 
         // Reflexive
-        Assert.assertEquals(l1, l1);
+        assertEquals(l1, l1);
 
         // Symmetric
-        Assert.assertEquals(l1, l2);
-        Assert.assertEquals(l2, l1);
+        assertEquals(l1, l2);
+        assertEquals(l2, l1);
 
         // Transitive
-        Assert.assertEquals(l1, l2);
-        Assert.assertEquals(l2, l3);
-        Assert.assertEquals(l1, l3);
+        assertEquals(l1, l2);
+        assertEquals(l2, l3);
+        assertEquals(l1, l3);
 
         // equals null == false
-        Assert.assertFalse(l1.equals(null));
+        assertFalse(l1.equals(null));
+    }
+
+    @Test
+    void testXWikiLinkToString()
+    {
+        final long docId = 101;
+        final String link = "test link";
+        final String fullName = "test fullName";
+
+        XWikiLink xWikiLink = new XWikiLink();
+        assertEquals("DocId = [0], FullName = [<null>], Link = [<null>], Type = [<null>], AttachmentName = [<null>]",
+            xWikiLink.toString());
+
+        xWikiLink.setDocId(docId);
+        xWikiLink.setLink(link);
+        xWikiLink.setFullName(fullName);
+        assertEquals(
+            "DocId = [101], FullName = [test fullName], Link = [test link], Type = [<null>], AttachmentName = [<null>]",
+            xWikiLink.toString());
     }
 }

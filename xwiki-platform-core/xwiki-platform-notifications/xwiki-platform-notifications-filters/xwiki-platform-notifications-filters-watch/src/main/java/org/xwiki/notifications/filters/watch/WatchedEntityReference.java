@@ -33,11 +33,22 @@ public interface WatchedEntityReference
 {
     /**
      * @param userReference a user
-     * @return if the given user watch the current entity reference
+     * @return {@code true} if the given user watch the current entity reference for any event type or format.
      * @throws NotificationException if an error happens
      * @since 9.9RC1
      */
     boolean isWatched(DocumentReference userReference) throws NotificationException;
+
+    /**
+     * @param userReference a user
+     * @return {@code true} if the given user watch the current entity reference for all events.
+     * @throws NotificationException if an error happens
+     * @since 12.8RC1
+     */
+    default boolean isWatchedWithAllEventTypes(DocumentReference userReference) throws NotificationException
+    {
+        return isWatched(userReference);
+    }
 
     /**
      * @param notificationFilterPreference a filter preference

@@ -84,10 +84,6 @@ public class DocumentTreeNode extends AbstractDocumentTreeNode implements Initia
     private ContextualAuthorizationManager authorization;
 
     @Inject
-    @Named("context")
-    private Provider<ComponentManager> contextComponentManagerProvider;
-
-    @Inject
     @Named("childPage/nestedPages")
     private QueryFilter childPageFilter;
 

@@ -38,10 +38,10 @@
   <hidden>true</hidden>
   <content>{{include reference="ExtensionCode.RepositoryCode"/}}
 
-{{include reference="XWiki.RatingsMacros"/}}
+{{include reference="XWiki.Ratings.RatingsMacros"/}}
 
 {{velocity output="false"}}
-#if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
+#if ($xcontext.action == 'edit')
   #set($isEditMode = true)
 #else
   #set($isViewMode = true)
@@ -137,7 +137,7 @@
         |(% class="label" %)Active Installs(%%)|$!doc.getValue('installedCount')
       #end
       ##------- Rating --------
-      |(% class="label" %)Rating(%%)|#displayFullRating($doc.documentReference "")
+      |(% class="label" %)Rating(%%)|#displayFullRating($doc.documentReference)
       ##------- Website --------------
       #set($website = $extension.getProperty("website").value)
       #if ("$!website" != '')
@@ -181,18 +181,18 @@
               [[$services.icon.render('download')  Download v$version&gt;&gt;attach:${id}-${version}.${type}||class="btn btn-primary"]]##
             #end
           #else
-            [[$services.icon.render('download')  Download v$version&gt;&gt;$download||class="btn btn-primary"]]##
+            [[$services.icon.render('download')  Download v$version&gt;&gt;${download}||class="btn btn-primary"]]##
           #end
         #end
         ##------- Source --------
         #set($source = $doc.getValue("source"))
         #if ("$!source" != "")
-          [[Sources&gt;&gt;$source||class="btn btn-default"]]##
+          [[Sources&gt;&gt;${source}||class="btn btn-default"]]##
         #end
         ##------- Issues --------
         #set($issues = $doc.getValue("issueManagementURL"))
         #if ("$!issues" != "")
-          [[Issues&gt;&gt;$issues||class="btn btn-default"]]##
+          [[Issues&gt;&gt;${issues}||class="btn btn-default"]]##
         #end
       )))
     {{/box}}
@@ -306,7 +306,7 @@
         #end
       #end
       ## Reverse the list to have latest versions first
-      #set ($discard = $collectionstool.reverse($releaseNotes))
+      #set ($discard = $collectiontool.reverseModifiable($releaseNotes))
       #if (!$releaseNotes.isEmpty())
         = Release Notes =
         #foreach ($entry in $releaseNotes)

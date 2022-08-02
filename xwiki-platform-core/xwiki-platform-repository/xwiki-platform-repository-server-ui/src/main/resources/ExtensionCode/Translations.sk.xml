@@ -49,6 +49,5 @@ extension.repository.doc.date=Posledná modifikácia
 ### Missing: extension.repository.installedCount=Installs
 
 ## Administration UI
-admin.repository=Uložisko rozšírení
-</content>
+admin.repository=Uložisko rozšírení</content>
 </xwikidoc>

@@ -25,21 +25,12 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Parent POM</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Distribution - Flavor - Functional Tests - Parent POM</description>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.w3c.css</groupId>
-        <artifactId>css-validator</artifactId>
-        <version>20100131</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -140,12 +131,6 @@
             </execution>
           </executions>
           <dependencies>
-            <dependency>
-              <groupId>org.xwiki.platform</groupId>
-              <artifactId>xwiki-platform-eventstream-store</artifactId>
-              <version>${project.version}</version>
-              <scope>runtime</scope>
-            </dependency>
             <dependency>
               <groupId>org.xwiki.platform</groupId>
               <artifactId>xwiki-platform-instance</artifactId>
@@ -277,6 +262,7 @@
                     templates/changeavatar\.vm <!-- does not produce any output, just redirects -->
                     templates/deletegroupmember\.vm <!-- does not produce any output, expects "fullname" to be a valid user name -->
                     templates/deprecatedMacros\.vm <!-- does not produce any output -->
+                    templates/display\.vm <!-- returns 400 (Bad Request) if expected request parameters are missing -->
                     templates/docalreadyexists\.vm <!-- returns 409 and shows an error message -->
                     templates/get\.vm <!-- just renders the page content using rendercontent.vm -->
                     templates/recyclebin\.vm <!-- output only comes from contentview.vm and docextra.vm parameter "id" must be an integer -->
@@ -289,6 +275,9 @@
                     templates/xpart\.vm <!-- avoid recursive include -->
                     templates/init\.vm <!-- escaping does not like it but it does not take any parameter anyway -->
                     templates/xml\.vm <!-- it's not escaping test job to validate XML format -->
+                    <!-- Those pages are deprecated and triggers a log warning -->
+                    XWiki/ResetPassword\.xml
+                    XWiki/ForgotUsername\.xml
                 </value>
               </property>
               <property>
@@ -324,7 +313,7 @@
                   /xwiki/bin/edit/XWiki/XWikiPreferences?editor=object
                   /xwiki/bin/edit/XWiki/XWikiPreferences?editor=class
                   /xwiki/bin/edit/XWiki/XWikiPreferences?editor=rights
-                  /xwiki/bin/inline/Panels/QuickLinks
+                  /xwiki/bin/edit/Panels/QuickLinks
                   /xwiki/bin/view/XWiki/Admin?category=preferences
                   /xwiki/bin/create/Main/?tocreate=page
                   /xwiki/bin/create/Main/?tocreate=space
@@ -415,7 +404,7 @@
         </os>
       </activation>
       <properties>
-        <xwikiExecutionStartCommand>bash start_xwiki.sh -p ${port} -sp ${stopport}</xwikiExecutionStartCommand>
+        <xwikiExecutionStartCommand>bash start_xwiki.sh -p ${port} -sp ${stopport} -ni</xwikiExecutionStartCommand>
         <xwikiExecutionStopCommand>bash stop_xwiki.sh -p ${port} -sp ${stopport}</xwikiExecutionStopCommand>
       </properties>
     </profile>
@@ -427,7 +416,7 @@
         </os>
       </activation>
       <properties>
-        <xwikiExecutionStartCommand>bash start_xwiki.sh -p ${port} -sp ${stopport}</xwikiExecutionStartCommand>
+        <xwikiExecutionStartCommand>bash start_xwiki.sh -p ${port} -sp ${stopport} -ni</xwikiExecutionStartCommand>
         <xwikiExecutionStopCommand>bash stop_xwiki.sh -p ${port} -sp ${stopport}</xwikiExecutionStopCommand>
       </properties>
     </profile>
@@ -450,8 +439,8 @@
     <profile>
       <id>macprofiler</id>
       <properties>
-        <xwikiExecutionStartCommand>sh start_xwiki_debug.sh ${port} ${stopport} profiler "${profilerPath}"</xwikiExecutionStartCommand>
-        <xwikiExecutionStopCommand>sh stop_xwiki.sh ${stopport}</xwikiExecutionStopCommand>
+        <xwikiExecutionStartCommand>sh start_xwiki_debug.sh -p ${port} -sp ${stopport} -yp "${profilerPath}" -ni</xwikiExecutionStartCommand>
+        <xwikiExecutionStopCommand>sh stop_xwiki.sh -p ${port} -sp ${stopport}</xwikiExecutionStopCommand>
       </properties>
     </profile>
     <profile>
@@ -529,7 +518,6 @@
     <module>xwiki-platform-distribution-flavor-test-misc</module>
     <module>xwiki-platform-distribution-flavor-test-pageobjects</module>
     <module>xwiki-platform-distribution-flavor-test-ui</module>
-    <module>xwiki-platform-distribution-flavor-test-selenium</module>
     <module>xwiki-platform-distribution-flavor-test-webstandards</module>
     <module>xwiki-platform-distribution-flavor-test-escaping</module>
     <module>xwiki-platform-distribution-flavor-test-storage</module>

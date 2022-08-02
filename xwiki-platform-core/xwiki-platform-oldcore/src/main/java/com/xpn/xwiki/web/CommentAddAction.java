@@ -19,6 +19,9 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +29,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.captcha.Captcha;
 import org.xwiki.captcha.CaptchaConfiguration;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -33,6 +39,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
@@ -42,6 +49,9 @@ import com.xpn.xwiki.user.api.XWikiRightService;
  *
  * @version $Id$
  */
+@Component
+@Named("commentadd")
+@Singleton
 public class CommentAddAction extends XWikiAction
 {
     /** The name of the XWikiComments property identifying the author. */
@@ -51,6 +61,15 @@ public class CommentAddAction extends XWikiAction
     private static final String USER_SPACE_PREFIX = "XWiki.";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommentAddAction.class);
+
+    @Inject
+    private UserReferenceResolver<CurrentUserReference> currentUserReferenceUserReferenceResolver;
+
+    @Override
+    protected Class<? extends XWikiForm> getFormClass()
+    {
+        return ObjectAddForm.class;
+    }
 
     @Override
     public boolean action(XWikiContext context) throws XWikiException
@@ -89,16 +108,24 @@ public class CommentAddAction extends XWikiAction
                 }
                 // We need to make sure the author will fit in a String property, this is mostly a protection against
                 // spammers who try to put large texts in this field
-                author = author.substring(0, Math.min(author.length(), 255));
+                int limit = xwiki.getStore().getLimitSize(context, StringProperty.class, "value");
+                author = author.substring(0, Math.min(author.length(), limit));
                 object.set(AUTHOR_PROPERTY_NAME, author, context);
             } else {
                 // A registered user must always post with his name.
                 object.set(AUTHOR_PROPERTY_NAME, context.getUser(), context);
             }
-            doc.setAuthorReference(context.getUserReference());
+            // We only update the original author of the document to avoid changing the effective one.
+            doc.getAuthors().setOriginalMetadataAuthor(
+                this.currentUserReferenceUserReferenceResolver.resolve(CurrentUserReference.INSTANCE));
+
+            String comment = localizePlainOrKey("core.comment.addComment");
+
+            // Make sure the user is allowed to make this modification
+            context.getWiki().checkSavingDocument(context.getUserReference(), doc, comment, true, context);
 
             // Save the new comment.
-            xwiki.saveDocument(doc, localizePlainOrKey("core.comment.addComment"), true, context);
+            xwiki.saveDocument(doc, comment, true, context);
         }
         // If xpage is specified then allow the specified template to be parsed.
         if (context.getRequest().get("xpage") != null) {

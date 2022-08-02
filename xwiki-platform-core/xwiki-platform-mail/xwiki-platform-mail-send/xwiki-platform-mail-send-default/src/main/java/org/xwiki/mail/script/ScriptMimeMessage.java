@@ -38,7 +38,6 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MimeBodyPartFactory;
-import org.xwiki.stability.Unstable;
 
 /**
  * Extends {@link javax.mail.internet.MimeMessage} with additional helper methods for scripts.
@@ -87,7 +86,6 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
      * @param bodyPart a {@link BodyPart} object to include in the mail
      * @since 10.0
      */
-    @Unstable
     public void addPart(BodyPart bodyPart)
     {
         addPart(null, bodyPart);
@@ -121,8 +119,7 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
      *        Also accepts a {@link BodyPart} object, in which case, the mime type and parameters are not used.
      * @param parameters the list of extra parameters. This is used for example to pass alternate content for the mail
      *        using the {@code alternate} key in the HTML Mime Body Part Factory. Mail headers can also be passed using
-     *        the {@code headers} key with a {@code Map&lt;String, String&gt;} value containing header keys
-     *        and values.
+     *        the {@code headers} key with a {@code Map<String, String>} value containing header keys and values.
      */
     public BodyPart addPart(String mimeType, Object content, Map<String, Object> parameters)
     {

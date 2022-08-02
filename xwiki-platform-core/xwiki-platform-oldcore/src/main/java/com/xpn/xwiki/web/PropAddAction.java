@@ -22,7 +22,11 @@ package com.xpn.xwiki.web;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.servlet.http.HttpServletResponse;
+
+import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -34,8 +38,17 @@ import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.util.Util;
 
+@Component
+@Named("propadd")
+@Singleton
 public class PropAddAction extends XWikiAction
 {
+    @Override
+    protected Class<? extends XWikiForm> getFormClass()
+    {
+        return PropAddForm.class;
+    }
+
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
@@ -47,15 +60,20 @@ public class PropAddAction extends XWikiAction
         XWiki xwiki = context.getWiki();
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
+
+        // We need to clone this document first, since a cached storage would return the same object for the
+        // following requests, so concurrent request might get a partially modified object, or worse, if an error
+        // occurs during the save, the cached object will not reflect the actual document at all.
+        doc = doc.clone();
+
         XWikiForm form = context.getForm();
 
         String propName = ((PropAddForm) form).getPropName();
 
         if (!Util.isValidXMLElementName(propName)) {
-            context.put("message", "action.addClassProperty.error.invalidName");
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST,
-                localizePlainOrKey("action.addClassProperty.error.invalidName"));
-            return true;
+            writeAjaxErrorResponse(HttpServletResponse.SC_BAD_REQUEST,
+                localizePlainOrKey("action.addClassProperty.error.invalidName"), context);
+            return false;
         }
 
         String propType = ((PropAddForm) form).getPropType();
@@ -83,7 +101,13 @@ public class PropAddAction extends XWikiAction
                     doc.setCreatorReference(context.getUserReference());
                 }
                 doc.setMetaDataDirty(true);
-                xwiki.saveDocument(doc, localizePlainOrKey("core.comment.addClassProperty"), true, context);
+
+                String comment = localizePlainOrKey("core.comment.addClassProperty");
+
+                // Make sure the user is allowed to make this modification
+                context.getWiki().checkSavingDocument(context.getUserReference(), doc, comment, true, context);
+
+                xwiki.saveDocument(doc, comment, true, context);
             }
         }
         // forward to edit

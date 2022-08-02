@@ -22,6 +22,7 @@ package org.xwiki.rendering.script;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -37,6 +38,7 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
+import org.xwiki.rendering.macro.MacroCategoryManager;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.MacroIdFactory;
 import org.xwiki.rendering.macro.MacroLookupException;
@@ -81,6 +83,9 @@ public class RenderingScriptService implements ScriptService
 
     @Inject
     private MacroManager macroManager;
+
+    @Inject
+    private MacroCategoryManager macroCategoryManager;
     
     @Inject
     private MacroIdFactory macroIdFactory;
@@ -90,7 +95,7 @@ public class RenderingScriptService implements ScriptService
      */
     public List<Syntax> getAvailableParserSyntaxes()
     {
-        List<Syntax> syntaxes = new ArrayList<Syntax>();
+        List<Syntax> syntaxes = new ArrayList<>();
         try {
             for (Parser parser : this.componentManagerProvider.get().<Parser>getInstanceList(Parser.class)) {
                 syntaxes.add(parser.getSyntax());
@@ -108,7 +113,7 @@ public class RenderingScriptService implements ScriptService
      */
     public List<Syntax> getAvailableRendererSyntaxes()
     {
-        List<Syntax> syntaxes = new ArrayList<Syntax>();
+        List<Syntax> syntaxes = new ArrayList<>();
         try {
             List<PrintRendererFactory> factories =
                 this.componentManagerProvider.get().getInstanceList(PrintRendererFactory.class);
@@ -213,7 +218,6 @@ public class RenderingScriptService implements ScriptService
         if (content == null || syntax == null) {
             return null;
         }
-        String input = String.valueOf(content);
 
         // Determine the escape character for the syntax.
         char escapeChar;
@@ -225,12 +229,12 @@ public class RenderingScriptService implements ScriptService
         }
 
         // Since we prefix all characters, the result size will be double the input's, so we can just use char[].
-        char[] result = new char[input.length() * 2];
+        char[] result = new char[content.length() * 2];
 
         // Escape the content.
-        for (int i = 0; i < input.length(); i++) {
+        for (int i = 0; i < content.length(); i++) {
             result[2 * i] = escapeChar;
-            result[2 * i + 1] = input.charAt(i);
+            result[2 * i + 1] = content.charAt(i);
         }
 
         return String.valueOf(result);
@@ -238,7 +242,7 @@ public class RenderingScriptService implements ScriptService
 
     /**
      * @return the list of Rendering Syntaxes that are configured for the current wiki (i.e. that are proposed to the
-     *         user when editing wik pages)
+     *         user when editing wiki pages). These are input Syntaxes only (i.e. Syntaxes having a Parser for them).
      * @since 8.2M1
      */
     public List<Syntax> getConfiguredSyntaxes()
@@ -276,7 +280,6 @@ public class RenderingScriptService implements ScriptService
      * @return the resolved macro id or {@code null} if resolving the given string fails
      * @since 10.10RC1
      */
-    @Unstable
     public MacroId resolveMacroId(String macroIdAsString)
     {
         try {
@@ -293,7 +296,6 @@ public class RenderingScriptService implements ScriptService
      * @return the descriptor of the specified macro if it exists, {@code null} otherwise
      * @since 10.10RC1
      */
-    @Unstable
     public MacroDescriptor getMacroDescriptor(MacroId macroId)
     {
         if (this.macroManager.exists(macroId)) {
@@ -304,6 +306,19 @@ public class RenderingScriptService implements ScriptService
             }
         }
         return null;
+    }
+
+    /**
+     * Return the list of categories of a given macro.
+     *
+     * @param macroId the macro id
+     * @return the list of categories of the macro
+     * @since 14.6RC1
+     */
+    @Unstable
+    public Set<String> getMacroCategories(MacroId macroId)
+    {
+        return this.macroCategoryManager.getMacroCategories(macroId);
     }
 
     private char getEscapeCharacter(Syntax syntax) throws IllegalArgumentException

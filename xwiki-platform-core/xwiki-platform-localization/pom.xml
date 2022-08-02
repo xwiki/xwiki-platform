@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-localization</artifactId>
   <name>XWiki Platform - Localization - Parent POM</name>
@@ -33,10 +33,21 @@
   <description>XWiki Platform - Localization - Parent POM</description>
   <modules>
     <module>xwiki-platform-localization-api</module>
+    <module>xwiki-platform-localization-rest</module>
     <module>xwiki-platform-localization-sources</module>
     <module>xwiki-platform-localization-syntaxes</module>
     <module>xwiki-platform-localization-script</module>
     <module>xwiki-platform-localization-macro</module>
+    <module>xwiki-platform-localization-webjar</module>
   </modules>
+
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-localization-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>
 

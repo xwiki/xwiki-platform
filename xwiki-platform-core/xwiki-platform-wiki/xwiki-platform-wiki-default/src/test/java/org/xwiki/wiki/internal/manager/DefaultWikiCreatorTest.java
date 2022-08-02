@@ -78,14 +78,14 @@ public class DefaultWikiCreatorTest
     public void create() throws Exception
     {
         // Other mocks
-        DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("wikiid1", "wikialias1");
+        DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("wikiid1", "wikialias1", "owner");
         XWikiDocument descriptorDocument = mock(XWikiDocument.class);
         when(wikiDescriptorBuilder.save(eq(descriptor))).thenReturn(descriptorDocument);
         when(wikiDescriptorManager.getById("wikiid1")).thenReturn(descriptor);
         when(store.isWikiNameAvailable(any(String.class), any(XWikiContext.class))).thenReturn(true);
 
         // Create
-        WikiDescriptor newWikiDescriptor = this.mocker.getComponentUnderTest().create("wikiid1", "wikialias1");
+        WikiDescriptor newWikiDescriptor = this.mocker.getComponentUnderTest().create("wikiid1", "wikialias1", "owner");
         assertNotNull(newWikiDescriptor);
 
         // Verify that the wiki descriptor is an instance of DefaultWikiDescriptor

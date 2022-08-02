@@ -27,7 +27,8 @@ import org.xwiki.model.reference.EntityReference;
  * The event also send the following parameters:
  * </p>
  * <ul>
- * <li>source: the current {com.xpn.xwiki.doc.XWikiDocument} instance</li>
+ * <li>source: the current {com.xpn.xwiki.doc.XWikiDocument} instance from which you can get the "original" document
+ * (the version before all the modifications)</li>
  * <li>data: the current {com.xpn.xwiki.XWikiContext} instance</li>
  * </ul>
  *

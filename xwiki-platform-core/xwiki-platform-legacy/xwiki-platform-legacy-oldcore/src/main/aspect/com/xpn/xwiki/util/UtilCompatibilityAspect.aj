@@ -24,8 +24,11 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
 import java.util.List;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.web.Utils;
 import org.apache.oro.text.regex.MalformedPatternException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -51,6 +54,10 @@ public privileged aspect UtilCompatibilityAspect
     @Deprecated
     public static String Util.getFileContent(File file) throws IOException
     {
+        ContextualAuthorizationManager authorization = Utils.getComponent(ContextualAuthorizationManager.class);
+        if (!authorization.hasAccess(Right.PROGRAM)) {
+            throw new IOException("Access denied.");
+        }
         return FileUtils.readFileToString(file, XWiki.DEFAULT_ENCODING);
     }
 
@@ -58,6 +65,10 @@ public privileged aspect UtilCompatibilityAspect
     @Deprecated
     public static String Util.getFileContent(Reader reader) throws IOException
     {
+        ContextualAuthorizationManager authorization = Utils.getComponent(ContextualAuthorizationManager.class);
+        if (!authorization.hasAccess(Right.PROGRAM)) {
+            throw new IOException("Access denied.");
+        }
         return IOUtils.toString(reader);
     }
 
@@ -65,6 +76,10 @@ public privileged aspect UtilCompatibilityAspect
     @Deprecated
     public static byte[] Util.getFileContentAsBytes(File file) throws IOException
     {
+        ContextualAuthorizationManager authorization = Utils.getComponent(ContextualAuthorizationManager.class);
+        if (!authorization.hasAccess(Right.PROGRAM)) {
+            throw new IOException("Access denied.");
+        }
         return FileUtils.readFileToByteArray(file);
     }
 
@@ -72,6 +87,10 @@ public privileged aspect UtilCompatibilityAspect
     @Deprecated
     public static byte[] Util.getFileContentAsBytes(InputStream is) throws IOException
     {
+        ContextualAuthorizationManager authorization = Utils.getComponent(ContextualAuthorizationManager.class);
+        if (!authorization.hasAccess(Right.PROGRAM)) {
+            throw new IOException("Access denied.");
+        }
         return IOUtils.toByteArray(is);
     }
 }

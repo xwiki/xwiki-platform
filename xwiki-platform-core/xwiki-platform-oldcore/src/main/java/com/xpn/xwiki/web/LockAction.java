@@ -19,15 +19,28 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.servlet.http.HttpServletResponse;
+
+import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 
+@Component
+@Named("lock")
+@Singleton
 public class LockAction extends XWikiAction
 {
+    @Override
+    protected Class<? extends XWikiForm> getFormClass()
+    {
+        return EditForm.class;
+    }
+
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
@@ -41,7 +54,7 @@ public class LockAction extends XWikiAction
 
         String username = context.getUser();
         XWikiLock lock = tdoc.getLock(context);
-        if ((lock == null) || (username.equals(lock.getUserName()))) {
+        if (lock == null || lock.getUserName().equals(username) || "1".equals(request.getParameter("force"))) {
             if ("inline".equals(request.get("action"))) {
                 doc.setLock(username, context);
             } else {

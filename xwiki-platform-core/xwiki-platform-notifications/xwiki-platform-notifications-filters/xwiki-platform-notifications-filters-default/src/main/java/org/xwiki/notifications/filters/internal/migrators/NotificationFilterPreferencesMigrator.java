@@ -70,13 +70,13 @@ import com.xpn.xwiki.objects.BaseObject;
 public class NotificationFilterPreferencesMigrator extends AbstractEventListener
 {
     private static final SpaceReference NOTIFICATION_CODE_SPACE = new SpaceReference("Code",
-            new SpaceReference("Notifications",
-                    new SpaceReference("XWiki", new WikiReference("xwiki"))
-            )
+        new SpaceReference("Notifications",
+            new SpaceReference("XWiki", new WikiReference("xwiki"))
+        )
     );
 
     private static final DocumentReference NOTIFICATION_FILTER_PREFERENCE_CLASS = new DocumentReference(
-            "NotificationFilterPreferenceClass", NOTIFICATION_CODE_SPACE
+        "NotificationFilterPreferenceClass", NOTIFICATION_CODE_SPACE
     );
 
     private static final String FIELD_FILTER_NAME = "filterName";
@@ -131,51 +131,52 @@ public class NotificationFilterPreferencesMigrator extends AbstractEventListener
 
     private void migrateUser(DocumentReference user) throws NotificationException
     {
-        logger.info("Migrating the notification filter preferences of user [{}].", user);
+        this.logger.info("Migrating the notification filter preferences of user [{}].", user);
 
-        XWikiContext context = contextProvider.get();
+        XWikiContext context = this.contextProvider.get();
         XWiki xwiki = context.getWiki();
 
         final DocumentReference notificationFilterPreferenceClass
-                = NOTIFICATION_FILTER_PREFERENCE_CLASS.setWikiReference(user.getWikiReference());
+            = NOTIFICATION_FILTER_PREFERENCE_CLASS.setWikiReference(user.getWikiReference());
 
         try {
-            logger.info("Loading the current notification filter preferences of user [{}].", user);
+            this.logger.info("Loading the current notification filter preferences of user [{}].", user);
             XWikiDocument doc = xwiki.getDocument(user, context);
 
             // Get the old preferences
             List<NotificationFilterPreference> preferencesToSave = convertXObjectsToPreferences(doc,
-                    notificationFilterPreferenceClass);
+                notificationFilterPreferenceClass);
 
             // Make sure we have not already saved in the database the migrated preferences (it would mean the migration
             // has already been executed but stopped while the user's page was saving)
-            Set<NotificationFilterPreference> preferencesInTheNewStore = modelBridge.getFilterPreferences(user);
-            if (!modelBridge.getFilterPreferences(user).isEmpty()
-                    && preferencesInTheNewStore.size() == preferencesToSave.size()) {
-                logger.info("It seems the notification filter preferences of user [{}] has already been migrated,"
-                        + " but the old ones have not been removed from the user's page yet. Probably a previous"
-                        + " migration has been run but stopped in the middle of the process.", user);
+            Set<NotificationFilterPreference> preferencesInTheNewStore = this.modelBridge.getFilterPreferences(user);
+            if (!this.modelBridge.getFilterPreferences(user).isEmpty()
+                && preferencesInTheNewStore.size() == preferencesToSave.size())
+            {
+                this.logger.info("It seems the notification filter preferences of user [{}] has already been migrated,"
+                    + " but the old ones have not been removed from the user's page yet. Probably a previous"
+                    + " migration has been run but stopped in the middle of the process.", user);
             } else {
                 // Save to the new store
-                logger.info("Saving the migrated notification filter preferences of user [{}] in the new store.", user);
-                modelBridge.saveFilterPreferences(user, preferencesToSave);
+                this.logger.info("Saving the migrated notification filter preferences of user [{}] in the new store.",
+                    user);
+                this.modelBridge.saveFilterPreferences(user, preferencesToSave);
             }
 
             // Remove the old xobjects
-            logger.info("Removing the old notification filter preferences in the page of the user [{}] "
-                    + "(please wait, it could be long).", user);
+            this.logger.info("Removing the old notification filter preferences in the page of the user [{}] "
+                + "(please wait, it could be long).", user);
             doc.removeXObjects(notificationFilterPreferenceClass);
             xwiki.saveDocument(doc, "Migrate notification filter preferences to the new store.", context);
 
         } catch (Exception e) {
             throw new NotificationException(
-                    String.format("Failed to migrate the notification preferences for the user [%s].",
-                            user), e);
+                String.format("Failed to migrate the notification preferences for the user [%s].", user), e);
         }
     }
 
     private List<NotificationFilterPreference> convertXObjectsToPreferences(XWikiDocument document,
-            DocumentReference notificationFilterPreferenceClass)
+        DocumentReference notificationFilterPreferenceClass)
     {
         List<NotificationFilterPreference> preferencesToConvert = new ArrayList<>();
 
@@ -196,7 +197,7 @@ public class NotificationFilterPreferencesMigrator extends AbstractEventListener
         DefaultNotificationFilterPreference preference = new DefaultNotificationFilterPreference();
 
         NotificationFilterType filterType = NotificationFilterType.valueOf(
-                obj.getStringValue(FIELD_FILTER_TYPE).toUpperCase());
+            obj.getStringValue(FIELD_FILTER_TYPE).toUpperCase());
 
         Set<NotificationFormat> filterFormats = new HashSet<>();
         for (String format : (List<String>) obj.getListValue(FIELD_FILTER_FORMATS)) {
@@ -215,37 +216,33 @@ public class NotificationFilterPreferencesMigrator extends AbstractEventListener
     }
 
     private void handleProperties(List<NotificationFilterPreference> preferencesToConvert,
-            BaseObject obj, DefaultNotificationFilterPreference preference)
+        BaseObject obj, DefaultNotificationFilterPreference preference)
     {
         Map<NotificationFilterProperty, List<String>> filterPreferenceProperties =
-                createNotificationFilterPropertiesMap(obj);
+            createNotificationFilterPropertiesMap(obj);
 
         if (!filterPreferenceProperties.get(NotificationFilterProperty.EVENT_TYPE).isEmpty()) {
             preference.setEventTypes(
-                    new HashSet<>(filterPreferenceProperties.get(NotificationFilterProperty.EVENT_TYPE)));
+                new HashSet<>(filterPreferenceProperties.get(NotificationFilterProperty.EVENT_TYPE)));
         }
 
         for (String page : filterPreferenceProperties.get(NotificationFilterProperty.PAGE)) {
-            DefaultNotificationFilterPreference pref
-                    = new DefaultNotificationFilterPreference(preference);
+            DefaultNotificationFilterPreference pref = new DefaultNotificationFilterPreference(preference);
             pref.setPageOnly(page);
             preferencesToConvert.add(pref);
         }
         for (String space : filterPreferenceProperties.get(NotificationFilterProperty.SPACE)) {
-            DefaultNotificationFilterPreference pref
-                    = new DefaultNotificationFilterPreference(preference);
+            DefaultNotificationFilterPreference pref = new DefaultNotificationFilterPreference(preference);
             pref.setPage(space);
             preferencesToConvert.add(pref);
         }
         for (String wiki : filterPreferenceProperties.get(NotificationFilterProperty.WIKI)) {
-            DefaultNotificationFilterPreference pref
-                    = new DefaultNotificationFilterPreference(preference);
+            DefaultNotificationFilterPreference pref = new DefaultNotificationFilterPreference(preference);
             pref.setWiki(wiki);
             preferencesToConvert.add(pref);
         }
         for (String user : filterPreferenceProperties.get(NotificationFilterProperty.USER)) {
-            DefaultNotificationFilterPreference pref
-                    = new DefaultNotificationFilterPreference(preference);
+            DefaultNotificationFilterPreference pref = new DefaultNotificationFilterPreference(preference);
             pref.setUser(user);
             preferencesToConvert.add(pref);
         }
@@ -257,17 +254,17 @@ public class NotificationFilterPreferencesMigrator extends AbstractEventListener
         Map<NotificationFilterProperty, List<String>> filterPreferenceProperties = new HashMap<>();
 
         filterPreferenceProperties.put(NotificationFilterProperty.APPLICATION,
-                obj.getListValue(FIELD_APPLICATIONS));
+            obj.getListValue(FIELD_APPLICATIONS));
         filterPreferenceProperties.put(NotificationFilterProperty.EVENT_TYPE,
-                obj.getListValue(FIELD_EVENT_TYPES));
+            obj.getListValue(FIELD_EVENT_TYPES));
         filterPreferenceProperties.put(NotificationFilterProperty.PAGE,
-                obj.getListValue(FIELD_PAGES));
+            obj.getListValue(FIELD_PAGES));
         filterPreferenceProperties.put(NotificationFilterProperty.SPACE,
-                obj.getListValue(FIELD_SPACES));
+            obj.getListValue(FIELD_SPACES));
         filterPreferenceProperties.put(NotificationFilterProperty.WIKI,
-                obj.getListValue(FIELD_WIKIS));
+            obj.getListValue(FIELD_WIKIS));
         filterPreferenceProperties.put(NotificationFilterProperty.USER,
-                obj.getListValue(FIELD_USERS));
+            obj.getListValue(FIELD_USERS));
         return filterPreferenceProperties;
     }
 
@@ -275,11 +272,11 @@ public class NotificationFilterPreferencesMigrator extends AbstractEventListener
     public void onEvent(Event event, Object source, Object data)
     {
         try {
-            for (String wikiId : wikiDescriptorManager.getAllIds()) {
+            for (String wikiId : this.wikiDescriptorManager.getAllIds()) {
                 migrateWiki(wikiId);
             }
         } catch (Exception e) {
-            logger.error("Failed to migrate notification filter preferences.", e);
+            this.logger.error("Failed to migrate notification filter preferences.", e);
         }
     }
 
@@ -288,37 +285,39 @@ public class NotificationFilterPreferencesMigrator extends AbstractEventListener
         WikiReference wikiReference = new WikiReference(wikiId);
 
         final DocumentReference notificationFilterPreferenceClass
-                = NOTIFICATION_FILTER_PREFERENCE_CLASS.setWikiReference(wikiReference);
+            = NOTIFICATION_FILTER_PREFERENCE_CLASS.setWikiReference(wikiReference);
 
-        // Don't execute the migration if the old class has already been deleted.
-        XWikiContext context = contextProvider.get();
+        // Don't execute the migration if the old class has already been deleted. It's important that the code here
+        // executes as fast as possible since it'll be executed at each XWiki startup.
+        XWikiContext context = this.contextProvider.get();
         XWiki xwiki = context.getWiki();
         if (!xwiki.exists(notificationFilterPreferenceClass, context)) {
-            logger.info("Wiki [{}] has already been migrated.", wikiId);
+            this.logger.debug("Wiki [{}] has already been migrated.", wikiId);
             return;
         }
 
         // Otherwise, let's do the migration
         try {
-            logger.info("Getting the list of the users having notification filter preferences to migrate on wiki [{}].",
-                    wikiId);
-            Query query = queryManager.createQuery(
-                    "select distinct doc.fullName from Document doc, "
-                            + "doc.object(XWiki.Notifications.Code.NotificationFilterPreferenceClass) obj",
+            this.logger.info(
+                "Getting the list of the users having notification filter preferences to migrate on wiki [{}].",
+                wikiId);
+            Query query = this.queryManager.createQuery("select distinct doc.fullName from Document doc, "
+                    + "doc.object(XWiki.Notifications.Code.NotificationFilterPreferenceClass) obj",
                     Query.XWQL).setWiki(wikiId);
             for (String fullName : query.<String>execute()) {
-                migrateUser(referenceResolver.resolve(fullName, wikiReference));
+                migrateUser(this.referenceResolver.resolve(fullName, wikiReference));
             }
 
             // Remove the useless class when all user have been migrated (not to trash because the trash might have not
             // been initialized yet since we are in a migrator).
             XWikiDocument oldClassDoc = xwiki.getDocument(notificationFilterPreferenceClass, context);
             if (!oldClassDoc.isNew()) {
-                logger.info("Removing the old notification filter preference class on wiki [{}].", wikiId);
+                this.logger.info("Removing the old notification filter preference class on wiki [{}].", wikiId);
                 xwiki.deleteDocument(oldClassDoc, false, context);
             }
         } catch (Exception e) {
-            logger.error("Failed to migrate notification filter preferences on wiki [{}].", wikiReference.getName(), e);
+            this.logger.error("Failed to migrate notification filter preferences on wiki [{}].",
+                wikiReference.getName(), e);
         }
     }
 }

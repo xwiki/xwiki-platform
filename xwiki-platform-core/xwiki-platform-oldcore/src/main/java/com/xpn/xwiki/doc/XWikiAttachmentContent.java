@@ -32,6 +32,7 @@ import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.io.input.BoundedInputStream;
 import org.apache.commons.io.output.ProxyOutputStream;
 import org.xwiki.environment.Environment;
+import org.xwiki.stability.Unstable;
 import org.xwiki.store.UnexpectedException;
 
 import com.xpn.xwiki.web.Utils;
@@ -81,7 +82,7 @@ public class XWikiAttachmentContent implements Cloneable
      */
     public XWikiAttachmentContent(XWikiAttachment attachment)
     {
-        this.setAttachment(attachment);
+        setAttachment(attachment);
     }
 
     /**
@@ -98,7 +99,7 @@ public class XWikiAttachmentContent implements Cloneable
         this.setAttachment(attachment);
         this.file = f;
     }
-
+    
     /**
      * @return the underlying storage file.
      * @since 5.2M1
@@ -204,6 +205,10 @@ public class XWikiAttachmentContent implements Cloneable
     public void setAttachment(XWikiAttachment attachment)
     {
         this.attachment = attachment;
+
+        if (this.attachment != null) {
+            setOwnerDocument(this.attachment.getDoc());
+        }
     }
 
     /**
@@ -228,6 +233,17 @@ public class XWikiAttachmentContent implements Cloneable
         if (contentDirty && this.ownerDocument != null) {
             this.ownerDocument.setMetaDataDirty(contentDirty);
         }
+    }
+
+    /**
+     * @return true of the content of this attachment still exist in the store
+     * @since 13.8RC1
+     * @since 13.4.4
+     * @since 12.10.10
+     */
+    public boolean exists()
+    {
+        return true;
     }
 
     /**
@@ -310,6 +326,9 @@ public class XWikiAttachmentContent implements Cloneable
         } finally {
             fios.close();
         }
+
+        // Indicate the content has been modified
+        setContentDirty(true);
     }
 
     /**
@@ -346,6 +365,22 @@ public class XWikiAttachmentContent implements Cloneable
             if (this.isContentDirty && ownerDocument != null) {
                 ownerDocument.setMetaDataDirty(true);
             }
+        }
+    }
+
+    /**
+     * Delete the temporary file item created to hold the content of the attachment.
+     * This method only performs the deletion if its content is dirty, its purpose is mainly to allow cleaning temporary
+     * attachments.
+     *
+     * @since 14.3RC1
+     */
+    @Unstable
+    public void dispose()
+    {
+        if (this.file != null && this.isContentDirty()) {
+            this.file.delete();
+            this.file = null;
         }
     }
 }

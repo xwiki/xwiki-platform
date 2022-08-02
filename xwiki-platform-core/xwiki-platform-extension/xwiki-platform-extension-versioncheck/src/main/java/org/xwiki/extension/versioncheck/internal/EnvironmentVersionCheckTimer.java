@@ -106,7 +106,8 @@ public class EnvironmentVersionCheckTimer implements Initializable
          * @param proposedVersion the version that should be checked for compatibility
          * @return true if the given version is compatible
          */
-        private boolean isCompatibleVersion(Version latestKnownVersion, Version proposedVersion) {
+        private boolean isCompatibleVersion(Version latestKnownVersion, Version proposedVersion)
+        {
 
             // Ensure that the given version is newer than our last known version
             if (proposedVersion.compareTo(latestKnownVersion) <= 0) {

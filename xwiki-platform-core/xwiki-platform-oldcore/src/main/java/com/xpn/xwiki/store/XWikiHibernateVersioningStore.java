@@ -26,14 +26,18 @@ import java.util.List;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.user.UserReferenceSerializer;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -44,6 +48,7 @@ import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeContent;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeId;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Realization of {@link XWikiVersioningStoreInterface} for Hibernate-based storage.
@@ -57,6 +62,8 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
 {
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiHibernateVersioningStore.class);
+
+    private static final String FIELD_DOCID = "docId";
 
     /**
      * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
@@ -142,7 +149,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
             if (doc.getDatabase() != null) {
                 context.setWikiId(doc.getDatabase());
             }
-            archiveDoc = new XWikiDocumentArchive(doc.getId());
+            archiveDoc = new XWikiDocumentArchive(doc.getDocumentReference().getWikiReference(), doc.getId());
             loadXWikiDocArchive(archiveDoc, true, context);
             doc.setDocumentArchive(archiveDoc);
         } finally {
@@ -173,25 +180,23 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     public void saveXWikiDocArchive(final XWikiDocumentArchive archivedoc, boolean bTransaction, XWikiContext context)
         throws XWikiException
     {
-        executeWrite(context, bTransaction, new HibernateCallback<Object>()
-        {
-            @Override
-            public Object doInHibernate(Session session) throws HibernateException
-            {
-                for (XWikiRCSNodeInfo ni : archivedoc.getDeletedNodeInfo()) {
-                    session.delete(ni);
-                }
-                archivedoc.getDeletedNodeInfo().clear();
-                for (XWikiRCSNodeInfo ni : archivedoc.getUpdatedNodeInfos()) {
-                    session.saveOrUpdate(ni);
-                }
-                archivedoc.getUpdatedNodeInfos().clear();
-                for (XWikiRCSNodeContent nc : archivedoc.getUpdatedNodeContents()) {
-                    session.update(nc);
-                }
-                archivedoc.getUpdatedNodeContents().clear();
-                return null;
+        executeWrite(context, session -> {
+            for (XWikiRCSNodeInfo ni : archivedoc.getDeletedNodeInfo()) {
+                session.delete(ni);
             }
+            archivedoc.getDeletedNodeInfo().clear();
+
+            for (XWikiRCSNodeInfo ni : archivedoc.getUpdatedNodeInfos()) {
+                session.saveOrUpdate(ni);
+            }
+            archivedoc.getUpdatedNodeInfos().clear();
+
+            for (XWikiRCSNodeContent nc : archivedoc.getUpdatedNodeContents()) {
+                session.update(nc);
+            }
+            archivedoc.getUpdatedNodeContents().clear();
+
+            return null;
         });
     }
 
@@ -243,19 +248,14 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         try {
-            executeWrite(context, true, new HibernateCallback<Object>()
-            {
-                @Override
-                public Object doInHibernate(Session session) throws HibernateException, XWikiException
-                {
-                    XWikiDocumentArchive archive = getXWikiDocumentArchive(doc, context);
-                    archive.resetArchive();
-                    archive.getDeletedNodeInfo().clear();
-                    doc.setMinorEdit(false);
-                    deleteArchive(doc, false, context);
-                    updateXWikiDocArchive(doc, false, context);
-                    return null;
-                }
+            executeWrite(context, session -> {
+                XWikiDocumentArchive archive = getXWikiDocumentArchive(doc, context);
+                archive.resetArchive();
+                archive.getDeletedNodeInfo().clear();
+                doc.setMinorEdit(false);
+                deleteArchive(doc, false, context);
+                updateXWikiDocArchive(doc, false, context);
+                return null;
             });
         } finally {
             restoreExecutionXContext();
@@ -270,7 +270,10 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
 
         try {
             XWikiDocumentArchive archiveDoc = getXWikiDocumentArchive(doc, context);
-            archiveDoc.updateArchive(doc, doc.getAuthor(), doc.getDate(), doc.getComment(), doc.getRCSVersion(),
+            UserReferenceSerializer<String> userReferenceSerializer = Utils.getComponent(
+                new DefaultParameterizedType(null, UserReferenceSerializer.class, String.class));
+            String author = userReferenceSerializer.serialize(doc.getAuthors().getOriginalMetadataAuthor());
+            archiveDoc.updateArchive(doc, author, doc.getDate(), doc.getComment(), doc.getRCSVersion(),
                 context);
             doc.setRCSVersion(archiveDoc.getLatestVersion());
             saveXWikiDocArchive(archiveDoc, bTransaction, context);
@@ -294,20 +297,30 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     protected List<XWikiRCSNodeInfo> loadAllRCSNodeInfo(XWikiContext context, final long id, boolean bTransaction)
         throws XWikiException
     {
-        return executeRead(context, bTransaction, new HibernateCallback<List<XWikiRCSNodeInfo>>()
-        {
-            @SuppressWarnings("unchecked")
-            @Override
-            public List<XWikiRCSNodeInfo> doInHibernate(Session session) throws HibernateException
-            {
-                try {
-                    return session.createCriteria(XWikiRCSNodeInfo.class)
-                        .add(Restrictions.eq("id.docId", Long.valueOf(id))).add(Restrictions.isNotNull("diff")).list();
-                } catch (IllegalArgumentException ex) {
-                    // This happens when the database has wrong values...
-                    LOGGER.warn("Invalid history for document " + id);
-                    return Collections.emptyList();
-                }
+        return executeRead(context, session -> {
+            try {
+                CriteriaBuilder builder = session.getCriteriaBuilder();
+                CriteriaQuery<XWikiRCSNodeInfo> query = builder.createQuery(XWikiRCSNodeInfo.class);
+                Root<XWikiRCSNodeInfo> root = query.from(XWikiRCSNodeInfo.class);
+
+                query.select(root);
+
+                Predicate[] predicates = new Predicate[2];
+                predicates[0] = builder.equal(root.get("id").get(FIELD_DOCID), id);
+                predicates[1] = builder.isNotNull(root.get("diff"));
+                query.where(predicates);
+
+                List<XWikiRCSNodeInfo> nodes = session.createQuery(query).getResultList();
+
+                // Remember the wiki where the nodes are from
+                nodes.forEach(n -> n.getId().setWikiReference(context.getWikiReference()));
+
+                return nodes;
+            } catch (IllegalArgumentException e) {
+                // This happens when the database has wrong values...
+                LOGGER.error("Invalid history for document [{}]", id, e);
+
+                return Collections.<XWikiRCSNodeInfo>emptyList();
             }
         });
     }
@@ -316,30 +329,33 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     public XWikiRCSNodeContent loadRCSNodeContent(final XWikiRCSNodeId id, boolean bTransaction, XWikiContext context)
         throws XWikiException
     {
-        return executeRead(context, bTransaction, new HibernateCallback<XWikiRCSNodeContent>()
-        {
-            @Override
-            public XWikiRCSNodeContent doInHibernate(Session session) throws HibernateException
-            {
+        WikiReference currentWiki = context.getWikiReference();
+
+        try {
+            if (id.getWikiReference() != null) {
+                context.setWikiReference(id.getWikiReference());
+            }
+
+            return executeRead(context, session -> {
                 XWikiRCSNodeContent content = new XWikiRCSNodeContent(id);
                 session.load(content, content.getId());
+
                 return content;
-            }
-        });
+            });
+        } finally {
+            context.setWikiReference(currentWiki);
+        }
     }
 
     @Override
     public void deleteArchive(final XWikiDocument doc, boolean bTransaction, XWikiContext context) throws XWikiException
     {
-        executeWrite(context, bTransaction, new HibernateCallback<Object>()
-        {
-            @Override
-            public Object doInHibernate(Session session) throws HibernateException, XWikiException
-            {
-                session.createQuery("delete from " + XWikiRCSNodeInfo.class.getName() + " where id.docId=?")
-                    .setLong(0, doc.getId()).executeUpdate();
-                return null;
-            }
+        executeWrite(context, session -> {
+            session
+                .createQuery("delete from " + XWikiRCSNodeInfo.class.getName() + " where id." + FIELD_DOCID + '=' + ':'
+                    + FIELD_DOCID)
+                .setParameter(FIELD_DOCID, doc.getId()).executeUpdate();
+            return null;
         });
     }
 }

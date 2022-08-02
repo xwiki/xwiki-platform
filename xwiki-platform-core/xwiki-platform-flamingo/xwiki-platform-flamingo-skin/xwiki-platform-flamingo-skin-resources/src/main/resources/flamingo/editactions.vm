@@ -1,8 +1,30 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
 ### Buttons displayed in the edit interface: cancel, preview (when enabled), save and continue, save and view.
 ###
 #if ("$!showactions" != '0')
   $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   $xwiki.ssfx.use('js/xwiki/actionbuttons/actionButtons.css', true)
+  ## In case of conflict issue we want to display the diff properly
+  #set ($discard = $xwiki.ssfx.use('uicomponents/viewers/diff.css', true))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/viewers/diff.js'))
   #set ($keyboardShortcutsEnabled = ($editor != 'wysiwyg'))
   <div class="buttons">
     <div class="btn-group">
@@ -15,11 +37,23 @@
     ## This allows the preview form to redirect back to the correct editor when pressing "Back to edit":
     <span class="meta-versionSummary metamodifs">
       <input type="hidden" name="xeditaction" value="$!xcontext.action" />
+      ## The three following fields are not declared as type="hidden" since we want them to be cached in the browser.
+      ## Current version of the document for the conflict check
+      ## Note that the labels should never be displayed: we provide them to ensure our webstandards tests are passing.
+      <label class="hidden" for="previousVersion">Previous version</label>
+      <input type="text" class="hidden" id="previousVersion" name="previousVersion" value="$tdoc.version" />
+      ## If the document is new or not when the user started the edition, for the conflict check too.
+      <label class="hidden" for="isNew">Is new document?</label>
+      <input type="text" class="hidden" id="isNew" name="isNew" value="$tdoc.isNew()" />
+      ## We store the date of the beginning of the edition for the conflict check mechanism.
+      <label class="hidden" for="editingVersionDate">Date of latest edition</label>
+      <input type="text" class="hidden" id="editingVersionDate" name="editingVersionDate" value="$datetool.date.getTime()" />
       #if ((!$commentFieldAdded) && $xwiki.hasEditComment())
         #set ($commentFieldAdded = 1)
         #if ($xwiki.isEditCommentFieldHidden())
           <input type="hidden" name="comment" id="comment" value="$!{escapetool.xml($request.comment)}" />
         #else
+          <label class="hidden" for="commentinput">$services.localization.render('core.comment')</label>
           <input type="text" name="comment" id="commentinput" value="$!{escapetool.xml($request.comment)}" size="40"
             title="$services.localization.render('core.comment.tooltip')" placeholder="$services.localization.render('core.comment.hint')" />
         #end

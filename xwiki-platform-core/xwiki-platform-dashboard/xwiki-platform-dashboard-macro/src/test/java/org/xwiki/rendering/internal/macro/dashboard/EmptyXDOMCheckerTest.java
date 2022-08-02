@@ -23,13 +23,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroMarkerBlock;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link EmptyXDOMChecker}.
@@ -37,36 +37,36 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @since 8.4RC1
  */
-public class EmptyXDOMCheckerTest
+@ComponentTest
+class EmptyXDOMCheckerTest
 {
-    @Rule
-    public MockitoComponentMockingRule<EmptyXDOMChecker> mocker =
-        new MockitoComponentMockingRule<>(EmptyXDOMChecker.class);
+    @InjectMockComponents
+    private EmptyXDOMChecker checker;
 
     @Test
-    public void checkWhenSingleMacroMarkerBlock() throws Exception
+    void checkWhenSingleMacroMarkerBlock()
     {
         List<Block> blocks = Collections.singletonList(
             new MacroMarkerBlock("macro", Collections.emptyMap(), Collections.emptyList(), false));
 
-        assertTrue(this.mocker.getComponentUnderTest().check(blocks));
+        assertTrue(this.checker.check(blocks));
     }
 
     @Test
-    public void checkWhenTwoMacroMarkerBlock() throws Exception
+    void checkWhenTwoMacroMarkerBlock()
     {
         List<Block> blocks = Arrays.asList(
             new MacroMarkerBlock("macro", Collections.emptyMap(), Collections.emptyList(), false),
             new MacroMarkerBlock("macro2", Collections.emptyMap(), Collections.emptyList(), false)
         );
 
-        assertTrue(this.mocker.getComponentUnderTest().check(blocks));
+        assertTrue(this.checker.check(blocks));
     }
 
     @Test
-    public void checkWhenNoBlock() throws Exception
+    void checkWhenNoBlock()
     {
         List<Block> blocks = Collections.emptyList();
-        assertTrue(this.mocker.getComponentUnderTest().check(blocks));
+        assertTrue(this.checker.check(blocks));
     }
 }

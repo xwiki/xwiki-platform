@@ -26,6 +26,9 @@ import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContextException;
+import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
@@ -80,6 +83,12 @@ public class EmailTemplateRenderer
     @Inject
     private RenderingContext renderingContext;
 
+    @Inject
+    private Execution execution;
+
+    @Inject
+    private ExecutionContextManager executionManager;
+
     /**
      * Execute a template.
      *
@@ -91,7 +100,35 @@ public class EmailTemplateRenderer
      * @throws NotificationException if something wrong happens
      */
     public Block executeTemplate(CompositeEvent event, String userId, Template template, Syntax syntax)
-            throws NotificationException
+        throws NotificationException
+    {
+        // Push a new execution context.
+        try {
+            this.execution.pushContext(this.executionManager.clone(this.execution.getContext()));
+        } catch (ExecutionContextException e) {
+            throw new NotificationException("Failed to push a new execution context", e);
+        }
+
+        try {
+            return executeTemplateInContext(event, userId, template, syntax);
+        } finally {
+            // Restore parent execution context
+            this.execution.popContext();
+        }
+    }
+
+    /**
+     * Execute a template in the current context.
+     *
+     * @param event composite event to render
+     * @param userId id of the user who will receive the email
+     * @param template the template to use
+     * @param syntax syntax of the template and of the output
+     * @return the rendered template
+     * @throws NotificationException if something wrong happens
+     */
+    private Block executeTemplateInContext(CompositeEvent event, String userId, Template template, Syntax syntax)
+        throws NotificationException
     {
         XWikiContext context = contextProvider.get();
         DocumentReference currentUser = context.getUserReference();
@@ -110,8 +147,7 @@ public class EmailTemplateRenderer
             context.setURLFactory(new ExternalServletURLFactory(context));
             // Set the given syntax in the rendering context
             if (renderingContext instanceof MutableRenderingContext) {
-                ((MutableRenderingContext) renderingContext).push(null, null, syntax, null,
-                        false, syntax);
+                ((MutableRenderingContext) renderingContext).push(null, null, syntax, null, false, syntax);
             }
             // Render the template or fallback to the default one
             return templateManager.execute(template);
@@ -134,6 +170,7 @@ public class EmailTemplateRenderer
 
     /**
      * Render a block to HTML syntax.
+     * 
      * @param block block to render
      * @return the HTML rendered version of the block
      */
@@ -146,6 +183,7 @@ public class EmailTemplateRenderer
 
     /**
      * Render a block to plain text syntax.
+     * 
      * @param block block to render
      * @return the plain text rendered version of the block
      */

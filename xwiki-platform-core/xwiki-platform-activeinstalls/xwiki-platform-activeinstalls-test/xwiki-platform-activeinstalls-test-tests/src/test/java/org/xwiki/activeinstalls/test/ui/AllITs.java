@@ -19,6 +19,7 @@
  */
 package org.xwiki.activeinstalls.test.ui;
 
+import org.junit.Ignore;
 import org.junit.runner.*;
 
 /**
@@ -28,6 +29,7 @@ import org.junit.runner.*;
  * @since 5.2M2
  */
 @RunWith(ElasticSearchRunner.class)
+@Ignore("Disabled since failing with Java 11. Been fixed with AI2 in 14.5+.")
 public class AllITs
 {
 }

@@ -47,6 +47,8 @@ import com.github.dockerjava.api.model.HostConfig;
 @Singleton
 public class ChromeManagerProvider implements Provider<ChromeManager>, Initializable, Disposable
 {
+    private static final String BRIDGE_NETWORK = "bridge";
+    
     @Inject
     private Logger logger;
 
@@ -93,7 +95,7 @@ public class ChromeManagerProvider implements Provider<ChromeManager>, Initializ
                 }
 
                 HostConfig hostConfig = containerManager.getHostConfig(network, remoteDebuggingPort);
-                if ("bridge".equals(network)) {
+                if (BRIDGE_NETWORK.equals(network)) {
                     // The extra host is needed in order for the created container to be able to access the XWiki
                     // instance running on the same machine as the Docker daemon.
                     hostConfig = hostConfig.withExtraHosts(this.configuration.getXWikiHost() + ":host-gateway");
@@ -105,7 +107,22 @@ public class ChromeManagerProvider implements Provider<ChromeManager>, Initializ
                     hostConfig);
                 containerManager.startContainer(this.containerId);
             }
-            return containerManager.getIpAddress(this.containerId, network);
+
+            // By default we assume XWiki is not running inside a Docker container (i.e. it runs on the same host as the
+            // Docker daemon) so it can access the Chrome browser (that runs inside a Docker container) using localhost
+            // because the Chrome container is supposed to export the remote debugging port on the Docker daemon host.
+            // Note that on Linux we could have also used the Chrome container's IP address but unfortunately that
+            // doesn't work on MacOS and Windows. The recommendation is to either use localhost plus port forwarding
+            // when you are on the Docker daemon host, or use the container IP/alias when you are inside a container.
+            String chromeHost = "localhost";
+            if (!BRIDGE_NETWORK.equals(network)) {
+                // Using a dedicated (user-defined) Docker network (instead of the default bridge) normally signals the
+                // fact that XWiki is also running inside a Docker container and so both the XWiki container and the
+                // Chrome container are in the specified network. In this case the Chrome browser must be accessed using
+                // the IP address of its Docker container.
+                chromeHost = containerManager.getIpAddress(this.containerId, network);
+            }
+            return chromeHost;
         } catch (Exception e) {
             throw new InitializationException("Failed to initialize the Docker container for the PDF export.", e);
         }

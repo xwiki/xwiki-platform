@@ -105,7 +105,7 @@ class ChromeManagerProviderTest
     {
         verify(this.containerManager).pullImage(this.configuration.getChromeDockerImage());
         verify(this.containerManager).startContainer(this.containerId);
-        verify(this.chromeManager).connect(this.containerIpAddress, this.configuration.getChromeRemoteDebuggingPort());
+        verify(this.chromeManager).connect("localhost", this.configuration.getChromeRemoteDebuggingPort());
 
         this.chromeManagerProvider.dispose();
         verify(this.containerManager).stopContainer(this.containerId);

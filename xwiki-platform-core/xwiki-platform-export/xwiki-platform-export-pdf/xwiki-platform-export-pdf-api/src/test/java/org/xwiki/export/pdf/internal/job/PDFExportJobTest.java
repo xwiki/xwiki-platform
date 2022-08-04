@@ -77,7 +77,7 @@ class PDFExportJobTest
     private RequiredSkinExtensionsRecorder requiredSkinExtensionsRecorder;
 
     @MockComponent
-    @Named("docker")
+    @Named("chrome")
     private PDFPrinter<URL> pdfPrinter;
 
     @MockComponent

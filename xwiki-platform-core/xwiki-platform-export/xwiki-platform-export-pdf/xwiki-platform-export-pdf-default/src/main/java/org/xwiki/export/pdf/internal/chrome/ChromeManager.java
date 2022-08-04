@@ -124,11 +124,11 @@ public class ChromeManager implements Initializable
     /**
      * Connect to the headless Chrome web browser that runs on the specified host, behind the specified port.
      * 
-     * @param host the host running the headless Chrome web browser (e.g. the IP address of the Docker container)
+     * @param host the host running the headless Chrome web browser, specified either as an IP address or a host name
      * @param remoteDebuggingPort the port number to connect to
      * @throws TimeoutException if the connection timeouts
      */
-    public void connect(String host, int remoteDebuggingPort) throws TimeoutException
+    void connect(String host, int remoteDebuggingPort) throws TimeoutException
     {
         this.logger.debug("Connecting to the Chrome remote debugging service on [{}:{}].", host, remoteDebuggingPort);
         this.webSocketServiceFactory = (webSocketURL -> WebSocketServiceImpl.create(URI.create(webSocketURL)));

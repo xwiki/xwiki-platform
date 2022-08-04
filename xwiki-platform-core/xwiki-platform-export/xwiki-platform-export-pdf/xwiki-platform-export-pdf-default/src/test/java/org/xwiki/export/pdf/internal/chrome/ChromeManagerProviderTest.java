@@ -17,55 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.export.pdf.internal.docker;
+package org.xwiki.export.pdf.internal.chrome;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import javax.inject.Provider;
-import javax.servlet.http.Cookie;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.xwiki.export.pdf.PDFExportConfiguration;
-import org.xwiki.export.pdf.internal.chrome.ChromeManager;
+import org.xwiki.export.pdf.internal.docker.ContainerManager;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.github.dockerjava.api.model.HostConfig;
-import com.github.kklisura.cdt.protocol.types.network.CookieParam;
-import com.github.kklisura.cdt.services.ChromeDevToolsService;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.XWikiRequest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link DockerPDFPrinter}.
+ * Unit tests for {@link ChromeManagerProvider}.
  * 
  * @version $Id$
  */
 @ComponentTest
-class DockerPDFPrinterTest
+class ChromeManagerProviderTest
 {
     @InjectMockComponents
-    private DockerPDFPrinter dockerPDFPrinter;
+    private ChromeManagerProvider chromeManagerProvider;
 
     @MockComponent
     private PDFExportConfiguration configuration;
@@ -76,12 +57,6 @@ class DockerPDFPrinterTest
     @MockComponent
     private ContainerManager containerManager;
 
-    @MockComponent
-    private Provider<XWikiContext> xcontextProvider;
-
-    @Mock
-    ChromeDevToolsService tabDevToolsService;
-
     HostConfig hostConfig;
 
     private String containerId = "8f55a905efec";
@@ -91,13 +66,6 @@ class DockerPDFPrinterTest
     @BeforeComponent
     void configure()
     {
-        XWikiContext xcontext = mock(XWikiContext.class);
-        when(this.xcontextProvider.get()).thenReturn(xcontext);
-
-        XWikiRequest request = mock(XWikiRequest.class);
-        when(xcontext.getRequest()).thenReturn(request);
-        when(request.getContextPath()).thenReturn("/xwiki");
-
         when(this.configuration.getChromeDockerContainerName()).thenReturn("test-pdf-printer");
         when(this.configuration.getChromeDockerImage()).thenReturn("test/chrome:latest");
         when(this.configuration.getChromeRemoteDebuggingPort()).thenReturn(1234);
@@ -124,59 +92,6 @@ class DockerPDFPrinterTest
             .thenReturn(this.hostConfig);
     }
 
-    @Test
-    void printWithoutPreviewURL()
-    {
-        try {
-            this.dockerPDFPrinter.print(null);
-            fail();
-        } catch (IOException e) {
-            assertEquals("Print preview URL missing.", e.getMessage());
-        }
-    }
-
-    @Test
-    void print() throws Exception
-    {
-        URL printPreviewURL = new URL("http://external:9293/xwiki/bin/export/Some/Page?x=y#z");
-        URL dockerPrintPreviewURL = new URL("http://xwiki-host:9293/xwiki/bin/export/Some/Page?x=y#z");
-
-        Cookie[] cookies = new Cookie[] {};
-        when(this.xcontextProvider.get().getRequest().getCookies()).thenReturn(cookies);
-
-        CookieParam cookieParam = new CookieParam();
-        List<CookieParam> cookieParams = Collections.singletonList(cookieParam);
-        when(this.chromeManager.toCookieParams(cookies)).thenReturn(cookieParams);
-
-        when(this.chromeManager.createIncognitoTab()).thenReturn(this.tabDevToolsService);
-        when(this.chromeManager.navigate(this.tabDevToolsService, new URL("http://xwiki-host:9293/xwiki/rest"), false))
-            .thenReturn(true);
-        when(this.chromeManager.navigate(this.tabDevToolsService, dockerPrintPreviewURL, true)).thenReturn(true);
-
-        InputStream pdfInputStream = mock(InputStream.class);
-        when(this.chromeManager.printToPDF(same(this.tabDevToolsService), any(Runnable.class)))
-            .then(new Answer<InputStream>()
-            {
-                @Override
-                public InputStream answer(InvocationOnMock invocation) throws Throwable
-                {
-                    try {
-                        return pdfInputStream;
-                    } finally {
-                        invocation.getArgument(1, Runnable.class).run();
-                    }
-                }
-            });
-
-        assertSame(pdfInputStream, this.dockerPDFPrinter.print(printPreviewURL));
-
-        verify(this.chromeManager).setCookies(this.tabDevToolsService, cookieParams);
-        assertEquals(dockerPrintPreviewURL.toString(), cookieParam.getUrl());
-
-        verify(this.chromeManager).setBaseURL(this.tabDevToolsService, printPreviewURL);
-        verify(this.chromeManager).closeIncognitoTab(this.tabDevToolsService);
-    }
-
     @BeforeComponent("initializeAndDispose")
     void beforeInitializeAndDispose()
     {
@@ -192,7 +107,7 @@ class DockerPDFPrinterTest
         verify(this.containerManager).startContainer(this.containerId);
         verify(this.chromeManager).connect(this.containerIpAddress, this.configuration.getChromeRemoteDebuggingPort());
 
-        this.dockerPDFPrinter.dispose();
+        this.chromeManagerProvider.dispose();
         verify(this.containerManager).stopContainer(this.containerId);
     }
 
@@ -213,7 +128,7 @@ class DockerPDFPrinterTest
         verify(this.hostConfig, never()).withExtraHosts(any(String.class));
         verify(this.chromeManager).connect(this.containerIpAddress, this.configuration.getChromeRemoteDebuggingPort());
 
-        this.dockerPDFPrinter.dispose();
+        this.chromeManagerProvider.dispose();
         verify(this.containerManager).stopContainer(this.containerId);
     }
 
@@ -231,7 +146,7 @@ class DockerPDFPrinterTest
 
         verify(this.chromeManager).connect("remote-chrome", this.configuration.getChromeRemoteDebuggingPort());
 
-        this.dockerPDFPrinter.dispose();
+        this.chromeManagerProvider.dispose();
         verify(this.containerManager, never()).stopContainer(any(String.class));
     }
 }

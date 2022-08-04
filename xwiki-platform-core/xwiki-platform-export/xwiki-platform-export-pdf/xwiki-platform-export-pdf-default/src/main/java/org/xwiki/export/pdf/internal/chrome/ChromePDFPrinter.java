@@ -17,14 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.export.pdf.internal.docker;
+package org.xwiki.export.pdf.internal.chrome;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -33,34 +32,27 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.servlet.http.Cookie;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLifecycleException;
-import org.xwiki.component.phase.Disposable;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.PDFPrinter;
-import org.xwiki.export.pdf.internal.chrome.ChromeManager;
 
-import com.github.dockerjava.api.model.HostConfig;
 import com.github.kklisura.cdt.protocol.types.network.CookieParam;
 import com.github.kklisura.cdt.services.ChromeDevToolsService;
 import com.xpn.xwiki.XWikiContext;
 
 /**
- * Prints the content of a given URL using a headless Chrome web browser running inside a Docker container.
+ * Prints the content of a given URL using a (headless) Chrome web browser (that may be running inside a Docker
+ * container).
  * 
  * @version $Id$
- * @since 14.4.2
- * @since 14.5
+ * @since 14.7RC1
  */
 @Component
 @Singleton
-@Named("docker")
-public class DockerPDFPrinter implements PDFPrinter<URL>, Initializable, Disposable
+@Named("chrome")
+public class ChromePDFPrinter implements PDFPrinter<URL>
 {
     @Inject
     private Logger logger;
@@ -69,88 +61,10 @@ public class DockerPDFPrinter implements PDFPrinter<URL>, Initializable, Disposa
     private PDFExportConfiguration configuration;
 
     @Inject
-    private ChromeManager chromeManager;
-
-    /**
-     * We use a provider (i.e. lazy initialization) because we don't always need this component (e.g. when the PDF
-     * export is done through a remote Chrome web browser that is not managed by XWiki).
-     */
-    @Inject
-    private Provider<ContainerManager> containerManagerProvider;
+    private Provider<ChromeManager> chromeManagerProvider;
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
-
-    private String containerId;
-
-    @Override
-    public void initialize() throws InitializationException
-    {
-        String chromeHost = this.configuration.getChromeHost();
-        if (StringUtils.isBlank(chromeHost)) {
-            chromeHost = initializeChromeDockerContainer(this.configuration.getChromeDockerImage(),
-                this.configuration.getChromeDockerContainerName(), this.configuration.getDockerNetwork(),
-                this.configuration.getChromeRemoteDebuggingPort());
-        }
-        initializeChromeService(chromeHost, this.configuration.getChromeRemoteDebuggingPort());
-    }
-
-    private String initializeChromeDockerContainer(String imageName, String containerName, String network,
-        int remoteDebuggingPort) throws InitializationException
-    {
-        this.logger.debug("Initializing the Docker container running the headless Chrome web browser.");
-        ContainerManager containerManager = this.containerManagerProvider.get();
-        try {
-            this.containerId = containerManager.maybeReuseContainerByName(containerName,
-                this.configuration.isChromeDockerContainerReusable());
-            if (this.containerId == null) {
-                // The container doesn't exist so we have to create it.
-                // But first we need to pull the image used to create the container, if we don't have it already.
-                if (!containerManager.isLocalImagePresent(imageName)) {
-                    containerManager.pullImage(imageName);
-                }
-
-                HostConfig hostConfig = containerManager.getHostConfig(network, remoteDebuggingPort);
-                if ("bridge".equals(network)) {
-                    // The extra host is needed in order for the created container to be able to access the XWiki
-                    // instance running on the same machine as the Docker daemon.
-                    hostConfig = hostConfig.withExtraHosts(this.configuration.getXWikiHost() + ":host-gateway");
-                }
-
-                this.containerId = containerManager.createContainer(imageName, containerName,
-                    Arrays.asList("--no-sandbox", "--remote-debugging-address=0.0.0.0",
-                        "--remote-debugging-port=" + remoteDebuggingPort),
-                    hostConfig);
-                containerManager.startContainer(this.containerId);
-            }
-            return containerManager.getIpAddress(this.containerId, network);
-        } catch (Exception e) {
-            throw new InitializationException("Failed to initialize the Docker container for the PDF export.", e);
-        }
-    }
-
-    private void initializeChromeService(String host, int remoteDebuggingPort) throws InitializationException
-    {
-        try {
-            this.chromeManager.connect(host, remoteDebuggingPort);
-        } catch (Exception e) {
-            throw new InitializationException("Failed to initialize the Chrome remote debugging service.", e);
-        }
-    }
-
-    @Override
-    public void dispose() throws ComponentLifecycleException
-    {
-        if (this.containerId != null) {
-            try {
-                this.containerManagerProvider.get().stopContainer(this.containerId);
-            } catch (Exception e) {
-                throw new ComponentLifecycleException(
-                    String.format("Failed to stop the Docker container [%s] used for PDF export.", this.containerId),
-                    e);
-            }
-        }
-    }
 
     @Override
     public InputStream print(URL printPreviewURL) throws IOException
@@ -160,11 +74,12 @@ public class DockerPDFPrinter implements PDFPrinter<URL>, Initializable, Disposa
         }
         this.logger.debug("Printing [{}]", printPreviewURL);
 
-        ChromeDevToolsService devToolsService = this.chromeManager.createIncognitoTab();
+        ChromeManager chromeManager = this.chromeManagerProvider.get();
+        ChromeDevToolsService devToolsService = chromeManager.createIncognitoTab();
         URL dockerPrintPreviewURL = getDockerPrintPreviewURL(printPreviewURL, devToolsService);
         try {
-            this.chromeManager.setCookies(devToolsService, getCookies(dockerPrintPreviewURL));
-            if (!this.chromeManager.navigate(devToolsService, dockerPrintPreviewURL, true)) {
+            chromeManager.setCookies(devToolsService, getCookies(dockerPrintPreviewURL));
+            if (!chromeManager.navigate(devToolsService, dockerPrintPreviewURL, true)) {
                 throw new IOException("Failed to load the print preview URL: " + dockerPrintPreviewURL);
             }
 
@@ -172,11 +87,11 @@ public class DockerPDFPrinter implements PDFPrinter<URL>, Initializable, Disposa
                 // Make sure the relative URLs are resolved based on the original print preview URL otherwise the user
                 // won't be able to open the links from the generated PDF because they use a host name defined only
                 // inside the Docker container where the PDF was generated. See PDFExportConfiguration#getXWikiHost()
-                this.chromeManager.setBaseURL(devToolsService, printPreviewURL);
+                chromeManager.setBaseURL(devToolsService, printPreviewURL);
             }
 
-            return this.chromeManager.printToPDF(devToolsService, () -> {
-                this.chromeManager.closeIncognitoTab(devToolsService);
+            return chromeManager.printToPDF(devToolsService, () -> {
+                chromeManager.closeIncognitoTab(devToolsService);
             });
         } catch (Exception e) {
             // Close the developer tools associated with the opened incognito browser tab only if an exception is
@@ -236,7 +151,7 @@ public class DockerPDFPrinter implements PDFPrinter<URL>, Initializable, Disposa
     {
         try {
             URL restURL = new URL(printPreviewURL, this.xcontextProvider.get().getRequest().getContextPath() + "/rest");
-            return this.chromeManager.navigate(devToolsService, restURL, false);
+            return this.chromeManagerProvider.get().navigate(devToolsService, restURL, false);
         } catch (IOException e) {
             return false;
         }
@@ -250,8 +165,8 @@ public class DockerPDFPrinter implements PDFPrinter<URL>, Initializable, Disposa
      */
     private List<CookieParam> getCookies(URL targetURL)
     {
-        XWikiContext xcontext = this.xcontextProvider.get();
-        List<CookieParam> cookies = this.chromeManager.toCookieParams((Cookie[]) xcontext.getRequest().getCookies());
+        List<CookieParam> cookies = this.chromeManagerProvider.get()
+            .toCookieParams((Cookie[]) this.xcontextProvider.get().getRequest().getCookies());
         // Cookies must have either the URL or the domain set otherwise the browser rejects them.
         cookies.forEach(cookie -> cookie.setUrl(targetURL.toString()));
         return cookies;

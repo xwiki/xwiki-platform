@@ -83,7 +83,7 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
      * </ul>
      */
     @Inject
-    @Named("docker")
+    @Named("chrome")
     private Provider<PDFPrinter<URL>> pdfPrinterProvider;
 
     @Inject

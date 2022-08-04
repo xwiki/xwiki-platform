@@ -30,8 +30,7 @@ def builds = [
       name: 'Main',
       profiles: 'legacy,integration-tests,snapshot',
       properties:
-        '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true -DskipITs',
-      daysToKeepStr: env.BRANCH_NAME == 'master' ? '30' : null
+        '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true -DskipITs'
     )
   },
   // Can be used to manually trigger the main build with integration tests on the CI.
@@ -40,8 +39,7 @@ def builds = [
       name: 'Main with Integration Tests',
       profiles: 'legacy,integration-tests,snapshot',
       properties:
-        '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true',
-      daysToKeepStr: env.BRANCH_NAME == 'master' ? '30' : null
+        '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true'
     )
   },
   'Distribution' : {
@@ -68,7 +66,6 @@ def builds = [
     buildFunctionalTest(
       name: 'Flavor Test - UI',
       pom: 'xwiki-platform-distribution-flavor-test-ui/pom.xml',
-      daysToKeepStr: env.BRANCH_NAME == 'master' ? '30' : null
     )
   },
   'Flavor Test - Misc' : {
@@ -359,9 +356,9 @@ private void buildInsideNode(map)
       if (map.properties != null) {
         properties = map.properties
       }
-      if (map.daysToKeepStr != null) {
-        daysToKeepStr = map.daysToKeepStr
-      }
+      // Keep builds for 30 days since we want to be able to see all builds if there are a lot at a given time, to be
+      // able to identify flickers, etc.
+      daysToKeepStr = env.BRANCH_NAME == 'master' ? '30' : null
       if (map.pom != null) {
         pom = map.pom
       }

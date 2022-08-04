@@ -191,17 +191,15 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
      * @param artifactFiles specify which of the image blocks should be processed; only the image blocks
      *          that were generated during the office import process should be processed
      * @param ownerDocumentReference specifies the document that owns the office file
-     * @param resourceReference a reference to the office file that is being viewed; this reference is used to compute
-     *            the path to the temporary directory holding the image artifacts
      * @param parameters the build parameters. Note that currently only {@code filterStyles} is supported and if "true"
      *            it means that styles will be filtered to the maximum and the focus will be put on importing only the
      * @return the set of temporary files corresponding to image artifacts
      */
     private Set<File> processImages(XDOM xdom, Set<File> artifactFiles, DocumentReference ownerDocumentReference,
-        String resourceReference, Map<String, ?> parameters)
+        Map<String, ?> parameters)
     {
         // Process all image blocks.
-        Set<File> temporaryFiles = new HashSet<File>();
+        Set<File> temporaryFiles = new HashSet<>();
         List<ImageBlock> imgBlocks = xdom.getBlocks(new ClassBlockMatcher(ImageBlock.class), Block.Axes.DESCENDANT);
         if (!imgBlocks.isEmpty()) {
             Map<String, File> fileMap = new HashMap<>();
@@ -238,8 +236,9 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
                         Block newImgBlock = new ImageBlock(urlImageReference, false, imgBlock.getParameters());
                         imgBlock.getParent().replaceChild(Arrays.asList(newImgBlock), imgBlock);
 
-                        // Make sure the new image block is not inside an ExpandedMacroBlock whose's content syntax doesn't
-                        // support relative path resource references (we use relative paths to refer the temporary files).
+                        // Make sure the new image block is not inside an ExpandedMacroBlock whose's content syntax
+                        // doesn't support relative path resource references (we use relative paths to refer the
+                        // temporary files).
                         maybeFixExpandedMacroAncestor(newImgBlock);
 
                         // Collect the temporary file so that it can be cleaned up when the view is disposed from cache.
@@ -261,7 +260,7 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
         if (expandedMacro != null) {
             Block parent = expandedMacro.getParent();
             if (!(parent instanceof MetaDataBlock) || !((MetaDataBlock) parent).getMetaData().contains(MODULE_NAME)) {
-                MetaDataBlock metaData = new MetaDataBlock(Collections.<Block>emptyList());
+                MetaDataBlock metaData = new MetaDataBlock(Collections.emptyList());
                 // Use a syntax that supports relative path resource references (we use relative paths to include the
                 // temporary files).
                 metaData.getMetaData().addMetaData(MetaData.SYNTAX, Syntax.XWIKI_2_1);
@@ -378,8 +377,9 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
 
         // It's possible that the attachment has been deleted. We need to catch such events and cleanup the cache.
         DocumentReference documentReference = attachmentReference.getDocumentReference();
-        if (!this.documentAccessBridge.getAttachmentReferences(documentReference).contains(attachmentReference) &&
-            !uploadedAttachment.isPresent()) {
+        if (!this.documentAccessBridge.getAttachmentReferences(documentReference).contains(attachmentReference)
+            && !uploadedAttachment.isPresent())
+        {
             // If a cached view exists, flush it.
             if (view != null) {
                 this.attachmentCache.remove(cacheKey);
@@ -403,12 +403,12 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
                     attachmentVersion = "temp";
                 }
                 XDOM xdom = xdomOfficeDocument.getContentDocument();
-                // We use only the file name from the resource reference because the rest of the information is specified by
-                // the owner document reference. This way we ensure the path to the temporary files doesn't contain
-                // redundant information and so it remains as small as possible (considering that the path length is limited
-                // on some environments).
+                // We use only the file name from the resource reference because the rest of the information is
+                // specified by the owner document reference. This way we ensure the path to the temporary files
+                // doesn't contain redundant information and so it remains as small as possible (considering that the
+                // path length is limited on some environments).
                 Set<File> temporaryFiles = processImages(xdom, xdomOfficeDocument.getArtifactsFiles(),
-                    attachmentReference.getDocumentReference(), attachmentReference.getName(), parameters);
+                    attachmentReference.getDocumentReference(), parameters);
                 view = new AttachmentOfficeDocumentView(reference, attachmentReference, attachmentVersion, xdom,
                     temporaryFiles);
 
@@ -436,7 +436,7 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
             {
                 XDOM xdom = xdomOfficeDocument.getContentDocument();
                 Set<File> temporaryFiles = processImages(xdom, xdomOfficeDocument.getArtifactsFiles(), ownerDocument,
-                    serializedResourceReference, parameters);
+                    parameters);
                 view = new OfficeDocumentView(resourceReference, xdom, temporaryFiles);
 
                 this.externalCache.set(cacheKey, view);

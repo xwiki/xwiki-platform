@@ -119,11 +119,17 @@
     <property>
       <code>require(['jquery', 'bootstrap'], function($) {
 
-  // Returns true if the window inner width is lower than 768.
-  function isSmallScreen() {
-    var windowWidth = window.innerWidth;
-    return windowWidth &lt; 768;
+  function updateParentListState(globalSearchElement, isSearchOpen) {
+    let parentUl = $(globalSearchElement).closest('ul');
+    if (parentUl) {
+      if (isSearchOpen) {
+        parentUl.addClass('globalsearch-open');
+      } else {
+        parentUl.removeClass('globalsearch-open');
+      }
+    }
   }
+
   $(function() {
 
     // Some variables used in the next 2 functions
@@ -139,11 +145,7 @@
         return true;
       }
       globalSearch.removeClass('globalsearch-close');
-      // Hide the notification and avatar buttons on small screens
-      if (isSmallScreen()) {
-        notificationButton.addClass('hidden');
-        avatar.addClass('hidden');
-      }
+      updateParentListState(globalSearch, true);
       globalSearchInput.focus();
       return false;
     });
@@ -158,14 +160,7 @@
         // actually performing the search).
         if (document.activeElement !== globalSearchButton[0] &amp;&amp; document.activeElement !== globalSearchInput[0]) {
           globalSearch.addClass('globalsearch-close');
-          // Make the notification and the avatar buttons visible again, on small screens, with a timeout so as to
-          // display the buttons only once the search input is visible.
-          if (isSmallScreen()) {
-            setTimeout( function() {
-              notificationButton.removeClass('hidden');
-              avatar.removeClass('hidden');
-            }, 350);
-          }
+          updateParentListState(globalSearch, false);
         }
       }, 1);
     });

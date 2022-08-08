@@ -25,7 +25,7 @@
     "http://www.puppycrawl.com/dtds/suppressions_1_0.dtd">
 
 <suppressions>
-  <suppress checks="ClassFanOutComplexity" files="DefaultLinkRefactoring.java"/>
+  <suppress checks="ClassFanOutComplexity" files="DefaultReferenceUpdater.java"/>
   <suppress checks="ClassFanOutComplexity" files="DefaultMacroRefactoring.java"/>
   <suppress checks="ClassFanOutComplexity" files="DefaultReferenceRenamer.java"/>
 </suppressions>

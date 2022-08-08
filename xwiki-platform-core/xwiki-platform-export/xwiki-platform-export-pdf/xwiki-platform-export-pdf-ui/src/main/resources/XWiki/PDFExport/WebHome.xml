@@ -42,6 +42,7 @@
   #set ($pdfExportJobStatusJSON = {
     'id': $pdfExportJobStatus.request.id,
     'state': $pdfExportJobStatus.state,
+    'canceled': $pdfExportJobStatus.canceled,
     'progress': {
       'offset': $pdfExportJobStatus.progress.offset
     }
@@ -66,6 +67,11 @@
     #set ($pdfExportJobRequest = $services.export.pdf.createRequest())
     #set ($pdfExportJob = $services.export.pdf.execute($pdfExportJobRequest))
     #returnPDFExportJobStatusJSON($pdfExportJobRequest.id)
+  #elseif ($request.action == 'cancel')
+    #set ($pdfExportJobId = $request.jobId.split('/'))
+    #set ($pdfExportJobStatus = $services.job.getJobStatus($pdfExportJobId))
+    #set ($discard = $pdfExportJobStatus.cancel())
+    #returnPDFExportJobStatusJSON($pdfExportJobId)
   #elseif ($request.data == 'jobStatus')
     #set ($pdfExportJobId = $request.jobId.split('/'))
     #returnPDFExportJobStatusJSON($pdfExportJobId)
@@ -167,7 +173,10 @@
     'export.pdf.options.loadFailure',
     'export.pdf.modal.close',
     'export.pdf.inProgress',
-    'export.pdf.failed'
+    'export.pdf.failed',
+    'export.pdf.canceling',
+    'export.pdf.canceled',
+    'export.pdf.cancelFailed'
   ]
 });
 
@@ -265,7 +274,16 @@ require([
     });
   };
 
+  // There's no PDF export job started. This promise is used to cancel the PDF export job (the job needs to be started
+  // before we can cancel it).
+  let pdfExportJobStarted = false;
+
   const runPDFExportJob = function(data) {
+    let resolvePDFExportJobStarted, rejectPDFExportJobStarted;
+    pdfExportJobStarted = new Promise((resolve, reject) =&gt; {
+      resolvePDFExportJobStarted = resolve;
+      rejectPDFExportJobStarted = reject;
+    });
     data.push(
       {name: 'outputSyntax', value: 'plain'},
       {name: 'sheet', value: 'XWiki.PDFExport.WebHome'},
@@ -280,6 +298,7 @@ require([
     );
     return Promise.resolve(new JobRunner({
       createStatusRequest: function(jobId) {
+        resolvePDFExportJobStarted(jobId);
         return {
           url: XWiki.currentDocument.getURL('get'),
           data: {
@@ -290,7 +309,24 @@ require([
           }
         };
       }
-    }).run(XWiki.currentDocument.getURL('get'), data));
+    }).run(XWiki.currentDocument.getURL('get'), data)).catch((reason) =&gt; {
+      // We need to reject any pending cancel requests.
+      rejectPDFExportJobStarted();
+      // But we also need to reject the PDF export itself.
+      return Promise.reject(reason);
+    }).finally(() =&gt; {
+      pdfExportJobStarted = false;
+    });
+  };
+
+  const cancelPDFExportJob = (jobId) =&gt; {
+    return Promise.resolve($.post(XWiki.currentDocument.getURL('get'), {
+      outputSyntax: 'plain',
+      sheet: 'XWiki.PDFExport.WebHome',
+      action: 'cancel',
+      form_token: xwikiMeta.form_token,
+      jobId: jobId.join('/')
+    }));
   };
 
   const showPrintPreviewModal = function(jobId) {
@@ -331,7 +367,9 @@ require([
 
   const exportToPDF = function(data) {
     return runPDFExportJob(data).then(job =&gt; {
-      if (job.pdfFileURL) {
+      if (job.canceled) {
+        // Do nothing.
+      } else if (job.pdfFileURL) {
         // The PDF file was generated on the server-side. The user just needs to download it.
         window.location.href = job.pdfFileURL;
       } else if (job.failed) {
@@ -347,15 +385,19 @@ require([
     event.preventDefault();
     $('body').css('cursor', 'wait');
     const notification = new XWiki.widgets.Notification(l10n['export.pdf.inProgress'], 'inprogress');
-    pdfExportOptionsModal.find('input[type=submit]').prop('disabled', true);
+    // Prevent multiple clicks on the export button.
+    pdfExportOptionsModal.find('.modal-footer input[type=submit]').prop('disabled', true);
     // Concatenate the PDF export options with the document selection.
     const data = pdfExportOptionsModal.serializeArray().concat(pdfExportOptionsModal.data('selection'));
     exportToPDF(data).then(() =&gt; {
+      // PDF export job finished.
       notification.hide();
     }).catch(() =&gt; {
+      // PDF export job failed.
       notification.replace(new XWiki.widgets.Notification(l10n['export.pdf.failed'], 'error'));
     }).finally(() =&gt; {
-      pdfExportOptionsModal.find('input[type=submit]').prop('disabled', false);
+      // Re-enable the PDF export options modal.
+      pdfExportOptionsModal.find('.modal-footer input[type=submit]').prop('disabled', false);
       $('body').css('cursor', '');
     });
   });
@@ -363,6 +405,31 @@ require([
   pdfExportOptionsModal.on('click', 'a.secondary.button', event =&gt; {
     event.preventDefault();
     pdfExportOptionsModal.modal('hide');
+  });
+
+  pdfExportOptionsModal.on('hide.bs.modal', event =&gt; {
+    const closeButton = pdfExportOptionsModal.find('.modal-header button.close');
+    if (closeButton.prop('disabled')) {
+      // Don't close the modal because there's a pending cancel request.
+      return event.preventDefault();
+    } else if (pdfExportJobStarted) {
+      // Cancel the running PDF export job.
+      const notification = new XWiki.widgets.Notification(l10n['export.pdf.canceling'], 'inprogress');
+      // Prevent multiple cancel requests.
+      pdfExportOptionsModal.find('.modal-header button.close').prop('disabled', true);
+      pdfExportOptionsModal.find('.modal-footer a.secondary.button').addClass('disabled');
+      pdfExportJobStarted.then(cancelPDFExportJob).then(() =&gt; {
+        notification.replace(new XWiki.widgets.Notification(l10n['export.pdf.canceled'], 'done'));
+      }).catch(() =&gt; {
+        notification.replace(new XWiki.widgets.Notification(l10n['export.pdf.cancelFailed'], 'error'));
+      }).finally(() =&gt; {
+        // Allow the user to retry the cancel (e.g. in case it failed due to some network issue).
+        pdfExportOptionsModal.find('.modal-header button.close').prop('disabled', false);
+        pdfExportOptionsModal.find('.modal-footer a.secondary.button').removeClass('disabled');
+      });
+      // Don't close the modal because the job doesn't finish immediately after being canceled.
+      return event.preventDefault();
+    }
   });
 
   const switchToPDFOptionsModal = function(event, url, data) {
@@ -385,7 +452,7 @@ require([
     exportButton.prependTo('#exportModalOtherCollapse .export-buttons');
 
     // Remove the accordion if the Office category is empty.
-    if (!$('#exportModelOfficeCollapse .pane-body').children().length) {
+    if (!$('#exportModelOfficeCollapse .panel-body').children().length) {
       // We need to keep the '#exportModalOtherCollapse' element because it is used by exporter.js
       $('#exportModalAccordion').replaceWith($('#exportModalOtherCollapse'));
       $('#exportModalOtherCollapse').attr({

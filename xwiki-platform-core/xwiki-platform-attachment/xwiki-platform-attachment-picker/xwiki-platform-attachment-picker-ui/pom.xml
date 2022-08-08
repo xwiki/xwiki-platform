@@ -25,17 +25,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-attachment-picker</artifactId>
-    <version>14.5-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-attachment-picker-ui</artifactId>
   <name>XWiki Platform - Attachment - Picker - UI</name>
-  <description>Integration of the attachment picker macro in the UI.</description>
+  <description>Integration of the attachment picker macro in all XWiki UIs (WYSIWYG Image Dialog)</description>
   <packaging>xar</packaging>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Attachment Picker Application</xwiki.extension.name>
-    <!-- Description to display by the Extension Manager -->
-    <xwiki.extension.description>Integration of the attachment picker macro in the UI.</xwiki.extension.description>
     <!-- Category to display by the Extension Manager -->
     <xwiki.extension.category>application</xwiki.extension.category>
   </properties>
@@ -49,23 +47,21 @@
     <!-- CKEditor is required for the integration of the attachment picker with the image picker dialog.
          It is an optional dependency and can be safely uninstalled if CKEditor is not required. -->
     <dependency>
-      <groupId>org.xwiki.contrib</groupId>
-      <artifactId>application-ckeditor-ui</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-ckeditor-ui</artifactId>
+      <version>${project.version}</version>
       <type>xar</type>
       <scope>runtime</scope>
       <optional>true</optional>
-      <exclusions>
-        <!-- Exclude to avoid conflicts with older versions of XWiki platform and rendering deps drawn by the 
-             contrib dependency. -->
-        <exclusion>
-          <groupId>org.xwiki.platform</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.xwiki.rendering</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
+    </dependency>
+    <!-- Provides XWiki.SuggestSolrService required to search for the attachments through solr. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-solr-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+      <optional>true</optional>
     </dependency>
   </dependencies>
 </project>

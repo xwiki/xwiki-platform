@@ -37,7 +37,7 @@ import static java.util.Collections.emptyList;
  * This script prints an error log when it is interpreted, making the test fail.
  *
  * @version $Id$
- * @since 14.5RC1
+ * @since 14.5
  * @since 14.4.2
  * @since 13.10.7
  */

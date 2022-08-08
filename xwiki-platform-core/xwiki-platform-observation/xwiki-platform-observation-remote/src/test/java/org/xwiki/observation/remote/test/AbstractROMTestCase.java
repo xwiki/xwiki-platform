@@ -100,7 +100,7 @@ public abstract class AbstractROMTestCase
     }
 
     @AfterEach
-    private void afterEach() throws Exception
+    void afterEach() throws Exception
     {
         cleanExecution(this.componentManager1);
         cleanExecution(this.componentManager2);

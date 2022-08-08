@@ -80,7 +80,7 @@ public privileged aspect DeleteActionCompatibilityAspect
      *            the entity is preferably deleted permanently
      * @return {@code true} if the user is redirected, {@code false} otherwise
      * @throws XWikiException if anything goes wrong during the document deletion
-     * @deprecated since 14.4.2, 14.5RC1, use {@link #deleteDocument(EntityReference, XWikiContext, boolean,
+     * @deprecated since 14.4.2, 14.5, use {@link #deleteDocument(EntityReference, XWikiContext, boolean,
      *             DocumentReference, boolean, boolean)} instead
      * @since 12.8RC1
      */

@@ -63,8 +63,8 @@ import org.xwiki.model.validation.EntityNameValidationConfiguration;
 import org.xwiki.model.validation.EntityNameValidationManager;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.QueryManager;
-import org.xwiki.refactoring.internal.LinkRefactoring;
 import org.xwiki.refactoring.internal.ModelBridge;
+import org.xwiki.refactoring.internal.ReferenceUpdater;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.script.internal.CloneableSimpleScriptContext;
@@ -457,8 +457,8 @@ public class MockitoOldcore
             this.componentManager.registerMockComponent(ModelBridge.class);
         }
 
-        if (!this.componentManager.hasComponent(LinkRefactoring.class)) {
-            this.componentManager.registerMockComponent(LinkRefactoring.class);
+        if (!this.componentManager.hasComponent(ReferenceUpdater.class)) {
+            this.componentManager.registerMockComponent(ReferenceUpdater.class);
         }
 
         // Make sure to a have an URLConfiguration component.

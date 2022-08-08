@@ -97,6 +97,9 @@ public class RssMacroTest
     @MockComponent
     private ConverterManager converterManager;
 
+    @MockComponent
+    private FeedItemContentCleaner contentCleaner;
+
     @Mock
     private RomeFeedFactory romeFeedFactory;
 
@@ -167,6 +170,8 @@ public class RssMacroTest
         when(plainTextParser.parse(any())).thenReturn(new XDOM(expectedBlockList));
         when(contentParser.parse("Some content", macroTransformationContext, false, false))
             .thenReturn(new XDOM(expectedBlockList));
+        when(this.contentCleaner.cleanContent(any(String.class)))
+            .then(invocation -> new RawBlock(invocation.getArgument(0, String.class), Syntax.HTML_5_0));
 
         List<Block> obtainedContent = this.macro.execute(rssMacroParameters, "Some content", macroTransformationContext);
         assertEquals(1, obtainedContent.size());
@@ -228,7 +233,7 @@ public class RssMacroTest
         assertEquals("rssitemdescription", groupBlock.getParameter("class"));
         assertEquals(1, groupBlock.getChildren().size());
         assertEquals(
-            new RawBlock("How do Americans get ready to work with Russians aboard the International Space Station?",
-            Syntax.XHTML_1_0), groupBlock.getChildren().get(0));
+            new RawBlock("How do Americans get ready to work with Russians aboard the International Space "
+                + "Station?", Syntax.HTML_5_0), groupBlock.getChildren().get(0));
     }
 }

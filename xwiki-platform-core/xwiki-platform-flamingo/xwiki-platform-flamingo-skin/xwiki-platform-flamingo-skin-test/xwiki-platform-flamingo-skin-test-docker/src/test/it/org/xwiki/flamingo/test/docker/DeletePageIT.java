@@ -655,7 +655,7 @@ class DeletePageIT
      * working when accessing the old page.
      *
      * @since 14.4.2
-     * @since 14.5RC1
+     * @since 14.5
      */
     @Test
     @Order(13)
@@ -693,7 +693,7 @@ class DeletePageIT
      * Check that if a new target is not selected, the backlinks are not altered and no redirect is added.
      *
      * @since 14.4.2
-     * @since 14.5RC1
+     * @since 14.5
      */
     @Test
     @Order(14)
@@ -727,7 +727,7 @@ class DeletePageIT
      * parent page has the backlinks updated a the redirect added.
      *
      * @since 14.4.2
-     * @since 14.5RC1
+     * @since 14.5
      */
     @Test
     @Order(15)

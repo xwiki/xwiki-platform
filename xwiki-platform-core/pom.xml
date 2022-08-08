@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>14.5-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -125,6 +125,8 @@
 
                  Single justification example:
             -->
+            
+            
 
           </analysisConfiguration>
         </configuration>
@@ -144,6 +146,7 @@
     <module>xwiki-platform-bridge</module>
     <module>xwiki-platform-captcha</module>
     <module>xwiki-platform-chart</module>
+    <module>xwiki-platform-ckeditor</module>
     <module>xwiki-platform-classloader</module>
     <module>xwiki-platform-component</module>
     <module>xwiki-platform-configuration</module>

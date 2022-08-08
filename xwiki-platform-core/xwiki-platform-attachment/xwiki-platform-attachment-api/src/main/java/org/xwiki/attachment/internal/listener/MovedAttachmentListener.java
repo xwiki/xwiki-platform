@@ -36,8 +36,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
-import org.xwiki.refactoring.internal.LinkRefactoring;
 import org.xwiki.refactoring.internal.ModelBridge;
+import org.xwiki.refactoring.internal.ReferenceUpdater;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
@@ -58,7 +58,7 @@ public class MovedAttachmentListener implements EventListener
     public static final String HINT = "org.xwiki.attachment.internal.listener.MovedAttachmentListener";
 
     @Inject
-    private LinkRefactoring linkRefactoring;
+    private ReferenceUpdater referenceUpdater;
 
     @Inject
     private JobProgressManager progressManager;
@@ -92,8 +92,8 @@ public class MovedAttachmentListener implements EventListener
         if (moveAttachmentRequest.isUpdateReferences()) {
             Predicate<EntityReference> canEdit = reference -> ((!moveAttachmentRequest.isCheckRights()
                 || this.authorization.hasAccess(Right.EDIT, moveAttachmentRequest.getUserReference(), reference))
-                && (!moveAttachmentRequest.isCheckAuthorRights()
-                || this.authorization.hasAccess(Right.EDIT, moveAttachmentRequest.getAuthorReference(), reference)));
+                && (!moveAttachmentRequest.isCheckAuthorRights() || this.authorization.hasAccess(Right.EDIT,
+                    moveAttachmentRequest.getAuthorReference(), reference)));
             // TODO: Make sure to apply the refactoring at farm level for attachments as part of XWIKI-8346.
             updateBackLinks(attachmentMovedEvent, canEdit);
         }
@@ -106,7 +106,7 @@ public class MovedAttachmentListener implements EventListener
             wikiId);
         List<DocumentReference> documentsList =
             this.modelBridge.getBackLinkedReferences(event.getSourceReference(), wikiId);
-        // Since the backlinks are not stored for the document containing the attachment, we need to add it to the 
+        // Since the backlinks are not stored for the document containing the attachment, we need to add it to the
         // list of documents.
         documentsList.add(event.getSourceReference().getDocumentReference());
 
@@ -116,7 +116,7 @@ public class MovedAttachmentListener implements EventListener
             for (DocumentReference backlinkDocumentReference : documentsList) {
                 this.progressManager.startStep(this);
                 if (canEdit.test(backlinkDocumentReference)) {
-                    this.linkRefactoring.renameLinks(backlinkDocumentReference, event.getSourceReference(),
+                    this.referenceUpdater.update(backlinkDocumentReference, event.getSourceReference(),
                         event.getTargetReference());
                 }
                 this.progressManager.endStep(this);

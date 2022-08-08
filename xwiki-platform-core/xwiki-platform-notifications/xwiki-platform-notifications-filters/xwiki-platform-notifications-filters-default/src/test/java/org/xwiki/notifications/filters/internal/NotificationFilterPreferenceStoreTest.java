@@ -52,7 +52,7 @@ import static org.mockito.Mockito.when;
  * Test of {@link NotificationFilterPreferenceStore}.
  *
  * @version $Id$
- * @since 14.5RC1
+ * @since 14.5
  * @since 14.4.1
  * @since 13.10.7
  */

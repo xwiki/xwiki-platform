@@ -63,7 +63,7 @@ class CurrentUserManagerTest
     private UserManager documentUserManager;
 
     @Test
-    void existsWhenNoCurrentUser()
+    void existsWhenNoCurrentUser() throws Exception
     {
         // No current user in the context
         XWikiContext xcontext = mock(XWikiContext.class);
@@ -76,7 +76,7 @@ class CurrentUserManagerTest
     }
 
     @Test
-    void existsWhenCurrentUser()
+    void existsWhenCurrentUser() throws Exception
     {
         XWikiContext xcontext = mock(XWikiContext.class);
         DocumentReference documentReference = new DocumentReference("wiki", "XWiki", "User");
@@ -92,7 +92,7 @@ class CurrentUserManagerTest
     }
 
     @Test
-    void existsWhenCurrentUserIsSuperAdmin()
+    void existsWhenCurrentUserIsSuperAdmin() throws Exception
     {
         XWikiContext xcontext = mock(XWikiContext.class);
         DocumentReference documentReference = new DocumentReference("wiki", "XWiki", "superadmin");
@@ -105,7 +105,7 @@ class CurrentUserManagerTest
     }
 
     @Test
-    void existsWhenCurrentUserIsGuest()
+    void existsWhenCurrentUserIsGuest() throws Exception
     {
         XWikiContext xcontext = mock(XWikiContext.class);
         DocumentReference documentReference = new DocumentReference("wiki", "XWiki", "xwikiguest");

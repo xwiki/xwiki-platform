@@ -43,7 +43,7 @@ import org.xwiki.rendering.transformation.RenderingContext;
  * 
  * @version $Id$
  * @since 14.4.2
- * @since 14.5RC1
+ * @since 14.5
  */
 @Component(roles = DocumentRenderer.class)
 @Singleton

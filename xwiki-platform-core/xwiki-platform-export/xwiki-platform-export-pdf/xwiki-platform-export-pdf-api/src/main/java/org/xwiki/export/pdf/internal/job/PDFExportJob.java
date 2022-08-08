@@ -45,7 +45,7 @@ import org.xwiki.security.authorization.Right;
  * 
  * @version $Id$
  * @since 14.4.2
- * @since 14.5RC1
+ * @since 14.5
  */
 @Component
 @Named(PDFExportJob.JOB_TYPE)
@@ -83,7 +83,7 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
      * </ul>
      */
     @Inject
-    @Named("docker")
+    @Named("chrome")
     private Provider<PDFPrinter<URL>> pdfPrinterProvider;
 
     @Inject
@@ -160,7 +160,9 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
     {
         URL printPreviewURL = (URL) this.request.getContext().get("request.url");
         try (InputStream pdfContent = this.pdfPrinterProvider.get().print(printPreviewURL)) {
-            this.temporaryResourceStore.createTemporaryFile(this.status.getPDFFileReference(), pdfContent);
+            if (!this.status.isCanceled()) {
+                this.temporaryResourceStore.createTemporaryFile(this.status.getPDFFileReference(), pdfContent);
+            }
         }
     }
 }

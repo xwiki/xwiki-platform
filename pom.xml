@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>14.5-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>14.5-SNAPSHOT</version>
+  <version>14.7-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
@@ -50,21 +50,18 @@
     <rendering.version>${platform.version}</rendering.version>
 
     <!-- Dependencies versions -->
-    <ckeditor.version>1.64.2</ckeditor.version>
     <bootstrap.version>3.4.1</bootstrap.version>
     <batik.version>1.14</batik.version>
     <restlet.version>2.3.12</restlet.version>
-    <tika.version>2.4.0</tika.version>
+    <tika.version>2.4.1</tika.version>
     <pdfbox.version>2.0.26</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
-    <jetty.version>9.4.29.v20200521</jetty.version>
-    <netty.version>4.1.78.Final</netty.version>
-    <hibernate.version>5.6.9.Final</hibernate.version>
-    <!-- Version of HSQLDB that we use in Platform when import XARs for creating functional test environments -->
-    <hsqldb.version>2.6.1</hsqldb.version>
+    <jetty.version>9.4.48.v20220622</jetty.version>
+    <netty.version>4.1.79.Final</netty.version>
+    <hibernate.version>5.6.10.Final</hibernate.version>
 
     <!-- Versions of other software we need in our functional tests -->
-    <testcontainers.version>1.17.2</testcontainers.version>
+    <testcontainers.version>1.17.3</testcontainers.version>
     <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
          sure the new version is available from https://download.documentfoundation.org/libreoffice/stable/
          Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
@@ -91,22 +88,24 @@
 
     <xwiki.enforcer.check-dependency-version.skip>${xwiki.enforcer.skip}</xwiki.enforcer.check-dependency-version.skip>
     <xwiki.enforcer.enforce-tika2-parsers.skip>${xwiki.enforcer.skip}</xwiki.enforcer.enforce-tika2-parsers.skip>
+    <xwiki.enforcer.banneddependencytype-xar.skip>${xwiki.enforcer.skip}</xwiki.enforcer.banneddependencytype-xar.skip>
 
     <!-- Versions of JDBC connectors we want to use in our distribution, in our tests and when using build tools -->
     <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
     <hsqldb.artifactId>hsqldb</hsqldb.artifactId>
+    <hsqldb.version>2.7.0</hsqldb.version>
     <mysql.groupId>mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-java</mysql.artifactId>
-    <mysql.version>8.0.29</mysql.version>
+    <mysql.version>8.0.30</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
-    <mariadb.version>3.0.5</mariadb.version>
+    <mariadb.version>3.0.7</mariadb.version>
     <derby.groupId>org.apache.derby</derby.groupId>
     <derby.artifactId>derby</derby.artifactId>
     <derby.version>10.14.2.0</derby.version>
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
-    <pgsql.version>42.4.0</pgsql.version>
+    <pgsql.version>42.4.1</pgsql.version>
     <oracle.groupId>com.oracle.ojdbc</oracle.groupId>
     <oracle.artifactId>ojdbc8</oracle.artifactId>
     <oracle.version>19.3.0.0</oracle.version>
@@ -164,7 +163,7 @@
       <dependency>
         <groupId>org.liquibase</groupId>
         <artifactId>liquibase-core</artifactId>
-        <version>4.11.0</version>
+        <version>4.12.0</version>
         <exclusions>
           <!-- Not the right id -->
           <exclusion>
@@ -379,13 +378,6 @@
         <version>1.2.0-xwiki</version>
         <scope>runtime</scope>
       </dependency>
-      <!-- Embedded in the Standard Flavor and used by the Dashboard Application (to add/edit gadgets) -->
-      <dependency>
-        <groupId>org.xwiki.contrib</groupId>
-        <artifactId>application-ckeditor-ui</artifactId>
-        <version>${ckeditor.version}</version>
-        <type>xar</type>
-      </dependency>
       <!-- Drawn by several transitive dependencies -->
       <dependency>
         <groupId>org.jfree</groupId>
@@ -427,6 +419,12 @@
         <groupId>org.webjars</groupId>
         <artifactId>bootstrap-select</artifactId>
         <version>1.13.18</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>bootstrap-3-typeahead</artifactId>
+        <version>4.0.2</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -535,7 +533,7 @@
       <dependency>
         <groupId>net.java.dev.jna</groupId>
         <artifactId>jna</artifactId>
-        <version>5.11.0</version>
+        <version>5.12.1</version>
       </dependency>
 
       <dependency>
@@ -552,7 +550,7 @@
       <dependency>
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
-        <version>1.14.3</version>
+        <version>1.15.2</version>
       </dependency>
 
       <!-- PDF -->
@@ -805,7 +803,7 @@
       <dependency>
         <groupId>com.icegreen</groupId>
         <artifactId>greenmail-junit5</artifactId>
-        <version>1.6.9</version>
+        <version>1.6.10</version>
       </dependency>
 
       <!-- Make sure to use a version of the Jetty client libraries matching the Jetty version we package -->
@@ -928,6 +926,14 @@
         <groupId>org.jetbrains</groupId>
         <artifactId>annotations</artifactId>
         <version>19.0.0</version>
+      </dependency>
+
+      <!-- Fast Diff -->
+      <dependency>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>fast-diff</artifactId>
+        <version>1.2.0</version>
+        <scope>runtime</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -1272,6 +1278,45 @@
                     <exclude>org.apache.tika:tika-parsers</exclude>
                   </excludes>
                 </bannedDependencies>
+              </rules>
+            </configuration>
+          </execution>
+          <!-- Make sure the old ckeditor contrib extension is not used. -->
+          <execution>
+            <id>enforce-ckeditor-platform</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <message>
+                    Do not use the CKEditor extension from contrib. Is it now packaged in xwiki platform.
+                  </message>
+                  <excludes>
+                    <exclude>org.xwiki.contrib:application-ckeditor*</exclude>
+                  </excludes>
+                </bannedDependencies>
+              </rules>
+            </configuration>
+          </execution>
+          <!-- Make sure JAR extensions don't trigger runtime dependencies on XAR extensions -->
+          <execution>
+            <id>enforcer-banneddependencytype-xar</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <skip>${xwiki.enforcer.banneddependencytype-xar.skip}</skip>
+              <rules>
+                <!-- Forbid JAR extensions to have XAR runtime dependencies -->
+                <validateDependencyVersion implementation="org.xwiki.tool.enforcer.BannedDependencyType">
+                  <dependencyType>xar</dependencyType>
+                  <projectPackaging>jar|webjar</projectPackaging>
+                  <!-- Integration test modules are never going to be installed as extension and they need to depend on XAR modules -->
+                  <projectArtifactId>^((?!-test-docker|.*-test-tests).)*$</projectArtifactId>
+                </validateDependencyVersion>
               </rules>
             </configuration>
           </execution>

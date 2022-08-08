@@ -26,13 +26,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -42,6 +42,7 @@ import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPrefere
 import org.xwiki.notifications.filters.internal.NotificationFilterPreferenceConfiguration;
 import org.xwiki.notifications.filters.internal.NotificationFilterPreferenceStore;
 import org.xwiki.stability.Unstable;
+import org.xwiki.user.UserException;
 import org.xwiki.user.UserManager;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
@@ -62,7 +63,7 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
  *     when a wiki is deleted</a>
  * @see <a href="https://jira.xwiki.org/browse/XWIKI-18397">XWIKI-18397: Notification filter preferences are never
  *     cleaned for deleted users</a>
- * @since 14.5RC1
+ * @since 14.5
  * @since 14.4.1
  * @since 13.10.7
  */
@@ -90,9 +91,6 @@ public class R140401000XWIKI15460DataMigration extends AbstractHibernateDataMigr
 
     @Inject
     private UserManager userManager;
-
-    @Inject
-    private Logger logger;
 
     @Override
     public XWikiDBVersion getVersion()
@@ -174,7 +172,13 @@ public class R140401000XWIKI15460DataMigration extends AbstractHibernateDataMigr
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toSet());
             for (String userReference : unknownUsers) {
-                this.store.deleteFilterPreferences(this.resolver.resolve(userReference));
+                DocumentReference userDocumentReference = this.resolver.resolve(userReference);
+                // Verify if the user still has some filters preferences to remove, in case they have already all been
+                // cleaned up when removing the filters preferences for the unknown wikis. Without this check, calling 
+                // deleteFilterPreferences could yield undesirable "no data" warning logs. 
+                if (!this.store.getPreferencesOfUser(userDocumentReference).isEmpty()) {
+                    this.store.deleteFilterPreferences(userDocumentReference);
+                }
             }
         } catch (NotificationException e) {
             throw new DataMigrationException("Failed to retrieve the notification filters preferences.", e);
@@ -194,16 +198,30 @@ public class R140401000XWIKI15460DataMigration extends AbstractHibernateDataMigr
     }
 
     private void identifyRemovedUsers(Map<String, Boolean> usersStatus,
-        DefaultNotificationFilterPreference filterPreference)
+        DefaultNotificationFilterPreference filterPreference) throws DataMigrationException
     {
         String owner = filterPreference.getOwner();
+
+        // Store the potential exception thrown inside computeIfAbsent, since assigning to a variable is not allowed.
+        AtomicReference<Exception> exception = new AtomicReference<>();
         usersStatus.computeIfAbsent(owner, key -> {
             DocumentReference entityReference = this.resolver.resolve(key);
             UserReference userReference =
                 this.documentReferenceUserReferenceResolver.resolve(entityReference);
 
-            return this.userManager.exists(userReference);
+            try {
+                return this.userManager.exists(userReference);
+            } catch (UserException e) {
+                exception.set(e);
+                return null;
+            }
         });
+
+        // If the exception store has been set, propagate the exception to make the migration fail.
+        if (exception.get() != null) {
+            throw new DataMigrationException(
+                String.format("Failed to identify if the owner of [%s] exists.", filterPreference), exception.get());
+        }
     }
 
     private boolean isMainWiki()

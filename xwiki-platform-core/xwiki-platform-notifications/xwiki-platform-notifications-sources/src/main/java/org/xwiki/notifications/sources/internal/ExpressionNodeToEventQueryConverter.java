@@ -74,6 +74,7 @@ public class ExpressionNodeToEventQueryConverter
         PROPERTY_MAPPING.put(EventProperty.GROUP_ID, Event.FIELD_GROUPID);
         PROPERTY_MAPPING.put(EventProperty.STREAM, Event.FIELD_STREAM);
         PROPERTY_MAPPING.put(EventProperty.DATE, Event.FIELD_DATE);
+        PROPERTY_MAPPING.put(EventProperty.REMOTE_OBSERVATION_ID, Event.FIELD_REMOTE_OBSERVATION_ID);
         PROPERTY_MAPPING.put(EventProperty.IMPORTANCE, Event.FIELD_IMPORTANCE);
         PROPERTY_MAPPING.put(EventProperty.TYPE, Event.FIELD_TYPE);
         PROPERTY_MAPPING.put(EventProperty.APPLICATION, Event.FIELD_APPLICATION);

@@ -52,6 +52,7 @@ import com.github.kklisura.cdt.protocol.commands.Page;
 import com.github.kklisura.cdt.protocol.commands.Runtime;
 import com.github.kklisura.cdt.protocol.commands.Target;
 import com.github.kklisura.cdt.protocol.types.network.CookieParam;
+import com.github.kklisura.cdt.protocol.types.page.Navigate;
 import com.github.kklisura.cdt.protocol.types.page.PrintToPDF;
 import com.github.kklisura.cdt.protocol.types.page.PrintToPDFTransferMode;
 import com.github.kklisura.cdt.protocol.types.runtime.Evaluate;
@@ -76,7 +77,7 @@ import com.github.kklisura.cdt.services.utils.ProxyUtils;
  * 
  * @version $Id$
  * @since 14.4.2
- * @since 14.5RC1
+ * @since 14.5
  */
 @Component(roles = ChromeManager.class)
 @Singleton
@@ -123,11 +124,11 @@ public class ChromeManager implements Initializable
     /**
      * Connect to the headless Chrome web browser that runs on the specified host, behind the specified port.
      * 
-     * @param host the host running the headless Chrome web browser (e.g. the IP address of the Docker container)
+     * @param host the host running the headless Chrome web browser, specified either as an IP address or a host name
      * @param remoteDebuggingPort the port number to connect to
      * @throws TimeoutException if the connection timeouts
      */
-    public void connect(String host, int remoteDebuggingPort) throws TimeoutException
+    void connect(String host, int remoteDebuggingPort) throws TimeoutException
     {
         this.logger.debug("Connecting to the Chrome remote debugging service on [{}:{}].", host, remoteDebuggingPort);
         this.webSocketServiceFactory = (webSocketURL -> WebSocketServiceImpl.create(URI.create(webSocketURL)));
@@ -171,18 +172,26 @@ public class ChromeManager implements Initializable
      * @param tabDevToolsService the developer tools service corresponding to the browser tab used to navigate to the
      *            specified web page
      * @param printPreviewURL the URL of the web page we are going to navigate to
+     * @param wait {@code true} to wait for the page to be ready, {@code false} otherwise
+     * @return {@code true} if the navigation was successful, {@code false} otherwise
      * @throws IOException if navigating to the specified web page fails
      */
-    public void navigate(ChromeDevToolsService tabDevToolsService, URL printPreviewURL) throws IOException
+    public boolean navigate(ChromeDevToolsService tabDevToolsService, URL printPreviewURL, boolean wait)
+        throws IOException
     {
         this.logger.debug("Navigating to [{}].", printPreviewURL);
         Page page = tabDevToolsService.getPage();
         page.enable();
-        page.navigate(printPreviewURL.toString());
+        Navigate navigate = page.navigate(printPreviewURL.toString());
+        boolean success = navigate.getErrorText() == null;
 
-        Runtime runtime = tabDevToolsService.getRuntime();
-        runtime.enable();
-        waitForPageReady(runtime);
+        if (success && wait) {
+            Runtime runtime = tabDevToolsService.getRuntime();
+            runtime.enable();
+            waitForPageReady(runtime);
+        }
+
+        return success;
     }
 
     /**
@@ -298,10 +307,11 @@ public class ChromeManager implements Initializable
      */
     public void setCookies(ChromeDevToolsService tabDevToolsService, List<CookieParam> cookies)
     {
-        this.logger.debug("Setting cookies [{}].",
-            cookies.stream().collect(Collectors.toMap(CookieParam::getName, CookieParam::getValue)));
+        this.logger.debug("Setting cookies [{}].", cookies.stream()
+            .map(cookie -> String.format("%s: %s", cookie.getName(), cookie.getValue())).collect(Collectors.toList()));
         Network network = tabDevToolsService.getNetwork();
         network.enable();
+        network.clearBrowserCookies();
         network.setCookies(cookies);
     }
 

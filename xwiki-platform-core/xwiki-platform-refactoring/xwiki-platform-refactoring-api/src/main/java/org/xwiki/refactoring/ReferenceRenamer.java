@@ -22,7 +22,6 @@ package org.xwiki.refactoring;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.refactoring.internal.LinkRefactoring;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.stability.Unstable;
 
@@ -44,7 +43,6 @@ public interface ReferenceRenamer
      * @param oldTarget the previous reference of the renamed entity (attachment or document)
      * @param newTarget the new reference of the renamed entity (attachment or document)
      * @param relative {@code true} if the link should be serialized relatively to the current document
-     *      (see {@link LinkRefactoring#updateRelativeLinks})
      * @return {@code true} if the given {@link Block} was modified
      */
     boolean renameReferences(Block block, DocumentReference currentDocumentReference, DocumentReference oldTarget,
@@ -57,8 +55,7 @@ public interface ReferenceRenamer
      * @param currentDocumentReference the current document reference
      * @param oldTarget the previous reference of the renamed entity (attachment or document)
      * @param newTarget the new reference of the renamed entity (attachment or document)
-     * @param relative {@code true} if the link should be serialized relatively to the current document (see {@link
-     *     LinkRefactoring#updateRelativeLinks})
+     * @param relative {@code true} if the link should be serialized relatively to the current document
      * @return {@code true} if the given {@link Block} was modified
      * @since 14.2RC1
      */
@@ -68,5 +65,5 @@ public interface ReferenceRenamer
     {
         return false;
     }
-    
+
 }

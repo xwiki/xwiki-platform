@@ -469,7 +469,8 @@ bundles=blueimp-gallery,blueimp-helper,blueimp-gallery-fullscreen,blueimp-galler
       &lt;div class="descriptionRow"&gt;
         &lt;span class="publisher"
           aria-label="$escapetool.xml($services.localization.render('image.lightbox.publisher.label'))"&gt;&lt;/span&gt;
-        &lt;span class="date" data-dateFormat="$dateFormat"
+        &lt;span class="date" data-date-format="$escapetool.xml($dateFormat)" 
+          data-user-time-zone="$escapetool.xml($xwiki.getUserTimeZone())"
           aria-label="$escapetool.xml($services.localization.render('image.lightbox.date.label'))"&gt;&lt;/span&gt;
       &lt;/div&gt;
     &lt;/div&gt;

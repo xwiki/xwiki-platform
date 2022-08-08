@@ -19,14 +19,17 @@
  */
 package org.xwiki.test.ui.po;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-
-import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 
 /**
  * Represents the actions possible on the Attachment Pane at the bottom of a page.
@@ -42,11 +45,59 @@ public class AttachmentsPane extends BaseElement
     @FindBy(xpath = "//input[@value='Add another file']")
     private WebElement addAnotherFile;
 
+    private LiveTableElement attachmentsLivetable;
+
+    private String livetableId;
+
     private ConfirmationModal confirmDelete;
+
+    /*
+     * List of attachments livetable column labels.
+     */
+    private static final List<String> LIVETABLE_COLUMNS =
+        Arrays.asList("mimeType", "filename", "filesize", "date", "author");
+
+    /**
+     * Default constructor.
+     *
+     * @since 14.6RC1
+     */
+    public AttachmentsPane()
+    {
+        this.livetableId = "docAttachments";
+        this.attachmentsLivetable = new LiveTableElement(this.livetableId);
+    }
+
+    /**
+     * @param livetableId the id of the attachments livetable
+     * @since 14.6RC1
+     */
+    public AttachmentsPane(String livetableId)
+    {
+        this.livetableId = livetableId;
+        this.attachmentsLivetable = new LiveTableElement(this.livetableId);
+    }
 
     public boolean isOpened()
     {
-        return getDriver().findElementWithoutWaiting(By.id("attachmentscontent")).isDisplayed();
+        return this.attachmentsLivetable.isReady();
+    }
+
+    /**
+     * Wait for the attachments livetable to be ready.
+     *
+     * @since 14.6RC1
+     */
+    public void waitForAttachmentsLivetable()
+    {
+        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
+        {
+            @Override
+            public Boolean apply(WebDriver driver)
+            {
+                return attachmentsLivetable.isReady();
+            }
+        });
     }
 
     /**
@@ -90,6 +141,30 @@ public class AttachmentsPane extends BaseElement
     }
 
     /**
+     * Get the row index of an attachment knowing the filename.
+     *
+     * @param attachmentName the name of the attachment
+     * @return the row index of the searched attachment
+     * @since 14.6RC1
+     */
+    public int getRowIndexByAttachmentName(String attachmentName)
+    {
+        return this.attachmentsLivetable.getRowNumberForElement(By.xpath("//a[text()='" + attachmentName + "']"));
+    }
+
+    /**
+     * Get the filename of an attachment knowing the index in the attachments livetable.
+     *
+     * @param positionNumber the index of the attachment in the livetable
+     * @return the filename of the attachment
+     * @since 14.6RC1
+     */
+    public String getAttachmentNameByPosition(int positionNumber)
+    {
+        return this.attachmentsLivetable.getCell(positionNumber, 2).findElement(By.className("name")).getText();
+    }
+
+    /**
      * Return the {@code a} tag of an attachment link according to its name.
      *
      * @param attachmentName the name of the attachment (for instance {@code "my_doc.txt"})
@@ -98,13 +173,8 @@ public class AttachmentsPane extends BaseElement
      */
     public WebElement getAttachmentLink(String attachmentName)
     {
-        By attachementLinkSelector = By.xpath(
-            String.format("//div[@id='_attachments']//a[@title = 'Download this attachment' and contains(@href, '%s')]",
-                attachmentName));
-        // Make sure that the element is visible and can be clicked before returning it to prevent interacting too 
-        // early with the attachment link.
-        getDriver().waitUntilCondition(elementToBeClickable(attachementLinkSelector));
-        return getDriver().findElementWithoutWaiting(attachementLinkSelector);
+        return this.attachmentsLivetable.getCell(getRowIndexByAttachmentName(attachmentName), 2)
+            .findElement(By.className("name")).findElement(By.tagName("a"));
     }
 
     /**
@@ -115,13 +185,28 @@ public class AttachmentsPane extends BaseElement
     public void deleteAttachmentByFileByName(String attachmentName)
     {
         // We initialize before so we can remove the animation before the modal is shown
-        this.confirmDelete = new ConfirmationModal(By.id("deleteAttachment"));
-        getDriver().findElement(By.xpath("//div[@id='attachmentscontent']//a[text()='" + attachmentName
-            + "']/../../div[contains(@class, 'xwikibuttonlinks')]/a[contains(@class,'deletelink')]")).click();
+        this.confirmDelete = new ConfirmationModal(By.xpath(".//table[@id='" + this.livetableId
+            + "']/parent::div/following-sibling::div[contains(@class, 'deleteAttachment')]"));
+        WebElement deleteButton = this.attachmentsLivetable.getCell(getRowIndexByAttachmentName(attachmentName), 6)
+            .findElement(By.className("actiondelete"));
+        // This is needed since Selenium deleteButton.click() fails on smaller windows, even if the element is
+        // clickable (visible and enabled). The failure was reproduced on org.xwiki.test.ui.CompareVersionsTest and
+        // might be resolved after moving the test to docker.
+        ((JavascriptExecutor) getDriver()).executeScript("arguments[0].click();", deleteButton);
         this.confirmDelete.clickOk();
-        getDriver().waitUntilElementDisappears(
-            By.xpath("//div[@id='attachmentscontent']//a[text()='" + attachmentName + "']"));
-        getDriver().waitUntilElementIsVisible(By.xpath("//div[@id='Attachmentspane']"));
+
+        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
+        {
+            @Override
+            public Boolean apply(WebDriver driver)
+            {
+                try {
+                    return !confirmDelete.isDisplayed() && !deleteButton.isDisplayed();
+                } catch (StaleElementReferenceException e) {
+                    return true;
+                }
+            }
+        });
     }
 
     /**
@@ -129,19 +214,26 @@ public class AttachmentsPane extends BaseElement
      */
     public void deleteFirstAttachment()
     {
-        String tmp = getDriver()
-            .findElement(By.xpath("//div[@id='_attachments']/*[1]/div[@class='information']/span[@class='name']"))
-            .getText();
-        getDriver()
-            .findElement(By
-                .xpath("//div[@id='attachmentscontent']//a[text()='" + tmp + "']/../../span[2]/a[@class='deletelink']"))
-            .click();
+        // We initialize before so we can remove the animation before the modal is shown
+        this.confirmDelete = new ConfirmationModal(By.xpath(".//table[@id='" + this.livetableId
+            + "']/parent::div/following-sibling::div[contains(@class, 'deleteAttachment')]"));
+        WebElement deleteButton = this.attachmentsLivetable.getCell(1, 6).findElement(By.className("actiondelete"));
+        deleteButton.click();
+        this.confirmDelete.clickOk();
 
-        getDriver().findElement(By.xpath("//*[@class='xdialog-modal-container']//input[@value='Yes']")).click();
-        getDriver().waitUntilElementDisappears(
-            By.xpath("//*[@class='xdialog-modal-container']/*[contains(@class, 'xdialog-box-confirmation')]"));
-        getDriver().waitUntilElementDisappears(
-            By.xpath("//div[@id='attachmentscontent']//a[text()='" + tmp + "']/../../span[2]/a[@class='deletelink']"));
+        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
+        {
+            @Override
+            public Boolean apply(WebDriver driver)
+            {
+                try {
+                    return !confirmDelete.isDisplayed() && !deleteButton.isDisplayed();
+                } catch (StaleElementReferenceException e) {
+                    return true;
+                }
+            }
+        });
+
     }
 
     /**
@@ -151,6 +243,17 @@ public class AttachmentsPane extends BaseElement
     {
         By countLocator = By.cssSelector("#Attachmentstab .itemCount");
         return Integer.parseInt(getDriver().findElement(countLocator).getText().replaceAll("[()]", ""));
+    }
+
+    /**
+     * Get the number of displayed attachments, regardless of the total number.
+     *
+     * @return the number of attachments displayed.
+     * @since 14.6RC1
+     */
+    public int getNumberOfAttachmentsDisplayed()
+    {
+        return this.attachmentsLivetable.getRowCount();
     }
 
     /**
@@ -165,8 +268,7 @@ public class AttachmentsPane extends BaseElement
 
     public String getUploaderOfAttachment(String attachmentName)
     {
-        return getDriver().findElement(By.xpath("//div[@id='attachmentscontent']//a[text()='" + attachmentName
-            + "']/../../div[@class='meta']/span[@class='publisher']/span[@class='wikilink']")).getText();
+        return this.attachmentsLivetable.getCell(getRowIndexByAttachmentName(attachmentName), 5).getText();
     }
 
     /**
@@ -177,7 +279,7 @@ public class AttachmentsPane extends BaseElement
      */
     public String getLatestVersionOfAttachment(String attachmentName)
     {
-        return getAttachmentVersionElement(attachmentName).getText();
+        return this.getAttachmentVersionElement(attachmentName).getText();
     }
 
     /**
@@ -189,38 +291,81 @@ public class AttachmentsPane extends BaseElement
      */
     public AttachmentHistoryPage goToAttachmentHistory(String attachmentName)
     {
-        getAttachmentVersionElement(attachmentName).click();
+        this.getAttachmentVersionElement(attachmentName).click();
         return new AttachmentHistoryPage();
     }
 
     public String getSizeOfAttachment(String attachmentName)
     {
-        return getDriver().findElement(By.xpath("//div[@id='attachmentscontent']//a[text()='" + attachmentName
-            + "']/../../div[@class='meta']/span[@class='size']")).getText().replaceAll("[()]", "");
+        return this.attachmentsLivetable.getCell(getRowIndexByAttachmentName(attachmentName), 3).getText();
 
     }
 
     public String getDateOfLastUpload(String attachmentName)
     {
-        return getDriver().findElement(By.xpath("//div[@id='attachmentscontent']//a[text()='" + attachmentName
-            + "']/../../div[@class='meta']/span[@class='date']")).getText().replaceFirst("on", "");
+        return this.attachmentsLivetable.getCell(getRowIndexByAttachmentName(attachmentName), 4).getText();
     }
 
-    public boolean attachmentExistsByFileName(String attachmentName)
+    /**
+     * Check if the attachment exists for the currently displayed rows.
+     *
+     * @param attachmentName the name of the searched attachment
+     * @return whether the attachment exists or not in the list of currently displayed attachments
+     * @since 14.6RC1
+     */
+    public boolean attachmentIsDisplayedByFileName(String attachmentName)
     {
         try {
-            getDriver()
-                .findElement(By.xpath("//a[@title = 'Download this attachment' and . = '" + attachmentName + "']"));
+            getDriver().findElement(By
+                .xpath("//tbody[@id='" + this.livetableId + "-display']//tr[td//a[text()='" + attachmentName + "']]"));
         } catch (NoSuchElementException e) {
             return false;
         }
         return true;
     }
 
+    /**
+     * Check if the attachment exists, regardless of the page where it is displayed.
+     *
+     * @param attachmentName the name of the searched attachment
+     * @return whether the attachments exists or not in the list of all attachments
+     */
+    public boolean attachmentExistsByFileName(String attachmentName)
+    {
+        this.filterColumn("filename", attachmentName);
+        boolean attachmentExists = this.attachmentIsDisplayedByFileName(attachmentName);
+        this.filterColumn("filename", "");
+
+        return attachmentExists;
+    }
+
+    /**
+     * @param attachmentName the name of the targeted attachment
+     * @return the button to trigger the attachment move action
+     * @since 14.6RC1
+     */
+    public WebElement getAttachmentMoveElement(String attachmentName)
+    {
+        return this.attachmentsLivetable.getCell(getRowIndexByAttachmentName(attachmentName), 6)
+            .findElement(By.className("move-attachment"));
+    }
+
     private WebElement getAttachmentVersionElement(String attachmentName)
     {
-        return getDriver()
-            .findElement(By.xpath(
-                "//div[@id='attachmentscontent']//a[text()= '" + attachmentName + "']/../../span[@class='version']/a"));
+        return this.attachmentsLivetable.getCell(getRowIndexByAttachmentName(attachmentName), 2)
+            .findElement(By.className("version"));
+    }
+
+    /**
+     * Set the value in the filter of a column.
+     *
+     * @param columnLabel the label of the column to filter
+     * @param filterValue the value to filter by
+     * @since 14.6RC1
+     */
+    public void filterColumn(String columnLabel, String filterValue)
+    {
+        int index = LIVETABLE_COLUMNS.indexOf(columnLabel) + 1;
+        this.attachmentsLivetable.filterColumn("xwiki-livetable-" + this.livetableId + "-filter-" + index, filterValue);
     }
 }

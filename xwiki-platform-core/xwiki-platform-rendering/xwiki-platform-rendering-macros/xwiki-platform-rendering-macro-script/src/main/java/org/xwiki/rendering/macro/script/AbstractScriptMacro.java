@@ -22,6 +22,7 @@ package org.xwiki.rendering.macro.script;
 import java.io.StringReader;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -109,7 +110,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     {
         super(macroName, null, ScriptMacroParameters.class);
 
-        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_DEVELOPMENT));
     }
 
     /**
@@ -120,7 +121,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     {
         super(macroName, macroDescription, ScriptMacroParameters.class);
 
-        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_DEVELOPMENT));
     }
 
     /**
@@ -132,7 +133,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     {
         super(macroName, macroDescription, contentDescriptor, ScriptMacroParameters.class);
 
-        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_DEVELOPMENT));
     }
 
     /**
@@ -145,7 +146,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     {
         super(macroName, macroDescription, parametersBeanClass);
 
-        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_DEVELOPMENT));
     }
 
     /**
@@ -159,7 +160,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     {
         super(macroName, macroDescription, contentDescriptor, parametersBeanClass);
 
-        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_DEVELOPMENT));
     }
 
     @Override

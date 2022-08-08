@@ -37,7 +37,7 @@ import org.xwiki.test.ui.po.Select;
  * 
  * @version $Id$
  * @since 14.4.2
- * @since 14.5RC1
+ * @since 14.5
  */
 public class PDFExportOptionsModal extends BaseModal
 {

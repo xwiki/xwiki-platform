@@ -41,8 +41,11 @@ export.pdf.options.template.hint=The PDF template controls the information displ
 export.pdf.options.loadFailure=Failed to load the PDF export options.
 
 export.pdf.modal.close=Close
-export.pdf.inProgress=Exporting...
+export.pdf.inProgress=Exporting as PDF...
 export.pdf.failed=Failed to export as PDF
+export.pdf.canceling=Canceling PDF export...
+export.pdf.canceled=PDF export canceled
+export.pdf.cancelFailed=Failed to cancel the PDF export
 
 export.pdf.templates.default=Default template
 export.pdf.templates.default.versionInfo=Version {0} authored by {1} on {2}

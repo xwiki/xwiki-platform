@@ -26,7 +26,7 @@ import org.xwiki.component.annotation.Role;
  * 
  * @version $Id$
  * @since 14.4.2
- * @since 14.5RC1
+ * @since 14.5
  */
 @Role
 public interface RequiredSkinExtensionsRecorder

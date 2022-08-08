@@ -29,6 +29,7 @@ import javax.inject.Provider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.eventstream.EventFactory;
 import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.internal.DefaultEvent;
@@ -71,6 +72,9 @@ class DocumentEventRecordedTest
     private Provider<XWikiContext> contextProvider;
 
     @MockComponent
+    private EventFactory eventFactory;
+
+    @MockComponent
     @Named("document")
     private UserReferenceSerializer<DocumentReference> userReferenceSerializer;
 
@@ -81,6 +85,8 @@ class DocumentEventRecordedTest
     {
         this.context = mock(XWikiContext.class);
         when(this.contextProvider.get()).thenReturn(this.context);
+
+        when(this.eventFactory.createRawEvent()).thenReturn(new DefaultEvent());
     }
 
     @Test

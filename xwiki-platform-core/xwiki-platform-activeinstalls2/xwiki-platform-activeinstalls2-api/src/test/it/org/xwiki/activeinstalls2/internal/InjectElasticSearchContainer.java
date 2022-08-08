@@ -31,7 +31,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * Marks a field as needed to be injected with the ElasticSearch container instance.
  *
  * @version $Id$
- * @since 14.5RC1
+ * @since 14.5
  */
 @Documented
 @Retention(RUNTIME)

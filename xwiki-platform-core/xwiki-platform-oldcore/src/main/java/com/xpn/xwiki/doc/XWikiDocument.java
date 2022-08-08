@@ -1139,9 +1139,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @return the copy of this XWikiDocument instance before any modification was made to it. It is reset to the actual
-     *         values when the document is saved in the database. This copy is used for finding out differences made to
-     *         this document (useful for example to send the correct notifications to document change listeners).
+     * @return the copy of this XWikiDocument instance before any modification was made to it. This copy is used for
+     *         finding out differences made to this document (useful for example to send the correct notifications to
+     *         document change listeners).
      */
     @Override
     public XWikiDocument getOriginalDocument()

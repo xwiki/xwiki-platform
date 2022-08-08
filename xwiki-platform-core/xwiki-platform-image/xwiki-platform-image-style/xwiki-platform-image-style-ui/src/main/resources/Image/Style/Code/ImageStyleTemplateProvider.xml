@@ -267,7 +267,9 @@
       <terminal>1</terminal>
     </property>
     <property>
-      <visibilityRestrictions/>
+      <visibilityRestrictions>
+        <value>Image.Style.Code.ImageStyles</value>
+      </visibilityRestrictions>
     </property>
   </object>
 </xwikidoc>

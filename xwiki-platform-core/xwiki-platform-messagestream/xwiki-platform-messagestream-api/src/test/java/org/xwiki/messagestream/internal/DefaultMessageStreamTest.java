@@ -25,7 +25,6 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.eventstream.EventFactory;
 import org.xwiki.eventstream.EventStore;
-import org.xwiki.eventstream.EventStream;
 import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
@@ -83,9 +82,6 @@ class DefaultMessageStreamTest
 
     @MockComponent
     private EntityReferenceSerializer<String> serializer;
-
-    @MockComponent
-    private EventStream stream;
 
     @MockComponent
     private EventStore eventStore;

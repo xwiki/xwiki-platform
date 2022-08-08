@@ -27,6 +27,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.xwiki.configuration.internal.RestrictedConfigurationSourceProvider;
+import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataQuery;
@@ -46,6 +48,12 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.xml.internal.html.DefaultHTMLElementSanitizer;
+import org.xwiki.xml.internal.html.HTMLDefinitions;
+import org.xwiki.xml.internal.html.HTMLElementSanitizerConfiguration;
+import org.xwiki.xml.internal.html.MathMLDefinitions;
+import org.xwiki.xml.internal.html.SVGDefinitions;
+import org.xwiki.xml.internal.html.SecureHTMLElementSanitizer;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -58,8 +66,22 @@ import static org.xwiki.rendering.test.integration.junit5.BlockAssert.assertBloc
  * @since 12.10
  */
 @ComponentTest
-@ComponentList({HTML5RendererFactory.class, HTML5Renderer.class, DefaultXHTMLLinkRenderer.class,
-    DefaultXHTMLLinkTypeRenderer.class, DefaultXHTMLImageRenderer.class, DefaultXHTMLImageTypeRenderer.class})
+@ComponentList({
+    HTML5RendererFactory.class,
+    HTML5Renderer.class,
+    DefaultXHTMLLinkRenderer.class,
+    DefaultXHTMLLinkTypeRenderer.class,
+    DefaultXHTMLImageRenderer.class,
+    DefaultXHTMLImageTypeRenderer.class,
+    DefaultHTMLElementSanitizer.class,
+    SecureHTMLElementSanitizer.class,
+    HTMLElementSanitizerConfiguration.class,
+    RestrictedConfigurationSourceProvider.class,
+    HTMLDefinitions.class,
+    MathMLDefinitions.class,
+    SVGDefinitions.class,
+    DefaultExecution.class
+})
 class LiveDataMacroTest
 {
     @InjectMockComponents

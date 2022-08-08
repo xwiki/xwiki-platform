@@ -76,7 +76,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     },
     extraJARs = {
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
-        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
         "org.xwiki.platform:xwiki-platform-mail-send-storage",
         // XWiki needs the mailsender plugin JAR to be present before it starts since it's not an extension and it
         // cannot be provisioned after XWiki is started!

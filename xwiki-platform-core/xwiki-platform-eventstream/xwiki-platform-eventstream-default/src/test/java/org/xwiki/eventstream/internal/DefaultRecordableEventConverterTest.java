@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.eventstream.Event;
+import org.xwiki.eventstream.EventFactory;
 import org.xwiki.eventstream.RecordableEvent;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.TargetableEvent;
@@ -70,6 +71,9 @@ class DefaultRecordableEventConverterTest
     @Named("context")
     private ComponentManager componentManager;
 
+    @MockComponent
+    private EventFactory eventFactory;
+
     @Mock
     private RecordableEventDescriptor descriptor;
 
@@ -86,6 +90,8 @@ class DefaultRecordableEventConverterTest
         when(contextProvider.get()).thenReturn(context);
         when(context.getUserReference()).thenReturn(CURRENT_USER);
         when(context.getWikiReference()).thenReturn(CURRENT_WIKI);
+
+        when(this.eventFactory.createRawEvent()).thenReturn(new DefaultEvent());
     }
 
     private class MockedRecordableEvent implements RecordableEvent, TargetableEvent

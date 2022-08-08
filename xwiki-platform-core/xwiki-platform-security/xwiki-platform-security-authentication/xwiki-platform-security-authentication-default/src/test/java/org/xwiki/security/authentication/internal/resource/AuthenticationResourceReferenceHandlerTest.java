@@ -29,6 +29,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
 import org.xwiki.security.authentication.AuthenticationAction;
 import org.xwiki.security.authentication.AuthenticationResourceReference;
@@ -72,28 +73,32 @@ class AuthenticationResourceReferenceHandlerTest
 
     private XWiki xwiki;
 
-    private XWikiContext xWikiContext;
+    private XWikiContext context;
 
     private ServletOutputStream servletOutputStream;
+
+    private WikiReference currentWiki;
 
     @BeforeEach
     void setup() throws XWikiException, IOException
     {
         ExecutionContext executionContext = mock(ExecutionContext.class);
         when(this.execution.getContext()).thenReturn(executionContext);
-        this.xWikiContext = mock(XWikiContext.class);
-        when(this.xWikiContextInitializer.initialize(executionContext)).thenReturn(xWikiContext);
+        this.context = mock(XWikiContext.class);
+        when(this.xWikiContextInitializer.initialize(executionContext)).thenReturn(context);
         this.response = mock(XWikiResponse.class);
-        when(xWikiContext.getResponse()).thenReturn(response);
+        when(context.getResponse()).thenReturn(response);
         this.xwiki = mock(XWiki.class);
-        when(xWikiContext.getWiki()).thenReturn(xwiki);
+        when(context.getWiki()).thenReturn(xwiki);
         when(this.xwiki.getEncoding()).thenReturn("UTF-8");
         XWikiPluginManager pluginManager = mock(XWikiPluginManager.class);
         when(this.xwiki.getPluginManager()).thenReturn(pluginManager);
-        when(pluginManager.endParsing(any(), eq(xWikiContext)))
+        when(pluginManager.endParsing(any(), eq(context)))
             .then(invocationOnMock -> invocationOnMock.getArgument(0));
         this.servletOutputStream = mock(ServletOutputStream.class);
         when(this.response.getOutputStream()).thenReturn(servletOutputStream);
+        currentWiki = new WikiReference("currentWiki");
+        when(context.getWikiReference()).thenReturn(currentWiki);
     }
 
     @Test
@@ -106,10 +111,12 @@ class AuthenticationResourceReferenceHandlerTest
     @Test
     void handleResetPassword() throws Exception
     {
+        WikiReference wikiReference = new WikiReference("foo");
         AuthenticationResourceReference resourceReference = new AuthenticationResourceReference(
+            wikiReference,
             AuthenticationAction.RESET_PASSWORD);
 
-        when(this.xwiki.evaluateTemplate("resetpassword.vm", xWikiContext)).thenReturn("Reset password content");
+        when(this.xwiki.evaluateTemplate("resetpassword.vm", context)).thenReturn("Reset password content");
 
         ResourceReferenceHandlerChain chain = mock(ResourceReferenceHandlerChain.class);
         this.resourceReferenceHandler.handle(resourceReference, chain);
@@ -118,15 +125,19 @@ class AuthenticationResourceReferenceHandlerTest
         verify(this.xWikiContextInitializer).initialize(any(ExecutionContext.class));
         verify(servletOutputStream).write("Reset password content".getBytes(StandardCharsets.UTF_8));
         verify(chain).handleNext(resourceReference);
+        verify(context).setWikiReference(wikiReference);
+        verify(context).setWikiReference(currentWiki);
     }
 
     @Test
     void handleForgotUsername() throws Exception
     {
+        WikiReference wikiReference = new WikiReference("bar");
         AuthenticationResourceReference resourceReference = new AuthenticationResourceReference(
-            AuthenticationAction.FORGOT_USERNAME);
+            wikiReference,
+            AuthenticationAction.RETRIEVE_USERNAME);
 
-        when(this.xwiki.evaluateTemplate("forgotusername.vm", xWikiContext)).thenReturn("Forgot user name content");
+        when(this.xwiki.evaluateTemplate("forgotusername.vm", context)).thenReturn("Forgot user name content");
 
         ResourceReferenceHandlerChain chain = mock(ResourceReferenceHandlerChain.class);
         this.resourceReferenceHandler.handle(resourceReference, chain);
@@ -135,5 +146,7 @@ class AuthenticationResourceReferenceHandlerTest
         verify(this.xWikiContextInitializer).initialize(any(ExecutionContext.class));
         verify(servletOutputStream).write("Forgot user name content".getBytes(StandardCharsets.UTF_8));
         verify(chain).handleNext(resourceReference);
+        verify(context).setWikiReference(wikiReference);
+        verify(context).setWikiReference(currentWiki);
     }
 }

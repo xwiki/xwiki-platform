@@ -25,7 +25,7 @@ import java.util.Objects;
 
 import org.xwiki.export.pdf.job.PDFExportJobStatus;
 import org.xwiki.export.pdf.job.PDFExportJobStatus.DocumentRenderingResult;
-import org.xwiki.job.internal.script.safe.SafeJobStatus;
+import org.xwiki.job.internal.script.safe.SafeCancelableJobStatus;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
 import org.xwiki.script.internal.safe.ScriptSafeProvider;
@@ -38,9 +38,9 @@ import org.xwiki.user.UserReferenceResolver;
  * 
  * @version $Id$
  * @since 14.4.2
- * @since 14.5RC1
+ * @since 14.5
  */
-public class SafePDFExportJobStatus extends SafeJobStatus<PDFExportJobStatus>
+public class SafePDFExportJobStatus extends SafeCancelableJobStatus<PDFExportJobStatus>
 {
     private final UserReferenceResolver<DocumentReference> userResolver;
 
@@ -109,6 +109,15 @@ public class SafePDFExportJobStatus extends SafeJobStatus<PDFExportJobStatus>
             return getWrapped().getPDFFileReference();
         } else {
             return null;
+        }
+    }
+
+    @Override
+    public void cancel()
+    {
+        // Allow the user that triggered the export to cancel it.
+        if (currentUserTriggeredTheExport()) {
+            getWrapped().cancel();
         }
     }
 

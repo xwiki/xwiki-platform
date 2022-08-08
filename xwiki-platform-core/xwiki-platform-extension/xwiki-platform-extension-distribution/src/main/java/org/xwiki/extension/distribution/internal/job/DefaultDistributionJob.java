@@ -33,7 +33,6 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.distribution.internal.job.step.CleanExtensionsDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.DefaultUIDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
-import org.xwiki.extension.distribution.internal.job.step.EventMigrationStep;
 import org.xwiki.extension.distribution.internal.job.step.FirstAdminUserStep;
 import org.xwiki.extension.distribution.internal.job.step.FlavorDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.OutdatedExtensionsDistributionStep;
@@ -98,15 +97,6 @@ public class DefaultDistributionJob extends AbstractDistributionJob<Distribution
                 OutdatedExtensionsDistributionStep.ID));
         } catch (ComponentLookupException e) {
             this.logger.error("Failed to get outdated extensions step instance", e);
-        }
-
-        if (isMainWiki) {
-            try {
-                steps.add(
-                    this.componentManager.<DistributionStep>getInstance(DistributionStep.class, EventMigrationStep.ID));
-            } catch (ComponentLookupException e) {
-                this.logger.error("Failed to get events migration step instance", e);
-            }
         }
 
         return steps;

@@ -25,18 +25,17 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-image-style</artifactId>
-    <version>14.5-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-image-style-rest</artifactId>
   <name>XWiki Platform - Image - Style - Rest</name>
+  <description>REST endpoints to get defined image styles</description>
   <properties>
     <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager. -->
-    <xwiki.extension.name>Rest Endpoint for the Image Style Application.</xwiki.extension.name>
-    <!-- Description to display by the Extension Manager. -->
-    <xwiki.extension.description>Provides the Rest endpoints for the Image Style configurations Application.</xwiki.extension.description>
+    <xwiki.extension.name>REST endpoints for the Image Style Application</xwiki.extension.name>
     <!-- Category to display in the Extension Manager. -->
-    <xwiki.extension.category>other</xwiki.extension.category>
+    <xwiki.extension.category>api</xwiki.extension.category>
   </properties>
   <dependencies>
     <dependency>

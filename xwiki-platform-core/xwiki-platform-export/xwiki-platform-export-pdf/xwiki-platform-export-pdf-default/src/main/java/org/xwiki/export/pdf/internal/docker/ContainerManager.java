@@ -21,6 +21,8 @@ package org.xwiki.export.pdf.internal.docker;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -30,7 +32,6 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.export.pdf.PDFExportConfiguration;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.AsyncDockerCmd;
@@ -41,6 +42,7 @@ import com.github.dockerjava.api.command.SyncDockerCmd;
 import com.github.dockerjava.api.exception.NotFoundException;
 import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.Container;
+import com.github.dockerjava.api.model.ContainerNetwork;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.Ports;
@@ -56,7 +58,7 @@ import com.github.dockerjava.transport.DockerHttpClient;
  * 
  * @version $Id$
  * @since 14.4.2
- * @since 14.5RC1
+ * @since 14.5
  */
 @Component(roles = ContainerManager.class)
 @Singleton
@@ -66,9 +68,6 @@ public class ContainerManager implements Initializable
 
     @Inject
     private Logger logger;
-
-    @Inject
-    private PDFExportConfiguration configuration;
 
     private DockerClient client;
 
@@ -86,9 +85,10 @@ public class ContainerManager implements Initializable
      * Attempts to reuse the container with the specified name.
      * 
      * @param containerName the name of the container to reuse
+     * @param reuse {@code true} to reuse the container if found, {@code false} to remove it if found
      * @return the container id, if a container with the specified name exists and can be reused, otherwise {@code null}
      */
-    public String maybeReuseContainerByName(String containerName)
+    public String maybeReuseContainerByName(String containerName, boolean reuse)
     {
         this.logger.debug("Looking for an existing Docker container with name [{}].", containerName);
         List<Container> containers =
@@ -100,10 +100,14 @@ public class ContainerManager implements Initializable
         }
 
         InspectContainerResponse container = inspectContainer(containers.get(0).getId());
-        if (container.getState().getDead() == Boolean.TRUE) {
+        if (!reuse) {
+            this.logger.debug("Docker container [{}] found but we can't reuse it.", container.getId());
+            removeContainer(container);
+            return null;
+        } else if (container.getState().getDead() == Boolean.TRUE) {
             this.logger.debug("Docker container [{}] is dead. Removing it.", container.getId());
             // The container is not reusable. Try to remove it so it can be recreated.
-            exec(this.client.removeContainerCmd(container.getId()));
+            removeContainer(container.getId());
             return null;
         } else if (container.getState().getPaused() == Boolean.TRUE) {
             this.logger.debug("Docker container [{}] is paused. Unpausing it.", container.getId());
@@ -150,32 +154,44 @@ public class ContainerManager implements Initializable
      * 
      * @param imageName the image to use for the new container
      * @param containerName the name to associate with the created container
-     * @param remoteDebuggingPort the port used for remote debugging
      * @param parameters the parameters to specify when creating the container
+     * @param hostConfig the host configuration
      * @return the id of the created container
      */
-    public String createContainer(String imageName, String containerName, int remoteDebuggingPort,
-        List<String> parameters)
+    public String createContainer(String imageName, String containerName, List<String> parameters,
+        HostConfig hostConfig)
     {
-        this.logger.debug("Creating a Docker container with name [{}] using image [{}], remote debugging port [{}]"
-            + " and parameters [{}].", containerName, imageName, remoteDebuggingPort, parameters);
-        ExposedPort exposedPort = ExposedPort.tcp(remoteDebuggingPort);
-        Ports portBindings = new Ports();
-        portBindings.bind(exposedPort, Ports.Binding.bindPort(remoteDebuggingPort));
+        this.logger.debug("Creating a Docker container with name [{}] using image [{}] and having parameters [{}].",
+            containerName, imageName, parameters);
+
+        // set extra hosts if network == bridge (using host.xwiki.internal:host-gateway)
 
         try (CreateContainerCmd createContainerCmd = this.client.createContainerCmd(imageName)) {
-            CreateContainerResponse container = createContainerCmd.withCmd(parameters).withExposedPorts(exposedPort)
-                // The extra host is needed in order to be able to access the XWiki instance running on the same machine
-                // as the Docker container itself.
-                .withHostConfig(HostConfig.newHostConfig()
-                    .withExtraHosts(this.configuration.getChromeDockerHostName() + ":host-gateway").withBinds(
-                        // Make sure it also works when XWiki is running in Docker.
-                        new Bind(DOCKER_SOCK, new Volume(DOCKER_SOCK)))
-                    .withPortBindings(portBindings))
-                .withName(containerName).exec();
+            List<ExposedPort> exposedPorts =
+                hostConfig.getPortBindings().getBindings().keySet().stream().collect(Collectors.toList());
+            CreateContainerResponse container = createContainerCmd.withName(containerName).withCmd(parameters)
+                .withExposedPorts(exposedPorts).withHostConfig(hostConfig).exec();
             this.logger.debug("Created the Docker container with id [{}].", container.getId());
             return container.getId();
         }
+    }
+
+    /**
+     * Creates the host configuration.
+     * 
+     * @param network the network to join
+     * @param port the port to expose (the port the container is going to listen to)
+     * @return the host configuration
+     */
+    public HostConfig getHostConfig(String network, int port)
+    {
+        ExposedPort exposedPort = ExposedPort.tcp(port);
+        Ports portBindings = new Ports();
+        portBindings.bind(exposedPort, Ports.Binding.bindPort(port));
+
+        return HostConfig.newHostConfig().withAutoRemove(true).withNetworkMode(network).withBinds(
+            // Make sure it also works when XWiki is running in Docker.
+            new Bind(DOCKER_SOCK, new Volume(DOCKER_SOCK))).withPortBindings(portBindings);
     }
 
     /**
@@ -196,14 +212,43 @@ public class ContainerManager implements Initializable
      */
     public void stopContainer(String containerId)
     {
-        if (containerId != null) {
-            this.logger.debug("Stopping the Docker container with id [{}].", containerId);
-            exec(this.client.stopContainerCmd(containerId));
+        this.logger.debug("Stopping the Docker container with id [{}].", containerId);
+        exec(this.client.stopContainerCmd(containerId));
 
-            // Wait for the container to be fully stopped before continuing.
-            this.logger.debug("Wait for the Docker container [{}] to stop.", containerId);
+        // Wait for the container to be fully stopped before continuing.
+        this.logger.debug("Wait for the Docker container [{}] to stop.", containerId);
+        try {
             wait(this.client.waitContainerCmd(containerId));
+        } catch (NotFoundException e) {
+            // Do nothing (the container might have been removed automatically when stopped).
         }
+    }
+
+    /**
+     * Remove the specified container.
+     * 
+     * @param containerId the if of the container to remove
+     */
+    private void removeContainer(String containerId)
+    {
+        try {
+            this.logger.debug("Removing the Docker container with id [{}].", containerId);
+            exec(this.client.removeContainerCmd(containerId));
+        } catch (NotFoundException e) {
+            // Do nothing (the container might have been removed automatically when stopped).
+        }
+    }
+
+    private void removeContainer(InspectContainerResponse container)
+    {
+        if (container.getState().getPaused() == Boolean.TRUE) {
+            exec(this.client.unpauseContainerCmd(container.getId()));
+            stopContainer(container.getId());
+        } else if (container.getState().getRunning() == Boolean.TRUE
+            || container.getState().getRestarting() == Boolean.TRUE) {
+            stopContainer(container.getId());
+        }
+        removeContainer(container.getId());
     }
 
     /**
@@ -212,10 +257,28 @@ public class ContainerManager implements Initializable
      * @param containerId the container to inspect
      * @return information about the specified container
      */
-    public InspectContainerResponse inspectContainer(String containerId)
+    private InspectContainerResponse inspectContainer(String containerId)
     {
         this.logger.debug("Inspecting the Docker container [{}].", containerId);
         return exec(this.client.inspectContainerCmd(containerId));
+    }
+
+    /**
+     * @param containerId the container id
+     * @param networkIdOrName the network id or name
+     * @return the IP address of the specified container in the specified network
+     */
+    public String getIpAddress(String containerId, String networkIdOrName)
+    {
+        Map<String, ContainerNetwork> networks = inspectContainer(containerId).getNetworkSettings().getNetworks();
+        // Try to find the network by name.
+        ContainerNetwork network = networks.get(networkIdOrName);
+        if (network == null) {
+            // Otherwise, find the network by id. Throw an exception if not found.
+            network = networks.values().stream().filter(n -> n.getNetworkID().equals(networkIdOrName)).findFirst()
+                .orElseThrow();
+        }
+        return network.getIpAddress();
     }
 
     private void wait(AsyncDockerCmd<?, ?> command)

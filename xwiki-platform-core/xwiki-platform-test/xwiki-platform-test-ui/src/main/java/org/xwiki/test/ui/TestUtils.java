@@ -1144,7 +1144,7 @@ public class TestUtils
     }
 
     /**
-     * @since 14.5RC1
+     * @since 14.5
      */
     public void setCurrentWiki(String currentWiki)
     {

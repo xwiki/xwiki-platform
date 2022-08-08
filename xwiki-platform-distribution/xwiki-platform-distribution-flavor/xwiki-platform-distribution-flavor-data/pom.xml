@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor</artifactId>
-    <version>14.5-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-data</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Data</name>
@@ -79,7 +79,7 @@
                  which has its own mapping and migrators. -->
             <dependency>
               <groupId>org.xwiki.platform</groupId>
-              <artifactId>xwiki-platform-eventstream-store-hibernate</artifactId>
+              <artifactId>xwiki-platform-legacy-events-hibernate-api</artifactId>
               <version>${project.version}</version>
             </dependency>
             <!-- Annotation has it own migrator that we need to execute to set the rigth version to the DB. -->

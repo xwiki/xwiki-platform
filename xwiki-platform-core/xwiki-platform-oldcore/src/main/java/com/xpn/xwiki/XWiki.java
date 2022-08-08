@@ -149,18 +149,16 @@ import org.xwiki.observation.event.CancelableEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
-import org.xwiki.refactoring.ReferenceRenamer;
 import org.xwiki.refactoring.batch.BatchOperationExecutor;
+import org.xwiki.refactoring.internal.ReferenceUpdater;
 import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.Block.Axes;
 import org.xwiki.rendering.block.MetaDataBlock;
-import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.MetadataBlockMatcher;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.parser.ParseException;
-import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxContent;
 import org.xwiki.rendering.transformation.RenderingContext;
@@ -487,6 +485,8 @@ public class XWiki implements EventListener
     private AsyncContext asyncContext;
 
     private AuthorizationManager authorizationManager;
+
+    private ReferenceUpdater referenceUpdater;
 
     private ConfigurationSource getConfiguration()
     {
@@ -827,6 +827,15 @@ public class XWiki implements EventListener
         }
 
         return this.authorizationManager;
+    }
+
+    private ReferenceUpdater getReferenceUpdater()
+    {
+        if (this.referenceUpdater == null) {
+            this.referenceUpdater = Utils.getComponent(ReferenceUpdater.class);
+        }
+
+        return this.referenceUpdater;
     }
 
     private String localizePlainOrKey(String key, Object... parameters)
@@ -4853,11 +4862,11 @@ public class XWiki implements EventListener
                         context.setWikiReference(wikiReference);
                     }
 
-                    // Step 4: For each child document, update its parent reference.
-                    // Step 5: For each backlink to rename, parse the backlink document and replace the links with
-                    // the new name.
-                    // Step 6: Refactor the relative links contained in the document to make sure they are relative
+                    // Step 4: Refactor the relative links contained in the document to make sure they are relative
                     // to the new document's location.
+                    // Step 5: For each child document, update its parent reference.
+                    // Step 6: For each backlink to rename, parse the backlink document and replace the links with
+                    // the new name.
                     this.updateLinksForRename(sourceDocument, targetDocumentReference, backlinkDocumentReferences,
                         childDocumentReferences, context);
                     result = true;
@@ -4890,6 +4899,10 @@ public class XWiki implements EventListener
         List<DocumentReference> backlinkDocumentReferences, List<DocumentReference> childDocumentReferences,
         XWikiContext context) throws XWikiException
     {
+        // Step 1: Refactor the relative links contained in the document to make sure they are relative to the new
+        // document's location.
+        getReferenceUpdater().update(newDocumentReference, sourceDoc.getDocumentReference(), newDocumentReference);
+
         // Step 2: For each child document, update its parent reference.
         if (childDocumentReferences != null) {
             for (DocumentReference childDocumentReference : childDocumentReferences) {
@@ -4914,30 +4927,6 @@ public class XWiki implements EventListener
                 XWikiDocument backlinkDocument = backlinkRootDocument.getTranslatedDocument(locale, context);
 
                 renameLinks(backlinkDocument, sourceDoc.getDocumentReference(), newDocumentReference, context);
-            }
-        }
-
-        // Get new document
-        XWikiDocument newDocument = getDocument(newDocumentReference, context);
-
-        // Step 4: Refactor the relative links contained in the document to make sure they are relative to the new
-        // document's location.
-        if (Utils.getContextComponentManager().hasComponent(BlockRenderer.class, sourceDoc.getSyntax().toIdString())) {
-            // Only support syntax for which a renderer is provided
-
-            ReferenceRenamer referenceRenamer = Utils.getComponent(ReferenceRenamer.class);
-
-            DocumentReference oldDocumentReference = sourceDoc.getDocumentReference();
-            XDOM newDocumentXDOM = newDocument.getXDOM();
-            boolean modified = referenceRenamer
-                .renameReferences(newDocumentXDOM, newDocumentReference, oldDocumentReference, newDocumentReference,
-                    false);
-
-            // Set the new content and save document if needed
-            if (modified) {
-                newDocument.setContent(newDocumentXDOM);
-                newDocument.setAuthorReference(context.getUserReference());
-                saveDocument(newDocument, context);
             }
         }
     }

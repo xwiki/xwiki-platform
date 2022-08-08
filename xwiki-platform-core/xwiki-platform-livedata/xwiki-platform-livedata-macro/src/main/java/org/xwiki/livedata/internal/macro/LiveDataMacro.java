@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -106,7 +107,7 @@ public class LiveDataMacro extends AbstractMacro<LiveDataMacroParameters>
         super("Live Data", "Display dynamic lists of data.",
             new DefaultContentDescriptor("Advanced Live Data configuration (JSON)", false),
             LiveDataMacroParameters.class);
-        setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_CONTENT));
     }
 
     @Override

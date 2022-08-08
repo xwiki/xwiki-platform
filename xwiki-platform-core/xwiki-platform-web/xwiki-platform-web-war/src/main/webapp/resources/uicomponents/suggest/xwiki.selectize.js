@@ -17,26 +17,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-/*!
-#set ($paths = {
-  'selectize': $services.webjars.url('org.webjars:selectize.js', 'js/standalone/selectize.min')
-})
-#set ($l10n = {
-  'selectTypedText': $services.localization.render('web.uicomponents.suggest.selectTypedText', ['{0}'])
-})
-#[[*/
-// Start JavaScript-only code.
-(function(paths, l10n) {
-  "use strict";
-
-require.config({
-  paths,
-  shim: {
-    'selectize': ['jquery']
-  }
+define('xwiki-selectize-messages', {
+  prefix: 'web.uicomponents.suggest.',
+  keys: [
+    'selectTypedText'
+  ]
 });
 
-define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], function($, Selectize) {
+define('xwiki-selectize', [
+  'jquery',
+  'selectize',
+  'xwiki-l10n!xwiki-selectize-messages',
+  'xwiki-events-bridge'
+], function($, Selectize, l10n) {
   var optionTemplate = [
     '<div class="xwiki-selectize-option" data-value="">',
       '<span class="xwiki-selectize-option-icon"></span>',
@@ -126,7 +119,7 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
       item: renderItem,
       option: renderOption,
       option_create: function(data, escapeHTML) {
-        var label = escapeHTML(l10n.selectTypedText).replace('{0}', '<em></em>');
+        var label = escapeHTML(l10n.get('selectTypedText', '__typedText__')).replace('__typedText__', '<em></em>');
         // The 'option' class is needed starting with v0.12.5 in order to have proper styling.
         var output = $('<div class="create option"></div>').html(label);
         output.find('em').text(data.input);
@@ -340,6 +333,3 @@ require(['jquery', 'xwiki-selectize', 'xwiki-events-bridge'], function($) {
   $(document).on('xwiki:dom:updated', init);
   $(init);
 });
-
-// End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$paths, $l10n]));

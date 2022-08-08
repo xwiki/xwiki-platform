@@ -336,7 +336,12 @@
   #set ($query = $query.setLimit($limit).setOffset($offset).bindValues($sqlParams))
   #set($items = $query.execute())
   #set($discard = $map.put('totalrows', $query.count()))
-  #set($discard = $map.put('returnedrows', $mathtool.min($items.size(), $limit)))
+  #if ($limit > 0)
+    #set($discard = $map.put('returnedrows', $mathtool.min($items.size(), $limit)))
+  #else
+    ## When the limit is 0, it's equivalent to no limit at all and the actual number of returned results can be used.
+    #set($discard = $map.put('returnedrows', $items.size()))
+  #end
   #set($discard = $map.put('offset', $mathtool.add($offset, 1)))
   #set($rows = [])
   #foreach($item in $items)

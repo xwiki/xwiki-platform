@@ -31,3 +31,11 @@ ul.xlist li.showAllResults div.xitemcontainer {
   padding-top: 3px;
   text-align: right;
 }
+
+@media (max-width: 768px) {
+  .suggestItems.searchSuggest.horizontalLayout {
+    width:  350px !important;
+    right: 10px !important;
+    left: unset !important;
+  }
+}

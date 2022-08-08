@@ -120,13 +120,10 @@ div.resultContainer div.sourceName {
 
 .horizontalLayout div.resultContainer div.sourceName {
   float:left;
-  width:80px;
+  width:150px;
   padding-right:23px;
   text-align:right;
   background-position:right 3px center;
-  @media (min-width: @screen-sm-min) {
-    width: 150px;
-  }
 }
 
 .horizontalLayout div.resultContainer div.xitemcontainer {

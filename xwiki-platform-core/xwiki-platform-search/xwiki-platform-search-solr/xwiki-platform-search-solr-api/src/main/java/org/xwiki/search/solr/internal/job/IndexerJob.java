@@ -32,7 +32,6 @@ import org.xwiki.job.AbstractJob;
 import org.xwiki.job.DefaultJobStatus;
 import org.xwiki.job.GroupedJob;
 import org.xwiki.job.JobGroupPath;
-import org.xwiki.job.Request;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -91,19 +90,6 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
         } else {
             return new JobGroupPath(this.entityReferenceSerializer.serialize(getRequest().getRootReference()), GROUP);
         }
-    }
-
-    @Override
-    protected IndexerRequest castRequest(Request request)
-    {
-        IndexerRequest indexerRequest;
-        if (request instanceof IndexerRequest) {
-            indexerRequest = (IndexerRequest) request;
-        } else {
-            indexerRequest = new IndexerRequest(request);
-        }
-
-        return indexerRequest;
     }
 
     @Override

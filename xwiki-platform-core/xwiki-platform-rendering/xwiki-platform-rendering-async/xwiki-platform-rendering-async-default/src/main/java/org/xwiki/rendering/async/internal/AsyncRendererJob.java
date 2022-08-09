@@ -27,7 +27,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.job.AbstractJob;
 import org.xwiki.job.GroupedJob;
 import org.xwiki.job.JobGroupPath;
-import org.xwiki.job.Request;
 import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.async.internal.DefaultAsyncContext.ContextUse;
 import org.xwiki.template.TemplateManager;
@@ -55,19 +54,6 @@ public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, Async
 
     @Inject
     private DocumentAccessBridge documentAccessBridge;
-
-    @Override
-    protected AsyncRendererJobRequest castRequest(Request request)
-    {
-        AsyncRendererJobRequest indexerRequest;
-        if (request instanceof AsyncRendererJobRequest) {
-            indexerRequest = (AsyncRendererJobRequest) request;
-        } else {
-            indexerRequest = new AsyncRendererJobRequest(request);
-        }
-
-        return indexerRequest;
-    }
 
     @Override
     protected AsyncRendererJobStatus createNewStatus(AsyncRendererJobRequest request)

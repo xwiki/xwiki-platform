@@ -38,7 +38,6 @@ import org.xwiki.eventstream.EventStream;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.job.AbstractJob;
 import org.xwiki.job.DefaultJobStatus;
-import org.xwiki.job.Request;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -76,19 +75,6 @@ public class LegacyEventMigrationJob
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
-
-    @Override
-    protected LegacyEventMigrationRequest castRequest(Request request)
-    {
-        LegacyEventMigrationRequest indexerRequest;
-        if (request instanceof LegacyEventMigrationRequest) {
-            indexerRequest = (LegacyEventMigrationRequest) request;
-        } else {
-            indexerRequest = new LegacyEventMigrationRequest(request);
-        }
-
-        return indexerRequest;
-    }
 
     @Override
     public String getType()

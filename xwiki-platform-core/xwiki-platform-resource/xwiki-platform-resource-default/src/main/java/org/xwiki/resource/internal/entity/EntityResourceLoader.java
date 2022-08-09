@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.resource.ResourceLoader;
 import org.xwiki.resource.entity.EntityResourceReference;
@@ -56,11 +55,12 @@ public class EntityResourceLoader implements ResourceLoader<EntityResourceRefere
         InputStream result = null;
 
         EntityReference entityReference = reference.getEntityReference();
-        // TODO: Add support for EntityType.PAGE_ATTACHMENT
-        if (EntityType.ATTACHMENT.equals(entityReference.getType())) {
+        if (EntityType.ATTACHMENT.equals(entityReference.getType())
+            || EntityType.PAGE_ATTACHMENT.equals(entityReference.getType()))
+        {
             // Return the attachment's content
             try {
-                result = this.dab.getAttachmentContent(new AttachmentReference(entityReference));
+                result = this.dab.getAttachmentContent(entityReference);
             } catch (Exception e) {
                 // Failed to get the document's content, consider the resource doesn't exist but log a debug error
                 // in case it's not normal, and we need to debug it.

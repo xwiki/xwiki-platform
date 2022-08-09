@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
@@ -30,6 +31,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.model.reference.PageAttachmentReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Exposes methods for accessing Document data. This is temporary until we remodel the Model classes and the Document
@@ -496,11 +499,28 @@ public interface DocumentAccessBridge
      * Returns the content of a document attachment.
      * 
      * @param attachmentReference the name of the attachment to access
-     * @return The content of the attachment as an input stream
+     * @return The content of the attachment as an input stream or null if the attachment doesn't exist
      * @throws Exception If the document cannot be accessed.
      * @since 2.2M1
+     * @deprecated use {@link #getAttachmentContent(EntityReference)} instead
      */
+    @Deprecated(since = "14.7RC1")
     InputStream getAttachmentContent(AttachmentReference attachmentReference) throws Exception;
+
+    /**
+     * Returns the content of a document attachment.
+     *
+     * @param reference the reference to the attachment to access (can be an {@link AttachmentReference} or
+     *        {@link PageAttachmentReference}, or any reference containing a Document reference and an attachment name)
+     * @return The content of the attachment as an input stream or null if the attachment doesn't exist
+     * @throws Exception If the document cannot be accessed.
+     * @since 14.7RC1
+     */
+    @Unstable
+    default InputStream getAttachmentContent(EntityReference reference) throws Exception
+    {
+        throw new NotImplementedException("Method not implemented");
+    }
 
     /**
      * Sets the content of a document attachment. If the document or the attachment does not exist, both will be created

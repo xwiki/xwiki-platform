@@ -22,6 +22,7 @@ package org.xwiki.refactoring.job;
 import java.util.Collections;
 import java.util.Map;
 
+import org.xwiki.job.Request;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.stability.Unstable;
 
@@ -62,6 +63,24 @@ public class DeleteRequest extends EntityRequest
     public static final String AUTO_REDIRECT = "autoRedirect";
 
     private static final long serialVersionUID = 1L;
+
+    /**
+     * Default constructor.
+     */
+    public DeleteRequest()
+    {
+    }
+
+    /**
+     * @param request the request to copy
+     * @since 14.7RC1
+     * @since 14.4.4
+     * @since 13.10.9
+     */
+    public DeleteRequest(Request request)
+    {
+        super(request);
+    }
 
     /**
      * @return {@code true} if the document will be removed permanently, {@code false} if it will be moved to recycle

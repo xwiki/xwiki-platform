@@ -20,6 +20,7 @@
 package org.xwiki.eventstream.store.internal;
 
 import org.xwiki.job.AbstractRequest;
+import org.xwiki.job.Request;
 
 /**
  * Request for the creation of a {@link EventStreamWikiCleanerJob}.
@@ -32,6 +33,24 @@ import org.xwiki.job.AbstractRequest;
 public class EventStreamWikiCleanerJobRequest extends AbstractRequest
 {
     private static final String WIKI_ID = "wikiId";
+
+    /**
+     * Default constructor.
+     */
+    public EventStreamWikiCleanerJobRequest()
+    {
+    }
+
+    /**
+     * @param request the request to copy
+     * @since 14.7RC1
+     * @since 14.4.4
+     * @since 13.10.9
+     */
+    public EventStreamWikiCleanerJobRequest(Request request)
+    {
+        super(request);
+    }
 
     /**
      * Create a request for the given wiki.

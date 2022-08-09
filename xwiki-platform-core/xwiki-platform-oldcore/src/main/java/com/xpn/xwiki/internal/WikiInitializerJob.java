@@ -28,7 +28,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.job.AbstractJob;
-import org.xwiki.job.Request;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.ObservationManager;
@@ -60,19 +59,6 @@ public class WikiInitializerJob extends AbstractJob<WikiInitializerRequest, Wiki
     @Inject
     @Named("current")
     private DocumentReferenceResolver<EntityReference> resolver;
-
-    @Override
-    protected WikiInitializerRequest castRequest(Request request)
-    {
-        WikiInitializerRequest indexerRequest;
-        if (request instanceof WikiInitializerRequest) {
-            indexerRequest = (WikiInitializerRequest) request;
-        } else {
-            indexerRequest = new WikiInitializerRequest(request);
-        }
-
-        return indexerRequest;
-    }
 
     @Override
     protected WikiInitializerJobStatus createNewStatus(WikiInitializerRequest request)

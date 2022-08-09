@@ -22,6 +22,7 @@ package org.xwiki.export.pdf.job;
 import java.util.Collections;
 import java.util.List;
 
+import org.xwiki.job.Request;
 import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.stability.Unstable;
@@ -54,6 +55,24 @@ public class PDFExportJobRequest extends AbstractCheckRightsRequest
     private static final String PROPERTY_FOOTER = "footer";
 
     private static final String PROPERTY_SERVER_SIDE = "serverSide";
+
+    /**
+     * Default constructor.
+     */
+    public PDFExportJobRequest()
+    {
+    }
+
+    /**
+     * @param request the request to copy
+     * @since 14.7RC1
+     * @since 14.4.4
+     * @since 13.10.9
+     */
+    public PDFExportJobRequest(Request request)
+    {
+        super(request);
+    }
 
     /**
      * @return the list of documents to include in the PDF export; the PDF export job will render each of these

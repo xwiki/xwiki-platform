@@ -24,6 +24,7 @@ import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -31,11 +32,14 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.PageAttachmentReference;
 import org.xwiki.model.reference.PageReference;
 import org.xwiki.resource.internal.entity.EntityResourceLoader;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
 /**
@@ -46,6 +50,9 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class EntityResourceLoaderTest
 {
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.DEBUG);
+
     @InjectMockComponents
     private EntityResourceLoader resourceLoader;
 
@@ -80,5 +87,21 @@ class EntityResourceLoaderTest
 
         InputStream is = this.resourceLoader.load(resourceReference);
         assertEquals("content", IOUtils.toString(is, "UTF-8"));
+    }
+
+    @Test
+    void loadWhenException() throws Exception
+    {
+        AttachmentReference attachmentReference = new AttachmentReference("file",
+            new DocumentReference("wiki", "space", "page"));
+        EntityResourceReference resourceReference = new EntityResourceReference(attachmentReference,
+            EntityResourceAction.VIEW);
+
+        when(this.dab.getAttachmentContent((EntityReference) attachmentReference)).thenThrow(new Exception("error"));
+
+        assertNull(this.resourceLoader.load(resourceReference));
+
+        assertEquals("Failed to get attachment's content for [Attachment wiki:space.page@file]",
+            logCapture.getMessage(0));
     }
 }

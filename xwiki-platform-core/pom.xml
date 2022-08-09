@@ -125,9 +125,17 @@
 
                  Single justification example:
             -->
-            
-            
-
+            <revapi.differences>
+              <criticality>highlight</criticality>
+              <differences>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>class com.xpn.xwiki.pdf.impl.PDFURIResolver</old>
+                  <justification>Requires a too big refactoring after Formula macro extraction to jsutify keeping it.
+                    See https://forum.xwiki.org/t/remove-legacy-pdfuriresolver-class/10808/3</justification>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>
@@ -166,7 +174,6 @@
     <module>xwiki-platform-filter</module>
     <module>xwiki-platform-flamingo</module>
     <module>xwiki-platform-flavor</module>
-    <module>xwiki-platform-formula</module>
     <module>xwiki-platform-graphviz</module>
     <module>xwiki-platform-groovy</module>
     <module>xwiki-platform-help</module>

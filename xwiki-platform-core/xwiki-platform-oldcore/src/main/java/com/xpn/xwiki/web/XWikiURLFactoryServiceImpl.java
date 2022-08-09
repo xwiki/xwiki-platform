@@ -46,6 +46,8 @@ public class XWikiURLFactoryServiceImpl implements XWikiURLFactoryService
         // TODO: This mode is still used by the REST module (in web.xml). We need to get rid of it.
         register(xwiki, XWikiContext.MODE_XMLRPC, ExternalServletURLFactory.class, "xwiki.urlfactory.xmlrpcclass");
         register(xwiki, XWikiContext.MODE_SERVLET, XWikiServletURLFactory.class, "xwiki.urlfactory.servletclass");
+        // TODO: This mode is not used anymore by the server-side PDF export. We need to move it to legacy or decide to
+        //  remove it altogether.
         register(xwiki, XWikiContext.MODE_PDF, PdfURLFactory.class, "xwiki.urlfactory.pdfclass");
     }
 

@@ -69,14 +69,6 @@
          **************************************************************************************************************
      -->
 
-     <!-- Formula Renderer cache -->
-     <local-cache-configuration name="xwiki.plugin.formula">
-        <persistence>
-           <!-- Let XWiki cache module set the proper path -->
-           <file-store segmented="false" purge="true" path="" />
-        </persistence>
-     </local-cache-configuration>
-
      <!-- LESS CSS cache -->
      <local-cache-configuration name="lesscss.skinfiles.cache">
         <persistence>

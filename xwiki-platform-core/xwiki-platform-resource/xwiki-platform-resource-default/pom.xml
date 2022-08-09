@@ -56,7 +56,11 @@
       <artifactId>xwiki-platform-model-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-bridge</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Testing Dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>

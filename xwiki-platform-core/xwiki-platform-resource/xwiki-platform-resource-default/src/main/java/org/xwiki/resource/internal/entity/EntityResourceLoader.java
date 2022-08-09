@@ -64,7 +64,7 @@ public class EntityResourceLoader implements ResourceLoader<EntityResourceRefere
             } catch (Exception e) {
                 // Failed to get the document's content, consider the resource doesn't exist but log a debug error
                 // in case it's not normal, and we need to debug it.
-                logger.debug("Failed to get attachment's content for [{}]", entityReference, e);
+                this.logger.debug("Failed to get attachment's content for [{}]", entityReference, e);
             }
         }
 

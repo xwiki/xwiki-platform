@@ -59,7 +59,7 @@ public class TemporaryResourceLoader implements ResourceLoader<TemporaryResource
         } catch (Exception e) {
             // Failed to get the document's content, consider the resource doesn't exist but log a debug error
             // in case it's not normal and we need to debug it.
-            logger.debug("Failed to get the temporary resource's content for [{}]", reference, e);
+            this.logger.debug("Failed to get the temporary resource's content for [{}]", reference, e);
         }
 
         return result;

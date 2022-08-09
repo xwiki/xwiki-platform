@@ -182,6 +182,11 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
       }
 
       if (window.localStorage.getItem(tour._options.name + '_current_step') != tour._options.steps.length - 1) {
+        // Make sure we can redirect again to the current step.
+        window.localStorage.removeItem(tour._options.name + '_redirect_to');
+        // We don't rely on the force parameter because it is lost on redirect. Instead, we just remove the flag that
+        // marks the tour as finished.
+        window.localStorage.removeItem(tour._options.name + '_end');
         tour.start(true);
       } else {
         tour.restart();
@@ -290,16 +295,22 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
       }
       var forceStart = getQueryStringParameterByName('startTour') == 'true';
 
-      // Launch the tour
-      tour.init();
+      var tourEnded = window.localStorage.getItem(tourName + '_end') === 'yes';
+      // Initialize the current step index from local storage.
+      tour.setCurrentStep();
+      var currentStep = tour.getStep(tour.getCurrentStep() || 0);
+      var tourNeedsRedirect = tour._isRedirect(currentStep.host, currentStep.path, document.location);
+      var tourAutoStart = !tourEnded &amp;&amp; !tourNeedsRedirect;
+
+      // Launch the tour.
       if (forceStart) {
         tour.restart();
-      } else if (window.localStorage.getItem(tourName + '_end') == null) {
+      } else if (tourAutoStart) {
         tour.start();
       }
 
-      // Create a resume button if the tour has already been closed by the user in the past
-      if (window.localStorage.getItem(tourName + '_end') == 'yes') {
+      // Create a resume button if the tour has already been closed by the user in the past.
+      if (!tourAutoStart) {
         createResumeButton(tour, false);
       }
     });

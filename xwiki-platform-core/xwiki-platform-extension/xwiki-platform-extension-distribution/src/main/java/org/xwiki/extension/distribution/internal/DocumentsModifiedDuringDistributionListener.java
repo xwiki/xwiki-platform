@@ -21,6 +21,7 @@ package org.xwiki.extension.distribution.internal;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,9 +32,9 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionContext;
+import org.xwiki.extension.ExtensionSession;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.distribution.internal.DocumentsModifiedDuringDistributionListener.DocumentStatus.Action;
 import org.xwiki.extension.xar.internal.handler.XarExtensionPlan;
@@ -61,7 +62,7 @@ public class DocumentsModifiedDuringDistributionListener extends AbstractEventLi
     public static final String NAME = "distribution.DocumentsModifiedDuringDistributionListener";
 
     @Inject
-    private Execution execution;
+    private ExtensionContext extensionContext;
 
     @Inject
     private JobContext jobContext;
@@ -144,7 +145,7 @@ public class DocumentsModifiedDuringDistributionListener extends AbstractEventLi
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        checkXARHandler(event, (XWikiDocument) source, (XWikiContext) data);
+        checkXARHandler(event, (XWikiDocument) source);
         checkDistributionAction(event, (XWikiDocument) source, (XWikiContext) data);
     }
 
@@ -162,19 +163,18 @@ public class DocumentsModifiedDuringDistributionListener extends AbstractEventLi
         return action;
     }
 
-    private void checkXARHandler(Event event, XWikiDocument document, XWikiContext xcontext)
+    private void checkXARHandler(Event event, XWikiDocument document)
     {
-        ExecutionContext context = this.execution.getContext();
+        Optional<ExtensionSession> extensionSession = this.extensionContext.getExtensionSession();
 
-        if (context != null) {
-            XarExtensionPlan xarExtensionPlan =
-                (XarExtensionPlan) context.getProperty(XarExtensionPlan.CONTEXTKEY_XARINSTALLPLAN);
+        if (extensionSession.isPresent()) {
+            XarExtensionPlan xarExtensionPlan = extensionSession.get().get(XarExtensionPlan.SESSIONTKEY_XARINSTALLPLAN);
 
             if (xarExtensionPlan != null) {
                 Request request = this.jobContext.getCurrentJob().getRequest();
 
                 // It's a job started by the Distribution Wizard
-                if (StringUtils.equals(request.<String> getProperty("context.action"), "distribution")) {
+                if (StringUtils.equals(request.<String>getProperty("context.action"), "distribution")) {
                     String distributionWiki = request.getProperty("context.wiki");
 
                     if (distributionWiki != null) {
@@ -243,8 +243,8 @@ public class DocumentsModifiedDuringDistributionListener extends AbstractEventLi
             }
         }
 
-        wikiDocuments.put(reference, new DocumentStatus(reference, previousVersion, action, previousExtension,
-            nextExtension));
+        wikiDocuments.put(reference,
+            new DocumentStatus(reference, previousVersion, action, previousExtension, nextExtension));
     }
 
     public Map<String, Map<DocumentReference, DocumentStatus>> getDocuments()

@@ -28,7 +28,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>xwiki-platform-legacy-refactoring-api</artifactId>
-  <name>XWiki Platform - Refactoring - API</name>
+  <name>XWiki Platform - Legacy - Refactoring - API</name>
   <description>Provides APIs to refactor XWiki entities</description>
   <properties>
     <!-- The features provided by this module -->

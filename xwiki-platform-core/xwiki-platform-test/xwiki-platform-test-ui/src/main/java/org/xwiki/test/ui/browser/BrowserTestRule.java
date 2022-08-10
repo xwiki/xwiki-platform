@@ -64,7 +64,7 @@ public class BrowserTestRule implements TestRule
         // We get the name of the current user Browser
         this.currentBrowserName = capability.getBrowserName();
         // We get the version of the current used Browser
-        this.currentBrowserVersion = capability.getVersion();
+        this.currentBrowserVersion = capability.getBrowserVersion();
     }
 
     @Override

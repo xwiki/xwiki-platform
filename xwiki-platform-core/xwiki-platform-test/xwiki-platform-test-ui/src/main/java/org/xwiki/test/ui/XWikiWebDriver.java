@@ -39,8 +39,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.interactions.Keyboard;
-import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.remote.CommandExecutor;
 import org.openqa.selenium.remote.ErrorHandler;
 import org.openqa.selenium.remote.FileDetector;
@@ -796,18 +794,6 @@ public class XWikiWebDriver extends RemoteWebDriver
     public void setLogLevel(Level level)
     {
         this.wrappedDriver.setLogLevel(level);
-    }
-
-    @Override
-    public Keyboard getKeyboard()
-    {
-        return this.wrappedDriver.getKeyboard();
-    }
-
-    @Override
-    public Mouse getMouse()
-    {
-        return this.wrappedDriver.getMouse();
     }
 
     @Override

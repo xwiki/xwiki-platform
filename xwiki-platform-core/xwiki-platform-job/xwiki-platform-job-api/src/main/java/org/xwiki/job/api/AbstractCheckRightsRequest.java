@@ -56,7 +56,7 @@ public abstract class AbstractCheckRightsRequest extends AbstractRequest
     /**
      * Default constructor.
      */
-    protected AbstractCheckRightsRequest()
+    public AbstractCheckRightsRequest()
     {
     }
 

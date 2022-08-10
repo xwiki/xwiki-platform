@@ -217,9 +217,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
       },
       success : function() {
         liveData.updateEntries().then(() => {
-          const liveDataId = liveData.data.id;
-          liveData = $('#' + liveDataId).data('liveData');
-          if (liveDataId === 'docAttachments') {
+          if (liveData.data.id === 'docAttachments') {
             updateCount(liveData.data.data.count);
           }
         });

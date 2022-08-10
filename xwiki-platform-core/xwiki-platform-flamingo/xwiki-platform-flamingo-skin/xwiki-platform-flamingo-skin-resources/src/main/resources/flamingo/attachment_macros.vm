@@ -257,7 +257,10 @@
         { 'id': 'date', 'filter': 'date'},
         { 'id': 'author', 'displayer': 'html' },
         { 'id': 'actions', 'displayer': 'html' }
-      ]
+      ],
+      'entryDescriptor': {
+        'idProperty': 'id'
+      }
     }
   })
   #set ($sourceParameters = $escapetool.url({

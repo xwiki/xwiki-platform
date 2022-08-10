@@ -216,6 +216,11 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-legacy-resource-temporary</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-legacy-web</artifactId>
       <version>${project.version}</version>
       <type>war</type>

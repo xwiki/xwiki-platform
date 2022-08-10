@@ -110,9 +110,7 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
     private TemporaryResourceStore temporaryResourceStore;
 
     @Inject
-    @Named("standard/tmp")
-    private ResourceReferenceSerializer<TemporaryResourceReference, ExtendedURL>
-        urlTemporaryResourceReferenceSerializer;
+    private ResourceReferenceSerializer<org.xwiki.resource.ResourceReference, ExtendedURL> resourceReferenceSerializer;
 
     /**
      * Used for serializing {@link AttachmentReference}s.
@@ -121,7 +119,7 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
     private EntityReferenceSerializer<String> serializer;
 
     @Inject
-    private ResourceReferenceTypeSerializer resourceReferenceSerializer;
+    private ResourceReferenceTypeSerializer resourceReferenceTypeSerializer;
 
     @Inject
     @Named("current")
@@ -226,8 +224,7 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
 
                         // Create a URL image reference which links to above temporary image file.
                         String temporaryResourceURL =
-                            this.urlTemporaryResourceReferenceSerializer.serialize(temporaryResourceReference)
-                                .serialize();
+                            this.resourceReferenceSerializer.serialize(temporaryResourceReference).serialize();
                         ResourceReference urlImageReference =
                             new ResourceReference(temporaryResourceURL, ResourceType.PATH);
                         urlImageReference.setTyped(true);
@@ -424,7 +421,7 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
     private OfficeDocumentView getView(ResourceReference resourceReference, Map<String, ?> parameters) throws Exception
     {
         DocumentReference ownerDocument = getOwnerDocument(parameters);
-        String serializedResourceReference = this.resourceReferenceSerializer.serialize(resourceReference);
+        String serializedResourceReference = this.resourceReferenceTypeSerializer.serialize(resourceReference);
 
         // Search the cache.
         String cacheKey = getCacheKey(ownerDocument, serializedResourceReference, parameters);

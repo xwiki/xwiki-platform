@@ -42,7 +42,7 @@ public abstract class AbstractDeletedDocumentsRequest extends AbstractCheckRight
     /**
      * Default constructor.
      */
-    protected AbstractDeletedDocumentsRequest()
+    public AbstractDeletedDocumentsRequest()
     {
     }
 

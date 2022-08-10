@@ -56,7 +56,7 @@
 #end
 
 #macro (maybeApplyStringFilter $fieldName $defaultMatchType $constraints $queryParameters)
-  #if ("$!request.getParameter($fieldName)" != '')
+  #if ("$!request.getParameter($fieldName)" != '' && $request.getParameter("${fieldName}_match") != 'empty')
     #set ($fieldNameWithAlias = $fieldName)
     #if ($fieldName.indexOf('.') < 0)
       #set ($fieldNameWithAlias = 'attachment.' + $fieldName)
@@ -83,7 +83,8 @@
 
 #macro (maybeApplyIntegerRangeFilter $fieldName $constraints $queryParameters)
   #set ($fieldValue = $request.getParameter($fieldName))
-  #if ("$!fieldValue" != '')
+  #set ($matchType = $request.getParameter("${fieldName}_match"))
+  #if ("$!fieldValue" != '' && $matchType != 'empty')
     #set ($range = $fieldValue.split('-'))
     #set ($range = [$numbertool.toNumber($range.get(0)).intValue(), $numbertool.toNumber($range.get(1)).intValue()])
     #applyRangeFilter($fieldName $range $constraints $queryParameters)
@@ -93,11 +94,9 @@
 #macro (maybeApplyDateRangeFilter $fieldName $constraints $queryParameters)
   #set ($fieldValue = $request.getParameter($fieldName))
   #if ("$!fieldValue" != '')
-    #set ($range = $fieldValue.split('-'))
-    #set ($range = [
-      $datetool.toDate($numbertool.toNumber($range.get(0))),
-      $datetool.toDate($numbertool.toNumber($range.get(1)))
-    ])
+    #set ($dateRange = {})
+    #parseDateRange('' $fieldValue $dateRange)
+    #set ($range = [$dateRange.start,$dateRange.end])
     #applyRangeFilter($fieldName $range $constraints $queryParameters)
   #end
 #end
@@ -247,37 +246,34 @@
   </div>
 #end
 
-## Display a livetable with attachments of the specified document. Use the given id when displaying the livetable and
-## for the javascript function name.
-#macro (showAttachmentsLivetable $attachmentsDoc $livetableId)
-  #set ($javascriptName = $livetableId + 'Livetable')
-  #set ($columns = ['mimeType', 'filename', 'filesize', 'date', 'author', 'actions'])
-  #set ($columnsProperties = {
-    'filename': {'type': 'text', 'html': true},
-    'date': {'type': 'date'},
-    'author': {'type': 'text', 'html': true},
-    'actions': {'sortable': false,'filterable': false,'html': true}
+## Display a liveData with attachments from the specified document.
+#macro (showAttachmentsLiveData $attachmentsDoc $liveDataId)
+  #set ($liveDataConfig = {
+    'meta': {
+      'propertyDescriptors': [
+        { 'id': 'mimeType', 'displayer': 'html'},
+        { 'id': 'filename', 'displayer': 'html' },
+        { 'id': 'filesize', 'displayer': 'html' },
+        { 'id': 'date', 'filter': 'date'},
+        { 'id': 'author', 'displayer': 'html' },
+        { 'id': 'actions', 'displayer': 'html' }
+      ]
+    }
   })
-  #if ($xwiki.exists('XWiki.AllAttachments'))
-    #set ($discard = $columnsProperties.putAll({
-      'mimeType': {'type': 'list', 'html': true, 'class': 'XWiki.AllAttachments'},
-      'filesize': {'type': 'list', 'html': true, 'class': 'XWiki.AllAttachments'}
-    }))
-  #else
-    ## When the class cannot be used, fallback to other filtering options, as appropriate by case.
-    #set ($discard = $columnsProperties.putAll({
-      'mimeType': {'type': 'text', 'html': true},
-      'filesize': {'html': true, 'filterable': false}
-    }))
-  #end
-  #set ($options = {
+  #set ($sourceParameters = $escapetool.url({
+    'template': 'xpart.vm',
     'translationPrefix': 'core.viewers.attachments.livetable.',
-    'url': $attachmentsDoc.getURL('get', "xpage=xpart&vm=attachmentsjson.vm"),
-    'rowCount': 5,
-    'selectedColumn': 'filename',
-    'javascriptName': $javascriptName,
-    'outputOnlyHtml': true
-  })
-  #livetable($livetableId $columns $columnsProperties $options)
-  #deleteAttachmentModal
+    'className': 'XWiki.AllAttachments',
+    "\$doc": "$attachmentsDoc",
+    'vm': 'attachmentsjson.vm'
+  }))
+{{liveData
+  id="$liveDataId"
+  properties="mimeType,filename,filesize,date,author,actions"
+  source='liveTable'
+  sourceParameters="$sourceParameters"
+  limit=5
+}}$jsontool.serialize($liveDataConfig){{/liveData}}
+
+{{html clean="false"}}#deleteAttachmentModal(){{/html}}
 #end

@@ -105,7 +105,9 @@
     #if ($hasAccess)
       #set ($attachment = $doc.getAttachment($attachmentReference.name))
       #set ($authorReference = $services.model.resolveDocument($attachment.author))
+      ## The property "doc.fullName" is needed by LiveData since it is used to identify a live data entry.
       #set ($discard = $row.putAll({
+        'doc.fullName': "$doc.fullname",
         'filename': "#displayFileNameAndVersion($attachmentReference $attachment)",
         'mimeType': "#displayAttachmentMimeType($attachment)",
         'filesize': "#displayAttachmentSize($attachment.longSize)",

@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.events.EventStreamAddedEvent;
+import org.xwiki.eventstream.events.MailEntityAddedEvent;
 import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.observation.remote.LocalEventData;
@@ -46,7 +47,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class EventStreamEventConverterTest
+class EventStreamEventConverterTest
 {
     @MockComponent
     EventStore store;
@@ -55,14 +56,14 @@ public class EventStreamEventConverterTest
     EventStreamEventConverter converter;
 
     @Test
-    public void convertNoThing()
+    void convertNoThing()
     {
         assertFalse(this.converter.toRemote(new LocalEventData(new LogEvent(), null, null), new RemoteEventData()));
         assertFalse(this.converter.fromRemote(new RemoteEventData(new LogEvent(), null, null), new LocalEventData()));
     }
 
     @Test
-    public void convertEmpty()
+    void convertEmpty()
     {
         RemoteEventData remoteEvent = new RemoteEventData();
 
@@ -76,7 +77,7 @@ public class EventStreamEventConverterTest
     }
 
     @Test
-    public void convertWithEvent() throws EventStreamException
+    void convertWithEvent() throws EventStreamException
     {
         DefaultEvent initialEvent = new DefaultEvent();
         initialEvent.setId("id");
@@ -96,5 +97,15 @@ public class EventStreamEventConverterTest
         assertSame(EventStreamAddedEvent.class, localEvent.getEvent().getClass());
         assertNotNull(localEvent.getSource());
         assertSame(loadedEvent, localEvent.getSource());
+    }
+
+    @Test
+    void convertWrongEventStreamEvent()
+    {
+        assertFalse(
+            this.converter.toRemote(new LocalEventData(new MailEntityAddedEvent(), null, null), new RemoteEventData()));
+        assertFalse(this.converter.fromRemote(new RemoteEventData(new MailEntityAddedEvent(), null, null),
+            new LocalEventData()));
+
     }
 }

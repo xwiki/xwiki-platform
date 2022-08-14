@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="AppWithinMinutes.CreateApplication" locale="">
+<xwikidoc version="1.5" reference="AppWithinMinutes.CreateApplication" locale="">
   <web>AppWithinMinutes</web>
   <name>CreateApplication</name>
   <language/>
@@ -65,27 +65,29 @@
     &lt;/ul&gt;
   &lt;/div&gt;
   &lt;form action="$doc.getURL()" method="post" class="xform wizard-body"&gt;
-    #locationPicker({
-      'id': 'app',
-      'title': {
-        'label': 'platform.appwithinminutes.appNameLabel',
-        'hint': 'platform.appwithinminutes.appNameHint',
-        'name': 'appName'
-      },
-      'preview': {
-        'label': 'appWithinMinutes.createApp.location.label',
-        'hint': 'appWithinMinutes.createApp.location.hint'
-      },
-      'parent': {
-        'label': 'appWithinMinutes.createApp.parent.label',
-        'hint': 'appWithinMinutes.createApp.parent.hint',
-        'name': 'appParentReference',
-        'reference': $doc.documentReference.wikiReference,
-        'placeholder': 'appWithinMinutes.createApp.parent.placeholder'
-      }
-    })
-    &lt;div class="appName-preview"&gt;&lt;/div&gt;
-    #appWizardFooter(1)
+    &lt;fieldset&gt;
+      #locationPicker({
+        'id': 'app',
+        'title': {
+          'label': 'platform.appwithinminutes.appNameLabel',
+          'hint': 'platform.appwithinminutes.appNameHint',
+          'name': 'appName'
+        },
+        'preview': {
+          'label': 'appWithinMinutes.createApp.location.label',
+          'hint': 'appWithinMinutes.createApp.location.hint'
+        },
+        'parent': {
+          'label': 'appWithinMinutes.createApp.parent.label',
+          'hint': 'appWithinMinutes.createApp.parent.hint',
+          'name': 'appParentReference',
+          'reference': $doc.documentReference.wikiReference,
+          'placeholder': 'appWithinMinutes.createApp.parent.placeholder'
+        }
+      })
+      &lt;div class="appName-preview"&gt;&lt;/div&gt;
+      #appWizardFooter(1)
+    &lt;/fieldset&gt;
   &lt;/form&gt;
 #end
 
@@ -205,6 +207,8 @@
         <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -252,6 +256,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -269,11 +275,15 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery'], function($) {
+      <code>require(['jquery', 'xwiki-form-validation-async'], function($) {
   var appNameInput = $('input[name="appName"]');
   var appParentInput = $('input[name="appParentReference"]');
   var preview = $('.appName-preview');
-  var submitButton = $('#wizard-next').prop('disabled', true);
+  var form = appNameInput.closest('form');
+
+  if (appNameInput.val() === '') {
+    form.validateAsync(() =&gt; Promise.reject(), 'appName');
+  }
 
   var errorMessage = appNameInput.closest('dd').prev('dt').find('.xErrorMsg');
   if (!errorMessage.length) {
@@ -284,6 +294,7 @@
     if (message) {
       appNameInput.addClass('xErrorField').focus();
       errorMessage.text(message).show();
+      return Promise.reject();
     } else {
       appNameInput.removeClass('xErrorField');
       errorMessage.hide();
@@ -293,37 +304,24 @@
   var updatePreview = function(content) {
     preview.removeClass('loading').html(content);
     var error = preview.find('.xErrorMsg');
-    submitButton.prop('disabled', error.length);
-    toggleValidationError(error.remove().text());
+    return toggleValidationError(error.remove().text());
   };
 
   var fetchPreviewUpdate = function() {
-    if (appNameInput.val() == '') {
-      updatePreview('&lt;span class="xErrorMsg"&gt;$escapetool.javascript($services.localization.render("platform.appwithinminutes.appNameEmptyError"))&lt;/span&gt;');
+    if (appNameInput.val() === '') {
+      return updatePreview('&lt;span class="xErrorMsg"&gt;$escapetool.javascript($services.localization.render("platform.appwithinminutes.appNameEmptyError"))&lt;/span&gt;');
     } else {
       preview.addClass('loading');
-      $.get(XWiki.currentDocument.getURL('get'), submitButton.closest('form').serialize(), updatePreview);
+      return $.get(XWiki.currentDocument.getURL('get'), form.serialize()).then(updatePreview);
     }
   };
 
-  var previewTimeout;
-  var schedulePreviewUpdate = function() {
-    clearTimeout(previewTimeout);
-    submitButton.prop('disabled', true);
-    setTimeout(fetchPreviewUpdate, 500);
-  };
-
-  appNameInput.add(appParentInput)
-    .on('input', schedulePreviewUpdate)
-    .on('keyup', function(event) {
-      // Show the error message if the user presses Enter before typing anything.
-      if (event.which == 13 &amp;&amp; appNameInput.val() == '' &amp;&amp; !appNameInput.hasClass('xErrorField')) {
-        fetchPreviewUpdate();
-      }
-    });
-  submitButton.closest('form').on('submit', function (event) {
-    if (appNameInput.hasClass('xErrorField')) {
-      event.preventDefault();
+  appNameInput.add(appParentInput).on('input', () =&gt; {
+    form.validateAsync(fetchPreviewUpdate, 'appName', 500);
+  }).on('keyup', function(event) {
+    // Show the error message if the user presses Enter before typing anything.
+    if (event.which === 13 &amp;&amp; appNameInput.val() === '' &amp;&amp; !appNameInput.hasClass('xErrorField')) {
+      form.validateAsync(fetchPreviewUpdate, 'appName');
     }
   });
 });</code>
@@ -357,6 +355,8 @@
         <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -385,6 +385,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -420,6 +422,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>

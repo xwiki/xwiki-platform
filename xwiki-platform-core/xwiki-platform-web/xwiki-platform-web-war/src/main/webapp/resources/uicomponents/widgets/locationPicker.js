@@ -133,15 +133,10 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
 });
 
 // Live synchronization between the Title, Location, Wiki, Parent and Name (as you type)
-require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
+require(['jquery', 'xwiki-meta', 'xwiki-events-bridge', 'xwiki-form-validation-async'], function($, xm) {
   $('.location-picker').each(function() {
     var picker = $(this);
     var form = picker.closest('form');
-    // We get all buttons but only those not disabled yet, since we will disable and enable them back.
-    var formRealButtons = form.find('input[type=submit]:not([disabled=disabled]),' +
-      'input[type=button]:not([disabled=disabled]),' +
-      'button:not([disabled=disabled])');
-    var formLinkButtons = form.find('a.button:not(.disabled)');
 
     var titleInput = picker.find('input.location-title-field');
     // The wiki field can be either a select (drop down) or an input (text or hidden).
@@ -151,7 +146,6 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
     var locationContainer = picker.find('.breadcrumb');
     // Input timeouts used to avoid handling too soon each individual letter, as the user types.
     var inputDelay = 500;
-    var spaceReferenceInputTimeout;
 
     /**
      * Compute a page name from a given title.
@@ -179,47 +173,23 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
       lastElement.text(value);
     };
 
-    var disableButtons = function() {
-      formRealButtons.prop("disabled", true);
-      formLinkButtons.addClass("disabled");
-    };
-
-    var enableButtons = function() {
-      formRealButtons.prop("disabled", false);
-      formLinkButtons.removeClass("disabled");
-    };
-
     /**
      * Event handler for the title input that updates both the location preview's last element and the name input.
      **/
-    var titleInputTimeout;
     var scheduleUpdateOfLocationAndNameFromTitleInput = function(event) {
-      clearTimeout(titleInputTimeout);
       if (event.type === 'input') {
         // Delay the update.
-        titleInputTimeout = setTimeout(updateLocationAndNameFromTitleInput, inputDelay);
-      } else if (event.type === 'change') {
+        form.validateAsync(updateLocationAndNameFromTitleInput, 'title', inputDelay);
+      } else {
         // Update right away.
-        updateLocationAndNameFromTitleInput();
-      } else if (event.type === 'keyup' && event.keyCode === 13) {
-        // Update right away and submit the form since the user hit enter, so he's expecting the form to be submitted.
-        // Note that the reason we need this is because we disable the submit button in
-        // updateLocationAndNameFromTitleInput: by default the event when clicking Enter on an text input field is
-        // to simulate a click button on the input submit button. But since the button is disabled, this submit
-        // cannot occur here.
-        // So we're actually actively listening on the enter input, to manually trigger the submit.
-        // Also note that we cannot perform a submit on each change event, since those are also triggered whenever
-        // the input text looses focus. And in such case, we don't want to trigger a submit.
-        updateLocationAndNameFromTitleInput(true);
+        form.validateAsync(updateLocationAndNameFromTitleInput(), 'title');
       }
     };
 
-    var updateLocationAndNameFromTitleInput = function(submit) {
-      // ensure the buttons are disabled before we got the name answer
-      disableButtons();
+    var updateLocationAndNameFromTitleInput = function() {
       var titleInputVal = titleInput.val();
       // Update the name field.
-      getPageName(titleInputVal).then(data => {
+      return getPageName(titleInputVal).then(data => {
         // Ensure that the input didn't change while we were waiting the answer.
         // It also protects the value if a previous request was slow to arrive.
         if (titleInputVal === titleInput.val()) {
@@ -236,12 +206,6 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
           nameInput.val(titleInputVal).trigger('change');
           // Update the location preview.
           updateLocationFromTitleInput();
-        }
-      }).finally(() => {
-        // Enable back the buttons
-        enableButtons();
-        if (submit) {
-          titleInput.closest('form').submit();
         }
       });
     };
@@ -282,16 +246,15 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
       }
 
       // Delay the execution in case the user is still typing.
-      clearTimeout(spaceReferenceInputTimeout);
-      spaceReferenceInputTimeout = setTimeout(function() {
-        updateLocation(wikiField.val(), spaceReference);
-      }, inputDelay);
+      form.validateAsync(() => {
+        return updateLocation(wikiField.val(), spaceReference);
+      }, 'location', inputDelay);
     };
 
     var updateLocationFromWikiField = function(event) {
       // TODO: Don't reload the entire location when the wiki changes. We should be able to update only the wiki element,
       // but we need to be able to "detect" it (e.g. the breadcrumb should add some CSS classes on the path elements).
-      updateLocation(wikiField.val());
+      form.validateAsync(updateLocation, 'location');
     };
 
     var updateLocation = function(wiki, localSpaceReference) {
@@ -305,7 +268,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
       var documentReference = new XWiki.EntityReference('WebHome', XWiki.EntityType.DOCUMENT, spaceReference);
       wiki && spaceReference.appendParent(new XWiki.WikiReference(wiki));
 
-      $.post(getCurrentPageURL(), {
+      return $.post(getCurrentPageURL(), {
         'xpage': 'hierarchy_reference',
         'reference': XWiki.Model.serialize(documentReference)
       }, function(data) {
@@ -343,7 +306,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
     // Synchronize the location fields while the user types.
     // We catch the change event because we want to make sure everything's updated when the user change fields
     // (particulary useful in our automated tests).
-    titleInput.on('input change keyup', scheduleUpdateOfLocationAndNameFromTitleInput);
+    titleInput.on('input change', scheduleUpdateOfLocationAndNameFromTitleInput);
     wikiField.on('change', updateLocationFromWikiField);
     nameInput.on('input change', updateLocationFromNameInput);
     spaceReferenceInput.on('input change xwiki:suggest:selected', updateLocationFromSpaceReference);
@@ -355,7 +318,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
 
     // Update the location with whatever the initial value of the title is.
     if (nameInput.val() !== undefined && !nameInput.val() && titleInput.val()) {
-      updateLocationAndNameFromTitleInput();
+      form.validateAsync(updateLocationAndNameFromTitleInput(), 'title');
     } else {
       updateLocationFromTitleInput();
     }

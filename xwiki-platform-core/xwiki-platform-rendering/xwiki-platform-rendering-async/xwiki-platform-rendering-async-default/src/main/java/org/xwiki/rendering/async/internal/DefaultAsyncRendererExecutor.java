@@ -37,6 +37,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.cache.CacheControl;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -89,6 +90,9 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
 
     @Inject
     private CacheControl cacheControl;
+
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
 
     @Inject
     private Logger logger;
@@ -227,6 +231,12 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
                 // Prepare to catch stuff to invalidate the cache
                 if (this.asyncContext instanceof DefaultAsyncContext) {
                     ((DefaultAsyncContext) this.asyncContext).pushContextUse();
+                }
+
+                // Mark the context document as used if it was explicitly set in the context
+                if (configuration.getContextEntries() != null && configuration.getContextEntries()
+                    .contains(XWikiContextContextStore.PROP_DOCUMENT_REFERENCE)) {
+                    this.asyncContext.useEntity(this.documentAccessBridge.getCurrentDocumentReference());
                 }
 
                 AsyncRendererResult result = syncRender(renderer, true, configuration);

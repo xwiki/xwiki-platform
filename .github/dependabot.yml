@@ -22,8 +22,8 @@ registries:
   maven-artifactory:
     type: maven-repository
     url: https://nexus.xwiki.org/nexus/content/groups/public/
-    username: void
-    password: void
+    username: "void"
+    password: "void"
 updates:
   - package-ecosystem: "maven"
     directory: "/"

@@ -19,11 +19,13 @@
 # ---------------------------------------------------------------------------
 version: 2
 registries:
+  # Hep find updates for non Maven Central dependencies
   maven-xwiki-public:
     type: maven-repository
     url: https://nexus.xwiki.org/nexus/content/groups/public/
     username: "void"
     password: "void"
+  # Required to resolve xwiki-common SNAPSHOT parent pom
   maven-xwiki-snapshots:
     type: maven-repository
     url: https://maven.xwiki.org/snapshots

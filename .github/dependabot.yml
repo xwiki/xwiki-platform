@@ -19,14 +19,22 @@
 # ---------------------------------------------------------------------------
 version: 2
 registries:
-  maven-artifactory:
+  maven-xwiki-public:
     type: maven-repository
     url: https://nexus.xwiki.org/nexus/content/groups/public/
+    username: "void"
+    password: "void"
+  maven-xwiki-public:
+    type: maven-repository
+    url: https://maven.xwiki.org/snapshots
     username: "void"
     password: "void"
 updates:
   - package-ecosystem: "maven"
     directory: "/"
+    registries:
+      - maven-xwiki-public
+      - maven-xwiki-snapshots
     schedule:
       interval: "weekly"
     allow:

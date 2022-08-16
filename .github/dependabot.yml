@@ -18,6 +18,10 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 version: 2
+registries:
+  maven-artifactory:
+    type: maven-repository
+    url: https://nexus.xwiki.org/nexus/content/groups/public/
 updates:
   - package-ecosystem: "maven"
     directory: "/"

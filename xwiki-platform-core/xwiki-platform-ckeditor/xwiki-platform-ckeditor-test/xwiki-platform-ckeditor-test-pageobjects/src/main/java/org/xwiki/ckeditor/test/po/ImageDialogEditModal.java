@@ -17,30 +17,43 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.ckeditor.test.ui;
+package org.xwiki.ckeditor.test.po;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.xwiki.test.docker.junit5.UITest;
+import org.openqa.selenium.By;
+import org.xwiki.test.ui.po.BaseElement;
 
 /**
- * All functional tests for the CKEditor integration.
+ * Page Object for the image edition/configuration modal.
  *
  * @version $Id$
- * @since 1.53.2
+ * @since 14.7RC1
  */
-@UITest
-public class AllITs
+public class ImageDialogEditModal extends BaseElement
 {
-    @Nested
-    @DisplayName("Save")
-    class NestedSaveIT extends SaveIT
+    /**
+     * Wait until the modal is loaded.
+     *
+     * @return the current page object
+     */
+    public ImageDialogEditModal waitUntilReady()
     {
+        getDriver().waitUntilElementIsVisible(By.className("image-editor-modal"));
+        return this;
     }
 
-    @Nested
-    @DisplayName("Image Plugin")
-    class NestedImagePluginIT extends ImagePluginIT
+    /**
+     * Click on the insert button to insert the configured image on the editor.
+     */
+    public void clickInsert()
     {
+        getDriver().findElement(By.cssSelector(".image-editor-modal .btn-primary")).click();
+    }
+
+    /**
+     * Click on the caption checkbox field.
+     */
+    public void clickCaptionCheckbox()
+    {
+        getDriver().findElement(By.id("imageCaptionActivation")).click();
     }
 }

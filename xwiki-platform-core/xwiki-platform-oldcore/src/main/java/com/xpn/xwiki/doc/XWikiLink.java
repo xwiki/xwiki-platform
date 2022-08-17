@@ -26,9 +26,10 @@ import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * Represent the relation between a document using a link to an entity, and the used entity.
- * @deprecated use TODO instead
+ * 
+ * @deprecated
  */
-@Deprecated(since = "14.6RC1")
+@Deprecated(since = "14.8RC1")
 public class XWikiLink
 {
     private long id;

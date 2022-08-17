@@ -123,7 +123,16 @@ public abstract class AbstractStringEntityReferenceResolver extends AbstractEnti
                     StringUtils.substringBefore(entityReferenceRepresentation, entityTypeSeparator));
                 entityReferenceRepresentation =
                     StringUtils.substringAfter(entityReferenceRepresentation, entityTypeSeparator);
+            } else {
+                throw new IllegalArgumentException(
+                    "Impossible to extract the type from the reference: the symbol scheme does not indicate any");
             }
+        }
+
+        // We have no idea what to know without a type
+        if (type == null) {
+            throw new IllegalArgumentException(
+                "Impossible to parse an entity reference without knowing the entity type");
         }
 
         // Get the type setup

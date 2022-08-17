@@ -99,7 +99,8 @@ public class MovedAttachmentListener implements EventListener
             try {
                 updateBackLinks(attachmentMovedEvent, canEdit);
             } catch (RefactoringException e) {
-                this.logger.error("Failed to update links backlinks", e);
+                this.logger.error("Failed to update backlinks targetting attachment [{}] for request [{}]",
+                    attachmentMovedEvent.getSourceReference(), moveAttachmentRequest.toString(), e);
             }
         }
     }

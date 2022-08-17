@@ -49,4 +49,3 @@
   }))
 #end
 #tree($dbTreeListSettings)
-$xwiki.jsfx.use('resources/uicomponents/widgets/tree.js', true)

@@ -38,16 +38,6 @@ require([paths.treeRequireConfig], function() {
         // Open the tree to the specified node and select it.
         openToNodeId && data.instance.openTo(openToNodeId);
       });
-
-      $('.xtree.dbTreeList').on('changed.jstree', function(event, data) {
-        if (typeof data.instance.settings.xwiki.fieldName !== 'undefined') {
-          var fieldName = data.instance.settings.xwiki.fieldName;
-          var fieldValue = data.selected.join('|');
-          $('input[type="hidden"]').filter(function() {
-            return $(this).attr('name') === fieldName;
-          }).val(fieldValue);
-        }
-      });
     };
 
     $(init).on('xwiki:dom:updated', init);

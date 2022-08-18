@@ -693,6 +693,15 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
         data.menu.remove._disabled = !canRemoveNodes(selectedNodes);
       }
 
+    }).on('changed.jstree', function(event, data) {
+      if (typeof data.instance.settings.xwiki.fieldName !== 'undefined') {
+        var fieldName = data.instance.settings.xwiki.fieldName;
+        var fieldValue = data.selected.join('|');
+        $('input[type="hidden"]').filter(function() {
+          return $(this).attr('name') === fieldName;
+        }).val(fieldValue);
+      }
+
     //
     // Un-wrap the links generated from wiki syntax so that they are taken into account by jsTree.
     //

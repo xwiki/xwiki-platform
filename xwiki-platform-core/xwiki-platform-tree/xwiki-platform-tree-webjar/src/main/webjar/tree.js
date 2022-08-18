@@ -699,7 +699,7 @@ define(['jquery', 'xwiki-page-ready', 'xwiki-job-runner', 'jsTree', 'tree-finder
       }
 
     }).on('changed.jstree', function(event, data) {
-      if (typeof data.instance.settings.xwiki.fieldName !== 'undefined') {
+      if (data.instance.settings.xwiki && typeof data.instance.settings.xwiki.fieldName !== 'undefined') {
         var fieldName = data.instance.settings.xwiki.fieldName;
         var fieldValue = data.selected.join('|');
         $('input[type="hidden"]').filter(function() {

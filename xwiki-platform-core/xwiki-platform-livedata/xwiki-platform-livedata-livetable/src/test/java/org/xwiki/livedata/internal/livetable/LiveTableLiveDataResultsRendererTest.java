@@ -32,6 +32,7 @@ import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.livetable.LiveDataLivetableException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -125,6 +126,28 @@ class LiveTableLiveDataResultsRendererTest
         when(this.document.getRenderedContent(Syntax.PLAIN_1_0, this.xcontext)).thenReturn(json);
         assertEquals(json, this.resultsRenderer.getLiveTableResultsFromPage(PAGE, new LiveDataQuery()));
         verify(this.templateManager).render("xwikivars.vm");
+    }
+
+    @Test
+    void getLiveTableResultsFromSubwikiPage() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("subwiki", "XWiki", "Page");
+        when(this.currentDocumentReferenceResolver.resolve("subwiki:XWiki.Page")).thenReturn(documentReference);
+        doNothing().when(this.authorization).checkAccess(Right.VIEW, documentReference);
+        when(this.xcontextProvider.get()).thenReturn(this.xcontext);
+        when(this.xcontext.getWiki()).thenReturn(this.wiki);
+        when(this.xcontext.getWikiReference()).thenReturn(new WikiReference("currentwiki"));
+
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(this.wiki.getDocument(documentReference, this.xcontext)).thenReturn(document);
+        when(document.isNew()).thenReturn(false);
+
+        String json = "{}";
+        when(document.getRenderedContent(Syntax.PLAIN_1_0, this.xcontext)).thenReturn(json);
+        assertEquals(json, this.resultsRenderer.getLiveTableResultsFromPage("subwiki:XWiki.Page", new LiveDataQuery()));
+        verify(this.templateManager).render("xwikivars.vm");
+        verify(this.xcontext).setWikiReference(new WikiReference("subwiki"));
+        verify(this.xcontext).setWikiReference(new WikiReference("currentwiki"));
     }
 
     @Test

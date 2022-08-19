@@ -47,6 +47,7 @@ import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.job.event.status.JobStatus.State;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.async.AsyncContextHandler;
@@ -233,10 +234,16 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
                     ((DefaultAsyncContext) this.asyncContext).pushContextUse();
                 }
 
-                // Mark the context document as used if it was explicitly set in the context
+                // Mark the context document as used if it was explicitly set in the context, unless the context 
+                // document is null.
                 if (configuration.getContextEntries() != null && configuration.getContextEntries()
-                    .contains(XWikiContextContextStore.PROP_DOCUMENT_REFERENCE)) {
-                    this.asyncContext.useEntity(this.documentAccessBridge.getCurrentDocumentReference());
+                    .contains(XWikiContextContextStore.PROP_DOCUMENT_REFERENCE))
+                {
+                    DocumentReference currentDocumentReference =
+                        this.documentAccessBridge.getCurrentDocumentReference();
+                    if (currentDocumentReference != null) {
+                        this.asyncContext.useEntity(currentDocumentReference);
+                    }
                 }
 
                 AsyncRendererResult result = syncRender(renderer, true, configuration);

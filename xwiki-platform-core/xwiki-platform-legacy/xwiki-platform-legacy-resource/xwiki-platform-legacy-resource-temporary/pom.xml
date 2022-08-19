@@ -31,6 +31,9 @@
   <name>XWiki Platform - Legacy - Resource - Temporary</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Legacy - Resource - Temporary</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

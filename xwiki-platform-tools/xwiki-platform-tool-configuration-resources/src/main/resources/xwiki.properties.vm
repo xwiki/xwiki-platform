@@ -127,6 +127,13 @@ environment.permanentDirectory = $xwikiPropertiesEnvironmentPermanentDirectory
 # rendering.transformation.macro.categories = toc = My Category\,Deprecated
 # rendering.transformation.macro.categories = script = My Other Category
 
+#-# [Since 14.8RC1]
+#-# Override the default hidden macro categories.
+#-#
+#-# For instance, to make the "Development" category hidden by default, in addition to the default "Internal" and 
+#-# "Deprecated" categories, you'd use:
+# rendering.transformation.macro.hiddenCategories = Development,Internal,Deprecated
+
 #-# [Since 2.5M2]
 #-# Specify whether the image dimensions should be extracted from the image parameters and included in the image URL
 #-# or not. When image dimensions are included in the image URL the image can be resized on the server side before being

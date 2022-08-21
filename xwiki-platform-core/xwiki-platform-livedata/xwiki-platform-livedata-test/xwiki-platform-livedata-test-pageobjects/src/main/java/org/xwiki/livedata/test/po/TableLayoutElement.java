@@ -449,7 +449,8 @@ public class TableLayoutElement extends BaseElement
         if (classes.contains("filter-list")) {
             if (element.getAttribute(CLASS_HTML_ATTRIBUTE).contains("selectized")) {
                 SuggestInputElement suggestInputElement = new SuggestInputElement(element);
-                suggestInputElement.sendKeys(content).selectTypedText();
+                suggestInputElement.clearSelectedSuggestions();
+                suggestInputElement.sendKeys(content).selectByVisibleText(content);
             } else {
                 new Select(element).selectByVisibleText(content);
             }
@@ -525,6 +526,23 @@ public class TableLayoutElement extends BaseElement
         int columnNumber = findColumnIndex(columnLabel);
         return getRoot().findElement(
             By.cssSelector(String.format("tbody tr:nth-child(%d) td:nth-child(%d)", rowNumber, columnNumber)));
+    }
+
+    /**
+     * Get the 1-based row index of an element, relative to the number of currently displayed rows.
+     *
+     * @param by the selector of the searched element
+     * @return the 1-based row index where the element was found, or 0 if it doesn't exist
+     * @since 14.7RC1
+     */
+    public int getRowIndexForElement(By by)
+    {
+        WebElement rowElement = getRoot().findElement(by);
+        if (rowElement.isDisplayed()) {
+            // Count the preceding rows.
+            return rowElement.findElements(By.xpath("./ancestor::tr[1]/preceding-sibling::tr")).size() + 1;
+        }
+        return 0;
     }
 
     /**

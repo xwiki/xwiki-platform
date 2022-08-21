@@ -95,6 +95,20 @@ public class LiveDataElement extends BaseElement
         return getFootnotes().stream().map(WebElement::getText).collect(Collectors.toList());
     }
 
+    /**
+     * @return if the live data has finished loading and is ready for service
+     */
+    public boolean isReady()
+    {
+        // See {@link #waitUntilReady()}.
+        String[] classes = getDriver().findElementWithoutWaiting(By.id(this.id)).getAttribute("class").split("\\s+");
+        boolean isVueLoaded = !Arrays.asList(classes).contains("loading");
+        boolean areComponentsLoaded =
+            getDriver().findElement(By.id(this.id)).findElements(By.cssSelector(".xwiki-livedata .loading")).isEmpty();
+
+        return isVueLoaded && areComponentsLoaded;
+    }
+
     private void waitUntilReady()
     {
         // First the Live Data macro displays a simple div with the loading class.

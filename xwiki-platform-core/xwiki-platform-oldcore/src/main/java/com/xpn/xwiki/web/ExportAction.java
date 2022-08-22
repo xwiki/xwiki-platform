@@ -164,11 +164,7 @@ public class ExportAction extends XWikiAction
         // Note 1: exportType will be null if no office server is started or it doesn't support the passed format
         // Note 2: we don't use the office server for PDF exports since it doesn't work OOB. Instead we use FOP.
         if ("pdf".equalsIgnoreCase(format)) {
-            // Use the factory to generate view URLs for browser-consumption. FOP will resolve any relative URL to
-            // a full URI, see FOPXSLFORenderer#getBaseURI(). Note that this is a better implementation than using
-            // ExternalServletURLFactory since that would only work for URLs that are computed using XWikiURLFactory
-            // and not those using a ResourceReferenceSerializer (e.g. ExtendedURLTemporaryResourceReferenceSerializer).
-            urlFactory = new XWikiServletURLFactory();
+            urlFactory = new ExternalServletURLFactory();
             exporter = new PdfExportImpl();
             exportType = ExportType.PDF;
         } else if (exportType == null) {

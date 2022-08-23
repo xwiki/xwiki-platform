@@ -29,7 +29,10 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
+ * Help serialize and unserialize links stored in Solr.
+ * 
  * @version $Id$
+ * @since 14.8RC1
  */
 @Component(roles = LinkSerializer.class)
 @Singleton

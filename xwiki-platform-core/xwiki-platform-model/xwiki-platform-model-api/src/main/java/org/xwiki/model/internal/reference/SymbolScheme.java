@@ -105,6 +105,13 @@ public interface SymbolScheme
     String[] getParameterReplacementSymbols(EntityType type);
 
     /**
+     * Resolve a parameter into its expected Java type.
+     * <p>
+     * {@link org.xwiki.model.reference.EntityReference} parameters can have various types and some are expected to have
+     * very specific types so we need to convert them when they are parsed from {@link String} when resolving a
+     * reference. A very common example is the parameter "locale" in DocumentReference and PageReference which is
+     * expected to be of type Locale.
+     * 
      * @param parameter the name of the parameter
      * @param value the String value of the parameter
      * @return the parameter converted in the expected type

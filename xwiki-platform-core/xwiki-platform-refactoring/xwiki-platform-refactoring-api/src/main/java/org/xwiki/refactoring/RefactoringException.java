@@ -46,7 +46,6 @@ public class RefactoringException extends Exception
     /**
      * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). A {@code null}
      *            value is permitted, and indicates that the cause is nonexistent or unknown
-     * @since 9.3RC1
      */
     public RefactoringException(Throwable cause)
     {

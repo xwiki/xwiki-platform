@@ -82,9 +82,9 @@ public interface XWikiStoreInterface
     List<DocumentReference> searchDocumentReferences(String wheresql, XWikiContext context) throws XWikiException;
 
     /**
-     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, com.xpn.xwiki.XWikiContext)}
+     * @deprecated use {@link #searchDocumentReferences(String, com.xpn.xwiki.XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     List<String> searchDocumentsNames(String wheresql, XWikiContext context) throws XWikiException;
 
     /**
@@ -94,9 +94,9 @@ public interface XWikiStoreInterface
         throws XWikiException;
 
     /**
-     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, int, int, com.xpn.xwiki.XWikiContext)}
+     * @deprecated use {@link #searchDocumentReferences(String, int, int, com.xpn.xwiki.XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     List<String> searchDocumentsNames(String wheresql, int nb, int start, XWikiContext context) throws XWikiException;
 
     /**
@@ -106,9 +106,9 @@ public interface XWikiStoreInterface
         XWikiContext context) throws XWikiException;
 
     /**
-     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, int, int, String, XWikiContext)}
+     * @deprecated use {@link #searchDocumentReferences(String, int, int, String, XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     List<String> searchDocumentsNames(String wheresql, int nb, int start, String selectColumns, XWikiContext context)
         throws XWikiException;
 
@@ -142,9 +142,9 @@ public interface XWikiStoreInterface
         List<?> parameterValues, XWikiContext context) throws XWikiException;
 
     /**
-     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, int, int, List, XWikiContext)}
+     * @deprecated use {@link #searchDocumentReferences(String, int, int, List, XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     List<String> searchDocumentsNames(String parametrizedSqlClause, int nb, int start, List<?> parameterValues,
         XWikiContext context) throws XWikiException;
 
@@ -158,9 +158,9 @@ public interface XWikiStoreInterface
         XWikiContext context) throws XWikiException;
 
     /**
-     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, List, XWikiContext)}
+     * @deprecated use {@link #searchDocumentReferences(String, List, XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     List<String> searchDocumentsNames(String parametrizedSqlClause, List<?> parameterValues, XWikiContext context)
         throws XWikiException;
 
@@ -429,9 +429,9 @@ public interface XWikiStoreInterface
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #loadBacklinks(DocumentReference, boolean, XWikiContext)}
+     * @deprecated use {@link #loadBacklinks(DocumentReference, boolean, XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     List<String> loadBacklinks(String fullName, XWikiContext context, boolean bTransaction) throws XWikiException;
 
     void saveLinks(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException;
@@ -543,9 +543,9 @@ public interface XWikiStoreInterface
     boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiException;
 
     /**
-     * @deprecated since 11.5RC1, use {@link #isCustomMappingValid(BaseClass, String)}
+     * @deprecated use {@link #isCustomMappingValid(BaseClass, String)}
      */
-    @Deprecated
+    @Deprecated(since = "11.5RC1")
     boolean isCustomMappingValid(BaseClass bclass, String custommapping1, XWikiContext context) throws XWikiException;
 
     /**
@@ -557,9 +557,9 @@ public interface XWikiStoreInterface
     }
 
     /**
-     * @deprecated since 11.5RC1, use {@link #injectCustomMapping(BaseClass)} instead
+     * @deprecated use {@link #injectCustomMapping(BaseClass)} instead
      */
-    @Deprecated
+    @Deprecated(since = "11.5RC1")
     boolean injectCustomMapping(BaseClass doc1class, XWikiContext xWikiContext) throws XWikiException;
 
     /**

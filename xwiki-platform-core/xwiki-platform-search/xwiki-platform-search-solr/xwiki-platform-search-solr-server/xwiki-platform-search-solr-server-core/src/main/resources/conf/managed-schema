@@ -129,6 +129,8 @@
 
     <!-- XWIKI BEGIN -->
 
+    <!-- The reference of the entity of the form <type>:<standard entity reference>
+    <field name="reference" type="string" indexed="true" stored="true" />
     <!-- The entity type: DOCUMENT, ATTACHMENT, OBJECT, OBJECT_PROPERTY -->
     <field name="type" type="string" indexed="true" stored="true" />
     <field name="wiki" type="string" indexed="true" stored="true" />

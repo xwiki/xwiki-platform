@@ -178,14 +178,8 @@ public class XWikiDocumentTest
         when(this.xWiki.getStore()).thenReturn(xWikiStoreInterface);
         when(this.xWiki.getDocument(any(DocumentReference.class), any())).thenReturn(this.document);
         when(this.xWiki.getDocumentReference(any(XWikiRequest.class), any())).thenReturn(documentReference);
-        when(this.xWiki.getDocumentReference((EntityReference) any(), any())).then(new Answer<DocumentReference>()
-        {
-            @Override
-            public DocumentReference answer(InvocationOnMock invocation) throws Throwable
-            {
-                return new DocumentReference(invocation.getArgument(0));
-            }
-        });
+        when(this.xWiki.getDocumentReference(any(EntityReference.class), any()))
+            .then(i -> new DocumentReference(i.getArgument(0)));
         when(this.xWiki.getLanguagePreference(any())).thenReturn("en");
         when(this.xWiki.getSectionEditingDepth()).thenReturn(2L);
         when(this.xWiki.getRightService()).thenReturn(this.xWikiRightService);

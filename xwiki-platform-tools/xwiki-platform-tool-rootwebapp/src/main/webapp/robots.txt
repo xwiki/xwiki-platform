@@ -9,7 +9,6 @@ User-agent: *
 Disallow: /xwiki/bin/viewattachrev/
 Disallow: /xwiki/bin/viewrev/
 Disallow: /xwiki/bin/pdf/
-Disallow: /xwiki/bin/tex/
 Disallow: /xwiki/bin/edit/
 Disallow: /xwiki/bin/create/
 Disallow: /xwiki/bin/inline/

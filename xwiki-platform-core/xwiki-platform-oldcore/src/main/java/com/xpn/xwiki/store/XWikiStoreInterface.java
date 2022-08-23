@@ -553,7 +553,11 @@ public interface XWikiStoreInterface
      */
     default boolean isCustomMappingValid(BaseClass bclass, String custommapping1)
     {
-        return isCustomMappingValid(bclass, custommapping1);
+        try {
+            return isCustomMappingValid(bclass, custommapping1, null);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**

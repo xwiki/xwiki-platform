@@ -141,12 +141,6 @@ public class DefaultLinkStore implements LinkStore
         EntityReference documentBasedReference = toDocumentBasedReference(reference);
 
         // Search for the Solr entities which contains extended links with the resolved DOCUMENT and PAGE references
-        SolrQuery solrQuery = new SolrQuery();
-
-        solrQuery.setRows(Integer.MAX_VALUE - 1);
-
-        // Load only the field we need
-        solrQuery.setFields(FieldUtils.REFERENCE);
 
         // Get only the entities with links to the passed reference (either as DOCUMENT or PAGE version)
         StringBuilder filter = new StringBuilder();
@@ -161,7 +155,13 @@ public class DefaultLinkStore implements LinkStore
         filter.append(FieldUtils.LINKS_EXTENDED);
         filter.append(':');
         filter.append(this.utils.toCompleteFilterQueryString(this.linkSerializer.serialize(documentBasedReference)));
-        solrQuery.addFilterQuery(filter.toString());
+
+        SolrQuery solrQuery = new SolrQuery(filter.toString());
+
+        solrQuery.setRows(Integer.MAX_VALUE - 1);
+
+        // Load only the field we need
+        solrQuery.setFields(FieldUtils.REFERENCE);
 
         QueryResponse response;
         try {
@@ -192,15 +192,23 @@ public class DefaultLinkStore implements LinkStore
             return entityReference;
         }
 
+        if (entityReference.getType() == EntityType.PAGE) {
+            return this.currentDocumentResolver.resolve(pageReference instanceof PageReference
+                ? (PageReference) pageReference : new PageReference(pageReference));
+        }
+
+        EntityType documentBasedType =
+            AbstractEntityReferenceResolver.TYPE_CONVERT_MAPPING.get(entityReference.getType());
+
         // Convert to DOCUMENT based reference
-        EntityType pageBasedType = AbstractEntityReferenceResolver.TYPE_CONVERT_MAPPING.get(entityReference.getType());
-        EntityReference documentBasedReference = this.referenceConverter.resolve(entityReference, pageBasedType);
+        EntityReference documentBasedReference = this.referenceConverter.resolve(entityReference, documentBasedType);
 
         // Find the right DOCUMENT reference
-        DocumentReference documentReference = this.currentDocumentResolver.resolve(new PageReference(pageReference));
+        DocumentReference documentReference = this.currentDocumentResolver.resolve(
+            pageReference instanceof PageReference ? (PageReference) pageReference : new PageReference(pageReference));
 
         // Switch the parent
-        return documentBasedReference.replaceParent(documentBasedReference.extractReference(pageBasedType),
+        return documentBasedReference.replaceParent(documentBasedReference.extractReference(documentBasedType),
             documentReference);
     }
 
@@ -211,8 +219,12 @@ public class DefaultLinkStore implements LinkStore
             return entityReference;
         }
 
-        EntityType documentBasedType =
-            AbstractEntityReferenceResolver.TYPE_CONVERT_MAPPING.get(entityReference.getType());
+        EntityType documentBasedType;
+        if (entityReference.getType() == EntityType.DOCUMENT) {
+            documentBasedType = EntityType.PAGE;
+        } else {
+            documentBasedType = AbstractEntityReferenceResolver.TYPE_CONVERT_MAPPING.get(entityReference.getType());
+        }
 
         // Convert the reference to PAGE based reference
         EntityReference pageBasedReference = this.referenceConverter.resolve(entityReference, documentBasedType);

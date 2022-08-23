@@ -47,6 +47,9 @@ public class SolrMetadataExtractorUtils
     private ComponentManagerManager componentManagerManager;
 
     @Inject
+    private ComponentManager defaultComponentManager;
+
+    @Inject
     private Logger logger;
 
     /**
@@ -65,6 +68,10 @@ public class SolrMetadataExtractorUtils
         EntityReference wikiReference = reference.extractReference(EntityType.WIKI);
         ComponentManager namespaceComponentManager = this.componentManagerManager
             .getComponentManager(new WikiNamespace(wikiReference.getName()).serialize(), false);
+        if (namespaceComponentManager == null) {
+            // Fallback on this component ComponentManager
+            namespaceComponentManager = this.defaultComponentManager;
+        }
 
         // Call all SolrEntityMetadataExtractor instances
         boolean updated = false;

@@ -88,6 +88,8 @@ public class DefaultSymbolScheme implements SymbolScheme
 
     /**
      * The separator used between the entity type and the reference.
+     * 
+     * @since 14.8RC1
      */
     private static final char CENTITYTYPESEP = ':';
 

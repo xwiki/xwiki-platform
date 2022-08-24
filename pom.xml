@@ -670,25 +670,23 @@
         <version>1.0.2</version>
       </dependency>
 
-      <!-- Carte Utils -->
+      <!-- Carte CSS4J and co -->
       <dependency>
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j</artifactId>
-        <version>3.7.2</version>
+        <version>3.8.0</version>
       </dependency>
-
-      <!-- Carte CSS4J -->
       <dependency>
         <groupId>io.sf.carte</groupId>
         <artifactId>carte-util</artifactId>
         <!-- Note: has a different release cycle than CSS4J -->
-        <version>3.5.1</version>
+        <version>3.6.0</version>
       </dependency>
       <dependency>
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j-dom4j</artifactId>
         <!-- Note: has a different release cycle than CSS4J "core" -->
-        <version>3.7.1</version>
+        <version>3.8.0</version>
       </dependency>
 
       <!-- Carte XML DTD -->
@@ -696,7 +694,7 @@
         <groupId>io.sf.carte</groupId>
         <artifactId>xml-dtd</artifactId>
         <!-- Note: has a different release cycle than CSS4J -->
-        <version>4.0.0</version>
+        <version>4.1.0</version>
       </dependency>
 
       <!-- Restlet -->

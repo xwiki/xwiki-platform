@@ -167,7 +167,7 @@ public class ChromeManager implements Initializable
         String message = String.format("Timeout waiting for Chrome remote debugging to become available. Waited [%s] "
             + "seconds", waitTime);
         if (exception != null) {
-            message = String.format("%s. Root cause: [%s]", ExceptionUtils.getRootCauseMessage(exception));
+            message = String.format("%s. Root cause: [%s]", message, ExceptionUtils.getRootCauseMessage(exception));
         }
         throw new TimeoutException(message);
     }

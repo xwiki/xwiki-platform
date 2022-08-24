@@ -17,48 +17,73 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.misc;
+package org.xwiki.flamingo.test.docker;
 
 import java.net.URL;
 import java.util.Map;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.export.pdf.test.po.PDFDocument;
+import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.test.docker.junit5.UITest;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class PDFTest extends TestCase
+/**
+ * Tests related to the server-side PDF export (to be moved when the PDF export feature is moved out of oldcore).
+ *
+ * @version $Id$
+ */
+// Note: vnc is set to false since otherwise our test framework fails to take a video since no page has been accessed
+// by the test. Since we don't need VNC, we turn it off and thus no video is taken.
+@UITest(vnc = false)
+class PDFExportIT
 {
+    private String prefix;
+
+    @BeforeEach
+    void beforeEach(TestConfiguration testConfiguration)
+    {
+        String host = testConfiguration.getServletEngine().getHostIP();
+        this.prefix = String.format("http://%s:8080/", host);
+    }
+
     /**
      * Verify that the PDF export feature works on a single simple page by downloading the PDF and parsing it using
      * PDFBox.
-     * 
+     *
      * @see "XWIKI-7048: PDF export templates can display properties of other objects if the XWiki.PDFClass object is
      *      missing"
      */
-    public void testExportSingleSimplePageAsPDF() throws Exception
+    @Test
+    void exportSingleSimplePageAsPDF() throws Exception
     {
         // We're using Dashboard.WebHome page because it has objects of type XWiki.GadgetClass and they have a title
         // property which was mistaken with the title property of XWiki.PDFClass before XWIKI-7048 was fixed. The gadget
         // title contains Velocity code that isn't wrapped in a Velocity macro so it is printed as is if not rendered in
         // the right context.
-        URL pdfURL = new URL("http://localhost:8080/xwiki/bin/export/Dashboard/WebHome?format=pdf");
+        URL pdfURL = new URL(createURL("xwiki/bin/export/Dashboard/WebHome?format=pdf"));
         try (PDFDocument document = new PDFDocument(pdfURL)) {
             String text = document.getText();
             // Note: This is the title of the Pages gadget when it's working
-            assertTrue("Invalid content", text.contains("Pages"));
+            assertTrue(text.contains("Pages"), "Invalid content");
             // Note: This is the title of the Pages gadget before XWIKI-7048 was fixed
-            assertFalse("Invalid content", text.contains("$services.localization.render("));
+            assertFalse(text.contains("$services.localization.render("), "Invalid content");
         }
     }
 
     /**
      * Verify that we can export content having links to attachments.
-     * 
+     *
      * @see "XWIKI-8978: PDF Export does not handle XWiki links to attached files properly"
      */
-    public void testExportContentWithAttachmentLink() throws Exception
+    @Test
+    void exportContentWithAttachmentLink() throws Exception
     {
-        URL pdfURL = new URL("http://localhost:8080/xwiki/bin/export/Sandbox/WebHome?format=pdf");
+        URL pdfURL = new URL(createURL("xwiki/bin/export/Sandbox/WebHome?format=pdf"));
         try (PDFDocument document = new PDFDocument(pdfURL)) {
             Map<String, String> links = document.getLinks();
             assertTrue(links.containsKey("XWikiLogo.png"));
@@ -74,13 +99,14 @@ public class PDFTest extends TestCase
 
     /**
      * Verify the PDF export with table of contents.
-     * 
+     *
      * @see "XWIKI-9370: PDF Export doesn't list the Table of Contents under certain circumstances"
      */
-    public void testTableOfContents() throws Exception
+    @Test
+    void exportTableOfContents() throws Exception
     {
-        URL pdfURL = new URL(
-            "http://localhost:8080/xwiki/bin/export/Sandbox/WebHome?format=pdf&pdftoc=1&attachments=1&pdfcover=0");
+        URL pdfURL =
+            new URL(createURL("xwiki/bin/export/Sandbox/WebHome?format=pdf&pdftoc=1&attachments=1&pdfcover=0"));
         try (PDFDocument document = new PDFDocument(pdfURL)) {
             Map<String, String> links = document.getLinksFromPage(0);
             // Make sure we have a Table of Contents.
@@ -90,5 +116,10 @@ public class PDFTest extends TestCase
                 assertTrue(entry.getValue().contains(entry.getKey()));
             }
         }
+    }
+
+    private String createURL(String suffix)
+    {
+        return String.format("%s%s", this.prefix, suffix);
     }
 }

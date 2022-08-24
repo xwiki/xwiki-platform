@@ -143,13 +143,15 @@ public class ChromeManager implements Initializable
 
         int timeoutMillis = timeoutSeconds * 1000;
         long start = System.currentTimeMillis();
+        Exception exception = null;
 
         while (System.currentTimeMillis() - start < timeoutMillis) {
             try {
                 this.chromeService.getVersion();
                 return;
             } catch (Exception e) {
-                this.logger.debug("Chrome remote debugging not available. Retrying in 2s.");
+                exception = e;
+                this.logger.debug("Chrome remote debugging not available. Retrying in 2s.", e);
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException ie) {
@@ -162,8 +164,12 @@ public class ChromeManager implements Initializable
         }
 
         long waitTime = (System.currentTimeMillis() - start) / 1000;
-        throw new TimeoutException(String
-            .format("Timeout waiting for Chrome remote debugging to become available. Waited [%s] seconds.", waitTime));
+        String message = String.format("Timeout waiting for Chrome remote debugging to become available. Waited [%s] "
+            + "seconds", waitTime);
+        if (exception != null) {
+            message = String.format("%s. Root cause: [%s]", ExceptionUtils.getRootCauseMessage(exception));
+        }
+        throw new TimeoutException(message);
     }
 
     /**

@@ -22,6 +22,7 @@ package org.xwiki.model.internal.reference;
 import java.io.Serializable;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -119,8 +120,8 @@ public abstract class AbstractStringEntityReferenceResolver extends AbstractEnti
         if (type == null) {
             Character entityTypeSeparator = getSymbolScheme().getEntityTypeSeparator();
             if (entityTypeSeparator != null) {
-                type = Enum.valueOf(EntityType.class,
-                    StringUtils.substringBefore(entityReferenceRepresentation, entityTypeSeparator));
+                type = Enum.valueOf(EntityType.class, StringUtils
+                    .substringBefore(entityReferenceRepresentation, entityTypeSeparator).toUpperCase(Locale.ENGLISH));
                 entityReferenceRepresentation =
                     StringUtils.substringAfter(entityReferenceRepresentation, entityTypeSeparator);
             } else {

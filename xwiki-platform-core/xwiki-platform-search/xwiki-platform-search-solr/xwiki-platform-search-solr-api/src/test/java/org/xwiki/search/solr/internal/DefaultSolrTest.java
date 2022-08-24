@@ -140,7 +140,7 @@ class DefaultSolrTest
 
         assertEquals("name", storedDocument.get(FieldUtils.NAME));
         assertEquals("", storedDocument.get(FieldUtils.DOCUMENT_LOCALE));
-        assertEquals(Arrays.asList("link1", "link2"), storedDocument.getFieldValues(FieldUtils.LINKS));   
+        assertEquals(Arrays.asList("link1", "link2"), storedDocument.getFieldValues(FieldUtils.LINKS));
     }
 
     @Test

@@ -73,7 +73,8 @@ public class DefaultLinkStore implements LinkStore
     private EntityReferenceResolver<EntityReference> referenceConverter;
 
     @Inject
-    private EntityReferenceResolver<String> entityResolver;
+    @Named("withparameters")
+    private EntityReferenceResolver<String> referenceResolver;
 
     @Inject
     @Named("current")
@@ -177,7 +178,7 @@ public class DefaultLinkStore implements LinkStore
             String referenceStr = (String) solrDocument.getFieldValue(FieldUtils.REFERENCE);
 
             if (referenceStr != null) {
-                references.add(this.entityResolver.resolve(referenceStr, null));
+                references.add(this.referenceResolver.resolve(referenceStr, null));
             }
         }
 

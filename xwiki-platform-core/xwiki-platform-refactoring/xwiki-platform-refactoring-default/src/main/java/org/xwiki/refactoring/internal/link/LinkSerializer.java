@@ -42,10 +42,11 @@ public class LinkSerializer
     private static final String ENTITY_PREFIX = "entity:";
 
     @Inject
-    @Named("withparameters")
+    @Named("withtype/withparameters")
     private EntityReferenceSerializer<String> entitySerializer;
 
     @Inject
+    @Named("withparameters")
     private EntityReferenceResolver<String> entityResolver;
 
     /**
@@ -56,7 +57,7 @@ public class LinkSerializer
     {
         // TODO: add support for more than entities
         // In the meantime make sure to use a syntax generic enough to support more than entities in the future
-        return ENTITY_PREFIX + reference.getType().getLowerCase() + ':' + this.entitySerializer.serialize(reference);
+        return ENTITY_PREFIX + this.entitySerializer.serialize(reference);
     }
 
     /**

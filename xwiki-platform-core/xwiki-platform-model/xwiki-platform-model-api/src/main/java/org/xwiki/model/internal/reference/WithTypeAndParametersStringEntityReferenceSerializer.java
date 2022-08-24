@@ -19,31 +19,30 @@
  */
 package org.xwiki.model.internal.reference;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.EntityReference;
 
 /**
- * A variation of {@link DefaultStringEntityReferenceResolver} with parameters support enabled for all entity types.
+ * A variation of {@link WithParametersStringEntityReferenceSerializer} which prefix the reference with the type.
  * 
  * @version $Id$
  * @since 14.8RC1
  */
 @Component
-@Named("withparameters")
+@Named("withtype/withparameters")
 @Singleton
-public class WithParametersStringEntityReferenceResolver extends DefaultStringEntityReferenceResolver
+public class WithTypeAndParametersStringEntityReferenceSerializer extends WithParametersStringEntityReferenceSerializer
 {
-    @Inject
-    @Named("withparameters")
-    private SymbolScheme symbolScheme;
-
     @Override
-    protected SymbolScheme getSymbolScheme()
+    public String serialize(EntityReference reference, Object... parameters)
     {
-        // Return a SymbolScheme where parameters syntax is enabled for all types
-        return this.symbolScheme;
+        String stringReference = super.serialize(reference, parameters);
+
+        return getSymbolScheme().getEntityTypeSeparator() != null
+            ? reference.getType().getLowerCase() + getSymbolScheme().getEntityTypeSeparator() + stringReference
+            : stringReference;
     }
 }

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.refactoring.internal.link;
+package org.xwiki.search.solr.internal.metadata;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -34,6 +34,8 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.link.LinkException;
+import org.xwiki.link.LinkStore;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.AbstractEntityReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
@@ -41,8 +43,6 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.PageReference;
-import org.xwiki.refactoring.RefactoringException;
-import org.xwiki.refactoring.link.LinkStore;
 import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.SolrUtils;
@@ -67,7 +67,7 @@ public class DefaultLinkStore implements LinkStore
     private SolrSearchCoreUtils searchUtils;
 
     @Inject
-    private LinkSerializer linkSerializer;
+    private SolrLinkSerializer linkSerializer;
 
     @Inject
     private EntityReferenceResolver<EntityReference> referenceConverter;
@@ -80,25 +80,25 @@ public class DefaultLinkStore implements LinkStore
     @Named("current")
     private DocumentReferenceResolver<PageReference> currentDocumentResolver;
 
-    private SolrClient getClient() throws RefactoringException
+    private SolrClient getClient() throws LinkException
     {
         try {
             return this.solr.getClient(SolrClientInstance.CORE_NAME);
         } catch (SolrException e) {
-            throw new RefactoringException("Failed to acces Solr search core", e);
+            throw new LinkException("Failed to acces Solr search core", e);
         }
     }
 
     @Override
     @SuppressWarnings("resource")
-    public Set<EntityReference> resolveLinkedEntities(EntityReference target) throws RefactoringException
+    public Set<EntityReference> resolveLinkedEntities(EntityReference target) throws LinkException
     {
         // Get the id of the reference
         String solrID;
         try {
             solrID = this.searchUtils.getId(target);
         } catch (Exception e) {
-            throw new RefactoringException("Failed to serialize the Solr id for the reference [" + target + "]", e);
+            throw new LinkException("Failed to serialize the Solr id for the reference [" + target + "]", e);
         }
 
         // Load the Solr document corresponding to the reference
@@ -106,7 +106,7 @@ public class DefaultLinkStore implements LinkStore
         try {
             solrDocument = getClient().getById(solrID);
         } catch (Exception e) {
-            throw new RefactoringException(
+            throw new LinkException(
                 "Failed to load the Solr document for the reference [" + target + "] (id [" + solrID + "])", e);
         }
 
@@ -134,7 +134,7 @@ public class DefaultLinkStore implements LinkStore
     }
 
     @Override
-    public Set<EntityReference> resolveBackLinkedEntities(EntityReference reference) throws RefactoringException
+    public Set<EntityReference> resolveBackLinkedEntities(EntityReference reference) throws LinkException
     {
         // Get the PAGE based reference
         EntityReference pageBasedReference = toPageBasedReference(reference);
@@ -168,7 +168,7 @@ public class DefaultLinkStore implements LinkStore
         try {
             response = getClient().query(solrQuery);
         } catch (Exception e) {
-            throw new RefactoringException("Failed to search Solr for the backlinks of an entity", e);
+            throw new LinkException("Failed to search Solr for the backlinks of an entity", e);
         }
 
         SolrDocumentList solrDocuments = response.getResults();

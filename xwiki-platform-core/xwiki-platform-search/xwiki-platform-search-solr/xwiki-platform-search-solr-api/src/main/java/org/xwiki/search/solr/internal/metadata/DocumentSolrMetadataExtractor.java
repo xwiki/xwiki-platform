@@ -19,9 +19,11 @@
  */
 package org.xwiki.search.solr.internal.metadata;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -143,6 +145,9 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         // Document translations have their own hidden fields
         solrDocument.setField(FieldUtils.HIDDEN, translatedDocument.isHidden());
 
+        // Add links found in the document
+        setLinks(solrDocument, translatedDocument, xcontext);
+
         // Add any extra fields (about objects, etc.) that can improve the findability of the document.
         setExtras(documentReference, solrDocument, locale);
 
@@ -176,6 +181,37 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         solrDocument.setField(FieldUtils.CREATOR_DISPLAY, creatorDisplayString);
     }
 
+    private void setLinks(SolrInputDocument solrDocument, XWikiDocument translatedDocument, XWikiContext xcontext)
+    {
+        // Extract links
+        // TODO: support more than EntityReference (extract and index any type of link found in the content)
+        Set<EntityReference> references = translatedDocument.getUniqueLinkedEntities(xcontext);
+
+        if (!references.isEmpty()) {
+            Set<String> links = new HashSet<>(references.size());
+            Set<String> linksExtended = new HashSet<>(references.size() * 2);
+
+            // Serialize the links and resolve the extended links
+            for (EntityReference reference : references) {
+                String referenceString = this.linkSerializer.serialize(reference);
+
+                links.add(referenceString);
+                linksExtended.add(referenceString);
+
+                // Add the reference without parameters as well as all its parents to the extended list
+                extendLink(reference, linksExtended);
+            }
+
+            // Add the links to the Solr document
+            for (String link : links) {
+                solrDocument.addField(FieldUtils.LINKS, link);
+            }
+            for (String linkExtended : linksExtended) {
+                solrDocument.addField(FieldUtils.LINKS_EXTENDED, linkExtended);
+            }
+        }
+    }
+    
     /**
      * @param documentReference the document's reference.
      * @param solrDocument the Solr document where to add the data.

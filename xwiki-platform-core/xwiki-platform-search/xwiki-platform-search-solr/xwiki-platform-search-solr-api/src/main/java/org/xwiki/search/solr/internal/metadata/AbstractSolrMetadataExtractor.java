@@ -119,6 +119,9 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     @Inject
     protected SolrSearchCoreUtils seachUtils;
 
+    @Inject
+    protected SolrLinkSerializer linkSerializer;
+
     private int shortTextLimit = -1;
 
     /**
@@ -544,6 +547,15 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
             // trailing slash in order to distinguish between space names with the same prefix (e.g. 0/Gallery/ and
             // 0/GalleryCode/).
             solrDocument.addField(FieldUtils.SPACE_FACET, (i - 1) + "/" + localAncestorReference + ".");
+        }
+    }
+
+    protected void extendLink(EntityReference reference, Set<String> linksExtended)
+    {
+        for (EntityReference parent =
+            reference.getParameters().isEmpty() ? reference : new EntityReference(reference.getName(),
+                reference.getType(), reference.getParent(), null); parent != null; parent = parent.getParent()) {
+            linksExtended.add(this.linkSerializer.serialize(parent));
         }
     }
 }

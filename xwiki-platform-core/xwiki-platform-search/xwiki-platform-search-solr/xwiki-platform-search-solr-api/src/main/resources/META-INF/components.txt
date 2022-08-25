@@ -17,9 +17,11 @@ org.xwiki.search.solr.internal.job.IndexerJob
 org.xwiki.search.solr.internal.job.DatabaseDocumentIterator
 org.xwiki.search.solr.internal.job.SolrDocumentIterator
 org.xwiki.search.solr.internal.metadata.AttachmentSolrMetadataExtractor
+org.xwiki.search.solr.internal.metadata.DefaultLinkStore
 org.xwiki.search.solr.internal.metadata.DocumentSolrMetadataExtractor
 org.xwiki.search.solr.internal.metadata.ObjectPropertySolrMetadataExtractor
 org.xwiki.search.solr.internal.metadata.ObjectSolrMetadataExtractor
+org.xwiki.search.solr.internal.metadata.SolrLinkSerializer
 org.xwiki.search.solr.internal.metadata.SolrMetadataExtractorUtils
 org.xwiki.search.solr.internal.reference.AttachmentSolrReferenceResolver
 org.xwiki.search.solr.internal.reference.DefaultSolrReferenceResolver

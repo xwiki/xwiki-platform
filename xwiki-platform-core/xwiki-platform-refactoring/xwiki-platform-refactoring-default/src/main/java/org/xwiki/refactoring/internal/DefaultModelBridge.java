@@ -37,6 +37,8 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.job.event.status.JobProgressManager;
+import org.xwiki.link.LinkException;
+import org.xwiki.link.LinkStore;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -50,7 +52,6 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.refactoring.RefactoringException;
 import org.xwiki.refactoring.internal.job.PermanentlyDeleteJob;
-import org.xwiki.refactoring.link.LinkStore;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -290,7 +291,12 @@ public class DefaultModelBridge implements ModelBridge
     @Override
     public Set<DocumentReference> getBackLinkedDocuments(EntityReference reference) throws RefactoringException
     {
-        Set<EntityReference> references = this.linkStore.resolveBackLinkedEntities(reference);
+        Set<EntityReference> references;
+        try {
+            references = this.linkStore.resolveBackLinkedEntities(reference);
+        } catch (LinkException e) {
+            throw new RefactoringException("Failed to resolve backlinks for entity [" + reference + "]", e);
+        }
 
         XWikiContext xcontext = this.xcontextProvider.get();
         Set<DocumentReference> documentReferences = new HashSet<>(references.size());

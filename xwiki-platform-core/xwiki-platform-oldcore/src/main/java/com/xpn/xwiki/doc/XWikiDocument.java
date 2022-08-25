@@ -97,6 +97,8 @@ import org.xwiki.filter.xar.input.XARInputProperties;
 import org.xwiki.filter.xar.output.XAROutputProperties;
 import org.xwiki.filter.xml.output.DefaultResultOutputTarget;
 import org.xwiki.job.event.status.JobProgressManager;
+import org.xwiki.link.LinkException;
+import org.xwiki.link.LinkStore;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.EntityType;
@@ -124,8 +126,6 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
-import org.xwiki.refactoring.RefactoringException;
-import org.xwiki.refactoring.link.LinkStore;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.Block.Axes;
 import org.xwiki.rendering.block.HeaderBlock;
@@ -5511,7 +5511,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         Set<EntityReference> references;
         try {
             references = getLinkStore().resolveBackLinkedEntities(getDocumentReference());
-        } catch (RefactoringException e) {
+        } catch (LinkException e) {
             throw new XWikiException("Failed to load backlinks for reference [" + getDocumentReference() + "]", e);
         }
 

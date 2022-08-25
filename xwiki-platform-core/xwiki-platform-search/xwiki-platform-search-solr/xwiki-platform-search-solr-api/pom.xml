@@ -112,6 +112,11 @@
       <artifactId>xwiki-platform-query-manager</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-link</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Embedded in the JAR to be used as default SOLR configuration -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -126,6 +131,7 @@
       <type>zip</type>
       <scope>provided</scope>
     </dependency>
+    
 
     <!-- Testing dependencies -->
     <!-- Since we're mocking a class (XWiki) we need those -->

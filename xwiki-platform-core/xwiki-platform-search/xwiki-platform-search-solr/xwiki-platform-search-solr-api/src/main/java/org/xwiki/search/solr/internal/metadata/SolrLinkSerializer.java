@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.refactoring.internal.link;
+package org.xwiki.search.solr.internal.metadata;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -34,9 +34,9 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  * @version $Id$
  * @since 14.8RC1
  */
-@Component(roles = LinkSerializer.class)
+@Component(roles = SolrLinkSerializer.class)
 @Singleton
-public class LinkSerializer
+public class SolrLinkSerializer
 {
     // TODO: add support for more than entities
     private static final String ENTITY_PREFIX = "entity:";

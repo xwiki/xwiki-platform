@@ -17,13 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.refactoring.link;
+package org.xwiki.link;
 
 import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.refactoring.RefactoringException;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -41,14 +40,14 @@ public interface LinkStore
     /**
      * @param reference the reference of the entity containing links
      * @return the other (DOCUMENT based) entities linked by the passed entity
-     * @throws RefactoringException when failing to load the links
+     * @throws LinkException when failing to load the links
      */
-    Set<EntityReference> resolveLinkedEntities(EntityReference reference) throws RefactoringException;
+    Set<EntityReference> resolveLinkedEntities(EntityReference reference) throws LinkException;
 
     /**
      * @param reference the reference of the entities targeted by the links
      * @return the (DOCUMENT based) entities containing links to the passed entity
-     * @throws RefactoringException when failing to load the backlinks
+     * @throws LinkException when failing to load the backlinks
      */
-    Set<EntityReference> resolveBackLinkedEntities(EntityReference reference) throws RefactoringException;
+    Set<EntityReference> resolveBackLinkedEntities(EntityReference reference) throws LinkException;
 }

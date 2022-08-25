@@ -10,6 +10,3 @@ org.xwiki.refactoring.job.XClassDeletingListener
 org.xwiki.refactoring.internal.DefaultMacroRefactoring
 org.xwiki.refactoring.internal.DefaultReferenceRenamer
 org.xwiki.refactoring.internal.ResourceReferenceRenamer
-org.xwiki.refactoring.internal.link.DefaultLinkStore
-org.xwiki.refactoring.internal.link.LinkSerializer
-org.xwiki.refactoring.internal.link.LinksSolrDocumentMetadataExtractor

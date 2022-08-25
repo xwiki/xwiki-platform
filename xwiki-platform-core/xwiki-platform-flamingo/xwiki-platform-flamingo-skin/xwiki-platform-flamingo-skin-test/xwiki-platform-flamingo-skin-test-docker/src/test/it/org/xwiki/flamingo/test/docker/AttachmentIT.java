@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -88,8 +89,15 @@ class AttachmentIT
         throws Exception
     {
         String testPageName = setup.serializeReference(testReference).split(":")[1];
-        setup.deletePage(testReference);
-        ViewPage viewPage = setup.createPage(testReference, "", "");
+        setup.rest().delete(testReference);
+        setup.rest().savePage(testReference, "", "");
+        Page page = setup.rest().get(testReference);
+        // We make the page hidden as we identified some issues specific to hidden pages (see XWIKI-20093).
+        // If it happens that some issues are specific to non-hidden pages, the test will need to be improved to 
+        // cover both cases (which will make the execution time of the test suite larger).
+        page.setHidden(true);
+        setup.rest().save(page);
+        ViewPage viewPage = setup.gotoPage(testReference);
         AttachmentsPane attachmentsPane = viewPage.openAttachmentsDocExtraPane();
 
         // Upload two attachments and check them

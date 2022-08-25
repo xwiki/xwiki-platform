@@ -40,7 +40,6 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.notifiers.internal.DefaultNotificationCacheManager;
-import org.xwiki.notifications.notifiers.rss.NotificationRSSManager;
 import org.xwiki.notifications.rest.NotificationsResource;
 import org.xwiki.notifications.rest.model.Notifications;
 import org.xwiki.notifications.sources.NotificationParameters;
@@ -49,7 +48,6 @@ import org.xwiki.notifications.sources.internal.DefaultNotificationParametersFac
 import org.xwiki.notifications.sources.internal.DefaultNotificationParametersFactory.ParametersKey;
 import org.xwiki.rest.XWikiResource;
 
-import com.rometools.rome.io.SyndFeedOutput;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.XWikiRequest;

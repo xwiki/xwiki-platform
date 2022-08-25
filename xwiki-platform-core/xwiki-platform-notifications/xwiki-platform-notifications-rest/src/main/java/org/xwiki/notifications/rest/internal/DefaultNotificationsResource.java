@@ -65,6 +65,7 @@ import com.xpn.xwiki.web.XWikiRequest;
 public class DefaultNotificationsResource extends XWikiResource implements NotificationsResource
 {
     private static final String TRUE = "true";
+    private static final String ASYNC_ID = "asyncId";
 
     @Inject
     private ParametrizedNotificationManager newNotificationManager;
@@ -102,7 +103,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
 
         if (result instanceof String) {
             response = Response.status(Status.ACCEPTED);
-            response.entity(Collections.singletonMap("asyncId", result));
+            response.entity(Collections.singletonMap(ASYNC_ID, result));
         } else {
             // Make sure URLs will be rendered like in any other display (by default REST API forces absolute URLs)
             XWikiContext xcontext = getXWikiContext();
@@ -196,7 +197,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
 
             if (result instanceof String) {
                 response = Response.status(Status.ACCEPTED);
-                response.entity(Collections.singletonMap("asyncId", result));
+                response.entity(Collections.singletonMap(ASYNC_ID, result));
             } else {
                 response = Response.ok(Collections.singletonMap("unread", result));
             }
@@ -244,7 +245,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             request.get("pages"), request.get("spaces"), request.get("wikis"), request.get("users"),
             request.get("count"), request.get("displayOwnEvents"), request.get("displayMinorEvents"),
             request.get("displaySystemEvents"), request.get("displayReadEvents"), request.get("displayReadStatus"),
-            request.get("tags"), request.get("currentWiki"), request.get("async"), request.get("asyncId"));
+            request.get("tags"), request.get("currentWiki"), request.get("async"), request.get(ASYNC_ID));
     }
 
     private NotificationParameters getNotificationParameters(String useUserPreferences, String userId, String untilDate,

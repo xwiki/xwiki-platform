@@ -662,6 +662,18 @@
       <version>${project.version}</version>
     </dependency>
 
+    <!-- Must be installed at the farm level because xwiki-platform-mentions-default must be installed at farm level. 
+         Otherwise, the components from mentions-api that depend on components from mentions-default are not reloaded 
+         when needed. One concrete consequence being exceptions thrown when accessing a configuration cache in a 
+         'finished' state.
+         TODO: remove when we drop support for the old event store. See https://jira.xwiki.org/browse/XWIKI-19933 -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-mentions-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+
     <!-- ********************************************************************** -->
     <!-- Base UI (to get the JARs) -->
     <dependency>

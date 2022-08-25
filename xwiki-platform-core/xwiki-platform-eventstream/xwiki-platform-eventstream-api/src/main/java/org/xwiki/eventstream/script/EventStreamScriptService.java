@@ -26,9 +26,11 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.RecordableEventDescriptorManager;
+import org.xwiki.eventstream.query.SimpleEventQuery;
 import org.xwiki.script.service.ScriptService;
 
 /**
@@ -44,6 +46,9 @@ public class EventStreamScriptService implements ScriptService
 {
     @Inject
     private RecordableEventDescriptorManager recordableEventDescriptorManager;
+
+    @Inject
+    private EventStore eventStore;
 
     /**
      * @param allWikis load the descriptors from all the wikis of the farm if true
@@ -68,5 +73,16 @@ public class EventStreamScriptService implements ScriptService
         throws EventStreamException
     {
         return recordableEventDescriptorManager.getDescriptorForEventType(eventType, allWikis);
+    }
+
+    /**
+     * @return the total number of event in the store
+     * @throws EventStreamException when failing to query the number of events
+     * @since 12.6.1
+     * @since 12.7RC1
+     */
+    public long getEventCount() throws EventStreamException
+    {
+        return this.eventStore.search(new SimpleEventQuery(0, 0)).getTotalHits();
     }
 }

@@ -32,6 +32,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -75,9 +76,6 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     private InternalNotificationsRenderer notificationsRenderer;
 
     @Inject
-    private NotificationRSSManager notificationRSSManager;
-
-    @Inject
     private DefaultNotificationCacheManager cacheManager;
 
     @Inject
@@ -85,6 +83,9 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
 
     @Inject
     private DefaultNotificationParametersFactory notificationParametersFactory;
+
+    @Inject
+    private RSSFeedRenderer rssFeedRenderer;
 
     @Override
     public Response getNotifications(String useUserPreferences, String userId, String untilDate,
@@ -186,7 +187,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         // Build the response
         Response.ResponseBuilder response;
         XWikiUser xWikiUser = getXWikiContext().getWiki().checkAuth(getXWikiContext());
-        if (xWikiUser == null) {
+        if (!StringUtils.isEmpty(userId) && xWikiUser == null) {
             response = Response.status(Status.UNAUTHORIZED);
         } else {
             Object result = getCompositeEvents(useUserPreferences, userId, null, true, null, pages, spaces, wikis,
@@ -217,7 +218,8 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         // Build the response
         XWikiUser xWikiUser = getXWikiContext().getWiki().checkAuth(getXWikiContext());
         DocumentReference userIdDoc = this.documentReferenceResolver.resolve(userId);
-        if (xWikiUser == null || !userIdDoc.equals(xWikiUser.getUserReference())) {
+        if ((xWikiUser == null && !StringUtils.isEmpty(userId))
+            || (xWikiUser != null && !userIdDoc.equals(xWikiUser.getUserReference()))) {
             getXWikiContext().getResponse().sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return null;
         } else {
@@ -226,8 +228,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
                     spaces, wikis, users, toMaxCount(maxCount, 10), displayOwnEvents, displayMinorEvents,
                     displaySystemEvents, displayReadEvents, tags, currentWiki, null, null, false, false);
 
-            SyndFeedOutput output = new SyndFeedOutput();
-            return output.outputString(notificationRSSManager.renderFeed(events));
+            return this.rssFeedRenderer.render(events);
         }
     }
 

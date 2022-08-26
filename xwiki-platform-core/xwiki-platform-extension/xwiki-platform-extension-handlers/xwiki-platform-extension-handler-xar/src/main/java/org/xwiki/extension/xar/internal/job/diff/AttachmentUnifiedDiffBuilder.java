@@ -32,9 +32,9 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.diff.display.UnifiedDiffBlock;
 import org.xwiki.extension.xar.job.diff.DocumentUnifiedDiff;
-import org.xwiki.extension.xar.job.diff.DocumentVersionReference;
 import org.xwiki.extension.xar.job.diff.EntityUnifiedDiff;
 import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.DocumentVersionReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;

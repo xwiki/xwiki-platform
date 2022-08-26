@@ -28,7 +28,9 @@ import org.xwiki.model.reference.DocumentReference;
  * 
  * @version $Id$
  * @since 7.0RC1
+ * @deprecated Use {@link org.xwiki.model.reference.DocumentVersionReference} instead.
  */
+@Deprecated(since = "14.8RC1")
 public class DocumentVersionReference extends DocumentReference
 {
     /**

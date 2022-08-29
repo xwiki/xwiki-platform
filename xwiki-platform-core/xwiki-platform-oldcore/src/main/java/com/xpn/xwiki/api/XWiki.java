@@ -1159,9 +1159,7 @@ public class XWiki extends Api
      * @param preference Preference name
      * @param space The space for which this preference is requested
      * @return The preference for this wiki and the current locale
-     * @deprecated use {@link #getSpacePreferenceFor(String, SpaceReference)} instead
      */
-    @Deprecated(since = "14.7")
     public String getSpacePreferenceFor(String preference, String space)
     {
         return getSpacePreferenceFor(preference, space, "");
@@ -1176,9 +1174,7 @@ public class XWiki extends Api
      * @param space The space for which this preference is requested
      * @param defaultValue default value to return if the preference does not exist or is empty
      * @return The preference for this wiki and the current locale in long format
-     * @deprecated use {@link #getSpacePreferenceFor(String, SpaceReference, String)} instead
      */
-    @Deprecated(since = "14.7")
     public String getSpacePreferenceFor(String preference, String space, String defaultValue)
     {
         return this.xwiki.getSpacePreference(preference, space, defaultValue, getXWikiContext());

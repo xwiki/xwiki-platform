@@ -3460,6 +3460,7 @@ public class XWiki implements EventListener
             cookieLanguage = Util.normalizeLanguage(getUserPreferenceFromCookie("interfacelanguage", context));
         } catch (Exception e) {
         }
+
         // Determine which language to use
         // First we get the language from the request
         if ((requestLanguage != null) && (!requestLanguage.equals(""))) {

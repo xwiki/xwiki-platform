@@ -20,12 +20,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-livedata</artifactId>
-    <version>14.7-SNAPSHOT</version>
+    <version>14.8-SNAPSHOT</version>
   </parent>
   <packaging>webjar</packaging>
   <artifactId>xwiki-platform-livedata-webjar</artifactId>
@@ -49,11 +50,18 @@
       <artifactId>jquery</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.webjars</groupId>
+      <groupId>org.webjars.npm</groupId>
       <artifactId>vue</artifactId>
-      <version>2.6.14</version>
-    </dependency>
-    <!-- Used by the date filter. -->
+      <version>2.7.10</version>
+      <exclusions>
+        <!-- Excluded because this dependency is 1) not used at runtime since all out components are pre-compiled 2) 
+        not currently deployable on webjars.org (see https://github.com/webjars/webjars/issues/1976)  -->
+        <exclusion>
+          <groupId>org.webjars.npm</groupId>
+          <artifactId>vue__compiler-sfc</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>    <!-- Used by the date filter. -->
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>momentjs</artifactId>

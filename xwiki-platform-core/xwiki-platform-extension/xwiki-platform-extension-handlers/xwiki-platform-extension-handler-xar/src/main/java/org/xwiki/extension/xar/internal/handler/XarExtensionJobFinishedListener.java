@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -35,8 +36,8 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
+import org.xwiki.extension.ExtensionContext;
+import org.xwiki.extension.ExtensionSession;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.internal.validator.AbstractExtensionValidator;
 import org.xwiki.extension.job.internal.InstallJob;
@@ -83,7 +84,7 @@ public class XarExtensionJobFinishedListener implements EventListener
         Arrays.<Event>asList(new JobFinishingEvent(InstallJob.JOBTYPE), new JobFinishingEvent(UninstallJob.JOBTYPE));
 
     @Inject
-    private Execution execution;
+    private ExtensionContext extensionContext;
 
     @Inject
     private Provider<Packager> packagerProvider;
@@ -128,11 +129,11 @@ public class XarExtensionJobFinishedListener implements EventListener
         JobFinishingEvent jobFinishingEvent = (JobFinishingEvent) event;
 
         if (!jobFinishingEvent.getRequest().isRemote()) {
-            ExecutionContext context = this.execution.getContext();
+            Optional<ExtensionSession> extensionSession = this.extensionContext.getExtensionSession();
 
-            if (context != null) {
+            if (extensionSession.isPresent()) {
                 XarExtensionPlan xarExtensionPlan =
-                    (XarExtensionPlan) context.getProperty(XarExtensionPlan.CONTEXTKEY_XARINSTALLPLAN);
+                    extensionSession.get().get(XarExtensionPlan.SESSIONTKEY_XARINSTALLPLAN);
 
                 if (xarExtensionPlan != null) {
                     Map<String, Map<XarEntry, XarExtensionPlanEntry>> previousXAREntries =
@@ -152,7 +153,7 @@ public class XarExtensionJobFinishedListener implements EventListener
                     // Delete pages
                     ////////////////////
 
-                    maybeDeletePages(jobFinishingEvent, xarExtensionPlan, previousXAREntries, (Job) source, context);
+                    maybeDeletePages(jobFinishingEvent, xarExtensionPlan, previousXAREntries, (Job) source);
 
                     ////////////////////////////////////////
                     // Invalidate security cache
@@ -165,7 +166,7 @@ public class XarExtensionJobFinishedListener implements EventListener
     }
 
     private void maybeDeletePages(JobFinishingEvent jobFinishingEvent, XarExtensionPlan xarExtensionPlan,
-        Map<String, Map<XarEntry, XarExtensionPlanEntry>> previousXAREntries, Job job, ExecutionContext context)
+        Map<String, Map<XarEntry, XarExtensionPlanEntry>> previousXAREntries, Job job)
     {
         try {
             XWikiContext xcontext = this.xcontextProvider.get();
@@ -283,7 +284,6 @@ public class XarExtensionJobFinishedListener implements EventListener
             } catch (IOException e) {
                 this.logger.error("Failed to close XAR extension plan", e);
             }
-            context.setProperty(XarExtensionPlan.CONTEXTKEY_XARINSTALLPLAN, null);
         }
     }
 

@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -37,7 +38,9 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.extension.ExtensionContext;
 import org.xwiki.extension.ExtensionException;
+import org.xwiki.extension.ExtensionSession;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
@@ -82,7 +85,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     private static final TranslationMarker LOG_EXTENSIONPLAN_END =
         new TranslationMarker("extension.xar.log.extensionplan.end");
 
-    private static final String CONTEXTKEY_PACKAGECONFIGURATION = "extension.xar.packageconfiguration";
+    private static final String SESSIONKEY_PACKAGECONFIGURATION = "extension.xar.packageconfiguration";
 
     @Inject
     private Packager packager;
@@ -106,6 +109,9 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     @Inject
     private Execution execution;
 
+    @Inject
+    private ExtensionContext extensionContext;
+
     protected static DocumentReference getRequestUserReference(String property, Request request)
     {
         Object obj = request.getProperty(property);
@@ -117,34 +123,12 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         return null;
     }
 
-    private void initializePagesIndex(Request request) throws ExtensionException, XarException, IOException
-    {
-        ExecutionContext context = this.execution.getContext();
-
-        if (context != null && context.getProperty(XarExtensionPlan.CONTEXTKEY_XARINSTALLPLAN) == null) {
-            ExtensionPlan plan = (ExtensionPlan) context.getProperty(AbstractExtensionJob.CONTEXTKEY_PLAN);
-
-            if (plan != null) {
-                if (request.isVerbose()) {
-                    this.logger.info(LOG_EXTENSIONPLAN_BEGIN, "Preparing XAR extension plan");
-                }
-
-                context.setProperty(XarExtensionPlan.CONTEXTKEY_XARINSTALLPLAN,
-                    new XarExtensionPlan(plan, this.xarRepository, this.localRepository));
-
-                if (request.isVerbose()) {
-                    this.logger.info(LOG_EXTENSIONPLAN_END, "XAR extension plan ready");
-                }
-            }
-        }
-    }
-
     private XarExtensionPlan getXARExtensionPlan()
     {
-        ExecutionContext context = this.execution.getContext();
+        Optional<ExtensionSession> session = this.extensionContext.getExtensionSession();
 
-        if (context != null) {
-            return (XarExtensionPlan) context.getProperty(XarExtensionPlan.CONTEXTKEY_XARINSTALLPLAN);
+        if (session.isPresent()) {
+            return session.get().get(XarExtensionPlan.SESSIONTKEY_XARINSTALLPLAN);
         }
 
         return null;
@@ -189,9 +173,13 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     private void installInternal(LocalExtension newLocalExtension, String wiki, Request request) throws InstallException
     {
         try {
-            initializePagesIndex(request);
-            initJobPackageConfiguration(request);
+            initializeSessionConfiguration(request);
         } catch (Exception e) {
+            if (e instanceof InterruptedException) {
+                // Restore interrupted state
+                Thread.currentThread().interrupt();
+            }
+
             throw new InstallException("Failed to initialize extension plan index", e);
         }
 
@@ -210,15 +198,20 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         throws UninstallException
     {
         try {
-            initializePagesIndex(request);
-            initJobPackageConfiguration(request);
+            initializeSessionConfiguration(request);
         } catch (Exception e) {
+            if (e instanceof InterruptedException) {
+                // Restore interrupted state
+                Thread.currentThread().interrupt();
+            }
+
             throw new UninstallException("Failed to initialize extension plan index", e);
         }
 
         // Only remove XAR when it's a local order (otherwise it will be deleted several times and the wiki will
         // probably not be in an expected state)
         if (!request.isRemote()) {
+            Optional<ExtensionSession> extensionSession = this.extensionContext.getExtensionSession();
             Job currentJob;
             try {
                 currentJob = this.componentManager.<JobContext>getInstance(JobContext.class).getCurrentJob();
@@ -226,7 +219,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                 currentJob = null;
             }
 
-            if (currentJob == null) {
+            if (currentJob == null || !extensionSession.isPresent()) {
                 String wiki;
                 try {
                     wiki = XarHandlerUtils.getWikiFromNamespace(namespace);
@@ -252,11 +245,46 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         }
     }
 
-    private void initJobPackageConfiguration(Request request) throws InterruptedException
+    private void initializeSessionConfiguration(Request request)
+        throws ExtensionException, XarException, IOException, InterruptedException
     {
-        ExecutionContext context = this.execution.getContext();
+        Optional<ExtensionSession> extensionSession = this.extensionContext.getExtensionSession();
 
-        if (context != null && context.getProperty(CONTEXTKEY_PACKAGECONFIGURATION) == null) {
+        if (extensionSession.isPresent()) {
+            initializePagesIndex(request, extensionSession.get());
+            initJobPackageConfiguration(request, extensionSession.get());
+        }
+    }
+
+    private void initializePagesIndex(Request request, ExtensionSession extensionSession)
+        throws ExtensionException, XarException, IOException
+    {
+        if (extensionSession.get(XarExtensionPlan.SESSIONTKEY_XARINSTALLPLAN) == null) {
+            ExecutionContext econtext = this.execution.getContext();
+
+            if (econtext != null) {
+                ExtensionPlan plan = (ExtensionPlan) econtext.getProperty(AbstractExtensionJob.CONTEXTKEY_PLAN);
+
+                if (plan != null) {
+                    if (request.isVerbose()) {
+                        this.logger.info(LOG_EXTENSIONPLAN_BEGIN, "Preparing XAR extension plan");
+                    }
+
+                    extensionSession.set(XarExtensionPlan.SESSIONTKEY_XARINSTALLPLAN,
+                        new XarExtensionPlan(plan, this.xarRepository, this.localRepository));
+
+                    if (request.isVerbose()) {
+                        this.logger.info(LOG_EXTENSIONPLAN_END, "XAR extension plan ready");
+                    }
+                }
+            }
+        }
+    }
+
+    private void initJobPackageConfiguration(Request request, ExtensionSession extensionSession)
+        throws InterruptedException
+    {
+        if (extensionSession.get(SESSIONKEY_PACKAGECONFIGURATION) == null) {
             Job currentJob = null;
             try {
                 currentJob = this.componentManager.<JobContext>getInstance(JobContext.class).getCurrentJob();
@@ -266,7 +294,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
 
             if (currentJob != null) {
                 PackageConfiguration configuration = new PackageConfiguration();
-                context.setProperty(CONTEXTKEY_PACKAGECONFIGURATION, configuration);
+                extensionSession.set(SESSIONKEY_PACKAGECONFIGURATION, configuration);
 
                 DocumentReference userReference =
                     getRequestUserReference(AbstractExtensionValidator.PROPERTY_USERREFERENCE, request);
@@ -297,8 +325,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                 // If user requested to be asked about conflict behavior
                 XarExtensionPlan xarExtensionPlan = getXARExtensionPlan();
                 if (currentJob.getStatus().getRequest().isInteractive() && xarExtensionPlan != null
-                    && xarExtensionPlan.containsNewPages())
-                {
+                    && xarExtensionPlan.containsNewPages()) {
                     XWikiContext xcontext = xcontextProvider.get();
                     // Make sure the context has the right user
                     xcontext.setUserReference(userReference);
@@ -320,9 +347,9 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         PackageConfiguration configuration;
 
         // Search job configuration in the context
-        ExecutionContext context = this.execution.getContext();
-        if (context != null) {
-            configuration = (PackageConfiguration) context.getProperty(CONTEXTKEY_PACKAGECONFIGURATION);
+        Optional<ExtensionSession> extensionSession = this.extensionContext.getExtensionSession();
+        if (extensionSession.isPresent()) {
+            configuration = extensionSession.get().get(SESSIONKEY_PACKAGECONFIGURATION);
         } else {
             configuration = null;
         }

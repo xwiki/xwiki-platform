@@ -73,7 +73,7 @@
   ## Compute the final query.
   ##
   #set ($query =  $services.query.hql("$whereClause $orderByClause"))
-  #set ($discard = $query.addFilter('attachment').addFilter('hidden'))
+  #set ($discard = $query.addFilter('attachment'))
   #set ($discard = $query.setLimit($limit).setOffset($offset))
   #foreach ($queryParameter in $queryParameters)
     #if ($queryParameter.match == 'exact')

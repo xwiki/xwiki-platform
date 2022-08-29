@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>14.7-SNAPSHOT</version>
+    <version>14.8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -125,9 +125,37 @@
 
                  Single justification example:
             -->
-            
-            
-
+            <revapi.differences>
+              <justification>Moved to a legacy module</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void org.xwiki.rendering.macro.AbstractMacro&lt;P&gt;::setDefaultCategory(java.lang.String) @ org.xwiki.rendering.macro.AbstractNoParameterSignableMacro</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void org.xwiki.rendering.macro.AbstractMacro&lt;P&gt;::setDefaultCategory(java.lang.String) @ org.xwiki.rendering.macro.AbstractSignableMacro&lt;P&gt;</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void org.xwiki.rendering.macro.AbstractMacro&lt;P&gt;::setDefaultCategory(java.lang.String) @ org.xwiki.rendering.macro.script.AbstractJSR223ScriptMacro&lt;P extends org.xwiki.rendering.macro.script.JSR223ScriptMacroParameters&gt;</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void org.xwiki.rendering.macro.AbstractMacro&lt;P&gt;::setDefaultCategory(java.lang.String) @ org.xwiki.rendering.macro.script.AbstractScriptMacro&lt;P extends org.xwiki.rendering.macro.script.ScriptMacroParameters&gt;</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void org.xwiki.rendering.macro.AbstractMacro&lt;P&gt;::setDefaultCategory(java.lang.String) @ org.xwiki.rendering.macro.container.AbstractContainerMacro&lt;P extends org.xwiki.rendering.macro.container.ContainerMacroParameters&gt;</old>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>
@@ -166,7 +194,6 @@
     <module>xwiki-platform-filter</module>
     <module>xwiki-platform-flamingo</module>
     <module>xwiki-platform-flavor</module>
-    <module>xwiki-platform-formula</module>
     <module>xwiki-platform-graphviz</module>
     <module>xwiki-platform-groovy</module>
     <module>xwiki-platform-help</module>

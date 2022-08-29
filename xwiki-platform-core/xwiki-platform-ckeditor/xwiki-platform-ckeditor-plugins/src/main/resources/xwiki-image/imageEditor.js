@@ -78,6 +78,7 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
             .then(function(defaultStyle) {
               var settings = {
                 preload: true,
+                persist: true,
                 onChange: function(value) {
                   updateAdvancedFromStyle(value, modal);
                 },

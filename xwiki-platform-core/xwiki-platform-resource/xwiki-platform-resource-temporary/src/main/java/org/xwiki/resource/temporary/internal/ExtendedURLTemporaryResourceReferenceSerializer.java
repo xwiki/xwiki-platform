@@ -44,7 +44,6 @@ import org.xwiki.url.URLNormalizer;
  * @since 6.1M2
  */
 @Component
-@Named("standard/tmp")
 @Singleton
 public class ExtendedURLTemporaryResourceReferenceSerializer
     implements ResourceReferenceSerializer<TemporaryResourceReference, ExtendedURL>

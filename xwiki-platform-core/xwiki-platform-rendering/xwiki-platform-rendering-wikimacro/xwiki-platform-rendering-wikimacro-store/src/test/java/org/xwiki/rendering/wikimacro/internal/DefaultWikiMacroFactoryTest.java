@@ -130,7 +130,7 @@ class DefaultWikiMacroFactoryTest
         assertEquals("Test Macro", macro.getDescriptor().getName());
         assertEquals(42, macro.getPriority());
         assertEquals("This is a macro used for testing purposes.", macro.getDescriptor().getDescription());
-        assertEquals("Test", macro.getDescriptor().getDefaultCategory());
+        assertEquals(Set.of("Test"), macro.getDescriptor().getDefaultCategories());
         assertEquals(WikiMacroVisibility.USER, ((WikiMacroDescriptor) macro.getDescriptor()).getVisibility());
         assertTrue(macro.supportsInlineMode());
         assertNull(macro.getDescriptor().getContentDescriptor());

@@ -259,13 +259,6 @@ public class WikiMacroDescriptor implements MacroDescriptor
     }
 
     @Override
-    // TODO: move to legacy once MacroDescriptor.getDefaultCategory is moved to legacy.
-    public String getDefaultCategory()
-    {
-        return this.getDefaultCategories().stream().findFirst().orElse(null);
-    }
-
-    @Override
     public Set<String> getDefaultCategories()
     {
         return this.defaultCategories;

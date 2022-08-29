@@ -59,7 +59,9 @@
           // creating and editing widget.
           temp.append(wrapper);
 
-          editor.widgets.initOn(element, widget, data);
+          // Initialize an empty image widget, then update it with the data from the image dialog.
+          var widgetInstance = editor.widgets.initOn(element, widget, {});
+          widgetInstance.setData(data);
           editor.widgets.finalizeCreation(temp);
         }
       });

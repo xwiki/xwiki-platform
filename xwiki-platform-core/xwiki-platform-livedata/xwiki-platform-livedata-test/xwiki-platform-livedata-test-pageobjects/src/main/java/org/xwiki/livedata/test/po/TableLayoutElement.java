@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.http.NameValuePair;
@@ -558,6 +559,17 @@ public class TableLayoutElement extends BaseElement
         return getRoot()
             .findElement(By.cssSelector(String.format(".column-filters > th:nth-child(%d) input", columnIndex)));
     }
+
+    /**
+     * @return the list of pagination size choices proposed by the pagination select field
+     * @since 14.7RC1
+     */
+    public Set<String> getPaginationSizes()
+    {
+        return new Select(getRoot().findElement(By.cssSelector(".pagination-page-size select"))).getOptions().stream()
+            .map(it -> it.getAttribute("value")).collect(Collectors.toSet());
+    }
+
 
     /**
      * Clicks on an action button identified by its name, on a given row.

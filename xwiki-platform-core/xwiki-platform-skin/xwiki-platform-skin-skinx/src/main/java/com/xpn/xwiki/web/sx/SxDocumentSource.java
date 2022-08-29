@@ -155,8 +155,8 @@ public class SxDocumentSource implements SxSource
                             this.document.getPrefixedFullName(), sxContent);
                         sxContent = writer.toString();
                     } catch (XWikiVelocityException ex) {
-                        LOGGER.warn("Velocity errors while parsing skin extension [{}] with content [{}]: ",
-                            this.document.getPrefixedFullName(), sxContent, ExceptionUtils.getRootCauseMessage(ex));
+                        LOGGER.error("Failed to interpret the Velocity in skin extension [{}] with content [{}]",
+                            sxObj.getReference(), sxContent, ex);
                     }
                 }
                 // Also add a newline, in case the different object contents don't end with a blank

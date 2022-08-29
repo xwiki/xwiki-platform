@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>14.7-SNAPSHOT</version>
+    <version>14.8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-war-legacydependencies</artifactId>
   <name>XWiki Platform - Distribution - War - Legacy Dependencies</name>
@@ -213,6 +213,11 @@
           <artifactId>xwiki-commons-component-api</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-legacy-resource-temporary</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

@@ -19,6 +19,7 @@
  */
 package org.xwiki.refactoring.job;
 
+import org.xwiki.job.Request;
 import org.xwiki.model.reference.EntityReference;
 
 /**
@@ -43,6 +44,24 @@ public abstract class AbstractCopyOrMoveRequest extends EntityRequest
      * @see #isUpdateLinksOnFarm()
      */
     private static final String PROPERTY_UPDATE_LINKS_ON_FARM = "updateLinksOnFarm";
+
+    /**
+     * Default constructor.
+     */
+    public AbstractCopyOrMoveRequest()
+    {
+    }
+
+    /**
+     * @param request the request to copy
+     * @since 14.7RC1
+     * @since 14.4.4
+     * @since 13.10.9
+     */
+    protected AbstractCopyOrMoveRequest(Request request)
+    {
+        super(request);
+    }
 
     /**
      * @return the destination entity, where to move the entities specified by {@link #getEntityReferences()}

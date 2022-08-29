@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>14.7-SNAPSHOT</version>
+    <version>14.8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-war-dependencies</artifactId>
   <name>XWiki Platform - Distribution - War - Dependencies</name>
@@ -325,12 +325,6 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-display-macro</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-formula-macro</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -666,6 +660,17 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-legacy-events-hibernate-api</artifactId>
       <version>${project.version}</version>
+    </dependency>
+
+    <!-- Must be a core extension because xwiki-platform-mentions-api must itself be a core extension. Otherwise,
+         the components from mentions-api that depend on components from mentions-default are not reloaded when needed.
+         One concrete consequence being exceptions thrown when accessing a configuration cache in a 'finished' state.
+         TODO: remove when we drop support for the old event store. See https://jira.xwiki.org/browse/XWIKI-19933 -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-mentions-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
 
     <!-- ********************************************************************** -->

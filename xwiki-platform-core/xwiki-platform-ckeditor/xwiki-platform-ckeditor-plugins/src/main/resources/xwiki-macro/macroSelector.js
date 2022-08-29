@@ -142,6 +142,7 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector', 'xwiki-selecti
     categoriesFilter.xwikiSelectize({
       preload: true,
       placeholder: translations.get('filter.category.placeholder'),
+      persist: true,
       onChange: function () {
         filterMacros.call(macroSelectorThis);
       },

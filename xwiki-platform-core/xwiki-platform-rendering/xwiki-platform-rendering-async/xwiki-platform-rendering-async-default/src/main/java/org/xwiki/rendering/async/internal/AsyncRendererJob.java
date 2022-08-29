@@ -27,7 +27,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.job.AbstractJob;
 import org.xwiki.job.GroupedJob;
 import org.xwiki.job.JobGroupPath;
-import org.xwiki.job.Request;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.async.internal.DefaultAsyncContext.ContextUse;
 import org.xwiki.template.TemplateManager;
@@ -55,19 +55,6 @@ public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, Async
 
     @Inject
     private DocumentAccessBridge documentAccessBridge;
-
-    @Override
-    protected AsyncRendererJobRequest castRequest(Request request)
-    {
-        AsyncRendererJobRequest indexerRequest;
-        if (request instanceof AsyncRendererJobRequest) {
-            indexerRequest = (AsyncRendererJobRequest) request;
-        } else {
-            indexerRequest = new AsyncRendererJobRequest(request);
-        }
-
-        return indexerRequest;
-    }
 
     @Override
     protected AsyncRendererJobStatus createNewStatus(AsyncRendererJobRequest request)
@@ -100,10 +87,15 @@ public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, Async
         // (other than executing it at the beginning of every single element which might be executed asynchronously...)
         this.templateManager.execute("xwikivars.vm");
 
-        // Mark the context document as used if it was explicitly set in the context
+        // Mark the context document as used if it was explicitly set in the context, unless the context document is 
+        // null.
         if (this.request.getContext() != null
-            && this.request.getContext().containsKey(XWikiContextContextStore.PROP_DOCUMENT_REFERENCE)) {
-            this.asyncContext.useEntity(this.documentAccessBridge.getCurrentDocumentReference());
+            && this.request.getContext().containsKey(XWikiContextContextStore.PROP_DOCUMENT_REFERENCE))
+        {
+            DocumentReference currentDocumentReference = this.documentAccessBridge.getCurrentDocumentReference();
+            if (currentDocumentReference != null) {
+                this.asyncContext.useEntity(currentDocumentReference);
+            }
         }
 
         AsyncRendererResult result = renderer.render(true, renderer.isCacheAllowed());

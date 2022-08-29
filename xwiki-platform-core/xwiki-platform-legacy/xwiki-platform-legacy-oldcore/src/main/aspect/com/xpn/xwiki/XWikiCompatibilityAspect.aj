@@ -194,6 +194,16 @@ public privileged aspect XWikiCompatibilityAspect
     }
 
     /**
+     * @deprecated since 7.4M1, use {@link #getSpacePreference(String, SpaceReference, String, XWikiContext)} instead
+     */
+    @Deprecated
+    public String XWiki.getSpacePreference(String preference, String space, String defaultValue, XWikiContext context)
+    {
+        return getSpacePreference(preference, new SpaceReference(space, context.getWikiReference()), defaultValue,
+            context);
+    }
+
+    /**
      * @deprecated replaced by {@link XWiki#getSpacePreference(String, XWikiContext)} since 2.3M1
      */
     @Deprecated

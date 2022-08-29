@@ -525,6 +525,39 @@ public privileged aspect XWikiCompatibilityAspect
     }
 
     /**
+     * Get the reference of the space and fallback on parent space or wiki in case nothing is found.
+     * <p>
+     * If the property is not set on any level then empty String is returned.
+     *
+     * @param preference Preference name
+     * @param space The space for which this preference is requested
+     * @return The preference for this wiki and the current locale
+     * @deprecated use {@link #getSpacePreferenceFor(String, SpaceReference)} instead
+     */
+    @Deprecated(since = "14.8RC1")
+    public String XWiki.getSpacePreferenceFor(String preference, String space)
+    {
+        return getSpacePreferenceFor(preference, space, "");
+    }
+
+    /**
+     * Get the reference of the space and fallback on parent space or wiki in case nothing is found.
+     * <p>
+     * If the property is not set on any level then <code>defaultValue</code> is returned.
+     *
+     * @param preference Preference name
+     * @param space The space for which this preference is requested
+     * @param defaultValue default value to return if the preference does not exist or is empty
+     * @return The preference for this wiki and the current locale in long format
+     * @deprecated use {@link #getSpacePreferenceFor(String, SpaceReference, String)} instead
+     */
+    @Deprecated(since = "14.8RC1")
+    public String XWiki.getSpacePreferenceFor(String preference, String space, String defaultValue)
+    {
+        return this.xwiki.getSpacePreference(preference, space, defaultValue, getXWikiContext());
+    }
+
+    /**
      * @deprecated replaced by {@link XWiki#getSpacePreference(String)} since 2.3M1
      */
     @Deprecated

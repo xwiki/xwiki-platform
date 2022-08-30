@@ -29,6 +29,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.search.solr.internal.api.IndexingUserConfig;
 
 import com.xpn.xwiki.XWiki;
@@ -64,7 +65,7 @@ public class DefaultIndexingUserConfig implements IndexingUserConfig
     private Provider<XWikiContext> contextProvider;
 
     @Inject
-    @Named("current")
+    @Named("explicit")
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
     @Override
@@ -73,15 +74,17 @@ public class DefaultIndexingUserConfig implements IndexingUserConfig
         DocumentReference indexingUser = null;
         XWikiContext context = contextProvider.get();
         XWiki wiki = context.getWiki();
+        WikiReference mainWikiRef = new WikiReference(context.getMainXWiki());
 
-        XWikiDocument configPage = wiki.getDocument(CONFIG_PAGE, context);
+        XWikiDocument configPage = wiki.getDocument(new DocumentReference(CONFIG_PAGE, mainWikiRef),
+            context);
         BaseObject configObject = configPage.getXObject(CONFIG_CLASS);
 
         if (configObject != null) {
             String indexers = configObject.getLargeStringValue("indexer");
             for (String userRef : ListClass.getListFromString(indexers)) {
                 if (StringUtils.isNotBlank(userRef)) {
-                    indexingUser = documentReferenceResolver.resolve(userRef);
+                    indexingUser = documentReferenceResolver.resolve(userRef, mainWikiRef);
                     break;
                 }
             }

@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -50,18 +51,21 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 public class DefaultIndexingUserConfigTest
 {
+    private static final String MAIN_WIKI_ID = "wiki";
+
     @MockComponent
     private Provider<XWikiContext> contextProvider;
 
     @MockComponent
-    @Named("current")
+    @Named("explicit")
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
     @InjectMockComponents
     private DefaultIndexingUserConfig indexUserConfig;
 
-    private LocalDocumentReference wikiConfigRef = new LocalDocumentReference("XWiki", "SolrSearchAdminIndexingUser");
+    private DocumentReference wikiConfigRef = new DocumentReference(MAIN_WIKI_ID, "XWiki", "SolrSearchAdminIndexingUser");
     private LocalDocumentReference wikiConfigClassRef = new LocalDocumentReference("XWiki", "SolrSearchAdminIndexingUserClass");
+    private WikiReference mainWikiRef = new WikiReference(MAIN_WIKI_ID);
 
     private XWikiDocument testMainwikiConfigDocument;
 
@@ -75,6 +79,7 @@ public class DefaultIndexingUserConfigTest
         when(testMainwiki.getDocument(wikiConfigRef, testContext)).thenReturn(testMainwikiConfigDocument);
 
         when(testContext.getWiki()).thenReturn(testMainwiki);
+        when(testContext.getMainXWiki()).thenReturn(MAIN_WIKI_ID);
         when(contextProvider.get()).thenReturn(testContext);
     }
 
@@ -88,8 +93,8 @@ public class DefaultIndexingUserConfigTest
     public void mainWikiWithSettings() throws XWikiException
     {
         String mainwikiIndexingUserString = "expected by mock resolver";
-        DocumentReference mainwikiIndexingUser = new DocumentReference("xwiki", "XWiki", "SomeIndexingUser");
-        when(documentReferenceResolver.resolve(mainwikiIndexingUserString)).thenReturn(mainwikiIndexingUser);
+        DocumentReference mainwikiIndexingUser = new DocumentReference(MAIN_WIKI_ID, "XWiki", "SomeIndexingUser");
+        when(documentReferenceResolver.resolve(mainwikiIndexingUserString, mainWikiRef)).thenReturn(mainwikiIndexingUser);
 
         BaseObject testMainwikiConfigObject = mock(BaseObject.class);
         when(testMainwikiConfigObject.getLargeStringValue("indexer")).thenReturn(mainwikiIndexingUserString);

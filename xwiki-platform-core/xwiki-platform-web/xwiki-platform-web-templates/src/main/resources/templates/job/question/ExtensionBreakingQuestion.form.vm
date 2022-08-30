@@ -38,7 +38,7 @@
     </div>
     <div class="panel-body">
       <p><a href="#" class="btSelectAllTree">$escapetool.xml($services.localization.render('job.question.ExtensionBreakingQuestion.tree.selectAll'))</a> / <a href="#" class="btUnselectAllTree">$escapetool.xml($services.localization.render('job.question.ExtensionBreakingQuestion.tree.selectNone'))</a></p>
-      <div class="deleteTree" data-url="$escapetool.xml($xwiki.relativeRequestURL)?qaction=data" />
+      <div class="deleteTree" data-url="$escapetool.xml($xwiki.relativeRequestURL)?qaction=data"></div>
     </div>
   </div>
   #questionButtons($jobStatus)

@@ -28,7 +28,7 @@ import com.xpn.xwiki.XWikiException;
  * Provides a configured indexing user.
  *
  * @version $Id$
- * @since 14.8
+ * @since 14.8M1
  */
 @Role
 public interface IndexingUserConfig

@@ -38,11 +38,11 @@
   <hidden>true</hidden>
   <content>== {{translation key="admin.indexinguser" /}} ==
 
-(% class="noitems" %)
 {{translation key="admin.indexinguser.explanation.part1" /}}
 
-(% class="noitems" %)
+
 {{translation key="admin.indexinguser.explanation.part2" /}}
+
 
 {{velocity}}
 #if ($xcontext.isMainWiki())
@@ -50,10 +50,12 @@
   #set ($params = {'indexer': ['indexer']})
   #set ($paramDoc = $xwiki.getDocument('XWiki.SolrSearchAdminIndexingUser'))
   #set ($paramClass = 'XWiki.SolrSearchAdminIndexingUserClass')
+  {{warning}}
+  **{{translation key="admin.indexinguser.explanation.security.head" /}}** {{translation key="admin.indexinguser.explanation.security.content" /}}
+  {{/warning}}
 
   {{include reference="XWiki.AdminFieldsDisplaySheet" /}}
 
-  (% class="noitems" %)
   {{translation key="admin.indexinguser.explanation.part3" /}}
 #else
 

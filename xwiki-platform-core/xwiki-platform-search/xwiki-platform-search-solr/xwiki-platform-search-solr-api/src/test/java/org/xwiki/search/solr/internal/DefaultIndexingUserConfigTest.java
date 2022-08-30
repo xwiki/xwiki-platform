@@ -26,7 +26,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.WikiReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -60,8 +60,8 @@ public class DefaultIndexingUserConfigTest
     @InjectMockComponents
     private DefaultIndexingUserConfig indexUserConfig;
 
-    private DocumentReference wikiConfigRef = new DocumentReference("xwiki", "XWiki", "SolrSearchAdminIndexingUser");
-    private DocumentReference wikiConfigClassRef = new DocumentReference("xwiki", "XWiki", "SolrSearchAdminIndexingUserClass");
+    private LocalDocumentReference wikiConfigRef = new LocalDocumentReference("XWiki", "SolrSearchAdminIndexingUser");
+    private LocalDocumentReference wikiConfigClassRef = new LocalDocumentReference("XWiki", "SolrSearchAdminIndexingUserClass");
 
     private XWikiDocument testMainwikiConfigDocument;
 
@@ -75,7 +75,6 @@ public class DefaultIndexingUserConfigTest
         when(testMainwiki.getDocument(wikiConfigRef, testContext)).thenReturn(testMainwikiConfigDocument);
 
         when(testContext.getWiki()).thenReturn(testMainwiki);
-        when(testContext.getWikiReference()).thenReturn(new WikiReference("xwiki"));
         when(contextProvider.get()).thenReturn(testContext);
     }
 

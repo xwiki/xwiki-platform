@@ -42,7 +42,7 @@ import com.xpn.xwiki.objects.classes.ListClass;
  * Provides the configured indexing user via information stored in a wiki page.
  *
  * @version $Id$
- * @since 14.8
+ * @since 14.8M1
  */
 @Component
 @Singleton
@@ -74,10 +74,8 @@ public class DefaultIndexingUserConfig implements IndexingUserConfig
         XWikiContext context = contextProvider.get();
         XWiki wiki = context.getWiki();
 
-        XWikiDocument configPage = wiki.getDocument(new DocumentReference(CONFIG_PAGE,
-            context.getWikiReference()), context);
-        BaseObject configObject = configPage.getXObject(new DocumentReference(CONFIG_CLASS,
-            context.getWikiReference()));
+        XWikiDocument configPage = wiki.getDocument(CONFIG_PAGE, context);
+        BaseObject configObject = configPage.getXObject(CONFIG_CLASS);
 
         if (configObject != null) {
             String indexers = configObject.getLargeStringValue("indexer");

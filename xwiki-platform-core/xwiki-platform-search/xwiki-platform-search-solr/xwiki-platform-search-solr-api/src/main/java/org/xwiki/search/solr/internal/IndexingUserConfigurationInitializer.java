@@ -36,7 +36,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * Initializes the configuration page for the indexing user.
  *
  * @version $Id$
- * @since 14.8
+ * @since 14.8M1
  */
 @Component
 @Singleton

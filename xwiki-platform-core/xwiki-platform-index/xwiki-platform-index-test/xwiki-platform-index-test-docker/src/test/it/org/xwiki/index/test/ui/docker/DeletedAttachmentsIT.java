@@ -25,11 +25,12 @@ import java.util.Date;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
+import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.index.test.po.DeletedAttachmentsPage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.AttachmentsPane;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
 
@@ -57,7 +58,7 @@ public class DeletedAttachmentsIT
             new ByteArrayInputStream("attachment content1".getBytes()));
 
         ViewPage testPage = setup.gotoPage(testReference);
-        AttachmentsPane attachmentsPane = testPage.openAttachmentsDocExtraPane();
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         attachmentsPane.deleteAttachmentByFileByName("deletedFile1.txt");
     }
 

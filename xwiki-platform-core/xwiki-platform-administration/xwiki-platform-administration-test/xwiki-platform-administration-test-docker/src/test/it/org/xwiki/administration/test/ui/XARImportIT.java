@@ -26,6 +26,8 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.administration.test.po.ImportAdministrationSectionPage;
+import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
+import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -34,7 +36,6 @@ import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.AttachmentsPane;
 import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
 
@@ -128,7 +129,7 @@ public class XARImportIT
         assertEquals("A third version of the document", history.getCurrentVersionComment());
         assertTrue(history.hasVersionWithSummary("A new version of the document"));
 
-        AttachmentsPane attachments = importedPage.openAttachmentsDocExtraPane();
+        AttachmentsPane attachments = new AttachmentsViewPage().openAttachmentsDocExtraPane();
 
         assertEquals(1, attachments.getNumberOfAttachments());
         assertEquals("3 bytes", attachments.getSizeOfAttachment(ATTACHE_NAME));
@@ -159,7 +160,7 @@ public class XARImportIT
         assertEquals("A third version of the document", history.getCurrentVersionComment());
         assertTrue(history.hasVersionWithSummary("A new version of the document"));
 
-        AttachmentsPane attachments = importedPage.openAttachmentsDocExtraPane();
+        AttachmentsPane attachments = new AttachmentsViewPage().openAttachmentsDocExtraPane();
 
         assertEquals(1, attachments.getNumberOfAttachments());
         assertEquals("3 bytes", attachments.getSizeOfAttachment(ATTACHE_NAME));

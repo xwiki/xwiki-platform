@@ -29,6 +29,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.xwiki.administration.test.po.AdministrationPage;
+import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
+import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.test.po.OfficeImporterPage;
 import org.xwiki.officeimporter.test.po.OfficeImporterResultPage;
@@ -37,7 +39,6 @@ import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.AttachmentsPane;
 import org.xwiki.test.ui.po.ConfirmationPage;
 import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.DeletingPage;
@@ -111,7 +112,7 @@ public class OfficeImporterIT
 
         // Test power point file
         resultPage = importFile(testName, "msoffice.97-2003/Test.ppt");
-        AttachmentsPane attachmentsPane = resultPage.openAttachmentsDocExtraPane();
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertTrue(attachmentsPane.attachmentExistsByFileName("Test-slide0.jpg"));
         assertTrue(attachmentsPane.attachmentExistsByFileName("Test-slide1.jpg"));
         assertTrue(attachmentsPane.attachmentExistsByFileName("Test-slide2.jpg"));
@@ -134,14 +135,14 @@ public class OfficeImporterIT
         assertTrue(matcher.find());
         String imageName = matcher.group("imageName");
         resultPage = wikiEditPage.clickCancel();
-        attachmentsPane = resultPage.openAttachmentsDocExtraPane();
+        attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertEquals(4, attachmentsPane.getNumberOfAttachments());
         assertTrue(attachmentsPane.attachmentExistsByFileName(imageName));
         deletePage(testName);
 
         // Test ODP file
         resultPage = importFile(testName, "ooffice.3.0/Test.odp");
-        attachmentsPane = resultPage.openAttachmentsDocExtraPane();
+        attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertTrue(attachmentsPane.attachmentExistsByFileName("Test-slide0.jpg"));
         assertTrue(attachmentsPane.attachmentExistsByFileName("Test-slide1.jpg"));
         assertTrue(attachmentsPane.attachmentExistsByFileName("Test-slide2.jpg"));
@@ -164,7 +165,7 @@ public class OfficeImporterIT
         assertTrue(matcher.find());
         imageName = matcher.group("imageName");
         resultPage = wikiEditPage.clickCancel();
-        attachmentsPane = resultPage.openAttachmentsDocExtraPane();
+        attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertEquals(4, attachmentsPane.getNumberOfAttachments());
         // the \ before the @ needs to be removed as it's not in the filename
         assertTrue(attachmentsPane.attachmentExistsByFileName(imageName.replaceAll("\\\\@", "@")));
@@ -172,7 +173,7 @@ public class OfficeImporterIT
 
         // Test power point file with accents
         resultPage = importFile(testName, "msoffice.97-2003/Test_accents & é$ù !-_.+();@=.ppt");
-        attachmentsPane = resultPage.openAttachmentsDocExtraPane();
+        attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & e$u !-_.+();@=-slide0.jpg"));
         assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & e$u !-_.+();@=-slide1.jpg"));
         assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & e$u !-_.+();@=-slide2.jpg"));

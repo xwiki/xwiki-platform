@@ -42,5 +42,10 @@
       <artifactId>xwiki-platform-administration-test-pageobjects</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-flamingo-skin-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 </project>

@@ -426,6 +426,8 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
             updateFactoryParameters(templateDocumentReference);
             message = ExtendedMimeMessage.wrap(this.factory.createMessage(templateDocumentReference,
                 this.factoryParameters));
+            message.setHeader("Auto-Submitted", "auto-generated");
+            message.setHeader("X-Auto-Response-Suppress", "All");
 
             List<EntityEvent> events = new ArrayList<>();
             this.currentEvents.forEach(

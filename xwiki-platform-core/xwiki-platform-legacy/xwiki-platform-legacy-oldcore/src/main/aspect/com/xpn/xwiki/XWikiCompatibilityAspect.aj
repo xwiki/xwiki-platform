@@ -58,6 +58,7 @@ import org.xwiki.xml.XMLUtils;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.model.EntityType;
 import org.xwiki.url.XWikiEntityURL;

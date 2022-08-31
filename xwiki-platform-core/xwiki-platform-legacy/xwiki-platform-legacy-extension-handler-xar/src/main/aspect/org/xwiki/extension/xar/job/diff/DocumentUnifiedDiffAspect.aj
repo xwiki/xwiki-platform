@@ -23,20 +23,21 @@ package org.xwiki.extension.xar.job.diff;
  * Add a backward compatibility layer to the {@link DocumentUnifiedDiff} class.
  *
  * @version $Id$
+ * @since 14.8RC1
  */
 public privileged aspect DocumentUnifiedDiffAspect
 {
     /**
-         * Creates a new instance to hold the differences between the specified document versions.
-         *
-         * @param previousReference the reference to the previous version of the document
-         * @param nextReference the reference to the next version of the document
-         * @deprecated now use {@link #DocumentUnifiedDiff(org.xwiki.model.reference.DocumentVersionReference, org.xwiki.model.reference.DocumentVersionReference)}
-         */
-        @Deprecated(since = "14.8RC1")
-        public DocumentUnifiedDiff.new(DocumentVersionReference previousReference, DocumentVersionReference nextReference)
-        {
-            this(new org.xwiki.model.reference.DocumentVersionReference(previousReference, previousReference.getVersion()),
-                new org.xwiki.model.reference.DocumentVersionReference(nextReference, nextReference.getVersion()));
-        }
+     * Creates a new instance to hold the differences between the specified document versions.
+     *
+     * @param previousReference the reference to the previous version of the document
+     * @param nextReference the reference to the next version of the document
+     * @deprecated now use {@link #DocumentUnifiedDiff(org.xwiki.model.reference.DocumentVersionReference, org.xwiki.model.reference.DocumentVersionReference)}
+     */
+    @Deprecated(since = "14.8RC1")
+    public DocumentUnifiedDiff.new(DocumentVersionReference previousReference, DocumentVersionReference nextReference)
+    {
+        this(new org.xwiki.model.reference.DocumentVersionReference(previousReference),
+            new org.xwiki.model.reference.DocumentVersionReference(nextReference));
+    }
 }

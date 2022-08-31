@@ -241,7 +241,7 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement selectByVisibleText(String text)
     {
-        getDriver().findElement(
+        getDriver().findElementWithoutWaiting(
             By.xpath("//*[contains(@class, 'selectize-dropdown') and contains(@class, 'active')]"
                 + "//*[contains(@class, 'xwiki-selectize-option-label') and . = '" + text + "']"))
             .click();

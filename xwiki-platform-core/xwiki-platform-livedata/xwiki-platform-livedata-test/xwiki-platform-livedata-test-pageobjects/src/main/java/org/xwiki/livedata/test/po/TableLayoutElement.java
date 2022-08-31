@@ -451,7 +451,7 @@ public class TableLayoutElement extends BaseElement
             if (element.getAttribute(CLASS_HTML_ATTRIBUTE).contains("selectized")) {
                 SuggestInputElement suggestInputElement = new SuggestInputElement(element);
                 suggestInputElement.clearSelectedSuggestions();
-                suggestInputElement.sendKeys(content).selectByVisibleText(content);
+                suggestInputElement.sendKeys(content).waitForSuggestions().selectByVisibleText(content);
             } else {
                 new Select(element).selectByVisibleText(content);
             }
@@ -534,7 +534,7 @@ public class TableLayoutElement extends BaseElement
      *
      * @param by the selector of the searched element
      * @return the 1-based row index where the element was found, or 0 if it doesn't exist
-     * @since 14.7RC1
+     * @since 14.8RC1
      */
     public int getRowIndexForElement(By by)
     {

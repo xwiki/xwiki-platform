@@ -100,40 +100,38 @@ public class LiveDataElement extends BaseElement
      */
     public boolean isReady()
     {
-        // See {@link #waitUntilReady()}.
-        String[] classes = getDriver().findElementWithoutWaiting(By.id(this.id)).getAttribute("class").split("\\s+");
-        boolean isVueLoaded = !Arrays.asList(classes).contains("loading");
-        boolean areComponentsLoaded =
-            getDriver().findElement(By.id(this.id)).findElements(By.cssSelector(".xwiki-livedata .loading")).isEmpty();
-
-        return isVueLoaded && areComponentsLoaded;
+        return isVueLoaded() && areComponentsLoaded();
     }
 
     private void waitUntilReady()
     {
-        // First the Live Data macro displays a simple div with the loading class.
-        // This div is replaced by the Live Data Vue template once vue is loaded.
-        getDriver().waitUntilCondition(
-            input -> {
-                try {
-                    String[] classes =
-                        getDriver().findElementWithoutWaiting(By.id(this.id)).getAttribute("class")
-                            .split("\\s+");
-                    return !Arrays.asList(classes).contains("loading");
-                } catch (NoSuchElementException | StaleElementReferenceException e) {
-                    // If there is no such element that mean the Live data is not loaded yet (or is missing).
-                    // If the element is stale, that means the element was removed from the DOM in the meantime, because
-                    // the initial div produced by the live data macro was replaced by the Vue template.
-                    return false;
-                }
-            });
+        getDriver().waitUntilCondition(input -> isVueLoaded());
 
-        // Then, once the Vue template is loaded, a div with the loading class is inserted until the rest of the data 
-        // and components required to display the Live Data are loaded too. 
-        getDriver().waitUntilCondition(
-            input -> getDriver().findElement(By.id(this.id)).findElements(By.cssSelector(".xwiki-livedata .loading"))
-                .isEmpty()
-        );
+        getDriver().waitUntilCondition(input -> areComponentsLoaded());
+    }
+
+    private boolean areComponentsLoaded()
+    {
+        // Once the Vue template is loaded, a div with the loading class is inserted until the rest of the data
+        // and components required to display the Live Data are loaded too.
+        return getDriver().findElement(By.id(this.id)).findElements(By.cssSelector(".xwiki-livedata .loading"))
+            .isEmpty();
+    }
+
+    private boolean isVueLoaded()
+    {
+        // First the Live Data macro displays a simple div with the loading class. This div is replaced by the Live
+        // Data Vue template once vue is loaded.
+        try {
+            String[] classes =
+                getDriver().findElementWithoutWaiting(By.id(this.id)).getAttribute("class").split("\\s+");
+            return !Arrays.asList(classes).contains("loading");
+        } catch (NoSuchElementException | StaleElementReferenceException e) {
+            // If there is no such element that mean the Live data is not loaded yet (or is missing).
+            // If the element is stale, that means the element was removed from the DOM in the meantime, because
+            // the initial div produced by the live data macro was replaced by the Vue template.
+            return false;
+        }
     }
 
     private List<WebElement> getFootnotes()

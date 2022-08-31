@@ -26,7 +26,7 @@ import org.xwiki.test.ui.po.ViewPage;
  * Represents a page with the attachments pane active.
  *
  * @version $Id$
- * @since 14.7RC1
+ * @since 14.8RC1
  */
 public class AttachmentsViewPage extends ViewPage
 {

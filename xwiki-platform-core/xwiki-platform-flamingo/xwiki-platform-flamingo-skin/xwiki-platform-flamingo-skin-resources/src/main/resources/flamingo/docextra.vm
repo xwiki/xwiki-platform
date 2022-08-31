@@ -21,6 +21,7 @@
 ##
 ## More document related data: comments, attachments ...
 ##
+#template('display_macros.vm')
 <div id="xwikidata">
 ##
 ## Build the list of documents extras to display, if it does not exist (default).
@@ -43,6 +44,7 @@
     #set ($discard = $docextras.add(['Annotations', 'annotations', $services.localization.render('docextra.annotations'), $annotationCount, 'annotationsinline.vm', $services.localization.render('core.shortcuts.view.annotations')]))
   #end
   #if ($showattachments)
+    #initRequiredSkinExtensions()
     $xwiki.jsfx.use('uicomponents/widgets/upload.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})
     $xwiki.ssfx.use('uicomponents/widgets/upload.css', true)
     $xwiki.jsfx.use('js/xwiki/viewers/attachments.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})
@@ -55,6 +57,8 @@
       #set ($sortAttachmentsBy = "&sortAttachmentsBy=$escapetool.url(${sortAttachmentsBy})")
     #end
     #set ($discard = $docextras.add(['Attachments', 'attachments', $services.localization.render('docextra.attachments'), $doc.getAttachmentList().size(), "attachmentsinline.vm$!{sortAttachmentsBy}", $services.localization.render('core.shortcuts.view.attachments')]))
+    #getRequiredSkinExtensions($requiredSkinExtensions)
+    #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
   #end
   #if ($showhistory)
     ## Pagination style

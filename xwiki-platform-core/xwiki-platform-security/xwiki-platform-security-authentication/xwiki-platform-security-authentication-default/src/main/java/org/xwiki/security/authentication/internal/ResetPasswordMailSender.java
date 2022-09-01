@@ -143,7 +143,7 @@ public class ResetPasswordMailSender
                 this.mimeMessageFactory.createMessage(
                     this.documentReferenceResolver.resolve(RESET_PASSWORD_MAIL_TEMPLATE_REFERENCE), parameters);
             if (!this.sendMessage(message, localizedError)) {
-                this.logger.info("The reset password mail to [{}] has not been sent after 1 second, check the status "
+                this.logger.debug("The reset password mail to [{}] has not been sent after 1 second, check the status "
                     + "in the administration", username);
             }
         } catch (MessagingException e) {

@@ -183,7 +183,7 @@ XWiki.widgets.LiveTable = Class.create({
       }
       if (typeof self.tags != "undefined" && self.tags.length > 0) {
          self.tags.each(function(tag) {
-            url += ("&tag=" + encodeURIComponent(tag.unescapeHTML()));
+            url += ("&tag=" + encodeURIComponent(tag));
          });
       }
       url += self.getSortURLFragment();
@@ -1289,7 +1289,7 @@ var LiveTableTagCloud = Class.create({
          if (typeof this.matchingTags[tagLabel.toLowerCase()] != "undefined") {
             tag.addClassName("selectable");
             Event.observe(tagSpan, "click", function(event) {
-                var tag = event.element().up("li").down("span").innerHTML.unescapeHTML();
+                var tag = event.element().up("li").down("span").textContent;
                 event.element().up("li").toggleClassName("selected");
                 if (event.element().up("li").hasClassName("selected")) {
                   self.selectedTags[tag] = {};
@@ -1316,7 +1316,7 @@ var LiveTableTagCloud = Class.create({
    getSelectedTags: function() {
       var result = new Array();
       this.domNode.select("li.selected").each(function(tag) {
-         result.push(tag.down("span").innerHTML);
+         result.push(tag.down("span").textContent);
       });
       return result;
    },

@@ -21,6 +21,7 @@ package org.xwiki.search.solr;
 
 import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * An extension point to be called when an entity is indexed for the Solr search core.
@@ -30,6 +31,7 @@ import org.xwiki.component.annotation.Role;
  * @since 14.8RC1
  */
 @Role
+@Unstable
 public interface SolrEntityMetadataExtractor<E>
 {
     /**

@@ -209,7 +209,7 @@ public class DefaultLinkStore implements LinkStore
             pageReference instanceof PageReference ? (PageReference) pageReference : new PageReference(pageReference));
 
         // Switch the parent
-        return documentBasedReference.replaceParent(documentBasedReference.extractReference(documentBasedType),
+        return documentBasedReference.replaceParent(documentBasedReference.extractReference(EntityType.DOCUMENT),
             documentReference);
     }
 
@@ -231,10 +231,12 @@ public class DefaultLinkStore implements LinkStore
         EntityReference pageBasedReference = this.referenceConverter.resolve(entityReference, documentBasedType);
 
         // Make sure it really is the same document currently
-        EntityReference documentBasedReference = toDocumentBasedReference(pageBasedReference);
-        if (documentBasedReference.equals(entityReference)) {
-            // It's not the same document so we cannot use it
-            return null;
+        if (entityReference.extractReference(EntityType.DOCUMENT) != null) {
+            EntityReference documentBasedReference = toDocumentBasedReference(pageBasedReference);
+            if (!documentBasedReference.equals(entityReference)) {
+                // It's not the same document so we cannot use it
+                return null;
+            }
         }
 
         return pageBasedReference;

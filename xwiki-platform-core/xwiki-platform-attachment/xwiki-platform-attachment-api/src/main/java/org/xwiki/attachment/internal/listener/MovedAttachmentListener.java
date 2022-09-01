@@ -20,6 +20,7 @@
 package org.xwiki.attachment.internal.listener;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -112,7 +113,11 @@ public class MovedAttachmentListener implements EventListener
 
         // TODO: it's possible to optimize a bit the actual entities to modify (especially which translation of the
         // document to load and parse) since we have the information in the store
-        Set<DocumentReference> documentsList = this.modelBridge.getBackLinkedDocuments(event.getSourceReference());
+        Set<DocumentReference> documentsList =
+            new HashSet<>(this.modelBridge.getBackLinkedDocuments(event.getSourceReference()));
+        // Since the backlinks are not stored for the document containing the attachment, we need to add it to the
+        // list of documents.
+        documentsList.add(event.getSourceReference().getDocumentReference());
 
         this.progressManager.pushLevelProgress(documentsList.size(), this);
 

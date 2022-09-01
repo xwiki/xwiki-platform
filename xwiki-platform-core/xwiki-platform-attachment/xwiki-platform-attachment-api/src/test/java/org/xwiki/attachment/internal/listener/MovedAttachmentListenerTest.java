@@ -115,7 +115,7 @@ class MovedAttachmentListenerTest
         verify(this.linkRefactoring).update(d2, SOURCE_ATTACHMENT, TARGET_ATTACHMENT);
         verify(this.linkRefactoring).update(DOCUMENT_REFERENCE, SOURCE_ATTACHMENT, TARGET_ATTACHMENT);
         assertEquals(1, this.logCapture.size());
-        assertEquals("Updating the back-links for attachment [Attachment wiki:space.page@oldname] in wiki [wiki].",
+        assertEquals("Updating the back-links for attachment [Attachment wiki:space.page@oldname].",
             this.logCapture.getMessage(0));
         assertEquals(Level.INFO, this.logCapture.getLogEvent(0).getLevel());
     }

@@ -42,11 +42,8 @@ import org.apache.commons.lang3.reflect.TypeUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
 import org.junit.jupiter.api.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.Event.Importance;
@@ -84,7 +81,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 /**
@@ -164,8 +160,6 @@ public class EventStoreTest
     @XWikiTempDir
     private File permanentDirectory;
 
-    private ConfigurationSource mockXWikiProperties;
-
     private Environment mockEnvironment;
 
     @MockComponent
@@ -180,18 +174,7 @@ public class EventStoreTest
     @AfterComponent
     public void afterComponent() throws Exception
     {
-        this.mockXWikiProperties =
-            this.componentManager.registerMockComponent(ConfigurationSource.class, "xwikiproperties");
         this.mockEnvironment = this.componentManager.registerMockComponent(Environment.class);
-        when(this.mockXWikiProperties.getProperty(anyString(), anyString())).then(new Answer<String>()
-        {
-            @Override
-            public String answer(InvocationOnMock invocation) throws Throwable
-            {
-                return invocation.getArgument(1);
-            }
-        });
-
         when(this.mockEnvironment.getPermanentDirectory()).thenReturn(this.permanentDirectory);
         FileUtils.deleteDirectory(this.permanentDirectory);
         this.permanentDirectory.mkdirs();

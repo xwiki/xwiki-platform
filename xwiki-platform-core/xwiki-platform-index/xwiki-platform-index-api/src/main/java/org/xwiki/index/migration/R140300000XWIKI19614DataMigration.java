@@ -44,8 +44,7 @@ import static org.xwiki.index.internal.DefaultLinksTaskConsumer.LINKS_TASK_TYPE;
  *
  * @version $Id$
  * @since 14.2RC1
- * @deprecated links indexing move to Solr, see org.xwiki.refactoring.internal.solr.* in
- *             xwiki-platform-refactoring-default module
+ * @deprecated link storage and indexing moved to Solr (implemented in xwiki-platform-search-solr-api)
  */
 // TODO: Implement DataMigration once XWIKI-19399 is fixed.
 @Component

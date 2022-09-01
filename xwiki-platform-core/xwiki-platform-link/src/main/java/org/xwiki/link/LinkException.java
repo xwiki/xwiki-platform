@@ -22,7 +22,7 @@ package org.xwiki.link;
 import org.xwiki.stability.Unstable;
 
 /**
- * Any exception raised in refactoring related APIs.
+ * Any exception raised in link related APIs.
  *
  * @version $Id$
  * @since 14.8RC1

@@ -54,7 +54,9 @@ public class DeleteRequest extends EntityRequest
 
     /**
      * @see #isUpdateLinksOnFarm()
+     * @deprecated not taken into account anymore
      */
+    @Deprecated(since = "14.8RC1")
     public static final String UPDATE_LINKS_ON_FARM = "updateLinksOnFarm";
 
     /**

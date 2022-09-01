@@ -401,8 +401,7 @@ public interface XWikiStoreInterface
     void deleteLock(XWikiLock lock, XWikiContext context, boolean bTransaction) throws XWikiException;
 
     /**
-     * @deprecated links indexing move to Solr, see org.xwiki.refactoring.internal.solr.* in
-     *             xwiki-platform-refactoring-default module
+     * @deprecated use {@link org.xwiki.link.LinkStore} APIs instead
      */
     @Deprecated(since = "14.8RC1")
     List<XWikiLink> loadLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException;
@@ -414,8 +413,7 @@ public interface XWikiStoreInterface
      * @param bTransaction {@code true} if a transaction must be create
      * @param context the current context
      * @since 2.2M2
-     * @deprecated links indexing move to Solr, see org.xwiki.refactoring.internal.solr.* in
-     *             xwiki-platform-refactoring-default module
+     * @deprecated use {@link org.xwiki.link.LinkStore} APIs instead
      */
     @Deprecated(since = "14.8RC1")
     List<DocumentReference> loadBacklinks(DocumentReference documentReference, boolean bTransaction,
@@ -428,8 +426,7 @@ public interface XWikiStoreInterface
      * @param bTransaction {@code true} if a transaction must be create
      * @param context the current context
      * @since 14.2RC1
-     * @deprecated links indexing move to Solr, see org.xwiki.refactoring.internal.solr.* in
-     *             xwiki-platform-refactoring-default module
+     * @deprecated use {@link org.xwiki.link.LinkStore} APIs instead
      */
     @Unstable
     @Deprecated(since = "14.8RC1")
@@ -440,21 +437,19 @@ public interface XWikiStoreInterface
     }
 
     /**
-     * @deprecated use {@link #loadBacklinks(DocumentReference, boolean, XWikiContext)}
+     * @deprecated use {@link org.xwiki.link.LinkStore} APIs instead
      */
     @Deprecated(since = "2.2M2")
     List<String> loadBacklinks(String fullName, XWikiContext context, boolean bTransaction) throws XWikiException;
 
     /**
-     * @deprecated links indexing move to Solr, see org.xwiki.refactoring.internal.solr.* in
-     *             xwiki-platform-refactoring-default module
+     * @deprecated link storage and indexing moved to Solr (implemented in xwiki-platform-search-solr-api)
      */
     @Deprecated(since = "14.8RC1")
     void saveLinks(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException;
 
     /**
-     * @deprecated links indexing move to Solr, see org.xwiki.refactoring.internal.solr.* in
-     *             xwiki-platform-refactoring-default module
+     * @deprecated link storage and indexing moved to Solr (implemented in xwiki-platform-search-solr-api)
      */
     @Deprecated(since = "14.8RC1")
     void deleteLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException;

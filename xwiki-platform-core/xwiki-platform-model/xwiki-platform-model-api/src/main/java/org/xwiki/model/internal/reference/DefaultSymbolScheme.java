@@ -206,7 +206,7 @@ public class DefaultSymbolScheme implements SymbolScheme
      * 
      * @param withParameters true if the parameters syntax should be supported for all entity types
      */
-    public void initialize(boolean withParameters)
+    private void initialize(boolean withParameters)
     {
         // Initialize parameters setup
         initializeParameters(withParameters);

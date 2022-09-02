@@ -24,6 +24,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
@@ -49,6 +50,9 @@ import static org.xwiki.index.internal.DefaultLinksTaskConsumer.LINKS_TASK_TYPE;
 public class LinksUpdateListener extends AbstractEventListener
 {
     @Inject
+    private Logger logger;
+
+    @Inject
     private RemoteObservationManagerContext remoteObservationManagerContext;
 
     @Inject
@@ -71,6 +75,7 @@ public class LinksUpdateListener extends AbstractEventListener
         XWikiContext context = this.contextProvider.get();
         if (!this.remoteObservationManagerContext.isRemoteState() && context.getWiki().hasBacklinks(context)) {
             XWikiDocument doc = (XWikiDocument) source;
+            this.logger.debug("Link analysis task starting for [{}]", doc.getDocumentReference());
             this.taskManager.addTask(doc.getDocumentReference().getWikiReference().getName(), doc.getId(),
                 LINKS_TASK_TYPE);
         }

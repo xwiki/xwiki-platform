@@ -243,7 +243,7 @@ public class DefaultTasksManager implements TaskManager, Initializable, Disposab
                     task.setTimestamp(newTimestamp);
                     this.queue.put(task);
                 } else {
-                    this.logger.error("[{}] abandoned because it has failed too many times.", task);
+                    this.logger.error("[{}] abandoned because it has failed too many times.", task, e);
                     deleteTask(task);
                     task.getFuture().cancel(false);
                 }

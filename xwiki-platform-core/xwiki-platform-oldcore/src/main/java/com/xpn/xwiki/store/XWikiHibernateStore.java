@@ -308,7 +308,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     statement.execute(
                         String.format("CREATE USER %s IDENTIFIED BY %s QUOTA UNLIMITED ON USERS", escapedSchema,
                             escapedSchema));
-                    statement.execute(String.format("GRANT RESOURCE TO %s", escapedSchema));
                 } else if (DatabaseProduct.DERBY == databaseProduct || DatabaseProduct.DB2 == databaseProduct
                     || DatabaseProduct.H2 == databaseProduct) {
                     statement.execute("CREATE SCHEMA " + escapedSchema);

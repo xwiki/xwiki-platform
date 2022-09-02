@@ -2941,16 +2941,6 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @deprecated since 7.4M1, use {@link #getSpacePreference(String, SpaceReference, String, XWikiContext)} instead
-     */
-    @Deprecated
-    public String getSpacePreference(String preference, String space, String defaultValue, XWikiContext context)
-    {
-        return getSpacePreference(preference, new SpaceReference(space, context.getWikiReference()), defaultValue,
-            context);
-    }
-
-    /**
      * Get the reference of the space and fallback on parent space or wiki in case nothing is found.
      * <p>
      * If the property is not set on any level then empty String is returned.

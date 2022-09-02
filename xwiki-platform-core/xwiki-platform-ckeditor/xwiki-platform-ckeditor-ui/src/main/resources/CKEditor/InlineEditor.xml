@@ -121,7 +121,7 @@
     <property>
       <code>define('xwiki-ckeditor-inline', ['jquery', 'xwiki-ckeditor'], function($, ckeditorPromise) {
   var loadCSS = function(url) {
-    var link = $('&lt;link&gt;').attr({
+    $('&lt;link&gt;').attr({
       type: 'text/css',
       rel: 'stylesheet',
       href: url
@@ -153,6 +153,89 @@
     }
   });
 
+  var startAvoidingCKAndSaveBarOverlap = function(editor) {
+    // CKEDITOR-470 - CKEditor's toolbar may overlap with XWiki's save bar.
+    // This function is a workaround that checks if they overlap when the page
+    // is scrolled and when the CKEditor's toolbar's CSS style is changed
+    // Ideally, we would cooperate with CKEditor's code to position its toolbar,
+    // but the toolbar position is not customizable.
+    //
+    // The CKEditor toolbar (the floatSpace variable) is positioned by this code:
+    // https://github.com/ckeditor/ckeditor4/blob/19a386c4691a99d37b43e876e5f5a7ce092c6016/plugins/floatingspace/plugin.js#L100
+    //
+    // This happens when the editor gains focus, when some text is typed (the
+    // editor's content changes), when the window is scrolled or when the window
+    // is resized.
+    // See https://github.com/ckeditor/ckeditor4/blob/19a386c4691a99d37b43e876e5f5a7ce092c6016/plugins/floatingspace/plugin.js#L310
+
+    function avoidCKAndSaveBarOverlap() {
+      // This callback will be called when the page is scrolled or when the
+      // CKEditor's toolbar position is changed.
+
+      var ckBRC = ckFloatingToolbar.getBoundingClientRect();
+      var saveBRC = saveBar.getBoundingClientRect();
+      var collision = ckBRC.top + ckBRC.height &gt; saveBRC.top;
+      if (saveBar.classList.contains("sticky-buttons-fixed")) {
+          // If XWiki's save bar is sticky, it should not have our custom
+          // padding-top.
+          if (saveBar.style.paddingTop) {
+            saveBar.style.paddingTop = '';
+          }
+
+          if (collision) {
+            // If there is a collision, CKEditor decided to place the toolbar at
+            // the bottom. This is the chosen position if:
+            // - the height of the CKEditor toolbar is not greater than the top of
+            //   the editor relative to the viewport, and
+            // - the height of the CKEditor toolbar is not greater than the
+            //   difference between the bottom of the editor relative to the
+            //   viewport and its height
+            // We put the CKEditor toolbar at the top of the viewport.
+            // Note that CKEditor will try to revert this on the events
+            // previously listed but we will force the position back again
+            // immediately thanks to the mutation observer. This does not
+            // trigger an event that makes CKEditor position the toolbar once
+            // again, so we are not racing with it.
+
+            ckFloatingToolbar.style.position = "fixed";
+            ckFloatingToolbar.style.top = "0px";
+          }
+      } else {
+        // If the XWiki's save bar is not sticky, we add a padding-top
+        // corresponding to the CKEditor toolbar's height if there is a
+        // collision, and we revert to the initial padding-top if there is no
+        // collision.
+        if (collision) {
+          if (!saveBar.style.paddingTop) {
+            saveBar.style.paddingTop = (parseInt(getComputedStyle(saveBar).getPropertyValue('padding-top')) + ckBRC.height) + 'px';
+          }
+        } else {
+          if (saveBar.style.paddingTop) {
+            saveBar.style.paddingTop = '';
+          }
+        }
+      }
+    }
+
+    var ckFloatingToolbar = document.getElementById('cke_' + editor.name);
+    var saveBar = document.getElementsByClassName('inplace-editing-buttons')[0];
+    if (ckFloatingToolbar &amp;&amp; saveBar) {
+      window.addEventListener("scroll", avoidCKAndSaveBarOverlap);
+      var mutationObserver = new MutationObserver(avoidCKAndSaveBarOverlap);
+      mutationObserver.observe(ckFloatingToolbar, {
+        attributes: true,
+        attributeFilter: ['style']
+      });
+
+      return function stopAvoidingCKAndSaveBarOverlap() {
+        window.removeEventListener("scroll", avoidCKAndSaveBarOverlap);
+        mutationObserver.disconnect();
+      };
+    }
+
+    return null;
+  };
+
   var createEditors = function(ckeditor, container, config) {
     container.attr({
       'data-sourceDocumentReference': XWiki.Model.serialize(config.document.documentReference),
@@ -170,6 +253,7 @@
   };
 
   var createEditor = function(ckeditor, element, config, instanceConfig) {
+    var stopAvoidingCKAndSaveBarOverlap = null;
     var deferred = $.Deferred();
     var editor = ckeditor.inline(element, $.extend({
       // It doesn't make sense to resize the editor when editing in-line and it also creates problems with the way
@@ -189,6 +273,7 @@
       // Make the content editable after the editor is ready and visible.
       // See CKEDITOR-390: The inline editor loads as read-only in Safari
       editor.setReadOnly(false);
+      stopAvoidingCKAndSaveBarOverlap = startAvoidingCKAndSaveBarOverlap(editor);
     });
     editor.once('reload', function(event) {
       $(document).off(['xwiki:actions:view.contentEditor', 'xwiki:actions:beforeSave.contentEditor'].join(' '));
@@ -212,6 +297,10 @@
         // * the in-place editor updates the edited element anyway using the view HTML (without rendering markers)
         //   and we risk overwriting it.
         editor.destroy(/* noUpdate: */ true);
+        if (stopAvoidingCKAndSaveBarOverlap) {
+          stopAvoidingCKAndSaveBarOverlap();
+          stopAvoidingCKAndSaveBarOverlap = null;
+        }
       }, 0);
     });
     return deferred.promise();

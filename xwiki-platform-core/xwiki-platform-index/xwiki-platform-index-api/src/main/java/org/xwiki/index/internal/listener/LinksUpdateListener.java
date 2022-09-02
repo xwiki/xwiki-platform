@@ -75,7 +75,10 @@ public class LinksUpdateListener extends AbstractEventListener
         XWikiContext context = this.contextProvider.get();
         if (!this.remoteObservationManagerContext.isRemoteState() && context.getWiki().hasBacklinks(context)) {
             XWikiDocument doc = (XWikiDocument) source;
-            this.logger.debug("Link analysis task starting for [{}]", doc.getDocumentReference());
+            // Note: we display the docId since the task manager logs only display the docId in logs and we want to
+            // make the match visually when there's a problem and we have to analyse the logs.
+            this.logger.debug("Link analysis task starting for [{}] (docId = [{}])", doc.getDocumentReference(),
+                doc.getId());
             this.taskManager.addTask(doc.getDocumentReference().getWikiReference().getName(), doc.getId(),
                 LINKS_TASK_TYPE);
         }

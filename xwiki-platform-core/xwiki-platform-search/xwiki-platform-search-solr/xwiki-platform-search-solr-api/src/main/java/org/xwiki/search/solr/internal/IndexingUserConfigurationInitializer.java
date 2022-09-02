@@ -19,16 +19,18 @@
  */
 package org.xwiki.search.solr.internal;
 
+import javax.annotation.Priority;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.EntityReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.AbstractMandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -39,8 +41,11 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @since 14.8M1
  */
 @Component
+@Named("XWiki.SolrSearchAdminIndexingUser")
 @Singleton
-public class IndexingUserConfigurationInitializer implements MandatoryDocumentInitializer
+// initalize after the corresponding class
+@Priority(MandatoryDocumentInitializer.DEFAULT_PRIORITY + 100)
+public class IndexingUserConfigurationInitializer extends AbstractMandatoryDocumentInitializer
 {
     @Inject
     private Provider<XWikiContext> contextProvider;
@@ -48,24 +53,21 @@ public class IndexingUserConfigurationInitializer implements MandatoryDocumentIn
     @Inject
     private Logger logger;
 
-    @Override
-    public EntityReference getDocumentReference()
+    /**
+     * Constructor setting the page reference.
+     */
+    public IndexingUserConfigurationInitializer()
     {
-        return DefaultIndexingUserConfig.CONFIG_PAGE;
+        super(DefaultIndexingUserConfig.CONFIG_PAGE);
     }
 
     @Override
-    public boolean updateDocument(XWikiDocument document)
+    protected boolean updateDocumentFields(XWikiDocument document, String title)
     {
-        boolean needsUpdate = false;
+        boolean needsUpdate = super.updateDocumentFields(document, title);
         XWikiContext context = contextProvider.get();
         if (!context.isMainWiki()) {
             return needsUpdate;
-        }
-
-        if (!document.isHidden()) {
-            document.setHidden(true);
-            needsUpdate = true;
         }
 
         if (document.getXObject(DefaultIndexingUserConfig.CONFIG_CLASS) == null) {

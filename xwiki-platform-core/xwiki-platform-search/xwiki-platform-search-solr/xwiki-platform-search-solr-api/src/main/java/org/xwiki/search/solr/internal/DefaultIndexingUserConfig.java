@@ -61,6 +61,11 @@ public class DefaultIndexingUserConfig implements IndexingUserConfig
     static final LocalDocumentReference CONFIG_PAGE
         = new LocalDocumentReference(XWiki.SYSTEM_SPACE, "SolrSearchAdminIndexingUser");
 
+    /**
+     * the name of the class field containing the indexing user.
+     */
+    static final String CONFIG_USER_ATTRIBUTE = "indexer";
+
     @Inject
     private Provider<XWikiContext> contextProvider;
 
@@ -81,7 +86,7 @@ public class DefaultIndexingUserConfig implements IndexingUserConfig
         BaseObject configObject = configPage.getXObject(CONFIG_CLASS);
 
         if (configObject != null) {
-            String indexers = configObject.getLargeStringValue("indexer");
+            String indexers = configObject.getLargeStringValue(CONFIG_USER_ATTRIBUTE);
             for (String userRef : ListClass.getListFromString(indexers)) {
                 if (StringUtils.isNotBlank(userRef)) {
                     indexingUser = documentReferenceResolver.resolve(userRef, mainWikiRef);

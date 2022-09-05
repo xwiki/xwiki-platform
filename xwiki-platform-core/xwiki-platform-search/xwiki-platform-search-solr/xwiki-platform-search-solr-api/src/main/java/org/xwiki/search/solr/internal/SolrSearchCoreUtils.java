@@ -33,7 +33,7 @@ import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
  * Provide various helpers around the Solr search code.
  * 
  * @version $Id$
- * @since 14.8CR1
+ * @since 14.8RC1
  */
 @Component(roles = SolrSearchCoreUtils.class)
 @Singleton

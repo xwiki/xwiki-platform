@@ -2,8 +2,11 @@ org.xwiki.search.solr.internal.DefaultSolr
 org.xwiki.search.solr.internal.DefaultSolrConfiguration
 org.xwiki.search.solr.internal.DefaultSolrFieldNameEncoder
 org.xwiki.search.solr.internal.DefaultSolrIndexer
+org.xwiki.search.solr.internal.DefaultIndexingUserConfig
 org.xwiki.search.solr.internal.DefaultSolrUtils
 org.xwiki.search.solr.internal.EmbeddedSolr
+org.xwiki.search.solr.internal.IndexingUserClassInitializer
+org.xwiki.search.solr.internal.IndexingUserConfigurationInitializer
 org.xwiki.search.solr.internal.RemoteSolr
 org.xwiki.search.solr.internal.SolrClientInstance
 org.xwiki.search.solr.internal.SolrFieldStringEntityReferenceResolver

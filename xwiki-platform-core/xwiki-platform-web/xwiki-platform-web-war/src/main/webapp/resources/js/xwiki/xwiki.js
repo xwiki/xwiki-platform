@@ -1835,23 +1835,6 @@ document.observe("xwiki:dom:loaded", function() {
   };
 
   /**
-   * Injects the given stylesheet or JavaScript file into the page head.
-   *
-   * @param {Element} resource stylesheet or JavaScript resource
-   */
-  var loadResource = function(resource) {
-    if (resource.getAttribute('src')) {
-      let script = document.createElement("script");
-      script.setAttribute('defer', '');
-      script.setAttribute('type', 'text/javascript');
-      script.setAttribute('src', resource.getAttribute('src'));
-      document.head.appendChild(script);
-    } else {
-      document.head.appendChild(resource);
-    }
-  };
-
-  /**
    * Injects the given HTML into the page head after removing the stylesheets and JavaScript files that are already
    * present in the page head (othewise they may be loaded again).
    *
@@ -1859,8 +1842,11 @@ document.observe("xwiki:dom:loaded", function() {
    */
   var extendPageHead = function(html) {
     var loadedResources;
-    var contentToInject = document.createElement('div');
-    contentToInject.innerHTML = html;
+    // Force the execution of script tags when adding them dynamically, since inserting via innerHTML will not trigger
+    // it.
+    var range = document.createRange();
+    range.setStart(document.head, 0);
+    var contentToInject = range.createContextualFragment(html);
     // Inject only the resources that are not already loaded.
     [...contentToInject.querySelectorAll('link[href], script[src]')].forEach(function(resource) {
       if (!loadedResources) {
@@ -1868,7 +1854,7 @@ document.observe("xwiki:dom:loaded", function() {
       }
       var url = resource.getAttribute('href') || resource.getAttribute('src');
       if(loadedResources.indexOf(url) < 0) {
-        loadResource(resource);
+        document.head.appendChild(resource);
       }
     });
   };

@@ -19,9 +19,7 @@
  */
 package org.xwiki.refactoring.internal.listener;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import javax.inject.Inject;
@@ -37,6 +35,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.event.AbstractLocalEventListener;
 import org.xwiki.observation.event.Event;
+import org.xwiki.refactoring.RefactoringException;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
 import org.xwiki.refactoring.internal.ModelBridge;
 import org.xwiki.refactoring.internal.ReferenceUpdater;
@@ -46,8 +45,6 @@ import org.xwiki.refactoring.job.DeleteRequest;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
-import org.xwiki.wiki.manager.WikiManagerException;
 
 /**
  * Updates the back-links after a document has been renamed or deleted.
@@ -75,9 +72,6 @@ public class BackLinkUpdaterListener extends AbstractLocalEventListener
     private ModelBridge modelBridge;
 
     @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
-
-    @Inject
     private ContextualAuthorizationManager authorization;
 
     @Inject
@@ -97,14 +91,18 @@ public class BackLinkUpdaterListener extends AbstractLocalEventListener
     @Override
     public void processLocalEvent(Event event, Object source, Object data)
     {
-        if (event instanceof DocumentRenamedEvent) {
-            maybeUpdateLinksAfterRename(event, source, data);
-        } else if (event instanceof DocumentDeletedEvent && this.jobContext.getCurrentJob() instanceof DeleteJob) {
-            maybeUpdateLinksAfterDelete(event);
+        try {
+            if (event instanceof DocumentRenamedEvent) {
+                maybeUpdateLinksAfterRename(event, source, data);
+            } else if (event instanceof DocumentDeletedEvent && this.jobContext.getCurrentJob() instanceof DeleteJob) {
+                maybeUpdateLinksAfterDelete(event);
+            }
+        } catch (RefactoringException e) {
+            this.logger.error("Failed to update links backlinks", e);
         }
     }
 
-    private void maybeUpdateLinksAfterDelete(Event event)
+    private void maybeUpdateLinksAfterDelete(Event event) throws RefactoringException
     {
         DeleteJob job = (DeleteJob) this.jobContext.getCurrentJob();
         DeleteRequest request = (DeleteRequest) job.getRequest();
@@ -113,64 +111,37 @@ public class BackLinkUpdaterListener extends AbstractLocalEventListener
 
         DocumentReference newTarget = request.getNewBacklinkTargets().get(deletedEvent.getDocumentReference());
         if (request.isUpdateLinks() && newTarget != null) {
-            updateBackLinks(deletedEvent.getDocumentReference(), newTarget, canEdit, request.isUpdateLinksOnFarm());
+            updateBackLinks(deletedEvent.getDocumentReference(), newTarget, canEdit);
         }
     }
 
-    private void maybeUpdateLinksAfterRename(Event event, Object source, Object data)
+    private void maybeUpdateLinksAfterRename(Event event, Object source, Object data) throws RefactoringException
     {
         boolean updateLinks = true;
-        boolean updateLinksOnFarm = true;
         Predicate<EntityReference> canEdit =
             entityReference -> this.authorization.hasAccess(Right.EDIT, entityReference);
 
         if (source instanceof MoveJob) {
             MoveRequest request = (MoveRequest) data;
             updateLinks = request.isUpdateLinks();
-            updateLinksOnFarm = request.isUpdateLinksOnFarm();
             // Check access rights taking into account the move request.
             canEdit = entityReference -> ((MoveJob) source).hasAccess(Right.EDIT, entityReference);
         }
 
         if (updateLinks) {
             DocumentRenamedEvent renameEvent = (DocumentRenamedEvent) event;
-            updateBackLinks(renameEvent.getSourceReference(), renameEvent.getTargetReference(), canEdit,
-                updateLinksOnFarm);
+            updateBackLinks(renameEvent.getSourceReference(), renameEvent.getTargetReference(), canEdit);
         }
     }
 
-    private void updateBackLinks(DocumentReference source, DocumentReference target, Predicate<EntityReference> canEdit,
-        boolean updateLinksOnFarm)
+    private void updateBackLinks(DocumentReference source, DocumentReference target, Predicate<EntityReference> canEdit)
+        throws RefactoringException
     {
-        Collection<String> wikiIds = Collections.singleton(source.getWikiReference().getName());
-        if (updateLinksOnFarm) {
-            try {
-                wikiIds = this.wikiDescriptorManager.getAllIds();
-            } catch (WikiManagerException e) {
-                this.logger.error("Failed to retrieve the list of wikis.", e);
-            }
-        }
+        this.logger.info("Updating the back-links for document [{}].", source);
 
-        if (!wikiIds.isEmpty()) {
-            this.progressManager.pushLevelProgress(wikiIds.size(), this);
-
-            try {
-                for (String wikiId : wikiIds) {
-                    this.progressManager.startStep(this);
-                    updateBackLinks(source, target, canEdit, wikiId);
-                    this.progressManager.endStep(this);
-                }
-            } finally {
-                this.progressManager.popLevelProgress(this);
-            }
-        }
-    }
-
-    private void updateBackLinks(DocumentReference source, DocumentReference target, Predicate<EntityReference> canEdit,
-        String wikiId)
-    {
-        this.logger.info("Updating the back-links for document [{}] in wiki [{}].", source, wikiId);
-        List<DocumentReference> backlinkDocumentReferences = this.modelBridge.getBackLinkedReferences(source, wikiId);
+        // TODO: it's possible to optimize a bit the actual entities to modify (especially which translation of the
+        // document to load and parse) since we have the information in the store
+        Set<DocumentReference> backlinkDocumentReferences = this.modelBridge.getBackLinkedDocuments(source);
 
         this.progressManager.pushLevelProgress(backlinkDocumentReferences.size(), this);
 

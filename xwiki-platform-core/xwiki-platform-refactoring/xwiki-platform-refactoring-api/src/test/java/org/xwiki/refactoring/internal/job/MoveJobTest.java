@@ -489,11 +489,6 @@ public class MoveJobTest extends AbstractMoveJobTest
         job.initialize(request);
 
         assertEquals(new JobGroupPath(Arrays.asList(RefactoringJobs.GROUP, "chess", "A")), job.getGroupPath());
-
-        request.setUpdateLinksOnFarm(true);
-        job.initialize(request);
-
-        assertEquals(new JobGroupPath(Arrays.asList(RefactoringJobs.GROUP)), job.getGroupPath());
     }
 
     @Test

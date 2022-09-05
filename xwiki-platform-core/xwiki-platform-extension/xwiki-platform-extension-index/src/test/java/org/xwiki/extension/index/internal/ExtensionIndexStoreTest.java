@@ -28,9 +28,6 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.jupiter.api.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
 import org.xwiki.extension.AbstractRemoteExtension;
 import org.xwiki.extension.DefaultExtensionAuthor;
@@ -68,7 +65,6 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -99,8 +95,6 @@ class ExtensionIndexStoreTest
 
     private ExtensionRepositoryDescriptor testRepositoryDescriptor;
 
-    private ConfigurationSource mockXWikiProperties;
-
     private Environment mockEnvironment;
 
     @MockComponent
@@ -115,17 +109,7 @@ class ExtensionIndexStoreTest
     @AfterComponent
     public void afterComponent() throws Exception
     {
-        this.mockXWikiProperties =
-            this.componentManager.registerMockComponent(ConfigurationSource.class, "xwikiproperties");
         this.mockEnvironment = this.componentManager.registerMockComponent(Environment.class);
-        when(this.mockXWikiProperties.getProperty(anyString(), anyString())).then(new Answer<String>()
-        {
-            @Override
-            public String answer(InvocationOnMock invocation) throws Throwable
-            {
-                return invocation.getArgument(1);
-            }
-        });
 
         when(this.mockEnvironment.getPermanentDirectory()).thenReturn(this.permanentDirectory);
         FileUtils.deleteDirectory(this.permanentDirectory);

@@ -43,10 +43,12 @@ import static org.xwiki.index.internal.DefaultLinksTaskConsumer.LINKS_TASK_TYPE;
  *
  * @version $Id$
  * @since 14.2RC1
+ * @deprecated link storage and indexing moved to Solr (implemented in xwiki-platform-search-solr-api)
  */
 @Component
 @Singleton
 @Named("LinksUpdateListener")
+@Deprecated(since = "14.8RC1")
 public class LinksUpdateListener extends AbstractEventListener
 {
     @Inject

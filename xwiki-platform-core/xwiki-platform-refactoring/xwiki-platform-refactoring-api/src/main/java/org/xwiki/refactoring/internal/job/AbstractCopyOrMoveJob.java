@@ -291,13 +291,9 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
     @Override
     protected EntityReference getCommonParent()
     {
-        if (this.request.isUpdateLinksOnFarm()) {
-            return null;
-        } else {
-            List<EntityReference> entityReferences = new LinkedList<>(this.request.getEntityReferences());
-            entityReferences.add(this.request.getDestination());
-            return getCommonParent(entityReferences);
-        }
+        List<EntityReference> entityReferences = new LinkedList<>(this.request.getEntityReferences());
+        entityReferences.add(this.request.getDestination());
+        return getCommonParent(entityReferences);
     }
 
     /**

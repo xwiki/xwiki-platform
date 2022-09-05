@@ -35,7 +35,6 @@ import org.xwiki.job.AbstractJobStatus;
 import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceProvider;
@@ -524,61 +523,6 @@ class DefaultModelBridgeTest
         verify(document, never()).setParentReference(any(DocumentReference.class));
         verify(this.xcontext.getWiki(), never()).saveDocument(any(XWikiDocument.class), anyString(), anyBoolean(),
             any(XWikiContext.class));
-    }
-
-    @Test
-    void getBackLinkedReferences() throws Exception
-    {
-        DocumentReference documentReference = new DocumentReference("alice", Arrays.asList("Path", "To"), "Page");
-        List<DocumentReference> backLinks = Arrays.asList(new DocumentReference("bob", "One", "Two"));
-        when(xwiki.getStore().loadBacklinks(documentReference, true, this.xcontext)).thenReturn(backLinks);
-
-        this.xcontext.setWikiId("carol");
-
-        assertEquals(backLinks, this.modelBridge.getBackLinkedReferences(documentReference, "bob"));
-
-        verify(this.xcontext).setWikiId("bob");
-        verify(this.xcontext).setWikiId("carol");
-    }
-
-    @Test
-    void getBackLinkedReferencesAttachment() throws Exception
-    {
-        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
-        AttachmentReference attachmentReference = new AttachmentReference("image.png", documentReference);
-        List<DocumentReference> backlinks = List.of(new DocumentReference("bob", "One", "Two"));
-
-        when(this.xwiki.getStore().loadBacklinks(attachmentReference, true, this.xcontext))
-            .thenReturn(backlinks);
-
-        this.xcontext.setWikiId("wiki0");
-
-        assertEquals(backlinks, this.modelBridge.getBackLinkedReferences(attachmentReference, "wiki"));
-
-        verify(this.xcontext).setWikiId("wiki");
-        verify(this.xcontext).setWikiId("wiki0");
-    }
-
-    @Test
-    void getBackLinkedReferencesAttachmentXWikiException() throws Exception
-    {
-        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
-        AttachmentReference attachmentReference = new AttachmentReference("image.png", documentReference);
-
-        when(this.xwiki.getStore().loadBacklinks(attachmentReference, true, this.xcontext))
-            .thenThrow(XWikiException.class);
-
-        this.xcontext.setWikiId("wiki0");
-
-        assertEquals(List.of(), this.modelBridge.getBackLinkedReferences(attachmentReference, "wiki"));
-
-        verify(this.xcontext).setWikiId("wiki");
-        verify(this.xcontext).setWikiId("wiki0");
-
-        assertEquals(1, this.logCapture.size());
-        assertEquals("Failed to retrieve the back-links for attachment "
-            + "[Attachment wiki:space.page@image.png] on wiki [wiki].", this.logCapture.getMessage(0));
-        assertEquals(Level.ERROR, this.logCapture.getLogEvent(0).getLevel());
     }
 
     @Test

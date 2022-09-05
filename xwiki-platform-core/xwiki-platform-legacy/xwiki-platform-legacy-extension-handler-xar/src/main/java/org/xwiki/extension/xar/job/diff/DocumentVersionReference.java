@@ -31,18 +31,8 @@ import org.xwiki.model.reference.DocumentReference;
  * @deprecated Use {@link org.xwiki.model.reference.DocumentVersionReference} instead.
  */
 @Deprecated(since = "14.8RC1")
-public class DocumentVersionReference extends DocumentReference
+public class DocumentVersionReference extends org.xwiki.model.reference.DocumentVersionReference
 {
-    /**
-     * Needed for serialization.
-     */
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * The name of the parameter used to store the version.
-     */
-    private static final String VERSION = "version";
-
     /**
      * Creates a new reference to the specified document version.
      * 
@@ -51,9 +41,7 @@ public class DocumentVersionReference extends DocumentReference
      */
     public DocumentVersionReference(DocumentReference documentReference, Serializable version)
     {
-        super(documentReference);
-
-        setParameter(VERSION, version);
+        super(documentReference, version);
     }
 
     /**
@@ -64,22 +52,5 @@ public class DocumentVersionReference extends DocumentReference
     public DocumentVersionReference(DocumentReference documentReference)
     {
         super(documentReference);
-    }
-
-    /**
-     * @return the document version
-     */
-    public Serializable getVersion()
-    {
-        return getParameter(VERSION);
-    }
-
-    /**
-     * @return the {@link DocumentReference} without the version
-     * @since 9.3RC1
-     */
-    public DocumentReference removeVersion()
-    {
-        return new DocumentReference(new DocumentVersionReference(this, null));
     }
 }

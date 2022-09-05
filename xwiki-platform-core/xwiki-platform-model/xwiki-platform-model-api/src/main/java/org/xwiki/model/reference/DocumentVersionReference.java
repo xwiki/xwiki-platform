@@ -17,17 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.xar.job.diff;
+package org.xwiki.model.reference;
 
 import java.io.Serializable;
-
-import org.xwiki.model.reference.DocumentReference;
 
 /**
  * A reference to a document version.
  * 
  * @version $Id$
- * @since 7.0RC1
+ * @since 14.8RC1
  */
 public class DocumentVersionReference extends DocumentReference
 {
@@ -74,7 +72,6 @@ public class DocumentVersionReference extends DocumentReference
 
     /**
      * @return the {@link DocumentReference} without the version
-     * @since 9.3RC1
      */
     public DocumentReference removeVersion()
     {

@@ -76,9 +76,6 @@ public class IndexingUserConfigurationInitializer extends AbstractMandatoryDocum
     {
         boolean needsUpdate = super.updateDocumentFields(document, title);
         XWikiContext context = contextProvider.get();
-        if (!context.isMainWiki()) {
-            return needsUpdate;
-        }
 
         if (document.getXObject(DefaultIndexingUserConfig.CONFIG_CLASS) == null) {
             try {

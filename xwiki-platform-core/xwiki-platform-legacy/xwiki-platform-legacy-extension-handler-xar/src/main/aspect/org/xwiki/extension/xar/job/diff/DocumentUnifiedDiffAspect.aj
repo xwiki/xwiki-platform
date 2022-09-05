@@ -37,7 +37,7 @@ public privileged aspect DocumentUnifiedDiffAspect
     @Deprecated(since = "14.8RC1")
     public DocumentUnifiedDiff.new(DocumentVersionReference previousReference, DocumentVersionReference nextReference)
     {
-        this(new org.xwiki.model.reference.DocumentVersionReference(previousReference),
-            new org.xwiki.model.reference.DocumentVersionReference(nextReference));
+        this((org.xwiki.model.reference.DocumentVersionReference) previousReference,
+            (org.xwiki.model.reference.DocumentVersionReference) nextReference);
     }
 }

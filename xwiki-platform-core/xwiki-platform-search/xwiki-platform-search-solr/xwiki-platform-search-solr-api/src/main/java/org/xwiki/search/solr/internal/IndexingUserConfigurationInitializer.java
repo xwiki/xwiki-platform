@@ -61,6 +61,16 @@ public class IndexingUserConfigurationInitializer extends AbstractMandatoryDocum
         super(DefaultIndexingUserConfig.CONFIG_PAGE);
     }
 
+    /**
+     * Configuration is only needed in the main wiki.
+     * @return always true
+     */
+    @Override
+    public boolean isMainWikiOnly()
+    {
+        return true;
+    }
+
     @Override
     protected boolean updateDocumentFields(XWikiDocument document, String title)
     {

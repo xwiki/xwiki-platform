@@ -46,6 +46,16 @@ public class IndexingUserClassInitializer extends AbstractMandatoryClassInitiali
         super(DefaultIndexingUserConfig.CONFIG_CLASS);
     }
 
+    /**
+     * Class is only needed in the main wiki.
+     * @return always true
+     */
+    @Override
+    public boolean isMainWikiOnly()
+    {
+        return true;
+    }
+
     @Override
     protected void createClass(BaseClass xclass)
     {

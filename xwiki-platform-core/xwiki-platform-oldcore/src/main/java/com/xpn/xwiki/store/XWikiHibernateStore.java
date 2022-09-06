@@ -553,6 +553,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     doc.setComment(StringUtils.abbreviate(comment, 1023));
                 }
 
+                // Before starting the transaction, make sure any document metadata which might rely on configuration is
+                // initialized
+                doc.initialize();
+
                 if (bTransaction) {
                     checkHibernate(context);
                     SessionFactory sfactory = injectCustomMappingsInSessionFactory(doc, context);

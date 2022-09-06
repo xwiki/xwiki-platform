@@ -9486,4 +9486,18 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             this.authors.setOriginalMetadataAuthor(userReference);
         }
     }
+
+    /**
+     * Make sure any document metadata which may depend on configuration is initialized to its default value.
+     * 
+     * @since 14.8RC1
+     * @since 14.4.4
+     * @since 13.10.10
+     */
+    @Unstable
+    public void initialize()
+    {
+        // There is no syntax by default in a new document and the default one is retrieved from the configuration
+        setSyntax(getSyntax());
+    }
 }

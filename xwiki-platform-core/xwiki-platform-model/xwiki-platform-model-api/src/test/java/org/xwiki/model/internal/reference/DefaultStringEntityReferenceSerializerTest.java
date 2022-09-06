@@ -318,7 +318,7 @@ class DefaultStringEntityReferenceSerializerTest implements TestConstants
             resolver.resolve("wiki:page1;param1=value1;param2=value2/page2;en_US", EntityType.PAGE);
         assertEquals("wiki:page1;param1=value1;param2=value2/page2;en_US", serializer.serialize(reference));
 
-        reference = resolver.resolve("wiki:pag\\;e1;pa\\;ram1=val\\;ue1;param2=value2/pag\\;e2;en_\\;US", EntityType.PAGE);
-        assertEquals("wiki:pag\\;e1;pa\\;ram1=val\\;ue1;param2=value2/pag\\;e2;en_\\;US", serializer.serialize(reference));
+        reference = resolver.resolve("wiki:pag\\;e1;pa\\;ram1=val\\;ue1;param2=value2/pag\\;e2;en_US", EntityType.PAGE);
+        assertEquals("wiki:pag\\;e1;pa\\;ram1=val\\;ue1;param2=value2/pag\\;e2;en_US", serializer.serialize(reference));
     }
 }

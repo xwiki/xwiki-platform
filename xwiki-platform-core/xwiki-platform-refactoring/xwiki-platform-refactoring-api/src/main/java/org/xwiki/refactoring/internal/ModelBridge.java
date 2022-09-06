@@ -21,14 +21,15 @@ package org.xwiki.refactoring.internal;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.job.api.AbstractCheckRightsRequest;
-import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.refactoring.RefactoringException;
 import org.xwiki.refactoring.internal.job.PermanentlyDeleteJob;
-import org.xwiki.stability.Unstable;
 
 /**
  * Interface used to access the XWiki model and to perform low level operations on it.
@@ -115,19 +116,11 @@ public interface ModelBridge
 
     /**
      * @param reference a document reference
-     * @param wikiId where to look for links
-     * @return the list of documents from the specified wiki that have links to the specified document
+     * @return the list of documents that have links to the specified entity
+     * @throws RefactoringException when failing to get the backlinked documents
+     * @since 14.8RC1
      */
-    List<DocumentReference> getBackLinkedReferences(DocumentReference reference, String wikiId);
-
-    /**
-     * @param reference a document reference
-     * @param wikiId where to look for links
-     * @return the list of documents from the specified wiki that have links to the specified document
-     * @since 14.2RC1
-     */
-    @Unstable
-    List<DocumentReference> getBackLinkedReferences(AttachmentReference reference, String wikiId);
+    Set<DocumentReference> getBackLinkedDocuments(EntityReference reference) throws RefactoringException;
 
     /**
      * @param spaceReference a space reference

@@ -28,10 +28,10 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.diff.display.UnifiedDiffBlock;
 import org.xwiki.extension.xar.job.diff.DocumentUnifiedDiff;
-import org.xwiki.extension.xar.job.diff.DocumentVersionReference;
 import org.xwiki.extension.xar.job.diff.EntityUnifiedDiff;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentVersionReference;
 import org.xwiki.model.reference.ObjectReference;
 
 import com.xpn.xwiki.doc.XWikiAttachment;

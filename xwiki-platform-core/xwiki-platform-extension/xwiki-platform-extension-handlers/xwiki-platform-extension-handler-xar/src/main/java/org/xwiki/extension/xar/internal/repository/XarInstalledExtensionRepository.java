@@ -49,9 +49,9 @@ import org.xwiki.extension.repository.internal.installed.AbstractInstalledExtens
 import org.xwiki.extension.xar.internal.handler.UnsupportedNamespaceException;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.extension.xar.internal.handler.XarHandlerUtils;
-import org.xwiki.extension.xar.job.diff.DocumentVersionReference;
 import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentVersionReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.authorization.Right;

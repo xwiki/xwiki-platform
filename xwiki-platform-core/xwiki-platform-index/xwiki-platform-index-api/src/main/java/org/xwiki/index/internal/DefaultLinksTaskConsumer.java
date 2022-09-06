@@ -41,10 +41,12 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
  *
  * @version $Id$
  * @since 14.2RC1
+ * @deprecated link storage and indexing moved to Solr (implemented in xwiki-platform-search-solr-api)
  */
 @Component
 @Singleton
 @Named(DefaultLinksTaskConsumer.LINKS_TASK_TYPE)
+@Deprecated(since = "14.8RC1")
 public class DefaultLinksTaskConsumer implements TaskConsumer
 {
     /**

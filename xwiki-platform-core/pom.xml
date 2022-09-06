@@ -221,6 +221,7 @@
     <module>xwiki-platform-jodatime</module>
     <module>xwiki-platform-lesscss</module>
     <module>xwiki-platform-like</module>
+    <module>xwiki-platform-link</module>
     <module>xwiki-platform-linkchecker</module>
     <module>xwiki-platform-livedata</module>
     <module>xwiki-platform-livetable</module>

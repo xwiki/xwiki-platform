@@ -122,7 +122,7 @@ class DefaultTasksManagerTest
 
         // By default, tasks as consumer instantaneously. 
         doAnswer(invocation -> {
-            TaskData task = invocation.getArgument(0);
+            invocation.getArgument(0);
             return null;
         }).when(this.taskExecutor).execute(any());
     }
@@ -152,7 +152,7 @@ class DefaultTasksManagerTest
         this.tasksManager.startThread();
         // Fails the first time, then succeeds the second time execute is called.
         doThrow(new RuntimeException("Test")).doAnswer(invocation -> {
-            TaskData taskData = invocation.getArgument(0);
+            invocation.getArgument(0);
             return null;
         }).when(this.taskExecutor).execute(any());
 

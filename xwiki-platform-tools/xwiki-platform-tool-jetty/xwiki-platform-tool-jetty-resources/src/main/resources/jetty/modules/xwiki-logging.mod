@@ -18,15 +18,15 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-#
-# Jetty std err/out logging
-#
+[description]
+Base configuration for the jetty logging mechanism.
+Provides a ${jetty.base}/resources/jetty-logging.properties.
 
 [depend]
-server
+resources
 
-[xml]
-etc/jetty-logging.xml
+[provides]
+logging
 
 [files]
 logs/
@@ -35,20 +35,6 @@ logs/
 lib/logging/**.jar
 resources/
 
-[ini-template]
-## Logging Configuration
-# Configure jetty logging for default internal behavior STDERR output
-# -Dorg.eclipse.jetty.util.log.class=org.eclipse.jetty.util.log.StdErrLog
-
-# Configure jetty logging for slf4j
-# -Dorg.eclipse.jetty.util.log.class=org.eclipse.jetty.util.log.Slf4jLog
-
-# Configure jetty logging for java.util.logging
-# -Dorg.eclipse.jetty.util.log.class=org.eclipse.jetty.util.log.JavaUtilLog
-
-# STDERR / STDOUT Logging
-# Number of days to retain logs
-# jetty.log.retain=90
-# Directory for logging output
-# Either a path relative to ${jetty.base} or an absolute path
-# jetty.logs=logs
+[ini]
+jetty.webapp.addServerClasses+=,org.eclipse.jetty.logging.
+jetty.webapp.addServerClasses+=,${jetty.home.uri}/lib/logging/

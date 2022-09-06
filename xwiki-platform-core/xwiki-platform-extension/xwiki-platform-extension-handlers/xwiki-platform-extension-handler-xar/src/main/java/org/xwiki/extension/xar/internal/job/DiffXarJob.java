@@ -42,7 +42,7 @@ import org.xwiki.extension.xar.internal.handler.packager.Packager;
 import org.xwiki.extension.xar.internal.job.diff.DocumentUnifiedDiffBuilder;
 import org.xwiki.extension.xar.job.diff.DiffXarJobStatus;
 import org.xwiki.extension.xar.job.diff.DocumentUnifiedDiff;
-import org.xwiki.extension.xar.job.diff.DocumentVersionReference;
+import org.xwiki.model.reference.DocumentVersionReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.xar.XarEntry;

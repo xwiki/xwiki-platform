@@ -1,4 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
 <!--
  Licensed to the Apache Software Foundation (ASF) under one or more
  contributor license agreements.  See the NOTICE file distributed with
@@ -16,33 +37,13 @@
  limitations under the License.
 -->
 
-<!--  
- This is the Solr schema file. This file should be named "schema.xml" and
- should be in the conf directory under the solr home
- (i.e. ./solr/conf/schema.xml by default) 
- or located where the classloader for the Solr webapp can find it.
+<!--
 
- This example schema is the recommended starting point for users.
- It should be kept correct and concise, usable out-of-the-box.
+ XWiki: this schema is a modified version of the Solr "_default" configset (generally found in server/solr/configsets/_default/conf).
+
 
  For more information, on how to customize this file, please see
- http://wiki.apache.org/solr/SchemaXml
-
- PERFORMANCE NOTE: this schema includes many optional features and should not
- be used for benchmarking.  To improve performance one could
-  - set stored="false" for all fields possible (esp large fields) when you
-    only need to search on the field but don't need to return the original
-    value.
-  - set indexed="false" if you don't need to search on the field, but only
-    return the field as a result of searching on other indexed fields.
-  - remove all unneeded copyField statements
-  - for best index size and searching performance, set "index" to false
-    for all general text fields, use copyField to copy them to the
-    catchall "text" field, and use that for searching.
-  - For maximum indexing performance, use the ConcurrentUpdateSolrServer
-    java client.
-  - Remember to run the JVM in server mode, and use a higher logging level
-    that avoids logging every request
+https://solr.apache.org/guide/solr/latest/indexing-guide/fields.html
 -->
 
 <schema name="xwiki" version="1.6">
@@ -258,52 +259,6 @@
     <!-- Retro compatibility with old Lucene module fields names -->
     <field name="lang" type="string" indexed="true" stored="true" multiValued="true" />
 
-    <!-- Dynamic field definitions allow using convention over configuration
-        for fields via the specification of patterns to match field names. 
-        EXAMPLE:  name="*_i" will match any field ending in _i (like myid_i, z_i)
-        RESTRICTION: the glob-like pattern in the name attribute must have
-        a "*" only at the start or the end.  -->
-
-    <!-- Dynamic text fields that are indexed based on their language. -->
-    <dynamicField name="*__"  type="text_general"    indexed="true"  stored="true" multiValued="true" />
-    <dynamicField name="*_ar"  type="text_ar"    indexed="true"  stored="true" multiValued="true" />
-    <dynamicField name="*_bg"  type="text_bg"    indexed="true"  stored="true" multiValued="true" />
-    <dynamicField name="*_ca"  type="text_ca"    indexed="true"  stored="true" multiValued="true" />
-    <!-- cs for XWiki means cz for Solr. 
-         See https://issues.apache.org/jira/browse/LUCENE-6366 and https://issues.apache.org/jira/browse/SOLR-7267 -->
-    <dynamicField name="*_cs"  type="text_cz"    indexed="true"  stored="true" multiValued="true" />
-    <dynamicField name="*_da"  type="text_da"    indexed="true"  stored="true" multiValued="true" />
-    <dynamicField name="*_de"  type="text_de"    indexed="true"  stored="true" multiValued="true" />
-    <dynamicField name="*_en"  type="text_en"    indexed="true"  stored="true" multiValued="true" />
-    <dynamicField name="*_el"  type="text_el"    indexed="true"  stored="true" multiValued="true" />
-    <dynamicField name="*_es"  type="text_es"    indexed="true"  stored="true" multiValued="true" />
-    <dynamicField name="*_eu"  type="text_eu"    indexed="true"  stored="true" multiValued="true" />
-    <dynamicField name="*_fa"  type="text_fa"    indexed="true"  stored="true" multiValued="true" />
-    <dynamicField name="*_fi"  type="text_fi"    indexed="true"  stored="true" multiValued="true" />
-    <dynamicField name="*_fr"  type="text_fr"    indexed="true"  stored="true" multiValued="true" />
-    <dynamicField name="*_ga"  type="text_ga"    indexed="true"  stored="true" multiValued="true" />
-    <dynamicField name="*_gl"  type="text_gl"    indexed="true"  stored="true" multiValued="true" />
-    <dynamicField name="*_hi"  type="text_hi"    indexed="true"  stored="true" multiValued="true" />
-    <dynamicField name="*_hu"  type="text_hu"    indexed="true"  stored="true" multiValued="true" />
-    <dynamicField name="*_hy"  type="text_hy"    indexed="true"  stored="true" multiValued="true" />
-    <dynamicField name="*_id"  type="text_id"    indexed="true"  stored="true" multiValued="true" />
-    <!-- "in" is the former code for "id". See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6457127 -->
-    <dynamicField name="*_in"  type="text_id"    indexed="true"  stored="true" multiValued="true" />
-    <dynamicField name="*_it"  type="text_it"    indexed="true"  stored="true" multiValued="true" />
-    <dynamicField name="*_ja"  type="text_ja"    indexed="true"  stored="true" multiValued="true" />
-    <dynamicField name="*_ko"  type="text_ko"    indexed="true"  stored="true" multiValued="true" />
-    <dynamicField name="*_lv"  type="text_lv"    indexed="true"  stored="true" multiValued="true" />
-    <dynamicField name="*_nl"  type="text_nl"    indexed="true"  stored="true" multiValued="true" />
-    <dynamicField name="*_no"  type="text_no"    indexed="true"  stored="true" multiValued="true" />
-    <dynamicField name="*_pt"  type="text_pt"    indexed="true"  stored="true" multiValued="true" />
-    <dynamicField name="*_pt_BR" type="text_pt_BR" indexed="true" stored="true" multiValued="true" />
-    <dynamicField name="*_ro"  type="text_ro"    indexed="true"  stored="true" multiValued="true" />
-    <dynamicField name="*_ru"  type="text_ru"    indexed="true"  stored="true" multiValued="true" />
-    <dynamicField name="*_sk"  type="text_sk"    indexed="true"  stored="true" multiValued="true" />
-    <dynamicField name="*_sv"  type="text_sv"    indexed="true"  stored="true" multiValued="true" />
-    <dynamicField name="*_th"  type="text_th"    indexed="true"  stored="true" multiValued="true" />
-    <dynamicField name="*_tr"  type="text_tr"    indexed="true"  stored="true" multiValued="true" />
-
     <!-- Dynamic fields that are indexed based on their data type. We need this to be able to index correctly non-string
         XObject properties. Note that all these fields have to be multiValued because object properties can have multiple
         values and also documents can have multiple objects of the same type (and these fields will collect values from
@@ -340,9 +295,9 @@
          unrecognized fields and also prevents the unnecessary storage of unused fields. -->
     <dynamicField name="*" type="ignored" multiValued="true" />
 
-    <!-- Field to use to determine and enforce document uniqueness. 
-         Unless this field is marked with required="false", it will be a required field
-      -->
+    <!-- Field to use to determine and enforce document uniqueness.
+      Unless this field is marked with required="false", it will be a required field
+    -->
     <uniqueKey>id</uniqueKey>
 
     <!-- copyField commands copy one field to another at the time a document
@@ -420,6 +375,7 @@
     <fieldType name="pfloats" class="solr.FloatPointField" docValues="true" multiValued="true"/>
     <fieldType name="plongs" class="solr.LongPointField" docValues="true" multiValued="true"/>
     <fieldType name="pdoubles" class="solr.DoublePointField" docValues="true" multiValued="true"/>
+    <fieldType name="random" class="solr.RandomSortField" indexed="true"/>
 
     <!-- since fields of this type are by default not stored or indexed,
        any data added to them will be ignored outright.  -->
@@ -450,19 +406,13 @@
     
     <!--Binary data type. The data should be sent/retrieved in as Base64 encoded Strings -->
     <fieldType name="binary" class="solr.BinaryField"/>
-
-    <!-- The "RandomSortField" is not used to store or search any
-         data.  You can declare fields of this type it in your schema
-         to generate pseudo-random orderings of your docs for sorting 
-         or function purposes.  The ordering is generated based on the field
-         name and the version of the index. As long as the index version
-         remains unchanged, and the same field name is reused,
-         the ordering of the docs will be consistent.  
-         If you want different psuedo-random orderings of documents,
-         for the same version of the index, use a dynamicField and
-         change the field name in the request.
-     -->
-    <fieldType name="random" class="solr.RandomSortField" indexed="true" />
+    
+    <!-- 
+    RankFields can be used to store scoring factors to improve document ranking. They should be used
+    in combination with RankQParserPlugin.
+    (experimental)
+    --> 
+    <fieldType name="rank" class="solr.RankField"/>
 
     <!-- solr.TextField allows the specification of custom text analyzers
          specified as a tokenizer and a list of token filters. Different
@@ -541,6 +491,7 @@
     <!-- A text field with defaults appropriate for English: it tokenizes with StandardTokenizer,
          removes English stop words (lang/stopwords_en.txt), down cases, protects words from protwords.txt, and
          finally applies Porter's stemming.  The query time analyzer also applies synonyms from synonyms.txt. -->
+    <dynamicField name="*_en" type="text_en"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_en" class="solr.TextField" positionIncrementGap="100">
       <analyzer type="index">
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -749,6 +700,8 @@
     <!-- some examples for different languages (generally ordered by ISO code) -->
 
     <!-- Arabic -->
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <dynamicField name="*_ar" type="text_ar"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_ar" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -762,6 +715,8 @@
     </fieldType>
 
     <!-- Bulgarian -->
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <dynamicField name="*_bg" type="text_bg"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_bg" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/> 
@@ -772,6 +727,8 @@
     </fieldType>
     
     <!-- Catalan -->
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <dynamicField name="*_ca" type="text_ca"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_ca" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -784,6 +741,8 @@
     </fieldType>
     
     <!-- CJK bigram (see text_ja for a Japanese configuration using morphological analysis) -->
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <dynamicField name="*_cjk" type="text_cjk"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_cjk" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -796,6 +755,10 @@
     </fieldType>
 
     <!-- Czech -->
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- cs for XWiki means cz for Solr. 
+         See https://issues.apache.org/jira/browse/LUCENE-6366 and https://issues.apache.org/jira/browse/SOLR-7267 -->
+    <dynamicField name="*_cs" type="text_cz"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_cz" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -808,6 +771,8 @@
     </fieldType>
     
     <!-- Danish -->
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <dynamicField name="*_da" type="text_da"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_da" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -818,6 +783,8 @@
     </fieldType>
     
     <!-- German -->
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <dynamicField name="*_de" type="text_de"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_de" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -831,6 +798,8 @@
     </fieldType>
     
     <!-- Greek -->
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <dynamicField name="*_el" type="text_el"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_el" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -842,6 +811,8 @@
     </fieldType>
     
     <!-- Spanish -->
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <dynamicField name="*_es" type="text_es"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_es" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -853,6 +824,8 @@
     </fieldType>
 
     <!-- Estonian -->
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <dynamicField name="*_et" type="text_et"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_et" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -863,6 +836,8 @@
     </fieldType>
 
     <!-- Basque -->
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <dynamicField name="*_eu" type="text_eu"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_eu" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -873,6 +848,8 @@
     </fieldType>
     
     <!-- Persian -->
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <dynamicField name="*_fa" type="text_fa"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_fa" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
         <!-- for ZWNJ -->
@@ -886,6 +863,8 @@
     </fieldType>
     
     <!-- Finnish -->
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <dynamicField name="*_fi" type="text_fi"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_fi" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -897,6 +876,8 @@
     </fieldType>
     
     <!-- French -->
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <dynamicField name="*_fr" type="text_fr"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_fr" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -916,6 +897,8 @@
     </fieldType>
     
     <!-- Irish -->
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <dynamicField name="*_ga" type="text_ga"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_ga" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -930,6 +913,8 @@
     </fieldType>
     
     <!-- Galician -->
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <dynamicField name="*_gl" type="text_gl"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_gl" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -941,6 +926,8 @@
     </fieldType>
     
     <!-- Hindi -->
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <dynamicField name="*_hi" type="text_hi"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_hi" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -955,6 +942,8 @@
     </fieldType>
     
     <!-- Hungarian -->
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <dynamicField name="*_hu" type="text_hu"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_hu" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -966,6 +955,8 @@
     </fieldType>
     
     <!-- Armenian -->
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <dynamicField name="*_hy" type="text_hy"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_hy" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -976,6 +967,10 @@
     </fieldType>
     
     <!-- Indonesian -->
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <dynamicField name="*_id" type="text_id"  indexed="true"  stored="true" multiValued="true"/>
+    <!-- XWIKI: "in" is the former code for "id". See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6457127 -->
+    <dynamicField name="*_in" type="text_id" indexed="true"  stored="true" multiValued="true" />
     <fieldType name="text_id" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -987,6 +982,8 @@
     </fieldType>
     
     <!-- Italian -->
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <dynamicField name="*_it" type="text_it"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_it" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -1004,6 +1001,8 @@
          NOTE: If you want to optimize search for precision, use default operator AND in your request
          handler config (q.op) Use OR if you would like to optimize for recall (default).
     -->
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <dynamicField name="*_ja" type="text_ja"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_ja" class="solr.TextField" positionIncrementGap="100" autoGeneratePhraseQueries="false">
       <analyzer>
         <!-- Kuromoji Japanese morphological analyzer/tokenizer (JapaneseTokenizer)
@@ -1050,7 +1049,8 @@
     </fieldType>
     
     <!-- Korean morphological analysis -->
-    <dynamicField name="*_txt_ko" type="text_ko"  indexed="true"  stored="true"/>
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <dynamicField name="*_ko" type="text_ko"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_ko" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
         <!-- Nori Korean morphological analyzer/tokenizer (KoreanTokenizer)
@@ -1084,6 +1084,8 @@
     </fieldType>
 
     <!-- Latvian -->
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <dynamicField name="*_lv" type="text_lv"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_lv" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -1094,6 +1096,8 @@
     </fieldType>
     
     <!-- Dutch -->
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <dynamicField name="*_nl" type="text_nl"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_nl" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -1105,6 +1109,8 @@
     </fieldType>
     
     <!-- Norwegian -->
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <dynamicField name="*_no" type="text_no"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_no" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -1117,6 +1123,8 @@
     </fieldType>
     
     <!-- Portuguese -->
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <dynamicField name="*_pt" type="text_pt"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_pt" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -1140,6 +1148,8 @@
     </fieldType>
 
     <!-- Romanian -->
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <dynamicField name="*_ro" type="text_ro"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_ro" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -1150,6 +1160,8 @@
     </fieldType>
     
     <!-- Russian -->
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <dynamicField name="*_ru" type="text_ru"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_ru" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -1173,6 +1185,8 @@
     </fieldType>
 
     <!-- Swedish -->
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <dynamicField name="*_sv" type="text_sv"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_sv" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -1184,6 +1198,8 @@
     </fieldType>
     
     <!-- Thai -->
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <dynamicField name="*_th" type="text_th"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_th" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
         <tokenizer class="solr.ThaiTokenizerFactory"/>
@@ -1193,6 +1209,8 @@
     </fieldType>
     
     <!-- Turkish -->
+    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <dynamicField name="*_tr" type="text_tr"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_tr" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>

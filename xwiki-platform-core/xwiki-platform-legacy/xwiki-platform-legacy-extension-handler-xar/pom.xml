@@ -38,6 +38,13 @@
     </xwiki.extension.features>
   </properties>
   <dependencies>
+    <!-- Trigger xwiki-platform-extension-handler-xar dependencies (but without xwiki-platform-extension-handler-xar jar itself) -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-handler-xar</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-extension-handler-xar</artifactId>

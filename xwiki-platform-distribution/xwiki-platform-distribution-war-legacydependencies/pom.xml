@@ -86,7 +86,7 @@
         </exclusion>
         <exclusion>
           <groupId>org.xwiki.platform</groupId>
-          <artifactId>xwiki-platform-extension-handler-jar</artifactId>
+          <artifactId>xwiki-platform-extension-handler-xar</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

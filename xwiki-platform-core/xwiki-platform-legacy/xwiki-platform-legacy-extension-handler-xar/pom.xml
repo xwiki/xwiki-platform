@@ -31,11 +31,19 @@
   <name>XWiki Platform - Legacy - Extension Handler XAR</name>
   <packaging>jar</packaging>
   <description>Legacy package for xwiki-platform-extension-handler-xar</description>
+  <properties>
+    <!-- The features provided by this module -->
+    <xwiki.extension.features>
+      org.xwiki.platform:xwiki-platform-extension-handler-xar
+    </xwiki.extension.features>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-extension-handler-xar</artifactId>
       <version>${project.version}</version>
+      <!-- We don't want to draw this dependency since we're wrapping it. -->
+      <scope>provided</scope>
     </dependency>
 
     <!-- Needed for backward compatibility Aspects -->

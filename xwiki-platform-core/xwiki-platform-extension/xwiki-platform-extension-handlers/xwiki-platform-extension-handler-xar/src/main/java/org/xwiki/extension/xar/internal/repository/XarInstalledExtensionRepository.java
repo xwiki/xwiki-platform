@@ -70,7 +70,7 @@ import org.xwiki.xar.XarException;
 @Singleton
 @Named(XarExtensionHandler.TYPE)
 public class XarInstalledExtensionRepository extends AbstractInstalledExtensionRepository<XarInstalledExtension>
-    implements InstalledExtensionRepository, Initializable
+    implements Initializable
 {
     @Inject
     private transient InstalledExtensionRepository installedRepository;

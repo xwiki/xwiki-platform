@@ -666,7 +666,7 @@ $services.localization.render('platform.core.profile.category.profile.disabled')
 
       &lt;/div&gt;
       #end
-      &lt;div class='userRecentChanges'&gt;
+      &lt;div class='userRecentChanges' data-xwiki-lightbox="false"&gt;
       #if ($xcontext.user == $doc.fullName)
         &lt;h2&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.activity'))&lt;/h2&gt;
       #else

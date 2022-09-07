@@ -1434,7 +1434,7 @@ $Msz MB##
   #end
   <table id="${htmlLiveTableId}" class="xwiki-livetable"
       #if("$!options.description" != '') summary="$escapetool.xml($options.description)"#end
-      data-settings="$escapetool.xml($jsontool.serialize($macro.settings))">
+      data-settings="$escapetool.xml($jsontool.serialize($macro.settings))" data-xwiki-lightbox="false">
     <tr>
       <td class="xwiki-livetable-pagination">
         <span id="${htmlLiveTableId}-limits" class="xwiki-livetable-limits"></span>

@@ -157,11 +157,13 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest>
             step.initialize(this);
 
             // Enable Welcome step if one of the steps is enabled
-            if (step.getState() == null) {
-                if (welcomeStep != null) {
+            // but don't prepare the following steps as it might be too early
+            if (welcomeStep.getState() != null) {
+                // Prepare the step to check if there is something to do
+                step.prepare();
+
+                if (step.getState() == null) {
                     welcomeStep.setState(null);
-                }
-                if (reportStep != null) {
                     reportStep.setState(null);
                 }
             }

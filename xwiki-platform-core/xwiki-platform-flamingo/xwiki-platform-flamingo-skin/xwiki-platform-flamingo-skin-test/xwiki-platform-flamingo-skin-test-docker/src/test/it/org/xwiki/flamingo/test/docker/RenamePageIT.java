@@ -29,6 +29,8 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
+import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.flamingo.skin.test.po.JobQuestionPane;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -39,7 +41,6 @@ import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.AttachmentsPane;
 import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
 import org.xwiki.test.ui.po.DocumentPicker;
 import org.xwiki.test.ui.po.RenamePage;
@@ -356,8 +357,8 @@ public class RenamePageIT
             setup.createPage(sourcePageReference2, "Some content to be linked in macro. number 2");
         ViewPage nestedMacroLinkPage =
             setup.createPage(sourcePageReference3, "Some content to be linked in nested macro. number 3");
-        ViewPage imageLinkPage = setup.createPage(sourcePageReference4, "A page with image to be linked. number 4");
-        AttachmentsPane attachmentsPane = imageLinkPage.openAttachmentsDocExtraPane();
+        setup.createPage(sourcePageReference4, "A page with image to be linked. number 4");
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         File image = new File(testConfiguration.getBrowser().getTestResourcesPath(), "AttachmentIT/image.gif");
         attachmentsPane.setFileToUpload(image.getAbsolutePath());
         attachmentsPane.waitForUploadToFinish("image.gif");

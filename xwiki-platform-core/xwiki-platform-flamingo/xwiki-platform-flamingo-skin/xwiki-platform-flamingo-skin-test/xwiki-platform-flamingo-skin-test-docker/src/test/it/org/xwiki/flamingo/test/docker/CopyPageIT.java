@@ -25,6 +25,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
+import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.index.tree.test.po.DocumentPickerModal;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -34,7 +36,6 @@ import org.xwiki.test.docker.junit5.TestLocalReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.WikisSource;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.AttachmentsPane;
 import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
 import org.xwiki.test.ui.po.CopyOverwritePromptPage;
 import org.xwiki.test.ui.po.CopyPage;
@@ -91,7 +92,7 @@ class CopyPageIT
         ViewPage viewPage = setup.createPage(sourceSpaceName, sourcePageName, PAGE_CONTENT, sourcePageName);
 
         // Add an attachment to verify that it's version is not incremented in the target document (XWIKI-8157).
-        AttachmentsPane attachmentsPane = viewPage.openAttachmentsDocExtraPane();
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         File image = new File(testConfiguration.getBrowser().getTestResourcesPath(), "AttachmentIT/image.gif");
         attachmentsPane.setFileToUpload(image.getAbsolutePath());
         attachmentsPane.waitForUploadToFinish("image.gif");
@@ -139,7 +140,7 @@ class CopyPageIT
         // Verify the attachment version is the same (XWIKI-8157).
         // FIXME: Remove the following wait when XWIKI-6688 is fixed.
         viewPage.waitForDocExtraPaneActive("comments");
-        attachmentsPane = viewPage.openAttachmentsDocExtraPane();
+        attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertEquals("1.1", attachmentsPane.getLatestVersionOfAttachment("image.gif"));
     }
 

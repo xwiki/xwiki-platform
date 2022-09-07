@@ -25,6 +25,8 @@ import java.util.List;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.attachment.picker.test.po.AttachmentGalleryPicker;
+import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
+import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -32,7 +34,6 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.AttachmentsPane;
 import org.xwiki.test.ui.po.ViewPage;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -62,12 +63,12 @@ class AttachmentGalleryPickerMacroIT
         // Login to be able to delete the page.
         setup.loginAsSuperAdmin();
         setup.deletePage(testReference);
-        ViewPage page = setup.createPage(testReference, "{{attachmentGalleryPicker id='testPicker1' /}}\n"
+        setup.createPage(testReference, "{{attachmentGalleryPicker id='testPicker1' /}}\n"
             + "\n"
             + "{{attachmentGalleryPicker id='testPicker2' limit=2 /}}\n"
             + "\n"
             + "{{attachmentGalleryPicker id='testPicker3' filter='image/*' /}}\n");
-        AttachmentsPane attachmentsPane = page.openAttachmentsDocExtraPane();
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         attachmentsPane.setFileToUpload(
             new File(testConfiguration.getBrowser().getTestResourcesPath(), "image1.png").getAbsolutePath());
         attachmentsPane.waitForUploadToFinish("image1.png");

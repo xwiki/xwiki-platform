@@ -28,12 +28,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.administration.test.po.AdministrationPage;
+import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
+import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.AttachmentsPane;
 import org.xwiki.test.ui.po.CommentsTab;
 import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.InformationPane;
@@ -137,7 +138,7 @@ public class NavigationIT
 
         // Test all panes
         viewPage = testUtils.gotoPage(testReference);
-        AttachmentsPane attachmentsPane = viewPage.useShortcutKeyForAttachmentPane();
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().useShortcutKeyForAttachmentPane();
         assertTrue(attachmentsPane.isOpened());
 
         HistoryPane historyPane = viewPage.useShortcutKeyForHistoryPane();
@@ -159,7 +160,7 @@ public class NavigationIT
     {
         ViewPage viewPage = testUtils.gotoPage(testReference);
 
-        AttachmentsPane attachmentsPane = viewPage.openAttachmentsDocExtraPane();
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertTrue(attachmentsPane.isOpened());
 
         HistoryPane historyPane = viewPage.openHistoryDocExtraPane();

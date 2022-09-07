@@ -27,7 +27,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.xwiki.test.ui.po.AttachmentsPane;
+import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
+import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.test.ui.po.ViewPage;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -81,7 +82,7 @@ public class LightboxPage extends ViewPage
 
     public String attachFile(String testResourcePath, String image)
     {
-        AttachmentsPane attachmentsPane = this.openAttachmentsDocExtraPane();
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         attachmentsPane.setFileToUpload(getFileToUpload(testResourcePath, image).getAbsolutePath());
         attachmentsPane.waitForUploadToFinish(image);
         assertTrue(attachmentsPane.attachmentExistsByFileName(image));

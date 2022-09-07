@@ -106,6 +106,7 @@
       #set ($attachment = $doc.getAttachment($attachmentReference.name))
       #set ($authorReference = $services.model.resolveDocument($attachment.author))
       #set ($discard = $row.putAll({
+        'id': $attachment.filename,
         'filename': "#displayFileNameAndVersion($attachmentReference $attachment)",
         'mimeType': "#displayAttachmentMimeType($attachment)",
         'filesize': "#displayAttachmentSize($attachment.longSize)",

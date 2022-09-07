@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>14.7-SNAPSHOT</version>
+    <version>14.8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -126,13 +126,48 @@
                  Single justification example:
             -->
             <revapi.differences>
-              <criticality>highlight</criticality>
+              <justification>Moved to a legacy module</justification>
+              <criticality>allowed</criticality>
               <differences>
                 <item>
-                  <code>java.class.removed</code>
-                  <old>class com.xpn.xwiki.pdf.impl.PDFURIResolver</old>
-                  <justification>Requires a too big refactoring after Formula macro extraction to jsutify keeping it.
-                    See https://forum.xwiki.org/t/remove-legacy-pdfuriresolver-class/10808/3</justification>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void org.xwiki.rendering.macro.AbstractMacro&lt;P&gt;::setDefaultCategory(java.lang.String) @ org.xwiki.rendering.macro.AbstractNoParameterSignableMacro</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void org.xwiki.rendering.macro.AbstractMacro&lt;P&gt;::setDefaultCategory(java.lang.String) @ org.xwiki.rendering.macro.AbstractSignableMacro&lt;P&gt;</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void org.xwiki.rendering.macro.AbstractMacro&lt;P&gt;::setDefaultCategory(java.lang.String) @ org.xwiki.rendering.macro.script.AbstractJSR223ScriptMacro&lt;P extends org.xwiki.rendering.macro.script.JSR223ScriptMacroParameters&gt;</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void org.xwiki.rendering.macro.AbstractMacro&lt;P&gt;::setDefaultCategory(java.lang.String) @ org.xwiki.rendering.macro.script.AbstractScriptMacro&lt;P extends org.xwiki.rendering.macro.script.ScriptMacroParameters&gt;</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void org.xwiki.rendering.macro.AbstractMacro&lt;P&gt;::setDefaultCategory(java.lang.String) @ org.xwiki.rendering.macro.container.AbstractContainerMacro&lt;P extends org.xwiki.rendering.macro.container.ContainerMacroParameters&gt;</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method java.lang.String com.xpn.xwiki.XWiki::getSpacePreference(java.lang.String, java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method java.lang.String com.xpn.xwiki.api.XWiki::getSpacePreferenceFor(java.lang.String, java.lang.String)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method java.lang.String com.xpn.xwiki.api.XWiki::getSpacePreferenceFor(java.lang.String, java.lang.String, java.lang.String)</old>
                 </item>
               </differences>
             </revapi.differences>
@@ -186,6 +221,7 @@
     <module>xwiki-platform-jodatime</module>
     <module>xwiki-platform-lesscss</module>
     <module>xwiki-platform-like</module>
+    <module>xwiki-platform-link</module>
     <module>xwiki-platform-linkchecker</module>
     <module>xwiki-platform-livedata</module>
     <module>xwiki-platform-livetable</module>

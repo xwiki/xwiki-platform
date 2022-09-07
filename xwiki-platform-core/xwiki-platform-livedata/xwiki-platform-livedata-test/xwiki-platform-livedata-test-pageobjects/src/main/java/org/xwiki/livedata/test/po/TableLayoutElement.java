@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.http.NameValuePair;
@@ -449,7 +450,8 @@ public class TableLayoutElement extends BaseElement
         if (classes.contains("filter-list")) {
             if (element.getAttribute(CLASS_HTML_ATTRIBUTE).contains("selectized")) {
                 SuggestInputElement suggestInputElement = new SuggestInputElement(element);
-                suggestInputElement.sendKeys(content).selectTypedText();
+                suggestInputElement.clearSelectedSuggestions();
+                suggestInputElement.sendKeys(content).waitForSuggestions().selectByVisibleText(content);
             } else {
                 new Select(element).selectByVisibleText(content);
             }
@@ -528,6 +530,23 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
+     * Get the 1-based row index of an element, relative to the number of currently displayed rows.
+     *
+     * @param by the selector of the searched element
+     * @return the 1-based row index where the element was found, or 0 if it doesn't exist
+     * @since 14.8RC1
+     */
+    public int getRowIndexForElement(By by)
+    {
+        WebElement rowElement = getRoot().findElement(by);
+        if (rowElement.isDisplayed()) {
+            // Count the preceding rows.
+            return rowElement.findElements(By.xpath("./ancestor::tr[1]/preceding-sibling::tr")).size() + 1;
+        }
+        return 0;
+    }
+
+    /**
      * Get the filter for the given column.
      *
      * @param columnLabel the label of the column to get the filter element for, for instance {@code "Title"}
@@ -540,6 +559,17 @@ public class TableLayoutElement extends BaseElement
         return getRoot()
             .findElement(By.cssSelector(String.format(".column-filters > th:nth-child(%d) input", columnIndex)));
     }
+
+    /**
+     * @return the list of pagination size choices proposed by the pagination select field
+     * @since 14.7RC1
+     */
+    public Set<String> getPaginationSizes()
+    {
+        return new Select(getRoot().findElement(By.cssSelector(".pagination-page-size select"))).getOptions().stream()
+            .map(it -> it.getAttribute("value")).collect(Collectors.toSet());
+    }
+
 
     /**
      * Clicks on an action button identified by its name, on a given row.

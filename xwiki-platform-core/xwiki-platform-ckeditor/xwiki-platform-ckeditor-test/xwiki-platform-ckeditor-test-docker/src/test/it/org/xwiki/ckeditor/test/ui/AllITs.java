@@ -37,4 +37,10 @@ public class AllITs
     class NestedSaveIT extends SaveIT
     {
     }
+
+    @Nested
+    @DisplayName("Image Plugin")
+    class NestedImagePluginIT extends ImagePluginIT
+    {
+    }
 }

@@ -26,7 +26,10 @@ import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * Represent the relation between a document using a link to an entity, and the used entity.
+ * 
+ * @deprecated link storage and indexing moved to Solr (implemented in xwiki-platform-search-solr-api)
  */
+@Deprecated(since = "14.8RC1")
 public class XWikiLink
 {
     private long id;

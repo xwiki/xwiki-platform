@@ -308,7 +308,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     statement.execute(
                         String.format("CREATE USER %s IDENTIFIED BY %s QUOTA UNLIMITED ON USERS", escapedSchema,
                             escapedSchema));
-                    statement.execute(String.format("GRANT RESOURCE TO %s", escapedSchema));
                 } else if (DatabaseProduct.DERBY == databaseProduct || DatabaseProduct.DB2 == databaseProduct
                     || DatabaseProduct.H2 == databaseProduct) {
                     statement.execute("CREATE SCHEMA " + escapedSchema);
@@ -562,6 +561,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 if (comment != null && comment.length() > 1023) {
                     doc.setComment(StringUtils.abbreviate(comment, 1023));
                 }
+
+                // Before starting the transaction, make sure any document metadata which might rely on configuration is
+                // initialized
+                doc.initialize();
 
                 if (bTransaction) {
                     checkHibernate(context);
@@ -2162,6 +2165,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     // ---------------------------------------
 
     @Override
+    @Deprecated(since = "14.8RC1")
     public List<XWikiLink> loadLinks(long docId, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
         XWikiContext context = getExecutionXContext(inputxcontext, true);
@@ -2202,6 +2206,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
+    @Deprecated(since = "14.8RC1")
     public List<DocumentReference> loadBacklinks(DocumentReference documentReference, boolean bTransaction,
         XWikiContext inputxcontext) throws XWikiException
     {
@@ -2222,6 +2227,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
+    @Deprecated(since = "14.8RC1")
     public List<DocumentReference> loadBacklinks(AttachmentReference attachmentReference, boolean bTransaction,
         XWikiContext inputxcontext) throws XWikiException
     {
@@ -2308,6 +2314,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
+    @Deprecated(since = "14.8RC1")
     public void saveLinks(XWikiDocument doc, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
         XWikiContext context = getExecutionXContext(inputxcontext, true);
@@ -2424,6 +2431,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
+    @Deprecated(since = "14.8RC1")
     public void deleteLinks(long docId, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
         XWikiContext context = getExecutionXContext(inputxcontext, true);

@@ -73,7 +73,15 @@
   ##
   #set($tablelist = [])
   #foreach($colname in $collist)
-    #livetable_addColumnToQuery($colname)
+    ## If a classname is defined and the class field corresponding to the column name,
+    ## we check the type of the field and skip it if it's Password.
+    #if ($className != '' &amp;&amp; $class.get($colname))
+      #if ($class.get($colname).classType != 'Password')
+        #livetable_addColumnToQuery($colname)
+      #end
+    #else
+      #livetable_addColumnToQuery($colname)
+    #end
   #end
   ##
   ## Tag filtering

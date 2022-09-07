@@ -21,6 +21,7 @@ package org.xwiki.ckeditor.test.po;
 
 import java.util.concurrent.TimeUnit;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.XWikiWebDriver;
@@ -28,7 +29,7 @@ import org.xwiki.test.ui.po.BaseElement;
 
 /**
  * Models a CKEditor instance.
- * 
+ *
  * @version $Id$
  * @since 1.13
  */
@@ -90,5 +91,17 @@ public class CKEditor extends BaseElement
         // The in-line frame element is renewed while editing so we can't cache it.
         return new RichTextAreaElement((WebElement) getDriver().executeScript(
             "return CKEDITOR.instances[arguments[0]].ui.contentsElement.find('iframe').getItem(0).$;", this.name));
+    }
+
+    /**
+     * Click on the CKEditor image button.
+     *
+     * @return a page object for the image selection modal
+     * @since 14.7RC1
+     */
+    public ImageDialogSelectModal clickImageButton()
+    {
+        getDriver().findElement(By.className("cke_button__image_icon")).click();
+        return new ImageDialogSelectModal().waitUntilReady();
     }
 }

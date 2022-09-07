@@ -125,9 +125,10 @@ public class PDFExportOptionsModal extends BaseModal
 
         getDriver().findElement(this.exportButtonLocator).click();
 
-        // Use a bigger timeout (30s) because the PDF export might have to fetch the headless Chrome Docker image,
+        // Use a bigger timeout (60s) because the PDF export might have to fetch the headless Chrome Docker image,
         // create the container and start it (if it's the first PDF export).
-        new WebDriverWait(getDriver(), Duration.ofSeconds(30))
+        // Note that the timeout was previously 30s which was too little for the CI.
+        new WebDriverWait(getDriver(), Duration.ofSeconds(60))
             .until((ExpectedCondition<Boolean>) driver -> !currentURL.equals(driver.getCurrentUrl()));
 
         // The browser used for running the test might be on a different machine than the one running XWiki and the test

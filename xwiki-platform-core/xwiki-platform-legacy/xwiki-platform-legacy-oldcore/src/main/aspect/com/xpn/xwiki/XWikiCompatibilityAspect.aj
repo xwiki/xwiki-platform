@@ -58,6 +58,7 @@ import org.xwiki.xml.XMLUtils;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.model.EntityType;
 import org.xwiki.url.XWikiEntityURL;
@@ -191,6 +192,16 @@ public privileged aspect XWikiCompatibilityAspect
     public String XWiki.getWebCopyright(XWikiContext context)
     {
         return this.getSpaceCopyright(context);
+    }
+
+    /**
+     * @deprecated since 7.4M1, use {@link #getSpacePreference(String, SpaceReference, String, XWikiContext)} instead
+     */
+    @Deprecated
+    public String XWiki.getSpacePreference(String preference, String space, String defaultValue, XWikiContext context)
+    {
+        return getSpacePreference(preference, new SpaceReference(space, context.getWikiReference()), defaultValue,
+            context);
     }
 
     /**

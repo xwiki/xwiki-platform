@@ -45,7 +45,7 @@ import static org.mockito.Mockito.doReturn;
  */
 @OldcoreTest
 @ReferenceComponentList
-public class StaticListClassTest
+class StaticListClassTest
 {
     /**
      * Static list values that contain HTML special characters that need to be escaped in the HTML display.
@@ -57,7 +57,7 @@ public class StaticListClassTest
 
     /** Tests that {@link StaticListClass#getList} returns values sorted according to the property's sort option. */
     @Test
-    public void testGetListIsSorted()
+    void testGetListIsSorted()
     {
         StaticListClass listClass = new StaticListClass();
         listClass.setValues("a=A|c=D|d=C|b");
@@ -86,7 +86,7 @@ public class StaticListClassTest
      * </ul>
      */
     @Test
-    public void testValuesSyntax()
+    void testValuesSyntax()
     {
         StaticListClass listClass = new StaticListClass();
         listClass.setValues("a|b=B and B|c=<=C=>|d=d\\|D|e");
@@ -105,7 +105,7 @@ public class StaticListClassTest
      * @see "XWIKI-9680: Apostrophes in static list value are encoded on .display()"
      */
     @Test
-    public void testDisplayView()
+    void testDisplayView()
     {
         ListProperty listProperty = new ListProperty();
         listProperty.setValue(VALUES_WITH_HTML_SPECIAL_CHARS);
@@ -119,7 +119,7 @@ public class StaticListClassTest
         staticListClass.setValues(VALUES_WITH_HTML_SPECIAL_CHARS.get(0) + '|' + VALUES_WITH_HTML_SPECIAL_CHARS.get(1)
             + '=' + StringUtils.reverse(VALUES_WITH_HTML_SPECIAL_CHARS.get(1)) + '|'
             + VALUES_WITH_HTML_SPECIAL_CHARS.get(2));
-        assertEquals("a&#60;b>c * 3'2\"1 * x{y&#38;z", staticListClass.displayView(propertyName, "", object, null));
+        assertEquals("a&#60;b>c * 3'2\"1 * x&#123;y&#38;z", staticListClass.displayView(propertyName, "", object, null));
     }
 
     /**
@@ -159,7 +159,7 @@ public class StaticListClassTest
      * Tests the 'input' display type.
      */
     @Test
-    public void testDisplayEditInput()
+    void testDisplayEditInput()
     {
         testDisplayEdit("input", VALUES_WITH_HTML_SPECIAL_CHARS, "<input size='7' id='w&#62;vb&#38;a&#60;r' "
             + "value='a&#60;b&#62;c|1&#34;2&#39;3|x&#123;y&#38;z' name='w&#62;vb&#38;a&#60;r' type='text'/>");
@@ -169,7 +169,7 @@ public class StaticListClassTest
      * Tests the 'select' display type.
      */
     @Test
-    public void testDisplayEditSelect()
+    void testDisplayEditSelect()
     {
         String expectedHTML = "<select id='w&#62;vb&#38;a&#60;r' name='w&#62;vb&#38;a&#60;r' size='7'>"
             + "<option value='' label='---'>---</option>"
@@ -184,7 +184,7 @@ public class StaticListClassTest
      * Tests the 'radio' display type.
      */
     @Test
-    public void testDisplayEditRadio()
+    void testDisplayEditRadio()
     {
         StringBuilder expectedHTML = new StringBuilder();
         expectedHTML.append("<label class=\"xwiki-form-listclass\" for=\"xwiki-form-b&#38;a&#60;r-0-0\">");
@@ -204,7 +204,7 @@ public class StaticListClassTest
      * Tests the 'checkbox' display type.
      */
     @Test
-    public void testDisplayEditCheckbox()
+    void testDisplayEditCheckbox()
     {
         StringBuilder expectedHTML = new StringBuilder();
         expectedHTML.append("<label class=\"xwiki-form-listclass\" for=\"xwiki-form-b&#38;a&#60;r-0-0\">");
@@ -224,7 +224,7 @@ public class StaticListClassTest
      * Tests the hidden display type.
      */
     @Test
-    public void testDisplayHidden()
+    void testDisplayHidden()
     {
         ListProperty listProperty = new ListProperty();
         listProperty.setValue(VALUES_WITH_HTML_SPECIAL_CHARS);
@@ -244,7 +244,7 @@ public class StaticListClassTest
      * Tests the suggest code generated when "use suggest" is set.
      */
     @Test
-    public void testDisplayEditWithSuggest() throws Exception
+    void testDisplayEditWithSuggest() throws Exception
     {
         ListProperty listProperty = new ListProperty();
         listProperty.setValue(VALUES_WITH_HTML_SPECIAL_CHARS);
@@ -275,7 +275,6 @@ public class StaticListClassTest
         doReturn("/xwiki/bin/view/Main/WebHome").when(this.oldcore.getSpyXWiki()).getURL("Main.WebHome", "view",
             this.oldcore.getXWikiContext());
         String output = staticListClass.displayEdit(propertyName, prefix, object, this.oldcore.getXWikiContext());
-        System.err.println(output);
         assertTrue(
             output.contains("new ajaxSuggest(this, &#123;script:&#34;/xwiki/bin/view/Main/WebHome?xpage=suggest&#38;"
                 + "classname=ClassSpace.ClassName&#38;fieldname=b&#38;a&#60;r&#38;firCol=-&#38;"

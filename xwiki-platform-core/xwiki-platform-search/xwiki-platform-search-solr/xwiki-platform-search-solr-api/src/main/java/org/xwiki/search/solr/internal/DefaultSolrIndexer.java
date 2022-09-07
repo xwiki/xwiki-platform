@@ -44,6 +44,7 @@ import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.search.solr.internal.api.IndexingUserConfig;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
 import org.xwiki.search.solr.internal.api.SolrIndexer;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
@@ -54,6 +55,7 @@ import org.xwiki.search.solr.internal.metadata.LengthSolrInputDocument;
 import org.xwiki.search.solr.internal.metadata.SolrMetadataExtractor;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.util.AbstractXWikiRunnable;
 
 /**
@@ -275,6 +277,12 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
     @Inject
     private SolrReferenceResolver solrRefereceResolver;
 
+    /**
+     * Provide a context user for indexing.
+     */
+    @Inject
+    private IndexingUserConfig indexingUserConfig;
+
     @Inject
     private Execution execution;
 
@@ -402,7 +410,10 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
 
             // For the current contiguous operations queue, group the changes
             try {
-                this.ecim.initialize(new ExecutionContext());
+                ExecutionContext executionContext = new ExecutionContext();
+                this.ecim.initialize(executionContext);
+                XWikiContext xcontext = (XWikiContext) executionContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+                xcontext.setUserReference(indexingUserConfig.getIndexingUserReference());
 
                 if (IndexOperation.INDEX.equals(operation)) {
                     LengthSolrInputDocument solrDocument = getSolrDocument(batchEntry.reference);

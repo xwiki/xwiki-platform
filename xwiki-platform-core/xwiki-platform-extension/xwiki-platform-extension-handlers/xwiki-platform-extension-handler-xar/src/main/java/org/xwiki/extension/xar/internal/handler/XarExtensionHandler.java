@@ -219,7 +219,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                 currentJob = null;
             }
 
-            if (currentJob == null || extensionSession.isEmpty()) {
+            if (currentJob == null || !extensionSession.isPresent()) {
                 String wiki;
                 try {
                     wiki = XarHandlerUtils.getWikiFromNamespace(namespace);

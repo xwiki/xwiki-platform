@@ -274,10 +274,12 @@ public class FOPXSLFORenderer implements XSLFORenderer, Initializable
     }
 
     /**
-     * Use the instance base URL as the FOP base URI so that the relative URLs returned by XWiki when rendering a page
-     * in view mode (for browser consumption - it's a best practice to return relative URLs and let browsers convert
-     * them to full URLs) are properly converted by FOP to full URIs before
-     * {@link org.apache.xmlgraphics.io.ResourceResolver#getResource(URI)} is called.
+     * Use the instance base URL as the FOP base URI so that any relative URLs returned by XWiki when rendering a
+     * page in view mode (for browser consumption - it's a best practice to return relative URLs and let browsers
+     * convert them to full URLs) are properly converted by FOP to full URIs before
+     * {@link org.apache.xmlgraphics.io.ResourceResolver#getResource(URI)} is called. Note that we currently use
+     * {@link com.xpn.xwiki.web.ExternalServletURLFactory} in {@link com.xpn.xwiki.web.ExportAction} and thus all
+     * URLs arriving in FOP should already be absolute.
      */
     private URI getBaseURI() throws InitializationException
     {

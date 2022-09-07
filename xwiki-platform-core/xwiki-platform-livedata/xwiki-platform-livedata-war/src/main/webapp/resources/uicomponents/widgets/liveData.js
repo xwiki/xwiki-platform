@@ -25,7 +25,7 @@
     'xwiki-livedata': $liveDataPath,
     'xwiki-livedata-vue': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
       'xwiki-livedata-vue.umd.min'),
-    'vue': $services.webjars.url('vue', 'vue.min'),
+    'vue': $services.webjars.url('org.webjars.npm:vue', 'dist/vue.min'),
     'vue-i18n': $services.webjars.url('org.webjars.npm:vue-i18n', 'dist/vue-i18n.min'),
     'daterangepicker': $services.webjars.url('bootstrap-daterangepicker', 'js/bootstrap-daterangepicker.js')
   },

@@ -360,6 +360,20 @@ public class EventStoreTest
             new HashSet<>(
                 this.eventStore.getEventStatuses(List.of(EVENT1, EVENT2, EVENT3), List.of("entity1", "entity2"))));
 
+        assertEquals(
+            Set.of(eventstatus(EVENT1, "entity1", true), eventstatus(EVENT2, "entity1", false),
+                eventstatus(EVENT3, "entity1", true), eventstatus(EVENT4, "entity1", true),
+                eventstatus(EVENT5, "entity1", true), eventstatus(EVENT6, "entity1", true),
+                eventstatus(EVENT7, "entity1", true), eventstatus(EVENT8, "entity1", true),
+                eventstatus(EVENT9, "entity1", true), eventstatus(EVENT10, "entity1", true),
+                eventstatus(EVENT11, "entity1", true), eventstatus(EVENT12, "entity1", true)
+            ),
+            new HashSet<>(
+                this.eventStore.getEventStatuses(
+                    List.of(EVENT1, EVENT2, EVENT3, EVENT4, EVENT5,
+                        EVENT6, EVENT7, EVENT8, EVENT9, EVENT10, EVENT11, EVENT12),
+                    List.of("entity1"))));
+
         assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().withStatus("entity2"));
 
         this.eventStore.deleteEventStatus(status12).get();

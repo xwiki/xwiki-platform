@@ -418,6 +418,9 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         solrQuery.addFilterQuery(serializeInCondition(EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS, entityIds)
             + " OR " + serializeInCondition(EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS, entityIds));
 
+        // Without it the query will only return 10 first results.
+        solrQuery.setRows(events.size());
+
         QueryResponse response;
         try {
             response = this.client.query(solrQuery);

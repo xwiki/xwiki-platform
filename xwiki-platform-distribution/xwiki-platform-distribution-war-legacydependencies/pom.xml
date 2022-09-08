@@ -370,6 +370,18 @@
           <groupId>org.xwiki.platform</groupId>
           <artifactId>xwiki-platform-oldcore</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.rendering</groupId>
+          <artifactId>xwiki-rendering-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-refactoring-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-component-default</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
   </dependencies>

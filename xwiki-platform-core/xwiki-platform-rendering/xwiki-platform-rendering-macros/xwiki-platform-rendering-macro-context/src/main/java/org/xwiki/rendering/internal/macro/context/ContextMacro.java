@@ -168,13 +168,13 @@ public class ContextMacro extends AbstractExecutedContentMacro<ContextMacroParam
         // care of many other things
         BlockAsyncRendererConfiguration configuration = createBlockAsyncRendererConfiguration(null, xdom, context);
 
-        // Configure the Transformation Context XDOM depending on the mode asked.
-        configuration.setXDOM(getXDOM(referencedDocReference, parameters));
-
         Map<String, Object> backupObjects = new HashMap<>();
         try {
             // Switch the context document
             this.documentAccessBridge.pushDocumentInContext(backupObjects, referencedDocReference);
+
+            // Configure the Transformation Context XDOM depending on the mode asked.
+            configuration.setXDOM(getXDOM(referencedDocReference, parameters));
 
             // Execute the content
             Block result = this.executor.execute(configuration);

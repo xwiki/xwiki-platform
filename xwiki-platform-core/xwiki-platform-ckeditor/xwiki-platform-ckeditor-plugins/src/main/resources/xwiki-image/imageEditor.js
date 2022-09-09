@@ -94,10 +94,13 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
                     callback(imageStyles);
                     // Sets the default value once the values are loaded.
                     imageStylesField.data('selectize').addItem(defaultStyle.defaultStyle || '');
-                    resolve(values.imageStyles);
                   }, function(err) {
                     reject(err);
                   });
+                },
+                onLoad: function() {
+                  // Wait for the selectize field to be fully loaded before continuing.
+                  resolve();
                 }
               };
 

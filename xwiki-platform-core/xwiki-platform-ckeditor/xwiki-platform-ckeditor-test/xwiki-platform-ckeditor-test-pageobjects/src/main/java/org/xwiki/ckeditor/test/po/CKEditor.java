@@ -101,7 +101,41 @@ public class CKEditor extends BaseElement
      */
     public ImageDialogSelectModal clickImageButton()
     {
-        getDriver().findElement(By.className("cke_button__image_icon")).click();
+        internalClickImageButton();
         return new ImageDialogSelectModal().waitUntilReady();
+    }
+
+    /**
+     * Click on the CKEditor image button when an image widget is on focus (i.e., the image modal will be opened in edit
+     * mode).
+     *
+     * @return a page object for the image edit modal
+     * @since 14.8RC1
+     */
+    public ImageDialogEditModal clickImageButtonWhenImageExists()
+    {
+        internalClickImageButton();
+        return new ImageDialogEditModal().waitUntilReady();
+    }
+
+    /**
+     * Execute the runnable on the context of the CKEditor iframe.
+     *
+     * @param runnable the action to run on the context of the CKEditor iframe
+     * @since 14.8RC1
+     */
+    public void executeOnIframe(Runnable runnable)
+    {
+        try {
+            getDriver().switchTo().frame(getDriver().findElement(By.cssSelector("iframe.cke_wysiwyg_frame")));
+            runnable.run();
+        } finally {
+            getDriver().switchTo().parentFrame();
+        }
+    }
+
+    private void internalClickImageButton()
+    {
+        getDriver().findElement(By.className("cke_button__image_icon")).click();
     }
 }

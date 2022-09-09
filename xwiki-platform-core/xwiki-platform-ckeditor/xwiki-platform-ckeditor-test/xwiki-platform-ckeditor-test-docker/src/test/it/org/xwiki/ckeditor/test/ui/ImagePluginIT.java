@@ -20,10 +20,13 @@
 package org.xwiki.ckeditor.test.ui;
 
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.ImageDialogEditModal;
@@ -32,6 +35,7 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.model.jaxb.Object;
 import org.xwiki.rest.model.jaxb.Page;
+import org.xwiki.rest.model.jaxb.Property;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -56,7 +60,7 @@ class ImagePluginIT
         activateImageDialog(setup);
 
         // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
-        setup.createUserAndLogin("alice", "pa$$word", "editor", "Wysiwyg", "usertype", "Advanced");
+        createAndLoginStandardUser(setup);
     }
 
     @AfterEach
@@ -67,13 +71,12 @@ class ImagePluginIT
     }
 
     @Test
+    @Order(1)
     void insertImage(TestUtils setup, TestReference testReference) throws Exception
     {
         String attachmentName = "image.gif";
         AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
-        ViewPage newPage = setup.createPage(testReference, "", "");
-        setup.attachFile(testReference, attachmentName,
-            getClass().getResourceAsStream("/ImagePlugin/" + attachmentName), false);
+        ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
 
         // Move to the WYSIWYG edition page.
         WYSIWYGEditPage wysiwygEditPage = newPage.editWYSIWYG();
@@ -101,6 +104,70 @@ class ImagePluginIT
             + "[[Caption>>image:attach:image.gif]]", savedPage.editWiki().getContent());
     }
 
+    @Test
+    @Order(2)
+    void insertImageWithStyle(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Create the image style as an admin.
+        setup.loginAsSuperAdmin();
+        DocumentReference borderedStyleDocumentReference =
+            new DocumentReference(setup.getCurrentWiki(), List.of("Image", "Style", "Code",
+                "ImageStyles"), "bordered");
+        setup.rest().delete(borderedStyleDocumentReference);
+        setup.rest().savePage(borderedStyleDocumentReference);
+        Object styleObject =
+            setup.rest().object(borderedStyleDocumentReference, "Image.Style.Code.ImageStyleClass");
+        Property borderedProperty = new Property();
+        borderedProperty.setName("prettyName");
+        borderedProperty.setValue("Bordered");
+        Property typeProperty = new Property();
+        typeProperty.setName("type");
+        typeProperty.setValue("bordered");
+        styleObject.withProperties(borderedProperty, typeProperty);
+        setup.rest().add(styleObject);
+
+        // Then test the image styles on the image dialog as a standard user.
+        createAndLoginStandardUser(setup);
+        String attachmentName = "image.gif";
+        AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
+        ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
+
+        // Move to the WYSIWYG edition page.
+        WYSIWYGEditPage wysiwygEditPage = newPage.editWYSIWYG();
+        CKEditor editor = new CKEditor("content").waitToLoad();
+
+        // Insert a first image.
+        ImageDialogSelectModal imageDialogSelectModal = editor.clickImageButton();
+        imageDialogSelectModal.selectAttachment(attachmentReference);
+        ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
+        // Assert the available image styles as well as the one currently selected.
+        assertEquals(Set.of("", "bordered"), imageDialogEditModal.getListImageStyles());
+        assertEquals("", imageDialogEditModal.getCurrentImageStyle());
+        imageDialogEditModal.setImageStyle("Bordered");
+        imageDialogEditModal.clickInsert();
+
+        ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
+
+        // Verify that the content matches what we did using CKEditor.
+        assertEquals("[[image:attach:image.gif||data-xwiki-image-style=\"bordered\"]]",
+            savedPage.editWiki().getContent());
+
+        // Re-edit the page.
+        savedPage.editWYSIWYG();
+        editor = new CKEditor("content").waitToLoad();
+
+        // Focus on the image to edit.
+        editor.executeOnIframe(() -> setup.getDriver().findElement(By.id("Iimage.gif")).click());
+
+        imageDialogEditModal = editor.clickImageButtonWhenImageExists();
+        assertEquals(Set.of("", "bordered"), imageDialogEditModal.getListImageStyles());
+        assertEquals("bordered", imageDialogEditModal.getCurrentImageStyle());
+
+        // Re-insert and save the page to avoid triggering a javascript alert for unsaved page.
+        imageDialogEditModal.clickInsert();
+        wysiwygEditPage.clickSaveAndView();
+    }
+
     private static void activateImageDialog(TestUtils setup) throws Exception
     {
         setup.loginAsSuperAdmin();
@@ -125,5 +192,19 @@ class ImagePluginIT
     private static DocumentReference getConfigPageDocumentReference(TestUtils setup)
     {
         return new DocumentReference(setup.getCurrentWiki(), "CKEditor", "Config");
+    }
+
+    private static void createAndLoginStandardUser(TestUtils setup)
+    {
+        setup.createUserAndLogin("alice", "pa$$word", "editor", "Wysiwyg", "usertype", "Advanced");
+    }
+
+    private ViewPage uploadAttachment(TestUtils setup, TestReference testReference, String attachmentName)
+        throws Exception
+    {
+        ViewPage newPage = setup.createPage(testReference, "", "");
+        setup.attachFile(testReference, attachmentName,
+            getClass().getResourceAsStream("/ImagePlugin/" + attachmentName), false);
+        return newPage;
     }
 }

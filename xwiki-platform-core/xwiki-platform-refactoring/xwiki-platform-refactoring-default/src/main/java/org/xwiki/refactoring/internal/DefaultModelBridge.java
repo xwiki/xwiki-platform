@@ -37,7 +37,6 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.job.event.status.JobProgressManager;
-import org.xwiki.link.LinkException;
 import org.xwiki.link.LinkStore;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -148,7 +147,7 @@ public class DefaultModelBridge implements ModelBridge
     private EntityReferenceProvider entityReferenceProvider;
 
     @Inject
-    private LinkStore linkStore;
+    private Provider<LinkStore> linkStoreProvider;
 
     @Override
     public boolean create(DocumentReference documentReference)
@@ -293,8 +292,8 @@ public class DefaultModelBridge implements ModelBridge
     {
         Set<EntityReference> references;
         try {
-            references = this.linkStore.resolveBackLinkedEntities(reference);
-        } catch (LinkException e) {
+            references = this.linkStoreProvider.get().resolveBackLinkedEntities(reference);
+        } catch (Exception e) {
             throw new RefactoringException("Failed to resolve backlinks for entity [" + reference + "]", e);
         }
 

@@ -72,23 +72,6 @@ class LightboxIT
 
     @Test
     @Order(1)
-    void disabledLightbox(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
-    {
-        enableLightbox(testUtils, false);
-
-        testUtils.createPage(testReference, getSimpleImage(IMAGES.get(0)), "Disabled Lightbox");
-        LightboxPage lightboxPage = new LightboxPage();
-        lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), IMAGES.get(0));
-
-        // Make sure that the images are displayed.
-        lightboxPage.reloadPage();
-
-        Optional<ImagePopover> imagePopover = lightboxPage.hoverImage(0);
-        assertFalse(imagePopover.isPresent());
-    }
-
-    @Test
-    @Order(2)
     void openImageWithoutDescription(TestUtils testUtils, TestReference testReference,
         TestConfiguration testConfiguration)
     {
@@ -129,7 +112,7 @@ class LightboxIT
     }
 
     @Test
-    @Order(3)
+    @Order(2)
     void openImageWithCaptionAndManuallyAddedId(TestUtils testUtils, TestReference testReference,
         TestConfiguration testConfiguration)
     {
@@ -170,7 +153,7 @@ class LightboxIT
     }
 
     @Test
-    @Order(4)
+    @Order(3)
     void openImageWithAlt(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
     {
         enableLightbox(testUtils, true);
@@ -196,7 +179,7 @@ class LightboxIT
     }
 
     @Test
-    @Order(5)
+    @Order(4)
     void openIconImage(TestUtils testUtils, TestReference testReference)
     {
         enableLightbox(testUtils, true);
@@ -216,7 +199,7 @@ class LightboxIT
     }
 
     @Test
-    @Order(6)
+    @Order(5)
     void clickLightboxEscape(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
     {
         enableLightbox(testUtils, true);
@@ -237,7 +220,7 @@ class LightboxIT
     }
 
     @Test
-    @Order(7)
+    @Order(6)
     void navigateThroughImages(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
     {
         enableLightbox(testUtils, true);
@@ -268,7 +251,7 @@ class LightboxIT
     }
 
     @Test
-    @Order(8)
+    @Order(7)
     void playSlideshow(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
     {
         enableLightbox(testUtils, true);
@@ -298,7 +281,7 @@ class LightboxIT
     }
 
     @Test
-    @Order(9)
+    @Order(8)
     void openMissingImage(TestUtils testUtils, TestReference testReference)
     {
         enableLightbox(testUtils, true);
@@ -321,7 +304,7 @@ class LightboxIT
     }
 
     @Test
-    @Order(10)
+    @Order(9)
     void openFullscreen(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
     {
         enableLightbox(testUtils, true);
@@ -343,7 +326,7 @@ class LightboxIT
     }
 
     @Test
-    @Order(11)
+    @Order(10)
     void verifyDownload(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
     {
         enableLightbox(testUtils, true);
@@ -377,7 +360,7 @@ class LightboxIT
     }
 
     @Test
-    @Order(12)
+    @Order(11)
     void verifyPartiallyDisabledLightbox(TestUtils testUtils, TestReference testReference)
     {
         enableLightbox(testUtils, true);
@@ -393,7 +376,7 @@ class LightboxIT
     }
 
     @Test
-    @Order(13)
+    @Order(12)
     void openImageWithoutId(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
     {
         enableLightbox(testUtils, true);
@@ -422,7 +405,7 @@ class LightboxIT
      * Check that the date displayed inside the lightbox takes into account user's timezone.
      */
     @Test
-    @Order(14)
+    @Order(13)
     void setNewTimezone(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
         throws Exception
     {

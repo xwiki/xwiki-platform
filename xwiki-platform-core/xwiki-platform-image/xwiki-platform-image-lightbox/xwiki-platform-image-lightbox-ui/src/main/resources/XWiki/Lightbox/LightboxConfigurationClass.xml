@@ -48,7 +48,7 @@
     <validationScript/>
     <isLightboxEnabled>
       <customDisplay/>
-      <defaultValue>0</defaultValue>
+      <defaultValue>1</defaultValue>
       <disabled>0</disabled>
       <displayFormType>select</displayFormType>
       <displayType/>

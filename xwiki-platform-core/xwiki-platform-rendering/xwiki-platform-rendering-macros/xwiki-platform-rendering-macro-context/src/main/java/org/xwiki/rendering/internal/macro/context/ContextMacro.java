@@ -169,6 +169,8 @@ public class ContextMacro extends AbstractExecutedContentMacro<ContextMacroParam
         // Reuse the very generic async rendering framework (even if we don't do async and caching) since it's taking
         // care of many other things
         BlockAsyncRendererConfiguration configuration = createBlockAsyncRendererConfiguration(null, xdom, context);
+        configuration.setAsyncAllowed(false);
+        configuration.setCacheAllowed(false);
 
         Map<String, Object> backupObjects = new HashMap<>();
         try {

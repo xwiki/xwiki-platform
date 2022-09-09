@@ -22,7 +22,6 @@ package org.xwiki.rendering.internal.macro.context;
 import java.util.Arrays;
 import java.util.Collections;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -51,8 +50,10 @@ import org.xwiki.security.authorization.Right;
 import org.xwiki.test.TestEnvironment;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -80,9 +81,6 @@ class ContextMacroTest
 
     private static final DocumentReference SOURCE_REFERENCE = new DocumentReference("wiki", "space", "source");
 
-    @Inject
-    protected BlockAsyncRendererExecutor executor;
-
     @MockComponent
     private DocumentAccessBridge dab;
 
@@ -100,10 +98,15 @@ class ContextMacroTest
     private DocumentReferenceResolver<String> macroReferenceResolver;
 
     @MockComponent
-    protected DocumentReferenceResolver<String> resolver;
+    private DocumentReferenceResolver<String> resolver;
 
     @InjectMockComponents
     private ContextMacro macro;
+
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
+    private BlockAsyncRendererExecutor executor;
 
     @BeforeEach
     public void beforeEach() throws Exception
@@ -117,6 +120,8 @@ class ContextMacroTest
 
         when(this.macroReferenceResolver.resolve(eq("target"), any())).thenReturn(TARGET_REFERENCE);
         when(this.resolver.resolve("source")).thenReturn(SOURCE_REFERENCE);
+
+        this.executor = this.componentManager.getInstance(BlockAsyncRendererExecutor.class);
     }
 
     @Test

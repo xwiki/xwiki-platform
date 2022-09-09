@@ -106,11 +106,12 @@ public class DefaultBlockAsyncRenderer extends AbstractBlockAsyncRenderer
                 this.asyncContext.useComponent(role.getRoleType(), role.getRoleHint());
             }
 
+            // Get the block to transform
             Block block = this.configuration.getBlock();
-            XDOM xdom;
-            if (block instanceof XDOM) {
-                xdom = (XDOM) block;
-            } else {
+
+            // Get the XDOM instance for the transformation context
+            XDOM xdom = this.configuration.getXDOM();
+            if (xdom == null) {
                 Block rootBlock = block.getRoot();
 
                 if (rootBlock instanceof XDOM) {

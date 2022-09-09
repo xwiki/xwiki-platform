@@ -28,8 +28,8 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.QueryManager;
+import org.xwiki.refactoring.internal.LinkRefactoring;
 import org.xwiki.refactoring.internal.ModelBridge;
-import org.xwiki.refactoring.internal.ReferenceUpdater;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
@@ -41,6 +41,7 @@ import org.xwiki.test.TestEnvironment;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -70,9 +71,10 @@ public class IntegrationTests implements RenderingTests
         componentManager.registerMockComponent(TemplateManager.class);
         componentManager.registerMockComponent(ModelBridge.class);
         componentManager.registerMockComponent(QueryManager.class);
-        componentManager.registerMockComponent(ReferenceUpdater.class);
+        componentManager.registerMockComponent(LinkRefactoring.class);
         componentManager.registerMockComponent(AuthorizationManager.class);
         componentManager.registerMockComponent(ContextualAuthorizationManager.class);
+        componentManager.registerMockComponent(WikiDescriptorManager.class);
 
         // Macro Reference Resolver
         DocumentReferenceResolver<String> macroResolver = componentManager.registerMockComponent(

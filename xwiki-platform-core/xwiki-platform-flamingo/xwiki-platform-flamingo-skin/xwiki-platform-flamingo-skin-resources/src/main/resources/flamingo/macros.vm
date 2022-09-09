@@ -193,7 +193,7 @@
   </div>
   #end
   <table id="${htmlLiveTableId}" class="xwiki-livetable"
-      data-settings="$escapetool.xml($jsontool.serialize($macro.settings))">
+      data-settings="$escapetool.xml($jsontool.serialize($macro.settings))" data-xwiki-lightbox="false">
     #if("$!options.description" != '')
       <caption class="sr-only">$options.description</caption>
     #end

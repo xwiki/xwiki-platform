@@ -36,6 +36,7 @@
     <xwiki.extension.features>
       org.xwiki.platform:xwiki-platform-extension-handler-xar
     </xwiki.extension.features>
+    <xwiki.jacoco.instructionRatio>0.66</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <!-- Trigger xwiki-platform-extension-handler-xar dependencies (but without xwiki-platform-extension-handler-xar jar itself) -->

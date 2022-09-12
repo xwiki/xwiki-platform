@@ -59,7 +59,9 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class DefaultMentionsDataConsumerTest
 {
-    private static final String AUTHOR_REFERENCE = "xwiki:XWiki.Author";
+    private static final String EFFECTIVE_METADATA_AUTHOR_REFERENCE = "xwiki:XWiki.EffectiveAuthor";
+
+    private static final String ORIGINAL_METADATA_AUTHOR_REFERENCE = "xwiki:XWiki.OriginalAuthor";
 
     private static final DocumentReference DOCUMENT_REFERENCE = new DocumentReference("xwiki", "XWiki", "Doc");
 
@@ -84,14 +86,23 @@ class DefaultMentionsDataConsumerTest
     @Mock
     private XWikiDocument doc;
 
+    @Mock
+    private UserReference effectiveMetadataAuthorReference;
+
+    @Mock
+    private UserReference originalMetadataAuthorReference;
+
     @BeforeEach
     void setUp()
     {
         DocumentAuthors documentAuthors = mock(DocumentAuthors.class);
         when(this.doc.getAuthors()).thenReturn(documentAuthors);
-        UserReference userReference = mock(UserReference.class);
-        when(documentAuthors.getEffectiveMetadataAuthor()).thenReturn(userReference);
-        when(this.userReferenceSerializer.serialize(userReference)).thenReturn(AUTHOR_REFERENCE);
+        when(documentAuthors.getEffectiveMetadataAuthor()).thenReturn(effectiveMetadataAuthorReference);
+        when(documentAuthors.getOriginalMetadataAuthor()).thenReturn(originalMetadataAuthorReference);
+        when(this.userReferenceSerializer.serialize(effectiveMetadataAuthorReference))
+            .thenReturn(EFFECTIVE_METADATA_AUTHOR_REFERENCE);
+        when(this.userReferenceSerializer.serialize(originalMetadataAuthorReference))
+            .thenReturn(ORIGINAL_METADATA_AUTHOR_REFERENCE);
         when(this.doc.getVersion()).thenReturn("1.1");
     }
 
@@ -111,13 +122,15 @@ class DefaultMentionsDataConsumerTest
         when(this.documentRevisionProvider.getRevision(DOCUMENT_REFERENCE, "1.1")).thenReturn(this.doc);
         when(this.doc.getPreviousVersion()).thenReturn(null);
         when(this.doc.getDocumentReferenceWithLocale()).thenReturn(DOCUMENT_REFERENCE);
-        when(this.createdDocumentMentionsAnalyzer.analyze(this.doc, DOCUMENT_REFERENCE, "1.1", AUTHOR_REFERENCE))
+        when(this.createdDocumentMentionsAnalyzer.analyze(this.doc, DOCUMENT_REFERENCE, "1.1",
+            ORIGINAL_METADATA_AUTHOR_REFERENCE))
             .thenReturn(emptyList());
 
         this.dataConsumer.consume(DOCUMENT_REFERENCE, "1.1");
 
         verifyNoInteractions(this.updatedDocumentMentionsAnalyzer);
-        verify(this.createdDocumentMentionsAnalyzer).analyze(this.doc, DOCUMENT_REFERENCE, "1.1", AUTHOR_REFERENCE);
+        verify(this.createdDocumentMentionsAnalyzer).analyze(this.doc, DOCUMENT_REFERENCE, "1.1",
+            ORIGINAL_METADATA_AUTHOR_REFERENCE);
         verifyNoInteractions(this.observationManager);
     }
 
@@ -128,21 +141,22 @@ class DefaultMentionsDataConsumerTest
         when(this.doc.getPreviousVersion()).thenReturn(null);
         when(this.doc.getDocumentReferenceWithLocale()).thenReturn(DOCUMENT_REFERENCE);
         MentionNotificationParameters mentionNotificationParameters =
-            new MentionNotificationParameters(AUTHOR_REFERENCE, DOCUMENT_REFERENCE, MentionLocation.DOCUMENT,
-                "1.1")
+            new MentionNotificationParameters(ORIGINAL_METADATA_AUTHOR_REFERENCE, DOCUMENT_REFERENCE,
+                MentionLocation.DOCUMENT, "1.1")
                 .addNewMention("user",
                     new MentionNotificationParameter("xwiki:XWiki.U1", "anchor1", DisplayStyle.FIRST_NAME));
-        when(this.createdDocumentMentionsAnalyzer.analyze(this.doc, DOCUMENT_REFERENCE, "1.1", AUTHOR_REFERENCE))
-            .thenReturn(singletonList(
-                mentionNotificationParameters));
+        when(this.createdDocumentMentionsAnalyzer.analyze(this.doc, DOCUMENT_REFERENCE, "1.1",
+            ORIGINAL_METADATA_AUTHOR_REFERENCE))
+            .thenReturn(singletonList(mentionNotificationParameters));
 
         this.dataConsumer.consume(DOCUMENT_REFERENCE, "1.1");
 
         verifyNoInteractions(this.updatedDocumentMentionsAnalyzer);
         verify(this.createdDocumentMentionsAnalyzer)
-            .analyze(this.doc, DOCUMENT_REFERENCE, "1.1", AUTHOR_REFERENCE);
+            .analyze(this.doc, DOCUMENT_REFERENCE, "1.1", ORIGINAL_METADATA_AUTHOR_REFERENCE);
         verify(this.observationManager)
-            .notify(isA(NewMentionsEvent.class), eq(AUTHOR_REFERENCE), eq(mentionNotificationParameters));
+            .notify(isA(NewMentionsEvent.class), eq(ORIGINAL_METADATA_AUTHOR_REFERENCE),
+                eq(mentionNotificationParameters));
     }
 
     @Test
@@ -155,14 +169,15 @@ class DefaultMentionsDataConsumerTest
         when(this.doc.getPreviousVersion()).thenReturn("1.0");
         when(this.doc.getDocumentReferenceWithLocale()).thenReturn(DOCUMENT_REFERENCE);
         when(
-            this.updatedDocumentMentionsAnalyzer.analyze(oldDoc, this.doc, DOCUMENT_REFERENCE, "1.1", AUTHOR_REFERENCE))
+            this.updatedDocumentMentionsAnalyzer.analyze(oldDoc, this.doc, DOCUMENT_REFERENCE, "1.1",
+                ORIGINAL_METADATA_AUTHOR_REFERENCE))
             .thenReturn(emptyList());
 
         this.dataConsumer.consume(DOCUMENT_REFERENCE, "1.1");
 
         verifyNoInteractions(this.createdDocumentMentionsAnalyzer);
         verify(this.updatedDocumentMentionsAnalyzer).analyze(oldDoc, this.doc, DOCUMENT_REFERENCE, "1.1",
-            AUTHOR_REFERENCE);
+            ORIGINAL_METADATA_AUTHOR_REFERENCE);
         verifyNoInteractions(this.observationManager);
     }
 
@@ -175,20 +190,22 @@ class DefaultMentionsDataConsumerTest
         when(this.doc.getPreviousVersion()).thenReturn("1.0");
         when(this.doc.getDocumentReferenceWithLocale()).thenReturn(DOCUMENT_REFERENCE);
         MentionNotificationParameters mentionNotificationParameters =
-            new MentionNotificationParameters(AUTHOR_REFERENCE, DOCUMENT_REFERENCE, MentionLocation.DOCUMENT,
-                "1.1")
+            new MentionNotificationParameters(ORIGINAL_METADATA_AUTHOR_REFERENCE, DOCUMENT_REFERENCE,
+                MentionLocation.DOCUMENT, "1.1")
                 .addNewMention("user",
                     new MentionNotificationParameter("xwiki:XWiki.U1", "anchor1", DisplayStyle.FIRST_NAME));
         when(
-            this.updatedDocumentMentionsAnalyzer.analyze(oldDoc, this.doc, DOCUMENT_REFERENCE, "1.1", AUTHOR_REFERENCE))
+            this.updatedDocumentMentionsAnalyzer.analyze(oldDoc, this.doc, DOCUMENT_REFERENCE, "1.1",
+                ORIGINAL_METADATA_AUTHOR_REFERENCE))
             .thenReturn(singletonList(mentionNotificationParameters));
 
         this.dataConsumer.consume(DOCUMENT_REFERENCE, "1.1");
 
         verifyNoInteractions(this.createdDocumentMentionsAnalyzer);
         verify(this.updatedDocumentMentionsAnalyzer)
-            .analyze(oldDoc, this.doc, DOCUMENT_REFERENCE, "1.1", AUTHOR_REFERENCE);
+            .analyze(oldDoc, this.doc, DOCUMENT_REFERENCE, "1.1", ORIGINAL_METADATA_AUTHOR_REFERENCE);
         verify(this.observationManager)
-            .notify(isA(NewMentionsEvent.class), eq(AUTHOR_REFERENCE), eq(mentionNotificationParameters));
+            .notify(isA(NewMentionsEvent.class), eq(ORIGINAL_METADATA_AUTHOR_REFERENCE),
+                eq(mentionNotificationParameters));
     }
 }

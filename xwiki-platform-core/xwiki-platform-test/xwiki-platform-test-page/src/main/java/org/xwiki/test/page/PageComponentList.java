@@ -73,6 +73,7 @@ import org.xwiki.rendering.internal.transformation.XWikiRenderingContext;
 import org.xwiki.rendering.internal.transformation.macro.CurrentMacroDocumentReferenceResolver;
 import org.xwiki.rendering.internal.transformation.macro.CurrentMacroEntityReferenceResolver;
 import org.xwiki.rendering.internal.transformation.macro.MacroTransformation;
+import org.xwiki.rendering.internal.transformation.macro.RawBlockFilterUtils;
 import org.xwiki.rendering.internal.util.DefaultErrorBlockGenerator;
 import org.xwiki.resource.internal.DefaultResourceReferenceManager;
 import org.xwiki.script.internal.DefaultScriptContextManager;
@@ -256,6 +257,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     // HTML Macro
     HTMLMacro.class,
     HTMLMacroXHTMLRendererFactory.class,
+    RawBlockFilterUtils.class,
 
     // Include Macro
     IncludeMacro.class,

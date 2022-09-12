@@ -163,6 +163,12 @@
       <artifactId>xwiki-platform-refactoring-default</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Refactoring operation but also anything that manipulate document backlink need Solr -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-solr-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- ********************************************************************** -->
     <!-- Core extension (what we absolutely require in a minimum XWiki runtime) -->

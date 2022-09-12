@@ -19,15 +19,21 @@
  */
 package org.xwiki.rendering.internal.transformation.macro;
 
+import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.when;
+import static org.xwiki.rendering.macro.AbstractMacro.DEFAULT_CATEGORY_DEPRECATED;
+import static org.xwiki.rendering.macro.AbstractMacro.DEFAULT_CATEGORY_INTERNAL;
 
 /**
  * Unit tests for {@link XWikiMacroTransformationConfiguration}.
@@ -35,21 +41,33 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  * @since 2.6RC1
  */
-public class XWikiMacroTransformationConfigurationTest
+@ComponentTest
+class XWikiMacroTransformationConfigurationTest
 {
-    @Rule
-    public MockitoComponentMockingRule<XWikiMacroTransformationConfiguration> mocker =
-        new MockitoComponentMockingRule<>(XWikiMacroTransformationConfiguration.class);
+    @InjectMockComponents
+    private XWikiMacroTransformationConfiguration configuration;
+
+    @MockComponent
+    private ConfigurationSource source;
 
     @Test
-    public void getCategories() throws Exception
+    void getCategories()
     {
-        ConfigurationSource source = this.mocker.getInstance(ConfigurationSource.class);
-        when(source.getProperty("rendering.transformation.macro.categories", Properties.class)).thenReturn(
-            new Properties());
+        when(this.source.getProperty("rendering.transformation.macro.categories", Properties.class))
+            .thenReturn(new Properties());
 
-        Properties categories = this.mocker.getComponentUnderTest().getCategories();
+        Properties categories = this.configuration.getCategories();
         assertNotNull(categories);
         assertEquals(0, categories.size());
+    }
+
+    @Test
+    void getHiddenCategories()
+    {
+        when(this.source.getProperty("rendering.transformation.macro." + "hiddenCategories", List.class,
+            List.of(DEFAULT_CATEGORY_INTERNAL, DEFAULT_CATEGORY_DEPRECATED)))
+            .thenReturn(List.of("C1", "C2", "C1", "C3"));
+        Set<String> hiddenCategories = this.configuration.getHiddenCategories();
+        assertEquals(Set.of("C1", "C2", "C3"), hiddenCategories);
     }
 }

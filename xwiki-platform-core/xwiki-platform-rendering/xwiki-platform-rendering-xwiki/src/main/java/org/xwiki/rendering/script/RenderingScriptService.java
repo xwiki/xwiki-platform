@@ -321,6 +321,16 @@ public class RenderingScriptService implements ScriptService
         return this.macroCategoryManager.getMacroCategories(macroId);
     }
 
+    /**
+     * @return the set of hidden macro categories
+     * @since 14.8RC1
+     */
+    @Unstable
+    public Set<String> getHiddenMacroCategories()
+    {
+        return this.macroCategoryManager.getHiddenCategories();
+    }
+
     private char getEscapeCharacter(Syntax syntax) throws IllegalArgumentException
     {
         if (Syntax.XWIKI_1_0.equals(syntax)) {

@@ -1854,9 +1854,10 @@ document.observe("xwiki:dom:loaded", function() {
       }
       var url = resource.getAttribute('href') || resource.getAttribute('src');
       if(loadedResources.indexOf(url) < 0) {
-        if (resource.getAttribute('src')) {
+        if (resource.getAttribute('src') && !resource.getAttribute('async')) {
           // Scripts that are dynamically created and added to the document are async by default, which means there are
           // no guarantees they will execute in the same order they were added.
+          // See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script#compatibility_notes
           resource.async = false;
         }
         document.head.appendChild(resource);

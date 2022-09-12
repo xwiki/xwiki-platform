@@ -583,10 +583,7 @@ define('xwiki-livedata', [
       return this.fetchEntries()
         .then(data => {
           this.data.data = Object.freeze(data);
-          let self = this;
-          Vue.nextTick(function () {
-            self.triggerEvent('entriesUpdated', {});
-          });
+          Vue.nextTick(() => this.triggerEvent('entriesUpdated', {}));
           // Remove the outdated footnotes, they will be recomputed by the new entries.
           this.footnotes.reset()
         })

@@ -37,18 +37,21 @@ define('xwiki-form-validation-async', ['jquery'], function($) {
     });
   };
 
-  // Postpone the form submit while there are pending validations.
-  $(document).on('submit', event => {
-    // If the user was able to submit a form then:
-    // * either the form is valid
-    // * or there is at least one asynchronous validation in progress
+  // Postpone the form submit while there are pending or rejected validations. We use event capturing because we want to
+  // execute our code before other form submit listeners (that are usually registered on the bubbling phase). We use
+  // plain JavaScript to register our listener because jQuery doesn't support the capturing phase.
+  document.addEventListener('submit', event => {
+    // Check if there are pending or rejected validations for the target form.
     const form = $(event.target);
-    const submitter = event.originalEvent?.submitter;
+    const submitter = event.submitter;
     const asyncValidations = Object.values(form.data('asyncValidations'));
     if (hasValidationsWithState(Object.values(asyncValidations), ['pending', 'rejected'])) {
-      // Postpone the submit until the form validation is performed.
+      // Postpone the submit until the pending validations are resolved.
       event.preventDefault();
-      // Disable the form in order to prevent the user from triggering new validations.
+      // Stop the event propagation (we're in the capturing phase) because the form is not ready yet to be submitted.
+      event.stopPropagation();
+      // Disable the form in order to prevent the user from re-submitting it while waiting for pending validations to be
+      // resolved.
       enableForm(form, false);
       Promise.all(asyncValidations).finally(() => {
         // Re-enable the form so that:
@@ -56,7 +59,7 @@ define('xwiki-form-validation-async', ['jquery'], function($) {
         // * the form data can be submitted, if there are no validation errors
         enableForm(form, true);
       }).then(() => {
-        // The form is valid. Resume the submit.
+        // All asynchronous validations have been resolved. Resume the submit.
         if (submitter) {
           // Use the button that initially triggered the submit in order to include its value in the sent data.
           $(submitter).click();
@@ -68,7 +71,7 @@ define('xwiki-form-validation-async', ['jquery'], function($) {
         // Form validation failed. Abort the submit.
       });
     }
-  });
+  }, true);
 
   // Schedule a validation with the specified delay.
   const delayedValidation = function(nextValidation, delay, form) {
@@ -135,22 +138,41 @@ define('xwiki-form-validation-async', ['jquery'], function($) {
 
     // Re-enable the submit button while the next validation is in progress, if there are no other failed validations.
     enableSubmit(form, !hasValidationsWithState(Object.values(asyncValidations), ['rejected']));
+
+    return nextValidation;
   };
 
   /**
-   * Validate an HTML form asynchronously.
+   * Schedules an asynchronous validation for a form field or marks the fact that a form field is currently being
+   * validated asynchronously. Can be used like this:
+   *
+   * <ul>
+   *   <li>$('#myFormField').validateAsync(() => Promise.resolve(), 500, 'myApp')</li>
+   *   <li>$('#myFormField').validateAsync(() => Promise.resolve(), 500)</li>
+   *   <li>$('#myFormField').validateAsync(Promise.resolve(), 'myApp')</li>
+   *   <li>$('#myFormField').validateAsync(Promise.resolve())</li>
+   * </ul>
    *
    * @param validation either a promise that is fulfilled when the validation is successful and rejected when the
    *   validation fails, or a function that returns such a promise (in case the validation needs to be delayed)
-   * @param validationKey usually a form field name or id, useful if you want to abort and overwrite a previous
-   *   validation (e.g. when a form field value changes)
    * @param delay the amount of milliseconds to delay the validation, used only when the validation is specified as a
    *   function that returns a promise
-   * @return the current jQuery collection
+   * @param namespace for each validation a key is computed based on the form field id and this namespace, in order to
+   *   be able to abort and overwrite a previous validation for the same form field
+   * @return the validation promise
    **/
-  $.fn.validateAsync = function(validation, validationKey, delay) {
-    return this.each(function() {
-      validateAsync({form: $(this), validation, validationKey, delay});
-    });
+  $.fn.validateAsync = function(validation, delay, namespace) {
+    let validationKey = this.attr('id') || this.attr('name');
+    if (!validationKey) {
+      throw 'The id and name attributes are both missing from the target form field.';
+    }
+    if (arguments.length === 2 && typeof delay === 'string') {
+      namespace = delay;
+      delay = undefined;
+    }
+    if (namespace) {
+      validationKey = `${namespace}.${validationKey}`;
+    }
+    return validateAsync({form: this.closest('form'), validation, validationKey, delay});
   };
 });

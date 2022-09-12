@@ -177,12 +177,16 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge', 'xwiki-form-validation-a
      * Event handler for the title input that updates both the location preview's last element and the name input.
      **/
     var scheduleUpdateOfLocationAndNameFromTitleInput = function(event) {
-      if (event.type === 'input') {
+      // Disable the page name input while its value is being updated based on the page title. This also disables the
+      // page name validation (client-side) until we receive the computed page name (a 'change' event is triggered
+      // afterwards in order to perform the synchronous client-side page name validation).
+      nameInput.prop('disabled', true);
+      if (event?.type === 'input') {
         // Delay the update.
-        form.validateAsync(updateLocationAndNameFromTitleInput, 'title', inputDelay);
+        titleInput.validateAsync(updateLocationAndNameFromTitleInput, inputDelay, 'locationPicker');
       } else {
         // Update right away.
-        form.validateAsync(updateLocationAndNameFromTitleInput(), 'title');
+        titleInput.validateAsync(updateLocationAndNameFromTitleInput(), 'locationPicker');
       }
     };
 
@@ -193,8 +197,8 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge', 'xwiki-form-validation-a
         // Ensure that the input didn't change while we were waiting the answer.
         // It also protects the value if a previous request was slow to arrive.
         if (titleInputVal === titleInput.val()) {
-          // we trigger a change so we can validate the name
-          nameInput.val(data.transformedName).trigger('change');
+          // Re-enable the page name input and trigger a change event to execute the client-side validations.
+          nameInput.prop('disabled', false).val(data.transformedName).trigger('change');
 
           // Update the location preview.
           updateLocationFromTitleInput();
@@ -202,8 +206,8 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge', 'xwiki-form-validation-a
       }).catch(() => {
         if (titleInputVal === titleInput.val()) {
           new XWiki.widgets.Notification(l10n['entitynamevalidation.nametransformation.error'], 'error');
-          // we trigger a change so we can validate the name
-          nameInput.val(titleInputVal).trigger('change');
+          // Re-enable the page name input and trigger a change event to execute the client-side validations.
+          nameInput.prop('disabled', false).val(titleInputVal).trigger('change');
           // Update the location preview.
           updateLocationFromTitleInput();
         }
@@ -246,15 +250,15 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge', 'xwiki-form-validation-a
       }
 
       // Delay the execution in case the user is still typing.
-      form.validateAsync(() => {
+      locationContainer.validateAsync(() => {
         return updateLocation(wikiField.val(), spaceReference);
-      }, 'location', inputDelay);
+      }, inputDelay, 'locationPicker');
     };
 
     var updateLocationFromWikiField = function(event) {
       // TODO: Don't reload the entire location when the wiki changes. We should be able to update only the wiki element,
       // but we need to be able to "detect" it (e.g. the breadcrumb should add some CSS classes on the path elements).
-      form.validateAsync(updateLocation, 'location');
+      locationContainer.validateAsync(updateLocation, 'locationPicker');
     };
 
     var updateLocation = function(wiki, localSpaceReference) {
@@ -274,6 +278,8 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge', 'xwiki-form-validation-a
       }, function(data) {
         // Update the space reference part of the new location.
         var newLocationContainer = $(data);
+        // Preserve the id because it is needed for the asynchronous validation key.
+        newLocationContainer.attr('id', locationContainer.attr('id'));
         locationContainer.replaceWith(newLocationContainer);
         locationContainer = newLocationContainer;
 
@@ -318,7 +324,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge', 'xwiki-form-validation-a
 
     // Update the location with whatever the initial value of the title is.
     if (nameInput.val() !== undefined && !nameInput.val() && titleInput.val()) {
-      form.validateAsync(updateLocationAndNameFromTitleInput(), 'title');
+      scheduleUpdateOfLocationAndNameFromTitleInput();
     } else {
       updateLocationFromTitleInput();
     }
@@ -359,24 +365,17 @@ require(['jquery'], function($) {
       // Show the validation message after the title input for simple users because they can't access the page input.
       insertAfterWhatNode: isSimpleUser ? titleInput[0] : pageInput[0]
     });
-    // We use a custom validation in order to handle the default value on browsers that don't support the placeholder
-    // attribute.
     pageValidator.displayMessageWhenEmpty = true;
     pageValidator.add(Validate.Custom, {
       failureMessage: l10n['core.validation.required.message'],
       against: function(value) {
-        return !pageInput.hasClass('empty') && typeof value === 'string' && value.strip().length > 0;
+        // The page name must not be blank.
+        return typeof value === 'string' && value.strip().length > 0;
       }
     });
 
-    // The page input is filled automatically when the user types in the title input so we should validate the page
-    // input at the same time.
-    titleInput.on('input', function() {
-      // Validate after the value of the page input is set.
-      setTimeout(function() {
-        pageValidator.validate();
-      }, 0);
-    });
+    // The page name can be set either directly, by typing in the page input, or indirectly, by typing in the title
+    // input. In the second case the code that updates the page name based on the page title triggers a 'change' event. 
     pageInput.on('change', function() {
       pageValidator.validate();
     });
@@ -463,7 +462,6 @@ require(['jquery'], function($) {
     });
   };
 
-  var validators = [];
   $('.location-picker').each(function() {
     var picker = $(this);
     var pickerValidators = [];
@@ -478,7 +476,6 @@ require(['jquery'], function($) {
       pickerValidators.push(pageValidator);
       picker.data('pageValidator', pageValidator);
     }
-    validators.push.apply(validators, pickerValidators);
 
     var locationEdit = picker.find('.location-edit');
     var locationEditToggle = picker.find('.location-action-edit');

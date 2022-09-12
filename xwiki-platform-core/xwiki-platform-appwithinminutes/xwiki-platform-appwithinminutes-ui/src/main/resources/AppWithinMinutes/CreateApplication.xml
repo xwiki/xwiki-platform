@@ -279,10 +279,11 @@
   var appNameInput = $('input[name="appName"]');
   var appParentInput = $('input[name="appParentReference"]');
   var preview = $('.appName-preview');
-  var form = appNameInput.closest('form');
 
   if (appNameInput.val() === '') {
-    form.validateAsync(() =&gt; Promise.reject(), 'appName');
+    // We use a function instead of passing directly the promise because we want to avoid the "Uncaught (in promise)"
+    // error. Basically, we want the rejected promise to be caught.
+    appNameInput.validateAsync(() =&gt; Promise.reject(), 'awm');
   }
 
   var errorMessage = appNameInput.closest('dd').prev('dt').find('.xErrorMsg');
@@ -292,7 +293,7 @@
 
   var toggleValidationError = function(message) {
     if (message) {
-      appNameInput.addClass('xErrorField').focus();
+      appNameInput.addClass('xErrorField');
       errorMessage.text(message).show();
       return Promise.reject();
     } else {
@@ -312,16 +313,16 @@
       return updatePreview('&lt;span class="xErrorMsg"&gt;$escapetool.javascript($services.localization.render("platform.appwithinminutes.appNameEmptyError"))&lt;/span&gt;');
     } else {
       preview.addClass('loading');
-      return $.get(XWiki.currentDocument.getURL('get'), form.serialize()).then(updatePreview);
+      return $.get(XWiki.currentDocument.getURL('get'), appNameInput.closest('form').serialize()).then(updatePreview);
     }
   };
 
   appNameInput.add(appParentInput).on('input', () =&gt; {
-    form.validateAsync(fetchPreviewUpdate, 'appName', 500);
+    appNameInput.validateAsync(fetchPreviewUpdate, 500, 'awm');
   }).on('keyup', function(event) {
     // Show the error message if the user presses Enter before typing anything.
     if (event.which === 13 &amp;&amp; appNameInput.val() === '' &amp;&amp; !appNameInput.hasClass('xErrorField')) {
-      form.validateAsync(fetchPreviewUpdate, 'appName');
+      appNameInput.validateAsync(fetchPreviewUpdate, 'awm').catch(() =&gt; appNameInput.focus());
     }
   });
 });</code>

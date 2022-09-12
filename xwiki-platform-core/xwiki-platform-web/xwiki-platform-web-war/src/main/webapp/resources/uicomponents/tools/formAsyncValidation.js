@@ -129,17 +129,28 @@ define('xwiki-form-validation-async', ['jquery'], function($) {
     asyncValidations[validationKey] = nextValidation;
     previousValidation?.__abort();
 
+    // Construct a promise that is settled when the next validation is settled, if not outdated.
+    const afterValidation = new Promise((resolve, reject) => {
+      nextValidation.then((value) => {
+        if (asyncValidations[validationKey] === nextValidation) {
+          resolve(value);
+        }
+      }).catch((error) => {
+        if (asyncValidations[validationKey] === nextValidation) {
+          reject(error);
+        }
+      });
+    });
+
     // Disable the form submit when the validation fails, if the validation is not outdated.
-    nextValidation.catch(() => {
-      if (asyncValidations[validationKey] === nextValidation) {
-        enableSubmit(form, false);
-      }
+    afterValidation.catch(() => {
+      enableSubmit(form, false);
     });
 
     // Re-enable the submit button while the next validation is in progress, if there are no other failed validations.
     enableSubmit(form, !hasValidationsWithState(Object.values(asyncValidations), ['rejected']));
 
-    return nextValidation;
+    return afterValidation;
   };
 
   /**

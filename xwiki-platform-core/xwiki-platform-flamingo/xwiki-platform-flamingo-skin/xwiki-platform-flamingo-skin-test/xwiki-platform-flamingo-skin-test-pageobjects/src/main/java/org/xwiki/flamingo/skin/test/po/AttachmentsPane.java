@@ -21,6 +21,7 @@ package org.xwiki.flamingo.skin.test.po;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -32,6 +33,8 @@ import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.test.ui.po.AttachmentHistoryPage;
 import org.xwiki.test.ui.po.BaseElement;
 import org.xwiki.test.ui.po.ConfirmationModal;
+
+import static org.xwiki.livedata.test.po.TableLayoutElement.FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS;
 
 /**
  * Represents the actions possible on the Attachment Pane at the bottom of a page.
@@ -386,6 +389,7 @@ public class AttachmentsPane extends BaseElement
      */
     public void filterColumn(int columnIndex, String filterValue)
     {
-        this.attachmentsTableLayoutElement.filterColumn(LIVEDATA_COLUMNS.get(columnIndex - 1), filterValue, true);
+        this.attachmentsTableLayoutElement.filterColumn(LIVEDATA_COLUMNS.get(columnIndex - 1), filterValue, true,
+            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
     }
 }

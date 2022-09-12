@@ -24,6 +24,7 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -61,6 +62,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
  */
 public class TableLayoutElement extends BaseElement
 {
+    /**
+     * Option for {@link #filterColumn(String, String, boolean, Map)} to wait for selectize fields suggestions before
+     * continuing. The default behavior being to use the typed text as the selected value without waiting.
+     */
+    public static final String FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS = "selectized.waitForSuggestions";
+    
     private static final String INNER_HTML_ATTRIBUTE = "innerHTML";
 
     private static final String CLASS_HTML_ATTRIBUTE = "class";
@@ -444,14 +451,38 @@ public class TableLayoutElement extends BaseElement
      */
     public void filterColumn(String columnLabel, String content, boolean wait)
     {
+        filterColumn(columnLabel, content, wait, Map.of());
+    }
+
+    /**
+     * Set the value in the filter of a column. Waits for the new filtered values to be displayed before continuing when
+     * {@code waits} is {@code true}.
+     *
+     * @param columnLabel the label of the column to filter, for instance {@code "Creation Date"}
+     * @param content the content to set on the filter
+     * @param wait when {@code true} waits for the filtered results to be displayed before continuing, otherwise
+     *     continues without waiting (useful when updating several filters in a row).
+     * @param options additional options that are only relevant for specific type of fields (e.g., for selectize
+     *     based fields only)
+     * @see #filterColumn(String, String)
+     * @see #filterColumn(String, String, boolean)
+     * @since 14.8RC1
+     */
+    public void filterColumn(String columnLabel, String content, boolean wait, Map<String, Object> options)
+    {
         WebElement element = getFilter(columnLabel);
 
         List<String> classes = Arrays.asList(getClasses(element));
         if (classes.contains("filter-list")) {
             if (element.getAttribute(CLASS_HTML_ATTRIBUTE).contains("selectized")) {
                 SuggestInputElement suggestInputElement = new SuggestInputElement(element);
-                suggestInputElement.clearSelectedSuggestions();
-                suggestInputElement.sendKeys(content).waitForSuggestions().selectByVisibleText(content);
+                // Wait for the suggestions on selectize fields only if this is explicitly asked.
+                suggestInputElement.clearSelectedSuggestions().sendKeys(content);
+                if (Objects.equals(options.get(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS), Boolean.TRUE)) {
+                    suggestInputElement.waitForSuggestions().selectByVisibleText(content);
+                } else {
+                    suggestInputElement.selectTypedText();
+                }
             } else {
                 new Select(element).selectByVisibleText(content);
             }

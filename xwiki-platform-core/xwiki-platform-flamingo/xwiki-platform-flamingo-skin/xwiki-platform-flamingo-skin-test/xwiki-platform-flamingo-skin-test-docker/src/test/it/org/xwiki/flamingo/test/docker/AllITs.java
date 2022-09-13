@@ -170,4 +170,10 @@ public class AllITs
     class NestedPDFExportIT extends PDFExportIT
     {
     }
+    
+    @Nested
+    @DisplayName("Backlinks Tests")
+    class NestedBacklinksIT extends BacklinksIT
+    {
+    }
 }

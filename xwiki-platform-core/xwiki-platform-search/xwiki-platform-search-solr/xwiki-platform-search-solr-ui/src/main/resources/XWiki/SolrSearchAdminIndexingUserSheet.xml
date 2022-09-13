@@ -36,7 +36,9 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>== {{translation key="admin.indexinguser" /}} ==
+  <content>{{velocity}}
+== $services.localization.render('admin.indexinguser') ==
+{{/velocity}}
 
 {{translation key="admin.indexinguser.explanation.part1" /}}
 
@@ -46,7 +48,6 @@
 
 {{velocity}}
 #if ($xcontext.isMainWiki())
-  #set ($section = 'IndexingUser')
   #set ($params = {'indexer': ['indexer']})
   #set ($paramDoc = $xwiki.getDocument('XWiki.SolrSearchAdminIndexingUser'))
   #set ($paramClass = 'XWiki.SolrSearchAdminIndexingUserClass')

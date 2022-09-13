@@ -54,6 +54,7 @@ public class ImageDialogSelectModal extends BaseElement
     {
         DocumentTreeElement documentTreeElement =
             new DocumentTreeElement(getDriver().findElement(By.cssSelector(".attachments-tree")));
+        documentTreeElement.waitForIt();
         documentTreeElement.openToAttachment(attachmentReference);
         TreeNodeElement attachmentNode = documentTreeElement.getAttachmentNode(attachmentReference);
         documentTreeElement.clearSelection();

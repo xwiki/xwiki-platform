@@ -758,6 +758,10 @@ public class PackageMojo extends AbstractOldCoreMojo
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-user-script", getXWikiPlatformVersion(), null, "jar"));
 
+        // Refactoring operation but also anything that manipulate document backlink need Solr
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-search-solr-api", getXWikiPlatformVersion(), null, "jar"));
+
         return mandatoryTopLevelArtifacts;
     }
 

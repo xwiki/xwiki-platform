@@ -267,6 +267,7 @@
 ## ---------------------------------------------------------------------------------------------------------
 ## FIXME: Using the 'container' class when displayed in an ajax call by clicking on a Wanted Link so that it looks good (proper margins) in the popup.
 <form action="$doc.getURL('create')" method="post" id="create" class="xform #if($request.ajax)container#end">
+  <fieldset>
 
   ## Deprecated: Pass along any received page parent.
   <input type='hidden' name='parent' value="$!{escapetool.xml($parent)}"/>
@@ -383,4 +384,5 @@
     </span>
   </div>
 
+  </fieldset>
 </form>

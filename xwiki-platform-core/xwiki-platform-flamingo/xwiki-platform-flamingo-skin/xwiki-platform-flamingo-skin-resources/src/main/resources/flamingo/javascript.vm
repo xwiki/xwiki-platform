@@ -85,6 +85,7 @@
     'xwiki-attachments-icon': $xwiki.getSkinFile('uicomponents/attachments/icons.js', true),
     'xwiki-entityReference': $xwiki.getSkinFile('uicomponents/model/entityReference.js'),
     'xwiki-events-bridge': $xwiki.getSkinFile('js/xwiki/eventsBridge.js'),
+    'xwiki-form-validation-async': $xwiki.getSkinFile('uicomponents/tools/formAsyncValidation.js'),
     'xwiki-job-runner': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-job-webjar', ""jobRunner${jsExtension}""))",
     'xwiki-l10n': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-localization-webjar', ""l10n${jsExtension}""))",
     'xwiki-locale-picker': $xwiki.getSkinFile('localePicker.js', true),

@@ -35,6 +35,7 @@
   #warning($services.localization.render('core.rename.warningRenameUser'))
 #end
   <form action="?xpage=rename&amp;step=2" method="post" id="rename" class="xform">
+  <fieldset>
   <div class="hidden">
     ## CSRF prevention
     <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
@@ -132,5 +133,6 @@
       <a class="secondary button" href="$doc.getURL()">$services.localization.render('cancel')</a>
     </span>
   </div>
-</form>
+  </fieldset>
+  </form>
 </div>

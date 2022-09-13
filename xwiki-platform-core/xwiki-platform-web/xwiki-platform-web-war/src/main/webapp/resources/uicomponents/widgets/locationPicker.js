@@ -485,7 +485,10 @@ require(['jquery'], function($) {
     picker.closest('form').on('submit', function(event) {
       var isValid = LiveValidation.massValidate(pickerValidators);
       if (!isValid && locationEdit.hasClass('hidden')) {
-        locationEditToggle.click();
+        // Triggering the click event while handling a click event (the submit event is caused most of the time by
+        // clicking the submit button) has no effect (jQuery simply ignores the trigger call). The workaround is to
+        // trigger the click event right after the current click event is handled.
+        setTimeout(() => locationEditToggle.click(), 0);
       }
     });
 

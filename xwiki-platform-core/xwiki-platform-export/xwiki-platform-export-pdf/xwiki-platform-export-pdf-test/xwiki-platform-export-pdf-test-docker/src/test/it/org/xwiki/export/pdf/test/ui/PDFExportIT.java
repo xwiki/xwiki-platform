@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.xwiki.export.pdf.test.po.ExportModal;
 import org.xwiki.export.pdf.test.po.PDFDocument;
@@ -50,6 +51,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 class PDFExportIT
 {
+    @BeforeAll
+    static void configure(TestUtils setup)
+    {
+        setup.gotoPage(new LocalDocumentReference("PDFExportIT", "EnableDebugLogs"), "get");
+    }
+
     @Test
     void exportAsPDF(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration) throws Exception
     {

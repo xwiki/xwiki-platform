@@ -47,9 +47,9 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.core.CoreContainer;
-import org.apache.solr.core.SolrCore;
 import org.apache.solr.core.CoreContainer.CoreLoadFailure;
 import org.apache.solr.core.CoreDescriptor;
+import org.apache.solr.core.SolrCore;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.DisposePriority;
 import org.xwiki.component.phase.Disposable;
@@ -291,7 +291,13 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
         Files.createDirectories(this.solrHomePath);
 
         // Copy the default solr.xml configuration file
-        FileUtils.write(this.solrHomePath.resolve("solr.xml").toFile(), "<solr/>", StandardCharsets.UTF_8);
+        StringBuilder builder = new StringBuilder();
+        builder.append("<solr>");
+        // Disable the log watcher until Solr support SLF4J 2
+        // FIXME: remove when Solr upgrade SLF4J (or stop logging a stack trace at least)
+        builder.append("<logging><str name=\"enabled\">false</str></logging>");
+        builder.append("</solr>");
+        FileUtils.write(this.solrHomePath.resolve("solr.xml").toFile(), builder.toString(), StandardCharsets.UTF_8);
 
         // [RETRO COMPATIBILITY for < 12.3]
         // Check if the solr home is not already at the old location (/solr) and move things

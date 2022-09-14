@@ -192,7 +192,7 @@ class PageTemplatesIT
         createPagePage.getDocumentPicker().setParent("Foo");
         createPagePage.getDocumentPicker().setName("Bar");
         String currentURL = setup.getDriver().getCurrentUrl();
-        createPagePage.clickCreate();
+        createPagePage.clickCreate(false);
         assertEquals(currentURL, setup.getDriver().getCurrentUrl());
         // and check that an error is displayed to the user
         createPagePage.waitForFieldErrorMessage();
@@ -239,7 +239,7 @@ class PageTemplatesIT
         createPage.getDocumentPicker().setParent(testSpace);
         createPage.getDocumentPicker().setName("ExistingPage");
         String currentURL = setup.getDriver().getCurrentUrl();
-        createPage.clickCreate();
+        createPage.clickCreate(false);
         // make sure that we stay on the same page and that an error is displayed to the user. Maybe we should check the
         // error
         assertEquals(currentURL, setup.getDriver().getCurrentUrl());
@@ -254,7 +254,7 @@ class PageTemplatesIT
         createPage.getDocumentPicker().setName("ExistingPage");
         createPage.setTemplate(templateProviderFullName);
         currentURL = setup.getDriver().getCurrentUrl();
-        createPage.clickCreate();
+        createPage.clickCreate(false);
         // make sure that we stay on the same page and that an error is displayed to the user. Maybe we should check the
         // error
         assertEquals(currentURL, setup.getDriver().getCurrentUrl());
@@ -275,7 +275,7 @@ class PageTemplatesIT
         // Try to create the a space (non-terminal document) that already exist.
         createSpace.getDocumentPicker().toggleLocationAdvancedEdit();
         createSpace.fillForm(existingSpaceName, "", null, false);
-        createSpace.clickCreate();
+        createSpace.clickCreate(false);
         String urlAfterSubmit = setup.getDriver().getCurrentUrl();
         urlAfterSubmit = urlAfterSubmit.substring(0,
             urlAfterSubmit.indexOf('?') > 0 ? urlAfterSubmit.indexOf('?') : urlAfterSubmit.length());

@@ -47,11 +47,6 @@ import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.Ports;
 import com.github.dockerjava.api.model.Volume;
-import com.github.dockerjava.core.DefaultDockerClientConfig;
-import com.github.dockerjava.core.DockerClientConfig;
-import com.github.dockerjava.core.DockerClientImpl;
-import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
-import com.github.dockerjava.transport.DockerHttpClient;
 
 /**
  * Help perform various operations on Docker containers.
@@ -69,16 +64,16 @@ public class ContainerManager implements Initializable
     @Inject
     private Logger logger;
 
+    @Inject
+    private DockerClientFactory dockerClientFactory;
+
     private DockerClient client;
 
     @Override
     public void initialize() throws InitializationException
     {
         this.logger.debug("Initializing the Docker client.");
-        DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder().build();
-        DockerHttpClient httpClient = new ApacheDockerHttpClient.Builder().dockerHost(config.getDockerHost())
-            .sslConfig(config.getSSLConfig()).build();
-        this.client = DockerClientImpl.getInstance(config, httpClient);
+        this.client = this.dockerClientFactory.createDockerClient();
     }
 
     /**

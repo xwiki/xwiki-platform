@@ -113,6 +113,7 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-minimaldependencies</artifactId>
       <version>${project.version}</version>
+      <type>pom</type>
       <scope>runtime</scope>
     </dependency>
     <dependency>

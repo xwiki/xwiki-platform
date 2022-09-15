@@ -609,7 +609,7 @@ public class PackageMojo extends AbstractOldCoreMojo
         Set<Artifact> mandatoryTopLevelArtifacts = new HashSet<>();
 
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
-            "xwiki-platform-minimaldependencies", getXWikiPlatformVersion(), null, "jar"));
+            "xwiki-platform-minimaldependencies", getXWikiPlatformVersion(), null, "pom"));
 
         // Add a special JAR used for functional tests to discover if some scripts in some wiki page require Programming
         // Rights.

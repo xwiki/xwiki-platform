@@ -358,7 +358,14 @@
       <version>${commons.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- Needed to wait for document backlink indexation queue to be consumed. -->
+    <!-- Needed to store links -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-solr-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Expected by Needed to wait for document backlink indexation queue to be consumed. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-index-api</artifactId>

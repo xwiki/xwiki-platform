@@ -55,7 +55,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin" })
 class LightboxIT
 {
-    public static final String USER_NAME = "JohnDoe";
+    private static final String USER_NAME = "JohnDoe";
 
     private static final DocumentReference LIGHTBOX_CONFIGURATION_REFERENCE =
         new DocumentReference("xwiki", Arrays.asList("XWiki", "Lightbox"), "LightboxConfiguration");

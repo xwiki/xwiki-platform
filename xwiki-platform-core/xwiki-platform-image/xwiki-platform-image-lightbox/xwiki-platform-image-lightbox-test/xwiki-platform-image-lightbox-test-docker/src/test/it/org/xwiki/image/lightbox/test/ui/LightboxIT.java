@@ -46,23 +46,23 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Functional tests for the image lightbox.
- * 
+ *
  * @version $Id$
  * @since 14.1RC1
  */
 @UITest(properties = {
     // Add the FileUploadPlugin which is needed by the test to upload attachment files
-    "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"})
+    "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin" })
 class LightboxIT
 {
+    private static final String USER_NAME = "JohnDoe";
+
     private static final DocumentReference LIGHTBOX_CONFIGURATION_REFERENCE =
         new DocumentReference("xwiki", Arrays.asList("XWiki", "Lightbox"), "LightboxConfiguration");
 
     private static final String LIGHTBOX_CONFIGURATION_CLASSNAME = "XWiki.Lightbox.LightboxConfigurationClass";
 
     private static final List<String> IMAGES = Arrays.asList("image1.png", "image2.png", "missingImage.png");
-
-    public static final String USER_NAME = "JohnDoe";
 
     @BeforeAll
     void beforeAll(TestUtils testUtils)

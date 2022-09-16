@@ -68,15 +68,32 @@ class LightboxIT
     void beforeAll(TestUtils testUtils)
     {
         testUtils.createUserAndLogin(USER_NAME, "pa$$word");
-        testUtils.updateObject(LIGHTBOX_CONFIGURATION_REFERENCE, LIGHTBOX_CONFIGURATION_CLASSNAME, 0,
-            "isLightboxEnabled", "1");
     }
 
     @Test
     @Order(1)
+    void disabledLightbox(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
+    {
+        enableLightbox(testUtils, false);
+
+        testUtils.createPage(testReference, getSimpleImage(IMAGES.get(0)), "Disabled Lightbox");
+        LightboxPage lightboxPage = new LightboxPage();
+        lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), IMAGES.get(0));
+
+        // Make sure that the images are displayed.
+        lightboxPage.reloadPage();
+
+        Optional<ImagePopover> imagePopover = lightboxPage.hoverImage(0);
+        assertFalse(imagePopover.isPresent());
+    }
+
+    @Test
+    @Order(2)
     void openImageWithoutDescription(TestUtils testUtils, TestReference testReference,
         TestConfiguration testConfiguration)
     {
+        enableLightbox(testUtils, true);
+
         testUtils.createPage(testReference, this.getSimpleImage(IMAGES.get(0)));
         LightboxPage lightboxPage = new LightboxPage();
 
@@ -112,10 +129,12 @@ class LightboxIT
     }
 
     @Test
-    @Order(2)
+    @Order(3)
     void openImageWithCaptionAndManuallyAddedId(TestUtils testUtils, TestReference testReference,
         TestConfiguration testConfiguration)
     {
+        enableLightbox(testUtils, true);
+
         testUtils.createPage(testReference, this.getImageWithCaptionAndManuallyAddedId(IMAGES.get(0)));
         LightboxPage lightboxPage = new LightboxPage();
 
@@ -151,9 +170,11 @@ class LightboxIT
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     void openImageWithAlt(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
     {
+        enableLightbox(testUtils, true);
+
         testUtils.createPage(testReference, this.getImageWithAlt(IMAGES.get(0)));
         LightboxPage lightboxPage = new LightboxPage();
 
@@ -175,9 +196,11 @@ class LightboxIT
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     void openIconImage(TestUtils testUtils, TestReference testReference)
     {
+        enableLightbox(testUtils, true);
+
         testUtils.createPage(testReference, "[[image:icon:accept]]");
 
         LightboxPage lightboxPage = new LightboxPage();
@@ -193,9 +216,11 @@ class LightboxIT
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     void clickLightboxEscape(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
     {
+        enableLightbox(testUtils, true);
+
         testUtils.createPage(testReference, this.getSimpleImage(IMAGES.get(0)));
         LightboxPage lightboxPage = new LightboxPage();
 
@@ -212,9 +237,11 @@ class LightboxIT
     }
 
     @Test
-    @Order(6)
+    @Order(7)
     void navigateThroughImages(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
     {
+        enableLightbox(testUtils, true);
+
         testUtils.createPage(testReference, this.getSimpleImage(IMAGES.get(0)) + this.getSimpleImage(IMAGES.get(1)));
         LightboxPage lightboxPage = new LightboxPage();
 
@@ -241,9 +268,11 @@ class LightboxIT
     }
 
     @Test
-    @Order(7)
+    @Order(8)
     void playSlideshow(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
     {
+        enableLightbox(testUtils, true);
+
         testUtils.createPage(testReference, this.getSimpleImage(IMAGES.get(0)) + this.getSimpleImage(IMAGES.get(1))
             + this.getSimpleImage(IMAGES.get(2)));
         LightboxPage lightboxPage = new LightboxPage();
@@ -269,9 +298,11 @@ class LightboxIT
     }
 
     @Test
-    @Order(8)
+    @Order(9)
     void openMissingImage(TestUtils testUtils, TestReference testReference)
     {
+        enableLightbox(testUtils, true);
+
         testUtils.createPage(testReference, this.getSimpleImage(IMAGES.get(2)));
         LightboxPage lightboxPage = new LightboxPage();
 
@@ -290,9 +321,11 @@ class LightboxIT
     }
 
     @Test
-    @Order(9)
+    @Order(10)
     void openFullscreen(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
     {
+        enableLightbox(testUtils, true);
+
         testUtils.createPage(testReference, this.getSimpleImage(IMAGES.get(0)));
         LightboxPage lightboxPage = new LightboxPage();
 
@@ -310,9 +343,11 @@ class LightboxIT
     }
 
     @Test
-    @Order(10)
+    @Order(11)
     void verifyDownload(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
     {
+        enableLightbox(testUtils, true);
+
         testUtils.createPage(testReference, this.getSimpleImage(IMAGES.get(0)));
         LightboxPage lightboxPage = new LightboxPage();
 
@@ -342,9 +377,11 @@ class LightboxIT
     }
 
     @Test
-    @Order(11)
+    @Order(12)
     void verifyPartiallyDisabledLightbox(TestUtils testUtils, TestReference testReference)
     {
+        enableLightbox(testUtils, true);
+
         testUtils.createPage(testReference, this.getPartiallyDisabledLightboxContent());
         LightboxPage lightboxPage = new LightboxPage();
 
@@ -356,9 +393,11 @@ class LightboxIT
     }
 
     @Test
-    @Order(12)
+    @Order(13)
     void openImageWithoutId(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
     {
+        enableLightbox(testUtils, true);
+
         testUtils.createPage(testReference, this.getImageWithoutId(IMAGES.get(0)));
         LightboxPage lightboxPage = new LightboxPage();
 
@@ -383,10 +422,12 @@ class LightboxIT
      * Check that the date displayed inside the lightbox takes into account user's timezone.
      */
     @Test
-    @Order(13)
+    @Order(14)
     void setNewTimezone(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
         throws Exception
     {
+        enableLightbox(testUtils, true);
+
         setTimezone(testUtils, "Europe/Paris");
         testUtils.createPage(testReference, this.getSimpleImage(IMAGES.get(0)));
         LightboxPage lightboxPage = new LightboxPage();
@@ -415,6 +456,12 @@ class LightboxIT
         Object userObject = testUtils.rest().object(new LocalDocumentReference("XWiki", USER_NAME), "XWiki.XWikiUsers");
         userObject.withProperties(TestUtils.RestTestUtils.property("timezone", timezoneValue));
         testUtils.rest().update(userObject);
+    }
+
+    private void enableLightbox(TestUtils testUtils, boolean enable)
+    {
+        testUtils.updateObject(LIGHTBOX_CONFIGURATION_REFERENCE, LIGHTBOX_CONFIGURATION_CLASSNAME, 0,
+            "isLightboxEnabled", enable ? "1" : "0");
     }
 
     private String getSimpleImage(String image)

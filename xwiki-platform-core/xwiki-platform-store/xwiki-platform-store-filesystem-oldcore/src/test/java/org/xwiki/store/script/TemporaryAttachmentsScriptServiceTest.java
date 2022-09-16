@@ -42,6 +42,8 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Attachment;
@@ -165,5 +167,22 @@ class TemporaryAttachmentsScriptServiceTest
             this.logCapture.getMessage(0));
         assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
     }
-}
 
+    @Test
+    void uploadTemporaryAttachmentWithFilename() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", "XWiki", "Doc");
+        XWikiAttachment xWikiAttachment = mock(XWikiAttachment.class);
+
+        when(this.request.getPart("upload")).thenReturn(this.part);
+        when(this.temporaryAttachmentSessionsManager.uploadAttachment(documentReference, this.part, "filename"))
+            .thenReturn(xWikiAttachment);
+
+        Attachment temporaryAttachment =
+            this.temporaryAttachmentsScriptService.uploadTemporaryAttachment(documentReference, "upload", "filename");
+
+        assertSame(xWikiAttachment, temporaryAttachment);
+
+        verify(this.temporaryAttachmentSessionsManager).uploadAttachment(documentReference, this.part, "filename");
+    }
+}

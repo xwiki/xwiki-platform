@@ -87,6 +87,13 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
     public XWikiAttachment uploadAttachment(DocumentReference documentReference, Part part)
         throws TemporaryAttachmentException
     {
+        return uploadAttachment(documentReference, part, null);
+    }
+
+    @Override
+    public XWikiAttachment uploadAttachment(DocumentReference documentReference, Part part, String filename)
+        throws TemporaryAttachmentException
+    {
         XWikiAttachment xWikiAttachment;
         long uploadMaxSize = getUploadMaxSize(documentReference);
         if (part.getSize() > uploadMaxSize) {
@@ -97,7 +104,13 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
         XWikiContext context = this.contextProvider.get();
         try {
             xWikiAttachment = new XWikiAttachment();
-            xWikiAttachment.setFilename(part.getSubmittedFileName());
+            String actualFilename;
+            if (filename != null) {
+                actualFilename = filename;
+            } else {
+                actualFilename = part.getSubmittedFileName();
+            }
+            xWikiAttachment.setFilename(actualFilename);
             xWikiAttachment.setContent(part.getInputStream());
             xWikiAttachment.setAuthorReference(context.getUserReference());
             // Initialize an empty document with the right document reference and locale. We don't set the actual 

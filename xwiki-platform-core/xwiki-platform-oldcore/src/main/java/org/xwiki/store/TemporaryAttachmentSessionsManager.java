@@ -58,6 +58,26 @@ public interface TemporaryAttachmentSessionsManager
         throws TemporaryAttachmentException;
 
     /**
+     * Temporary store the given {@link Part} to a cached {@link XWikiAttachment} attached to the given
+     * {@link DocumentReference}.
+     *
+     * @param documentReference the reference of the document that the attachment should be attached to.
+     * @param part the actual data that is uploaded.
+     * @param filename an optional filename used instead of using {@link Part#getSubmittedFileName()}, ignored when
+     *     {@code null}
+     * @return an attachment that is not saved yet but cached and contains the data of the given part.
+     * @throws TemporaryAttachmentException if the part size exceeds the maximum upload size, or in case of problem
+     *     when reading the part.
+     * @since 13.8
+     */
+    @Unstable
+    default XWikiAttachment uploadAttachment(DocumentReference documentReference, Part part, String filename)
+        throws TemporaryAttachmentException
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
      * Retrieve all temporary attachments related to the given document reference in the current user session.
      *
      * @param documentReference the reference for which to retrieve temporary attachments.

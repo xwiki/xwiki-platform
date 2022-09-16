@@ -83,11 +83,9 @@ $xwiki.jsx.use($attachmentPickerDocName)
   #end
   (% class="gallery" %)(((
   ## Only display the upload form if they have edit permission on targetAttachDocument
-  #if ($xwiki.hasAccessLevel('edit',$xcontext.user,${targetAttachDocument.fullName}))
-    #attachmentPicker_displayUploadForm($targetDocument, $targetAttachDocument, $options)
-  #end
+  #attachmentPicker_displayUploadForm($targetDocument, $targetAttachDocument, $options)
   #attachmentPicker_displayAttachmentGalleryEmptyValue($targetDocument, $targetAttachDocument, $options, $currentValue)
-  #set ($sortedAttachments = $collectiontool.sort($targetAttachDocument.getAttachmentList(), "${options.sortAttachmentsBy}") )
+  #set ($sortedAttachments = $services.temporaryAttachments.listAllAttachments($targetAttachDocument))
   #foreach ($attachment in $sortedAttachments)
     #set ($extension = $attachment.getFilename())
     #set ($extension = $extension.substring($mathtool.add($extension.lastIndexOf('.'), 1)).toLowerCase())
@@ -149,8 +147,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
 #macro (attachmentPicker_displayAttachmentDetails $attachment $options)
   #if ($attachment)
     ## Compute the attachment reference because there's no getter.
-    #set ($attachmentReference = $services.model.createAttachmentReference($attachment.document.documentReference,
-      $attachment.filename))
+    #set ($attachmentReference = $services.model.createAttachmentReference($attachment.doc.documentReference, $attachment.filename))
     #set ($attachmentStringReference = $services.rendering.escape($services.model.serialize($attachmentReference, 'default'), 'xwiki/2.1'))
     #if ($attachment.isImage() &amp;&amp; $options.displayImage)
       ## We add the version to the query string in order to invalidate the cache when an image attachment is replaced.
@@ -496,20 +493,59 @@ $xwiki.jsx.use($attachmentPickerDocName)
             hasErrors = true;
           }
         }.bind(this));
-        // No form submission by AJAX right now, because file uploads can't be done this way without HTML5, this is future work
-        // Save the document before submitting, since the current form data will be lost otherwise
         if (!hasErrors) {
           if (this.directSave) {
             uploadForm.submit();
           } else {
-            // FIXME This fails in HTML5, will deal with it later:
-            // this.property.down('input').value = uploadForm.down('input[type="file"]').value;
-            // uploadForm.xredirect.value = window.location.pathname;
-            document.observe('xwiki:document:saved', function() {
-              new XWiki.widgets.Notification("$services.localization.render('xe.attachmentSelector.upload.inProgress')", 'inprogress');
-              uploadForm.submit();
-            })
-            document.fire('xwiki:actions:save', {'continue': true, form: this.property.up('form')});
+            // Require jquery locally until we are able to fully migrate this code away from prototype.
+            const form = this.property.up('form');
+            console.log('&gt;&gt;&gt; property', this.property);
+            require(['jquery'], function($){
+              const data = new FormData();
+              const uploadedFile = $('#attachfile')[0].files[0];
+              const filenameCheckbox = $("#uploadAttachment input[name='filename']");
+
+              data.append('upload', uploadedFile);
+              // TODO: Use CKEditor.FileUploader to avoid code duplication, but this document should be move to legacy and replaced by a reusable document located in a common place
+              const notification = new XWiki.widgets.Notification("$services.localization.render('xe.attachmentSelector.upload.inProgress')", 'inprogress');
+              const params = {
+                'form_token': $(form).find('[name="form_token"]').val(),
+                'sheet': 'CKEditor.FileUploader', // TODO: runtime dependency on CKEditor!!
+                'outputSyntax': 'plain'
+              };
+
+              // Update the name of the file with the name of the currently selected attachment if required.
+              if(filenameCheckbox.prop('checked')) {
+                params['filename'] = filenameCheckbox.val()
+              }
+
+              $.ajax({
+                'url': XWiki.currentDocument.getURL('get', new URLSearchParams(params).toString()),
+                method: 'POST',
+                data: data,
+                processData: false,
+                contentType: false, // Sets the 'multipart/form-data' automatically
+                headers: {
+                  // TODO: make this configurable
+                  // TODO: this might also impact if we allow the current user to upload an image!
+                  'X-XWiki-Temporary-Attachment-Support': true // TODO: get the flag from CKEditor?
+                }
+              }).done(function() {
+                // TODO: localization
+                notification.replace(new XWiki.widgets.Notification('Attachment upload succeeded.', 'done'));
+                // Add a field with the name of the uploaded file so that it is moved from the temporary
+                // attachments to the persisded ones on save.
+                $(form).append($('&lt;input/&gt;')
+                               .prop('type', 'hidden')
+                               .prop('name', 'uploadedFiles')
+                               .prop('value', uploadedFile.name))
+                $(form).find('input[type="hidden"].property-reference').prop('value', uploadedFile.name);
+                
+              }).fail(function() {
+                // TODO: localization
+                notification.replace(new XWiki.widgets.Notification('Attachment upload failed.', 'error'));
+              });
+            });
           }
         }
       }.bindAsEventListener(this));
@@ -1197,102 +1233,74 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
       <nameField/>
       <validationScript/>
       <async_cached>
-        <customDisplay/>
         <defaultValue>0</defaultValue>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
         <displayType/>
-        <hint/>
         <name>async_cached</name>
         <number>13</number>
         <prettyName>Cached</prettyName>
         <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </async_cached>
       <async_context>
         <cache>0</cache>
-        <customDisplay/>
-        <defaultValue/>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <freeText>forbidden</freeText>
-        <hint/>
         <largeStorage>0</largeStorage>
         <multiSelect>1</multiSelect>
         <name>async_context</name>
         <number>14</number>
-        <picker>1</picker>
         <prettyName>Context elements</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator>, </separator>
         <separators>|, </separators>
         <size>5</size>
-        <sort/>
         <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
         <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
-        <customDisplay/>
         <defaultValue>0</defaultValue>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
         <displayType/>
-        <hint/>
         <name>async_enabled</name>
         <number>12</number>
         <prettyName>Asynchronous rendering</prettyName>
         <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </async_enabled>
       <code>
-        <contenttype>---</contenttype>
-        <customDisplay/>
         <disabled>0</disabled>
         <editor>Text</editor>
-        <hint/>
         <name>code</name>
         <number>10</number>
-        <picker>1</picker>
         <prettyName>Macro code</prettyName>
         <rows>20</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
       <contentDescription>
         <contenttype>PureText</contenttype>
-        <customDisplay/>
         <disabled>0</disabled>
         <editor>PureText</editor>
-        <hint/>
         <name>contentDescription</name>
         <number>9</number>
-        <picker>1</picker>
         <prettyName>Content description (Not applicable for "No content" type)</prettyName>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </contentDescription>
       <contentJavaType>
         <cache>0</cache>
-        <customDisplay/>
         <defaultValue>Unknown</defaultValue>
         <disabled>0</disabled>
         <displayType>input</displayType>
         <freeText>allowed</freeText>
-        <hint/>
         <largeStorage>1</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentJavaType</name>
@@ -1303,159 +1311,111 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
         <separator>|</separator>
         <separators>|</separators>
         <size>1</size>
-        <sort/>
         <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
         <values>Unknown|Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </contentJavaType>
       <contentType>
         <cache>0</cache>
-        <customDisplay/>
-        <defaultValue/>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <freeText>forbidden</freeText>
-        <hint/>
         <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>7</number>
-        <picker>1</picker>
         <prettyName>Macro content availability</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator>|</separator>
         <separators>|</separators>
         <size>1</size>
-        <sort/>
         <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
         <values>Optional|Mandatory|No content</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </contentType>
       <defaultCategories>
         <cache>0</cache>
-        <customDisplay/>
-        <defaultValue/>
         <disabled>0</disabled>
         <displayType>input</displayType>
         <freeText>forbidden</freeText>
-        <hint/>
         <largeStorage>0</largeStorage>
         <multiSelect>1</multiSelect>
         <name>defaultCategories</name>
         <number>4</number>
-        <picker>0</picker>
         <prettyName>Default categories</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <separators>|, </separators>
         <size>1</size>
-        <sort/>
         <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
         <values/>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </defaultCategories>
       <description>
         <contenttype>PureText</contenttype>
-        <customDisplay/>
         <disabled>0</disabled>
         <editor>PureText</editor>
-        <hint/>
         <name>description</name>
         <number>3</number>
-        <picker>1</picker>
         <prettyName>Macro description</prettyName>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </description>
       <id>
-        <customDisplay/>
         <disabled>0</disabled>
-        <hint/>
         <name>id</name>
         <number>1</number>
-        <picker>1</picker>
         <prettyName>Macro id</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </id>
       <name>
-        <customDisplay/>
         <disabled>0</disabled>
-        <hint/>
         <name>name</name>
         <number>2</number>
-        <picker>1</picker>
         <prettyName>Macro name</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
       <priority>
-        <customDisplay/>
         <disabled>0</disabled>
-        <hint/>
         <name>priority</name>
         <number>11</number>
         <numberType>integer</numberType>
         <prettyName>Priority</prettyName>
         <size>10</size>
         <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
       </priority>
       <supportsInlineMode>
-        <customDisplay/>
-        <defaultValue/>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
-        <hint/>
         <name>supportsInlineMode</name>
         <number>5</number>
         <prettyName>Supports inline mode</prettyName>
         <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </supportsInlineMode>
       <visibility>
         <cache>0</cache>
-        <customDisplay/>
-        <defaultValue/>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <freeText>forbidden</freeText>
-        <hint/>
         <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>visibility</name>
         <number>6</number>
-        <picker>1</picker>
         <prettyName>Macro visibility</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator>|</separator>
         <separators>|</separators>
         <size>1</size>
-        <sort/>
         <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
         <values>Current User|Current Wiki|Global</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </visibility>
@@ -1603,25 +1563,23 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
 ##  1. Edit the current page
 ##  2. View the target attachment page. (can be the same page)
 #macro (attachmentPicker_displayButton)
-  #if ($hasEdit &amp;&amp; $targetPermView)
-    #set ($queryString = {
-      'docname': $doc.fullName,
-      'classname': $classname,
-      'property': $property,
-      'object': $object,
-      'savemode': $savemode,
-      'defaultValue': $defaultValue,
-      'filter': $filter,
-      'displayImage': $displayImage,
-      'versionSummary': $xcontext.macro.params.versionSummary.equals('true')
-    })
-    #if ($hasTargetDoc)
-      #set ($queryString.targetdocname = $targetdoc.fullName)
-    #end
-    #set ($linkLabel = $services.rendering.escape($services.rendering.escape($buttontext, 'xwiki/2.1'), 'xwiki/2.1'))
-    (% class="buttonwrapper" %)[[$linkLabel&gt;&gt;${xcontext.macro.doc.fullName}||queryString="$escapetool.url($queryString)"
-      class="attachment-picker-start button" title="$services.rendering.escape($buttontext, 'xwiki/2.1')"]](%%)##
+  #set ($queryString = {
+    'docname': $doc.fullName,
+    'classname': $classname,
+    'property': $property,
+    'object': $object,
+    'savemode': $savemode,
+    'defaultValue': $defaultValue,
+    'filter': $filter,
+    'displayImage': $displayImage,
+    'versionSummary': $xcontext.macro.params.versionSummary.equals('true')
+  })
+  #if ($hasTargetDoc)
+    #set ($queryString.targetdocname = $targetdoc.fullName)
   #end
+  #set ($linkLabel = $services.rendering.escape($services.rendering.escape($buttontext, 'xwiki/2.1'), 'xwiki/2.1'))
+  (% class="buttonwrapper" %)[[$linkLabel&gt;&gt;${xcontext.macro.doc.fullName}||queryString="$escapetool.url($queryString)"
+    class="attachment-picker-start button" title="$services.rendering.escape($buttontext, 'xwiki/2.1')"]](%%)##
 #end
 {{/velocity}}
 
@@ -1631,7 +1589,7 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
 #elseif ($xcontext.action == 'inline' || $xcontext.action == 'edit')
   (% class="attachment-picker" %)(((##
     #attachmentPicker_displayAttachment($propValue $displayImage false true) #attachmentPicker_displayButton()##
-    {{html}}&lt;input type="hidden" name="${classname}_${object}_${property}" value="${propValue}"/&gt;{{/html}}##
+    {{html}}&lt;input type="hidden" name="${classname}_${object}_${property}" value="${propValue}" class="property-reference"/&gt;{{/html}}##
   )))
 #else
   #attachmentPicker_displayAttachment($propValue $displayImage $link false)

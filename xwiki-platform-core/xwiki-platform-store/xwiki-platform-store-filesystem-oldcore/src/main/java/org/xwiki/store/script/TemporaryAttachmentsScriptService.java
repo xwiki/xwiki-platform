@@ -20,6 +20,14 @@
 package org.xwiki.store.script;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -36,18 +44,20 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 import org.xwiki.store.TemporaryAttachmentException;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
+import org.xwiki.store.filesystem.internal.StoreFilesystemOldcoreException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
  * Script service dedicated to the handling of temporary attachments.
  *
- * @version $Id$
  * @see TemporaryAttachmentSessionsManager
  * @since 14.3RC1
  */
@@ -70,18 +80,37 @@ public class TemporaryAttachmentsScriptService implements ScriptService
      * Temporary upload the attachment identified by the given field name: the request should be of type
      * {@code multipart/form-data}.
      *
-     * @param documentReference the target document reference the attachment should be later attached to
+     * @param documentReference the target document reference the attachment should be later attached to.
      * @param fieldName the name of the field of the uploaded data
-     * @return a temporary {@link Attachment} not yet persisted attachment, or {@code null} in case of error
+     * @return a temporary {@link Attachment} not yet persisted
+     *          attachment
      */
     public Attachment uploadTemporaryAttachment(DocumentReference documentReference, String fieldName)
+    {
+        return uploadTemporaryAttachment(documentReference, fieldName, null);
+    }
+
+    /**
+     * Temporary upload the attachment identified by the given field name: the request should be of type
+     * {@code multipart/form-data}.
+     *
+     * @param documentReference the target document reference the attachment should be later attached to
+     * @param fieldName the name of the field of the uploaded data
+     * @param filename an optional filename used instead of using the filename of the file passing in
+     *           {@code fieldName}, ignored when {@code null}
+     * @return a temporary {@link Attachment} not yet persisted attachment, or {@code null} in case of error
+     * @since 14.9RC1
+     */
+    @Unstable
+    public Attachment uploadTemporaryAttachment(DocumentReference documentReference, String fieldName, String filename)
     {
         XWikiContext context = this.contextProvider.get();
         Optional<XWikiAttachment> result = Optional.empty();
         try {
             Part part = context.getRequest().getPart(fieldName);
             if (part != null) {
-                result = Optional.of(this.temporaryAttachmentSessionsManager.uploadAttachment(documentReference, part));
+                result = Optional.of(this.temporaryAttachmentSessionsManager.uploadAttachment(documentReference, part
+                    , filename));
             }
         } catch (IOException | ServletException e) {
             this.logger.warn("Error while reading the request content part: [{}]", getRootCauseMessage(e));
@@ -95,5 +124,120 @@ public class TemporaryAttachmentsScriptService implements ScriptService
                 .orElse(null);
             return new Attachment(document, attachment, context);
         }).orElse(null);
+    }
+
+    /**
+     * @param documentReference the target document reference the attachments should be later attached to
+     * @return the list of temporary attachments linked to the given document reference. The list is sorted by the
+     *     attachments filenames ({@link XWikiAttachment#getFilename()})
+     * @since 14.8
+     */
+    @Unstable
+    public List<XWikiAttachment> listTemporaryAttachments(DocumentReference documentReference)
+    {
+        ArrayList<XWikiAttachment> attachments =
+            new ArrayList<>(this.temporaryAttachmentSessionsManager.getUploadedAttachments(documentReference));
+        attachments.sort(Comparator.comparing(XWikiAttachment::getFilename));
+        return attachments;
+    }
+
+    /**
+     * Build a list of all the attachments of a given document. The list contains the persisted attachments of the
+     * document, merged with the temporary attachments. The persisted attachments are replaced by the temporary one if
+     * their names match.
+     *
+     * @param documentReference the target document reference the temporary attachments should be later attached to
+     * @return the list of all attachments linked to the given document reference. Persisted attachments are overridden
+     *     by temporary one if names match. The list is sorted by the attachments filenames
+     *     ({@link XWikiAttachment#getFilename()})
+     * @since 14.8
+     */
+    @Unstable
+    public List<XWikiAttachment> listAllAttachments(DocumentReference documentReference)
+        throws StoreFilesystemOldcoreException
+    {
+        Collection<XWikiAttachment> temporaryAttachments =
+            new ArrayList<>(this.temporaryAttachmentSessionsManager.getUploadedAttachments(documentReference));
+        XWikiDocument document = getDocument(documentReference);
+        List<XWikiAttachment> fullList = temporaryAttachments.stream()
+            // TODO: test this step
+            .peek(temporaryAttachment -> temporaryAttachment.setDoc(document))
+            .collect(Collectors.toList());
+        Stream<XWikiAttachment> nonOverriddenAttachments =
+            document.getAttachmentList()
+                .stream()
+                .filter(persistedAttachment -> temporaryAttachments.stream()
+                    .noneMatch(attachmentEqualityPredicate(persistedAttachment)));
+        fullList.addAll(nonOverriddenAttachments.collect(Collectors.toList()));
+
+        fullList.sort(Comparator.comparing(XWikiAttachment::getFilename));
+        return fullList;
+    }
+
+    /**
+     * Check if a given attachment is found in the temporary attachment session.
+     * {@link #persistentAttachmentExists(XWikiAttachment)} exists as well to check if a given attachment can be found
+     * in the persisted attachments. Note that both method can return {@code true} for the same {@link XWikiAttachment}
+     * when an attachment is overridden in the temporary attachment session.
+     *
+     * @param attachment an attachment
+     * @return {@code true} if a matching attachment exists in the temporary attachment session (i.e., same filename and
+     *     document reference), {@code false} otherwise
+     * @see #persistentAttachmentExists(XWikiAttachment)
+     * @since 14.8
+     */
+    @Unstable
+    public boolean temporaryAttachmentExists(XWikiAttachment attachment)
+    {
+        return this.temporaryAttachmentSessionsManager
+            .getUploadedAttachments(attachment.getReference().getDocumentReference())
+            .stream()
+            .anyMatch(attachmentEqualityPredicate(attachment));
+    }
+
+    /**
+     * Check if a given attachment is persisted. {@link #temporaryAttachmentExists(XWikiAttachment)} exists as well to
+     * check if a given attachment can be found in the temporary attachment session. Note that both method can return
+     * {@code true} at for the same {@link XWikiAttachment} when an attachment is overridden in the temporary attachment
+     * session.
+     *
+     * @param attachment an attachment
+     * @return {@code true} if a matching persisted attachment exists (i.e., same filename and document reference),
+     *     {@code false} otherwise
+     * @throws StoreFilesystemOldcoreException in case of error when accessing the attachment's document
+     * @see #temporaryAttachmentExists(XWikiAttachment)
+     * @since 14.8
+     */
+    @Unstable
+    public boolean persistentAttachmentExists(XWikiAttachment attachment)
+        throws StoreFilesystemOldcoreException
+    {
+        return getDocument(attachment.getReference().getDocumentReference())
+            .getAttachmentList()
+            .stream()
+            .anyMatch(attachmentEqualityPredicate(attachment));
+    }
+
+    /**
+     * Define the equality condition between two attachments. Two attachments are considered equals if their
+     * {@link XWikiAttachment#getFilename()} match.
+     *
+     * @param attachment0 the attachment used to build the predicate
+     * @return a predicate to compare other attachments against {@code attachment0}
+     */
+    private Predicate<XWikiAttachment> attachmentEqualityPredicate(XWikiAttachment attachment0)
+    {
+        String attachment0Filename = attachment0.getFilename();
+        return attachment1 -> Objects.equals(attachment1.getFilename(), attachment0Filename);
+    }
+
+    private XWikiDocument getDocument(DocumentReference documentReference) throws StoreFilesystemOldcoreException
+    {
+        try {
+            XWikiContext context = this.contextProvider.get();
+            return context.getWiki().getDocument(documentReference, context);
+        } catch (XWikiException e) {
+            throw new StoreFilesystemOldcoreException(e);
+        }
     }
 }

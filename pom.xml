@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>14.8-SNAPSHOT</version>
+    <version>14.9-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>14.8-SNAPSHOT</version>
+  <version>14.9-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
@@ -57,7 +57,7 @@
     <pdfbox.version>2.0.26</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
     <jetty.version>9.4.48.v20220622</jetty.version>
-    <netty.version>4.1.81.Final</netty.version>
+    <netty.version>4.1.82.Final</netty.version>
     <hibernate.version>5.6.11.Final</hibernate.version>
 
     <!-- Versions of other software we need in our functional tests -->
@@ -178,7 +178,7 @@
       <dependency>
         <groupId>org.python</groupId>
         <artifactId>jython-slim</artifactId>
-        <version>2.7.2</version>
+        <version>2.7.3</version>
         <exclusions>
           <!-- Not need in the context of XWiki and cause conflict with other dependencies -->
           <exclusion>

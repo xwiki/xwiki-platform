@@ -17,40 +17,45 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.export.pdf;
+package org.xwiki.export.pdf.browser;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.concurrent.TimeoutException;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
- * Generic interface to print some data as PDF.
+ * Manages the web browser used for printing to PDF.
  * 
  * @version $Id$
- * @param <T> the input data type
- * @since 14.4.2
- * @since 14.5
+ * @since 14.8
  */
 @Role
 @Unstable
-public interface PDFPrinter<T>
+public interface BrowserManager extends AutoCloseable
 {
     /**
-     * Prints the specified data as PDF.
+     * Attempts to connect to the web browser that runs on the specified host, behind the specified port.
      * 
-     * @param input the data to be printed as PDF
-     * @return the PDF input stream
+     * @param host the host running the web browser, specified either as an IP address or a host name
+     * @param port the port number to connect to
+     * @throws TimeoutException if the connection timeouts
      */
-    InputStream print(T input) throws IOException;
+    void connect(String host, int port) throws TimeoutException;
 
     /**
-     * @return {@code true} if this PDF printer is ready to be used, {@code false} otherwise
-     * @since 14.8
+     * @return {@code true} if the web browser can be accessed, {@code false} otherwise
      */
-    default boolean isAvailable()
-    {
-        return true;
-    }
+    boolean isConnected();
+
+    /**
+     * Opens a new web browser tab that uses a separate browser context (profile).
+     * 
+     * @return the create tab
+     */
+    BrowserTab createIncognitoTab() throws IOException;
+
+    @Override
+    void close();
 }

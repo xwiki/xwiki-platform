@@ -88,13 +88,13 @@ public interface PDFExportConfiguration
     /**
      * @return {@code true} if the PDF export should be performed server-side, e.g. using a headless Chrome web browser
      *         running inside a Docker container, {@code false} if the user's web browser should be used instead;
-     *         defaults to server-side PDF generation
+     *         defaults to client-side PDF generation
      * @since 14.4.3
      * @since 14.5.1
      * @since 14.6RC1
      */
     default boolean isServerSide()
     {
-        return true;
+        return false;
     }
 }

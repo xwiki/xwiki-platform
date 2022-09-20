@@ -1,0 +1,148 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.xwiki.export.pdf.browser;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
+import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.slf4j.Logger;
+import org.xwiki.component.util.ReflectionUtils;
+import org.xwiki.export.pdf.PDFExportConfiguration;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.MockComponent;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+/**
+ * Unit tests for {@link AbstractBrowserPDFPrinter}.
+ * 
+ * @version $Id$
+ */
+@ComponentTest
+class BrowserPDFPrinterTest
+{
+    @Mock(answer = Answers.CALLS_REAL_METHODS)
+    private AbstractBrowserPDFPrinter printer;
+
+    @MockComponent
+    private Logger logger;
+
+    @MockComponent
+    private PDFExportConfiguration configuration;
+
+    @Mock
+    private HttpServletRequest request;
+
+    @Mock
+    private BrowserManager browserManager;
+
+    @Mock(answer = Answers.CALLS_REAL_METHODS)
+    private BrowserTab browserTab;
+
+    @BeforeEach
+    void configure()
+    {
+        ReflectionUtils.setFieldValue(this.printer, "logger", this.logger);
+        ReflectionUtils.setFieldValue(this.printer, "configuration", this.configuration);
+
+        when(this.printer.getBrowserManager()).thenReturn(this.browserManager);
+        when(this.printer.getRequest()).thenReturn(this.request);
+
+        when(this.request.getContextPath()).thenReturn("/xwiki");
+        when(this.configuration.getXWikiHost()).thenReturn("xwiki-host");
+    }
+
+    @Test
+    void printWithoutPreviewURL()
+    {
+        try {
+            this.printer.print(null);
+            fail();
+        } catch (IOException e) {
+            assertEquals("Print preview URL missing.", e.getMessage());
+        }
+    }
+
+    @Test
+    void print() throws Exception
+    {
+        URL printPreviewURL = new URL("http://external:9293/xwiki/bin/export/Some/Page?x=y#z");
+        URL browserPrintPreviewURL = new URL("http://xwiki-host:9293/xwiki/bin/export/Some/Page?x=y#z");
+
+        Cookie[] cookies = new Cookie[] {mock(Cookie.class)};
+        when(this.request.getCookies()).thenReturn(cookies);
+
+        when(this.browserManager.createIncognitoTab()).thenReturn(this.browserTab);
+        when(this.browserTab.navigate(new URL("http://xwiki-host:9293/xwiki/rest"), null, false)).thenReturn(true);
+        when(this.browserTab.navigate(browserPrintPreviewURL, cookies, true)).thenReturn(true);
+
+        InputStream pdfInputStream = mock(InputStream.class);
+        when(this.browserTab.printToPDF(any(Runnable.class))).then(new Answer<InputStream>()
+        {
+            @Override
+            public InputStream answer(InvocationOnMock invocation) throws Throwable
+            {
+                try {
+                    return pdfInputStream;
+                } finally {
+                    invocation.getArgument(0, Runnable.class).run();
+                }
+            }
+        });
+
+        assertSame(pdfInputStream, this.printer.print(printPreviewURL));
+
+        verify(this.browserTab).setBaseURL(printPreviewURL);
+        verify(this.browserTab).close();
+    }
+
+    @Test
+    void isAvailable()
+    {
+        assertFalse(this.printer.isAvailable());
+
+        when(this.browserManager.isConnected()).thenReturn(true);
+        assertTrue(this.printer.isAvailable());
+
+        RuntimeException exception = new RuntimeException("Connection failed!");
+        when(this.browserManager.isConnected()).thenThrow(exception);
+        assertFalse(this.printer.isAvailable());
+
+        verify(this.logger).warn("Failed to connect to the web browser used for server-side PDF printing.", exception);
+    }
+}

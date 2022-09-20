@@ -19,25 +19,36 @@
  */
 package org.xwiki.export.pdf.script;
 
+import java.net.URL;
+
+import javax.inject.Named;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.export.pdf.PDFExportConfiguration;
+import org.xwiki.export.pdf.PDFPrinter;
 import org.xwiki.export.pdf.internal.job.PDFExportJob;
 import org.xwiki.export.pdf.job.PDFExportJobRequest;
 import org.xwiki.export.pdf.job.PDFExportJobRequestFactory;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
+import org.xwiki.script.internal.safe.ScriptSafeProvider;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -60,6 +71,13 @@ class PDFExportScriptServiceTest
     private PDFExportJobRequestFactory requestFactory;
 
     @MockComponent
+    @Named("chrome")
+    private PDFPrinter<URL> pdfPrinter;
+
+    @MockComponent
+    private PDFExportConfiguration configuration;
+
+    @MockComponent
     private ContextualAuthorizationManager authorization;
 
     @MockComponent
@@ -67,6 +85,13 @@ class PDFExportScriptServiceTest
 
     @MockComponent
     private Execution execution;
+
+    /**
+     * Used to return script-safe objects.
+     */
+    @MockComponent
+    @SuppressWarnings("rawtypes")
+    private ScriptSafeProvider scriptSafeProvider;
 
     @Mock
     private PDFExportJobRequest request;
@@ -126,5 +151,39 @@ class PDFExportScriptServiceTest
 
         assertNull(this.service.execute(this.request));
         assertSame(exception, this.service.getLastError());
+    }
+
+    @Test
+    void isServerSidePrintingAvailable()
+    {
+        assertFalse(this.service.isServerSidePrintingAvailable());
+        assertNull(this.service.getLastError());
+
+        when(this.pdfPrinter.isAvailable()).thenReturn(true);
+        assertTrue(this.service.isServerSidePrintingAvailable());
+        assertNull(this.service.getLastError());
+
+        when(this.pdfPrinter.isAvailable()).thenThrow(new RuntimeException("Failed to initialize."));
+        assertFalse(this.service.isServerSidePrintingAvailable());
+        assertEquals("Failed to initialize.", this.service.getLastError().getMessage());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void getConfiguration()
+    {
+        PDFExportConfiguration safeConfig = mock(PDFExportConfiguration.class, "safe");
+        when(this.scriptSafeProvider.get(this.configuration)).thenReturn(safeConfig);
+        assertEquals(safeConfig, this.service.getConfiguration());
+        assertNull(this.service.getLastError());
+
+        when(this.authorization.hasAccess(Right.ADMIN)).thenReturn(true);
+        assertEquals(this.configuration, this.service.getConfiguration());
+        assertNull(this.service.getLastError());
+
+        when(this.authorization.hasAccess(Right.ADMIN)).thenReturn(false);
+        when(this.scriptSafeProvider.get(this.configuration)).thenThrow(new RuntimeException("Failed!"));
+        assertNull(this.service.getConfiguration());
+        assertEquals("Failed!", this.service.getLastError().getMessage());
     }
 }

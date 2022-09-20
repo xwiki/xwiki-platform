@@ -35,6 +35,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.context.concurrent.ContextStoreManager;
 import org.xwiki.export.pdf.PDFExportConfiguration;
+import org.xwiki.export.pdf.PDFPrinter;
 import org.xwiki.export.pdf.job.PDFExportJobRequest;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -88,6 +89,10 @@ class DefaultPDFExportJobRequestFactoryTest
 
     @MockComponent
     private PDFExportConfiguration configuration;
+
+    @MockComponent
+    @Named("chrome")
+    private PDFPrinter<URL> pdfPrinter;
 
     @Mock
     private XWikiContext xcontext;
@@ -183,6 +188,7 @@ class DefaultPDFExportJobRequestFactoryTest
     void createRequestWithDefaultTemplate() throws Exception
     {
         when(this.configuration.isServerSide()).thenReturn(true);
+        when(this.pdfPrinter.isAvailable()).thenReturn(true);
 
         DocumentReference templateReference =
             new DocumentReference("test", Arrays.asList("XWiki", "PDFExport"), "Template");

@@ -44,6 +44,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.concurrent.ContextStoreManager;
 import org.xwiki.export.pdf.PDFExportConfiguration;
+import org.xwiki.export.pdf.PDFPrinter;
 import org.xwiki.export.pdf.job.PDFExportJobRequest;
 import org.xwiki.export.pdf.job.PDFExportJobRequestFactory;
 import org.xwiki.model.internal.reference.comparator.DocumentReferenceComparator;
@@ -89,6 +90,15 @@ public class DefaultPDFExportJobRequestFactory implements PDFExportJobRequestFac
     @Inject
     private PDFExportConfiguration configuration;
 
+    /**
+     * Used to check if server-side printing is available. We use a provider instead of direct injection because we want
+     * the printer to be initialized only when server-side printing is requested, as per
+     * {@link PDFExportJobRequest#isServerSide()}.
+     */
+    @Inject
+    @Named("chrome")
+    private Provider<PDFPrinter<URL>> pdfPrinterProvider;
+
     private DocumentReferenceComparator documentReferenceComparator = new DocumentReferenceComparator(true);
 
     @Override
@@ -102,7 +112,8 @@ public class DefaultPDFExportJobRequestFactory implements PDFExportJobRequestFac
     {
         PDFExportJobRequest request = new PDFExportJobRequest();
         request.setId(EXPORT, "pdf", suffix);
-        request.setServerSide(this.configuration.isServerSide());
+        // Fall-back on the client-side printing if server-side printing is not available.
+        request.setServerSide(this.configuration.isServerSide() && this.pdfPrinterProvider.get().isAvailable());
 
         setRightsProperties(request);
         setContextProperties(request);

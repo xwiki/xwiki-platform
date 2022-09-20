@@ -26,8 +26,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.inject.Named;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.export.pdf.PDFPrinter;
@@ -77,7 +75,6 @@ class PDFExportJobTest
     private RequiredSkinExtensionsRecorder requiredSkinExtensionsRecorder;
 
     @MockComponent
-    @Named("chrome")
     private PDFPrinter<URL> pdfPrinter;
 
     @MockComponent
@@ -126,7 +123,7 @@ class PDFExportJobTest
     }
 
     @Test
-    void run() throws Exception
+    void runServerSide() throws Exception
     {
         when(this.requiredSkinExtensionsRecorder.stop()).thenReturn("required skin extensions");
 
@@ -135,6 +132,7 @@ class PDFExportJobTest
         this.request.getContext().put("request.url", printPreviewURL);
         when(this.pdfPrinter.print(printPreviewURL)).thenReturn(pdfContent);
 
+        this.request.setServerSide(true);
         this.pdfExportJob.initialize(this.request);
         this.pdfExportJob.runInternal();
 
@@ -151,7 +149,6 @@ class PDFExportJobTest
     @Test
     void runClientSide() throws Exception
     {
-        this.request.setServerSide(false);
         this.pdfExportJob.initialize(this.request);
         this.pdfExportJob.runInternal();
 

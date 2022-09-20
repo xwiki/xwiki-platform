@@ -53,7 +53,14 @@
       #set ($pdfExportJobStatusJSON.pdfFileURL = $services.resource.temporary.getURL(
         $pdfExportJobStatus.getPDFFileReference()))
     #end
-    #set ($pdfExportJobStatusJSON.failed = $pdfExportJobStatus.logTail.hasLogLevel('ERROR'))
+    ## Check if the PDF export job log contains errors and extract the last error message.
+    #set ($lastError = $pdfExportJobStatus.logTail.getLastLogEvent('ERROR'))
+    #if ($lastError.throwable)
+      #set ($lastError = $exceptiontool.getRootCauseMessage($lastError.throwable))
+    #else
+      #set ($lastError = $lastError.formattedMessage)
+    #end
+    #set ($pdfExportJobStatusJSON.lastError = $lastError)
   #end
   #jsonResponse($pdfExportJobStatusJSON)
 #end
@@ -75,6 +82,12 @@
   #elseif ($request.data == 'jobStatus')
     #set ($pdfExportJobId = $request.jobId.split('/'))
     #returnPDFExportJobStatusJSON($pdfExportJobId)
+  #elseif ($request.data == 'serverSidePrintingAvailable')
+    #set ($serverSidePrintingAvailable = $services.export.pdf.configuration.isServerSide() &amp;&amp;
+      $services.export.pdf.isServerSidePrintingAvailable())
+    #jsonResponse({
+      "serverSidePrintingAvailable": $serverSidePrintingAvailable
+    })
   #end
 #end
 {{/velocity}}</content>
@@ -171,9 +184,13 @@
     'export.pdf.options.template',
     'export.pdf.options.template.hint',
     'export.pdf.options.loadFailure',
+    'export.pdf.serverSidePrinting.checking',
+    'export.pdf.serverSidePrinting.unavailable',
+    'export.pdf.serverSidePrinting.checkFailed',
     'export.pdf.modal.close',
     'export.pdf.inProgress',
     'export.pdf.failed',
+    'export.pdf.lastError',
     'export.pdf.canceling',
     'export.pdf.canceled',
     'export.pdf.cancelFailed'
@@ -248,6 +265,34 @@ require([
     select.find('option').first().attr('selected', 'selected');
   }
 
+  const checkIfServerSidePrintingIsAvailable = function() {
+    // Disable the Export button while we determine if server-side PDF printing is available.
+    pdfExportOptionsModal.find('.modal-footer input[type=submit]').prop('disabled', true);
+    // Notify the user.
+    $('body').css('cursor', 'wait');
+    const notification = new XWiki.widgets.Notification(l10n['export.pdf.serverSidePrinting.checking'], 'inprogress');
+    fetch(XWiki.currentDocument.getURL('get', $.param({
+      outputSyntax: 'plain',
+      sheet: 'XWiki.PDFExport.WebHome',
+      data: 'serverSidePrintingAvailable',
+    }))).then(response =&gt; response.json()).then(data =&gt; {
+      if (data.serverSidePrintingAvailable) {
+        // Everything's fine, don't distract the user.
+        notification.hide();
+      } else {
+        notification.replace(new XWiki.widgets.Notification(l10n['export.pdf.serverSidePrinting.unavailable'],
+          // Increase a bit the timeout so that the user has the time to read the warning message.
+          'warning', {timeout : 10}));
+      }
+    }).catch(() =&gt; {
+      notification.replace(new XWiki.widgets.Notification(l10n['export.pdf.serverSidePrinting.checkFailed'], 'error'));
+    }).finally(() =&gt; {
+      // Re-enable the Export button.
+      pdfExportOptionsModal.find('.modal-footer input[type=submit]').prop('disabled', false);
+      $('body').css('cursor', '');
+    });
+  };
+
   const openPDFOptionsModal = function(url, data) {
     // Store the document selection so it can be used later when the modal is submitted.
     pdfExportOptionsModal.data('selection', data);
@@ -267,6 +312,9 @@ require([
         form.find('dl').prepend(templateOption.contents());
         pdfExportOptionsModal.attr('action', form.attr('action'));
         pdfExportOptionsModal.find('.modal-body').removeClass('loading').append(form.contents());
+        if (config.serverSide) {
+          checkIfServerSidePrintingIsAvailable();
+        }
       } else {
         new XWiki.widgets.Notification(l10n['export.pdf.options.loadFailure'], 'error');
         pdfExportOptionsModal.modal('hide');
@@ -372,9 +420,14 @@ require([
       } else if (job.pdfFileURL) {
         // The PDF file was generated on the server-side. The user just needs to download it.
         window.location.href = job.pdfFileURL;
-      } else if (job.failed) {
-        return Promise.reject();
       } else {
+        if (job.lastError) {
+          // The PDF export job log contains some error messages which can indicate a possible failure of the
+          // server-side PDF printing. Warn the user and continue with client-side printing.
+          new XWiki.widgets.Notification(l10n.get('export.pdf.lastError', job.lastError), 'warning',
+            // Increase a bit the timeout so that the user has the time to read the warning message.
+            {timeout : 10});
+        }
         // Show the Print Preview modal in order for the user to be able to save the result as PDF.
         return showPrintPreviewModal(job.id);
       }
@@ -644,7 +697,8 @@ require([
   #end
 #end
 #set ($config = {
-  'templates': $templates
+  'templates': $templates,
+  'serverSide': $services.export.pdf.configuration.isServerSide()
 })
 &lt;script id="pdfExportConfig" type="application/json"&gt;$jsontool.serialize($config).replace(
   '&lt;', '\u003C')&lt;/script&gt;

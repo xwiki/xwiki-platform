@@ -22,6 +22,7 @@ package org.xwiki.export.pdf.internal.chrome;
 import java.util.Arrays;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
@@ -33,6 +34,7 @@ import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.export.pdf.PDFExportConfiguration;
+import org.xwiki.export.pdf.browser.BrowserManager;
 import org.xwiki.export.pdf.internal.docker.ContainerManager;
 
 import com.github.dockerjava.api.model.HostConfig;
@@ -45,10 +47,11 @@ import com.github.dockerjava.api.model.HostConfig;
  */
 @Component
 @Singleton
-public class ChromeManagerProvider implements Provider<ChromeManager>, Initializable, Disposable
+@Named("chrome")
+public class ChromeManagerProvider implements Provider<BrowserManager>, Initializable, Disposable
 {
     private static final String BRIDGE_NETWORK = "bridge";
-    
+
     @Inject
     private Logger logger;
 
@@ -56,7 +59,8 @@ public class ChromeManagerProvider implements Provider<ChromeManager>, Initializ
     private PDFExportConfiguration configuration;
 
     @Inject
-    private ChromeManager chromeManager;
+    @Named("chrome")
+    private BrowserManager chromeManager;
 
     /**
      * We use a provider (i.e. lazy initialization) because we don't always need this component (e.g. when the Chrome
@@ -140,7 +144,7 @@ public class ChromeManagerProvider implements Provider<ChromeManager>, Initializ
     @Override
     public void dispose() throws ComponentLifecycleException
     {
-        if (this.containerId != null) {
+        if (this.containerId != null && !this.configuration.isChromeDockerContainerReusable()) {
             try {
                 this.containerManagerProvider.get().stopContainer(this.containerId);
             } catch (Exception e) {
@@ -152,7 +156,7 @@ public class ChromeManagerProvider implements Provider<ChromeManager>, Initializ
     }
 
     @Override
-    public ChromeManager get()
+    public BrowserManager get()
     {
         return this.chromeManager;
     }

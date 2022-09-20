@@ -40,9 +40,14 @@
 export.pdf.options.template.hint=The PDF template controls the information displayed on the cover page, in the table of contents as well as in the header and footer of each page.
 export.pdf.options.loadFailure=Failed to load the PDF export options.
 
+export.pdf.serverSidePrinting.checking=Checking if server-side PDF printing is available...
+export.pdf.serverSidePrinting.unavailable=Server-side PDF printing is unavailable. Using client-side printing instead.
+export.pdf.serverSidePrinting.checkFailed=Failed to check if server-side PDF printing is available
+
 export.pdf.modal.close=Close
 export.pdf.inProgress=Exporting as PDF...
 export.pdf.failed=Failed to export as PDF
+export.pdf.lastError=The PDF export log contains errors: {0}
 export.pdf.canceling=Canceling PDF export...
 export.pdf.canceled=PDF export canceled
 export.pdf.cancelFailed=Failed to cancel the PDF export

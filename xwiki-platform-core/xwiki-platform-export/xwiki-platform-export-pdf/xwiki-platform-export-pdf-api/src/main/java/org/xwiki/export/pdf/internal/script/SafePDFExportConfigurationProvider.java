@@ -17,40 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.export.pdf;
+package org.xwiki.export.pdf.internal.script;
 
-import java.io.IOException;
-import java.io.InputStream;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.export.pdf.PDFExportConfiguration;
+import org.xwiki.script.internal.safe.ScriptSafeProvider;
 
 /**
- * Generic interface to print some data as PDF.
+ * Provide a safe {@link PDFExportConfiguration}.
  * 
  * @version $Id$
- * @param <T> the input data type
- * @since 14.4.2
- * @since 14.5
+ * @since 14.8
  */
-@Role
-@Unstable
-public interface PDFPrinter<T>
+@Component
+@Singleton
+public class SafePDFExportConfigurationProvider implements ScriptSafeProvider<PDFExportConfiguration>
 {
     /**
-     * Prints the specified data as PDF.
-     * 
-     * @param input the data to be printed as PDF
-     * @return the PDF input stream
+     * The provider of instances safe for public scripts.
      */
-    InputStream print(T input) throws IOException;
+    @Inject
+    @SuppressWarnings("rawtypes")
+    private ScriptSafeProvider defaultSafeProvider;
 
-    /**
-     * @return {@code true} if this PDF printer is ready to be used, {@code false} otherwise
-     * @since 14.8
-     */
-    default boolean isAvailable()
+    @Override
+    @SuppressWarnings("unchecked")
+    public <S> S get(PDFExportConfiguration unsafe)
     {
-        return true;
+        return (S) new SafePDFExportConfiguration(unsafe, this.defaultSafeProvider);
     }
 }

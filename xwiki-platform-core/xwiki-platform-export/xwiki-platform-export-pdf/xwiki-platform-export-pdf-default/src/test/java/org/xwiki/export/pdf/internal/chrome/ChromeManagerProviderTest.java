@@ -21,8 +21,11 @@ package org.xwiki.export.pdf.internal.chrome;
 
 import java.util.Arrays;
 
+import javax.inject.Named;
+
 import org.junit.jupiter.api.Test;
 import org.xwiki.export.pdf.PDFExportConfiguration;
+import org.xwiki.export.pdf.browser.BrowserManager;
 import org.xwiki.export.pdf.internal.docker.ContainerManager;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -52,7 +55,8 @@ class ChromeManagerProviderTest
     private PDFExportConfiguration configuration;
 
     @MockComponent
-    private ChromeManager chromeManager;
+    @Named("chrome")
+    private BrowserManager chromeManager;
 
     @MockComponent
     private ContainerManager containerManager;
@@ -129,7 +133,7 @@ class ChromeManagerProviderTest
         verify(this.chromeManager).connect(this.containerIpAddress, this.configuration.getChromeRemoteDebuggingPort());
 
         this.chromeManagerProvider.dispose();
-        verify(this.containerManager).stopContainer(this.containerId);
+        verify(this.containerManager, never()).stopContainer(this.containerId);
     }
 
     @BeforeComponent("initializeWithRemoteChrome")

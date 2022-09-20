@@ -30,7 +30,7 @@
   <artifactId>xwiki-platform-export-pdf-api</artifactId>
   <name>XWiki Platform - Export - PDF - API</name>
   <packaging>jar</packaging>
-  <description>API for multipage PDF export using a headless Chrome browser running inside a Docker container.</description>
+  <description>API for multipage PDF export that supports both client-side printing, using the user's web browser, and server-side printing, e.g. using a headless Chrome browser that may run inside a Docker container.</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>PDF Export API</xwiki.extension.name>
@@ -76,6 +76,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>xwiki-platform-user-api</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <!-- Test dependencies -->
     <dependency>

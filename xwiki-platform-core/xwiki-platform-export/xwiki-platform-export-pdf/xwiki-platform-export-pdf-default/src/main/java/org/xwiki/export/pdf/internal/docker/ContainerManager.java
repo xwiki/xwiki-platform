@@ -207,15 +207,15 @@ public class ContainerManager implements Initializable
      */
     public void stopContainer(String containerId)
     {
-        this.logger.debug("Stopping the Docker container with id [{}].", containerId);
-        exec(this.client.stopContainerCmd(containerId));
-
-        // Wait for the container to be fully stopped before continuing.
-        this.logger.debug("Wait for the Docker container [{}] to stop.", containerId);
         try {
+            this.logger.debug("Stopping the Docker container with id [{}].", containerId);
+            exec(this.client.stopContainerCmd(containerId));
+
+            // Wait for the container to be fully stopped before continuing.
+            this.logger.debug("Wait for the Docker container [{}] to stop.", containerId);
             wait(this.client.waitContainerCmd(containerId));
         } catch (NotFoundException e) {
-            // Do nothing (the container might have been removed automatically when stopped).
+            // Do nothing (the container doesn't exist anymore).
         }
     }
 

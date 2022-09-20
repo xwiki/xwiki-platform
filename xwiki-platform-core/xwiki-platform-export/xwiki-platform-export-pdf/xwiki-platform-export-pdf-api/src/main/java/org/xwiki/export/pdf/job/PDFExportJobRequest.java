@@ -193,7 +193,7 @@ public class PDFExportJobRequest extends AbstractCheckRightsRequest
      */
     public boolean isServerSide()
     {
-        return getProperty(PROPERTY_SERVER_SIDE, true);
+        return getProperty(PROPERTY_SERVER_SIDE, false);
     }
 
     /**

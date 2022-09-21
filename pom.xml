@@ -205,15 +205,23 @@
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>
           </exclusion>
-          <!-- Wrong id -->
-          <exclusion>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
-          </exclusion>
           <!-- Remove when is https://issues.apache.org/jira/browse/TIKA-3537 fixed -->
           <exclusion>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+          </exclusion>
+          <!-- Wrong ids -->
+          <exclusion>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcmail-jdk15on</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -231,6 +239,17 @@
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parser-crypto-module</artifactId>
         <version>${tika.version}</version>
+        <exclusions>
+          <!-- Wrong ids -->
+          <exclusion>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcmail-jdk15on</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
@@ -267,6 +286,15 @@
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
           </exclusion>
+          <!-- Wrong ids -->
+          <exclusion>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcmail-jdk15on</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
@@ -283,6 +311,15 @@
           <exclusion>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
+          </exclusion>
+          <!-- Wrong ids -->
+          <exclusion>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcmail-jdk15on</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -1081,7 +1118,7 @@
 
               <!-- Right id of the The Bouncy Castle Crypto packages -->
               <extensionOverride>
-                <id>org.bouncycastle:bcprov-jdk15on</id>
+                <id>org.bouncycastle:bcprov-jdk18on</id>
                 <features>
                   bouncycastle:bcprov-jdk16/140,
                   bouncycastle:bcprov-jdk15/140,
@@ -1093,11 +1130,12 @@
                   org.bouncycastle:bcprov-jdk14,
                   org.bouncycastle:bcprov-jdk13,
                   org.bouncycastle:bcprov-jdk12,
-                  org.bouncycastle:bcprov-jdk15to18
+                  org.bouncycastle:bcprov-jdk15to18,
+                  org.bouncycastle:bcprov-jdk15on
                 </features>
               </extensionOverride>
               <extensionOverride>
-                <id>org.bouncycastle:bcpkix-jdk15on</id>
+                <id>org.bouncycastle:bcpkix-jdk18on</id>
                 <features>
                   bouncycastle:bcpkix-jdk16/140,
                   bouncycastle:bcpkix-jdk15/140,
@@ -1109,11 +1147,12 @@
                   org.bouncycastle:bcpkix-jdk14,
                   org.bouncycastle:bcpkix-jdk13,
                   org.bouncycastle:bcpkix-jdk12,
-                  org.bouncycastle:bcpkix-jdk15to18
+                  org.bouncycastle:bcpkix-jdk15to18,
+                  org.bouncycastle:bcpkix-jdk15on
                 </features>
               </extensionOverride>
               <extensionOverride>
-                <id>org.bouncycastle:bcmail-jdk15on</id>
+                <id>org.bouncycastle:bcmail-jdk18on</id>
                 <features>
                   bouncycastle:bcmail-jdk16/140,
                   bouncycastle:bcmail-jdk15/140,
@@ -1125,7 +1164,8 @@
                   org.bouncycastle:bcmail-jdk14,
                   org.bouncycastle:bcmail-jdk13,
                   org.bouncycastle:bcmail-jdk12,
-                  org.bouncycastle:bcmail-jdk15to18
+                  org.bouncycastle:bcmail-jdk15to18,
+                  org.bouncycastle:bcmail-jdk15on
                 </features>
               </extensionOverride>
               <extensionOverride>

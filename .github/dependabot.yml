@@ -19,7 +19,7 @@
 # ---------------------------------------------------------------------------
 version: 2
 registries:
-  # Hep find updates for non Maven Central dependencies
+  # Helps find updates for non Maven Central dependencies
   maven-xwiki-public:
     type: maven-repository
     url: https://nexus.xwiki.org/nexus/content/groups/public/

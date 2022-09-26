@@ -250,7 +250,7 @@ require([
         &lt;span class="xHint"&gt;&lt;/span&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
-        &lt;select id="pdfTemplate" name="template"&gt;&lt;/select&gt;
+        &lt;select id="pdfTemplate" name="pdftemplate"&gt;&lt;/select&gt;
       &lt;/dd&gt;
     &lt;/dl&gt;
   `);

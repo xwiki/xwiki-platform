@@ -59,6 +59,7 @@
     <jetty.version>9.4.48.v20220622</jetty.version>
     <netty.version>4.1.82.Final</netty.version>
     <hibernate.version>5.6.11.Final</hibernate.version>
+    <dockerJava.version>3.2.13</dockerJava.version>
 
     <!-- Versions of other software we need in our functional tests -->
     <testcontainers.version>1.17.3</testcontainers.version>
@@ -969,6 +970,30 @@
         <artifactId>fast-diff</artifactId>
         <version>1.2.0</version>
         <scope>runtime</scope>
+      </dependency>
+
+      <!-- Docker -->
+      <dependency>
+        <groupId>com.github.docker-java</groupId>
+        <artifactId>docker-java</artifactId>
+        <version>${dockerJava.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.docker-java</groupId>
+        <artifactId>docker-java-core</artifactId>
+        <version>${dockerJava.version}</version>
+        <exclusions>
+          <!-- Wrong id -->
+          <exclusion>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk15on</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>com.github.docker-java</groupId>
+        <artifactId>docker-java-transport-httpclient5</artifactId>
+        <version>${dockerJava.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

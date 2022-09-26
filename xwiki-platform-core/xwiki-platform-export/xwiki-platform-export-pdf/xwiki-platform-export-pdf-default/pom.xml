@@ -34,7 +34,6 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>PDF Export Default API Implementation</xwiki.extension.name>
-    <dockerJava.version>3.2.13</dockerJava.version>
     <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     <xwiki.jacoco.instructionRatio>0.43</xwiki.jacoco.instructionRatio>
     <!-- All wikis are using the same headless Chrome browser (and thus the same Docker container) to perform the PDF
@@ -66,12 +65,15 @@
     <dependency>
       <groupId>com.github.docker-java</groupId>
       <artifactId>docker-java-core</artifactId>
-      <version>${dockerJava.version}</version>
+    </dependency>
+    <!-- Required by docker-java-core -->
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcpkix-jdk18on</artifactId>
     </dependency>
     <dependency>
       <groupId>com.github.docker-java</groupId>
       <artifactId>docker-java-transport-httpclient5</artifactId>
-      <version>${dockerJava.version}</version>
     </dependency>
     <!-- Used for interacting with the headless Chrome web browser. -->
     <dependency>

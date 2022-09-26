@@ -11,3 +11,5 @@ org.xwiki.repository.internal.resources.RepositoryRESTResource
 org.xwiki.repository.internal.resources.SearchRESTResource
 org.xwiki.repository.internal.xhtml.ExtensionXHTMLLinkTypeRenderer
 org.xwiki.repository.script.RepositoryScriptService
+org.xwiki.repository.script.TemporaryCoreExtensionRepository
+org.xwiki.repository.script.TemporaryLocalExtensionRepository

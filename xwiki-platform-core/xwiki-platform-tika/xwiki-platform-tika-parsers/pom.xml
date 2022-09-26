@@ -48,13 +48,6 @@
     <dependency>
       <groupId>org.apache.tika</groupId>
       <artifactId>tika-parser-advancedmedia-module</artifactId>
-      <exclusions>
-        <!-- Wrong id -->
-        <exclusion>
-          <groupId>javax.annotation</groupId>
-          <artifactId>javax.annotation-api</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.tika</groupId>
@@ -135,12 +128,6 @@
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-to-slf4j</artifactId>
       <scope>runtime</scope>
-    </dependency>
-
-    <!-- Replace the version triggered by Tika parsers by a more accurate one -->
-    <dependency>
-      <groupId>jakarta.annotation</groupId>
-      <artifactId>jakarta.annotation-api</artifactId>
     </dependency>
 
     <!-- Test Dependencies -->

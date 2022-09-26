@@ -50,13 +50,13 @@
       <contenttype>FullyRenderedText</contenttype>
       <customDisplay/>
       <disabled>0</disabled>
-      <editor>---</editor>
+      <editor>Text</editor>
       <hint>XWiki.PDFExport.TemplateClass_cover.hint</hint>
       <name>cover</name>
       <number>1</number>
-      <picker>1</picker>
+      <picker>0</picker>
       <prettyName>Cover</prettyName>
-      <rows>5</rows>
+      <rows>20</rows>
       <size>40</size>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -67,13 +67,13 @@
       <contenttype>FullyRenderedText</contenttype>
       <customDisplay/>
       <disabled>0</disabled>
-      <editor>---</editor>
+      <editor>Text</editor>
       <hint>XWiki.PDFExport.TemplateClass_footer.hint</hint>
       <name>footer</name>
       <number>4</number>
-      <picker>1</picker>
+      <picker>0</picker>
       <prettyName>Footer</prettyName>
-      <rows>5</rows>
+      <rows>20</rows>
       <size>40</size>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -84,13 +84,13 @@
       <contenttype>FullyRenderedText</contenttype>
       <customDisplay/>
       <disabled>0</disabled>
-      <editor>---</editor>
+      <editor>Text</editor>
       <hint>XWiki.PDFExport.TemplateClass_header.hint</hint>
       <name>header</name>
       <number>3</number>
-      <picker>1</picker>
+      <picker>0</picker>
       <prettyName>Header</prettyName>
-      <rows>5</rows>
+      <rows>20</rows>
       <size>40</size>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -101,13 +101,13 @@
       <contenttype>FullyRenderedText</contenttype>
       <customDisplay/>
       <disabled>0</disabled>
-      <editor>---</editor>
+      <editor>Text</editor>
       <hint>XWiki.PDFExport.TemplateClass_toc.hint</hint>
       <name>toc</name>
       <number>2</number>
-      <picker>1</picker>
+      <picker>0</picker>
       <prettyName>Table of Contents</prettyName>
-      <rows>5</rows>
+      <rows>20</rows>
       <size>40</size>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>

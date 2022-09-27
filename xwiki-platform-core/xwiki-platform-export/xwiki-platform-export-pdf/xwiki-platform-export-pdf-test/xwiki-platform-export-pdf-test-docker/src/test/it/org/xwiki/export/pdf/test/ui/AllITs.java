@@ -31,7 +31,8 @@ import org.xwiki.test.docker.junit5.UITest;
  * @since 14.4.2
  * @since 14.5
  */
-@UITest(properties = {"xwikiPropertiesAdditionalProperties=export.pdf.serverSide=true"})
+@UITest(properties = {"xwikiPropertiesAdditionalProperties=export.pdf.serverSide=true"}, extraJARs = {
+    "org.xwiki.platform:xwiki-platform-resource-temporary"})
 @ExtendWith(DynamicTestConfigurationExtension.class)
 class AllITs
 {

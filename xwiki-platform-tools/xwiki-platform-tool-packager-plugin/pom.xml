@@ -39,17 +39,6 @@
     <!-- It might be causing issue with this plugin build but not sure why and it's quite random -->
     <xwiki.spoon.skip>true</xwiki.spoon.skip>
   </properties>
-  <dependencyManagement>
-    <dependencies>
-      <!-- TODO: remove when we find a solution to Solr locking itself (the lock placed by the plugin prevent the XWiki instance from accessing the index) -->
-      <dependency>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-search-solr-api</artifactId>
-        <!-- Not running with Solr because it causes lock problems -->
-        <scope>provided</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -374,7 +363,7 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-search-solr-api</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
+      <scope>provided</scope>
     </dependency>
     <!-- Expected by Needed to wait for document backlink indexation queue to be consumed. -->
     <dependency>

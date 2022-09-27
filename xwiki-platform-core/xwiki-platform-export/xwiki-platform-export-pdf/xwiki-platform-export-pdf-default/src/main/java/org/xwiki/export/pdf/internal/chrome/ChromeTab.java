@@ -57,12 +57,12 @@ import com.github.kklisura.cdt.services.ChromeDevToolsService;
  */
 public class ChromeTab implements BrowserTab
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ChromeTab.class);
-
     /**
      * The JavaScript code used to wait for the page to be fully ready before printing it to PDF.
      */
-    private static final String PAGE_READY_PROMISE;
+    static final String PAGE_READY_PROMISE;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ChromeTab.class);
 
     static {
         // Read the JavaScript code for page ready promise once and cache it.

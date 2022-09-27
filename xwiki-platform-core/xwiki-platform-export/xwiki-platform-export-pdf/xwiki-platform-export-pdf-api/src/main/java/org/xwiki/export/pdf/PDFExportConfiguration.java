@@ -46,13 +46,6 @@ public interface PDFExportConfiguration
     String getChromeDockerContainerName();
 
     /**
-     * @return {@code true} if the Docker container running the headless Chrome web browser can be reused across XWiki
-     *         restarts, {@code false} to remove the container each time XWiki is stopped / restarted; defaults to
-     *         {@code false}
-     */
-    boolean isChromeDockerContainerReusable();
-
-    /**
      * @return the name or id of the Docker network to add the Chrome Docker container to; this is useful when XWiki
      *         itself runs inside a Docker container and you want to have the Chrome container in the same network in
      *         order for them to communicate, see {@link #getXWikiHost()}; defaults to "{@code bridge}" the default

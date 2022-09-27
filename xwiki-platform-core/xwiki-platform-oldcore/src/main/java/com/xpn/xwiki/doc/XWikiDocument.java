@@ -7333,6 +7333,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         loadAttachments(context);
         if (cloneArchive) {
             loadArchive(context);
+        } else {
+            setDocumentArchive(new XWikiDocumentArchive(getId()));
         }
 
         XWikiDocument newdoc = cloneInternal(newDocumentReference, false, cloneArchive);

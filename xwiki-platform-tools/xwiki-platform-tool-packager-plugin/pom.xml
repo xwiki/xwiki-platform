@@ -89,9 +89,18 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-authorization-bridge</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-extension-handler-xar</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
     </dependency>
     <!-- By default we import/export using HSQLDB. We could have let users of this plugin define which version to use
          but it makes it simpler to use the plugin to define it here as a default which can be overridden by users
@@ -100,7 +109,6 @@
       <groupId>org.hsqldb</groupId>
       <artifactId>hsqldb</artifactId>
       <version>${hsqldb.version}</version>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -112,28 +120,30 @@
       <artifactId>xwiki-platform-index-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-
-    <!-- Make sure artifacts included in the built Jetty package are built before the plugin -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-minimaldependencies</artifactId>
+      <artifactId>xwiki-platform-configuration-default</artifactId>
       <version>${project.version}</version>
-      <type>pom</type>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-tool-rootwebapp</artifactId>
+      <artifactId>xwiki-platform-user-default</artifactId>
       <version>${project.version}</version>
-      <type>war</type>
-      <scope>runtime</scope>
     </dependency>
-    <!-- PR Test checker -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-test-checker</artifactId>
+      <artifactId>xwiki-platform-store-filesystem-oldcore</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-refactoring-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-configuration-default</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <!-- We need the Servlet API dep since it's used by the Packager and since it has
          a provided scope in XWiki core it's not inherited as part of transitive deps -->
@@ -142,6 +152,29 @@
       <artifactId>javax.servlet-api</artifactId>
       <scope>runtime</scope>
     </dependency>
+
+    <!-- Make sure artifacts included in the built Jetty package are built before the plugin -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-minimaldependencies</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-tool-rootwebapp</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+      <scope>provided</scope>
+    </dependency>
+    <!-- PR Test checker -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-checker</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
     <!-- Needed to unpack the Flamingo skin resourced into the custom WAR -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -149,14 +182,14 @@
       <version>${project.version}</version>
       <!-- Using provided even though it's not strictly required but in case some other module depend on this one, to
            stop the chain -->
-      <scope>runtime</scope>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
       <version>${project.version}</version>
       <type>zip</type>
-      <scope>runtime</scope>
+      <scope>provided</scope>
     </dependency>
 
     <!-- Test Dependencies -->

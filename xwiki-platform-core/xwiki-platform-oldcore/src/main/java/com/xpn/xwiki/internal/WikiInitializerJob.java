@@ -98,7 +98,7 @@ public class WikiInitializerJob extends AbstractJob<WikiInitializerRequest, Wiki
             // Initialize plugins
             xcontext.getWiki().getPluginManager().virtualInit(xcontext);
 
-            this.logger.info("Initialization if wiki [{}] done", wikiId);
+            this.logger.info("Initialization of wiki [{}] done", wikiId);
 
             this.progressManager.startStep(this, "Call listeners");
 

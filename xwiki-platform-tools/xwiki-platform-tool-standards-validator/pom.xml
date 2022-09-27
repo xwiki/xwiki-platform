@@ -37,6 +37,7 @@
   </properties>
   <dependencyManagement>
     <dependencies>
+      <!-- Nu Validator is not compatible with ICU4J 70+ -->
       <dependency>
         <groupId>com.ibm.icu</groupId>
         <artifactId>icu4j</artifactId>

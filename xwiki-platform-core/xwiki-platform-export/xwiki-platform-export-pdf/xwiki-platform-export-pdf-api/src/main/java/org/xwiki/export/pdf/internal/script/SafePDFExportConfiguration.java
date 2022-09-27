@@ -56,12 +56,6 @@ public class SafePDFExportConfiguration extends AbstractSafeObject<PDFExportConf
     }
 
     @Override
-    public boolean isChromeDockerContainerReusable()
-    {
-        return getWrapped().isChromeDockerContainerReusable();
-    }
-
-    @Override
     public String getDockerNetwork()
     {
         return null;

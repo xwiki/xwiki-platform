@@ -58,12 +58,6 @@ public class DefaultPDFExportConfiguration implements PDFExportConfiguration
     }
 
     @Override
-    public boolean isChromeDockerContainerReusable()
-    {
-        return this.configurationSource.getProperty(PREFIX + "chromeDockerContainerReusable", false);
-    }
-
-    @Override
     public String getDockerNetwork()
     {
         return this.configurationSource.getProperty(PREFIX + "dockerNetwork", "bridge");

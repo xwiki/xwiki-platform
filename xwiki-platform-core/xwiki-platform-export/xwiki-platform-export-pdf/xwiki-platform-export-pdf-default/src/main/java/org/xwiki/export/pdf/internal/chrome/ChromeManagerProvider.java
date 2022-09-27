@@ -71,6 +71,13 @@ public class ChromeManagerProvider implements Provider<BrowserManager>, Initiali
 
     private String containerId;
 
+    /**
+     * Flag indicating if the Docker container used for PDF export was created by this component instance or not. This
+     * is needed in order to know whether to stop the Docker container or not when the component is disposed. We
+     * shouldn't stop a Docker container that we didn't create (i.e. that is being reused).
+     */
+    private boolean isContainerCreator;
+
     @Override
     public void initialize() throws InitializationException
     {
@@ -89,8 +96,7 @@ public class ChromeManagerProvider implements Provider<BrowserManager>, Initiali
         this.logger.debug("Initializing the Docker container running the headless Chrome web browser.");
         ContainerManager containerManager = this.containerManagerProvider.get();
         try {
-            this.containerId = containerManager.maybeReuseContainerByName(containerName,
-                this.configuration.isChromeDockerContainerReusable());
+            this.containerId = containerManager.maybeReuseContainerByName(containerName);
             if (this.containerId == null) {
                 // The container doesn't exist so we have to create it.
                 // But first we need to pull the image used to create the container, if we don't have it already.
@@ -109,6 +115,7 @@ public class ChromeManagerProvider implements Provider<BrowserManager>, Initiali
                     Arrays.asList("--no-sandbox", "--remote-debugging-address=0.0.0.0",
                         "--remote-debugging-port=" + remoteDebuggingPort),
                     hostConfig);
+                this.isContainerCreator = true;
                 containerManager.startContainer(this.containerId);
             }
 
@@ -144,7 +151,9 @@ public class ChromeManagerProvider implements Provider<BrowserManager>, Initiali
     @Override
     public void dispose() throws ComponentLifecycleException
     {
-        if (this.containerId != null && !this.configuration.isChromeDockerContainerReusable()) {
+        this.chromeManager.close();
+
+        if (this.containerId != null && this.isContainerCreator) {
             try {
                 this.containerManagerProvider.get().stopContainer(this.containerId);
             } catch (Exception e) {

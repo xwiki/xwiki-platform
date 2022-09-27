@@ -99,7 +99,7 @@ class ChromeManagerProviderTest
     @BeforeComponent("initializeAndDispose")
     void beforeInitializeAndDispose()
     {
-        when(this.containerManager.maybeReuseContainerByName(this.configuration.getChromeDockerContainerName(), false))
+        when(this.containerManager.maybeReuseContainerByName(this.configuration.getChromeDockerContainerName()))
             .thenReturn(null);
         when(this.containerManager.isLocalImagePresent(this.configuration.getChromeDockerImage())).thenReturn(false);
     }
@@ -119,8 +119,7 @@ class ChromeManagerProviderTest
     void beforeInitializeWithExistingContainer()
     {
         mockNetwork("test-network");
-        when(this.configuration.isChromeDockerContainerReusable()).thenReturn(true);
-        when(this.containerManager.maybeReuseContainerByName(this.configuration.getChromeDockerContainerName(), true))
+        when(this.containerManager.maybeReuseContainerByName(this.configuration.getChromeDockerContainerName()))
             .thenReturn(this.containerId);
     }
 
@@ -145,7 +144,7 @@ class ChromeManagerProviderTest
     @Test
     void initializeWithRemoteChrome() throws Exception
     {
-        verify(this.containerManager, never()).maybeReuseContainerByName(any(String.class), any(Boolean.class));
+        verify(this.containerManager, never()).maybeReuseContainerByName(any(String.class));
         verify(this.containerManager, never()).startContainer(any(String.class));
 
         verify(this.chromeManager).connect("remote-chrome", this.configuration.getChromeRemoteDebuggingPort());

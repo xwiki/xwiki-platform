@@ -80,10 +80,9 @@ public class ContainerManager implements Initializable
      * Attempts to reuse the container with the specified name.
      * 
      * @param containerName the name of the container to reuse
-     * @param reuse {@code true} to reuse the container if found, {@code false} to remove it if found
      * @return the container id, if a container with the specified name exists and can be reused, otherwise {@code null}
      */
-    public String maybeReuseContainerByName(String containerName, boolean reuse)
+    public String maybeReuseContainerByName(String containerName)
     {
         this.logger.debug("Looking for an existing Docker container with name [{}].", containerName);
         List<Container> containers =
@@ -95,11 +94,7 @@ public class ContainerManager implements Initializable
         }
 
         InspectContainerResponse container = inspectContainer(containers.get(0).getId());
-        if (!reuse) {
-            this.logger.debug("Docker container [{}] found but we can't reuse it.", container.getId());
-            removeContainer(container);
-            return null;
-        } else if (container.getState().getDead() == Boolean.TRUE) {
+        if (container.getState().getDead() == Boolean.TRUE) {
             this.logger.debug("Docker container [{}] is dead. Removing it.", container.getId());
             // The container is not reusable. Try to remove it so it can be recreated.
             removeContainer(container.getId());
@@ -232,18 +227,6 @@ public class ContainerManager implements Initializable
         } catch (NotFoundException e) {
             // Do nothing (the container might have been removed automatically when stopped).
         }
-    }
-
-    private void removeContainer(InspectContainerResponse container)
-    {
-        if (container.getState().getPaused() == Boolean.TRUE) {
-            exec(this.client.unpauseContainerCmd(container.getId()));
-            stopContainer(container.getId());
-        } else if (container.getState().getRunning() == Boolean.TRUE
-            || container.getState().getRestarting() == Boolean.TRUE) {
-            stopContainer(container.getId());
-        }
-        removeContainer(container.getId());
     }
 
     /**

@@ -4534,7 +4534,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             if (cloneArchive) {
                 doc.cloneDocumentArchive(this);
             } else {
-                doc.setDocumentArchive(getDocumentArchive());
+                doc.setDocumentArchive(new XWikiDocumentArchive(newDocumentReference.getWikiReference(), getId()));
             }
             doc.getAuthors().copyAuthors(getAuthors());
             doc.setContent(getContent());
@@ -7333,8 +7333,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         loadAttachments(context);
         if (cloneArchive) {
             loadArchive(context);
-        } else {
-            setDocumentArchive(new XWikiDocumentArchive(getId()));
         }
 
         XWikiDocument newdoc = cloneInternal(newDocumentReference, false, cloneArchive);

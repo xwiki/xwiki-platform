@@ -75,6 +75,7 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
      * PDF printing is requested, as per {@link PDFExportJobRequest#isServerSide()}.
      */
     @Inject
+    @Named("chrome")
     private Provider<PDFPrinter<URL>> pdfPrinterProvider;
 
     @Inject

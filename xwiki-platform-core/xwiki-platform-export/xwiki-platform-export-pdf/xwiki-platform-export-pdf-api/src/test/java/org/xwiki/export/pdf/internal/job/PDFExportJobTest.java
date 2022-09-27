@@ -26,6 +26,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.inject.Named;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.export.pdf.PDFPrinter;
@@ -75,6 +77,7 @@ class PDFExportJobTest
     private RequiredSkinExtensionsRecorder requiredSkinExtensionsRecorder;
 
     @MockComponent
+    @Named("chrome")
     private PDFPrinter<URL> pdfPrinter;
 
     @MockComponent

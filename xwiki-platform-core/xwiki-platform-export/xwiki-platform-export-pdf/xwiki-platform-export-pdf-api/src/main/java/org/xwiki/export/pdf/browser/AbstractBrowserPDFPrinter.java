@@ -109,8 +109,8 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
     {
         return getBrowserPrintPreviewURLs(printPreviewURL).stream()
             .filter(url -> this.isURLAccessibleFromBrowser(url, browserTab)).findFirst()
-            .orElseThrow(() -> new IOException("Couldn't find an alternative print preview URL that the headless "
-                + "Chrome web browser can access from within its Docker container."));
+            .orElseThrow(() -> new IOException("Couldn't find an alternative print preview URL that the web browser "
+                + "used for PDF printing can access."));
     }
 
     private List<URL> getBrowserPrintPreviewURLs(URL printPreviewURL) throws IOException

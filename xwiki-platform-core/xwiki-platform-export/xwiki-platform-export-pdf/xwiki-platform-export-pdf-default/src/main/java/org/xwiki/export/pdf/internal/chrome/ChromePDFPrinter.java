@@ -39,6 +39,7 @@ import com.xpn.xwiki.XWikiContext;
  * @since 14.7RC1
  */
 @Component
+@Named("chrome")
 @Singleton
 public class ChromePDFPrinter extends AbstractBrowserPDFPrinter
 {

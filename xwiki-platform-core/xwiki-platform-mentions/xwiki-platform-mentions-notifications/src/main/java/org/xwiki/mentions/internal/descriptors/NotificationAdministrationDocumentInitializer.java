@@ -22,6 +22,8 @@ package org.xwiki.mentions.internal.descriptors;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -40,8 +42,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
- * A Mandatory Document Intializer that aims at providing global preferences for Mentions Notifications.
- * In the future, this should be replaced by a proper API in Notification to allow enabling such preferences globally.
+ * A Mandatory Document Intializer that aims at providing global preferences for Mentions Notifications. In the future,
+ * this should be replaced by a proper API in Notification to allow enabling such preferences globally.
  *
  * @version $Id$
  * @since 12.6.3
@@ -64,6 +66,11 @@ public class NotificationAdministrationDocumentInitializer extends AbstractManda
 
     @Inject
     private Logger logger;
+
+    /**
+     * Keep a map of the dates used for the initialization of the startDate of each wiki.
+     */
+    private Map<String, Date> startDateWikiMap = new ConcurrentHashMap<>();
 
     /**
      * Default constructor.
@@ -92,13 +99,20 @@ public class NotificationAdministrationDocumentInitializer extends AbstractManda
         }
 
         if (!mentionEventPreferenceAlreadySaved) {
+            String wikiId = document.getDocumentReference().getWikiReference().getName();
+            // It is possible for several document with the "XWiki.Notifications.Code.NotificationAdministration" 
+            // document reference to be initialized separately. We keep a map of the computed dates so that every 
+            // initialization initializes the startDate property with the same date.
+            // Usually initialization are static and updating the document is idempotent. This is not the case here 
+            // because of the call to the Date constructor.
+            this.startDateWikiMap.putIfAbsent(wikiId, new Date());
             try {
                 int newObject = document.createXObject(notificationPreferenceClass, this.contextProvider.get());
                 BaseObject xObject = document.getXObject(notificationPreferenceClass, newObject);
                 xObject.setStringValue(EVENT_TYPE_FIELD, MentionEvent.EVENT_TYPE);
                 xObject.setStringValue("format", "alert");
                 xObject.setIntValue("notificationEnabled", 1);
-                xObject.setDateValue("startDate", new Date());
+                xObject.setDateValue("startDate", this.startDateWikiMap.get(wikiId));
             } catch (XWikiException e) {
                 this.logger.error("Error while trying to set the global Notification Administration preferences "
                     + "for mentions notifications", e);

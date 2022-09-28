@@ -289,13 +289,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
 
     private void writeHomeConfiguration() throws IOException
     {
-        StringBuilder builder = new StringBuilder();
-        builder.append("<solr>");
-        // Disable the log watcher until Solr support SLF4J 2
-        // FIXME: remove when Solr upgrade SLF4J (or stop logging a stack trace at least)
-        builder.append("<logging><str name=\"enabled\">false</str></logging>");
-        builder.append("</solr>");
-        FileUtils.write(this.solrHomePath.resolve("solr.xml").toFile(), builder.toString(), StandardCharsets.UTF_8);
+        FileUtils.write(this.solrHomePath.resolve("solr.xml").toFile(), "<solr/>", StandardCharsets.UTF_8);
     }
 
     private void createHomeDirectory() throws IOException

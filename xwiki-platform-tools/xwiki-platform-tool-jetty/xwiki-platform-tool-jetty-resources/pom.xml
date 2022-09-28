@@ -39,7 +39,7 @@
 
          Following versions of some specific Jetty dependencies should be kept in sync when upgrading Jetty.
     -->
-    <jetty.version>10.0.7</jetty.version>
+    <jetty.version>10.0.10</jetty.version>
     <!-- Jetty expects a different version of slf4j -->
     <slf4j.version>2.0.0-alpha5</slf4j.version>
   </properties>

@@ -4534,7 +4534,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             if (cloneArchive) {
                 doc.cloneDocumentArchive(this);
             } else {
-                doc.setDocumentArchive(getDocumentArchive());
+                // Initialize the document archive with empty archive, using the new document reference and id.
+                // Without this explicit initialization, it is possible for the archive to be incorrectly initialized.
+                // For instance, with the archive of the cloned document.
+                doc.setDocumentArchive(new XWikiDocumentArchive(newDocumentReference.getWikiReference(), getId()));
             }
             doc.getAuthors().copyAuthors(getAuthors());
             doc.setContent(getContent());

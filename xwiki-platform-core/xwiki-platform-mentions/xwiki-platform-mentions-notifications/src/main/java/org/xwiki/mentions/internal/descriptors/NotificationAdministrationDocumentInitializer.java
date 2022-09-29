@@ -22,8 +22,6 @@ package org.xwiki.mentions.internal.descriptors;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -32,6 +30,8 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.mentions.events.MentionEvent;
 import org.xwiki.model.reference.LocalDocumentReference;
 
@@ -61,16 +61,20 @@ public class NotificationAdministrationDocumentInitializer extends AbstractManda
 
     private static final String EVENT_TYPE_FIELD = "eventType";
 
+    /**
+     * TODO: Can be removed once XWIKI-20164 is implemented.
+     */
+    private static final String CONTEXT_MENTION_STARTDATE =
+        "XWiki.Notifications.Code.NotificationAdministration.mention.startDate";
+
     @Inject
     private Provider<XWikiContext> contextProvider;
 
     @Inject
     private Logger logger;
 
-    /**
-     * Keep a map of the dates used for the initialization of the startDate of each wiki.
-     */
-    private Map<String, Date> startDateWikiMap = new ConcurrentHashMap<>();
+    @Inject
+    private Execution execution;
 
     /**
      * Default constructor.
@@ -99,20 +103,22 @@ public class NotificationAdministrationDocumentInitializer extends AbstractManda
         }
 
         if (!mentionEventPreferenceAlreadySaved) {
-            String wikiId = document.getDocumentReference().getWikiReference().getName();
             // It is possible for several document with the "XWiki.Notifications.Code.NotificationAdministration" 
-            // document reference to be initialized separately. We keep a map of the computed dates so that every 
-            // initialization initializes the startDate property with the same date.
+            // document reference to be initialized separately. We keep a date in the ExecutionContext so that 
+            // every initialization initializes the startDate property with the same date.
             // Usually initialization are static and updating the document is idempotent. This is not the case here 
-            // because of the call to the Date constructor.
-            this.startDateWikiMap.putIfAbsent(wikiId, new Date());
+            // because of the call to "new Date()".
+            ExecutionContext context = this.execution.getContext();
+            if (!context.hasProperty(CONTEXT_MENTION_STARTDATE)) {
+                context.setProperty(CONTEXT_MENTION_STARTDATE, new Date());
+            }
             try {
                 int newObject = document.createXObject(notificationPreferenceClass, this.contextProvider.get());
                 BaseObject xObject = document.getXObject(notificationPreferenceClass, newObject);
                 xObject.setStringValue(EVENT_TYPE_FIELD, MentionEvent.EVENT_TYPE);
                 xObject.setStringValue("format", "alert");
                 xObject.setIntValue("notificationEnabled", 1);
-                xObject.setDateValue("startDate", this.startDateWikiMap.get(wikiId));
+                xObject.setDateValue("startDate", (Date) context.getProperty(CONTEXT_MENTION_STARTDATE));
             } catch (XWikiException e) {
                 this.logger.error("Error while trying to set the global Notification Administration preferences "
                     + "for mentions notifications", e);

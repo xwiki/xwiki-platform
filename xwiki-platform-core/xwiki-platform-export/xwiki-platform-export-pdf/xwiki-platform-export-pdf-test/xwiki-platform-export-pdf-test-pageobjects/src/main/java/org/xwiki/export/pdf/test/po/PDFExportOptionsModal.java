@@ -66,8 +66,7 @@ public class PDFExportOptionsModal extends BaseModal
         super(By.id("pdfExportOptions"));
 
         getDriver().waitUntilCondition(ExpectedConditions.elementToBeClickable(this.exportButtonLocator));
-        getDriver().waitUntilCondition(
-            ExpectedConditions.numberOfElementsToBe(By.cssSelector("#pdfExportOptions .modal-body.loading"), 0));
+        getDriver().waitUntilElementHasAttributeValue(By.id("pdfExportOptions"), "data-state", "loaded");
     }
 
     /**

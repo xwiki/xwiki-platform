@@ -41,8 +41,8 @@ export.pdf.options.template.hint=The PDF template controls the information displ
 export.pdf.options.loadFailure=Failed to load the PDF export options.
 
 export.pdf.serverSidePrinting.checking=Checking if server-side PDF printing is available...
-export.pdf.serverSidePrinting.unavailable=Server-side PDF printing is unavailable. Using client-side printing instead.
-export.pdf.serverSidePrinting.checkFailed=Failed to check if server-side PDF printing is available
+export.pdf.serverSidePrinting.unavailable=Server-side PDF printing is currently unavailable. Please contact your administrator.
+export.pdf.serverSidePrinting.checkFailed=Failed to check if server-side PDF printing is available.
 
 export.pdf.modal.close=Close
 export.pdf.inProgress=Exporting as PDF...

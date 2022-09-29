@@ -447,6 +447,11 @@
           // Remove the element we added after the macro to force the inline rendering.
           var inlineEnforcer = editor.editable().findOne('span#xwiki-macro-inline-enforcer');
           if (inlineEnforcer) {
+            // Adding a zero width space between the widget and inlineEnforcer help webkit based browsers place the
+            // caret once inlineEnforcer is removed (without this, the caret is present but not visible). See
+            // https://github.com/ckeditor/ckeditor5/issues/1724 (mentioning CKEditor 5, but also working with CKEditor
+            // 4). 
+            inlineEnforcer.$.insertAdjacentText('beforebegin', '\u200b');
             // Place the caret after the inserted inline macro in order to allow the user to continue typing.
             editor.getSelection().selectElement(inlineEnforcer);
             inlineEnforcer.remove();

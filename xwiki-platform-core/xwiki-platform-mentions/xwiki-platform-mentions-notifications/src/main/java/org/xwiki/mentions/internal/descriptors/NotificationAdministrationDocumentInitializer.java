@@ -30,6 +30,8 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.mentions.events.MentionEvent;
 import org.xwiki.model.reference.LocalDocumentReference;
 
@@ -40,8 +42,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
- * A Mandatory Document Intializer that aims at providing global preferences for Mentions Notifications.
- * In the future, this should be replaced by a proper API in Notification to allow enabling such preferences globally.
+ * A Mandatory Document Intializer that aims at providing global preferences for Mentions Notifications. In the future,
+ * this should be replaced by a proper API in Notification to allow enabling such preferences globally.
  *
  * @version $Id$
  * @since 12.6.3
@@ -59,11 +61,20 @@ public class NotificationAdministrationDocumentInitializer extends AbstractManda
 
     private static final String EVENT_TYPE_FIELD = "eventType";
 
+    /**
+     * TODO: Can be removed once XWIKI-20164 is implemented.
+     */
+    private static final String CONTEXT_MENTION_STARTDATE =
+        "XWiki.Notifications.Code.NotificationAdministration.mention.startDate";
+
     @Inject
     private Provider<XWikiContext> contextProvider;
 
     @Inject
     private Logger logger;
+
+    @Inject
+    private Execution execution;
 
     /**
      * Default constructor.
@@ -92,13 +103,22 @@ public class NotificationAdministrationDocumentInitializer extends AbstractManda
         }
 
         if (!mentionEventPreferenceAlreadySaved) {
+            // It is possible for several document with the "XWiki.Notifications.Code.NotificationAdministration" 
+            // document reference to be initialized separately. We keep a date in the ExecutionContext so that 
+            // every initialization initializes the startDate property with the same date.
+            // Usually initialization are static and updating the document is idempotent. This is not the case here 
+            // because of the call to "new Date()".
+            ExecutionContext context = this.execution.getContext();
+            if (!context.hasProperty(CONTEXT_MENTION_STARTDATE)) {
+                context.setProperty(CONTEXT_MENTION_STARTDATE, new Date());
+            }
             try {
                 int newObject = document.createXObject(notificationPreferenceClass, this.contextProvider.get());
                 BaseObject xObject = document.getXObject(notificationPreferenceClass, newObject);
                 xObject.setStringValue(EVENT_TYPE_FIELD, MentionEvent.EVENT_TYPE);
                 xObject.setStringValue("format", "alert");
                 xObject.setIntValue("notificationEnabled", 1);
-                xObject.setDateValue("startDate", new Date());
+                xObject.setDateValue("startDate", (Date) context.getProperty(CONTEXT_MENTION_STARTDATE));
             } catch (XWikiException e) {
                 this.logger.error("Error while trying to set the global Notification Administration preferences "
                     + "for mentions notifications", e);

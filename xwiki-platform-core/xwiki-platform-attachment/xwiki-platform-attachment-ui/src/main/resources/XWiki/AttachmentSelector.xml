@@ -90,7 +90,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
     #set ($extension = $attachment.getFilename())
     #set ($extension = $extension.substring($mathtool.add($extension.lastIndexOf('.'), 1)).toLowerCase())
     #if ($options.filter.size() == 0 || $options.filter.contains($extension))
-    #attachmentPicker_displayAttachmentBox($attachment $targetDocument $targetAttachDocument, $options $currentValue)
+      #attachmentPicker_displayAttachmentBox($attachment $targetDocument $targetAttachDocument, $options $currentValue)
     #end
   #end
   )))
@@ -500,7 +500,6 @@ $xwiki.jsx.use($attachmentPickerDocName)
           } else {
             // Require jquery locally until we are able to fully migrate this code away from prototype.
             const form = this.property.up('form');
-            console.log('&gt;&gt;&gt; property', this.property);
             require(['jquery'], function($){
               const data = new FormData();
               const uploadedFile = $('#attachfile')[0].files[0];
@@ -508,11 +507,10 @@ $xwiki.jsx.use($attachmentPickerDocName)
 
               // TODO: deal with replace currently selected checkbox.
               data.append('upload', uploadedFile);
-              // TODO: Use CKEditor.FileUploader to avoid code duplication, but this document should be move to legacy and replaced by a reusable document located in a common place
               const notification = new XWiki.widgets.Notification("$services.localization.render('xe.attachmentSelector.upload.inProgress')", 'inprogress');
               const params = {
                 'form_token': $(form).find('[name="form_token"]').val(),
-                'sheet': 'CKEditor.FileUploader', // TODO: runtime dependency on CKEditor!!
+                'sheet': 'CKEditor.FileUploader',
                 'outputSyntax': 'plain'
               };
 
@@ -528,9 +526,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
                 processData: false,
                 contentType: false, // Sets the 'multipart/form-data' automatically
                 headers: {
-                  // TODO: make this configurable
-                  // TODO: this might also impact if we allow the current user to upload an image!
-                  'X-XWiki-Temporary-Attachment-Support': true // TODO: get the flag from CKEditor?
+                  'X-XWiki-Temporary-Attachment-Support': true // TODO: check if services.temporaryAttachments exists
                 }
               }).done(function() {
                 // TODO: localization
@@ -542,7 +538,6 @@ $xwiki.jsx.use($attachmentPickerDocName)
                                .prop('name', 'uploadedFiles')
                                .prop('value', uploadedFile.name))
                 $(form).find('input[type="hidden"].property-reference').prop('value', uploadedFile.name);
-                
               }).fail(function() {
                 // TODO: localization
                 notification.replace(new XWiki.widgets.Notification('Attachment upload failed.', 'error'));

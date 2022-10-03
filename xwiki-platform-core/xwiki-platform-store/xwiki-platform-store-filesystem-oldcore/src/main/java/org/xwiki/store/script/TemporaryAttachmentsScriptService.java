@@ -135,12 +135,15 @@ public class TemporaryAttachmentsScriptService implements ScriptService
      * @since 14.8
      */
     @Unstable
-    public List<XWikiAttachment> listTemporaryAttachments(DocumentReference documentReference)
+    public List<Attachment> listTemporaryAttachments(DocumentReference documentReference)
+        throws StoreFilesystemOldcoreException
     {
-        ArrayList<XWikiAttachment> attachments =
-            new ArrayList<>(this.temporaryAttachmentSessionsManager.getUploadedAttachments(documentReference));
-        attachments.sort(Comparator.comparing(XWikiAttachment::getFilename));
-        return attachments;
+        XWikiDocument document = getDocument(documentReference);
+        return this.temporaryAttachmentSessionsManager.getUploadedAttachments(documentReference)
+            .stream()
+            .map(attachment -> convertToAttachment(document, attachment))
+            .sorted(getLowerCaseStringComparator())
+            .collect(Collectors.toList());
     }
 
     /**
@@ -162,46 +165,49 @@ public class TemporaryAttachmentsScriptService implements ScriptService
             new ArrayList<>(this.temporaryAttachmentSessionsManager.getUploadedAttachments(documentReference));
         XWikiDocument document = getDocument(documentReference);
         List<Attachment> fullList = temporaryAttachments.stream()
-            // TODO: test this step
             .peek(temporaryAttachment -> temporaryAttachment.setDoc(document))
             .map(attachment -> convertToAttachment(document, attachment))
             .collect(Collectors.toList());
         Stream<Attachment> nonOverriddenAttachments =
             document.getAttachmentList()
                 .stream()
+                .map(xWikiAttachment -> convertToAttachment(document, xWikiAttachment))
                 .filter(persistedAttachment -> temporaryAttachments.stream()
-                    .noneMatch(attachmentEqualityPredicate(persistedAttachment)))
-                .map(attachment -> convertToAttachment(document, attachment));
+                    .map(xWikiAttachment -> convertToAttachment(document, xWikiAttachment))
+                    .noneMatch(attachmentEqualityPredicate(persistedAttachment)));
         fullList.addAll(nonOverriddenAttachments.collect(Collectors.toList()));
 
-        fullList.sort(Comparator.comparing(Attachment::getFilename));
+        fullList.sort(getLowerCaseStringComparator());
         return fullList;
     }
 
     /**
      * Check if a given attachment is found in the temporary attachment session.
-     * {@link #persistentAttachmentExists(XWikiAttachment)} exists as well to check if a given attachment can be found
-     * in the persisted attachments. Note that both method can return {@code true} for the same {@link XWikiAttachment}
-     * when an attachment is overridden in the temporary attachment session.
+     * {@link #persistentAttachmentExists(Attachment)} exists as well to check if a given attachment can be found in the
+     * persisted attachments. Note that both method can return {@code true} for the same {@link XWikiAttachment} when an
+     * attachment is overridden in the temporary attachment session.
      *
      * @param attachment an attachment
      * @return {@code true} if a matching attachment exists in the temporary attachment session (i.e., same filename and
      *     document reference), {@code false} otherwise
-     * @see #persistentAttachmentExists(XWikiAttachment)
+     * @see #persistentAttachmentExists(Attachment)
      * @since 14.8
      */
     @Unstable
-    public boolean temporaryAttachmentExists(XWikiAttachment attachment)
+    public boolean temporaryAttachmentExists(Attachment attachment) throws StoreFilesystemOldcoreException
     {
+        DocumentReference documentReference = attachment.getReference().getDocumentReference();
+        XWikiDocument document = getDocument(documentReference);
         return this.temporaryAttachmentSessionsManager
-            .getUploadedAttachments(attachment.getReference().getDocumentReference())
+            .getUploadedAttachments(documentReference)
             .stream()
+            .map(xWikiAttachment -> convertToAttachment(document, xWikiAttachment))
             .anyMatch(attachmentEqualityPredicate(attachment));
     }
 
     /**
-     * Check if a given attachment is persisted. {@link #temporaryAttachmentExists(XWikiAttachment)} exists as well to
-     * check if a given attachment can be found in the temporary attachment session. Note that both method can return
+     * Check if a given attachment is persisted. {@link #temporaryAttachmentExists(Attachment)} exists as well to check
+     * if a given attachment can be found in the temporary attachment session. Note that both method can return
      * {@code true} at for the same {@link XWikiAttachment} when an attachment is overridden in the temporary attachment
      * session.
      *
@@ -209,16 +215,18 @@ public class TemporaryAttachmentsScriptService implements ScriptService
      * @return {@code true} if a matching persisted attachment exists (i.e., same filename and document reference),
      *     {@code false} otherwise
      * @throws StoreFilesystemOldcoreException in case of error when accessing the attachment's document
-     * @see #temporaryAttachmentExists(XWikiAttachment)
+     * @see #temporaryAttachmentExists(Attachment)
      * @since 14.8
      */
     @Unstable
-    public boolean persistentAttachmentExists(XWikiAttachment attachment)
+    public boolean persistentAttachmentExists(Attachment attachment)
         throws StoreFilesystemOldcoreException
     {
-        return getDocument(attachment.getReference().getDocumentReference())
+        XWikiDocument document = getDocument(attachment.getReference().getDocumentReference());
+        return document
             .getAttachmentList()
             .stream()
+            .map(xWikiAttachment -> convertToAttachment(document, xWikiAttachment))
             .anyMatch(attachmentEqualityPredicate(attachment));
     }
 
@@ -229,7 +237,7 @@ public class TemporaryAttachmentsScriptService implements ScriptService
      * @param attachment0 the attachment used to build the predicate
      * @return a predicate to compare other attachments against {@code attachment0}
      */
-    private Predicate<XWikiAttachment> attachmentEqualityPredicate(XWikiAttachment attachment0)
+    private Predicate<Attachment> attachmentEqualityPredicate(Attachment attachment0)
     {
         String attachment0Filename = attachment0.getFilename();
         return attachment1 -> Objects.equals(attachment1.getFilename(), attachment0Filename);
@@ -247,7 +255,15 @@ public class TemporaryAttachmentsScriptService implements ScriptService
 
     private Attachment convertToAttachment(XWikiDocument document, XWikiAttachment attachment)
     {
+        if (attachment == null) {
+            return null;
+        }
         return new Attachment(new Document(document, this.contextProvider.get()), attachment,
             this.contextProvider.get());
+    }
+
+    private static Comparator<Attachment> getLowerCaseStringComparator()
+    {
+        return Comparator.comparing(attachment -> Objects.toString(attachment.getFilename(), "").toLowerCase());
     }
 }

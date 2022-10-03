@@ -90,7 +90,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
     #set ($extension = $attachment.getFilename())
     #set ($extension = $extension.substring($mathtool.add($extension.lastIndexOf('.'), 1)).toLowerCase())
     #if ($options.filter.size() == 0 || $options.filter.contains($extension))
-      #attachmentPicker_displayAttachmentBox($attachment $targetDocument $targetAttachDocument, $options $currentValue)
+    #attachmentPicker_displayAttachmentBox($attachment $targetDocument $targetAttachDocument, $options $currentValue)
     #end
   #end
   )))
@@ -147,7 +147,8 @@ $xwiki.jsx.use($attachmentPickerDocName)
 #macro (attachmentPicker_displayAttachmentDetails $attachment $options)
   #if ($attachment)
     ## Compute the attachment reference because there's no getter.
-    #set ($attachmentReference = $services.model.createAttachmentReference($attachment.doc.documentReference, $attachment.filename))
+    #set ($attachmentReference = $services.model.createAttachmentReference($attachment.document.documentReference,
+      $attachment.filename))
     #set ($attachmentStringReference = $services.rendering.escape($services.model.serialize($attachmentReference, 'default'), 'xwiki/2.1'))
     #if ($attachment.isImage() &amp;&amp; $options.displayImage)
       ## We add the version to the query string in order to invalidate the cache when an image attachment is replaced.
@@ -505,6 +506,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
               const uploadedFile = $('#attachfile')[0].files[0];
               const filenameCheckbox = $("#uploadAttachment input[name='filename']");
 
+              // TODO: deal with replace currently selected checkbox.
               data.append('upload', uploadedFile);
               // TODO: Use CKEditor.FileUploader to avoid code duplication, but this document should be move to legacy and replaced by a reusable document located in a common place
               const notification = new XWiki.widgets.Notification("$services.localization.render('xe.attachmentSelector.upload.inProgress')", 'inprogress');

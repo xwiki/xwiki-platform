@@ -50,6 +50,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Attachment;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -153,24 +155,26 @@ public class TemporaryAttachmentsScriptService implements ScriptService
      * @since 14.8
      */
     @Unstable
-    public List<XWikiAttachment> listAllAttachments(DocumentReference documentReference)
+    public List<Attachment> listAllAttachments(DocumentReference documentReference)
         throws StoreFilesystemOldcoreException
     {
         Collection<XWikiAttachment> temporaryAttachments =
             new ArrayList<>(this.temporaryAttachmentSessionsManager.getUploadedAttachments(documentReference));
         XWikiDocument document = getDocument(documentReference);
-        List<XWikiAttachment> fullList = temporaryAttachments.stream()
+        List<Attachment> fullList = temporaryAttachments.stream()
             // TODO: test this step
             .peek(temporaryAttachment -> temporaryAttachment.setDoc(document))
+            .map(attachment -> convertToAttachment(document, attachment))
             .collect(Collectors.toList());
-        Stream<XWikiAttachment> nonOverriddenAttachments =
+        Stream<Attachment> nonOverriddenAttachments =
             document.getAttachmentList()
                 .stream()
                 .filter(persistedAttachment -> temporaryAttachments.stream()
-                    .noneMatch(attachmentEqualityPredicate(persistedAttachment)));
+                    .noneMatch(attachmentEqualityPredicate(persistedAttachment)))
+                .map(attachment -> convertToAttachment(document, attachment));
         fullList.addAll(nonOverriddenAttachments.collect(Collectors.toList()));
 
-        fullList.sort(Comparator.comparing(XWikiAttachment::getFilename));
+        fullList.sort(Comparator.comparing(Attachment::getFilename));
         return fullList;
     }
 
@@ -239,5 +243,11 @@ public class TemporaryAttachmentsScriptService implements ScriptService
         } catch (XWikiException e) {
             throw new StoreFilesystemOldcoreException(e);
         }
+    }
+
+    private Attachment convertToAttachment(XWikiDocument document, XWikiAttachment attachment)
+    {
+        return new Attachment(new Document(document, this.contextProvider.get()), attachment,
+            this.contextProvider.get());
     }
 }

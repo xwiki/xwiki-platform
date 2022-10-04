@@ -962,6 +962,14 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-# The default is:
 # wiki.alias.suffix=
 
+#-# [Since 14.9RC1]
+#-# Allows delegating the database/schema/user creation (depends on the database) for a new wiki to an infra admin.
+#-# Said differently, if the following property is false then XWiki will not create any database/schema/user when
+#-# creating a wiki. It's assumed that it will exist prior to using the Wiki creation wizard.
+#-#
+#-# The default is:
+# wiki.createDatabase = true
+
 #-------------------------------------------------------------------------------------
 # Store
 #-------------------------------------------------------------------------------------

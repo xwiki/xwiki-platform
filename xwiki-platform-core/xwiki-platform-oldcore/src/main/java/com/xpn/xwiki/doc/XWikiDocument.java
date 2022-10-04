@@ -5520,7 +5520,16 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
         Set<DocumentReference> documentReferences = new HashSet<>(references.size());
         for (EntityReference entityReference : references) {
-            documentReferences.add(context.getWiki().getDocumentReference(entityReference, context));
+            // Resolve the DOCUMENT reference
+            DocumentReference linkReference = context.getWiki().getDocumentReference(entityReference, context);
+
+            // Retro compatibility: remove the locale as it's what is expected of #getBackLinkedReferences(XWikicontext)
+            if (linkReference.getLocale() != null) {
+                linkReference = new DocumentReference(linkReference, (Locale) null);
+            }
+
+            // Add the reference
+            documentReferences.add(linkReference);
         }
 
         return new ArrayList<>(documentReferences);

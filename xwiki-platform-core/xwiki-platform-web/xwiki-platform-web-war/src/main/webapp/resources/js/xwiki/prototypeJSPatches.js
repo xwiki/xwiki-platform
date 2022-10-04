@@ -19,6 +19,8 @@
  */
 (function () {
   // Code executed before Prototype.js is loaded.
+  // Restore the original code, since Prototype.js is overriding the Array.from method. See
+  // https://github.com/prototypejs/prototype/issues/338.
   const originalArrayFrom = Array.from;
   setTimeout(() => {
     // Code executed after Prototype.js is loaded.

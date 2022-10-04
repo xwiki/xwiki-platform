@@ -79,9 +79,6 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 @Unstable
 public class R140401000XWIKI15460DataMigration extends AbstractHibernateDataMigration
 {
-    private static final String XWQL_QUERY = "select doc.fullName from Document doc, "
-        + "doc.object(XWiki.XWikiUsers) objUser where doc.fullName = :username limit 1";
-
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
 
@@ -243,11 +240,13 @@ public class R140401000XWIKI15460DataMigration extends AbstractHibernateDataMigr
                 // of the user
                 } else {
                     String serializedName = this.entityReferenceSerializer.serialize(entityReference);
-
-                    List<Long> result = this.queryManager.createQuery(XWQL_QUERY, Query.XWQL)
+                    String statement = ", BaseObject as obj where doc.fullName = :username and "
+                        + "doc.fullName = obj.name and obj.className = 'XWiki.XWikiUsers'";
+                    List<Long> result = this.queryManager.createQuery(statement, Query.HQL)
                         .setWiki(wikiReference.getName())
                         .bindValue("username", serializedName)
                         .addFilter(this.countQueryFilter)
+                        .setLimit(1)
                         .execute();
                     return result.get(0) > 0;
 

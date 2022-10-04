@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.filters.migration;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -29,13 +30,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.NotificationFilterPreferenceConfiguration;
 import org.xwiki.notifications.filters.internal.NotificationFilterPreferenceStore;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryFilter;
+import org.xwiki.query.QueryManager;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -47,6 +54,7 @@ import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 import com.xpn.xwiki.store.migration.hibernate.HibernateDataMigration;
@@ -95,6 +103,22 @@ class R140401000XWIKI15460DataMigrationTest
     @MockComponent
     private NotificationFilterPreferenceConfiguration filterPreferenceConfiguration;
 
+    @MockComponent
+    private Execution execution;
+
+    @MockComponent
+    @Named("local")
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    @MockComponent
+    @Named("count")
+    private QueryFilter countFilter;
+
+    @MockComponent
+    private QueryManager queryManager;
+
+    private XWikiContext context;
+
     @RegisterExtension
     LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
@@ -104,6 +128,12 @@ class R140401000XWIKI15460DataMigrationTest
         when(this.wikiDescriptorManager.getAllIds()).thenReturn(asList("mainwikiid", "wikiA"));
         when(this.wikiDescriptorManager.getMainWikiId()).thenReturn("mainwikiid");
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("mainwikiid");
+
+        ExecutionContext executionContext = mock(ExecutionContext.class);
+        when(this.execution.getContext()).thenReturn(executionContext);
+
+        this.context = mock(XWikiContext.class);
+        when(executionContext.getProperty("xwikicontext")).thenReturn(this.context);
     }
 
     @Test
@@ -139,48 +169,115 @@ class R140401000XWIKI15460DataMigrationTest
         DefaultNotificationFilterPreference nfp0 = new DefaultNotificationFilterPreference();
         nfp0.setWiki("mainwikiid");
         nfp0.setOwner("xwiki:XWiki.ExistingUser");
+
         DefaultNotificationFilterPreference nfp1 = new DefaultNotificationFilterPreference();
         nfp1.setPageOnly("unknownikiid:XWiki.Test");
-        nfp1.setOwner("xwiki:XWiki.ExistingUser");
+        nfp1.setOwner("mainwikiid:XWiki.ExistingUser");
+
         DefaultNotificationFilterPreference nfp2 = new DefaultNotificationFilterPreference();
         nfp2.setPage("wikiA:XWiki.test");
         nfp2.setOwner("xwiki:XWiki.DeletedUser");
+
         DefaultNotificationFilterPreference nfp3 = new DefaultNotificationFilterPreference();
         nfp3.setPage("wikiA:XWiki.test");
-        nfp3.setOwner("xwiki:XWiki.DeletedUser");
-        DocumentReference existingUserDocumentReference = new DocumentReference("xwiki", "XWiki", "ExistingUser");
-        DocumentReference deletedUserDocumentReference = new DocumentReference("xwiki", "XWiki", "DeletedUser");
+        nfp3.setOwner("otherwiki:XWiki.DeletedUser");
 
-        UserReference existingUserReference = mock(UserReference.class);
-        UserReference deletedUserReference = mock(UserReference.class);
+        DefaultNotificationFilterPreference nfp4 = new DefaultNotificationFilterPreference();
+        nfp4.setPage("wikiA:XWiki.test");
+        nfp4.setOwner("deletedwiki:XWiki.DeletedUser");
 
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn(currentWikiId);
+        when(this.context.getWikiReference()).thenReturn(new WikiReference(currentWikiId));
+
         when(this.store.getPaginatedFilterPreferences(1000, 0)).thenReturn(new HashSet<>(asList(
             nfp0,
             nfp1,
             nfp2,
-            nfp3
+            nfp3,
+            nfp4
         )));
+
+        DocumentReference existingUserDocumentReference = new DocumentReference("xwiki", "XWiki", "ExistingUser");
+        DocumentReference existingUserDocumentReference2 = new DocumentReference("mainwikiid", "XWiki", "ExistingUser");
+        DocumentReference deletedUserDocumentReference = new DocumentReference("xwiki", "XWiki", "DeletedUser");
+        DocumentReference deletedUserDocumentReference2 = new DocumentReference("otherwiki", "XWiki", "DeletedUser");
+        DocumentReference deletedUserDocumentReference3 = new DocumentReference("deletedwiki", "XWiki", "DeletedUser");
+
         when(this.resolver.resolve("xwiki:XWiki.ExistingUser")).thenReturn(existingUserDocumentReference);
+        when(this.resolver.resolve("mainwikiid:XWiki.ExistingUser")).thenReturn(existingUserDocumentReference2);
         when(this.resolver.resolve("xwiki:XWiki.DeletedUser")).thenReturn(deletedUserDocumentReference);
-        when(this.documentReferenceUserReferenceResolver.resolve(existingUserDocumentReference))
-            .thenReturn(existingUserReference);
-        when(this.documentReferenceUserReferenceResolver.resolve(deletedUserDocumentReference))
-            .thenReturn(deletedUserReference);
-        when(this.userManager.exists(existingUserReference)).thenReturn(true);
-        when(this.userManager.exists(deletedUserReference)).thenReturn(false);
-        when(this.store.getPreferencesOfUser(deletedUserDocumentReference)).thenReturn(List.of(nfp3));
+        when(this.resolver.resolve("otherwiki:XWiki.DeletedUser")).thenReturn(deletedUserDocumentReference2);
+        when(this.resolver.resolve("deletedwiki:XWiki.DeletedUser")).thenReturn(deletedUserDocumentReference3);
+
+        when(this.wikiDescriptorManager.exists("deletedwiki")).thenReturn(false);
+        when(this.wikiDescriptorManager.exists("otherwiki")).thenReturn(true);
+        when(this.wikiDescriptorManager.exists("xwiki")).thenReturn(true);
+
+        String statement = ", BaseObject as obj where doc.fullName = :username and "
+            + "doc.fullName = obj.name and obj.className = 'XWiki.XWikiUsers'";
+
+        Query query = mock(Query.class, "generalmock");
+        when(this.queryManager.createQuery(statement, Query.HQL)).thenReturn(query);
+
+        Query xwikiWikiQuery = mock(Query.class, "xwiki");
+        Query otherWikiQuery = mock(Query.class, "otherWiki");
+        when(query.setWiki("otherwiki")).thenReturn(otherWikiQuery);
+        when(query.setWiki("xwiki")).thenReturn(xwikiWikiQuery);
+
+        when(this.entityReferenceSerializer.serialize(existingUserDocumentReference)).thenReturn("XWiki.ExistingUser");
+        when(this.entityReferenceSerializer.serialize(existingUserDocumentReference2)).thenReturn("XWiki.ExistingUser");
+
+        when(this.entityReferenceSerializer.serialize(deletedUserDocumentReference)).thenReturn("XWiki.DeletedUser");
+        when(this.entityReferenceSerializer.serialize(deletedUserDocumentReference2)).thenReturn("XWiki.DeletedUser");
+
+        Query existingUserXWiki = mock(Query.class, "xwikiExistingUser");
+        when(xwikiWikiQuery.bindValue("username", "XWiki.ExistingUser")).thenReturn(existingUserXWiki);
+        when(existingUserXWiki.addFilter(this.countFilter)).thenReturn(existingUserXWiki);
+        when(existingUserXWiki.setLimit(1)).thenReturn(existingUserXWiki);
+        when(existingUserXWiki.execute()).thenReturn(Collections.singletonList(1L));
+
+        Query deletedUserXWiki = mock(Query.class, "xwikiDeletedUser");
+        when(xwikiWikiQuery.bindValue("username", "XWiki.DeletedUser")).thenReturn(deletedUserXWiki);
+        when(deletedUserXWiki.addFilter(this.countFilter)).thenReturn(deletedUserXWiki);
+        when(deletedUserXWiki.setLimit(1)).thenReturn(deletedUserXWiki);
+        when(deletedUserXWiki.execute()).thenReturn(Collections.singletonList(0L));
+
+        Query deletedUserOther = mock(Query.class, "otherDeletedUser");
+        when(otherWikiQuery.bindValue("username", "XWiki.DeletedUser")).thenReturn(deletedUserOther);
+        when(deletedUserOther.addFilter(this.countFilter)).thenReturn(deletedUserOther);
+        when(deletedUserOther.setLimit(1)).thenReturn(deletedUserOther);
+        when(deletedUserOther.execute()).thenReturn(Collections.singletonList(0L));
+
+        if (currentWikiId.equals("mainwikiid")) {
+            UserReference existingUserReference = mock(UserReference.class);
+            when(this.documentReferenceUserReferenceResolver.resolve(existingUserDocumentReference))
+                .thenReturn(existingUserReference);
+            when(this.userManager.exists(existingUserReference)).thenReturn(true);
+        } else {
+            when(this.wikiDescriptorManager.exists("mainwikiid")).thenReturn(true);
+
+            Query mainwikiidWikiQuery = mock(Query.class, "mainwikiid");
+            when(query.setWiki("mainwikiid")).thenReturn(mainwikiidWikiQuery);
+
+            Query existingUserMainWiki = mock(Query.class, "xwikiExistingUser");
+            when(mainwikiidWikiQuery.bindValue("username", "XWiki.ExistingUser")).thenReturn(existingUserMainWiki);
+            when(existingUserMainWiki.addFilter(this.countFilter)).thenReturn(existingUserMainWiki);
+            when(existingUserMainWiki.setLimit(1)).thenReturn(existingUserMainWiki);
+            when(existingUserMainWiki.execute()).thenReturn(Collections.singletonList(1L));
+        }
+
+        when(this.store.getPreferencesOfUser(deletedUserDocumentReference)).thenReturn(List.of(nfp2));
+        when(this.store.getPreferencesOfUser(deletedUserDocumentReference2)).thenReturn(List.of(nfp3));
+        when(this.store.getPreferencesOfUser(deletedUserDocumentReference3)).thenReturn(List.of(nfp4));
 
         this.dataMigration.hibernateMigrate();
 
         // Verify that the notification preferences of the unknown wiki are removed.
         verify(this.store, times(expectedTimes)).deleteFilterPreference(new WikiReference("unknownikiid"));
-        // Verify that the notification preferences of the unknown user are removed.
+        // Verify that the notification preferences of the unknown users are removed.
         verify(this.store).deleteFilterPreferences(deletedUserDocumentReference);
-        // Verify that the users are only resolved once.
-        verify(this.resolver).resolve("xwiki:XWiki.ExistingUser");
-        // Unknown users are resolved a second time when removed. 
-        verify(this.resolver, times(2)).resolve("xwiki:XWiki.DeletedUser");
+        verify(this.store).deleteFilterPreferences(deletedUserDocumentReference2);
+        verify(this.store).deleteFilterPreferences(deletedUserDocumentReference3);
         // Verify that  the results are paginated.
         verify(this.store).getPaginatedFilterPreferences(1000, 0);
         verify(this.store).getPaginatedFilterPreferences(1000, 1000);

@@ -218,7 +218,7 @@ public class R140401000XWIKI15460DataMigration extends AbstractHibernateDataMigr
         DefaultNotificationFilterPreference filterPreference) throws DataMigrationException
     {
         String owner = filterPreference.getOwner();
-        WikiReference currentWiki = this.getXWikiContext().getWikiReference();
+        WikiReference currentWiki = getXWikiContext().getWikiReference();
 
         // Store the potential exception thrown inside computeIfAbsent, since assigning to a variable is not allowed.
         AtomicReference<Exception> exception = new AtomicReference<>();

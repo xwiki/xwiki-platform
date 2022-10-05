@@ -280,7 +280,8 @@
     #creationForm()
   #elseif(!$services.csrf.isTokenValid($request.form_token))
     {{error}}
-      {{translation key="platform.flamingo.themes.home.create.csrf" parameters="$request.newThemeName" /}}
+      #set ($newThemeName = $services.rendering.escape($escapetool.java($request.newThemeName), 'xwiki/2.1'))
+      {{translation key="platform.flamingo.themes.home.create.csrf" parameters="~"$newThemeName~""/}}
     {{/error}}
     
     {{html}}

@@ -108,8 +108,8 @@ public class ContextMacro extends AbstractExecutedContentMacro<ContextMacroParam
         }
     }
 
-    private XDOM getXDOM(DocumentReference referencedDocReference, ContextMacroParameters parameters)
-        throws MacroExecutionException
+    private XDOM getXDOM(DocumentReference referencedDocReference, ContextMacroParameters parameters,
+        MacroTransformationContext context) throws MacroExecutionException
     {
         try {
             if (parameters.getTransformationContext() == TransformationContextMode.DOCUMENT
@@ -137,7 +137,7 @@ public class ContextMacro extends AbstractExecutedContentMacro<ContextMacroParam
             throw new MacroExecutionException("Failed to resolve the XDOM to use in the transformation", e);
         }
 
-        return null;
+        return context.getXDOM();
     }
 
     @Override
@@ -178,7 +178,7 @@ public class ContextMacro extends AbstractExecutedContentMacro<ContextMacroParam
             this.documentAccessBridge.pushDocumentInContext(backupObjects, referencedDocReference);
 
             // Configure the Transformation Context XDOM depending on the mode asked.
-            configuration.setXDOM(getXDOM(referencedDocReference, parameters));
+            configuration.setXDOM(getXDOM(referencedDocReference, parameters, context));
 
             // Execute the content
             Block result = this.executor.execute(configuration);

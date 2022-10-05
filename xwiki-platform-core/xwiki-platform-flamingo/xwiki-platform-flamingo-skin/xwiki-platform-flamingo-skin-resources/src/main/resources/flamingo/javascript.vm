@@ -29,6 +29,8 @@
 <script src="$escapetool.xml($services.webjars.url('requirejs', "require$jsExtension"))" data-wysiwyg="true"></script>
 ## Load the JavaScript module used to determine when the page is ready (no pending HTTP requests or promises).
 <script src="$escapetool.xml($xwiki.getSkinFile('uicomponents/tools/pageReady.js'))" data-wysiwyg="true"></script>
+## Fix some Prototype.js breaking changes. 
+<script src="$escapetool.xml($xwiki.getSkinFile('js/xwiki/prototypeJSPatches.js'))"></script>
 ## FIXME: We still have code depending on Prototype.js without declaring it (i.e. without using RequireJS). Short term
 ## goal is to stop loading Prototype.js by default and change the existing code to load it when needed. Long term goal is
 ## to stop relying on Prototype.js . Note that we load Prototype.js before the following inline script because we have to

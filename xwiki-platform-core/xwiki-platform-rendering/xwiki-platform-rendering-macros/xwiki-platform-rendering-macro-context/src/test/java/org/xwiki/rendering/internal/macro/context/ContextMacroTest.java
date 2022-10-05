@@ -56,6 +56,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -165,15 +166,17 @@ class ContextMacroTest
         MacroBlock macroBlock = new MacroBlock("context", Collections.<String, String>emptyMap(), false);
         MetaData metadata = new MetaData();
         metadata.addMetaData(MetaData.SOURCE, "source");
-        XDOM xdom = new XDOM(Arrays.asList(macroBlock), metadata);
+        XDOM pageXDOM = new XDOM(Arrays.asList(macroBlock), metadata);
         MacroTransformationContext macroContext = new MacroTransformationContext();
         macroContext.setSyntax(Syntax.XWIKI_2_0);
         macroContext.setCurrentMacroBlock(macroBlock);
+        macroContext.setXDOM(pageXDOM);
 
         DocumentModelBridge dmb = mock(DocumentModelBridge.class);
         when(this.dab.getTranslatedDocumentInstance(TARGET_REFERENCE)).thenReturn(dmb);
 
-        when(this.parser.parse(eq(""), same(macroContext), eq(false), any(MetaData.class), eq(false))).thenReturn(xdom);
+        XDOM contentXDOM = new XDOM(Arrays.asList(new WordBlock("test")), metadata);
+        when(this.parser.parse(eq(""), same(macroContext), eq(false), any(MetaData.class), eq(false))).thenReturn(contentXDOM);
 
         ContextMacroParameters parameters = new ContextMacroParameters();
         parameters.setDocument("target");
@@ -189,5 +192,6 @@ class ContextMacroTest
         BlockAsyncRendererConfiguration configuration = configurationCaptor.getValue();
         assertEquals(AUTHOR, configuration.getSecureAuthorReference());
         assertEquals(SOURCE_REFERENCE, configuration.getSecureDocumentReference());
+        assertSame(pageXDOM, configuration.getXDOM());
     }
 }

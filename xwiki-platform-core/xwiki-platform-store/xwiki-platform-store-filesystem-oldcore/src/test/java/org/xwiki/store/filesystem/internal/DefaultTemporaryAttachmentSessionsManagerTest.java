@@ -45,10 +45,10 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
+import static com.xpn.xwiki.plugin.fileupload.FileUploadPlugin.UPLOAD_MAXSIZE_PARAMETER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -104,9 +104,7 @@ class DefaultTemporaryAttachmentSessionsManagerTest
         String sessionId = "mySession";
         when(this.httpSession.getId()).thenReturn(sessionId);
 
-        DocumentReference documentReference = mock(DocumentReference.class);
-        SpaceReference spaceReference = mock(SpaceReference.class);
-        when(documentReference.getLastSpaceReference()).thenReturn(spaceReference);
+        DocumentReference documentReference = new DocumentReference("xwiki", "Space", "Document");
         Part part = mock(Part.class);
 
         String filename = "fileFoo.xml";
@@ -118,22 +116,23 @@ class DefaultTemporaryAttachmentSessionsManagerTest
         when(this.context.getWiki()).thenReturn(xwiki);
         DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "User");
         when(this.context.getUserReference()).thenReturn(userReference);
-        when(xwiki.getSpacePreference(FileUploadPlugin.UPLOAD_MAXSIZE_PARAMETER, spaceReference, this.context))
-            .thenReturn("42");
+        SpaceReference lastSpaceReference = documentReference.getLastSpaceReference();
+        when(xwiki.getSpacePreference(UPLOAD_MAXSIZE_PARAMETER, lastSpaceReference, this.context)).thenReturn("42");
         when(part.getSize()).thenReturn(41L);
 
         doAnswer(invocationOnMock -> {
             TemporaryAttachmentSession temporaryAttachmentSession = invocationOnMock.getArgument(1);
             assertEquals(sessionId, temporaryAttachmentSession.getSessionId());
             return null;
-        }).when(httpSession).setAttribute(eq(ATTRIBUTE_KEY), any(TemporaryAttachmentSession.class));
+        }).when(this.httpSession).setAttribute(eq(ATTRIBUTE_KEY), any(TemporaryAttachmentSession.class));
 
         XWikiAttachment attachment = this.attachmentManager.uploadAttachment(documentReference, part);
         assertNotNull(attachment);
         assertEquals(filename, attachment.getFilename());
         assertEquals(userReference, attachment.getAuthorReference());
+        assertEquals(documentReference, attachment.getDoc().getDocumentReference());
 
-        verify(httpSession).setAttribute(eq(ATTRIBUTE_KEY), any(TemporaryAttachmentSession.class));
+        verify(this.httpSession).setAttribute(eq(ATTRIBUTE_KEY), any(TemporaryAttachmentSession.class));
     }
 
     @Test

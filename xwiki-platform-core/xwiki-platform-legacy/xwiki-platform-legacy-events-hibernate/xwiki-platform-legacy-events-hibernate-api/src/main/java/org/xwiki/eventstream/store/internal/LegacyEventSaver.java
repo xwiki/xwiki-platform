@@ -23,7 +23,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.namespace.NamespaceContextExecutor;
@@ -32,7 +31,6 @@ import org.xwiki.model.namespace.WikiNamespace;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 
 /**
@@ -96,14 +94,8 @@ public class LegacyEventSaver
         namespaceContextExecutor.execute(new WikiNamespace(wikiId), () -> {
             XWikiContext context = contextProvider.get();
             XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
-            try {
-                hibernateStore.beginTransaction(context);
-                Session session = hibernateStore.getSession(context);
-                session.save(event);
-                hibernateStore.endTransaction(context, true);
-            } catch (XWikiException e) {
-                hibernateStore.endTransaction(context, false);
-            }
+
+            hibernateStore.executeWrite(context, session -> session.save(event));
 
             return null;
         });

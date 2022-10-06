@@ -25,6 +25,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.xwiki.index.IndexException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.LogLevel;
@@ -38,12 +40,15 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 
 import ch.qos.logback.classic.Level;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -95,6 +100,16 @@ class DefaultLinksTaskConsumerTest
         when(this.wiki.hasBacklinks(this.context)).thenReturn(true);
         when(this.documentRevisionProvider.getRevision(DOCUMENT_REFERENCE, VERSION)).thenReturn(this.document);
         when(this.wiki.getHibernateStore()).thenReturn(this.hibernateStore);
+        when(this.hibernateStore.executeWrite(same(this.context), any())).thenAnswer(new Answer<Void>()
+        {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable
+            {
+                invocation.<HibernateCallback<Void>>getArgument(1).doInHibernate(null);
+
+                return null;
+            }
+        });
     }
 
     @Test

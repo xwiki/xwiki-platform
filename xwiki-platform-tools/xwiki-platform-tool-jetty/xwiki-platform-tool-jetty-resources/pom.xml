@@ -138,6 +138,8 @@
       <groupId>org.mortbay.jasper</groupId>
       <artifactId>apache-el</artifactId>
       <version>${apache-el.version}</version>
+      <optional>true</optional>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
   <build>

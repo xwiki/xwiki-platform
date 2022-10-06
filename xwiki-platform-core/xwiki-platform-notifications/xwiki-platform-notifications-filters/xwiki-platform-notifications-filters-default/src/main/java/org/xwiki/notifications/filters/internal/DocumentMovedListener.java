@@ -24,7 +24,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.namespace.NamespaceContextExecutor;
@@ -123,22 +122,22 @@ public class DocumentMovedListener extends AbstractEventListener
     {
         XWikiContext context = contextProvider.get();
         XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
-        hibernateStore.beginTransaction(context);
-        Session session = hibernateStore.getSession(context);
 
-        if ("WebHome".equals(sourceLocation.getName())) {
+        hibernateStore.executeWrite(context, session -> {
+            if ("WebHome".equals(sourceLocation.getName())) {
+                session
+                    .createQuery("update DefaultNotificationFilterPreference p set p.page = :newPage "
+                        + "where p.page = :oldPage")
+                    .setString(NEW_PAGE, serializer.serialize(targetLocation.getLastSpaceReference()))
+                    .setString(OLD_PAGE, serializer.serialize(sourceLocation.getLastSpaceReference())).executeUpdate();
+            }
             session
-                .createQuery(
-                    "update DefaultNotificationFilterPreference p set p.page = :newPage " + "where p.page = :oldPage")
-                .setString(NEW_PAGE, serializer.serialize(targetLocation.getLastSpaceReference()))
-                .setString(OLD_PAGE, serializer.serialize(sourceLocation.getLastSpaceReference())).executeUpdate();
-        }
-        session
-            .createQuery("update DefaultNotificationFilterPreference p set p.pageOnly = :newPage "
-                + "where p.pageOnly = :oldPage")
-            .setString(NEW_PAGE, serializer.serialize(targetLocation))
-            .setString(OLD_PAGE, serializer.serialize(sourceLocation)).executeUpdate();
+                .createQuery("update DefaultNotificationFilterPreference p set p.pageOnly = :newPage "
+                    + "where p.pageOnly = :oldPage")
+                .setString(NEW_PAGE, serializer.serialize(targetLocation))
+                .setString(OLD_PAGE, serializer.serialize(sourceLocation)).executeUpdate();
 
-        hibernateStore.endTransaction(context, true);
+            return null;
+        });
     }
 }

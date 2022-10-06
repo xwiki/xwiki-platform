@@ -73,12 +73,12 @@ public class DefaultLinksTaskConsumer implements TaskConsumer
                 // Verify that the document has not been removed in the meantime.
                 if (doc != null) {
                     XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
-                    hibernateStore.beginTransaction(context);
-                    try {
+
+                    hibernateStore.executeWrite(context, session -> {
                         hibernateStore.saveLinks(doc, context, false);
-                    } finally {
-                        endTransaction(context, hibernateStore);
-                    }
+
+                        return null;
+                    });
                 }
             } catch (XWikiException e) {
                 throw new IndexException(

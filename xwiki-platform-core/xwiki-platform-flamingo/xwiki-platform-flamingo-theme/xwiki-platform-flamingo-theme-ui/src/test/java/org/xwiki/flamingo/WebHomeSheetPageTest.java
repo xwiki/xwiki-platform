@@ -28,11 +28,14 @@ import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.TranslationBundleContext;
 import org.xwiki.localization.macro.internal.TranslationMacro;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.rendering.RenderingScriptServiceComponentList;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.internal.configuration.DefaultExtendedRenderingConfiguration;
 import org.xwiki.rendering.internal.configuration.RenderingConfigClassDocumentConfigurationSource;
+import org.xwiki.rendering.internal.macro.DefaultMacroCategoryManager;
 import org.xwiki.rendering.internal.macro.message.ErrorMessageMacro;
+import org.xwiki.rendering.internal.syntax.SyntaxConverter;
+import org.xwiki.rendering.internal.transformation.macro.DefaultMacroTransformationConfiguration;
+import org.xwiki.rendering.script.RenderingScriptService;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
@@ -54,13 +57,17 @@ import static org.mockito.Mockito.when;
  */
 @HTML50ComponentList
 @XWikiSyntax21ComponentList
-@RenderingScriptServiceComponentList
 @ComponentList({
     ErrorMessageMacro.class,
     TranslationMacro.class,
     TestNoScriptMacro.class,
     DefaultExtendedRenderingConfiguration.class,
-    RenderingConfigClassDocumentConfigurationSource.class
+    RenderingConfigClassDocumentConfigurationSource.class,
+    // Rendering script service
+    RenderingScriptService.class,
+    SyntaxConverter.class,
+    DefaultMacroCategoryManager.class,
+    DefaultMacroTransformationConfiguration.class
 })
 class WebHomeSheetPageTest extends PageTest
 {

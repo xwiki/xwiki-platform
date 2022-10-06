@@ -447,15 +447,16 @@
           // Remove the element we added after the macro to force the inline rendering.
           var inlineEnforcer = editor.editable().findOne('span#xwiki-macro-inline-enforcer');
           if (inlineEnforcer) {
-            // Place the caret after the inserted inline macro in order to allow the user to continue typing.
-            // We proceed by inserting and non-breakable space after the inline enforcer, before selecting its content.
-            // It is required to be cross-browser compatible. Without these operations, the caret was not visible in
-            // Chrome after the inline macro insertion.
+            // Place the caret after the inserted inline macro in order to allow the user to continue typing. We proceed
+            // by inserting and non-breakable space after the inline enforcer. It is required to be cross-browser
+            // compatible. Without these operations, the caret is not visible in Chrome after the inline macro
+            // insertion.
             var space = new CKEDITOR.dom.text('\u00A0');
             space.insertAfter(inlineEnforcer);
             var range = editor.createRange();
             range.selectNodeContents(space);
-            // TEST with not selected space.
+            // Make the range of length zero (from endOffset to endOffset) so that a caret is displayed after the
+            // space, instead of a selection of the space.
             range.setStartAfter(space, range.endOffset);
             editor.getSelection().selectRanges([range]);
             // Clean up the inline enforcer to avoid duplicates for the next inline macro insertion.

@@ -109,12 +109,23 @@ $xwiki.jsx.use($attachmentPickerDocName)
  * @param $currentValue the currently selected file, used for determining if the box should be highlighted as the current value
  *#
 #macro (attachmentPicker_displayAttachmentBox $attachment $targetDocument $targetAttachDocument, $options $currentValue)
-  #if ($options.displayImage &amp;&amp; $attachment.isImage())
-    #set ($cssClass = 'gallery_image')
+  #set ($hasTemporaryAttachment = "$!services.temporaryAttachments" != '')
+  #set ($canEdit = $xwiki.hasAccessLevel('edit', $xcontext.user, ${targetAttachDocument.fullName}))
+  #set ($isTemporaryAttachment = false)
+  #if(!$hasTemporaryAttachment)
+    #set ($canDeleteAttachment = $canEdit)
   #else
-    #set ($cssClass = '')
+    #set ($isTemporaryAttachment = $services.temporaryAttachments.temporaryAttachmentExists($attachment))
+    #set ($canDeleteAttachment = !$isTemporaryAttachment &amp;&amp; $canEdit)
   #end
-  #attachmentPicker_displayStartFrame({'value' : $attachment.filename, 'text' : $attachment.filename, 'cssClass' : "$!{cssClass}"} $currentValue)
+  #set ($cssClasses = [])
+  #if ($options.displayImage &amp;&amp; $attachment.isImage())
+    #set ($discard = $cssClasses.add('gallery_image'))
+  #end
+  #if ($isTemporaryAttachment)
+    #set ($discard = $cssClasses.add('temporary_attachment'))
+  #end
+  #attachmentPicker_displayStartFrame({'value' : $attachment.filename, 'text' : $attachment.filename, 'cssClass' : "${stringtool.join($cssClasses, ' ')}"} $currentValue)
   #attachmentPicker_displayAttachmentDetails($attachment $options)
   #set ($returnURL = $escapetool.url($doc.getURL('view', $request.queryString)))
   #set ($deleteURL = $targetAttachDocument.getAttachmentURL($attachment.filename, 'delattachment', "xredirect=${returnURL}&amp;form_token=$!{services.csrf.getToken()}") )
@@ -126,17 +137,17 @@ $xwiki.jsx.use($attachmentPickerDocName)
   ## Delete action is only proposed for users with the edit right on the document.
   ## If the temporary attachment is available, the delete action is only allowed for non-temporary attachments.  
   #set ($attachmentActions = [{'name' : 'select', 'url' : $selectURL}])
-  #set ($hasTemporaryAttachment = "$!services.temporaryAttachments" != '')
-  #set ($canEdit = $xwiki.hasAccessLevel('edit', $xcontext.user, ${targetAttachDocument.fullName}))
-  #if(!$hasTemporaryAttachment)
-    #set ($canDeleteAttachment = $canEdit)
-  #else
-    #set ($canDeleteAttachment = !$services.temporaryAttachments.temporaryAttachmentExists($attachment) &amp;&amp; $canEdit)
-  #end
   #if($canDeleteAttachment)
     #set ($discard = $attachmentActions.add({'name' : 'delete', 'url' : $deleteURL}))
   #end
-  #attachmentPicker_displayEndFrame ($attachmentActions)
+  #define($additionalContent)
+    #if ($isTemporaryAttachment)
+      #set ($titleMessage = $services.localization.render('attachment.attachmentSelector.attachmentBox.temporaryAttachmentTitle'))
+      #set ($titleMessage = $services.rendering.escape($titleMessage, 'xwiki/2.1'))
+      (% title="$titleMessage" %)$services.icon.render('clock')(%%)
+    #end
+  #end
+  #attachmentPicker_displayEndFrame ($attachmentActions $additionalContent)
 #end
 
 #**
@@ -193,13 +204,14 @@ $xwiki.jsx.use($attachmentPickerDocName)
  *          &lt;dd&gt;an optional parameter to be used in the "rel" HTML attribute; for example "__blank" can be used to open the link in a new tab/window&lt;/dd&gt;
  *        &lt;/dl&gt;
  *#
-#macro (attachmentPicker_displayEndFrame $actions)
+#macro (attachmentPicker_displayEndFrame $actions $additionalContent)
     )))## attachmentframe
     (% class="gallery_actions" %)(((
       #foreach ($action in $actions)
         #set( $actionname = $services.localization.render("${translationPrefix}.actions.${action.name}") )
         [[${actionname}&gt;&gt;path:${action.url}||class="tool ${action.name}" title="${actionname}" #if($action.rel) rel="${action.rel}"#end]]##
       #end
+      $!additionalContent
     )))## actions
   )))## attachmentbox
 #end

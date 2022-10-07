@@ -36,6 +36,7 @@
   <logger name="ch.qos.logback.classic.model.processor" level="warn"/>
 
   <logger name="org.xwiki" level="info"/>
+  <logger name="com.xwiki" level="info"/>
 
   <!-- Old code is using the com.xpn.xwiki package and is logging too much stuff at INFO level, which is why we use
        the default WARN level. -->

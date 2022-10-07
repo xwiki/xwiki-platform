@@ -228,6 +228,18 @@ var XWiki = (function(XWiki) {
         this.form.enable();
       }
     },
+    getFormData: function(submitter) {
+      let formData = {};
+      if (this.form instanceof HTMLFormElement) {
+        formData = new FormData(this.form);
+        if (typeof submitter === 'string') {
+          formData.set(submitter, '');
+        }
+      } else if (typeof this.form.serialize === 'function') {
+        formData = this.form.serialize({hash: true, submit: submitter});
+      }
+      return new URLSearchParams(formData);
+    },
     onSave : function(event) {
       // Don't continue if the event has been stopped already.
       if (event.defaultPrevented) {
@@ -279,7 +291,7 @@ var XWiki = (function(XWiki) {
       if (isContinue) {
         submitValue = 'action_saveandcontinue';
       }
-      var formData = new Hash(this.form.serialize({hash: true, submit: submitValue}));
+      var formData = this.getFormData(submitValue);
       if (isContinue) {
         formData.set('minorEdit', '1');
       }
@@ -297,7 +309,7 @@ var XWiki = (function(XWiki) {
       };
       new Ajax.Request(this.form.action, {
         method : 'post',
-        parameters : formData.toQueryString(),
+        parameters : formData.toString(),
         onSuccess : this.onSuccess.bind(this, state),
         on0 : this.on0.bind(this),
         on409 : this.on409.bind(this, state),
@@ -520,7 +532,7 @@ var XWiki = (function(XWiki) {
       this.enableEditors();
 
       var jsonAnswer = response.responseJSON;
-      var formData = new Hash(this.form.serialize({hash: true, submit: 'preview'}));
+      var formData = this.getFormData('preview');
 
       var displayModal;
 
@@ -551,7 +563,7 @@ var XWiki = (function(XWiki) {
         var previewUrl = new XWiki.Document().getURL("preview", queryString);
         new Ajax.Request(previewUrl, {
           method : 'post',
-          parameters : formData.toQueryString(),
+          parameters : formData.toString(),
           onSuccess : displayModal,
           onFailure : self.onFailure.bind(self, state)
         });

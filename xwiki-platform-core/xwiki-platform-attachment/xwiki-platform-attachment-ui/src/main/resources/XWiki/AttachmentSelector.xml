@@ -86,7 +86,8 @@ $xwiki.jsx.use($attachmentPickerDocName)
   #attachmentPicker_displayUploadForm($targetDocument, $targetAttachDocument, $options)
   #attachmentPicker_displayAttachmentGalleryEmptyValue($targetDocument, $targetAttachDocument, $options, $currentValue)
   #if ("$!services.temporaryAttachments" != '')
-    #set ($sortedAttachments = $services.temporaryAttachments.listAllAttachments($targetAttachDocument))
+    #set ($unsortedAttachments = $services.temporaryAttachments.listAllAttachments($targetAttachDocument))
+    #set ($sortedAttachments = $collectiontool.sort($unsortedAttachments, "${options.sortAttachmentsBy}"))
   #else
     #set ($sortedAttachments = $collectiontool.sort($targetAttachDocument.getAttachmentList(), "${options.sortAttachmentsBy}") )
   #end

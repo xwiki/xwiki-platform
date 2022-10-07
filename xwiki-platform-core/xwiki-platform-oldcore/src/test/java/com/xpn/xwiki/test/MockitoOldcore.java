@@ -751,9 +751,6 @@ public class MockitoOldcore
                     }
 
                     XWikiDocument savedDocument = document.clone();
-                    // Retrieve the document's history aggregated in the versioning store. 
-                    savedDocument.setDocumentArchive(getMockVersioningStore().getXWikiDocumentArchive(savedDocument,
-                        context));
                     documents.put(document.getDocumentReferenceWithLocale(), savedDocument);
 
                     if (isNew) {

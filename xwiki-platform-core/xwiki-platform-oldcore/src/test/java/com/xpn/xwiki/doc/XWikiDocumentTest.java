@@ -55,6 +55,7 @@ import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.DocumentSection;
 import com.xpn.xwiki.objects.BaseObject;
@@ -78,7 +79,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -849,5 +853,39 @@ public class XWikiDocumentTest
         assertEquals(2, attachmentList.size());
         assertEquals("file.txt", attachmentList.get(1).getFilename());
         assertEquals("file", attachmentList.get(0).getFilename());
+    }
+
+    /*
+     * Test for checking that cloneInternal doesn't replace the XWikiDocumentArchive by an empty document archive,
+     * and to ensure that the versioningStore is properly called when using
+     * XWikiDocument#getDocumentArchive(XWikiContext).
+     */
+    @Test
+    void getDocumentArchiveAfterClone() throws XWikiException
+    {
+        XWikiContext context = this.oldcore.getXWikiContext();
+        XWikiVersioningStoreInterface versioningStore =
+            this.document.getVersioningStore(context);
+        when(versioningStore.getXWikiDocumentArchive(any(), any())).then(invocationOnMock -> {
+            XWikiDocument doc = invocationOnMock.getArgument(0);
+            if (doc.getDocumentArchive() != null) {
+                return doc.getDocumentArchive();
+            } else {
+                return mock(XWikiDocumentArchive.class);
+            }
+        });
+        assertSame(versioningStore, document.getVersioningStore(context));
+        assertNull(this.document.getDocumentArchive());
+        XWikiDocumentArchive documentArchive = this.document.getDocumentArchive(context);
+        assertNotNull(documentArchive);
+        assertNotNull(this.document.getDocumentArchive());
+
+        XWikiDocument cloneDoc = document.clone();
+        assertNull(cloneDoc.getDocumentArchive());
+        XWikiDocumentArchive cloneArchive = cloneDoc.getDocumentArchive(context);
+        verify(versioningStore).getXWikiDocumentArchive(
+            argThat(givenDoc -> givenDoc != XWikiDocumentTest.this.document), eq(context));
+        assertNotNull(cloneArchive);
+        assertNotSame(cloneArchive, documentArchive);
     }
 }

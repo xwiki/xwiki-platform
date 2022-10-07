@@ -235,8 +235,6 @@ class TemporaryAttachmentsScriptServiceTest
         assertEquals(List.of(xWikiAttachment1, xWikiAttachment0),
             this.temporaryAttachmentsScriptService.listAllAttachments(DOCUMENT_REFERENCE).stream()
                 .map(Attachment::getAttachment).collect(toList()));
-        verify(xWikiAttachment0).setDoc(this.xWikiDocument);
-        verify(xWikiAttachment1).setDoc(this.xWikiDocument);
     }
 
     @Test

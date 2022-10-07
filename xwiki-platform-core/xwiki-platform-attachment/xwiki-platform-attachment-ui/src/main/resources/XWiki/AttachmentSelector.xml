@@ -123,9 +123,11 @@ $xwiki.jsx.use($attachmentPickerDocName)
     "${options.get('classname')}_${options.get('object')}_${options.get('property')}": ${attachment.filename},
     'form_token': $!{services.csrf.getToken()}
   })))
+  ## Delete action is only proposed for users with the edit right on the document.
+  ## If the temporary attachment is available, the delete action is only allowed for non-temporary attachments.  
   #set ($attachmentActions = [{'name' : 'select', 'url' : $selectURL}])
   #set ($hasTemporaryAttachment = "$!services.temporaryAttachments" != '')
-  #set ($canEdit = $xwiki.hasAccessLevel('edit',$xcontext.user,${targetAttachDocument.fullName}))
+  #set ($canEdit = $xwiki.hasAccessLevel('edit', $xcontext.user, ${targetAttachDocument.fullName}))
   #if(!$hasTemporaryAttachment)
     #set ($canDeleteAttachment = $canEdit)
   #else
@@ -447,67 +449,67 @@ $xwiki.jsx.use($attachmentPickerDocName)
     </property>
     <property>
       <code>var XWiki = (function(XWiki) {
-function uploadTemporaryAttachment() {
-  // Require jquery locally until we are able to fully migrate this code away from prototype.
-  const form = this.property.up('form');
-  require(['jquery'], function ($) {
-    const data = new FormData();
-    const uploadedFile = $('#attachfile')[0].files[0];
-    const filenameCheckbox = $("#uploadAttachment input[name='filename']");
-
-    // TODO: deal with replace currently selected checkbox.
-    data.append('upload', uploadedFile);
-    const notification = new XWiki.widgets.Notification(
-      "$services.localization.render('xe.attachmentSelector.upload.inProgress')", 'inprogress');
-    const params = {
-      'form_token': $(form).find('[name="form_token"]').val(),
-      'sheet': 'CKEditor.FileUploader',
-      'outputSyntax': 'plain'
-    };
-
-    // Update the name of the file with the name of the currently selected attachment if required.
-    if (filenameCheckbox.prop('checked')) {
-      params['filename'] = filenameCheckbox.val()
-    }
-
-    $.ajax({
-      'url': XWiki.currentDocument.getURL('get', new URLSearchParams(params).toString()),
-      method: 'POST',
-      data: data,
-      processData: false,
-      contentType: false, // Sets the 'multipart/form-data' automatically
-      headers: {
-        'X-XWiki-Temporary-Attachment-Support': true
+  function uploadTemporaryAttachment() {
+    // Require jquery locally until we are able to fully migrate this code away from prototype.
+    const form = this.property.up('form');
+    require(['jquery'], function ($) {
+      const data = new FormData();
+      const uploadedFile = $('#attachfile')[0].files[0];
+      const filenameCheckbox = $("#uploadAttachment input[name='filename']");
+  
+      // TODO: Fix replace currently selected checkbox (see XWIKI-20181).
+      data.append('upload', uploadedFile);
+      const notification = new XWiki.widgets.Notification(
+        "$services.localization.render('xe.attachmentSelector.upload.inProgress')", 'inprogress');
+      const params = {
+        'form_token': $(form).find('[name="form_token"]').val(),
+        'sheet': 'CKEditor.FileUploader',
+        'outputSyntax': 'plain'
+      };
+  
+      // Update the name of the file with the name of the currently selected attachment if required.
+      if (filenameCheckbox.prop('checked')) {
+        params['filename'] = filenameCheckbox.val()
       }
-    }).done(function (response) {
-      #set ($successMessage = $escapetool.javascript($services.localization.render('attachment.attachmentSelector.temporaryUpload.success')))
-      notification.replace(new XWiki.widgets.Notification("$successMessage", 'done'));
-      // Add a field with the name of the uploaded file so that it is moved from the temporary
-      // attachments to the persisded ones on save.
-      $(form).append($('&lt;input/&gt;')
-        .prop('type', 'hidden')
-        .prop('name', 'uploadedFiles')
-        .prop('value', response.fileName))
-      $(form).find('input[type="hidden"].property-reference').prop('value', response.fileName);
-      this.updateAttachment(response.fileName, response.url);
-      this.dialog.closeDialog();
-    }.bind(this)).fail(function  () {
-      #set ($errorMessage = $escapetool.javascript($services.localization.render('attachment.attachmentSelector.temporaryUpload.failure')))notification.replace(new XWiki.widgets.Notification("$errorMessage", 'error'));
-    });
-  }.bind(this));
-}
-
-function directUploadAttachment(uploadForm) {
-  // FIXME This fails in HTML5, will deal with it later:
-  // this.property.down('input').value = uploadForm.down('input[type="file"]').value;
-  // uploadForm.xredirect.value = window.location.pathname;
-  document.observe('xwiki:document:saved', function () {
-    new XWiki.widgets.Notification("$services.localization.render('xe.attachmentSelector.upload.inProgress')",
-      'inprogress');
-    uploadForm.submit();
-  })
-  document.fire('xwiki:actions:save', {'continue': true, form: this.property.up('form')});
-}
+  
+      $.ajax({
+        'url': XWiki.currentDocument.getURL('get', new URLSearchParams(params).toString()),
+        method: 'POST',
+        data: data,
+        processData: false,
+        contentType: false, // Sets the 'multipart/form-data' automatically
+        headers: {
+          'X-XWiki-Temporary-Attachment-Support': true
+        }
+      }).done(function (response) {
+        #set ($successMessage = $escapetool.javascript($services.localization.render('attachment.attachmentSelector.temporaryUpload.success')))
+        notification.replace(new XWiki.widgets.Notification("$successMessage", 'done'));
+        // Add a field with the name of the uploaded file so that it is moved from the temporary
+        // attachments to the persisded ones on save.
+        $(form).append($('&lt;input/&gt;')
+          .prop('type', 'hidden')
+          .prop('name', 'uploadedFiles')
+          .prop('value', response.fileName))
+        $(form).find('input[type="hidden"].property-reference').prop('value', response.fileName);
+        this.updateAttachment(response.fileName, response.url);
+        this.dialog.closeDialog();
+      }.bind(this)).fail(function  () {
+        #set ($errorMessage = $escapetool.javascript($services.localization.render('attachment.attachmentSelector.temporaryUpload.failure')))notification.replace(new XWiki.widgets.Notification("$errorMessage", 'error'));
+      });
+    }.bind(this));
+  }
+  
+  function directUploadAttachment(uploadForm) {
+    // FIXME This fails in HTML5, will deal with it later:
+    // this.property.down('input').value = uploadForm.down('input[type="file"]').value;
+    // uploadForm.xredirect.value = window.location.pathname;
+    document.observe('xwiki:document:saved', function () {
+      new XWiki.widgets.Notification("$services.localization.render('xe.attachmentSelector.upload.inProgress')",
+        'inprogress');
+      uploadForm.submit();
+    })
+    document.fire('xwiki:actions:save', {'continue': true, form: this.property.up('form')});
+  }
 
   /** Handles the gallery buttons directly in the current page without reloading the window. */
   XWiki.AttachmentPicker = Class.create({

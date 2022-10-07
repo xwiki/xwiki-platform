@@ -23,7 +23,7 @@ package org.xwiki.store.filesystem.internal;
  * Exception for the Store - Filesystem - Old Core module.
  *
  * @version $Id$
- * @since 14.8RC1
+ * @since 14.9RC1
  */
 public class StoreFilesystemOldcoreException extends Exception
 {

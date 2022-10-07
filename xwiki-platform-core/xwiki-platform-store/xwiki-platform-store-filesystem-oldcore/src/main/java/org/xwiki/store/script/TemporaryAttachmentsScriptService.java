@@ -60,6 +60,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMess
 /**
  * Script service dedicated to the handling of temporary attachments.
  *
+ * @version $Id$
  * @see TemporaryAttachmentSessionsManager
  * @since 14.3RC1
  */
@@ -132,7 +133,7 @@ public class TemporaryAttachmentsScriptService implements ScriptService
      * @param documentReference the target document reference the attachments should be later attached to
      * @return the list of temporary attachments linked to the given document reference. The list is sorted by the
      *     attachments filenames ({@link XWikiAttachment#getFilename()})
-     * @since 14.8
+     * @since 14.9RC1
      */
     @Unstable
     public List<Attachment> listTemporaryAttachments(DocumentReference documentReference)
@@ -155,7 +156,7 @@ public class TemporaryAttachmentsScriptService implements ScriptService
      * @return the list of all attachments linked to the given document reference. Persisted attachments are overridden
      *     by temporary one if names match. The list is sorted by the attachments filenames
      *     ({@link XWikiAttachment#getFilename()})
-     * @since 14.8
+     * @since 14.9RC1
      */
     @Unstable
     public List<Attachment> listAllAttachments(DocumentReference documentReference)
@@ -190,7 +191,7 @@ public class TemporaryAttachmentsScriptService implements ScriptService
      * @return {@code true} if a matching attachment exists in the temporary attachment session (i.e., same filename and
      *     document reference), {@code false} otherwise
      * @see #persistentAttachmentExists(Attachment)
-     * @since 14.8
+     * @since 14.9RC1
      */
     @Unstable
     public boolean temporaryAttachmentExists(Attachment attachment) throws StoreFilesystemOldcoreException
@@ -215,7 +216,7 @@ public class TemporaryAttachmentsScriptService implements ScriptService
      *     {@code false} otherwise
      * @throws StoreFilesystemOldcoreException in case of error when accessing the attachment's document
      * @see #temporaryAttachmentExists(Attachment)
-     * @since 14.8
+     * @since 14.9RC1
      */
     @Unstable
     public boolean persistentAttachmentExists(Attachment attachment)

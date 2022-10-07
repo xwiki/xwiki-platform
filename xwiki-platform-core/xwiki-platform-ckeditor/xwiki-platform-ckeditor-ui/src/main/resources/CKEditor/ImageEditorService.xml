@@ -329,16 +329,20 @@
 
 #advanced .alignments label {
   margin-right: 1em;
+}
+
+#advanced .xform {
+  margin-top: floor(@font-size-base * 1.4);
 }</code>
     </property>
     <property>
-      <contentType>CSS</contentType>
+      <contentType>LESS</contentType>
     </property>
     <property>
       <name/>
     </property>
     <property>
-      <parse>1</parse>
+      <parse>0</parse>
     </property>
     <property>
       <use>onDemand</use>

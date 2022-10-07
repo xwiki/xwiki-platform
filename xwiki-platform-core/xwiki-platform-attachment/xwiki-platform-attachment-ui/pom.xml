@@ -51,9 +51,9 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-ckeditor-ui</artifactId>
+      <artifactId>xwiki-platform-store-filesystem-oldcore</artifactId>
       <version>${project.version}</version>
-      <type>xar</type>
+      <scope>runtime</scope>
       <optional>true</optional>
     </dependency>
     <!-- Test dependencies. -->

@@ -85,7 +85,11 @@ $xwiki.jsx.use($attachmentPickerDocName)
   ## Only display the upload form if they have edit permission on targetAttachDocument
   #attachmentPicker_displayUploadForm($targetDocument, $targetAttachDocument, $options)
   #attachmentPicker_displayAttachmentGalleryEmptyValue($targetDocument, $targetAttachDocument, $options, $currentValue)
-  #set ($sortedAttachments = $services.temporaryAttachments.listAllAttachments($targetAttachDocument))
+  #if ("$!services.temporaryAttachments" != '')
+    #set ($sortedAttachments = $services.temporaryAttachments.listAllAttachments($targetAttachDocument))
+  #else
+    #set ($sortedAttachments = $collectiontool.sort($targetAttachDocument.getAttachmentList(), "${options.sortAttachmentsBy}") )
+  #end
   #foreach ($attachment in $sortedAttachments)
     #set ($extension = $attachment.getFilename())
     #set ($extension = $extension.substring($mathtool.add($extension.lastIndexOf('.'), 1)).toLowerCase())
@@ -119,7 +123,18 @@ $xwiki.jsx.use($attachmentPickerDocName)
     "${options.get('classname')}_${options.get('object')}_${options.get('property')}": ${attachment.filename},
     'form_token': $!{services.csrf.getToken()}
   })))
-  #attachmentPicker_displayEndFrame ([{'name' : 'select', 'url' : $selectURL}, {'name' : 'delete', 'url' : $deleteURL}])
+  #set ($attachmentActions = [{'name' : 'select', 'url' : $selectURL}])
+  #set ($hasTemporaryAttachment = "$!services.temporaryAttachments" != '')
+  #set ($canEdit = $xwiki.hasAccessLevel('edit',$xcontext.user,${targetAttachDocument.fullName}))
+  #if(!$hasTemporaryAttachment)
+    #set ($canDeleteAttachment = $canEdit)
+  #else
+    #set ($canDeleteAttachment = !$services.temporaryAttachments.temporaryAttachmentExists($attachment) &amp;&amp; $canEdit)
+  #end
+  #if($canDeleteAttachment)
+    #set ($discard = $attachmentActions.add({'name' : 'delete', 'url' : $deleteURL}))
+  #end
+  #attachmentPicker_displayEndFrame ($attachmentActions)
 #end
 
 #**
@@ -432,6 +447,68 @@ $xwiki.jsx.use($attachmentPickerDocName)
     </property>
     <property>
       <code>var XWiki = (function(XWiki) {
+function uploadTemporaryAttachment() {
+  // Require jquery locally until we are able to fully migrate this code away from prototype.
+  const form = this.property.up('form');
+  require(['jquery'], function ($) {
+    const data = new FormData();
+    const uploadedFile = $('#attachfile')[0].files[0];
+    const filenameCheckbox = $("#uploadAttachment input[name='filename']");
+
+    // TODO: deal with replace currently selected checkbox.
+    data.append('upload', uploadedFile);
+    const notification = new XWiki.widgets.Notification(
+      "$services.localization.render('xe.attachmentSelector.upload.inProgress')", 'inprogress');
+    const params = {
+      'form_token': $(form).find('[name="form_token"]').val(),
+      'sheet': 'CKEditor.FileUploader',
+      'outputSyntax': 'plain'
+    };
+
+    // Update the name of the file with the name of the currently selected attachment if required.
+    if (filenameCheckbox.prop('checked')) {
+      params['filename'] = filenameCheckbox.val()
+    }
+
+    $.ajax({
+      'url': XWiki.currentDocument.getURL('get', new URLSearchParams(params).toString()),
+      method: 'POST',
+      data: data,
+      processData: false,
+      contentType: false, // Sets the 'multipart/form-data' automatically
+      headers: {
+        'X-XWiki-Temporary-Attachment-Support': true
+      }
+    }).done(function (response) {
+      #set ($successMessage = $escapetool.javascript($services.localization.render('attachment.attachmentSelector.temporaryUpload.success')))
+      notification.replace(new XWiki.widgets.Notification("$successMessage", 'done'));
+      // Add a field with the name of the uploaded file so that it is moved from the temporary
+      // attachments to the persisded ones on save.
+      $(form).append($('&lt;input/&gt;')
+        .prop('type', 'hidden')
+        .prop('name', 'uploadedFiles')
+        .prop('value', response.fileName))
+      $(form).find('input[type="hidden"].property-reference').prop('value', response.fileName);
+      this.updateAttachment(response.fileName, response.url);
+      this.dialog.closeDialog();
+    }.bind(this)).fail(function  () {
+      #set ($errorMessage = $escapetool.javascript($services.localization.render('attachment.attachmentSelector.temporaryUpload.failure')))notification.replace(new XWiki.widgets.Notification("$errorMessage", 'error'));
+    });
+  }.bind(this));
+}
+
+function directUploadAttachment(uploadForm) {
+  // FIXME This fails in HTML5, will deal with it later:
+  // this.property.down('input').value = uploadForm.down('input[type="file"]').value;
+  // uploadForm.xredirect.value = window.location.pathname;
+  document.observe('xwiki:document:saved', function () {
+    new XWiki.widgets.Notification("$services.localization.render('xe.attachmentSelector.upload.inProgress')",
+      'inprogress');
+    uploadForm.submit();
+  })
+  document.fire('xwiki:actions:save', {'continue': true, form: this.property.up('form')});
+}
+
   /** Handles the gallery buttons directly in the current page without reloading the window. */
   XWiki.AttachmentPicker = Class.create({
     /**
@@ -498,51 +575,11 @@ $xwiki.jsx.use($attachmentPickerDocName)
           if (this.directSave) {
             uploadForm.submit();
           } else {
-            // Require jquery locally until we are able to fully migrate this code away from prototype.
-            const form = this.property.up('form');
-            require(['jquery'], function($){
-              const data = new FormData();
-              const uploadedFile = $('#attachfile')[0].files[0];
-              const filenameCheckbox = $("#uploadAttachment input[name='filename']");
-
-              // TODO: deal with replace currently selected checkbox.
-              data.append('upload', uploadedFile);
-              const notification = new XWiki.widgets.Notification("$services.localization.render('xe.attachmentSelector.upload.inProgress')", 'inprogress');
-              const params = {
-                'form_token': $(form).find('[name="form_token"]').val(),
-                'sheet': 'CKEditor.FileUploader',
-                'outputSyntax': 'plain'
-              };
-
-              // Update the name of the file with the name of the currently selected attachment if required.
-              if(filenameCheckbox.prop('checked')) {
-                params['filename'] = filenameCheckbox.val()
-              }
-
-              $.ajax({
-                'url': XWiki.currentDocument.getURL('get', new URLSearchParams(params).toString()),
-                method: 'POST',
-                data: data,
-                processData: false,
-                contentType: false, // Sets the 'multipart/form-data' automatically
-                headers: {
-                  'X-XWiki-Temporary-Attachment-Support': true // TODO: check if services.temporaryAttachments exists
-                }
-              }).done(function() {
-                // TODO: localization
-                notification.replace(new XWiki.widgets.Notification('Attachment upload succeeded.', 'done'));
-                // Add a field with the name of the uploaded file so that it is moved from the temporary
-                // attachments to the persisded ones on save.
-                $(form).append($('&lt;input/&gt;')
-                               .prop('type', 'hidden')
-                               .prop('name', 'uploadedFiles')
-                               .prop('value', uploadedFile.name))
-                $(form).find('input[type="hidden"].property-reference').prop('value', uploadedFile.name);
-              }).fail(function() {
-                // TODO: localization
-                notification.replace(new XWiki.widgets.Notification('Attachment upload failed.', 'error'));
-              });
-            });
+            if ("$!services.temporaryAttachments" != '') {
+              uploadTemporaryAttachment.call(this);
+            } else {
+              directUploadAttachment.call(this, uploadForm);
+            }
           }
         }
       }.bindAsEventListener(this));

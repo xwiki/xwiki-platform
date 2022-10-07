@@ -165,7 +165,6 @@ public class TemporaryAttachmentsScriptService implements ScriptService
             new ArrayList<>(this.temporaryAttachmentSessionsManager.getUploadedAttachments(documentReference));
         XWikiDocument document = getDocument(documentReference);
         List<Attachment> fullList = temporaryAttachments.stream()
-            .peek(temporaryAttachment -> temporaryAttachment.setDoc(document))
             .map(attachment -> convertToAttachment(document, attachment))
             .collect(Collectors.toList());
         Stream<Attachment> nonOverriddenAttachments =

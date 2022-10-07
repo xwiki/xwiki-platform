@@ -2536,6 +2536,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         if (this.archive != null) {
             return this.archive.get();
         }
+        // Some APIs are expecting the archive to be null for loading it
+        // (e.g. VersioningStore#loadXWikiDocumentArchive), so it's better to keep it null than to return an
+        // empty archive which would never be populated.
         return null;
     }
 
@@ -2583,6 +2586,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // request)
         if (arch != null) {
             this.archive = new SoftReference<XWikiDocumentArchive>(arch);
+        } else {
+            // Some APIs are expecting the archive to be null for loading it
+            // (e.g. VersioningStore#loadXWikiDocumentArchive), so we allow setting it back to null.
+            this.archive = null;
         }
     }
 
@@ -4534,10 +4541,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             if (cloneArchive) {
                 doc.cloneDocumentArchive(this);
             } else {
-                // Initialize the document archive with empty archive, using the new document reference and id.
                 // Without this explicit initialization, it is possible for the archive to be incorrectly initialized.
                 // For instance, with the archive of the cloned document.
-                doc.setDocumentArchive(new XWikiDocumentArchive(newDocumentReference.getWikiReference(), getId()));
+                // Here we guarantee that further calls of APIs to get the archive will properly populate the data.
+                doc.setDocumentArchive((XWikiDocumentArchive) null);
             }
             doc.getAuthors().copyAuthors(getAuthors());
             doc.setContent(getContent());

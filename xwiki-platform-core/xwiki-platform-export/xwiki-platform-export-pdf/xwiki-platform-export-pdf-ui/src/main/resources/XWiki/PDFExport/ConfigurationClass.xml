@@ -46,6 +46,91 @@
     <defaultWeb/>
     <nameField/>
     <validationScript/>
+    <chromeDockerContainerName>
+      <customDisplay>{{include reference="XWiki.PDFExport.ConfigurationDisplayer" /}}</customDisplay>
+      <disabled>0</disabled>
+      <hint>XWiki.PDFExport.ConfigurationClass_chromeDockerContainerName.hint</hint>
+      <name>chromeDockerContainerName</name>
+      <number>7</number>
+      <picker>0</picker>
+      <prettyName>Chrome Docker Container Name</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp>[a-zA-Z0-9][a-zA-Z0-9_.-]+</validationRegExp>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </chromeDockerContainerName>
+    <chromeDockerImage>
+      <customDisplay>{{include reference="XWiki.PDFExport.ConfigurationDisplayer" /}}</customDisplay>
+      <disabled>0</disabled>
+      <hint>XWiki.PDFExport.ConfigurationClass_chromeDockerImage.hint</hint>
+      <name>chromeDockerImage</name>
+      <number>6</number>
+      <picker>0</picker>
+      <prettyName>Chrome Docker Image</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </chromeDockerImage>
+    <chromeHost>
+      <customDisplay>{{include reference="XWiki.PDFExport.ConfigurationDisplayer" /}}</customDisplay>
+      <disabled>0</disabled>
+      <hint>XWiki.PDFExport.ConfigurationClass_chromeHost.hint</hint>
+      <name>chromeHost</name>
+      <number>3</number>
+      <picker>0</picker>
+      <prettyName>Chrome Host</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </chromeHost>
+    <chromeRemoteDebuggingPort>
+      <customDisplay>{{include reference="XWiki.PDFExport.ConfigurationDisplayer" /}}</customDisplay>
+      <disabled>0</disabled>
+      <hint>XWiki.PDFExport.ConfigurationClass_chromeRemoteDebuggingPort.hint</hint>
+      <name>chromeRemoteDebuggingPort</name>
+      <number>4</number>
+      <numberType>integer</numberType>
+      <prettyName>Chrome Remote Debugging Port</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+    </chromeRemoteDebuggingPort>
+    <dockerNetwork>
+      <customDisplay>{{include reference="XWiki.PDFExport.ConfigurationDisplayer" /}}</customDisplay>
+      <disabled>0</disabled>
+      <hint>XWiki.PDFExport.ConfigurationClass_dockerNetwork.hint</hint>
+      <name>dockerNetwork</name>
+      <number>8</number>
+      <picker>0</picker>
+      <prettyName>Docker Network</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp>[a-zA-Z0-9][a-zA-Z0-9_.-]+</validationRegExp>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </dockerNetwork>
+    <serverSide>
+      <customDisplay/>
+      <defaultValue/>
+      <disabled>0</disabled>
+      <displayFormType>select</displayFormType>
+      <displayType/>
+      <hint>XWiki.PDFExport.ConfigurationClass_serverSide.hint</hint>
+      <name>serverSide</name>
+      <number>2</number>
+      <prettyName>Server Side</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </serverSide>
     <templates>
       <cache>0</cache>
       <classname>XWiki.PDFExport.TemplateClass</classname>
@@ -74,7 +159,65 @@
       <valueField/>
       <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
     </templates>
+    <xwikiHost>
+      <customDisplay>{{include reference="XWiki.PDFExport.ConfigurationDisplayer" /}}</customDisplay>
+      <disabled>0</disabled>
+      <hint>XWiki.PDFExport.ConfigurationClass_xwikiHost.hint</hint>
+      <name>xwikiHost</name>
+      <number>5</number>
+      <picker>0</picker>
+      <prettyName>XWiki Host</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </xwikiHost>
   </class>
+  <object>
+    <name>XWiki.PDFExport.ConfigurationClass</name>
+    <number>0</number>
+    <className>XWiki.ClassSheetBinding</className>
+    <guid>906c635b-6769-4105-9999-e2f688eb73b4</guid>
+    <class>
+      <name>XWiki.ClassSheetBinding</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <sheet>
+        <cache>0</cache>
+        <classname/>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
+        <name>sheet</name>
+        <number>1</number>
+        <picker>1</picker>
+        <prettyName>Sheet</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <size>30</size>
+        <sort>none</sort>
+        <sql/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
+      </sheet>
+    </class>
+    <property>
+      <sheet>XWiki.PDFExport.ConfigurationSheet</sheet>
+    </property>
+  </object>
   <object>
     <name>XWiki.PDFExport.ConfigurationClass</name>
     <number>0</number>

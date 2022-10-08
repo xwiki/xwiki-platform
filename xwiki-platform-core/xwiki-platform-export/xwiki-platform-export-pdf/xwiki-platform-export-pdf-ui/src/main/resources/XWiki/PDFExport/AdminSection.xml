@@ -20,9 +20,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="XWiki.PDFExport.Configuration" locale="">
+<xwikidoc version="1.5" reference="XWiki.PDFExport.AdminSection" locale="">
   <web>XWiki.PDFExport</web>
-  <name>Configuration</name>
+  <name>AdminSection</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
@@ -36,9 +36,61 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content/>
+  <content>{{velocity output="false"}}
+#macro (copyObject $sourceDoc $targetDoc $className)
+  #set ($sourceObj = $sourceDoc.getObject($className))
+  #set ($targetObj = $targetDoc.getObject($className, true))
+  #foreach ($propName in $sourceObj.propertyNames)
+    #set ($discard = $targetObj.set($propName, $sourceObj.getValue($propName)))
+  #end
+#end
+
+#macro (displayPDFExportConfigForm)
+  {{html clean="false"}}
+  #set ($configDoc = $xwiki.getDocument('XWiki.PDFExport.Configuration'))
+  &lt;form id="pdfExportConfig" method="post" action="$configDoc.getURL('save')"&gt;
+    &lt;fieldset&gt;
+      #if ($configDoc.isNew())
+        ## Copy the configuration object from the template.
+        #set ($templateDoc = $xwiki.getDocument('XWiki.PDFExport.ConfigurationTemplate'))
+        #copyObject($templateDoc $configDoc 'XWiki.PDFExport.ConfigurationClass')
+        ## We still need to specify the template when we save because otherwise the configuration object is not added
+        ## (the save action only updates existing objects).
+        &lt;input type="hidden" name="template" value="$templateDoc.fullName" /&gt;
+        ## Make sure the configuration page is created as hidden.
+        &lt;input type="hidden" name="xhidden" value="1" /&gt;
+      #end
+      &lt;input type="hidden" name="form_token" value="$!services.csrf.token" /&gt;
+      &lt;input value="$escapetool.xml($services.localization.render('export.pdf.admin.saveComment'))"
+        type="hidden" name="comment" /&gt;
+      $services.display.content($configDoc)
+      &lt;div&gt;
+        &lt;input class="btn btn-primary" type="submit" name="action_saveandcontinue"
+          value="$escapetool.xml($services.localization.render('admin.save'))" /&gt;
+        #set ($resetURL = $configDoc.getURL('delete', $escapetool.url({
+          'confirm': 1,
+          'form_token': $services.csrf.token,
+          'xredirect': "$request.requestURI?$!request.queryString"
+        })))
+        &lt;a class="btn btn-default" href="$resetURL"
+            title="$escapetool.xml($services.localization.render('export.pdf.admin.reset.hint'))"
+            data-confirmation="$escapetool.xml($services.localization.render('export.pdf.admin.reset.confirmation'))"&gt;
+          $escapetool.xml($services.localization.render('export.pdf.admin.reset'))
+        &lt;/a&gt;
+      &lt;/div&gt;
+    &lt;/fieldset&gt;
+  &lt;/form&gt;
+  {{/html}}
+#end
+{{/velocity}}
+
+{{velocity}}
+#if ($xcontext.action == 'admin')
+  #displayPDFExportConfigForm()
+#end
+{{/velocity}}</content>
   <object>
-    <name>XWiki.PDFExport.Configuration</name>
+    <name>XWiki.PDFExport.AdminSection</name>
     <number>0</number>
     <className>XWiki.ConfigurableClass</className>
     <guid>fb8c9d65-378e-4450-8b8f-f8274d3b8428</guid>
@@ -263,10 +315,10 @@
       <categoryIcon/>
     </property>
     <property>
-      <codeToExecute/>
+      <codeToExecute>{{include reference="XWiki.PDFExport.AdminSection" /}}</codeToExecute>
     </property>
     <property>
-      <configurationClass>XWiki.PDFExport.ConfigurationClass</configurationClass>
+      <configurationClass/>
     </property>
     <property>
       <displayBeforeCategory/>
@@ -294,55 +346,6 @@
     </property>
     <property>
       <sectionOrder>450</sectionOrder>
-    </property>
-  </object>
-  <object>
-    <name>XWiki.PDFExport.Configuration</name>
-    <number>0</number>
-    <className>XWiki.PDFExport.ConfigurationClass</className>
-    <guid>60abcbaa-e027-4698-9fbf-4165aaa0c50c</guid>
-    <class>
-      <name>XWiki.PDFExport.ConfigurationClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <templates>
-        <cache>0</cache>
-        <classname>XWiki.PDFExport.TemplateClass</classname>
-        <customDisplay/>
-        <defaultValue/>
-        <disabled>0</disabled>
-        <displayType>input</displayType>
-        <freeText/>
-        <hint>XWiki.PDFExport.ConfigurationClass_templates.hint</hint>
-        <idField/>
-        <largeStorage>0</largeStorage>
-        <multiSelect>1</multiSelect>
-        <name>templates</name>
-        <number>1</number>
-        <picker>1</picker>
-        <prettyName>Templates</prettyName>
-        <relationalStorage>1</relationalStorage>
-        <separator> </separator>
-        <separators/>
-        <size>1</size>
-        <sort/>
-        <sql/>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <valueField/>
-        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
-      </templates>
-    </class>
-    <property>
-      <templates>
-        <value>XWiki.PDFExport.Template</value>
-      </templates>
     </property>
   </object>
 </xwikidoc>

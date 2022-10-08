@@ -34,7 +34,7 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>PDF Export Default API Implementation</xwiki.extension.name>
-    <xwiki.jacoco.instructionRatio>0.58</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.59</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -51,6 +51,12 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>xwiki-platform-skin-skinx</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- Used to implement the configuration source. -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-configuration-default</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

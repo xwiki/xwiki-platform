@@ -19,9 +19,15 @@
  */
 package org.xwiki.export.pdf.internal.script;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.xwiki.export.pdf.PDFExportConfiguration;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.internal.safe.AbstractSafeObject;
 import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 /**
  * Script-safe version of {@link PDFExportConfiguration}.
@@ -32,15 +38,21 @@ import org.xwiki.script.internal.safe.ScriptSafeProvider;
 public class SafePDFExportConfiguration extends AbstractSafeObject<PDFExportConfiguration>
     implements PDFExportConfiguration
 {
+    private ContextualAuthorizationManager authorization;
+
     /**
      * Creates a new safe instance that wraps the given unsafe instance.
      * 
      * @param wrapped the unsafe, wrapped object
      * @param safeProvider the provider of instances safe for public scripts
+     * @param authorization the component used to check access rights
      */
-    public SafePDFExportConfiguration(PDFExportConfiguration wrapped, ScriptSafeProvider<?> safeProvider)
+    public SafePDFExportConfiguration(PDFExportConfiguration wrapped, ScriptSafeProvider<?> safeProvider,
+        ContextualAuthorizationManager authorization)
     {
         super(wrapped, safeProvider);
+
+        this.authorization = authorization;
     }
 
     @Override
@@ -83,5 +95,13 @@ public class SafePDFExportConfiguration extends AbstractSafeObject<PDFExportConf
     public boolean isServerSide()
     {
         return getWrapped().isServerSide();
+    }
+
+    @Override
+    public List<DocumentReference> getTemplates()
+    {
+        return getWrapped().getTemplates().stream()
+            .filter(templateReference -> this.authorization.hasAccess(Right.VIEW, templateReference))
+            .collect(Collectors.toList());
     }
 }

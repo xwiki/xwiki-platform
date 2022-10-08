@@ -19,7 +19,11 @@
  */
 package org.xwiki.export.pdf;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -89,5 +93,14 @@ public interface PDFExportConfiguration
     default boolean isServerSide()
     {
         return false;
+    }
+
+    /**
+     * @return the list of PDF export templates the user can choose from
+     * @since 14.9RC1
+     */
+    default List<DocumentReference> getTemplates()
+    {
+        return Collections.emptyList();
     }
 }

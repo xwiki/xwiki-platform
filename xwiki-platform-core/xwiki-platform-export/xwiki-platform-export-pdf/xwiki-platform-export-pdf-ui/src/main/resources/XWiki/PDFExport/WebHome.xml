@@ -839,36 +839,34 @@ require([
     <property>
       <content>{{velocity}}
 {{html clean="false"}}
-#set ($discard = $xwiki.ssx.use('XWiki.PDFExport.WebHome'))
-#set ($discard = $xwiki.jsx.use('XWiki.PDFExport.WebHome'))
-#set ($configClassRef = 'XWiki.PDFExport.ConfigurationClass')
-#set ($configLocalRef = 'XWiki.PDFExport.Configuration')
-#set ($configRef = $services.model.resolveDocument($configLocalRef))
-#set ($configObj = $xwiki.getDocument($configRef).getObject($configClassRef))
 #set ($templates = [])
-#foreach ($template in $configObj.getValue('templates'))
-  #if ($services.security.authorization.hasAccess('view', $template))
+#foreach ($template in $services.export.pdf.configuration.templates)
+  #if ($xwiki.exists($template))
     #set ($discard = $templates.add({
       'label': $xwiki.getDocument($template).plainTitle,
-      'value': $template
+      'value': $services.model.serialize($template, 'default')
     }))
   #end
 #end
-#set ($spinner = {'url': $xwiki.getSkinFile('icons/xwiki/spinner.gif')})
-#if ($services.icon.currentIconSetName == 'Font Awesome')
-  #set ($spinner = {'cssClass': 'fa fa-spinner fa-spin'})
+#if (!$templates.isEmpty())
+  #set ($discard = $xwiki.ssx.use('XWiki.PDFExport.WebHome'))
+  #set ($discard = $xwiki.jsx.use('XWiki.PDFExport.WebHome'))
+  #set ($spinner = {'url': $xwiki.getSkinFile('icons/xwiki/spinner.gif')})
+  #if ($services.icon.currentIconSetName == 'Font Awesome')
+    #set ($spinner = {'cssClass': 'fa fa-spinner fa-spin'})
+  #end
+  #set ($config = {
+    'icons': {
+      'pdf': $services.icon.getMetaData('file-pdf'),
+      'error': $services.icon.getMetaData('error'),
+      'spinner': $spinner
+    },
+    'templates': $templates,
+    'serverSide': $services.export.pdf.configuration.isServerSide()
+  })
+  &lt;script id="pdfExportConfig" type="application/json"&gt;$jsontool.serialize($config).replace(
+    '&lt;', '\u003C')&lt;/script&gt;
 #end
-#set ($config = {
-  'icons': {
-    'pdf': $services.icon.getMetaData('file-pdf'),
-    'error': $services.icon.getMetaData('error'),
-    'spinner': $spinner
-  },
-  'templates': $templates,
-  'serverSide': $services.export.pdf.configuration.isServerSide()
-})
-&lt;script id="pdfExportConfig" type="application/json"&gt;$jsontool.serialize($config).replace(
-  '&lt;', '\u003C')&lt;/script&gt;
 {{/html}}
 {{/velocity}}</content>
     </property>

@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 
 /**
  * Provide a safe {@link PDFExportConfiguration}.
@@ -43,10 +44,13 @@ public class SafePDFExportConfigurationProvider implements ScriptSafeProvider<PD
     @SuppressWarnings("rawtypes")
     private ScriptSafeProvider defaultSafeProvider;
 
+    @Inject
+    private ContextualAuthorizationManager authorization;
+
     @Override
     @SuppressWarnings("unchecked")
     public <S> S get(PDFExportConfiguration unsafe)
     {
-        return (S) new SafePDFExportConfiguration(unsafe, this.defaultSafeProvider);
+        return (S) new SafePDFExportConfiguration(unsafe, this.defaultSafeProvider, this.authorization);
     }
 }

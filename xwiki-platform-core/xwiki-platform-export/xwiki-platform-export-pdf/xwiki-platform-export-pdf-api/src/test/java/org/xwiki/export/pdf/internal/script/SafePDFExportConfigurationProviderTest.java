@@ -19,12 +19,20 @@
  */
 package org.xwiki.export.pdf.internal.script;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.export.pdf.PDFExportConfiguration;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -40,6 +48,9 @@ class SafePDFExportConfigurationProviderTest
 {
     @InjectMockComponents
     private SafePDFExportConfigurationProvider provider;
+
+    @MockComponent
+    private ContextualAuthorizationManager authorization;
 
     @Mock
     private PDFExportConfiguration config;
@@ -57,5 +68,11 @@ class SafePDFExportConfigurationProviderTest
 
         when(this.config.getXWikiHost()).thenReturn("host.xwiki.internal");
         assertNull(safeConfig.getXWikiHost());
+
+        DocumentReference firstTemplateRef = new DocumentReference("test", "First", "Template");
+        DocumentReference secondTemplateRef = new DocumentReference("test", "Second", "Template");
+        when(this.authorization.hasAccess(Right.VIEW, secondTemplateRef)).thenReturn(true);
+        when(this.config.getTemplates()).thenReturn(Arrays.asList(firstTemplateRef, secondTemplateRef));
+        assertEquals(Collections.singletonList(secondTemplateRef), safeConfig.getTemplates());
     }
 }

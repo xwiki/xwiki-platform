@@ -25,10 +25,10 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -47,8 +47,6 @@ import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import org.xwiki.store.filesystem.internal.StoreFilesystemOldcoreException;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.api.Attachment;
-import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
@@ -85,8 +83,7 @@ public class TemporaryAttachmentsScriptService implements ScriptService
      *
      * @param documentReference the target document reference the attachment should be later attached to.
      * @param fieldName the name of the field of the uploaded data
-     * @return a temporary {@link Attachment} not yet persisted
-     *          attachment
+     * @return a temporary {@link Attachment} not yet persisted attachment
      */
     public Attachment uploadTemporaryAttachment(DocumentReference documentReference, String fieldName)
     {
@@ -100,7 +97,7 @@ public class TemporaryAttachmentsScriptService implements ScriptService
      * @param documentReference the target document reference the attachment should be later attached to
      * @param fieldName the name of the field of the uploaded data
      * @param filename an optional filename used instead of using the filename of the file passing in
-     *           {@code fieldName}, ignored when {@code null}
+     *     {@code fieldName}, ignored when {@code null}
      * @return a temporary {@link Attachment} not yet persisted attachment, or {@code null} in case of error
      * @since 14.9RC1
      */
@@ -112,8 +109,8 @@ public class TemporaryAttachmentsScriptService implements ScriptService
         try {
             Part part = context.getRequest().getPart(fieldName);
             if (part != null) {
-                result = Optional.of(this.temporaryAttachmentSessionsManager.uploadAttachment(documentReference, part
-                    , filename));
+                result = Optional.of(
+                    this.temporaryAttachmentSessionsManager.uploadAttachment(documentReference, part, filename));
             }
         } catch (IOException | ServletException e) {
             this.logger.warn("Error while reading the request content part: [{}]", getRootCauseMessage(e));

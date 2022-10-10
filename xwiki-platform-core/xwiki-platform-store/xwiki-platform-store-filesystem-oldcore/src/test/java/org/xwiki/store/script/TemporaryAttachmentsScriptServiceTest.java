@@ -51,12 +51,6 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiRightService;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.api.Attachment;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.XWikiRequest;
 
 import ch.qos.logback.classic.Level;
@@ -128,7 +122,7 @@ class TemporaryAttachmentsScriptServiceTest
         XWikiAttachment xWikiAttachment = mock(XWikiAttachment.class);
 
         when(this.request.getPart("upload")).thenReturn(this.part);
-        when(this.temporaryAttachmentSessionsManager.uploadAttachment(DOCUMENT_REFERENCE, this.part))
+        when(this.temporaryAttachmentSessionsManager.uploadAttachment(DOCUMENT_REFERENCE, this.part, null))
             .thenReturn(xWikiAttachment);
 
         Attachment temporaryAttachment =
@@ -136,7 +130,7 @@ class TemporaryAttachmentsScriptServiceTest
 
         assertSame(xWikiAttachment, temporaryAttachment.getAttachment());
 
-        verify(this.temporaryAttachmentSessionsManager).uploadAttachment(DOCUMENT_REFERENCE, this.part);
+        verify(this.temporaryAttachmentSessionsManager).uploadAttachment(DOCUMENT_REFERENCE, this.part, null);
     }
 
     @ParameterizedTest
@@ -167,7 +161,7 @@ class TemporaryAttachmentsScriptServiceTest
         throws Exception
     {
         when(this.request.getPart("upload")).thenReturn(this.part);
-        when(this.temporaryAttachmentSessionsManager.uploadAttachment(DOCUMENT_REFERENCE, this.part))
+        when(this.temporaryAttachmentSessionsManager.uploadAttachment(DOCUMENT_REFERENCE, this.part, null))
             .thenThrow(TemporaryAttachmentException.class);
 
         assertNull(this.temporaryAttachmentsScriptService.uploadTemporaryAttachment(DOCUMENT_REFERENCE,
@@ -190,7 +184,7 @@ class TemporaryAttachmentsScriptServiceTest
         Attachment temporaryAttachment =
             this.temporaryAttachmentsScriptService.uploadTemporaryAttachment(DOCUMENT_REFERENCE, "upload", "filename");
 
-        assertSame(xWikiAttachment, temporaryAttachment);
+        assertSame(xWikiAttachment, temporaryAttachment.getAttachment());
 
         verify(this.temporaryAttachmentSessionsManager).uploadAttachment(DOCUMENT_REFERENCE, this.part, "filename");
     }

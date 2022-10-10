@@ -114,7 +114,7 @@ platform.flamingo.themes.global=Global
 ###############################################################################
 
 ## Used to indicate where deprecated keys start
-@deprecatedstart
+#@deprecatedstart
 
 #######################################
 ## until 7.3M1

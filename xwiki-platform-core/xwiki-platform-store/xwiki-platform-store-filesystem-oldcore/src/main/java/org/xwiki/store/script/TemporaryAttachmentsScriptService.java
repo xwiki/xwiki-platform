@@ -20,6 +20,7 @@
 package org.xwiki.store.script;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -28,7 +29,6 @@ import javax.inject.Singleton;
 import javax.servlet.ServletException;
 import javax.servlet.http.Part;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -38,13 +38,17 @@ import org.xwiki.store.TemporaryAttachmentException;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.api.Attachment;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
+
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
  * Script service dedicated to the handling of temporary attachments.
  *
- * @see TemporaryAttachmentSessionsManager
  * @version $Id$
+ * @see TemporaryAttachmentSessionsManager
  * @since 14.3RC1
  */
 @Component
@@ -66,25 +70,30 @@ public class TemporaryAttachmentsScriptService implements ScriptService
      * Temporary upload the attachment identified by the given field name: the request should be of type
      * {@code multipart/form-data}.
      *
-     * @param documentReference the target document reference the attachment should be later attached to.
-     * @param fieldName the name of the field of the uploaded data.
-     * @return a temporary {@link XWikiAttachment} not yet persisted.
-     *          attachment.
+     * @param documentReference the target document reference the attachment should be later attached to
+     * @param fieldName the name of the field of the uploaded data
+     * @return a temporary {@link Attachment} not yet persisted attachment, or {@code null} in case of error
      */
-    public XWikiAttachment uploadTemporaryAttachment(DocumentReference documentReference, String fieldName)
+    public Attachment uploadTemporaryAttachment(DocumentReference documentReference, String fieldName)
     {
         XWikiContext context = this.contextProvider.get();
-        XWikiAttachment result = null;
+        Optional<XWikiAttachment> result = Optional.empty();
         try {
             Part part = context.getRequest().getPart(fieldName);
             if (part != null) {
-                result = this.temporaryAttachmentSessionsManager.uploadAttachment(documentReference, part);
+                result = Optional.of(this.temporaryAttachmentSessionsManager.uploadAttachment(documentReference, part));
             }
         } catch (IOException | ServletException e) {
-            logger.warn("Error while reading the request content part: [{}]", ExceptionUtils.getRootCauseMessage(e));
+            this.logger.warn("Error while reading the request content part: [{}]", getRootCauseMessage(e));
         } catch (TemporaryAttachmentException e) {
-            logger.warn("Error while uploading the attachment: [{}]", ExceptionUtils.getRootCauseMessage(e));
+            this.logger.warn("Error while uploading the attachment: [{}]", getRootCauseMessage(e));
         }
-        return result;
+
+        return result.map(attachment -> {
+            Document document = Optional.ofNullable(attachment.getDoc())
+                .map(doc -> doc.newDocument(context))
+                .orElse(null);
+            return new Attachment(document, attachment, context);
+        }).orElse(null);
     }
 }

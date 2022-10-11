@@ -17,7 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.store.filesystem.internal;
+package org.xwiki.store.filesystem;
+
+import org.xwiki.stability.Unstable;
 
 /**
  * Exception for the Store - Filesystem - Old Core module.
@@ -25,16 +27,18 @@ package org.xwiki.store.filesystem.internal;
  * @version $Id$
  * @since 14.9RC1
  */
+@Unstable
 public class StoreFilesystemOldcoreException extends Exception
 {
     /**
-     * Constructor with the cause of this exception.
+     * Constructs a new filesystem oldcore exception with the specified detail message and cause.
      *
+     * @param message the detail message (which is saved for later retrieval by the {@link #getMessage()} method).
      * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method).  (A
      *     {@code null} value is permitted, and indicates that the cause is nonexistent or unknown.)
      */
-    public StoreFilesystemOldcoreException(Throwable cause)
+    public StoreFilesystemOldcoreException(String message, Throwable cause)
     {
-        super(cause);
+        super(message, cause);
     }
 }

@@ -44,7 +44,7 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 import org.xwiki.store.TemporaryAttachmentException;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
-import org.xwiki.store.filesystem.internal.StoreFilesystemOldcoreException;
+import org.xwiki.store.filesystem.StoreFilesystemOldcoreException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -83,7 +83,7 @@ public class TemporaryAttachmentsScriptService implements ScriptService
      *
      * @param documentReference the target document reference the attachment should be later attached to
      * @param fieldName the name of the field of the uploaded data
-     * @return a temporary {@link Attachment} not yet persisted attachment
+     * @return a temporary {@link Attachment} not yet persisted attachment, or {@code null} in case of error
      */
     public Attachment uploadTemporaryAttachment(DocumentReference documentReference, String fieldName)
     {
@@ -238,7 +238,8 @@ public class TemporaryAttachmentsScriptService implements ScriptService
             XWikiContext context = this.contextProvider.get();
             return context.getWiki().getDocument(documentReference, context);
         } catch (XWikiException e) {
-            throw new StoreFilesystemOldcoreException(e);
+            throw new StoreFilesystemOldcoreException(String.format("Failed to load document [%s]", documentReference),
+                e);
         }
     }
 

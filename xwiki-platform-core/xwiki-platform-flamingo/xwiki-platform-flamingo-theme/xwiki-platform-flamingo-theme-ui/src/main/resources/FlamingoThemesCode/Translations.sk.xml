@@ -76,7 +76,7 @@ platform.flamingo.themes.defaultvalue=Preddefinovaný
 ###############################################################################
 
 ## Used to indicate where deprecated keys start
-### Missing: @deprecatedstart
+#@deprecatedstart
 
 #######################################
 ## until 7.3M1

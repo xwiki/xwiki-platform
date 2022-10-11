@@ -79,7 +79,7 @@ platform.flamingo.themes.global=वैश्विक
 ###############################################################################
 
 ## Used to indicate where deprecated keys start
-### Missing: @deprecatedstart
+#@deprecatedstart
 
 #######################################
 ## until 7.3M1

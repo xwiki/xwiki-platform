@@ -115,7 +115,7 @@ ckeditor.plugin.image.imageEditor.advancedTab.size.width.label=Ширина
 ckeditor.plugin.image.imageEditor.advancedTab.size.height.label=Высота
 ckeditor.plugin.image.imageEditor.advancedTab.size.hint=Определяет размер изображения.
 ckeditor.plugin.image.imageEditor.advancedTab.border.label=Рамка
-ckeditor.plugin.image.imageEditor.advancedTab.border.hint=Когда галочка установлена, изображение отображается с рамкой
+ckeditor.plugin.image.imageEditor.advancedTab.border.hint=Когда флажок установлен, изображение отображается с рамкой
 ckeditor.plugin.image.imageEditor.advancedTab.alignment.label=Выравнивание
 ckeditor.plugin.image.imageEditor.advancedTab.alignment.hint=Определите выравнивание изображения.
 ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.none=Нет
@@ -123,7 +123,7 @@ ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.start=Начал�
 ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.center=Центр
 ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.end=Окончание
 ckeditor.plugin.image.imageEditor.advancedTab.textWrap.label=Обтекание текстом
-ckeditor.plugin.image.imageEditor.advancedTab.textWrap.hint=Если галочка установлена, окружающий текст обтекает изображение.
+ckeditor.plugin.image.imageEditor.advancedTab.textWrap.hint=Если этот флажок установлен, окружающий текст обтекает изображение.
 ckeditor.plugin.image.imageSelector.documentTreeTab.title=Дерево документов
 ckeditor.plugin.image.imageSelector.uploadTab.title=Загрузка
 ckeditor.plugin.image.imageSelector.uploadTab.file.title=Файл
@@ -200,6 +200,6 @@ imageSelector.modal.loadFail.message=Не удалось получить диа
 imageSelector.modal.fileUpload.success=Загрузка файла прошла успешно.
 imageSelector.modal.fileUpload.fail=Загрузка файла не удалась.
 imageSelector.modal.fileUpload.abort=Загрузка файла прервана.
-imageSelector.modal.initialization.fail=Не удалось получить диалог выбора изображения.
+imageSelector.modal.initialization.fail=Не удалось получить диалог редактора изображений.
 </content>
 </xwikidoc>

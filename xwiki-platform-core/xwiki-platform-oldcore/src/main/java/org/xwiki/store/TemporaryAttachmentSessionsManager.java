@@ -61,7 +61,7 @@ public interface TemporaryAttachmentSessionsManager
      * Temporary store the given {@link Part} to a cached {@link XWikiAttachment} attached to the given
      * {@link DocumentReference}.
      *
-     * @param documentReference the reference of the document that the attachment should be attached to.
+     * @param documentReference the reference of the document that the attachment should be attached to
      * @param part the actual data that is uploaded
      * @param filename an optional filename used instead of using {@link Part#getSubmittedFileName()}, ignored when
      *     {@code null}

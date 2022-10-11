@@ -204,6 +204,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
  *          &lt;dt&gt;rel&lt;/dt&gt;
  *          &lt;dd&gt;an optional parameter to be used in the "rel" HTML attribute; for example "__blank" can be used to open the link in a new tab/window&lt;/dd&gt;
  *        &lt;/dl&gt;
+ * @param $additionalContent optional additional content that does not follow the structure of the actions 
  *#
 #macro (attachmentPicker_displayEndFrame $actions $additionalContent)
     )))## attachmentframe
@@ -1612,23 +1613,25 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
 ##  1. Edit the current page
 ##  2. View the target attachment page. (can be the same page)
 #macro (attachmentPicker_displayButton)
-  #set ($queryString = {
-    'docname': $doc.fullName,
-    'classname': $classname,
-    'property': $property,
-    'object': $object,
-    'savemode': $savemode,
-    'defaultValue': $defaultValue,
-    'filter': $filter,
-    'displayImage': $displayImage,
-    'versionSummary': $xcontext.macro.params.versionSummary.equals('true')
-  })
-  #if ($hasTargetDoc)
-    #set ($queryString.targetdocname = $targetdoc.fullName)
+  #if ($targetPermView)
+    #set ($queryString = {
+      'docname': $doc.fullName,
+      'classname': $classname,
+      'property': $property,
+      'object': $object,
+      'savemode': $savemode,
+      'defaultValue': $defaultValue,
+      'filter': $filter,
+      'displayImage': $displayImage,
+      'versionSummary': $xcontext.macro.params.versionSummary.equals('true')
+    })
+    #if ($hasTargetDoc)
+      #set ($queryString.targetdocname = $targetdoc.fullName)
+    #end
+    #set ($linkLabel = $services.rendering.escape($services.rendering.escape($buttontext, 'xwiki/2.1'), 'xwiki/2.1'))
+    (% class="buttonwrapper" %)[[$linkLabel&gt;&gt;${xcontext.macro.doc.fullName}||queryString="$escapetool.url($queryString)"
+      class="attachment-picker-start button" title="$services.rendering.escape($buttontext, 'xwiki/2.1')"]](%%)##
   #end
-  #set ($linkLabel = $services.rendering.escape($services.rendering.escape($buttontext, 'xwiki/2.1'), 'xwiki/2.1'))
-  (% class="buttonwrapper" %)[[$linkLabel&gt;&gt;${xcontext.macro.doc.fullName}||queryString="$escapetool.url($queryString)"
-    class="attachment-picker-start button" title="$services.rendering.escape($buttontext, 'xwiki/2.1')"]](%%)##
 #end
 {{/velocity}}
 

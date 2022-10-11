@@ -81,7 +81,7 @@ public class TemporaryAttachmentsScriptService implements ScriptService
      * Temporary upload the attachment identified by the given field name: the request should be of type
      * {@code multipart/form-data}.
      *
-     * @param documentReference the target document reference the attachment should be later attached to.
+     * @param documentReference the target document reference the attachment should be later attached to
      * @param fieldName the name of the field of the uploaded data
      * @return a temporary {@link Attachment} not yet persisted attachment
      */
@@ -127,6 +127,8 @@ public class TemporaryAttachmentsScriptService implements ScriptService
     }
 
     /**
+     * Return a list of the temporary attachments, sorted by filenames (ignoring the case).
+     *
      * @param documentReference the target document reference the attachments should be later attached to
      * @return the list of temporary attachments linked to the given document reference. The list is sorted by the
      *     attachments filenames ({@link XWikiAttachment#getFilename()})
@@ -145,9 +147,9 @@ public class TemporaryAttachmentsScriptService implements ScriptService
     }
 
     /**
-     * Build a list of all the attachments of a given document. The list contains the persisted attachments of the
-     * document, merged with the temporary attachments. The persisted attachments are replaced by the temporary one if
-     * their names match.
+     * Build a list of all the attachments of a given document, sorted by filenames (ignoring the case). The list
+     * contains the persisted attachments of the document, merged with the temporary attachments. The persisted
+     * attachments are replaced by the temporary one if their names match.
      *
      * @param documentReference the target document reference the temporary attachments should be later attached to
      * @return the list of all attachments linked to the given document reference. Persisted attachments are overridden
@@ -191,15 +193,9 @@ public class TemporaryAttachmentsScriptService implements ScriptService
      * @since 14.9RC1
      */
     @Unstable
-    public boolean temporaryAttachmentExists(Attachment attachment) throws StoreFilesystemOldcoreException
+    public boolean temporaryAttachmentExists(Attachment attachment)
     {
-        DocumentReference documentReference = attachment.getReference().getDocumentReference();
-        XWikiDocument document = getDocument(documentReference);
-        return this.temporaryAttachmentSessionsManager
-            .getUploadedAttachments(documentReference)
-            .stream()
-            .map(xWikiAttachment -> convertToAttachment(document, xWikiAttachment))
-            .anyMatch(attachmentEqualityPredicate(attachment));
+        return this.temporaryAttachmentSessionsManager.getUploadedAttachment(attachment.getReference()).isPresent();
     }
 
     /**
@@ -220,11 +216,7 @@ public class TemporaryAttachmentsScriptService implements ScriptService
         throws StoreFilesystemOldcoreException
     {
         XWikiDocument document = getDocument(attachment.getReference().getDocumentReference());
-        return document
-            .getAttachmentList()
-            .stream()
-            .map(xWikiAttachment -> convertToAttachment(document, xWikiAttachment))
-            .anyMatch(attachmentEqualityPredicate(attachment));
+        return document.getAttachment(attachment.getFilename()) != null;
     }
 
     /**

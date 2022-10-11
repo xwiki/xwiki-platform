@@ -21,6 +21,7 @@ package org.xwiki.store.script;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import javax.inject.Provider;
@@ -76,6 +77,9 @@ import static org.mockito.Mockito.when;
 class TemporaryAttachmentsScriptServiceTest
 {
     private static final DocumentReference DOCUMENT_REFERENCE = new DocumentReference("xwiki", "XWiki", "Doc");
+
+    private static final AttachmentReference ATTACHMENT_REFERENCE =
+        new AttachmentReference("filename", DOCUMENT_REFERENCE);
 
     @InjectMockComponents
     private TemporaryAttachmentsScriptService temporaryAttachmentsScriptService;
@@ -275,7 +279,7 @@ class TemporaryAttachmentsScriptServiceTest
     }
 
     @Test
-    void temporaryAttachmentExistsNoTemporaryAttachment() throws Exception
+    void temporaryAttachmentExistsNoTemporaryAttachment()
     {
         Document document = new Document(this.xWikiDocument, this.context);
         XWikiAttachment xWikiAttachment = mock(XWikiAttachment.class);
@@ -288,7 +292,7 @@ class TemporaryAttachmentsScriptServiceTest
     }
 
     @Test
-    void temporaryAttachmentExistsNotSameFilename() throws Exception
+    void temporaryAttachmentExistsNotSameFilename()
     {
         Document document = new Document(this.xWikiDocument, this.context);
         XWikiAttachment xWikiAttachment = mock(XWikiAttachment.class);
@@ -308,21 +312,14 @@ class TemporaryAttachmentsScriptServiceTest
     }
 
     @Test
-    void temporaryAttachmentExistsSameFilename() throws Exception
+    void temporaryAttachmentExistsSameFilename()
     {
         Document document = new Document(this.xWikiDocument, this.context);
         XWikiAttachment xWikiAttachment = mock(XWikiAttachment.class);
+        when(xWikiAttachment.getReference()).thenReturn(ATTACHMENT_REFERENCE);
         Attachment attachment = new Attachment(document, xWikiAttachment, this.context);
-        String fileName = "picture.png";
-        when(xWikiAttachment.getReference()).thenReturn(new AttachmentReference(fileName, DOCUMENT_REFERENCE));
-        when(xWikiAttachment.getFilename()).thenReturn(fileName);
-
-        XWikiAttachment xWikiAttachment1 = mock(XWikiAttachment.class);
-        when(this.temporaryAttachmentSessionsManager.getUploadedAttachments(DOCUMENT_REFERENCE)).thenReturn(List.of(
-            xWikiAttachment1
-        ));
-
-        when(xWikiAttachment1.getFilename()).thenReturn(fileName);
+        when(this.temporaryAttachmentSessionsManager.getUploadedAttachment(ATTACHMENT_REFERENCE))
+            .thenReturn(Optional.of(xWikiAttachment));
 
         assertTrue(this.temporaryAttachmentsScriptService.temporaryAttachmentExists(attachment));
     }
@@ -363,15 +360,10 @@ class TemporaryAttachmentsScriptServiceTest
     {
         Document document = new Document(this.xWikiDocument, this.context);
         XWikiAttachment xWikiAttachment = mock(XWikiAttachment.class);
+        when(xWikiAttachment.getFilename()).thenReturn("file.png");
+        when(xWikiAttachment.getReference()).thenReturn(ATTACHMENT_REFERENCE);
         Attachment attachment = new Attachment(document, xWikiAttachment, this.context);
-        String fileName = "picture.png";
-        when(xWikiAttachment.getReference()).thenReturn(new AttachmentReference(fileName, DOCUMENT_REFERENCE));
-        when(xWikiAttachment.getFilename()).thenReturn(fileName);
-
-        XWikiAttachment xWikiAttachment1 = mock(XWikiAttachment.class);
-        when(this.xWikiDocument.getAttachmentList()).thenReturn(List.of(xWikiAttachment1));
-
-        when(xWikiAttachment1.getFilename()).thenReturn(fileName);
+        when(this.xWikiDocument.getAttachment("file.png")).thenReturn(xWikiAttachment);
 
         assertTrue(this.temporaryAttachmentsScriptService.persistentAttachmentExists(attachment));
     }

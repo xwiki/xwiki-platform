@@ -28,6 +28,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -98,7 +99,15 @@ public class ScopeNotificationFilterClassMigrator extends AbstractHibernateDataM
         XWikiContext context = contextProvider.get();
 
         // There is something to migrate only if the old class exists!
-        return context.getWiki().exists(getOldClassReference(), context);
+        DocumentReference classReference = getOldClassReference();
+        try {
+            return context.getWiki().exists(classReference, context);
+        } catch (XWikiException e) {
+            this.logger.warn("Failed to check the existence of the class with reference [{}]: {}", classReference,
+                ExceptionUtils.getRootCauseMessage(e));
+        }
+
+        return true;
     }
 
     @Override

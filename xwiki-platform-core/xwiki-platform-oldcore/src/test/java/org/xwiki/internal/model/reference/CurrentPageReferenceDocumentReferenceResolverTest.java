@@ -62,7 +62,7 @@ class CurrentPageReferenceDocumentReferenceResolverTest
     private DocumentAccessBridge dab;
 
     @Test
-    void resolveWhenDocumentReferenceExists()
+    void resolveWhenDocumentReferenceExists() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", "pageA", "WebHome");
         when(this.dab.exists(documentReference)).thenReturn(true);
@@ -71,7 +71,7 @@ class CurrentPageReferenceDocumentReferenceResolverTest
     }
 
     @Test
-    void resolveWhenDocumentReferenceDoesntExistsAndTopLevelDocument()
+    void resolveWhenDocumentReferenceDoesntExistsAndTopLevelDocument() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", "pageA", "WebHome");
         when(this.dab.exists(documentReference)).thenReturn(false);
@@ -80,7 +80,7 @@ class CurrentPageReferenceDocumentReferenceResolverTest
     }
 
     @Test
-    void resolveWhenDocumentReferenceDoesntExistsAndNotTopLevelDocumentAndTerminalDocumentExists()
+    void resolveWhenDocumentReferenceDoesntExistsAndNotTopLevelDocumentAndTerminalDocumentExists() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("pageA", "pageB"), "WebHome");
         when(this.dab.exists(documentReference)).thenReturn(false);
@@ -91,7 +91,7 @@ class CurrentPageReferenceDocumentReferenceResolverTest
     }
 
     @Test
-    void resolveWhenDocumentReferenceDoesntExistsAndNotTopLevelDocumentAndTerminalDocumentDoesntExists()
+    void resolveWhenDocumentReferenceDoesntExistsAndNotTopLevelDocumentAndTerminalDocumentDoesntExists() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("pageA", "pageB"), "WebHome");
         when(this.dab.exists(documentReference)).thenReturn(false);

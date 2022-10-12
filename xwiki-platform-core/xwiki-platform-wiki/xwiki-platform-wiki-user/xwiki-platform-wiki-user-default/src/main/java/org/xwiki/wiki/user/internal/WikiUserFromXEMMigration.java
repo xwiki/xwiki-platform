@@ -119,7 +119,7 @@ public class WikiUserFromXEMMigration extends AbstractHibernateDataMigration
         }
     }
 
-    private boolean isWorkspaceTemplate(String wikiId)
+    private boolean isWorkspaceTemplate(String wikiId) throws XWikiException
     {
         // Context, XWiki
         XWikiContext context = getXWikiContext();

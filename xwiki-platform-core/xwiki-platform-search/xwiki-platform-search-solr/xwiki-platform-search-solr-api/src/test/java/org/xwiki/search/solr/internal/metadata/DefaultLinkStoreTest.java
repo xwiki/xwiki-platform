@@ -19,7 +19,6 @@
  */
 package org.xwiki.search.solr.internal.metadata;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -28,12 +27,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.internal.model.reference.CurrentPageReferenceDocumentReferenceResolver;
-import org.xwiki.link.LinkException;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.PageAttachmentReference;
@@ -41,10 +38,8 @@ import org.xwiki.model.reference.PageReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.search.solr.Solr;
-import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.internal.SolrSearchCoreUtils;
 import org.xwiki.search.solr.internal.api.FieldUtils;
-import org.xwiki.search.solr.internal.api.SolrIndexerException;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 import org.xwiki.search.solr.test.SolrComponentList;
 import org.xwiki.test.TestEnvironment;
@@ -84,8 +79,7 @@ class DefaultLinkStoreTest
     private Solr solr;
 
     @Test
-    void resolveEntities() throws SolrException, SolrServerException, IOException, LinkException, SolrIndexerException,
-        IllegalArgumentException
+    void resolveEntities() throws Exception
     {
         SolrClient client = this.solr.getClient("search");
 

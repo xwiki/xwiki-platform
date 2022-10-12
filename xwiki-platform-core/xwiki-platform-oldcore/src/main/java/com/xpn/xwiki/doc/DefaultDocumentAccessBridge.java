@@ -243,7 +243,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     }
 
     @Override
-    public boolean exists(DocumentReference documentReference)
+    public boolean exists(DocumentReference documentReference) throws XWikiException
     {
         XWikiContext context = getContext();
         if (context != null) {
@@ -255,7 +255,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
 
     @Override
     @Deprecated
-    public boolean exists(String documentReference)
+    public boolean exists(String documentReference) throws XWikiException
     {
         XWikiContext context = getContext();
         if (context != null) {

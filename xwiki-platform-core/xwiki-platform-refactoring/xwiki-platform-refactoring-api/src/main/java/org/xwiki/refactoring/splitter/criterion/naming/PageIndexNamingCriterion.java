@@ -19,6 +19,8 @@
  */
 package org.xwiki.refactoring.splitter.criterion.naming;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.block.XDOM;
 
@@ -30,6 +32,8 @@ import org.xwiki.rendering.block.XDOM;
  */
 public class PageIndexNamingCriterion implements NamingCriterion
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PageIndexNamingCriterion.class);
+
     /**
      * {@link DocumentAccessBridge} used to lookup for existing wiki pages and avoid name clashes.
      */
@@ -64,11 +68,22 @@ public class PageIndexNamingCriterion implements NamingCriterion
         String newDocumentName = baseDocumentName + INDEX_SEPERATOR + newIndex;
         // Resolve any name clashes.
         int localIndex = 0;
-        while (docBridge.exists(newDocumentName)) {
+        while (exists(newDocumentName)) {
             // Append a trailing local index if the page already exists
             newDocumentName =
                 baseDocumentName + INDEX_SEPERATOR + newIndex + INDEX_SEPERATOR + (++localIndex);
         }
         return newDocumentName;
+    }
+
+    private boolean exists(String document)
+    {
+        try {
+            return this.docBridge.exists(document);
+        } catch (Exception e) {
+            LOGGER.error("Failed to check the existence of the document with reference [{}]", document, e);
+        }
+
+        return false;
     }
 }

@@ -170,22 +170,28 @@ public interface DocumentAccessBridge
 
     /**
      * Check if a document exists or not in the wiki.
+     * <p>
+     * Since 14.9, if the check fail an exception is thrown.
      * 
      * @param documentReference The reference of the document to check.
      * @return <code>true</code> if the document already exists, <code>false</code> otherwise.
+     * @throws Exception when failing to check document existence
      * @since 2.2.1
      */
-    boolean exists(DocumentReference documentReference);
+    boolean exists(DocumentReference documentReference) throws Exception;
 
     /**
      * Check if a document exists or not in the wiki.
+     * <p>
+     * Since 14.9, if the check fail an exception is thrown.
      * 
      * @param documentReference The reference of the document to check.
      * @return <code>true</code> if the document already exists, <code>false</code> otherwise.
      * @deprecated replaced by {@link #exists(DocumentReference)} since 2.2.1
+     * @throws Exception when failing to check document existence
      */
     @Deprecated
-    boolean exists(String documentReference);
+    boolean exists(String documentReference) throws Exception;
 
     /**
      * Updates the target document with the new content provided. If the target document does not exists, a new one will

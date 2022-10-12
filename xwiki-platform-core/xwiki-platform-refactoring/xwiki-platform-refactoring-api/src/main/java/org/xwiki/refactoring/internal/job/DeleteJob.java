@@ -93,7 +93,11 @@ public class DeleteJob extends AbstractEntityJobWithChecks<EntityRequest, Entity
 
         switch (entityReference.getType()) {
             case DOCUMENT:
-                process(new DocumentReference(entityReference));
+                try {
+                    process(new DocumentReference(entityReference));
+                } catch (Exception e) {
+                    this.logger.error("Failed to delete document with reference [{}]", entityReference, e);
+                }
                 break;
             case SPACE:
                 process(new SpaceReference(entityReference));
@@ -103,7 +107,7 @@ public class DeleteJob extends AbstractEntityJobWithChecks<EntityRequest, Entity
         }
     }
 
-    private void process(DocumentReference documentReference)
+    private void process(DocumentReference documentReference) throws Exception
     {
         if (this.request.isDeep() && isSpaceHomeReference(documentReference)) {
             process(documentReference.getLastSpaceReference());
@@ -119,12 +123,17 @@ public class DeleteJob extends AbstractEntityJobWithChecks<EntityRequest, Entity
             @Override
             public void visit(DocumentReference documentReference)
             {
-                maybeDelete(documentReference);
+                try {
+                    maybeDelete(documentReference);
+                } catch (Exception e) {
+                    logger.error("Failed to delete document [{}] from space [{}]", documentReference, spaceReference,
+                        e);
+                }
             }
         });
     }
 
-    private void maybeDelete(DocumentReference documentReference)
+    private void maybeDelete(DocumentReference documentReference) throws Exception
     {
         Boolean shouldSkipRecycleBinProperty = this.getRequest().getProperty(SHOULD_SKIP_RECYCLE_BIN_PROPERTY);
         boolean skipRecycleBin = this.configuration.isRecycleBinSkippingActivated()

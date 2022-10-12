@@ -43,7 +43,6 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationConfiguration;
-import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
@@ -232,7 +231,7 @@ public class DefaultNotificationParametersFactoryTest
     }
 
     @Test
-    public void createNotificationParameters() throws NotificationException
+    public void createNotificationParameters() throws Exception
     {
         when(this.configuration.isEventPrefilteringEnabled()).thenReturn(false);
 

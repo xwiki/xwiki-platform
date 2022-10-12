@@ -103,7 +103,7 @@ public class DefaultIconSetManager implements IconSetManager
 
         // Get the icon set
         DocumentReference iconThemeDocRef = documentReferenceResolver.resolve(iconTheme);
-        if (!StringUtils.isBlank(iconTheme) && documentAccessBridge.exists(iconThemeDocRef)) {
+        if (!StringUtils.isBlank(iconTheme) && exists(iconThemeDocRef)) {
             iconSet = iconSetCache.get(iconThemeDocRef);
             if (iconSet == null) {
                 // lazy loading
@@ -114,6 +114,15 @@ public class DefaultIconSetManager implements IconSetManager
         }
 
         return iconSet;
+    }
+
+    private boolean exists(DocumentReference iconThemeDocRef) throws IconException
+    {
+        try {
+            return this.documentAccessBridge.exists(iconThemeDocRef);
+        } catch (Exception e) {
+            throw new IconException("Failed to check if the icon theme age exist", e);
+        }
     }
 
     @Override

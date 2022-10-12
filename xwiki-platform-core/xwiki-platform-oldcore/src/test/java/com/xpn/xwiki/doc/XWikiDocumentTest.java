@@ -221,7 +221,7 @@ public class XWikiDocumentTest
     }
 
     @Test
-    public void getUniqueLinkedPages10()
+    public void getUniqueLinkedPages10() throws XWikiException
     {
         XWikiDocument contextDocument =
             new XWikiDocument(new DocumentReference("contextdocwiki", "contextdocspace", "contextdocpage"));

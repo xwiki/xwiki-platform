@@ -348,7 +348,7 @@ class XWikiWikiModelTest
     }
 
     @Test
-    void isDocumentAvailable()
+    void isDocumentAvailable() throws Exception
     {
         DocumentResourceReference documentResourcereference = new DocumentResourceReference("wiki:space.document");
         DocumentReference documentReference = new DocumentReference("wiki", "space", "document");

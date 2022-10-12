@@ -131,7 +131,7 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
 
         // Find the avatar attachment name or null if not defined or an error happened when locating it
         String fileName = null;
-        if (this.documentAccessBridge.exists(userReference)) {
+        if (exists(userReference)) {
             Object avatarProperty =
                 this.documentAccessBridge.getProperty(userReference, new DocumentReference(userReference
                     .getWikiReference().getName(), USER_SPACE, "XWikiUsers"), "avatar");
@@ -183,6 +183,16 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
         List<Block> result = Collections.singletonList(imageBlock);
 
         return context.isInline() ? result : Collections.singletonList(new GroupBlock(result));
+    }
+
+    private boolean exists(DocumentReference userReference) throws MacroExecutionException
+    {
+        try {
+            return this.documentAccessBridge.exists(userReference);
+        } catch (Exception e) {
+            throw new MacroExecutionException(
+                "Failed to check the existence of the user with reference [" + userReference + "]", e);
+        }
     }
 
     @Override

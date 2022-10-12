@@ -6506,12 +6506,22 @@ public class XWiki implements EventListener
      * @deprecated since 2.2.1 use {@link #exists(DocumentReference, XWikiContext)}
      */
     @Deprecated
-    public boolean exists(String fullname, XWikiContext context)
+    public boolean exists(String fullname, XWikiContext context) throws XWikiException
     {
         return exists(getCurrentMixedDocumentReferenceResolver().resolve(fullname), context);
     }
 
-    public boolean exists(DocumentReference documentReference, XWikiContext context)
+    /**
+     * Check if a document exist.
+     * <p>
+     * Since 14.9, if the check fail an exception is thrown.
+     * 
+     * @param documentReference the reference of the document
+     * @param context the XWiki context
+     * @return true if the document exist or false if it does not
+     * @throws XWikiException when failing to check document existence
+     */
+    public boolean exists(DocumentReference documentReference, XWikiContext context) throws XWikiException
     {
         String currentWiki = context.getWikiId();
 
@@ -6521,8 +6531,6 @@ public class XWiki implements EventListener
             context.setWikiId(documentReference.getWikiReference().getName());
 
             return getStore().exists(doc, context);
-        } catch (XWikiException e) {
-            return false;
         } finally {
             context.setWikiId(currentWiki);
         }
@@ -6530,14 +6538,17 @@ public class XWiki implements EventListener
 
     /**
      * Returns whether a page exists or not.
+     * <p>
+     * Since 14.9, if the check fail an exception is thrown.
      * 
      * @param reference the reference of the page to check for its existence
      * @return true if the page exists, false if not
+     * @throws XWikiException when failing to check page existence
      * @since 13.3RC1
      * @since 12.10.7
      */
     @Unstable
-    public boolean exists(PageReference reference, XWikiContext context)
+    public boolean exists(PageReference reference, XWikiContext context) throws XWikiException
     {
         // Try as space
         DocumentReference documentReference = getCurrentReferenceDocumentReferenceResolver().resolve(reference);
@@ -7295,14 +7306,35 @@ public class XWiki implements EventListener
 
     }
 
-    public String getUniquePageName(String space, XWikiContext context)
+    /**
+     * Generates a unique page name based on initial page name and already existing pages.
+     * <p>
+     * Since 14.9, if the document exist check fail an exception is thrown.
+     * 
+     * @param space the space where to add a new document
+     * @param context the XWiki context
+     * @return a unique document name
+     * @throws XWikiException when failing to check document existence
+     */
+    public String getUniquePageName(String space, XWikiContext context) throws XWikiException
     {
         String pageName = generateRandomString(16);
 
         return getUniquePageName(space, pageName, context);
     }
 
-    public String getUniquePageName(String space, String name, XWikiContext context)
+    /**
+     * Generates a unique page name based on initial page name and already existing pages.
+     * <p>
+     * Since 14.9, if the document exist check fail an exception is thrown.
+     * 
+     * @param space the space where to add a new document
+     * @param name the prefix of the document name
+     * @param context the XWiki context
+     * @return a unique document name
+     * @throws XWikiException when failing to check document existence
+     */
+    public String getUniquePageName(String space, String name, XWikiContext context) throws XWikiException
     {
         String pageName = clearName(name, context);
         if (exists(space + "." + pageName, context)) {

@@ -588,7 +588,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
 
         return new StringBuilder(2000).append("<?xml version=\"1.1\" encoding=\"UTF-8\"?>\n")
             .append("<!DOCTYPE hibernate-mapping PUBLIC\n").append("\t\"-//Hibernate/Hibernate Mapping DTD//EN\"\n")
-            .append("\t\"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd\">\n").append("<hibernate-mapping>")
+            .append("\t\"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd\">\n").append("<hibernate-mapping>")
             .append("<class entity-name=\"").append(className).append("\" table=\"")
             .append(toDynamicMappingTableName(className)).append("\">\n")
             .append(" <id name=\"id\" type=\"long\" unsaved-value=\"any\">\n")

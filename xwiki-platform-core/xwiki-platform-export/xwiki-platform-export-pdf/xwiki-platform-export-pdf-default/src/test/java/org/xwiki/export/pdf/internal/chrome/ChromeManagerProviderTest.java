@@ -23,20 +23,22 @@ import java.util.Arrays;
 
 import javax.inject.Named;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.browser.BrowserManager;
 import org.xwiki.export.pdf.internal.docker.ContainerManager;
-import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.github.dockerjava.api.model.HostConfig;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -67,7 +69,7 @@ class ChromeManagerProviderTest
 
     private String containerIpAddress = "172.17.0.2";
 
-    @BeforeComponent
+    @BeforeEach
     void configure()
     {
         when(this.configuration.getChromeDockerContainerName()).thenReturn("test-pdf-printer");
@@ -96,36 +98,34 @@ class ChromeManagerProviderTest
             .thenReturn(this.hostConfig);
     }
 
-    @BeforeComponent("initializeAndDispose")
-    void beforeInitializeAndDispose()
+    @Test
+    void getAndDispose() throws Exception
     {
         when(this.containerManager.maybeReuseContainerByName(this.configuration.getChromeDockerContainerName()))
             .thenReturn(null);
         when(this.containerManager.isLocalImagePresent(this.configuration.getChromeDockerImage())).thenReturn(false);
-    }
 
-    @Test
-    void initializeAndDispose() throws Exception
-    {
+        assertEquals(this.chromeManager, this.chromeManagerProvider.get());
+
         verify(this.containerManager).pullImage(this.configuration.getChromeDockerImage());
         verify(this.containerManager).startContainer(this.containerId);
         verify(this.chromeManager).connect("localhost", this.configuration.getChromeRemoteDebuggingPort());
 
         this.chromeManagerProvider.dispose();
+
+        verify(this.chromeManager, times(2)).close();
         verify(this.containerManager).stopContainer(this.containerId);
     }
 
-    @BeforeComponent("initializeWithExistingContainer")
-    void beforeInitializeWithExistingContainer()
+    @Test
+    void getWithExistingContainer() throws Exception
     {
         mockNetwork("test-network");
         when(this.containerManager.maybeReuseContainerByName(this.configuration.getChromeDockerContainerName()))
             .thenReturn(this.containerId);
-    }
 
-    @Test
-    void initializeWithExistingContainer() throws Exception
-    {
+        assertEquals(this.chromeManager, this.chromeManagerProvider.get());
+
         verify(this.containerManager, never()).pullImage(any(String.class));
         verify(this.containerManager, never()).startContainer(any(String.class));
         verify(this.hostConfig, never()).withExtraHosts(any(String.class));
@@ -135,15 +135,13 @@ class ChromeManagerProviderTest
         verify(this.containerManager, never()).stopContainer(this.containerId);
     }
 
-    @BeforeComponent("initializeWithRemoteChrome")
-    void beforeInitializeWithRemoteChrome()
+    @Test
+    void getWithRemoteChrome() throws Exception
     {
         when(this.configuration.getChromeHost()).thenReturn("remote-chrome");
-    }
 
-    @Test
-    void initializeWithRemoteChrome() throws Exception
-    {
+        assertEquals(this.chromeManager, this.chromeManagerProvider.get());
+
         verify(this.containerManager, never()).maybeReuseContainerByName(any(String.class));
         verify(this.containerManager, never()).startContainer(any(String.class));
 
@@ -151,5 +149,23 @@ class ChromeManagerProviderTest
 
         this.chromeManagerProvider.dispose();
         verify(this.containerManager, never()).stopContainer(any(String.class));
+    }
+
+    @Test
+    void getWithConfigurationChange() throws Exception
+    {
+        when(this.configuration.getChromeHost()).thenReturn("remote-chrome");
+
+        assertEquals(this.chromeManager, this.chromeManagerProvider.get());
+        assertEquals(this.chromeManager, this.chromeManagerProvider.get());
+
+        // Change the configuration and get the instance again.
+        when(this.configuration.getChromeHost()).thenReturn("another-chrome");
+
+        assertEquals(this.chromeManager, this.chromeManagerProvider.get());
+
+        verify(this.chromeManager).connect("remote-chrome", this.configuration.getChromeRemoteDebuggingPort());
+        verify(this.chromeManager).connect("another-chrome", this.configuration.getChromeRemoteDebuggingPort());
+        verify(this.chromeManager, times(2)).close();
     }
 }

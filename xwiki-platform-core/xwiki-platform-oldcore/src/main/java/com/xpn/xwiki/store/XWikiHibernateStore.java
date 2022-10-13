@@ -599,8 +599,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         doc.setDate(ndate);
                         if (doc.isContentDirty()) {
                             doc.setContentUpdateDate(ndate);
-                            DocumentAuthors authors = doc.getAuthors();
-                            authors.setContentAuthor(authors.getEffectiveMetadataAuthor());
+                            doc.setContentAuthorReference(doc.getAuthorReference());
                         }
                         doc.incrementVersion();
                         if (context.getWiki().hasVersioning(context)) {

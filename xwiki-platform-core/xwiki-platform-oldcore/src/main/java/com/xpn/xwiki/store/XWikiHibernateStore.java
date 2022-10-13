@@ -2208,70 +2208,71 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         return backlinkNames;
     }
 
+    private Set<XWikiLink> extractLinks(XWikiDocument doc, XWikiContext context)
+    {
+        Set<XWikiLink> links = new LinkedHashSet<>();
+
+        String fullName = this.localEntityReferenceSerializer.serialize(doc.getDocumentReference());
+
+        // Add entity references.
+        for (EntityReference entityReference : doc.getUniqueLinkedEntities(context)) {
+            XWikiLink wikiLink = new XWikiLink();
+
+            wikiLink.setDocId(doc.getId());
+            wikiLink.setFullName(fullName);
+
+            // getUniqueLinkedEntities() returns both DOCUMENT and PAGE references (and ATTACHMENT and
+            // PAGE_ATTACHMENT references). If the reference is a PageReference (or a PageAttachmentReference) then
+            // we can't know if it points to a terminal page or a non-terminal one, and thus we need to get the
+            // document to check if it exists, starting with the non-terminal one since "[[page:test]]" points
+            // first to the non-terminal page when it exists.
+            EntityReference documentReferenceToSerialize = convertToDocumentReference(entityReference);
+            wikiLink.setLink(this.localEntityReferenceSerializer.serialize(documentReferenceToSerialize));
+            boolean isAttachmentReference = false;
+            if (Objects.equals(entityReference.getType(), EntityType.ATTACHMENT)
+                || Objects.equals(entityReference.getType(), EntityType.PAGE_ATTACHMENT)) {
+                wikiLink.setAttachmentName(entityReference.getName());
+                isAttachmentReference = true;
+            }
+            wikiLink.setType(
+                isAttachmentReference ? EntityType.ATTACHMENT.getLowerCase() : EntityType.DOCUMENT.getLowerCase());
+
+            links.add(wikiLink);
+        }
+
+        // Add included pages.
+        List<String> includedPages = doc.getIncludedPages(context);
+        for (String includedPage : includedPages) {
+            XWikiLink wikiLink = new XWikiLink();
+
+            wikiLink.setDocId(doc.getId());
+            wikiLink.setFullName(fullName);
+            wikiLink.setLink(includedPage);
+            wikiLink.setType(EntityType.DOCUMENT.getLowerCase());
+            links.add(wikiLink);
+        }
+
+        return links;
+    }
+
     @Override
     @Deprecated(since = "14.8RC1")
     public void saveLinks(XWikiDocument doc, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
         XWikiContext context = getExecutionXContext(inputxcontext, true);
 
-        try {
-            if (bTransaction) {
-                checkHibernate(context);
-                bTransaction = beginTransaction(context);
-            }
-            Session session = getSession(context);
+        // Extract the links
+        Set<XWikiLink> links = extractLinks(doc, context);
 
+        // Save the links
+        executeWrite(context, session -> {
             // We delete the existing links before saving the newly analyzed ones. Unless non exists yet.
             if (countLinks(doc.getId(), context, false) > 0) {
-                deleteLinks(doc.getId(), context, bTransaction);
+                deleteLinks(doc.getId(), context, false);
             }
 
             // necessary to blank links from doc
             context.remove("links");
-
-            // Extract the links.
-            Set<XWikiLink> links = new LinkedHashSet<>();
-
-            String fullName = this.localEntityReferenceSerializer.serialize(doc.getDocumentReference());
-
-            // Add entity references.
-            for (EntityReference entityReference : doc.getUniqueLinkedEntities(context)) {
-                XWikiLink wikiLink = new XWikiLink();
-
-                wikiLink.setDocId(doc.getId());
-                wikiLink.setFullName(fullName);
-
-                // getUniqueLinkedEntities() returns both DOCUMENT and PAGE references (and ATTACHMENT and
-                // PAGE_ATTACHMENT references). If the reference is a PageReference (or a PageAttachmentReference) then
-                // we can't know if it points to a terminal page or a non-terminal one, and thus we need to get the
-                // document to check if it exists, starting with the non-terminal one since "[[page:test]]" points
-                // first to the non-terminal page when it exists.
-                EntityReference documentReferenceToSerialize =
-                    convertToDocumentReference(entityReference, inputxcontext);
-                wikiLink.setLink(this.localEntityReferenceSerializer.serialize(documentReferenceToSerialize));
-                boolean isAttachmentReference = false;
-                if (Objects.equals(entityReference.getType(), EntityType.ATTACHMENT)
-                    || Objects.equals(entityReference.getType(), EntityType.PAGE_ATTACHMENT)) {
-                    wikiLink.setAttachmentName(entityReference.getName());
-                    isAttachmentReference = true;
-                }
-                wikiLink.setType(
-                    isAttachmentReference ? EntityType.ATTACHMENT.getLowerCase() : EntityType.DOCUMENT.getLowerCase());
-
-                links.add(wikiLink);
-            }
-
-            // Add included pages.
-            List<String> includedPages = doc.getIncludedPages(context);
-            for (String includedPage : includedPages) {
-                XWikiLink wikiLink = new XWikiLink();
-
-                wikiLink.setDocId(doc.getId());
-                wikiLink.setFullName(fullName);
-                wikiLink.setLink(includedPage);
-                wikiLink.setType(EntityType.DOCUMENT.getLowerCase());
-                links.add(wikiLink);
-            }
 
             if (!links.isEmpty()) {
                 // Get link size limit
@@ -2280,9 +2281,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 // Save the links.
                 for (XWikiLink wikiLink : links) {
                     // Verify that the link reference isn't larger than the maximum size of the field since otherwise
-                    // that
-                    // would lead to a DB error that would result in a fatal error, and the user would have a hard time
-                    // understanding why his page failed to be saved.
+                    // that would lead to a DB error that would result in a fatal error, and the user would have a hard
+                    // time understanding why his page failed to be saved.
                     if (wikiLink.getLink().length() <= linkMaxSize) {
                         session.save(wikiLink);
                     } else {
@@ -2291,22 +2291,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     }
                 }
             }
-        } catch (Exception e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_LINKS, "Exception while saving links", e);
-        } finally {
-            try {
-                if (bTransaction) {
-                    endTransaction(context, false);
-                }
-            } catch (Exception e) {
-            }
 
-            restoreExecutionXContext();
-        }
+            return null;
+        });
     }
 
-    private EntityReference convertToDocumentReference(EntityReference entityReference, XWikiContext context)
+    private EntityReference convertToDocumentReference(EntityReference entityReference)
     {
         // The passed entityReference can of type DOCUMENT, ATTACHMENT, PAGE or PAGE_ATTACHMENT.
         EntityReference documentReference = entityReference;

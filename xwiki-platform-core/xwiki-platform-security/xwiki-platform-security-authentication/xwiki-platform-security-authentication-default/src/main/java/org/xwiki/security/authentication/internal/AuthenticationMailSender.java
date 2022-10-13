@@ -23,7 +23,10 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -49,9 +52,11 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.security.authentication.ResetPasswordException;
+import org.xwiki.security.authentication.RetrieveUsernameException;
 import org.xwiki.user.UserProperties;
 import org.xwiki.user.UserPropertiesResolver;
 import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -61,12 +66,17 @@ import com.xpn.xwiki.XWikiContext;
  * @version $Id$
  * @since 13.1RC1
  */
-@Component(roles = ResetPasswordMailSender.class)
+@Component(roles = AuthenticationMailSender.class)
 @Singleton
-public class ResetPasswordMailSender
+public class AuthenticationMailSender
 {
+    private static final String XWIKI_SPACE = "XWiki";
+
     private static final LocalDocumentReference RESET_PASSWORD_MAIL_TEMPLATE_REFERENCE =
-        new LocalDocumentReference("XWiki", "ResetPasswordMailContent");
+        new LocalDocumentReference(XWIKI_SPACE, "ResetPasswordMailContent");
+
+    private static final LocalDocumentReference RETRIEVE_USERNAME_TEMPLATE_REFERENCE =
+        new LocalDocumentReference(XWIKI_SPACE, "ForgotUsernameMailContent");
 
     private static final String NO_REPLY = "no-reply@";
     private static final String FROM = "from";
@@ -106,6 +116,9 @@ public class ResetPasswordMailSender
     private Provider<UserPropertiesResolver> userPropertiesResolverProvider;
 
     @Inject
+    private UserReferenceSerializer<String> userReferenceSerializer;
+
+    @Inject
     private Logger logger;
 
     /**
@@ -119,35 +132,23 @@ public class ResetPasswordMailSender
     public void sendResetPasswordEmail(String username, InternetAddress email, URL resetPasswordURL) throws
         ResetPasswordException
     {
-        XWikiContext context = this.contextProvider.get();
-        String fromAddress = this.mailSenderConfiguration.getFromAddress();
-        if (StringUtils.isEmpty(fromAddress)) {
-            fromAddress = NO_REPLY + context.getRequest().getServerName();
-        }
-
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put(FROM, fromAddress);
-        parameters.put(TO, email);
-        parameters.put("language", this.contextProvider.get().getLocale());
-        parameters.put("type", "Reset Password");
-        Map<String, String> velocityVariables = new HashMap<>();
+        Map<String, Object> velocityVariables = new HashMap<>();
         velocityVariables.put("userName", username);
         velocityVariables.put("passwordResetURL", resetPasswordURL.toExternalForm());
-        parameters.put("velocityVariables", velocityVariables);
 
-        String localizedError =
-            this.localizationManager.getTranslationPlain("xe.admin.passwordReset.error.emailFailed");
+        Map<String, Object> parameters = this.getEmailParameters(email, "Reset Password", velocityVariables);
 
         try {
             MimeMessage message =
                 this.mimeMessageFactory.createMessage(
                     this.documentReferenceResolver.resolve(RESET_PASSWORD_MAIL_TEMPLATE_REFERENCE), parameters);
-            if (!this.sendMessage(message, localizedError)) {
+            if (!this.sendMessage(message)) {
                 this.logger.debug("The reset password mail to [{}] has not been sent after 1 second, check the status "
                     + "in the administration", username);
             }
         } catch (MessagingException e) {
-            throw new ResetPasswordException(localizedError, e);
+            throw new ResetPasswordException(
+                this.localizationManager.getTranslationPlain("xe.admin.passwordReset.error.emailFailed"), e);
         }
     }
 
@@ -183,7 +184,7 @@ public class ResetPasswordMailSender
 
         try {
             MimeMessage message = this.textMimeMessageFactory.createMessage(mailContent, parameters);
-            if (!this.sendMessage(message, localizedError)) {
+            if (!this.sendMessage(message)) {
                 this.logger.info("The security mail to [{}] has not been sent after 1 second, check the status in the "
                     + "administration of the wiki.", userReference);
             }
@@ -193,14 +194,64 @@ public class ResetPasswordMailSender
     }
 
     /**
+     * Send an email containing username information related to the given user references.
+     *
+     * @param email the email of the user who lost their username
+     * @param userReferences the list of user references attached to that email
+     * @throws RetrieveUsernameException in case of problem for sending the email
+     * @since 14.9
+     * @since 14.4.6
+     * @since 13.10.10
+     */
+    public void sendRetrieveUsernameEmail(InternetAddress email, Set<UserReference> userReferences)
+        throws RetrieveUsernameException
+    {
+        Map<String, Object> velocityVariables = new HashMap<>();
+        List<String> usernames = userReferences.stream()
+            .map(this.userReferenceSerializer::serialize)
+            .collect(Collectors.toList());
+        velocityVariables.put("usernames", usernames);
+
+        Map<String, Object> parameters = this.getEmailParameters(email, "Forgot Username", velocityVariables);
+
+        try {
+            MimeMessage message =
+                this.mimeMessageFactory.createMessage(
+                    this.documentReferenceResolver.resolve(RETRIEVE_USERNAME_TEMPLATE_REFERENCE), parameters);
+            this.sendMessage(message);
+        } catch (MessagingException e) {
+            throw new RetrieveUsernameException(
+                this.localizationManager.getTranslationPlain("xe.admin.forgotUsername.error.emailFailed"), e);
+        }
+    }
+
+    private Map<String, Object> getEmailParameters(InternetAddress email, String type,
+        Map<String, Object> velocityVariables)
+    {
+        XWikiContext context = this.contextProvider.get();
+        String fromAddress = this.mailSenderConfiguration.getFromAddress();
+        if (StringUtils.isEmpty(fromAddress)) {
+            fromAddress = NO_REPLY + context.getRequest().getServerName();
+        }
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put(FROM, fromAddress);
+        parameters.put(TO, email);
+        parameters.put("language", this.contextProvider.get().getLocale());
+        parameters.put("type", type);
+        parameters.put("velocityVariables", velocityVariables);
+
+        return parameters;
+    }
+
+    /**
      * Send the given message and throw an exception with the localized error in case of mail errors.
      *
      * @param message the message to be sent
-     * @param localizedError the error message in case of exception
      * @return {@code true} only if the mail state is {@link MailState#SEND_SUCCESS}.
-     * @throws ResetPasswordException in case of mail errors.
+     * @throws MessagingException in case of mail errors.
      */
-    private boolean sendMessage(MimeMessage message, String localizedError) throws ResetPasswordException
+    private boolean sendMessage(MimeMessage message) throws MessagingException
     {
         MailListener mailListener = this.mailListenerProvider.get();
         this.mailSender.sendAsynchronously(Collections.singleton(message),
@@ -213,8 +264,7 @@ public class ResetPasswordMailSender
 
         if (mailErrors != null && mailErrors.hasNext()) {
             MailStatus lastError = mailErrors.next();
-            throw new ResetPasswordException(
-                String.format("%s - %s", localizedError, lastError.getErrorDescription()));
+            throw new MessagingException(lastError.getErrorDescription());
         }
 
         if (mailStatusResult.isProcessed() && mailStatusResult.getAll().hasNext()) {

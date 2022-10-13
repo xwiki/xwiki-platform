@@ -69,7 +69,7 @@ class R140600000XWIKI19869DataMigrationListenerTest
     private ResetPasswordManager resetPasswordManager;
 
     @MockComponent
-    private ResetPasswordMailSender resetPasswordMailSender;
+    private AuthenticationMailSender resetPasswordMailSender;
 
     @MockComponent
     private UserReferenceResolver<String> userReferenceResolver;

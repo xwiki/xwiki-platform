@@ -20,6 +20,7 @@
 package org.xwiki.security.authentication.script;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -43,6 +44,7 @@ import org.xwiki.security.authentication.AuthenticationResourceReference;
 import org.xwiki.security.authentication.ResetPasswordException;
 import org.xwiki.security.authentication.ResetPasswordManager;
 import org.xwiki.security.authentication.ResetPasswordRequestResponse;
+import org.xwiki.security.authentication.RetrieveUsernameManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.LogLevel;
@@ -64,6 +66,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -95,6 +98,9 @@ class AuthenticationScriptServiceTest
 
     @MockComponent
     private ContextualAuthorizationManager authorizationManager;
+
+    @MockComponent
+    private RetrieveUsernameManager retrieveUsernameManager;
 
     @MockComponent
     @Named("contextpath")
@@ -263,5 +269,24 @@ class AuthenticationScriptServiceTest
             () -> this.scriptService.resetPassword(userReference, verificationCode, "some password"));
         assertEquals(expectedException, resetPasswordException);
         verify(this.resetPasswordManager, never()).resetPassword(eq(userReference), any());
+    }
+
+    @Test
+    void retrieveUsernameAndSendEmail() throws Exception
+    {
+        String email = "foo@bar.com";
+        when(this.retrieveUsernameManager.findUsers(email)).thenReturn(Collections.emptySet());
+        this.scriptService.retrieveUsernameAndSendEmail(email);
+
+        verify(this.retrieveUsernameManager).findUsers(email);
+        verify(this.retrieveUsernameManager, never()).sendRetrieveUsernameEmail(any(), any());
+
+        Set<UserReference> userReferences = Collections.singleton(mock(UserReference.class));
+        when(this.retrieveUsernameManager.findUsers(email)).thenReturn(userReferences);
+
+        this.scriptService.retrieveUsernameAndSendEmail(email);
+
+        verify(this.retrieveUsernameManager, times(2)).findUsers(email);
+        verify(this.retrieveUsernameManager).sendRetrieveUsernameEmail(email, userReferences);
     }
 }

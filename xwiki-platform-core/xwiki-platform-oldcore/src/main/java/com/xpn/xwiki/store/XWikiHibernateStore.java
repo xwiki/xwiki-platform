@@ -2227,7 +2227,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             // document to check if it exists, starting with the non-terminal one since "[[page:test]]" points
             // first to the non-terminal page when it exists.
             EntityReference documentReferenceToSerialize = convertToDocumentReference(entityReference);
-            wikiLink.setLink(this.localEntityReferenceSerializer.serialize(documentReferenceToSerialize));
+            wikiLink.setLink(this.compactWikiEntityReferenceSerializer.serialize(documentReferenceToSerialize));
             boolean isAttachmentReference = false;
             if (Objects.equals(entityReference.getType(), EntityType.ATTACHMENT)
                 || Objects.equals(entityReference.getType(), EntityType.PAGE_ATTACHMENT)) {

@@ -114,7 +114,7 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
     private UserReferenceSerializer<String> referenceSerializer;
 
     @Inject
-    private Provider<ResetPasswordMailSender> resetPasswordMailSenderProvider;
+    private Provider<AuthenticationMailSender> resetPasswordMailSenderProvider;
 
     @Inject
     @Named("xwikiproperties")

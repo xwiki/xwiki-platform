@@ -2183,52 +2183,54 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         return backlinkNames;
     }
 
+    private Set<XWikiLink> extractLinks(XWikiDocument doc, XWikiContext context)
+    {
+        Set<XWikiLink> links = new LinkedHashSet<>();
+
+        String fullName = this.localEntityReferenceSerializer.serialize(doc.getDocumentReference());
+
+        // Add wiki syntax links.
+        Set<String> linkedPages = doc.getUniqueLinkedPages(context);
+        for (String linkedPage : linkedPages) {
+            XWikiLink wikiLink = new XWikiLink();
+
+            wikiLink.setDocId(doc.getId());
+            wikiLink.setFullName(fullName);
+            wikiLink.setLink(linkedPage);
+
+            links.add(wikiLink);
+        }
+
+        // Add included pages.
+        List<String> includedPages = doc.getIncludedPages(context);
+        for (String includedPage : includedPages) {
+            XWikiLink wikiLink = new XWikiLink();
+
+            wikiLink.setDocId(doc.getId());
+            wikiLink.setFullName(fullName);
+            wikiLink.setLink(includedPage);
+
+            links.add(wikiLink);
+        }
+
+        return links;
+    }
+
     @Override
     public void saveLinks(XWikiDocument doc, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
         XWikiContext context = getExecutionXContext(inputxcontext, true);
 
-        try {
-            if (bTransaction) {
-                checkHibernate(context);
-                bTransaction = beginTransaction(context);
-            }
-            Session session = getSession(context);
+        // Extract the links
+        Set<XWikiLink> links = extractLinks(doc, context);
 
+        // Save the links
+        executeWrite(context, session -> {
             // need to delete existing links before saving the page's one
-            deleteLinks(doc.getId(), context, bTransaction);
+            deleteLinks(doc.getId(), context, false);
 
             // necessary to blank links from doc
             context.remove("links");
-
-            // Extract the links.
-            Set<XWikiLink> links = new LinkedHashSet<>();
-
-            String fullName = this.localEntityReferenceSerializer.serialize(doc.getDocumentReference());
-
-            // Add wiki syntax links.
-            Set<String> linkedPages = doc.getUniqueLinkedPages(context);
-            for (String linkedPage : linkedPages) {
-                XWikiLink wikiLink = new XWikiLink();
-
-                wikiLink.setDocId(doc.getId());
-                wikiLink.setFullName(fullName);
-                wikiLink.setLink(linkedPage);
-
-                links.add(wikiLink);
-            }
-
-            // Add included pages.
-            List<String> includedPages = doc.getIncludedPages(context);
-            for (String includedPage : includedPages) {
-                XWikiLink wikiLink = new XWikiLink();
-
-                wikiLink.setDocId(doc.getId());
-                wikiLink.setFullName(fullName);
-                wikiLink.setLink(includedPage);
-
-                links.add(wikiLink);
-            }
 
             if (!links.isEmpty()) {
                 // Get link size limit
@@ -2237,9 +2239,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 // Save the links.
                 for (XWikiLink wikiLink : links) {
                     // Verify that the link reference isn't larger than the maximum size of the field since otherwise
-                    // that
-                    // would lead to a DB error that would result in a fatal error, and the user would have a hard time
-                    // understanding why his page failed to be saved.
+                    // that would lead to a DB error that would result in a fatal error, and the user would have a hard
+                    // time understanding why his page failed to be saved.
                     if (wikiLink.getLink().length() <= linkMaxSize) {
                         session.save(wikiLink);
                     } else {
@@ -2248,19 +2249,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     }
                 }
             }
-        } catch (Exception e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_LINKS, "Exception while saving links", e);
-        } finally {
-            try {
-                if (bTransaction) {
-                    endTransaction(context, false);
-                }
-            } catch (Exception e) {
-            }
 
-            restoreExecutionXContext();
-        }
+            return null;
+        });
     }
 
     @Override

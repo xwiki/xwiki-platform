@@ -71,11 +71,8 @@ public interface TemporaryAttachmentSessionsManager
      * @since 14.9RC1
      */
     @Unstable
-    default XWikiAttachment uploadAttachment(DocumentReference documentReference, Part part, String filename)
-        throws TemporaryAttachmentException
-    {
-        throw new UnsupportedOperationException();
-    }
+    XWikiAttachment uploadAttachment(DocumentReference documentReference, Part part, String filename)
+        throws TemporaryAttachmentException;
 
     /**
      * Retrieve all temporary attachments related to the given document reference in the current user session.

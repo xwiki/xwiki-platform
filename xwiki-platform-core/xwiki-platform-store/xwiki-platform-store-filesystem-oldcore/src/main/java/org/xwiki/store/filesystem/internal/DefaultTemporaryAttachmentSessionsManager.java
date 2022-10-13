@@ -29,6 +29,7 @@ import javax.inject.Singleton;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -105,7 +106,7 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
         try {
             xWikiAttachment = new XWikiAttachment();
             String actualFilename;
-            if (filename != null) {
+            if (StringUtils.isNotBlank(filename)) {
                 actualFilename = filename;
             } else {
                 actualFilename = part.getSubmittedFileName();

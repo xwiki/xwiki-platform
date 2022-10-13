@@ -117,6 +117,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
     #set ($canDeleteAttachment = $canEdit)
   #else
     #set ($isTemporaryAttachment = $services.temporaryAttachments.temporaryAttachmentExists($attachment))
+    ## TODO: Update once it is made possible to delete temporary attachments (see XWIKI-20225).
     #set ($canDeleteAttachment = !$isTemporaryAttachment &amp;&amp; $canEdit)
   #end
   #set ($cssClasses = [])

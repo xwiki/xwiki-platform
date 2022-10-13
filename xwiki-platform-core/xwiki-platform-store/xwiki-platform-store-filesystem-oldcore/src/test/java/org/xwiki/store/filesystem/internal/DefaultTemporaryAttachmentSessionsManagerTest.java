@@ -32,6 +32,9 @@ import javax.servlet.http.Part;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReference;
@@ -154,9 +157,37 @@ class DefaultTemporaryAttachmentSessionsManagerTest
 
         when(part.getInputStream()).thenReturn(new ByteArrayInputStream("foo".getBytes(UTF_8)));
 
-        XWikiAttachment xWikiAttachment = this.attachmentManager.uploadAttachment(documentReference, part, "newFilename");
+        XWikiAttachment xWikiAttachment =
+            this.attachmentManager.uploadAttachment(documentReference, part, "newFilename");
         assertEquals("newFilename", xWikiAttachment.getFilename());
         verify(part, never()).getSubmittedFileName();
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {
+        "",
+        " ",
+        "  ",
+        "\t"
+    })
+    void uploadAttachmentWithEmptyFilename(String filename) throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", "XWiki", "Document");
+        SpaceReference spaceReference = documentReference.getLastSpaceReference();
+
+        XWiki xwiki = mock(XWiki.class);
+        Part part = mock(Part.class);
+
+        when(this.context.getWiki()).thenReturn(xwiki);
+        when(xwiki.getSpacePreference(UPLOAD_MAXSIZE_PARAMETER, spaceReference, this.context))
+            .thenReturn("42");
+
+        when(part.getInputStream()).thenReturn(new ByteArrayInputStream("foo".getBytes(UTF_8)));
+        when(part.getSubmittedFileName()).thenReturn("partFilename");
+
+        XWikiAttachment xWikiAttachment = this.attachmentManager.uploadAttachment(documentReference, part, filename);
+        assertEquals("partFilename", xWikiAttachment.getFilename());
     }
 
     @Test

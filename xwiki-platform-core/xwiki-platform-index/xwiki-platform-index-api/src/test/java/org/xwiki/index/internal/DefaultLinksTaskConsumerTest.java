@@ -129,13 +129,13 @@ class DefaultLinksTaskConsumerTest
     void consume() throws Exception
     {
         this.defaultLinksTaskConsumer.consume(DOCUMENT_REFERENCE, VERSION);
-        verify(this.hibernateStore).saveLinks(this.document, this.context, false);
+        verify(this.hibernateStore).saveLinks(this.document, this.context, true);
     }
 
     @Test
     void consumeSaveLinksFailed() throws Exception
     {
-        doThrow(XWikiException.class).when(this.hibernateStore).saveLinks(this.document, this.context, false);
+        doThrow(XWikiException.class).when(this.hibernateStore).saveLinks(this.document, this.context, true);
         IndexException e = assertThrows(IndexException.class,
             () -> this.defaultLinksTaskConsumer.consume(DOCUMENT_REFERENCE, VERSION));
         assertEquals("Failed to updated links for document [wiki:space.page] version [2.5].", e.getMessage());

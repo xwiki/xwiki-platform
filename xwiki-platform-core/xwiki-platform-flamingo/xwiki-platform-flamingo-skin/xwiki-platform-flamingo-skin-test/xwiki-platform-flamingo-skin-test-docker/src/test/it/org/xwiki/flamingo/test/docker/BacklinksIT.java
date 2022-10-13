@@ -67,8 +67,11 @@ class BacklinksIT
                 setup.serializeReference(targetDocumentReference.getLocalDocumentReference())),
             null);
         // Create a source page with a link to the target page but on a different wiki
-        setup.createPage(sourceDocumentReference2, String.format("[[page:otherwiki:%s]][[otherwiki:%s]]",
-            setup.serializeReference(targetDocumentReference.getLocalDocumentReference())), null);
+        setup.createPage(sourceDocumentReference2,
+            String.format("[[page:otherwiki:%s]][[otherwiki:%s]]",
+                setup.serializeReference(targetDocumentReference.getLocalDocumentReference()),
+                setup.serializeReference(targetDocumentReference.getLocalDocumentReference())),
+            null);
 
         // Wait for the solr indexing to be completed before checking the backlinks of the target.
         new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmpyQueue();

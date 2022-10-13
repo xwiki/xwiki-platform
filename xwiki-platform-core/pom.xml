@@ -136,6 +136,13 @@
                   <justification>Unstable API change: Script services are not supposed to expose classes from com.xpn.xwiki.doc.*</justification>
                   <criticality>documented</criticality>
                 </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.addedToInterface</code>
+                  <new>method com.xpn.xwiki.doc.XWikiAttachment org.xwiki.store.TemporaryAttachmentSessionsManager::uploadAttachment(org.xwiki.model.reference.DocumentReference, javax.servlet.http.Part, java.lang.String) throws org.xwiki.store.TemporaryAttachmentException</new>
+                  <justification>We can't provide a default implementation for this new method, it needs to be implemented on upgrade</justification>
+                  <criticality>documented</criticality>
+                </item>
               </differences>
             </revapi.differences>
           </analysisConfiguration>

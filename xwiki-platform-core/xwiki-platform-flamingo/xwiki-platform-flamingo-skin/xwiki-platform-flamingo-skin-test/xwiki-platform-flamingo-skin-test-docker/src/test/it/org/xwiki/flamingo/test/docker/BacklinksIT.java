@@ -31,7 +31,6 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_0;
 
 /**
  * @version $Id$
@@ -41,35 +40,42 @@ import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_0;
 class BacklinksIT
 {
     @Test
-    void backlinksCreationSyntax20(TestUtils setup, TestReference reference, TestConfiguration testConfiguration)
-        throws Exception
+    void backlinks(TestUtils setup, TestReference reference, TestConfiguration testConfiguration) throws Exception
     {
         setup.loginAsSuperAdmin();
         DocumentReference targetDocumentReference =
             new DocumentReference("BacklinkTargetTest", reference.getLastSpaceReference());
-        DocumentReference sourceDocumentReference =
-            new DocumentReference("BacklinkSourceTest", reference.getLastSpaceReference());
+        DocumentReference sourceDocumentReference1 =
+            new DocumentReference("BacklinkSourceTest1", reference.getLastSpaceReference());
+        DocumentReference sourceDocumentReference2 =
+            new DocumentReference("BacklinkSourceTest2", reference.getLastSpaceReference());
 
         setup.rest().delete(targetDocumentReference);
-        setup.rest().delete(sourceDocumentReference);
+        setup.rest().delete(sourceDocumentReference1);
+        setup.rest().delete(sourceDocumentReference2);
 
         // Create page listing backlinks leading to it.
         ViewPage vp = setup.createPage(targetDocumentReference,
-            "{{velocity}}#foreach ($link in $doc.getBacklinks())\n$link\n#end{{/velocity}}", null,
-            XWIKI_2_0.toIdString());
+            "{{velocity}}#foreach ($link in $doc.getBacklinks())\n$link\n#end{{/velocity}}", null);
         // No backlinks at this stage
         assertEquals("", vp.getContent());
 
-        // Create page pointing to the page listing the backlinks.
-        setup.createPage(sourceDocumentReference,
-            String.format("[[backlink>>%s]]", setup.serializeReference(targetDocumentReference)), null,
-            XWIKI_2_0.toIdString());
+        // Create a source page with a local link to the target page
+        setup.createPage(sourceDocumentReference1,
+            String.format("[[page:%s]][[%s]]",
+                setup.serializeReference(reference.getLastSpaceReference()),
+                setup.serializeReference(targetDocumentReference.getLocalDocumentReference())),
+            null);
+        // Create a source page with a link to the target page but on a different wiki
+        setup.createPage(sourceDocumentReference2, String.format("[[page:otherwiki:%s]][[otherwiki:%s]]",
+            setup.serializeReference(targetDocumentReference.getLocalDocumentReference())), null);
 
         // Wait for the solr indexing to be completed before checking the backlinks of the target.
         new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmpyQueue();
 
         vp = setup.gotoPage(targetDocumentReference);
-        assertEquals(setup.serializeReference(sourceDocumentReference.getLocalDocumentReference()), vp.getContent());
+
+        assertEquals(setup.serializeReference(sourceDocumentReference1.getLocalDocumentReference()), vp.getContent());
     }
 
     private String computedHostURL(TestConfiguration testConfiguration)

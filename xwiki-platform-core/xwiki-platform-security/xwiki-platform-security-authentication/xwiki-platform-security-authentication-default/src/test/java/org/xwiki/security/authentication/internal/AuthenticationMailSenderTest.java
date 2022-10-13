@@ -72,15 +72,15 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests for {@link ResetPasswordMailSender}.
+ * Tests for {@link AuthenticationMailSender}.
  *
  * @version $Id$
  */
 @ComponentTest
-class ResetPasswordMailSenderTest
+class AuthenticationMailSenderTest
 {
     @InjectMockComponents
-    private ResetPasswordMailSender resetPasswordMailSender;
+    private AuthenticationMailSender resetPasswordMailSender;
 
     private static final LocalDocumentReference RESET_PASSWORD_MAIL_TEMPLATE_REFERENCE =
         new LocalDocumentReference("XWiki", "ResetPasswordMailContent");
@@ -255,7 +255,8 @@ class ResetPasswordMailSenderTest
             () -> this.resetPasswordMailSender.sendResetPasswordEmail(username, email, resetPasswordUrl));
         verify(this.mailSender).sendAsynchronously(Collections.singleton(message), session, this.mailListener);
         verify(mailStatusResult).waitTillProcessed(1000L);
-        assertEquals("Cannot send this email - Some sending error", resetPasswordException.getMessage());
+        assertEquals("Cannot send this email", resetPasswordException.getMessage());
+        assertEquals("Some sending error", resetPasswordException.getCause().getMessage());
     }
 
     @Test

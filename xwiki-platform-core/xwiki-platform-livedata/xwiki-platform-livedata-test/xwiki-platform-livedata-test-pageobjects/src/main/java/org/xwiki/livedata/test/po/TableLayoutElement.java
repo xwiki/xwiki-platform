@@ -47,6 +47,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.test.ui.po.DateRangePicker;
 import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.SuggestInputElement;
 
@@ -489,6 +490,14 @@ public class TableLayoutElement extends BaseElement
         } else if (classes.contains("filter-text")) {
             element.clear();
             element.sendKeys(content);
+        } else if (classes.contains("filter-date")) {
+            element.click();
+            DateRangePicker picker = new DateRangePicker();
+            picker.clearRange();
+            if (!Objects.equals(content, " ")) {
+                element.sendKeys(content);
+                picker.applyRange();
+            }
         }
 
         if (wait) {

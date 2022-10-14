@@ -21,16 +21,22 @@ package org.xwiki.export.pdf.test.ui;
 
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.testcontainers.containers.Network;
 import org.xwiki.export.pdf.test.po.ExportModal;
 import org.xwiki.export.pdf.test.po.PDFDocument;
+import org.xwiki.export.pdf.test.po.PDFExportAdministrationSectionPage;
 import org.xwiki.export.pdf.test.po.PDFExportOptionsModal;
 import org.xwiki.export.pdf.test.po.PDFImage;
+import org.xwiki.export.pdf.test.po.PDFTemplateEditPage;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -39,6 +45,7 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -48,17 +55,35 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 14.4.2
  * @since 14.5
  */
-@UITest
+@UITest(extraJARs = {"org.xwiki.platform:xwiki-platform-resource-temporary"})
 class PDFExportIT
 {
-    @BeforeAll
-    static void configure(TestUtils setup)
+    @Test
+    @Order(1)
+    void configurePDFExport(TestUtils setup, TestConfiguration testConfiguration)
     {
+        setup.loginAsSuperAdmin();
         setup.gotoPage(new LocalDocumentReference("PDFExportIT", "EnableDebugLogs"), "get");
+
+        // Make sure we start with the default settings.
+        PDFExportAdministrationSectionPage adminSection = PDFExportAdministrationSectionPage.gotoPage().reset();
+        adminSection.getGeneratorSelect().selectByVisibleText("Chrome Docker Container");
+
+        if (!testConfiguration.getServletEngine().isOutsideDocker()) {
+            // The servlet engine runs inside a Docker container so in order for the headless Chrome web browser (used
+            // for PDF export) to access XWiki its own Docker container has to be in the same network and we also need
+            // to pass the internal host name or IP address used by XWiki.
+            adminSection.setDockerNetwork(Network.SHARED.getId());
+            adminSection.setXWikiHost(testConfiguration.getServletEngine().getInternalIP());
+        }
+
+        adminSection.clickSave();
+        assertEquals("Available", adminSection.getGeneratorStatus(true));
     }
 
     @Test
-    void exportAsPDF(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration) throws Exception
+    @Order(2)
+    void exportAsPDF(TestUtils setup, TestConfiguration testConfiguration) throws Exception
     {
         setup.createUserAndLogin("John", "pass");
 
@@ -134,6 +159,105 @@ class PDFExportIT
             assertEquals(1, contentPageImages.size());
             assertEquals(512, contentPageImages.get(0).getWidth());
             assertEquals(512, contentPageImages.get(0).getHeight());
+        }
+    }
+
+    @Test
+    @Order(3)
+    void exportWithCustomPDFTemplate(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        setup.rest().delete(new LocalDocumentReference("WebHome",
+            new EntityReference("My cool template", EntityType.SPACE, testReference.getLastSpaceReference())));
+
+        // Create a custom PDF template, as a simple user.
+        setup.createPage(testReference, "", "").createPage().createPageFromTemplate("My cool template", null, null,
+            "XWiki.PDFExport.TemplateProvider");
+        PDFTemplateEditPage templateEditPage = new PDFTemplateEditPage();
+        templateEditPage.setCover(templateEditPage.getCover().replace("<h1>", "<h1>Book: "));
+        templateEditPage
+            .setTableOfContents(templateEditPage.getTableOfContents().replace("core.pdf.tableOfContents", "Chapters"));
+        templateEditPage.setHeader(templateEditPage.getHeader().replace("$escapetool", "Chapter: $escapetool"));
+        templateEditPage.clickSaveAndContinue();
+
+        // Register the template in the PDF export administration section.
+        setup.loginAsSuperAdmin();
+        PDFExportAdministrationSectionPage adminSection = PDFExportAdministrationSectionPage.gotoPage();
+        adminSection.getTemplatesInput().sendKeys("my cool").waitForSuggestions()
+            .selectByVisibleText("My cool template");
+        adminSection.clickSave();
+
+        // We also have to give script rights to the template author because it was created based on the default one
+        // which contains scripts.
+        setup.setGlobalRights(null, "XWiki.John", "script", true);
+
+        // Export using the custom PDF template we created.
+        setup.loginAndGotoPage("John", "pass",
+            setup.getURL(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent"), "WebHome")));
+        PDFExportOptionsModal exportOptions = ExportModal.open(new ViewPage()).clickExportAsPDFButton();
+        exportOptions.getTemplateSelect().selectByVisibleText("My cool template");
+
+        try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration))) {
+            // Verify that the custom PDF template was used.
+
+            // We should have 3 pages: cover page, table of contents and the actual content.
+            assertEquals(3, pdf.getNumberOfPages());
+
+            // Verify the custom cover page.
+            String coverPageText = pdf.getTextFromPage(0);
+            assertTrue(coverPageText.contains("Book: Parent"), "Unexpected cover page text: " + coverPageText);
+
+            // Verify the custom table of contents page.
+            String tocPageText = pdf.getTextFromPage(1);
+            assertTrue(tocPageText.contains("Chapters"), "Unexpected table of contents: " + tocPageText);
+
+            // Verify the custom PDF header.
+            String contentPageText = pdf.getTextFromPage(2);
+            assertTrue(contentPageText.startsWith("Chapter: Parent"),
+                "Unexpected header on the content page: " + contentPageText);
+        }
+    }
+
+    @Test
+    @Order(4)
+    void updatePDFExportConfigurationWithValidation(TestUtils setup, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        setup.loginAsSuperAdmin();
+        PDFExportAdministrationSectionPage adminSection = PDFExportAdministrationSectionPage.gotoPage();
+
+        // Verify the client-side validation.
+        assertTrue(adminSection.isChromeDockerContainerNameValid());
+        assertTrue(adminSection.isChromeRemoteDebuggingPortValid());
+
+        adminSection.setChromeDockerContainerName("%^&*");
+        adminSection.setChromeRemoteDebuggingPort("-9222");
+        adminSection.clickSave(false);
+
+        assertFalse(adminSection.isChromeDockerContainerNameValid());
+        assertFalse(adminSection.isChromeRemoteDebuggingPortValid());
+
+        // Change the configuration.
+        adminSection.setChromeDockerContainerName("headless-chrome-pdf-printer-" + new Date().getTime());
+        adminSection.setChromeRemoteDebuggingPort("9223");
+
+        assertTrue(adminSection.isChromeDockerContainerNameValid());
+        assertTrue(adminSection.isChromeRemoteDebuggingPortValid());
+
+        adminSection.clickSave();
+        assertEquals("Available", adminSection.getGeneratorStatus(true));
+
+        // Try the PDF export with the new generator.
+        setup.loginAndGotoPage("John", "pass",
+            setup.getURL(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent"), "WebHome")));
+        PDFExportOptionsModal exportOptions = ExportModal.open(new ViewPage()).clickExportAsPDFButton();
+        exportOptions.getCoverCheckbox().click();
+        exportOptions.getTocCheckbox().click();
+
+        try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration))) {
+            assertEquals(1, pdf.getNumberOfPages());
+            String content = pdf.getTextFromPage(0);
+            assertTrue(content.contains("Chapter 1"), "Unexpected content: " + content);
         }
     }
 

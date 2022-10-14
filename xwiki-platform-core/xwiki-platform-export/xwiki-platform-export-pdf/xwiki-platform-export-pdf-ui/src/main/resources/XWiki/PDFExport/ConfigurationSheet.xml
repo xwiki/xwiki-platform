@@ -275,6 +275,14 @@
       fieldset.classList.toggle('hidden', fieldset.disabled);
     });
   });
+
+  document.querySelectorAll('a[data-confirmation]').forEach(anchor =&gt; {
+    anchor.addEventListener('click', event =&gt; {
+      if (!confirm(anchor.getAttribute('data-confirmation'))) {
+        event.preventDefault();
+      }
+    });
+  });
 })();
 
 require(['jquery', 'xwiki-events-bridge'], function($) {

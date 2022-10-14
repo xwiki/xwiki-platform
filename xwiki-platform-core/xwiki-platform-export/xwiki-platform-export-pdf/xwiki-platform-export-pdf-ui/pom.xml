@@ -81,11 +81,13 @@
       <artifactId>xwiki-platform-localization-rest-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- We're using the icon script service. -->
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>xwiki-platform-localization-webjar</artifactId>
+      <artifactId>xwiki-platform-icon-script</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- We're using the default xclass sheet. -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>xwiki-platform-xclass-ui</artifactId>
@@ -93,7 +95,20 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
+    <!-- We publish a template provider and an administration section. -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-administration-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
     <!-- JavaScript dependencies -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-localization-webjar</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>requirejs</artifactId>

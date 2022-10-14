@@ -28,9 +28,9 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.xwiki.test.ui.po.BaseModal;
-import org.xwiki.test.ui.po.Select;
 
 /**
  * Represents the actions possible on the modal used to configure and trigger the PDF export.

@@ -283,6 +283,44 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
       event.preventDefault();
     }
   });
+
+  const setPDFGeneratorStatus = function(status) {
+    document.querySelectorAll('dd.pdfGeneratorStatus').forEach(statusContainer =&gt; {
+      statusContainer.className = `pdfGeneratorStatus pdfGeneratorStatus-${status}`;
+    });
+  };
+
+  const fetchPDFGeneratorStatus = function() {
+    setPDFGeneratorStatus('checking');
+    fetch(XWiki.currentDocument.getURL('get', $.param({
+      outputSyntax: 'plain',
+      sheet: 'XWiki.PDFExport.WebHome',
+      data: 'serverSidePrintingAvailable'
+    }))).then(response =&gt; response.json()).then(data =&gt; {
+      if (data.serverSidePrintingAvailable) {
+        setPDFGeneratorStatus('available');
+      } else {
+        setPDFGeneratorStatus('unavailable');
+      }
+    }).catch(reason =&gt; {
+      setPDFGeneratorStatus('checkFailed');
+    });
+  };
+
+  const updatePDFGeneratorStatus = function() {
+    if (document.getElementById('pdfGenerator')?.value === 'userBrowser') {
+      setPDFGeneratorStatus('available');
+    } else {
+      fetchPDFGeneratorStatus();
+    }
+  };
+
+  $(document).on('xwiki:action:save', (event) =&gt; {
+    setPDFGeneratorStatus('checking');
+  });
+
+  $(document).on('xwiki:document:saved', updatePDFGeneratorStatus);
+  updatePDFGeneratorStatus();
 });</code>
     </property>
     <property>
@@ -442,6 +480,20 @@ fieldset.pdfGeneratorConfig {
       .box-shadow(@shadow);
     }
   }
+}
+
+.pdfGeneratorStatus-checking-message,
+.pdfGeneratorStatus-checkFailed-message,
+.pdfGeneratorStatus-available-message,
+.pdfGeneratorStatus-unavailable-message {
+  display: none;
+}
+
+.pdfGeneratorStatus-checking .pdfGeneratorStatus-checking-message,
+.pdfGeneratorStatus-checkFailed .pdfGeneratorStatus-checkFailed-message,
+.pdfGeneratorStatus-available .pdfGeneratorStatus-available-message,
+.pdfGeneratorStatus-unavailable .pdfGeneratorStatus-unavailable-message {
+  display: block;
 }</code>
     </property>
     <property>

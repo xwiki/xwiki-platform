@@ -184,9 +184,9 @@
     'export.pdf.options.template',
     'export.pdf.options.template.hint',
     'export.pdf.options.loadFailure',
-    'export.pdf.serverSidePrinting.checking',
-    'export.pdf.serverSidePrinting.unavailable',
-    'export.pdf.serverSidePrinting.checkFailed',
+    'export.pdf.generator.checking',
+    'export.pdf.generator.unavailable',
+    'export.pdf.generator.checkFailed',
     'export.pdf.modal.close',
     'export.pdf.inProgress',
     'export.pdf.failed',
@@ -289,7 +289,7 @@ require([
 
     $('body').css('cursor', 'wait');
     const notification = pdfExportOptionsModal.find('.modal-body &gt; .alert')
-      .text(l10n['export.pdf.serverSidePrinting.checking'])
+      .text(l10n['export.pdf.generator.checking'])
       .prepend(renderIcon(config.icons.spinner));
     return fetch(XWiki.currentDocument.getURL('get', $.param({
       outputSyntax: 'plain',
@@ -297,11 +297,11 @@ require([
       data: 'serverSidePrintingAvailable',
     }))).then(response =&gt; response.json()).then(data =&gt; {
       if (!data.serverSidePrintingAvailable) {
-        return Promise.reject(l10n['export.pdf.serverSidePrinting.unavailable']);
+        return Promise.reject(l10n['export.pdf.generator.unavailable']);
       }
     }).catch(reason =&gt; {
       notification.removeClass('alert-progress').addClass('alert-danger')
-        .text(reason || l10n['export.pdf.serverSidePrinting.checkFailed'])
+        .text(reason || l10n['export.pdf.generator.checkFailed'])
         .prepend(renderIcon(config.icons.error));
       // Propagate the error in order to prevent the loading of the PDF export options.
       return Promise.reject(reason);
@@ -753,7 +753,7 @@ require([
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>

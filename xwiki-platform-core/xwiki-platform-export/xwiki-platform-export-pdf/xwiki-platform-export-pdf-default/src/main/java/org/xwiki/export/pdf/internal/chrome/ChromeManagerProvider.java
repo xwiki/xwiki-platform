@@ -129,6 +129,7 @@ public class ChromeManagerProvider implements Provider<BrowserManager>, Disposab
         if (this.containerId != null && this.isContainerCreator) {
             this.containerManagerProvider.get().stopContainer(this.containerId);
             this.containerId = null;
+            this.isContainerCreator = false;
         }
     }
 

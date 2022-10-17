@@ -194,6 +194,7 @@
     'export.pdf.canceling',
     'export.pdf.canceled',
     'export.pdf.cancelFailed',
+    'export.pdf.loading',
     'cancel'
   ]
 });
@@ -328,6 +329,9 @@ require([
   };
 
   const loadPDFOptions = function(url) {
+    const notification = pdfExportOptionsModal.find('.modal-body &gt; .alert')
+      .text(l10n['export.pdf.loading'])
+      .prepend(renderIcon(config.icons.spinner));
     $('&lt;div&gt;&lt;/div&gt;').load(url + ' #pdfExportOptions', function() {
       const form = $(this).find('#pdfExportOptions');
       if (form.length) {
@@ -340,7 +344,7 @@ require([
         pdfExportOptionsModal.find('.modal-body').empty().append(form.contents());
         pdfExportOptionsModal.attr('data-state', 'loaded');
       } else {
-        pdfExportOptionsModal.find('.modal-body &gt; .alert').removeClass('alert-progress').addClass('alert-danger')
+        notification.removeClass('alert-progress').addClass('alert-danger')
           .text(l10n['export.pdf.options.loadFailure'])
           .prepend(renderIcon(config.icons.error));
       }

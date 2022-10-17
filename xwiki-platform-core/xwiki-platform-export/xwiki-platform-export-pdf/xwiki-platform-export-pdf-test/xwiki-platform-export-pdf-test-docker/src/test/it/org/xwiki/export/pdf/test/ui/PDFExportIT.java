@@ -21,6 +21,7 @@ package org.xwiki.export.pdf.test.ui;
 
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -92,8 +93,9 @@ class PDFExportIT
         PDFExportOptionsModal exportOptions = ExportModal.open(viewPage).clickExportAsPDFButton();
 
         try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration))) {
-            // We should have 3 pages: cover page, table of contents and the actual content.
-            assertEquals(3, pdf.getNumberOfPages());
+            // We should have 4 pages: cover page, table of contents, one page for the parent document and one page for
+            // the child document.
+            assertEquals(4, pdf.getNumberOfPages());
 
             //
             // Verify the cover page.
@@ -119,43 +121,53 @@ class PDFExportIT
             //
 
             String tocPageText = pdf.getTextFromPage(1);
-            // The header shows the page title and the footer shows the page number and the page count.
-            assertTrue(tocPageText.startsWith("Parent\n2 / 3\n"),
-                "Unexpected header and footer on table of contents page: " + coverPageText);
-            assertTrue(tocPageText.contains("Table of Contents\nChapter 1\nSection 1\n"),
+            // The footer shows the page number and the page count.
+            assertTrue(tocPageText.startsWith("2 / 4\n"),
+                "Unexpected footer on table of contents page: " + tocPageText);
+            assertTrue(tocPageText.contains("Table of Contents\nParent\nChapter 1\nChild\nSection 1\n"),
                 "Unexpected table of contents: " + tocPageText);
 
             // The table of contents should have internal links (anchors) to each section.
             Map<String, String> tocPageLinks = pdf.getLinksFromPage(1);
-            assertEquals(2, tocPageLinks.size());
-            assertEquals(Arrays.asList("HChapter1", "HSection1"),
+            assertEquals(4, tocPageLinks.size());
+            assertEquals(
+                Arrays.asList("Hxwiki:PDFExportIT.Parent.WebHome", "HChapter1",
+                    "Hxwiki:PDFExportIT.Parent.Child.WebHome", "HSection1"),
                 tocPageLinks.values().stream().collect(Collectors.toList()));
 
             // No images on the table of contents page.
             assertEquals(0, pdf.getImagesFromPage(1).size());
 
             //
-            // Verify the content page.
+            // Verify the page corresponding to the parent document.
             //
 
             String contentPageText = pdf.getTextFromPage(2);
-            assertTrue(contentPageText.startsWith("Parent\n3 / 3\n"),
+            assertTrue(contentPageText.startsWith("Parent\n3 / 4\n"),
                 "Unexpected header and footer on the content page: " + contentPageText);
             assertTrue(
-                contentPageText.contains("Chapter 1\n"
+                contentPageText.contains("Parent\nChapter 1\n"
                     + "Content of first chapter. Current user is xwiki:XWiki.John.\nLink to child page.\nloaded!\n"),
-                "Parent page content missing: " + contentPageText);
-            assertTrue(contentPageText.contains("Section 1\nContent of first section.\n"),
-                "Child page content missing: " + contentPageText);
+                "Parent document content missing: " + contentPageText);
 
-            // The content of the parent page has a link to the child page.
+            // The content of the parent document has a link to the child document.
             Map<String, String> contentPageLinks = pdf.getLinksFromPage(2);
             assertEquals(1, contentPageLinks.size());
             assertEquals(setup.getURL(Arrays.asList("PDFExportIT", "Parent"), "Child") + "/",
                 contentPageLinks.get("child page."));
 
-            // The content of the child page shows an image.
-            List<PDFImage> contentPageImages = pdf.getImagesFromPage(2);
+            //
+            // Verify the page corresponding to the child document.
+            //
+
+            contentPageText = pdf.getTextFromPage(3);
+            assertTrue(contentPageText.startsWith("Child\n4 / 4\n"),
+                "Unexpected header and footer on the content page: " + contentPageText);
+            assertTrue(contentPageText.contains("Child\nSection 1\nContent of first section.\n"),
+                "Child document content missing: " + contentPageText);
+
+            // The content of the child document shows an image.
+            List<PDFImage> contentPageImages = pdf.getImagesFromPage(3);
             assertEquals(1, contentPageImages.size());
             assertEquals(512, contentPageImages.get(0).getWidth());
             assertEquals(512, contentPageImages.get(0).getHeight());
@@ -164,6 +176,43 @@ class PDFExportIT
 
     @Test
     @Order(3)
+    void exportAsPDFSinglePage(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        ViewPage viewPage =
+            setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent", "Child"), "WebHome"));
+        PDFExportOptionsModal exportOptions = ExportModal.open(viewPage).clickExportAsPDFButton();
+
+        try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration))) {
+            // We should have 3 pages: cover page, table of contents and one page for the content.
+            assertEquals(3, pdf.getNumberOfPages());
+
+            //
+            // Verify the table of contents page.
+            //
+
+            String tocPageText = pdf.getTextFromPage(1);
+            // The document title is not included when a single page is exported.
+            assertTrue(tocPageText.contains("Table of Contents\nSection 1"),
+                "Unexpected table of contents: " + tocPageText);
+
+            // The table of contents should have internal links (anchors) to each section.
+            Map<String, String> tocPageLinks = pdf.getLinksFromPage(1);
+            assertEquals(Collections.singletonList("HSection1"),
+                tocPageLinks.values().stream().collect(Collectors.toList()));
+
+            //
+            // Verify the content page.
+            //
+
+            String contentPageText = pdf.getTextFromPage(2);
+            // The document title is not included when a single page is exported.
+            assertTrue(contentPageText.startsWith("Child\n3 / 3\nSection 1\nContent of first section.\n"),
+                "Unexpected content: " + contentPageText);
+        }
+    }
+
+    @Test
+    @Order(4)
     void exportWithCustomPDFTemplate(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
         throws Exception
     {
@@ -177,7 +226,7 @@ class PDFExportIT
         templateEditPage.setCover(templateEditPage.getCover().replace("<h1>", "<h1>Book: "));
         templateEditPage
             .setTableOfContents(templateEditPage.getTableOfContents().replace("core.pdf.tableOfContents", "Chapters"));
-        templateEditPage.setHeader(templateEditPage.getHeader().replace("$escapetool", "Chapter: $escapetool"));
+        templateEditPage.setHeader(templateEditPage.getHeader().replace("<span ", "Chapter: <span "));
         templateEditPage.clickSaveAndContinue();
 
         // Register the template in the PDF export administration section.
@@ -200,8 +249,9 @@ class PDFExportIT
         try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration))) {
             // Verify that the custom PDF template was used.
 
-            // We should have 3 pages: cover page, table of contents and the actual content.
-            assertEquals(3, pdf.getNumberOfPages());
+            // We should have 4 pages: cover page, table of contents, one page for the parent document and one page for
+            // the child document.
+            assertEquals(4, pdf.getNumberOfPages());
 
             // Verify the custom cover page.
             String coverPageText = pdf.getTextFromPage(0);
@@ -219,7 +269,7 @@ class PDFExportIT
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     void updatePDFExportConfigurationWithValidation(TestUtils setup, TestConfiguration testConfiguration)
         throws Exception
     {
@@ -255,7 +305,8 @@ class PDFExportIT
         exportOptions.getTocCheckbox().click();
 
         try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration))) {
-            assertEquals(1, pdf.getNumberOfPages());
+            // One page for the parent document and one page for the child document.
+            assertEquals(2, pdf.getNumberOfPages());
             String content = pdf.getTextFromPage(0);
             assertTrue(content.contains("Chapter 1"), "Unexpected content: " + content);
         }

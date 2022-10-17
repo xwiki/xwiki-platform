@@ -54,6 +54,8 @@ public class PDFExportJobRequest extends AbstractCheckRightsRequest
 
     private static final String PROPERTY_FOOTER = "footer";
 
+    private static final String PROPERTY_TITLE = "title";
+
     private static final String PROPERTY_SERVER_SIDE = "serverSide";
 
     /**
@@ -205,5 +207,29 @@ public class PDFExportJobRequest extends AbstractCheckRightsRequest
     public void setServerSide(boolean serverSide)
     {
         setProperty(PROPERTY_SERVER_SIDE, serverSide);
+    }
+
+    /**
+     * @return whether to render the document title before the document content, using a level 1 heading; when not set
+     *         it defaults to {@code true} if {@link #getDocuments()} has multiple entries, otherwise to {@code false},
+     *         when a single document is rendered; note that this has an impact on the table of contents (when we
+     *         generate one)
+     * @since 14.9RC1
+     */
+    public boolean isWithTitle()
+    {
+        return getProperty(PROPERTY_TITLE, getDocuments().size() > 1);
+    }
+
+    /**
+     * Sets whether to render the document title, before the document content, or not.
+     *
+     * @param withTitle {@code true} to include the document title, {@code false} to omit the document title,
+     *            {@code null} to include the document title only when multiple documents are rendered
+     * @since 14.9RC1
+     */
+    public void setWithTitle(Boolean withTitle)
+    {
+        setProperty(PROPERTY_TITLE, withTitle);
     }
 }

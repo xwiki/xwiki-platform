@@ -31,7 +31,10 @@ import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.export.pdf.job.PDFExportJobStatus.DocumentRenderingResult;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
@@ -63,14 +66,19 @@ public class DocumentRenderer
     @Named("context")
     private ComponentManager contextComponentManager;
 
+    @Inject
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
+
     /**
      * Renders the specified document.
      * 
      * @param documentReference the document to render
+     * @param withTitle {@code true} to render also the document title (before the document content), {@code false}
+     *            otherwise
      * @return the rendering result
      * @throws Exception if rendering the specified document fails
      */
-    public DocumentRenderingResult render(DocumentReference documentReference) throws Exception
+    public DocumentRenderingResult render(DocumentReference documentReference, boolean withTitle) throws Exception
     {
         Syntax targetSyntax = this.renderingContext.getTargetSyntax();
 
@@ -84,9 +92,32 @@ public class DocumentRenderer
         parameters.setTargetSyntax(targetSyntax);
 
         DocumentModelBridge document = this.documentAccessBridge.getTranslatedDocumentInstance(documentReference);
-        XDOM xdom = this.documentDisplayer.display(document, parameters);
+        XDOM xdom = display(document, parameters, withTitle);
         String html = renderXDOM(xdom, targetSyntax);
         return new DocumentRenderingResult(documentReference, xdom, html);
+    }
+
+    private XDOM display(DocumentModelBridge document, DocumentDisplayerParameters parameters, boolean withTitle)
+    {
+        XDOM xdom = this.documentDisplayer.display(document, parameters);
+
+        if (withTitle) {
+            parameters.setTitleDisplayed(true);
+            XDOM titleXDOM = this.documentDisplayer.display(document, parameters);
+            String documentReference = this.entityReferenceSerializer.serialize(document.getDocumentReference());
+            // Generate an id so that we can target this heading from the table of contents.
+            String id = xdom.getIdGenerator().generateUniqueId("H", documentReference);
+            HeaderBlock title = new HeaderBlock(titleXDOM.getChildren(), HeaderLevel.LEVEL1, id);
+            // Mark the beginning of a new document when multiple documents are rendered.
+            title.setParameter("data-xwiki-document-reference", documentReference);
+            if (xdom.getChildren().isEmpty()) {
+                xdom.addChild(title);
+            } else {
+                xdom.insertChildBefore(title, xdom.getChildren().get(0));
+            }
+        }
+
+        return xdom;
     }
 
     private String renderXDOM(XDOM xdom, Syntax targetSyntax) throws Exception

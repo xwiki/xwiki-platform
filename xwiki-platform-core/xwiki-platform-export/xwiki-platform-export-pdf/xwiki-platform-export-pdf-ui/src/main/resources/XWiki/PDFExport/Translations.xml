@@ -47,6 +47,7 @@ export.pdf.lastError=The PDF export log contains errors: {0}
 export.pdf.canceling=Canceling PDF export...
 export.pdf.canceled=PDF export canceled
 export.pdf.cancelFailed=Failed to cancel the PDF export
+export.pdf.loading=Loading...
 
 export.pdf.templates.default=Default template
 export.pdf.templates.default.versionInfo=Version {0} authored by {1} on {2}

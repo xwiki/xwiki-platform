@@ -121,8 +121,8 @@ class PDFExportJobTest
         when(this.authorization.hasAccess(Right.VIEW, this.bobReference, this.firstPageReference)).thenReturn(true);
         when(this.authorization.hasAccess(Right.VIEW, this.bobReference, this.secondPageReference)).thenReturn(true);
 
-        when(this.documentRenderer.render(this.firstPageReference)).thenReturn(this.firstPageRendering);
-        when(this.documentRenderer.render(this.secondPageReference)).thenReturn(this.secondPageRendering);
+        when(this.documentRenderer.render(this.firstPageReference, true)).thenReturn(this.firstPageRendering);
+        when(this.documentRenderer.render(this.secondPageReference, true)).thenReturn(this.secondPageRendering);
     }
 
     @Test

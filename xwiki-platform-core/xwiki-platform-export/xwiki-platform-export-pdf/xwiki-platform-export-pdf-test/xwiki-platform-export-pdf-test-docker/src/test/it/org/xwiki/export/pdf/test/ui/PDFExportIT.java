@@ -27,9 +27,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.Network;
+import org.testcontainers.utility.ResourceReaper;
+import org.xwiki.export.pdf.internal.docker.ContainerManager;
 import org.xwiki.export.pdf.test.po.ExportModal;
 import org.xwiki.export.pdf.test.po.PDFDocument;
 import org.xwiki.export.pdf.test.po.PDFExportAdministrationSectionPage;
@@ -59,6 +62,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest(extraJARs = {"org.xwiki.platform:xwiki-platform-resource-temporary"})
 class PDFExportIT
 {
+    @BeforeAll
+    static void configure()
+    {
+        ResourceReaper.instance().registerLabelsFilterForCleanup(ContainerManager.DEFAULT_LABELS);
+    }
+
     @Test
     @Order(1)
     void configurePDFExport(TestUtils setup, TestConfiguration testConfiguration)

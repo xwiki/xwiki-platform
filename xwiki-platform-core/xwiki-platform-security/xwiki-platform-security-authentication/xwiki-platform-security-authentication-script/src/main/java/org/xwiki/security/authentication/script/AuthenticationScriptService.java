@@ -255,6 +255,7 @@ public class AuthenticationScriptService implements ScriptService
      * @since 13.10.10
      * @since 14.4.6
      */
+    @Unstable
     public void retrieveUsernameAndSendEmail(String userEmail) throws RetrieveUsernameException
     {
         Set<UserReference> users = this.retrieveUsernameManager.findUsers(userEmail);

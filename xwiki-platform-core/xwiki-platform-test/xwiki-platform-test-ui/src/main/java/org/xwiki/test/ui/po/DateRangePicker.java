@@ -20,9 +20,9 @@
 package org.xwiki.test.ui.po;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
 
 /**
  * Represents the actions possible on the date range picker widget.
@@ -32,11 +32,17 @@ import org.openqa.selenium.support.FindBy;
  */
 public class DateRangePicker extends BaseElement
 {
-    @FindBy(className = "daterangepicker")
     private WebElement container;
 
-    public DateRangePicker()
+    /**
+     * Get the date range picker corresponding to the given element.
+     *
+     * @param element an element that has a date range picker assigned
+     */
+    public DateRangePicker(WebElement element)
     {
+        this.container = (WebElement) ((JavascriptExecutor) getDriver()).executeScript(
+            "return jQuery(arguments[0]).data('daterangepicker').container[0];", element);
         waitUntilReady();
     }
 

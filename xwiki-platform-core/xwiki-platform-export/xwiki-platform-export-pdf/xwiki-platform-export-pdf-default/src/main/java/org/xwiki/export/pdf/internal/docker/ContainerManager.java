@@ -20,6 +20,7 @@
 package org.xwiki.export.pdf.internal.docker;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -59,6 +60,13 @@ import com.github.dockerjava.api.model.Volume;
 @Singleton
 public class ContainerManager implements Initializable
 {
+    /**
+     * The labels used to identify the Docker containers created by this component. This is needed for instance to be
+     * able to cleanup the created Docker containers after running the functional tests.
+     */
+    public static final Map<String, String> DEFAULT_LABELS =
+        Collections.singletonMap(ContainerManager.class.getPackageName(), "true");
+
     private static final String DOCKER_SOCK = "/var/run/docker.sock";
 
     @Inject
@@ -87,6 +95,10 @@ public class ContainerManager implements Initializable
         this.logger.debug("Looking for an existing Docker container with name [{}].", containerName);
         List<Container> containers =
             exec(this.client.listContainersCmd().withNameFilter(Arrays.asList(containerName)).withShowAll(true));
+        // The previous name filtering doesn't perform exact matching (it's more of a partial / contains search).
+        containers = containers.stream().filter(container -> {
+            return Arrays.asList(container.getNames()).contains("/" + containerName);
+        }).collect(Collectors.toList());
         if (containers.isEmpty()) {
             this.logger.debug("Could not find any Docker container with name [{}].", containerName);
             // There's no container with the specified name.
@@ -154,13 +166,11 @@ public class ContainerManager implements Initializable
         this.logger.debug("Creating a Docker container with name [{}] using image [{}] and having parameters [{}].",
             containerName, imageName, parameters);
 
-        // set extra hosts if network == bridge (using host.xwiki.internal:host-gateway)
-
         try (CreateContainerCmd createContainerCmd = this.client.createContainerCmd(imageName)) {
             List<ExposedPort> exposedPorts =
                 hostConfig.getPortBindings().getBindings().keySet().stream().collect(Collectors.toList());
-            CreateContainerResponse container = createContainerCmd.withName(containerName).withCmd(parameters)
-                .withExposedPorts(exposedPorts).withHostConfig(hostConfig).exec();
+            CreateContainerResponse container = createContainerCmd.withName(containerName).withLabels(DEFAULT_LABELS)
+                .withCmd(parameters).withExposedPorts(exposedPorts).withHostConfig(hostConfig).exec();
             this.logger.debug("Created the Docker container with id [{}].", container.getId());
             return container.getId();
         }

@@ -471,7 +471,7 @@ public final class DockerTestUtils
      * </ul>
      * 
      * @param labels the labels used to match the Docker containers to cleanup
-     * @since 14.9RC1
+     * @since 14.9
      */
     public static void cleanupContainersWithLabels(Map<String, String> labels)
     {

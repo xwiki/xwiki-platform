@@ -147,7 +147,7 @@ public class DefaultBlockAsyncRenderer extends AbstractBlockAsyncRenderer
     private Block tranform(XDOM xdom, Block block) throws RenderingException
     {
         TransformationContext transformationContext =
-            new TransformationContext(xdom, this.configuration.getDefaultSyntax(), false);
+            new TransformationContext(xdom, this.configuration.getDefaultSyntax(), this.configuration.isResricted());
         transformationContext.setTargetSyntax(this.configuration.getTargetSyntax());
         transformationContext.setId(this.configuration.getTransformationId());
 

@@ -142,6 +142,9 @@ public abstract class AbstractExecutedContentMacro<P> extends AbstractMacro<P>
         // Set the transformation id
         configuration.setTransformationId(context.getTransformationContext().getId());
 
+        // Indicate if we are in a restricted mode
+        configuration.setResricted(context.getTransformationContext().isRestricted());
+
         return configuration;
     }
 }

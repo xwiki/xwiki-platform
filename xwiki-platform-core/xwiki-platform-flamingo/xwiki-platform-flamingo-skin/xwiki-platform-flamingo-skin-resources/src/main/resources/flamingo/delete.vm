@@ -42,6 +42,7 @@
 #template("startpage.vm")
 <div class="main">
   <div id="mainContentArea">
+    #template("hierarchy.vm")
     #define($title)<a href="$doc.getURL('view')">$!escapetool.xml($doc.plainTitle)</a>#end
     #set($titleToDisplay = $services.localization.render('core.delete.title', [$title]))
     <div class="xcontent">

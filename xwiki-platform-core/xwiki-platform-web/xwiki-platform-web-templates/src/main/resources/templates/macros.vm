@@ -1471,12 +1471,12 @@ $Msz MB##
               #set($displayName = "#getLivetableColumnDisplayName($colname, $colprop, $transprefix)")
               #set ($defaultHeaderClass = {'_actions': 'actions', '_avatar': 'avatar'})
               #set ($discard = $colprop.putIfAbsent('headerClass', $defaultHeaderClass.get($colname)))
-              <th scope="col" class="xwiki-livetable-display-header-text $!colprop.headerClass
+              <th scope="col" class="xwiki-livetable-display-header-text $!escapetool.xml($colprop.headerClass)
                   #if ($!colprop.type == 'hidden')hidden#end
                   #if ($isSortable)sortable #if ($colname == $selectedColumn)selected $defaultOrder#else asc#end#end">
-                #if($isSortable)<a rel="${colname}">#end
+                #if($isSortable)<a rel="${escapetool.xml($colname)}">#end
                 #if($isFilterable)<label for="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}">#end
-                $displayName
+                $escapetool.xml($displayName)
                 #if($isFilterable)</label>#end
                 #if($isSortable)</a>#end
                 #set($columnCount = $mathtool.add($columnCount, 1))
@@ -1573,11 +1573,11 @@ $Msz MB##
   #set($escapedTitle = $escapetool.xml($services.localization.render('platform.livetable.filtersTitle',
     [$services.localization.render("${transprefix}$column")])))
   #if ($filterType == 'list' || $filterType == 'multilist')
-    <select id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$column"
+    <select id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$!escapetool.xml($column)"
       #if ($filterType == 'multilist')
         class="xwiki-livetable-multilist" multiple="multiple">
       #else
-        ><option value="">$services.localization.render('platform.livetable.selectAll')</option>
+        ><option value="">$escapetool.xml($services.localization.render('platform.livetable.selectAll'))</option>
         <option disabled="disabled">────</option>
       #end
     #set ($storedValues = $xproperty.listValues)
@@ -1588,17 +1588,17 @@ $Msz MB##
       #if ($displayedValue == $l10nKey)
         #set ($displayedValue = $displayedValues.get($storedValue).value)
       #end
-      <option value="$storedValue">$displayedValue</option>
+      <option value="$!escapetool.xml($storedValue)">$!escapetool.xml($displayedValue)</option>
     #end
     </select>
   #elseif ($filterType == 'boolean')
-    <select id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$column">
+    <select id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$!escapetool.xml($column)">
       <option value="">$services.localization.render('platform.livetable.selectAll')</option>
       <option value="0">$services.localization.render('no')</option>
       <option value="1">$services.localization.render('yes')</option>
     </select>
   #elseif ($filterType == 'text' || $filterType == 'number')
-    <input id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$column" type="text"
+    <input id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$!escapetool.xml($column)" type="text"
       #if ("$!columnProperties.size" != '')size="$!escapetool.xml($columnProperties.size)"#end
       title="$escapedTitle"/>
   #elseif ($filterType == 'suggest' && $xproperty)

@@ -20,7 +20,7 @@
 /*!
 #set ($paths = {
   'css': {
-    'macroWizard': $services.webjars.url('org.xwiki.contrib:application-ckeditor-webjar',
+    'macroWizard': $services.webjars.url('org.xwiki.platform:xwiki-platform-ckeditor-webjar',
       'plugins/xwiki-macro/macroWizard.min.css', {'evaluate': true})
   }
 })

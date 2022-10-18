@@ -20,26 +20,25 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>14.10-SNAPSHOT</version>
+    <artifactId>xwiki-platform-dashboard</artifactId>
+    <version>14.9-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-dashboard</artifactId>
-  <name>XWiki Platform - Dashboard - Parent POM</name>
+  <artifactId>xwiki-platform-dashboard-test</artifactId>
+  <name>XWiki Platform - Dashboard - Test - Parent POM</name>
+  <description>XWiki Platform - Dashboard - Test - Parent POM</description>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Dashboard - Parent POM</description>
   <modules>
-    <module>xwiki-platform-dashboard-ui</module>
-    <module>xwiki-platform-dashboard-macro</module>
+    <module>xwiki-platform-dashboard-test-pageobjects</module>
   </modules>
   <profiles>
     <profile>
-      <id>integration-tests</id>
+      <id>docker</id>
       <modules>
-        <module>xwiki-platform-dashboard-test</module>
+        <module>xwiki-platform-dashboard-test-docker</module>
       </modules>
     </profile>
   </profiles>

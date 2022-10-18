@@ -20,27 +20,26 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-dashboard-test</artifactId>
     <version>14.9-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-dashboard</artifactId>
-  <name>XWiki Platform - Dashboard - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Dashboard - Parent POM</description>
-  <modules>
-    <module>xwiki-platform-dashboard-ui</module>
-    <module>xwiki-platform-dashboard-macro</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-dashboard-test</module>
-      </modules>
-    </profile>
-  </profiles>
+  <artifactId>xwiki-platform-dashboard-test-pageobjects</artifactId>
+  <name>XWiki Platform - Dashboard - Test - Page Objects</name>
+  <description>XWiki Platform - Dashboard - Test - Page Objects</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-ui</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-ckeditor-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

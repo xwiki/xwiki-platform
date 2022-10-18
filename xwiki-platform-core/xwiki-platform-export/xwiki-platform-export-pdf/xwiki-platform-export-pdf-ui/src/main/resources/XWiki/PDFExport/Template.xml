@@ -286,6 +286,19 @@
   }
 
   /**
+   * Table of Contents
+   */
+  /* Distinguish the table of contents entries that correspond to document titles from those that correspond to headings
+    found in the document content. */
+  .pdf-toc &gt; ul &gt; li[data-xwiki-document-reference] {
+    margin-top: 1em;
+
+    &gt; span {
+      font-weight: bolder;
+    }
+  }
+
+  /**
    * Standard Page
    */
   @page {
@@ -311,6 +324,8 @@
 
   /* Marks the beginning of a new XWiki document. */
   h1[data-xwiki-document-reference] {
+    /* Distinguish document titles from the rest of the level 1 headings that may appear in the document content. */
+    font-weight: bolder;
     string-set: chapter-name content(text);
 
     &amp; ~ h1[data-xwiki-document-reference] {

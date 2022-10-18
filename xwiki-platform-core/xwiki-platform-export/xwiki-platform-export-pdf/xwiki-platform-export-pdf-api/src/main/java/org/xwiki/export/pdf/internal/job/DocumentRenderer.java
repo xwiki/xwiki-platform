@@ -52,6 +52,12 @@ import org.xwiki.rendering.transformation.RenderingContext;
 @Singleton
 public class DocumentRenderer
 {
+    /**
+     * The parameter used to mark header blocks that correspond to document titles. In other words, this marks the
+     * beginning of a new document when multiple documents are exported.
+     */
+    public static final String PARAMETER_DOCUMENT_REFERENCE = "data-xwiki-document-reference";
+
     @Inject
     private DocumentAccessBridge documentAccessBridge;
 
@@ -109,7 +115,7 @@ public class DocumentRenderer
             String id = xdom.getIdGenerator().generateUniqueId("H", documentReference);
             HeaderBlock title = new HeaderBlock(titleXDOM.getChildren(), HeaderLevel.LEVEL1, id);
             // Mark the beginning of a new document when multiple documents are rendered.
-            title.setParameter("data-xwiki-document-reference", documentReference);
+            title.setParameter(PARAMETER_DOCUMENT_REFERENCE, documentReference);
             if (xdom.getChildren().isEmpty()) {
                 xdom.addChild(title);
             } else {

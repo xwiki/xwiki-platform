@@ -331,7 +331,7 @@
   margin-right: 1em;
 }
 
-#advanced .xform {
+#standard .xform, #advanced .xform {
   margin-top: floor(@font-size-base * 1.4);
 }</code>
     </property>

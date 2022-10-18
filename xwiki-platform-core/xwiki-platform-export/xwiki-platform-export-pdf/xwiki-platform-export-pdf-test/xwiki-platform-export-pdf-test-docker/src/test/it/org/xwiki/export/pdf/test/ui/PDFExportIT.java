@@ -31,7 +31,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.Network;
-import org.testcontainers.utility.ResourceReaper;
 import org.xwiki.export.pdf.internal.docker.ContainerManager;
 import org.xwiki.export.pdf.test.po.ExportModal;
 import org.xwiki.export.pdf.test.po.PDFDocument;
@@ -42,6 +41,7 @@ import org.xwiki.export.pdf.test.po.PDFTemplateEditPage;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -65,7 +65,8 @@ class PDFExportIT
     @BeforeAll
     static void configure()
     {
-        ResourceReaper.instance().registerLabelsFilterForCleanup(ContainerManager.DEFAULT_LABELS);
+        // Cleanup the Chrome Docker containers used for PDF export.
+        DockerTestUtils.cleanupContainersWithLabels(ContainerManager.DEFAULT_LABELS);
     }
 
     @Test

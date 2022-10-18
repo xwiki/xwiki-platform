@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.testcontainers.containers.Network;
 import org.xwiki.export.pdf.internal.docker.ContainerManager;
 import org.xwiki.export.pdf.test.po.ExportModal;
@@ -60,6 +61,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 14.5
  */
 @UITest(extraJARs = {"org.xwiki.platform:xwiki-platform-resource-temporary"})
+@ExtendWith(PDFExportExecutionCondition.class)
 class PDFExportIT
 {
     @BeforeAll

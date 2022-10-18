@@ -31,6 +31,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.export.pdf.internal.job.DocumentRenderer;
 import org.xwiki.export.pdf.internal.job.PDFExportJob;
 import org.xwiki.export.pdf.job.PDFExportJobRequest;
 import org.xwiki.export.pdf.job.PDFExportJobStatus;
@@ -42,6 +43,7 @@ import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.HeaderBlock;
+import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.renderer.event.EventBlockRenderer;
@@ -206,6 +208,37 @@ class PDFTocMacroTest
             "onWord [First Heading]",
             "endLink [Typed = [true] Type = [doc]] [false]",
             "endListItem",
+            "endList [BULLETED]",
+            ""
+        );
+        assertBlockEvents(StringUtils.join(events, "\n"), output.get(0));
+    }
+
+    @Test
+    void executeWithDocumentTitles() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("test", "Some", "Page");
+        HeaderBlock header =
+            new HeaderBlock(Collections.singletonList(new WordBlock("Document Title")), HeaderLevel.LEVEL1);
+        header.setParameter(DocumentRenderer.PARAMETER_DOCUMENT_REFERENCE, "test:Some.Page");
+        XDOM xdom = new XDOM(
+            Arrays.asList(header, new ParagraphBlock(Collections.singletonList(new WordBlock("document content")))));
+        this.jobStatus.getDocumentRenderingResults().clear();
+        this.jobStatus.getDocumentRenderingResults()
+            .add(new DocumentRenderingResult(documentReference, xdom, "rendered content"));
+
+        when(this.jobStatusStore.getJobStatus(jobId)).thenReturn(this.jobStatus);
+        when(this.documentAccessBridge.getCurrentUserReference()).thenReturn(this.aliceReference);
+
+        List<Block> output = this.pdfTocMacro.execute(this.parameters, null, this.context);
+
+        List<String> events = Arrays.asList(
+            "beginList [BULLETED]",
+            "beginListItem [[data-xwiki-document-reference]=[test:Some.Page]]",
+            "beginLink [Typed = [true] Type = [doc]] [false]",
+            "onWord [Document Title]",
+            "endLink [Typed = [true] Type = [doc]] [false]",
+            "endListItem [[data-xwiki-document-reference]=[test:Some.Page]]",
             "endList [BULLETED]",
             ""
         );

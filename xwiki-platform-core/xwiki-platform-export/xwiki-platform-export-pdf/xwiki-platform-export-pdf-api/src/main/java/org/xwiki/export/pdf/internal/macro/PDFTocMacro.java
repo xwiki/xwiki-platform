@@ -110,7 +110,7 @@ public class PDFTocMacro extends AbstractMacro<PDFTocMacroParameters>
     {
         super.initialize();
 
-        this.tocTreeBuilder = new TocTreeBuilder(new TocBlockFilter(this.plainTextParser, this.linkLabelGenerator));
+        this.tocTreeBuilder = new PDFTocTreeBuilder(new TocBlockFilter(this.plainTextParser, this.linkLabelGenerator));
     }
 
     @Override

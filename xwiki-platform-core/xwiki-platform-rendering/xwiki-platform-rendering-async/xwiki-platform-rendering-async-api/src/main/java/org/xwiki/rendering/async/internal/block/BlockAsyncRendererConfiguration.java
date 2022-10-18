@@ -61,6 +61,8 @@ public class BlockAsyncRendererConfiguration extends AsyncRendererConfiguration
 
     private boolean inline;
 
+    private boolean resricted;
+
     private BlockAsyncRendererDecorator decorator;
 
     private Set<EntityReference> references;
@@ -236,6 +238,28 @@ public class BlockAsyncRendererConfiguration extends AsyncRendererConfiguration
     public void setInline(boolean inline)
     {
         this.inline = inline;
+    }
+
+    /**
+     * @return indicator of whether the transformation context is restricted or not
+     * @since 14.9
+     * @since 14.4.6
+     * @since 13.10.10
+     */
+    public boolean isResricted()
+    {
+        return this.resricted;
+    }
+
+    /**
+     * @param resricted indicator of whether the transformation context is restricted or not
+     * @since 14.9
+     * @since 14.4.6
+     * @since 13.10.10
+     */
+    public void setResricted(boolean resricted)
+    {
+        this.resricted = resricted;
     }
 
     /**

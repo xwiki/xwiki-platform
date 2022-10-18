@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.box;
+package org.xwiki.rendering.async;
 
 import java.util.List;
 
@@ -33,7 +33,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
-import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.async.internal.AsyncRendererJobRequest;
 import org.xwiki.rendering.async.internal.AsyncRendererJobStatus;
 import org.xwiki.rendering.test.integration.RenderingTestSuite;

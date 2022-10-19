@@ -31,7 +31,9 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.ViewPage;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.equalTo;
 
 /**
  * Main docker test suite for the Dashboard extension.
@@ -57,7 +59,8 @@ class DashboardIT
         WebElement macroEntry = macroDialogSelectModal.getFirstMacro().orElseThrow();
         // We check that some css property are correctly applied on the listed macros (see XWIKI-20235). 
         String cssValue = macroEntry.getCssValue("color");
-        assertEquals("rgb(51, 51, 51)", cssValue);
+        // Implicit opacity is not always removed browsers, so we need to check on both cases.
+        assertThat(cssValue, anyOf(equalTo("rgb(51, 51, 51)"), equalTo("rgba(51, 51, 51, 1)")));
         macroEntry.click();
         MacroDialogEditModal macroDialogEditModal = macroDialogSelectModal.clickSelect();
         macroDialogEditModal.clickSubmit();

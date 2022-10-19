@@ -281,9 +281,6 @@
   .pdf-cover h1 {
     font-weight: bolder;
   }
-  .pdf-cover a.user-name {
-    text-decoration: none;
-  }
 
   /**
    * Table of Contents
@@ -318,7 +315,7 @@
   }
 
   .pdf-header {
-    color: @text-muted !important;
+    color: @text-muted;
     position: running(header);
   }
 
@@ -334,13 +331,12 @@
   }
 
   .pdf-chapter-name:before {
-    color: @text-muted !important;
     content: string(chapter-name);
   }
 
   /* Style the footer. We use PagedJS classes because the footer is currently generated using only CSS. */
   .pagedjs_page .pagedjs_margin-bottom-center .pagedjs_margin-content::after {
-    color: @text-muted !important;
+    color: @text-muted;
   }
 
   /**
@@ -352,6 +348,19 @@
 
   .page-landscape {
     page: landscape;
+  }
+
+  /**
+   * Style Cleanup
+   * Remove styles that don't make much sense when printing to PDF.
+   */
+  body {
+    background-color: unset;
+  }
+
+  *, *:before, *:after {
+    // Box shadows don't look good in PDF.
+    box-shadow: none !important;
   }
 }</code>
     </property>

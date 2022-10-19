@@ -33,6 +33,8 @@
 ## Compute all the meta attributes to add to the HTML tag.
 ## ---------------------------------------------------------------------------------------------------------------
 #set ($metaAttributes = [])
+## Target the paper paged media by default when using the print feature provided by the web browser.
+#addMetaAttribute($metaAttributes, 'paged-media', 'paper')
 #if("$!doc" != "" && "$!tdoc" != "")
   ## NOTE: you should not use these attributes in javascript directly, but via the 'xwiki-meta' module instead:
   ## http://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/FrontendResources/JavaScriptAPI/#HGetsomeinformationaboutthecurrentdocument

@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -59,13 +60,13 @@ public class DefaultRetrieveUsernameManager implements RetrieveUsernameManager
     private QueryManager queryManager;
 
     @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
+    private Provider<WikiDescriptorManager> wikiDescriptorManagerProvider;
 
     @Inject
     private UserReferenceResolver<String> userReferenceResolver;
 
     @Inject
-    private AuthenticationMailSender authenticationMailSender;
+    private Provider<AuthenticationMailSender> authenticationMailSenderProvider;
 
     @Override
     public Set<UserReference> findUsers(String requestEmail) throws RetrieveUsernameException
@@ -84,7 +85,7 @@ public class DefaultRetrieveUsernameManager implements RetrieveUsernameManager
                 .bindValue("email", StringUtils.toRootLowerCase(requestEmail));
 
             if (mainWiki) {
-                query = query.setWiki(this.wikiDescriptorManager.getMainWikiId());
+                query = query.setWiki(this.wikiDescriptorManagerProvider.get().getMainWikiId());
             }
 
             List<String> userSerializedReferences = query.execute();
@@ -106,7 +107,7 @@ public class DefaultRetrieveUsernameManager implements RetrieveUsernameManager
         }
         try {
             InternetAddress email = new InternetAddress(requestEmail);
-            this.authenticationMailSender.sendRetrieveUsernameEmail(email, userReferences);
+            this.authenticationMailSenderProvider.get().sendRetrieveUsernameEmail(email, userReferences);
         } catch (AddressException e) {
             throw new RetrieveUsernameException(
                 String.format("Error with the given email adresse: [%s]", requestEmail), e);

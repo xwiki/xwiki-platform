@@ -158,7 +158,8 @@ export function initWrapper(displayer, {props, logic, editBus, mocks})
           put() {},
           reset() {},
           list() { return []; }
-        }
+        },
+        isContentTrusted: () => true
       }, logic),
     },
     mocks: Object.assign({

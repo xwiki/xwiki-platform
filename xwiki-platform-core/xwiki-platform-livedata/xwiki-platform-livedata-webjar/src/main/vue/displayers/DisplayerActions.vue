@@ -46,7 +46,7 @@
           :key="action.id"
           :class="'action action_' + action.id"
           :title="action.description"
-          :href="entry[action.urlProperty] || '#'"
+          :href="sanitizeUrl(entry[action.urlProperty]) || '#'"
         >
           <XWikiIcon :iconDescriptor="action.icon" /><span class="action-name">{{ action.name }}</span>
         </a>

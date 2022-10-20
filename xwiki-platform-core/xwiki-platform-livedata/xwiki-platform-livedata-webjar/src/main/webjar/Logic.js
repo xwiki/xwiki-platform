@@ -105,6 +105,7 @@ define('xwiki-livedata', [
   const Logic = function (element) {
     this.element = element;
     this.data = JSON.parse(element.getAttribute("data-config") || "{}");
+    this.contentTrusted = element.getAttribute("data-config-content-trusted") === "true";
     if(this.data.entries) {
       // Calling Object.freeze(undefined) on IE11 triggers an exception. 
       this.data.entries = Object.freeze(this.data.entries);
@@ -1467,6 +1468,18 @@ define('xwiki-livedata', [
 
     getEditBus() {
       return editBus;
+    },
+
+    //
+    // Content status
+    //
+
+    /**
+     * @returns {boolean} when false, the content is not trusted will be sanitized whenever Vue integrated escaping
+     * is not enough. When true, the content is never sanitized
+     */
+    isContentTrusted() {
+      return this.contentTrusted;
     }
   };
 

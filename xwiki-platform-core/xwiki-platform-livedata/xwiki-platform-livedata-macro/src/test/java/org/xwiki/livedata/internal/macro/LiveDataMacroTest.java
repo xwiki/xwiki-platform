@@ -27,6 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataQuery;
@@ -41,6 +42,7 @@ import org.xwiki.rendering.internal.renderer.xhtml.image.DefaultXHTMLImageTypeRe
 import org.xwiki.rendering.internal.renderer.xhtml.link.DefaultXHTMLLinkRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.link.DefaultXHTMLLinkTypeRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -58,8 +60,16 @@ import static org.xwiki.rendering.test.integration.junit5.BlockAssert.assertBloc
  * @since 12.10
  */
 @ComponentTest
-@ComponentList({HTML5RendererFactory.class, HTML5Renderer.class, DefaultXHTMLLinkRenderer.class,
-    DefaultXHTMLLinkTypeRenderer.class, DefaultXHTMLImageRenderer.class, DefaultXHTMLImageTypeRenderer.class})
+@ComponentList({
+    HTML5RendererFactory.class,
+    HTML5Renderer.class,
+    DefaultXHTMLLinkRenderer.class,
+    DefaultXHTMLLinkTypeRenderer.class,
+    DefaultXHTMLImageRenderer.class,
+    DefaultXHTMLImageTypeRenderer.class,
+    LiveDataMacroConfiguration.class,
+    LiveDataMacroRights.class
+})
 class LiveDataMacroTest
 {
     @InjectMockComponents
@@ -70,6 +80,12 @@ class LiveDataMacroTest
 
     @MockComponent
     private LiveDataConfigurationResolver<String> stringConfigResolver;
+
+    @MockComponent
+    private DocumentAccessBridge documentAccessBridge;
+
+    @MockComponent
+    private AuthorizationManager authorizationManager;
 
     private PrintRendererFactory rendererFactory;
 
@@ -95,7 +111,8 @@ class LiveDataMacroTest
     void executeWithoutParams() throws Exception
     {
         String expectedConfig = json("{'query':{'source':{}},'meta':{'pagination':{}}}");
-        String expected = "<div class=\"liveData loading\" data-config=\"" + escapeXML(expectedConfig) + "\"></div>";
+        String expected = "<div class=\"liveData loading\" data-config=\"" + escapeXML(expectedConfig) + "\" "
+            + "data-config-content-trusted=\"true\"></div>";
 
         List<Block> blocks = this.liveDataMacro.execute(new LiveDataMacroParameters(), null, null);
         assertBlocks(expected, blocks, this.rendererFactory);
@@ -133,8 +150,8 @@ class LiveDataMacroTest
         expectedConfig.append("  }".trim());
         expectedConfig.append("}");
 
-        String expected = "<div class=\"liveData loading\" id=\"test\" data-config=\""
-            + escapeXML(json(expectedConfig.toString())) + "\"></div>";
+        String expected = String.format("<div class=\"liveData loading\" id=\"test\" data-config=\"%s\" "
+            + "data-config-content-trusted=\"true\"></div>", escapeXML(json(expectedConfig.toString())));
 
         LiveDataMacroParameters parameters = new LiveDataMacroParameters();
         parameters.setId("test");
@@ -192,8 +209,8 @@ class LiveDataMacroTest
         expectedConfig.append("  }".trim());
         expectedConfig.append("}");
 
-        String expected = "<div class=\"liveData loading\" id=\"test\" data-config=\""
-            + escapeXML(json(expectedConfig.toString())) + "\"></div>";
+        String expected = String.format("<div class=\"liveData loading\" id=\"test\" data-config=\"%s\" "
+            + "data-config-content-trusted=\"false\"></div>", escapeXML(json(expectedConfig.toString())));
 
         List<Block> blocks = this.liveDataMacro.execute(parameters, "{...}", null);
         assertBlocks(expected, blocks, this.rendererFactory);

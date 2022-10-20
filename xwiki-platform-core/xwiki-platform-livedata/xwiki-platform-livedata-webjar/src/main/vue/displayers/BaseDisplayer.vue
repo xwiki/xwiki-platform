@@ -71,10 +71,9 @@
             -->
             <span>{{ value }}</span>
           </slot>
-          <span
-            v-if="!isViewable"
-            v-html="$t('livedata.displayer.emptyValue')"
-          ></span>
+          <span v-if="!isViewable">
+            {{ $t('livedata.displayer.emptyValue') }}<sup>*</sup>
+          </span>
         </div>
 
         <!-- The slot containing the displayer Editor widget -->
@@ -116,7 +115,7 @@
           :close-popover="closePopover"
         />
         <ActionFollowLink
-          :displayer="{ href }"
+          :displayer="{ href: sanitizeUrl(href) }"
           v-if="href"
           :close-popover="closePopover"
         />

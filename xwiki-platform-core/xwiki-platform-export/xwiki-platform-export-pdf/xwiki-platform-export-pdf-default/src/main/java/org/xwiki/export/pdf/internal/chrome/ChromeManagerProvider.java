@@ -20,6 +20,9 @@
 package org.xwiki.export.pdf.internal.chrome;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -29,10 +32,7 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.phase.Disposable;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.browser.BrowserManager;
 import org.xwiki.export.pdf.internal.docker.ContainerManager;
@@ -48,7 +48,7 @@ import com.github.dockerjava.api.model.HostConfig;
 @Component
 @Singleton
 @Named("chrome")
-public class ChromeManagerProvider implements Provider<BrowserManager>, Initializable, Disposable
+public class ChromeManagerProvider implements Provider<BrowserManager>, Disposable
 {
     private static final String BRIDGE_NETWORK = "bridge";
 
@@ -78,22 +78,76 @@ public class ChromeManagerProvider implements Provider<BrowserManager>, Initiali
      */
     private boolean isContainerCreator;
 
+    /**
+     * We store the previous configuration values in order to detect when the configuration changes.
+     */
+    private Map<String, Object> previousConfig;
+
     @Override
-    public void initialize() throws InitializationException
+    public void dispose()
+    {
+        disconnect();
+    }
+
+    @Override
+    public BrowserManager get()
+    {
+        if (configurationChanged()) {
+            disconnect();
+            connect();
+        }
+
+        return this.chromeManager;
+    }
+
+    private synchronized boolean configurationChanged()
+    {
+        Map<String, Object> nextConfig = copyConfiguration();
+        boolean changed = !Objects.equals(this.previousConfig, nextConfig);
+        this.previousConfig = nextConfig;
+        return changed;
+    }
+
+    /**
+     * @return a copy of the configuration properties that influence the connection with the Chrome web browser
+     */
+    private Map<String, Object> copyConfiguration()
+    {
+        Map<String, Object> config = new HashMap<>();
+        config.put("chromeHost", this.configuration.getChromeHost());
+        config.put("chromeRemoteDebuggingPort", this.configuration.getChromeRemoteDebuggingPort());
+        config.put("chromeDockerImage", this.configuration.getChromeDockerImage());
+        config.put("chromeDockerContainerName", this.configuration.getChromeDockerContainerName());
+        config.put("dockerNetwork", this.configuration.getDockerNetwork());
+        return config;
+    }
+
+    private void disconnect()
+    {
+        this.chromeManager.close();
+
+        if (this.containerId != null && this.isContainerCreator) {
+            this.containerManagerProvider.get().stopContainer(this.containerId);
+            this.containerId = null;
+            this.isContainerCreator = false;
+        }
+    }
+
+    private void connect()
     {
         String chromeHost = this.configuration.getChromeHost();
         if (StringUtils.isBlank(chromeHost)) {
-            chromeHost = initializeChromeDockerContainer(this.configuration.getChromeDockerImage(),
+            chromeHost = prepareChromeDockerContainer(this.configuration.getChromeDockerImage(),
                 this.configuration.getChromeDockerContainerName(), this.configuration.getDockerNetwork(),
                 this.configuration.getChromeRemoteDebuggingPort());
         }
-        initializeChromeService(chromeHost, this.configuration.getChromeRemoteDebuggingPort());
+        connectChromeService(chromeHost, this.configuration.getChromeRemoteDebuggingPort());
     }
 
-    private String initializeChromeDockerContainer(String imageName, String containerName, String network,
-        int remoteDebuggingPort) throws InitializationException
+    private String prepareChromeDockerContainer(String imageName, String containerName, String network,
+        int remoteDebuggingPort)
     {
-        this.logger.debug("Initializing the Docker container running the headless Chrome web browser.");
+        this.logger.debug("Preparing the Docker container running the headless Chrome web browser.");
         ContainerManager containerManager = this.containerManagerProvider.get();
         try {
             this.containerId = containerManager.maybeReuseContainerByName(containerName);
@@ -135,38 +189,16 @@ public class ChromeManagerProvider implements Provider<BrowserManager>, Initiali
             }
             return chromeHost;
         } catch (Exception e) {
-            throw new InitializationException("Failed to initialize the Docker container for the PDF export.", e);
+            throw new RuntimeException("Failed to prepare the Docker container for the PDF export.", e);
         }
     }
 
-    private void initializeChromeService(String host, int remoteDebuggingPort) throws InitializationException
+    private void connectChromeService(String host, int remoteDebuggingPort)
     {
         try {
             this.chromeManager.connect(host, remoteDebuggingPort);
         } catch (Exception e) {
-            throw new InitializationException("Failed to initialize the Chrome remote debugging service.", e);
+            throw new RuntimeException("Failed to connect to the Chrome remote debugging service.", e);
         }
-    }
-
-    @Override
-    public void dispose() throws ComponentLifecycleException
-    {
-        this.chromeManager.close();
-
-        if (this.containerId != null && this.isContainerCreator) {
-            try {
-                this.containerManagerProvider.get().stopContainer(this.containerId);
-            } catch (Exception e) {
-                throw new ComponentLifecycleException(
-                    String.format("Failed to stop the Docker container [%s] used for PDF export.", this.containerId),
-                    e);
-            }
-        }
-    }
-
-    @Override
-    public BrowserManager get()
-    {
-        return this.chromeManager;
     }
 }

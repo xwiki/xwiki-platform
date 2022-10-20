@@ -39,6 +39,12 @@ public class WebDriverFactory
 {
     public XWikiWebDriver createWebDriver(String browserName)
     {
+        // Tell Webdriver to use Java11+'s bundled HTTP client instead of AsyncHttpClient.
+        // This is to avoid https://github.com/SeleniumHQ/selenium/issues/9528#issuecomment-1282482248
+        // See also https://www.selenium.dev/blog/2022/using-java11-httpclient/
+        // To be removed once https://github.com/SeleniumHQ/selenium/issues/9528 is fixed.
+        System.setProperty("webdriver.http.factory", "jdk-http-client");
+
         WebDriver driver;
         if (browserName.startsWith("*firefox")) {
             // Note: the Gecko driver needs to be set as a system property under the "webdriver.gecko.driver" key for

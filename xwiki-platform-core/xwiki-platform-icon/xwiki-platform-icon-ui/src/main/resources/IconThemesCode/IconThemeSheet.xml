@@ -44,7 +44,7 @@ This document is an Icon Theme.
 
 
 {{{
-$doc.content
+$doc.content.replace('}}}', '~}}}')
 }}}
 #else
 Sheet of [[IconThemesCode.IconThemeClass]]

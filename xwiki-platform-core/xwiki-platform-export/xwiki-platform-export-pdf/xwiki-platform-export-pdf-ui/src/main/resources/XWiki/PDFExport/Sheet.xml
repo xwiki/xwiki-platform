@@ -73,6 +73,9 @@
   #set ($discard = $xwiki.jsx.use($sheetReference))
   ## Output the HTML header but without the garbage from the start of the BODY tag.
   #set ($htmlHeader = "#template('htmlheader.vm')")
+  ## The PDF export doesn't target only the paper paged media, and we want to preserve the styles from the XWiki skin as
+  ## much as possible.
+  #set ($htmlHeader = $htmlHeader.replace('data-xwiki-paged-media="paper"', ''))
   #set ($headTagEnd = $htmlHeader.indexOf('&lt;/head&gt;'))
   #set ($bodyTagStart = $htmlHeader.indexOf('&lt;body'))
   #set ($bodyContentStart = $htmlHeader.indexOf('&gt;', $bodyTagStart) + 1)
@@ -466,10 +469,6 @@
     background-color: white !important;
     padding-right: .5em;
   }
-  .pdf-toc ul a,
-  .pdf-toc ul a:visited {
-    text-decoration: none;
-  }
 
   /* Page number */
   .pdf-toc ul a::after {
@@ -495,8 +494,11 @@
   /**
    * Content
    */
-  a:link::after, a:visited::after {
-    content: none;
+  /* Browsers try to improve the contrast in order to generate print-friendly PDFs and for this they change the colors
+    we specify in CSS. The following rules tell the browser to preserve our colors. */
+  html:not([data-xwiki-paged-media=paper]) * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 
   table {
@@ -562,7 +564,7 @@
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>

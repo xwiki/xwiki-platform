@@ -40,10 +40,6 @@
 export.pdf.options.template.hint=The PDF template controls the information displayed on the cover page, in the table of contents as well as in the header and footer of each page.
 export.pdf.options.loadFailure=Failed to load the PDF export options.
 
-export.pdf.serverSidePrinting.checking=Checking if server-side PDF printing is available...
-export.pdf.serverSidePrinting.unavailable=Server-side PDF printing is currently unavailable. Please contact your administrator.
-export.pdf.serverSidePrinting.checkFailed=Failed to check if server-side PDF printing is available.
-
 export.pdf.modal.close=Close
 export.pdf.inProgress=Exporting as PDF...
 export.pdf.failed=Failed to export as PDF
@@ -51,6 +47,7 @@ export.pdf.lastError=The PDF export log contains errors: {0}
 export.pdf.canceling=Canceling PDF export...
 export.pdf.canceled=PDF export canceled
 export.pdf.cancelFailed=Failed to cancel the PDF export
+export.pdf.loading=Loading...
 
 export.pdf.templates.default=Default template
 export.pdf.templates.default.versionInfo=Version {0} authored by {1} on {2}
@@ -62,6 +59,8 @@ export.pdf.template.skinExtensionInfo=The CSS and JavaScript skin extensions pro
 admin.export.pdf=PDF Export
 admin.export.pdf.description=Configure how wiki pages are exported to PDF.
 
+export.pdf.admin.status=Status
+export.pdf.admin.configuration=Configuration
 export.pdf.admin.saveComment=Updated the PDF export configuration from the Administration
 export.pdf.admin.reset=Reset
 export.pdf.admin.reset.hint=Restore the default configuration
@@ -72,6 +71,10 @@ export.pdf.config.empty=(empty)
 
 export.pdf.generator.label=Generator
 export.pdf.generator.hint=The tool used to generate the PDF.
+export.pdf.generator.checking=Checking if the PDF generator is available...
+export.pdf.generator.checkFailed=Failed to check if the PDF generator is available.
+export.pdf.generator.available=Available
+export.pdf.generator.unavailable=The PDF generator is currently unavailable.
 export.pdf.generator.userBrowser.label=User Browser
 export.pdf.generator.userBrowser.hint=The PDF is generated client-side using the print function provided by the user's own web browser.
 export.pdf.generator.chromeDockerContainer.label=Chrome Docker Container

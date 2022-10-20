@@ -47,8 +47,9 @@ class PDFExportIT
     @BeforeEach
     void beforeEach(TestConfiguration testConfiguration)
     {
-        String host = testConfiguration.getServletEngine().getHostIP();
-        this.prefix = String.format("http://%s:8080/", host);
+        String host = testConfiguration.getServletEngine().getIP();
+        int port = testConfiguration.getServletEngine().getPort();
+        this.prefix = String.format("http://%s:%s/", host, port);
     }
 
     /**
@@ -87,7 +88,7 @@ class PDFExportIT
         try (PDFDocument document = new PDFDocument(pdfURL)) {
             Map<String, String> links = document.getLinks();
             assertTrue(links.containsKey("XWikiLogo.png"));
-            assertEquals("http://localhost:8080/xwiki/bin/download/Sandbox/WebHome/XWikiLogo.png?rev=1.1",
+            assertEquals(String.format("%sxwiki/bin/download/Sandbox/WebHome/XWikiLogo.png?rev=1.1", this.prefix),
                 links.get("XWikiLogo.png"));
 
             // Ideally we should be asserting for a value of 1 (for the embedded XWikiLogo.png image) but it seems the

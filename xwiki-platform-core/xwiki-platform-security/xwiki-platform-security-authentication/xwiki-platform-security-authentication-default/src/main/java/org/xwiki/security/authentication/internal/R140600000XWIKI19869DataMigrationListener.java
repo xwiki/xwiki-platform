@@ -75,7 +75,7 @@ public class R140600000XWIKI19869DataMigrationListener extends AbstractEventList
     private Provider<ResetPasswordManager> resetPasswordManagerProvider;
 
     @Inject
-    private Provider<ResetPasswordMailSender> resetPasswordMailSenderProvider;
+    private Provider<AuthenticationMailSender> resetPasswordMailSenderProvider;
 
     @Inject
     private Provider<UserReferenceResolver<String>> userReferenceResolverProvider;

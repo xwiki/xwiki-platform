@@ -20,13 +20,7 @@
 package org.xwiki.export.pdf.internal.chrome;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.net.InetSocketAddress;
-import java.net.URI;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
@@ -36,26 +30,14 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.export.pdf.browser.BrowserManager;
 import org.xwiki.export.pdf.browser.BrowserTab;
 
 import com.github.kklisura.cdt.protocol.commands.Target;
 import com.github.kklisura.cdt.services.ChromeDevToolsService;
 import com.github.kklisura.cdt.services.ChromeService;
-import com.github.kklisura.cdt.services.WebSocketService;
-import com.github.kklisura.cdt.services.config.ChromeDevToolsServiceConfiguration;
-import com.github.kklisura.cdt.services.exceptions.ChromeServiceException;
-import com.github.kklisura.cdt.services.exceptions.WebSocketServiceException;
-import com.github.kklisura.cdt.services.factory.WebSocketServiceFactory;
-import com.github.kklisura.cdt.services.impl.ChromeDevToolsServiceImpl;
-import com.github.kklisura.cdt.services.impl.ChromeServiceImpl;
-import com.github.kklisura.cdt.services.impl.WebSocketServiceImpl;
-import com.github.kklisura.cdt.services.invocation.CommandInvocationHandler;
 import com.github.kklisura.cdt.services.types.ChromeTab;
 import com.github.kklisura.cdt.services.types.ChromeVersion;
-import com.github.kklisura.cdt.services.utils.ProxyUtils;
 
 /**
  * Help interact with the headless Chrome web browser.
@@ -67,7 +49,7 @@ import com.github.kklisura.cdt.services.utils.ProxyUtils;
 @Component
 @Singleton
 @Named("chrome")
-public class ChromeManager implements BrowserManager, Initializable
+public class ChromeManager implements BrowserManager
 {
     /**
      * The number of seconds to wait for Chrome remote debugging before giving up.
@@ -77,7 +59,8 @@ public class ChromeManager implements BrowserManager, Initializable
     @Inject
     private Logger logger;
 
-    private WebSocketServiceFactory webSocketServiceFactory;
+    @Inject
+    private ChromeServiceFactory chromeServiceFactory;
 
     /**
      * The top level service used to interact with the browser.
@@ -90,32 +73,20 @@ public class ChromeManager implements BrowserManager, Initializable
      */
     private ChromeDevToolsService browserDevToolsService;
 
-    private InetSocketAddress chromeAddress;
-
-    @Override
-    public void initialize() throws InitializationException
-    {
-        this.webSocketServiceFactory = (webSocketURL -> WebSocketServiceImpl.create(URI.create(webSocketURL)));
-    }
-
     @Override
     public void connect(String host, int remoteDebuggingPort) throws TimeoutException
     {
-        this.logger.debug("Connecting to the Chrome remote debugging service on [{}:{}].", host, remoteDebuggingPort);
-        InetSocketAddress newChromeAddress = InetSocketAddress.createUnresolved(host, remoteDebuggingPort);
-        if (!Objects.equals(this.chromeAddress, newChromeAddress)) {
-            // Connect to the new address.
-            this.chromeAddress = newChromeAddress;
-            this.chromeService = new ChromeServiceImpl(host, remoteDebuggingPort, this.webSocketServiceFactory);
+        if (this.browserDevToolsService != null) {
+            throw new IllegalStateException(
+                "Chrome is already connected. Please close the current connection before establishing a new one.");
         }
 
-        // Close the previous WebSocket session.
-        if (this.browserDevToolsService != null) {
-            this.browserDevToolsService.close();
-        }
+        this.logger.debug("Connecting to the Chrome remote debugging service on [{}:{}].", host, remoteDebuggingPort);
+        this.chromeService = this.chromeServiceFactory.createChromeService(host, remoteDebuggingPort);
+
         // Create a new WebSocket session.
         ChromeVersion chromeVersion = waitForChromeService(REMOTE_DEBUGGING_TIMEOUT);
-        createBrowserDevToolsService(chromeVersion);
+        this.browserDevToolsService = this.chromeServiceFactory.createBrowserDevToolsService(chromeVersion);
     }
 
     @Override
@@ -171,6 +142,10 @@ public class ChromeManager implements BrowserManager, Initializable
     @Override
     public BrowserTab createIncognitoTab() throws IOException
     {
+        if (this.browserDevToolsService == null) {
+            throw new IllegalStateException("The Chrome web browser is not connected.");
+        }
+
         this.logger.debug("Creating incognito tab.");
         Target browserTarget = this.browserDevToolsService.getTarget();
 
@@ -190,53 +165,13 @@ public class ChromeManager implements BrowserManager, Initializable
         }
     }
 
-    /**
-     * Opens a WebSocket connection / session between XWiki and Chrome's remote debugging service, that allows us to
-     * control the Chrome web browser (create new tabs, load web pages, etc.).
-     * <p>
-     * Code adapted from {@link ChromeServiceImpl#createDevToolsService(ChromeTab)}. The main difference is that we're
-     * connecting to the browser WebSocket end-point rather than to a tab end-point (otherwise we wouldn't be able /
-     * allowed to create a new browser context).
-     * 
-     * @param chromeVersion provides information about the Chrome version, including the WebSocket debugger URL
-     * @throws ChromeServiceException if connecting to the browser WebSocket end-point fails
-     */
-    private void createBrowserDevToolsService(ChromeVersion chromeVersion) throws ChromeServiceException
-    {
-        try {
-            // Connect to the browser via WebSocket.
-            String webSocketDebuggerUrl = chromeVersion.getWebSocketDebuggerUrl();
-            WebSocketService webSocketService =
-                this.webSocketServiceFactory.createWebSocketService(webSocketDebuggerUrl);
-
-            // Create invocation handler.
-            CommandInvocationHandler commandInvocationHandler = new CommandInvocationHandler();
-
-            // Setup command cache for this session.
-            Map<Method, Object> commandsCache = new ConcurrentHashMap<>();
-
-            // Create developer tools service.
-            this.browserDevToolsService = ProxyUtils.createProxyFromAbstract(ChromeDevToolsServiceImpl.class,
-                new Class[] {WebSocketService.class, ChromeDevToolsServiceConfiguration.class},
-                new Object[] {webSocketService, new ChromeDevToolsServiceConfiguration()},
-                (unused, method, args) -> commandsCache.computeIfAbsent(method, key -> {
-                    Class<?> returnType = method.getReturnType();
-                    return ProxyUtils.createProxy(returnType, commandInvocationHandler);
-                }));
-
-            // Register developer tools service with invocation handler.
-            commandInvocationHandler.setChromeDevToolsService(this.browserDevToolsService);
-        } catch (WebSocketServiceException e) {
-            throw new ChromeServiceException("Failed to connect to the browser web socket.", e);
-        }
-    }
-
     @Override
     public void close()
     {
-        this.chromeAddress = null;
         this.chromeService = null;
-        this.browserDevToolsService.close();
-        this.browserDevToolsService = null;
+        if (this.browserDevToolsService != null) {
+            this.browserDevToolsService.close();
+            this.browserDevToolsService = null;
+        }
     }
 }

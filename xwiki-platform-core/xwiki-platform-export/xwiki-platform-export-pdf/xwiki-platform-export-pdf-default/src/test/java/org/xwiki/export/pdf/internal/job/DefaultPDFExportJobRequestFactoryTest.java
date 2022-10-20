@@ -40,6 +40,7 @@ import org.xwiki.export.pdf.job.PDFExportJobRequest;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -108,6 +109,7 @@ class DefaultPDFExportJobRequestFactoryTest
 
         XWikiDocument currentDocument = mock(XWikiDocument.class);
         when(currentDocument.getDocumentReference()).thenReturn(new DocumentReference("test", "Some", "Page"));
+        when(currentDocument.getRenderedTitle(Syntax.PLAIN_1_0, this.xcontext)).thenReturn("Page Title");
         when(this.xcontext.getDoc()).thenReturn(currentDocument);
         when(this.localStringEntityReferenceSerializer
             .serialize(currentDocument.getDocumentReference().getLastSpaceReference())).thenReturn("Some");
@@ -162,6 +164,7 @@ class DefaultPDFExportJobRequestFactoryTest
 
         assertEquals(3, request.getId().size());
         assertEquals(Arrays.asList("export", "pdf"), request.getId().subList(0, 2));
+        assertFalse(request.isStatusSerialized());
         assertFalse(request.isServerSide());
 
         assertTrue(request.isCheckRights());
@@ -182,6 +185,8 @@ class DefaultPDFExportJobRequestFactoryTest
         assertFalse(request.isWithToc());
         assertTrue(request.isWithHeader());
         assertTrue(request.isWithFooter());
+
+        assertEquals("Page Title.pdf", request.getFileName());
     }
 
     @Test

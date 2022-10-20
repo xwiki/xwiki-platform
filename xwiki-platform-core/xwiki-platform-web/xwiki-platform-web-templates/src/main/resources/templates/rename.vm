@@ -35,6 +35,7 @@
   #end
   <div class="main layoutsubsection">
   <div id="mainContentArea">
+    #template("hierarchy.vm")
     #if ("$!request.renameId" != '')
       ## Display the rename status
       #template("renameStatus.vm")

@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>14.9-SNAPSHOT</version>
+    <version>14.10-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>14.9-SNAPSHOT</version>
+  <version>14.10-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
@@ -57,7 +57,7 @@
     <pdfbox.version>2.0.27</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
     <jetty.version>9.4.49.v20220914</jetty.version>
-    <netty.version>4.1.82.Final</netty.version>
+    <netty.version>4.1.84.Final</netty.version>
     <hibernate.version>5.6.12.Final</hibernate.version>
     <dockerJava.version>3.2.13</dockerJava.version>
 
@@ -68,7 +68,7 @@
          Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
          (e.g. 7.2.7).
     -->
-    <libreoffice.version>7.2.7</libreoffice.version>
+    <libreoffice.version>7.3.6</libreoffice.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
@@ -90,14 +90,15 @@
     <xwiki.enforcer.check-dependency-version.skip>${xwiki.enforcer.skip}</xwiki.enforcer.check-dependency-version.skip>
     <xwiki.enforcer.enforce-tika2-parsers.skip>${xwiki.enforcer.skip}</xwiki.enforcer.enforce-tika2-parsers.skip>
     <xwiki.enforcer.banneddependencytype-xar.skip>${xwiki.enforcer.skip}</xwiki.enforcer.banneddependencytype-xar.skip>
+    <xwiki.enforcer.mysql-connector-id.skip>${xwiki.enforcer.skip}</xwiki.enforcer.mysql-connector-id.skip>
 
     <!-- Versions of JDBC connectors we want to use in our distribution, in our tests and when using build tools -->
     <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
     <hsqldb.artifactId>hsqldb</hsqldb.artifactId>
     <hsqldb.version>2.7.0</hsqldb.version>
-    <mysql.groupId>mysql</mysql.groupId>
-    <mysql.artifactId>mysql-connector-java</mysql.artifactId>
-    <mysql.version>8.0.30</mysql.version>
+    <mysql.groupId>com.mysql</mysql.groupId>
+    <mysql.artifactId>mysql-connector-j</mysql.artifactId>
+    <mysql.version>8.0.31</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
     <mariadb.version>3.0.8</mariadb.version>
@@ -422,7 +423,7 @@
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>2.11.2</version>
+        <version>2.12.0</version>
       </dependency>
       <!-- Common WebJars -->
       <dependency>
@@ -708,7 +709,7 @@
       <dependency>
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j</artifactId>
-        <version>3.8.0</version>
+        <version>3.9.0</version>
       </dependency>
       <dependency>
         <groupId>io.sf.carte</groupId>
@@ -720,7 +721,7 @@
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j-dom4j</artifactId>
         <!-- Note: has a different release cycle than CSS4J "core" -->
-        <version>3.8.0</version>
+        <version>3.9.0</version>
       </dependency>
 
       <!-- Carte XML DTD -->
@@ -1376,6 +1377,27 @@
                   <!-- Integration test modules are never going to be installed as extension and they need to depend on XAR modules -->
                   <projectArtifactId>^((?!-test-docker|.*-test-tests).)*$</projectArtifactId>
                 </validateDependencyVersion>
+              </rules>
+            </configuration>
+          </execution>
+          <!-- Make sure the right id is used for MySQL connector -->
+          <execution>
+            <id>enforcer-mysql-connector-id</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <skip>${xwiki.enforcer.mysql-connector-id.skip}</skip>
+              <rules>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <message>
+                    The right id for the MySQL connector is com.mysql:mysql-connector-j.
+                  </message>
+                  <excludes>
+                    <exclude>mysql:mysql-connector-java</exclude>
+                  </excludes>
+                </bannedDependencies>
               </rules>
             </configuration>
           </execution>

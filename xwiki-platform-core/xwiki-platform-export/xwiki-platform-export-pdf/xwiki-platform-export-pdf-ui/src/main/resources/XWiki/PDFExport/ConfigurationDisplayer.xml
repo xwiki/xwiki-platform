@@ -63,10 +63,11 @@
   #end
   #set ($pattern = $field.getProperty('validationRegExp').value)
   &lt;input type="$escapetool.xml($inputType)" id="$!escapedId" name="$!escapedName" value="$!escapedValue"
-    placeholder="$!escapetool.xml($placeholder)"#if ($options.required) required#end
-    #if ($options.min)min="$!escapetool.xml($options.min)"#end
-    #if ($options.max)max="$!escapetool.xml($options.max)"#end
-    #if ("$!pattern" != '')pattern="$escapetool.xml($pattern)"#end /&gt;
+    #if ("$!placeholder" != '') placeholder="$!escapetool.xml($placeholder)"#end
+    #if ($options.required) required#end
+    #if ($options.min) min="$!escapetool.xml($options.min)"#end
+    #if ($options.max) max="$!escapetool.xml($options.max)"#end
+    #if ("$!pattern" != '') pattern="$escapetool.xml($pattern)"#end /&gt;
 #elseif ($type == 'view' || $type == 'rendered')
   #if ("$!value" == '')
     #set ($escapedValue = $escapetool.xml($configPropertyValue))

@@ -49,7 +49,11 @@
   {{html clean="false"}}
   #set ($configDoc = $xwiki.getDocument('XWiki.PDFExport.Configuration'))
   &lt;form id="pdfExportConfig" method="post" action="$configDoc.getURL('save')"&gt;
+    #displayPDFExportStatus()
     &lt;fieldset&gt;
+      &lt;legend&gt;
+        $escapetool.xml($services.localization.render('export.pdf.admin.configuration'))
+      &lt;/legend&gt;
       #if ($configDoc.isNew())
         ## Copy the configuration object from the template.
         #set ($templateDoc = $xwiki.getDocument('XWiki.PDFExport.ConfigurationTemplate'))
@@ -81,6 +85,50 @@
     &lt;/fieldset&gt;
   &lt;/form&gt;
   {{/html}}
+#end
+
+#macro (spinner)
+  #if ($services.icon.currentIconSetName == 'Font Awesome')
+    &lt;span class="fa fa-spinner fa-spin"&gt;&lt;/span&gt;
+  #else
+    &lt;img src="$escapetool.xml($xwiki.getSkinFile('icons/xwiki/spinner.gif'))" /&gt;
+  #end
+#end
+
+#macro (displayPDFExportStatus)
+  &lt;fieldset class="xform"&gt;
+    &lt;legend&gt;
+      $escapetool.xml($services.localization.render('export.pdf.admin.status'))
+    &lt;/legend&gt;
+    &lt;dl&gt;
+      &lt;dt&gt;
+        &lt;label&gt;
+          $escapetool.xml($services.localization.render('export.pdf.generator.label'))
+        &lt;/label&gt;
+        &lt;span class="xHint"&gt;
+          $escapetool.xml($services.localization.render('export.pdf.generator.hint'))
+        &lt;/span&gt;
+      &lt;/dt&gt;
+      &lt;dd class="pdfGeneratorStatus pdfGeneratorStatus-checking"&gt;
+        &lt;div class="pdfGeneratorStatus-checking-message"&gt;
+          #spinner()
+          $escapetool.xml($services.localization.render('export.pdf.generator.checking'))
+        &lt;/div&gt;
+        &lt;div class="pdfGeneratorStatus-checkFailed-message"&gt;
+          $services.icon.renderHTML('error')
+          $escapetool.xml($services.localization.render('export.pdf.generator.checkFailed'))
+        &lt;/div&gt;
+        &lt;div class="pdfGeneratorStatus-available-message"&gt;
+          $services.icon.renderHTML('check')
+          $escapetool.xml($services.localization.render('export.pdf.generator.available'))
+        &lt;/div&gt;
+        &lt;div class="pdfGeneratorStatus-unavailable-message"&gt;
+          $services.icon.renderHTML('warning')
+          $escapetool.xml($services.localization.render('export.pdf.generator.unavailable'))
+        &lt;/div&gt;
+      &lt;/dd&gt;
+    &lt;/dl&gt;
+  &lt;/fieldset&gt;
 #end
 {{/velocity}}
 

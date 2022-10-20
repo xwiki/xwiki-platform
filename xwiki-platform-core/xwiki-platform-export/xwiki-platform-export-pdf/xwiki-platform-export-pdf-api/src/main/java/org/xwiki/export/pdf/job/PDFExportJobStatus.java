@@ -121,6 +121,7 @@ public class PDFExportJobStatus extends DefaultJobStatus<PDFExportJobRequest>
         } else {
             this.pdfFileReference = new TemporaryResourceReference("export",
                 Arrays.asList("pdf", UUID.randomUUID().toString() + ".pdf"), request.getDocuments().get(0));
+            this.pdfFileReference.addParameter("fileName", request.getFileName());
         }
     }
 

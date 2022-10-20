@@ -228,17 +228,23 @@ var XWiki = (function(XWiki) {
         this.form.enable();
       }
     },
-    getFormData: function(submitter) {
+    getFormData: function(action) {
       let formData = {};
       if (this.form instanceof HTMLFormElement) {
         formData = new FormData(this.form);
-        if (typeof submitter === 'string') {
-          formData.set(submitter, '');
+        if (this.hasFormAction(action)) {
+          formData.set(action, '');
         }
       } else if (typeof this.form.serialize === 'function') {
-        formData = this.form.serialize({hash: true, submit: submitter});
+        formData = this.form.serialize({hash: true, submit: action});
       }
       return new URLSearchParams(formData);
+    },
+    hasFormAction: function(action) {
+      return typeof action === 'string' && [...this.form.querySelectorAll('input[type=submit], button')]
+        .some(button => {
+          return button.getAttribute('name') === action;
+        });
     },
     onSave : function(event) {
       // Don't continue if the event has been stopped already.

@@ -98,7 +98,7 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
     {
         if (!this.request.getDocuments().isEmpty()) {
             this.requiredSkinExtensionsRecorder.start();
-            render(this.request.getDocuments());
+            render(this.request.getDocuments(), this.request.isWithTitle());
             if (!this.status.isCanceled()) {
                 this.status.setRequiredSkinExtensions(this.requiredSkinExtensionsRecorder.stop());
             }
@@ -110,7 +110,7 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
         }
     }
 
-    private void render(List<DocumentReference> documentReferences) throws Exception
+    private void render(List<DocumentReference> documentReferences, boolean withTitle) throws Exception
     {
         this.progressManager.pushLevelProgress(documentReferences.size(), this);
 
@@ -121,7 +121,8 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
                 } else {
                     this.progressManager.startStep(this);
                     if (hasAccess(Right.VIEW, documentReference)) {
-                        this.status.getDocumentRenderingResults().add(this.documentRenderer.render(documentReference));
+                        this.status.getDocumentRenderingResults()
+                            .add(this.documentRenderer.render(documentReference, withTitle));
                     }
                     Thread.yield();
                     this.progressManager.endStep(this);

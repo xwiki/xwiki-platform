@@ -22,15 +22,24 @@ package com.xpn.xwiki.plugin.skinx;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
 
 import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
@@ -38,12 +47,16 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.skinx.internal.async.SkinExtensionAsync;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.test.MockitoOldcore;
@@ -53,7 +66,13 @@ import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -63,7 +82,7 @@ import static org.mockito.Mockito.when;
  * @since 13.10RC1
  */
 @OldcoreTest
-public class CssSkinExtensionPluginTest
+class CssSkinExtensionPluginTest
 {
     @InjectMockitoOldcore
     private MockitoOldcore mockitoOldcore;
@@ -83,17 +102,30 @@ public class CssSkinExtensionPluginTest
 
     @MockComponent
     @Named("currentmixed")
-    private DocumentReferenceResolver<String> documentReferenceResolver;
+    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
 
     @MockComponent
     @Named("current")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
 
     @MockComponent
+    private DocumentReferenceResolver<String> documentReferenceResolver;
+
+    @MockComponent
+    @Named("current")
+    private EntityReferenceResolver<String> currentEntityReferenceResolver;
+
+    @MockComponent
     private AuthorizationManager authorizationManager;
 
     @MockComponent
     private ContextualAuthorizationManager contextualAuthorizationManager;
+
+    @MockComponent
+    private SkinExtensionAsync skinExtensionAsync;
+
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     private XWikiContext context;
     private BaseClass pluginClass;
@@ -112,7 +144,7 @@ public class CssSkinExtensionPluginTest
         XWikiRequest xWikiRequest = mock(XWikiRequest.class);
         context.setRequest(xWikiRequest);
         XWiki wiki = mockitoOldcore.getSpyXWiki();
-        when(this.documentReferenceResolver.resolve(CssSkinExtensionPlugin.SSX_CLASS_NAME)).thenReturn(
+        when(this.currentMixedDocumentReferenceResolver.resolve(CssSkinExtensionPlugin.SSX_CLASS_NAME)).thenReturn(
             new DocumentReference(CssSkinExtensionPlugin.SSX_CLASS_REFERENCE, new WikiReference("xwiki")));
         when(wiki.getDocument(CssSkinExtensionPlugin.SSX_CLASS_NAME, context)).thenReturn(classDoc);
         when(classDoc.getXClass()).thenReturn(this.pluginClass);
@@ -205,5 +237,151 @@ public class CssSkinExtensionPluginTest
             CssSkinExtensionPlugin.class.getCanonicalName());
         String obtainedContent = this.skinExtensionPlugin.endParsing(content, this.context);
         assertEquals(expectedContent, obtainedContent);
+    }
+
+    @Test
+    void use() throws XWikiException
+    {
+        String resource = "MySpace.MySSXPage";
+        Map<String, Object> parameters = Collections.singletonMap("fooParam", "barValue");
+
+        DocumentReference documentReference = new DocumentReference("xwiki", "MySpace", "MySSXPage");
+        when(this.currentEntityReferenceResolver.resolve(resource, EntityType.DOCUMENT)).thenReturn(documentReference);
+        when(this.entityReferenceSerializer.serialize(documentReference)).thenReturn(resource);
+
+        when(this.documentReferenceResolver.resolve(resource)).thenReturn(documentReference);
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(this.mockitoOldcore.getSpyXWiki().getDocument(documentReference, context)).thenReturn(document);
+
+        DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "Foo");
+        when(document.getAuthorReference()).thenReturn(userReference);
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, userReference, documentReference)).thenReturn(true);
+
+        this.skinExtensionPlugin.use(resource, parameters, context);
+        String className = CssSkinExtensionPlugin.class.getCanonicalName();
+        Set<String> resources = (Set<String>) context.get(className);
+
+        assertEquals(Collections.singleton(resource), resources);
+
+        Map<String, Map<String, Object>> parametersMap =
+            (Map<String, Map<String, Object>>) context.get(className + "_parameters");
+        Map<String, Map<String, Object>> expectedParameters = new HashMap<>();
+        expectedParameters.put(resource, parameters);
+
+        assertEquals(expectedParameters, parametersMap);
+        verify(this.authorizationManager).hasAccess(Right.SCRIPT, userReference, documentReference);
+        verify(this.skinExtensionAsync).use("ssx", resource, parameters);
+
+        String resource2 = "MySpace.MyOtherSSXPage";
+        Map<String, Object> parameters2 = null;
+        DocumentReference documentReference2 = new DocumentReference("xwiki", "MySpace", "MyOtherSSXPage");
+
+        when(this.currentEntityReferenceResolver.resolve(resource2, EntityType.DOCUMENT))
+            .thenReturn(documentReference2);
+        when(this.entityReferenceSerializer.serialize(documentReference2)).thenReturn(resource2);
+
+        when(this.documentReferenceResolver.resolve(resource2)).thenReturn(documentReference2);
+        XWikiDocument document2 = mock(XWikiDocument.class);
+        when(this.mockitoOldcore.getSpyXWiki().getDocument(documentReference2, context)).thenReturn(document2);
+
+        DocumentReference userReference2 = new DocumentReference("xwiki", "XWiki", "Bar");
+        when(document2.getAuthorReference()).thenReturn(userReference2);
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, userReference2, documentReference2)).thenReturn(false);
+
+        this.skinExtensionPlugin.use(resource2, parameters2, context);
+        resources = (Set<String>) context.get(className);
+        assertEquals(Collections.singleton(resource), resources);
+        parametersMap =
+            (Map<String, Map<String, Object>>) context.get(className + "_parameters");
+        assertEquals(expectedParameters, parametersMap);
+        verify(this.authorizationManager).hasAccess(Right.SCRIPT, userReference2, documentReference2);
+        verify(this.skinExtensionAsync, never()).use("ssx", resource2, parameters2);
+
+        assertEquals(1, this.logCapture.size());
+        assertEquals("Extensions present in [MySpace.MyOtherSSXPage] ignored because of lack of script right "
+            + "from the author.", this.logCapture.getMessage(0));
+
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, userReference2, documentReference2)).thenReturn(true);
+        this.skinExtensionPlugin.use(resource2, parameters2, context);
+
+        Set<String> expectedSet = new HashSet<>();
+        expectedSet.add(resource);
+        expectedSet.add(resource2);
+
+        resources = (Set<String>) context.get(className);
+        assertEquals(expectedSet, resources);
+
+        parametersMap =
+            (Map<String, Map<String, Object>>) context.get(className + "_parameters");
+        assertEquals(expectedParameters, parametersMap);
+        verify(this.authorizationManager, times(2)).hasAccess(Right.SCRIPT, userReference2, documentReference2);
+        verify(this.skinExtensionAsync).use("ssx", resource2, null);
+
+        parameters2 = Collections.singletonMap("buzValue", 42);
+        this.skinExtensionPlugin.use(resource2, parameters2, context);
+
+        resources = (Set<String>) context.get(className);
+        assertEquals(expectedSet, resources);
+        parametersMap =
+            (Map<String, Map<String, Object>>) context.get(className + "_parameters");
+        expectedParameters.put(resource2, parameters2);
+        assertEquals(expectedParameters, parametersMap);
+        verify(this.skinExtensionAsync).use("ssx", resource2, parameters2);
+
+        this.skinExtensionPlugin.use(resource, null, context);
+        expectedParameters.remove(resource);
+        resources = (Set<String>) context.get(className);
+        assertEquals(expectedSet, resources);
+        parametersMap =
+            (Map<String, Map<String, Object>>) context.get(className + "_parameters");
+        expectedParameters.put(resource2, parameters2);
+        assertEquals(expectedParameters, parametersMap);
+        verify(this.skinExtensionAsync).use("ssx", resource, null);
+    }
+
+    @Test
+    void hasPageExtensions()
+    {
+        this.context.setDoc(null);
+        assertFalse(this.skinExtensionPlugin.hasPageExtensions(context));
+
+        XWikiDocument currentDoc = mock(XWikiDocument.class, "currentDoc");
+        this.context.setDoc(currentDoc);
+
+        String className = CssSkinExtensionPlugin.SSX_CLASS_NAME;
+        when(currentDoc.getObjects(className)).thenReturn(null);
+        assertFalse(this.skinExtensionPlugin.hasPageExtensions(context));
+        verify(currentDoc).getObjects(className);
+
+        BaseObject baseObject = mock(BaseObject.class, "specificObj");
+        when(baseObject.getStringValue("use")).thenReturn("wiki");
+        Vector<BaseObject> objectList = new Vector<>();
+        objectList.add(mock(BaseObject.class));
+        objectList.add(null);
+        objectList.add(mock(BaseObject.class));
+        objectList.add(baseObject);
+        objectList.add(null);
+        objectList.add(mock(BaseObject.class));
+
+        when(currentDoc.getObjects(className)).thenReturn(objectList);
+        assertFalse(this.skinExtensionPlugin.hasPageExtensions(context));
+        verifyNoInteractions(this.authorizationManager);
+
+        when(baseObject.getStringValue("use")).thenReturn("currentPage");
+        DocumentReference documentReference = new DocumentReference("xwiki", "MySpace", "SomePage");
+        DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "Foo");
+        when(currentDoc.getDocumentReference()).thenReturn(documentReference);
+        when(currentDoc.getAuthorReference()).thenReturn(userReference);
+
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, userReference, documentReference)).thenReturn(false);
+        assertFalse(this.skinExtensionPlugin.hasPageExtensions(context));
+        verify(this.authorizationManager).hasAccess(Right.SCRIPT, userReference, documentReference);
+
+        assertEquals(1, this.logCapture.size());
+        assertEquals("Extensions present in [xwiki:MySpace.SomePage] ignored because of lack of script right "
+            + "from the author.", this.logCapture.getMessage(0));
+
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, userReference, documentReference)).thenReturn(true);
+        assertTrue(this.skinExtensionPlugin.hasPageExtensions(context));
     }
 }

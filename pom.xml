@@ -86,6 +86,7 @@
     <xwiki.enforcer.check-dependency-version.skip>${xwiki.enforcer.skip}</xwiki.enforcer.check-dependency-version.skip>
     <xwiki.enforcer.enforce-tika2-parsers.skip>${xwiki.enforcer.skip}</xwiki.enforcer.enforce-tika2-parsers.skip>
     <xwiki.enforcer.banneddependencytype-xar.skip>${xwiki.enforcer.skip}</xwiki.enforcer.banneddependencytype-xar.skip>
+    <xwiki.enforcer.mysql-connector-id.skip>${xwiki.enforcer.skip}</xwiki.enforcer.mysql-connector-id.skip>
 
     <!-- Hibernate -->
     <hibernate.version>5.6.0.Final</hibernate.version>
@@ -93,9 +94,9 @@
     <!-- Versions of JDBC connectors we want to use in our distribution, in our tests and when using build tools -->
     <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
     <hsqldb.artifactId>hsqldb</hsqldb.artifactId>
-    <mysql.groupId>mysql</mysql.groupId>
-    <mysql.artifactId>mysql-connector-java</mysql.artifactId>
-    <mysql.version>8.0.30</mysql.version>
+    <mysql.groupId>com.mysql</mysql.groupId>
+    <mysql.artifactId>mysql-connector-j</mysql.artifactId>
+    <mysql.version>8.0.31</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
     <mariadb.version>3.0.9</mariadb.version>
@@ -1262,6 +1263,27 @@
                   <!-- Integration test modules are never going to be installed as extension and they need to depend on XAR modules -->
                   <projectArtifactId>^((?!-test-docker|.*-test-tests).)*$</projectArtifactId>
                 </validateDependencyVersion>
+              </rules>
+            </configuration>
+          </execution>
+          <!-- Make sure the right id is used for MySQL connector -->
+          <execution>
+            <id>enforcer-mysql-connector-id</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <skip>${xwiki.enforcer.mysql-connector-id.skip}</skip>
+              <rules>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <message>
+                    The right id for the MySQL connector is com.mysql:mysql-connector-j.
+                  </message>
+                  <excludes>
+                    <exclude>mysql:mysql-connector-java</exclude>
+                  </excludes>
+                </bannedDependencies>
               </rules>
             </configuration>
           </execution>

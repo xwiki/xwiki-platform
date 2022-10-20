@@ -81,7 +81,7 @@ describe('BaseDisplayer.vue', () => {
       }
     });
 
-    expect(wrapper.find('div.view > div').html()).toBe('<div><span></span> <span>livedata.displayer.emptyValue</span></div>');
+    expect(wrapper.find('div.view > div').text()).toBe('livedata.displayer.emptyValue*');
   })
 
   it('Renders a viewable entry with an empty content', () => {

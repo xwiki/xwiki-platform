@@ -1,1 +1,3 @@
 org.xwiki.livedata.internal.macro.LiveDataMacro
+org.xwiki.livedata.internal.macro.LiveDataMacroConfiguration
+org.xwiki.livedata.internal.macro.LiveDataMacroRights

@@ -33,7 +33,8 @@
     view-only>
     <!-- Provide the Html Viewer widget to the `viewer` slot -->
     <template #viewer>
-      <div class="html-wrapper" v-html="value"></div>
+      <div class="html-wrapper"
+           v-html="safeValue"/>
     </template>
   </BaseDisplayer>
 </template>

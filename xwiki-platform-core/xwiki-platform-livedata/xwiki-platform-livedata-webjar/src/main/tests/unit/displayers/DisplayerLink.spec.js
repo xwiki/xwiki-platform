@@ -43,6 +43,41 @@ describe('DisplayerLink.vue', () => {
     expect(wrapper.find('a').element.href).toBe('http://localhost/entryLink');
   })
 
+  it('Renders an entry in view mode with untrusted content', () => {
+    const logic = {
+      getDisplayerDescriptor() {
+        return {
+          propertyHref: 'colorHref'
+        };
+      },
+      isContentTrusted: () => false
+    };
+    const wrapperHttpLink = initWrapper(DisplayerLink, {
+      props: {
+        entry: {
+          color: 'yellow<script>console.log("hello")</script>',
+          colorHref: 'http://test.com'
+        }
+      },
+      logic
+    });
+    expect(wrapperHttpLink.text()).toMatch('yellow')
+    expect(wrapperHttpLink.find('a').element.href).toBe('http://test.com/');
+
+    const wrapperJavascriptLink = initWrapper(DisplayerLink, {
+      props: {
+        entry: {
+          color: 'yellow<script>console.log("hello")</script>',
+          colorHref: 'javascript:console.log("world")'
+        }
+      },
+      logic
+    });
+
+    expect(wrapperJavascriptLink.text()).toMatch('yellow')
+    expect(wrapperJavascriptLink.find('a').element.href).toBe('http://localhost/#');
+  })
+
   it('Renders an entry in view mode with an empty content', () => {
     const wrapper = initWrapper(DisplayerLink, {
       props: {

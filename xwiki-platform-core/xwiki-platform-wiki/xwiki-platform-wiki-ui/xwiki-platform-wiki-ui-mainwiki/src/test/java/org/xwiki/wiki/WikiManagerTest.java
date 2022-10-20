@@ -45,7 +45,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Test of the WikiManager WebHome Document (@{code WikiManager.WebHome}).
+ * Test of the WikiManager WebHome Document ({@code WikiManager.WebHome}).
  *
  * @version $Id$
  * @since 13.7RC1

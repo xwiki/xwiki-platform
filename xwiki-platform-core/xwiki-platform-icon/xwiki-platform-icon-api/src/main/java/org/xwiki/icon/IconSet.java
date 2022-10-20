@@ -262,7 +262,7 @@ public class IconSet
     /**
      * Checks if the provided icon name exists in the icon set.
      *
-     * @param iconName an icon name (for instance, @{code add})
+     * @param iconName an icon name (for instance, {@code add})
      * @return {@code true} if the icon name exists in the icon set, {@code false} otherwise
      * @since 13.4RC1
      */

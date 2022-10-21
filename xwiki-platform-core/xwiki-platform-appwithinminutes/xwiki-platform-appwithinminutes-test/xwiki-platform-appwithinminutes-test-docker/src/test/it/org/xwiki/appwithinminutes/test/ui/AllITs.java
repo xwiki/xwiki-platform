@@ -70,7 +70,7 @@ public class AllITs
 
     @Nested
     @DisplayName("Application name test")
-    class NestedApplicationNameIt extends ApplicationNameIt
+    class NestedApplicationNameIT extends ApplicationNameIT
     {
     }
 }

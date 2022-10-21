@@ -104,4 +104,10 @@ public class SafePDFExportConfiguration extends AbstractSafeObject<PDFExportConf
             .filter(templateReference -> this.authorization.hasAccess(Right.VIEW, templateReference))
             .collect(Collectors.toList());
     }
+
+    @Override
+    public int getPageReadyTimeout()
+    {
+        return getWrapped().getPageReadyTimeout();
+    }
 }

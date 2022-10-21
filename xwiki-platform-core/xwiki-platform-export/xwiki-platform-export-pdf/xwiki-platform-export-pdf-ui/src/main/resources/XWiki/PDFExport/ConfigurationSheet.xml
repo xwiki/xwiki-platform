@@ -162,6 +162,7 @@
       &lt;/dl&gt;
     &lt;/fieldset&gt;
   &lt;/dd&gt;
+  #displayPDFExportConfigProperty('pageReadyTimeout', {'min': 0, 'max': 2147483647})
 #end
 {{/velocity}}
 
@@ -269,7 +270,7 @@
     </property>
     <property>
       <code>(function() {
-  document.querySelector('select#pdfGenerator').addEventListener('change', function(event) {
+  document.querySelector('select#pdfGenerator')?.addEventListener('change', function(event) {
     event.target.parentNode.querySelectorAll('fieldset.pdfGeneratorConfig').forEach(fieldset =&gt; {
       fieldset.disabled = fieldset.id !== `pdfGenerator-${event.target.value}`;
       fieldset.classList.toggle('hidden', fieldset.disabled);
@@ -475,7 +476,10 @@ fieldset.pdfGeneratorConfig {
   &gt; dl {
     margin-left: 0;
   }
+}
 
+form#inline,
+form#pdfExportConfig {
   input:invalid {
     @border-color: @state-danger-text;
     border-color: @border-color;

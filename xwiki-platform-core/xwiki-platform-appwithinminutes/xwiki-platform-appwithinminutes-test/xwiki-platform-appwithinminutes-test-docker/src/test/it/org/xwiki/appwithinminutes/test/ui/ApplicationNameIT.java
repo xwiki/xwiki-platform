@@ -44,7 +44,7 @@ import static org.xwiki.appwithinminutes.test.po.ApplicationCreatePage.EMPTY_APP
  * @version $Id$
  */
 @UITest
-class ApplicationNameIt
+class ApplicationNameIT
 {
     @BeforeAll
     static void beforeAll(TestUtils setup)

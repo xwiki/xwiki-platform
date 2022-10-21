@@ -103,4 +103,13 @@ public interface PDFExportConfiguration
     {
         return Collections.emptyList();
     }
+
+    /**
+     * @return the number of seconds to wait for the web page to be ready (for print) before timing out
+     * @since 14.9
+     */
+    default int getPageReadyTimeout()
+    {
+        return 60;
+    }
 }

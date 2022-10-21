@@ -63,7 +63,7 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
         URL browserPrintPreviewURL = getBrowserPrintPreviewURL(printPreviewURL, browserTab);
         try {
             Cookie[] cookies = getRequest().getCookies();
-            if (!browserTab.navigate(browserPrintPreviewURL, cookies, true)) {
+            if (!browserTab.navigate(browserPrintPreviewURL, cookies, true, this.configuration.getPageReadyTimeout())) {
                 throw new IOException("Failed to load the print preview URL: " + browserPrintPreviewURL);
             }
 

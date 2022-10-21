@@ -195,6 +195,7 @@
     'export.pdf.canceled',
     'export.pdf.cancelFailed',
     'export.pdf.loading',
+    'export.pdf.pageReadyTimeout',
     'cancel'
   ]
 });
@@ -416,6 +417,12 @@ require([
         'width': $(window).width()
       }).on('load', () =&gt; {
         iframe[0].contentWindow.require(['xwiki-page-ready'], function(pageReady) {
+          setTimeout(() =&gt; {
+            // Remove the iframe because if an infinite loop prevented the page to be ready for print then it will
+            // continue to drain resources, slowing down the user's browser.
+            iframe.remove();
+            reject(l10n['export.pdf.pageReadyTimeout']);
+          }, config.pageReadyTimeout * 1000);
           pageReady.afterPageReady(() =&gt; {
             // Trigger the print only after all page ready callbacks were executed, because the print preview is
             // initialized as a page ready callback.
@@ -449,10 +456,14 @@ require([
       } else if (job.pdfFileURL) {
         // The PDF file was generated on the server-side. The user just needs to download it.
         window.location.href = job.pdfFileURL;
+      } else if (config.serverSide) {
+        // The PDF file should have been generated on the server-side but it wasn't so the PDF export must have failed.
+        return Promise.reject(job.lastError);
       } else {
+        // The PDF file is going to be generated using the user's own web browser.
         if (job.lastError) {
-          // The PDF export job log contains some error messages which can indicate a possible failure of the
-          // server-side PDF printing. Warn the user and continue with client-side printing.
+          // The PDF export job log contains some error messages that might explain why the PDF file doesn't have the
+          // expected content.
           new XWiki.widgets.Notification(l10n.get('export.pdf.lastError', job.lastError), 'warning',
             // Increase a bit the timeout so that the user has the time to read the warning message.
             {timeout : 10});
@@ -474,9 +485,13 @@ require([
     exportToPDF(data).then(() =&gt; {
       // PDF export job finished.
       notification.hide();
-    }).catch(() =&gt; {
+    }).catch(reason =&gt; {
       // PDF export job failed.
-      notification.replace(new XWiki.widgets.Notification(l10n['export.pdf.failed'], 'error'));
+      let message = l10n['export.pdf.failed'];
+      if (reason) {
+        message += `: ${reason}`;
+      }
+      notification.replace(new XWiki.widgets.Notification(message, 'error'));
     }).finally(() =&gt; {
       // Re-enable the PDF export options modal.
       pdfExportOptionsModal.find('.modal-footer input[type=submit]').prop('disabled', false);
@@ -866,7 +881,8 @@ require([
       'spinner': $spinner
     },
     'templates': $templates,
-    'serverSide': $services.export.pdf.configuration.isServerSide()
+    'serverSide': $services.export.pdf.configuration.isServerSide(),
+    'pageReadyTimeout': $services.export.pdf.configuration.pageReadyTimeout
   })
   &lt;script id="pdfExportConfig" type="application/json"&gt;$jsontool.serialize($config).replace(
     '&lt;', '\u003C')&lt;/script&gt;

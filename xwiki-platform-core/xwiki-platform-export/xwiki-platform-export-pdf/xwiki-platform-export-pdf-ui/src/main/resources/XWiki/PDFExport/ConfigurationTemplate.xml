@@ -121,6 +121,20 @@
         <validationRegExp>[a-zA-Z0-9][a-zA-Z0-9_.-]+</validationRegExp>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </dockerNetwork>
+      <pageReadyTimeout>
+        <customDisplay>{{include reference="XWiki.PDFExport.ConfigurationDisplayer" /}}</customDisplay>
+        <disabled>0</disabled>
+        <hint>XWiki.PDFExport.ConfigurationClass_pageReadyTimeout.hint</hint>
+        <name>pageReadyTimeout</name>
+        <number>9</number>
+        <numberType>integer</numberType>
+        <prettyName>Page Ready Timeout</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </pageReadyTimeout>
       <serverSide>
         <customDisplay/>
         <defaultValue/>
@@ -193,6 +207,9 @@
     </property>
     <property>
       <dockerNetwork/>
+    </property>
+    <property>
+      <pageReadyTimeout/>
     </property>
     <property>
       <serverSide/>

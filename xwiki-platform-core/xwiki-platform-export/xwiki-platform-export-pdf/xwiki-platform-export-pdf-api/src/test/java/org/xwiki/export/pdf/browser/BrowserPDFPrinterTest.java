@@ -85,6 +85,7 @@ class BrowserPDFPrinterTest
 
         when(this.request.getContextPath()).thenReturn("/xwiki");
         when(this.configuration.getXWikiHost()).thenReturn("xwiki-host");
+        when(this.configuration.getPageReadyTimeout()).thenReturn(30);
     }
 
     @Test
@@ -109,7 +110,7 @@ class BrowserPDFPrinterTest
 
         when(this.browserManager.createIncognitoTab()).thenReturn(this.browserTab);
         when(this.browserTab.navigate(new URL("http://xwiki-host:9293/xwiki/rest"), null, false)).thenReturn(true);
-        when(this.browserTab.navigate(browserPrintPreviewURL, cookies, true)).thenReturn(true);
+        when(this.browserTab.navigate(browserPrintPreviewURL, cookies, true, 30)).thenReturn(true);
 
         InputStream pdfInputStream = mock(InputStream.class);
         when(this.browserTab.printToPDF(any(Runnable.class))).then(new Answer<InputStream>()

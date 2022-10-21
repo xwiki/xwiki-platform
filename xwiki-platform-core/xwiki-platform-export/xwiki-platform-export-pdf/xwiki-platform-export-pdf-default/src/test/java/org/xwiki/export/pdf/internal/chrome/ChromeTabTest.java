@@ -173,7 +173,8 @@ class ChromeTabTest
         when(this.page.navigate(url.toString())).thenReturn(navigate);
 
         Evaluate evaluate = mock(Evaluate.class);
-        when(this.runtime.evaluate(/* expression */ ChromeTab.PAGE_READY_PROMISE, /* objectGroup */ null,
+        String pageReadyPromise = ChromeTab.PAGE_READY_PROMISE.replace("__pageReadyTimeout__", "25000");
+        when(this.runtime.evaluate(/* expression */ pageReadyPromise, /* objectGroup */ null,
             /* includeCommandLineAPI */ false, /* silent */ false, /* contextId */ null, /* returnByValue */ true,
             /* generatePreview */ false, /* userGesture */ false, /* awaitPromise */ true,
             /* throwOnSideEffect */ false, /* timeout */ ChromeManager.REMOTE_DEBUGGING_TIMEOUT * 1000.0,
@@ -184,7 +185,7 @@ class ChromeTabTest
         when(evaluate.getResult()).thenReturn(result);
         when(result.getValue()).thenReturn("Page ready.");
 
-        assertTrue(this.chromeTab.navigate(url, null, true));
+        assertTrue(this.chromeTab.navigate(url, null, true, 25));
 
         verify(this.runtime).enable();
     }
@@ -198,7 +199,8 @@ class ChromeTabTest
         when(this.page.navigate(url.toString())).thenReturn(navigate);
 
         Evaluate evaluate = mock(Evaluate.class);
-        when(this.runtime.evaluate(/* expression */ ChromeTab.PAGE_READY_PROMISE, /* objectGroup */ null,
+        String pageReadyPromise = ChromeTab.PAGE_READY_PROMISE.replace("__pageReadyTimeout__", "60000");
+        when(this.runtime.evaluate(/* expression */ pageReadyPromise, /* objectGroup */ null,
             /* includeCommandLineAPI */ false, /* silent */ false, /* contextId */ null, /* returnByValue */ true,
             /* generatePreview */ false, /* userGesture */ false, /* awaitPromise */ true,
             /* throwOnSideEffect */ false, /* timeout */ ChromeManager.REMOTE_DEBUGGING_TIMEOUT * 1000.0,

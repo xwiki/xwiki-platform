@@ -97,7 +97,7 @@ public class ChromeTab implements BrowserTab
     }
 
     @Override
-    public boolean navigate(URL url, Cookie[] cookies, boolean wait) throws IOException
+    public boolean navigate(URL url, Cookie[] cookies, boolean wait, int timeout) throws IOException
     {
         LOGGER.debug("Navigating to [{}].", url);
 
@@ -113,7 +113,7 @@ public class ChromeTab implements BrowserTab
         if (success && wait) {
             Runtime runtime = this.tabDevToolsService.getRuntime();
             runtime.enable();
-            waitForPageReady(runtime);
+            waitForPageReady(runtime, timeout);
         }
 
         return success;
@@ -172,11 +172,13 @@ public class ChromeTab implements BrowserTab
      * Wait for a page to be ready.
      * 
      * @param runtime the page runtime
+     * @param timeout the number of seconds to wait for the web page to be ready before timing out
      */
-    private void waitForPageReady(Runtime runtime) throws IOException
+    private void waitForPageReady(Runtime runtime, int timeout) throws IOException
     {
         LOGGER.debug("Waiting for page to be ready.");
-        Evaluate evaluate = runtime.evaluate(/* expression */ PAGE_READY_PROMISE, /* objectGroup */ null,
+        String pageReadyPromise = PAGE_READY_PROMISE.replace("__pageReadyTimeout__", String.valueOf(timeout * 1000));
+        Evaluate evaluate = runtime.evaluate(/* expression */ pageReadyPromise, /* objectGroup */ null,
             /* includeCommandLineAPI */ false, /* silent */ false, /* contextId */ null, /* returnByValue */ true,
             /* generatePreview */ false, /* userGesture */ false, /* awaitPromise */ true,
             /* throwOnSideEffect */ false, /* timeout */ ChromeManager.REMOTE_DEBUGGING_TIMEOUT * 1000.0,

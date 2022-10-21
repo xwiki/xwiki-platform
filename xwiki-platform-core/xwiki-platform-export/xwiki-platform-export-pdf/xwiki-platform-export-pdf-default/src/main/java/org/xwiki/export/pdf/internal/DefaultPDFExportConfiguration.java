@@ -109,6 +109,12 @@ public class DefaultPDFExportConfiguration implements PDFExportConfiguration
             .map(template -> this.documentReferenceResolver.resolve(template)).collect(Collectors.toList());
     }
 
+    @Override
+    public int getPageReadyTimeout()
+    {
+        return getProperty("pageReadyTimeout", PDFExportConfiguration.super.getPageReadyTimeout());
+    }
+
     private <T> T getProperty(String key, T defaultValue)
     {
         if (this.configDocument.containsKey(key)) {

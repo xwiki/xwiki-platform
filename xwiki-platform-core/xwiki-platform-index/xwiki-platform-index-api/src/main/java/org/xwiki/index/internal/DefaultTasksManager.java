@@ -235,6 +235,7 @@ public class DefaultTasksManager implements TaskManager, Initializable, Disposab
             Thread.currentThread().interrupt();
         } catch (Exception e) {
             this.logger.warn("Error during the execution of task [{}]. Cause: [{}].", task, getRootCauseMessage(e));
+            this.logger.debug("Stack trace for previous error: ", e);
             if (task != null && isTimestampValid(task)) {
                 if (!task.tooManyAttempts()) {
                     // Push back the failed task at the beginning of the queue by resetting its timestamp.

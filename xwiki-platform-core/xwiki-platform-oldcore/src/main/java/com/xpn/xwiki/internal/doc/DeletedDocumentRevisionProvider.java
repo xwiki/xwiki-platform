@@ -26,6 +26,9 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.security.authorization.AuthorizationException;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.user.UserReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -61,12 +64,23 @@ public class DeletedDocumentRevisionProvider implements DocumentRevisionProvider
         }
 
         return null;
-
     }
 
     @Override
     public XWikiDocument getRevision(XWikiDocument document, String revision) throws XWikiException
     {
         return getRevision(document != null ? document.getDocumentReferenceWithLocale() : null, revision);
+    }
+
+    @Override
+    public void checkAccess(Right right, UserReference userReference, DocumentReference documentReference,
+        String revision) throws AuthorizationException, XWikiException
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        XWikiDeletedDocument deletedDocument = xcontext.getWiki().getDeletedDocument(Long.valueOf(revision), xcontext);
+        if (deletedDocument != null) {
+            xcontext.getWiki().getRecycleBinStore().checkAccess(right, userReference, deletedDocument);
+        }
     }
 }

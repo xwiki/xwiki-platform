@@ -84,16 +84,20 @@ import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.resource.internal.DefaultResourceReferenceHandlerChain;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 import org.xwiki.template.TemplateManager;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.velocity.VelocityManager;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.mandatory.RedirectClassDocumentInitializer;
 import com.xpn.xwiki.internal.web.LegacyAction;
@@ -187,6 +191,13 @@ public abstract class XWikiAction implements LegacyAction
     private EntityNameValidationConfiguration entityNameValidationConfiguration;
 
     private EntityReferenceSerializer<String> localSerializer;
+
+    @Inject
+    private DocumentRevisionProvider documentRevisionProvider;
+
+    @Inject
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> userReferenceResolver;
 
     /**
      * @return the class of the XWikiForm in charge of parsing the request
@@ -946,6 +957,11 @@ public abstract class XWikiAction implements LegacyAction
         return true;
     }
 
+    private UserReference getCurrentUserReference(XWikiContext context)
+    {
+        return this.userReferenceResolver.resolve(context.getUserReference());
+    }
+
     protected void handleRevision(XWikiContext context) throws XWikiException
     {
         String rev = context.getRequest().getParameter("rev");
@@ -960,11 +976,26 @@ public abstract class XWikiAction implements LegacyAction
                 Locale locale = LocaleUtils.toLocale(context.getRequest().getParameter("language"), Locale.ROOT);
                 tdoc = new XWikiDocument(tdoc.getDocumentReference(), locale);
             }
-            XWikiDocument rdoc =
-                (!doc.getLocale().equals(tdoc.getLocale())) ? doc : context.getWiki().getDocument(doc, rev, context);
 
-            XWikiDocument rtdoc =
-                (doc.getLocale().equals(tdoc.getLocale())) ? rdoc : context.getWiki().getDocument(tdoc, rev, context);
+            DocumentReference documentReference = doc.getDocumentReference();
+            try {
+                documentRevisionProvider
+                    .checkAccess(Right.VIEW, getCurrentUserReference(context), documentReference, rev);
+            } catch (AuthorizationException e) {
+                Object[] args = { documentReference, rev, context.getUserReference() };
+                throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                    "Access to document {0} with revision {1} has been denied to user {2}", e, args);
+            }
+
+            XWikiDocument rdoc;
+            XWikiDocument rtdoc;
+            if (doc.getLocale().equals(tdoc.getLocale())) {
+                rdoc = this.documentRevisionProvider.getRevision(doc.getDocumentReferenceWithLocale(), rev);
+                rtdoc = rdoc;
+            } else {
+                rdoc = doc;
+                rtdoc = this.documentRevisionProvider.getRevision(tdoc.getDocumentReferenceWithLocale(), rev);
+            }
 
             context.put("tdoc", rtdoc);
             context.put("cdoc", rdoc);

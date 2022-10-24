@@ -132,7 +132,7 @@ public class PDFExportOptionsModal extends BaseModal
 
         // The browser used for running the test might be on a different machine than the one running XWiki and the test
         // code itself so we can't always use the same URL as the browser to download the PDF file.
-        URL pdfURL = new URL(hostURL, new URL(getDriver().getCurrentUrl()).getPath());
+        URL pdfURL = new URL(hostURL, new URL(getDriver().getCurrentUrl()).getFile());
         return new PDFDocument(pdfURL);
     }
 }

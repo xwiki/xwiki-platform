@@ -238,6 +238,7 @@ public class DefaultTasksManager implements TaskManager, Initializable, Disposab
         } catch (Exception e) {
             this.logger.warn("Error during the execution of task [{}] for document [{}]. Cause: [{}].", task,
                 getTaskDocumentReferenceForLogging(task), getRootCauseMessage(e));
+            this.logger.debug("Stack trace for previous error: ", e);
             if (task != null && isTimestampValid(task)) {
                 if (!task.tooManyAttempts()) {
                     // Push back the failed task at the beginning of the queue by resetting its timestamp.

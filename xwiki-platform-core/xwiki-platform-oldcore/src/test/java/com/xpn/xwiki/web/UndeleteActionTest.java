@@ -43,6 +43,7 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.store.XWikiHibernateRecycleBinStore;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
@@ -104,6 +105,9 @@ class UndeleteActionTest
     @Mock
     private XWikiDeletedDocument deletedDocument;
 
+    @Mock
+    private XWikiHibernateRecycleBinStore recycleBinStore;
+
     /**
      * The object being tested.
      */
@@ -113,7 +117,7 @@ class UndeleteActionTest
     void beforeEach() throws Exception
     {
         this.oldcore.getXWikiContext().setRequest(this.request);
-
+        this.oldcore.getSpyXWiki().setRecycleBinStore(this.recycleBinStore);
         XWikiDocument contextDocument = mock(XWikiDocument.class);
         when(contextDocument.getDocumentReference()).thenReturn(DELETED_REFERENCE);
         this.oldcore.getXWikiContext().setDoc(contextDocument);
@@ -143,8 +147,8 @@ class UndeleteActionTest
     {
         when(this.csrfToken.isTokenValid(null)).thenReturn(true);
 
-        when(this.oldcore.getMockRightService().hasAccessLevel(any(), any(), any(), any())).thenReturn(true);
-
+        when(this.recycleBinStore.hasAccess(any(), any(), any()))
+            .thenReturn(true);
         assertFalse(this.undeleteAction.action(this.oldcore.getXWikiContext()));
 
         verify(this.requestFactory).createRestoreRequest(Arrays.asList(ID));
@@ -157,7 +161,7 @@ class UndeleteActionTest
     {
         when(this.csrfToken.isTokenValid(null)).thenReturn(true);
 
-        when(this.oldcore.getMockAuthorizationManager().hasAccess(Right.EDIT, null, DELETED_REFERENCE))
+        when(this.recycleBinStore.hasAccess(any(), any(), any()))
             .thenReturn(true);
 
         assertFalse(this.undeleteAction.action(this.oldcore.getXWikiContext()));
@@ -205,8 +209,8 @@ class UndeleteActionTest
     {
         when(this.request.getParameter("showBatch")).thenReturn("true");
 
-        when(this.oldcore.getMockRightService().hasAccessLevel(any(), any(), any(), any())).thenReturn(true);
-
+        when(this.recycleBinStore.hasAccess(any(), any(), any()))
+            .thenReturn(true);
         assertTrue(this.undeleteAction.action(this.oldcore.getXWikiContext()));
         // Render the "restore" template.
         assertEquals("restore", undeleteAction.render(this.oldcore.getXWikiContext()));
@@ -236,7 +240,8 @@ class UndeleteActionTest
         // Confirmation button pressed.
         when(this.request.getParameter("confirm")).thenReturn("true");
 
-        when(this.oldcore.getMockRightService().hasAccessLevel(any(), any(), any(), any())).thenReturn(true);
+        when(this.recycleBinStore.hasAccess(any(), any(), any()))
+            .thenReturn(true);
 
         assertFalse(this.undeleteAction.action(this.oldcore.getXWikiContext()));
 

@@ -73,4 +73,10 @@ public class AllITs
     class NestedApplicationNameIT extends ApplicationNameIT
     {
     }
+    
+    @Nested
+    @DisplayName("User class field test")
+    class NestedUserClassFieldIT extends UserClassFieldIT
+    {
+    }
 }

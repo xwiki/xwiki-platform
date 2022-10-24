@@ -126,32 +126,7 @@
                  Single justification example:
             -->
 
-            <revapi.differences>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.returnTypeChanged</code>
-                  <old>method com.xpn.xwiki.doc.XWikiAttachment org.xwiki.store.script.TemporaryAttachmentsScriptService::uploadTemporaryAttachment(org.xwiki.model.reference.DocumentReference, java.lang.String)</old>
-                  <new>method com.xpn.xwiki.api.Attachment org.xwiki.store.script.TemporaryAttachmentsScriptService::uploadTemporaryAttachment(org.xwiki.model.reference.DocumentReference, java.lang.String)</new>
-                  <justification>Unstable API change: Script services are not supposed to expose classes from com.xpn.xwiki.doc.*</justification>
-                  <criticality>documented</criticality>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.addedToInterface</code>
-                  <new>method com.xpn.xwiki.doc.XWikiAttachment org.xwiki.store.TemporaryAttachmentSessionsManager::uploadAttachment(org.xwiki.model.reference.DocumentReference, javax.servlet.http.Part, java.lang.String) throws org.xwiki.store.TemporaryAttachmentException</new>
-                  <justification>We can't provide a default implementation for this new method, it needs to be implemented on upgrade</justification>
-                  <criticality>documented</criticality>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.addedToInterface</code>
-                  <new>method boolean org.xwiki.export.pdf.browser.BrowserTab::navigate(java.net.URL, javax.servlet.http.Cookie[], boolean, int) throws java.io.IOException</new>
-                  <justification>Unstable API</justification>
-                  <criticality>documented</criticality>
-                </item>
-              </differences>
-            </revapi.differences>
+            
           </analysisConfiguration>
         </configuration>
       </plugin>

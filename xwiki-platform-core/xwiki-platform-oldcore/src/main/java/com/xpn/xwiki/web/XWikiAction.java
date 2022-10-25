@@ -996,6 +996,12 @@ public abstract class XWikiAction implements LegacyAction
                 rdoc = doc;
                 rtdoc = this.documentRevisionProvider.getRevision(tdoc.getDocumentReferenceWithLocale(), rev);
             }
+            if (rdoc == null) {
+                Object[] args = { doc.getDocumentReferenceWithLocale(), rev };
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_STORE_HIBERNATE_UNEXISTANT_VERSION,
+                    "Version {1} does not exist while reading document {0}", null, args);
+            }
 
             context.put("tdoc", rtdoc);
             context.put("cdoc", rdoc);

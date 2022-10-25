@@ -73,4 +73,10 @@ public class AllITs
     class NestedUserClassFieldIT extends UserClassFieldIT
     {
     }
+
+    @Nested
+    @DisplayName("Class Editor tests")
+    class NestedClassEditorIT extends ClassEditorIT
+    {
+    }
 }

@@ -24,7 +24,7 @@ import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 
 /**
  * Represents the actions available when editing the application class. This is also the second step of the App Within
@@ -158,7 +158,7 @@ public class ApplicationClassEditPage extends ApplicationEditPage
      * @since 13.2
      * @since 12.10.6
      */
-    public static ApplicationClassEditPage goToEditor(DocumentReference reference)
+    public static ApplicationClassEditPage goToEditor(EntityReference reference)
     {
         getUtil().gotoPage(reference, "edit",
             "editor", "inline", "template", "AppWithinMinutes.ClassTemplate", "title",

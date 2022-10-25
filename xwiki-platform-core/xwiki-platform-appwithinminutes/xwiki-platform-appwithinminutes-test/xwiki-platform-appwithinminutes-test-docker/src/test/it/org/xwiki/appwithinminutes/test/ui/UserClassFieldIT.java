@@ -78,9 +78,9 @@ class UserClassFieldIT
 
     @Test
     @Order(1)
-    void suggestions(TestUtils setup, TestReference testReference)
+    void suggestions(TestReference testReference)
     {
-        ApplicationClassEditPage editor = goToEditor(setup, testReference);
+        ApplicationClassEditPage editor = goToEditor(testReference);
         SuggestInputElement userPicker = new SuggestClassFieldEditPane(editor.addField("User").getName()).getPicker();
 
         // The suggestions should be case-insensitive. Match the last name.
@@ -122,9 +122,9 @@ class UserClassFieldIT
 
     @Test
     @Order(2)
-    void singleSelection(TestUtils setup, TestReference testReference)
+    void singleSelection(TestReference testReference)
     {
-        ApplicationClassEditPage editor = goToEditor(setup, testReference);
+        ApplicationClassEditPage editor = goToEditor(testReference);
         SuggestInputElement userPicker = new SuggestClassFieldEditPane(editor.addField("User").getName()).getPicker();
 
         // Use the keyboard.
@@ -155,9 +155,9 @@ class UserClassFieldIT
 
     @Test
     @Order(3)
-    void multipleSelection(TestUtils setup, TestReference testReference)
+    void multipleSelection(TestReference testReference)
     {
-        ApplicationClassEditPage editor = goToEditor(setup, testReference);
+        ApplicationClassEditPage editor = goToEditor(testReference);
         SuggestClassFieldEditPane userField = new SuggestClassFieldEditPane(editor.addField("User").getName());
         userField.openConfigPanel();
         userField.setMultipleSelect(true);
@@ -192,9 +192,9 @@ class UserClassFieldIT
 
     @Test
     @Order(4)
-    void saveAndInitialSelection(TestUtils setup, TestReference testReference)
+    void saveAndInitialSelection(TestReference testReference)
     {
-        ApplicationClassEditPage editor = goToEditor(setup, testReference);
+        ApplicationClassEditPage editor = goToEditor(testReference);
         SuggestInputElement userPicker = new SuggestClassFieldEditPane(editor.addField("User").getName()).getPicker();
         userPicker.sendKeys("thomas").waitForSuggestions().sendKeys(Keys.ENTER);
         editor.clickSaveAndView().edit();
@@ -255,7 +255,7 @@ class UserClassFieldIT
     @Order(5)
     void applicationEntry(TestUtils setup, TestReference testReference)
     {
-        ApplicationClassEditPage editor = goToEditor(setup, testReference);
+        ApplicationClassEditPage editor = goToEditor(testReference);
         // Create the application class.
         SuggestInputElement userPicker = new SuggestClassFieldEditPane(editor.addField("User").getName()).getPicker();
         userPicker.sendKeys("thomas").waitForSuggestions().sendKeys(Keys.ENTER);
@@ -288,11 +288,9 @@ class UserClassFieldIT
             users.get(0).findElement(By.className("user-avatar")).getAttribute("src").contains("/Enygma2002.png?"));
     }
 
-    private ApplicationClassEditPage goToEditor(TestUtils setup, TestReference testReference)
+    private ApplicationClassEditPage goToEditor(TestReference testReference)
     {
-        setup.gotoPage(testReference.getLastSpaceReference(), "edit",
-            "editor=inline&template=AppWithinMinutes.ClassTemplate&title=" + testReference.getName() + " Class");
-        return new ApplicationClassEditPage();
+        return ApplicationClassEditPage.goToEditor(testReference.getLastSpaceReference());
     }
 
     /**

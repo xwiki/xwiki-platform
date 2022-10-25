@@ -153,19 +153,23 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest>
         WelcomeDistributionStep welcomeStep = (WelcomeDistributionStep) getStep(steps, WelcomeDistributionStep.ID);
         ReportDistributionStep reportStep = (ReportDistributionStep) getStep(steps, ReportDistributionStep.ID);
 
+        // Initialize steps
+        steps.forEach(s -> s.initialize(this));
+
+        // Prepare steps until reaching the first enabled step and enabled welcome/report steps if they exist
         for (DistributionStep step : steps) {
-            step.initialize(this);
+            // Prepare the step to check if there is something to do
+            step.prepare();
 
-            // Enable Welcome step if one of the steps is enabled
-            // but don't prepare the following steps as it might be too early
-            if (welcomeStep.getState() != null) {
-                // Prepare the step to check if there is something to do
-                step.prepare();
-
-                if (step.getState() == null) {
+            if (step.getState() == null) {
+                // Enable Welcome and report steps if one of the steps is enabled
+                if (welcomeStep != null) {
                     welcomeStep.setState(null);
                     reportStep.setState(null);
                 }
+
+                // Don't prepare following steps as it might be too early
+                break;
             }
         }
 

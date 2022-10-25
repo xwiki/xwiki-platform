@@ -64,6 +64,15 @@ public class DynamicTestConfigurationExtension implements ExecutionCondition
             } catch (DockerTestException e) {
                 throw new RuntimeException("Failed to merge PDF Export configuration.", e);
             }
+        } else if (DockerTestUtils.isInAContainer()) {
+            // The test framework is running inside a Docker container but the servlet engine doesn't use a separate
+            // Docker container (it runs inside the same Docker container as the test framework). We skip the PDF export
+            // tests in this case because the Chrome Docker container won't be able to access XWiki (it needs to be in
+            // the same Docker network, but we can't control / get the Docker network of the test framework container).
+            return ConditionEvaluationResult.disabled(String.format(
+                "Servlet engine [%s] is forbidden "
+                    + "when the PDF export tests are executed inside a Docker container, skipping.",
+                configuration.getServletEngine()));
         }
         return ConditionEvaluationResult.enabled("PDF export configuration merged.");
     }

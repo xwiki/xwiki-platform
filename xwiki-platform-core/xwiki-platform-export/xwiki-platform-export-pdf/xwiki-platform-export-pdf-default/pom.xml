@@ -36,7 +36,7 @@
     <xwiki.extension.name>PDF Export Default API Implementation</xwiki.extension.name>
     <dockerJava.version>3.2.13</dockerJava.version>
     <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
-    <xwiki.jacoco.instructionRatio>0.42</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.41</xwiki.jacoco.instructionRatio>
     <!-- All wikis are using the same headless Chrome browser (and thus the same Docker container) to perform the PDF
       export. -->
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>

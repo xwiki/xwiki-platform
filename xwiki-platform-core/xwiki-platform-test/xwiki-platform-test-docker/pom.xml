@@ -232,7 +232,9 @@
             <configuration>
               <excludes>
                 <!-- Cyclomatic complexity > 10 -->
-                **/WARBuilder.java
+                **/WARBuilder.java,
+                <!-- Class Fan-Out Complexity > 20 -->
+                **/DockerTestUtils.java
               </excludes>
             </configuration>
           </execution>

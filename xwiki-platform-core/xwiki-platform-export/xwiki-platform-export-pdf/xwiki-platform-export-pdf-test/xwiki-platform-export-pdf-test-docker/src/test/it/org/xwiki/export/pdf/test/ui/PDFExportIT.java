@@ -25,12 +25,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.xwiki.export.pdf.internal.docker.ContainerManager;
 import org.xwiki.export.pdf.test.po.ExportModal;
 import org.xwiki.export.pdf.test.po.PDFDocument;
 import org.xwiki.export.pdf.test.po.PDFExportOptionsModal;
 import org.xwiki.export.pdf.test.po.PDFImage;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -48,8 +52,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 14.5
  */
 @UITest
+@ExtendWith(DynamicTestConfigurationExtension.class)
 class PDFExportIT
 {
+    @BeforeAll
+    static void configure()
+    {
+        // Cleanup the Chrome Docker containers used for PDF export.
+        DockerTestUtils.cleanupContainersWithLabels(ContainerManager.DEFAULT_LABELS);
+    }
+
     @Test
     void exportAsPDF(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration) throws Exception
     {

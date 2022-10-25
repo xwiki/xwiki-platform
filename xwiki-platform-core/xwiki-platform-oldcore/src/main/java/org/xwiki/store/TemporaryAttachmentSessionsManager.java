@@ -75,6 +75,22 @@ public interface TemporaryAttachmentSessionsManager
         throws TemporaryAttachmentException;
 
     /**
+     * Allow to temporarily attach the given instance of {@link XWikiAttachment} to the given document reference.
+     * This can be useful if an API manipulates an {@link XWikiAttachment} without saving it, and want it to be
+     * discoverable when parsing a document through the download action for example.
+     * Note that consumer of this API needs to be aware that the file attached to the {@link XWikiAttachment} might be
+     * deleted at the end of the session, as any temporary attachment.
+     *
+     * @param attachment the attachment to be temporarily attached to the document
+     * @param documentReference the reference of the document to link this attachment to
+     * @throws TemporaryAttachmentException in case of problem when performing the link
+     * @since 14.10RC1
+     */
+    @Unstable
+    void temporarilyAttach(XWikiAttachment attachment, DocumentReference documentReference)
+        throws TemporaryAttachmentException;
+
+    /**
      * Retrieve all temporary attachments related to the given document reference in the current user session.
      *
      * @param documentReference the reference for which to retrieve temporary attachments.

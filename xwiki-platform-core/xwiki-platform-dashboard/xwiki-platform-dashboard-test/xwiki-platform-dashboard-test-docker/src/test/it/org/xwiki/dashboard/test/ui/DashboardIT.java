@@ -59,7 +59,7 @@ class DashboardIT
         WebElement macroEntry = macroDialogSelectModal.getFirstMacro().orElseThrow();
         // We check that some css property are correctly applied on the listed macros (see XWIKI-20235). 
         String cssValue = macroEntry.getCssValue("color");
-        // Implicit opacity is not always removed browsers, so we need to check on both cases.
+        // Implicit opacity is not always removed by browsers, so we need to check on both cases.
         assertThat(cssValue, anyOf(equalTo("rgb(51, 51, 51)"), equalTo("rgba(51, 51, 51, 1)")));
         macroEntry.click();
         MacroDialogEditModal macroDialogEditModal = macroDialogSelectModal.clickSelect();

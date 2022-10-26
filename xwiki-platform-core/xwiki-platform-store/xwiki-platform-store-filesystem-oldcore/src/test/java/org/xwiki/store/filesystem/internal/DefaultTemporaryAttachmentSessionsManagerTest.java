@@ -39,6 +39,7 @@ import org.mockito.Mock;
 import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.store.TemporaryAttachmentException;
 import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -62,6 +63,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -253,5 +255,21 @@ class DefaultTemporaryAttachmentSessionsManagerTest
         DocumentReference documentReference = mock(DocumentReference.class);
         when(temporaryAttachmentSession.removeAttachments(documentReference)).thenReturn(true);
         assertTrue(this.attachmentManager.removeUploadedAttachments(documentReference));
+    }
+
+    @Test
+    void temporarilyAttach() throws TemporaryAttachmentException
+    {
+        DocumentReference documentReference = mock(DocumentReference.class);
+        XWikiAttachment attachment = mock(XWikiAttachment.class);
+        String sessionId = "removeUploadedAttachmentsPlural";
+        when(httpSession.getId()).thenReturn(sessionId);
+        TemporaryAttachmentSession temporaryAttachmentSession = mock(TemporaryAttachmentSession.class);
+        when(httpSession.getAttribute(ATTRIBUTE_KEY)).thenReturn(temporaryAttachmentSession);
+
+        this.attachmentManager.temporarilyAttach(attachment, documentReference);
+        verify(temporaryAttachmentSession).addAttachment(documentReference, attachment);
+
+        verifyNoInteractions(attachment);
     }
 }

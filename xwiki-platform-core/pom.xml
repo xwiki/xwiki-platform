@@ -125,8 +125,18 @@
 
                  Single justification example:
             -->
-
-            
+            <revapi.differences>
+              <justification>Unstable API</justification>
+              <criticality>documented</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.addedToInterface</code>
+                  <new>method void org.xwiki.store.TemporaryAttachmentSessionsManager::temporarilyAttach(com.xpn.xwiki.doc.XWikiAttachment, org.xwiki.model.reference.DocumentReference) throws org.xwiki.store.TemporaryAttachmentException</new>
+                  <justification>New method needed in the unstable interface for temporary attachments.</justification>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

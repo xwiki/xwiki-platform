@@ -382,7 +382,7 @@
   {{/error}}
 #elseif ($wikimacro.parameters.target == 'user' &amp;&amp; "$!wikimacro.parameters.user" != "" &amp;&amp; !$services.security.authorization.hasAccess('admin', $wikimacro.parameters.user.reference) &amp;&amp; !$xcontext.userReference.equals($wikimacro.parameters.user.reference))
   {{error}}
-    {{translation key="notifications.settings.error.userReferenceAdminForbidden" parameters="$wikimacro.parameters.user" /}}
+    {{translation key="notifications.settings.error.userReferenceAdminForbidden" parameters="~"${services.rendering.escape($escapetool.java($wikimacro.parameters.user), 'xwiki/2.1')}~"" /}}
   {{/error}}
 #else
 #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsAutoWatchPreferencesMacro'))
@@ -394,7 +394,7 @@
 #set ($dataUser = "")
 #if ($wikimacro.parameters.target == 'user')
   #set ($mode = $services.notification.watch.getAutomaticWatchMode($targetUser))
-  #set ($dataUser = "data-user=""$services.model.serialize($targetUser)""")
+  #set ($dataUser = "data-user=""$escapetool.xml($services.model.serialize($targetUser))""")
 #else
   #set ($mode = $services.notification.watch.defaultAutomaticWatchMode)
 #end

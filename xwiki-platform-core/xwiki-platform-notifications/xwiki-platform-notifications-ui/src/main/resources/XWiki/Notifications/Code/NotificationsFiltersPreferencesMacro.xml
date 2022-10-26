@@ -1042,11 +1042,11 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'xwiki-bootstrap-
 ## This should be improved later with such API.
 #elseif ("$!wikimacro.parameters.user" != "" &amp;&amp; $wikimacro.parameters.user.class.simpleName != 'DocumentUserReference')
   {{error}}
-    This macro only allows to handle DocumentUserReference references and you specified a $wikimacro.parameters.user.class.simpleName reference.
+    This macro only allows to handle DocumentUserReference references and you specified a $services.rendering.escape($wikimacro.parameters.user.class.simpleName, 'xwiki/2.1') reference.
   {{/error}}
 #elseif ("$!wikimacro.parameters.user" != "" &amp;&amp; !$services.security.authorization.hasAccess('admin', $wikimacro.parameters.user.reference) &amp;&amp; !$xcontext.userReference.equals($wikimacro.parameters.user.reference))
   {{error}}
-    You don't have administration right on  $wikimacro.parameters.user.
+    You don't have administration right on $services.rendering.escape($wikimacro.parameters.user, 'xwiki/2.1').
   {{/error}}
 #else
 #set ($discard = $services.logging.deprecate("NotificationsFiltersPreferencesMacro", "This macro should not be used anymore in favor of SystemNotificationsFiltersPreferencesMacro and CustomNotificationsFiltersPreferencesMacro."))
@@ -1067,7 +1067,8 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'xwiki-bootstrap-
 ### MACRO CONTENT
 ######################################################
 {{html clean="false"}}
-&lt;div class="filterPreferences xform" data-user-url="$escapetool.xml($services.rest.url($targetUser))" data-user="$services.model.serialize($targetUser)"&gt;
+&lt;div class="filterPreferences xform" data-user-url="$escapetool.xml($services.rest.url($targetUser))"
+  data-user="$escapetool.xml($services.model.serialize($targetUser))"&gt;
   &lt;div class="row"&gt;
     &lt;p class="xHint col-xs-12 col-sm-9 col-md-8 col-lg-9"&gt;
       $escapetool.xml($services.localization.render('notifications.settings.filters.preferences.hint'))
@@ -1101,7 +1102,8 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'xwiki-bootstrap-
 ######################################################
 ### ADD FILTER MODAL
 ######################################################
-&lt;div class="modal fade" tabindex="-1" role="dialog" id="modal-add-filter-preference" data-user="$services.model.serialize($targetUser)"&gt;
+&lt;div class="modal fade" tabindex="-1" role="dialog" id="modal-add-filter-preference"
+  data-user="$escapetool.xml($services.model.serialize($targetUser))"&gt;
   &lt;div class="modal-dialog" role="document"&gt;
     &lt;div class="modal-content"&gt;
       &lt;div class="modal-header"&gt;

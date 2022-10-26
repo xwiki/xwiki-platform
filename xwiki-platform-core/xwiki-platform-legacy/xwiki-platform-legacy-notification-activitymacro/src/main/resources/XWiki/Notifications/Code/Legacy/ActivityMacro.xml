@@ -159,10 +159,19 @@
     <property>
       <code>{{velocity}}
 #set ($wikis = '')
-#if ($services.wiki.currentWikiId != $services.wiki.mainWikiId)
+#if ("$!xcontext.macro.params.wikis" != '')
+  #set ($wikis = $xcontext.macro.params.wikis)
+#elseif ($services.wiki.currentWikiId != $services.wiki.mainWikiId)
   #set ($wikis = $services.wiki.currentWikiId)
 #end
-{{notifications useUserPreferences="false" displayOwnEvents="true" count="$xcontext.macro.params.entries" #if("$!xcontext.macro.params.wikis" != '')wikis="$xcontext.macro.params.wikis"#{else}wikis="$wikis"#end #if("$!xcontext.macro.params.spaces" != '')spaces="$xcontext.macro.params.spaces"#end #if("$!xcontext.macro.params.authors" != '')users="$xcontext.macro.params.authors"#end #if("$!xcontext.macro.params.tags" != '')tags="$xcontext.macro.params.tags"#end #if("$!xcontext.macro.params.minor" != '')displayMinorEvents="$xcontext.macro.params.minor"#end #if("$!xcontext.macro.params.rss" != '')displayRSSLink="$xcontext.macro.params.rss"#end /}}
+{{notifications useUserPreferences="false" displayOwnEvents="true"
+        count="$services.rendering.escape($xcontext.macro.params.entries, 'xwiki/2.1')"
+        wikis="$services.rendering.escape($wikis, 'xwiki/2.1')"
+        #if("$!xcontext.macro.params.spaces" != '')spaces="$services.rendering.escape($xcontext.macro.params.spaces, 'xwiki/2.1')"#end
+        #if("$!xcontext.macro.params.authors" != '')users="$services.rendering.escape($xcontext.macro.params.authors, 'xwiki/2.1')"#end
+        #if("$!xcontext.macro.params.tags" != '')tags="$services.rendering.escape($xcontext.macro.params.tags, 'xwiki/2.1')"#end
+        #if("$!xcontext.macro.params.minor" != '')displayMinorEvents="$services.rendering.escape($xcontext.macro.params.minor, 'xwiki/2.1')"#end
+        #if("$!xcontext.macro.params.rss" != '')displayRSSLink="$services.rendering.escape($xcontext.macro.params.rss, 'xwiki/2.1')"#end /}}
 {{/velocity}}</code>
     </property>
     <property>

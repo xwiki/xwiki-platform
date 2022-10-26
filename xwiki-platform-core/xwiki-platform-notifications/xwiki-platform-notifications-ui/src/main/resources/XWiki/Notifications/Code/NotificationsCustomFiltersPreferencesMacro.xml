@@ -1086,7 +1086,7 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
   #else
     #set ($targetUser = $xcontext.userReference)
   #end
-  #set ($divData = "data-doc-url=""$escapetool.xml($services.rest.url($targetUser))"" data-user=""$services.model.serialize($targetUser)""")
+  #set ($divData = "data-doc-url=""$escapetool.xml($services.rest.url($targetUser))"" data-user=""$escapetool.xml($services.model.serialize($targetUser))""")
 #end
 ######################################################
 ### CSS and JAVASCRIPTS

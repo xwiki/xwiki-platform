@@ -984,7 +984,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
     #set ($targetUser = $xcontext.userReference)
     #set ($targetUserReference = $services.user.currentUserReference)
   #end
-  #set ($divData = "data-user=""$services.model.serialize($targetUser)""")
+  #set ($divData = "data-user=""$escapetool.xml($services.model.serialize($targetUser))""")
 #end
 #set ($userDoc = $xwiki.getDocument($targetUser))
 ######################################################

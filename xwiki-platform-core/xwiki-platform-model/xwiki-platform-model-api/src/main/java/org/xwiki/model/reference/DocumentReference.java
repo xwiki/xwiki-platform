@@ -284,13 +284,13 @@ public class DocumentReference extends AbstractLocalizedEntityReference
     @Transient
     public DocumentReference setWikiReference(WikiReference wikiReference)
     {
-        WikiReference currentWikiReferene = getWikiReference();
+        WikiReference currentWikiReference = getWikiReference();
 
-        if (currentWikiReferene.equals(wikiReference)) {
+        if (currentWikiReference.equals(wikiReference)) {
             return this;
         }
 
-        return new DocumentReference(this, currentWikiReferene, wikiReference);
+        return new DocumentReference(this, currentWikiReference, wikiReference);
     }
 
     /**

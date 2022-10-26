@@ -19,7 +19,7 @@
  */
 
 define('imageEditorTranslationKeys', [], [
-  'modal.backToEditor.button',
+  'modal.changeImage.button',
   'modal.loadFail.message',
   'modal.title',
   'modal.insertButton',
@@ -116,7 +116,7 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
 
     function addChangeImageButton(insertButton, modal) {
       var selectImageButton = $('<button type="button" class="btn btn-default pull-left"></button>')
-        .text(translations.get('modal.backToEditor.button'))
+        .text(translations.get('modal.changeImage.button'))
         .prependTo(insertButton.parent());
       selectImageButton.on('click', function() {
         var imageData = getFormData(modal);

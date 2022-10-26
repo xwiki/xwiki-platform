@@ -126,6 +126,14 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
     }
 
     @Override
+    public void temporarilyAttach(XWikiAttachment attachment, DocumentReference documentReference)
+        throws TemporaryAttachmentException
+    {
+        TemporaryAttachmentSession temporaryAttachmentSession = getOrCreateSession();
+        temporaryAttachmentSession.addAttachment(documentReference, attachment);
+    }
+
+    @Override
     public Collection<XWikiAttachment> getUploadedAttachments(DocumentReference documentReference)
     {
         TemporaryAttachmentSession temporaryAttachmentSession = getOrCreateSession();

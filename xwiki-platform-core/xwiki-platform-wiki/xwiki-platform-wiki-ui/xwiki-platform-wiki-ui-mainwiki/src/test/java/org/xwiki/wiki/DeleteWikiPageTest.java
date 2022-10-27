@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.flamingo;
+package org.xwiki.wiki;
 
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
@@ -39,12 +39,12 @@ import org.xwiki.test.page.XWikiSyntax21ComponentList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Test of the {@code FlamingoThemesCode.WebHomeSheet} page.
+ * Test of the {@code WikiManager.DeleteWiki} page.
  *
  * @version $Id$
- * @since 13.10.10
- * @since 14.4.6
- * @since 14.9RC1
+ * @since 13.10.11
+ * @since 14.4.7
+ * @since 14.10RC1
  */
 @HTML50ComponentList
 @XWikiSyntax21ComponentList
@@ -52,30 +52,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
     ErrorMessageMacro.class,
     TranslationMacro.class,
     TestNoScriptMacro.class,
-    DefaultExtendedRenderingConfiguration.class,
-    RenderingConfigClassDocumentConfigurationSource.class,
     RenderingScriptService.class,
     SyntaxConverter.class,
     DefaultMacroCategoryManager.class,
     DefaultMacroTransformationConfiguration.class,
-    // Rendering script service
-    RenderingScriptService.class,
-    SyntaxConverter.class,
-    DefaultMacroCategoryManager.class,
-    DefaultMacroTransformationConfiguration.class
+    DefaultExtendedRenderingConfiguration.class,
+    RenderingConfigClassDocumentConfigurationSource.class
 })
-class WebHomeSheetPageTest extends PageTest
+class DeleteWikiPageTest extends PageTest
 {
     @Test
-    void createAction() throws Exception
+    void unknownWikiId() throws Exception
     {
-        this.request.put("newThemeName", "some content\"/}}{{noscript/}}");
-        this.request.put("form_token", "1");
-        this.request.put("action", "create");
-
-        Document document = this.renderHTMLPage(new DocumentReference("xwiki", "FlamingoThemesCode", "WebHomeSheet"));
-
-        assertEquals("platform.flamingo.themes.home.create.csrf [some content\"/}}{{noscript/}}]",
+        this.request.put("wikiId", "\" /}}{{noscript/}}");
+        Document document = renderHTMLPage(new DocumentReference("xwiki", "WikiManager", "DeleteWiki"));
+        assertEquals("platform.wiki.error.wikidoesnotexist [\" /}}{{noscript/}}]",
             document.select(".box.errormessage").text());
     }
 }

@@ -124,6 +124,7 @@ ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.center=Centré
 ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.end=A la fin
 ckeditor.plugin.image.imageEditor.advancedTab.textWrap.label=Adaptation au texte
 ckeditor.plugin.image.imageEditor.advancedTab.textWrap.hint=Si coché, l'image est entourée par le texte.
+ckeditor.plugin.image.imageSelector.treeTab.title=Arborescence
 ckeditor.plugin.image.imageSelector.uploadTab.title=Envoi
 ckeditor.plugin.image.imageSelector.uploadTab.file.title=Fichier
 ckeditor.plugin.image.imageSelector.uploadTab.file.hint=Sélectionnez un fichier local à ajouter à la page.
@@ -186,6 +187,9 @@ macroEditor.content=Contenu
 macroEditor.noParameters=Cette macro ne possède aucun paramètre.
 macroEditor.descriptorRequestFailed=La recherche du descripteur de la macro {0} a échoué.
 macroEditor.installRequestFailed=Impossible d''installer la macro {0}.
+
+
+imageEditor.modal.changeImage.button=Modifier l'image
 
 
 imageEditor.modal.loadFail.message=Impossible d'afficher le formulaire de modification de l'image.

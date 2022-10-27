@@ -60,7 +60,8 @@
   ##
   #if (!$wiki)
     #if (!$services.wiki.lastError)
-      {{error}}{{translation key="platform.wiki.error.wikidoesnotexist" parameters="$wikiId"/}}{{/error}}
+      #set ($escapedWikiId = $services.rendering.escape($escapetool.java($wikiId), 'xwiki/2.1'))
+      {{error}}{{translation key="platform.wiki.error.wikidoesnotexist" parameters="~"${escapedWikiId}~""/}}{{/error}}
     #else
       #printException($services.wiki.lastError)
     #end

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.attachment;
+package org.xwiki.test.page;
 
 import java.util.List;
 
@@ -34,12 +34,12 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 import static java.util.Collections.emptyList;
 
 /**
- * This script prints an error log when it is interpreted, making the test fail.
+ * This macro prints an error log when it is executed, making the page test fail.
  *
  * @version $Id$
- * @since 14.5RC1
- * @since 14.4.2
- * @since 13.10.7
+ * @since 13.10.11
+ * @since 14.4.7
+ * @since 14.10RC1
  */
 @Component
 @Named("noscript")

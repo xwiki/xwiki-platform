@@ -124,6 +124,7 @@ ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.center=Центр
 ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.end=Окончание
 ckeditor.plugin.image.imageEditor.advancedTab.textWrap.label=Обтекание текстом
 ckeditor.plugin.image.imageEditor.advancedTab.textWrap.hint=Если галочка установлена, окружающий текст обтекает изображение.
+ckeditor.plugin.image.imageSelector.treeTab.title=Дерево
 ckeditor.plugin.image.imageSelector.uploadTab.title=Загрузка
 ckeditor.plugin.image.imageSelector.uploadTab.file.title=Файл
 ckeditor.plugin.image.imageSelector.uploadTab.file.hint=Выберите локальный файл для добавления на страницу.
@@ -186,6 +187,9 @@ macroEditor.content=Контент
 macroEditor.noParameters=Этот макрос не имеет параметров.
 macroEditor.descriptorRequestFailed=Не удалось получить {0} дескриптор макроса.
 macroEditor.installRequestFailed=Не удалось установить макрос {0}.
+
+
+imageEditor.modal.changeImage.button=Заменить изображение
 
 
 imageEditor.modal.loadFail.message=Не удалось получить диалог настройки изображения.

@@ -129,6 +129,13 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
+    <!-- Runtime dependencies. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-xwiki</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Needed to display wiki activity in the user profile "Wiki" tab -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -160,6 +167,13 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-livedata-macro</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-xwiki</artifactId>
       <version>${project.version}</version>
       <type>test-jar</type>
       <scope>test</scope>

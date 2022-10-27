@@ -144,7 +144,7 @@ class XWikiSyntaxMacrosListPageTest extends PageTest
         assertEquals("help.macroList.description", includeMacroRowTds.get(3).text());
         assertEquals("help.macroList.visibility", includeMacroRowTds.get(4).text());
         assertWikiMacro(trs.get(1), "mymacro", "/xwiki/bin/view/XWiki/MyMacro", "My Macro",
-            Set.of("Category1", "Category2"), "My Macro Description", "WIKI");
+            Set.of("Category1", "Category2"), "My Macro Description", "XWiki.WikiMacroClass_visibility_WIKI");
         assertJavaMacro(trs.get(2), "velocity", "Velocity", "Development", "Executes a Velocity script.",
             "XWiki.WikiMacroClass_visibility_Global");
         assertJavaMacro(trs.get(3), "translation", "Translation", "Content",

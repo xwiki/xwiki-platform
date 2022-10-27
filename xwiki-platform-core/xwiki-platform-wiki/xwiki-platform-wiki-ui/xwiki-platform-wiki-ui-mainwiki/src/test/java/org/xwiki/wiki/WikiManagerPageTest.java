@@ -58,7 +58,7 @@ import static org.mockito.Mockito.when;
 @ComponentList({
     ControlCharactersFilter.class,
 })
-class WikiManagerTest extends PageTest
+class WikiManagerPageTest extends PageTest
 {
     /**
      * Verify the resolved configuration of the Live Data macro (stored in the {@code data-config} attribute of the

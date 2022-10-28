@@ -71,7 +71,7 @@
     #sendSuccess($document $fileName)
   #else
     ## Forbidden
-    #sendError(403 'You are not allowed to perform this action.')
+    #sendError(403 "$services.localization.render('ckeditor.upload.error.forbidden')")
   #end
 #end
 
@@ -103,12 +103,17 @@
       #set ($document = $xwiki.getDocument($request.document))
     #end
     #set ($reference = $document.documentReference)
-    #set ($attachment = $services.temporaryAttachments.uploadTemporaryAttachment($reference, 'upload', 
-        $request.filename))
-    #if ($attachment)
-      #sendSuccess($document, $attachment.filename)
+    #set ($skipRightCheck = ($request.getHeader('X-XWiki-Temporary-Attachment-Skip-Right-Check') == 'true'))
+    #if ($skipRightCheck || $document.hasAccessLevel('edit'))
+      #set ($attachment = $services.temporaryAttachments.uploadTemporaryAttachment($reference, 'upload',
+          $request.filename))
+      #if ($attachment)
+        #sendSuccess($document, $attachment.filename)
+      #else
+        #sendError(400 "$services.localization.render('ckeditor.upload.error.emptyreturn')")
+      #end
     #else
-      #sendError(400 "$services.localization.render('ckeditor.upload.error.emptyreturn')")
+    #sendError(403 "$services.localization.render('ckeditor.upload.error.forbidden')")
     #end
   #else
     #sendError(403 "$services.localization.render('ckeditor.upload.error.csrf')")

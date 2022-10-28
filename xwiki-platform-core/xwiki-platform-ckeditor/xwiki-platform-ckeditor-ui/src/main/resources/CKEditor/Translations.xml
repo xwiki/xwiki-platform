@@ -153,7 +153,8 @@ ckeditor.plugin.image.imageSelector.urlTab.url.placeholder=https://...
 ckeditor.inline.failedToInit=Failed to initialize CKEditor.
 
 ckeditor.upload.error.csrf=The CSRF token is missing.
-ckeditor.upload.error.emptyReturn=Error when uploading the file: it might exceed the configured maximum upload size.
+ckeditor.upload.error.emptyReturn=Error when uploading the file: it might exceed the configured maximum upload size..
+ckeditor.upload.error.forbidden=You are not allowed to perform this action.
 
 modal.ok=OK
 modal.cancel=Cancel

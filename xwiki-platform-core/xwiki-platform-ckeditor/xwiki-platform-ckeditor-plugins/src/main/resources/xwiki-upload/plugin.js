@@ -153,6 +153,9 @@
         var xhr = event.data.fileLoader.xhr;
         xhr.setRequestHeader( 'X-XWiki-Temporary-Attachment-Support',
           editor.config['xwiki-upload'].isTemporaryAttachmentSupported);
+        console.log(editor);
+        // FIXME: Read this from an attribute.
+        xhr.setRequestHeader( 'X-XWiki-Temporary-Attachment-Skip-Right-Check', 'false');
       }
     });
     // Inject a new input field when an attachment is added so that the save request knows

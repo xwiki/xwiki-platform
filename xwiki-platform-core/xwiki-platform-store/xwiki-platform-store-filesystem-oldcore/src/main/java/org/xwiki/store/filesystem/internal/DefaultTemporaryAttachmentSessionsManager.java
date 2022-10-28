@@ -21,6 +21,7 @@ package org.xwiki.store.filesystem.internal;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -159,5 +160,22 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
     {
         TemporaryAttachmentSession temporaryAttachmentSession = getOrCreateSession();
         return temporaryAttachmentSession.removeAttachments(documentReference);
+    }
+
+    @Override
+    public void attachTemporaryAttachmentsInDocument(XWikiDocument document, List<String> fileNames)
+    {
+        if (!fileNames.isEmpty()) {
+            for (String temporaryUploadedFile : fileNames) {
+                Optional<XWikiAttachment> uploadedAttachmentOpt =
+                    getUploadedAttachment(document.getDocumentReference(), temporaryUploadedFile);
+                uploadedAttachmentOpt.ifPresent(uploadedAttachment -> {
+                    XWikiAttachment previousAttachment = document.setAttachment(uploadedAttachment);
+                    if (previousAttachment != null) {
+                        uploadedAttachment.setVersion(previousAttachment.getNextVersion());
+                    }
+                });
+            }
+        }
     }
 }

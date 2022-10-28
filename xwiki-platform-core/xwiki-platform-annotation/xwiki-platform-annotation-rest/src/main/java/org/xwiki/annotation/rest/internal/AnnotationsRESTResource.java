@@ -169,6 +169,8 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
 
             // add the annotation
             Map<String, Object> annotationMetadata = getMap(request.getAnnotation());
+
+            this.handleTemporaryUploadedFiles(documentReference, annotationMetadata);
             this.annotationService.addAnnotation(documentName, request.getSelection(), request.getSelectionContext(),
                 request.getSelectionOffset(), getXWikiUser(), annotationMetadata);
 

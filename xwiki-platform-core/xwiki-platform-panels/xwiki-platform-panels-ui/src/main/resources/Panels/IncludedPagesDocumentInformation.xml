@@ -40,43 +40,6 @@
   <object>
     <name>Panels.IncludedPagesDocumentInformation</name>
     <number>0</number>
-    <className>NumberedHeadings.Code.NumberedHeadingsClass</className>
-    <guid>1ca27444-5837-4d6b-8e07-2fff6a8b46ed</guid>
-    <class>
-      <name>NumberedHeadings.Code.NumberedHeadingsClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <status>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>status</name>
-        <number>1</number>
-        <prettyName>Status</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>|activated|deactivated</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </status>
-    </class>
-    <property>
-      <status/>
-    </property>
-  </object>
-  <object>
-    <name>Panels.IncludedPagesDocumentInformation</name>
-    <number>0</number>
     <className>XWiki.DocumentSheetBinding</className>
     <guid>c4318e6a-ef35-460d-9559-be0bfd19647e</guid>
     <class>
@@ -248,7 +211,10 @@
 #if($pages.size() != 0)
   {{html clean="false"}}&lt;dt&gt;{{/html}}$services.localization.render('panels.documentInformation.includesCount', [$pages.size()]){{html clean="false"}}&lt;/dt&gt;{{/html}}
   #foreach ($page in $pages)
-  {{html clean="false"}}&lt;dd&gt;{{/html}}[[$page&gt;&gt;$page]] [[[[image:icon:page_white_edit||alt="$services.localization.render('panels.documentInformation.editIncluded', [$page])"]]&gt;&gt;path:$xwiki.getURL($page, 'edit')]]{{html clean="false"}}&lt;/dd&gt;{{/html}}
+    #set ($pageLink = $services.rendering.escape($page, 'xwiki/2.1'))
+    #set ($pageName = $services.rendering.escape($services.rendering.escape($page, 'xwiki/2.1'), 'xwiki/2.1'))
+    #set ($alt = $services.rendering.escape($services.localization.render('panels.documentInformation.editIncluded', [$page]), 'xwiki/2.1'))
+    {{html clean="false"}}&lt;dd&gt;{{/html}}[[$pageName&gt;&gt;$pageLink]] [[[[image:icon:page_white_edit||alt="$alt"]]&gt;&gt;path:$xwiki.getURL($page, 'edit')]]{{html clean="false"}}&lt;/dd&gt;{{/html}}
   #end
 #end
 ##--------------------------------------------------------------------------

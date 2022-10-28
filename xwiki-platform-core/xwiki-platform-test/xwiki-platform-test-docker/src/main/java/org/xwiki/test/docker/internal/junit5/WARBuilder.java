@@ -280,7 +280,7 @@ public class WARBuilder
                 String mysqlDriverVersion = isJDBCDriverSpecified(this.testConfiguration.getJDBCDriverVersion())
                     ? this.testConfiguration.getJDBCDriverVersion()
                     : this.mavenResolver.getPropertyFromCurrentPOM("mysql.version");
-                artifact = new DefaultArtifact("mysql", "mysql-connector-java", JAR, mysqlDriverVersion);
+                artifact = new DefaultArtifact("com.mysql", "mysql-connector-j", JAR, mysqlDriverVersion);
                 break;
             case MARIADB:
                 String mariadbDriverVersion = isJDBCDriverSpecified(this.testConfiguration.getJDBCDriverVersion())

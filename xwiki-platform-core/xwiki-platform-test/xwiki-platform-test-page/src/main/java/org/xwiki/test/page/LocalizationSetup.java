@@ -127,13 +127,9 @@ public final class LocalizationSetup
     private static Object[] getVarArgs(InvocationOnMock invocationOnMockRender, int i)
     {
         Object[] parameters;
-        if (invocationOnMockRender.getArguments().length > i) {
-            Object argument = invocationOnMockRender.getArgument(i);
-            if (argument instanceof String) {
-                parameters = new Object[] { argument };
-            } else {
-                parameters = (Object[]) argument;
-            }
+        Object[] arguments = invocationOnMockRender.getArguments();
+        if (arguments.length > i) {
+            parameters = Arrays.copyOfRange(arguments, i, arguments.length);
         } else {
             parameters = new Object[] {};
         }

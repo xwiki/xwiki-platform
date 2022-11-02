@@ -417,7 +417,9 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
     protected void handleTemporaryUploadedFiles(DocumentReference documentReference, Map<String, Object> metadataMap)
         throws XWikiException
     {
-        if (metadataMap.containsKey("uploadedFiles")) {
+        String documentName = this.referenceSerializer.serialize(documentReference);
+        boolean canUploadAttachment = this.annotationRightService.canUploadAttachment(documentName, getXWikiUser());
+        if (canUploadAttachment && metadataMap.containsKey("uploadedFiles")) {
             XWikiContext context = this.xcontextProvider.get();
             XWikiDocument document = context.getWiki().getDocument(documentReference, context);
             String[] uploadedFiles = StringUtils.split(String.valueOf(metadataMap.get("uploadedFiles")), ",");

@@ -114,6 +114,12 @@ public class XWikiAnnotationRightService implements AnnotationRightService
         return this.authorization.hasAccess(Right.VIEW, getUserReference(userName), getDocumentReference(target));
     }
 
+    @Override
+    public boolean canUploadAttachment(String target, String userName)
+    {
+        return this.authorization.hasAccess(Right.EDIT, getUserReference(userName), getDocumentReference(target));
+    }
+
     /**
      * Helper method to parse the target as a reference and extract a serialized document reference from it: the
      * document reference serialized if the target can be parsed as a typed reference, or the initial string itself

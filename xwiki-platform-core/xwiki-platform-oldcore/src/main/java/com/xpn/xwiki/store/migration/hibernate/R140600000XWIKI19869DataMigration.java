@@ -240,10 +240,18 @@ public class R140600000XWIKI19869DataMigration extends AbstractHibernateDataMigr
         Collection<XWikiRCSNodeInfo> archiveNodes = documentArchive.getNodes();
 
         for (XWikiRCSNodeInfo node : new ArrayList<>(archiveNodes)) {
-            XWikiDocument revision = this.documentRevisionProvider.getRevision(userDoc, node.getVersion().toString());
-            if (fixPasswordHash(revision, false, false)) {
-                documentArchive.updateArchive(revision, revision.getAuthor(), revision.getDate(), revision.getComment(),
-                    revision.getRCSVersion(), context);
+            try {
+                XWikiDocument revision =
+                    this.documentRevisionProvider.getRevision(userDoc, node.getVersion().toString());
+                if (fixPasswordHash(revision, false, false)) {
+                    documentArchive.updateArchive(revision, revision.getAuthor(), revision.getDate(),
+                        revision.getComment(), revision.getRCSVersion(), context);
+                }
+            } catch (Exception e) {
+                this.logger.warn(
+                    "Failed to handler revision [{}] for user page [{}]: {}. It's recommended to delete this version.",
+                    node.getVersion().toString(), userDoc.getDocumentReference(),
+                    ExceptionUtils.getRootCauseMessage(e));
             }
         }
     }

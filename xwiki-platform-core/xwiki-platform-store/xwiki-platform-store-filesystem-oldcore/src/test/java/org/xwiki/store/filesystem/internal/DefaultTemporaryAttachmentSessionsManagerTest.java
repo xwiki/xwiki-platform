@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,6 +50,7 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
@@ -271,5 +273,48 @@ class DefaultTemporaryAttachmentSessionsManagerTest
         verify(temporaryAttachmentSession).addAttachment(documentReference, attachment);
 
         verifyNoInteractions(attachment);
+    }
+
+    @Test
+    void attachTemporaryAttachmentsInDocument()
+    {
+        XWikiDocument document = mock(XWikiDocument.class);
+        this.attachmentManager.attachTemporaryAttachmentsInDocument(document, Collections.emptyList());
+        verifyNoInteractions(this.context);
+
+        String sessionId = "removeUploadedAttachmentsPlural";
+        when(httpSession.getId()).thenReturn(sessionId);
+        TemporaryAttachmentSession temporaryAttachmentSession = mock(TemporaryAttachmentSession.class);
+        when(httpSession.getAttribute(ATTRIBUTE_KEY)).thenReturn(temporaryAttachmentSession);
+
+        DocumentReference documentReference = mock(DocumentReference.class);
+        when(document.getDocumentReference()).thenReturn(documentReference);
+
+        String file1 = "myfile.txt";
+        String file2 = "otherfile.gif";
+
+        XWikiAttachment attachment1 = mock(XWikiAttachment.class, "file1");
+        XWikiAttachment attachment2 = mock(XWikiAttachment.class, "file2");
+
+        XWikiAttachment previousAttachment1 = mock(XWikiAttachment.class, "previousFile1");
+        when(document.setAttachment(attachment1)).thenReturn(previousAttachment1);
+
+        String version = "4.5";
+        when(previousAttachment1.getNextVersion()).thenReturn(version);
+
+        when(temporaryAttachmentSession.getAttachment(documentReference, file1)).thenReturn(Optional.of(attachment1));
+        when(temporaryAttachmentSession.getAttachment(documentReference, file2)).thenReturn(Optional.of(attachment2));
+
+        this.attachmentManager.attachTemporaryAttachmentsInDocument(document, List.of(
+            "foo",
+            file1,
+            "bar",
+            file2,
+            ""
+        ));
+        verify(document).setAttachment(attachment1);
+        verify(document).setAttachment(attachment2);
+        verify(attachment1).setVersion(version);
+        verifyNoInteractions(attachment2);
     }
 }

@@ -427,4 +427,9 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
                 .attachTemporaryAttachmentsInDocument(document, Arrays.asList(uploadedFiles));
         }
     }
+
+    protected void cleanTemporaryUploadedFiles(DocumentReference documentReference)
+    {
+        this.temporaryAttachmentSessionsManager.removeUploadedAttachments(documentReference);
+    }
 }

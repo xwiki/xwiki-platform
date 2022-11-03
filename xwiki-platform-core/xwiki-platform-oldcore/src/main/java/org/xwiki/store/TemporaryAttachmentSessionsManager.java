@@ -147,7 +147,10 @@ public interface TemporaryAttachmentSessionsManager
     /**
      * This method aims at attaching the {@link XWikiAttachment} that might have been previously temporary upload to the
      * {@link XWikiDocument} they are targeting.
-     * This method should only be called before performing a save of the document to actually persist them.
+     * This method should only be called before performing a save of the document to actually persist them. Also note
+     * that this method cannot call {@link #removeUploadedAttachment(DocumentReference, String)} as removing the
+     * attachment would delete the data before they can be properly saved in the persistent storage. So the consumer of
+     * the API should take care of properly calling this API when needed.
      *
      * @param document the actual document instance that should receive the attachments
      * @param fileNames the names of the uploaded files to attach

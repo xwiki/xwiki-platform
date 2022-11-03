@@ -155,6 +155,7 @@ public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
             newAnnotation.setAuthor(getXWikiUser());
             // and update
             annotationService.updateAnnotation(documentName, newAnnotation);
+            this.cleanTemporaryUploadedFiles(documentReference);
             // and then return the annotated content, as specified by the annotation request
             AnnotationResponse response = getSuccessResponseWithAnnotatedContent(documentName, updateRequest);
             return response;

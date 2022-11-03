@@ -52,6 +52,7 @@ import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -114,6 +115,10 @@ class DefaultModelBridgeTest
 
     @MockComponent
     private AuthorizationManager authorization;
+
+    @MockComponent
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> userReferenceResolver;
 
     @InjectComponentManager
     private MockitoComponentManager componentManager;
@@ -785,7 +790,7 @@ class DefaultModelBridgeTest
 
         XWikiRightService rightService = mock(XWikiRightService.class);
         when(xwiki.getRightService()).thenReturn(rightService);
-        when(rightService.hasAccessLevel(any(), any(), any(), any())).thenReturn(true);
+        when(recycleBin.hasAccess(any(), any(), any())).thenReturn(true);
 
         assertTrue(this.modelBridge.canRestoreDeletedDocument(deletedDocument, userReferenceToCheck));
 
@@ -815,7 +820,7 @@ class DefaultModelBridgeTest
         // No rights.
         XWikiRightService rightService = mock(XWikiRightService.class);
         when(xwiki.getRightService()).thenReturn(rightService);
-        when(rightService.hasAccessLevel(any(), any(), any(), any())).thenReturn(false);
+        when(recycleBin.hasAccess(any(), any(), any())).thenReturn(false);
         DocumentReference authorReference = new DocumentReference("wiki", "user", "Alice");
         when(xcontext.getAuthorReference()).thenReturn(authorReference);
         when(request.isCheckRights()).thenReturn(true);

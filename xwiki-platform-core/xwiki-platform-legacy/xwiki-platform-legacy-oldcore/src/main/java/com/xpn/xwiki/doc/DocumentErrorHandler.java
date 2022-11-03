@@ -23,6 +23,7 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+@Deprecated(since = "14.10RC1")
 public class DocumentErrorHandler implements ErrorHandler
 {
     /**

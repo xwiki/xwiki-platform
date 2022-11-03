@@ -19,6 +19,7 @@
 ## ---------------------------------------------------------------------------
 ##
 ## @Deprecated since 9.8RC1 use the ClassPropertyValues REST resource instead.
+## TODO: add a warning when the template is not used in XWiki Standard anymore
 ##
 $response.setContentType("text/xml")
 ##
@@ -27,7 +28,8 @@ $response.setContentType("text/xml")
 #set($firCol = "$!{request.get('firCol')}")
 #set($secCol = "$!{request.get('secCol')}")
 #set($templatename = $classname + 'Template')
-#set($p = $xwiki.getDocument($classname).getxWikiClass().get($fieldname).getPropertyClass())
+#set($classDocument = $xwiki.getDocument($classname))
+#set($p = $classDocument.getxWikiClass().get($fieldname).getPropertyClass())
 #set($hibquery = "$!p.getSql()")
 ##
 ## Determine what was the input. If the property accepts multiple values and has separators, then
@@ -64,7 +66,8 @@ $response.setContentType("text/xml")
     #set($like = " lower("+ $likeCol.replaceAll("[^a-zA-Z0-9_.]", "") + ") like :input ESCAPE '!' and")
     #set($hibquery = "${hibquery.substring(0, $whereidx)}${like}${hibquery.substring($whereidx)}")
   #end
-  #set($results = $services.query.hql($hibquery).setLimit(30).bindValue('input', "%${input}%").execute())
+  ## Make sure the query is executed with the right of its author
+  #set($results = $services.query.hql($hibquery).setQueryAuthor($classDocument.getAuthorReference(), $classDocument.getDocumentReference()).setLimit(30).bindValue('input', "%${input}%").execute())
   <?xml version="1.0" encoding="UTF-8"?>
   <results type="${resultsType}">
   #foreach($res in $results)

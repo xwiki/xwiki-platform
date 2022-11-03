@@ -20,6 +20,7 @@
 package org.xwiki.store;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.Part;
@@ -30,6 +31,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Interface for operations related to temporary upload of attachments.
@@ -141,4 +143,21 @@ public interface TemporaryAttachmentSessionsManager
      *          current user session, {@code false} if there was no matching temporary attachment in cache.
      */
     boolean removeUploadedAttachments(DocumentReference documentReference);
+
+    /**
+     * This method aims at attaching the {@link XWikiAttachment} that might have been previously temporary upload to the
+     * {@link XWikiDocument} they are targeting.
+     * This method should only be called before performing a save of the document to actually persist them. Also note
+     * that this method cannot call {@link #removeUploadedAttachment(DocumentReference, String)} as removing the
+     * attachment would delete the data before they can be properly saved in the persistent storage. So the consumer of
+     * the API should take care of properly calling this API when needed.
+     *
+     * @param document the actual document instance that should receive the attachments
+     * @param fileNames the names of the uploaded files to attach
+     * @since 14.10RC1
+     */
+    @Unstable
+    default void attachTemporaryAttachmentsInDocument(XWikiDocument document, List<String> fileNames)
+    {
+    }
 }

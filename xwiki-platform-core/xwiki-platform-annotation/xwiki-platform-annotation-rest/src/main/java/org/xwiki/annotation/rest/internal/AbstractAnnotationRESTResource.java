@@ -23,6 +23,7 @@ package org.xwiki.annotation.rest.internal;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -32,6 +33,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.annotation.Annotation;
 import org.xwiki.annotation.AnnotationService;
 import org.xwiki.annotation.AnnotationServiceException;
@@ -47,6 +49,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rest.XWikiResource;
+import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import org.xwiki.wysiwyg.converter.HTMLConverter;
 
 import com.xpn.xwiki.XWiki;
@@ -109,6 +112,9 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
 
     @Inject
     private HTMLConverter htmlConverter;
+
+    @Inject
+    private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
 
     /**
      * Builds an annotation response containing the annotated content along with the annotation stubs, according to the
@@ -406,5 +412,24 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
             metadataMap.remove(REQUIRES_HTML_CONVERSION);
         }
         return metadataMap;
+    }
+
+    protected void handleTemporaryUploadedFiles(DocumentReference documentReference, Map<String, Object> metadataMap)
+        throws XWikiException
+    {
+        String documentName = this.referenceSerializer.serialize(documentReference);
+        boolean canUploadAttachment = this.annotationRightService.canUploadAttachment(documentName, getXWikiUser());
+        if (canUploadAttachment && metadataMap.containsKey("uploadedFiles")) {
+            XWikiContext context = this.xcontextProvider.get();
+            XWikiDocument document = context.getWiki().getDocument(documentReference, context);
+            String[] uploadedFiles = StringUtils.split(String.valueOf(metadataMap.get("uploadedFiles")), ",");
+            this.temporaryAttachmentSessionsManager
+                .attachTemporaryAttachmentsInDocument(document, Arrays.asList(uploadedFiles));
+        }
+    }
+
+    protected void cleanTemporaryUploadedFiles(DocumentReference documentReference)
+    {
+        this.temporaryAttachmentSessionsManager.removeUploadedAttachments(documentReference);
     }
 }

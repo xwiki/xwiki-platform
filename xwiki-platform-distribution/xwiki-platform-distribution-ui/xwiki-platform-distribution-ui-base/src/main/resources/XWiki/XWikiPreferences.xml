@@ -1507,7 +1507,7 @@
       <groups>XWiki.XWikiAllGroup</groups>
     </property>
     <property>
-      <levels>edit,comment,script</levels>
+      <levels>edit,comment</levels>
     </property>
     <property>
       <users/>

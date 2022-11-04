@@ -515,6 +515,8 @@ public class XarPackage
 
         DocumentBuilder dBuilder;
         try {
+            // Prevent XXE attack
+            dbFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
             dBuilder = dbFactory.newDocumentBuilder();
         } catch (ParserConfigurationException e) {
             throw new XarException("Failed to create a new Document builder", e);

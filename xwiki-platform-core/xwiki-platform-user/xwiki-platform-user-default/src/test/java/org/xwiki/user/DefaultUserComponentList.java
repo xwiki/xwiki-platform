@@ -29,17 +29,12 @@ import org.xwiki.configuration.internal.SpacesConfigurationSource;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.user.internal.AllGuestConfigurationSource;
 import org.xwiki.user.internal.AllSuperAdminConfigurationSource;
-import org.xwiki.user.internal.ConfiguredStringUserReferenceSerializer;
 import org.xwiki.user.internal.DefaultConfiguredStringUserReferenceResolver;
-import org.xwiki.user.internal.DefaultUserConfiguration;
 import org.xwiki.user.internal.DefaultUserManager;
 import org.xwiki.user.internal.GuestConfigurationSource;
 import org.xwiki.user.internal.SecureAllUserPropertiesResolver;
 import org.xwiki.user.internal.SecureUserPropertiesResolver;
 import org.xwiki.user.internal.SuperAdminConfigurationSource;
-import org.xwiki.user.internal.document.CurrentUserReferenceResolver;
-import org.xwiki.user.internal.document.DocumentDocumentReferenceUserReferenceResolver;
-import org.xwiki.user.internal.document.DocumentDocumentReferenceUserReferenceSerializer;
 import org.xwiki.user.internal.document.NormalUserConfigurationSourceAuthorization;
 import org.xwiki.user.internal.document.NormalUserPreferencesConfigurationSource;
 import org.xwiki.user.internal.document.SecureUserDocumentUserPropertiesResolver;
@@ -64,11 +59,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target({ TYPE, METHOD, ANNOTATION_TYPE })
 @ComponentList({
-    // UserReferenceSerializer
-    DocumentDocumentReferenceUserReferenceSerializer.class,
-    CurrentUserReferenceResolver.class,
-    DocumentDocumentReferenceUserReferenceResolver.class,
-    ConfiguredStringUserReferenceSerializer.class,
     // User Script Service
     SecureUserPropertiesResolver.class,
     SuperAdminConfigurationSource.class,
@@ -83,8 +73,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     UserPreferencesConfigurationSource.class,
     NormalUserPreferencesConfigurationSource.class,
     NormalUserConfigurationSourceAuthorization.class,
-    // User Configuration
-    DefaultUserConfiguration.class,
     // Group Script Service
     DefaultGroupManager.class,
     GroupsCache.class,
@@ -92,6 +80,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     SpacesConfigurationSource.class
 })
 @Inherited
+@UserReferenceComponentList
 public @interface DefaultUserComponentList
 {
 }

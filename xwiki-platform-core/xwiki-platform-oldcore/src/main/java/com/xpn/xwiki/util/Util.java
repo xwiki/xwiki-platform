@@ -59,8 +59,6 @@ import org.apache.oro.text.regex.PatternMatcherInput;
 import org.apache.oro.text.regex.Perl5Matcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 import org.xwiki.environment.Environment;
 import org.xwiki.xml.XMLUtils;
 
@@ -607,28 +605,6 @@ public class Util
         } catch (Exception e) {
             return null;
         }
-    }
-
-    /**
-     * API to obtain a DOM document for the specified string
-     *
-     * @param str The parsed text
-     * @return A DOM document element corresponding to the string, or null on error
-     */
-    public org.w3c.dom.Document getDOMForString(String str)
-    {
-        try {
-            return DocumentBuilderFactory.newInstance().newDocumentBuilder()
-                .parse(new InputSource(new StringReader(str)));
-        } catch (SAXException ex) {
-            LOGGER.warn("Cannot parse string:" + str, ex);
-        } catch (IOException ex) {
-            LOGGER.warn("Cannot parse string:" + str, ex);
-        } catch (ParserConfigurationException ex) {
-            LOGGER.warn("Cannot parse string:" + str, ex);
-        }
-
-        return null;
     }
 
     /**

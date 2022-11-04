@@ -608,22 +608,6 @@ public class Util
     }
 
     /**
-     * API to get a new DOM document
-     *
-     * @return a new DOM document element, or null on error
-     */
-    public org.w3c.dom.Document getDOMDocument()
-    {
-        try {
-            return DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-        } catch (ParserConfigurationException ex) {
-            LOGGER.warn("Cannot create DOM tree", ex);
-        }
-
-        return null;
-    }
-
-    /**
      * API to protect Text from Radeox transformation
      *
      * @param text

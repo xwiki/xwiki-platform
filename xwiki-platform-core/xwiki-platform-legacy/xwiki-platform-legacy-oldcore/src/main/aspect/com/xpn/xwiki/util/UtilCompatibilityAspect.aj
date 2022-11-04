@@ -125,4 +125,22 @@ public privileged aspect UtilCompatibilityAspect
 
         return null;
     }
+
+    /**
+     * API to get a new DOM document
+     *
+     * @return a new DOM document element, or null on error
+     * @deprecated use {@code XMLScriptService#createDOMDocument()} instead
+     */
+    @Deprecated(since = "14.10RC1")
+    public org.w3c.dom.Document Util.getDOMDocument()
+    {
+        try {
+            return DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        } catch (ParserConfigurationException ex) {
+            LOGGER.warn("Cannot create DOM tree", ex);
+        }
+
+        return null;
+    }
 }

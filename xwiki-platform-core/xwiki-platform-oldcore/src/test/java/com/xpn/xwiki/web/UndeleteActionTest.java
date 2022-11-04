@@ -35,7 +35,6 @@ import org.xwiki.refactoring.job.RestoreRequest;
 import org.xwiki.refactoring.script.RefactoringScriptService;
 import org.xwiki.refactoring.script.RequestFactory;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;

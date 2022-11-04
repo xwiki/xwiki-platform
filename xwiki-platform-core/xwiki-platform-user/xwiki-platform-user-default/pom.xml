@@ -102,6 +102,7 @@
             <configuration>
               <includes>
                 <include>**/DefaultUserComponentList.class</include>
+                <include>**/UserReferenceComponentList.class</include>
               </includes>
             </configuration>
           </execution>

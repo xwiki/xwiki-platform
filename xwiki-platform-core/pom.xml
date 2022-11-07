@@ -137,6 +137,23 @@
                 </item>
               </differences>
             </revapi.differences>
+            <revapi.differences>
+              <!-- Limitation caused by https://github.com/revapi/revapi/issues/264 -->
+              <justification>Not a breakage, method was moved to legacy</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method org.w3c.dom.Document com.xpn.xwiki.util.Util::getDOMDocument()</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method org.w3c.dom.Document com.xpn.xwiki.util.Util::getDOMForString(java.lang.String)</old>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

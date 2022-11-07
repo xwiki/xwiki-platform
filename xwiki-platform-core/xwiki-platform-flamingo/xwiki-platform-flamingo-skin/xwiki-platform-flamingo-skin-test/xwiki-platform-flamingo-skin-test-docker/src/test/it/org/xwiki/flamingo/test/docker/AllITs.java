@@ -137,7 +137,7 @@ public class AllITs
 
     @Nested
     @DisplayName("Restore deleted Page tests")
-    class NestedRestoreDeletedPageIT extends RestoreDeletedPageIT
+    class NestedRecycleBinIT extends RecycleBinIT
     {
     }
 }

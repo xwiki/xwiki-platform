@@ -85,6 +85,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.model.jaxb.Property;
 import org.xwiki.rest.model.jaxb.Xwiki;
@@ -589,12 +590,30 @@ public class TestUtils
      * @param users the comma-separated list of users that will have the rights (e.g. {@code XWiki.Admin}. Can be
      *              empty of null
      * @param rights the comma-separated list of rights to give (e.g. {@code edit,admin})
-     * @param enabled true if the rights should be allowed, false if they should be disabled
+     * @param enabled true if the rights should be allowed, false if they should be denied
      * @since 12.2
      */
     public void setRights(EntityReference entityReference, String groups, String users, String rights, boolean enabled)
     {
         setRights(entityReference, "XWiki.XWikiRights", groups, users, rights, enabled);
+    }
+
+    /**
+     * Add or update a {@code XWikiRights} xobject to the specified space reference.
+     *
+     * @param space the reference to the space for which to set rights for
+     * @param groups the comma-separated list of groups that will have the rights (e.g. {@code XWiki.XWikiAdminGroup}.
+     *               Can be empty or null
+     * @param users the comma-separated list of users that will have the rights (e.g. {@code XWiki.Admin}. Can be
+     *              empty of null
+     * @param rights the comma-separated list of rights to give (e.g. {@code edit,admin})
+     * @param enabled true if the rights should be allowed, false if they should be denied
+     * @since 14.10RC1
+     */
+    public void setRightsOnSpace(SpaceReference space, String groups, String users, String rights, boolean enabled)
+    {
+        DocumentReference documentReference = new DocumentReference("WebPreferences", space);
+        setRights(documentReference, "XWiki.XWikiGlobalRights", groups, users, rights, enabled);
     }
 
     private void setRights(EntityReference entityReference, String rightClassName, String groups, String users,

@@ -44,6 +44,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.attachment.AttachmentValidationException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.xml.XMLUtils;
@@ -614,8 +615,7 @@ public class Utils
                 fileupload.loadFileList(context);
             }
         } catch (Exception e) {
-            if ((e instanceof XWikiException)
-                && (((XWikiException) e).getCode() == XWikiException.ERROR_XWIKI_APP_FILE_EXCEPTION_MAXSIZE)) {
+            if (e instanceof AttachmentValidationException) {
                 context.put("exception", e);
             } else {
                 LOGGER.error("Failed to process MultiPart request", e);

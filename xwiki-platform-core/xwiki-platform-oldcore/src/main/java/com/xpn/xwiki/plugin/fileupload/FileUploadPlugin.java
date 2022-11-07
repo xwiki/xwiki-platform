@@ -31,6 +31,8 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.attachment.AttachmentValidationException;
+import org.xwiki.attachment.AttachmentValidator;
 import org.xwiki.environment.Environment;
 import org.xwiki.text.StringUtils;
 
@@ -97,6 +99,8 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
     private Environment environment;
 
     private String temporaryDirectory;
+
+    private AttachmentValidator attachmentValidator;
 
     /**
      * @param name the plugin name
@@ -177,7 +181,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
      * @throws XWikiException An XWikiException is thrown if the request could not be parsed.
      * @see FileUploadPluginApi#loadFileList()
      */
-    public void loadFileList(XWikiContext context) throws XWikiException
+    public void loadFileList(XWikiContext context) throws XWikiException, AttachmentValidationException
     {
         XWiki xwiki = context.getWiki();
         loadFileList(
@@ -197,7 +201,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
      * @see FileUploadPluginApi#loadFileList(long, int, String)
      */
     public void loadFileList(long uploadMaxSize, int uploadSizeThreshold, String tempdir, XWikiContext context)
-        throws XWikiException
+        throws XWikiException, AttachmentValidationException
     {
         LOGGER.debug("Loading uploaded files");
 
@@ -210,7 +214,8 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
         }
 
         Collection<FileItem> fileItems =
-            FileUploadUtils.getFileItems(uploadMaxSize, uploadSizeThreshold, tempdir, context.getRequest());
+            FileUploadUtils.getFileItems(uploadMaxSize, uploadSizeThreshold, tempdir, context.getRequest(),
+                getAttachmentValidator());
         List<FileItem> items;
         if (fileItems instanceof List) {
             items = (List<FileItem>) fileItems;
@@ -421,6 +426,14 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
             this.environment = Utils.getComponent(Environment.class);
         }
         return this.environment;
+    }
+
+    private AttachmentValidator getAttachmentValidator()
+    {
+        if (this.attachmentValidator == null) {
+            this.attachmentValidator = Utils.getComponent(AttachmentValidator.class);
+        }
+        return this.attachmentValidator;
     }
 
     private String getTemporaryDirectory(XWiki xwiki)

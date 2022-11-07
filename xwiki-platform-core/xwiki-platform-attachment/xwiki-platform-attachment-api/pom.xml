@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>Provides APIs related to attachments manipulation.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.72</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.59</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -57,6 +57,11 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-uiextension-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-configuration-default</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- Runtime dependencies. -->

@@ -933,6 +933,16 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-# with programming rights, while this configuration affect any attachment.
 # attachment.download.forceDownload=
 
+#-# [Since 14.10RC1]
+#-# TODO: document this
+#-#
+# attachment.mimetype.allowList=
+
+#-# [Since 14.10RC1]
+#-# TODO: document this
+#-#
+# attachment.mimetype.blockList=
+
 #-------------------------------------------------------------------------------------
 # Active Installs
 #-------------------------------------------------------------------------------------

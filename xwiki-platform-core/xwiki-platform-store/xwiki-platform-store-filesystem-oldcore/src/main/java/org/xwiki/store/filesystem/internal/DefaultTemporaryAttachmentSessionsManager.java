@@ -31,17 +31,16 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
+import org.xwiki.attachment.AttachmentValidationException;
+import org.xwiki.attachment.AttachmentValidator;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.store.TemporaryAttachmentException;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 
 /**
  * Default implementation of {@link TemporaryAttachmentSessionsManager}.
@@ -58,19 +57,13 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
     @Inject
     private Provider<XWikiContext> contextProvider;
 
+    @Inject
+    private AttachmentValidator attachmentValidator;
+
     private HttpSession getSession()
     {
         XWikiContext context = this.contextProvider.get();
         return context.getRequest().getSession();
-    }
-
-    private long getUploadMaxSize(DocumentReference documentReference)
-    {
-        XWikiContext context = this.contextProvider.get();
-        SpaceReference lastSpaceReference = documentReference.getLastSpaceReference();
-        String uploadMaxSizeValue = context.getWiki()
-            .getSpacePreference(FileUploadPlugin.UPLOAD_MAXSIZE_PARAMETER, lastSpaceReference, context);
-        return NumberUtils.toLong(uploadMaxSizeValue, FileUploadPlugin.UPLOAD_DEFAULT_MAXSIZE);
     }
 
     private TemporaryAttachmentSession getOrCreateSession()
@@ -96,16 +89,10 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
     public XWikiAttachment uploadAttachment(DocumentReference documentReference, Part part, String filename)
         throws TemporaryAttachmentException
     {
-        XWikiAttachment xWikiAttachment;
-        long uploadMaxSize = getUploadMaxSize(documentReference);
-        if (part.getSize() > uploadMaxSize) {
-            throw new TemporaryAttachmentException(String.format(
-                "The file size [%s] is larger than the upload max size [%s]", part.getSize(), uploadMaxSize));
-        }
         TemporaryAttachmentSession temporaryAttachmentSession = getOrCreateSession();
         XWikiContext context = this.contextProvider.get();
         try {
-            xWikiAttachment = new XWikiAttachment();
+            XWikiAttachment xWikiAttachment = new XWikiAttachment();
             String actualFilename;
             if (StringUtils.isNotBlank(filename)) {
                 actualFilename = filename;
@@ -119,16 +106,18 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
             // document since it's a temporary attachment, but it is still useful to have a minimal knowledge of the
             // document it is stored for.
             xWikiAttachment.setDoc(new XWikiDocument(documentReference, documentReference.getLocale()), false);
+            this.attachmentValidator.validateAttachment(xWikiAttachment);
             temporaryAttachmentSession.addAttachment(documentReference, xWikiAttachment);
+            return xWikiAttachment;
         } catch (IOException e) {
             throw new TemporaryAttachmentException("Error while reading the content of a request part", e);
+        } catch (AttachmentValidationException e) {
+            throw new TemporaryAttachmentException("Error while validating the attachment.", e);
         }
-        return xWikiAttachment;
     }
 
     @Override
     public void temporarilyAttach(XWikiAttachment attachment, DocumentReference documentReference)
-        throws TemporaryAttachmentException
     {
         TemporaryAttachmentSession temporaryAttachmentSession = getOrCreateSession();
         temporaryAttachmentSession.addAttachment(documentReference, attachment);

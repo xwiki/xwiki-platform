@@ -35,6 +35,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.lang.StringUtils;
+import org.xwiki.attachment.AttachmentValidationException;
+import org.xwiki.attachment.AttachmentValidator;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -116,6 +118,9 @@ public class BaseAttachmentsResource extends XWikiResource
     @Inject
     @Named("local")
     private EntityReferenceSerializer<String> localEntityReferenceSerializer;
+
+    @Inject
+    private AttachmentValidator attachmentValidator;
 
     /**
      * @param scope where to retrieve the attachments from; it should be a reference to a wiki, space or document
@@ -351,18 +356,35 @@ public class BaseAttachmentsResource extends XWikiResource
         Boolean withPrettyNames) throws XWikiException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
-        boolean alreadyExisting = document.getAttachment(attachmentName) != null;
+        XWikiDocument previousDoc = xcontext.getDoc();
+        try {
+            xcontext.setDoc(document.getDocument());
+            boolean alreadyExisting = document.getAttachment(attachmentName) != null;
 
-        XWikiAttachment xwikiAttachment =
-            createOrUpdateAttachment(new AttachmentReference(attachmentName, document.getDocumentReference()), content);
-        // The doc has been updated during the creation of the attachment, so we need to ensure we answer with the
-        // updated version.
-        Document updatedDoc = xwikiAttachment.getDoc().newDocument(xcontext);
-        Attachment attachment = this.modelFactory.toRestAttachment(uriInfo.getBaseUri(),
-            new com.xpn.xwiki.api.Attachment(updatedDoc, xwikiAttachment, this.xcontextProvider.get()), withPrettyNames,
-            false);
+            XWikiAttachment xwikiAttachment =
+                createOrUpdateAttachment(new AttachmentReference(attachmentName, document.getDocumentReference()),
+                    content);
 
-        return new AttachmentInfo(attachment, alreadyExisting);
+            // We wait for the XWikiAttachment to be loaded before checking the size as accurately checking the size of 
+            // the content input stream is not possible.
+            try {
+                this.attachmentValidator.validateAttachment(xwikiAttachment);
+            } catch (AttachmentValidationException e) {
+                throw new XWikiException(String.format("Failed to validate the attachment [%s]", xwikiAttachment), e);
+            }
+
+            // The doc has been updated during the creation of the attachment, so we need to ensure we answer with the
+            // updated version.
+            Document updatedDoc = xwikiAttachment.getDoc().newDocument(xcontext);
+            Attachment attachment = this.modelFactory.toRestAttachment(this.uriInfo.getBaseUri(),
+                new com.xpn.xwiki.api.Attachment(updatedDoc, xwikiAttachment, this.xcontextProvider.get()),
+                withPrettyNames,
+                false);
+
+            return new AttachmentInfo(attachment, alreadyExisting);
+        } finally {
+            xcontext.setDoc(previousDoc);
+        }
     }
 
     protected XWikiAttachment createOrUpdateAttachment(AttachmentReference attachmentReference, InputStream content)

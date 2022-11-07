@@ -23,6 +23,7 @@ package com.xpn.xwiki.plugin.fileupload;
 import java.util.List;
 
 import org.apache.commons.fileupload.FileItem;
+import org.xwiki.attachment.AttachmentValidationException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -62,7 +63,7 @@ public class FileUploadPluginApi extends PluginApi<FileUploadPlugin>
      *
      * @throws XWikiException if the request could not be parsed, or the maximum file size was reached.
      */
-    public void loadFileList() throws XWikiException
+    public void loadFileList() throws XWikiException, AttachmentValidationException
     {
         getProtectedPlugin().loadFileList(getXWikiContext());
     }
@@ -75,7 +76,8 @@ public class FileUploadPluginApi extends PluginApi<FileUploadPlugin>
      * @param tempdir Temporary directory to store the uploaded files that are not kept in memory.
      * @throws XWikiException if the request could not be parsed, or the maximum file size was reached.
      */
-    public void loadFileList(long uploadMaxSize, int uploadSizeThreashold, String tempdir) throws XWikiException
+    public void loadFileList(long uploadMaxSize, int uploadSizeThreashold, String tempdir)
+        throws XWikiException, AttachmentValidationException
     {
         getProtectedPlugin().loadFileList(uploadMaxSize, uploadSizeThreashold, tempdir, getXWikiContext());
     }

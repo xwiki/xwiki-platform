@@ -1266,6 +1266,10 @@
                 <id>jakarta.validation:jakarta.validation-api</id>
                 <features>javax.validation:validation-api</features>
               </extensionOverride>
+              <extensionOverride>
+                <id>com.google.javascript:closure-compiler-unshaded</id>
+                <features>com.google.javascript:closure-compiler</features>
+              </extensionOverride>
             </extensionOverrides>
           </configuration>
         </plugin>

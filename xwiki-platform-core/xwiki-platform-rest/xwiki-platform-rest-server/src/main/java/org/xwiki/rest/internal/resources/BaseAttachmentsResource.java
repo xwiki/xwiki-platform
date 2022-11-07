@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -35,8 +36,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.lang.StringUtils;
-import org.xwiki.attachment.AttachmentValidationException;
-import org.xwiki.attachment.AttachmentValidator;
+import org.slf4j.Logger;
+import org.xwiki.attachment.validation.AttachmentValidationException;
+import org.xwiki.attachment.validation.AttachmentValidator;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -59,6 +61,8 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+
+import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
  * @version $Id$
@@ -121,6 +125,9 @@ public class BaseAttachmentsResource extends XWikiResource
 
     @Inject
     private AttachmentValidator attachmentValidator;
+
+    @Inject
+    private Logger logger;
 
     /**
      * @param scope where to retrieve the attachments from; it should be a reference to a wiki, space or document
@@ -353,7 +360,7 @@ public class BaseAttachmentsResource extends XWikiResource
     }
 
     protected AttachmentInfo storeAndRetrieveAttachment(Document document, String attachmentName, InputStream content,
-        Boolean withPrettyNames) throws XWikiException
+        Boolean withPrettyNames) throws XWikiException, AttachmentValidationException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
         XWikiDocument previousDoc = xcontext.getDoc();
@@ -367,11 +374,15 @@ public class BaseAttachmentsResource extends XWikiResource
 
             // We wait for the XWikiAttachment to be loaded before checking the size as accurately checking the size of 
             // the content input stream is not possible.
-            try {
-                this.attachmentValidator.validateAttachment(xwikiAttachment);
-            } catch (AttachmentValidationException e) {
-                throw new XWikiException(String.format("Failed to validate the attachment [%s]", xwikiAttachment), e);
-            }
+            this.attachmentValidator.validateAttachment(xwikiAttachment.getLongSize(), () -> {
+                try {
+                    return Optional.of(xwikiAttachment.getContentInputStream(this.xcontextProvider.get()));
+                } catch (XWikiException e) {
+                    this.logger.warn("Failed to get the input stream for attachment [{}]. Cause: [{}]", xwikiAttachment,
+                        getRootCauseMessage(e));
+                    return Optional.empty();
+                }
+            }, xwikiAttachment.getFilename());
 
             // The doc has been updated during the creation of the attachment, so we need to ensure we answer with the
             // updated version.

@@ -25,6 +25,7 @@ import java.util.Optional;
 
 import javax.servlet.http.Part;
 
+import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -57,7 +58,7 @@ public interface TemporaryAttachmentSessionsManager
      *                                      when reading the part.
      */
     XWikiAttachment uploadAttachment(DocumentReference documentReference, Part part)
-        throws TemporaryAttachmentException;
+        throws TemporaryAttachmentException, AttachmentValidationException;
 
     /**
      * Temporary store the given {@link Part} to a cached {@link XWikiAttachment} attached to the given
@@ -74,7 +75,7 @@ public interface TemporaryAttachmentSessionsManager
      */
     @Unstable
     XWikiAttachment uploadAttachment(DocumentReference documentReference, Part part, String filename)
-        throws TemporaryAttachmentException;
+        throws TemporaryAttachmentException, AttachmentValidationException;
 
     /**
      * Allow to temporarily attach the given instance of {@link XWikiAttachment} to the given document reference.

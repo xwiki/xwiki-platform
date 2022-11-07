@@ -31,16 +31,20 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
 import org.apache.commons.lang3.StringUtils;
-import org.xwiki.attachment.AttachmentValidationException;
-import org.xwiki.attachment.AttachmentValidator;
+import org.slf4j.Logger;
+import org.xwiki.attachment.validation.AttachmentValidationException;
+import org.xwiki.attachment.validation.AttachmentValidator;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.store.TemporaryAttachmentException;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+
+import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
  * Default implementation of {@link TemporaryAttachmentSessionsManager}.
@@ -59,6 +63,9 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
 
     @Inject
     private AttachmentValidator attachmentValidator;
+
+    @Inject
+    private Logger logger;
 
     private HttpSession getSession()
     {
@@ -80,14 +87,14 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
 
     @Override
     public XWikiAttachment uploadAttachment(DocumentReference documentReference, Part part)
-        throws TemporaryAttachmentException
+        throws TemporaryAttachmentException, AttachmentValidationException
     {
         return uploadAttachment(documentReference, part, null);
     }
 
     @Override
     public XWikiAttachment uploadAttachment(DocumentReference documentReference, Part part, String filename)
-        throws TemporaryAttachmentException
+        throws TemporaryAttachmentException, AttachmentValidationException
     {
         TemporaryAttachmentSession temporaryAttachmentSession = getOrCreateSession();
         XWikiContext context = this.contextProvider.get();
@@ -106,13 +113,19 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
             // document since it's a temporary attachment, but it is still useful to have a minimal knowledge of the
             // document it is stored for.
             xWikiAttachment.setDoc(new XWikiDocument(documentReference, documentReference.getLocale()), false);
-            this.attachmentValidator.validateAttachment(xWikiAttachment);
+            this.attachmentValidator.validateAttachment(xWikiAttachment.getLongSize(), () -> {
+                try {
+                    return Optional.of(xWikiAttachment.getContentInputStream(this.contextProvider.get()));
+                } catch (XWikiException e) {
+                    this.logger.warn("Failed to get the input stream for attachment [{}]. Cause: [{}]", xWikiAttachment,
+                        getRootCauseMessage(e));
+                    return Optional.empty();
+                }
+            }, xWikiAttachment.getFilename());
             temporaryAttachmentSession.addAttachment(documentReference, xWikiAttachment);
             return xWikiAttachment;
         } catch (IOException e) {
             throw new TemporaryAttachmentException("Error while reading the content of a request part", e);
-        } catch (AttachmentValidationException e) {
-            throw new TemporaryAttachmentException("Error while validating the attachment.", e);
         }
     }
 

@@ -23,7 +23,7 @@ package com.xpn.xwiki.plugin.fileupload;
 import java.util.List;
 
 import org.apache.commons.fileupload.FileItem;
-import org.xwiki.attachment.AttachmentValidationException;
+import org.xwiki.attachment.validation.AttachmentValidationException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.attachment.internal;
+package org.xwiki.attachment.validation.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,15 +34,13 @@ import javax.servlet.http.Part;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
-import org.xwiki.attachment.AttachmentConfiguration;
-import org.xwiki.attachment.AttachmentValidationException;
-import org.xwiki.attachment.AttachmentValidator;
+import org.xwiki.attachment.validation.AttachmentValidationConfiguration;
+import org.xwiki.attachment.validation.AttachmentValidationException;
+import org.xwiki.attachment.validation.AttachmentValidator;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.tika.internal.TikaUtils;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiAttachment;
 
 import static com.xpn.xwiki.plugin.fileupload.FileUploadPlugin.UPLOAD_DEFAULT_MAXSIZE;
 import static com.xpn.xwiki.plugin.fileupload.FileUploadPlugin.UPLOAD_MAXSIZE_PARAMETER;
@@ -63,7 +61,7 @@ public class DefaultAttachmentValidator implements AttachmentValidator
     private Provider<XWikiContext> contextProvider;
 
     @Inject
-    private AttachmentConfiguration attachmentConfiguration;
+    private AttachmentValidationConfiguration attachmentValidationConfiguration;
 
     @Inject
     private Logger logger;
@@ -90,22 +88,10 @@ public class DefaultAttachmentValidator implements AttachmentValidator
     }
 
     @Override
-    public void validateAttachment(XWikiAttachment xwikiAttachment) throws AttachmentValidationException
-    {
-        validateAttachment(xwikiAttachment.getLongSize(), () -> {
-            try {
-                return Optional.of(xwikiAttachment.getContentInputStream(this.contextProvider.get()));
-            } catch (XWikiException e) {
-                this.logger.warn("Failed to get the input stream for attachment [{}]. Cause: [{}]", xwikiAttachment,
-                    getRootCauseMessage(e));
-                return Optional.empty();
-            }
-        }, xwikiAttachment.getFilename());
-    }
-
-    private void validateAttachment(long attachmentSize, Supplier<Optional<InputStream>> supplier, String filename)
+    public void validateAttachment(long attachmentSize, Supplier<Optional<InputStream>> supplier, String filename)
         throws AttachmentValidationException
     {
+        validateAttachment(attachmentSize, supplier, filename);
         validateSize(attachmentSize);
         validateMimetype(supplier, filename);
     }
@@ -128,8 +114,8 @@ public class DefaultAttachmentValidator implements AttachmentValidator
         throws AttachmentValidationException
     {
         String mimeType = getMimeType(supplier, filename).toLowerCase();
-        List<String> allowedMimetypes = this.attachmentConfiguration.getAllowedMimetypes();
-        List<String> blockerMimetypes = this.attachmentConfiguration.getBlockerMimetypes();
+        List<String> allowedMimetypes = this.attachmentValidationConfiguration.getAllowedMimetypes();
+        List<String> blockerMimetypes = this.attachmentValidationConfiguration.getBlockerMimetypes();
         boolean hasAllowedMimetypes = !allowedMimetypes.isEmpty();
         boolean hasBlockerMimetypes = !blockerMimetypes.isEmpty();
 

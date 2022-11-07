@@ -31,8 +31,8 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.attachment.AttachmentValidationException;
-import org.xwiki.attachment.AttachmentValidator;
+import org.xwiki.attachment.validation.AttachmentValidationException;
+import org.xwiki.attachment.validation.AttachmentValidator;
 import org.xwiki.environment.Environment;
 import org.xwiki.text.StringUtils;
 

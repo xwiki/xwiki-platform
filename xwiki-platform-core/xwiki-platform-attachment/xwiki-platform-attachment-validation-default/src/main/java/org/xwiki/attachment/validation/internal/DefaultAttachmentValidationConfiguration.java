@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.attachment.internal;
+package org.xwiki.attachment.validation.internal;
 
 import java.util.List;
 
@@ -25,12 +25,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.xwiki.attachment.AttachmentConfiguration;
+import org.xwiki.attachment.validation.AttachmentValidationConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 
-import static org.xwiki.attachment.internal.AttachmentMimetypeRestrictionClassDocumentInitializer.ALLOWED_MIMETYPES_FIELD;
-import static org.xwiki.attachment.internal.AttachmentMimetypeRestrictionClassDocumentInitializer.BLOCKED_MIMETYPES_FIELD;
+import static org.xwiki.attachment.validation.internal.AttachmentMimetypeRestrictionClassDocumentInitializer.ALLOWED_MIMETYPES_FIELD;
+import static org.xwiki.attachment.validation.internal.AttachmentMimetypeRestrictionClassDocumentInitializer.BLOCKED_MIMETYPES_FIELD;
 
 /**
  * Default implementation of the attachment configuration. Looks for the configuration:
@@ -45,7 +45,7 @@ import static org.xwiki.attachment.internal.AttachmentMimetypeRestrictionClassDo
  */
 @Component
 @Singleton
-public class DefaultAttachmentConfiguration implements AttachmentConfiguration
+public class DefaultAttachmentValidationConfiguration implements AttachmentValidationConfiguration
 {
     private static final String ATTACHMENT_MIMETYPE_ALLOW_LIST_PROPERTY = "attachment.mimetype.allowList";
 

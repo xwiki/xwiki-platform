@@ -17,14 +17,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.attachment;
+package org.xwiki.attachment.validation;
+
+import java.io.InputStream;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 import javax.servlet.http.Part;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
-
-import com.xpn.xwiki.doc.XWikiAttachment;
 
 /**
  * Provide the operations to validator an attachment. For instance, by checking the size or the mimetype of the
@@ -48,8 +50,12 @@ public interface AttachmentValidator
     /**
      * Check if a given attachment is valid in the current space.
      *
-     * @param xwikiAttachment the attachment to validate
+     * @param attachmentSize the attachment size
+     * @param supplier a supplier of the input steam of the attachment. Can return {@link Optional#empty()} in case
+     *     of issue
+     * @param filename the attachment file name
      * @throws AttachmentValidationException in case of error when validating the attachment
      */
-    void validateAttachment(XWikiAttachment xwikiAttachment) throws AttachmentValidationException;
+    void validateAttachment(long attachmentSize, Supplier<Optional<InputStream>> supplier, String filename)
+        throws AttachmentValidationException;
 }

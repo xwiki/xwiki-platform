@@ -32,11 +32,16 @@
   <name>XWiki Platform - Attachment - Validation - UI</name>
   <description>User Interface for the attachments validation</description>
   <packaging>xar</packaging>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Attachment Validation Application</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-attachment-validation-default</artifactId>
-      <version>14.10-SNAPSHOT</version>
+      <version>${platform.version}</version>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
 </project>

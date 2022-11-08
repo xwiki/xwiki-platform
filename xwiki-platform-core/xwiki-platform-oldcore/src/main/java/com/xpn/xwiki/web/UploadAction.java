@@ -40,6 +40,7 @@ import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -60,11 +61,15 @@ import static javax.script.ScriptContext.ENGINE_SCOPE;
 @Singleton
 public class UploadAction extends XWikiAction
 {
+    /**
+     * The prefix of the accepted file input field name.
+     * @since 14.10RC1
+     */
+    @Unstable
+    public static final String FILE_FIELD_NAME = "filepath";
+
     /** Logging helper object. */
     private static final Logger LOGGER = LoggerFactory.getLogger(UploadAction.class);
-
-    /** The prefix of the accepted file input field name. */
-    private static final String FILE_FIELD_NAME = "filepath";
 
     /** The prefix of the corresponding filename input field name. */
     private static final String FILENAME_FIELD_NAME = "filename";

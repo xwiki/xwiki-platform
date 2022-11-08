@@ -32,7 +32,7 @@ import static com.xpn.xwiki.internal.mandatory.XWikiPreferencesDocumentInitializ
 import static org.xwiki.component.wiki.internal.WikiComponentConstants.CLASS_SPACE_NAME;
 
 /**
- * Look for the configuration in a space. TODO: add the WebPreferences in the search
+ * Look for the attachment mimetype restriction configuration in a space.
  *
  * @version $Id$
  * @since 14.10RC1

@@ -41,6 +41,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.tika.internal.TikaUtils;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.web.UploadAction;
 
 import static com.xpn.xwiki.plugin.fileupload.FileUploadPlugin.UPLOAD_DEFAULT_MAXSIZE;
 import static com.xpn.xwiki.plugin.fileupload.FileUploadPlugin.UPLOAD_MAXSIZE_PARAMETER;
@@ -49,6 +50,9 @@ import static javax.servlet.http.HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE;
 import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
+ * Default implementation of {@link AttachmentValidator}. Check for the file size and mimetype of a given file. The
+ * configuration values are retrieved using {@link AttachmentValidationConfiguration}.
+ *
  * @version $Id$
  * @since 14.10RC1
  */
@@ -69,10 +73,9 @@ public class DefaultAttachmentValidator implements AttachmentValidator
     @Override
     public void validateAttachment(Part part) throws AttachmentValidationException
     {
-        // TODO: use constant instead of "filepath"
         long size = part.getSize();
         // We don't check the mimetype for parts that are not expected to be use as file.
-        if (StringUtils.startsWith(part.getName(), "filepath")) {
+        if (StringUtils.startsWith(part.getName(), UploadAction.FILE_FIELD_NAME)) {
             validateAttachment(size, () -> {
                 try {
                     return Optional.of(part.getInputStream());
@@ -122,7 +125,7 @@ public class DefaultAttachmentValidator implements AttachmentValidator
             || hasBlockerMimetypes && checkMimetype(blockerMimetypes, mimeType))
         {
             throw new AttachmentValidationException(String.format("Invalid mimetype [%s]", mimeType),
-                SC_UNSUPPORTED_MEDIA_TYPE, "core.action.upload.failure.mimetypeRejected", null);
+                SC_UNSUPPORTED_MEDIA_TYPE, "attachment.validation.mimetype.rejected", null);
         }
     }
 
@@ -142,7 +145,7 @@ public class DefaultAttachmentValidator implements AttachmentValidator
                 mimeType = TikaUtils.detect(inputStream.get(), fileName);
             }
         } catch (Exception e) {
-            this.logger.warn("Failed to identify a mimetype. Cause: [{}]", getRootCauseMessage(e));
+            this.logger.warn("Failed to identify the mimetype of [{}]. Cause: [{}]", fileName, getRootCauseMessage(e));
             mimeType = "";
         }
         return mimeType;

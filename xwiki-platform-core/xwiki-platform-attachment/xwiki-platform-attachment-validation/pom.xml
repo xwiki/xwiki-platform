@@ -29,6 +29,7 @@
   </parent>
   <artifactId>xwiki-platform-attachment-validation</artifactId>
   <name>XWiki Platform - Attachment - Validation - Parent POM</name>
+  <description>Provides the services to validate attachments</description>
   <packaging>pom</packaging>
   <modules>
     <module>xwiki-platform-attachment-validation-api</module>

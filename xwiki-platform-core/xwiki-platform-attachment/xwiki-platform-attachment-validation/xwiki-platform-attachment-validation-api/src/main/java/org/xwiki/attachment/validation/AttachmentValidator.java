@@ -29,7 +29,7 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
- * Provide the operations to validator an attachment. For instance, by checking the size or the mimetype of the
+ * Provide the operations to validate an attachment. For instance, by checking the size or the mimetype of the
  * attachment.
  *
  * @version $Id$

@@ -20,6 +20,8 @@
 package org.xwiki.attachment.validation;
 
 /**
+ * Exception thrown in case of error while validating an attachment.
+ *
  * @version $Id$
  * @since 14.10RC1
  */

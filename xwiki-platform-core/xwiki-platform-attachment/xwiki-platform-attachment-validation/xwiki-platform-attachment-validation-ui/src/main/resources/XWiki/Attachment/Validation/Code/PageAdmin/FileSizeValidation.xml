@@ -125,7 +125,7 @@
     </property>
     <property>
       <code>require(['jquery', 'xwiki-events-bridge'], $ =&gt; {
-  $(document).on('xwiki:html5upload:fileSelected', (event, data) =&gt; {
+  $(document).on('xwiki:actions:beforeUpload', (event, data) =&gt; {
     const configElement = document.getElementById('attachment-validation-filesize-configuration');
     const config = JSON.parse(configElement.textContent);
     const maxFileSize = config.maxFileSize;

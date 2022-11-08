@@ -25,7 +25,7 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
- * TODO.
+ * Configuration values for the attachment validation.
  *
  * @version $Id$
  * @since 14.10RC1
@@ -35,12 +35,12 @@ import org.xwiki.stability.Unstable;
 public interface AttachmentValidationConfiguration
 {
     /**
-     * @return TODO
+     * @return the list of allowed attachment mimetype regex (e.g., "image/png", "text/.*")
      */
     List<String> getAllowedMimetypes();
 
     /**
-     * @return TODO
+     * @return the list of blocker attachment mimetype regex (e.g., "image/png", "text/.*")
      */
     List<String> getBlockerMimetypes();
 }

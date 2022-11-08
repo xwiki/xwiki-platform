@@ -124,11 +124,11 @@
   var preventParallelUploads = function (editor) {
     var uploadQueue = $.Deferred().resolve();
     editor.on('fileUploadRequest', function (event) {
-      var eventFileSelected = $(document).trigger('xwiki:html5upload:fileSelected', {
+      var eventFileSelected = $(document).trigger('xwiki:actions:beforeUpload', {
         file: event.data.fileLoader.file,
       });
       // We only queue the file and continue the upload if it is properly validated.
-      if (event.returnValue) {
+      if (eventFileSelected.returnValue) {
         var xhr = event.data.fileLoader.xhr;
         // We need to know when the upload ends (load, error or abort) in order to perform the next upload.
         var uploadPromise = $.Deferred();

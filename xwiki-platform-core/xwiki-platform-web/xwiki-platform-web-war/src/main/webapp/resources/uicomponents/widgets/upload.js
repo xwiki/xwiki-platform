@@ -392,7 +392,6 @@ var XWiki = (function(XWiki) {
     },
 
     /** Templates for feedback messages displayed to the user. */
-    // TODO: make this more flexible
     messages : {
       UNKNOWN_ERROR         : new Template("$services.localization.render('core.widgets.html5upload.error.unknown', ['#{name}'])"),
       INVALID_FILE_TYPE     : new Template("$services.localization.render('core.widgets.html5upload.error.invalidType', ['#{name}'])"),
@@ -509,7 +508,7 @@ var XWiki = (function(XWiki) {
       for (var i = 0; i < total; ++i) {
         var file = this.input.files[i];
         try {
-          var event = Event.fire(this.input, 'xwiki:html5upload:fileSelected', {
+          var event = Event.fire(this.input, 'xwiki:actions:beforeUpload', {
             file: file
           });
           // Queue the file only if no listener cancelled the event.

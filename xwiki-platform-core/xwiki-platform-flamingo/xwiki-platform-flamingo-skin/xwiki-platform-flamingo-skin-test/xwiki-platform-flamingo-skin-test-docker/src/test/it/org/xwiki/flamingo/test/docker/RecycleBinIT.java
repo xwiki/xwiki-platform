@@ -25,14 +25,13 @@ import java.util.List;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
-import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
-import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.AttachmentsPane;
 import org.xwiki.test.ui.po.DeletePageOutcomePage;
 import org.xwiki.test.ui.po.DeletedPageEntry;
 import org.xwiki.test.ui.po.DeletingPage;
@@ -69,9 +68,9 @@ class RecycleBinIT
         ViewPage page = setup.createPage(testReference, "Once upon a time..", "A story");
 
         // Add an attachment.
-        new AttachmentsViewPage().openAttachmentsDocExtraPane().setFileToUpload(
-            new File(testConfiguration.getBrowser().getTestResourcesPath(),
-                "RecycleBinIT/SmallAttachment.txt").getAbsolutePath());
+        page.openAttachmentsDocExtraPane()
+            .setFileToUpload(new File(testConfiguration.getBrowser().getTestResourcesPath(),
+                "AttachmentIT/SmallAttachment.txt").getAbsolutePath());
 
         // Delete the page.
         page.delete().clickYes();
@@ -101,7 +100,7 @@ class RecycleBinIT
         assertEquals("2.1", historyPane.getCurrentVersion());
 
         // Check the attachment.
-        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        AttachmentsPane attachmentsPane = page.openAttachmentsDocExtraPane();
         assertEquals(1, attachmentsPane.getNumberOfAttachments());
         assertEquals("1.1", attachmentsPane.getLatestVersionOfAttachment("SmallAttachment.txt"));
 

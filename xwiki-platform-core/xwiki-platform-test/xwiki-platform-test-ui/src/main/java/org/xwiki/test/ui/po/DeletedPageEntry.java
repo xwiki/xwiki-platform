@@ -102,7 +102,7 @@ public class DeletedPageEntry extends BaseElement
     {
         getDriver().findElementWithoutWaiting(getRow(), By.cssSelector(ACTION_VIEW_CSS_SELECTOR)).click();
         ViewPage viewPage = new ViewPage();
-        viewPage.waitUntilPageIsReady();
+        viewPage.waitUntilPageIsLoaded();
         return viewPage;
     }
 
@@ -129,7 +129,7 @@ public class DeletedPageEntry extends BaseElement
     {
         getDriver().findElementWithoutWaiting(getRow(), By.cssSelector(ACTION_RESTORE_CSS_SELECTOR)).click();
         ViewPage viewPage = new ViewPage();
-        viewPage.waitUntilPageIsReady();
+        viewPage.waitUntilPageIsLoaded();
         return viewPage;
     }
 }

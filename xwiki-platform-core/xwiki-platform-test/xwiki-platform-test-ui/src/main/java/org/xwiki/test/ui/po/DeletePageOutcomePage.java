@@ -22,7 +22,6 @@ package org.xwiki.test.ui.po;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -44,7 +43,7 @@ public class DeletePageOutcomePage extends ViewPage
      * @deprecated Since 14.10RC1 prefer using {@link #getDeletedPagesEntries()} and
      *             {@link DeletedPageEntry#getDeleter()}.
      */
-    @Deprecated(since = "14.10RC1")
+    @Deprecated
     public String getPageDeleter()
     {
         List<DeletedPageEntry> deletedPagesEntries = getDeletedPagesEntries();
@@ -106,7 +105,7 @@ public class DeletePageOutcomePage extends ViewPage
      * @deprecated Since 14.10RC1 prefer using {@link #getDeletedPagesEntries()} and
      *              {@link DeletedPageEntry#clickRestore()}.
      */
-    @Deprecated(since = "14.10RC1")
+    @Deprecated
     public ViewPage clickRestore()
     {
         List<DeletedPageEntry> deletedPagesEntries = getDeletedPagesEntries();
@@ -135,7 +134,7 @@ public class DeletePageOutcomePage extends ViewPage
      * @deprecated Since 14.10RC1 prefer using {@link #getDeletedPagesEntries()} and
      *             {@link DeletedPageEntry#clickDelete()}.
      */
-    @Deprecated(since = "14.10RC1")
+    @Deprecated
     public DeletePageOutcomePage clickDeletePage()
     {
         List<DeletedPageEntry> deletedPagesEntries = getDeletedPagesEntries();
@@ -154,7 +153,7 @@ public class DeletePageOutcomePage extends ViewPage
      * @deprecated Since 14.10RC1 prefer using {@link #getDeletedTerminalPagesEntries()} and
      *             {@link DeletedPageEntry#clickDelete()}.
      */
-    @Deprecated(since = "14.10RC1")
+    @Deprecated
     public DeletePageOutcomePage clickDeleteTerminalPage()
     {
         List<DeletedPageEntry> deletedPagesEntries = getDeletedTerminalPagesEntries();
@@ -175,7 +174,7 @@ public class DeletePageOutcomePage extends ViewPage
      * @deprecated Since 14.10RC1 prefer using {@link #getDeletedPagesEntries()} and
      *            {@link DeletedPageEntry#clickDelete()}.
      */
-    @Deprecated(since = "14.10RC1")
+    @Deprecated
     public ViewPage clickViewDocument(int row)
     {
         int actualEntryNumber = row - 1;

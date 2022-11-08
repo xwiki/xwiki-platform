@@ -91,7 +91,6 @@ public class DefaultAttachmentValidator implements AttachmentValidator
     public void validateAttachment(long attachmentSize, Supplier<Optional<InputStream>> supplier, String filename)
         throws AttachmentValidationException
     {
-        validateAttachment(attachmentSize, supplier, filename);
         validateSize(attachmentSize);
         validateMimetype(supplier, filename);
     }
@@ -113,7 +112,7 @@ public class DefaultAttachmentValidator implements AttachmentValidator
     private void validateMimetype(Supplier<Optional<InputStream>> supplier, String filename)
         throws AttachmentValidationException
     {
-        String mimeType = getMimeType(supplier, filename).toLowerCase();
+        String mimeType = detectMimeType(supplier, filename).toLowerCase();
         List<String> allowedMimetypes = this.attachmentValidationConfiguration.getAllowedMimetypes();
         List<String> blockerMimetypes = this.attachmentValidationConfiguration.getBlockerMimetypes();
         boolean hasAllowedMimetypes = !allowedMimetypes.isEmpty();
@@ -122,8 +121,8 @@ public class DefaultAttachmentValidator implements AttachmentValidator
         if (hasAllowedMimetypes && !checkMimetype(allowedMimetypes, mimeType)
             || hasBlockerMimetypes && checkMimetype(blockerMimetypes, mimeType))
         {
-            throw new AttachmentValidationException("Invalid mimetype", SC_UNSUPPORTED_MEDIA_TYPE,
-                "core.action.upload.failure.mimetypeRejected", "TODO");
+            throw new AttachmentValidationException(String.format("Invalid mimetype [%s]", mimeType),
+                SC_UNSUPPORTED_MEDIA_TYPE, "core.action.upload.failure.mimetypeRejected", null);
         }
     }
 
@@ -132,7 +131,7 @@ public class DefaultAttachmentValidator implements AttachmentValidator
         return mimetypes.stream().anyMatch(mimeTypePattern -> Pattern.matches(mimeTypePattern, mimeType));
     }
 
-    private String getMimeType(Supplier<Optional<InputStream>> supplier, String fileName)
+    private String detectMimeType(Supplier<Optional<InputStream>> supplier, String fileName)
     {
         String mimeType;
         try {

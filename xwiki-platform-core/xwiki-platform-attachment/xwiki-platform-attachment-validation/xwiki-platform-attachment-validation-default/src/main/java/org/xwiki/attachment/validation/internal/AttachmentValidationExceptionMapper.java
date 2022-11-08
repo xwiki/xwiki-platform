@@ -19,20 +19,24 @@
  */
 package org.xwiki.attachment.validation.internal;
 
-import java.util.Map;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import org.json.JSONObject;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiRestComponent;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+
 /**
  * Exception mapper for {@link AttachmentValidationException}.
+ *
  * @version $Id$
  * @since 14.10RC1
  */
@@ -46,12 +50,13 @@ public class AttachmentValidationExceptionMapper implements ExceptionMapper<Atta
     @Override
     public Response toResponse(AttachmentValidationException exception)
     {
+        JSONObject entity = new JSONObject();
+        entity.put("message", exception.getMessage());
+        entity.put("translationKey", exception.getTranslationKey());
         return Response
             .serverError()
-            .entity(Map.of(
-                "message", exception.getMessage(),
-                "translationKey", exception.getTranslationKey()
-            ))
+            .entity(entity.toString())
+            .type(APPLICATION_JSON)
             .status(exception.getHttpStatus())
             .build();
     }

@@ -20,8 +20,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="XWiki.Attachment.Code.PageAdmin" locale="">
-  <web>XWiki.Attachment.Code</web>
+<xwikidoc version="1.5" reference="XWiki.Attachment.Validation.Code.PageAdmin" locale="">
+  <web>XWiki.Attachment.Validation.Code</web>
   <name>PageAdmin</name>
   <language/>
   <defaultLanguage/>
@@ -40,7 +40,7 @@
 #set ($params = {
   'mimetypes': ['allowedMimetypes', 'blockedMimetypes']
 })
-#set ($paramClass = 'XWiki.Attachment.Code.AttachmentMimetypeRestrictionClass')
+#set ($paramClass = 'XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass')
 #set ($objectPolicy = 'updateOrCreate')
 ## Make sure to initialize an empty object if it does not exist yet, otherwise the admin form is not displayed.
 #set ($discard = $doc.getObject($paramClass, true))
@@ -48,7 +48,7 @@
 
 {{include reference="XWiki.AdminFieldsDisplaySheet" /}}</content>
   <object>
-    <name>XWiki.Attachment.Code.PageAdmin</name>
+    <name>XWiki.Attachment.Validation.Code.PageAdmin</name>
     <number>0</number>
     <className>XWiki.ConfigurableClass</className>
     <guid>aa32cf9f-e64b-4959-ac61-0f4eb798139e</guid>
@@ -273,7 +273,7 @@
       <categoryIcon/>
     </property>
     <property>
-      <codeToExecute>{{include reference="XWiki.Attachment.Code.PageAdmin" /}}</codeToExecute>
+      <codeToExecute>{{include reference="XWiki.Attachment.Validation.Code.PageAdmin" /}}</codeToExecute>
     </property>
     <property>
       <configurationClass/>

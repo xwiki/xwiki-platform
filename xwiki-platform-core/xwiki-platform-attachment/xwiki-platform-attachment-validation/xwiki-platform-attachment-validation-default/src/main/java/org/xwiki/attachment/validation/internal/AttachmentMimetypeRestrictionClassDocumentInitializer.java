@@ -33,9 +33,8 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import static com.xpn.xwiki.objects.classes.ListClass.DISPLAYTYPE_INPUT;
 
 /**
- * Initialize the {@code XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass} XClass. This class is 
- * used to
- * configure restrictions on the kind of attachments that can be uploaded.
+ * Initialize the {@code XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass} XClass. This class is used
+ * to configure restrictions on the kind of attachments that can be uploaded.
  *
  * @version $Id$
  * @since 14.10RC1
@@ -54,7 +53,7 @@ public class AttachmentMimetypeRestrictionClassDocumentInitializer extends Abstr
      * The local reference of the redirect attachment class.
      */
     public static final LocalDocumentReference REFERENCE =
-        new LocalDocumentReference(List.of("XWiki", "Attachment", "Validation", "Code"), 
+        new LocalDocumentReference(List.of("XWiki", "Attachment", "Validation", "Code"),
             "AttachmentMimetypeRestrictionClass");
 
     /**
@@ -78,8 +77,7 @@ public class AttachmentMimetypeRestrictionClassDocumentInitializer extends Abstr
     @Override
     protected void createClass(BaseClass xclass)
     {
-        // TODO: localization.
         xclass.addStaticListField(ALLOWED_MIMETYPES_FIELD, "Allowed Mimetypes", 1, true, "", DISPLAYTYPE_INPUT);
-        xclass.addStaticListField(BLOCKED_MIMETYPES_FIELD, "Denied Mimetypes", 1, true, "", DISPLAYTYPE_INPUT);
+        xclass.addStaticListField(BLOCKED_MIMETYPES_FIELD, "Blocked Mimetypes", 1, true, "", DISPLAYTYPE_INPUT);
     }
 }

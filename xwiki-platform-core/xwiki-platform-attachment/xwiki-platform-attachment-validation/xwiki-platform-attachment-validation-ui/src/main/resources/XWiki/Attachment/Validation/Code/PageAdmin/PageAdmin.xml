@@ -270,7 +270,7 @@
       </sectionOrder>
     </class>
     <property>
-      <categoryIcon/>
+      <categoryIcon>file-text</categoryIcon>
     </property>
     <property>
       <codeToExecute>{{include reference="XWiki.Attachment.Validation.Code.PageAdmin" /}}</codeToExecute>
@@ -285,7 +285,7 @@
       <displayInCategory>content</displayInCategory>
     </property>
     <property>
-      <displayInSection>Attachments Restriction</displayInSection>
+      <displayInSection>attachmentsrestriction</displayInSection>
     </property>
     <property>
       <heading/>
@@ -303,7 +303,7 @@
       <scope>WIKI+ALL_SPACES</scope>
     </property>
     <property>
-      <sectionOrder/>
+      <sectionOrder>800</sectionOrder>
     </property>
   </object>
 </xwikidoc>

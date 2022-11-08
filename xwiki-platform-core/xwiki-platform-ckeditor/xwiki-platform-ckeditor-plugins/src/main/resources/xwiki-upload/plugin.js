@@ -121,28 +121,34 @@
   };
 
   // Prevent parallel uploads in order to reduce the load on the server.
-  var preventParallelUploads = function(editor) {
+  var preventParallelUploads = function (editor) {
     var uploadQueue = $.Deferred().resolve();
-    editor.on('fileUploadRequest', function(event) {
-      var xhr = event.data.fileLoader.xhr;
-      // We need to know when the upload ends (load, error or abort) in order to perform the next upload.
-      var uploadPromise = $.Deferred();
-      xhr.addEventListener('loadend', uploadPromise.resolve.bind(uploadPromise));
-      // Overwrite the original send function to 'wait' for the previous upload to end.
-      var originalSend = xhr.send;
-      xhr.send = function() {
-        var data = arguments;
-        // Wait for the previous upload in the queue to end before sending the new upload.
-        uploadQueue = uploadQueue.then(function() {
-          originalSend.apply(xhr, data);
-          return uploadPromise.promise();
-        });
-      };
-    // Make sure our listener is called as early as possible because:
-    // * the loadend event listener is not called if added after the upload request was opened (initialized);
-    //   see https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Using_XMLHttpRequest#monitoring_progress
-    // * another event listener might send the upload request before we overwrite the send function;
-    //   see https://ckeditor.com/docs/ckeditor4/latest/guide/dev_file_upload.html#request-2
+    editor.on('fileUploadRequest', function (event) {
+      var eventFileSelected = $(document).trigger('xwiki:html5upload:fileSelected', {
+        file: event.data.fileLoader.file,
+      });
+      // We only queue the file and continue the upload if it is properly validated.
+      if (event.returnValue) {
+        var xhr = event.data.fileLoader.xhr;
+        // We need to know when the upload ends (load, error or abort) in order to perform the next upload.
+        var uploadPromise = $.Deferred();
+        xhr.addEventListener('loadend', uploadPromise.resolve.bind(uploadPromise));
+        // Overwrite the original send function to 'wait' for the previous upload to end.
+        var originalSend = xhr.send;
+        xhr.send = function () {
+          var data = arguments;
+          // Wait for the previous upload in the queue to end before sending the new upload.
+          uploadQueue = uploadQueue.then(function () {
+            originalSend.apply(xhr, data);
+            return uploadPromise.promise();
+          });
+        };
+      }
+      // Make sure our listener is called as early as possible because:
+      // * the loadend event listener is not called if added after the upload request was opened (initialized);
+      //   see https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Using_XMLHttpRequest#monitoring_progress
+      // * another event listener might send the upload request before we overwrite the send function;
+      //   see https://ckeditor.com/docs/ckeditor4/latest/guide/dev_file_upload.html#request-2
     }, null, null, 1);
   };
 

@@ -81,8 +81,7 @@ var XWiki = (function(XWiki) {
     },
 
     /**
-     * Create and return a new XWiki button element, an <tt>a.secondary.button</tt> element inside a
-     * <tt>span.buttonwrapper</tt>.
+     * Create and return a new XWiki button element, an <tt>a.secondary.button</tt> element inside a <tt>span.buttonwrapper</tt>.
      *
      * @param text the text to display on the button
      * @param handler optional event handler to attach to the <tt>click</tt> event
@@ -111,33 +110,12 @@ var XWiki = (function(XWiki) {
       this.container = container;
       this.formData = formData;
       this.options = options;
-      this.validate();
       this.initProgressParameters();
       this.generateStatusUI();
     },
 
     /**
-     * Do a simple validation of the selected file type and size. Throws exceptions if either is invalid according to
-     * the options.
-     *
-     * @throws 'INVALID_FILE_TYPE' if the file doesn't match the filter
-     * @throws 'UPLOAD_LIMIT_EXCEEDED' if the file size exceeds the configured maximum file size
-     */
-    validate : function() {
-      // Check if the file matches the filter
-      if (! this.options.fileFilter.test(this.file.type)) {
-        throw 'INVALID_FILE_TYPE';
-      }
-
-      // Check if the file size is below the acceptable threshold
-      if (this.file.size > this.options.maxFilesize) {
-        throw 'UPLOAD_LIMIT_EXCEEDED';
-      }
-    },
-
-    /**
-     * Generates upload status UI, consisting of optional file information (name, type, size), and optional progress
-     * bar.
+     * Generates upload status UI, consisting of optional file information (name, type, size), and optional progress bar.
      */
     generateStatusUI : function() {
       var statusUI = this.statusUI = {};
@@ -322,8 +300,7 @@ var XWiki = (function(XWiki) {
     },
 
     /**
-     * Function called by the XHR when the request finishes successfully (both sending the file and receiving the
-     * response).
+     * Function called by the XHR when the request finishes successfully (both sending the file and receiving the response).
      *
      * @param event the ProgressEvent fired by the browser
      */
@@ -486,8 +463,7 @@ var XWiki = (function(XWiki) {
     },
 
     /**
-     * Generates upload status UI, consisting of a container for individual file upload UI, a hide button, and a cancel
-     * button.
+     * Generates upload status UI, consisting of a container for individual file upload UI, a hide button, and a cancel button.
      */
     generateStatusUI : function() {
       var statusUI = this.statusUI = {};
@@ -533,17 +509,20 @@ var XWiki = (function(XWiki) {
       for (var i = 0; i < total; ++i) {
         var file = this.input.files[i];
         try {
-          var event = Event.fire(this.input, 'xwiki:html5upload:fileSelected', this.formData);
-          console.log('PPPP', event);
-          // TOOD: how to stop event?
-          this.fileUploadItems.push(new FileUploadItem(file, this.statusUI.LIST, this.formData, this.options));
+          var event = Event.fire(this.input, 'xwiki:html5upload:fileSelected', {
+            file: file
+          });
+          // Queue the file only if no listener cancelled the event.
+          if (event.returnValue) {
+            this.fileUploadItems.push(new FileUploadItem(file, this.statusUI.LIST, this.formData, this.options));
+            Event.fire(this.input, 'xwiki:html5upload:start');
+          }
         } catch (ex) {
           this.showMessage(ex, 'error', {size : UploadUtils.bytesToSize(this.options && this.options.maxFilesize),
                                          name : file.name, type: file.type
           });
         }
       }
-      Event.fire(this.input, 'xwiki:html5upload:start');
     },
 
     /**

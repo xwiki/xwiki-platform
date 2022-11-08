@@ -30,8 +30,6 @@ import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiRestComponent;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 /**

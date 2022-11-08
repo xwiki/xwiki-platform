@@ -33,7 +33,8 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import static com.xpn.xwiki.objects.classes.ListClass.DISPLAYTYPE_INPUT;
 
 /**
- * Initialize the {@code XWiki.Attachment.Code.AttachmentMimetypeRestrictionClass} XClass. This class is used to
+ * Initialize the {@code XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass} XClass. This class is 
+ * used to
  * configure restrictions on the kind of attachments that can be uploaded.
  *
  * @version $Id$
@@ -47,13 +48,14 @@ public class AttachmentMimetypeRestrictionClassDocumentInitializer extends Abstr
     /**
      * Hint for this class.
      */
-    public static final String HINT = "XWiki.Attachment.Code.AttachmentMimetypeRestrictionClass";
+    public static final String HINT = "XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass";
 
     /**
      * The local reference of the redirect attachment class.
      */
     public static final LocalDocumentReference REFERENCE =
-        new LocalDocumentReference(List.of("XWiki", "Attachment", "Code"), "AttachmentMimetypeRestrictionClass");
+        new LocalDocumentReference(List.of("XWiki", "Attachment", "Validation", "Code"), 
+            "AttachmentMimetypeRestrictionClass");
 
     /**
      * Field name for the allowed mime types.

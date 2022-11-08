@@ -124,12 +124,21 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery', 'xwiki-events-bridge'], $ =&gt; {
+      <code>define('attachment-validation-mimetype-messages', {
+  prefix: 'attachment.validation.mimetype.',
+  keys: [
+    'errorMessage',
+    'allowedMimetypes',
+    'blockerMimetypes'
+  ]
+});
+
+require(['jquery', 'xwiki-l10n!attachment-validation-mimetype-messages', 'xwiki-events-bridge'], ($, l10n) =&gt; {
   function checkMimetype(mimetypes, mimetype) {
     return mimetypes.some(mimetypePattern =&gt; new RegExp(mimetypePattern).match(mimetype));
   }
 
-  $(document).on('xwiki:html5upload:fileSelected', function (event, data) {
+  $(document).on('xwiki:actions:beforeUpload', function (event, data) {
     const configElement = document.getElementById('attachment-validation-mimetypes-configuration');
     const config = JSON.parse(configElement.textContent);
     const mimeType = data.file.type.toLowerCase();
@@ -140,10 +149,14 @@
     const hasInvalidMimetype = hasAllowedMimetypes &amp;&amp; !checkMimetype(allowedMimetypes, mimeType)
       || hasBlockerMimetypes &amp;&amp; checkMimetype(blockerMimetypes, mimeType);
     if (hasInvalidMimetype) {
-      // TODO: localization.
-      new XWiki.widgets.Notification(
-        "File " + data.file.name + " has invalid mimetype " + mimeType + ". Allowed mimetypes: " + allowedMimetypes +
-        ". Blocker mimetypes: " + blockerMimetypes, "error");
+      let localizedMessage = l10n.get('errorMessage', data.file.name, mimeType);
+      if (hasAllowedMimetypes) {
+        localizedMessage += '<br />' + l10n.get('allowedMimetypes', allowedMimetypes);
+      }
+      if (hasBlockerMimetypes) {
+        localizedMessage += '<br />' + l10n.get('blockerMimetypes', blockerMimetypes)
+      }
+      new XWiki.widgets.Notification(localizedMessage, "error");
     }
 
     return !hasInvalidMimetype;
@@ -296,7 +309,7 @@ $jsontool.serialize({
       <extensionPointId>org.xwiki.platform.template.header.after</extensionPointId>
     </property>
     <property>
-      <name>org.xwiki.platform.attachment.validation.header.after.config</name>
+      <name>org.xwiki.platform.attachment.validation.mimetype.header.after.config</name>
     </property>
     <property>
       <parameters/>

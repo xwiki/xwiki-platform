@@ -124,15 +124,37 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery', 'xwiki-events-bridge'], $ =&gt; {
+      <code>define('attachment-validation-filesize-messages', {
+  prefix: 'attachment.validation.filesize.',
+  keys: [
+    'errorMessage'
+  ]
+});
+
+require(['jquery', 'xwiki-l10n!attachment-validation-filesize-messages', 'xwiki-events-bridge'], ($, l10n) =&gt; {
+  function formatBytes(bytes) {
+    // Inspired from https://stackoverflow.com/a/18650828/657524
+    if (!+bytes) {
+      return '0 Bytes'
+    }
+
+    const k = 1024
+    const sizes = ['bytes', 'Kb', 'Mb', 'Gb', 'Tb', 'Pb', 'Eb', 'Zb', 'Yb']
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))}${sizes[i]}`
+  }
+
   $(document).on('xwiki:actions:beforeUpload', (event, data) =&gt; {
     const configElement = document.getElementById('attachment-validation-filesize-configuration');
     const config = JSON.parse(configElement.textContent);
     const maxFileSize = config.maxFileSize;
     const tooLarge = data.file.size &gt; maxFileSize;
-    if(tooLarge) {
-      // TODO: localization + convert bytes size into a readible unit (Mo/Go...).
-      new XWiki.widgets.Notification("File " + data.file.name + " too large. Max file size: " + maxFileSize, "error")
+    if (tooLarge) {
+      const localizedMessage = l10n.get('errorMessage', data.file.name, formatBytes(data.file.size),
+        formatBytes(maxFileSize));
+      new XWiki.widgets.Notification(localizedMessage, "error")
     }
     return !tooLarge;
   });
@@ -283,7 +305,7 @@ $jsontool.serialize({
       <extensionPointId>org.xwiki.platform.template.header.after</extensionPointId>
     </property>
     <property>
-      <name>org.xwiki.platform.attachment.validation.header.after.config</name>
+      <name>org.xwiki.platform.attachment.validation.filesize.header.after.config</name>
     </property>
     <property>
       <parameters/>

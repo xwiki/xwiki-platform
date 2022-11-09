@@ -37,7 +37,7 @@ import org.xwiki.stability.Unstable;
  */
 @Component
 @Singleton
-@Named("attachment-validation")
+@Named("attachmentValidation")
 @Unstable
 public class AttachmentValidationScriptService implements ScriptService
 {

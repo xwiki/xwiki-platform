@@ -614,12 +614,10 @@ public class Utils
                 context.put("fileuploadplugin", fileupload);
                 fileupload.loadFileList(context);
             }
+        } catch (AttachmentValidationException e) {
+            context.put("exception", e);
         } catch (Exception e) {
-            if (e instanceof AttachmentValidationException) {
-                context.put("exception", e);
-            } else {
-                LOGGER.error("Failed to process MultiPart request", e);
-            }
+            LOGGER.error("Failed to process MultiPart request", e);
         }
         return fileupload;
     }

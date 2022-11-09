@@ -37,6 +37,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
+import org.xwiki.attachment.validation.AttachmentValidationException;
+import org.xwiki.attachment.validation.AttachmentValidator;
 import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -54,14 +56,18 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static com.xpn.xwiki.plugin.fileupload.FileUploadPlugin.UPLOAD_MAXSIZE_PARAMETER;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -84,6 +90,9 @@ class DefaultTemporaryAttachmentSessionsManagerTest
 
     @MockComponent
     private Provider<XWikiContext> contextProvider;
+
+    @MockComponent
+    private AttachmentValidator attachmentValidator;
 
     @XWikiTempDir
     private File tmpDir;
@@ -165,6 +174,34 @@ class DefaultTemporaryAttachmentSessionsManagerTest
             this.attachmentManager.uploadAttachment(documentReference, part, "newFilename");
         assertEquals("newFilename", xWikiAttachment.getFilename());
         verify(part, never()).getSubmittedFileName();
+    }
+
+    @Test
+    void uploadAttachmentInvalid() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", "XWiki", "Document");
+        SpaceReference spaceReference = documentReference.getLastSpaceReference();
+
+        XWiki xwiki = mock(XWiki.class);
+        Part part = mock(Part.class);
+
+        when(this.context.getWiki()).thenReturn(xwiki);
+        when(xwiki.getSpacePreference(UPLOAD_MAXSIZE_PARAMETER, spaceReference, this.context))
+            .thenReturn("42");
+
+        when(part.getInputStream()).thenReturn(new ByteArrayInputStream("foo".getBytes(UTF_8)));
+
+        doThrow(AttachmentValidationException.class).when(this.attachmentValidator)
+            .validateAttachment(anyLong(), any(), anyString());
+
+        TemporaryAttachmentSession temporaryAttachmentSession = mock(TemporaryAttachmentSession.class);
+        when(this.httpSession.getAttribute(ATTRIBUTE_KEY)).thenReturn(temporaryAttachmentSession);
+
+        assertThrows(AttachmentValidationException.class,
+            () -> this.attachmentManager.uploadAttachment(documentReference, part, "newFilename"));
+
+        verify(part, never()).getSubmittedFileName();
+        verifyNoInteractions(temporaryAttachmentSession);
     }
 
     @ParameterizedTest

@@ -372,18 +372,6 @@ public class BaseAttachmentsResource extends XWikiResource
                 createOrUpdateAttachment(new AttachmentReference(attachmentName, document.getDocumentReference()),
                     content);
 
-            // We wait for the XWikiAttachment to be loaded before checking the size as accurately checking the size of 
-            // the content input stream is not possible.
-            this.attachmentValidator.validateAttachment(xwikiAttachment.getLongSize(), () -> {
-                try {
-                    return Optional.of(xwikiAttachment.getContentInputStream(this.xcontextProvider.get()));
-                } catch (XWikiException e) {
-                    this.logger.warn("Failed to get the input stream for attachment [{}]. Cause: [{}]", xwikiAttachment,
-                        getRootCauseMessage(e));
-                    return Optional.empty();
-                }
-            }, xwikiAttachment.getFilename());
-
             // The doc has been updated during the creation of the attachment, so we need to ensure we answer with the
             // updated version.
             Document updatedDoc = xwikiAttachment.getDoc().newDocument(xcontext);
@@ -399,7 +387,7 @@ public class BaseAttachmentsResource extends XWikiResource
     }
 
     protected XWikiAttachment createOrUpdateAttachment(AttachmentReference attachmentReference, InputStream content)
-        throws XWikiException
+        throws XWikiException, AttachmentValidationException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
         XWiki xwiki = xcontext.getWiki();
@@ -413,6 +401,18 @@ public class BaseAttachmentsResource extends XWikiResource
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_MISC,
                 String.format("Failed to create or update the attachment [%s].", attachmentReference), e);
         }
+
+        // We wait for the XWikiAttachment to be loaded before checking the size as accurately checking the size of 
+        // the content input stream is not possible.
+        this.attachmentValidator.validateAttachment(attachment.getLongSize(), () -> {
+            try {
+                return Optional.of(attachment.getContentInputStream(this.xcontextProvider.get()));
+            } catch (XWikiException e) {
+                this.logger.warn("Failed to get the input stream for attachment [{}]. Cause: [{}]", attachment,
+                    getRootCauseMessage(e));
+                return Optional.empty();
+            }
+        }, attachment.getFilename());
 
         // Set the document author.
         document.setAuthorReference(xcontext.getUserReference());

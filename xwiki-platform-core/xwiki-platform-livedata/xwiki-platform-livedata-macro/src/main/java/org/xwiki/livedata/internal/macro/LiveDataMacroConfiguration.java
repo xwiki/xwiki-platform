@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -56,8 +55,6 @@ import org.xwiki.livedata.macro.LiveDataMacroParameters;
 @Singleton
 public class LiveDataMacroConfiguration
 {
-    private static final Pattern PATTERN_COMMA = Pattern.compile("\\s*,\\s*");
-
     private static final String UTF8 = "UTF-8";
 
     /**
@@ -119,7 +116,7 @@ public class LiveDataMacroConfiguration
         if (properties == null) {
             return null;
         } else {
-            return Stream.of(PATTERN_COMMA.split(properties)).collect(Collectors.toList());
+            return getSplitStringStream(properties).collect(Collectors.toList());
         }
     }
 
@@ -146,7 +143,9 @@ public class LiveDataMacroConfiguration
         if (sort == null) {
             return null;
         } else {
-            return Stream.of(PATTERN_COMMA.split(sort)).filter(StringUtils::isNotEmpty).map(this::getSortEntry)
+            return getSplitStringStream(sort)
+                .filter(StringUtils::isNotEmpty)
+                .map(this::getSortEntry)
                 .collect(Collectors.toList());
         }
     }
@@ -193,7 +192,8 @@ public class LiveDataMacroConfiguration
         if (parameters.getLayouts() == null) {
             return null;
         } else {
-            return Stream.of(PATTERN_COMMA.split(parameters.getLayouts())).map(LiveDataLayoutDescriptor::new)
+            return getSplitStringStream(parameters.getLayouts())
+                .map(LiveDataLayoutDescriptor::new)
                 .collect(Collectors.toList());
         }
     }
@@ -203,7 +203,8 @@ public class LiveDataMacroConfiguration
         LiveDataPaginationConfiguration pagination = new LiveDataPaginationConfiguration();
         pagination.setShowPageSizeDropdown(parameters.getShowPageSizeDropdown());
         if (parameters.getPageSizes() != null) {
-            pagination.setPageSizes(Stream.of(PATTERN_COMMA.split(parameters.getPageSizes())).map(Integer::parseInt)
+            pagination.setPageSizes(getSplitStringStream(parameters.getPageSizes())
+                .map(Integer::parseInt)
                 .collect(Collectors.toList()));
         }
         return pagination;
@@ -229,5 +230,10 @@ public class LiveDataMacroConfiguration
             values.add(value);
         }
         return parameters;
+    }
+
+    private Stream<String> getSplitStringStream(String commaListAsString)
+    {
+        return Stream.of(commaListAsString.split(",")).map(StringUtils::trim);
     }
 }

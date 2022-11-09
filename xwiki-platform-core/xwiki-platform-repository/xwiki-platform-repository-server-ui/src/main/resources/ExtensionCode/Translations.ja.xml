@@ -43,12 +43,12 @@ extension.repository.summary=要約
 extension.repository.type=種類
 extension.repository.category=カテゴリー
 ### Missing: extension.repository.authors=Authors
-### Missing: extension.repository.doc.creationDate=Created On
-### Missing: extension.repository.doc.date=Last Modified
+extension.repository.doc.creationDate=作成日
+extension.repository.doc.date=最終更新日
 ### Missing: extension.repository.rating=Rating
-### Missing: extension.repository.installedCount=Installs
+extension.repository.installedCount=インストール数
 
 ## Administration UI
-### Missing: admin.repository=Extension Repository
+admin.repository=拡張機能のレポジトリ
 </content>
   </xwikidoc>

@@ -371,7 +371,7 @@ define('editInPlace', [
   };
 
   var loadCSS = function(url) {
-    $('&lt;link&gt;').attr({
+    $('&lt;link/&gt;').attr({
       type: 'text/css',
       rel: 'stylesheet',
       href: url
@@ -883,26 +883,26 @@ define('editInPlace', [
       addToFormData(formData, this._getActionButtons().find(':input'));
       // retrieve all input fields listing the temporary uploaded files.
       var xwikiDocument = this._getActionButtons().data('xwikiDocument');
-      formData.append('title', xwikiDocument.rawTitle);
-      formData.append('language', xwikiDocument.getRealLocale());
-      formData.append('isNew', xwikiDocument.isNew);
+      formData.set('title', xwikiDocument.rawTitle);
+      formData.set('language', xwikiDocument.getRealLocale());
+      formData.set('isNew', xwikiDocument.isNew);
 
       if (xwikiDocument.content !== xwikiDocument.originalDocument.content) {
         // Submit the raw (source) content. No syntax conversion is needed in this case.
-        formData.append('content', xwikiDocument.content);
+        formData.set('content', xwikiDocument.content);
       } else {
         // Submit the rendered content (HTML), but make sure it is converted to the document syntax on the server.
-        formData.append('content', xwikiDocument.renderedContent);
-        formData.append('RequiresHTMLConversion', 'content');
-        formData.append('content_syntax', xwikiDocument.syntax);
+        formData.set('content', xwikiDocument.renderedContent);
+        formData.set('RequiresHTMLConversion', 'content');
+        formData.set('content_syntax', xwikiDocument.syntax);
       }
       // Add the temporary uploaded files to the form.
       addToFormData(formData, $('#xwikicontent').nextAll('input[name="uploadedFiles"]'));
 
       // Check for merge conflicts only if the document is not new and we know the current version.
       if (!xwikiDocument.isNew &amp;&amp; xwikiDocument.version) {
-        formData.append('previousVersion', xwikiDocument.version);
-        formData.append('editingVersionDate', new Date(xwikiDocument.modified).getTime());
+        formData.set('previousVersion', xwikiDocument.version);
+        formData.set('editingVersionDate', new Date(xwikiDocument.modified).getTime());
       }
       // Note: if you refactor, please make sure that actionsButtons inputs have the lowest priority.
       return formData;

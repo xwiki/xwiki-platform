@@ -365,6 +365,8 @@ public class BaseAttachmentsResource extends XWikiResource
         XWikiContext xcontext = this.xcontextProvider.get();
         XWikiDocument previousDoc = xcontext.getDoc();
         try {
+            // The context needs to be updated with the document where the attachment will be attached to be able to 
+            // resolve the configuration when validating the attachment mimetype.
             xcontext.setDoc(document.getDocument());
             boolean alreadyExisting = document.getAttachment(attachmentName) != null;
 
@@ -382,6 +384,7 @@ public class BaseAttachmentsResource extends XWikiResource
 
             return new AttachmentInfo(attachment, alreadyExisting);
         } finally {
+            // Restore the context to its initial value.
             xcontext.setDoc(previousDoc);
         }
     }

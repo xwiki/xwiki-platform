@@ -297,12 +297,11 @@ require(['jquery', 'xwiki-l10n!attachment-validation-mimetype-messages', 'xwiki-
       <async_enabled>0</async_enabled>
     </property>
     <property>
-      <content>{{velocity}}
-(% id='attachment-validation-mimetypes-configuration' class='hidden' %)
-$jsontool.serialize({
+      <content>{{velocity wiki='false'}}
+<div id='attachment-validation-mimetypes-configuration' class='hidden'>$jsontool.serialize({
   "allowedMimetypes": $services.attachmentValidation.getAllowedMimetypes(),
   "blockerMimetypes": $services.attachmentValidation.getBlockerMimetypes()
-})
+})</div>
 {{/velocity}}</content>
     </property>
     <property>

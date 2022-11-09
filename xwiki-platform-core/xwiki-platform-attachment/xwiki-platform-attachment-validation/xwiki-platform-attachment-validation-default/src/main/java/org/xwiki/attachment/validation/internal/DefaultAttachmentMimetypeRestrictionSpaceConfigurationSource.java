@@ -55,9 +55,6 @@ public class DefaultAttachmentMimetypeRestrictionSpaceConfigurationSource extend
     @Override
     protected DocumentReference getDocumentReference()
     {
-        // Note: We would normally use a Reference Resolver here but since the Model module uses the Configuration
-        // module we cannot use one as otherwise we would create a cyclic build dependency...
-
         // Get the current document reference to extract the wiki and space names.
         DocumentReference currentDocumentReference = this.documentAccessBridge.getCurrentDocumentReference();
 

@@ -27,7 +27,6 @@ import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.servlet.http.Part;
@@ -61,7 +60,6 @@ import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessa
 public class DefaultAttachmentValidator implements AttachmentValidator
 {
     @Inject
-    @Named("readonly")
     private Provider<XWikiContext> contextProvider;
 
     @Inject

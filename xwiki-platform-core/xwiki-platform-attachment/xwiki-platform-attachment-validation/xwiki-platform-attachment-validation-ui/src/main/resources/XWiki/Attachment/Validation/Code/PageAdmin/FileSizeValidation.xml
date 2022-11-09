@@ -294,11 +294,10 @@ require(['jquery', 'xwiki-l10n!attachment-validation-filesize-messages', 'xwiki-
       <async_enabled>0</async_enabled>
     </property>
     <property>
-      <content>{{velocity}}
-(% id='attachment-validation-filesize-configuration' class='hidden' %)
-$jsontool.serialize({
+      <content>{{velocity wiki='false'}}
+<div id='attachment-validation-filesize-configuration' class='hidden'>$jsontool.serialize({
   "maxFileSize": $xwiki.getSpacePreference('upload_maxsize')
-})
+})</div>
 {{/velocity}}</content>
     </property>
     <property>

@@ -20,10 +20,12 @@
 package org.xwiki.test.ui.po;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -83,9 +85,13 @@ public class DeletePageOutcomePage extends ViewPage
      */
     public List<DeletedPageEntry> getDeletedPagesEntries()
     {
-        WebElement table =
-            getDriver().findElementWithoutWaiting(By.cssSelector("div.xwikimessage div.docs table"));
-        return getDeletedEntries(table, false);
+        try {
+            WebElement table =
+                getDriver().findElementWithoutWaiting(By.cssSelector("div.xwikimessage div.docs table"));
+            return getDeletedEntries(table, false);
+        } catch (NoSuchElementException e) {
+            return Collections.emptyList();
+        }
     }
 
     /**
@@ -93,9 +99,13 @@ public class DeletePageOutcomePage extends ViewPage
      */
     public List<DeletedPageEntry> getDeletedTerminalPagesEntries()
     {
-        WebElement table =
-            getDriver().findElementWithoutWaiting(By.cssSelector("div.xwikimessage div.terminal-docs table"));
-        return getDeletedEntries(table, true);
+        try {
+            WebElement table =
+                getDriver().findElementWithoutWaiting(By.cssSelector("div.xwikimessage div.terminal-docs table"));
+            return getDeletedEntries(table, true);
+        } catch (NoSuchElementException e) {
+            return Collections.emptyList();
+        }
     }
 
     /**

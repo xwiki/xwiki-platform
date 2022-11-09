@@ -22,7 +22,6 @@ package org.xwiki.ckeditor.test.ui;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -34,7 +33,6 @@ import org.xwiki.ckeditor.test.po.ImageDialogSelectModal;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.model.jaxb.Object;
-import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.model.jaxb.Property;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -56,18 +54,8 @@ class ImagePluginIT
     @BeforeEach
     void setUp(TestUtils setup) throws Exception
     {
-        // Activate the new image dialog.
-        activateImageDialog(setup);
-
         // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
         createAndLoginStandardUser(setup);
-    }
-
-    @AfterEach
-    void tearDown(TestUtils setup) throws Exception
-    {
-        // Deactivate the new image dialog.
-        deactivateImageDialog(setup);
     }
 
     @Test
@@ -166,27 +154,6 @@ class ImagePluginIT
         // Re-insert and save the page to avoid triggering a javascript alert for unsaved page.
         imageDialogEditModal.clickInsert();
         wysiwygEditPage.clickSaveAndView();
-    }
-
-    private static void activateImageDialog(TestUtils setup) throws Exception
-    {
-        setup.loginAsSuperAdmin();
-        DocumentReference configPageDocumentReference = getConfigPageDocumentReference(setup);
-        setup.rest().delete(configPageDocumentReference);
-        Page page = setup.rest().page(configPageDocumentReference);
-        setup.rest().save(page);
-        Object object = setup.rest()
-            .object(configPageDocumentReference, "CKEditor.ConfigClass");
-        // Update the configuration to activate xwiki-image (by removing it from the removed plugins).
-        object.withProperties(TestUtils.RestTestUtils.property("removePlugins",
-            List.of("bidi", "colorbutton", "font", "justify", "save", "sourcearea")));
-        setup.rest().add(object);
-    }
-
-    private void deactivateImageDialog(TestUtils setup) throws Exception
-    {
-        setup.loginAsSuperAdmin();
-        setup.rest().delete(getConfigPageDocumentReference(setup));
     }
 
     private static DocumentReference getConfigPageDocumentReference(TestUtils setup)

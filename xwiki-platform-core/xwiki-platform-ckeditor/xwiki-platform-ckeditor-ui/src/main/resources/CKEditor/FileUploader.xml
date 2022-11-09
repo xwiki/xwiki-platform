@@ -177,9 +177,9 @@
     #set ($document = $xwiki.getDocument($request.document))
   #end
   #if ($request.getHeader('X-XWiki-Temporary-Attachment-Support') == 'true' &amp;&amp; !$document.isTranslation())
-    #handleTemporaryUploadRequest
+    #handleTemporaryUploadRequest()
   #else
-    #handleUploadRequest
+    #handleUploadRequest()
   #end
 #end
 {{/velocity}}</content>

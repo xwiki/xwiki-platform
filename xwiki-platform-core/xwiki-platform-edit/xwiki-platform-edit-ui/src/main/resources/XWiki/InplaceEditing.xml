@@ -371,7 +371,7 @@ define('editInPlace', [
   };
 
   var loadCSS = function(url) {
-    var link = $('&lt;link&gt;').attr({
+    $('&lt;link/&gt;').attr({
       type: 'text/css',
       rel: 'stylesheet',
       href: url
@@ -843,6 +843,12 @@ define('editInPlace', [
     });
   };
 
+  function addToFormData(formData, inputs) {
+    inputs.serializeArray().forEach(function(entry) {
+      formData.append(entry.name, entry.value);
+    });
+  }
+
   // actionButtons.js expects a form so we use a fake form. Refactoring actionButtons.js is too dangerous ATM.
   var fakeForm = {
     action: XWiki.currentDocument.getURL('save'),
@@ -873,45 +879,33 @@ define('editInPlace', [
       return this._getActionButtons().find(selector)[0];
     },
     serialize: function() {
-      var extra = this._getActionButtons().find(':input').serializeArray().reduce(function(extra, entry) {
-        var value = extra[entry.name] || [];
-        value.push(entry.value);
-        extra[entry.name] = value;
-        return extra;
-      }, {});
+      var formData = new FormData();
+      addToFormData(formData, this._getActionButtons().find(':input'));
       // retrieve all input fields listing the temporary uploaded files.
-      var uploadedFiles = $('#xwikicontent').nextAll('input[name="uploadedFiles"]').serializeArray().reduce(function(extra, entry) {
-        var value = extra[entry.name] || [];
-        value.push(entry.value);
-        extra[entry.name] = value;
-        return extra;
-      }, {});
       var xwikiDocument = this._getActionButtons().data('xwikiDocument');
-      var formData = {
-        title: xwikiDocument.rawTitle,
-        language: xwikiDocument.getRealLocale(),
-        isNew: xwikiDocument.isNew
-      };
-      if (xwikiDocument.content != xwikiDocument.originalDocument.content) {
+      formData.set('title', xwikiDocument.rawTitle);
+      formData.set('language', xwikiDocument.getRealLocale());
+      formData.set('isNew', xwikiDocument.isNew);
+
+      if (xwikiDocument.content !== xwikiDocument.originalDocument.content) {
         // Submit the raw (source) content. No syntax conversion is needed in this case.
-        formData.content = xwikiDocument.content;
+        formData.set('content', xwikiDocument.content);
       } else {
         // Submit the rendered content (HTML), but make sure it is converted to the document syntax on the server.
-        $.extend(formData, {
-          content: xwikiDocument.renderedContent,
-          RequiresHTMLConversion: 'content',
-          content_syntax: xwikiDocument.syntax
-        });
+        formData.set('content', xwikiDocument.renderedContent);
+        formData.set('RequiresHTMLConversion', 'content');
+        formData.set('content_syntax', xwikiDocument.syntax);
       }
       // Add the temporary uploaded files to the form.
-      $.extend(formData, uploadedFiles);
+      addToFormData(formData, $('#xwikicontent').nextAll('input[name="uploadedFiles"]'));
+
       // Check for merge conflicts only if the document is not new and we know the current version.
       if (!xwikiDocument.isNew &amp;&amp; xwikiDocument.version) {
-        formData.previousVersion = xwikiDocument.version;
-        formData.editingVersionDate = new Date(xwikiDocument.modified).getTime();
+        formData.set('previousVersion', xwikiDocument.version);
+        formData.set('editingVersionDate', new Date(xwikiDocument.modified).getTime());
       }
-      // Ensure that formData information has priority over extra information.
-      return $.extend({}, extra, formData);
+      // Note: if you refactor, please make sure that actionsButtons inputs have the lowest priority.
+      return formData;
     }
   };
 

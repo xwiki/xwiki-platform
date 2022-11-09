@@ -25,11 +25,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
@@ -64,6 +67,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.wiki.WikiModel;
+import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.DefaultAuthorizationManager;
@@ -83,6 +87,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.xwiki.rendering.test.integration.junit5.BlockAssert.assertBlocks;
 import static org.xwiki.rendering.test.integration.junit5.BlockAssert.assertBlocksStartsWith;
@@ -94,17 +99,15 @@ import static org.xwiki.rendering.test.integration.junit5.BlockAssert.assertBloc
  * @since 1.5M2
  */
 @ComponentTest
-@AllComponents(excludes = {
-    CurrentMacroEntityReferenceResolver.class,
-    DefaultAuthorizationManager.class
-})
+@AllComponents(excludes = {CurrentMacroEntityReferenceResolver.class, DefaultAuthorizationManager.class})
 class IncludeMacroTest
 {
+    private final static DocumentReference INCLUDER_AUHOR = new DocumentReference("wiki", "XWiki", "includer");
+
+    private final static DocumentReference INCLUDED_AUHOR = new DocumentReference("wiki", "XWiki", "included");
+
     @InjectComponentManager
     private MockitoComponentManager componentManager;
-
-    @MockComponent
-    private DocumentModelBridge includedDocument;
 
     @MockComponent
     private DocumentAccessBridge dab;
@@ -119,6 +122,12 @@ class IncludeMacroTest
     @MockComponent
     @Named("current")
     private AttachmentReferenceResolver<String> currentAttachmentReferenceResolver;
+
+    @MockComponent
+    private AuthorExecutor authorExecutor;
+
+    @Mock
+    private DocumentModelBridge includedDocument;
 
     /**
      * Mocks the component that is used to resolve the 'reference' parameter.
@@ -141,6 +150,8 @@ class IncludeMacroTest
         this.includeMacro = this.componentManager.getInstance(Macro.class, "include");
         this.rendererFactory = this.componentManager.getInstance(PrintRendererFactory.class, "event/1.0");
 
+        when(this.dab.getCurrentAuthorReference()).thenReturn(INCLUDER_AUHOR);
+
         // Put a fake XWiki context on the execution context.
         Execution execution = this.componentManager.getInstance(Execution.class);
         ExecutionContextManager ecm = this.componentManager.getInstance(ExecutionContextManager.class);
@@ -153,6 +164,15 @@ class IncludeMacroTest
 
         // Register a WikiModel mock so that we're in wiki mode (otherwise links will be considered as URLs for ex).
         this.componentManager.registerMockComponent(WikiModel.class);
+
+        when(this.authorExecutor.call(any(), any(), any())).then(new Answer<Void>()
+        {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable
+            {
+                return ((Callable<Void>) invocation.getArgument(0)).call();
+            }
+        });
     }
 
     @Test
@@ -168,9 +188,48 @@ class IncludeMacroTest
             + "endDocument";
         // @formatter:on
 
-        List<Block> blocks = runIncludeMacro(Context.CURRENT, "word", false);
+        List<Block> blocks = runIncludeMacro(Context.CURRENT, "word", false, true);
 
         assertBlocks(expected, blocks, this.rendererFactory);
+    }
+
+    @Test
+    void executeWithDifferentAuthors() throws Exception
+    {
+        // @formatter:off
+        String expected = "beginDocument\n"
+            + "beginMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
+            + "beginParagraph\n"
+            + "onWord [word]\n"
+            + "endParagraph\n"
+            + "endMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
+            + "endDocument";
+        // @formatter:on
+
+        List<Block> blocks = runIncludeMacro(Context.CURRENT, "word", false, false);
+
+        assertBlocks(expected, blocks, this.rendererFactory);
+    }
+
+    @Test
+    void executeWithCurrentUserNoView() throws Exception
+    {
+        String referenceString = "reference";
+        DocumentReference reference = new DocumentReference("wiki", "space", "page");
+
+        when(this.macroEntityReferenceResolver.resolve(eq(referenceString), eq(EntityType.DOCUMENT),
+            any(MacroBlock.class))).thenReturn(reference);
+        when(this.dab.getDocumentInstance((EntityReference) reference)).thenReturn(this.includedDocument);
+        when(this.includedDocument.getDocumentReference()).thenReturn(reference);
+        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, reference)).thenReturn(false);
+
+        IncludeMacroParameters parameters = new IncludeMacroParameters();
+        parameters.setReference(referenceString);
+
+        Throwable exception = assertThrows(MacroExecutionException.class,
+            () -> this.includeMacro.execute(parameters, null, createMacroTransformationContext("whatever", false)));
+        assertEquals("Current user [null] doesn't have view rights on document [wiki:space.page]",
+            exception.getMessage());
     }
 
     @Test
@@ -215,7 +274,7 @@ class IncludeMacroTest
         // @formatter:on
 
         // We verify that a Velocity macro set in the including page is not seen in the included page.
-        List<Block> blocks = runIncludeMacro(Context.NEW, "{{velocity}}$foo{{/velocity}}", true);
+        List<Block> blocks = runIncludeMacro(Context.NEW, "{{velocity}}$foo{{/velocity}}", true, false);
 
         assertBlocksStartsWith(expected, blocks, this.rendererFactory);
     }
@@ -278,7 +337,7 @@ class IncludeMacroTest
         PageReference includedPageReference = new PageReference("includedWiki", "includedSpace", "includedPage");
         setupDocumentMocks("includedWiki:includedSpace.includedPage", includedDocumentReference,
             "includedWiki:includedSpace/includedPage", includedPageReference,
-            "[[page]] [[attach:test.png]] image:test.png");
+            "[[page]] [[attach:test.png]] image:test.png", false);
         when(this.dab.getCurrentDocumentReference()).thenReturn(includedDocumentReference);
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();
@@ -294,8 +353,7 @@ class IncludeMacroTest
 
         parameters.setPage("includedWiki:includedSpace/includedPage");
 
-        blocks =
-            this.includeMacro.execute(parameters, null, createMacroTransformationContext("whatever", false));
+        blocks = this.includeMacro.execute(parameters, null, createMacroTransformationContext("whatever", false));
 
         assertBlocks(expected, blocks, this.rendererFactory);
     }
@@ -321,13 +379,12 @@ class IncludeMacroTest
             + "endDocument";
         // @formatter:on
 
-        String documentContent = "= Heading =\n"
-            + "image:test.png";
+        String documentContent = "= Heading =\n" + "image:test.png";
 
         DocumentReference includedDocumentReference =
             new DocumentReference("includedWiki", "includedSpace", "includedPage");
-        setupDocumentMocks("includedWiki:includedSpace.includedPage", includedDocumentReference,
-            documentContent);
+        setupDocumentMocks("includedWiki:includedSpace.includedPage", includedDocumentReference, documentContent,
+            false);
         when(this.dab.getCurrentDocumentReference()).thenReturn(includedDocumentReference);
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();
@@ -384,18 +441,17 @@ class IncludeMacroTest
         parameters.setContext(Context.NEW);
 
         DocumentReference includedDocumentReference = new DocumentReference("wiki", "space", "page");
-        setupDocumentMocks("wiki:space.page", includedDocumentReference, "");
+        setupDocumentMocks("wiki:space.page", includedDocumentReference, "", false);
 
-        when(documentDisplayer.display(same(this.includedDocument), any(DocumentDisplayerParameters.class))).thenAnswer(
-            (Answer) invocation -> {
+        when(documentDisplayer.display(same(this.includedDocument), any(DocumentDisplayerParameters.class)))
+            .thenAnswer((Answer) invocation -> {
                 // Call again the include macro when the document displayer executes to simulate a recursive call.
                 // Verify that it raises a MacroExecutionException in this case.
                 Throwable exception = assertThrows(MacroExecutionException.class,
                     () -> this.includeMacro.execute(parameters, null, macroContext));
                 assertEquals("Found recursive inclusion of document [wiki:space.page]", exception.getMessage());
                 throw exception;
-            }
-        );
+            });
 
         // Verify that the exception bubbles up.
         Throwable exception = assertThrows(MacroExecutionException.class,
@@ -426,7 +482,7 @@ class IncludeMacroTest
 
         DocumentReference sourceReference = new DocumentReference("wiki", "space", "page");
         DocumentReference resolvedReference = new DocumentReference("wiki", "space", "relativePage");
-        setupDocumentMocks("relativePage", resolvedReference, "content");
+        setupDocumentMocks("relativePage", resolvedReference, "content", false);
         when(this.dab.getCurrentDocumentReference()).thenReturn(sourceReference);
 
         List<Block> blocks = this.includeMacro.execute(parameters, null, macroContext);
@@ -456,7 +512,7 @@ class IncludeMacroTest
 
         MacroTransformationContext macroContext = createMacroTransformationContext("whatever", false);
         DocumentReference resolvedReference = new DocumentReference("wiki", "space", "document");
-        setupDocumentMocks("document", resolvedReference, "content1\n\n= section =\ncontent2");
+        setupDocumentMocks("document", resolvedReference, "content1\n\n= section =\ncontent2", false);
 
         List<Block> blocks = this.includeMacro.execute(parameters, null, macroContext);
 
@@ -472,9 +528,9 @@ class IncludeMacroTest
 
         MacroTransformationContext macroContext = createMacroTransformationContext("whatever", false);
         DocumentReference resolvedReference = new DocumentReference("wiki", "space", "document");
-        setupDocumentMocks("document", resolvedReference, "content");
-        when(this.dab.getCurrentDocumentReference()).thenReturn(
-            new DocumentReference("wiki", "Space", "IncludingPage"));
+        setupDocumentMocks("document", resolvedReference, "content", false);
+        when(this.dab.getCurrentDocumentReference())
+            .thenReturn(new DocumentReference("wiki", "Space", "IncludingPage"));
 
         Throwable exception = assertThrows(MacroExecutionException.class,
             () -> this.includeMacro.execute(parameters, null, macroContext));
@@ -500,7 +556,7 @@ class IncludeMacroTest
 
         MacroTransformationContext macroContext = createMacroTransformationContext("whatever", false);
         DocumentReference resolvedReference = new DocumentReference("wiki", "space", "document");
-        setupDocumentMocks("document", resolvedReference, "= Heading =\ncontent");
+        setupDocumentMocks("document", resolvedReference, "= Heading =\ncontent", false);
         when(this.dab.getCurrentDocumentReference())
             .thenReturn(new DocumentReference("wiki", "Space", "IncludingPage"));
 
@@ -529,7 +585,7 @@ class IncludeMacroTest
 
         MacroTransformationContext macroContext = createMacroTransformationContext("whatever", false);
         DocumentReference resolvedReference = new DocumentReference("wiki", "space", "document");
-        setupDocumentMocks("document", resolvedReference, "= Heading =\ncontent");
+        setupDocumentMocks("document", resolvedReference, "= Heading =\ncontent", false);
         when(this.dab.getCurrentDocumentReference())
             .thenReturn(new DocumentReference("wiki", "Space", "IncludingPage"));
 
@@ -559,7 +615,7 @@ class IncludeMacroTest
 
         MacroTransformationContext macroContext = createMacroTransformationContext("whatever", false);
         DocumentReference resolvedReference = new DocumentReference("wiki", "space", "document");
-        setupDocumentMocks("document", resolvedReference, "=content=");
+        setupDocumentMocks("document", resolvedReference, "=content=", false);
         when(this.dab.getCurrentDocumentReference())
             .thenReturn(new DocumentReference("wiki", "Space", "IncludingPage"));
 
@@ -592,7 +648,7 @@ class IncludeMacroTest
         // Getting the macro context
         MacroTransformationContext macroContext = createMacroTransformationContext("whatever", false);
         DocumentReference resolvedReference = new DocumentReference("wiki", "space", "document");
-        setupDocumentMocks("document", resolvedReference, "(((= content =)))");
+        setupDocumentMocks("document", resolvedReference, "(((= content =)))", false);
 
         List<Block> blocks = this.includeMacro.execute(parameters, null, macroContext);
         assertBlocks(expected, blocks, this.rendererFactory);
@@ -608,14 +664,14 @@ class IncludeMacroTest
     }
 
     private void setupDocumentMocks(String includedReferenceString, DocumentReference includedReference,
-        String includedContent) throws Exception
+        String includedContent, boolean sameAuthors) throws Exception
     {
-        setupDocumentMocks(includedReferenceString, includedReference, null, null, includedContent);
+        setupDocumentMocks(includedReferenceString, includedReference, null, null, includedContent, sameAuthors);
     }
 
     private void setupDocumentMocks(String includedDocumentReferenceString, DocumentReference includedDocumentReference,
-        String includedPageReferenceString, PageReference includedPageReference, String includedContent)
-        throws Exception
+        String includedPageReferenceString, PageReference includedPageReference, String includedContent,
+        boolean sameAuthors) throws Exception
     {
         when(this.macroEntityReferenceResolver.resolve(eq(includedDocumentReferenceString), eq(EntityType.DOCUMENT),
             any(MacroBlock.class))).thenReturn(includedDocumentReference);
@@ -634,6 +690,12 @@ class IncludeMacroTest
         when(this.includedDocument.getSyntax()).thenReturn(Syntax.XWIKI_2_0);
         when(this.includedDocument.getXDOM()).thenReturn(getXDOM(includedContent));
         when(this.includedDocument.getRealLanguage()).thenReturn("");
+
+        if (sameAuthors) {
+            when(this.includedDocument.getContentAuthorReference()).thenReturn(INCLUDER_AUHOR);
+        } else {
+            when(this.includedDocument.getContentAuthorReference()).thenReturn(INCLUDED_AUHOR);
+        }
     }
 
     private XDOM getXDOM(String content) throws Exception
@@ -655,15 +717,15 @@ class IncludeMacroTest
 
     private List<Block> runIncludeMacro(final Context context, String includedContent) throws Exception
     {
-        return runIncludeMacro(context, includedContent, false);
+        return runIncludeMacro(context, includedContent, false, false);
     }
 
-    private List<Block> runIncludeMacro(final Context context, String includedContent, boolean restricted)
-        throws Exception
+    private List<Block> runIncludeMacro(final Context context, String includedContent, boolean restricted,
+        boolean sameAuthor) throws Exception
     {
         DocumentReference includedDocumentReference = new DocumentReference("wiki", "Space", "IncludedPage");
         String includedDocStringRef = "wiki:space.page";
-        setupDocumentMocks(includedDocStringRef, includedDocumentReference, includedContent);
+        setupDocumentMocks(includedDocStringRef, includedDocumentReference, includedContent, sameAuthor);
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();
         parameters.setReference(includedDocStringRef);
@@ -683,6 +745,13 @@ class IncludeMacroTest
         if (context == Context.NEW) {
             verify(this.dab).pushDocumentInContext(any(Map.class), same(this.includedDocument));
             verify(this.dab).popDocumentFromContext(any(Map.class));
+        } else {
+            if (sameAuthor) {
+                verifyNoInteractions(this.authorExecutor);
+            } else {
+                verify(this.authorExecutor).call(any(), eq(INCLUDED_AUHOR),
+                    eq(this.includedDocument.getDocumentReference()));
+            }
         }
 
         return blocks;

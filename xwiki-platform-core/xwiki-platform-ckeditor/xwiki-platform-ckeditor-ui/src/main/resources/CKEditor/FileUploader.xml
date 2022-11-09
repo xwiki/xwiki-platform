@@ -108,7 +108,7 @@
     #if ($attachment)
       #sendSuccess($document, $attachment.filename)
     #else
-      #sendError(400 "$services.localization.render('ckeditor.upload.error.emptyreturn')")
+      #sendError(400 "$services.localization.render('ckeditor.upload.error.emptyReturn')")
     #end
   #else
     #sendError(403 "$services.localization.render('ckeditor.upload.error.csrf')")

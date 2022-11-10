@@ -78,16 +78,17 @@ public final class DocumentSplitterUtils
     }
 
     /**
-     * Move artifacts (i.e. embedded images) from the original office document to a specific wiki document corresponding
-     * to a section. Only the artifacts from that section are moved.
+     * Add artifacts (i.e. embedded images) from the original office document to a specific wiki document corresponding
+     * to a section. Only the artifacts in that section is added.
+     *
+     * Note that this creates reduntat attachments if the same file is
+     * referenced from several sections in the splitted document.
      * 
      * @param sectionDoc the newly created wiki document corresponding to a section of the original office document
-     * @param officeDocument the office document being splitted into wiki documents
      * @param fileMap Map of files from the original document
      * @return the relocated artifacts
      */
-    public static Set<File> relocateArtifacts(WikiDocument sectionDoc, XDOMOfficeDocument officeDocument,
-        Map<String, File> fileMap)
+    public static Set<File> addArtifacts(WikiDocument sectionDoc, Map<String, File> fileMap)
     {
         Set<File> result = new HashSet<>();
         List<ImageBlock> imageBlocks =

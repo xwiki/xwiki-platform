@@ -1,1 +1,92 @@
+<?xml version="1.1" encoding="UTF-8"?>
 
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="Main.WebHome" locale="ja">
+  <web>Main</web>
+  <name>WebHome</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>ホーム</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>false</hidden>
+  <content>{{box cssClass="floatinginfobox"}}
+{{velocity}}
+{{html clean="false"}}
+## Chromeの XSS Auditorは以下の場合にプレビューをブロックします：
+## * 送信されたコンテンツが外部URLによるiframeを含む場合
+## * プレビューが送信されたiframeを表示する場合
+## この問題は、送信されたコンテンツ（マクロマーカー）とHTMLのプレビューを一致させないことで回避できます。
+## XWIKI-14818を確認：Preview triggers ERR_BLOCKED_BY_XSS_AUDITOR in Chrome
+#set ($iframe = 'iframe')
+&lt;$iframe src="https://www.youtube.com/embed/9QTWrZ7OfzI" title="XWikiのYouTubeの動画" role="presentation" allowfullscreen&gt;&lt;/$iframe&gt;
+{{/html}}
+{{/velocity}}
+{{/box}}
+
+= あなたのウィキへようこそ =
+
+XWikiは知識をまとめるのに最適なツールです。//ウィキ//は複数の//ページ//の階層からなります。それぞれページをもつ複数のウィキを作成することができます。
+
+XWikiは（サポート、ドキュメンテーション、セールスなどについての）ナレッジベースとして、ワークスペースでの共同作業、あるいはイントラネットに利用できます。
+
+= 基本事項 =
+
+ウィキを活用するには、ログイン後、
+
+上にある{{velocity}}$services.icon.render('pencil'){{/velocity}}ボタンをクリックしてください。このページを//編集//してウィキを必要に応じた仕方でカスタマイズできます。
+
+上にある{{velocity}}$services.icon.render('add'){{/velocity}}ボタンをクリックしてください。ページをウィキに//追加//し、最もよくコンテンツを組織する//階層//を作成することができます。
+
+タイトルの上にある{{velocity}}$services.icon.render('home'){{/velocity}}パンくずリストより、各ページ間を//移動//することができます。パンくずリストがあれば大きなウィキの中で迷うこともありません。
+
+[[サンドボックス&gt;&gt;Sandbox.WebHome]]には、より多くのデモコンテンツがあります。また、サンドボックスはウィキの機能を試す際にも使用できます。
+
+ {{box}}XWikiの使い方については、{{velocity}}[[スタートガイド&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome?version=$xwiki.version]]{{/velocity}}もご覧ください。{{/box}}
+
+(% class="row" %)
+(((
+(% class="col-xs-12 col-sm-6" %)
+(((
+= ウィキを拡張 =
+
+{{velocity}}[[エクステンションマネージャー&gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('wiki', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&amp;section=XWiki.Extensions')]]{{/velocity}}から拡張機能を検索してインストールすると、//あなた//が必要な機能を追加してウィキの性能を向上させることができます。
+
+コミュニティーが作成した900個以上の拡張機能は、[[拡張機能レポジトリ&gt;&gt;http://extensions.xwiki.org]]から確認できます。
+)))
+
+(% class="col-xs-12 col-sm-6" %)
+(((
+= アプリケーションを作成 =
+
+利用可能な拡張機能を超えて、あなたのデータの//構造//を//あなたの//ニーズに基づき規定し、 [[App Within Minutes&gt;&gt;AppWithinMinutes]]（AWM）で//あなた//自身のアプリケーションを作ることができます。
+
+AWMを使うと、あなたとユーザーが簡単にデータを作成し、管理できるようになります。
+)))
+)))</content>
+  </xwikidoc>

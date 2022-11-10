@@ -191,8 +191,7 @@ class DefaultTemporaryAttachmentSessionsManagerTest
 
         when(part.getInputStream()).thenReturn(new ByteArrayInputStream("foo".getBytes(UTF_8)));
 
-        doThrow(AttachmentValidationException.class).when(this.attachmentValidator)
-            .validateAttachment(anyLong(), any(), anyString());
+        doThrow(AttachmentValidationException.class).when(this.attachmentValidator).validateAttachment(any());
 
         TemporaryAttachmentSession temporaryAttachmentSession = mock(TemporaryAttachmentSession.class);
         when(this.httpSession.getAttribute(ATTRIBUTE_KEY)).thenReturn(temporaryAttachmentSession);

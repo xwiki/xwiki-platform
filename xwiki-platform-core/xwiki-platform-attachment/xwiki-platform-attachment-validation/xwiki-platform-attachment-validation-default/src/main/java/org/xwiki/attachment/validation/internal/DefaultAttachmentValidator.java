@@ -19,29 +19,26 @@
  */
 package org.xwiki.attachment.validation.internal;
 
-import java.io.InputStream;
 import java.util.List;
-import java.util.regex.Pattern;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
-import org.xwiki.attachment.validation.AttachmentSupplier;
 import org.xwiki.attachment.validation.AttachmentValidationConfiguration;
 import org.xwiki.attachment.validation.AttachmentValidationException;
+import org.xwiki.attachment.validation.AttachmentValidationStep;
+import org.xwiki.attachment.validation.AttachmentValidationSupplier;
 import org.xwiki.attachment.validation.AttachmentValidator;
+import org.xwiki.attachment.validation.internal.step.FileSizeAttachmentValidationStep;
+import org.xwiki.attachment.validation.internal.step.MimetypeAttachmentValidationStep;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.tika.internal.TikaUtils;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 
-import com.xpn.xwiki.XWikiContext;
-
-import static com.xpn.xwiki.plugin.fileupload.FileUploadPlugin.UPLOAD_DEFAULT_MAXSIZE;
-import static com.xpn.xwiki.plugin.fileupload.FileUploadPlugin.UPLOAD_MAXSIZE_PARAMETER;
-import static javax.servlet.http.HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE;
-import static javax.servlet.http.HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE;
-import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessage;
+import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
 /**
  * Default implementation of {@link AttachmentValidator}. Check for the file size and mimetype of a given file. The
@@ -54,71 +51,41 @@ import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessa
 @Singleton
 public class DefaultAttachmentValidator implements AttachmentValidator
 {
-    @Inject
-    private Provider<XWikiContext> contextProvider;
+    private static final List<String> KNOWN_STEPS =
+        List.of(FileSizeAttachmentValidationStep.HINT, MimetypeAttachmentValidationStep.HINT);
 
     @Inject
-    private AttachmentValidationConfiguration attachmentValidationConfiguration;
+    private ComponentManager componentManager;
 
     @Inject
-    private Logger logger;
+    @Named(FileSizeAttachmentValidationStep.HINT)
+    private AttachmentValidationStep sizeAttachmentValidationStep;
+
+    @Inject
+    @Named(MimetypeAttachmentValidationStep.HINT)
+    private AttachmentValidationStep mimetypeAttachmentValidationStep;
 
     @Override
-    public void validateAttachment(AttachmentSupplier supplier) throws AttachmentValidationException
+    public void validateAttachment(AttachmentValidationSupplier supplier) throws AttachmentValidationException
     {
-        long size = supplier.getSize();
-        // We don't check the mimetype for parts that are not expected to be use as file.
-        validateSize(size);
-        if (supplier.checkMimetype()) {
-            validateMimetype(supplier.getInputStream(), supplier.getFileName());
-        }
-    }
-
-    private void validateSize(long attachmentSize) throws AttachmentValidationException
-    {
-        if (attachmentSize > getUploadMaxSize()) {
-            throw new AttachmentValidationException("File size too big", SC_REQUEST_ENTITY_TOO_LARGE,
-                "core.action.upload.failure.maxSize", "fileuploadislarge");
-        }
-    }
-
-    private long getUploadMaxSize()
-    {
-        XWikiContext context = this.contextProvider.get();
-        return context.getWiki().getSpacePreferenceAsLong(UPLOAD_MAXSIZE_PARAMETER, UPLOAD_DEFAULT_MAXSIZE, context);
-    }
-
-    private void validateMimetype(InputStream inputStream, String filename)
-        throws AttachmentValidationException
-    {
-        String mimeType = detectMimeType(inputStream, filename).toLowerCase();
-        List<String> allowedMimetypes = this.attachmentValidationConfiguration.getAllowedMimetypes();
-        List<String> blockerMimetypes = this.attachmentValidationConfiguration.getBlockerMimetypes();
-        boolean hasAllowedMimetypes = !allowedMimetypes.isEmpty();
-        boolean hasBlockerMimetypes = !blockerMimetypes.isEmpty();
-
-        if (hasAllowedMimetypes && !checkMimetype(allowedMimetypes, mimeType)
-            || hasBlockerMimetypes && checkMimetype(blockerMimetypes, mimeType))
-        {
-            throw new AttachmentValidationException(String.format("Invalid mimetype [%s]", mimeType),
-                SC_UNSUPPORTED_MEDIA_TYPE, "attachment.validation.mimetype.rejected", null);
-        }
-    }
-
-    private boolean checkMimetype(List<String> mimetypes, String mimeType)
-    {
-        return mimetypes.stream().anyMatch(mimeTypePattern -> Pattern.matches(mimeTypePattern, mimeType));
-    }
-
-    private String detectMimeType(InputStream inputStream, String fileName)
-    {
-        String mimeType;
+        // Known attachment validators are hardcoded because we want to control the order in which they are called.
+        // It is better to first check the attachment size, before running an expensive mimetype validation.
+        // TODO: the hardcoding can be removed once XCOMMONS-2507 is implemented.
+        this.sizeAttachmentValidationStep.validate(supplier);
+        this.mimetypeAttachmentValidationStep.validate(supplier);
         try {
-            mimeType = TikaUtils.detect(inputStream, fileName);
-        } catch (Exception e) {
-            this.logger.warn("Failed to identify the mimetype of [{}]. Cause: [{}]", fileName, getRootCauseMessage(e));
-            mimeType = "";
+            Map<String, AttachmentValidationStep> map =
+                this.componentManager.getInstanceMap(AttachmentValidationStep.class);
+            for (Entry<String, AttachmentValidationStep> entry : map.entrySet()) {
+                // Hardcoded steps are skipped as they have already been executed.
+                if (!KNOWN_STEPS.contains(entry.getKey())) {
+                    entry.getValue().validate(supplier);
+                }
+            }
+        } catch (ComponentLookupException e) {
+            throw new AttachmentValidationException(
+                String.format("Failed to resolve the [%s] components.", AttachmentValidationStep.class), e,
+                SC_INTERNAL_SERVER_ERROR, "attachment.validation.attachmentValidationStep.error");
         }
-        return mimeType;
     }
 }

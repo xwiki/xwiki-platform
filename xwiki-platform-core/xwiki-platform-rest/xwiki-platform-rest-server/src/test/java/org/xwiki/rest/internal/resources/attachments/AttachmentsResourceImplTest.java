@@ -205,7 +205,7 @@ class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
             eq(false), eq(false))).thenReturn(attachment);
 
         doThrow(AttachmentValidationException.class).when(this.attachmentValidator)
-            .validateAttachment(anyLong(), any(), anyString());
+            .validateAttachment(any());
 
         assertThrows(AttachmentValidationException.class,
             () -> this.attachmentsResource.addAttachment("test", "Path/spaces/To", "Page", multipart, false, true));

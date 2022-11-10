@@ -55,6 +55,13 @@ public class AttachmentValidationException extends Exception
         this.contextMessage = contextMessage;
     }
 
+    /**
+     * Construct a new exception with a message, an http status and a translation key.
+     *
+     * @param message the error message
+     * @param httpStatus the http status
+     * @param translationKey the translation key
+     */
     public AttachmentValidationException(String message, int httpStatus, String translationKey)
     {
         super(message);
@@ -63,6 +70,14 @@ public class AttachmentValidationException extends Exception
         this.contextMessage = null;
     }
 
+    /**
+     * Contruct a new exception with a message and a cause, plus an http status and a translation key.
+     *
+     * @param message the error message
+     * @param cause the exception cause
+     * @param httpStatus the http status
+     * @param translationKey the translation key
+     */
     public AttachmentValidationException(String message, Throwable cause, int httpStatus, String translationKey)
     {
         super(message, cause);

@@ -19,25 +19,29 @@
  */
 package org.xwiki.attachment.validation;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
+import java.io.InputStream;
 
 /**
- * Provide the operations to validate an attachment. For instance, by checking the size or the mimetype of the
- * attachment.
+ * Provides the metadata required to validate an attachment .
  *
  * @version $Id$
  * @since 14.10RC1
  */
-@Role
-@Unstable
-public interface AttachmentValidator
+public interface AttachmentValidationSupplier
 {
     /**
-     * Check if the part is a valid attachment in the current space.
-     *
-     * @param supplier the attachment supplier, wrapping the actual uploaded file input stream and it required metadatas
-     * @throws AttachmentValidationException in case of error when validating the part
+     * @return the attachment size in bytes
      */
-    void validateAttachment(AttachmentValidationSupplier supplier) throws AttachmentValidationException;
+    long getSize();
+
+    /**
+     * @return the attachment input steam
+     * @throws AttachmentValidationException in case of error when retrieving the input steam
+     */
+    InputStream getInputStream() throws AttachmentValidationException;
+
+    /**
+     * @return the attachment filename
+     */
+    String getFileName();
 }

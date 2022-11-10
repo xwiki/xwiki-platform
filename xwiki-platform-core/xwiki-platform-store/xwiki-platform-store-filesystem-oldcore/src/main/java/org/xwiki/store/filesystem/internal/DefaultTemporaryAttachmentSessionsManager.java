@@ -33,7 +33,7 @@ import javax.servlet.http.Part;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
-import org.xwiki.attachment.validation.AttachmentSupplier;
+import org.xwiki.attachment.validation.AttachmentValidationSupplier;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.attachment.validation.AttachmentValidator;
 import org.xwiki.component.annotation.Component;
@@ -45,6 +45,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+
+import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
 /**
  * Default implementation of {@link TemporaryAttachmentSessionsManager}.
@@ -114,31 +116,8 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
             // document it is stored for.
             xWikiAttachment.setDoc(new XWikiDocument(documentReference, documentReference.getLocale()), false);
 
-            // TODO: Duplicated from BaseAttachmentResource
-            this.attachmentValidator.validateAttachment(new AttachmentSupplier()
-            {
-                @Override
-                public long getSize()
-                {
-                    return xWikiAttachment.getLongSize();
-                }
-
-                @Override
-                public InputStream getInputStream() throws AttachmentValidationException 
-                {
-                    try {
-                        return xWikiAttachment.getContentInputStream(context);
-                    } catch (XWikiException e) {
-                        throw new AttachmentValidationException("TODO", e, 0, "TODO");
-                    }
-                }
-
-                @Override
-                public String getFileName()
-                {
-                    return xWikiAttachment.getFilename();
-                }
-            });
+            this.attachmentValidator
+                .validateAttachment(new XWikiAttachmentValidationSupplier(xWikiAttachment, context));
             temporaryAttachmentSession.addAttachment(documentReference, xWikiAttachment);
             return xWikiAttachment;
         } catch (IOException e) {
@@ -195,6 +174,43 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
                     }
                 });
             }
+        }
+    }
+
+    private static class XWikiAttachmentValidationSupplier implements AttachmentValidationSupplier
+    {
+        private final XWikiAttachment xWikiAttachment;
+
+        private final XWikiContext context;
+
+        XWikiAttachmentValidationSupplier(XWikiAttachment xWikiAttachment, XWikiContext context)
+        {
+            this.xWikiAttachment = xWikiAttachment;
+            this.context = context;
+        }
+
+        @Override
+        public long getSize()
+        {
+            return this.xWikiAttachment.getLongSize();
+        }
+
+        @Override
+        public InputStream getInputStream() throws AttachmentValidationException
+        {
+            try {
+                return this.xWikiAttachment.getContentInputStream(this.context);
+            } catch (XWikiException e) {
+                throw new AttachmentValidationException(
+                    String.format("Failed to read the input stream for attachment [%s]", this.xWikiAttachment), e,
+                    SC_INTERNAL_SERVER_ERROR, "attachment.validation.inputStream.error");
+            }
+        }
+
+        @Override
+        public String getFileName()
+        {
+            return this.xWikiAttachment.getFilename();
         }
     }
 }

@@ -19,41 +19,26 @@
  */
 package org.xwiki.attachment.validation.internal;
 
-import java.io.InputStream;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Supplier;
+import java.util.Map;
 
 import javax.inject.Named;
-import javax.inject.Provider;
-import javax.servlet.http.Part;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.xwiki.attachment.validation.AttachmentValidationConfiguration;
 import org.xwiki.attachment.validation.AttachmentValidationException;
-import org.xwiki.test.LogLevel;
-import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.attachment.validation.AttachmentValidationStep;
+import org.xwiki.attachment.validation.AttachmentValidationSupplier;
+import org.xwiki.attachment.validation.internal.step.FileSizeAttachmentValidationStep;
+import org.xwiki.attachment.validation.internal.step.MimetypeAttachmentValidationStep;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.UploadAction;
-
-import static com.xpn.xwiki.plugin.fileupload.FileUploadPlugin.UPLOAD_DEFAULT_MAXSIZE;
-import static com.xpn.xwiki.plugin.fileupload.FileUploadPlugin.UPLOAD_MAXSIZE_PARAMETER;
-import static com.xpn.xwiki.web.UploadAction.FILE_FIELD_NAME;
-import static javax.servlet.http.HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE;
-import static javax.servlet.http.HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -70,114 +55,60 @@ class DefaultAttachmentValidatorTest
     private DefaultAttachmentValidator validator;
 
     @MockComponent
-    @Named("readonly")
-    private Provider<XWikiContext> contextProvider;
+    private ComponentManager componentManager;
 
     @MockComponent
-    private AttachmentValidationConfiguration attachmentValidationConfiguration;
+    @Named(FileSizeAttachmentValidationStep.HINT)
+    private AttachmentValidationStep sizeAttachmentValidationStep;
 
-    @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
-
-    @Mock
-    private XWikiContext xwikiContext;
-
-    @Mock
-    private XWiki wiki;
+    @MockComponent
+    @Named(MimetypeAttachmentValidationStep.HINT)
+    private AttachmentValidationStep mimetypeAttachmentValidationStep;
 
     @Mock
-    private Part part;
+    private AttachmentValidationSupplier supplier;
 
-    @BeforeEach
-    void setUp() throws Exception
+    @Mock
+    private AttachmentValidationStep otherAttachmentValidationStep;
+
+    @Test
+    void validateAttachment() throws Exception
     {
-        when(this.contextProvider.get()).thenReturn(this.xwikiContext);
-        when(this.xwikiContext.getWiki()).thenReturn(this.wiki);
-        when(this.wiki.getSpacePreferenceAsLong(UPLOAD_MAXSIZE_PARAMETER, UPLOAD_DEFAULT_MAXSIZE,
-            this.xwikiContext)).thenReturn(42L);
-        when(this.part.getSubmittedFileName()).thenReturn("fileName.txt");
-        when(this.part.getName()).thenReturn("token");
-        when(this.part.getSize()).thenReturn(10L);
-        when(this.part.getInputStream()).thenReturn(mock(InputStream.class));
+        this.validator.validateAttachment(this.supplier);
+        verify(this.sizeAttachmentValidationStep).validate(this.supplier);
+        verify(this.mimetypeAttachmentValidationStep).validate(this.supplier);
+        verify(this.componentManager).getInstanceMap(AttachmentValidationStep.class);
     }
 
     @Test
-    void validateAttachmentTooLarge()
+    void validateAttachmentOneAdditionalStep() throws Exception
     {
-        Supplier<Optional<InputStream>> inputStream = () -> Optional.of(Mockito.mock(InputStream.class));
+        when(this.componentManager.getInstanceMap(AttachmentValidationStep.class)).thenReturn(Map.of(
+            MimetypeAttachmentValidationStep.HINT, this.mimetypeAttachmentValidationStep,
+            FileSizeAttachmentValidationStep.HINT, this.sizeAttachmentValidationStep,
+            "other", this.otherAttachmentValidationStep
+        ));
+        this.validator.validateAttachment(this.supplier);
+        verify(this.sizeAttachmentValidationStep).validate(this.supplier);
+        verify(this.mimetypeAttachmentValidationStep).validate(this.supplier);
+        verify(this.otherAttachmentValidationStep).validate(this.supplier);
+        verify(this.componentManager).getInstanceMap(AttachmentValidationStep.class);
+    }
+
+    @Test
+    void validateAttachmentGetInstanceMapError() throws Exception
+    {
+        when(this.componentManager.getInstanceMap(AttachmentValidationStep.class))
+            .thenThrow(ComponentLookupException.class);
+
         AttachmentValidationException exception = assertThrows(AttachmentValidationException.class,
-            () -> this.validator.validateAttachment(100, inputStream, "fileName.txt"));
+            () -> this.validator.validateAttachment(this.supplier));
 
-        assertEquals("File size too big", exception.getMessage());
-        assertEquals(SC_REQUEST_ENTITY_TOO_LARGE, exception.getHttpStatus());
-        assertEquals("core.action.upload.failure.maxSize", exception.getTranslationKey());
-        assertEquals("fileuploadislarge", exception.getContextMessage());
-    }
-
-    @Test
-    void validateMimetypeImagesOnly()
-    {
-        when(this.attachmentValidationConfiguration.getAllowedMimetypes()).thenReturn(List.of("image/.*"));
-
-        Supplier<Optional<InputStream>> inputStream = () -> Optional.of(Mockito.mock(InputStream.class));
-        AttachmentValidationException exception = assertThrows(AttachmentValidationException.class,
-            () -> this.validator.validateAttachment(10, inputStream, "fileName.txt"));
-
-        assertEquals("Invalid mimetype [text/plain]", exception.getMessage());
-        assertEquals(SC_UNSUPPORTED_MEDIA_TYPE, exception.getHttpStatus());
-        assertEquals("attachment.validation.mimetype.rejected", exception.getTranslationKey());
-        assertNull(exception.getContextMessage());
-    }
-
-    @Test
-    void validateMimetypePlainTextBlocked()
-    {
-        when(this.attachmentValidationConfiguration.getBlockerMimetypes()).thenReturn(List.of("text/.*"));
-
-        Supplier<Optional<InputStream>> inputStream = () -> Optional.of(Mockito.mock(InputStream.class));
-        AttachmentValidationException exception = assertThrows(AttachmentValidationException.class,
-            () -> this.validator.validateAttachment(10, inputStream, "fileName.txt"));
-
-        assertEquals("Invalid mimetype [text/plain]", exception.getMessage());
-        assertEquals(SC_UNSUPPORTED_MEDIA_TYPE, exception.getHttpStatus());
-        assertEquals("attachment.validation.mimetype.rejected", exception.getTranslationKey());
-        assertNull(exception.getContextMessage());
-    }
-
-    @Test
-    void validateMimetypePartTooLarge()
-    {
-        when(this.part.getSize()).thenReturn(100L);
-        when(this.attachmentValidationConfiguration.getBlockerMimetypes()).thenReturn(List.of("text/.*"));
-
-        AttachmentValidationException exception =
-            assertThrows(AttachmentValidationException.class, () -> this.validator.validateAttachment(this.part));
-
-        assertEquals("File size too big", exception.getMessage());
-        assertEquals(SC_REQUEST_ENTITY_TOO_LARGE, exception.getHttpStatus());
-        assertEquals("core.action.upload.failure.maxSize", exception.getTranslationKey());
-        assertEquals("fileuploadislarge", exception.getContextMessage());
-    }
-
-    @Test
-    void validateMimetypePartInvalidMimetype()
-    {
-        when(this.part.getName()).thenReturn(FILE_FIELD_NAME + "_suffix");
-        when(this.attachmentValidationConfiguration.getBlockerMimetypes()).thenReturn(List.of("text/.*"));
-
-        AttachmentValidationException exception =
-            assertThrows(AttachmentValidationException.class, () -> this.validator.validateAttachment(this.part));
-
-        assertEquals("Invalid mimetype [text/plain]", exception.getMessage());
-        assertEquals(SC_UNSUPPORTED_MEDIA_TYPE, exception.getHttpStatus());
-        assertEquals("attachment.validation.mimetype.rejected", exception.getTranslationKey());
-        assertNull(exception.getContextMessage());
-    }
-
-    @Test
-    void validateMimetypePartMimetypeSkipped() throws Exception
-    {
-        this.validator.validateAttachment(this.part);
-        verifyNoInteractions(this.attachmentValidationConfiguration);
+        assertEquals(
+            "Failed to resolve the [interface org.xwiki.attachment.validation.AttachmentValidationStep] components.",
+            exception.getMessage());
+        verify(this.sizeAttachmentValidationStep).validate(this.supplier);
+        verify(this.mimetypeAttachmentValidationStep).validate(this.supplier);
+        verifyNoInteractions(this.otherAttachmentValidationStep);
     }
 }

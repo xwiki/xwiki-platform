@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.plugin.fileupload;
 
-import java.io.InputStream;
 import java.util.List;
 
 import javax.servlet.http.Part;
@@ -28,7 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
-import org.xwiki.attachment.validation.AttachmentSupplier;
+import org.xwiki.attachment.validation.AttachmentValidationSupplier;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.attachment.validation.AttachmentValidator;
 import org.xwiki.component.manager.ComponentManager;
@@ -45,6 +44,7 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 import static ch.qos.logback.classic.Level.DEBUG;
 import static com.xpn.xwiki.plugin.fileupload.FileUploadPlugin.FILE_LIST_KEY;
+import static com.xpn.xwiki.web.UploadAction.FILE_FIELD_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -92,13 +92,14 @@ class FileUploadPluginTest
         Utils.setComponentManager(this.componentManager);
         when(this.context.getRequest()).thenReturn(this.request);
         when(this.request.getParts()).thenReturn(List.of(this.part0));
+        when(this.part0.getName()).thenReturn(FILE_FIELD_NAME + "_aaa");
     }
 
     @Test
     void loadFileList() throws Exception
     {
         this.fileUploadPlugin.loadFileList(100, 10, "/tmp", this.context);
-        verify(this.attachmentValidator).validateAttachment(mock(AttachmentSupplier.class));
+        verify(this.attachmentValidator).validateAttachment(any(AttachmentValidationSupplier.class));
         verify(this.context).put(eq(FILE_LIST_KEY), any());
         assertEquals("Loading uploaded files", this.logCapture.getMessage(0));
         assertEquals(DEBUG, this.logCapture.getLogEvent(0).getLevel());
@@ -107,10 +108,11 @@ class FileUploadPluginTest
     @Test
     void loadFileListValidationError() throws Exception
     {
-        doThrow(AttachmentValidationException.class).when(this.attachmentValidator).validateAttachment(mock(AttachmentSupplier.class));
+        doThrow(AttachmentValidationException.class).when(this.attachmentValidator)
+            .validateAttachment(any(AttachmentValidationSupplier.class));
         assertThrows(AttachmentValidationException.class, () -> this.fileUploadPlugin.loadFileList(100, 10, "/tmp",
             this.context));
-        verify(this.attachmentValidator).validateAttachment(mock(AttachmentSupplier.class));
+        verify(this.attachmentValidator).validateAttachment(any(AttachmentValidationSupplier.class));
         verify(this.context, never()).put(eq(FILE_LIST_KEY), any());
         assertEquals("Loading uploaded files", this.logCapture.getMessage(0));
         assertEquals(DEBUG, this.logCapture.getLogEvent(0).getLevel());

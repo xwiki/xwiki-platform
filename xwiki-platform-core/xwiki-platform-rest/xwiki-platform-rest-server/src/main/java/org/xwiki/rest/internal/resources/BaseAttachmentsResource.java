@@ -26,7 +26,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -37,7 +36,7 @@ import javax.inject.Named;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
-import org.xwiki.attachment.validation.AttachmentSupplier;
+import org.xwiki.attachment.validation.AttachmentValidationSupplier;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.attachment.validation.AttachmentValidator;
 import org.xwiki.model.EntityType;
@@ -63,7 +62,7 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessage;
+import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
 /**
  * @version $Id$
@@ -132,14 +131,14 @@ public class BaseAttachmentsResource extends XWikiResource
 
     /**
      * @param scope where to retrieve the attachments from; it should be a reference to a wiki, space or document
-     * @param filters the filters used to restrict the set of attachments (you can filter by space name, document name,
-     *            attachment name, author and type)
+     * @param filters the filters used to restrict the set of attachments (you can filter by space name, document
+     *     name, attachment name, author and type)
      * @param offset defines the start of the range
      * @param limit the maximum number of attachments to include in the range
-     * @param withPrettyNames whether to include pretty names (like author full name and document title) in the returned
-     *            attachment metadata
+     * @param withPrettyNames whether to include pretty names (like author full name and document title) in the
+     *     returned attachment metadata
      * @return the list of attachments from the specified scope that match the given filters and that are within the
-     *         specified range
+     *     specified range
      * @throws XWikiRestException if we fail to retrieve the attachments
      */
     protected Attachments getAttachments(EntityReference scope, Map<String, String> filters, Integer offset,
@@ -406,9 +405,7 @@ public class BaseAttachmentsResource extends XWikiResource
                 String.format("Failed to create or update the attachment [%s].", attachmentReference), e);
         }
 
-        // We wait for the XWikiAttachment to be loaded before checking the size as accurately checking the size of 
-        // the content input stream is not possible.
-        this.attachmentValidator.validateAttachment(new AttachmentSupplier()
+        this.attachmentValidator.validateAttachment(new AttachmentValidationSupplier()
         {
             @Override
             public long getSize()
@@ -422,7 +419,9 @@ public class BaseAttachmentsResource extends XWikiResource
                 try {
                     return attachment.getContentInputStream(xcontext);
                 } catch (XWikiException e) {
-                    throw new AttachmentValidationException("TODO", e, 0, "TODO");
+                    throw new AttachmentValidationException(
+                        String.format("Failed to read the input stream for attachment [%s]", attachment), e,
+                        SC_INTERNAL_SERVER_ERROR, "attachment.validation.inputStream.error");
                 }
             }
 

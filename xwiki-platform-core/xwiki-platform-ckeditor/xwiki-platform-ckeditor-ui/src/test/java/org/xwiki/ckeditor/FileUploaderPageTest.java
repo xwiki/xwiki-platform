@@ -88,6 +88,7 @@ class FileUploaderPageTest extends PageTest
         // Make all the csrf tokens valid by default.
         when(this.csrfScriptService.isTokenValid(any())).thenReturn(true);
         setOutputSyntax(Syntax.PLAIN_1_0);
+        setAttachmentSupportStatus(true);
     }
 
     @Test
@@ -97,10 +98,6 @@ class FileUploaderPageTest extends PageTest
 
         this.context.setAction("get");
 
-        ScriptXWikiServletRequest requestSpy =
-            spy((ScriptXWikiServletRequest) this.scriptContext.getAttribute("request"));
-        this.scriptContext.setAttribute("request", requestSpy, GLOBAL_SCOPE);
-
         this.request.put("filename", "test.txt");
 
         Attachment attachment = mock(Attachment.class);
@@ -109,7 +106,6 @@ class FileUploaderPageTest extends PageTest
 
         when(attachment.getFilename()).thenReturn("test.txt");
 
-        when(requestSpy.getHeader("X-XWiki-Temporary-Attachment-Support")).thenReturn("true");
         JSON json = renderJSONPage(documentReference);
 
         assertEquals(1, ((JSONObject) json).get("uploaded"));
@@ -124,16 +120,11 @@ class FileUploaderPageTest extends PageTest
 
         this.context.setAction("get");
 
-        ScriptXWikiServletRequest requestSpy =
-            spy((ScriptXWikiServletRequest) this.scriptContext.getAttribute("request"));
-        this.scriptContext.setAttribute("request", requestSpy, GLOBAL_SCOPE);
-
         this.request.put("filename", "test.txt");
 
         when(this.temporaryAttachmentsScriptService.uploadTemporaryAttachment(documentReference, "upload",
             "test.txt")).thenThrow(new AttachmentValidationException("message", 42, "translationKey", null));
 
-        when(requestSpy.getHeader("X-XWiki-Temporary-Attachment-Support")).thenReturn("true");
         JSONObject json = renderJSONPage(documentReference);
 
         assertEquals(0, json.get("uploaded"));
@@ -148,20 +139,23 @@ class FileUploaderPageTest extends PageTest
 
         this.context.setAction("get");
 
-        ScriptXWikiServletRequest requestSpy =
-            spy((ScriptXWikiServletRequest) this.scriptContext.getAttribute("request"));
-        this.scriptContext.setAttribute("request", requestSpy, GLOBAL_SCOPE);
-
         this.request.put("filename", "test.txt");
 
         when(this.temporaryAttachmentsScriptService.uploadTemporaryAttachment(documentReference, "upload",
             "test.txt")).thenThrow(mock(TemporaryAttachmentException.class));
 
-        when(requestSpy.getHeader("X-XWiki-Temporary-Attachment-Support")).thenReturn("true");
         JSONObject json = renderJSONPage(documentReference);
 
         assertEquals(0, json.get("uploaded"));
         assertEquals(400, json.getJSONObject("error").get("number"));
         assertEquals("ckeditor.upload.error.emptyReturn", json.getJSONObject("error").get("message"));
+    }
+
+    private void setAttachmentSupportStatus(boolean status)
+    {
+        ScriptXWikiServletRequest requestSpy =
+            spy((ScriptXWikiServletRequest) this.scriptContext.getAttribute("request"));
+        this.scriptContext.setAttribute("request", requestSpy, GLOBAL_SCOPE);
+        when(requestSpy.getHeader("X-XWiki-Temporary-Attachment-Support")).thenReturn(Boolean.toString(status));
     }
 }

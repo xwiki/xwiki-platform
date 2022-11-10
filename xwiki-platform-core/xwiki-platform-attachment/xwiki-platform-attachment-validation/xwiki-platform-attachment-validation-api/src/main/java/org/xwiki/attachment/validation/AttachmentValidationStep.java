@@ -19,24 +19,25 @@
  */
 package org.xwiki.attachment.validation;
 
-import java.io.InputStream;
-import java.util.Optional;
-import java.util.function.Supplier;
+import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
+ * One attachment validation step. {@link AttachmentValidator} calls them on ofter the other and fails whenever a step
+ * fails.
+ *
  * @version $Id$
- * @since x.y.z
+ * @since 14.10RC1
  */
-public interface AttachmentSupplier
+@Role
+@Unstable
+public interface AttachmentValidationStep
 {
-    long getSize();
-
-    default boolean checkMimetype()
-    {
-        return true;
-    }
-
-    InputStream getInputStream() throws AttachmentValidationException;
-
-    String getFileName();
+    /**
+     * Validate a single aspect of the attachment.
+     *
+     * @param supplier the attachment supplier
+     * @throws AttachmentValidationException in case of validation error
+     */
+    void validate(AttachmentValidationSupplier supplier) throws AttachmentValidationException;
 }

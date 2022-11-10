@@ -103,8 +103,6 @@ public class DefaultPDFExportJobRequestFactory implements PDFExportJobRequestFac
     {
         PDFExportJobRequest request = new PDFExportJobRequest();
         request.setId(EXPORT, "pdf", suffix);
-        // The job status is not needed after the PDF is generated.
-        request.setStatusSerialized(false);
         request.setServerSide(this.configuration.isServerSide());
 
         setRightsProperties(request);

@@ -164,7 +164,6 @@ class DefaultPDFExportJobRequestFactoryTest
 
         assertEquals(3, request.getId().size());
         assertEquals(Arrays.asList("export", "pdf"), request.getId().subList(0, 2));
-        assertFalse(request.isStatusSerialized());
         assertFalse(request.isServerSide());
 
         assertTrue(request.isCheckRights());

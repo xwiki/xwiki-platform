@@ -41,6 +41,7 @@ import com.github.kklisura.cdt.protocol.commands.Network;
 import com.github.kklisura.cdt.protocol.commands.Page;
 import com.github.kklisura.cdt.protocol.commands.Runtime;
 import com.github.kklisura.cdt.protocol.types.network.CookieParam;
+import com.github.kklisura.cdt.protocol.types.page.Frame;
 import com.github.kklisura.cdt.protocol.types.page.Navigate;
 import com.github.kklisura.cdt.protocol.types.page.PrintToPDF;
 import com.github.kklisura.cdt.protocol.types.page.PrintToPDFTransferMode;
@@ -117,6 +118,14 @@ public class ChromeTab implements BrowserTab
         }
 
         return success;
+    }
+
+    @Override
+    public String getSource()
+    {
+        Page page = this.tabDevToolsService.getPage();
+        Frame frame = page.getFrameTree().getFrame();
+        return page.getResourceContent(frame.getId(), frame.getUrl()).getContent();
     }
 
     @Override
@@ -219,9 +228,8 @@ public class ChromeTab implements BrowserTab
         if (cookies == null) {
             return Collections.emptyList();
         } else {
-            String cookieURL = targetURL.toString();
             return Stream.of(cookies).filter(Objects::nonNull)
-                .map(servletCookie -> toCookieParam(servletCookie, cookieURL)).collect(Collectors.toList());
+                .map(servletCookie -> toCookieParam(servletCookie, targetURL)).collect(Collectors.toList());
         }
     }
 
@@ -232,16 +240,19 @@ public class ChromeTab implements BrowserTab
      * @param targetURL the URL the cookie is applied to
      * @return the browser cookie
      */
-    private CookieParam toCookieParam(Cookie servletCookie, String targetURL)
+    private CookieParam toCookieParam(Cookie servletCookie, URL targetURL)
     {
         CookieParam browserCookie = new CookieParam();
         browserCookie.setName(servletCookie.getName());
         browserCookie.setValue(servletCookie.getValue());
-        browserCookie.setDomain(servletCookie.getDomain());
+        browserCookie.setDomain(targetURL.getHost());
+        // Preserve the original path. Note that the target web page behind the target URL may load additional resources
+        // from different paths, that also need the cookie (e.g. for authentication), which is why we can't use the path
+        // from the target URL.
         browserCookie.setPath(servletCookie.getPath());
         browserCookie.setSecure(servletCookie.getSecure());
         browserCookie.setHttpOnly(servletCookie.isHttpOnly());
-        browserCookie.setUrl(targetURL);
+        browserCookie.setUrl(targetURL.toString());
         return browserCookie;
     }
 

@@ -73,9 +73,12 @@ class PDFExportIT
 
     @Test
     @Order(1)
-    void configurePDFExport(TestUtils setup, TestConfiguration testConfiguration)
+    void configurePDFExport(TestUtils setup, TestConfiguration testConfiguration) throws Exception
     {
         setup.loginAsSuperAdmin();
+        // Restrict view access for guests in order to verify that the Chrome Docker container properly authenticates
+        // the user (the authentication cookies are copied and updated to match the Chrome Docker container IP address).
+        setup.setWikiPreference("authenticate_view", "1");
         setup.gotoPage(new LocalDocumentReference("PDFExportIT", "EnableDebugLogs"), "get");
 
         // Make sure we start with the default settings.
@@ -104,7 +107,7 @@ class PDFExportIT
             setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent"), "WebHome"));
         PDFExportOptionsModal exportOptions = ExportModal.open(viewPage).clickExportAsPDFButton();
 
-        try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration))) {
+        try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration), "John", "pass")) {
             // We should have 4 pages: cover page, table of contents, one page for the parent document and one page for
             // the child document.
             assertEquals(4, pdf.getNumberOfPages());
@@ -194,7 +197,7 @@ class PDFExportIT
             setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent", "Child"), "WebHome"));
         PDFExportOptionsModal exportOptions = ExportModal.open(viewPage).clickExportAsPDFButton();
 
-        try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration))) {
+        try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration), "John", "pass")) {
             // We should have 3 pages: cover page, table of contents and one page for the content.
             assertEquals(3, pdf.getNumberOfPages());
 
@@ -258,7 +261,7 @@ class PDFExportIT
         PDFExportOptionsModal exportOptions = ExportModal.open(new ViewPage()).clickExportAsPDFButton();
         exportOptions.getTemplateSelect().selectByVisibleText("My cool template");
 
-        try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration))) {
+        try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration), "John", "pass")) {
             // Verify that the custom PDF template was used.
 
             // We should have 4 pages: cover page, table of contents, one page for the parent document and one page for
@@ -316,7 +319,7 @@ class PDFExportIT
         exportOptions.getCoverCheckbox().click();
         exportOptions.getTocCheckbox().click();
 
-        try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration))) {
+        try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration), "John", "pass")) {
             // One page for the parent document and one page for the child document.
             assertEquals(2, pdf.getNumberOfPages());
             String content = pdf.getTextFromPage(0);

@@ -44,9 +44,12 @@ import com.github.kklisura.cdt.protocol.commands.Target;
 import com.github.kklisura.cdt.protocol.types.dom.Node;
 import com.github.kklisura.cdt.protocol.types.io.Read;
 import com.github.kklisura.cdt.protocol.types.network.CookieParam;
+import com.github.kklisura.cdt.protocol.types.page.Frame;
+import com.github.kklisura.cdt.protocol.types.page.FrameTree;
 import com.github.kklisura.cdt.protocol.types.page.Navigate;
 import com.github.kklisura.cdt.protocol.types.page.PrintToPDF;
 import com.github.kklisura.cdt.protocol.types.page.PrintToPDFTransferMode;
+import com.github.kklisura.cdt.protocol.types.page.ResourceContent;
 import com.github.kklisura.cdt.protocol.types.runtime.Evaluate;
 import com.github.kklisura.cdt.protocol.types.runtime.ExceptionDetails;
 import com.github.kklisura.cdt.protocol.types.runtime.RemoteObject;
@@ -118,11 +121,11 @@ class ChromeTabTest
     @Test
     void navigateWithoutWait() throws Exception
     {
-        URL url = new URL("http://www.xwiki.org");
+        URL url = new URL("http://www.xwiki.com/xwiki/bin/view/Support/");
         Cookie cookie = mock(Cookie.class);
         when(cookie.getName()).thenReturn("color");
         when(cookie.getValue()).thenReturn("blue");
-        when(cookie.getDomain()).thenReturn("xwiki.org");
+        when(cookie.getDomain()).thenReturn("www.xwiki.org");
         when(cookie.getPath()).thenReturn("/xwiki/bin/view/Main/");
         when(cookie.getSecure()).thenReturn(true);
         when(cookie.isHttpOnly()).thenReturn(true);
@@ -143,11 +146,12 @@ class ChromeTabTest
         CookieParam browserCookie = this.cookiesCaptor.getValue().get(0);
         assertEquals("color", browserCookie.getName());
         assertEquals("blue", browserCookie.getValue());
-        assertEquals("xwiki.org", browserCookie.getDomain());
+        assertEquals("www.xwiki.com", browserCookie.getDomain());
+        // The original path is preserved.
         assertEquals("/xwiki/bin/view/Main/", browserCookie.getPath());
         assertTrue(browserCookie.getSecure());
         assertTrue(browserCookie.getHttpOnly());
-        assertEquals("http://www.xwiki.org", browserCookie.getUrl());
+        assertEquals("http://www.xwiki.com/xwiki/bin/view/Support/", browserCookie.getUrl());
 
         verify(this.page).enable();
     }
@@ -221,6 +225,24 @@ class ChromeTabTest
             assertEquals("Failed to wait for page to be ready. Root cause: 'xwiki-page-ready' module not found",
                 e.getMessage());
         }
+    }
+
+    @Test
+    void getSource()
+    {
+        FrameTree frameTree = mock(FrameTree.class);
+        when(this.page.getFrameTree()).thenReturn(frameTree);
+
+        Frame frame = mock(Frame.class);
+        when(frameTree.getFrame()).thenReturn(frame);
+        when(frame.getId()).thenReturn("frameId");
+        when(frame.getUrl()).thenReturn("frameURL");
+
+        ResourceContent resourceContent = mock(ResourceContent.class);
+        when(this.page.getResourceContent("frameId", "frameURL")).thenReturn(resourceContent);
+        when(resourceContent.getContent()).thenReturn("source");
+
+        assertEquals("source", this.chromeTab.getSource());
     }
 
     @Test

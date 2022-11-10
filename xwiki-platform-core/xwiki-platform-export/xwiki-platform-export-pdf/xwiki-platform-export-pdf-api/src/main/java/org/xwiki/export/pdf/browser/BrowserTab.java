@@ -89,6 +89,12 @@ public interface BrowserTab extends AutoCloseable
     }
 
     /**
+     * @return the source of the web page loaded in this browser tab
+     * @since 14.10RC1
+     */
+    String getSource();
+
+    /**
      * Sets the base URL for the currently loaded web page.
      * 
      * @param baseURL the base URL to set

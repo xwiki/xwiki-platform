@@ -22,12 +22,16 @@ package org.xwiki.export.pdf.test.po;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -61,11 +65,20 @@ public class PDFDocument implements AutoCloseable
      * Fetches and parses a PDF document from a given URL.
      * 
      * @param url where to fetch the PDF document from
+     * @param userName the user name used to access the PDF document
+     * @param password the password used to access the PDF document
      * @throws IOException if fetching and parsing the PDF document fails
      */
-    public PDFDocument(URL url) throws IOException
+    public PDFDocument(URL url, String userName, String password) throws IOException
     {
-        this.document = PDDocument.load(IOUtils.toByteArray(url));
+        URLConnection connection = url.openConnection();
+        if (!StringUtils.isEmpty(userName)) {
+            String auth = userName + ":" + password;
+            byte[] encodedAuth = Base64.getEncoder().encode((auth.getBytes(StandardCharsets.UTF_8)));
+            String authHeaderValue = "Basic " + new String(encodedAuth);
+            connection.setRequestProperty("Authorization", authHeaderValue);
+        }
+        this.document = PDDocument.load(IOUtils.toByteArray(connection));
     }
 
     @Override

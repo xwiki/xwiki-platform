@@ -23,10 +23,13 @@ import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -133,6 +136,20 @@ public class XWikiContextContextStore extends AbstractContextStore
     public static final String SUFFIX_PROP_REQUEST_COOKIES = "cookies";
 
     /**
+     * The suffix of the entry containing the request headers.
+     * 
+     * @since 14.10RC1
+     */
+    public static final String SUFFIX_PROP_REQUEST_HEADERS = "headers";
+
+    /**
+     * The suffix of the entry containing the request remote address.
+     * 
+     * @since 14.10RC1
+     */
+    public static final String SUFFIX_PROP_REQUEST_REMOTE_ADDR = "remoteAddr";
+
+    /**
      * The suffix of the entry containing the request wiki.
      * 
      * @since 10.11RC1
@@ -166,6 +183,20 @@ public class XWikiContextContextStore extends AbstractContextStore
      * Name of the entry containing the request cookies.
      */
     public static final String PROP_REQUEST_COOKIES = PREFIX_PROP_REQUEST + SUFFIX_PROP_REQUEST_COOKIES;
+
+    /**
+     * Name of the entry containing the request headers.
+     * 
+     * @since 14.10RC1
+     */
+    public static final String PROP_REQUEST_HEADERS = PREFIX_PROP_REQUEST + SUFFIX_PROP_REQUEST_HEADERS;
+
+    /**
+     * Name of the entry containing the request remote address.
+     * 
+     * @since 14.10RC1
+     */
+    public static final String PROP_REQUEST_REMOTE_ADDR = PREFIX_PROP_REQUEST + SUFFIX_PROP_REQUEST_REMOTE_ADDR;
 
     /**
      * Name of the entry containing the request wiki.
@@ -217,7 +248,8 @@ public class XWikiContextContextStore extends AbstractContextStore
     public XWikiContextContextStore()
     {
         super(PROP_WIKI, PROP_USER, PROP_LOCALE, PROP_ACTION, PROP_REQUEST_BASE, PROP_REQUEST_URL,
-            PROP_REQUEST_PARAMETERS, PROP_REQUEST_COOKIES, PROP_REQUEST_WIKI, PROP_DOCUMENT_REFERENCE);
+            PROP_REQUEST_PARAMETERS, PROP_REQUEST_HEADERS, PROP_REQUEST_COOKIES, PROP_REQUEST_REMOTE_ADDR,
+            PROP_REQUEST_WIKI, PROP_DOCUMENT_REFERENCE);
     }
 
     @Override
@@ -276,8 +308,16 @@ public class XWikiContextContextStore extends AbstractContextStore
                         saveRequestParameters(contextStore, request);
                         break;
 
+                    case SUFFIX_PROP_REQUEST_HEADERS:
+                        saveRequestHeaders(contextStore, request);
+                        break;
+
                     case SUFFIX_PROP_REQUEST_COOKIES:
                         saveRequestCookies(contextStore, request);
+                        break;
+
+                    case SUFFIX_PROP_REQUEST_REMOTE_ADDR:
+                        saveRequestRemoteAddr(contextStore, request);
                         break;
 
                     case SUFFIX_PROP_REQUEST_WIKI:
@@ -323,6 +363,17 @@ public class XWikiContextContextStore extends AbstractContextStore
         contextStore.put(PROP_REQUEST_PARAMETERS, new LinkedHashMap<>(request.getParameterMap()));
     }
 
+    private void saveRequestHeaders(Map<String, Serializable> contextStore, XWikiRequest request)
+    {
+        if (request.getHeaderNames() != null) {
+            Map<String, List<String>> headers = Collections.list(request.getHeaderNames()).stream()
+                .map(headerName -> Map.entry(headerName, Collections.list(request.getHeaders(headerName))))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (left, right) -> right,
+                    () -> new LinkedHashMap<String, List<String>>()));
+            contextStore.put(PROP_REQUEST_HEADERS, (Serializable) headers);
+        }
+    }
+
     private void saveRequestCookies(Map<String, Serializable> contextStore, XWikiRequest request)
     {
         Cookie[] cookies = request.getCookies();
@@ -333,11 +384,18 @@ public class XWikiContextContextStore extends AbstractContextStore
         contextStore.put(PROP_REQUEST_COOKIES, cookies);
     }
 
+    private void saveRequestRemoteAddr(Map<String, Serializable> contextStore, XWikiRequest request)
+    {
+        contextStore.put(PROP_REQUEST_REMOTE_ADDR, request.getRemoteAddr());
+    }
+
     private void saveRequestAll(Map<String, Serializable> contextStore, String key, XWikiRequest request)
     {
         saveRequestURL(contextStore, request);
         saveRequestParameters(contextStore, request);
+        saveRequestHeaders(contextStore, request);
         saveRequestCookies(contextStore, request);
+        saveRequestRemoteAddr(contextStore, request);
     }
 
     @Override

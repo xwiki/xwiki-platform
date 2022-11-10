@@ -135,6 +135,23 @@
                   <new>method void org.xwiki.store.TemporaryAttachmentSessionsManager::temporarilyAttach(com.xpn.xwiki.doc.XWikiAttachment, org.xwiki.model.reference.DocumentReference) throws org.xwiki.store.TemporaryAttachmentException</new>
                   <justification>New method needed in the unstable interface for temporary attachments.</justification>
                 </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.addedToInterface</code>
+                  <new>method java.lang.String org.xwiki.export.pdf.browser.BrowserTab::getSource()</new>
+                  <justification>New method needed in the unstable interface for browser tab.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.attributeValueChanged</code>
+                  <old>class org.xwiki.rest.model.jaxb.LinkCollection</old>
+                  <new>class org.xwiki.rest.model.jaxb.LinkCollection</new>
+                  <annotationType>javax.xml.bind.annotation.XmlSeeAlso</annotationType>
+                  <attribute>value</attribute>
+                  <oldValue>{org.xwiki.rest.model.jaxb.HistorySummary.class, org.xwiki.rest.model.jaxb.Attribute.class, org.xwiki.rest.model.jaxb.Translation.class, org.xwiki.rest.model.jaxb.JobLog.class, org.xwiki.rest.model.jaxb.JobStatus.class, org.xwiki.rest.model.jaxb.Syntaxes.class, org.xwiki.rest.model.jaxb.SearchResults.class, org.xwiki.rest.model.jaxb.SearchResult.class, org.xwiki.rest.model.jaxb.Tags.class, org.xwiki.rest.model.jaxb.Tag.class, org.xwiki.rest.model.jaxb.Properties.class, org.xwiki.rest.model.jaxb.Translations.class, org.xwiki.rest.model.jaxb.ObjectSummary.class, org.xwiki.rest.model.jaxb.Objects.class, org.xwiki.rest.model.jaxb.Classes.class, org.xwiki.rest.model.jaxb.Class.class, org.xwiki.rest.model.jaxb.PropertyValues.class, org.xwiki.rest.model.jaxb.Property.class, org.xwiki.rest.model.jaxb.Attachment.class, org.xwiki.rest.model.jaxb.Comment.class, org.xwiki.rest.model.jaxb.Comments.class, org.xwiki.rest.model.jaxb.Attachments.class, org.xwiki.rest.model.jaxb.History.class, org.xwiki.rest.model.jaxb.PageSummary.class, org.xwiki.rest.model.jaxb.Space.class, org.xwiki.rest.model.jaxb.Wiki.class, org.xwiki.rest.model.jaxb.Pages.class, org.xwiki.rest.model.jaxb.Spaces.class, org.xwiki.rest.model.jaxb.Wikis.class, org.xwiki.rest.model.jaxb.Xwiki.class}</oldValue>
+                  <newValue>{org.xwiki.rest.model.jaxb.HistorySummary.class, org.xwiki.rest.model.jaxb.Attribute.class, org.xwiki.rest.model.jaxb.Translation.class, org.xwiki.rest.model.jaxb.Client.class, org.xwiki.rest.model.jaxb.JobLog.class, org.xwiki.rest.model.jaxb.JobStatus.class, org.xwiki.rest.model.jaxb.Syntaxes.class, org.xwiki.rest.model.jaxb.SearchResults.class, org.xwiki.rest.model.jaxb.SearchResult.class, org.xwiki.rest.model.jaxb.Tags.class, org.xwiki.rest.model.jaxb.Tag.class, org.xwiki.rest.model.jaxb.Properties.class, org.xwiki.rest.model.jaxb.Translations.class, org.xwiki.rest.model.jaxb.ObjectSummary.class, org.xwiki.rest.model.jaxb.Objects.class, org.xwiki.rest.model.jaxb.Classes.class, org.xwiki.rest.model.jaxb.Class.class, org.xwiki.rest.model.jaxb.PropertyValues.class, org.xwiki.rest.model.jaxb.Property.class, org.xwiki.rest.model.jaxb.Attachment.class, org.xwiki.rest.model.jaxb.Comment.class, org.xwiki.rest.model.jaxb.Comments.class, org.xwiki.rest.model.jaxb.Attachments.class, org.xwiki.rest.model.jaxb.History.class, org.xwiki.rest.model.jaxb.PageSummary.class, org.xwiki.rest.model.jaxb.Space.class, org.xwiki.rest.model.jaxb.Wiki.class, org.xwiki.rest.model.jaxb.Pages.class, org.xwiki.rest.model.jaxb.Spaces.class, org.xwiki.rest.model.jaxb.Wikis.class, org.xwiki.rest.model.jaxb.Xwiki.class}</newValue>
+                  <justification>New REST resource added.</justification>
+                </item>
               </differences>
             </revapi.differences>
             <revapi.differences>

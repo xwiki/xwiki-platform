@@ -20,7 +20,6 @@
 package org.xwiki.officeimporter.internal.splitter;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -84,22 +83,20 @@ public final class DocumentSplitterUtils
      * 
      * @param sectionDoc the newly created wiki document corresponding to a section of the original office document
      * @param officeDocument the office document being splitted into wiki documents
+     * @param fileMap Map of files from the original document
      * @return the relocated artifacts
      */
-    public static Set<File> relocateArtifacts(WikiDocument sectionDoc, XDOMOfficeDocument officeDocument)
+    public static Set<File> relocateArtifacts(WikiDocument sectionDoc, XDOMOfficeDocument officeDocument,
+        Map<String, File> fileMap)
     {
-        Set<File> artifacts = officeDocument.getArtifactsFiles();
         Set<File> result = new HashSet<>();
         List<ImageBlock> imageBlocks =
             sectionDoc.getXdom().getBlocks(new ClassBlockMatcher(ImageBlock.class), Axes.DESCENDANT);
         if (!imageBlocks.isEmpty()) {
-            Map<String, File> fileMap = new HashMap<>();
-            artifacts.forEach(item -> fileMap.put(item.getName(), item));
             for (ImageBlock imageBlock : imageBlocks) {
                 String imageReference = imageBlock.getReference().getReference();
                 File file = fileMap.get(imageReference);
                 result.add(file);
-                artifacts.remove(file);
             }
         }
         return result;

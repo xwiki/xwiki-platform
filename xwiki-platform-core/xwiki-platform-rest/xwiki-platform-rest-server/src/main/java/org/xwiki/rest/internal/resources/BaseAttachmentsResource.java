@@ -37,6 +37,7 @@ import javax.inject.Named;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
+import org.xwiki.attachment.validation.AttachmentSupplier;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.attachment.validation.AttachmentValidator;
 import org.xwiki.model.EntityType;
@@ -407,15 +408,30 @@ public class BaseAttachmentsResource extends XWikiResource
 
         // We wait for the XWikiAttachment to be loaded before checking the size as accurately checking the size of 
         // the content input stream is not possible.
-        this.attachmentValidator.validateAttachment(attachment.getLongSize(), () -> {
-            try {
-                return Optional.of(attachment.getContentInputStream(this.xcontextProvider.get()));
-            } catch (XWikiException e) {
-                this.logger.warn("Failed to get the input stream for attachment [{}]. Cause: [{}]", attachment,
-                    getRootCauseMessage(e));
-                return Optional.empty();
+        this.attachmentValidator.validateAttachment(new AttachmentSupplier()
+        {
+            @Override
+            public long getSize()
+            {
+                return attachment.getLongSize();
             }
-        }, attachment.getFilename());
+
+            @Override
+            public InputStream getInputStream() throws AttachmentValidationException
+            {
+                try {
+                    return attachment.getContentInputStream(xcontext);
+                } catch (XWikiException e) {
+                    throw new AttachmentValidationException("TODO", e, 0, "TODO");
+                }
+            }
+
+            @Override
+            public String getFileName()
+            {
+                return attachment.getFilename();
+            }
+        });
 
         // Set the document author.
         document.setAuthorReference(xcontext.getUserReference());

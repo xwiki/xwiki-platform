@@ -55,6 +55,22 @@ public class AttachmentValidationException extends Exception
         this.contextMessage = contextMessage;
     }
 
+    public AttachmentValidationException(String message, int httpStatus, String translationKey)
+    {
+        super(message);
+        this.httpStatus = httpStatus;
+        this.translationKey = translationKey;
+        this.contextMessage = null;
+    }
+
+    public AttachmentValidationException(String message, Throwable cause, int httpStatus, String translationKey)
+    {
+        super(message, cause);
+        this.httpStatus = httpStatus;
+        this.translationKey = translationKey;
+        this.contextMessage = null;
+    }
+
     /**
      * @return the http status to return when this exception is caught
      */

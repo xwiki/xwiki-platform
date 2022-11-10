@@ -19,20 +19,16 @@
  */
 package org.xwiki.attachment.validation.internal;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.servlet.http.Part;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
+import org.xwiki.attachment.validation.AttachmentSupplier;
 import org.xwiki.attachment.validation.AttachmentValidationConfiguration;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.attachment.validation.AttachmentValidator;
@@ -40,7 +36,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.tika.internal.TikaUtils;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.UploadAction;
 
 import static com.xpn.xwiki.plugin.fileupload.FileUploadPlugin.UPLOAD_DEFAULT_MAXSIZE;
 import static com.xpn.xwiki.plugin.fileupload.FileUploadPlugin.UPLOAD_MAXSIZE_PARAMETER;
@@ -69,31 +64,14 @@ public class DefaultAttachmentValidator implements AttachmentValidator
     private Logger logger;
 
     @Override
-    public void validateAttachment(Part part) throws AttachmentValidationException
+    public void validateAttachment(AttachmentSupplier supplier) throws AttachmentValidationException
     {
-        long size = part.getSize();
+        long size = supplier.getSize();
         // We don't check the mimetype for parts that are not expected to be use as file.
-        if (StringUtils.startsWith(part.getName(), UploadAction.FILE_FIELD_NAME)) {
-            validateAttachment(size, () -> {
-                try {
-                    return Optional.of(part.getInputStream());
-                } catch (IOException e) {
-                    this.logger.warn("Failed to get the input stream for part [{}]. Cause: [{}]", part,
-                        getRootCauseMessage(e));
-                    return Optional.empty();
-                }
-            }, part.getSubmittedFileName());
-        } else {
-            validateSize(size);
+        validateSize(size);
+        if (supplier.checkMimetype()) {
+            validateMimetype(supplier.getInputStream(), supplier.getFileName());
         }
-    }
-
-    @Override
-    public void validateAttachment(long attachmentSize, Supplier<Optional<InputStream>> supplier, String filename)
-        throws AttachmentValidationException
-    {
-        validateSize(attachmentSize);
-        validateMimetype(supplier, filename);
     }
 
     private void validateSize(long attachmentSize) throws AttachmentValidationException
@@ -110,10 +88,10 @@ public class DefaultAttachmentValidator implements AttachmentValidator
         return context.getWiki().getSpacePreferenceAsLong(UPLOAD_MAXSIZE_PARAMETER, UPLOAD_DEFAULT_MAXSIZE, context);
     }
 
-    private void validateMimetype(Supplier<Optional<InputStream>> supplier, String filename)
+    private void validateMimetype(InputStream inputStream, String filename)
         throws AttachmentValidationException
     {
-        String mimeType = detectMimeType(supplier, filename).toLowerCase();
+        String mimeType = detectMimeType(inputStream, filename).toLowerCase();
         List<String> allowedMimetypes = this.attachmentValidationConfiguration.getAllowedMimetypes();
         List<String> blockerMimetypes = this.attachmentValidationConfiguration.getBlockerMimetypes();
         boolean hasAllowedMimetypes = !allowedMimetypes.isEmpty();
@@ -132,16 +110,11 @@ public class DefaultAttachmentValidator implements AttachmentValidator
         return mimetypes.stream().anyMatch(mimeTypePattern -> Pattern.matches(mimeTypePattern, mimeType));
     }
 
-    private String detectMimeType(Supplier<Optional<InputStream>> supplier, String fileName)
+    private String detectMimeType(InputStream inputStream, String fileName)
     {
         String mimeType;
         try {
-            Optional<InputStream> inputStream = supplier.get();
-            if (inputStream.isEmpty()) {
-                mimeType = "";
-            } else {
-                mimeType = TikaUtils.detect(inputStream.get(), fileName);
-            }
+            mimeType = TikaUtils.detect(inputStream, fileName);
         } catch (Exception e) {
             this.logger.warn("Failed to identify the mimetype of [{}]. Cause: [{}]", fileName, getRootCauseMessage(e));
             mimeType = "";

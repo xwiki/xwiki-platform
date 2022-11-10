@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.plugin.fileupload;
 
+import java.io.InputStream;
 import java.util.List;
 
 import javax.servlet.http.Part;
@@ -27,6 +28,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
+import org.xwiki.attachment.validation.AttachmentSupplier;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.attachment.validation.AttachmentValidator;
 import org.xwiki.component.manager.ComponentManager;
@@ -48,6 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -95,7 +98,7 @@ class FileUploadPluginTest
     void loadFileList() throws Exception
     {
         this.fileUploadPlugin.loadFileList(100, 10, "/tmp", this.context);
-        verify(this.attachmentValidator).validateAttachment(this.part0);
+        verify(this.attachmentValidator).validateAttachment(mock(AttachmentSupplier.class));
         verify(this.context).put(eq(FILE_LIST_KEY), any());
         assertEquals("Loading uploaded files", this.logCapture.getMessage(0));
         assertEquals(DEBUG, this.logCapture.getLogEvent(0).getLevel());
@@ -104,10 +107,10 @@ class FileUploadPluginTest
     @Test
     void loadFileListValidationError() throws Exception
     {
-        doThrow(AttachmentValidationException.class).when(this.attachmentValidator).validateAttachment(this.part0);
+        doThrow(AttachmentValidationException.class).when(this.attachmentValidator).validateAttachment(mock(AttachmentSupplier.class));
         assertThrows(AttachmentValidationException.class, () -> this.fileUploadPlugin.loadFileList(100, 10, "/tmp",
             this.context));
-        verify(this.attachmentValidator).validateAttachment(this.part0);
+        verify(this.attachmentValidator).validateAttachment(mock(AttachmentSupplier.class));
         verify(this.context, never()).put(eq(FILE_LIST_KEY), any());
         assertEquals("Loading uploaded files", this.logCapture.getMessage(0));
         assertEquals(DEBUG, this.logCapture.getLogEvent(0).getLevel());

@@ -23,27 +23,20 @@ import java.io.InputStream;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import javax.servlet.http.Part;
-
-import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
-
 /**
- * Provide the operations to validate an attachment. For instance, by checking the size or the mimetype of the
- * attachment.
- *
  * @version $Id$
- * @since 14.10RC1
+ * @since x.y.z
  */
-@Role
-@Unstable
-public interface AttachmentValidator
+public interface AttachmentSupplier
 {
-    /**
-     * Check if the part is a valid attachment in the current space.
-     *
-     * @param supplier the attachment supplier, wrapping the actual uploaded file input stream and it required metadatas
-     * @throws AttachmentValidationException in case of error when validating the part
-     */
-    void validateAttachment(AttachmentSupplier supplier) throws AttachmentValidationException;
+    long getSize();
+
+    default boolean checkMimetype()
+    {
+        return true;
+    }
+
+    InputStream getInputStream() throws AttachmentValidationException;
+
+    String getFileName();
 }

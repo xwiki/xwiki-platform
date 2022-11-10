@@ -29,6 +29,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.xwiki.attachment.validation.AttachmentSupplier;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.attachment.validation.AttachmentValidator;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -36,6 +37,7 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -68,15 +70,15 @@ class FileUploadUtilsTest
     {
         Collection<FileItem> fileItems = FileUploadUtils.getFileItems(100, 100, "/tmp", this.request, this.validator);
         assertEquals(1, fileItems.size());
-        verify(this.validator).validateAttachment(this.part0);
+        verify(this.validator).validateAttachment(mock(AttachmentSupplier.class));
     }
 
     @Test
     void getFileItemsValidationIssue() throws Exception
     {
-        doThrow(AttachmentValidationException.class).when(this.validator).validateAttachment(this.part0);
+        doThrow(AttachmentValidationException.class).when(this.validator).validateAttachment(mock(AttachmentSupplier.class));
         assertThrows(AttachmentValidationException.class, () -> FileUploadUtils.getFileItems(100, 100, "/tmp",
             this.request, this.validator));
-        verify(this.validator).validateAttachment(this.part0);
+        verify(this.validator).validateAttachment(mock(AttachmentSupplier.class));
     }
 }

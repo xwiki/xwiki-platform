@@ -87,7 +87,7 @@
     #set ($url = $doc.getURL('view', "viewer=$escapetool.url($extraAnchor)"))
   #end
 
-  #submenuitem($url, $escapetool.xml($extraText), $idHref, '', $glyphIcon)
+  #submenuitem($url, $extraText, $idHref, '', $glyphIcon)
 #end
 
 ###########################################

@@ -128,8 +128,8 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
                 targetDocumentDescriptor.setParentReference(targetParent);
             }
 
-            // Add artifacts.
-            Set<File> artifactsFiles = DocumentSplitterUtils.addArtifacts(doc, fileMap);
+            // The artifact files to attach to the section document.
+            Set<File> artifactsFiles = DocumentSplitterUtils.getSectionArtifacts(doc, fileMap);
 
             // Create the resulting XDOMOfficeDocument.
             XDOMOfficeDocument splitDocument = new XDOMOfficeDocument(doc.getXdom(), artifactsFiles,

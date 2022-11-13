@@ -40,8 +40,8 @@
 
 ## MENU
 core.menu.type.wiki=ウィキ
-### Missing: core.menu.watchlist.add.wiki=Watch Wiki
-### Missing: core.menu.watchlist.remove.wiki=Unwatch Wiki
+core.menu.watchlist.add.wiki=ウィキを監視
+core.menu.watchlist.remove.wiki=ウィキの監視を解除
 ### Missing: core.menu.admin.wiki=Administer wiki
 
 # WIKI INFORMATION PANEL

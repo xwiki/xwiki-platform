@@ -38,7 +38,7 @@
   <hidden>true</hidden>
   <content>admin.email=メール
 ### Missing: admin.email.description=Configure mail sending parameters and view mail statuses.
-### Missing: admin.emailgeneral=Advanced
+admin.emailgeneral=高度
 ### Missing: admin.emailgeneral.description=Configure advanced mail parameters, like mail address obfuscation.
 ### Missing: admin.emailsend=Mail Sending
 ### Missing: admin.emailsend.description=Configure mail sending parameters.

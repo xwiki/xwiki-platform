@@ -67,7 +67,7 @@ appWithinMinutes.wizardStep.presentation.name=プレゼンテーション
 platform.appwithinminutes.wizardStepNextButtonLabel=次のステップ
 platform.appwithinminutes.wizardStepNextButtonTip=次のステップに行く
 platform.appwithinminutes.wizardStepFinishButtonLabel=完了
-platform.appwithinminutes.wizardStepFinishButtonTip=アプリケーションのホームページに行く
+platform.appwithinminutes.wizardStepFinishButtonTip=アプリケーションのトップページに行く
 ### Missing: platform.appwithinminutes.wizardStepPreviousButtonLabel=Previous Step
 ### Missing: platform.appwithinminutes.wizardStepPreviousButtonTip=Go to previous step
 platform.appwithinminutes.wizardStepHelpTitle=ステップ
@@ -84,8 +84,8 @@ appWithinMinutes.codeSpace.title=コード
 ### Missing: appWithinMinutes.codeSpace.hiddenPagesInfo=The hidden pages are also listed, even though your current user profile settings prevent to do so, otherwise none of the application code pages would be visible because they are all hidden by default.
 platform.appwithinminutes.appNamePageTitle=アプリケーションを作成
 platform.appwithinminutes.appNameLabel=アプリケーション名
-platform.appwithinminutes.appNameHint=アプリケーション名はホームページのURLと、アプリケーションのコードを保存する場所を決定します。
-platform.appwithinminutes.appNamePreviewHomePageUrlLabel=アプリケーションのホームページのURL
+platform.appwithinminutes.appNameHint=アプリケーション名はトップページのURLと、アプリケーションのコードを保存する場所を決定します。
+platform.appwithinminutes.appNamePreviewHomePageUrlLabel=アプリケーションのトップページのURL
 platform.appwithinminutes.appNamePreviewCodeSpaceLabel=アプリケーションのコードの場所
 platform.appwithinminutes.appNameIsUsedWarning=このアプリケーションは既に存在します。次のステップに進むと、既存のアプリケーションを編集します。
 platform.appwithinminutes.appNameEmptyError=アプリケーション名を入力してください。
@@ -253,9 +253,9 @@ platform.appwithinminutes.wizardStep2Title=データを構造化しましょう
 #@deprecated appWithinMinutes.wizardStep.presentation.name
 platform.appwithinminutes.wizardStep3Name=表示
 #@deprecated appWithinMinutes.wizardStep.presentation.title
-platform.appwithinminutes.wizardStep3Title=アプリケーションのホームページをカスタマイズしましょう
+platform.appwithinminutes.wizardStep3Title=アプリケーションのトップページをカスタマイズしましょう
 #@deprecated appWithinMinutes.wizardStep.presentation.description
-platform.appwithinminutes.wizardStep3Description=アプリケーションのホームページをカスタマイズしましょう
+platform.appwithinminutes.wizardStep3Description=アプリケーションのトップページをカスタマイズしましょう
 
 ### Since 11.0
 platform.appwithinminutes.appsLiveTable.doc.space=アプリケーション名

@@ -65,9 +65,21 @@ public class PDFDocument implements AutoCloseable
      * Fetches and parses a PDF document from a given URL.
      * 
      * @param url where to fetch the PDF document from
+     * @throws IOException if fetching and parsing the PDF document fails
+     */
+    public PDFDocument(URL url) throws IOException
+    {
+        this(url, null, null);
+    }
+
+    /**
+     * Fetches and parses a PDF document from a given URL.
+     * 
+     * @param url where to fetch the PDF document from
      * @param userName the user name used to access the PDF document
      * @param password the password used to access the PDF document
      * @throws IOException if fetching and parsing the PDF document fails
+     * @since 14.10RC1
      */
     public PDFDocument(URL url, String userName, String password) throws IOException
     {

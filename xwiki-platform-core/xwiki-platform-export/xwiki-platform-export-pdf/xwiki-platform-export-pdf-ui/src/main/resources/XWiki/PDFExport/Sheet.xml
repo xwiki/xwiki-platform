@@ -38,7 +38,7 @@
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
 #set ($sheetReference = 'XWiki.PDFExport.Sheet')
-#set ($pdfElements = ['cover', 'header', 'footer', 'toc'])
+#set ($pdfElements = ['cover', 'toc', 'header', 'footer'])
 #set ($pdfExportJobId = $request.jobId.split('/'))
 
 #macro (getPDFExportConfigFromRequest $pdfExportConfig)
@@ -280,23 +280,32 @@
     }
   };
 
-  // Replace each canvas with an image before paged.js layouts the print pages, otherwise all canvases become blank when
-  // they are moved around within the DOM tree.
+  // Adjust the exported content before performing the print layout.
   pageReady.afterPageReady(() =&gt; {
     fixInternalAnchors($('#xwikicontent, .pdf-toc'));
     removeEmptyToC();
-    // Canvases are replaced with images asynchronously so we need to return a promise in order to delay the rest of the
-    // page ready callbacks.
-    return replaceCanvasesWithImages($('#xwikicontent'));
   });
 
   // Trigger the print preview after the page is ready. Note that by returning a promise we're making the next page
   // ready callbacks wait for the print preview to be ready. This is important in case one of the next page ready
   // callbacks triggers the print.
-  pageReady.afterPageReady(() =&gt; new Promise((resolve, reject) =&gt; {
-    window.PagedConfig = {after: resolve};
-    require(['paged-polyfill'], function(PagedPolyfill) {});
-  }));
+  pageReady.afterPageReady(() =&gt; {
+    // We don't need Paged.js (the polyfill for CSS Paged Media module) unless the user asked for a table of contents,
+    // headers or footers (which require the Paged Media module).
+    const usePagedPolyfill = $('body').children('.pdf-toc, .pdf-header, .pdf-footer').length;
+    if (usePagedPolyfill) {
+      return new Promise((resolve, reject) =&gt; {
+        window.PagedConfig = {after: resolve};
+        // Replace each canvas with an image before paged.js layouts the print pages, otherwise all canvases become
+        // blank when they are moved around within the DOM tree.
+        replaceCanvasesWithImages($('#xwikicontent')).catch((cause) =&gt; {
+          console.log('Failed to replace canvases with images. Cause: ' + cause);
+        }).finally(() =&gt; {
+          require(['paged-polyfill'], function(PagedPolyfill) {});
+        })
+      });
+    }
+  });
 
   // Revoke the object URLs previously created, after the print layout is ready.
   pageReady.afterPageReady(() =&gt; {
@@ -421,16 +430,83 @@
     <property>
       <code>@media print {
   /**
+   * Standard Page
+   */
+  @page {
+    size: A4;
+    margin: .5in;
+    padding: .2in 0;
+
+    /* Header */
+    @top-center {
+      content: element(header);
+    }
+
+    /* Footer */
+    @bottom-center {
+      content: element(footer);
+    }
+  }
+
+  .pdf-header,
+  .pdf-footer {
+    color: @text-muted;
+  }
+
+  .pdf-header {
+    position: running(header);
+  }
+
+  .pdf-footer {
+    position: running(footer);
+  }
+
+  .pdf-page-number::after {
+    content: counter(page);
+  }
+  .pdf-page-count::after {
+    content: counter(pages);
+  }
+
+  /**
+   * Landscape Page
+   */
+  @page landscape {
+    size: A4 landscape;
+  }
+
+  .page-landscape {
+    page: landscape;
+  }
+
+  /**
    * Cover Page
    */
+  @page cover {
+    @top-center {
+      /* Hide the header on the cover page. */
+      content: none;
+    }
+
+    @bottom-center {
+      /* Hide the footer on the cover page. */
+      content: none;
+    }
+  }
+
   .pdf-cover {
     page: cover;
+    break-after: page;
   }
 
   /**
    * Table of Contents
    */
+  @page toc {
+  }
+
   .pdf-toc {
+    page: toc;
     break-after: page;
   }
 
@@ -482,16 +558,6 @@
   }
 
   /**
-   * Header &amp; Footer
-   */
-  .pdf-page-number::after {
-    content: counter(page);
-  }
-  .pdf-page-count::after {
-    content: counter(pages);
-  }
-
-  /**
    * Content
    */
   /* Browsers try to improve the contrast in order to generate print-friendly PDFs and for this they change the colors
@@ -499,6 +565,15 @@
   html:not([data-xwiki-paged-media=paper]) * {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+  }
+
+  /* Remove styles that don't make much sense when printing to PDF. */
+  body {
+    background-color: unset;
+  }
+  *, *:before, *:after {
+    /* Box shadows don't look good in PDF. */
+    box-shadow: none !important;
   }
 
   table {

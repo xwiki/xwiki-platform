@@ -131,7 +131,9 @@
 {{/velocity}}</cover>
     </property>
     <property>
-      <footer/>
+      <footer>{{html clean="false"}}
+&lt;span class="pdf-page-number"&gt;&lt;/span&gt; / &lt;span class="pdf-page-count"&gt;&lt;/span&gt;
+{{/html}}</footer>
     </property>
     <property>
       <header>{{velocity}}
@@ -266,13 +268,6 @@
   /**
    * Cover Page
    */
-  @page cover {
-    @bottom-center {
-      /* Hide the page number on the cover page. */
-      content: none;
-    }
-  }
-
   .pdf-cover {
     border-top: 1px solid @nav-tabs-border-color;
     border-bottom: 1px solid @nav-tabs-border-color;
@@ -296,71 +291,25 @@
   }
 
   /**
-   * Standard Page
+   * Header
    */
-  @page {
-    size: A4;
-    margin: .5in;
-    padding: .2in 0;
-
-    /* Header */
-    @top-center {
-      content: element(header);
-    }
-
-    /* Footer */
-    @bottom-center {
-      content: counter(page) " / " counter(pages);
-    }
+  .pdf-chapter-name:before {
+    content: string(chapter-name);
   }
 
-  .pdf-header {
-    color: @text-muted;
-    position: running(header);
-  }
-
+  /**
+   * Content
+   */
   /* Marks the beginning of a new XWiki document. */
   h1[data-xwiki-document-reference] {
     /* Distinguish document titles from the rest of the level 1 headings that may appear in the document content. */
     font-weight: bolder;
     string-set: chapter-name content(text);
 
+    /* Start each XWiki document on a new print page. */
     &amp; ~ h1[data-xwiki-document-reference] {
       break-before: page;
     }
-  }
-
-  .pdf-chapter-name:before {
-    content: string(chapter-name);
-  }
-
-  /* Style the footer. We use PagedJS classes because the footer is currently generated using only CSS. */
-  .pagedjs_page .pagedjs_margin-bottom-center .pagedjs_margin-content::after {
-    color: @text-muted;
-  }
-
-  /**
-   * Landscape Page
-   */
-  @page landscape {
-    size: A4 landscape;
-  }
-
-  .page-landscape {
-    page: landscape;
-  }
-
-  /**
-   * Style Cleanup
-   * Remove styles that don't make much sense when printing to PDF.
-   */
-  body {
-    background-color: unset;
-  }
-
-  *, *:before, *:after {
-    // Box shadows don't look good in PDF.
-    box-shadow: none !important;
   }
 }</code>
     </property>

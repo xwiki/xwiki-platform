@@ -26,6 +26,7 @@ import javax.servlet.http.Part;
 
 import org.xwiki.bridge.attachment.AttachmentAccessWrapper;
 import org.xwiki.bridge.attachment.AttachmentAccessWrapperException;
+import org.xwiki.stability.Unstable;
 
 /**
  * Attachment wrapper for {@link Part}. Provides access to various metadata required to access an attachment. For
@@ -35,6 +36,7 @@ import org.xwiki.bridge.attachment.AttachmentAccessWrapperException;
  * @version $Id$
  * @since 14.10RC1
  */
+@Unstable
 public class PartAttachmentAccessWrapper implements AttachmentAccessWrapper
 {
     private final Part part;

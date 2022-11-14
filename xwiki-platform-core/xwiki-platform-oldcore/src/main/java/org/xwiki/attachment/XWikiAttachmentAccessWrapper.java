@@ -23,6 +23,7 @@ import java.io.InputStream;
 
 import org.xwiki.bridge.attachment.AttachmentAccessWrapper;
 import org.xwiki.bridge.attachment.AttachmentAccessWrapperException;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -35,6 +36,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
  * @version $Id$
  * @since 14.10RC1
  */
+@Unstable
 public class XWikiAttachmentAccessWrapper implements AttachmentAccessWrapper
 {
     private final XWikiAttachment attachment;
@@ -43,7 +45,8 @@ public class XWikiAttachmentAccessWrapper implements AttachmentAccessWrapper
 
     /**
      * Default constructor.
-     * @param attachment the attachment to wrap 
+     *
+     * @param attachment the attachment to wrap
      * @param context the content, used when retrieving the attachment input stream
      */
     public XWikiAttachmentAccessWrapper(XWikiAttachment attachment, XWikiContext context)

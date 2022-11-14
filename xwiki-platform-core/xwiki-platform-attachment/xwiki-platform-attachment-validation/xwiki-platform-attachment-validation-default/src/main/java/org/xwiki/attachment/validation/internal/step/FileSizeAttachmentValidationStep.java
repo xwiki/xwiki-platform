@@ -26,7 +26,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.attachment.validation.AttachmentValidationStep;
-import org.xwiki.attachment.validation.AttachmentValidationSupplier;
+import org.xwiki.bridge.attachment.AttachmentAccessWrapper;
 import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiContext;
@@ -55,9 +55,9 @@ public class FileSizeAttachmentValidationStep implements AttachmentValidationSte
     private Provider<XWikiContext> contextProvider;
 
     @Override
-    public void validate(AttachmentValidationSupplier supplier) throws AttachmentValidationException
+    public void validate(AttachmentAccessWrapper wrapper) throws AttachmentValidationException
     {
-        if (supplier.getSize() > getUploadMaxSize()) {
+        if (wrapper.getSize() > getUploadMaxSize()) {
             throw new AttachmentValidationException("File size too big", SC_REQUEST_ENTITY_TOO_LARGE,
                 "core.action.upload.failure.maxSize", "fileuploadislarge");
         }

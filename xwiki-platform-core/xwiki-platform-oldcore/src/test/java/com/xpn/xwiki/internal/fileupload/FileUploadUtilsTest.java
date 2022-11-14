@@ -30,7 +30,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.attachment.validation.AttachmentValidationException;
-import org.xwiki.attachment.validation.AttachmentValidationSupplier;
+import org.xwiki.bridge.attachment.AttachmentAccessWrapper;
 import org.xwiki.attachment.validation.AttachmentValidator;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 
@@ -72,16 +72,16 @@ class FileUploadUtilsTest
     {
         Collection<FileItem> fileItems = FileUploadUtils.getFileItems(100, 100, "/tmp", this.request, this.validator);
         assertEquals(1, fileItems.size());
-        verify(this.validator).validateAttachment(any(AttachmentValidationSupplier.class));
+        verify(this.validator).validateAttachment(any(AttachmentAccessWrapper.class));
     }
 
     @Test
     void getFileItemsValidationIssue() throws Exception
     {
         doThrow(AttachmentValidationException.class).when(this.validator)
-            .validateAttachment(any(AttachmentValidationSupplier.class));
+            .validateAttachment(any(AttachmentAccessWrapper.class));
         assertThrows(AttachmentValidationException.class, () -> FileUploadUtils.getFileItems(100, 100, "/tmp",
             this.request, this.validator));
-        verify(this.validator).validateAttachment(any(AttachmentValidationSupplier.class));
+        verify(this.validator).validateAttachment(any(AttachmentAccessWrapper.class));
     }
 }

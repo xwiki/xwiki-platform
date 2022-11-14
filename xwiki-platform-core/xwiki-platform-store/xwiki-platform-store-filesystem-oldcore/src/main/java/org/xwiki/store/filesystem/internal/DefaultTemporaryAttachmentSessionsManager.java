@@ -20,7 +20,6 @@
 package org.xwiki.store.filesystem.internal;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +32,7 @@ import javax.servlet.http.Part;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
-import org.xwiki.attachment.validation.AttachmentValidationSupplier;
+import org.xwiki.attachment.XWikiAttachmentAccessWrapper;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.attachment.validation.AttachmentValidator;
 import org.xwiki.component.annotation.Component;
@@ -42,11 +41,8 @@ import org.xwiki.store.TemporaryAttachmentException;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-
-import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
 /**
  * Default implementation of {@link TemporaryAttachmentSessionsManager}.
@@ -116,8 +112,7 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
             // document it is stored for.
             xWikiAttachment.setDoc(new XWikiDocument(documentReference, documentReference.getLocale()), false);
 
-            this.attachmentValidator
-                .validateAttachment(new XWikiAttachmentValidationSupplier(xWikiAttachment, context));
+            this.attachmentValidator.validateAttachment(new XWikiAttachmentAccessWrapper(xWikiAttachment, context));
             temporaryAttachmentSession.addAttachment(documentReference, xWikiAttachment);
             return xWikiAttachment;
         } catch (IOException e) {
@@ -174,43 +169,6 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
                     }
                 });
             }
-        }
-    }
-
-    private static class XWikiAttachmentValidationSupplier implements AttachmentValidationSupplier
-    {
-        private final XWikiAttachment xWikiAttachment;
-
-        private final XWikiContext context;
-
-        XWikiAttachmentValidationSupplier(XWikiAttachment xWikiAttachment, XWikiContext context)
-        {
-            this.xWikiAttachment = xWikiAttachment;
-            this.context = context;
-        }
-
-        @Override
-        public long getSize()
-        {
-            return this.xWikiAttachment.getLongSize();
-        }
-
-        @Override
-        public InputStream getInputStream() throws AttachmentValidationException
-        {
-            try {
-                return this.xWikiAttachment.getContentInputStream(this.context);
-            } catch (XWikiException e) {
-                throw new AttachmentValidationException(
-                    String.format("Failed to read the input stream for attachment [%s]", this.xWikiAttachment), e,
-                    SC_INTERNAL_SERVER_ERROR, "attachment.validation.inputStream.error");
-            }
-        }
-
-        @Override
-        public String getFileName()
-        {
-            return this.xWikiAttachment.getFilename();
         }
     }
 }

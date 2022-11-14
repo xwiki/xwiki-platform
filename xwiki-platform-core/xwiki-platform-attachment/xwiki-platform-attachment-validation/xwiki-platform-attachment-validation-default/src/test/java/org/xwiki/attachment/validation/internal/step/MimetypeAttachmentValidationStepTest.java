@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.attachment.validation.AttachmentValidationConfiguration;
 import org.xwiki.attachment.validation.AttachmentValidationException;
-import org.xwiki.attachment.validation.AttachmentValidationSupplier;
+import org.xwiki.bridge.attachment.AttachmentAccessWrapper;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -63,11 +63,11 @@ class MimetypeAttachmentValidationStepTest
     {
         when(this.attachmentValidationConfiguration.getBlockerMimetypes()).thenReturn(List.of("text/.*"));
 
-        AttachmentValidationSupplier supplier = mock(AttachmentValidationSupplier.class);
-        when(supplier.getInputStream()).thenReturn(mock(InputStream.class));
-        when(supplier.getFileName()).thenReturn("test.txt");
+        AttachmentAccessWrapper wrapper = mock(AttachmentAccessWrapper.class);
+        when(wrapper.getInputStream()).thenReturn(mock(InputStream.class));
+        when(wrapper.getFileName()).thenReturn("test.txt");
         AttachmentValidationException exception = assertThrows(AttachmentValidationException.class,
-            () -> this.validationStep.validate(supplier));
+            () -> this.validationStep.validate(wrapper));
 
         assertEquals("Invalid mimetype [text/plain]", exception.getMessage());
         assertEquals(SC_UNSUPPORTED_MEDIA_TYPE, exception.getHttpStatus());

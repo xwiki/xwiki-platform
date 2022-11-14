@@ -27,9 +27,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.attachment.validation.AttachmentValidationStep;
-import org.xwiki.attachment.validation.AttachmentValidationSupplier;
 import org.xwiki.attachment.validation.internal.step.FileSizeAttachmentValidationStep;
 import org.xwiki.attachment.validation.internal.step.MimetypeAttachmentValidationStep;
+import org.xwiki.bridge.attachment.AttachmentAccessWrapper;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -55,6 +55,7 @@ class DefaultAttachmentValidatorTest
     private DefaultAttachmentValidator validator;
 
     @MockComponent
+    @Named("context")
     private ComponentManager componentManager;
 
     @MockComponent
@@ -66,7 +67,7 @@ class DefaultAttachmentValidatorTest
     private AttachmentValidationStep mimetypeAttachmentValidationStep;
 
     @Mock
-    private AttachmentValidationSupplier supplier;
+    private AttachmentAccessWrapper wrapper;
 
     @Mock
     private AttachmentValidationStep otherAttachmentValidationStep;
@@ -74,9 +75,9 @@ class DefaultAttachmentValidatorTest
     @Test
     void validateAttachment() throws Exception
     {
-        this.validator.validateAttachment(this.supplier);
-        verify(this.sizeAttachmentValidationStep).validate(this.supplier);
-        verify(this.mimetypeAttachmentValidationStep).validate(this.supplier);
+        this.validator.validateAttachment(this.wrapper);
+        verify(this.sizeAttachmentValidationStep).validate(this.wrapper);
+        verify(this.mimetypeAttachmentValidationStep).validate(this.wrapper);
         verify(this.componentManager).getInstanceMap(AttachmentValidationStep.class);
     }
 
@@ -88,10 +89,10 @@ class DefaultAttachmentValidatorTest
             FileSizeAttachmentValidationStep.HINT, this.sizeAttachmentValidationStep,
             "other", this.otherAttachmentValidationStep
         ));
-        this.validator.validateAttachment(this.supplier);
-        verify(this.sizeAttachmentValidationStep).validate(this.supplier);
-        verify(this.mimetypeAttachmentValidationStep).validate(this.supplier);
-        verify(this.otherAttachmentValidationStep).validate(this.supplier);
+        this.validator.validateAttachment(this.wrapper);
+        verify(this.sizeAttachmentValidationStep).validate(this.wrapper);
+        verify(this.mimetypeAttachmentValidationStep).validate(this.wrapper);
+        verify(this.otherAttachmentValidationStep).validate(this.wrapper);
         verify(this.componentManager).getInstanceMap(AttachmentValidationStep.class);
     }
 
@@ -102,13 +103,13 @@ class DefaultAttachmentValidatorTest
             .thenThrow(ComponentLookupException.class);
 
         AttachmentValidationException exception = assertThrows(AttachmentValidationException.class,
-            () -> this.validator.validateAttachment(this.supplier));
+            () -> this.validator.validateAttachment(this.wrapper));
 
         assertEquals(
             "Failed to resolve the [interface org.xwiki.attachment.validation.AttachmentValidationStep] components.",
             exception.getMessage());
-        verify(this.sizeAttachmentValidationStep).validate(this.supplier);
-        verify(this.mimetypeAttachmentValidationStep).validate(this.supplier);
+        verify(this.sizeAttachmentValidationStep).validate(this.wrapper);
+        verify(this.mimetypeAttachmentValidationStep).validate(this.wrapper);
         verifyNoInteractions(this.otherAttachmentValidationStep);
     }
 }

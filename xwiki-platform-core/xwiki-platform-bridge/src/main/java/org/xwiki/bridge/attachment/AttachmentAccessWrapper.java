@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.attachment.validation;
+package org.xwiki.bridge.attachment;
 
 import java.io.InputStream;
 
@@ -32,7 +32,7 @@ import org.xwiki.stability.Unstable;
  */
 @Role
 @Unstable
-public interface AttachmentValidationSupplier
+public interface AttachmentAccessWrapper
 {
     /**
      * @return the attachment size in bytes
@@ -41,9 +41,9 @@ public interface AttachmentValidationSupplier
 
     /**
      * @return the attachment input steam
-     * @throws AttachmentValidationException in case of error when retrieving the input steam
+     * @throws AttachmentAccessWrapperException in case of error when retrieving the input steam
      */
-    InputStream getInputStream() throws AttachmentValidationException;
+    InputStream getInputStream() throws AttachmentAccessWrapperException;
 
     /**
      * @return the attachment filename

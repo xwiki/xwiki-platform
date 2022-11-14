@@ -19,6 +19,7 @@
  */
 package org.xwiki.attachment.validation;
 
+import org.xwiki.bridge.attachment.AttachmentAccessWrapper;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
@@ -36,8 +37,9 @@ public interface AttachmentValidator
     /**
      * Check if the part is a valid attachment in the current space.
      *
-     * @param supplier the attachment supplier, wrapping the actual uploaded file input stream and it required metadatas
+     * @param wrapper the attachment wrapper, containing the actual uploaded file input stream, and its required
+     *     metadatas
      * @throws AttachmentValidationException in case of error when validating the part
      */
-    void validateAttachment(AttachmentValidationSupplier supplier) throws AttachmentValidationException;
+    void validateAttachment(AttachmentAccessWrapper wrapper) throws AttachmentValidationException;
 }

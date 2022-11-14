@@ -25,7 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.attachment.validation.AttachmentValidationException;
-import org.xwiki.attachment.validation.AttachmentValidationSupplier;
+import org.xwiki.bridge.attachment.AttachmentAccessWrapper;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -74,10 +74,10 @@ class FileSizeAttachmentValidationStepTest
     @Test
     void validateAttachmentTooLarge()
     {
-        AttachmentValidationSupplier attachmentValidationSupplier = mock(AttachmentValidationSupplier.class);
-        when(attachmentValidationSupplier.getSize()).thenReturn(100L);
+        AttachmentAccessWrapper attachmentAccessWrapper = mock(AttachmentAccessWrapper.class);
+        when(attachmentAccessWrapper.getSize()).thenReturn(100L);
         AttachmentValidationException exception = assertThrows(AttachmentValidationException.class,
-            () -> this.validationStep.validate(attachmentValidationSupplier));
+            () -> this.validationStep.validate(attachmentAccessWrapper));
 
         assertEquals("File size too big", exception.getMessage());
         assertEquals(SC_REQUEST_ENTITY_TOO_LARGE, exception.getHttpStatus());

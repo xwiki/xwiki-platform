@@ -17,28 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.attachment.validation;
+package org.xwiki.bridge.attachment;
 
-import org.xwiki.bridge.attachment.AttachmentAccessWrapper;
-import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
- * One attachment validation step. {@link AttachmentValidator} calls them on ofter the other and fails whenever a step
- * fails.
+ * Represent exceptions encountered when interacting with an {@link AttachmentAccessWrapper}.
  *
  * @version $Id$
  * @since 14.10RC1
  */
-@Role
 @Unstable
-public interface AttachmentValidationStep
+public class AttachmentAccessWrapperException extends Exception
 {
     /**
-     * Validate a single aspect of the attachment.
+     * Constructs a new attachment access wrapper exception with the specified detail message and cause.
      *
-     * @param wrapper the attachment wrapper
-     * @throws AttachmentValidationException in case of validation error
+     * @param message the detail message (which is saved for later retrieval by the {@link #getMessage()} method).
+     * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method).  (A
+     *     {@code null} value is permitted, and indicates that the cause is nonexistent or unknown.)
      */
-    void validate(AttachmentAccessWrapper wrapper) throws AttachmentValidationException;
+    public AttachmentAccessWrapperException(String message, Throwable cause)
+    {
+        super(message, cause);
+    }
 }

@@ -30,7 +30,7 @@ import javax.inject.Singleton;
 import org.xwiki.attachment.validation.AttachmentValidationConfiguration;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.attachment.validation.AttachmentValidationStep;
-import org.xwiki.attachment.validation.AttachmentValidationSupplier;
+import org.xwiki.bridge.attachment.AttachmentAccessWrapper;
 import org.xwiki.attachment.validation.AttachmentValidator;
 import org.xwiki.attachment.validation.internal.step.FileSizeAttachmentValidationStep;
 import org.xwiki.attachment.validation.internal.step.MimetypeAttachmentValidationStep;
@@ -67,20 +67,20 @@ public class DefaultAttachmentValidator implements AttachmentValidator
     private AttachmentValidationStep mimetypeAttachmentValidationStep;
 
     @Override
-    public void validateAttachment(AttachmentValidationSupplier supplier) throws AttachmentValidationException
+    public void validateAttachment(AttachmentAccessWrapper wrapper) throws AttachmentValidationException
     {
         // Known attachment validators are hardcoded because we want to control the order in which they are called.
         // It is better to first check the attachment size, before running an expensive mimetype validation.
         // TODO: the hardcoding can be removed once XCOMMONS-2507 is implemented.
-        this.sizeAttachmentValidationStep.validate(supplier);
-        this.mimetypeAttachmentValidationStep.validate(supplier);
+        this.sizeAttachmentValidationStep.validate(wrapper);
+        this.mimetypeAttachmentValidationStep.validate(wrapper);
         try {
             Map<String, AttachmentValidationStep> map =
                 this.componentManager.getInstanceMap(AttachmentValidationStep.class);
             for (Entry<String, AttachmentValidationStep> entry : map.entrySet()) {
                 // Hardcoded steps are skipped as they have already been executed.
                 if (!KNOWN_STEPS.contains(entry.getKey())) {
-                    entry.getValue().validate(supplier);
+                    entry.getValue().validate(wrapper);
                 }
             }
         } catch (ComponentLookupException e) {

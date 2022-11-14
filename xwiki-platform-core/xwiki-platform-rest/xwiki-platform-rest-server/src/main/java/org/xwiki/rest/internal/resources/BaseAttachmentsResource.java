@@ -36,7 +36,7 @@ import javax.inject.Named;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
-import org.xwiki.attachment.validation.AttachmentValidationSupplier;
+import org.xwiki.attachment.XWikiAttachmentAccessWrapper;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.attachment.validation.AttachmentValidator;
 import org.xwiki.model.EntityType;
@@ -61,8 +61,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-
-import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
 /**
  * @version $Id$
@@ -405,32 +403,7 @@ public class BaseAttachmentsResource extends XWikiResource
                 String.format("Failed to create or update the attachment [%s].", attachmentReference), e);
         }
 
-        this.attachmentValidator.validateAttachment(new AttachmentValidationSupplier()
-        {
-            @Override
-            public long getSize()
-            {
-                return attachment.getLongSize();
-            }
-
-            @Override
-            public InputStream getInputStream() throws AttachmentValidationException
-            {
-                try {
-                    return attachment.getContentInputStream(xcontext);
-                } catch (XWikiException e) {
-                    throw new AttachmentValidationException(
-                        String.format("Failed to read the input stream for attachment [%s]", attachment), e,
-                        SC_INTERNAL_SERVER_ERROR, "attachment.validation.inputStream.error");
-                }
-            }
-
-            @Override
-            public String getFileName()
-            {
-                return attachment.getFilename();
-            }
-        });
+        this.attachmentValidator.validateAttachment(new XWikiAttachmentAccessWrapper(attachment, xcontext));
 
         // Set the document author.
         document.setAuthorReference(xcontext.getUserReference());

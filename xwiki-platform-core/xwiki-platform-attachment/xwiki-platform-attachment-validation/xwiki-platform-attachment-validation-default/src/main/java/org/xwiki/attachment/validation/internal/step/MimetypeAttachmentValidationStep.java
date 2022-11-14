@@ -31,10 +31,12 @@ import org.slf4j.Logger;
 import org.xwiki.attachment.validation.AttachmentValidationConfiguration;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.attachment.validation.AttachmentValidationStep;
-import org.xwiki.attachment.validation.AttachmentValidationSupplier;
+import org.xwiki.bridge.attachment.AttachmentAccessWrapper;
+import org.xwiki.bridge.attachment.AttachmentAccessWrapperException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.tika.internal.TikaUtils;
 
+import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE;
 import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessage;
 
@@ -61,9 +63,17 @@ public class MimetypeAttachmentValidationStep implements AttachmentValidationSte
     private Logger logger;
 
     @Override
-    public void validate(AttachmentValidationSupplier supplier) throws AttachmentValidationException
+    public void validate(AttachmentAccessWrapper wrapper) throws AttachmentValidationException
     {
-        String mimeType = detectMimeType(supplier.getInputStream(), supplier.getFileName()).toLowerCase();
+        InputStream inputStream;
+        try {
+            inputStream = wrapper.getInputStream();
+        } catch (AttachmentAccessWrapperException e) {
+            throw new AttachmentValidationException(
+                String.format("Failed to read the input stream for [%s]", wrapper), e,
+                SC_INTERNAL_SERVER_ERROR, "attachment.validation.inputStream.error");
+        }
+        String mimeType = detectMimeType(inputStream, wrapper.getFileName()).toLowerCase();
         List<String> allowedMimetypes = this.attachmentValidationConfiguration.getAllowedMimetypes();
         List<String> blockerMimetypes = this.attachmentValidationConfiguration.getBlockerMimetypes();
         boolean hasAllowedMimetypes = !allowedMimetypes.isEmpty();

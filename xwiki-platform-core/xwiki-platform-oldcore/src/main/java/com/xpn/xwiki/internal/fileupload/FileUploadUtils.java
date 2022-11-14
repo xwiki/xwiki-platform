@@ -21,7 +21,6 @@ package com.xpn.xwiki.internal.fileupload;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -40,15 +39,13 @@ import org.apache.commons.fileupload.servlet.ServletRequestContext;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.attachment.PartAttachmentAccessWrapper;
 import org.xwiki.attachment.validation.AttachmentValidationException;
-import org.xwiki.attachment.validation.AttachmentValidationSupplier;
 import org.xwiki.attachment.validation.AttachmentValidator;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPluginApi;
 import com.xpn.xwiki.web.UploadAction;
-
-import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
 /**
  * File upload related tools.
@@ -102,7 +99,7 @@ public final class FileUploadUtils
             List<FileItem> items = new ArrayList<>(parts.size());
             for (Part part : parts) {
                 if (StringUtils.startsWith(part.getName(), UploadAction.FILE_FIELD_NAME)) {
-                    attachmentValidator.validateAttachment(new PartAttachmentValidationSupplier(part));
+                    attachmentValidator.validateAttachment(new PartAttachmentAccessWrapper(part));
                 }
                 items.add(new PartFileItem(part));
             }
@@ -151,45 +148,6 @@ public final class FileUploadUtils
                 throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                     XWikiException.ERROR_XWIKI_APP_UPLOAD_PARSE_EXCEPTION, "Exception while parsing uploaded file", e);
             }
-        }
-    }
-
-    private static class PartAttachmentValidationSupplier implements AttachmentValidationSupplier
-    {
-        private final Part part;
-
-        /**
-         * Default constructor.
-         *
-         * @param part the part to validate as an attachment
-         */
-        PartAttachmentValidationSupplier(Part part)
-        {
-            this.part = part;
-        }
-
-        @Override
-        public long getSize()
-        {
-            return this.part.getSize();
-        }
-
-        @Override
-        public InputStream getInputStream() throws AttachmentValidationException
-        {
-            try {
-                return this.part.getInputStream();
-            } catch (IOException e) {
-                throw new AttachmentValidationException(
-                    String.format("Failed to read the input stream for part [%s]", this.part), e,
-                    SC_INTERNAL_SERVER_ERROR, "attachment.validation.inputStream.error");
-            }
-        }
-
-        @Override
-        public String getFileName()
-        {
-            return this.part.getSubmittedFileName();
         }
     }
 }

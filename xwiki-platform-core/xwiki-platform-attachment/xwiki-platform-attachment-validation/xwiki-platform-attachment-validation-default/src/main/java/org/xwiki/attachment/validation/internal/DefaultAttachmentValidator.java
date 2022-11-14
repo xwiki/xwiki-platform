@@ -55,6 +55,7 @@ public class DefaultAttachmentValidator implements AttachmentValidator
         List.of(FileSizeAttachmentValidationStep.HINT, MimetypeAttachmentValidationStep.HINT);
 
     @Inject
+    @Named("context")
     private ComponentManager componentManager;
 
     @Inject

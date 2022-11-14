@@ -21,12 +21,17 @@ package org.xwiki.attachment.validation;
 
 import java.io.InputStream;
 
+import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
+
 /**
  * Provides the metadata required to validate an attachment .
  *
  * @version $Id$
  * @since 14.10RC1
  */
+@Role
+@Unstable
 public interface AttachmentValidationSupplier
 {
     /**

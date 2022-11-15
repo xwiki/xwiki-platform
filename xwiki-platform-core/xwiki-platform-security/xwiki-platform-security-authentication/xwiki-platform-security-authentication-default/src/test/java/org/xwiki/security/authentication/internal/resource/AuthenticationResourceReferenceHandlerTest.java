@@ -31,11 +31,14 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
+import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.security.authentication.AuthenticationAction;
 import org.xwiki.security.authentication.AuthenticationResourceReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -45,6 +48,7 @@ import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.web.XWikiResponse;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -68,6 +72,9 @@ class AuthenticationResourceReferenceHandlerTest
 
     @MockComponent
     private Execution execution;
+
+    @MockComponent
+    private WikiDescriptorManager wikiDescriptorManager;
 
     private XWikiResponse response;
 
@@ -112,13 +119,19 @@ class AuthenticationResourceReferenceHandlerTest
     void handleResetPassword() throws Exception
     {
         WikiReference wikiReference = new WikiReference("foo");
+        when(this.wikiDescriptorManager.exists("foo")).thenReturn(false);
         AuthenticationResourceReference resourceReference = new AuthenticationResourceReference(
             wikiReference,
             AuthenticationAction.RESET_PASSWORD);
 
-        when(this.xwiki.evaluateTemplate("resetpassword.vm", context)).thenReturn("Reset password content");
-
         ResourceReferenceHandlerChain chain = mock(ResourceReferenceHandlerChain.class);
+        ResourceReferenceHandlerException exception =
+            assertThrows(ResourceReferenceHandlerException.class,
+                () -> this.resourceReferenceHandler.handle(resourceReference, chain));
+        assertEquals("The wiki [foo] does not exist.", exception.getMessage());
+
+        when(this.wikiDescriptorManager.exists("foo")).thenReturn(true);
+        when(this.xwiki.evaluateTemplate("resetpassword.vm", context)).thenReturn("Reset password content");
         this.resourceReferenceHandler.handle(resourceReference, chain);
 
         verify(response).setContentType("text/html; charset=UTF-8");
@@ -133,20 +146,42 @@ class AuthenticationResourceReferenceHandlerTest
     void handleForgotUsername() throws Exception
     {
         WikiReference wikiReference = new WikiReference("bar");
+        when(this.wikiDescriptorManager.exists("bar")).thenReturn(false);
         AuthenticationResourceReference resourceReference = new AuthenticationResourceReference(
             wikiReference,
             AuthenticationAction.RETRIEVE_USERNAME);
 
+        ResourceReferenceHandlerChain chain = mock(ResourceReferenceHandlerChain.class);
+        ResourceReferenceHandlerException exception =
+            assertThrows(ResourceReferenceHandlerException.class,
+                () -> this.resourceReferenceHandler.handle(resourceReference, chain));
+        assertEquals("The wiki [bar] does not exist.", exception.getMessage());
+
+        when(this.wikiDescriptorManager.exists("bar")).thenReturn(true);
         when(this.xwiki.evaluateTemplate("forgotusername.vm", context)).thenReturn("Forgot user name content");
 
-        ResourceReferenceHandlerChain chain = mock(ResourceReferenceHandlerChain.class);
         this.resourceReferenceHandler.handle(resourceReference, chain);
-
         verify(response).setContentType("text/html; charset=UTF-8");
         verify(this.xWikiContextInitializer).initialize(any(ExecutionContext.class));
         verify(servletOutputStream).write("Forgot user name content".getBytes(StandardCharsets.UTF_8));
         verify(chain).handleNext(resourceReference);
         verify(context).setWikiReference(wikiReference);
         verify(context).setWikiReference(currentWiki);
+    }
+
+    @Test
+    void handleForgotUsernameWikiDescriptorError() throws Exception
+    {
+        WikiReference wikiReference = new WikiReference("bar");
+        when(this.wikiDescriptorManager.exists("bar")).thenThrow(new WikiManagerException("Cannot access wiki"));
+        AuthenticationResourceReference resourceReference = new AuthenticationResourceReference(
+            wikiReference,
+            AuthenticationAction.RETRIEVE_USERNAME);
+
+        ResourceReferenceHandlerChain chain = mock(ResourceReferenceHandlerChain.class);
+        ResourceReferenceHandlerException exception =
+            assertThrows(ResourceReferenceHandlerException.class,
+                () -> this.resourceReferenceHandler.handle(resourceReference, chain));
+        assertEquals("Error when checking if wiki [bar] exists.", exception.getMessage());
     }
 }

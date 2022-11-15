@@ -47,9 +47,9 @@ import static org.xwiki.attachment.validation.internal.AttachmentMimetypeRestric
 @Singleton
 public class DefaultAttachmentValidationConfiguration implements AttachmentValidationConfiguration
 {
-    private static final String ATTACHMENT_MIMETYPE_ALLOW_LIST_PROPERTY = "attachment.mimetype.allowList";
+    private static final String ATTACHMENT_MIMETYPE_ALLOW_LIST_PROPERTY = "attachment.upload.allowList";
 
-    private static final String ATTACHMENT_MIMETYPE_BLOCK_LIST_PROPERTY = "attachment.mimetype.blockList";
+    private static final String ATTACHMENT_MIMETYPE_BLOCK_LIST_PROPERTY = "attachment.upload.blockList";
 
     @Inject
     @Named(DefaultAttachmentMimetypeRestrictionSpacesConfigurationSource.HINT)

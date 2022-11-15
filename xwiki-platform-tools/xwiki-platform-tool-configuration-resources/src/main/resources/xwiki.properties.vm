@@ -939,7 +939,7 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-# list is not empty, any attachment with an unlisted mimetype will be rejected.
 #-# For instance, if you want to only accept plain text and any kind of images, you can set the list to:
 #-# text/plain,image/.*
-# attachment.mimetype.allowList=
+# attachment.upload.allowList=
 
 #-# [Since 14.10RC1]
 #-# Define the list of blocked attachment mimetypes. By default, this list is empty, but you can specify a 
@@ -948,7 +948,7 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-# For instance, if you want to reject plain text and any kind of images, you can set the list to:
 #-# text/plain,image/.*
 #-#
-# attachment.mimetype.blockList=
+# attachment.upload.blockList=
 
 #-------------------------------------------------------------------------------------
 # Active Installs

@@ -92,11 +92,11 @@ class DefaultAttachmentValidationConfigurationTest
         when(this.attachmentConfigurationSource.containsKey(ALLOWED_MIMETYPES_FIELD)).thenReturn(false);
         when(this.wikiConfigurationSource.containsKey(ALLOWED_MIMETYPES_FIELD)).thenReturn(false);
         List<String> expectedMimetypes = List.of("image/.*");
-        when(this.xWikiPropertiesConfigurationSource.<List<String>>getProperty("attachment.mimetype.allowList",
+        when(this.xWikiPropertiesConfigurationSource.<List<String>>getProperty("attachment.upload.allowList",
             List.of())).thenReturn(expectedMimetypes);
         assertEquals(expectedMimetypes, this.configuration.getAllowedMimetypes());
 
-        verify(this.xWikiPropertiesConfigurationSource).getProperty("attachment.mimetype.allowList", List.of());
+        verify(this.xWikiPropertiesConfigurationSource).getProperty("attachment.upload.allowList", List.of());
         verify(this.attachmentConfigurationSource, never()).getProperty(ALLOWED_MIMETYPES_FIELD);
         verify(this.wikiConfigurationSource, never()).getProperty(ALLOWED_MIMETYPES_FIELD);
     }
@@ -132,12 +132,12 @@ class DefaultAttachmentValidationConfigurationTest
         when(this.attachmentConfigurationSource.containsKey(BLOCKED_MIMETYPES_FIELD)).thenReturn(false);
         when(this.wikiConfigurationSource.containsKey(BLOCKED_MIMETYPES_FIELD)).thenReturn(false);
         List<String> expectedMimetypes = List.of("image/.*");
-        when(this.xWikiPropertiesConfigurationSource.<List<String>>getProperty("attachment.mimetype.blockList",
+        when(this.xWikiPropertiesConfigurationSource.<List<String>>getProperty("attachment.upload.blockList",
             List.of()))
             .thenReturn(expectedMimetypes);
         assertEquals(expectedMimetypes, this.configuration.getBlockerMimetypes());
 
-        verify(this.xWikiPropertiesConfigurationSource).getProperty("attachment.mimetype.blockList", List.of());
+        verify(this.xWikiPropertiesConfigurationSource).getProperty("attachment.upload.blockList", List.of());
         verify(this.attachmentConfigurationSource, never()).getProperty(BLOCKED_MIMETYPES_FIELD);
         verify(this.wikiConfigurationSource, never()).getProperty(BLOCKED_MIMETYPES_FIELD);
     }

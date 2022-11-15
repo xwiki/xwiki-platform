@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 
+import com.xpn.xwiki.objects.classes.BooleanClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.PropertyClassInterface;
 import com.xpn.xwiki.objects.classes.StaticListClass;
@@ -85,6 +86,18 @@ public class TextAreaMetaClass extends StringMetaClass
         contentTypeClass.setMultiSelect(false);
         contentTypeClass.setSize(1);
         safeput(contentTypeClass.getName(), contentTypeClass);
+
+        addRestricted();
+    }
+
+    private void addRestricted()
+    {
+        BooleanClass restrictedClass = new BooleanClass(this);
+        restrictedClass.setName("restricted");
+        restrictedClass.setPrettyName("Restricted");
+        restrictedClass.setDisplayType("yesno");
+        restrictedClass.setDisplayFormType("checkbox");
+        safeput(restrictedClass.getName(), restrictedClass);
     }
 
     @Override

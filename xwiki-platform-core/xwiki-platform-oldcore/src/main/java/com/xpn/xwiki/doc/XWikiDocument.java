@@ -1488,6 +1488,26 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * @param text the text to render
      * @param sourceSyntaxId the id of the Syntax used by the passed text (e.g. {@code xwiki/2.1})
+     * @param restrictedTransformationContext see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
+     * @param sDocument the {@link XWikiDocument} to use as secure document, if null keep the current one
+     * @param isolated true of the content should be executed in this document's context
+     * @param context the XWiki context
+     * @return the given text rendered in the context of this document using the passed Syntax
+     * @since 14.10RC1
+     * @since 14.4.7
+     * @since 13.10.11
+     */
+    @Unstable
+    public String getRenderedContent(String text, Syntax sourceSyntaxId, boolean restrictedTransformationContext,
+        XWikiDocument sDocument, boolean isolated, XWikiContext context)
+    {
+        return getRenderedContent(text, sourceSyntaxId, getOutputSyntax(), restrictedTransformationContext, sDocument,
+            isolated, context);
+    }
+
+    /**
+     * @param text the text to render
+     * @param sourceSyntaxId the id of the Syntax used by the passed text (e.g. {@code xwiki/2.1})
      * @param targetSyntaxId the id of the syntax in which to render the document content
      * @param restrictedTransformationContext see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
      * @param sDocument the {@link XWikiDocument} to use as secure document, if null keep the current one

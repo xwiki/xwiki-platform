@@ -60,7 +60,7 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
     private Provider<XWikiContext> contextProvider;
 
     @Inject
-    private AttachmentValidator attachmentValidator;
+    private Provider<AttachmentValidator> attachmentValidator;
 
     @Inject
     private Logger logger;
@@ -112,7 +112,8 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
             // document it is stored for.
             xWikiAttachment.setDoc(new XWikiDocument(documentReference, documentReference.getLocale()), false);
 
-            this.attachmentValidator.validateAttachment(new XWikiAttachmentAccessWrapper(xWikiAttachment, context));
+            this.attachmentValidator.get()
+                .validateAttachment(new XWikiAttachmentAccessWrapper(xWikiAttachment, context));
             temporaryAttachmentSession.addAttachment(documentReference, xWikiAttachment);
             return xWikiAttachment;
         } catch (IOException e) {

@@ -17,36 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.bridge.attachment;
+package org.xwiki.attachment.validation.test.ui.docker;
 
-import java.io.InputStream;
-
-import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.xwiki.test.docker.junit5.UITest;
 
 /**
- * Provides the metadata required to validate an attachment.
+ * All UI tests for the Attachment validation feature.
  *
  * @version $Id$
  * @since 14.10RC1
  */
-@Role
-@Unstable
-public interface AttachmentAccessWrapper
+@UITest
+public class AllITs
 {
-    /**
-     * @return the attachment size in bytes
-     */
-    long getSize();
-
-    /**
-     * @return the attachment input steam
-     * @throws AttachmentAccessWrapperException in case of error when retrieving the input steam
-     */
-    InputStream getInputStream() throws AttachmentAccessWrapperException;
-
-    /**
-     * @return the attachment filename
-     */
-    String getFileName();
+    @Nested
+    @DisplayName("Attachment validation test")
+    class NestedAttachmentValidationIT extends AttachmentValidationIT
+    {
+    }
 }

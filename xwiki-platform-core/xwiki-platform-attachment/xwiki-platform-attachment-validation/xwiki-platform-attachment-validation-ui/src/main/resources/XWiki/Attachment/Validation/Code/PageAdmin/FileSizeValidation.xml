@@ -135,11 +135,11 @@ require(['jquery', 'xwiki-l10n!attachment-validation-filesize-messages', 'xwiki-
   function formatBytes(bytes) {
     // Inspired from https://stackoverflow.com/a/18650828/657524
     if (!+bytes) {
-      return '0 Bytes'
+      return '0 bytes'
     }
 
     const k = 1024
-    const sizes = ['bytes', 'Kb', 'Mb', 'Gb', 'Tb', 'Pb', 'Eb', 'Zb', 'Yb']
+    const sizes = [' bytes', 'Kb', 'Mb', 'Gb', 'Tb', 'Pb', 'Eb', 'Zb', 'Yb']
 
     const i = Math.floor(Math.log(bytes) / Math.log(k))
 
@@ -210,7 +210,7 @@ require(['jquery', 'xwiki-l10n!attachment-validation-filesize-messages', 'xwiki-
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -294,10 +294,12 @@ require(['jquery', 'xwiki-l10n!attachment-validation-filesize-messages', 'xwiki-
       <async_enabled>0</async_enabled>
     </property>
     <property>
-      <content>{{velocity wiki='false'}}
-<div id='attachment-validation-filesize-configuration' class='hidden'>$jsontool.serialize({
+      <content>{{velocity}}
+{{html clean='false'}}
+&lt;script type='application/json' id='attachment-validation-filesize-configuration'&gt;$jsontool.serialize({
   "maxFileSize": $xwiki.getSpacePreference('upload_maxsize')
-})</div>
+}).replace('&lt;', '\u003C').replace('{{/', '\u007B\u007B\u002F')&lt;/script&gt;
+{{/html}}
 {{/velocity}}</content>
     </property>
     <property>

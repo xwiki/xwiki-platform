@@ -20,12 +20,17 @@
 package org.xwiki.attachment.validation;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 
@@ -42,14 +47,20 @@ import org.xwiki.stability.Unstable;
 public class AttachmentValidationScriptService implements ScriptService
 {
     @Inject
-    private AttachmentValidationConfiguration attachmentValidationConfiguration;
+    @Named("context")
+    private Provider<ComponentManager> componentManager;
+
+    @Inject
+    private Logger logger;
 
     /**
      * @return the list of allowed attachment mimetype regex (e.g., "image/png", "text/.*")
      */
     public List<String> getAllowedMimetypes()
     {
-        return this.attachmentValidationConfiguration.getAllowedMimetypes();
+        return getAttachmentValidationConfiguration()
+            .map(AttachmentValidationConfiguration::getAllowedMimetypes)
+            .orElse(List.of());
     }
 
     /**
@@ -57,6 +68,21 @@ public class AttachmentValidationScriptService implements ScriptService
      */
     public List<String> getBlockerMimetypes()
     {
-        return this.attachmentValidationConfiguration.getBlockerMimetypes();
+        return getAttachmentValidationConfiguration()
+            .map(AttachmentValidationConfiguration::getBlockerMimetypes)
+            .orElse(List.of());
+    }
+
+    private Optional<AttachmentValidationConfiguration> getAttachmentValidationConfiguration()
+    {
+        try {
+            AttachmentValidationConfiguration attachmentValidationConfiguration =
+                this.componentManager.get().getInstance(AttachmentValidationConfiguration.class);
+            return Optional.of(attachmentValidationConfiguration);
+        } catch (ComponentLookupException e) {
+            this.logger.error("Failed to retrieve an instance of [{}] with hint [default].",
+                AttachmentValidationConfiguration.class.getName());
+            return Optional.empty();
+        }
     }
 }

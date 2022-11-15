@@ -63,8 +63,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
@@ -92,6 +90,9 @@ class DefaultTemporaryAttachmentSessionsManagerTest
     private Provider<XWikiContext> contextProvider;
 
     @MockComponent
+    private Provider<AttachmentValidator> attachmentValidatorProvider;
+
+    @Mock
     private AttachmentValidator attachmentValidator;
 
     @XWikiTempDir
@@ -115,6 +116,8 @@ class DefaultTemporaryAttachmentSessionsManagerTest
 
         Environment environment = mockitoComponentManager.registerMockComponent(Environment.class);
         when(environment.getTemporaryDirectory()).thenReturn(this.tmpDir);
+
+        when(this.attachmentValidatorProvider.get()).thenReturn(this.attachmentValidator);
     }
 
     @Test

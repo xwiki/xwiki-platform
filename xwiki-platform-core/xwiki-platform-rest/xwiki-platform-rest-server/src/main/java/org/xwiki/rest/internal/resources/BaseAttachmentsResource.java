@@ -33,12 +33,14 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
 import org.xwiki.attachment.XWikiAttachmentAccessWrapper;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.attachment.validation.AttachmentValidator;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -122,10 +124,8 @@ public class BaseAttachmentsResource extends XWikiResource
     private EntityReferenceSerializer<String> localEntityReferenceSerializer;
 
     @Inject
-    private AttachmentValidator attachmentValidator;
-
-    @Inject
-    private Logger logger;
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
 
     /**
      * @param scope where to retrieve the attachments from; it should be a reference to a wiki, space or document
@@ -403,7 +403,13 @@ public class BaseAttachmentsResource extends XWikiResource
                 String.format("Failed to create or update the attachment [%s].", attachmentReference), e);
         }
 
-        this.attachmentValidator.validateAttachment(new XWikiAttachmentAccessWrapper(attachment, xcontext));
+        try {
+            this.componentManagerProvider.get().<AttachmentValidator>getInstance(AttachmentValidator.class)
+                .validateAttachment(new XWikiAttachmentAccessWrapper(attachment, xcontext));
+        } catch (ComponentLookupException e) {
+            throw new XWikiException(
+                String.format("Failed to instantiate a [%s] component.", AttachmentValidator.class.getName()), e);
+        }
 
         // Set the document author.
         document.setAuthorReference(xcontext.getUserReference());

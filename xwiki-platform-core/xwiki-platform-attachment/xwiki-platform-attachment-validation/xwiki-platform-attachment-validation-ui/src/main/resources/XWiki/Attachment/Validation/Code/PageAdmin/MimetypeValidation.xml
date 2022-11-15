@@ -151,10 +151,10 @@ require(['jquery', 'xwiki-l10n!attachment-validation-mimetype-messages', 'xwiki-
     if (hasInvalidMimetype) {
       let localizedMessage = l10n.get('errorMessage', data.file.name, mimeType);
       if (hasAllowedMimetypes) {
-        localizedMessage += '<br />' + l10n.get('allowedMimetypes', allowedMimetypes);
+        localizedMessage += '&lt;br/&gt;' + l10n.get('allowedMimetypes', allowedMimetypes);
       }
       if (hasBlockerMimetypes) {
-        localizedMessage += '<br />' + l10n.get('blockerMimetypes', blockerMimetypes)
+        localizedMessage += '&lt;br/&gt;' + l10n.get('blockerMimetypes', blockerMimetypes)
       }
       new XWiki.widgets.Notification(localizedMessage, "error");
     }
@@ -297,11 +297,13 @@ require(['jquery', 'xwiki-l10n!attachment-validation-mimetype-messages', 'xwiki-
       <async_enabled>0</async_enabled>
     </property>
     <property>
-      <content>{{velocity wiki='false'}}
-<div id='attachment-validation-mimetypes-configuration' class='hidden'>$jsontool.serialize({
+      <content>{{velocity}}
+{{html clean='false'}}
+&lt;script type='application/json' id='attachment-validation-mimetypes-configuration'&gt;$jsontool.serialize({
   "allowedMimetypes": $services.attachmentValidation.getAllowedMimetypes(),
   "blockerMimetypes": $services.attachmentValidation.getBlockerMimetypes()
-})</div>
+}).replace('&lt;', '\u003C').replace('{{/', '\u007B\u007B\u002F')&lt;/script&gt;
+{{/html}}
 {{/velocity}}</content>
     </property>
     <property>

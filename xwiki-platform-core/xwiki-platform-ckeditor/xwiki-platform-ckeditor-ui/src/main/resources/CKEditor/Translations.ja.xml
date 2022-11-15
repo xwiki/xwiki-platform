@@ -1,0 +1,215 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="CKEditor.Translations" locale="ja">
+  <web>CKEditor</web>
+  <name>Translations</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>### Missing: CKEditor.ConfigClass_removePlugins=Disabled Plugins
+### Missing: CKEditor.ConfigClass_removePlugins.hint=The list of plugins that have been disabled.
+### Missing: CKEditor.ConfigClass_removeButtons=Disabled Toolbar Features
+### Missing: CKEditor.ConfigClass_removeButtons.hint=The list of toolbar features that have been disabled.
+### Missing: CKEditor.ConfigClass_linkShowAdvancedTab=Link: Show Advanced Tab
+### Missing: CKEditor.ConfigClass_linkShowAdvancedTab.hint=Allows you to set link attributes such as id, name, class or style.
+### Missing: CKEditor.ConfigClass_linkShowTargetTab=Link: Show Target Tab
+### Missing: CKEditor.ConfigClass_linkShowTargetTab.hint=Allows you to set the link target attribute (e.g. to open the link in a new tab).
+### Missing: CKEditor.ConfigClass_loadJavaScriptSkinExtensions=Load JavaScript Skin Extensions
+### Missing: CKEditor.ConfigClass_loadJavaScriptSkinExtensions.hint=Some rendering macros are displayed using JavaScript code. Loading the JavaScript code improves the WYSIWYG aspect of the editor but it may cause problems if the JavaScript code interferes with the CKEditor code or if it changes content outside of the macro output boundaries.
+### Missing: CKEditor.ConfigClass_advanced=Advanced Configuration
+### Missing: CKEditor.ConfigClass_advanced.hint=You can write a JavaScript snippet to modify directly the configuration object. Check the {0}CKEditor documentation{1} for the list of available configuration properties.
+### Missing: ckeditor.content.placeholder=Start typing here...
+### Missing: ckeditor.admin.saveComment=Updated the CKEditor configuration from the Administration
+ckeditor.admin.reset=リセット
+### Missing: ckeditor.admin.reset.hint=Restore the default configuration
+### Missing: ckeditor.admin.reset.confirmation=Are you sure you want to restore the default configuration? All your changes will be lost.
+ckeditor.plugin.link.options=設定
+### Missing: ckeditor.plugin.link.anchor=Anchor
+### Missing: ckeditor.plugin.link.queryString=Query String
+### Missing: ckeditor.plugin.link.defaultLabel=type the link label
+ckeditor.plugin.link.openInNewTab=リンクを新しいタブで開く
+### Missing: ckeditor.plugin.list.listType.none=None
+ckeditor.plugin.macro.placeholder=マクロ：{0}
+ckeditor.plugin.macro.buttonHint=XWikiマクロ
+ckeditor.plugin.macro.editButtonHint=マクロを編集
+### Missing: ckeditor.plugin.macro.refreshFailed=Failed to refresh the edited content.
+ckeditor.plugin.macro.dedicatedInsertButtonHint={0}マクロを挿入
+ckeditor.plugin.office.importer.title=Officeファイルをインポート
+### Missing: ckeditor.plugin.office.importer.filePath=File Path
+ckeditor.plugin.office.importer.filePath.hint=インポートするOfficeファイルを選択。ファイルをアップロードした後でページに添付し、ファイルの内容をページのコンテンツに挿入します。
+ckeditor.plugin.office.importer.filterStyles=フィルターのスタイル
+### Missing: ckeditor.plugin.office.importer.filterStyles.hint=Filter text styles like font, color, alignment, margins. Content structure including heading levels, paragraphs, lists and tables are preserved.
+### Missing: ckeditor.plugin.office.importer.useOfficeViewer=Use the Office Viewer
+### Missing: ckeditor.plugin.office.importer.useOfficeViewer.hint=Check this option if you don't plan to edit the content of the office file after the import or if you don't want to mix the content of the office file with the content that you are currently editing.
+### Missing: ckeditor.plugin.office.importer.required=Required
+ckeditor.plugin.office.importer.import=インポート
+ckeditor.plugin.office.importer.inProgress=Officeファイルをインポートしています…
+ckeditor.plugin.office.importer.done=Officeファイルをインポートしました。
+ckeditor.plugin.office.importer.fail=Officeファイルをインポートできませんでした。
+ckeditor.plugin.office.importer.noUploadURL=ファイルのアップロードURLが設定されていません。
+ckeditor.plugin.office.importer.failedToLoadForm=フォームを読み込めませんでした。
+### Missing: ckeditor.plugin.resource.notSpecified=The {0} is not specified.
+### Missing: ckeditor.plugin.save.leaveConfirmationMessage=There are unsaved changes. Do you want to discard them?
+### Missing: ckeditor.plugin.save.failed=The content cannot be saved because of a CKEditor internal error. You should try to copy your important changes and reload the editor.
+### Missing: ckeditor.plugin.source.conversionFailed=Failed to perform the conversion.
+### Missing: ckeditor.plugin.toolbar.basicStyles=Basic Styles
+ckeditor.plugin.toolbar.lists=リスト
+### Missing: ckeditor.plugin.toolbar.bulletedlist=Bulleted List
+### Missing: ckeditor.plugin.toolbar.numberedlist=Numbered List
+ckeditor.plugin.toolbar.insert=挿入
+ckeditor.plugin.toolbar.horizontalrule=水平線
+### Missing: ckeditor.plugin.toolbar.specialchar=Special Character
+### Missing: ckeditor.plugin.toolbar.infoBox=Info Box
+### Missing: ckeditor.plugin.toolbar.successBox=Success Box
+### Missing: ckeditor.plugin.toolbar.warningBox=Warning Box
+### Missing: ckeditor.plugin.toolbar.errorBox=Error Box
+### Missing: ckeditor.plugin.toolbar.toc=Table of Contents
+### Missing: ckeditor.plugin.toolbar.include=Include
+### Missing: ckeditor.plugin.toolbar.code=Code Snippet
+ckeditor.plugin.toolbar.otherMacros=他のマクロ
+ckeditor.plugin.syntax.update.inProgress=WYSIWYGエディターをアップデートしています
+ckeditor.plugin.syntax.update.done=WYSIWYGエディターをアップデートしました
+ckeditor.plugin.syntax.update.failed=WYSIWYGエディターをアップデートできませんでした
+### Missing: ckeditor.plugin.syntax.wysiwygModeUnsupported=The WYSIWYG edit mode is not supported by the {0} syntax.
+### Missing: ckeditor.plugin.image.imageEditor.standardTab.title=Standard
+### Missing: ckeditor.plugin.image.imageEditor.advancedTab.title=Advanced
+ckeditor.plugin.image.imageEditor.standardTab.imageStyles.label=画像のスタイル
+### Missing: ckeditor.plugin.image.imageEditor.standardTab.imageStyles.hint=Select the style to apply on the image.
+### Missing: ckeditor.plugin.image.imageEditor.standardTab.alt.label=Alternative Text
+### Missing: ckeditor.plugin.image.imageEditor.standardTab.alt.hint=Define an alternate text for an image, if the image cannot be displayed.
+ckeditor.plugin.image.imageEditor.standardTab.caption.label=キャプション
+### Missing: ckeditor.plugin.image.imageEditor.standardTab.caption.hint=Activate and define an image caption.
+### Missing: ckeditor.plugin.image.imageEditor.standardTab.caption.ariaLabel=Activate and define an image caption.
+ckeditor.plugin.image.imageEditor.advancedTab.size.label=サイズ
+ckeditor.plugin.image.imageEditor.advancedTab.size.width.label=幅
+ckeditor.plugin.image.imageEditor.advancedTab.size.height.label=高さ
+ckeditor.plugin.image.imageEditor.advancedTab.size.hint=画像のサイズを規定。
+ckeditor.plugin.image.imageEditor.advancedTab.border.label=枠
+### Missing: ckeditor.plugin.image.imageEditor.advancedTab.border.hint=When checked, the image is displayed with a border
+### Missing: ckeditor.plugin.image.imageEditor.advancedTab.alignment.label=Alignment
+### Missing: ckeditor.plugin.image.imageEditor.advancedTab.alignment.hint=Define the image alignment.
+### Missing: ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.none=None
+### Missing: ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.start=Start
+### Missing: ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.center=Center
+### Missing: ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.end=End
+### Missing: ckeditor.plugin.image.imageEditor.advancedTab.textWrap.label=Text Wrap
+### Missing: ckeditor.plugin.image.imageEditor.advancedTab.textWrap.hint=When checked, the image is wrapped around the surrounding text.
+ckeditor.plugin.image.imageSelector.treeTab.title=ツリー
+ckeditor.plugin.image.imageSelector.uploadTab.title=アップロード
+ckeditor.plugin.image.imageSelector.uploadTab.file.title=ファイル
+ckeditor.plugin.image.imageSelector.uploadTab.file.hint=ページに追加するローカルファイルを選択。
+ckeditor.plugin.image.imageSelector.uploadTab.uploadButton=アップロード
+ckeditor.plugin.image.imageSelector.iconTab.title=アイコン
+ckeditor.plugin.image.imageSelector.iconTab.icon.title=アイコン
+### Missing: ckeditor.plugin.image.imageSelector.iconTab.icon.hint=The identifier of the icon to display as an image.
+### Missing: ckeditor.plugin.image.imageSelector.iconTab.icon.placeholder=accept
+ckeditor.plugin.image.imageSelector.urlTab.title=URL
+ckeditor.plugin.image.imageSelector.urlTab.url.title=URL
+### Missing: ckeditor.plugin.image.imageSelector.urlTab.url.hint=The url of the image to display.
+ckeditor.plugin.image.imageSelector.urlTab.url.placeholder=https://...
+### Missing: ckeditor.inline.failedToInit=Failed to initialize CKEditor.
+### Missing: ckeditor.upload.error.csrf=The CSRF token is missing.
+### Missing: ckeditor.upload.error.emptyReturn=Error when uploading the file: it might exceed the configured maximum upload size.
+modal.ok=OK
+modal.cancel=キャンセル
+modal.close=閉じる
+resource.attach.label=添付ファイル
+### Missing: resource.attach.placeholder=Path.To.Page@attachment.png
+### Missing: resource.data.label=Data URI
+resource.doc.label=ページ
+### Missing: resource.doc.placeholder=Path.To.Page
+resource.icon.label=アイコン
+resource.mailto.label=メールアドレス
+resource.mailto.placeholder=user@example.org
+resource.path.label=パス
+resource.path.placeholder=/ファイル/への/パス
+resource.unc.label=UNCパス
+### Missing: resource.unc.placeholder=//server/share/path/to/file
+resource.unknown.label=不明
+resource.url.label=URL
+### Missing: resource.url.placeholder=http://www.example.org/image.png
+resource.user.label=ユーザー
+resource.user.placeholder=エイリアス
+resourcePicker.attach.hint=添付ファイルを選択
+resourcePicker.doc.hint=ページを選択
+entityResourceSuggester.doc.placeholder=ページを探す…
+entityResourceSuggester.attach.placeholder=添付ファイルを探す…
+entityResourcePicker.select=選択
+entityResourcePicker.doc.title=ページを選択
+entityResourcePicker.attach.title=添付ファイルを選択
+macroSelector.title=マクロを選択
+### Missing: macroSelector.filter.text.placeholder=Type to filter
+macroSelector.filter.category.all=全てのマクロ
+### Missing: macroSelector.filter.category.other=Other
+macroSelector.filter.category.notinstalled=インストールされていません
+macroSelector.failedToRetrieveMacros=利用できるマクロのリストを取得できませんでした。
+macroSelector.select=選択
+### Missing: macroSelector.recommended=Recommended
+macroSelector.install=インストール
+macroSelector.install.confirm=拡張機能{0} {1}をインストールします。続行してよろしいですか？
+macroSelector.install.notAllowed=この拡張機能のインストールは許可されていません
+macroSelector.filter.category.placeholder=カテゴリーを選択…
+macroEditor.title=マクロを編集
+### Missing: macroEditor.more=More
+macroEditor.changeMacro=マクロを変更
+### Missing: macroEditor.submit=Submit
+### Missing: macroEditor.content=Content
+### Missing: macroEditor.noParameters=This macro has no parameters.
+### Missing: macroEditor.descriptorRequestFailed=Failed to retrieve the {0} macro descriptor.
+### Missing: macroEditor.installRequestFailed=Failed to install the {0} macro.
+
+
+imageEditor.modal.changeImage.button=画像を変更
+imageEditor.modal.loadFail.message=画像エディターフォームを取得できませんでした。
+imageEditor.modal.title=画像を編集
+imageEditor.modal.insertButton=挿入
+imageEditor.modal.initialization.fail=画像の選択フォームを取得できませんでした。
+imageSelector.modal.title=画像を選択
+imageSelector.modal.selectButton=選択
+imageSelector.modal.loadFail.message=画像の選択フォームを取得できませんでした。
+imageSelector.modal.fileUpload.success=ファイルをアップロードしました。
+imageSelector.modal.fileUpload.fail=ファイルをアップロードできませんでした。
+imageSelector.modal.fileUpload.abort=ファイルのアップロードを中止しました。
+imageSelector.modal.initialization.fail=画像の選択フォームを取得できませんでした。
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## Deprecated since 14.10RC1
+imageEditor.modal.backToEditor.button=戻る
+ckeditor.plugin.image.imageSelector.documentTreeTab.title=ドキュメントツリー
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+  </xwikidoc>

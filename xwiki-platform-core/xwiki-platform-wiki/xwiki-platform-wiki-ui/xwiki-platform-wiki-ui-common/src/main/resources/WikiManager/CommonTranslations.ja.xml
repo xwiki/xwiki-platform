@@ -37,13 +37,13 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>admin.wikis=ウィキ
-### Missing: admin.wikis.descriptor=Descriptor
-### Missing: admin.wikis.descriptor.description=Configure the wiki descriptor
-### Missing: admin.wiki.description=Describe your wiki (pretty name and description) and set its owner and homepage.
-### Missing: platform.wiki.admin.wiki.ownerProblemConfirmation=The new owner's user does not exist or it may come from a different wiki.\\nAre you sure you want to use it and continue with the save operation?
-### Missing: platform.wiki.admin.wiki.csrfInvalidError=Invalid security (CSRF) token. Please refresh the page and try again.
-### Missing: platform.wiki.admin.wiki.requiredFieldsError=The 'Homepage' field cannot be empty.
-### Missing: platform.wiki.admin.wiki.ownerWarning=Warning: Once you change this, the previous owner will lose their owner rights. If that is you, make sure you do not lock yourself out of the wiki. If that happens by mistake, you will need to contact the main wiki's administrators or use the superadmin account.
+admin.wikis.descriptor=記述子
+admin.wikis.descriptor.description=ウィキの記述子を設定
+admin.wiki.description=ウィキの説明（名称と詳細）を入力して、所有者とトップページを設定してください。
+platform.wiki.admin.wiki.ownerProblemConfirmation=新しい所有者は存在しないか、あるいは他のウィキの所有者です。\n保存してよろしいですか？
+platform.wiki.admin.wiki.csrfInvalidError=不正なセキュリティー（CSRF）トークンです。ページを再度読み込んでお試しください。
+platform.wiki.admin.wiki.requiredFieldsError='トップページ'のフィールドは入力が必須です。
+platform.wiki.admin.wiki.ownerWarning=警告：一旦これを変更すると、以前の所有者は所有者権限を失います。もしこれがあなたなら、自分自身をウィキから締め出さないよう注意してください。それが誤りで起こった場合は、メインのwikiの管理者に連絡するか、スーパー管理者のアカウントを使用する必要があります。
 
 ###############################################################################
 ## Deprecated
@@ -56,7 +56,7 @@
 #######################################
 ## until 6.4RC1
 #######################################
-### Missing: admin.wiki=Wiki
+admin.wiki=ウィキ
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

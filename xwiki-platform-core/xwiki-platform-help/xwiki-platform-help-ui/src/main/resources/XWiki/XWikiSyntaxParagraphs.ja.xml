@@ -1,1 +1,69 @@
+<?xml version="1.1" encoding="UTF-8"?>
 
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc locale="ja">
+  <web>XWiki</web>
+  <name>XWikiSyntaxParagraphs</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>XWikiSyntaxParagraphs</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Editing =
+
+== Paragraphs ==
+
+=== 1.0 Paragraphs ===
+
+Paragraphs are text elements separated by 2 or more new lines.
+
+{{info}}New lines are not honored in XWiki Syntax 1.0. 
+You need to insert a double backslash instead, like: {{{\\}}}{{/info}}
+
+|=Feature|=XWiki Syntax 1.0|=Result
+|Simple paragraph|This is a paragraph|This is a paragraph
+|Paragraph on multiple lines|Paragraph on{{{\\}}}\\multiple lines|Paragraph on\\multiple lines
+|Two paragraphs|Paragraph one\\\\Paragraph two|Paragraph one\\\\Paragraph two
+|Parametrized paragraph|&lt;p style="text-align:center;color:blue"&gt;Centered and blue paragraph&lt;/p&gt;|(% style="text-align:center;color:blue" %)\\Centered and blue paragraph
+
+=== 2.0 Paragraphs ===
+
+Paragraphs are text elements separated by 2 or more new lines.
+
+|=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
+|Simple paragraph|This is a paragraph|This is a paragraph
+|Paragraph on multiple lines|Paragraph on\\multiple lines|Paragraph on\\multiple lines
+|Two paragraphs|Paragraph one\\\\Paragraph two|Paragraph one\\\\Paragraph two
+|Parametrized paragraph|{{{(% style="text-align:center;color:blue" %)}}}\\Centered and blue paragraph|(% style="text-align:center;color:blue" %)\\Centered and blue paragraph
+|Different style on some portion of the paragraph content|paragraph with {{{(% style="color:red" %)}}}red{{{(%%)}}} different style inside|paragraph with (% style="color:red" %)red(%%) texte inside</content>
+</xwikidoc>

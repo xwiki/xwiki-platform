@@ -39,7 +39,7 @@
   <content>platform.core.profile.category.notifications=通知
 notifications.filters.cancel=キャンセル
 notifications.filters.submit=保存
-### Missing: notifications.filters.type.label=Filter type:
+notifications.filters.type.label=フィルターの種類：
 ### Missing: notifications.filters.type.hint=How the filter should act towards an event in the given location
 ### Missing: notifications.filters.location.label=Filter scope:
 ### Missing: notifications.filters.location.hint=What part of the wiki should be concerned by the filter?

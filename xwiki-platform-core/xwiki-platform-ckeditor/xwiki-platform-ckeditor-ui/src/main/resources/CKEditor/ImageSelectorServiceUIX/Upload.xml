@@ -140,22 +140,29 @@
 
   uploadButton.on('click', function(event) {
     event.preventDefault();
-    imageSelectorElement.addClass('loading');
-    imageSelector.createLoader($("#fileUploadField").prop('files')[0], {
-      onSuccess: function(entityReference) {
-        imageSelector.updateSelectedImageReferences([XWiki.Model.serialize(entityReference)]);
-        imageSelectorElement.removeClass('loading');
-        new XWiki.widgets.Notification(translations.get('modal.fileUpload.success'), 'done');
-      },
-      onError: function() {
-        new XWiki.widgets.Notification(translations.get('modal.fileUpload.fail'), 'error');
-        imageSelectorElement.removeClass('loading');
-      },
-      onAbort: function() {
-        new XWiki.widgets.Notification(translations.get('modal.fileUpload.abort'), 'error');
-        imageSelectorElement.removeClass('loading');
-      }
-    });
+
+    const uploadedFile = $("#fileUploadField").prop('files')[0];
+
+    const eventFileSelected = Event.fire(document, 'xwiki:actions:beforeUpload', {file: uploadedFile});
+
+    if (eventFileSelected.returnValue) {
+      imageSelectorElement.addClass('loading');
+      imageSelector.createLoader(uploadedFile, {
+        onSuccess: function(entityReference) {
+          imageSelector.updateSelectedImageReferences([XWiki.Model.serialize(entityReference)]);
+          imageSelectorElement.removeClass('loading');
+          new XWiki.widgets.Notification(translations.get('modal.fileUpload.success'), 'done');
+        },
+        onError: function() {
+          new XWiki.widgets.Notification(translations.get('modal.fileUpload.fail'), 'error');
+          imageSelectorElement.removeClass('loading');
+        },
+        onAbort: function() {
+          new XWiki.widgets.Notification(translations.get('modal.fileUpload.abort'), 'error');
+          imageSelectorElement.removeClass('loading');
+        }
+      });
+    }
   });
 });
 </code>
@@ -210,7 +217,7 @@
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>

@@ -29,8 +29,8 @@ import org.apache.commons.fileupload.FileItem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.xwiki.attachment.AttachmentAccessWrapper;
 import org.xwiki.attachment.validation.AttachmentValidationException;
-import org.xwiki.bridge.attachment.AttachmentAccessWrapper;
 import org.xwiki.attachment.validation.AttachmentValidator;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 

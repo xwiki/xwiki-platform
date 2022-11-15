@@ -19,7 +19,7 @@
  */
 package org.xwiki.attachment.validation;
 
-import org.xwiki.bridge.attachment.AttachmentAccessWrapper;
+import org.xwiki.attachment.AttachmentAccessWrapper;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 

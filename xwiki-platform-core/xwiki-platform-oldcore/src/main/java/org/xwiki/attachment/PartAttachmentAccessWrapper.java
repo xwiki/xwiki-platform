@@ -24,8 +24,6 @@ import java.io.InputStream;
 
 import javax.servlet.http.Part;
 
-import org.xwiki.bridge.attachment.AttachmentAccessWrapper;
-import org.xwiki.bridge.attachment.AttachmentAccessWrapperException;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -58,12 +56,12 @@ public class PartAttachmentAccessWrapper implements AttachmentAccessWrapper
     }
 
     @Override
-    public InputStream getInputStream() throws AttachmentAccessWrapperException
+    public InputStream getInputStream() throws IOException
     {
         try {
             return this.part.getInputStream();
         } catch (IOException e) {
-            throw new AttachmentAccessWrapperException(
+            throw new IOException(
                 String.format("Failed to read the input stream for part [%s]", this.part), e);
         }
     }

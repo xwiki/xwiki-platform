@@ -26,7 +26,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.attachment.validation.AttachmentValidationStep;
-import org.xwiki.bridge.attachment.AttachmentAccessWrapper;
+import org.xwiki.attachment.AttachmentAccessWrapper;
 import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiContext;

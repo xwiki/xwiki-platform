@@ -17,28 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.bridge.attachment;
+package org.xwiki.attachment;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 import org.xwiki.stability.Unstable;
 
 /**
- * Represent exceptions encountered when interacting with an {@link AttachmentAccessWrapper}.
+ * Provides the metadata required to access an attachment without depending on a specific implementation.
+ * TODO: Should be moved to xwiki-platform-attachment-api as soon at its dependency to oldcore is removed.
  *
  * @version $Id$
  * @since 14.10RC1
  */
 @Unstable
-public class AttachmentAccessWrapperException extends Exception
+public interface AttachmentAccessWrapper
 {
     /**
-     * Constructs a new attachment access wrapper exception with the specified detail message and cause.
-     *
-     * @param message the detail message (which is saved for later retrieval by the {@link #getMessage()} method).
-     * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method).  (A
-     *     {@code null} value is permitted, and indicates that the cause is nonexistent or unknown.)
+     * @return the attachment size in bytes
      */
-    public AttachmentAccessWrapperException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
+    long getSize();
+
+    /**
+     * @return the attachment input steam
+     * @throws IOException in case of error when retrieving the input steam
+     */
+    InputStream getInputStream() throws IOException;
+
+    /**
+     * @return the attachment filename
+     */
+    String getFileName();
 }

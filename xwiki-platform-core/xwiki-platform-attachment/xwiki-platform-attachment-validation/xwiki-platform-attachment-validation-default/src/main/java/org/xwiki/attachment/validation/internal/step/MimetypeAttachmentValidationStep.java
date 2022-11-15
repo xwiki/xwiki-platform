@@ -19,6 +19,7 @@
  */
 package org.xwiki.attachment.validation.internal.step;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -28,11 +29,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.xwiki.attachment.AttachmentAccessWrapper;
 import org.xwiki.attachment.validation.AttachmentValidationConfiguration;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.attachment.validation.AttachmentValidationStep;
-import org.xwiki.bridge.attachment.AttachmentAccessWrapper;
-import org.xwiki.bridge.attachment.AttachmentAccessWrapperException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.tika.internal.TikaUtils;
 
@@ -68,7 +68,7 @@ public class MimetypeAttachmentValidationStep implements AttachmentValidationSte
         InputStream inputStream;
         try {
             inputStream = wrapper.getInputStream();
-        } catch (AttachmentAccessWrapperException e) {
+        } catch (IOException e) {
             throw new AttachmentValidationException(
                 String.format("Failed to read the input stream for [%s]", wrapper), e,
                 SC_INTERNAL_SERVER_ERROR, "attachment.validation.inputStream.error");

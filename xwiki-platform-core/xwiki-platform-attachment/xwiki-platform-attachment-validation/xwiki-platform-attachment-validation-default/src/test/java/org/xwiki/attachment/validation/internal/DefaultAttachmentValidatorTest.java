@@ -25,11 +25,11 @@ import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.xwiki.attachment.AttachmentAccessWrapper;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.attachment.validation.AttachmentValidationStep;
 import org.xwiki.attachment.validation.internal.step.FileSizeAttachmentValidationStep;
 import org.xwiki.attachment.validation.internal.step.MimetypeAttachmentValidationStep;
-import org.xwiki.bridge.attachment.AttachmentAccessWrapper;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;

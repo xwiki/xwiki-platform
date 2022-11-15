@@ -27,10 +27,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.xwiki.attachment.AttachmentAccessWrapper;
 import org.xwiki.attachment.validation.AttachmentValidationConfiguration;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.attachment.validation.AttachmentValidationStep;
-import org.xwiki.bridge.attachment.AttachmentAccessWrapper;
 import org.xwiki.attachment.validation.AttachmentValidator;
 import org.xwiki.attachment.validation.internal.step.FileSizeAttachmentValidationStep;
 import org.xwiki.attachment.validation.internal.step.MimetypeAttachmentValidationStep;

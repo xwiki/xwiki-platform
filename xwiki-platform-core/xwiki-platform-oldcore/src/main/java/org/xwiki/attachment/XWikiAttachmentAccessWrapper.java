@@ -19,10 +19,9 @@
  */
 package org.xwiki.attachment;
 
+import java.io.IOException;
 import java.io.InputStream;
 
-import org.xwiki.bridge.attachment.AttachmentAccessWrapper;
-import org.xwiki.bridge.attachment.AttachmentAccessWrapperException;
 import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
@@ -62,12 +61,12 @@ public class XWikiAttachmentAccessWrapper implements AttachmentAccessWrapper
     }
 
     @Override
-    public InputStream getInputStream() throws AttachmentAccessWrapperException
+    public InputStream getInputStream() throws IOException
     {
         try {
             return this.attachment.getContentInputStream(this.context);
         } catch (XWikiException e) {
-            throw new AttachmentAccessWrapperException(
+            throw new IOException(
                 String.format("Failed to read the input stream for attachment [%s]", this.attachment), e);
         }
     }

@@ -96,7 +96,7 @@ platform.wiki.error.oneParameterNotSpecified=パラメーター''{0}''が指定�
 ### Missing: platform.wiki.error.parameterAcceptsMultipleValues=
 platform.wiki.error.exceptionWithMessage=例外：{0}
 platform.wiki.form.requiredField=必須
-### Missing: platform.wiki.csrf.error=
+platform.wiki.csrf.error=不正なセキュリティートークンです。再試行してください。
 
 ## Users
 ### Missing: platform.wiki.users.userAlreadyMemberOfWiki=
@@ -117,7 +117,7 @@ platform.wiki.users.join.confirmation=このウィキに参加してよろしい
 platform.wiki.users.join.yes=はい
 ### Missing: platform.wiki.users.join.no=No
 platform.wiki.users.join.success=ユーザー{0}{1}{2}がウィキに参加しました{3}{4}{5}。
-### Missing: platform.wiki.users.leave.error.userIsOwner=The user {0}{1}{2} is the owner of the wiki {3}{4}{5}. The owner of a wiki cannot leave it unless the wiki is deleted or the owner is changed.
+platform.wiki.users.leave.error.userIsOwner=ユーザー {0}{1}{2} はウィキ {3}{4}{5} の所有者です。ウィキを削除するか所有者を変更しない限り、所有者はこのウィキから退出できません。
 platform.wiki.users.leave.confirmation=ウィキ {0}{1}{2} を退出してよろしいですか？
 platform.wiki.users.leave.confirmation.yes=はい
 platform.wiki.users.leave.confirmation.no=いいえ
@@ -248,12 +248,12 @@ platform.wiki.sheet.title.settings=ウィキのプロパティー
 platform.wiki.sheet.title.createnewalias=新しいエイリアスを作成
 platform.wiki.sheet.title.viewaliases=エイリアスを閲覧
 platform.wiki.sheet.desc.wikiprettyname=ウィキの表示名。
-### Missing: platform.wiki.sheet.desc.owner=A user who will have all the rights on this wiki.
-### Missing: platform.wiki.sheet.desc.secure=If enabled, all this wiki's generated externals URLs will start with \"https\".
-### Missing: platform.wiki.sheet.desc.port=The port to use for all this wiki's generated externals URLs. If not set it's inherited from the configuration and the main wiki. Only taken into account for domain based URLs.
-### Missing: platform.wiki.sheet.desc.iswikitemplate=Indicate if this wiki can be used as a template when creating a new wiki.
+platform.wiki.sheet.desc.owner=このウィキの全ての権限をもつユーザー。
+### Missing: platform.wiki.sheet.desc.secure=
+### Missing: platform.wiki.sheet.desc.port=
+### Missing: platform.wiki.sheet.desc.iswikitemplate=
 platform.wiki.sheet.desc.server=ウィキにアクセスする際に使用するエイリアス。
-### Missing: platform.wiki.sheet.desc.description=A brief wiki description.
+platform.wiki.sheet.desc.description=ウィキの簡潔な説明。
 platform.wiki.sheet.desc.homepage=ウィキのトップページ。
 platform.wiki.sheet.prop.wikiprettyname=名称
 platform.wiki.sheet.prop.owner=オーナー
@@ -263,9 +263,9 @@ platform.wiki.sheet.prop.description=詳細
 platform.wiki.sheet.prop.server=エイリアス
 platform.wiki.sheet.prop.homepage=トップページ
 platform.wiki.sheet.prop.iswikitemplate=ウィキのテンプレート
-### Missing: platform.wiki.sheet.descriptor=This page defines how to access the \"{0}\" wiki, and some properties about it. For more configurations, please go to the
+### Missing: platform.wiki.sheet.descriptor=
 ### Missing: platform.wiki.sheet.descriptor.admin=administration page of the wiki.
-### Missing: platform.wiki.sheet.aliases=An alias is another name for the wiki. You can add aliases to create different URLs for the wiki.
+### Missing: platform.wiki.sheet.aliases=
 
 ###############################################################################
 ## Deprecated
@@ -278,7 +278,7 @@ platform.wiki.sheet.prop.iswikitemplate=ウィキのテンプレート
 #######################################
 ## until 6.1
 #######################################
-### Missing: platform.wiki.dependencies.applicationmanager.missing=The {0}Application Manager Plugin{1} is not installed. Please install it and try again.
+### Missing: platform.wiki.dependencies.applicationmanager.missing=
 
 #######################################
 ## until 6.4RC1
@@ -289,10 +289,10 @@ admin.wikis.template=ウィキのテンプレート
 #######################################
 ## until 7.0M2
 #######################################
-### Missing: platform.wiki.create.wizard.step.provisioning=The system is provisioning the wiki.
-### Missing: platform.wiki.create.wizard.step.provisioning.wait=Please wait while the system is provisioning the wiki.
-### Missing: platform.wiki.create.wizard.step.provisioning.complete=The wiki is almost ready. Please click on "finalize" to perform the last operation.
-### Missing: platform.wiki.create.wizard.step.provisioning.error=The wiki {0} has been created but some of the pages contained in the template have not been copied. You should probably delete it.
+### Missing: platform.wiki.create.wizard.step.provisioning=
+### Missing: platform.wiki.create.wizard.step.provisioning.wait=
+### Missing: platform.wiki.create.wizard.step.provisioning.complete=
+### Missing: platform.wiki.create.wizard.step.provisioning.error=
 platform.wiki.create.wizard.step.provisioning.finalize=完了
 
 #######################################

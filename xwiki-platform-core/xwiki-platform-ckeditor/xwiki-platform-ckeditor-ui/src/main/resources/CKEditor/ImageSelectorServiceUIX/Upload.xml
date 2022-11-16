@@ -143,9 +143,10 @@
 
     const uploadedFile = $("#fileUploadField").prop('files')[0];
 
-    const eventFileSelected = Event.fire(document, 'xwiki:actions:beforeUpload', {file: uploadedFile});
+    const beforeUploadEvent = $.Event("xwiki:actions:beforeUpload");
+    $(document).trigger(beforeUploadEvent, {file: uploadedFile});
 
-    if (eventFileSelected.returnValue) {
+    if (!beforeUploadEvent.isDefaultPrevented()) {
       imageSelectorElement.addClass('loading');
       imageSelector.createLoader(uploadedFile, {
         onSuccess: function(entityReference) {

@@ -512,7 +512,7 @@ var XWiki = (function(XWiki) {
             file: file
           });
           // Queue the file only if no listener cancelled the event.
-          if (event.returnValue) {
+          if (!event.defaultPrevented) {
             this.fileUploadItems.push(new FileUploadItem(file, this.statusUI.LIST, this.formData, this.options));
             Event.fire(this.input, 'xwiki:html5upload:start');
           }

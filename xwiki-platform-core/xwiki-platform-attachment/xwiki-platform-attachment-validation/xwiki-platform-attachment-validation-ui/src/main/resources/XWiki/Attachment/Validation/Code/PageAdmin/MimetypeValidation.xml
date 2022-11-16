@@ -157,9 +157,8 @@ require(['jquery', 'xwiki-l10n!attachment-validation-mimetype-messages', 'xwiki-
         localizedMessage += '&lt;br/&gt;' + l10n.get('blockerMimetypes', blockerMimetypes)
       }
       new XWiki.widgets.Notification(localizedMessage, "error");
+      event.preventDefault();
     }
-
-    return !hasInvalidMimetype;
   });
 })</code>
     </property>

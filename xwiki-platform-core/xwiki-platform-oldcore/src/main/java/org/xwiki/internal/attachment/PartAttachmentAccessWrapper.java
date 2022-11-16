@@ -17,63 +17,57 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.attachment;
+package org.xwiki.internal.attachment;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.xwiki.stability.Unstable;
+import javax.servlet.http.Part;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiAttachment;
+import org.xwiki.attachment.AttachmentAccessWrapper;
 
 /**
- * Attachment wrapper for {@link XWikiAttachment}. Provides access to various metadata required to access an attachment.
- * For instance, its size, name, and an input steam of its content.
+ * Attachment wrapper for {@link Part}. Provides access to various metadata required to access an attachment. For
+ * instance, its size, name, and an input steam of its content. This wrapper is used to wrap a {@link Part} that is
+ * meant to be saved as an attachment.
  *
  * @version $Id$
  * @since 14.10RC1
  */
-@Unstable
-public class XWikiAttachmentAccessWrapper implements AttachmentAccessWrapper
+public class PartAttachmentAccessWrapper implements AttachmentAccessWrapper
 {
-    private final XWikiAttachment attachment;
-
-    private final XWikiContext context;
+    private final Part part;
 
     /**
      * Default constructor.
      *
-     * @param attachment the attachment to wrap
-     * @param context the content, used when retrieving the attachment input stream
+     * @param part the part to access as an attachment
      */
-    public XWikiAttachmentAccessWrapper(XWikiAttachment attachment, XWikiContext context)
+    public PartAttachmentAccessWrapper(Part part)
     {
-        this.attachment = attachment;
-        this.context = context;
+        this.part = part;
     }
 
     @Override
     public long getSize()
     {
-        return this.attachment.getLongSize();
+        return this.part.getSize();
     }
 
     @Override
     public InputStream getInputStream() throws IOException
     {
         try {
-            return this.attachment.getContentInputStream(this.context);
-        } catch (XWikiException e) {
+            return this.part.getInputStream();
+        } catch (IOException e) {
             throw new IOException(
-                String.format("Failed to read the input stream for attachment [%s]", this.attachment), e);
+                String.format("Failed to read the input stream for part [%s]", this.part), e);
         }
     }
 
     @Override
     public String getFileName()
     {
-        return this.attachment.getFilename();
+        return this.part.getSubmittedFileName();
     }
 }

@@ -155,8 +155,8 @@ require(['jquery', 'xwiki-l10n!attachment-validation-filesize-messages', 'xwiki-
       const localizedMessage = l10n.get('errorMessage', data.file.name, formatBytes(data.file.size),
         formatBytes(maxFileSize));
       new XWiki.widgets.Notification(localizedMessage, "error")
+      event.preventDefault();
     }
-    return !tooLarge;
   });
 })</code>
     </property>

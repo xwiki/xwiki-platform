@@ -32,10 +32,10 @@ import javax.servlet.http.Part;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
-import org.xwiki.attachment.XWikiAttachmentAccessWrapper;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.attachment.validation.AttachmentValidator;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.internal.attachment.XWikiAttachmentAccessWrapper;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.store.TemporaryAttachmentException;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;

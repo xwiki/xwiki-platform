@@ -39,7 +39,7 @@ import org.apache.commons.fileupload.servlet.ServletRequestContext;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.attachment.PartAttachmentAccessWrapper;
+import org.xwiki.internal.attachment.PartAttachmentAccessWrapper;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.attachment.validation.AttachmentValidator;
 

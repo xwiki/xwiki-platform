@@ -36,11 +36,11 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.apache.commons.lang.StringUtils;
-import org.xwiki.attachment.XWikiAttachmentAccessWrapper;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.attachment.validation.AttachmentValidator;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.internal.attachment.XWikiAttachmentAccessWrapper;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;

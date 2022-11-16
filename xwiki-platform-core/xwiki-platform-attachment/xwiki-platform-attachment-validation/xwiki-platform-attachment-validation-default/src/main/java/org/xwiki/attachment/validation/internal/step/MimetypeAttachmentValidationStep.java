@@ -22,7 +22,7 @@ package org.xwiki.attachment.validation.internal.step;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.regex.Pattern;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -41,7 +41,7 @@ import static javax.servlet.http.HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE;
 import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
- * Validate the attachment mimetype.
+ * Validate the attachment mimetype based on configured lists of allowed and blocker mimetypes.
  *
  * @version $Id$
  * @since 14.10RC1
@@ -83,13 +83,22 @@ public class MimetypeAttachmentValidationStep implements AttachmentValidationSte
             || hasBlockerMimetypes && checkMimetype(blockerMimetypes, mimeType))
         {
             throw new AttachmentValidationException(String.format("Invalid mimetype [%s]", mimeType),
-                SC_UNSUPPORTED_MEDIA_TYPE, "attachment.validation.mimetype.rejected", null);
+                SC_UNSUPPORTED_MEDIA_TYPE, "attachment.validation.mimetype.rejected", List.of(allowedMimetypes,
+                blockerMimetypes), null);
         }
     }
 
     private boolean checkMimetype(List<String> mimetypes, String mimeType)
     {
-        return mimetypes.stream().anyMatch(mimeTypePattern -> Pattern.matches(mimeTypePattern, mimeType));
+        return mimetypes.stream().anyMatch(mimeTypePattern -> {
+            if (mimeTypePattern.contains("*")) {
+                return Objects.equals(mimeTypePattern, mimeType);
+            } else {
+                // Use the first * char found as a joker. 
+                String[] parts = mimeTypePattern.split("\\*", 2);
+                return mimeType.startsWith(parts[0]) && mimeType.endsWith(parts[1]);
+            }
+        });
     }
 
     private String detectMimeType(InputStream inputStream, String fileName)

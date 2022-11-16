@@ -45,7 +45,7 @@ menu.livetable.doc.name=ページの名称
 menu.livetable.doc.location=場所
 menu.livetable.doc.space=スペース
 ### Missing: menu.livetable.doc.fullname=Page full name
-### Missing: menu.livetable.doc.author=Last Author
+### Missing: menu.livetable.doc.author=
 menu.livetable.doc.creator=作者
 menu.livetable.doc.date=アップデート日
 menu.livetable.doc.creationDate=作成日
@@ -71,20 +71,20 @@ menu.uix.extensionPoint.value.template.header.after=ページのヘッダーの�
 menu.uix.extensionPoint.value.panels.rightPanels=右のパネルの内側
 menu.uix.extensionPoint.value.panels.leftPanels=左のパネルの内側
 ### Missing: menu.uix.content.label=UI Extension Content
-### Missing: menu.uix.content.hint=If you can see this then it probably means you have JavaScript disabled. You should select the same value as for the menu display location.
-### Missing: menu.uix.scope.label=Menu Visibility Scope
-### Missing: menu.uix.scope.hint=Specifies in which context the menu is visible.
+### Missing: menu.uix.content.hint=
+### Missing: menu.uix.scope.label=
+### Missing: menu.uix.scope.hint=
 
 # Menu Macro
 ### Missing: rendering.macro.menu.name=Menu
-### Missing: rendering.macro.menu.description=Displays a menu created using simple wiki syntax (nested lists and links).
+### Missing: rendering.macro.menu.description=
 ### Missing: rendering.macro.menu.parameter.id.name=Id
-### Missing: rendering.macro.menu.parameter.id.description=Optional menu identifier that will be set on the HTML element that wraps the menu. You can use this identifier in JavaScript code to access the menu DOM or in functional tests to assert the menu items.
+### Missing: rendering.macro.menu.parameter.id.description=
 ### Missing: rendering.macro.menu.parameter.type.name=Type
-### Missing: rendering.macro.menu.parameter.type.description=The optional menu type determines the menu appearance and behaviour. The supported values are: horizontal (default value) and vertical.
-### Missing: rendering.macro.menu.content.description=Define the menu structure using wiki syntax. Each menu item should be a list item and should contain the menu item label or link. You can use nested lists for sub-menu items.
+### Missing: rendering.macro.menu.parameter.type.description=
+### Missing: rendering.macro.menu.content.description=
 
 # Menu WebHome
-### Missing: menu.description=This is a simple application that helps you create navigation menus to be displayed either horizontally as a top bar after the page header or vertically in a side panel.
+### Missing: menu.description=
 </content>
   </xwikidoc>

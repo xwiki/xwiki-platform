@@ -40,16 +40,16 @@
 help.tipsPanel.noTipMessage=ヒントはありません！
 help.tipsPanel.gettingStartedTip=XWikiを初めて使う場合は、[[スタートガイド&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/]]をご確認ください。
 help.tipsPanel.jumpToPageTip=Ctrl+GまたはMeta+Gでウィキのどのページにも飛ぶことができます。\n[[他のショートカット&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/KeyboardShortcuts]]も見てみてください。
-### Missing: help.tipsPanel.improveXWikiTip=Did you know that you can improve XWiki? Take 5 minutes to [[fill this survey&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]] and help this open source project!
-### Missing: help.tipsPanel.breadcrumbsTip=You can click on the arrows next to the breadcrumb elements to quickly navigate to sibling and children pages.
-### Missing: help.tipsPanel.advancedHiddenShortcutTip=Press the x+x+x+a key combo to toggle the [[Advanced mode&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] and x+x+x+h to toggle the display of [[hidden pages&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]].
-### Missing: help.tipsPanel.linkAutocompleteWYSIWYGTip=When editing in WYSIWYG, type ##[## and then start typing letters to get suggestions for creating a link.
-### Missing: help.macroList.title=Available Macros
+help.tipsPanel.improveXWikiTip=あなたもXWikiを改善できることを知っていましたか？5分程度の[アンケートに答えて&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]]プロジェクトを手伝ってください！
+### Missing: help.tipsPanel.breadcrumbsTip=
+### Missing: help.tipsPanel.advancedHiddenShortcutTip=
+### Missing: help.tipsPanel.linkAutocompleteWYSIWYGTip=
+help.macroList.title=利用可能なマクロ
 ### Missing: help.macroList.id=Id
 ### Missing: help.macroList.name=Name
 help.macroList.categories=カテゴリー
 help.macroList.description=詳細
-### Missing: help.macroList.visibility=Visibility
+help.macroList.visibility=見え方
 
 ###############################################################################
 ## Deprecated

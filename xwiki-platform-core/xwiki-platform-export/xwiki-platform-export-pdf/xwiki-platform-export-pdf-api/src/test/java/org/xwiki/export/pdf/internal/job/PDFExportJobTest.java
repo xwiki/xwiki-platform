@@ -134,6 +134,12 @@ class PDFExportJobTest
     }
 
     @Test
+    void getGroupPath()
+    {
+        assertEquals(Arrays.asList("export", "pdf"), this.pdfExportJob.getGroupPath().getPath());
+    }
+
+    @Test
     void runServerSide() throws Exception
     {
         when(this.requiredSkinExtensionsRecorder.stop()).thenReturn("required skin extensions");

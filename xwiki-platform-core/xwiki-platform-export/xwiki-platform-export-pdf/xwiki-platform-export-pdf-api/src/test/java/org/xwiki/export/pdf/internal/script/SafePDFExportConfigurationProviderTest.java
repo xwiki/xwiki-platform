@@ -77,5 +77,8 @@ class SafePDFExportConfigurationProviderTest
 
         when(this.config.getMaxContentSize()).thenReturn(34);
         assertEquals(34, safeConfig.getMaxContentSize());
+
+        when(this.config.getThreadPoolSize()).thenReturn(7);
+        assertEquals(7, safeConfig.getThreadPoolSize());
     }
 }

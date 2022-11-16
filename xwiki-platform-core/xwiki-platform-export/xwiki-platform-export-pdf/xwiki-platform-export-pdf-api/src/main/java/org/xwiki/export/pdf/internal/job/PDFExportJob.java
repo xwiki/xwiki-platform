@@ -22,6 +22,7 @@ package org.xwiki.export.pdf.internal.job;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -36,6 +37,8 @@ import org.xwiki.export.pdf.job.PDFExportJobRequest;
 import org.xwiki.export.pdf.job.PDFExportJobStatus;
 import org.xwiki.export.pdf.job.PDFExportJobStatus.DocumentRenderingResult;
 import org.xwiki.job.AbstractJob;
+import org.xwiki.job.GroupedJob;
+import org.xwiki.job.JobGroupPath;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.resource.temporary.TemporaryResourceStore;
@@ -51,7 +54,7 @@ import org.xwiki.security.authorization.Right;
  */
 @Component
 @Named(PDFExportJob.JOB_TYPE)
-public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobStatus>
+public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobStatus> implements GroupedJob
 {
     /**
      * The PDF export job type.
@@ -90,6 +93,12 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
     public String getType()
     {
         return JOB_TYPE;
+    }
+
+    @Override
+    public JobGroupPath getGroupPath()
+    {
+        return new JobGroupPath(Arrays.asList("export", "pdf"));
     }
 
     @Override

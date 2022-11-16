@@ -124,4 +124,14 @@ public interface PDFExportConfiguration
     {
         return 100;
     }
+
+    /**
+     * @return the maximum number of PDF exports that can be executed in parallel (each PDF export needs a separate
+     *         thread); defaults to {@code 3}
+     * @since 14.10RC1
+     */
+    default int getThreadPoolSize()
+    {
+        return 3;
+    }
 }

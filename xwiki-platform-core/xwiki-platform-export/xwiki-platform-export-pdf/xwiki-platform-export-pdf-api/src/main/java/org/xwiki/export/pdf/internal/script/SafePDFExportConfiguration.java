@@ -116,4 +116,10 @@ public class SafePDFExportConfiguration extends AbstractSafeObject<PDFExportConf
     {
         return getWrapped().getMaxContentSize();
     }
+
+    @Override
+    public int getThreadPoolSize()
+    {
+        return getWrapped().getThreadPoolSize();
+    }
 }

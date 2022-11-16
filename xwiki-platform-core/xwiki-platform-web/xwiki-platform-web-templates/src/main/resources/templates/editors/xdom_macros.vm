@@ -33,11 +33,7 @@
   #if ("$!parameters.disabled" == 'true')
     #set ($attributes.disabled = 'disabled')
   #end
-  #if ("$!parameters.restricted" == 'true')
-    #set ($attributes.data-restricted = 'true')
-  #else
-    #set ($attributes.data-restricted = 'false')
-  #end
+  #set ($attributes.data-restricted = "$!parameters.restricted" == 'true')
 #end
 #macro (getTextArea)
   #set ($syntaxId = $edit.data.syntax.toIdString())

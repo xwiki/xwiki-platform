@@ -44,15 +44,15 @@ panels.category=カテゴリー
 panels._actions=アクション
 ### Missing: panels.emptyvalue=
 panels.children.title=子ページ
-### Missing: panels.siblings.title=Sibling Pages
+### Missing: panels.siblings.title=
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart
 
 ## Deprecated since 12.6.3, 12.9RC1
-### Missing: panels.documentInformation.configureSyntaxes=Configure more syntaxes
-### Missing: panels.documentInformation.confirmChangeSyntaxWysiwyg=Do you want to also convert the document's content and objects to the selected syntax? Choosing 'cancel' will reset the syntax to the previous one and do nothing. Note that if you choose 'ok' you will loose modifications and this will save the document automatically, you can cancel this modification by going to the document history interface and revert the last version.
-### Missing: panels.documentInformation.confirmChangeSyntax=Do you want to also convert the document's content and objects to the selected syntax? Choosing 'cancel' will only change the syntax identifier, without modifying the document's content. Note that if you choose 'ok' this will save the document automatically, you can cancel this modification by going to the document history interface and revert the last version.
+panels.documentInformation.configureSyntaxes=他のシンタックスを設定
+panels.documentInformation.confirmChangeSyntaxWysiwyg=ドキュメントの内容とオブジェクトを選択したシンタックスに変換しますか？'キャンセル'を選択するとシンタックスを復元し、何も行いません。'はい'を選択すると修正を消去し、ドキュメントを自動的に保存します。ドキュメントの履歴画面に戻り、最新のバージョンを復旧すると、この修正をキャンセルできます。
+panels.documentInformation.confirmChangeSyntax=ドキュメントの内容とオブジェクトを選択したシンタックスに変換しますか？'キャンセル'を選択するとシンタックスだけを変更し、ドキュメントの内容は修正しません。'はい'を選択するとドキュメントを自動的に保存します。ドキュメントの履歴画面に戻り、最新のバージョンを復旧すると、この修正をキャンセルできます。
 panels.documentInformation.failedSyntaxConversion=選択したシンタックスを変換できませんでした。このシンタックスを使用したい場合は、再度選択して、変換を行わないでください。
 
 ## Used to indicate where deprecated keys end

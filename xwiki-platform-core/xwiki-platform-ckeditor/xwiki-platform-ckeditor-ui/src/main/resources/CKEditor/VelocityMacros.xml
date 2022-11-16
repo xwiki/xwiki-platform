@@ -116,11 +116,7 @@
     ## editor is used.
     #set ($macro.previousDisplayMode = 'edit')
   #end
-  #if ("$!source.restricted" == 'true')
-    #set ($restricted = true)
-  #else
-    #set ($restricted = false)
-  #end
+  #set ($restricted = "$!source.restricted" == 'true')
   #if ($source.html)
     #set ($html = $services.wysiwyg.parseAndRender($source.html, $source.syntax, $source.documentReference, $restricted))
     #if ("$!html" == '' &amp;&amp; $html != '')

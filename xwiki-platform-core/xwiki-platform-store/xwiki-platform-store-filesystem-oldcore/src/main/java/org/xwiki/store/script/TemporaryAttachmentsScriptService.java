@@ -85,6 +85,9 @@ public class TemporaryAttachmentsScriptService implements ScriptService
      * @param documentReference the target document reference the attachment should be later attached to
      * @param fieldName the name of the field of the uploaded data
      * @return a temporary {@link Attachment} not yet persisted attachment, or {@code null} in case of error
+     * @throws TemporaryAttachmentException in case of problem when reading the attachment
+     * @throws AttachmentValidationException in case of error when validating the attachment (e.g., the maximum
+     *     filesize is reached)
      */
     public Attachment uploadTemporaryAttachment(DocumentReference documentReference, String fieldName)
         throws TemporaryAttachmentException, AttachmentValidationException
@@ -101,6 +104,9 @@ public class TemporaryAttachmentsScriptService implements ScriptService
      * @param filename an optional filename used instead of using the filename of the file passing in
      *     {@code fieldName}, ignored when {@code null}
      * @return a temporary {@link Attachment} not yet persisted attachment, or {@code null} in case of error
+     * @throws TemporaryAttachmentException in case of problem when reading the attachment
+     * @throws AttachmentValidationException in case of error when validating the attachment (e.g., the maximum
+     *     filesize is reached)
      * @since 14.9RC1
      */
     @Unstable

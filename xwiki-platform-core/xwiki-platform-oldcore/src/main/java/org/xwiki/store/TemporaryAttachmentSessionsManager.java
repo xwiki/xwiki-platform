@@ -54,8 +54,9 @@ public interface TemporaryAttachmentSessionsManager
      * @param documentReference the reference of the document that the attachment should be attached to.
      * @param part the actual data that is uploaded.
      * @return an attachment that is not saved yet but cached and contains the data of the given part.
-     * @throws TemporaryAttachmentException if the part size exceeds the maximum upload size, or in case of problem
-     *                                      when reading the part.
+     * @throws TemporaryAttachmentException in case of problem when reading the part
+     * @throws AttachmentValidationException in case of error when validating the attachment (e.g., the maximum
+     *     filesize is reached)
      */
     XWikiAttachment uploadAttachment(DocumentReference documentReference, Part part)
         throws TemporaryAttachmentException, AttachmentValidationException;
@@ -69,8 +70,9 @@ public interface TemporaryAttachmentSessionsManager
      * @param filename an optional filename used instead of using {@link Part#getSubmittedFileName()}, ignored when
      *     {@code null} or blank
      * @return an attachment that is not saved yet but cached and contains the data of the given part
-     * @throws TemporaryAttachmentException if the part size exceeds the maximum upload size, or in case of problem
-     *     when reading the part
+     * @throws TemporaryAttachmentException in case of problem when reading the part
+     * @throws AttachmentValidationException in case of error when validating the attachment (e.g., the maximum
+     *     filesize is reached)
      * @since 14.9RC1
      */
     @Unstable

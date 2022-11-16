@@ -179,6 +179,8 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
      *
      * @param context Context of the request.
      * @throws XWikiException An XWikiException is thrown if the request could not be parsed.
+     * @throws AttachmentValidationException in case of error when validating the attachment (e.g., the maximum
+     *     filesize is reached)
      * @see FileUploadPluginApi#loadFileList()
      */
     public void loadFileList(XWikiContext context) throws XWikiException, AttachmentValidationException
@@ -194,10 +196,13 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
      * Loads the list of uploaded files in the context if there are any uploaded files.
      *
      * @param uploadMaxSize Maximum size of the uploaded files.
-     * @param uploadSizeThreshold the threshold over which the file data should be stored on disk, and not in memory.
+     * @param uploadSizeThreshold the threshold over which the file data should be stored on disk, and not in
+     *     memory.
      * @param tempdir Temporary directory to store the uploaded files that are not kept in memory.
      * @param context Context of the request.
-     * @throws XWikiException if the request could not be parsed, or the maximum file size was reached.
+     * @throws XWikiException if the request could not be parsed, or the maximum file size was reached
+     * @throws AttachmentValidationException in case of error when validating the attachment (e.g., the maximum
+     *     filesize is reached)
      * @see FileUploadPluginApi#loadFileList(long, int, String)
      */
     public void loadFileList(long uploadMaxSize, int uploadSizeThreshold, String tempdir, XWikiContext context)

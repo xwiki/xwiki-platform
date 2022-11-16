@@ -24,7 +24,7 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
- * One attachment validation step. {@link AttachmentValidator} calls them on ofter the other and fails whenever a step
+ * One attachment validation step. {@link AttachmentValidator} calls them one after the other and fails whenever a step
  * fails.
  *
  * @version $Id$

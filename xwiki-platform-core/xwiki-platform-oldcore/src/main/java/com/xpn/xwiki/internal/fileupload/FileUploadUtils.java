@@ -75,7 +75,9 @@ public final class FileUploadUtils
      * @param request the request to parse
      * @param attachmentValidator the validator used to validate if the request parts are valid attachments
      * @return the parts found in the request as a collection of {@link FileItem}
-     * @throws XWikiException if the request could not be parsed, or the maximum file size was reached
+     * @throws XWikiException if the request could not be parsed
+     * @throws AttachmentValidationException in case of error when validating the attachment (e.g., the maximum
+     *     filesize is reached)
      * @see FileUploadPluginApi#loadFileList(long, int, String)
      */
     public static Collection<FileItem> getFileItems(long uploadMaxSize, int uploadSizeThreshold, String tempdir,

@@ -34,7 +34,7 @@
         // rather than the default wiki syntax.
         sourceSyntax: editor.element.getAttribute('data-sourceDocumentSyntax'),
         // Indicate if the content is supposed to be executed in a restricted context
-        wysiwygRestricted: editor.element.getAttribute('data-restricted') === 'true' ? 'true' : 'false',
+        wysiwygRestricted: editor.element.getAttribute('data-restricted') === 'true',
         // Don't wrap the returned HTML with the BODY tag and don't include the HEAD tag when the editor is used
         // in-line (because the returned HTML will be inserted directly into the main page).
         stripHTMLEnvelope: editor.elementMode === CKEDITOR.ELEMENT_MODE_INLINE

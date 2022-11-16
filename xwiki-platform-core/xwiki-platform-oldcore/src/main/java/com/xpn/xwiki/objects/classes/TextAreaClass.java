@@ -360,7 +360,7 @@ public class TextAreaClass extends StringClass
     @Unstable
     public boolean isRestricted()
     {
-        return (getIntValue("restricted", 0) == 1);
+        return getIntValue("restricted", 0) == 1;
     }
 
     /**

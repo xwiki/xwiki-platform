@@ -94,14 +94,14 @@ annotations.config.activate.explanation=以下の2つの設定より、どの場
 annotations.config.type.explanation=注釈にプロパティーを追加する場合は、このクラスに追加してください。
 admin.annotations=注釈
 admin.annotations.description=ページの注釈を設定
-### Missing: AnnotationCode.AnnotationConfig_activated=Annotations are activated
-### Missing: AnnotationCode.AnnotationConfig_activated.hint=Decide if annotations are active on the wiki
-### Missing: AnnotationCode.AnnotationConfig_exceptionSpaces=Except for the following locations
-### Missing: AnnotationCode.AnnotationConfig_exceptionSpaces.hint=Deactivate annotations for the following subset of locations:
-### Missing: AnnotationCode.AnnotationConfig_displayed=Display annotations by default
-### Missing: AnnotationCode.AnnotationConfig_displayed.hint=Decide if annotations are displayed by default or only when "Show annotations" is checked on each page
-### Missing: AnnotationCode.AnnotationConfig_displayHighlight=Highlight annotations by default
-### Missing: AnnotationCode.AnnotationConfig_displayHighlight.hint=Decide if highlighting of an annotation should be displayed always or only when hovering over an annotation or a structure of annotations
-### Missing: AnnotationCode.AnnotationConfig_annotationClass=XWiki class defining annotations structure
+AnnotationCode.AnnotationConfig_activated=注釈の有効化
+AnnotationCode.AnnotationConfig_activated.hint=ウィキで注釈を有効にするか決定してください
+AnnotationCode.AnnotationConfig_exceptionSpaces=注釈を有効化しない場所
+AnnotationCode.AnnotationConfig_exceptionSpaces.hint=以下の場所では注釈を無効にする：
+AnnotationCode.AnnotationConfig_displayed=注釈を既定で表示
+AnnotationCode.AnnotationConfig_displayed.hint=注釈を既定で表示するか各ページで「注釈を表示」が有効化されている場合にのみ表示するかを決定してください
+### Missing: AnnotationCode.AnnotationConfig_displayHighlight=
+### Missing: AnnotationCode.AnnotationConfig_displayHighlight.hint=
+AnnotationCode.AnnotationConfig_annotationClass=注釈の構造を規定するXWikiのクラス
 </content>
   </xwikidoc>

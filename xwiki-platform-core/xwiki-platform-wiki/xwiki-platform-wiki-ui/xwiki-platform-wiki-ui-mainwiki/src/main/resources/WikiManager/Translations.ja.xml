@@ -127,14 +127,14 @@ platform.wiki.users.leave.title=ウィキ"{0}"から退出
 platform.wiki.users.leave.empty=ウィキから退出
 platform.wiki.users.delete.title=ウィキ"{0}"を削除
 platform.wiki.users.delete.empty=ウィキを削除
-### Missing: platform.wiki.users.invitation.reply.hint=A reply message to send, viewable by the wiki admin, in which you can motivate your decision.
-### Missing: platform.wiki.users.join.request.hint=To join the wiki {0}{1}{2}, you must first issue a join request. After doing so, a wiki admin will review and consider your request.
-### Missing: platform.wiki.users.join.request.message.hint=A message to send, viewable by the wiki admin, in which you can motivate this join request.
-### Missing: platform.wiki.users.invitation.title=You have been invited to join the wiki {0}{1}{2}.
-### Missing: platform.wiki.users.invitation.message.label=Invitation message
+### Missing: platform.wiki.users.invitation.reply.hint=
+### Missing: platform.wiki.users.join.request.hint=
+### Missing: platform.wiki.users.join.request.message.hint=
+### Missing: platform.wiki.users.invitation.title=
+platform.wiki.users.invitation.message.label=招待メッセージ
 platform.wiki.users.invitation.reply.title=返信
-### Missing: platform.wiki.users.invitation.accept.label=Accept
-### Missing: platform.wiki.users.invitation.reject.label=Reject
+### Missing: platform.wiki.users.invitation.accept.label=
+### Missing: platform.wiki.users.invitation.reject.label=
 platform.wiki.users.invitation.postpone.label=後で
 platform.wiki.users.join.request.message.label=メッセージ
 platform.wiki.users.join.request.send.label=リクエストを送信
@@ -142,27 +142,27 @@ platform.wiki.users.join.request.cancel.label=戻る
 
 ## User profile
 platform.wiki.users.profile.joinedwikis.label=参加済のウィキ
-### Missing: platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=You are not a member of any wiki yet.
-### Missing: platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=The user is not a member of any wiki yet.
-### Missing: platform.wiki.users.profile.activity.title=Activity of wiki {0}
-### Missing: platform.wiki.users.profile.activity.hint=Generates an activity stream for the given wiki(s).
-### Missing: platform.wiki.users.profile.activity.multipletitle=Activity of wikis {0}
-### Missing: platform.wiki.users.profile.activity.show=show activity
+platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=あなたはまだどのウィキのメンバーでもありません。
+platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=ユーザーはどのウィキのメンバーでもありません。
+platform.wiki.users.profile.activity.title=ウィキ {0} のアクティビティー
+### Missing: platform.wiki.users.profile.activity.hint=
+### Missing: platform.wiki.users.profile.activity.multipletitle=
+platform.wiki.users.profile.activity.show=アクティビティーを表示
 
 ## Wiki Deletion
-### Missing: platform.wiki.delete.confirmation=Are you sure you want to delete the wiki {0}{1}{2}? This action cannot be reverted!
-### Missing: platform.wiki.delete.confirmation.retypeWikiId=Please repeat the identifier of the wiki here:
-### Missing: platform.wiki.delete.error.wikiIdDoesNotMatch=Type in the exact Wiki Identifier of the wiki that should be deleted.
+### Missing: platform.wiki.delete.confirmation=
+### Missing: platform.wiki.delete.confirmation.retypeWikiId=
+### Missing: platform.wiki.delete.error.wikiIdDoesNotMatch=
 platform.wiki.delete.success=ユーザー {0}{1}{2} はウィキ''{3}''を削除しました。
 
 ## Wiki macro
-### Missing: platform.wiki.macro.noWikis=There are currently no wikis created (except the main one).
+### Missing: platform.wiki.macro.noWikis=
 rendering.macro.wikis.name=ウィキ
-### Missing: rendering.macro.wikis.description=List all wikis
+### Missing: rendering.macro.wikis.description=
 
 ## LegacyWorkspaces macro
-### Missing: rendering.macro.workspaces.name=Workspaces (Legacy)
-### Missing: rendering.macro.workspaces.description=Deprecated macro that should not be used here for compatibility reasons. Please use the "wikis" macro instead.
+### Missing: rendering.macro.workspaces.name=
+### Missing: rendering.macro.workspaces.description=
 
 ## Browse
 platform.wiki.browse=ウィキを閲覧
@@ -182,68 +182,68 @@ platform.wiki.browse._actions.delete=削除
 
 ## Classes
 WikiManager.WikiUserClass_membershipType_open=誰でも参加可能
-### Missing: WikiManager.WikiUserClass_membershipType_request=Any global user can request to join but an admin must accept
-### Missing: WikiManager.WikiUserClass_membershipType_invite=Only an admin can send invitations to join this wiki
+### Missing: WikiManager.WikiUserClass_membershipType_request=
+### Missing: WikiManager.WikiUserClass_membershipType_invite=
 WikiManager.WikiUserClass_userScope_local_only=ローカルユーザーのみ利用可能
-### Missing: WikiManager.WikiUserClass_userScope_global_only=Only global users are available in the wiki
-### Missing: WikiManager.WikiUserClass_userScope_local_and_global=Both global and local users are available in the wiki
-### Missing: platform.wiki.prop.wikiname=Wiki Identifier
+### Missing: WikiManager.WikiUserClass_userScope_global_only=
+### Missing: WikiManager.WikiUserClass_userScope_local_and_global=
+platform.wiki.prop.wikiname=ウィキの識別子
 platform.wiki.prop.wikiprettyname=名称
 platform.wiki.prop.wikialias=エイリアス
 platform.wiki.prop.description=詳細
-### Missing: platform.wiki.prop.owner=Owner
+platform.wiki.prop.owner=所有者
 platform.wiki.prop.membershipType.label=メンバーシップの種類
 platform.wiki.prop.membershipType.hint=ユーザーがこのウィキに参加する方法。
 
 ## Wizard
-### Missing: platform.wiki.create.wizard.desc.wikiname=The unique identifier of the new wiki.
+### Missing: platform.wiki.create.wizard.desc.wikiname=
 platform.wiki.create.wizard.desc.wikiprettyname=このウィキの表示名。
-### Missing: platform.wiki.create.wizard.desc.wikialias=The domain name that will point to the wiki.
-### Missing: platform.wiki.create.wizard.desc.newTemplateHint=Template to use for this new wiki (all pages will be cloned).
-### Missing: platform.wiki.create.wizard.desc.description=A brief description of the wiki and its purpose.
-### Missing: platform.wiki.create.wizard.desc.owner=A user who will always have all the rights on this wiki, independent of the rights configured in the Administration.
+### Missing: platform.wiki.create.wizard.desc.wikialias=
+platform.wiki.create.wizard.desc.newTemplateHint=この新しいウィキに使用するテンプレート（全てのページがコピーされます）。
+### Missing: platform.wiki.create.wizard.desc.description=
+### Missing: platform.wiki.create.wizard.desc.owner=
 platform.wiki.create.wizard.desc.members=ウィキに参加できるユーザー。
-### Missing: platform.wiki.create.wizard.step.nameAndType=Step 1 — Choose a name
+platform.wiki.create.wizard.step.nameAndType=ステップ1 — 名前を選択しましょう
 ### Missing: platform.wiki.create.wizard.step.nameAndType.shortname=Name
-### Missing: platform.wiki.create.wizard.step.users=Step 2 — Choose members
+platform.wiki.create.wizard.step.users=ステップ2 — メンバーを選択しましょう
 platform.wiki.create.wizard.step.users.shortname=ユーザー
-### Missing: platform.wiki.create.wizard.step.cleaningUp=Cleaning Up
-### Missing: platform.wiki.create.wizard.step.provisioning.cleanUp=Clean &amp; delete this wiki
-### Missing: platform.wiki.create.wizard.step.cleaningup.success=The wiki {0} has been successfuly deleted.
-### Missing: platform.wiki.create.wizard.step.cleaningup.error=Error, the wiki {0} has not been deleted.
-### Missing: platform.wiki.create.wizard.step.cleaningUp.confirmmessage=You are about to delete wiki {0}. Please confirm.
-### Missing: platform.wiki.create.wizard.step.cleaningUp.confirm=Confirm
-### Missing: platform.wiki.create.wizard.setAsTemplate.label=This wiki will be a template
+### Missing: platform.wiki.create.wizard.step.cleaningUp=
+### Missing: platform.wiki.create.wizard.step.provisioning.cleanUp=
+### Missing: platform.wiki.create.wizard.step.cleaningup.success=
+platform.wiki.create.wizard.step.cleaningup.error=エラー。ウィキ {0} は削除されていません。
+platform.wiki.create.wizard.step.cleaningUp.confirmmessage=ウィキ {0} を削除します。承認してください。
+platform.wiki.create.wizard.step.cleaningUp.confirm=承認
+### Missing: platform.wiki.create.wizard.setAsTemplate.label=
 ### Missing: platform.wiki.create.wizard.template.noTemplate=No template (default)
-### Missing: platform.wiki.create.wizard.userScope.label=User Scope
-### Missing: platform.wiki.create.wizard.userScope.hint=Select what kind of users can access the wiki
+### Missing: platform.wiki.create.wizard.userScope.label=
+### Missing: platform.wiki.create.wizard.userScope.hint=
 platform.wiki.create.wizard.template.label=テンプレート
-### Missing: platform.wiki.create.wizard.flavortemplate.label=Flavor / Template
-### Missing: platform.wiki.create.wizard.flavortemplate.hint=Flavor or Template to use as the initial content of the new wiki
-### Missing: platform.wiki.create.wizard.flavortemplate.flavorTab=Flavor
+platform.wiki.create.wizard.flavortemplate.label=フレーバー / テンプレート
+### Missing: platform.wiki.create.wizard.flavortemplate.hint=
+platform.wiki.create.wizard.flavortemplate.flavorTab=フレーバー
 platform.wiki.create.wizard.flavortemplate.templateTab=テンプレート
-### Missing: platform.wiki.create.wizard.step.dw=After clicking on the "Create" button, the wiki will be created and the Distribution Wizard will be started in order to help you initialize your wiki. If you skip the wizard, your wiki will be empty.
+### Missing: platform.wiki.create.wizard.step.dw=
 platform.wiki.create.wizard.step.previous=前のステップ
 platform.wiki.create.wizard.step.next=次のステップ
 platform.wiki.create.wizard.step.create=作成
 platform.wiki.create.wizard.step.creation=ウィキの作成
 platform.wiki.create.wizard.step.creation.wait=ウィキを作成するまでお待ちください。
 platform.wiki.create.wizard.step.creation.complete=ウィキ {0} が作成されました。アクセスできます。
-### Missing: platform.wiki.create.wizard.step.creation.errorlog=However, error(s) have been generated during that process and you might want to review them.
-### Missing: platform.wiki.create.wizard.step.creation.error=The creation of the wiki {0} failed. It''s recommended to delete it.
+### Missing: platform.wiki.create.wizard.step.creation.errorlog=
+platform.wiki.create.wizard.step.creation.error=ウィキ {0} を作成できませんでした。削除を推奨します。
 platform.wiki.create.wizard.step.creation.go=ウィキに行く
 
 ## Admin
 admin.wikis.description=ウィキの管理。
 admin.wikis.templates=ウィキのテンプレート
 admin.wikis.templates.description=ウィキのテンプレートを管理
-### Missing: admin.wikis.templates.hint=A template is a wiki that will be considered as a model to create new wikis. When a user selects a template to create a new wiki, all the content of the template is copied in the new wiki.
+### Missing: admin.wikis.templates.hint=
 ### Missing: admin.wikis.rights=Creation Right
 
 ## XWikiServer Sheet
-### Missing: platform.wiki.sheet.title=Descriptor of the wiki \"{0}\"
-### Missing: platform.wiki.sheet.erroraliasalreadynotexists=Wiki alias \"{0}\" already exists.
-### Missing: platform.wiki.sheet.erroraliasdoesnotexists=Wiki alias \"{0}\" does not exists.
+### Missing: platform.wiki.sheet.title=
+platform.wiki.sheet.erroraliasalreadynotexists=ウィキのエイリアス"{0}"は既に存在します。
+platform.wiki.sheet.erroraliasdoesnotexists=ウィキのエイリアス"{0}"は存在しません。
 platform.wiki.sheet.title.settings=ウィキのプロパティー
 platform.wiki.sheet.title.createnewalias=新しいエイリアスを作成
 platform.wiki.sheet.title.viewaliases=エイリアスを閲覧

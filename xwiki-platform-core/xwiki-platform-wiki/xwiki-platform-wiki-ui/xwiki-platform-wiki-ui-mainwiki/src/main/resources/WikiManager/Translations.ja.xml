@@ -76,47 +76,47 @@ platform.wiki.menu.deletewiki=ウィキを削除
 platform.wiki.menu.userwikis=ウィキ
 
 ## Dependencies
-### Missing: platform.wiki.dependencies.wiki.missing=The "Wiki" java component is not installed. This page will not work properly. Make sure that the "Wiki API" and "Wiki Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
-### Missing: platform.wiki.dependencies.template.missing=The "Wiki Template" java component is not installed. This page will not work properly. Make sure that the "Wiki Template API" and "Wiki Template Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-template-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-template-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
-### Missing: platform.wiki.dependencies.user.missing=The "Wiki User" java component is not installed. This page will not work properly. Make sure that the "Wiki User API" and "Wiki User Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
+### Missing: platform.wiki.dependencies.wiki.missing=
+### Missing: platform.wiki.dependencies.template.missing=
+### Missing: platform.wiki.dependencies.user.missing=
 
 ## Create
 platform.wiki.create.button=ウィキを作成
 platform.wiki.create.title=新しいウィキを作成
 platform.wiki.create.members=メンバー
-### Missing: platform.wiki.create.prettyname.empty=Pretty name must not be empty
+platform.wiki.create.prettyname.empty=名称を指定してください
 platform.wiki.create.error=ウィキ"{0}"を作成できませんでした: {1}。
 platform.wiki.create.error.wikiname.databasealreadyexists=このIDをもつデータベースが既に存在しています
 platform.wiki.create.error.wikiname.wikialreadyexists=このIDは既に使用されています
-### Missing: platform.wiki.create.error.wikiname.empty=Identifier can't be empty
+platform.wiki.create.error.wikiname.empty=IDを指定してください
 
 ## Common errors and messages
 platform.wiki.error.wikidoesnotexist=ウィキ [{0}] は存在しません
 platform.wiki.error.oneParameterNotSpecified=パラメーター''{0}''が指定されていません。
-### Missing: platform.wiki.error.parameterAcceptsMultipleValues=Multiple values accepted.
-### Missing: platform.wiki.error.exceptionWithMessage=Exception: {0}
-### Missing: platform.wiki.form.requiredField=Required
-### Missing: platform.wiki.csrf.error=Invalid security token. Please retry your operation.
+### Missing: platform.wiki.error.parameterAcceptsMultipleValues=
+platform.wiki.error.exceptionWithMessage=例外：{0}
+platform.wiki.form.requiredField=必須
+### Missing: platform.wiki.csrf.error=
 
 ## Users
-### Missing: platform.wiki.users.userAlreadyMemberOfWiki=The user {0}{1}{2} is already a member of the wiki {3}{4}{5}.
-### Missing: platform.wiki.users.userNotMemberOfWiki=The user {0}{1}{2} is not a member of the wiki {3}{4}{5}.
-### Missing: platform.wiki.users.logInToContinue=In order to continue, you need to {0}log in{1} first.
-### Missing: platform.wiki.users.invitation.userAcceptedNotification=The user ''{0}'' ({1}) has accepted the invitation to join the wiki ''{2}'' ({3}).
-### Missing: platform.wiki.users.invitation.userAcceptedSuccess=The user {0}{1}{2} successfully accepted the invitation and joined the wiki {3}{4}{5}.
-### Missing: platform.wiki.users.invitation.userRejectedSuccess=The user {0}{1}{2} successfully rejected the invitation to join the wiki {3}{4}{5}.
-### Missing: platform.wiki.users.join.error.needInvitation=This wiki is invite only. To do so, you need to receive an invitation from one of its admins.
-### Missing: platform.wiki.users.join.request.pendingRequestExists=The user {0}{1}{2} already has a pending request to join the wiki {3}{4}{5}. Please wait for a wiki admin to review it.
+### Missing: platform.wiki.users.userAlreadyMemberOfWiki=
+### Missing: platform.wiki.users.userNotMemberOfWiki=
+platform.wiki.users.logInToContinue=続行するには最初に{0}ログイン{1}してください。
+### Missing: platform.wiki.users.invitation.userAcceptedNotification=
+### Missing: platform.wiki.users.invitation.userAcceptedSuccess=
+### Missing: platform.wiki.users.invitation.userRejectedSuccess=
+platform.wiki.users.join.error.needInvitation=このウィキは招待専用です。管理者から招待を受け取る必要があります。
+### Missing: platform.wiki.users.join.request.pendingRequestExists=
 platform.wiki.users.join.request.cancelConfirmation=ウィキ {0}{1}{2} の参加リクエストをキャンセルしてよろしいですか？
 platform.wiki.users.join.request.cancelYes=はい
 platform.wiki.users.join.request.cancelNo=いいえ
 platform.wiki.users.join.request.cancelSuccess=ユーザー {0}{1}{2} はウィキ {3}{4}{5} の参加リクエストをキャンセルしました。
-### Missing: platform.wiki.users.join.request.saveNotification=The user ''{0}'' ({1}) has requested to join the wiki ''{2}'' ({3}).
-### Missing: platform.wiki.users.join.request.success=The user {0}{1}{2} successfully sent the request to join wiki {3}{4}{5}.
-### Missing: platform.wiki.users.join.confirmation=Are you sure you want to join the wiki {0}{1}{2}?
-### Missing: platform.wiki.users.join.yes=Yes
+### Missing: platform.wiki.users.join.request.saveNotification=
+### Missing: platform.wiki.users.join.request.success=
+platform.wiki.users.join.confirmation=このウィキに参加してよろしいですか{0}{1}{2}？
+platform.wiki.users.join.yes=はい
 ### Missing: platform.wiki.users.join.no=No
-### Missing: platform.wiki.users.join.success=The user {0}{1}{2} successfully joined wiki {3}{4}{5}.
+platform.wiki.users.join.success=ユーザー{0}{1}{2}がウィキに参加しました{3}{4}{5}。
 ### Missing: platform.wiki.users.leave.error.userIsOwner=The user {0}{1}{2} is the owner of the wiki {3}{4}{5}. The owner of a wiki cannot leave it unless the wiki is deleted or the owner is changed.
 platform.wiki.users.leave.confirmation=ウィキ {0}{1}{2} を退出してよろしいですか？
 platform.wiki.users.leave.confirmation.yes=はい

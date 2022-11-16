@@ -42,7 +42,7 @@ platform.appwithinminutes.description=XWikiの強力な構造化データ管理�
 platform.appwithinminutes.createAppButtonLabel=アプリケーションを作成
 platform.appwithinminutes.appsLiveTableHeading=アプリケーション
 platform.appwithinminutes.appsLiveTable.doc.title=アプリケーション
-### Missing: platform.appwithinminutes.appsLiveTable.doc.author=Last author
+### Missing: platform.appwithinminutes.appsLiveTable.doc.author=
 platform.appwithinminutes.appsLiveTable.doc.date=アップデートの日付
 platform.appwithinminutes.appsLiveTable._actions=アクション
 platform.appwithinminutes.grantSpaceAdminRightsSaveComment=スペースの管理権限を与える。
@@ -51,37 +51,37 @@ platform.appwithinminutes.grantSpaceAdminRightsSaveComment=スペースの管理
 platform.appwithinminutes.appPanelCreateEntry=あなたのアプリケーションを作りましょう！
 
 ### Wizard step
-### Missing: platform.appwithinminutes.wizardStepHeading=Step {0} \u2014 {1}
+platform.appwithinminutes.wizardStepHeading=ステップ{0} — {1}
 appWithinMinutes.wizardStep.name.name=名称
-### Missing: appWithinMinutes.wizardStep.name.title=Name your application
-appWithinMinutes.wizardStep.name.description=アプリケーションの名称を選択してください
+appWithinMinutes.wizardStep.name.title=アプリケーションに名称を付けましょう
+appWithinMinutes.wizardStep.name.description=アプリケーションの名称を選択しましょう
 appWithinMinutes.wizardStep.structure.name=構造
 appWithinMinutes.wizardStep.structure.title=データを構造化
-### Missing: appWithinMinutes.wizardStep.structure.description=Describe the application data
+appWithinMinutes.wizardStep.structure.description=アプリケーションのデータを記述しましょう
 appWithinMinutes.wizardStep.entries.name=エントリー
-### Missing: appWithinMinutes.wizardStep.entries.title=Locate your data
+appWithinMinutes.wizardStep.entries.title=データを特定
 appWithinMinutes.wizardStep.entries.description=データの保存場所を選択
 appWithinMinutes.wizardStep.presentation.name=プレゼンテーション
-### Missing: appWithinMinutes.wizardStep.presentation.title=Customize your application home page
-### Missing: appWithinMinutes.wizardStep.presentation.description=Customize the application home page
+appWithinMinutes.wizardStep.presentation.title=アプリケーションのメインページをカスタマイズ
+appWithinMinutes.wizardStep.presentation.description=アプリケーションのメインページをカスタマイズしましょう
 platform.appwithinminutes.wizardStepNextButtonLabel=次のステップ
 platform.appwithinminutes.wizardStepNextButtonTip=次のステップに行く
 platform.appwithinminutes.wizardStepFinishButtonLabel=完了
 platform.appwithinminutes.wizardStepFinishButtonTip=アプリケーションのトップページに行く
-### Missing: platform.appwithinminutes.wizardStepPreviousButtonLabel=Previous Step
-### Missing: platform.appwithinminutes.wizardStepPreviousButtonTip=Go to previous step
+platform.appwithinminutes.wizardStepPreviousButtonLabel=前のステップ
+platform.appwithinminutes.wizardStepPreviousButtonTip=前のステップに戻る
 platform.appwithinminutes.wizardStepHelpTitle=ステップ
-### Missing: platform.appwithinminutes.wizardStepHelpDescription=This wizard will guide you through the process of creating an application. These are the steps you'll take:
+platform.appwithinminutes.wizardStepHelpDescription=このウィザードでアプリケーションを作成しましょう。必要なステップは次の通りです：
 
 ### Wizard Step 1: Application Name
-### Missing: appWithinMinutes.createApp.location.label=Location
-### Missing: appWithinMinutes.createApp.location.hint=The location in the page hierarchy where the application will be created.
-### Missing: appWithinMinutes.createApp.parent.label=Parent
-### Missing: appWithinMinutes.createApp.parent.hint=The parent of the new application. Leave this field empty if you want to create a top level application.
-### Missing: appWithinMinutes.createApp.parent.placeholder=Path.To.Parent
+appWithinMinutes.createApp.location.label=場所
+appWithinMinutes.createApp.location.hint=アプリケーションを作成するページ階層内の位置。
+appWithinMinutes.createApp.parent.label=親ページ
+appWithinMinutes.createApp.parent.hint=新しいアプリケーションの親ページです。トップのレベルにアプリケーションを作成したい場合は、このフィールドを空のままにしてください。
+appWithinMinutes.createApp.parent.placeholder=親ページ.への.パス
 appWithinMinutes.codeSpace.title=コード
-### Missing: appWithinMinutes.codeSpace.description=This is the place where the application code is located.
-### Missing: appWithinMinutes.codeSpace.hiddenPagesInfo=The hidden pages are also listed, even though your current user profile settings prevent to do so, otherwise none of the application code pages would be visible because they are all hidden by default.
+appWithinMinutes.codeSpace.description=これはアプリケーションのコードが保存される場所です。
+### Missing: appWithinMinutes.codeSpace.hiddenPagesInfo=
 platform.appwithinminutes.appNamePageTitle=アプリケーションを作成
 platform.appwithinminutes.appNameLabel=アプリケーション名
 platform.appwithinminutes.appNameHint=アプリケーション名はトップページのURLと、アプリケーションのコードを保存する場所を決定します。
@@ -91,25 +91,25 @@ platform.appwithinminutes.appNameIsUsedWarning=このアプリケーションは
 platform.appwithinminutes.appNameEmptyError=アプリケーション名を入力してください。
 
 ### Wizard Step 2: Application Structure
-### Missing: platform.appwithinminutes.classEditorPaletteTitle=Field Palette
-### Missing: platform.appwithinminutes.classEditorPaletteHint=Drag &amp; drop fields from the palette to create the form that will be used to input your data.
-### Missing: platform.appwithinminutes.classEditorCanvasHint=Drag fields from the palette and drop them in this area.
+### Missing: platform.appwithinminutes.classEditorPaletteTitle=
+### Missing: platform.appwithinminutes.classEditorPaletteHint=
+### Missing: platform.appwithinminutes.classEditorCanvasHint=
 platform.appwithinminutes.classEditorUpdateTemplateLabel=テンプレートをアップデート
 platform.appwithinminutes.classEditorUpdateTemplateHint=テンプレート（{0}）は既定のフィールドの値を保存します。
 platform.appwithinminutes.classEditorUpdateSheetLabel=シートをアップデート
 platform.appwithinminutes.classEditorUpdateSheetHint=シート（{0}）は構造化データを表示して編集するために使用されます。
 platform.appwithinminutes.classEditorUpdateTranslationsLabel=翻訳をアップデート
-### Missing: platform.appwithinminutes.classEditorUpdateTranslationsHint=Update the translation of field pretty names and list values ({0}).
-### Missing: platform.appwithinminutes.classEditorMultipleSheetsWarning=This class has multiple sheets.
-### Missing: platform.appwithinminutes.classEditorDuplicateFieldNameError=The class has two fields with the same name: {0}
+### Missing: platform.appwithinminutes.classEditorUpdateTranslationsHint=
+platform.appwithinminutes.classEditorMultipleSheetsWarning=このクラスには複数のシートがあります。
+### Missing: platform.appwithinminutes.classEditorDuplicateFieldNameError=
 platform.appwithinminutes.classEditorTemplateSaveComment=既定の値をアップデート
-### Missing: platform.appwithinminutes.classEditorBindSheetSaveComment=Bind class sheet
+### Missing: platform.appwithinminutes.classEditorBindSheetSaveComment=
 platform.appwithinminutes.classEditorSheetSaveComment=クラスシートをアップデート
 platform.appwithinminutes.classEditorTranslationsSaveComment=翻訳をアップデート
 platform.appwithinminutes.classEditorStandardCategoryName=標準
-### Missing: platform.appwithinminutes.classEditorPickersCategoryName=Pickers
+platform.appwithinminutes.classEditorPickersCategoryName=ピッカー
 platform.appwithinminutes.classEditorDocumentCategoryName=ページ
-### Missing: platform.appwithinminutes.classEditorAdvancedCategoryName=Advanced
+### Missing: platform.appwithinminutes.classEditorAdvancedCategoryName=
 platform.appwithinminutes.classEditorDBListFieldName=データベースのリスト
 platform.appwithinminutes.classEditorGroupsFieldName=グループ
 platform.appwithinminutes.classEditorUsersFieldName=ユーザー
@@ -117,16 +117,16 @@ platform.appwithinminutes.classEditorDateFieldName=日付
 platform.appwithinminutes.classEditorStaticListFieldName=静的リスト
 ### Missing: platform.appwithinminutes.classEditorBooleanFieldName=Boolean
 platform.appwithinminutes.classEditorNumberFieldName=数
-### Missing: platform.appwithinminutes.classEditorTextAreaFieldName=Long Text
-### Missing: platform.appwithinminutes.classEditorStringFieldName=Short Text
+platform.appwithinminutes.classEditorTextAreaFieldName=長いテキスト
+platform.appwithinminutes.classEditorStringFieldName=短いテキスト
 ### Missing: platform.appwithinminutes.classEditorContentFieldName=Content
 platform.appwithinminutes.classEditorTitleFieldName=タイトル
 platform.appwithinminutes.classEditorPageFieldName=ページ
 platform.appwithinminutes.classEditorDeleteFieldLabel=削除
 platform.appwithinminutes.classEditorConfigureFieldLabel=設定
 platform.appwithinminutes.classEditorPreviewFieldLabel=プレビュー
-### Missing: platform.appwithinminutes.classEditorPreviewFieldHint=Hide configuration panel and apply changes
-### Missing: platform.appwithinminutes.classEditorMoveFieldLabel=Move
+### Missing: platform.appwithinminutes.classEditorPreviewFieldHint=
+platform.appwithinminutes.classEditorMoveFieldLabel=移動
 platform.appwithinminutes.classEditorMoveFieldHint=ドラッグアンドドロップで順番を変更
 platform.appwithinminutes.classEditorFieldDefaultValueToolTip=既定の値
 
@@ -142,30 +142,30 @@ platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=追加
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=削除
 appWithinMinutes.templateProviderEditor.hint=アプリケーションのエントリーは、構造化データを含むウィキのページです。
-### Missing: appWithinMinutes.templateProviderEditor.icon.hint=The icon associated with an application entry.
-### Missing: appWithinMinutes.templateProviderEditor.description.hint=Short description of an application entry.
-### Missing: appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Where to create the entries from
-### Missing: appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=If no location is selected, the entries can be created from any page.
-### Missing: appWithinMinutes.templateProviderEditor.creationRestrictions.name=Where to create the entries
-### Missing: appWithinMinutes.templateProviderEditor.creationRestrictions.hint=If no location is selected, the entries can be created anywhere in the wiki.
-### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Don't enforce entry location
-### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Use the locations specified above only as suggestions, allowing the user to select a different location when creating an application entry.
-### Missing: appWithinMinutes.templateProviderEditor.terminal.hint=Whether the application entries should be terminal pages or not.
+appWithinMinutes.templateProviderEditor.icon.hint=アプリケーションのエントリーに関係付けるアイコン。
+appWithinMinutes.templateProviderEditor.description.hint=アプリケーションのエントリーの短い説明。
+### Missing: appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=
+### Missing: appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=
+appWithinMinutes.templateProviderEditor.creationRestrictions.name=エントリーを作成する場所
+### Missing: appWithinMinutes.templateProviderEditor.creationRestrictions.hint=
+### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=
+### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=
+### Missing: appWithinMinutes.templateProviderEditor.terminal.hint=
 
 ### Wizard Step 3: Application Presentation
 platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=アプリケーションのフィールド
-### Missing: platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel=Generic columns
+platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel=一般カラム
 platform.appwithinminutes.liveTableEditorHelpTitle=ヒント
-### Missing: platform.appwithinminutes.liveTableEditorHelpDescription=Generic live table columns are independent of your application structure. They provide information about the pages that hold your application data.
+### Missing: platform.appwithinminutes.liveTableEditorHelpDescription=
 platform.appwithinminutes.liveTableEditorDocTitleColumnName=ページのタイトル
 platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=アプリケーションのデータを含むページのタイトル
 platform.appwithinminutes.liveTableEditorDocNameColumnName=ページ名
 platform.appwithinminutes.liveTableEditorDocNameColumnDescription=アプリケーションのデータを含むページの名称
 platform.appwithinminutes.liveTableEditorDocLocationColumnName=場所
 platform.appwithinminutes.liveTableEditorDocLocationColumnDescription=アプリケーションのデータを含むページの場所
-### Missing: platform.appwithinminutes.liveTableEditorDocAuthorColumnName=Last Author
+### Missing: platform.appwithinminutes.liveTableEditorDocAuthorColumnName=
 platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=アプリケーションのデータを最後に編集したユーザー
-### Missing: platform.appwithinminutes.liveTableEditorDocCreatorColumnName=Creator
+platform.appwithinminutes.liveTableEditorDocCreatorColumnName=作成者
 platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription=アプリケーションのデータを作成したユーザー
 platform.appwithinminutes.liveTableEditorDocDateColumnName=日付
 platform.appwithinminutes.liveTableEditorDocDateColumnDescription=アプリケーションのデータを最後に編集した日付
@@ -174,21 +174,21 @@ platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription=アプ
 platform.appwithinminutes.liveTableEditorActionsColumnName=アクション
 platform.appwithinminutes.liveTableEditorActionsColumnDescription=アプリケーションのデータについて実行できるアクション（編集や削除など）のリスト
 platform.appwithinminutes.liveTableEditorAttachmentsColumnName=添付ファイル
-### Missing: platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=A special column to display links to the attachments of a data page
+### Missing: platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=
 platform.appwithinminutes.liveTableEditorImagesColumnName=画像
-### Missing: platform.appwithinminutes.liveTableEditorImagesColumnDescription=A special column to display the images attached to a data page
+### Missing: platform.appwithinminutes.liveTableEditorImagesColumnDescription=
 platform.appwithinminutes.liveTableEditorAvatarColumnName=アバター
-### Missing: platform.appwithinminutes.liveTableEditorAvatarColumnDescription=A special column to display the user avatar. Works only for a table bound to the XWiki.XWikiUsers class
-### Missing: platform.appwithinminutes.liveTableEditorTitleHint=The application title to be displayed on the application home page, on the applications panel and live table, on the breadcrumb, etc.
-### Missing: platform.appwithinminutes.liveTableEditorDescriptionHint=The content to be displayed on the homepage above the live table with the application data. Use it to describe the application.
-### Missing: platform.appwithinminutes.liveTableEditorColumnsHint=Select the columns you would like to include in the live table displayed on the application home page.
-### Missing: platform.appwithinminutes.liveTableEditorSaveComment=Update LiveTable
+### Missing: platform.appwithinminutes.liveTableEditorAvatarColumnDescription=
+platform.appwithinminutes.liveTableEditorTitleHint=アプリケーションのタイトルは、アプリケーションのトップページ、アプリケーションのパネル、ライブテーブル、パンくずリストなどに表示されます。
+### Missing: platform.appwithinminutes.liveTableEditorDescriptionHint=
+### Missing: platform.appwithinminutes.liveTableEditorColumnsHint=
+platform.appwithinminutes.liveTableEditorSaveComment=ライブテーブルをアップデート
 platform.appwithinminutes.liveTableEditorMoveColumnHint=ドラッグアンドドロップで順番を変更
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=削除
-### Missing: platform.appwithinminutes.liveTableEditorAddColumnHint=Add selected column
-### Missing: platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Some columns are deprecated, probably because the corresponding application fields have been deleted. Do you want to remove them? &lt;a href=""&gt;Yes&lt;/a&gt; / &lt;a href=""&gt;No&lt;/a&gt;
+### Missing: platform.appwithinminutes.liveTableEditorAddColumnHint=
+### Missing: platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=
 ### Missing: platform.appwithinminutes.liveTableEditorIcon=Icon
-### Missing: platform.appwithinminutes.liveTableEditorIconHintWithPicker=The application icon. You can select an icon from the icon picker or you can reference an attached image.
+### Missing: platform.appwithinminutes.liveTableEditorIconHintWithPicker=
 
 ### Wizard Step 4: Application home page
 platform.appwithinminutes.appLiveTableHeading=エントリー
@@ -202,32 +202,32 @@ platform.appwithinminutes.appHomePageDeleteEntriesLabel=全てのエントリー
 platform.appwithinminutes.appHomePageEditAppLabel=アプリケーションを編集
 platform.appwithinminutes.appHomePageTranslateAppLabel=アプリケーションを翻訳
 platform.appwithinminutes.appHomePageDeleteAppLabel=アプリケーションを削除
-### Missing: platform.appwithinminutes.appHomePageMovedWarning=The application might not function correctly because it has been renamed or moved without updating the code. Please edit the application and follow the steps in order to update the code.
+### Missing: platform.appwithinminutes.appHomePageMovedWarning=
 AppWithinMinutes.LiveTableClass_description=詳細
-### Missing: AppWithinMinutes.LiveTableClass_columns=Live Table Columns
+### Missing: AppWithinMinutes.LiveTableClass_columns=
 
 ### Delete application dialog
-### Missing: platform.appwithinminutes.deleteAppConfirmation=The application {0} and ALL its entries will be deleted. Are you sure you want to continue?
+platform.appwithinminutes.deleteAppConfirmation=アプリケーション {0} と全てのエントリーが削除されます。続行してよろしいですか？
 platform.appwithinminutes.deleteAppEntriesConfirmation=アプリケーション {0} の全エントリーを削除します。続行してよろしいですか？
 platform.appwithinminutes.deleteAppDoesNotExistError=指定したアプリケーションは存在しません。
-### Missing: platform.appwithinminutes.deleteAppInvalidAppError=The specified name is not a valid App Within Minutes application.
-### Missing: platform.appwithinminutes.deleteAppNotSpecifiedError=No application name was specified.
+### Missing: platform.appwithinminutes.deleteAppInvalidAppError=
+platform.appwithinminutes.deleteAppNotSpecifiedError=アプリケーション名が指定されていません。
 
 ### Rename Application
-### Missing: appWithinMinutes.renameApp.label=Rename Application
+appWithinMinutes.renameApp.label=アプリケーションの名称を変更
 appWithinMinutes.renameApp.close=閉じる
-### Missing: appWithinMinutes.renameApp.changeAppTitleInfo=You can change the application title without renaming the application just by editing the application home page.
-### Missing: appWithinMinutes.renameApp.regenerateAppCodeWarning=The application code is going to be regenerated if you rename the application. Code customizations will be overwritten as a consequence.
+### Missing: appWithinMinutes.renameApp.changeAppTitleInfo=
+### Missing: appWithinMinutes.renameApp.regenerateAppCodeWarning=
 appWithinMinutes.renameApp.newName.label=新しい名称
 appWithinMinutes.renameApp.pageExistsError=この名称のページは指定した場所に既に存在します。
 appWithinMinutes.renameApp.locationForbiddenError=アプリケーションを選択した場所に移動することは許可されていません。
 appWithinMinutes.renameApp.location.label=新しい場所
-### Missing: appWithinMinutes.renameApp.location.hint=The location in the page hierarchy where to move the application.
-### Missing: appWithinMinutes.renameApp.parent.label=New Parent
-### Missing: appWithinMinutes.renameApp.parent.hint=The new parent page. Leave this field empty if you want to move the application to the top of the page hierarchy.
-### Missing: appWithinMinutes.renameApp.inProgress=Renaming application...
-### Missing: appWithinMinutes.renameApp.done=Application renamed
-### Missing: appWithinMinutes.renameApp.failed=Failed to rename the application
+### Missing: appWithinMinutes.renameApp.location.hint=
+### Missing: appWithinMinutes.renameApp.parent.label=
+### Missing: appWithinMinutes.renameApp.parent.hint=
+appWithinMinutes.renameApp.inProgress=アプリケーションの名称を変更しています…
+appWithinMinutes.renameApp.done=アプリケーションの名称を変更しました
+appWithinMinutes.renameApp.failed=アプリケーションの名称を変更できませんでした
 
 ### Deprecated keys
 ### Since 8.4
@@ -236,12 +236,12 @@ platform.appwithinminutes.appNamePreviewDataSpaceLabel=アプリケーション�
 platform.appwithinminutes.liveTableEditorDocSpaceColumnName=スペース
 platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=アプリケーションのエントリーを含むスペースの名称
 ### Missing: platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Page full name
-### Missing: platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=The name of the page that contains the application entry, prefixed with the space name
+### Missing: platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=
 
 #@deprecated appWithinMinutes.wizardStep.name.name
 platform.appwithinminutes.wizardStep1Name=名称
 #@deprecated appWithinMinutes.wizardStep.name.title
-### Missing: platform.appwithinminutes.wizardStep1Title=Name your application
+platform.appwithinminutes.wizardStep1Title=アプリケーションに名称を付けましょう
 #@deprecated appWithinMinutes.wizardStep.name.description
 platform.appwithinminutes.wizardStep1Description=アプリケーションの名称を選択しましょう
 #@deprecated appWithinMinutes.wizardStep.structure.name
@@ -249,7 +249,7 @@ platform.appwithinminutes.wizardStep2Name=構造
 #@deprecated appWithinMinutes.wizardStep.structure.title
 platform.appwithinminutes.wizardStep2Title=データを構造化しましょう
 #@deprecated appWithinMinutes.wizardStep.structure.description
-### Missing: platform.appwithinminutes.wizardStep2Description=Describe the application data
+platform.appwithinminutes.wizardStep2Description=アプリケーションのデータを記述しましょう
 #@deprecated appWithinMinutes.wizardStep.presentation.name
 platform.appwithinminutes.wizardStep3Name=表示
 #@deprecated appWithinMinutes.wizardStep.presentation.title
@@ -260,6 +260,6 @@ platform.appwithinminutes.wizardStep3Description=アプリケーションのト�
 ### Since 11.0
 platform.appwithinminutes.appsLiveTable.doc.space=アプリケーション名
 ### Missing: appWithinMinutes.classEditor.title={0} Structure
-### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries
+appWithinMinutes.templateProviderEditor.title={0}件のエントリー
 </content>
   </xwikidoc>

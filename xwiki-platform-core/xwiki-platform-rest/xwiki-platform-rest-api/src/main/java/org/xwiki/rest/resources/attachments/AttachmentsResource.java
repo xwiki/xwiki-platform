@@ -31,6 +31,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.Attachments;
 
@@ -60,5 +61,5 @@ public interface AttachmentsResource
             Multipart multipart,
             @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames,
             @QueryParam("createPage") @DefaultValue("false") Boolean createPage
-    ) throws XWikiRestException;
+    ) throws XWikiRestException, AttachmentValidationException;
 }

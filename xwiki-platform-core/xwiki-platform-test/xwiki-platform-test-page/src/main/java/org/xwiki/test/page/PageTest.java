@@ -61,6 +61,9 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 import com.xpn.xwiki.web.XWikiServletResponseStub;
 
+import net.sf.json.JSON;
+import net.sf.json.JSONSerializer;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
@@ -198,6 +201,19 @@ public class PageTest
     protected Document renderHTMLPage(DocumentReference reference) throws Exception
     {
         return Jsoup.parse(renderPage(reference));
+    }
+
+    /**
+     * Load a given document reference, render it and parse it as JSON using {@link JSONSerializer}.
+     *
+     * @param reference the reference of the document to load, render, and parse as JSON
+     * @param <T> a subclass of {@link JSON}
+     * @return the result of the parsing of the rendering of the document using {@link JSONSerializer}
+     * @throws Exception in case of error when rendering or parsing the document
+     */
+    protected <T extends JSON> T renderJSONPage(DocumentReference reference) throws Exception
+    {
+        return (T) JSONSerializer.toJSON(renderPage(reference));
     }
 
     /**

@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="CKEditor.FileUploader" locale="">
+<xwikidoc version="1.5" reference="CKEditor.FileUploader" locale="">
   <web>CKEditor</web>
   <name>FileUploader</name>
   <language/>
@@ -103,10 +103,20 @@
       #set ($document = $xwiki.getDocument($request.document))
     #end
     #set ($reference = $document.documentReference)
-    #set ($attachment = $services.temporaryAttachments.uploadTemporaryAttachment($reference, 'upload', 
+    #try('uploadTemporaryAttachmentException')
+      #set ($attachment = $services.temporaryAttachments.uploadTemporaryAttachment($reference, 'upload',
         $request.filename))
+    #end
     #if ($attachment)
       #sendSuccess($document, $attachment.filename)
+    #elseif ("$!uploadTemporaryAttachmentException" != '')
+      ## The exception is wrapped in an org.apache.velocity.exception.MethodInvocationException
+      #set ($validationException = $uploadTemporaryAttachmentException.cause)
+      #if ($validationException.translationKey)
+        #sendError(400 "$services.localization.render($validationException.translationKey, $validationException.translationParameters)")
+      #else
+        #sendError(400 "$services.localization.render('ckeditor.upload.error.emptyReturn')")
+      #end
     #else
       #sendError(400 "$services.localization.render('ckeditor.upload.error.emptyReturn')")
     #end
@@ -168,9 +178,9 @@
     #set ($document = $xwiki.getDocument($request.document))
   #end
   #if ($request.getHeader('X-XWiki-Temporary-Attachment-Support') == 'true' &amp;&amp; !$document.isTranslation())
-    #handleTemporaryUploadRequest
+    #handleTemporaryUploadRequest()
   #else
-    #handleUploadRequest
+    #handleUploadRequest()
   #end
 #end
 {{/velocity}}</content>

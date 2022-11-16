@@ -110,27 +110,8 @@ var XWiki = (function(XWiki) {
       this.container = container;
       this.formData = formData;
       this.options = options;
-      this.validate();
       this.initProgressParameters();
       this.generateStatusUI();
-    },
-
-    /**
-     * Do a simple validation of the selected file type and size. Throws exceptions if either is invalid according to the options.
-     *
-     * @throws 'INVALID_FILE_TYPE' if the file doesn't match the filter
-     * @throws 'UPLOAD_LIMIT_EXCEEDED' if the file size exceeds the configured maximum file size
-     */
-    validate : function() {
-      // Check if the file matches the filter
-      if (! this.options.fileFilter.test(this.file.type)) {
-        throw 'INVALID_FILE_TYPE';
-      }
-
-      // Check if the file size is below the acceptable threshold
-      if (this.file.size > this.options.maxFilesize) {
-        throw 'UPLOAD_LIMIT_EXCEEDED';
-      }
     },
 
     /**
@@ -527,14 +508,20 @@ var XWiki = (function(XWiki) {
       for (var i = 0; i < total; ++i) {
         var file = this.input.files[i];
         try {
-          this.fileUploadItems.push(new FileUploadItem(file, this.statusUI.LIST, this.formData, this.options));
+          var event = Event.fire(this.input, 'xwiki:actions:beforeUpload', {
+            file: file
+          });
+          // Queue the file only if no listener cancelled the event.
+          if (!event.defaultPrevented) {
+            this.fileUploadItems.push(new FileUploadItem(file, this.statusUI.LIST, this.formData, this.options));
+            Event.fire(this.input, 'xwiki:html5upload:start');
+          }
         } catch (ex) {
           this.showMessage(ex, 'error', {size : UploadUtils.bytesToSize(this.options && this.options.maxFilesize),
                                          name : file.name, type: file.type
           });
         }
       }
-      Event.fire(this.input, 'xwiki:html5upload:start');
     },
 
     /**

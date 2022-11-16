@@ -38,6 +38,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.Part;
 
 import org.slf4j.Logger;
+import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
@@ -84,8 +85,12 @@ public class TemporaryAttachmentsScriptService implements ScriptService
      * @param documentReference the target document reference the attachment should be later attached to
      * @param fieldName the name of the field of the uploaded data
      * @return a temporary {@link Attachment} not yet persisted attachment, or {@code null} in case of error
+     * @throws TemporaryAttachmentException in case of problem when reading the attachment
+     * @throws AttachmentValidationException in case of error when validating the attachment (e.g., the maximum
+     *     filesize is reached)
      */
     public Attachment uploadTemporaryAttachment(DocumentReference documentReference, String fieldName)
+        throws TemporaryAttachmentException, AttachmentValidationException
     {
         return uploadTemporaryAttachment(documentReference, fieldName, null);
     }
@@ -99,31 +104,33 @@ public class TemporaryAttachmentsScriptService implements ScriptService
      * @param filename an optional filename used instead of using the filename of the file passing in
      *     {@code fieldName}, ignored when {@code null}
      * @return a temporary {@link Attachment} not yet persisted attachment, or {@code null} in case of error
+     * @throws TemporaryAttachmentException in case of problem when reading the attachment
+     * @throws AttachmentValidationException in case of error when validating the attachment (e.g., the maximum
+     *     filesize is reached)
      * @since 14.9RC1
      */
     @Unstable
     public Attachment uploadTemporaryAttachment(DocumentReference documentReference, String fieldName, String filename)
+        throws TemporaryAttachmentException, AttachmentValidationException
     {
         XWikiContext context = this.contextProvider.get();
-        Optional<XWikiAttachment> result = Optional.empty();
+
         try {
             Part part = context.getRequest().getPart(fieldName);
             if (part != null) {
-                result = Optional.of(
-                    this.temporaryAttachmentSessionsManager.uploadAttachment(documentReference, part, filename));
+                XWikiAttachment attachment =
+                    this.temporaryAttachmentSessionsManager.uploadAttachment(documentReference, part, filename);
+                Document document = Optional.ofNullable(attachment.getDoc())
+                    .map(doc -> doc.newDocument(context))
+                    .orElse(null);
+                return new Attachment(document, attachment, context);
+            } else {
+                return null;
             }
         } catch (IOException | ServletException e) {
             this.logger.warn("Error while reading the request content part: [{}]", getRootCauseMessage(e));
-        } catch (TemporaryAttachmentException e) {
-            this.logger.warn("Error while uploading the attachment: [{}]", getRootCauseMessage(e));
+            return null;
         }
-
-        return result.map(attachment -> {
-            Document document = Optional.ofNullable(attachment.getDoc())
-                .map(doc -> doc.newDocument(context))
-                .orElse(null);
-            return new Attachment(document, attachment, context);
-        }).orElse(null);
     }
 
     /**

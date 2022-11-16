@@ -91,7 +91,7 @@ public class MimetypeAttachmentValidationStep implements AttachmentValidationSte
     private boolean checkMimetype(List<String> mimetypes, String mimeType)
     {
         return mimetypes.stream().anyMatch(mimeTypePattern -> {
-            if (mimeTypePattern.contains("*")) {
+            if (!mimeTypePattern.contains("*")) {
                 return Objects.equals(mimeTypePattern, mimeType);
             } else {
                 // Use the first * char found as a joker. 

@@ -35,12 +35,14 @@ import org.xwiki.stability.Unstable;
 public interface AttachmentValidationConfiguration
 {
     /**
-     * @return the list of allowed attachment mimetype regex (e.g., "image/png", "text/.*")
+     * @return the list of allowed attachment mimetypes. A joker (@code '*') can be used to match any media (e.g.,
+     *     "image/png", "text/*")
      */
     List<String> getAllowedMimetypes();
 
     /**
-     * @return the list of blocker attachment mimetype regex (e.g., "image/png", "text/.*")
+     * @return the list of blocker attachment mimetype. A joker (@code '*') can be used to match any media (e.g.,
+     *     "image/png", "text/*")
      */
     List<String> getBlockerMimetypes();
 }

@@ -111,9 +111,9 @@
       #sendSuccess($document, $attachment.filename)
     #elseif ("$!uploadTemporaryAttachmentException" != '')
       ## The exception is wrapped in an org.apache.velocity.exception.MethodInvocationException
-      #set ($exception = $uploadTemporaryAttachmentException.cause)
-      #if ($exception.translationKey)
-        #sendError(400 "$services.localization.render($exception.translationKey, $exception.translationParameters)")
+      #set ($validationException = $uploadTemporaryAttachmentException.cause)
+      #if ($validationException.translationKey)
+        #sendError(400 "$services.localization.render($validationException.translationKey, $validationException.translationParameters)")
       #else
         #sendError(400 "$services.localization.render('ckeditor.upload.error.emptyReturn')")
       #end

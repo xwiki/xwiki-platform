@@ -135,7 +135,16 @@
 
 require(['jquery', 'xwiki-l10n!attachment-validation-mimetype-messages', 'xwiki-events-bridge'], ($, l10n) =&gt; {
   function checkMimetype(mimetypes, mimetype) {
-    return mimetypes.some(mimetypePattern =&gt; new RegExp(mimetypePattern).match(mimetype));
+    return mimetypes.some(mimetypePattern =&gt; {
+      const indexOfJoker = mimetypePattern.indexOf('*');
+      if (indexOfJoker === -1) {
+        return mimetypePattern === mimetype;
+      } else {
+        const prefix = mimetypePattern.substring(0, indexOfJoker);
+        const suffix = mimetypePattern.substring(indexOfJoker + 1, mimetypePattern.length);
+        return mimetype.startsWith(prefix) &amp;&amp; mimetype.endsWith(suffix);
+      }
+    });
   }
 
   $(document).on('xwiki:actions:beforeUpload', function (event, data) {
@@ -212,7 +221,7 @@ require(['jquery', 'xwiki-l10n!attachment-validation-mimetype-messages', 'xwiki-
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>

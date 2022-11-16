@@ -19,6 +19,8 @@
  */
 package org.xwiki.attachment.validation.internal.step;
 
+import java.util.List;
+
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -81,7 +83,8 @@ class FileSizeAttachmentValidationStepTest
 
         assertEquals("File size too big", exception.getMessage());
         assertEquals(SC_REQUEST_ENTITY_TOO_LARGE, exception.getHttpStatus());
-        assertEquals("core.action.upload.failure.maxSize", exception.getTranslationKey());
+        assertEquals("attachment.validation.filesize.rejected", exception.getTranslationKey());
+        assertEquals(List.of(42L), exception.getTranslationParameters());
         assertEquals("fileuploadislarge", exception.getContextMessage());
     }
 }

@@ -51,6 +51,7 @@ public class AttachmentValidationExceptionMapper implements ExceptionMapper<Atta
         JSONObject entity = new JSONObject();
         entity.put("message", exception.getMessage());
         entity.put("translationKey", exception.getTranslationKey());
+        entity.put("translationParameters", exception.getTranslationParameters());
         return Response
             .serverError()
             .entity(entity.toString())

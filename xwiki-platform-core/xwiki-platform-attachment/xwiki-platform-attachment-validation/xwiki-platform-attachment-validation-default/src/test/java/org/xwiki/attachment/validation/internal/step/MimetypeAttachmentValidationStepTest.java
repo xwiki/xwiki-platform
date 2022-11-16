@@ -22,8 +22,9 @@ package org.xwiki.attachment.validation.internal.step;
 import java.io.InputStream;
 import java.util.List;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.attachment.AttachmentAccessWrapper;
 import org.xwiki.attachment.validation.AttachmentValidationConfiguration;
 import org.xwiki.attachment.validation.AttachmentValidationException;
@@ -58,10 +59,14 @@ class MimetypeAttachmentValidationStepTest
     @RegisterExtension
     LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
-    @Test
-    void validateMimetypePlainTextBlocked() throws Exception
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "text/*",
+        "text/plain"
+    })
+    void validateMimetypePlainTextBlocked(String blockerMimetype) throws Exception
     {
-        when(this.attachmentValidationConfiguration.getBlockerMimetypes()).thenReturn(List.of("text/.*"));
+        when(this.attachmentValidationConfiguration.getBlockerMimetypes()).thenReturn(List.of(blockerMimetype));
 
         AttachmentAccessWrapper wrapper = mock(AttachmentAccessWrapper.class);
         when(wrapper.getInputStream()).thenReturn(mock(InputStream.class));
@@ -72,6 +77,29 @@ class MimetypeAttachmentValidationStepTest
         assertEquals("Invalid mimetype [text/plain]", exception.getMessage());
         assertEquals(SC_UNSUPPORTED_MEDIA_TYPE, exception.getHttpStatus());
         assertEquals("attachment.validation.mimetype.rejected", exception.getTranslationKey());
+        assertEquals(List.of(List.of(), List.of(blockerMimetype)), exception.getTranslationParameters());
+        assertNull(exception.getContextMessage());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "image/png",
+        "image/*"
+    })
+    void validateMimetypePlainTextAllowed(String blockerMimetype) throws Exception
+    {
+        when(this.attachmentValidationConfiguration.getAllowedMimetypes()).thenReturn(List.of(blockerMimetype));
+
+        AttachmentAccessWrapper wrapper = mock(AttachmentAccessWrapper.class);
+        when(wrapper.getInputStream()).thenReturn(mock(InputStream.class));
+        when(wrapper.getFileName()).thenReturn("test.txt");
+        AttachmentValidationException exception = assertThrows(AttachmentValidationException.class,
+            () -> this.validationStep.validate(wrapper));
+
+        assertEquals("Invalid mimetype [text/plain]", exception.getMessage());
+        assertEquals(SC_UNSUPPORTED_MEDIA_TYPE, exception.getHttpStatus());
+        assertEquals("attachment.validation.mimetype.rejected", exception.getTranslationKey());
+        assertEquals(List.of(List.of(blockerMimetype), List.of()), exception.getTranslationParameters());
         assertNull(exception.getContextMessage());
     }
 }

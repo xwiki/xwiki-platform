@@ -97,14 +97,16 @@ class AttachmentValidationIT
         assertEquals(415, putMethodText.getStatusCode());
         assertEquals("{"
             + "\"message\":\"Invalid mimetype [text/plain]\","
-            + "\"translationKey\":\"attachment.validation.mimetype.rejected\""
+            + "\"translationKey\":\"attachment.validation.mimetype.rejected\","
+            + "\"translationParameters\":\"[[image/.*], []]\""
             + "}", putMethodText.getResponseBodyAsString());
 
         PutMethod putMethodImage = restUploadImage(setup, subPage, IMAGE_FILE_NAME);
         assertEquals(413, putMethodImage.getStatusCode());
-        assertEquals("{"
+        assertEquals("{" 
             + "\"message\":\"File size too big\","
-            + "\"translationKey\":\"core.action.upload.failure.maxSize\""
+            + "\"translationKey\":\"attachment.validation.filesize.rejected\","
+            + "\"translationParameters\":\"[10]\""
             + "}", putMethodImage.getResponseBodyAsString());
 
         // Check that no image are saved to the document after the various upload tries.

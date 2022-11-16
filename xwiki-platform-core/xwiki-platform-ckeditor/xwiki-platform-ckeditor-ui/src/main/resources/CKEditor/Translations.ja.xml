@@ -36,9 +36,9 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: CKEditor.ConfigClass_removePlugins=Disabled Plugins
-### Missing: CKEditor.ConfigClass_removePlugins.hint=The list of plugins that have been disabled.
-### Missing: CKEditor.ConfigClass_removeButtons=Disabled Toolbar Features
+  <content>CKEditor.ConfigClass_removePlugins=無効化されたプラグイン
+CKEditor.ConfigClass_removePlugins.hint=無効化されたプラグインのリスト。
+CKEditor.ConfigClass_removeButtons=無効化されたツールバーの機能
 ### Missing: CKEditor.ConfigClass_removeButtons.hint=The list of toolbar features that have been disabled.
 ### Missing: CKEditor.ConfigClass_linkShowAdvancedTab=Link: Show Advanced Tab
 ### Missing: CKEditor.ConfigClass_linkShowAdvancedTab.hint=Allows you to set link attributes such as id, name, class or style.

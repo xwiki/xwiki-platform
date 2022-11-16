@@ -39,7 +39,7 @@
   <content>captcha.jcaptcha=JCaptcha
 captcha.jcaptcha.displayer.image.alt=画像CAPTCHA
 captcha.jcaptcha.displayer.audio.error.audioElementNotSupported=このブラウザーは音声をサポートしていません。
-### Missing: captcha.jcaptcha.displayer.audio.play=Listen
+captcha.jcaptcha.displayer.audio.play=聞く
 captcha.jcaptcha.displayer.error.unsupportedType=JCaptchaが適切に設定されていません
 captcha.jcaptcha.displayer.refresh=再読み込み
 captcha.jcaptcha.displayer.answer.placeholder=解答
@@ -54,11 +54,11 @@ captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.DefaultGimpyEngine=�
 captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.SimpleListImageCaptchaEngine=単純なリスト
 captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.NonLinearTextGimpyEngine=Non Linear TextによるGimpy
 captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.HotmailEngine=Hotmail
-### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.DeformedBaffleListGimpyEngine=Deformed Baffle List Gimpy
-### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.BaffleListGimpyEngine=Baffle List Gimpy
+### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.DeformedBaffleListGimpyEngine=
+### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.BaffleListGimpyEngine=
 ### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.HotmailEngine2008=Hotmail 2008
-### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.sound.speller.SpellerSoundCaptchaEngine=Speller
-### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.sound.gimpy.SimpleListSoundCaptchaEngine=Simple List
-### Missing: captcha.jcaptcha.engine.org.xwiki.captcha.internal.SimpleMathCaptchaEngine=Simple Math
+### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.sound.speller.SpellerSoundCaptchaEngine=
+captcha.jcaptcha.engine.com.octo.captcha.engine.sound.gimpy.SimpleListSoundCaptchaEngine=シンプルなリスト
+captcha.jcaptcha.engine.org.xwiki.captcha.internal.SimpleMathCaptchaEngine=シンプルな算数
 </content>
   </xwikidoc>

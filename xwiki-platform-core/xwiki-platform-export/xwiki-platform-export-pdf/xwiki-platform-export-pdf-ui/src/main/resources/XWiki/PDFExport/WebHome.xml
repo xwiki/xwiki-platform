@@ -53,8 +53,15 @@
       #set ($pdfExportJobStatusJSON.pdfFileURL = $services.resource.temporary.getURL(
         $pdfExportJobStatus.getPDFFileReference()))
     #end
-    ## Check if the PDF export job log contains errors and extract the last error message.
-    #set ($lastError = $pdfExportJobStatus.logTail.getLastLogEvent('ERROR'))
+    ## Check if the PDF export job failed.
+    #set ($lastError = {'throwable': $pdfExportJobStatus.error})
+    #set ($pdfExportJobStatusJSON.failed = "$!lastError.throwable" != '')
+    #if (!$pdfExportJobStatusJSON.failed)
+      ## The PDF export job log can contain errors even if the job did not fail. Let's extract the last error and warn
+      ## the user because it may justify why the result is not as expected.
+      #set ($lastError = $pdfExportJobStatus.logTail.getLastLogEvent('ERROR'))
+    #end
+    ## Extract the error message from the last error.
     #if ($lastError.throwable)
       #set ($lastError = $exceptiontool.getRootCauseMessage($lastError.throwable))
     #else
@@ -453,12 +460,12 @@ require([
     return runPDFExportJob(data).then(job =&gt; {
       if (job.canceled) {
         // Do nothing.
+      } else if (job.failed || (config.serverSide &amp;&amp; !job.pdfFileURL)) {
+        // Either the job failed, or the PDF file should have been generated server-side but it wasn't.
+        return Promise.reject(job.lastError);
       } else if (job.pdfFileURL) {
         // The PDF file was generated on the server-side. The user just needs to download it.
         window.location.href = job.pdfFileURL;
-      } else if (config.serverSide) {
-        // The PDF file should have been generated on the server-side but it wasn't so the PDF export must have failed.
-        return Promise.reject(job.lastError);
       } else {
         // The PDF file is going to be generated using the user's own web browser.
         if (job.lastError) {

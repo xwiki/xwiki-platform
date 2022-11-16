@@ -74,5 +74,8 @@ class SafePDFExportConfigurationProviderTest
         when(this.authorization.hasAccess(Right.VIEW, secondTemplateRef)).thenReturn(true);
         when(this.config.getTemplates()).thenReturn(Arrays.asList(firstTemplateRef, secondTemplateRef));
         assertEquals(Collections.singletonList(secondTemplateRef), safeConfig.getTemplates());
+
+        when(this.config.getMaxContentSize()).thenReturn(34);
+        assertEquals(34, safeConfig.getMaxContentSize());
     }
 }

@@ -109,7 +109,9 @@ XWiki.PDFExport.ConfigurationClass_chromeDockerContainerName.hint=The name of th
 XWiki.PDFExport.ConfigurationClass_dockerNetwork=Docker Network
 XWiki.PDFExport.ConfigurationClass_dockerNetwork.hint=The name or id of the Docker network to add the Chrome Docker container to. This is useful when XWiki itself runs inside a Docker container and you want to have the Chrome container in the same network in order for them to communicate.
 XWiki.PDFExport.ConfigurationClass_pageReadyTimeout=Page Ready Timeout
-XWiki.PDFExport.ConfigurationClass_pageReadyTimeout.hint=The number of seconds to wait for the web page to be ready for print before timing out.</content>
+XWiki.PDFExport.ConfigurationClass_pageReadyTimeout.hint=The number of seconds to wait for the web page to be ready for print before timing out.
+XWiki.PDFExport.ConfigurationClass_maxContentSize=Maximum Content Size
+XWiki.PDFExport.ConfigurationClass_maxContentSize.hint=The maximum content size, in kilobytes (KB), that can be included in a single PDF export. Use 0 to disable the limit.</content>
   <object>
     <name>XWiki.PDFExport.Translations</name>
     <number>0</number>

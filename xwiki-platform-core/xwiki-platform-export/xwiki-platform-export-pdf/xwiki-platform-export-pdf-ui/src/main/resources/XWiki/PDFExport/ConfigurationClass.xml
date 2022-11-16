@@ -116,6 +116,20 @@
       <validationRegExp>[a-zA-Z0-9][a-zA-Z0-9_.-]+</validationRegExp>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </dockerNetwork>
+    <maxContentSize>
+      <customDisplay>{{include reference="XWiki.PDFExport.ConfigurationDisplayer" /}}</customDisplay>
+      <disabled>0</disabled>
+      <hint>XWiki.PDFExport.ConfigurationClass_maxContentSize.hint</hint>
+      <name>maxContentSize</name>
+      <number>10</number>
+      <numberType>integer</numberType>
+      <prettyName>Maximum Content Size</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+    </maxContentSize>
     <pageReadyTimeout>
       <customDisplay>{{include reference="XWiki.PDFExport.ConfigurationDisplayer" /}}</customDisplay>
       <disabled>0</disabled>

@@ -110,4 +110,10 @@ public class SafePDFExportConfiguration extends AbstractSafeObject<PDFExportConf
     {
         return getWrapped().getPageReadyTimeout();
     }
+
+    @Override
+    public int getMaxContentSize()
+    {
+        return getWrapped().getMaxContentSize();
+    }
 }

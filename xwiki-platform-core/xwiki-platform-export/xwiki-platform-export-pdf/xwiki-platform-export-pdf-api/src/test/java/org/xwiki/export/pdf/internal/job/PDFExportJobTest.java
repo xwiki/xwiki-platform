@@ -28,8 +28,10 @@ import java.util.List;
 
 import javax.inject.Named;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.PDFPrinter;
 import org.xwiki.export.pdf.internal.RequiredSkinExtensionsRecorder;
 import org.xwiki.export.pdf.job.PDFExportJobRequest;
@@ -49,6 +51,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -83,6 +86,9 @@ class PDFExportJobTest
     @MockComponent
     private TemporaryResourceStore temporaryResourceStore;
 
+    @MockComponent
+    private PDFExportConfiguration configuration;
+
     private DocumentReference firstPageReference = new DocumentReference("test", "First", "Page");
 
     private DocumentRenderingResult firstPageRendering = new DocumentRenderingResult(this.firstPageReference,
@@ -102,6 +108,8 @@ class PDFExportJobTest
     @BeforeEach
     void configure() throws Exception
     {
+        when(this.configuration.getMaxContentSize()).thenReturn(1);
+
         DocumentReference thirdPageReference = new DocumentReference("test", "Third", "Page");
         when(this.authorization.hasAccess(Right.VIEW, this.aliceReference, thirdPageReference)).thenReturn(true);
         DocumentReference fourthPageReference = new DocumentReference("test", "Fourth", "Page");
@@ -178,5 +186,21 @@ class PDFExportJobTest
         assertNull(jobStatus.getPDFFileReference());
         assertNull(jobStatus.getRequiredSkinExtensions());
         assertEquals(0, jobStatus.getDocumentRenderingResults().size());
+    }
+
+    @Test
+    void runWithContentSizeLimitExceeded() throws Exception
+    {
+        DocumentRenderingResult largeResult = new DocumentRenderingResult(this.secondPageReference,
+            new XDOM(Collections.singletonList(new WordBlock("second"))), StringUtils.repeat('x', 1000));
+        when(this.documentRenderer.render(this.secondPageReference, true)).thenReturn(largeResult);
+
+        this.pdfExportJob.initialize(this.request);
+        try {
+            this.pdfExportJob.runInternal();
+            fail();
+        } catch (Exception e) {
+            assertEquals("Maximum content size limit exceeded.", e.getMessage());
+        }
     }
 }

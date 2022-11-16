@@ -163,6 +163,7 @@
     &lt;/fieldset&gt;
   &lt;/dd&gt;
   #displayPDFExportConfigProperty('pageReadyTimeout', {'min': 0, 'max': 2147483647})
+  #displayPDFExportConfigProperty('maxContentSize', {'min': 0, 'max': 2147483647})
 #end
 {{/velocity}}
 

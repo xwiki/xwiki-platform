@@ -29,10 +29,12 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.PDFPrinter;
 import org.xwiki.export.pdf.internal.RequiredSkinExtensionsRecorder;
 import org.xwiki.export.pdf.job.PDFExportJobRequest;
 import org.xwiki.export.pdf.job.PDFExportJobStatus;
+import org.xwiki.export.pdf.job.PDFExportJobStatus.DocumentRenderingResult;
 import org.xwiki.job.AbstractJob;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -81,6 +83,9 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
     @Inject
     private TemporaryResourceStore temporaryResourceStore;
 
+    @Inject
+    private PDFExportConfiguration configuration;
+
     @Override
     public String getType()
     {
@@ -115,14 +120,25 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
         this.progressManager.pushLevelProgress(documentReferences.size(), this);
 
         try {
+            // The max content size configuration is expressed in kilobytes (KB), so we approximate the actual limit by
+            // multiplying with 1000 (bytes).
+            int maxContentSize = this.configuration.getMaxContentSize() * 1000;
+            int contentSize = 0;
             for (DocumentReference documentReference : documentReferences) {
                 if (this.status.isCanceled()) {
                     break;
                 } else {
                     this.progressManager.startStep(this);
                     if (hasAccess(Right.VIEW, documentReference)) {
-                        this.status.getDocumentRenderingResults()
-                            .add(this.documentRenderer.render(documentReference, withTitle));
+                        DocumentRenderingResult renderingResult =
+                            this.documentRenderer.render(documentReference, withTitle);
+                        this.status.getDocumentRenderingResults().add(renderingResult);
+                        // We approximate the size by counting the characters, which take 1 byte most of the time. We
+                        // don't have to be very precise.
+                        contentSize += renderingResult.getHTML().length();
+                        if (contentSize > maxContentSize) {
+                            throw new RuntimeException("Maximum content size limit exceeded.");
+                        }
                     }
                     Thread.yield();
                     this.progressManager.endStep(this);

@@ -115,6 +115,12 @@ public class DefaultPDFExportConfiguration implements PDFExportConfiguration
         return getProperty("pageReadyTimeout", PDFExportConfiguration.super.getPageReadyTimeout());
     }
 
+    @Override
+    public int getMaxContentSize()
+    {
+        return getProperty("maxContentSize", PDFExportConfiguration.super.getMaxContentSize());
+    }
+
     private <T> T getProperty(String key, T defaultValue)
     {
         if (this.configDocument.containsKey(key)) {

@@ -36,18 +36,18 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: authentication.admin.failureStrategy.label=Failure strategies
-### Missing: authentication.admin.failureStrategy.hint=Strategies to use in case of multiple authentication failure. Multiple strategies can be selected.
+  <content>### Missing: authentication.admin.failureStrategy.label=
+### Missing: authentication.admin.failureStrategy.hint=
 authentication.admin.failureStrategy.disableAccount.name=アカウントを無効にする
 authentication.admin.failureStrategy.captcha.name=CAPTCHA
-### Missing: authentication.admin.maxAttempts.label=Maximum number of authorized attempts
-### Missing: authentication.admin.maxAttempts.hint=This represents the maximum number of authorized login failures before the strategy is activated. This number is taken into account only in the context of the following time window. Please consider that a 0 value means the feature is disabled.
-### Missing: authentication.admin.timeWindow.label=Time window for login failures
-### Missing: authentication.admin.timeWindow.hint=The time window in seconds during which to consider the failing login attempts for activating the strategy.
-### Missing: authentication.admin.isAuthenticationSecurityEnabled.label=Enable or disable the authentication security mechanism
-### Missing: authentication.admin.isAuthenticationSecurityEnabled.hint=Disabling the authentication security mechanism will also reset the authentication failure records.
-### Missing: authentication.admin.isAuthenticationSecurityEnabled.disabled=Disabled
-### Missing: authentication.admin.isAuthenticationSecurityEnabled.enabled=Enabled
+### Missing: authentication.admin.maxAttempts.label=
+### Missing: authentication.admin.maxAttempts.hint=
+### Missing: authentication.admin.timeWindow.label=
+### Missing: authentication.admin.timeWindow.hint=
+authentication.admin.isAuthenticationSecurityEnabled.label=認証のセキュリティーメカニズムを有効あるいは無効にする
+### Missing: authentication.admin.isAuthenticationSecurityEnabled.hint=
+### Missing: authentication.admin.isAuthenticationSecurityEnabled.disabled=
+### Missing: authentication.admin.isAuthenticationSecurityEnabled.enabled=
 ### Missing: authentication.admin.heading=Authentication Security
 </content>
   </xwikidoc>

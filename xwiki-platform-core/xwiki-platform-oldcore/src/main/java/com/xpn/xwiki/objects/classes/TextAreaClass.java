@@ -414,10 +414,9 @@ public class TextAreaClass extends StringClass
 
                     // Make sure the right author is used to execute the textarea
                     // Clone the document to void messaging with the cache
-                    if (!Objects.equals(sdoc.getAuthors().getEffectiveMetadataAuthor(),
-                        sdoc.getAuthors().getContentAuthor())) {
+                    if (!Objects.equals(sdoc.getAuthorReference(), sdoc.getContentAuthorReference())) {
                         sdoc = sdoc.clone();
-                        sdoc.getAuthors().setContentAuthor(sdoc.getAuthors().getEffectiveMetadataAuthor());
+                        sdoc.setContentAuthorReference(sdoc.getAuthorReference());
                     }
 
                     buffer.append(

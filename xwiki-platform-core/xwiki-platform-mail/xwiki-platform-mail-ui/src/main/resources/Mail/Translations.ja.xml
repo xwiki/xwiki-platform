@@ -37,9 +37,9 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>admin.email=メール
-### Missing: admin.email.description=Configure mail sending parameters and view mail statuses.
+admin.email.description=メールの送信に関するパラメーターの設定と、メールのステータスの閲覧。
 admin.emailgeneral=高度
-### Missing: admin.emailgeneral.description=Configure advanced mail parameters, like mail address obfuscation.
+admin.emailgeneral.description=メールアドレスの難読化など、メールの高度なパラメータの設定。
 admin.emailsend=メールの送信
 admin.emailsend.description=メールの送信に関するパラメーターを設定。
 admin.emailstatus=メール送信の状態
@@ -71,10 +71,10 @@ Mail.SendMailStatus_livetable.type=種類
 Mail.SendMailStatus_livetable.recipients=受信者
 Mail.SendMailStatus_livetable.state=状態
 Mail.SendMailStatus_livetable.wiki=ウィキ
-### Missing: Mail.SendMailStatus_livetable.error=Error
-### Missing: Mail.SendMailStatus_livetable.actions=Actions
-### Missing: Mail.SendMailStatus_livetable.resend=Resend
-### Missing: mailSender.admin.resendSuccess=The mail has been resent successfully
-### Missing: mailSender.admin.resendFailure=Failed to resend. Click for more details.
+Mail.SendMailStatus_livetable.error=エラー
+Mail.SendMailStatus_livetable.actions=アクション
+Mail.SendMailStatus_livetable.resend=再送
+mailSender.admin.resendSuccess=メールは正常に再送されました
+mailSender.admin.resendFailure=再送できませんでした。クリックすると詳細を表示します。
 </content>
   </xwikidoc>

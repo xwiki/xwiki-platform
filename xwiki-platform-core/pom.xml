@@ -130,19 +130,16 @@
               <criticality>documented</criticality>
               <differences>
                 <item>
-                  <ignore>true</ignore>
                   <code>java.method.addedToInterface</code>
                   <new>method void org.xwiki.store.TemporaryAttachmentSessionsManager::temporarilyAttach(com.xpn.xwiki.doc.XWikiAttachment, org.xwiki.model.reference.DocumentReference) throws org.xwiki.store.TemporaryAttachmentException</new>
                   <justification>New method needed in the unstable interface for temporary attachments.</justification>
                 </item>
                 <item>
-                  <ignore>true</ignore>
                   <code>java.method.addedToInterface</code>
                   <new>method java.lang.String org.xwiki.export.pdf.browser.BrowserTab::getSource()</new>
                   <justification>New method needed in the unstable interface for browser tab.</justification>
                 </item>
                 <item>
-                  <ignore>true</ignore>
                   <code>java.annotation.attributeValueChanged</code>
                   <old>class org.xwiki.rest.model.jaxb.LinkCollection</old>
                   <new>class org.xwiki.rest.model.jaxb.LinkCollection</new>
@@ -160,14 +157,30 @@
               <criticality>allowed</criticality>
               <differences>
                 <item>
-                  <ignore>true</ignore>
                   <code>java.method.removed</code>
                   <old>method org.w3c.dom.Document com.xpn.xwiki.util.Util::getDOMDocument()</old>
                 </item>
                 <item>
-                  <ignore>true</ignore>
                   <code>java.method.removed</code>
                   <old>method org.w3c.dom.Document com.xpn.xwiki.util.Util::getDOMForString(java.lang.String)</old>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <justification>Not a breakage, deprecated ComponentRole replaced by Role</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <code>java.annotation.removed</code>
+                  <old>interface org.xwiki.store.serialization.xml.XMLSerializer&lt;R, P extends R&gt;</old>
+                  <new>interface org.xwiki.store.serialization.xml.XMLSerializer&lt;R, P extends R&gt;</new>
+                  <annotation>@org.xwiki.component.annotation.ComponentRole</annotation>
+                </item>
+                <item>
+                  <code>java.annotation.added</code>
+                  <old>interface org.xwiki.store.serialization.xml.XMLSerializer&lt;R, P extends R&gt;</old>
+                  <new>interface org.xwiki.store.serialization.xml.XMLSerializer&lt;R, P extends R&gt;</new>
+                  <annotation>@org.xwiki.component.annotation.Role</annotation>
                 </item>
               </differences>
             </revapi.differences>

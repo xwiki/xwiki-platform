@@ -39,52 +39,52 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>= Programming =
+  <content>= プログラミング =
 
-== Macros ==
+==マクロ ==
 
-=== 1.0 Macros ===
+=== マクロ1.0 ===
 
-There are two kinds of macros in XWiki Syntax 1.0:
+XWikiシンタックス 1.0には2種類のマクロが存在します。
 
-* Velocity macros (called using the ###macroname(param1 ... paramN)## syntax)
-* Radeox macros (called using the ##{macroname:param1=value1|...|paramN=valueN}## syntax)
+* Velocityマクロ（###macroname(param1 ... paramN)## シンタックスを用いて呼び出す）
+* Radeoxマクロ（##{macroname:param1=value1|...|paramN=valueN}## シンタックスを用いて呼び出す）
 
 {{info}}
-For the full list of available macros check the [[Extensions wiki&gt;&gt;https://extensions.xwiki.org/]].
+利用可能なマクロの一覧は[[拡張機能ウィキ&gt;&gt;https://extensions.xwiki.org/]]より確認できます。
 {{/info}}
 
-|=Feature|=XWiki Syntax 1.0
-|Velocity Macro|(((
-{{{#info("Some text")}}}
+|=機能|=XWikiシンタックス 1.0
+|Velocityマクロ|(((
+{{{#info("テキスト")}}}
 )))
-|Radeox Macro|(((
+|Radeoxマクロ|(((
 {{{{code:java}
-java content
+Javaによるコンテンツ
 {code}
 }}}
 )))
 
-=== 2.0 Macros ===
+=== マクロ2.0 ===
 
-There is only one kind of macro in XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}, which is called by the syntax: ##{{{{{macroname param1="value1" ... paramN="valueN"}}...{{/macroname}}}}}##. For macros without content there's a short notation: ##{{{{{macroname param1="value1" ... paramN="valueN"/}}}}}##
+XWikiシンタックス {{velocity}}$crtSyntaxVer{{/velocity}}には1種類のマクロのみ存在します。マクロは以下のシンタックスで呼び出せます：##{{{{{macroname param1="value1" ... paramN="valueN"}}...{{/macroname}}}}}##。内容をもたないマクロは、短く##{{{{{macroname param1="value1" ... paramN="valueN"/}}}}}##で呼び出せます。
 
-|=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
-|Rendering Macro with a content|(((
+|=機能|=XWikiシンタックス {{velocity}}$crtSyntaxVer{{/velocity}}|=結果
+|内容のあるマクロの描写|(((
 {{{{{code language="java"}}
 System.out.println("Hello World!");
 {{/code}}
 }}}
 )))|{{code language="java"}}System.out.println("Hello World!");{{/code}}
-|Rendering Macro without content|(((
+|内容をもたないマクロの描写|(((
 {{{{{include reference="Space.Page"/}}}}}
-)))|The referenced page is included in the current page
+)))|参照されたページが現在のページに含まれます
 
 {{info}}
-For the full list of available macros check the [[Extensions wiki&gt;&gt;https://extensions.xwiki.org/]].
+利用可能なマクロの一覧は[[拡張機能ウィキ&gt;&gt;https://extensions.xwiki.org/]]より確認できます。
 {{/info}}
 
-==== Macros in this wiki ====
+====このウィキのマクロ ====
 
 {{include reference="XWiki.XWikiSyntaxMacrosList"/}}</content>
 </xwikidoc>

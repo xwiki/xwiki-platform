@@ -39,14 +39,14 @@
   <content>index.spacesMacro.title=スペース
 index.spacesMacro.spaceIndex.title=スペースのインデックスを表示
 index.spacesMacro.spaceIndex.alt=スペースのインデックス
-### Missing: index.spacesMacro.spaceAdministration.title=See Space Administration
-### Missing: index.spacesMacro.spaceAdministration.alt=Administer Space
+index.spacesMacro.spaceAdministration.title=スペースの管理を表示
+index.spacesMacro.spaceAdministration.alt=スペースを管理
 index.spacesMacro.createSpace.link=新しいスペースを作成
 index.spacesMacro.createSpace.defaultSpaceName=スペースの名称
 index.spacesMacro.createSpace.submit=作成
 index.deletedDocuments.deleteAll=全て削除
-### Missing: index.administration.remainingTasks.heading=Remaining Document Analysis tasks
-### Missing: index.administration.remainingTasks.emptyQueue=No remaining tasks.
-### Missing: admin.documentanalysis=Document Analysis
+index.administration.remainingTasks.heading=残りのドキュメント分析タスク
+index.administration.remainingTasks.emptyQueue=残っているタスクはありません。
+admin.documentanalysis=ドキュメント分析
 </content>
   </xwikidoc>

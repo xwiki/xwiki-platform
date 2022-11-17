@@ -1320,6 +1320,13 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The format is:
 #-# user.preferences.superadmin.<preference name> = <value>
 #-#
+#-# Values set by default for the SuperAdmin user:
+#-# user.preferences.superadmin.displayHiddenDocuments = 1
+#-# user.preferences.superadmin.active = 1
+#-# user.preferences.superadmin.first_name = SuperAdmin
+#-# user.preferences.superadmin.email_checked = 1
+#-# user.preferences.superadmin.usertype = Advanced
+#-#
 #-# Examples:
 #-# user.preferences.superadmin.displayHiddenDocuments = 0
 #-# user.preferences.superadmin.editor = Text
@@ -1329,6 +1336,12 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-#
 #-# The format is:
 #-# user.preferences.guest.<preference name> = <value>
+#-#
+#-# Values set by default for the Guest user:
+#-# user.preferences.guest.displayHiddenDocuments = 0
+#-# user.preferences.guest.active = 0
+#-# user.preferences.guest.first_name = Guest
+#-# user.preferences.guest.email_checked = 0
 #-#
 #-# Examples:
 #-# user.preferences.guest.displayHiddenDocuments = 1

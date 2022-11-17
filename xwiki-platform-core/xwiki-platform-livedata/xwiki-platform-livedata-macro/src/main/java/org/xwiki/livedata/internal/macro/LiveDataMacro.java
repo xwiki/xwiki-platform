@@ -38,12 +38,14 @@ import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.skinx.SkinExtension;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
+import static org.xwiki.security.authorization.Right.SCRIPT;
 
 /**
  * Display dynamic lists of data.
@@ -66,7 +68,7 @@ public class LiveDataMacro extends AbstractMacro<LiveDataMacroParameters>
     private LiveDataMacroConfiguration liveDataMacroConfiguration;
 
     @Inject
-    private LiveDataMacroRights liveDataMacroRights;
+    private ContextualAuthorizationManager contextualAuthorizationManager;
 
     /**
      * The component used to load the JavaScript code of the Live Data widget.
@@ -111,7 +113,7 @@ public class LiveDataMacro extends AbstractMacro<LiveDataMacroParameters>
             // The content is trusted if the author has script right, or if no advanced configuration is used (i.e., 
             // no macro content), and we are running in a trusted context.
             boolean trustedContent =
-                StringUtils.isBlank(content) || (this.liveDataMacroRights.authorHasScriptRight()
+                StringUtils.isBlank(content) || (this.contextualAuthorizationManager.hasAccess(SCRIPT)
                     && !context.getTransformationContext().isRestricted());
             output.setParameter("data-config-content-trusted", Boolean.toString(trustedContent));
         } catch (Exception e) {

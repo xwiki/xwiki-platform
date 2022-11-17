@@ -50,8 +50,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     DefaultLiveDataConfigurationResolver.class,
     StringLiveDataConfigurationResolver.class,
     JsFileSkinExtension.class,
-    LiveDataMacroConfiguration.class,
-    LiveDataMacroRights.class
+    LiveDataMacroConfiguration.class
 })
 @Inherited
 public @interface LiveDataMacroComponentList

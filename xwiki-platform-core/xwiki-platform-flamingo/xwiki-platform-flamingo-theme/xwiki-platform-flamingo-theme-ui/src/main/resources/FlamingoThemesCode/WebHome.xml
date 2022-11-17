@@ -37,6 +37,11 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-{{documentTree showTranslations="false" showAttachments="false" root="document:$doc.documentReference" /}}
+#set ($documentReference = $services.rendering.escape("document:$doc.documentReference", 'xwiki/2.1'))
+{{documentTree
+  showTranslations="false"
+  showAttachments="false"
+  root="$documentReference"
+/}}
 {{/velocity}}</content>
 </xwikidoc>

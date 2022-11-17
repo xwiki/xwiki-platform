@@ -36,15 +36,15 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <parent>IconThemes.WebHome</parent>
-  <content>### Missing: platform.icon.picker.preview=Preview with:
+  <content>platform.icon.picker.preview=これでプレビュー：
 platform.icon.picker.loading=読み込んでいます
-### Missing: rendering.macro.iconPicker.name=Icon Picker
-### Missing: rendering.macro.iconPicker.description=Select an icon within the XWiki icon set.
+rendering.macro.iconPicker.name=アイコンピッカー
+rendering.macro.iconPicker.description=XWikiのアイコンセットからアイコンを選択してください。
 rendering.macro.iconPicker.parameter.id.name=ID
-### Missing: rendering.macro.iconPicker.parameter.id.description=DOM id of the input field where the picker will apply to
+rendering.macro.iconPicker.parameter.id.description=ピッカーが適用される入力フィールドのDOM ID
 rendering.macro.iconPicker.parameter.class.name=クラス
-### Missing: rendering.macro.iconPicker.parameter.class.description=CSS class of inputs where the picker will apply to
-### Missing: rendering.macro.iconPicker.parameter.prefix.name=Prefix
-### Missing: rendering.macro.iconPicker.parameter.prefix.description=Prefix to add before the name of the icon in the input field (default: "image:icon:")
+rendering.macro.iconPicker.parameter.class.description=ピッカーが適用される入力フィールドのCSSクラス
+rendering.macro.iconPicker.parameter.prefix.name=接頭辞
+rendering.macro.iconPicker.parameter.prefix.description=入力フィールドでアイコン名の前に追加する接頭辞（既定："image:icon:"）
 </content>
   </xwikidoc>

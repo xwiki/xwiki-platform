@@ -39,47 +39,47 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>= Editing =
+  <content>= 編集 =
 
-== Groups ==
+== グループ ==
 
-=== 2.0 Groups ===
+=== グループ2.0 ===
 
-Groups can be used to insert another document inline directly into the current document. This allows for example to insert complex elements or style inside a list item, inside a table cell or a paragraph. Groups are delimited by the following syntactic elements: ##{{{(((...)))}}}##. One Group can contain another Group and there is no limit of imbrication.
+グループを使うと、現在のドキュメントに別のドキュメントを直接挿入することができます。例えば、リストの項目、表のセル、段落の中に、複雑な要素やスタイルを挿入することができます。グループは ##{{{(((...)))}}}## のシンタックスで区切られます。グループは入れ子構造にすることができます。
 
-|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
+|=XWikiシンタックス {{velocity}}$crtSyntaxVer{{/velocity}}|=結果
 |((({{{
-|=Header 1|=Header 2|=Header 3
-|Cell One|(((
+|=ヘッダー1|=ヘッダー2|=ヘッダー3
+|セル1|(((
 = Embedded document =
 
-Some embedded paragraph.
+埋め込まれた段落。
 
-* list item one
-* list item two
-  ** sub-item 1
-  ** sub-item 2
-))) | Cell Three
+* リストの項目1
+* リストの項目2
+  ** サブ項目1
+  ** サブ項目2
+))) | セル3
 
-Next paragraph in the top-level document
+最上位のドキュメントの次の段落
 }}})))|(((
-|=Header 1|=Header 2|=Header 3
-|Cell One|(((
+|=ヘッダー1|=ヘッダー2|=ヘッダー3
+|セル1|(((
 {{html}}&lt;h1 id="HEmbeddeddocument"&gt;&lt;span&gt;Embedded document&lt;/span&gt;&lt;/h1&gt;{{/html}}
 
-Some embedded paragraph.
+埋め込まれた段落。
 
-* list item one
-* list item two
-  ** sub-item 1
-  ** sub-item 2
-))) | Cell Three
+* リストの項目1
+* リストの項目2
+  ** サブ項目1
+  ** サブ項目2
+))) | セル3
 
-Next paragraph in the top-level document
+最上位のドキュメントの次の段落
 )))
-|((({{{(% class="myClass" style="color:blue" %)(((blue paragraphs
+|((({{{(% class="myClass" style="color:blue" %)(((myClass の
 
-inside myClass)))}}})))| (% class="myClass" style="color:blue" %)(((blue paragraphs
+青字の段落)))}}})))| (% class="myClass" style="color:blue" %)(((myClass の
 
-inside my group)))</content>
+青字の段落)))</content>
 </xwikidoc>

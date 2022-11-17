@@ -22,6 +22,7 @@ package com.xpn.xwiki.objects.classes;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -424,6 +425,14 @@ public class TextAreaClass extends StringClass
                         VelocityEvaluator velocityEvaluator = Utils.getComponent(VelocityEvaluator.class);
                         content = velocityEvaluator.evaluateVelocityNoException(content,
                             isolated ? sdoc.getDocumentReference() : null);
+                    }
+
+                    // Make sure the right author is used to execute the textarea
+                    // Clone the document to void messaging with the cache
+                    if (!Objects.equals(sdoc.getAuthors().getEffectiveMetadataAuthor(),
+                        sdoc.getAuthors().getContentAuthor())) {
+                        sdoc = sdoc.clone();
+                        sdoc.getAuthors().setContentAuthor(sdoc.getAuthors().getEffectiveMetadataAuthor());
                     }
 
                     buffer.append(

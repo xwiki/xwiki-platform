@@ -39,11 +39,11 @@
   <content>administration.title=管理
 administration.title.page=ページの管理
 administration.title.wiki=ウィキの管理
-### Missing: administration.title.global=Global Administration
+### Missing: administration.title.global=
 administration.sectionTitle=管理：{0}
 administration.sectionTitle.page=ページの管理：{0}
 administration.sectionTitle.wiki=ウィキの管理：{0}
-### Missing: administration.sectionTitle.global=Global Administration: {0}
+### Missing: administration.sectionTitle.global=
 administration.menu.search.hint=検索…
 administration.menu.search.noResults=結果がありません。
 
@@ -52,76 +52,76 @@ XWiki.XWikiPreferences_use_email_verification.hint=「はい」に設定する�
 XWiki.XWikiPreferences_validation_email_content.hint=ユーザーがEメールアドレスを検証する際に送信されるEメールのテンプレート。
 XWiki.XWikiPreferences_confirmation_email_content.hint=ユーザーは、最初に受け取るEメールの認証リンクをクリックしてアカウントを認証します。このEメールテンプレートでは、認証を行ったユーザーに送信するメールを設定できます。
 XWiki.XWikiPreferences_invitation_email_content.hint=このEメールのテンプレートでは、登録を招待するユーザーに送るメールを設定できます。
-### Missing: XWiki.Registration_heading.hint=
-### Missing: XWiki.Registration_welcomeMessage.hint=
-### Missing: XWiki.Registration_liveValidation_enabled.hint=
-### Missing: XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=
-### Missing: XWiki.Registration_loginButton_enabled.hint=
-### Missing: XWiki.Registration_loginButton_autoLogin_enabled.hint=
-### Missing: XWiki.Registration_defaultRedirect.hint=
+XWiki.Registration_heading.hint=登録中あるいは登録が完了したユーザーに表示されるページの最上部の行を設定できます。Velocityとウィキのシンタックスを使うことができます。
+XWiki.Registration_welcomeMessage.hint=これはユーザーがフォームを入力しているときにのみ表示されます。Velocityとウィキのシンタックスコードを使うことができます。
+XWiki.Registration_liveValidation_enabled.hint=JavaScriptのコードによるライブ認証を無効にする場合は、偽に設定してください（フィールドはサーバーにより検証されます）。
+XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=ライブ認証では、フィールドを適切に入力していることをユーザーに通知するメッセージを表示します。特定のフィールドで上書きされていない場合、このメッセージを表示します。Velocityコードを使うことができます。
+XWiki.Registration_loginButton_enabled.hint=ユーザーが登録すると、クリックするとユーザー名とパスワードをログインアクションに送信し、即座にログインするボタンを表示します。これはユーザー名とパスワードをHTML形式で返すため、必要とするセキュリティーによっては問題があるかもしれません。
+XWiki.Registration_loginButton_autoLogin_enabled.hint=ログインボタンが有効の場合、ユーザーのログインボタンを押すJavaScriptのコードを設定できます。
+XWiki.Registration_defaultRedirect.hint=転送パラメーターを設定していない場合で、ログインボタンを押したときにユーザーを転送するURLを設定できます。Velocityコードを使うことができます。
 XWiki.Registration_requireCaptcha.hint=ユーザーの登録時にCAPTCHAの解決を必須とする場合は、これを真に設定してください。
-### Missing: XWiki.Registration_registrationSuccessMessage.hint=
+XWiki.Registration_registrationSuccessMessage.hint=正常に登録が完了したユーザーに表示するメッセージを設定できます。Velocityとウィキのシンタックスコードを使うことができます。
 XWiki.Registration_passwordLength.hint=パスワードの最低の長さ。パスワードは長い方が安全性があります。6文字以上に設定することを推奨します。
 XWiki.Registration_passwordRuleOneLowerCaseEnabled.hint=チェックすると、パスワードが最低1つの小文字を含むことを必須とします。
 XWiki.Registration_passwordRuleOneUpperCaseEnabled.hint=有効にすると、パスワードに1つ以上大文字を設定するよう強制できます。
 XWiki.Registration_passwordRuleOneNumberEnabled.hint=有効にすると、パスワードに1つ以上数字を設定するよう強制できます。
-### Missing: XWiki.Registration_passwordRuleOneSymbolEnabled.hint=
+XWiki.Registration_passwordRuleOneSymbolEnabled.hint=チェックすると、パスワードが最低1つのシンボル文字を含むことを必須とします。
 
 # Look &amp; Feel Sections
 admin.themes=テーマ
 admin.themes.description=色とアイコンのテーマ、スキンとロゴをカスタマイズ。
-### Missing: admin.colorthemes.local=Local
+admin.colorthemes.local=ローカル
 ### Missing: admin.colorthemes.global=
-### Missing: XWiki.XWikiPreferences_showannotations.hint=
+XWiki.XWikiPreferences_showannotations.hint=ページのレイアウトに注釈のセクションを表示。
 XWiki.XWikiPreferences_showcomments.hint=ページのレイアウトにコメントのセクションを表示。
 XWiki.XWikiPreferences_showattachments.hint=ページのレイアウトに添付ファイルのセクションを表示。
 XWiki.XWikiPreferences_showhistory.hint=ページのレイアウトに履歴のセクションを表示。
-### Missing: XWiki.XWikiPreferences_showinformation.hint=
-### Missing: XWiki.XWikiPreferences_title.hint=
-### Missing: XWiki.XWikiPreferences_meta.hint=
-### Missing: XWiki.XWikiPreferences_webcopyright.hint=
-### Missing: XWiki.XWikiPreferences_version.hint=
-### Missing: XWiki.XWikiPreferences_skin.hint=
-### Missing: XWiki.XWikiPreferences_iconTheme.hint=
+XWiki.XWikiPreferences_showinformation.hint=ページのレイアウトに情報のセクションを表示。
+XWiki.XWikiPreferences_title.hint=ブラウザーで表示されるページタイトルのフォーマットを設定。
+XWiki.XWikiPreferences_meta.hint=ページの詳細、作者、キーワードなど、各ページに追加するメタデータを設定。
+XWiki.XWikiPreferences_webcopyright.hint=フッターの著作権セクションに表示する情報を設定。
+XWiki.XWikiPreferences_version.hint=フッターのバージョンセクションに表示する情報を設定。
+XWiki.XWikiPreferences_skin.hint=使用する既定のスキンを設定。ファイルシステムのスキン（例：flamingo）またはカスタムのページスキン（例：XWiki.DefaultSkin）を設定できます
+XWiki.XWikiPreferences_iconTheme.hint=既定で使用するアイコンのテーマを指定。
 XWiki.XWikiPreferences_colorTheme.hint=既定で使用する色のテーマを指定。
 
 # Editing Sections
 admin.edit=編集
-### Missing: admin.edit.description=
+admin.edit.description=編集モード、WYSIWYGエディター、利用可能なシンタックスを設定。
 admin.title=タイトル
-### Missing: XWiki.XWikiPreferences_xwiki.title.mandatory.hint=
-### Missing: XWiki.XWikiPreferences_editor.hint=
-### Missing: XWiki.XWikiPreferences_editcomment.hint=
-### Missing: XWiki.XWikiPreferences_editcomment_mandatory.hint=
-### Missing: XWiki.XWikiPreferences_minoredit.hint=
-### Missing: admin.wysiwyg.description=
-### Missing: XWiki.XWikiPreferences_core.defaultDocumentSyntax.hint=
+XWiki.XWikiPreferences_xwiki.title.mandatory.hint=ウィキのページの作成時にタイトルを必須とする。
+XWiki.XWikiPreferences_editor.hint=ページの内容を編集する際に既定で使用するエディターの種類を選択してください。
+XWiki.XWikiPreferences_editcomment.hint=ページの新しいバージョンを作成する際にメッセージの入力を許可。
+XWiki.XWikiPreferences_editcomment_mandatory.hint=バージョンの要約メッセージを指定するまで、ページの変更は保存されません。
+XWiki.XWikiPreferences_minoredit.hint=ページに主要なバージョン（x.1）と軽微なバージョン（1.x）を設定することを許可。軽微なバージョンは、ページの履歴より「軽微な変更を表示」のボタンで表示できます。
+admin.wysiwyg.description=既定のWYSIWYGエディターを選択し、設定してください。
+XWiki.XWikiPreferences_core.defaultDocumentSyntax.hint=新しいウィキページを作成する際に、ページのコンテンツに既定で使用するマークアップのシンタックス。
 
 # Localization Section
-### Missing: XWiki.XWikiPreferences_multilingual.hint=
-### Missing: XWiki.XWikiPreferences_languages.hint=
+XWiki.XWikiPreferences_multilingual.hint=ウィキに複数の言語によるコンテンツがある場合は、多言語モードを有効にしてください。ウィキのページを翻訳したり、好みの言語でインターフェースを表示したりできるようになります。
+XWiki.XWikiPreferences_languages.hint=インターフェースで利用可能な言語を選択してください。選択した言語でウィキのページを翻訳できるようになります（多言語モードが有効の場合）。
 XWiki.XWikiPreferences_default_language.hint=ウィキの既定の言語を選択
-### Missing: XWiki.XWikiPreferences_dateformat.hint=
+XWiki.XWikiPreferences_dateformat.hint=日付（ページの作成日など）を表示する際に使用するフォーマットを選択
 ### Missing: XWiki.XWikiPreferences_timezone.hint=
 
 # Import Section
-### Missing: administration.section.import.hint=
+administration.section.import.hint=新しいパッケージをアップロードするか、利用可能なパッケージの一覧から選択してください。選択したパッケージの内容は、インポートのオプションとあわせて表示されます。
 
 # Export Section
-### Missing: administration.section.export.pages=Pages
+administration.section.export.pages=ページ
 administration.section.export.pages.all=全てのページ
-### Missing: administration.section.export.withHistory.hint=
-### Missing: administration.section.export.targetXWikiVersion=
-### Missing: administration.section.export.targetXWikiVersion.hint=
+administration.section.export.withHistory.hint=ページの履歴をエクスポートに含める。それ以外の場合、ページの最新のバージョンだけをエクスポートします。
+administration.section.export.targetXWikiVersion=ターゲットのXWikiのバージョン
+administration.section.export.targetXWikiVersion.hint=ページをインポートするXWikiのバージョン。現在のバージョンは{0}です。
 administration.section.export.targetXWikiVersion.12plus=バージョン12.0以上
 administration.section.export.targetXWikiVersion.below12=バージョン12.0未満
-### Missing: administration.section.export.packageName.hint=
-### Missing: administration.section.export.moreOptions=
+administration.section.export.packageName.hint=エクスポートしたウィキページのアーカイブを生成する際に使用するファイル名。
+administration.section.export.moreOptions=他のオプション
 ### Missing: administration.section.export.lessOptions=
-### Missing: administration.section.export.description.hint=
-### Missing: administration.section.export.author.hint=
+administration.section.export.description.hint=パッケージの説明。インポート時に表示します。
+administration.section.export.author.hint=パッケージの作者名。インポート時に表示します。
 administration.section.export.licence.hint=コンテンツのライセンス。例：LGPL、GPLV2など。
-### Missing: administration.section.export.version.hint=
+administration.section.export.version.hint=パッケージのバージョン。パッケージの記述子に保存されます。
 ### Missing: administration.section.export.backupPack.hint=
 
 # Users Section
@@ -131,36 +131,36 @@ administration.section.users.enableUser.failed=ユーザーアカウントを有
 administration.section.users.disableUser.inProgress=ユーザーアカウントを無効化しています…
 administration.section.users.disableUser.done=ユーザーアカウントを無効化しました
 administration.section.users.disableUser.failed=ユーザーアカウントを無効化できませんでした
-### Missing: administration.section.users.deleteUser.confirmationMessage=
+administration.section.users.deleteUser.confirmationMessage=ユーザー {0} を削除し、所属する全ての{1}グループ{2}から削除します。続行してよろしいですか？
 ### Missing: administration.section.users.deleteUser.programmingRightsWarning=
 ### Missing: administration.section.users.deleteUser.scriptRightsWarning=
 ### Missing: administration.section.users.deleteUser.newAuthor=
 ### Missing: administration.section.users.deleteUser.newAuthor.hint=
 administration.section.users.deleteUser.newAuthor.error=選択したユーザーには{0}の権限がありません！
 administration.section.users.deleteUser.newAuthor.programming=プログラミング
-### Missing: administration.section.users.deleteUser.newAuthor.script=script
+administration.section.users.deleteUser.newAuthor.script=スクリプト
 admin.usersgroups.extensionrights=拡張機能の権限
 
 # Other Category
-### Missing: admin.other=Other
-### Missing: admin.other.description=
-### Missing: administration.section.analytics.status=Status
+admin.other=その他
+admin.other.description=拡張機能の様々な設定。
+administration.section.analytics.status=状態
 ### Missing: administration.section.analytics.status.hint=
 
 # Social category
-### Missing: admin.social=Social
-### Missing: admin.social.description=
+admin.social=ソーシャル
+admin.social.description=ソーシャル機能を設定。
 
 # Configurable Class
-### Missing: XWiki.ConfigurableClass_displayInSection=
+XWiki.ConfigurableClass_displayInSection=セクションに表示
 XWiki.ConfigurableClass_heading=ヘッダー
-### Missing: XWiki.ConfigurableClass_configurationClass=
-### Missing: XWiki.ConfigurableClass_linkPrefix=Link prefix
+XWiki.ConfigurableClass_configurationClass=設定クラス
+XWiki.ConfigurableClass_linkPrefix=リンクの接頭辞
 XWiki.ConfigurableClass_propertiesToShow=表示するプロパティー
 XWiki.ConfigurableClass_codeToExecute=実行するコード
-### Missing: XWiki.ConfigurableClass_iconAttachment=
-### Missing: XWiki.ConfigurableClass_displayInCategory=
-### Missing: XWiki.ConfigurableClass_displayBeforeCategory=
+XWiki.ConfigurableClass_iconAttachment=アイコンの添付
+XWiki.ConfigurableClass_displayInCategory=カテゴリー別で表示
+XWiki.ConfigurableClass_displayBeforeCategory=カテゴリーの前に表示
 XWiki.ConfigurableClass_categoryIcon=カテゴリーのアイコン
 ### Missing: XWiki.ConfigurableClass_scope=
 ### Missing: XWiki.ConfigurableClass_scope_WIKI=Wiki
@@ -174,11 +174,11 @@ XWiki.ConfigurableClass_sectionOrder=セクションの順序
 #@deprecatedstart
 
 ## Deprecated since 11.6RC1
-### Missing: XWiki.XWikiPreferences_auth_active_check.hint=
-### Missing: administration.section.users.deleteUser.markInactiveMessage=
+XWiki.XWikiPreferences_auth_active_check.hint=「はい」に設定すると、Eメールで送信されたトークンの入力をユーザーのログイン時に必須とします。
+administration.section.users.deleteUser.markInactiveMessage=ユーザーを削除する代わりに、プロフィールを非アクティブに設定できます。ユーザーのログインを防ぐとともに、ユーザーが作成したスクリプトに関連付けられたアクセス権限を保存します。
 
 ## Deprecated since 11.8RC1
-### Missing: administration.section.users.deleteUser.markDisabledMessage=
+administration.section.users.deleteUser.markDisabledMessage=ユーザーを削除する代わりに、プロフィールを無効に設定できます。ユーザーのログインを防ぐとともに、ユーザーが作成したスクリプトに関連付けられたアクセス権限を保存します。
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

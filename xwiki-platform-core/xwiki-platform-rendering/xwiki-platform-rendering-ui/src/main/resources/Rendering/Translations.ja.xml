@@ -37,8 +37,8 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>admin.syntaxes=シンタックス
-### Missing: admin.syntaxes.description=Choose the default page syntax and configure the available markup syntaxes.
-### Missing: Rendering.RenderingConfigClass_disabledSyntaxes=Disabled Syntaxes
-### Missing: Rendering.RenderingConfigClass_disabledSyntaxes.hint=The list of markup syntaxes in which pages cannot be written
+admin.syntaxes.description=既定のページのシンタックスを選択して、利用可能なマークアップのシンタックスを設定してください。
+Rendering.RenderingConfigClass_disabledSyntaxes=無効のシンタックス
+Rendering.RenderingConfigClass_disabledSyntaxes.hint=ページの作成に使用できないマークアップのシンタックスのリスト
 </content>
   </xwikidoc>

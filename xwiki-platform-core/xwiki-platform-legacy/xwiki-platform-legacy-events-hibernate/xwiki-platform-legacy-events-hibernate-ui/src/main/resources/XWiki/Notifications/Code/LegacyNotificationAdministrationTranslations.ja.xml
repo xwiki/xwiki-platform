@@ -37,10 +37,10 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>legacy.event.migration.description=XWikiは12.6にイベント（通知）の新しい保存に切り替えました。多くのイベントをもつ古いウィキでイベントをコピーするには長い時間がかかり、また、イベントの維持が常に望ましいとは限らないので、ウィキの管理者に委ねることにしました。それらに対処しないと、以前の通知が失われたように見えるかもしれません。マイグレーションはバックグラウンドで実行されます。
-### Missing: legacy.event.count.store=Number of events in the standard store
-### Missing: legacy.event.count.legacy=Number of events in the legacy store
-### Missing: legacy.event.migration.alltime=All time
-### Missing: legacy.event.migration.since=Since
-### Missing: legacy.event.migration.start=Start migration
+legacy.event.count.store=標準保存のイベントの数
+legacy.event.count.legacy=レガシー保存のイベントの数
+legacy.event.migration.alltime=全期間
+legacy.event.migration.since=これ以降
+legacy.event.migration.start=マイグレーションを開始
 </content>
   </xwikidoc>

@@ -42,10 +42,10 @@ extension.repository.name=名称
 extension.repository.summary=要約
 extension.repository.type=種類
 extension.repository.category=カテゴリー
-### Missing: extension.repository.authors=Authors
+### Missing: extension.repository.authors=
 extension.repository.doc.creationDate=作成日
 extension.repository.doc.date=最終更新日
-### Missing: extension.repository.rating=Rating
+extension.repository.rating=評価
 extension.repository.installedCount=インストール数
 
 ## Administration UI

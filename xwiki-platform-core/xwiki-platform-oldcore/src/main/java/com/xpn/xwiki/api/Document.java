@@ -43,6 +43,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.model.document.DocumentAuthors;
+import org.xwiki.model.internal.document.SafeDocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -2161,6 +2162,9 @@ public class Document extends Api
     /**
      * Verifies if the user identified by {@code userReference} has the access identified by {@code right} on this
      * document.
+     * Note that this method does not override {@link Api#hasAccess(Right, DocumentReference)}: they share same
+     * signature but on the {@code Api} one the {@link DocumentReference} parameter is about the entity where to check
+     * the right, while here it's about the user to check right for.
      * 
      * @param right the right to check
      * @param userReference the user to check the right for
@@ -2170,6 +2174,19 @@ public class Document extends Api
     public boolean hasAccess(Right right, DocumentReference userReference)
     {
         return getAuthorizationManager().hasAccess(right, userReference, getDocumentReference());
+    }
+
+    /**
+     * Verifies if the context user has the access identified by {@code right} on the current context document.
+     * @param right the right to check
+     * @return {@code true} if the user has the specified right on this document, {@code false} otherwise
+     * @since 14.10RC1
+     * @since 14.4.7
+     */
+    @Unstable
+    public boolean hasAccess(Right right)
+    {
+        return hasAccess(right, getXWikiContext().getUserReference());
     }
 
     public boolean getLocked()
@@ -2595,7 +2612,7 @@ public class Document extends Api
     {
         if (hasAccessLevel("edit")) {
 
-            DocumentAuthors authors = this.getAuthors();
+            DocumentAuthors authors = getDoc().getAuthors();
             authors.setOriginalMetadataAuthor(getCurrentUserReferenceResolver().resolve(CurrentUserReference.INSTANCE));
             // If the current author does not have PR don't let it set current user as author of the saved document
             // since it can lead to right escalation
@@ -2692,7 +2709,7 @@ public class Document extends Api
     {
         XWikiContext xcontext = getXWikiContext();
 
-        getAuthors()
+        getDoc().getAuthors()
             .setOriginalMetadataAuthor(getCurrentUserReferenceResolver().resolve(CurrentUserReference.INSTANCE));
         DocumentReference author = getEffectiveAuthorReference();
         if (hasAccess(Right.EDIT, author)) {
@@ -3310,6 +3327,12 @@ public class Document extends Api
     @Unstable
     public DocumentAuthors getAuthors()
     {
-        return doc.getAuthors();
+        if (this.hasAccess(Right.PROGRAM)) {
+            // We're using getDoc here to ensure to have a cloned doc
+            return getDoc().getAuthors();
+        } else {
+            // in this case we don't care if the doc is cloned or not since it's readonly
+            return new SafeDocumentAuthors(this.doc.getAuthors());
+        }
     }
 }

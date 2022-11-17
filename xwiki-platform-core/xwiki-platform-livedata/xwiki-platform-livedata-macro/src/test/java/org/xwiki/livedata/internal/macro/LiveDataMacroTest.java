@@ -44,7 +44,7 @@ import org.xwiki.rendering.internal.renderer.xhtml.image.DefaultXHTMLImageTypeRe
 import org.xwiki.rendering.internal.renderer.xhtml.link.DefaultXHTMLLinkRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.link.DefaultXHTMLLinkTypeRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -69,8 +69,7 @@ import static org.xwiki.rendering.test.integration.junit5.BlockAssert.assertBloc
     DefaultXHTMLLinkTypeRenderer.class,
     DefaultXHTMLImageRenderer.class,
     DefaultXHTMLImageTypeRenderer.class,
-    LiveDataMacroConfiguration.class,
-    LiveDataMacroRights.class
+    LiveDataMacroConfiguration.class
 })
 class LiveDataMacroTest
 {
@@ -87,7 +86,7 @@ class LiveDataMacroTest
     private DocumentAccessBridge documentAccessBridge;
 
     @MockComponent
-    private AuthorizationManager authorizationManager;
+    private ContextualAuthorizationManager contextualAuthorizationManager;
 
     private PrintRendererFactory rendererFactory;
 

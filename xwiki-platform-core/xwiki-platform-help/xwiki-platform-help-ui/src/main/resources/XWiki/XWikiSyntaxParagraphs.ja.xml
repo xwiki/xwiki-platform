@@ -39,31 +39,31 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>= Editing =
+  <content>= 編集 =
 
-== Paragraphs ==
+== 段落 ==
 
-=== 1.0 Paragraphs ===
+=== 段落1.0 ===
 
-Paragraphs are text elements separated by 2 or more new lines.
+段落は2つ以上の改行で分けられたテキストのことを指します。
 
-{{info}}New lines are not honored in XWiki Syntax 1.0. 
-You need to insert a double backslash instead, like: {{{\\}}}{{/info}}
+{{info}}XWikiシンタックス 1.0では改行は尊重されません。
+{{{}}}の代わりに、二重のバックスラッシュを挿入する必要があります。{{/info}}
 
-|=Feature|=XWiki Syntax 1.0|=Result
-|Simple paragraph|This is a paragraph|This is a paragraph
-|Paragraph on multiple lines|Paragraph on{{{\\}}}\\multiple lines|Paragraph on\\multiple lines
-|Two paragraphs|Paragraph one\\\\Paragraph two|Paragraph one\\\\Paragraph two
-|Parametrized paragraph|&lt;p style="text-align:center;color:blue"&gt;Centered and blue paragraph&lt;/p&gt;|(% style="text-align:center;color:blue" %)\\Centered and blue paragraph
+|=機能|=XWikiシンタックス 1.0|=結果
+|シンプルな段落|これは段落です|これは段落です
+|複数行の段落|複数行の{{{}}}段落|複数行の段落
+|2つの段落|段落1\\段落2|段落1\\段落2
+|パラメーター付きの段落|&lt;p style="text-align:center;color:blue"&gt;中央に揃えた青色の段落&lt;/p&gt;|(% style="text-align:center;color:blue" %)中央に揃えた青色の段落
 
-=== 2.0 Paragraphs ===
+=== 段落2.0 ===
 
-Paragraphs are text elements separated by 2 or more new lines.
+段落は2つ以上の改行で分けられたテキストのことを指します。
 
-|=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
-|Simple paragraph|This is a paragraph|This is a paragraph
-|Paragraph on multiple lines|Paragraph on\\multiple lines|Paragraph on\\multiple lines
-|Two paragraphs|Paragraph one\\\\Paragraph two|Paragraph one\\\\Paragraph two
-|Parametrized paragraph|{{{(% style="text-align:center;color:blue" %)}}}\\Centered and blue paragraph|(% style="text-align:center;color:blue" %)\\Centered and blue paragraph
-|Different style on some portion of the paragraph content|paragraph with {{{(% style="color:red" %)}}}red{{{(%%)}}} different style inside|paragraph with (% style="color:red" %)red(%%) texte inside</content>
+|=機能|=XWikiシンタックス {{velocity}}$crtSyntaxVer{{/velocity}}|=結果
+|シンプルな段落|これは段落です|これは段落です
+|複数行の段落|複数行の段落|複数行の段落
+|2つの段落|段落1\\段落2|段落1\\段落2
+|パラメーター付きの段落|{{{(% style="text-align:center;color:blue" %)}}}中央に揃えた青色の段落|(% style="text-align:center;color:blue" %)中央に揃えた青色の段落
+|内容の一部に異なるスタイルが適用された段落|{{{(% style="color:red" %)}}}赤色{{{(%%)}}}の異なるスタイルがある段落|(% style="color:red" %)赤色(%%)のテキストがある段落</content>
 </xwikidoc>

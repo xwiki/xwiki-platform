@@ -234,6 +234,11 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
     private boolean isExpectedSolrVersion(File solrconfigFile)
     {
         XMLInputFactory factory = XMLInputFactory.newInstance();
+        // Prevent any XXE attack by disabling DOCTYPE declarations (even though we control the solr config file and
+        // thus the risk is almost non-existent. The user would need to find a way to replace it).
+        // Note that all solrconfig files checked didn't contain any DOCTYPE so that should be good.
+        // This will also prevent SonarQube from complaining every time this file is modified.
+        factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
 
         try (FileReader reader = new FileReader(solrconfigFile)) {
             XMLStreamReader xmlReader = factory.createXMLStreamReader(reader);

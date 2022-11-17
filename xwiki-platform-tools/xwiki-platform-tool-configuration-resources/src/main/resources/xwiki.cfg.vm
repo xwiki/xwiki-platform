@@ -520,10 +520,6 @@ xwiki.stats.default=0
 #-# Indicate if Filter module should be used when exporting a XAR in the export action.
 #-# By default Filter module is used, uncomment to use the old system.
 # xwiki.action.export.xar.usefilter=0
-#-# [Since 6.2]
-#-# Indicate if Filter module should be used when importing a XAR in the import action.
-#-# By default Filter module is used, uncomment to use the old system.
-# xwiki.action.import.xar.usefilter=0
 
 #-# [Since 12.0]
 #-# Indicate if the XAR packages should be optimized (from size point of view) by default.

@@ -33,9 +33,8 @@ import org.xwiki.test.ui.po.ViewPage;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Tests for the object editor.
+ * Tests for the TextArea property.
  *
- * @since 12.4RC1
  * @version $Id$
  */
 @UITest
@@ -43,16 +42,16 @@ class TextAreaIT
 {
     private static final String TEXTAREA_CLASS = "TextAreaIT.NestedSpace.TextAreaClass";
 
+    private static final DocumentReference TEXTAREA_CLASS_REFERENCE =
+        new DocumentReference("xwiki", Arrays.asList("TextAreaIT", "NestedSpace"), "TextAreaClass");
+
     @BeforeAll
     public void beforeEach(TestUtils testUtils)
     {
         testUtils.loginAsSuperAdmin();
 
-        DocumentReference textAreaClassReference =
-            new DocumentReference("xwiki", Arrays.asList("TextAreaIT", "NestedSpace"), "TextAreaClass");
-
-        testUtils.createPage(textAreaClassReference, "", "TextAreaClass");
-        testUtils.addClassProperty(textAreaClassReference, "textarea", "TextArea");
+        testUtils.createPage(TEXTAREA_CLASS_REFERENCE, "", "TextAreaClass");
+        testUtils.addClassProperty(TEXTAREA_CLASS_REFERENCE, "textarea", "TextArea");
     }
 
     @Test
@@ -94,5 +93,30 @@ class TextAreaIT
             + "current author: XWiki.superadmin",
         // @formatter:on
             viewPage.getContent());
+    }
+
+    @Test
+    @Order(2)
+    void restricted(TestUtils testUtils, TestReference testReference)
+    {
+        // Cleanup
+        testUtils.deletePage(testReference);
+
+        testUtils.createPage(testReference, "{{velocity}}$doc.display('textarea'){{/velocity}}");
+        testUtils.addObject(testReference, TEXTAREA_CLASS, "textarea", "{{velocity}}OK{{/velocity}}");
+
+        ViewPage viewPage = testUtils.gotoPage(testReference);
+
+        assertEquals("OK", viewPage.getContent());
+
+        // Make the textarea restricted
+        testUtils.updateClassProperty(TEXTAREA_CLASS_REFERENCE, "textarea_restricted", "1");
+
+        viewPage = testUtils.gotoPage(testReference);
+
+        assertEquals("Failed to execute the [velocity] macro. "
+            + "Cause: [The execution of the [velocity] script macro is not allowed. "
+            + "Check the rights of its last author or the parameters if it's rendered from another script.]. "
+            + "Click on this message for details.", viewPage.getContent());
     }
 }

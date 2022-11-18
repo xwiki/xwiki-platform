@@ -158,4 +158,10 @@ public class AllITs
     class NestedInvitationIT extends InvitationIT
     {
     }
+
+    @Nested
+    @DisplayName("TextArea property Tests")
+    class NestedTextAreaIT extends TextAreaIT
+    {
+    }
 }

@@ -129,7 +129,7 @@ platform.wiki.users.delete.title=ウィキ"{0}"を削除
 platform.wiki.users.delete.empty=ウィキを削除
 ### Missing: platform.wiki.users.invitation.reply.hint=
 platform.wiki.users.join.request.hint=ウィキ {0}{1}{2} に参加するには、参加リクエストを送信する必要があります。送信後、ウィキの管理者が参加を許可するかを確認します。
-### Missing: platform.wiki.users.join.request.message.hint=
+platform.wiki.users.join.request.message.hint=参加をリクエストする際にウィキの管理者に送信するメッセージ。
 ### Missing: platform.wiki.users.invitation.title=
 platform.wiki.users.invitation.message.label=招待メッセージ
 platform.wiki.users.invitation.reply.title=返信
@@ -214,12 +214,12 @@ platform.wiki.create.wizard.step.cleaningup.error=エラー。ウィキ {0} は�
 platform.wiki.create.wizard.step.cleaningUp.confirmmessage=ウィキ {0} を削除します。承認してください。
 platform.wiki.create.wizard.step.cleaningUp.confirm=承認
 platform.wiki.create.wizard.setAsTemplate.label=このウィキをテンプレートにする
-### Missing: platform.wiki.create.wizard.template.noTemplate=No template (default)
-### Missing: platform.wiki.create.wizard.userScope.label=
-### Missing: platform.wiki.create.wizard.userScope.hint=
+platform.wiki.create.wizard.template.noTemplate=テンプレートがありません（既定）
+platform.wiki.create.wizard.userScope.label=ユーザースコープ
+platform.wiki.create.wizard.userScope.hint=どの種類のユーザーがウィキにアクセスできるか選択してください
 platform.wiki.create.wizard.template.label=テンプレート
 platform.wiki.create.wizard.flavortemplate.label=フレーバー / テンプレート
-### Missing: platform.wiki.create.wizard.flavortemplate.hint=
+platform.wiki.create.wizard.flavortemplate.hint=新しいウィキの最初のコンテンツとして使用するフレーバーあるいはテンプレート
 platform.wiki.create.wizard.flavortemplate.flavorTab=フレーバー
 platform.wiki.create.wizard.flavortemplate.templateTab=テンプレート
 ### Missing: platform.wiki.create.wizard.step.dw=
@@ -229,7 +229,7 @@ platform.wiki.create.wizard.step.create=作成
 platform.wiki.create.wizard.step.creation=ウィキの作成
 platform.wiki.create.wizard.step.creation.wait=ウィキを作成するまでお待ちください。
 platform.wiki.create.wizard.step.creation.complete=ウィキ {0} が作成されました。アクセスできます。
-### Missing: platform.wiki.create.wizard.step.creation.errorlog=
+platform.wiki.create.wizard.step.creation.errorlog=ただし、作成する際にエラーが発生しました。エラーは確認が必要かもしれません。
 platform.wiki.create.wizard.step.creation.error=ウィキ {0} を作成できませんでした。削除を推奨します。
 platform.wiki.create.wizard.step.creation.go=ウィキに行く
 
@@ -237,11 +237,11 @@ platform.wiki.create.wizard.step.creation.go=ウィキに行く
 admin.wikis.description=ウィキの管理。
 admin.wikis.templates=ウィキのテンプレート
 admin.wikis.templates.description=ウィキのテンプレートを管理
-### Missing: admin.wikis.templates.hint=
-### Missing: admin.wikis.rights=Creation Right
+admin.wikis.templates.hint=テンプレートは、新しいウィキを作成する際に使用されるウィキです。ユーザーがテンプレートを選択して新しいウィキを作成する際、テンプレートの全てのコンテンツがコピーされます。
+admin.wikis.rights=作成権限
 
 ## XWikiServer Sheet
-### Missing: platform.wiki.sheet.title=
+platform.wiki.sheet.title=ウィキ "{0}" の記述子
 platform.wiki.sheet.erroraliasalreadynotexists=ウィキのエイリアス"{0}"は既に存在します。
 platform.wiki.sheet.erroraliasdoesnotexists=ウィキのエイリアス"{0}"は存在しません。
 platform.wiki.sheet.title.settings=ウィキのプロパティー
@@ -249,9 +249,9 @@ platform.wiki.sheet.title.createnewalias=新しいエイリアスを作成
 platform.wiki.sheet.title.viewaliases=エイリアスを閲覧
 platform.wiki.sheet.desc.wikiprettyname=ウィキの表示名。
 platform.wiki.sheet.desc.owner=このウィキの全ての権限をもつユーザー。
-### Missing: platform.wiki.sheet.desc.secure=
-### Missing: platform.wiki.sheet.desc.port=
-### Missing: platform.wiki.sheet.desc.iswikitemplate=
+platform.wiki.sheet.desc.secure=有効にすると、このウィキが生成する全ての外部URLが"https"から始まるようになります。
+platform.wiki.sheet.desc.port=このウィキが生成する全ての外部URLに使用するポート。設定がない場合は、メインのウィキの設定を使用します。ドメインに基づくURLにのみ適用されます。
+platform.wiki.sheet.desc.iswikitemplate=新しいウィキを作成する際にこのウィキをテンプレートとして使用できるかどうかを指定。
 platform.wiki.sheet.desc.server=ウィキにアクセスする際に使用するエイリアス。
 platform.wiki.sheet.desc.description=ウィキの簡潔な説明。
 platform.wiki.sheet.desc.homepage=ウィキのトップページ。
@@ -264,8 +264,8 @@ platform.wiki.sheet.prop.server=エイリアス
 platform.wiki.sheet.prop.homepage=トップページ
 platform.wiki.sheet.prop.iswikitemplate=ウィキのテンプレート
 ### Missing: platform.wiki.sheet.descriptor=
-### Missing: platform.wiki.sheet.descriptor.admin=administration page of the wiki.
-### Missing: platform.wiki.sheet.aliases=
+### Missing: platform.wiki.sheet.descriptor.admin=
+platform.wiki.sheet.aliases=エイリアスは、ウィキの別名です。エイリアスを追加すると、異なるウィキのURLを作成できます。
 
 ###############################################################################
 ## Deprecated
@@ -278,7 +278,7 @@ platform.wiki.sheet.prop.iswikitemplate=ウィキのテンプレート
 #######################################
 ## until 6.1
 #######################################
-### Missing: platform.wiki.dependencies.applicationmanager.missing=
+platform.wiki.dependencies.applicationmanager.missing={0}アプリケーション管理プラグイン{1}がインストールされていません。インストール後、再度お試しください。
 
 #######################################
 ## until 6.4RC1
@@ -289,10 +289,10 @@ admin.wikis.template=ウィキのテンプレート
 #######################################
 ## until 7.0M2
 #######################################
-### Missing: platform.wiki.create.wizard.step.provisioning=
-### Missing: platform.wiki.create.wizard.step.provisioning.wait=
-### Missing: platform.wiki.create.wizard.step.provisioning.complete=
-### Missing: platform.wiki.create.wizard.step.provisioning.error=
+platform.wiki.create.wizard.step.provisioning=システムがウィキを準備しています。
+platform.wiki.create.wizard.step.provisioning.wait=システムがウィキを準備しています。お待ちください。
+platform.wiki.create.wizard.step.provisioning.complete=準備が完了しました。"完了"をクリックし、最後の操作を実行してください。
+platform.wiki.create.wizard.step.provisioning.error=ウィキ {0} を作成しましたが、テンプレートにあるいくつかのページがコピーされませんでした。ウィキを削除すべきかもしれません。
 platform.wiki.create.wizard.step.provisioning.finalize=完了
 
 #######################################

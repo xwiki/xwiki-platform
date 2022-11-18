@@ -112,7 +112,7 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
     {
         if (!this.request.getDocuments().isEmpty()) {
             this.requiredSkinExtensionsRecorder.start();
-            render(this.request.getDocuments(), this.request.isWithTitle());
+            render(this.request.getDocuments());
             if (!this.status.isCanceled()) {
                 this.status.setRequiredSkinExtensions(this.requiredSkinExtensionsRecorder.stop());
             }
@@ -124,7 +124,7 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
         }
     }
 
-    private void render(List<DocumentReference> documentReferences, boolean withTitle) throws Exception
+    private void render(List<DocumentReference> documentReferences) throws Exception
     {
         this.progressManager.pushLevelProgress(documentReferences.size(), this);
 
@@ -139,12 +139,7 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
                 } else {
                     this.progressManager.startStep(this);
                     if (hasAccess(Right.VIEW, documentReference)) {
-                        DocumentRenderingResult renderingResult =
-                            this.documentRenderer.render(documentReference, withTitle);
-                        this.status.getDocumentRenderingResults().add(renderingResult);
-                        // We approximate the size by counting the characters, which take 1 byte most of the time. We
-                        // don't have to be very precise.
-                        contentSize += renderingResult.getHTML().length();
+                        contentSize += render(documentReference);
                         if (contentSize > maxContentSize) {
                             throw new RuntimeException("Maximum content size limit exceeded.");
                         }
@@ -156,6 +151,20 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
         } finally {
             this.progressManager.popLevelProgress(this);
         }
+    }
+
+    private int render(DocumentReference documentReference) throws Exception
+    {
+        // TODO: Don't render the same document twice.
+        // TODO: Collect the XDOMs only when the table of content is requested.
+        // TODO: Keep only the headings in the collected XDOMs in order to reduce the memory footprint.
+        DocumentRenderingResult renderingResult =
+            this.documentRenderer.render(documentReference, this.request.isWithTitle());
+        this.status.getDocumentRenderingResults().add(renderingResult);
+
+        // We approximate the size by counting the characters, which take 1 byte most of the time. We don't have to be
+        // very precise.
+        return renderingResult.getHTML().length();
     }
 
     /**

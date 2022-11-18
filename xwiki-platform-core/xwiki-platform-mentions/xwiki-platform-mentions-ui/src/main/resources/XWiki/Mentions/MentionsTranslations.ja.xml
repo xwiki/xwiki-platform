@@ -36,25 +36,25 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: rendering.macro.mention.name=User Mention
-### Missing: rendering.macro.mention.description=Insert a user mention.
+  <content>rendering.macro.mention.name=ユーザーメンション
+rendering.macro.mention.description=ユーザーメンションを挿入。
 ### Missing: rendering.macro.mention.parameter.reference.name=Reference
 ### Missing: rendering.macro.mention.parameter.reference.description=The mentioned user or group reference.
 rendering.macro.mention.parameter.style.name=表示のスタイル
-### Missing: rendering.macro.mention.parameter.style.description=The style choice of the mention (this is only supported for user mentions).
-### Missing: rendering.macro.mention.parameter.anchor.name=Anchor
-### Missing: rendering.macro.mention.parameter.anchor.description=The anchor to be used for linking to that mention (this anchor should be unique to the document as much as possible).
-### Missing: rendering.macro.mention.parameter.type.name=Type
+rendering.macro.mention.parameter.style.description=メンションを表示するスタイル（これはユーザーメンションにのみ適用されます）。
+rendering.macro.mention.parameter.anchor.name=アンカー
+rendering.macro.mention.parameter.anchor.description=メンションへのリンクに使用するアンカー（このアンカーはできるだけドキュメントに固有であるべきです）。
+rendering.macro.mention.parameter.type.name=種類
 ### Missing: rendering.macro.mention.parameter.type.description=The type of the mentioned actor.
-### Missing: org.xwiki.mentions.DisplayStyle.FULL_NAME=Full name of the user
-### Missing: org.xwiki.mentions.DisplayStyle.FIRST_NAME=First name of the user only
-### Missing: org.xwiki.mentions.DisplayStyle.LOGIN=Username
-### Missing: XWiki.Mentions.MentionsConfigurationClass_mentionsColor=Mentions Color
-### Missing: XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=The color of the mentions to the current user (note: used as the value of a background-color css attribute).
-### Missing: XWiki.Mentions.MentionsConfigurationClass_selfMentionsColor=Self Mentions Color
-### Missing: XWiki.Mentions.MentionsConfigurationClass_quoteActivated=Activate the quotes
-### Missing: XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=Defines if a quote of the text surrounding a mention is included in the user mention notifications.
+org.xwiki.mentions.DisplayStyle.FULL_NAME=ユーザーの氏名
+org.xwiki.mentions.DisplayStyle.FIRST_NAME=ユーザーの名のみ
+org.xwiki.mentions.DisplayStyle.LOGIN=ユーザー名
+XWiki.Mentions.MentionsConfigurationClass_mentionsColor=メンションの色
+XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=現在のユーザーのメンションの色（メモ：CSSのbackground-colorの属性に使用します）。
+XWiki.Mentions.MentionsConfigurationClass_selfMentionsColor=自分のメンションの色
+XWiki.Mentions.MentionsConfigurationClass_quoteActivated=引用を有効にする
+XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=メンションを囲むテキストの引用をユーザーメンションの通知に含むかどうかを規定。
 ### Missing: mentions.tip=When editing in WYSIWYG, type @ and then start typing letters to get suggestions to mention a user.
-### Missing: mentions.configuration.heading=Mentions Preferences
+mentions.configuration.heading=メンションの設定
 </content>
   </xwikidoc>

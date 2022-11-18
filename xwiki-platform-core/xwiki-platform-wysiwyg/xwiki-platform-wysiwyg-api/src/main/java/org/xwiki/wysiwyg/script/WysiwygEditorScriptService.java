@@ -169,6 +169,28 @@ public class WysiwygEditorScriptService implements ScriptService
      */
     public String parseAndRender(String html, Syntax syntax, EntityReference sourceReference)
     {
+        return parseAndRender(html, syntax, sourceReference, false);
+    }
+
+    /**
+     * Parses the given HTML fragment and renders the result in annotated XHTML syntax.
+     * <p>
+     * This method is currently used in {@code wysiwyginput.vm} and its purpose is to refresh the content of the WYSIWYG
+     * editor. This method is called for instance when a macro is inserted or edited.
+     *
+     * @param html the HTML fragment to be rendered
+     * @param syntax the storage syntax identifier
+     * @param sourceReference the reference of the html (where it's coming from)
+     * @param restricted true if the content of this property should be executed in a restricted content, false
+     *            otherwise
+     * @return the XHTML result of rendering the given HTML fragment
+     * @since 14.10RC1
+     * @since 14.4.7
+     * @since 13.10.11
+     */
+    @Unstable
+    public String parseAndRender(String html, Syntax syntax, EntityReference sourceReference, boolean restricted)
+    {
         XWikiDocument securityDocument = createSecurityDocument();
         XWikiDocument originalSecurityDocument = setSecurityDocument(securityDocument);
 
@@ -194,7 +216,7 @@ public class WysiwygEditorScriptService implements ScriptService
                 resolvedSourceReference = securityDocument.getDocumentReference();
             }
 
-            return this.htmlConverter.parseAndRender(html, syntax, resolvedSourceReference);
+            return this.htmlConverter.parseAndRender(html, syntax, resolvedSourceReference, restricted);
         } catch (Exception e) {
             // Leave the previous HTML in case of an exception.
             return html;
@@ -266,6 +288,26 @@ public class WysiwygEditorScriptService implements ScriptService
      */
     public String toAnnotatedXHTML(String source, Syntax syntax, EntityReference sourceReference)
     {
+        return toAnnotatedXHTML(source, syntax, sourceReference, false);
+    }
+
+    /**
+     * Converts the given source text from the specified syntax to annotated XHTML, which can be used as input for the
+     * WYSIWYG editor.
+     *
+     * @param source the text to be converted
+     * @param syntax the syntax of the source
+     * @param sourceReference the reference of the source
+     * @param restricted true if the content of this property should be executed in a restricted content, false
+     *            otherwise
+     * @return the annotated XHTML result of the conversion
+     * @since 14.10RC1
+     * @since 14.4.7
+     * @since 13.10.11
+     */
+    @Unstable
+    public String toAnnotatedXHTML(String source, Syntax syntax, EntityReference sourceReference, boolean restricted)
+    {
         XWikiDocument securityDocument = createSecurityDocument();
         XWikiDocument originalSecurityDocument = setSecurityDocument(securityDocument);
 
@@ -291,7 +333,7 @@ public class WysiwygEditorScriptService implements ScriptService
                 resolvedSourceReference = securityDocument.getDocumentReference();
             }
 
-            return this.htmlConverter.toHTML(source, syntax, resolvedSourceReference);
+            return this.htmlConverter.toHTML(source, syntax, resolvedSourceReference, restricted);
         } catch (Exception e) {
             // Return the source text in case of an exception.
             return source;

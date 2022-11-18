@@ -17,23 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.flamingo.test.docker;
+package org.xwiki.ckeditor.test.ui;
 
 import java.util.Arrays;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.ObjectEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Tests for the TextArea property.
+ * Tests for the TextArea property editor.
  *
  * @version $Id$
  */
@@ -48,75 +50,45 @@ class TextAreaIT
     @BeforeAll
     public void beforeEach(TestUtils testUtils)
     {
+        // Use superadmin
         testUtils.loginAsSuperAdmin();
 
+        // Make WYSIWYG the default editor
+        testUtils.setPropertyInXWikiPreferences("editor", "String", "Wysiwyg");
+
+        // Create a class with a textarea
         testUtils.createPage(TEXTAREA_CLASS_REFERENCE, "", "TextAreaClass");
         testUtils.addClassProperty(TEXTAREA_CLASS_REFERENCE, "textarea", "TextArea");
     }
 
     @Test
     @Order(1)
-    void authors(TestUtils testUtils, TestReference testReference)
-    {
-        // Cleanup
-        testUtils.deletePage(testReference);
-
-        // Create the page content with a normal user
-        testUtils.createUserAndLogin("user", "password");
-        testUtils.createPage(testReference, "");
-
-        // Add object with superadmin
-        testUtils.loginAsSuperAdmin();
-        testUtils.addObject(testReference, TEXTAREA_CLASS, "textarea",
-        // @formatter:off
-            "{{velocity}}\n"
-            + "document: $doc.documentReference\n"
-            + "content author: $services.user.serialize($doc.authors.contentAuthor)\n"
-            + "effective author: $services.user.serialize($doc.authors.effectiveMetadataAuthor)\n"
-            + "original author: $services.user.serialize($doc.authors.originalMetadataAuthor)\n"
-            + "current author: $services.user.serialize($xcontext.context.authorReference)\n"
-            + "{{/velocity}}");
-       // @formatter:on
-
-        DocumentReference testReference2 =
-            new DocumentReference(testReference.getName() + "2", testReference.getLastSpaceReference());
-
-        ViewPage viewPage = testUtils.createPage(testReference2, "{{velocity}}$xwiki.getDocument('"
-            + testUtils.serializeReference(testReference) + "').display('textarea'){{/velocity}}");
-
-        assertEquals(
-        // @formatter:off
-            "document: xwiki:TextAreaIT.authors.WebHome\n"
-            + "content author: xwiki:XWiki.user\n"
-            + "effective author: XWiki.superadmin\n"
-            + "original author: XWiki.superadmin\n"
-            + "current author: XWiki.superadmin",
-        // @formatter:on
-            viewPage.getContent());
-    }
-
-    @Test
-    @Order(2)
     void restricted(TestUtils testUtils, TestReference testReference)
     {
         // Cleanup
         testUtils.deletePage(testReference);
 
-        testUtils.createPage(testReference, "{{velocity}}$doc.display('textarea'){{/velocity}}");
+        testUtils.createPage(testReference, "");
         testUtils.addObject(testReference, TEXTAREA_CLASS, "textarea", "{{velocity}}OK{{/velocity}}");
 
         ViewPage viewPage = testUtils.gotoPage(testReference);
+        ObjectEditPage objectEditPage = viewPage.editObjects();
+        objectEditPage.getObjectsOfClass(TEXTAREA_CLASS);
+        CKEditor ckeditor = new CKEditor(TEXTAREA_CLASS + "_0_textarea").waitToLoad();
 
-        assertEquals("OK", viewPage.getContent());
+        assertEquals("OK", ckeditor.getRichTextArea().getText());
 
         // Make the textarea restricted
         testUtils.updateClassProperty(TEXTAREA_CLASS_REFERENCE, "textarea_restricted", "1");
 
         viewPage = testUtils.gotoPage(testReference);
+        objectEditPage = viewPage.editObjects();
+        objectEditPage.getObjectsOfClass(TEXTAREA_CLASS);
+        ckeditor = new CKEditor(TEXTAREA_CLASS + "_0_textarea").waitToLoad();
 
         assertEquals("Failed to execute the [velocity] macro. "
             + "Cause: [The execution of the [velocity] script macro is not allowed. "
             + "Check the rights of its last author or the parameters if it's rendered from another script.]. "
-            + "Click on this message for details.", viewPage.getContent());
+            + "Click on this message for details.", ckeditor.getRichTextArea().getText());
     }
 }

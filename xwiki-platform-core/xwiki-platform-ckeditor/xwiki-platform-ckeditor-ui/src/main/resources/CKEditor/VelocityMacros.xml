@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="CKEditor.VelocityMacros" locale="">
+<xwikidoc version="1.5" reference="CKEditor.VelocityMacros" locale="">
   <web>CKEditor</web>
   <name>VelocityMacros</name>
   <language/>
@@ -48,7 +48,8 @@
   #if ($toHTML)
     #set ($source = {
       'documentReference': $doc.documentReference,
-      'syntax': $sourceSyntax
+      'syntax': $sourceSyntax,
+      'restricted' : $request.wysiwygRestricted
     })
     #if ($fromHTML)
       #set ($source.html = $text)
@@ -115,14 +116,15 @@
     ## editor is used.
     #set ($macro.previousDisplayMode = 'edit')
   #end
+  #set ($restricted = "$!source.restricted" == 'true')
   #if ($source.html)
-    #set ($html = $services.wysiwyg.parseAndRender($source.html, $source.syntax, $source.documentReference))
+    #set ($html = $services.wysiwyg.parseAndRender($source.html, $source.syntax, $source.documentReference, $restricted))
     #if ("$!html" == '' &amp;&amp; $html != '')
       ## Before XWiki 11.9RC1 (see XWIKI-16737)
       #set ($html = $services.wysiwyg.parseAndRender($source.html, $source.syntax.toIdString()))
     #end
   #else
-    #set ($html = $services.wysiwyg.toAnnotatedXHTML($source.content, $source.syntax, $source.documentReference))
+    #set ($html = $services.wysiwyg.toAnnotatedXHTML($source.content, $source.syntax, $source.documentReference, $restricted))
     #if ("$!html" == '' &amp;&amp; $html != '')
       ## Before XWiki 11.9RC1 (see XWIKI-16737)
       #set ($html = $services.wysiwyg.toAnnotatedXHTML($source.content, $source.syntax.toIdString()))
@@ -204,7 +206,8 @@
   #set ($source = {
     'documentReference': $sourceDocumentReference,
     'syntax': $sourceDocument.syntax,
-    'content': $parameters.content
+    'content': $parameters.content,
+    'restricted': $parameters.attributes.data-restricted
   })
   #set ($content = "#ckeditor_renderContentSheet($source)")
   &gt;$!escapetool.xml($content)&lt;/textarea&gt;

@@ -140,4 +140,10 @@ public class AllITs
     class NestedRecycleBinIT extends RecycleBinIT
     {
     }
+
+    @Nested
+    @DisplayName("TextArea property Tests")
+    class NestedTextAreaIT extends TextAreaIT
+    {
+    }
 }

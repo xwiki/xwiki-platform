@@ -62,7 +62,7 @@ class TextAreaIT
     }
 
     @Test
-    @Order(2)
+    @Order(1)
     void restricted(TestUtils testUtils, TestReference testReference)
     {
         // Cleanup

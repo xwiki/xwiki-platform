@@ -20,6 +20,7 @@
 package org.xwiki.attachment.validation.test.ui.docker;
 
 import java.io.File;
+import java.util.List;
 
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.io.IOUtils;
@@ -85,7 +86,8 @@ class AttachmentValidationIT
         WebElement errorMimetype = getNotificationError(setup);
         assertEquals("File text.txt has an invalid mimetype text/plain.\n"
             + "Allowed mimetypes: image/.*", errorMimetype.getText());
-        errorMimetype.click();
+
+        cleanNotification(setup, errorMimetype);
 
         // Upload an image, not allowed because it is larger than 10b.
         upload(attachmentsPane, testConfiguration, IMAGE_FILE_NAME);
@@ -103,7 +105,7 @@ class AttachmentValidationIT
 
         PutMethod putMethodImage = restUploadImage(setup, subPage, IMAGE_FILE_NAME);
         assertEquals(413, putMethodImage.getStatusCode());
-        assertEquals("{" 
+        assertEquals("{"
             + "\"message\":\"File size too big\","
             + "\"translationKey\":\"attachment.validation.filesize.rejected\","
             + "\"translationParameters\":\"[10]\""
@@ -125,6 +127,18 @@ class AttachmentValidationIT
     private WebElement getNotificationError(TestUtils setup)
     {
         return setup.getDriver().findElement(By.cssSelector(".xnotification-error"));
+    }
+
+    private void cleanNotification(TestUtils setup, WebElement notificationElement)
+    {
+        int initialSize = getNotificationErrors(setup).size();
+        notificationElement.click();
+        setup.getDriver().waitUntilCondition(webDriver -> getNotificationErrors(setup).size() == initialSize - 1);
+    }
+
+    private List<WebElement> getNotificationErrors(TestUtils setup)
+    {
+        return setup.getDriver().findElements(By.cssSelector(".xnotification-error"));
     }
 
     private void upload(AttachmentsPane attachmentsPane, TestConfiguration testConfiguration, String fileName)

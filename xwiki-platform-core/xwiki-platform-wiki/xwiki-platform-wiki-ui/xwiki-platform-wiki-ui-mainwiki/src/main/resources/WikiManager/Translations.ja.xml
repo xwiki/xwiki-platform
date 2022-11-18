@@ -71,14 +71,14 @@
 ###############################################################################
 
 ## Menus
-### Missing: platform.wiki.menu.wikiindex=Wiki Index
+platform.wiki.menu.wikiindex=ウィキのインデックス
 platform.wiki.menu.deletewiki=ウィキを削除
 platform.wiki.menu.userwikis=ウィキ
 
 ## Dependencies
-### Missing: platform.wiki.dependencies.wiki.missing=
-### Missing: platform.wiki.dependencies.template.missing=
-### Missing: platform.wiki.dependencies.user.missing=
+platform.wiki.dependencies.wiki.missing="Wiki" Javaコンポーネントがインストールされていないため、このページは適切に機能しません。拡張機能マネージャーで"Wiki API"と"Wiki Script"の拡張機能がインストールされていることを確認するか、'xwiki-platform-wiki-api-&lt;バージョン&gt;.jar'と'xwiki-platform-wiki-script-&lt;バージョン&gt;.jar'が'WEB-INF/lib/'のウェブアプリケーションフォルダー内にあることを確認してください（手動インストールの場合）。
+platform.wiki.dependencies.template.missing="Wiki Template" Javaコンポーネントがインストールされていないため、このページは適切に機能しません。拡張機能マネージャーで"Wiki Template API"と"Wiki Template Script"の拡張機能がインストールされていることを確認するか、'xwiki-platform-wiki-template-api-&lt;バージョン&gt;.jar'と'xwiki-platform-wiki-template-script-&lt;バージョン&gt;.jar'が'WEB-INF/lib/'のウェブアプリケーションフォルダー内にあることを確認してください（手動インストールの場合）。
+platform.wiki.dependencies.user.missing="Wiki User" Javaコンポーネントがインストールされていないため、このページは適切に機能しません。拡張機能マネージャーで"Wiki User API"と"Wiki User Script"の拡張機能がインストールされていることを確認するか、'xwiki-platform-wiki-user-api-&lt;バージョン&gt;.jar'と'xwiki-platform-wiki-user-script-&lt;バージョン&gt;.jar'が'WEB-INF/lib/'のウェブアプリケーションフォルダー内にあることを確認してください（手動インストールの場合）。
 
 ## Create
 platform.wiki.create.button=ウィキを作成
@@ -93,7 +93,7 @@ platform.wiki.create.error.wikiname.empty=IDを指定してください
 ## Common errors and messages
 platform.wiki.error.wikidoesnotexist=ウィキ [{0}] は存在しません
 platform.wiki.error.oneParameterNotSpecified=パラメーター''{0}''が指定されていません。
-### Missing: platform.wiki.error.parameterAcceptsMultipleValues=
+platform.wiki.error.parameterAcceptsMultipleValues=複数の値が許可されています。
 platform.wiki.error.exceptionWithMessage=例外：{0}
 platform.wiki.form.requiredField=必須
 platform.wiki.csrf.error=不正なセキュリティートークンです。再試行してください。
@@ -133,8 +133,8 @@ platform.wiki.users.join.request.hint=ウィキ {0}{1}{2} に参加するには�
 ### Missing: platform.wiki.users.invitation.title=
 platform.wiki.users.invitation.message.label=招待メッセージ
 platform.wiki.users.invitation.reply.title=返信
-### Missing: platform.wiki.users.invitation.accept.label=
-### Missing: platform.wiki.users.invitation.reject.label=
+platform.wiki.users.invitation.accept.label=受け入れる
+platform.wiki.users.invitation.reject.label=拒否する
 platform.wiki.users.invitation.postpone.label=後で
 platform.wiki.users.join.request.message.label=メッセージ
 platform.wiki.users.join.request.send.label=リクエストを送信
@@ -145,24 +145,24 @@ platform.wiki.users.profile.joinedwikis.label=参加済のウィキ
 platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=あなたはまだどのウィキのメンバーでもありません。
 platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=ユーザーはどのウィキのメンバーでもありません。
 platform.wiki.users.profile.activity.title=ウィキ {0} のアクティビティー
-### Missing: platform.wiki.users.profile.activity.hint=
-### Missing: platform.wiki.users.profile.activity.multipletitle=
+platform.wiki.users.profile.activity.hint=指定したウィキのアクティビティーストリームを生成。
+platform.wiki.users.profile.activity.multipletitle=ウィキ {0} のアクティビティー
 platform.wiki.users.profile.activity.show=アクティビティーを表示
 
 ## Wiki Deletion
 ### Missing: platform.wiki.delete.confirmation=
-### Missing: platform.wiki.delete.confirmation.retypeWikiId=
-### Missing: platform.wiki.delete.error.wikiIdDoesNotMatch=
+platform.wiki.delete.confirmation.retypeWikiId=ウィキの識別子を繰り返してください：
+platform.wiki.delete.error.wikiIdDoesNotMatch=削除するウィキの識別子を入力してください。
 platform.wiki.delete.success=ユーザー {0}{1}{2} はウィキ''{3}''を削除しました。
 
 ## Wiki macro
-### Missing: platform.wiki.macro.noWikis=
+platform.wiki.macro.noWikis=作成済のウィキがありません（メインのウィキを除いて）。
 rendering.macro.wikis.name=ウィキ
-### Missing: rendering.macro.wikis.description=
+rendering.macro.wikis.description=全てのウィキの一覧を表示
 
 ## LegacyWorkspaces macro
-### Missing: rendering.macro.workspaces.name=
-### Missing: rendering.macro.workspaces.description=
+rendering.macro.workspaces.name=ワークスペース（レガシー）
+rendering.macro.workspaces.description=互換性の理由で使用すべきでない非推奨のマクロです。代わりに"wikis"マクロを使用してください。
 
 ## Browse
 platform.wiki.browse=ウィキを閲覧
@@ -183,7 +183,7 @@ platform.wiki.browse._actions.delete=削除
 ## Classes
 WikiManager.WikiUserClass_membershipType_open=誰でも参加可能
 ### Missing: WikiManager.WikiUserClass_membershipType_request=
-### Missing: WikiManager.WikiUserClass_membershipType_invite=
+WikiManager.WikiUserClass_membershipType_invite=管理者のみウィキへの招待を送信することが可能
 WikiManager.WikiUserClass_userScope_local_only=ローカルユーザーのみ利用可能
 ### Missing: WikiManager.WikiUserClass_userScope_global_only=
 ### Missing: WikiManager.WikiUserClass_userScope_local_and_global=
@@ -196,24 +196,24 @@ platform.wiki.prop.membershipType.label=メンバーシップの種類
 platform.wiki.prop.membershipType.hint=ユーザーがこのウィキに参加する方法。
 
 ## Wizard
-### Missing: platform.wiki.create.wizard.desc.wikiname=
+platform.wiki.create.wizard.desc.wikiname=新しいウィキの固有の識別子。
 platform.wiki.create.wizard.desc.wikiprettyname=このウィキの表示名。
-### Missing: platform.wiki.create.wizard.desc.wikialias=
+platform.wiki.create.wizard.desc.wikialias=ウィキで使用するドメイン名。
 platform.wiki.create.wizard.desc.newTemplateHint=この新しいウィキに使用するテンプレート（全てのページがコピーされます）。
-### Missing: platform.wiki.create.wizard.desc.description=
-### Missing: platform.wiki.create.wizard.desc.owner=
+platform.wiki.create.wizard.desc.description=ウィキとその目的についての簡単な説明。
+platform.wiki.create.wizard.desc.owner=管理機能による設定から独立して、ウィキに関する全ての権限を常に所有するユーザー。
 platform.wiki.create.wizard.desc.members=ウィキに参加できるユーザー。
-platform.wiki.create.wizard.step.nameAndType=ステップ1 — 名前を選択しましょう
-### Missing: platform.wiki.create.wizard.step.nameAndType.shortname=Name
+platform.wiki.create.wizard.step.nameAndType=ステップ1 — 名称を設定しましょう
+platform.wiki.create.wizard.step.nameAndType.shortname=名称
 platform.wiki.create.wizard.step.users=ステップ2 — メンバーを選択しましょう
 platform.wiki.create.wizard.step.users.shortname=ユーザー
-### Missing: platform.wiki.create.wizard.step.cleaningUp=
-### Missing: platform.wiki.create.wizard.step.provisioning.cleanUp=
-### Missing: platform.wiki.create.wizard.step.cleaningup.success=
+platform.wiki.create.wizard.step.cleaningUp=クリーンアップ
+platform.wiki.create.wizard.step.provisioning.cleanUp=このウィキを消去・削除
+platform.wiki.create.wizard.step.cleaningup.success=ウィキ {0} を正常に削除しました。
 platform.wiki.create.wizard.step.cleaningup.error=エラー。ウィキ {0} は削除されていません。
 platform.wiki.create.wizard.step.cleaningUp.confirmmessage=ウィキ {0} を削除します。承認してください。
 platform.wiki.create.wizard.step.cleaningUp.confirm=承認
-### Missing: platform.wiki.create.wizard.setAsTemplate.label=
+platform.wiki.create.wizard.setAsTemplate.label=このウィキをテンプレートにする
 ### Missing: platform.wiki.create.wizard.template.noTemplate=No template (default)
 ### Missing: platform.wiki.create.wizard.userScope.label=
 ### Missing: platform.wiki.create.wizard.userScope.hint=

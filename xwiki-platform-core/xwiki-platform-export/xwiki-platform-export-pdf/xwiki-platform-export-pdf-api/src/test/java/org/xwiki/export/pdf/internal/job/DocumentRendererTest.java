@@ -49,6 +49,7 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
@@ -114,6 +115,7 @@ class DocumentRendererTest
                 public XDOM answer(InvocationOnMock invocation) throws Throwable
                 {
                     DocumentDisplayerParameters params = (DocumentDisplayerParameters) invocation.getArgument(1);
+                    assertNotNull(params.getIdGenerator());
                     return params.isTitleDisplayed() ? titleXDOM : xdom;
                 }
             });

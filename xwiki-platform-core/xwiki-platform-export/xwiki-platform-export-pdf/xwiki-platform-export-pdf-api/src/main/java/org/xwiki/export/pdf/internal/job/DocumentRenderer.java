@@ -21,11 +21,12 @@ package org.xwiki.export.pdf.internal.job;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
@@ -40,6 +41,7 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
+import org.xwiki.rendering.util.IdGenerator;
 
 /**
  * Component used to render documents.
@@ -49,7 +51,7 @@ import org.xwiki.rendering.transformation.RenderingContext;
  * @since 14.5
  */
 @Component(roles = DocumentRenderer.class)
-@Singleton
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class DocumentRenderer
 {
     /**
@@ -76,6 +78,11 @@ public class DocumentRenderer
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
+     * Used to generate unique identifiers across multiple rendered documents.
+     */
+    private IdGenerator idGenerator = new IdGenerator();
+
+    /**
      * Renders the specified document.
      * 
      * @param documentReference the document to render
@@ -96,6 +103,10 @@ public class DocumentRenderer
         parameters.setTransformationContextRestricted(false);
         parameters.setContentTranslated(false);
         parameters.setTargetSyntax(targetSyntax);
+        // Use the same id generator while rendering all the documents included in a PDF export in order to ensure that
+        // the generated identifiers are unique across the aggregated content (as if all the exported documents are
+        // included in the same parent document).
+        parameters.setIdGenerator(this.idGenerator);
 
         DocumentModelBridge document = this.documentAccessBridge.getTranslatedDocumentInstance(documentReference);
         XDOM xdom = display(document, parameters, withTitle);

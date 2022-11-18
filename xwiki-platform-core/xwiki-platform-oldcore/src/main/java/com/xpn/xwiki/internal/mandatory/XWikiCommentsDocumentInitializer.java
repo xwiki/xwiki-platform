@@ -87,7 +87,7 @@ public class XWikiCommentsDocumentInitializer extends AbstractCommentsDocumentIn
         xclass.addNumberField("replyto", "Reply To", 5, "integer");
 
         String commentPropertyName = "comment";
-        xclass.addTextAreaField(commentPropertyName, "Comment", 40, 5);
+        xclass.addTextAreaField(commentPropertyName, "Comment", 40, 5, true);
 
         // FIXME: Ensure that the comment text editor is set to its default value after an upgrade. This should be
         // handled in a cleaner way in BaseClass#addTextAreaField. See: https://jira.xwiki.org/browse/XWIKI-17605

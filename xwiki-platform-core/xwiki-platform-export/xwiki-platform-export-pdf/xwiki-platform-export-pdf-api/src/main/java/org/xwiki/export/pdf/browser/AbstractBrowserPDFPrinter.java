@@ -169,25 +169,20 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
 
     private Optional<CookieFilterContext> getCookieFilterContext(URL targetURL, BrowserTab browserTab)
     {
-        Optional<String> browserIPAddress = getBrowserIPAddress(targetURL, browserTab);
-        if (browserIPAddress.isPresent()) {
-            return Optional.of(new CookieFilterContext()
+        return getBrowserIPAddress(targetURL, browserTab).map(browserIPAddress -> new CookieFilterContext()
+        {
+            @Override
+            public String getBrowserIPAddress()
             {
-                @Override
-                public String getBrowserIPAddress()
-                {
-                    return browserIPAddress.get();
-                }
+                return browserIPAddress;
+            }
 
-                @Override
-                public URL getTargetURL()
-                {
-                    return targetURL;
-                }
-            });
-        } else {
-            return Optional.empty();
-        }
+            @Override
+            public URL getTargetURL()
+            {
+                return targetURL;
+            }
+        });
     }
 
     private Optional<String> getBrowserIPAddress(URL targetURL, BrowserTab browserTab)

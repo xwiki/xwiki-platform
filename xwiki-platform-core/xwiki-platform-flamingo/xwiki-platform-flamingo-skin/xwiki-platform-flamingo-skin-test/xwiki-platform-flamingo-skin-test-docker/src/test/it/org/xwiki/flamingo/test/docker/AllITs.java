@@ -176,4 +176,10 @@ public class AllITs
     class NestedBacklinksIT extends BacklinksIT
     {
     }
+
+    @Nested
+    @DisplayName("TextArea property Tests")
+    class NestedTextAreaIT extends TextAreaIT
+    {
+    }
 }

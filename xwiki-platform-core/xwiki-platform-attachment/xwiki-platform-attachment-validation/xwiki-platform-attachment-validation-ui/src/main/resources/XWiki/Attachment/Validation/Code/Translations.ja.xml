@@ -42,8 +42,8 @@ attachment.validation.mimetype.errorMessage=ファイル {0} のmimetype {1} が
 attachment.validation.mimetype.allowedMimetypes=許可されているmimetypes：{0}
 attachment.validation.mimetype.blockerMimetypes=許可されていないmimetypes：{0}
 XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_allowedMimetypes=許可されているmimetype
-XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_allowedMimetypes.hint=許可する添付ファイルのmimetypeの一覧を規定。既定ではこの一覧は空ですが、許可するmimetypeの一覧をコンマで区切って指定できます。アスタリスク（*）を使うと、全ての種類のファイルを許可できます。一覧を設定すると、指定されていないmimetypeの添付ファイルは拒否されます。たとえば、プレーンテキストと全種類の画像を許可したい場合は、text/plain,image/*のように設定してください。
+XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_allowedMimetypes.hint=許可する添付ファイルのmimetypeの一覧を規定。既定ではこの一覧は空ですが、許可するmimetypeの一覧をコンマで分割して指定できます。アスタリスク（*）を使うと、全ての種類のファイルを許可できます。一覧を設定すると、指定されていないmimetypeの添付ファイルは拒否されます。たとえば、プレーンテキストと全種類の画像を許可したい場合は、text/plain,image/*のように設定してください。
 XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_blockedMimetypes=ブロックされているmimetype 
-XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_blockedMimetypes.hint=拒否する添付ファイルのmimetypeの一覧を規定。既定ではこの一覧は空ですが、ブロックするmimetypeの一覧をコンマで区切って指定できます。アスタリスク（*）を使うと、全ての種類のファイルをブロックできます。一覧を設定すると、指定されていないmimetypeの添付ファイルはブロックされます。たとえば、プレーンテキストと全種類の画像をブロックしたい場合は、text/plain,image/*のように設定してください。
+XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_blockedMimetypes.hint=拒否する添付ファイルのmimetypeの一覧を規定。既定ではこの一覧は空ですが、ブロックするmimetypeの一覧をコンマで分割して指定できます。アスタリスク（*）を使うと、全ての種類のファイルをブロックできます。一覧を設定すると、指定されていないmimetypeの添付ファイルはブロックされます。たとえば、プレーンテキストと全種類の画像をブロックしたい場合は、text/plain,image/*のように設定してください。
 </content>
   </xwikidoc>

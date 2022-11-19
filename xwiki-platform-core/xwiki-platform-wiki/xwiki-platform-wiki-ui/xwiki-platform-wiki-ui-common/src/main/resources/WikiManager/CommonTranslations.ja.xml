@@ -41,7 +41,7 @@ admin.wikis.descriptor=記述子
 admin.wikis.descriptor.description=ウィキの記述子を設定
 admin.wiki.description=ウィキの説明（名称と詳細）を入力して、所有者とトップページを設定してください。
 platform.wiki.admin.wiki.ownerProblemConfirmation=新しい所有者は存在しないか、あるいは他のウィキの所有者です。\n保存してよろしいですか？
-platform.wiki.admin.wiki.csrfInvalidError=不正なセキュリティー（CSRF）トークンです。ページを再度読み込んでお試しください。
+platform.wiki.admin.wiki.csrfInvalidError=不正なセキュリティー（CSRF）トークンです。ページを再度読み込んで、もう一度お試しください。
 platform.wiki.admin.wiki.requiredFieldsError='トップページ'のフィールドは入力が必須です。
 platform.wiki.admin.wiki.ownerWarning=警告：一旦これを変更すると、以前の所有者は所有者権限を失います。もしこれがあなたなら、自分自身をウィキから締め出さないよう注意してください。それが誤りで起こった場合は、メインのwikiの管理者に連絡するか、スーパー管理者のアカウントを使用する必要があります。
 

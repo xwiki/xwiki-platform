@@ -91,7 +91,7 @@ platform.appwithinminutes.appNameIsUsedWarning=このアプリケーションは
 platform.appwithinminutes.appNameEmptyError=アプリケーション名を入力してください。
 
 ### Wizard Step 2: Application Structure
-### Missing: platform.appwithinminutes.classEditorPaletteTitle=
+platform.appwithinminutes.classEditorPaletteTitle=フィールドパレット
 platform.appwithinminutes.classEditorPaletteHint=フィールドをパレットからドラッグアンドドロップすると、データの入力に使用するフォームを作成します。
 platform.appwithinminutes.classEditorCanvasHint=フィールドをパレットからドラッグして、この領域にドロップしてください。
 platform.appwithinminutes.classEditorUpdateTemplateLabel=テンプレートをアップデート
@@ -150,7 +150,7 @@ appWithinMinutes.templateProviderEditor.creationRestrictions.name=エントリ�
 appWithinMinutes.templateProviderEditor.creationRestrictions.hint=場所の指定がない場合、ウィキのどの場所にもエントリーを作成できます。
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=エントリーの場所を強制しない
 ### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=
-### Missing: appWithinMinutes.templateProviderEditor.terminal.hint=
+appWithinMinutes.templateProviderEditor.terminal.hint=アプリケーションのエントリーをターミナルページとするか否か。
 
 ### Wizard Step 3: Application Presentation
 platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=アプリケーションのフィールド
@@ -174,21 +174,21 @@ platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription=アプ
 platform.appwithinminutes.liveTableEditorActionsColumnName=アクション
 platform.appwithinminutes.liveTableEditorActionsColumnDescription=アプリケーションのデータについて実行できるアクション（編集や削除など）のリスト
 platform.appwithinminutes.liveTableEditorAttachmentsColumnName=添付ファイル
-### Missing: platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=
+platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=データページに添付されたファイルへのリンクを表示する特別なカラム
 platform.appwithinminutes.liveTableEditorImagesColumnName=画像
-### Missing: platform.appwithinminutes.liveTableEditorImagesColumnDescription=
+platform.appwithinminutes.liveTableEditorImagesColumnDescription=データページに添付された画像へのリンクを表示する特別なカラム
 platform.appwithinminutes.liveTableEditorAvatarColumnName=アバター
-### Missing: platform.appwithinminutes.liveTableEditorAvatarColumnDescription=
+platform.appwithinminutes.liveTableEditorAvatarColumnDescription=ユーザーアバターを表示する特別なカラム。XWiki.XWikiUsersクラスに結びつけられた表でのみ機能
 platform.appwithinminutes.liveTableEditorTitleHint=アプリケーションのタイトルは、アプリケーションのトップページ、アプリケーションのパネル、ライブテーブル、パンくずリストなどに表示されます。
 ### Missing: platform.appwithinminutes.liveTableEditorDescriptionHint=
 ### Missing: platform.appwithinminutes.liveTableEditorColumnsHint=
 platform.appwithinminutes.liveTableEditorSaveComment=ライブテーブルをアップデート
 platform.appwithinminutes.liveTableEditorMoveColumnHint=ドラッグアンドドロップで順番を変更
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=削除
-### Missing: platform.appwithinminutes.liveTableEditorAddColumnHint=
-### Missing: platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=
-### Missing: platform.appwithinminutes.liveTableEditorIcon=Icon
-### Missing: platform.appwithinminutes.liveTableEditorIconHintWithPicker=
+platform.appwithinminutes.liveTableEditorAddColumnHint=選択したカラムを追加
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=いくつかのカラムは、対応するアプリケーションのフィールドが削除されたため非推奨です。削除してよろしいですか？&lt;a href=""&gt;はい&lt;/a&gt; / &lt;a href=""&gt;いいえ&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorIcon=アイコン
+platform.appwithinminutes.liveTableEditorIconHintWithPicker=アプリケーションのアイコン。アイコンピッカーからアイコンを選択するか、添付したイメージを参照できます。
 
 ### Wizard Step 4: Application home page
 platform.appwithinminutes.appLiveTableHeading=エントリー
@@ -202,7 +202,7 @@ platform.appwithinminutes.appHomePageDeleteEntriesLabel=全てのエントリー
 platform.appwithinminutes.appHomePageEditAppLabel=アプリケーションを編集
 platform.appwithinminutes.appHomePageTranslateAppLabel=アプリケーションを翻訳
 platform.appwithinminutes.appHomePageDeleteAppLabel=アプリケーションを削除
-### Missing: platform.appwithinminutes.appHomePageMovedWarning=
+platform.appwithinminutes.appHomePageMovedWarning=このアプリケーションは、コードをアップデートせず名称が変更されたか移動されたため、適切に機能しないおそれがあります。アプリケーションを編集し、以下のステップに従ってコードをアップデートしてください。
 AppWithinMinutes.LiveTableClass_description=詳細
 ### Missing: AppWithinMinutes.LiveTableClass_columns=
 
@@ -210,21 +210,21 @@ AppWithinMinutes.LiveTableClass_description=詳細
 platform.appwithinminutes.deleteAppConfirmation=アプリケーション {0} と全てのエントリーが削除されます。続行してよろしいですか？
 platform.appwithinminutes.deleteAppEntriesConfirmation=アプリケーション {0} の全エントリーを削除します。続行してよろしいですか？
 platform.appwithinminutes.deleteAppDoesNotExistError=指定したアプリケーションは存在しません。
-### Missing: platform.appwithinminutes.deleteAppInvalidAppError=
+platform.appwithinminutes.deleteAppInvalidAppError=指定した名称は、有効なApp Within Minutesアプリケーションではありません。
 platform.appwithinminutes.deleteAppNotSpecifiedError=アプリケーション名が指定されていません。
 
 ### Rename Application
 appWithinMinutes.renameApp.label=アプリケーションの名称を変更
 appWithinMinutes.renameApp.close=閉じる
-### Missing: appWithinMinutes.renameApp.changeAppTitleInfo=
-### Missing: appWithinMinutes.renameApp.regenerateAppCodeWarning=
+appWithinMinutes.renameApp.changeAppTitleInfo=アプリケーションのタイトルは、アプリケーションのトップページを編集するだけで変更できます。アプリケーションの名称を変更する必要はありません。
+appWithinMinutes.renameApp.regenerateAppCodeWarning=アプリケーションの名称を変更すると、アプリケーションのコードが新しく生成されます。その結果、カスタマイズしたコードは上書きされます。
 appWithinMinutes.renameApp.newName.label=新しい名称
 appWithinMinutes.renameApp.pageExistsError=この名称のページは指定した場所に既に存在します。
 appWithinMinutes.renameApp.locationForbiddenError=アプリケーションを選択した場所に移動することは許可されていません。
 appWithinMinutes.renameApp.location.label=新しい場所
-### Missing: appWithinMinutes.renameApp.location.hint=
+appWithinMinutes.renameApp.location.hint=アプリケーションを移動するページの階層内の場所。
 ### Missing: appWithinMinutes.renameApp.parent.label=
-### Missing: appWithinMinutes.renameApp.parent.hint=
+appWithinMinutes.renameApp.parent.hint=新しい親ページ。アプリケーションをページの階層の最上位に移動したい場合は、このフィールドを空のままにしてください。
 appWithinMinutes.renameApp.inProgress=アプリケーションの名称を変更しています…
 appWithinMinutes.renameApp.done=アプリケーションの名称を変更しました
 appWithinMinutes.renameApp.failed=アプリケーションの名称を変更できませんでした
@@ -236,7 +236,7 @@ platform.appwithinminutes.appNamePreviewDataSpaceLabel=アプリケーション�
 platform.appwithinminutes.liveTableEditorDocSpaceColumnName=スペース
 platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=アプリケーションのエントリーを含むスペースの名称
 ### Missing: platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Page full name
-### Missing: platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=
+platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=アプリケーションのエントリーを含むページの名称。先頭にスペースの名称が付きます
 
 #@deprecated appWithinMinutes.wizardStep.name.name
 platform.appwithinminutes.wizardStep1Name=名称

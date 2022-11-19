@@ -83,8 +83,8 @@ annotations.action.validate.tooltip=この注釈の選択したテキストに�
 annotations.action.validate.success=注釈を検証しました。
 annotations.action.validate.loaderror=失敗しました：
 annotations.filters.show=フィルター
-### Missing: annotations.filters.nooption=
-### Missing: annotations.filters.anyvalue=
+annotations.filters.nooption="{0}" をフィルタリングする値がありません
+annotations.filters.anyvalue=任意の値
 annotations.filters.clearvalue=消去
 annotations.config.title=注釈の設定パネル
 annotations.config.display.title=注釈の表示
@@ -100,8 +100,8 @@ AnnotationCode.AnnotationConfig_exceptionSpaces=注釈を有効化しない場�
 AnnotationCode.AnnotationConfig_exceptionSpaces.hint=以下の場所では注釈を無効にする：
 AnnotationCode.AnnotationConfig_displayed=注釈を既定で表示
 AnnotationCode.AnnotationConfig_displayed.hint=注釈を既定で表示するか各ページで「注釈を表示」が有効化されている場合にのみ表示するかを決定してください
-### Missing: AnnotationCode.AnnotationConfig_displayHighlight=
-### Missing: AnnotationCode.AnnotationConfig_displayHighlight.hint=
+AnnotationCode.AnnotationConfig_displayHighlight=注釈を既定でハイライト
+AnnotationCode.AnnotationConfig_displayHighlight.hint=注釈を常にハイライトするか、あるいは注釈もしくは注釈の構造をホバリングしたときにのみハイライトするかを決定してください
 AnnotationCode.AnnotationConfig_annotationClass=注釈の構造を規定するXWikiのクラス
 </content>
   </xwikidoc>

@@ -47,16 +47,16 @@ notifications.filters.type.label=フィルターの種類：
 ## Advanced filters options
 notifications.settings.filters.advanced=フィルタリングの上級設定
 ### Missing: notifications.filters.advanced.toggles.hint=
-### Missing: notifications.filters.advanced.toggles.table.name=Filter name
+notifications.filters.advanced.toggles.table.name=フィルター名
 notifications.filters.advanced.toggles.table.description=詳細
-### Missing: notifications.filters.advanced.toggles.table.toggle=
+notifications.filters.advanced.toggles.table.toggle=切り替える
 notifications.filters.advanced.modal.close=閉じる
 
 ## Filters names
-### Missing: notifications.filters.name.systemUserNotificationFilter=System Filter
-### Missing: notifications.filters.description.systemUserNotificationFilter=
-### Missing: notifications.filters.name.ownEventsNotificationFilter=
-### Missing: notifications.filters.description.ownEventsNotificationFilter=
+notifications.filters.name.systemUserNotificationFilter=システムフィルター
+notifications.filters.description.systemUserNotificationFilter=イベントが特別にあなたを対象としていない限り、システムからの通知を表示しない
+notifications.filters.name.ownEventsNotificationFilter=自分のイベントのフィルター
+notifications.filters.description.ownEventsNotificationFilter=イベントが特別にあなたを対象としていない限り、自分のアクティビティーに関する通知を表示しない
 ### Missing: notifications.filters.name.eventReadAlertFilter=
 ### Missing: notifications.filters.description.eventReadAlertFilter=
 ### Missing: notifications.filters.name.eventReadEmailFilter=
@@ -73,7 +73,7 @@ notifications.filters.preferences.scopeNotificationFilter.space=ページと子�
 notifications.filters.preferences.scopeNotificationFilter.wiki=ウィキ
 
 ## Notifications toggles
-### Missing: notifications.toggle.disabled.hint=
+notifications.toggle.disabled.hint=これらの場所を監視したい場合は、設定から通知を有効にする必要があります
 
 ## Notifications formats
 notifications.format.alert=アラート
@@ -89,7 +89,7 @@ notifications.filters.preferences.setEnabled.error=フィルターの設定を�
 ### Missing: notifications.filters.preferences.allEvents=
 
 ## System Filter preferences settings
-### Missing: notifications.settings.filters.preferences.system.title=System Filters
+notifications.settings.filters.preferences.system.title=システムフィルター
 ### Missing: notifications.settings.filters.preferences.system.hint=
 ## Header definition for notification filter preferences
 notifications.settings.filters.preferences.system.table.name=名称
@@ -99,10 +99,10 @@ notifications.settings.filters.preferences.system.table.notificationFormats=フ�
 
 ## Custom Filter preferences settings
 notifications.settings.filters.preferences.custom.title=カスタムフィルター
-### Missing: notifications.settings.filters.preferences.custom.hint=
+notifications.settings.filters.preferences.custom.hint=フィルターを作成すると、受け取る通知をコントロールできます。
 ## Header definition for notification filter preferences
 notifications.settings.filters.preferences.custom.table.name=場所
-### Missing: notifications.settings.filters.preferences.custom.table.filterType=Filter Action
+notifications.settings.filters.preferences.custom.table.filterType=フィルターアクション
 notifications.settings.filters.preferences.custom.table.eventTypes=イベント
 notifications.settings.filters.preferences.custom.table.notificationFormats=フォーマット
 ### Missing: notifications.settings.filters.preferences.custom.table.isEnabled=
@@ -113,38 +113,38 @@ notifications.filters.type.custom.exclusive=イベントを無視
 
 ## Add filter modal
 notifications.settings.addFilter=フィルターを追加
-### Missing: notifications.settings.addFilter.hint=
+notifications.settings.addFilter.hint=特定の場所のイベントのフィルターを作成。フィルターを使うと、イベントと通知のチャンネルに応じて、通知を送信するかあるいは防ぐかを決められます。
 notifications.filters.preferences.custom.addFilter.location.label=場所
-### Missing: notifications.filters.preferences.custom.addFilter.location.hint=
+notifications.filters.preferences.custom.addFilter.location.hint=このフィルターは、ここで選択した場所で起こるイベントに適用されます。1つ以上の場所を選択してください。
 notifications.filters.preferences.custom.addFilter.type.label=アクション
-### Missing: notifications.filters.preferences.custom.addFilter.type.hint=
+notifications.filters.preferences.custom.addFilter.type.hint=このフィルターでは、選択した場所で起こるイベントを通知あるいは無視できます。イベントに関して行いたいアクションを選択してください。
 notifications.filters.preferences.custom.addFilter.filterType.inclusive=イベントを通知
 notifications.filters.preferences.custom.addFilter.filterType.exclusive=イベントを無視
 notifications.filters.preferences.custom.addFilter.notificationFormat.label=チャンネル
-### Missing: notifications.filters.preferences.custom.addFilter.notificationFormat.hint=
+notifications.filters.preferences.custom.addFilter.notificationFormat.hint=このフィルターは、以下で選択したコミュニケーションチャンネルに送信する通知にのみ適用されます。1つ以上のチャンネルを選択してください。
 notifications.filters.preferences.custom.addFilter.eventType.label=イベント
-### Missing: notifications.filters.preferences.custom.addFilter.eventType.hint=
-### Missing: notifications.menu.header=Notifications
+notifications.filters.preferences.custom.addFilter.eventType.hint=このフィルターは、以上で選択した場所のうち、ここで選択したイベントに適用されます。1つ以上のイベントを選択してください。
+notifications.menu.header=通知
 notifications.menu.header.settings=設定
 notifications.menu.clear=全て消去
 notifications.menu.clearing=通知を消去しています
 notifications.menu.cleared=通知を消去しました
 notifications.settings.title=通知の設定
 notifications.settings.error.notAdmin=確認には管理者の権限が必要です。
-### Missing: notifications.settings.menu=Notification menu
+notifications.settings.menu=通知のメニュー
 ### Missing: notifications.settings.menu.hint=
 notifications.settings.email=Eメール
 notifications.settings.email.forGuest=通知設定を変更するにはログインあるいは登録が必要です。
 notifications.settings.email.disabled=通知メールは無効化されています。管理者に連絡してください。
 ### Missing: notifications.settings.email.hint=
 notifications.settings.email.title=Eメールの設定
-### Missing: notifications.settings.email.frequency=Email Frequency
+notifications.settings.email.frequency=Eメールの頻度
 ### Missing: notifications.settings.email.frequency.hint=
 ### Missing: notifications.settings.email.diffType.hint=
 notifications.settings.saving=設定を保存しています…
 notifications.settings.saved=保存しました！
 notifications.settings.savingfailed=設定を保存できませんでした
-### Missing: notifications.settings.filters=Filters ({0})
+notifications.settings.filters=フィルター（{0}）
 ### Missing: notifications.settings.errorFilterWiki=
 notifications.settings.preferences=設定
 ### Missing: notifications.settings.preferences.hint=
@@ -155,7 +155,7 @@ notifications.settings.applications.appName=名称
 notifications.settings.events=イベント
 notifications.settings.watch.title=監視中のページ
 notifications.settings.watch.autowatchmode=自動ページ監視
-### Missing: notifications.settings.watch.autowatchmode.hint=
+notifications.settings.watch.autowatchmode.hint=作業を行ったページを監視したいかどうかを決定してください
 notifications.settings.watch.forGuest=通知設定を変更するにはログインあるいは登録が必要です。
 ### Missing: notifications.settings.watch.disabled=
 ### Missing: notifications.events.by=

@@ -63,9 +63,9 @@ XWiki.Registration_requireCaptcha.hint=ユーザーの登録時にCAPTCHAの解�
 XWiki.Registration_registrationSuccessMessage.hint=正常に登録が完了したユーザーに表示するメッセージを設定できます。Velocityとウィキのシンタックスコードを使うことができます。
 XWiki.Registration_passwordLength.hint=パスワードの最低の長さ。パスワードは長い方が安全性があります。6文字以上に設定することを推奨します。
 XWiki.Registration_passwordRuleOneLowerCaseEnabled.hint=チェックすると、パスワードが最低1つの小文字を含むことを必須とします。
-XWiki.Registration_passwordRuleOneUpperCaseEnabled.hint=有効にすると、パスワードに1つ以上大文字を設定するよう強制できます。
-XWiki.Registration_passwordRuleOneNumberEnabled.hint=有効にすると、パスワードに1つ以上数字を設定するよう強制できます。
-XWiki.Registration_passwordRuleOneSymbolEnabled.hint=チェックすると、パスワードが最低1つのシンボル文字を含むことを必須とします。
+XWiki.Registration_passwordRuleOneUpperCaseEnabled.hint=チェックすると、パスワードに1つ以上大文字を設定するよう強制できます。
+XWiki.Registration_passwordRuleOneNumberEnabled.hint=チェックすると、パスワードに1つ以上数字を設定するよう強制できます。
+XWiki.Registration_passwordRuleOneSymbolEnabled.hint=パスワードに1つ以上シンボル文字を設定するよう強制できます。
 
 # Look &amp; Feel Sections
 admin.themes=テーマ
@@ -145,7 +145,7 @@ admin.usersgroups.extensionrights=拡張機能の権限
 admin.other=その他
 admin.other.description=拡張機能の様々な設定。
 administration.section.analytics.status=状態
-### Missing: administration.section.analytics.status.hint=
+administration.section.analytics.status.hint=Google Analytics™による追跡を有効かどうかを判断
 
 # Social category
 admin.social=ソーシャル

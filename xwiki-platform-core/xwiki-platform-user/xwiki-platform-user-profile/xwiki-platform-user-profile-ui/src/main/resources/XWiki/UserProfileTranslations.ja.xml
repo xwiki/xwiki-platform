@@ -36,25 +36,25 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: XWiki.XWikiUsers_displayHiddenDocuments.hint=
-### Missing: XWiki.XWikiUsers_accessibility.hint=
-### Missing: XWiki.XWikiUsers_timezone.hint=
+  <content>XWiki.XWikiUsers_displayHiddenDocuments.hint=ウィキは既定では表示しないドキュメントを含みます。これらのドキュメントには、アプリケーションのクラス、設定ページ、マクロ、スタイル、スクリプトなどの技術的な内容が記述されています。
+XWiki.XWikiUsers_accessibility.hint=追加のアクセシビリティー機能からは、フォントの拡大、リンクへの下線の追加などを有効にできます。
+XWiki.XWikiUsers_timezone.hint=タイムゾーンを設定して、現在の場所と日付を対応させることができます。
 ### Missing: XWiki.XWikiUsers_editor.hint=
-### Missing: XWiki.XWikiUsers_usertype.hint=
-### Missing: XWiki.XWikiUsers_extensionConflictSetup.hint=
+XWiki.XWikiUsers_usertype.hint=どのユーザーの種類を既定とするか設定してください。上級ユーザーは、編集機能を使用したりターミナルページを作成したりできます。
+XWiki.XWikiUsers_extensionConflictSetup.hint=拡張機能マネージャーに、競合の解決に関する既定のルールを確認させるかどうかを指示（例えば、アップグレードするドキュメントがウィキから削除された場合の対応を確認させるなど）。
 userprofile.default=既定
 user.profile.groups.title=グループ
 user.profile.groups.description=ユーザーが所属している全てのグループです。
 user.profile.groups.table.group=グループ
 platform.core.profile.category.groups=グループ
 user.profile.notifications=通知
-### Missing: user.profile.network.unfollow.question=
-### Missing: user.profile.network.unfollow.question.yes=
+user.profile.network.unfollow.question=このユーザーのフォローを解除してよろしいですか？
+user.profile.network.unfollow.question.yes=はい、フォローを解除します
 user.profile.network.unfollow.question.no=いいえ、キャンセルします
 user.profile.network.following=フォローしています
-### Missing: user.profile.network.notfollowing=
-### Missing: user.profile.network.follow=
-### Missing: user.profile.network.unfollow=
+user.profile.network.notfollowing=フォローしていません
+user.profile.network.follow=フォローを開始
+user.profile.network.unfollow=フォローを解除
 user.profile.network.done=完了
 user.profile.network.saving=保存しています…
 user.profile.network.error=通知設定を保存する際のエラー

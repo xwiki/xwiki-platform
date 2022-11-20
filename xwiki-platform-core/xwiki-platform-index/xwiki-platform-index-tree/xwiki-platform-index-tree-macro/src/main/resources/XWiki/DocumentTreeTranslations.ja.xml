@@ -37,17 +37,17 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>rendering.macro.documentTree.name=ページツリー
-rendering.macro.documentTree.description=XWikiページのツリーを表示します。
+rendering.macro.documentTree.description=XWikiページのツリーを表示。
 rendering.macro.documentTree.parameter.readOnly.name=読み取り専用
-### Missing: rendering.macro.documentTree.parameter.readOnly.description=
+rendering.macro.documentTree.parameter.readOnly.description=必要な権限がある場合、ユーザーにツリーの構造の変更を許可しますか？
 rendering.macro.documentTree.parameter.showWikis.name=ウィキを表示
 rendering.macro.documentTree.parameter.showWikis.description=ウィキのノードを表示するか否か。メインウィキで、ツリーのソースがプログラミング権限で保存されている場合にのみ表示できます。
 rendering.macro.documentTree.parameter.showWikiPrettyName.name=ウィキの名称を表示
-### Missing: rendering.macro.documentTree.parameter.showWikiPrettyName.description=
+rendering.macro.documentTree.parameter.showWikiPrettyName.description=ウィキのノードを表示する際、ウィキのIDの代わりに名称を表示。
 rendering.macro.documentTree.parameter.showSpaces.name=スペースを表示
 rendering.macro.documentTree.parameter.showSpaces.description=スペースのノードを表示するか否か。スペースのノードを表示する際、ページはスペースによってまとめられます。
 rendering.macro.documentTree.parameter.showDocumentTitle.name=ページのタイトルを表示
-### Missing: rendering.macro.documentTree.parameter.showDocumentTitle.description=
+rendering.macro.documentTree.parameter.showDocumentTitle.description=ページのノードを表示する際に、ページの名称の代わりにページのタイトルを表示するか否か。
 rendering.macro.documentTree.parameter.showTranslations.name=翻訳を表示
 rendering.macro.documentTree.parameter.showTranslations.description=ページの翻訳を表示するか否か。
 rendering.macro.documentTree.parameter.showAttachments.name=添付ファイルを表示
@@ -59,7 +59,7 @@ rendering.macro.documentTree.parameter.showClassProperties.description=クラス
 rendering.macro.documentTree.parameter.root.name=ルート
 ### Missing: rendering.macro.documentTree.parameter.root.description=
 rendering.macro.documentTree.parameter.showRoot.name=ルートを表示
-### Missing: rendering.macro.documentTree.parameter.showRoot.description=
+rendering.macro.documentTree.parameter.showRoot.description=ルートのノードを表示するか否か。ルードのノードは多くの場合、ツリーを表示するコンテクストにより暗示されるため（例：ツリーの前のラベル）既定では表示しませんが、ルート以下に新しいノードを作成する際などには、表示すると役立つかもしれません。
 ### Missing: rendering.macro.documentTree.parameter.compact.name=
 ### Missing: rendering.macro.documentTree.parameter.compact.description=
 rendering.macro.documentTree.parameter.links.name=リンク

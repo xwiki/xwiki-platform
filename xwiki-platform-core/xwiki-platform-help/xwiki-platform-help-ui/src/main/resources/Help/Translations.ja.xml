@@ -40,7 +40,7 @@
 help.tipsPanel.noTipMessage=ヒントはありません！
 help.tipsPanel.gettingStartedTip=XWikiを初めて使う場合は、[[スタートガイド&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/]]をご確認ください。
 help.tipsPanel.jumpToPageTip=Ctrl+GまたはMeta+Gでウィキのどのページにも移動できます。\n[[他のショートカット&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/KeyboardShortcuts]]も見てみてください。
-help.tipsPanel.improveXWikiTip=あなたもXWikiを改善できることを知っていますか？5分程度の[アンケートに答えて&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]]プロジェクトを手伝ってください！
+help.tipsPanel.improveXWikiTip=あなたもXWikiを改善できることを知っていますか？5分程度の[[アンケートに答えて&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]]プロジェクトを手伝ってください！
 help.tipsPanel.breadcrumbsTip=パンくずリストにある矢印をクリックすると、兄弟・子ページに移動できます。
 help.tipsPanel.advancedHiddenShortcutTip=x+x+x+aキーを押すと[[上級モード&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]]を有効にできます。x+x+x+hキーを押すと[[隠しページ&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]]を有効にできます。
 ### Missing: help.tipsPanel.linkAutocompleteWYSIWYGTip=

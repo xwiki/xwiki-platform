@@ -36,18 +36,18 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: authentication.admin.failureStrategy.label=
-### Missing: authentication.admin.failureStrategy.hint=
+  <content>authentication.admin.failureStrategy.label=失敗時の方針
+authentication.admin.failureStrategy.hint=複数回認証に失敗した際に用いる方針。複数の方針を選択できます。
 authentication.admin.failureStrategy.disableAccount.name=アカウントを無効にする
 authentication.admin.failureStrategy.captcha.name=CAPTCHA
-### Missing: authentication.admin.maxAttempts.label=
-### Missing: authentication.admin.maxAttempts.hint=
-### Missing: authentication.admin.timeWindow.label=
-### Missing: authentication.admin.timeWindow.hint=
+authentication.admin.maxAttempts.label=認証の最大試行数
+authentication.admin.maxAttempts.hint=複数回認証に失敗した際の方針を適用するまでの認証の最大試行数。この数は、以下の時間設定を前提として適用されます。0に設定すると、この機能は無効となります。
+authentication.admin.timeWindow.label=ログイン失敗に関するタイムウィンドウ
+authentication.admin.timeWindow.hint=複数回認証に失敗した際の方針を有効にするにあたって考慮する時間枠（秒数）。
 authentication.admin.isAuthenticationSecurityEnabled.label=認証のセキュリティーメカニズムを有効あるいは無効にする
-### Missing: authentication.admin.isAuthenticationSecurityEnabled.hint=
-### Missing: authentication.admin.isAuthenticationSecurityEnabled.disabled=
-### Missing: authentication.admin.isAuthenticationSecurityEnabled.enabled=
-### Missing: authentication.admin.heading=Authentication Security
+authentication.admin.isAuthenticationSecurityEnabled.hint=認証セキュリティーのメカニズムを無効にすると、認証の失敗に関する記録もリセットされます。
+authentication.admin.isAuthenticationSecurityEnabled.disabled=無効
+authentication.admin.isAuthenticationSecurityEnabled.enabled=有効
+authentication.admin.heading=認証セキュリティー
 </content>
   </xwikidoc>

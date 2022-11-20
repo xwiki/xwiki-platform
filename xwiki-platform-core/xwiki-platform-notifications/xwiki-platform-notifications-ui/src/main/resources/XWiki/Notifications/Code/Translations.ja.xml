@@ -132,7 +132,7 @@ notifications.menu.cleared=通知を消去しました
 notifications.settings.title=通知の設定
 notifications.settings.error.notAdmin=確認には管理者の権限が必要です。
 notifications.settings.menu=通知のメニュー
-### Missing: notifications.settings.menu.hint=
+notifications.settings.menu.hint=通知のメニューはページの右上にあります。ベル（{0}）をクリックすると表示できます
 notifications.settings.email=Eメール
 notifications.settings.email.forGuest=通知設定を変更するにはログインあるいは登録が必要です。
 notifications.settings.email.disabled=通知メールは無効化されています。管理者に連絡してください。
@@ -140,14 +140,14 @@ notifications.settings.email.hint=定期的にウィキでの出来事の要約�
 notifications.settings.email.title=Eメールの設定
 notifications.settings.email.frequency=Eメールの頻度
 notifications.settings.email.frequency.hint=ウィキでの出来事の要約をEメールで受信したい頻度を選択してください。
-### Missing: notifications.settings.email.diffType.hint=
+notifications.settings.email.diffType.hint=全ての変更に関してEメールで受け取りたい詳細のレベルを選択してください。
 notifications.settings.saving=設定を保存しています…
 notifications.settings.saved=保存しました！
 notifications.settings.savingfailed=設定を保存できませんでした
 notifications.settings.filters=フィルター（{0}）
 notifications.settings.errorFilterWiki=エラー：ページではなくウィキを選択してください
 notifications.settings.preferences=設定
-### Missing: notifications.settings.preferences.hint=
+notifications.settings.preferences.hint=起こっているイベントをストリームまたはEメールで通知。
 notifications.settings.applications.title=アプリケーション
 notifications.settings.applications.hint=これは通知を送信できるアプリケーションの一覧です。いずれも有効化あるいは無効化できます。
 notifications.settings.applications.forGuest=通知設定を変更するにはログインあるいは登録が必要です。
@@ -172,7 +172,7 @@ notifications.email.linkDetails=詳細を参照
 notifications.rss.feedLink=RSSフィード
 notifications.rss.feedLinkDescription=通知のイベントフィード
 notifications.rss.feedTitle=通知のRSSフィード
-### Missing: notifications.rss.feedDescription=
+notifications.rss.feedDescription=このRSSフィードはプロフィールのページでカスタマイズできます。
 ### Missing: notifications.rss.seeChanges=
 ### Missing: notifications.rss.defaultTitleWithPage=
 notifications.rss.defaultTitle=新しいイベント
@@ -208,13 +208,13 @@ notifications.userprofile.error=通知設定を保存する際のエラー
 
 ## Macros description
 rendering.macro.notificationsApplicationsPreferences.name=通知アプリケーションの設定
-### Missing: rendering.macro.notificationsApplicationsPreferences.description=
+rendering.macro.notificationsApplicationsPreferences.description=現在のユーザーの通知アプリケーションについての設定を表示。
 rendering.macro.notificationsApplicationsPreferences.parameter.target.name=ターゲット
-### Missing: rendering.macro.notificationsApplicationsPreferences.parameter.target.description=
-### Missing: rendering.macro.notificationsAutoWatchPreferences.name=
-### Missing: rendering.macro.notificationsAutoWatchPreferences.description=
+rendering.macro.notificationsApplicationsPreferences.parameter.target.description=マクロのターゲット（現在のユーザーについては"user"、現在のウィキについては"wiki"）
+rendering.macro.notificationsAutoWatchPreferences.name=通知の自動監視の設定
+rendering.macro.notificationsAutoWatchPreferences.description=自動監視に関する現在のユーザーの設定を表示。
 rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=ターゲット
-### Missing: rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=
+rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=マクロのターゲット（現在のユーザーについては"user"、現在のウィキについては"wiki"）
 
 ## Toggle notification filters labels
 ### Missing: notifications.filters.preferences.label.page=
@@ -233,8 +233,8 @@ notifications.switches.changeStatusError=通知の状態を変更できません
 
 ## until 13.2RC1
 notifications.settings.filters.preferences.title=フィルター
-### Missing: notifications.settings.filters.preferences.hint=
-### Missing: notifications.settings.filters.preferences.forGuest=
+notifications.settings.filters.preferences.hint=フィルターを作成すると、アクティブなイベントが通知を送信するタイミングを設定できます。
+notifications.settings.filters.preferences.forGuest=通知フィルターを設定するにはログインまたは登録が必要です。
 ## Header definition for notification filter preferences
 notifications.settings.filters.preferences.table.name=名称
 notifications.settings.filters.preferences.table.filterType=フィルターの種類

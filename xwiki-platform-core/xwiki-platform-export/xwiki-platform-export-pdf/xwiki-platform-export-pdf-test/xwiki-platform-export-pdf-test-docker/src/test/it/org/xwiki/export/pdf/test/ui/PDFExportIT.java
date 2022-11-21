@@ -136,9 +136,6 @@ class PDFExportIT
             //
 
             String tocPageText = pdf.getTextFromPage(1);
-            // The footer shows the page number and the page count.
-            assertTrue(tocPageText.startsWith("2 / 4\n"),
-                "Unexpected footer on table of contents page: " + tocPageText);
             assertTrue(tocPageText.contains("Table of Contents\nParent\nChapter 1\nChild\nSection 1\n"),
                 "Unexpected table of contents: " + tocPageText);
 
@@ -242,6 +239,7 @@ class PDFExportIT
         templateEditPage
             .setTableOfContents(templateEditPage.getTableOfContents().replace("core.pdf.tableOfContents", "Chapters"));
         templateEditPage.setHeader(templateEditPage.getHeader().replace("<span ", "Chapter: <span "));
+        templateEditPage.setFooter(templateEditPage.getFooter().replaceFirst("<span ", "Page <span "));
         templateEditPage.clickSaveAndContinue();
 
         // Register the template in the PDF export administration section.
@@ -276,10 +274,10 @@ class PDFExportIT
             String tocPageText = pdf.getTextFromPage(1);
             assertTrue(tocPageText.contains("Chapters"), "Unexpected table of contents: " + tocPageText);
 
-            // Verify the custom PDF header.
+            // Verify the custom PDF header and footer.
             String contentPageText = pdf.getTextFromPage(2);
-            assertTrue(contentPageText.startsWith("Chapter: Parent"),
-                "Unexpected header on the content page: " + contentPageText);
+            assertTrue(contentPageText.startsWith("Chapter: Parent\nPage 3 / 4\n"),
+                "Unexpected header and footer on the content page: " + contentPageText);
         }
     }
 

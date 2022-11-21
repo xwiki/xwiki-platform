@@ -104,7 +104,7 @@ ckeditor.plugin.syntax.wysiwygModeUnsupported=L''édition WYSIWYG n''est pas sup
 ckeditor.plugin.image.imageEditor.standardTab.title=Standard
 ckeditor.plugin.image.imageEditor.advancedTab.title=Avancé
 ckeditor.plugin.image.imageEditor.standardTab.imageStyles.label=Styles de l'image
-ckeditor.plugin.image.imageEditor.standardTab.imageStyles.hint=Sélectionnez le style à appliquer à l'image
+ckeditor.plugin.image.imageEditor.standardTab.imageStyles.hint=Sélectionnez le style à appliquer à l'image.
 ckeditor.plugin.image.imageEditor.standardTab.alt.label=Texte alternatif
 ckeditor.plugin.image.imageEditor.standardTab.alt.hint=Indiquez un texte alternatif pour l'image (ce texte sera utilisé si l'image ne peut être affichée).
 ckeditor.plugin.image.imageEditor.standardTab.caption.label=Légende
@@ -113,7 +113,7 @@ ckeditor.plugin.image.imageEditor.standardTab.caption.ariaLabel=Activer et indiq
 ckeditor.plugin.image.imageEditor.advancedTab.size.label=Taille
 ckeditor.plugin.image.imageEditor.advancedTab.size.width.label=Largeur
 ckeditor.plugin.image.imageEditor.advancedTab.size.height.label=Hauteur
-ckeditor.plugin.image.imageEditor.advancedTab.size.hint=Définissez la taille de l'image
+ckeditor.plugin.image.imageEditor.advancedTab.size.hint=Définissez la taille de l'image.
 ckeditor.plugin.image.imageEditor.advancedTab.border.label=Bordure
 ckeditor.plugin.image.imageEditor.advancedTab.border.hint=Si coché, une bordure sera ajoutée à l'image
 ckeditor.plugin.image.imageEditor.advancedTab.alignment.label=Alignement
@@ -124,7 +124,7 @@ ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.center=Centré
 ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.end=A la fin
 ckeditor.plugin.image.imageEditor.advancedTab.textWrap.label=Adaptation au texte
 ckeditor.plugin.image.imageEditor.advancedTab.textWrap.hint=Si coché, l'image est entourée par le texte.
-ckeditor.plugin.image.imageSelector.documentTreeTab.title=Arbre de document
+ckeditor.plugin.image.imageSelector.treeTab.title=Arborescence
 ckeditor.plugin.image.imageSelector.uploadTab.title=Envoi
 ckeditor.plugin.image.imageSelector.uploadTab.file.title=Fichier
 ckeditor.plugin.image.imageSelector.uploadTab.file.hint=Sélectionnez un fichier local à ajouter à la page.
@@ -174,9 +174,11 @@ macroSelector.filter.category.other=Autre
 macroSelector.filter.category.notinstalled=Non installée
 macroSelector.failedToRetrieveMacros=Impossible de récupérer la liste des macros disponibles.
 macroSelector.select=Sélectionner
+macroSelector.recommended=Recommandé
 macroSelector.install=Installer
+macroSelector.install.confirm=Vous êtes sur le point d''installer l''extension {0} {1}. Voulez-vous continuer ?
 macroSelector.install.notAllowed=Vous n'êtes pas autorisés à installer cette extension
-### Missing: macroSelector.filter.category.placeholder=Select a category...
+macroSelector.filter.category.placeholder=Sélectionnez une catégorie...
 macroEditor.title=Modifier la Macro
 macroEditor.more=Plus
 macroEditor.changeMacro=Modifier la Macro
@@ -187,7 +189,9 @@ macroEditor.descriptorRequestFailed=La recherche du descripteur de la macro {0} 
 macroEditor.installRequestFailed=Impossible d''installer la macro {0}.
 
 
-imageEditor.modal.backToEditor.button=Retour
+imageEditor.modal.changeImage.button=Modifier l'image
+
+
 imageEditor.modal.loadFail.message=Impossible d'afficher le formulaire de modification de l'image.
 imageEditor.modal.title=Modifier l'image
 imageEditor.modal.insertButton=Insérer
@@ -195,9 +199,19 @@ imageEditor.modal.initialization.fail=Impossible d'afficher le formulaire de sé
 imageSelector.modal.title=Sélectionner l'image
 imageSelector.modal.selectButton=Sélectionnez
 imageSelector.modal.loadFail.message=Impossible d'afficher le formulaire de sélection de l'image.
-imageSelector.modal.fileUpload.success=Fichier envoyé avec succès
-imageSelector.modal.fileUpload.fail=Échec d'envoi du fichier
-imageSelector.modal.fileUpload.abort=Envoi du fichier annulé
+imageSelector.modal.fileUpload.success=Fichier envoyé avec succès.
+imageSelector.modal.fileUpload.fail=Échec d'envoi du fichier.
+imageSelector.modal.fileUpload.abort=Envoi du fichier annulé.
 imageSelector.modal.initialization.fail=Impossible d'afficher le formulaire de sélection de l'image.
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## Deprecated since 14.10RC1
+imageEditor.modal.backToEditor.button=Retour
+ckeditor.plugin.image.imageSelector.documentTreeTab.title=Arbre de document
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
 </xwikidoc>

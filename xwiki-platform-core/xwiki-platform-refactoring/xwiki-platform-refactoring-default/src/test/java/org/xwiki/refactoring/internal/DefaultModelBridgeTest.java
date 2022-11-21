@@ -35,7 +35,6 @@ import org.xwiki.job.AbstractJobStatus;
 import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceProvider;
@@ -52,6 +51,7 @@ import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -114,6 +114,10 @@ class DefaultModelBridgeTest
 
     @MockComponent
     private AuthorizationManager authorization;
+
+    @MockComponent
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> userReferenceResolver;
 
     @InjectComponentManager
     private MockitoComponentManager componentManager;
@@ -527,61 +531,6 @@ class DefaultModelBridgeTest
     }
 
     @Test
-    void getBackLinkedReferences() throws Exception
-    {
-        DocumentReference documentReference = new DocumentReference("alice", Arrays.asList("Path", "To"), "Page");
-        List<DocumentReference> backLinks = Arrays.asList(new DocumentReference("bob", "One", "Two"));
-        when(xwiki.getStore().loadBacklinks(documentReference, true, this.xcontext)).thenReturn(backLinks);
-
-        this.xcontext.setWikiId("carol");
-
-        assertEquals(backLinks, this.modelBridge.getBackLinkedReferences(documentReference, "bob"));
-
-        verify(this.xcontext).setWikiId("bob");
-        verify(this.xcontext).setWikiId("carol");
-    }
-
-    @Test
-    void getBackLinkedReferencesAttachment() throws Exception
-    {
-        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
-        AttachmentReference attachmentReference = new AttachmentReference("image.png", documentReference);
-        List<DocumentReference> backlinks = List.of(new DocumentReference("bob", "One", "Two"));
-
-        when(this.xwiki.getStore().loadBacklinks(attachmentReference, true, this.xcontext))
-            .thenReturn(backlinks);
-
-        this.xcontext.setWikiId("wiki0");
-
-        assertEquals(backlinks, this.modelBridge.getBackLinkedReferences(attachmentReference, "wiki"));
-
-        verify(this.xcontext).setWikiId("wiki");
-        verify(this.xcontext).setWikiId("wiki0");
-    }
-
-    @Test
-    void getBackLinkedReferencesAttachmentXWikiException() throws Exception
-    {
-        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
-        AttachmentReference attachmentReference = new AttachmentReference("image.png", documentReference);
-
-        when(this.xwiki.getStore().loadBacklinks(attachmentReference, true, this.xcontext))
-            .thenThrow(XWikiException.class);
-
-        this.xcontext.setWikiId("wiki0");
-
-        assertEquals(List.of(), this.modelBridge.getBackLinkedReferences(attachmentReference, "wiki"));
-
-        verify(this.xcontext).setWikiId("wiki");
-        verify(this.xcontext).setWikiId("wiki0");
-
-        assertEquals(1, this.logCapture.size());
-        assertEquals("Failed to retrieve the back-links for attachment "
-            + "[Attachment wiki:space.page@image.png] on wiki [wiki].", this.logCapture.getMessage(0));
-        assertEquals(Level.ERROR, this.logCapture.getLogEvent(0).getLevel());
-    }
-
-    @Test
     void restoreDeletedDocument() throws Exception
     {
         long deletedDocumentId = 42;
@@ -785,7 +734,7 @@ class DefaultModelBridgeTest
 
         XWikiRightService rightService = mock(XWikiRightService.class);
         when(xwiki.getRightService()).thenReturn(rightService);
-        when(rightService.hasAccessLevel(any(), any(), any(), any())).thenReturn(true);
+        when(recycleBin.hasAccess(any(), any(), any())).thenReturn(true);
 
         assertTrue(this.modelBridge.canRestoreDeletedDocument(deletedDocument, userReferenceToCheck));
 
@@ -815,7 +764,7 @@ class DefaultModelBridgeTest
         // No rights.
         XWikiRightService rightService = mock(XWikiRightService.class);
         when(xwiki.getRightService()).thenReturn(rightService);
-        when(rightService.hasAccessLevel(any(), any(), any(), any())).thenReturn(false);
+        when(recycleBin.hasAccess(any(), any(), any())).thenReturn(false);
         DocumentReference authorReference = new DocumentReference("wiki", "user", "Alice");
         when(xcontext.getAuthorReference()).thenReturn(authorReference);
         when(request.isCheckRights()).thenReturn(true);

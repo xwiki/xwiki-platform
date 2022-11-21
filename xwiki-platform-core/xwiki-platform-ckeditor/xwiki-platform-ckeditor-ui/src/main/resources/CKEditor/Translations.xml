@@ -136,7 +136,7 @@ ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.end=End
 ckeditor.plugin.image.imageEditor.advancedTab.textWrap.label=Text Wrap
 ckeditor.plugin.image.imageEditor.advancedTab.textWrap.hint=When checked, the image is wrapped around the surrounding text.
 
-ckeditor.plugin.image.imageSelector.documentTreeTab.title=Document Tree
+ckeditor.plugin.image.imageSelector.treeTab.title=Tree
 ckeditor.plugin.image.imageSelector.uploadTab.title=Upload
 ckeditor.plugin.image.imageSelector.uploadTab.file.title=File
 ckeditor.plugin.image.imageSelector.uploadTab.file.hint=Select a local file to add to the page.
@@ -210,7 +210,7 @@ macroEditor.descriptorRequestFailed=Failed to retrieve the {0} macro descriptor.
 macroEditor.installRequestFailed=Failed to install the {0} macro.
 
 
-imageEditor.modal.backToEditor.button=Back
+imageEditor.modal.changeImage.button=Change Image
 imageEditor.modal.loadFail.message=Failed to retrieve the image editor form.
 imageEditor.modal.title=Edit Image
 imageEditor.modal.insertButton=Insert
@@ -223,6 +223,16 @@ imageSelector.modal.fileUpload.success=File upload succeeded.
 imageSelector.modal.fileUpload.fail=File upload failed.
 imageSelector.modal.fileUpload.abort=File upload aborted.
 imageSelector.modal.initialization.fail=Failed to retrieve the image selection form.
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## Deprecated since 14.10RC1
+imageEditor.modal.backToEditor.button=Back
+ckeditor.plugin.image.imageSelector.documentTreeTab.title=Document Tree
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
   <object>
     <name>CKEditor.Translations</name>

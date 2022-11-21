@@ -36,11 +36,16 @@ import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.servlet.ServletRequestContext;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.internal.attachment.PartAttachmentAccessWrapper;
+import org.xwiki.attachment.validation.AttachmentValidationException;
+import org.xwiki.attachment.validation.AttachmentValidator;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPluginApi;
+import com.xpn.xwiki.web.UploadAction;
 
 /**
  * File upload related tools.
@@ -60,19 +65,24 @@ public final class FileUploadUtils
     }
 
     /**
-     * Loads the list of uploaded files in the context if there are any uploaded files.
-     * Note that the order of the result is not guaranteed and might be different depending on the servlet engine used.
+     * Loads the list of uploaded files in the context if there are any uploaded files. Note that the order of the
+     * result is not guaranteed and might be different depending on the servlet engine used.
      *
-     * @param uploadMaxSize Maximum size of the uploaded files.
-     * @param uploadSizeThreshold the threshold over which the file data should be stored on disk, and not in memory.
-     * @param tempdir Temporary directory to store the uploaded files that are not kept in memory.
-     * @param request the request to parse.
+     * @param uploadMaxSize Maximum size of the uploaded files
+     * @param uploadSizeThreshold the threshold over which the file data should be stored on disk, and not in
+     *     memory
+     * @param tempdir Temporary directory to store the uploaded files that are not kept in memory
+     * @param request the request to parse
+     * @param attachmentValidator the validator used to validate if the request parts are valid attachments
      * @return the parts found in the request as a collection of {@link FileItem}
-     * @throws XWikiException if the request could not be parsed, or the maximum file size was reached.
+     * @throws XWikiException if the request could not be parsed
+     * @throws AttachmentValidationException in case of error when validating the attachment (e.g., the maximum
+     *     filesize is reached)
      * @see FileUploadPluginApi#loadFileList(long, int, String)
      */
     public static Collection<FileItem> getFileItems(long uploadMaxSize, int uploadSizeThreshold, String tempdir,
-        HttpServletRequest request) throws XWikiException
+        HttpServletRequest request, AttachmentValidator attachmentValidator)
+        throws XWikiException, AttachmentValidationException
     {
         // The request multi-part content is automatically consumed by the application server when multi part support is
         // enabled so we cannot use the standard fileupload parser which expect to real the source content.
@@ -90,11 +100,9 @@ public final class FileUploadUtils
         if (!parts.isEmpty()) {
             List<FileItem> items = new ArrayList<>(parts.size());
             for (Part part : parts) {
-                if (part.getSize() > uploadMaxSize) {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                        XWikiException.ERROR_XWIKI_APP_FILE_EXCEPTION_MAXSIZE, "File size too big");
+                if (StringUtils.startsWith(part.getName(), UploadAction.FILE_FIELD_NAME)) {
+                    attachmentValidator.validateAttachment(new PartAttachmentAccessWrapper(part));
                 }
-
                 items.add(new PartFileItem(part));
             }
 

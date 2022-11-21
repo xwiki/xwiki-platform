@@ -173,6 +173,11 @@ public final class Relations
     public static final String SYNTAXES = "http://www.xwiki.org/rel/syntaxes";
 
     /**
+     * Relation for links pointing to the REST client information.
+     */
+    public static final String CLIENT = "http://www.xwiki.org/rel/client";
+
+    /**
      * Avoid instantiation.
      */
     private Relations()

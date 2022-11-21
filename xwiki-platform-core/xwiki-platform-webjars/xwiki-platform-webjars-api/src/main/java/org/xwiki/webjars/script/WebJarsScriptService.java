@@ -226,6 +226,7 @@ public class WebJarsScriptService implements ScriptService
             groupId = webjarId.substring(0, groupSeparatorPosition);
             artifactId = webjarId.substring(groupSeparatorPosition + 1);
         }
+        String extensionId = String.format("%s:%s", groupId, artifactId);
 
         Map<String, Object> urlParams = new LinkedHashMap<>();
         if (params != null) {
@@ -237,29 +238,49 @@ public class WebJarsScriptService implements ScriptService
         // query string (since the namespace is now part of the URL).
         urlParams.remove(WIKI);
 
-        Object version = urlParams.remove(VERSION);
+        // Construct a WebJarsResourceReference so that we can serialize it!
+        WebJarsResourceReference resourceReference;
+        String version = (String) urlParams.remove(VERSION);
         if (version == null) {
             // Try to determine the version based on the extensions that are currently installed or provided by default.
-            version = getVersion(String.format("%s:%s", groupId, artifactId), namespace);
+            Extension extension = getExtension(extensionId, namespace);
+            if (extension != null) {
+                // Generate the URL based on the found extension
+                resourceReference = getResourceReference(getArtifactId(extension.getId().getId()),
+                    extension.getId().getVersion().getValue(), namespace, path, urlParams);
+            } else {
+                // Fallback on a URL which does not include the version
+                resourceReference = getResourceReference(artifactId, null, namespace, path, urlParams);
+            }
+        } else {
+            // The version was explicitly indicated
+            resourceReference = getResourceReference(artifactId, version, namespace, path, urlParams);
         }
-
-        // Construct a WebJarsResourceReference so that we can serialize it!
-        WebJarsResourceReference resourceReference =
-            getResourceReference(artifactId, version, namespace, path, urlParams);
 
         ExtendedURL extendedURL;
         try {
             extendedURL = this.defaultResourceReferenceSerializer.serialize(resourceReference);
         } catch (SerializeResourceReferenceException | UnsupportedResourceReferenceException e) {
-            this.logger.warn("Error while serializing WebJar URL for id [{}], path = [{}]. Root cause = [{}]",
-                webjarId, path, ExceptionUtils.getRootCauseMessage(e));
+            this.logger.warn("Error while serializing WebJar URL for id [{}], path = [{}]. Root cause = [{}]", webjarId,
+                path, ExceptionUtils.getRootCauseMessage(e));
             return null;
         }
 
         return extendedURL.serialize();
     }
 
-    private WebJarsResourceReference getResourceReference(String artifactId, Object version, String namespace,
+    private String getArtifactId(String extensionId)
+    {
+        String artifactId = extensionId;
+        int groupSeparatorPosition = extensionId.indexOf(':');
+        if (groupSeparatorPosition >= 0) {
+            artifactId = extensionId.substring(groupSeparatorPosition + 1);
+        }
+
+        return artifactId;
+    }
+
+    private WebJarsResourceReference getResourceReference(String artifactId, String version, String namespace,
         String path, Map<String, Object> urlParams)
     {
         List<String> segments = new ArrayList<>();
@@ -267,7 +288,7 @@ public class WebJarsScriptService implements ScriptService
         // Don't include the version if it's not specified and there's no installed/core extension that matches the
         // given WebJar id.
         if (version != null) {
-            segments.add((String) version);
+            segments.add(version);
         }
         segments.addAll(Arrays.asList(path.split(RESOURCE_SEPARATOR)));
 
@@ -293,7 +314,7 @@ public class WebJarsScriptService implements ScriptService
         return resourceReference;
     }
 
-    private String getVersion(String extensionId, String namespace)
+    private Extension getExtension(String extensionId, String namespace)
     {
         // Look for WebJars that are core extensions.
         Extension extension = this.coreExtensionRepository.getCoreExtension(extensionId);
@@ -306,12 +327,10 @@ public class WebJarsScriptService implements ScriptService
                 // Fallback by looking in the main wiki
                 selectedNamespace = constructNamespace(this.wikiDescriptorManager.getMainWikiId());
                 extension = this.installedExtensionRepository.getInstalledExtension(extensionId, selectedNamespace);
-                if (extension == null) {
-                    return null;
-                }
             }
         }
-        return extension.getId().getVersion().getValue();
+
+        return extension;
     }
 
     private String resolveNamespace(String namespace)

@@ -207,7 +207,8 @@ public class TaskData implements Serializable
      */
     public boolean tooManyAttempts()
     {
-        return this.attempts > 10;
+        // Try 10 times.
+        return this.attempts > 9;
     }
 
     @Override

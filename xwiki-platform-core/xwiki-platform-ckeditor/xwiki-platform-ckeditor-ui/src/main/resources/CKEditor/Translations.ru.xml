@@ -101,7 +101,45 @@ ckeditor.plugin.syntax.update.inProgress=Обновление редактора
 ckeditor.plugin.syntax.update.done=WYSIWYG редактор обновлен
 ckeditor.plugin.syntax.update.failed=Не удалось обновить редактор WYSIWYG
 ckeditor.plugin.syntax.wysiwygModeUnsupported=Режим редактирования WYSIWYG не поддерживается синтаксисом {0}.
+ckeditor.plugin.image.imageEditor.standardTab.title=Основное
+ckeditor.plugin.image.imageEditor.advancedTab.title=Дополнительное
+ckeditor.plugin.image.imageEditor.standardTab.imageStyles.label=Стиль изображения
+ckeditor.plugin.image.imageEditor.standardTab.imageStyles.hint=Выберите стиль, который нужно применить к изображению.
+ckeditor.plugin.image.imageEditor.standardTab.alt.label=Альтернативный текст
+ckeditor.plugin.image.imageEditor.standardTab.alt.hint=Определяет альтернативный текст для изображения, показываемый если изображение не может быть отображено.
+ckeditor.plugin.image.imageEditor.standardTab.caption.label=Подпись
+ckeditor.plugin.image.imageEditor.standardTab.caption.hint=Активирует подпись под изображением.
+ckeditor.plugin.image.imageEditor.standardTab.caption.ariaLabel=Активирует подпись под изображением.
+ckeditor.plugin.image.imageEditor.advancedTab.size.label=Размер
+ckeditor.plugin.image.imageEditor.advancedTab.size.width.label=Ширина
+ckeditor.plugin.image.imageEditor.advancedTab.size.height.label=Высота
+ckeditor.plugin.image.imageEditor.advancedTab.size.hint=Определяет размер изображения.
+ckeditor.plugin.image.imageEditor.advancedTab.border.label=Рамка
+ckeditor.plugin.image.imageEditor.advancedTab.border.hint=Когда галочка установлена, изображение отображается с рамкой
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.label=Выравнивание
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.hint=Определите выравнивание изображения.
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.none=Нет
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.start=Начало
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.center=Центр
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.end=Окончание
+ckeditor.plugin.image.imageEditor.advancedTab.textWrap.label=Обтекание текстом
+ckeditor.plugin.image.imageEditor.advancedTab.textWrap.hint=Если галочка установлена, окружающий текст обтекает изображение.
+ckeditor.plugin.image.imageSelector.treeTab.title=Дерево
+ckeditor.plugin.image.imageSelector.uploadTab.title=Загрузка
+ckeditor.plugin.image.imageSelector.uploadTab.file.title=Файл
+ckeditor.plugin.image.imageSelector.uploadTab.file.hint=Выберите локальный файл для добавления на страницу.
+ckeditor.plugin.image.imageSelector.uploadTab.uploadButton=Загрузить
+ckeditor.plugin.image.imageSelector.iconTab.title=Значок
+ckeditor.plugin.image.imageSelector.iconTab.icon.title=Значок
+ckeditor.plugin.image.imageSelector.iconTab.icon.hint=Идентификатор значка для отображения в качестве изображения.
+ckeditor.plugin.image.imageSelector.iconTab.icon.placeholder=accept
+ckeditor.plugin.image.imageSelector.urlTab.title=URL
+ckeditor.plugin.image.imageSelector.urlTab.url.title=URL
+ckeditor.plugin.image.imageSelector.urlTab.url.hint=URL-адрес изображения для отображения.
+ckeditor.plugin.image.imageSelector.urlTab.url.placeholder=https://...
 ckeditor.inline.failedToInit=Не удалось инициализировать CKEditor.
+ckeditor.upload.error.csrf=Токен CSRF отсутствует.
+ckeditor.upload.error.emptyReturn=Ошибка при загрузке файла: он может превышать настроенный максимальный размер загрузки.
 modal.ok=ОК
 modal.cancel=Отмена
 modal.close=Закрыть
@@ -133,8 +171,14 @@ macroSelector.title=Выбрать макрос
 macroSelector.filter.text.placeholder=Введите для отбора
 macroSelector.filter.category.all=Все макросы
 macroSelector.filter.category.other=Прочее
+macroSelector.filter.category.notinstalled=Не установлен
 macroSelector.failedToRetrieveMacros=Не удалось получить список доступных макросов.
 macroSelector.select=Выбрать
+macroSelector.recommended=Рекомендовано
+macroSelector.install=Установить
+macroSelector.install.confirm=Вы собираетесь установить расширение {0} {1}. Вы уверены что хотите продолжить?
+macroSelector.install.notAllowed=Вам не разрешено устанавливать это расширение
+macroSelector.filter.category.placeholder=Выберите категорию...
 macroEditor.title=Редактировать макрос
 macroEditor.more=Еще...
 macroEditor.changeMacro=Изменить макрос
@@ -142,5 +186,32 @@ macroEditor.submit=Подтвердить
 macroEditor.content=Контент
 macroEditor.noParameters=Этот макрос не имеет параметров.
 macroEditor.descriptorRequestFailed=Не удалось получить {0} дескриптор макроса.
+macroEditor.installRequestFailed=Не удалось установить макрос {0}.
+
+
+imageEditor.modal.changeImage.button=Заменить изображение
+
+
+imageEditor.modal.loadFail.message=Не удалось получить диалог настройки изображения.
+imageEditor.modal.title=Настройка изображения
+imageEditor.modal.insertButton=Вставить
+imageEditor.modal.initialization.fail=Не удалось получить диалог выбора изображения.
+imageSelector.modal.title=Выбор изображения
+imageSelector.modal.selectButton=Выбрать
+imageSelector.modal.loadFail.message=Не удалось получить диалог выбора изображения.
+imageSelector.modal.fileUpload.success=Загрузка файла прошла успешно.
+imageSelector.modal.fileUpload.fail=Загрузка файла не удалась.
+imageSelector.modal.fileUpload.abort=Загрузка файла прервана.
+imageSelector.modal.initialization.fail=Не удалось получить диалог выбора изображения.
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## Deprecated since 14.10RC1
+imageEditor.modal.backToEditor.button=Назад
+ckeditor.plugin.image.imageSelector.documentTreeTab.title=Дерево документов
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
 </xwikidoc>

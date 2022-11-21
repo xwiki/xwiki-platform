@@ -287,7 +287,7 @@ export default {
         pageSizesSet.add(limit);
       }
       // Converts the set of page size values into an array and sorts them in ascending numerical order.
-      return Array.from(pageSizesSet).sort((a, b) => a - b);
+      return [...pageSizesSet].sort((a, b) => a - b);
     },
     showEntryRange() {
       return this.data.meta.pagination.showEntryRange

@@ -20,6 +20,7 @@
 package org.xwiki.attachment.refactoring;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.xwiki.job.Request;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.stability.Unstable;
@@ -50,6 +51,24 @@ public class MoveAttachmentRequest extends EntityRequest
      */
     @Unstable
     public static final String UPDATE_REFERENCES = "updateReferences";
+
+    /**
+     * Default constructor.
+     */
+    public MoveAttachmentRequest()
+    {
+    }
+
+    /**
+     * @param request the request to copy
+     * @since 14.7RC1
+     * @since 14.4.4
+     * @since 13.10.9
+     */
+    public MoveAttachmentRequest(Request request)
+    {
+        super(request);
+    }
 
     /**
      * @return the destination of the move

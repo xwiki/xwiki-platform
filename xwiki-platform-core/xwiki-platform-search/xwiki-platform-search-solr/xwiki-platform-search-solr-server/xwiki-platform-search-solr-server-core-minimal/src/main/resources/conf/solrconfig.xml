@@ -25,9 +25,6 @@
 <config>
   <luceneMatchVersion>${solr.version}</luceneMatchVersion>
 
-  <!-- Register the Solr core in JMX -->
-  <jmx />
-
   <!-- The default high-performance update handler -->
   <updateHandler class="solr.DirectUpdateHandler2">
     <!-- Required for atomic updates -->

@@ -42,7 +42,7 @@ platform.flamingo.themes.home.otherthemes=Ostale dostupne teme
 platform.flamingo.themes.home.warningOldColorThemeInstalled=Ovo je aplikacija za upravljanje Flamingo temama. Flamingo tema je prilagodljiva varijanta bilo koje kože koja se temelji na Flamingu. Ako želite upravljati temama boja za kože koje se temelje na Colibriju, trebali biste otići na {0}aplikaciju za Colibri teme za boje{1}.
 platform.flamingo.themes.home.warningCurrentOldColorTheme=Trenutna tema je Colibri tema boja koja nije optimizirana za rad s kožom koja se temelji na Flamingu. Napravili smo najbolje što možemo da bude kompatibilna, ali rezultati bi mogli biti ispod optimalnih.
 platform.flamingo.themes.home.useThisTheme=Upotrijebi ovu temu
-platform.flamingo.themes.home.newThemeName=Ime teme...
+platform.flamingo.themes.home.newThemeName=Ime teme…
 platform.flamingo.themes.home.create=Izradi novu temu
 platform.flamingo.themes.home.create.invalid=Ime teme nije valjano\!
 platform.flamingo.themes.home.create.csrf=Iz sigurnosnih razloga, molim potvrdite da želite izraditi temu imena "{0}".
@@ -76,7 +76,7 @@ platform.flamingo.themes.global=Globalno
 ###############################################################################
 
 ## Used to indicate where deprecated keys start
-@deprecatedstart
+#@deprecatedstart
 
 #######################################
 ## until 7.3M1
@@ -88,5 +88,6 @@ platform.flamingo.themes.lessCode.warning=Nažalost, ovo polje se ne uzima u obz
 #######################################
 platform.flamingo.themes.incompatiblebrowser=Isprike, pretpregled ne radi na ovoj verziji Internet Explorera. Trebate koristiti ažurniji preglednik.
 
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

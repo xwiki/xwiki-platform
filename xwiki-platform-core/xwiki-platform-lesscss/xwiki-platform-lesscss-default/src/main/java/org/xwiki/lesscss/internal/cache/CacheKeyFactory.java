@@ -77,9 +77,6 @@ public class CacheKeyFactory
                      +  colorTheme.length()    + CACHE_KEY_SEPARATOR + colorTheme;
 
         if (withContext) {
-            String xcontext = xcontextCacheKeyFactory.getCacheKey();
-            result += CACHE_KEY_SEPARATOR + xcontext.length() + CACHE_KEY_SEPARATOR + xcontext;
-
             /** Also take into account the request parameters, if any, except parameters which are already
              * taken into account or that are irrelevant. */
             Request request = container.getRequest();
@@ -94,6 +91,9 @@ public class CacheKeyFactory
                     }
                 }
             }
+
+            String xcontext = xcontextCacheKeyFactory.getCacheKey();
+            result += CACHE_KEY_SEPARATOR + xcontext.length() + CACHE_KEY_SEPARATOR + xcontext;
         }
 
         return result;

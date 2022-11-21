@@ -68,7 +68,7 @@ class UsersParameterHandlerTest
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Test
-    void handlerUsersParameter()
+    void handlerUsersParameter() throws Exception
     {
         NotificationParameters notificationParameters = new NotificationParameters();
         this.usersParameterHandler.handleUsersParameter(null, notificationParameters);

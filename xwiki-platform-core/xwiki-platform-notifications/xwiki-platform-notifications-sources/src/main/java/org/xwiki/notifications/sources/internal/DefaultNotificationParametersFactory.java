@@ -448,7 +448,11 @@ public class DefaultNotificationParametersFactory
 
         handleSubwikiWithoutLocationParameters(notificationParameters, parameters, currentWiki);
 
-        usersParameterHandler.handleUsersParameter(parameters.get(ParametersKey.USERS), notificationParameters);
+        try {
+            usersParameterHandler.handleUsersParameter(parameters.get(ParametersKey.USERS), notificationParameters);
+        } catch (Exception e) {
+            throw new NotificationException("Failed to handler users parameter", e);
+        }
 
         handleTagsParameter(notificationParameters, parameters.get(ParametersKey.TAGS), currentWiki);
     }

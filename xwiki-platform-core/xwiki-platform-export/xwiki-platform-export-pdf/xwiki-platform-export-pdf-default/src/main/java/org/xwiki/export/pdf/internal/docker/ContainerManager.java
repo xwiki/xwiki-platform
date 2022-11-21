@@ -20,6 +20,7 @@
 package org.xwiki.export.pdf.internal.docker;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -47,11 +48,6 @@ import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.Ports;
 import com.github.dockerjava.api.model.Volume;
-import com.github.dockerjava.core.DefaultDockerClientConfig;
-import com.github.dockerjava.core.DockerClientConfig;
-import com.github.dockerjava.core.DockerClientImpl;
-import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
-import com.github.dockerjava.transport.DockerHttpClient;
 
 /**
  * Help perform various operations on Docker containers.
@@ -64,10 +60,20 @@ import com.github.dockerjava.transport.DockerHttpClient;
 @Singleton
 public class ContainerManager implements Initializable
 {
+    /**
+     * The labels used to identify the Docker containers created by this component. This is needed for instance to be
+     * able to cleanup the created Docker containers after running the functional tests.
+     */
+    public static final Map<String, String> DEFAULT_LABELS =
+        Collections.singletonMap(ContainerManager.class.getPackageName(), "true");
+
     private static final String DOCKER_SOCK = "/var/run/docker.sock";
 
     @Inject
     private Logger logger;
+
+    @Inject
+    private DockerClientFactory dockerClientFactory;
 
     private DockerClient client;
 
@@ -75,24 +81,24 @@ public class ContainerManager implements Initializable
     public void initialize() throws InitializationException
     {
         this.logger.debug("Initializing the Docker client.");
-        DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder().build();
-        DockerHttpClient httpClient = new ApacheDockerHttpClient.Builder().dockerHost(config.getDockerHost())
-            .sslConfig(config.getSSLConfig()).build();
-        this.client = DockerClientImpl.getInstance(config, httpClient);
+        this.client = this.dockerClientFactory.createDockerClient();
     }
 
     /**
      * Attempts to reuse the container with the specified name.
      * 
      * @param containerName the name of the container to reuse
-     * @param reuse {@code true} to reuse the container if found, {@code false} to remove it if found
      * @return the container id, if a container with the specified name exists and can be reused, otherwise {@code null}
      */
-    public String maybeReuseContainerByName(String containerName, boolean reuse)
+    public String maybeReuseContainerByName(String containerName)
     {
         this.logger.debug("Looking for an existing Docker container with name [{}].", containerName);
         List<Container> containers =
             exec(this.client.listContainersCmd().withNameFilter(Arrays.asList(containerName)).withShowAll(true));
+        // The previous name filtering doesn't perform exact matching (it's more of a partial / contains search).
+        containers = containers.stream().filter(container -> {
+            return Arrays.asList(container.getNames()).contains("/" + containerName);
+        }).collect(Collectors.toList());
         if (containers.isEmpty()) {
             this.logger.debug("Could not find any Docker container with name [{}].", containerName);
             // There's no container with the specified name.
@@ -100,11 +106,7 @@ public class ContainerManager implements Initializable
         }
 
         InspectContainerResponse container = inspectContainer(containers.get(0).getId());
-        if (!reuse) {
-            this.logger.debug("Docker container [{}] found but we can't reuse it.", container.getId());
-            removeContainer(container);
-            return null;
-        } else if (container.getState().getDead() == Boolean.TRUE) {
+        if (container.getState().getDead() == Boolean.TRUE) {
             this.logger.debug("Docker container [{}] is dead. Removing it.", container.getId());
             // The container is not reusable. Try to remove it so it can be recreated.
             removeContainer(container.getId());
@@ -164,13 +166,11 @@ public class ContainerManager implements Initializable
         this.logger.debug("Creating a Docker container with name [{}] using image [{}] and having parameters [{}].",
             containerName, imageName, parameters);
 
-        // set extra hosts if network == bridge (using host.xwiki.internal:host-gateway)
-
         try (CreateContainerCmd createContainerCmd = this.client.createContainerCmd(imageName)) {
             List<ExposedPort> exposedPorts =
                 hostConfig.getPortBindings().getBindings().keySet().stream().collect(Collectors.toList());
-            CreateContainerResponse container = createContainerCmd.withName(containerName).withCmd(parameters)
-                .withExposedPorts(exposedPorts).withHostConfig(hostConfig).exec();
+            CreateContainerResponse container = createContainerCmd.withName(containerName).withLabels(DEFAULT_LABELS)
+                .withCmd(parameters).withExposedPorts(exposedPorts).withHostConfig(hostConfig).exec();
             this.logger.debug("Created the Docker container with id [{}].", container.getId());
             return container.getId();
         }
@@ -212,15 +212,15 @@ public class ContainerManager implements Initializable
      */
     public void stopContainer(String containerId)
     {
-        this.logger.debug("Stopping the Docker container with id [{}].", containerId);
-        exec(this.client.stopContainerCmd(containerId));
-
-        // Wait for the container to be fully stopped before continuing.
-        this.logger.debug("Wait for the Docker container [{}] to stop.", containerId);
         try {
+            this.logger.debug("Stopping the Docker container with id [{}].", containerId);
+            exec(this.client.stopContainerCmd(containerId));
+
+            // Wait for the container to be fully stopped before continuing.
+            this.logger.debug("Wait for the Docker container [{}] to stop.", containerId);
             wait(this.client.waitContainerCmd(containerId));
         } catch (NotFoundException e) {
-            // Do nothing (the container might have been removed automatically when stopped).
+            // Do nothing (the container doesn't exist anymore).
         }
     }
 
@@ -237,18 +237,6 @@ public class ContainerManager implements Initializable
         } catch (NotFoundException e) {
             // Do nothing (the container might have been removed automatically when stopped).
         }
-    }
-
-    private void removeContainer(InspectContainerResponse container)
-    {
-        if (container.getState().getPaused() == Boolean.TRUE) {
-            exec(this.client.unpauseContainerCmd(container.getId()));
-            stopContainer(container.getId());
-        } else if (container.getState().getRunning() == Boolean.TRUE
-            || container.getState().getRestarting() == Boolean.TRUE) {
-            stopContainer(container.getId());
-        }
-        removeContainer(container.getId());
     }
 
     /**

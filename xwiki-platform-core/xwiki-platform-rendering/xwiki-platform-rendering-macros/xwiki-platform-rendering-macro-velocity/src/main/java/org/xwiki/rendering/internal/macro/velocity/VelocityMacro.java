@@ -38,7 +38,6 @@ import org.xwiki.rendering.macro.velocity.VelocityMacroConfiguration;
 import org.xwiki.rendering.macro.velocity.VelocityMacroParameters;
 import org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.script.ScriptContextManager;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
 
@@ -75,9 +74,6 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
      */
     @Inject
     private VelocityMacroConfiguration configuration;
-
-    @Inject
-    private ScriptContextManager scriptContextManager;
 
     /**
      * The logger to log.

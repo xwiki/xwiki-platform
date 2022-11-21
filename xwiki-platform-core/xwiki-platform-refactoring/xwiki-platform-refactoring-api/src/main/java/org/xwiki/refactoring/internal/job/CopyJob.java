@@ -78,7 +78,11 @@ public class CopyJob extends AbstractCopyOrMoveJob<CopyRequest>
     {
         DocumentCopyingEvent documentCopyingEvent = new DocumentCopyingEvent(sourceReference, targetReference);
         DocumentCopiedEvent documentCopiedEvent = new DocumentCopiedEvent(sourceReference, targetReference);
-        copyOrMove(sourceReference, targetReference, documentCopyingEvent, documentCopiedEvent);
+        try {
+            copyOrMove(sourceReference, targetReference, documentCopyingEvent, documentCopiedEvent);
+        } catch (Exception e) {
+            this.logger.error("Failed to copy or move document from [{}] to [{}]", sourceReference, targetReference, e);
+        }
     }
 
     @Override

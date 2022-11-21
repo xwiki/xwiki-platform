@@ -47,7 +47,6 @@ import org.xwiki.extension.version.IncompatibleVersionConstraintException;
 import org.xwiki.extension.version.Version;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobGroupPath;
-import org.xwiki.job.Request;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.platform.flavor.FlavorManager;
 import org.xwiki.platform.flavor.FlavorQuery;
@@ -89,19 +88,6 @@ public class FlavorSearchJob extends AbstractInstallPlanJob<FlavorSearchRequest>
     {
         // We reuse install plan stuff but blocking in this job would cause more issues than it solves
         return null;
-    }
-
-    @Override
-    protected FlavorSearchRequest castRequest(Request request)
-    {
-        FlavorSearchRequest installRequest;
-        if (request instanceof FlavorSearchRequest) {
-            installRequest = (FlavorSearchRequest) request;
-        } else {
-            installRequest = new FlavorSearchRequest(request);
-        }
-
-        return installRequest;
     }
 
     @Override

@@ -19,10 +19,6 @@
  */
 package org.xwiki.image.lightbox.test.ui;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -32,36 +28,41 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.image.lightbox.test.po.ImagePopover;
 import org.xwiki.image.lightbox.test.po.Lightbox;
 import org.xwiki.image.lightbox.test.po.LightboxPage;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.rest.model.jaxb.Object;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.rest.model.jaxb.Object;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Functional tests for the image lightbox.
- * 
+ *
  * @version $Id$
  * @since 14.1RC1
  */
 @UITest(properties = {
     // Add the FileUploadPlugin which is needed by the test to upload attachment files
-    "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"})
+    "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin" })
 class LightboxIT
 {
+    private static final String USER_NAME = "JohnDoe";
+
     private static final DocumentReference LIGHTBOX_CONFIGURATION_REFERENCE =
         new DocumentReference("xwiki", Arrays.asList("XWiki", "Lightbox"), "LightboxConfiguration");
 
     private static final String LIGHTBOX_CONFIGURATION_CLASSNAME = "XWiki.Lightbox.LightboxConfigurationClass";
 
     private static final List<String> IMAGES = Arrays.asList("image1.png", "image2.png", "missingImage.png");
-
-    public static final String USER_NAME = "JohnDoe";
 
     @BeforeAll
     void beforeAll(TestUtils testUtils)
@@ -431,7 +432,8 @@ class LightboxIT
         testUtils.createPage(testReference, this.getSimpleImage(IMAGES.get(0)));
         LightboxPage lightboxPage = new LightboxPage();
         lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), IMAGES.get(0));
-        String lastUploadDate = lightboxPage.openAttachmentsDocExtraPane().getDateOfLastUpload(IMAGES.get(0));
+        String lastUploadDate =
+            new AttachmentsViewPage().openAttachmentsDocExtraPane().getDateOfLastUpload(IMAGES.get(0));
 
         // Make sure that the images are displayed.
         lightboxPage.reloadPage();
@@ -443,7 +445,7 @@ class LightboxIT
         setTimezone(testUtils, "America/Barbados");
         lightboxPage.reloadPage();
 
-        lastUploadDate = lightboxPage.openAttachmentsDocExtraPane().getDateOfLastUpload(IMAGES.get(0));
+        lastUploadDate = new AttachmentsViewPage().openAttachmentsDocExtraPane().getDateOfLastUpload(IMAGES.get(0));
         lightbox = lightboxPage.openLightboxAtImage(0);
         assertTrue(lightbox.isDisplayed());
         assertEquals(lastUploadDate, lightbox.getDate());

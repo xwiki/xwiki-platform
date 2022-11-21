@@ -22,6 +22,8 @@ package org.xwiki.refactoring.splitter.criterion.naming;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.BlockFilter;
@@ -42,6 +44,8 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
  */
 public class HeadingNameNamingCriterion implements NamingCriterion
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HeadingNameNamingCriterion.class);
+
     /**
      * Used to render block to plain text.
      */
@@ -140,7 +144,7 @@ public class HeadingNameNamingCriterion implements NamingCriterion
 
         // Truncate long document names.
         // TODO: the value should be asked to the store API instead of being hardcoded
-        int maxWidth = (documentNames.contains(documentName) || docBridge.exists(documentName)) ? 765 : 768;
+        int maxWidth = (documentNames.contains(documentName) || exists(documentName)) ? 765 : 768;
         if (documentName.length() > maxWidth) {
             documentName = documentName.substring(0, maxWidth);
         }
@@ -148,7 +152,7 @@ public class HeadingNameNamingCriterion implements NamingCriterion
         // Resolve any name clashes.
         String newDocumentName = documentName;
         int localIndex = 0;
-        while (documentNames.contains(newDocumentName) || docBridge.exists(newDocumentName)) {
+        while (documentNames.contains(newDocumentName) || exists(newDocumentName)) {
             // Append a trailing local index if the page already exists
             newDocumentName = documentName + INDEX_SEPERATOR + (++localIndex);
         }
@@ -157,6 +161,17 @@ public class HeadingNameNamingCriterion implements NamingCriterion
         documentNames.add(newDocumentName);
 
         return newDocumentName;
+    }
+
+    private boolean exists(String document)
+    {
+        try {
+            return this.docBridge.exists(document);
+        } catch (Exception e) {
+            LOGGER.error("Failed to check the existence of the document with reference [{}]", document, e);
+        }
+
+        return false;
     }
 
     /**

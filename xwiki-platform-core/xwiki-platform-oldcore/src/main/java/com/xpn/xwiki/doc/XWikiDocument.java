@@ -45,7 +45,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -97,6 +96,8 @@ import org.xwiki.filter.xar.input.XARInputProperties;
 import org.xwiki.filter.xar.output.XAROutputProperties;
 import org.xwiki.filter.xml.output.DefaultResultOutputTarget;
 import org.xwiki.job.event.status.JobProgressManager;
+import org.xwiki.link.LinkException;
+import org.xwiki.link.LinkStore;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.EntityType;
@@ -416,15 +417,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private static UserConfiguration getUserConfiguration()
     {
         return Utils.getComponent(UserConfiguration.class);
-    }
-
-    /**
-     * Used to convert {@link PageReference} into {@link DocumentReference}.
-     */
-    private static DocumentReferenceResolver<PageReference> getCurrentPageReferenceDocumentReferenceResolver()
-    {
-        return Utils.getComponent(new DefaultParameterizedType(null, DocumentReferenceResolver.class,
-            PageReference.class), "current");
     }
 
     private String title;
@@ -945,6 +937,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private UserReferenceSerializer<String> getUserReferenceCompactWikiSerializer()
     {
         return Utils.getComponent(UserReferenceSerializer.TYPE_STRING, "compactwiki/document");
+    }
+
+    private LinkStore getLinkStore()
+    {
+        return Utils.getComponent(LinkStore.class);        
     }
 
     public XWikiStoreInterface getStore(XWikiContext context)
@@ -1605,6 +1602,26 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         XWikiContext context)
     {
         return getRenderedContent(text, sourceSyntaxId, getOutputSyntax(), false, sDocument, isolated, context);
+    }
+
+    /**
+     * @param text the text to render
+     * @param sourceSyntaxId the id of the Syntax used by the passed text (e.g. {@code xwiki/2.1})
+     * @param restrictedTransformationContext see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
+     * @param sDocument the {@link XWikiDocument} to use as secure document, if null keep the current one
+     * @param isolated true of the content should be executed in this document's context
+     * @param context the XWiki context
+     * @return the given text rendered in the context of this document using the passed Syntax
+     * @since 14.10RC1
+     * @since 14.4.7
+     * @since 13.10.11
+     */
+    @Unstable
+    public String getRenderedContent(String text, Syntax sourceSyntaxId, boolean restrictedTransformationContext,
+        XWikiDocument sDocument, boolean isolated, XWikiContext context)
+    {
+        return getRenderedContent(text, sourceSyntaxId, getOutputSyntax(), restrictedTransformationContext, sDocument,
+            isolated, context);
     }
 
     /**
@@ -2538,6 +2555,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         if (this.archive != null) {
             return this.archive.get();
         }
+        // Some APIs are expecting the archive to be null for loading it
+        // (e.g. VersioningStore#loadXWikiDocumentArchive), so it's better to keep it null than to return an
+        // empty archive which would never be populated.
         return null;
     }
 
@@ -2585,6 +2605,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // request)
         if (arch != null) {
             this.archive = new SoftReference<XWikiDocumentArchive>(arch);
+        } else {
+            // Some APIs are expecting the archive to be null for loading it
+            // (e.g. VersioningStore#loadXWikiDocumentArchive), so we allow setting it back to null.
+            this.archive = null;
         }
     }
 
@@ -4327,20 +4351,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Unstable
     public void readTemporaryUploadedFiles(EditForm editForm)
     {
-        List<String> temporaryUploadedFiles = editForm.getTemporaryUploadedFiles();
-        if (!temporaryUploadedFiles.isEmpty()) {
-            TemporaryAttachmentSessionsManager attachmentManager = getTemporaryAttachmentManager();
-            for (String temporaryUploadedFile : temporaryUploadedFiles) {
-                Optional<XWikiAttachment> uploadedAttachmentOpt =
-                    attachmentManager.getUploadedAttachment(getDocumentReference(), temporaryUploadedFile);
-                uploadedAttachmentOpt.ifPresent(uploadedAttachment -> {
-                    XWikiAttachment previousAttachment = this.setAttachment(uploadedAttachment);
-                    if (previousAttachment != null) {
-                        uploadedAttachment.setVersion(previousAttachment.getNextVersion());
-                    }
-                });
-            }
-        }
+        getTemporaryAttachmentManager().attachTemporaryAttachmentsInDocument(this, editForm.getTemporaryUploadedFiles());
     }
 
     /**
@@ -4536,7 +4547,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             if (cloneArchive) {
                 doc.cloneDocumentArchive(this);
             } else {
-                doc.setDocumentArchive(getDocumentArchive());
+                // Without this explicit initialization, it is possible for the archive to be incorrectly initialized.
+                // For instance, with the archive of the cloned document.
+                // Here we guarantee that further calls of APIs to get the archive will properly populate the data.
+                doc.setDocumentArchive((XWikiDocumentArchive) null);
             }
             doc.getAuthors().copyAuthors(getAuthors());
             doc.setContent(getContent());
@@ -5498,8 +5512,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * Get the wiki document references pointing to this document.
      * <p>
-     * Theses links are stored to the database when documents are saved. You can use "backlinks" in XWikiPreferences or
-     * "xwiki.backlinks" in xwiki.cfg file to enable links storage in the database.
+     * Theses links are stored in the Solr search core when the document is indexed. You can use "backlinks" in
+     * XWikiPreferences or "xwiki.backlinks" in xwiki.cfg file to enable links storage in the database.
+     * <p>
+     * Since 14.8RC1, this method return all backlinked documents and not just those located in the context wiki.
      *
      * @param context the XWiki context.
      * @return the found wiki document references
@@ -5508,7 +5524,28 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public List<DocumentReference> getBackLinkedReferences(XWikiContext context) throws XWikiException
     {
-        return getStore(context).loadBacklinks(getDocumentReference(), true, context);
+        Set<EntityReference> references;
+        try {
+            references = getLinkStore().resolveBackLinkedEntities(getDocumentReference());
+        } catch (LinkException e) {
+            throw new XWikiException("Failed to load backlinks for reference [" + getDocumentReference() + "]", e);
+        }
+
+        Set<DocumentReference> documentReferences = new HashSet<>(references.size());
+        for (EntityReference entityReference : references) {
+            // Resolve the DOCUMENT reference
+            DocumentReference linkReference = context.getWiki().getDocumentReference(entityReference, context);
+
+            // Retro compatibility: remove the locale as it's what is expected of #getBackLinkedReferences(XWikicontext)
+            if (linkReference.getLocale() != null) {
+                linkReference = new DocumentReference(linkReference, (Locale) null);
+            }
+
+            // Add the reference
+            documentReferences.add(linkReference);
+        }
+
+        return new ArrayList<>(documentReferences);
     }
 
     /**
@@ -5517,7 +5554,17 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Deprecated(since = "2.2M2")
     public List<String> getBackLinkedPages(XWikiContext context) throws XWikiException
     {
-        return getStore(context).loadBacklinks(getFullName(), context, true);
+        List<DocumentReference> references = getBackLinkedReferences(context);
+
+        EntityReferenceSerializer<String> serializer = getCompactWikiEntityReferenceSerializer();
+
+        List<String> documentNames = new ArrayList<>(references.size());
+        for (DocumentReference reference : references) {
+            // Serialize the reference
+            documentNames.add(serializer.serialize(reference));
+        }
+
+        return documentNames;
     }
 
     /**
@@ -5539,7 +5586,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         Set<XWikiLink> links;
 
         // We don't handle the links the same way in 1.0 syntax for retro-compatibility reason
-        // So here we explicitely get the link from the DB instead of looking inside the document.
+        // So here we explicitly get the link from the DB instead of looking inside the document.
         if (is10Syntax()) {
             links = new LinkedHashSet<>(getStore(context).loadLinks(getId(), context, true));
         } else {
@@ -5780,12 +5827,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             }
 
             for (EntityReference reference : references) {
-                // If the reference is a PageReference then we can't know if it points to a terminal page or a
-                // non-terminal one, and thus we need to resolve it.
-                if (reference instanceof PageReference) {
-                    reference = getCurrentPageReferenceDocumentReferenceResolver().resolve((PageReference) reference);
-                }
-                documentNames.add(serializer.serialize(reference));
+                // Get the reference of the document
+                DocumentReference linkDocumentReference = context.getWiki().getDocumentReference(reference, context);
+
+                // Serialize the reference
+                documentNames.add(serializer.serialize(linkDocumentReference));
             }
         } finally {
             context.setDoc(contextDoc);
@@ -9485,5 +9531,19 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             UserReference userReference = userStringToUserReference(serializedUserReference);
             this.authors.setOriginalMetadataAuthor(userReference);
         }
+    }
+
+    /**
+     * Make sure any document metadata which may depend on configuration is initialized to its default value.
+     * 
+     * @since 14.8RC1
+     * @since 14.4.4
+     * @since 13.10.10
+     */
+    @Unstable
+    public void initialize()
+    {
+        // There is no syntax by default in a new document and the default one is retrieved from the configuration
+        setSyntax(getSyntax());
     }
 }

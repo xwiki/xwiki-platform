@@ -256,7 +256,7 @@
     </property>
     <property>
       <parameters>priority=200
-title=ckeditor.plugin.image.imageSelector.documentTreeTab.title
+title=ckeditor.plugin.image.imageSelector.treeTab.title
 id=documentTree</parameters>
     </property>
     <property>

@@ -67,13 +67,6 @@ public class ViewPage extends BasePage
         return new HistoryPane();
     }
 
-    public AttachmentsPane openAttachmentsDocExtraPane()
-    {
-        getDriver().findElement(By.id("Attachmentslink")).click();
-        waitForDocExtraPaneActive("attachments");
-        return new AttachmentsPane();
-    }
-
     public InformationPane openInformationDocExtraPane()
     {
         getDriver().findElement(By.id("Informationlink")).click();
@@ -264,16 +257,10 @@ public class ViewPage extends BasePage
         getDriver().scrollTo(0, 0);
     }
 
-    private void useShortcutForDocExtraPane(String shortcut, String pane)
+    protected void useShortcutForDocExtraPane(String shortcut, String pane)
     {
         getDriver().createActions().sendKeys(shortcut).perform();
         waitForDocExtraPaneActive(pane);
-    }
-
-    public AttachmentsPane useShortcutKeyForAttachmentPane()
-    {
-        useShortcutForDocExtraPane("a", "attachments");
-        return new AttachmentsPane();
     }
 
     public HistoryPane useShortcutKeyForHistoryPane()

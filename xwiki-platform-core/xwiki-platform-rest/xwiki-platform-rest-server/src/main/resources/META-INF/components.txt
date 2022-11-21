@@ -5,6 +5,7 @@ org.xwiki.rest.internal.JaxRsServletProvider
 org.xwiki.rest.internal.JaxRsServletReloader
 org.xwiki.rest.internal.XWikiJaxRsApplication
 org.xwiki.rest.internal.XWikiRestletJaxRsApplication
+org.xwiki.rest.internal.resources.ClientResourceImpl
 org.xwiki.rest.internal.resources.RootResourceImpl
 org.xwiki.rest.internal.resources.SyntaxesResourceImpl
 org.xwiki.rest.internal.resources.wikis.WikisResourceImpl

@@ -45,7 +45,7 @@ platform.flamingo.themes.home.otherthemes=Otros temas disponibles
 platform.flamingo.themes.home.warningOldColorThemeInstalled=Esta es la aplicación para gestionar los Temas de Flamingo. Un Tema de Flamingo es una variación personalizable de cualquier piel basada en Flamingo. Si desea administrar Temas de Color para skins basados en Colibrí, debe ir a {0}Aplicación de Temas de Color de Colibrí{1}.
 platform.flamingo.themes.home.warningCurrentOldColorTheme=El Tema actual es un Tema de Color Colibrí que no está optimizado para trabajar con una piel basada en Flamingo. Hemos hecho todo lo posible para que sea compatible, pero los resultados pueden no ser óptimos.
 platform.flamingo.themes.home.useThisTheme=Usar este tema
-platform.flamingo.themes.home.newThemeName=Nombre del tema...
+platform.flamingo.themes.home.newThemeName=Nombre del tema…
 platform.flamingo.themes.home.create=Crear un nuevo tema
 platform.flamingo.themes.home.create.invalid=¡Nombre de tema inválido!
 platform.flamingo.themes.home.create.csrf=Por razones de seguridad, confirme que desea crear un Tema llamado "{0}".
@@ -79,7 +79,7 @@ platform.flamingo.themes.global=Global
 ###############################################################################
 
 ## Used to indicate where deprecated keys start
-@deprecatedstart
+#@deprecatedstart
 
 #######################################
 ## until 7.3M1
@@ -91,5 +91,6 @@ platform.flamingo.themes.lessCode.warning=Desafortunadamente, este campo no se t
 #######################################
 platform.flamingo.themes.incompatiblebrowser=Lo sentimos, la vista previa no funciona con esta versión de Internet Explorer. Necesitas usar un navegador más nuevo.
 
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

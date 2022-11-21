@@ -21,7 +21,7 @@ package org.xwiki.attachment.test.po;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.xwiki.test.ui.po.AttachmentsPane;
+import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
 import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.test.ui.po.ViewPage;
 

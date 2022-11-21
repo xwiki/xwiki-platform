@@ -1,0 +1,85 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc locale="ja">
+  <web>XWiki</web>
+  <name>XWikiSyntaxVerbatim</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>XWikiSyntaxVerbatim</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= 高度 =
+
+== 逐語 ==
+
+=== 逐語 1.0 ===
+
+フォーマットしない内容の入力を許可（XWikiシンタックスを考慮しません)。
+
+{{info}}XWikiシンタックス 1.0では、[[Preマクロ&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Pre%20Macro%20%28Radeox%29]]はXWikiシンタックスとRadeoxマクロだけを保ちます。HTMLスニペットとGroovy、Velocityスクリプトは実行されます。{{/info}}
+
+|=機能|=XWikiシンタックス 1.0|=結果
+|インラインの逐語|{{{逐語のまま{pre}*[レンダリングしない]*{/pre}内容}}}|逐語のまま{{{*[レンダリングしない]*}}}内容
+|ブロックの逐語|((({{{
+{pre}
+複数行の
+*逐語の*
+内容
+{/pre}
+}}}
+{{info}}[[Codeマクロ&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Code%20Macro%20%28Radeox%29]]も使用できますが、内容を既定でボックスの中に表示します。{{/info}}
+)))|((({{{
+複数行の
+*逐語の*
+内容
+}}})))
+
+=== 逐語 2.0 ===
+
+フォーマットしない内容の入力を許可（XWikiシンタックスを考慮しません)。
+
+|=機能|=XWikiシンタックス {{velocity}}$crtSyntaxVer{{/velocity}}|=結果
+|インラインの逐語|{{{逐語のまま{{{**[[レンダリングしない]]**}}}内容}}}|逐語のまま{{{**[[レンダリングしない]]**}}}内容
+|ブロックの逐語|((({{{
+{{{
+複数行の
+**逐語の**
+内容
+}}}
+}}})))|((({{{
+複数行の
+**逐語の**
+内容
+}}})))</content>
+</xwikidoc>

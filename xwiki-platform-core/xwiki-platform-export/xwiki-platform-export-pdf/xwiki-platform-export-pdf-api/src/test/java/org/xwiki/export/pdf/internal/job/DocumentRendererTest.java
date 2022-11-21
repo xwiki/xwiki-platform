@@ -35,8 +35,11 @@ import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.export.pdf.job.PDFExportJobStatus.DocumentRenderingResult;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
@@ -46,6 +49,7 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
@@ -77,6 +81,9 @@ class DocumentRendererTest
     @Named("context")
     private ComponentManager contextComponentManager;
 
+    @MockComponent
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
+
     @Mock
     private BlockRenderer html5Renderer;
 
@@ -96,10 +103,22 @@ class DocumentRendererTest
     {
         DocumentReference documentReference = new DocumentReference("test", "Some", "Page");
         when(this.documentAccessBridge.getTranslatedDocumentInstance(documentReference)).thenReturn(this.document);
+        when(this.document.getDocumentReference()).thenReturn(documentReference);
+        when(this.entityReferenceSerializer.serialize(documentReference)).thenReturn("test:Some.Page");
 
-        XDOM xdom = new XDOM(Arrays.asList(new WordBlock("test")));
+        XDOM titleXDOM = new XDOM(Arrays.asList(new WordBlock("title")));
+        XDOM xdom = new XDOM(Arrays.asList(new WordBlock("content")));
         when(this.documentDisplayer.display(same(this.document), any(DocumentDisplayerParameters.class)))
-            .thenReturn(xdom);
+            .then(new Answer<XDOM>()
+            {
+                @Override
+                public XDOM answer(InvocationOnMock invocation) throws Throwable
+                {
+                    DocumentDisplayerParameters params = (DocumentDisplayerParameters) invocation.getArgument(1);
+                    assertNotNull(params.getIdGenerator());
+                    return params.isTitleDisplayed() ? titleXDOM : xdom;
+                }
+            });
 
         doAnswer(new Answer<Void>()
         {
@@ -111,9 +130,19 @@ class DocumentRendererTest
             }
         }).when(this.html5Renderer).render(same(xdom), any(WikiPrinter.class));
 
-        DocumentRenderingResult result = this.documentRenderer.render(documentReference);
+        DocumentRenderingResult result = this.documentRenderer.render(documentReference, false);
         assertEquals(documentReference, result.getDocumentReference());
+        assertEquals(1, xdom.getChildren().size());
         assertSame(xdom, result.getXDOM());
         assertEquals("some content", result.getHTML());
+
+        // Now render with title.
+        result = this.documentRenderer.render(documentReference, true);
+        assertEquals(2, xdom.getChildren().size());
+        HeaderBlock title = (HeaderBlock) xdom.getChildren().get(0);
+        assertEquals(HeaderLevel.LEVEL1, title.getLevel());
+        assertEquals("Htest:Some.Page", title.getId());
+        assertEquals("test:Some.Page", title.getParameter("data-xwiki-document-reference"));
+        assertEquals("title", ((WordBlock) title.getChildren().get(0)).getWord());
     }
 }

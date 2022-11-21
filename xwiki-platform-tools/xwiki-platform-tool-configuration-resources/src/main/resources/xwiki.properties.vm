@@ -121,11 +121,20 @@ environment.permanentDirectory = $xwikiPropertiesEnvironmentPermanentDirectory
 #-# [Since 2.0M3]
 #-# Overrides default macro categories (Each macro has default categories already defined, for example
 #-# "Navigation" for the Table of Contents Macro).
+#-# Note: the categories are case sensitive.
 #-#
 #-# Ex: To redefine the macro categories for the TOC macro so that it'd be in the "My Category" and "Deprecated" 
 #-# categories + redefine the category for the Script Macro to be "My Other Category", you'd use:
 # rendering.transformation.macro.categories = toc = My Category\,Deprecated
 # rendering.transformation.macro.categories = script = My Other Category
+
+#-# [Since 14.8RC1]
+#-# Override the default hidden macro categories.
+#-# Note: the categories are case sensitive.
+#-#
+#-# For instance, to make the "Development" category hidden by default, in addition to the default "Internal" and 
+#-# "Deprecated" categories, you'd use:
+# rendering.transformation.macro.hiddenCategories = Development,Internal,Deprecated
 
 #-# [Since 2.5M2]
 #-# Specify whether the image dimensions should be extracted from the image parameters and included in the image URL
@@ -924,6 +933,23 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-# with programming rights, while this configuration affect any attachment.
 # attachment.download.forceDownload=
 
+#-# [Since 14.10RC1]
+#-# Define the list of allowed attachment mimetypes. By default, this list is empty, but you can specify a 
+#-# comma-separated list of allowed mimetypes. Note that a joker (*) can be used to accept any media type. Once this
+#-# list is not empty, any attachment with an unlisted mimetype will be rejected.
+#-# For instance, if you want to only accept plain text and any kind of images, you can set the list to:
+#-# text/plain,image/*
+# attachment.upload.allowList=
+
+#-# [Since 14.10RC1]
+#-# Define the list of blocked attachment mimetypes. By default, this list is empty, but you can specify a 
+#-# comma-separated list of blocked mimetypes. Note that a joker (*) can be used to accept any media type. Once this 
+#-# list is not empty, any attachment matching one of the listed mimetype will be rejected.
+#-# For instance, if you want to reject plain text and any kind of images, you can set the list to:
+#-# text/plain,image/*
+#-#
+# attachment.upload.blockList=
+
 #-------------------------------------------------------------------------------------
 # Active Installs
 #-------------------------------------------------------------------------------------
@@ -952,6 +978,14 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-#
 #-# The default is:
 # wiki.alias.suffix=
+
+#-# [Since 14.9RC1]
+#-# Allows delegating the database/schema/user creation (depends on the database) for a new wiki to an infra admin.
+#-# Said differently, if the following property is false then XWiki will not create any database/schema/user when
+#-# creating a wiki. It's assumed that it will exist prior to using the Wiki creation wizard.
+#-#
+#-# The default is:
+# wiki.createDatabase = true
 
 #-------------------------------------------------------------------------------------
 # Store
@@ -1286,6 +1320,13 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The format is:
 #-# user.preferences.superadmin.<preference name> = <value>
 #-#
+#-# Values set by default for the SuperAdmin user:
+#-# user.preferences.superadmin.displayHiddenDocuments = 1
+#-# user.preferences.superadmin.active = 1
+#-# user.preferences.superadmin.first_name = SuperAdmin
+#-# user.preferences.superadmin.email_checked = 1
+#-# user.preferences.superadmin.usertype = Advanced
+#-#
 #-# Examples:
 #-# user.preferences.superadmin.displayHiddenDocuments = 0
 #-# user.preferences.superadmin.editor = Text
@@ -1295,6 +1336,12 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-#
 #-# The format is:
 #-# user.preferences.guest.<preference name> = <value>
+#-#
+#-# Values set by default for the Guest user:
+#-# user.preferences.guest.displayHiddenDocuments = 0
+#-# user.preferences.guest.active = 0
+#-# user.preferences.guest.first_name = Guest
+#-# user.preferences.guest.email_checked = 0
 #-#
 #-# Examples:
 #-# user.preferences.guest.displayHiddenDocuments = 1

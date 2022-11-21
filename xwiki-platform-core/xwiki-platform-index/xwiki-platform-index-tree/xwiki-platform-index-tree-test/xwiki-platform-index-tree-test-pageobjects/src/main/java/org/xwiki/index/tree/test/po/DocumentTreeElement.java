@@ -91,10 +91,24 @@ public class DocumentTreeElement extends TreeElement
      * 
      * @param path the path used to locate the attachment
      * @return this tree
+     * @see #openToAttachment(AttachmentReference)
      */
     public DocumentTreeElement openToAttachment(String... path)
     {
         return openTo(getAttachmentNodeId(path));
+    }
+
+    /**
+     * Open the tree to the specific attachment.
+     *
+     * @param attachmentReference the attachment reference to open the tree to
+     * @return this tree
+     * @see #openToAttachment(String...)
+     * @since 14.7RC1
+     */
+    public DocumentTreeElement openToAttachment(AttachmentReference attachmentReference)
+    {
+        return openTo(getNodeId(attachmentReference));
     }
 
     @Override
@@ -163,10 +177,22 @@ public class DocumentTreeElement extends TreeElement
     /**
      * @param path the path used to locate the attachment
      * @return the corresponding attachment node
+     * @see #getAttachmentNode(AttachmentReference)
      */
     public TreeNodeElement getAttachmentNode(String... path)
     {
         return getNode(getAttachmentNodeId(path));
+    }
+
+    /**
+     * @param attachmentReference the attachment reference of the attachment node to get
+     * @return the corresponding attachment node
+     * @see #getAttachmentNode(String...)
+     * @since 14.7RC1
+     */
+    public TreeNodeElement getAttachmentNode(AttachmentReference attachmentReference)
+    {
+        return getNode(getNodeId(attachmentReference));
     }
 
     private String getNodeId(EntityReference reference)

@@ -130,7 +130,7 @@
       |(% class="label" %)Developed by(%%)|#if ($authors.isEmpty())
           Unknown
         #else
-          $doc.authors
+          $doc.display('authors')
         #end
       ##------- Active Installs --------
       #if ($doc.getValue('installedCount') &amp;&amp; $doc.getValue('showInstalledCount') != 0)

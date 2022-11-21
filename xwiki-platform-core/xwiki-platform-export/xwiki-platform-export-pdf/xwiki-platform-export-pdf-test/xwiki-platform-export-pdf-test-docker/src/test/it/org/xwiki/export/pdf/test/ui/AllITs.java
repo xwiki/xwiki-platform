@@ -31,8 +31,8 @@ import org.xwiki.test.docker.junit5.UITest;
  * @since 14.4.2
  * @since 14.5
  */
-@UITest
-@ExtendWith(DynamicTestConfigurationExtension.class)
+@UITest(extraJARs = {"org.xwiki.platform:xwiki-platform-resource-temporary"})
+@ExtendWith(PDFExportExecutionCondition.class)
 class AllITs
 {
     @Nested

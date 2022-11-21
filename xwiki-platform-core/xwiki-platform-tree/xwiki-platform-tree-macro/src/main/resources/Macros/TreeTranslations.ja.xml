@@ -1,0 +1,70 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1" locale="ja">
+  <web>Macros</web>
+  <name>TreeTranslations</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Macros.Tree</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Tree Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>rendering.macro.tree.name=ツリー
+rendering.macro.tree.description=マクロのコンテンツあるいはソースのパラメーターにより規定されたツリーの階層を表示します。
+### Missing: rendering.macro.tree.parameter.reference.name=
+### Missing: rendering.macro.tree.parameter.reference.description=
+rendering.macro.tree.parameter.root.name=ルート
+rendering.macro.tree.parameter.root.description=ルートのノードIDです。特定のノード（指定したルート）以下のノードを表示する際に役立ちます。ツリーは、ルートにあるノードの子供を最初のレベルに表示するため、ルートのノードは実際には表示されません。ルートのノードが指定されていない場合は、ツリー全体を表示します。
+rendering.macro.tree.parameter.showRoot.name=ルートを表示
+### Missing: rendering.macro.tree.parameter.showRoot.description=
+rendering.macro.tree.parameter.dragAndDrop.name=ドラッグアンドドロップ
+rendering.macro.tree.parameter.dragAndDrop.description=ユーザーがツリーノードをドラッグアンドドロップできるかどうかを指定。
+rendering.macro.tree.parameter.contextMenu.name=コンテクストメニュー
+rendering.macro.tree.parameter.contextMenu.description=ユーザーがツリーノードを右クリックした際にコンテクストメニューを表示するかどうか。
+rendering.macro.tree.parameter.class.name=クラス
+rendering.macro.tree.parameter.class.description=ツリーの最上位にあるHTML要素に追加するCSSのクラス。
+rendering.macro.tree.parameter.icons.name=アイコン
+### Missing: rendering.macro.tree.parameter.icons.description=
+### Missing: rendering.macro.tree.parameter.edges.name=
+### Missing: rendering.macro.tree.parameter.edges.description=
+rendering.macro.tree.parameter.links.name=リンク
+### Missing: rendering.macro.tree.parameter.links.description=
+rendering.macro.tree.parameter.checkboxes.name=チェックボックス
+### Missing: rendering.macro.tree.parameter.checkboxes.description=
+### Missing: rendering.macro.tree.parameter.openTo.name=Open to
+### Missing: rendering.macro.tree.parameter.openTo.description=
+### Missing: rendering.macro.tree.parameter.finder.name=
+### Missing: rendering.macro.tree.parameter.finder.description=
+rendering.macro.tree.parameter.limit.name=制限
+### Missing: rendering.macro.tree.parameter.limit.description=
+### Missing: rendering.macro.tree.content.description=
+tree.macro.editModeWarning=このツリーは編集モードで表示できません。
+</content>
+  </xwikidoc>

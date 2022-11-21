@@ -751,7 +751,6 @@ public class MockitoOldcore
                     }
 
                     XWikiDocument savedDocument = document.clone();
-
                     documents.put(document.getDocumentReferenceWithLocale(), savedDocument);
 
                     if (isNew) {

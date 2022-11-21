@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.configuration.WikiConfiguration;
 
 /**
@@ -52,6 +53,16 @@ public class DefaultWikiConfiguration implements WikiConfiguration
     @Override
     public String getAliasSuffix()
     {
-        return configuration.getProperty(PREFIX + "alias.suffix", "");
+        return this.configuration.getProperty(PREFIX + "alias.suffix", "");
+    }
+
+    /**
+     * @since 14.9RC1
+     */
+    @Unstable
+    @Override
+    public boolean shouldCreateDatabase()
+    {
+        return this.configuration.getProperty(PREFIX + "createDatabase", true);
     }
 }

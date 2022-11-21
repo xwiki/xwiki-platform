@@ -88,7 +88,7 @@ public class MoveJob extends AbstractCopyOrMoveJob<MoveRequest>
     }
 
     @Override
-    protected boolean checkAllRights(DocumentReference oldReference, DocumentReference newReference)
+    protected boolean checkAllRights(DocumentReference oldReference, DocumentReference newReference) throws Exception
     {
         if (!hasAccess(Right.DELETE, oldReference)) {
             // The move operation is implemented as Copy + Delete.
@@ -104,7 +104,11 @@ public class MoveJob extends AbstractCopyOrMoveJob<MoveRequest>
     {
         DocumentRenamingEvent documentRenamingEvent = new DocumentRenamingEvent(oldReference, newReference);
         DocumentRenamedEvent documentRenamedEvent = new DocumentRenamedEvent(oldReference, newReference);
-        copyOrMove(oldReference, newReference, documentRenamingEvent, documentRenamedEvent);
+        try {
+            copyOrMove(oldReference, newReference, documentRenamingEvent, documentRenamedEvent);
+        } catch (Exception e) {
+            this.logger.error("Failed to copy or move document from [{}] to [{}]", oldReference, newReference, e);
+        }
     }
 
     @Override

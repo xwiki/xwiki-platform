@@ -24,6 +24,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
@@ -42,12 +43,17 @@ import static org.xwiki.index.internal.DefaultLinksTaskConsumer.LINKS_TASK_TYPE;
  *
  * @version $Id$
  * @since 14.2RC1
+ * @deprecated link storage and indexing moved to Solr (implemented in xwiki-platform-search-solr-api)
  */
 @Component
 @Singleton
 @Named("LinksUpdateListener")
+@Deprecated(since = "14.8RC1")
 public class LinksUpdateListener extends AbstractEventListener
 {
+    @Inject
+    private Logger logger;
+
     @Inject
     private RemoteObservationManagerContext remoteObservationManagerContext;
 
@@ -71,6 +77,10 @@ public class LinksUpdateListener extends AbstractEventListener
         XWikiContext context = this.contextProvider.get();
         if (!this.remoteObservationManagerContext.isRemoteState() && context.getWiki().hasBacklinks(context)) {
             XWikiDocument doc = (XWikiDocument) source;
+            // Note: we display the docId since the task manager logs only display the docId in logs and we want to
+            // make the match visually when there's a problem and we have to analyse the logs.
+            this.logger.debug("Link analysis task starting for [{}] (docId = [{}])", doc.getDocumentReference(),
+                doc.getId());
             this.taskManager.addTask(doc.getDocumentReference().getWikiReference().getName(), doc.getId(),
                 LINKS_TASK_TYPE);
         }

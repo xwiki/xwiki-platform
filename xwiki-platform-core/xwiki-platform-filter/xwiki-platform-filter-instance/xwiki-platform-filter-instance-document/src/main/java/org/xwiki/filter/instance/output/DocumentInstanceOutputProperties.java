@@ -152,7 +152,7 @@ public class DocumentInstanceOutputProperties extends InstanceOutputProperties
      * @return Indicate if the versions coming from the events should be kept
      */
     @PropertyName("Preserve version")
-    @PropertyDescription("Indicate if the versions comming from the events should be kept")
+    @PropertyDescription("Indicate if the versions coming from the events should be kept")
     public boolean isVersionPreserved()
     {
         return this.versionPreserved;

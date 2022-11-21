@@ -19,24 +19,25 @@
  */
 package org.xwiki.eventstream.store.internal;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.migration.DataMigrationException;
-import com.xpn.xwiki.store.migration.XWikiDBVersion;
-import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
-import org.hibernate.Session;
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
-import java.util.List;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.migration.DataMigrationException;
+import com.xpn.xwiki.store.migration.XWikiDBVersion;
+import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 
 /**
  * Fix entries stored in the activity stream events table that have an absolute serialized reference in the "page"
@@ -103,16 +104,17 @@ public class RecordableEventMigrator extends AbstractHibernateDataMigration
 
     private void saveEvent(LegacyEvent event)
     {
-        XWikiContext context = contextProvider.get();
+        XWikiContext context = this.contextProvider.get();
         XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
+
         try {
-            hibernateStore.beginTransaction(context);
-            Session session = hibernateStore.getSession(context);
-            session.update(event);
-            hibernateStore.endTransaction(context, true);
+            hibernateStore.executeWrite(context, session -> {
+                session.update(event);
+
+                return null;
+            });
         } catch (XWikiException e) {
-            hibernateStore.endTransaction(context, false);
-            logger.warn("Failed to update the event [{}].", event.getEventId());
+            this.logger.warn("Failed to update the event [{}].", event.getEventId());
         }
     }
 }

@@ -22,11 +22,15 @@ package com.xpn.xwiki.user.impl.xwiki;
 import java.net.URL;
 import java.security.Principal;
 
+import javax.inject.Provider;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.securityfilter.authenticator.persistent.PersistentLoginManagerInterface;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 
@@ -62,6 +66,9 @@ public class XWikiAuthServiceImplTest
     @Before
     public void before() throws Exception
     {
+        this.oldcore.getMocker().registerMockComponent(
+            new DefaultParameterizedType(null, Provider.class, PersistentLoginManagerInterface.class));
+
         this.authService = new XWikiAuthServiceImpl();
 
         // Dummy response

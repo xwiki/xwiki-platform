@@ -243,7 +243,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     }
 
     @Override
-    public boolean exists(DocumentReference documentReference)
+    public boolean exists(DocumentReference documentReference) throws XWikiException
     {
         XWikiContext context = getContext();
         if (context != null) {
@@ -255,7 +255,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
 
     @Override
     @Deprecated
-    public boolean exists(String documentReference)
+    public boolean exists(String documentReference) throws XWikiException
     {
         XWikiContext context = getContext();
         if (context != null) {
@@ -592,17 +592,26 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     public byte[] getAttachmentContent(String documentReference, String attachmentFilename) throws Exception
     {
         XWikiContext xcontext = getContext();
-        return xcontext.getWiki().getDocument(documentReference, xcontext).getAttachment(attachmentFilename)
-            .getContent(xcontext);
+        XWikiAttachment attachment =
+            xcontext.getWiki().getDocument(documentReference, xcontext).getAttachment(attachmentFilename);
+        return attachment != null ? attachment.getContent(xcontext) : new byte[0];
     }
 
     @Override
+    @Deprecated(since = "14.7RC1")
     public InputStream getAttachmentContent(AttachmentReference attachmentReference) throws Exception
     {
+        return getAttachmentContent((EntityReference) attachmentReference);
+    }
+
+    @Override
+    public InputStream getAttachmentContent(EntityReference reference) throws Exception
+    {
         XWikiContext xcontext = getContext();
-        XWikiDocument attachmentDocument =
-            xcontext.getWiki().getDocument(attachmentReference.getDocumentReference(), xcontext);
-        return attachmentDocument.getAttachment(attachmentReference.getName()).getContentInputStream(xcontext);
+        EntityReference documentReference = reference.extractReference(EntityType.DOCUMENT);
+        XWikiDocument attachmentDocument = xcontext.getWiki().getDocument(documentReference, xcontext);
+        XWikiAttachment attachment = attachmentDocument.getAttachment(reference.getName());
+        return attachment != null ? attachment.getContentInputStream(xcontext) : null;
     }
 
     @Override

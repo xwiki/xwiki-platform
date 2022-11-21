@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
@@ -37,6 +38,7 @@ import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.EventListener;
@@ -84,6 +86,10 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
      * Used to match events on "use" property.
      */
     private final List<Event> events = new ArrayList<>(3);
+
+    private AuthorizationManager authorizationManager;
+    private DocumentReferenceResolver<String> stringDocumentReferenceResolver;
+    private EntityReferenceResolver<String> currentEntityReferenceResolver;
 
     /**
      * XWiki plugin constructor.
@@ -174,7 +180,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     @Override
     public Set<String> getAlwaysUsedExtensions(XWikiContext context)
     {
-        EntityReferenceSerializer<String> serializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
+        EntityReferenceSerializer<String> serializer = getDefaultEntityReferenceSerializer();
         Set<DocumentReference> references = getAlwaysUsedExtensions();
         Set<String> names = new HashSet<>(references.size());
         for (DocumentReference reference : references) {
@@ -214,7 +220,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
                         XWikiDocument doc = context.getWiki().getDocument(extension, context);
                         // Only add the extension as being "always used" if the page holding it has been saved with
                         // programming rights.
-                        if (Utils.getComponent(AuthorizationManager.class).hasAccess(Right.PROGRAM,
+                        if (getAuthorizationManager().hasAccess(Right.PROGRAM,
                             doc.getAuthorReference(), doc.getDocumentReference())) {
                             extensions.add(extension);
                         }
@@ -236,16 +242,34 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     public boolean hasPageExtensions(XWikiContext context)
     {
         XWikiDocument doc = context.getDoc();
-        if (doc != null) {
-            List<BaseObject> objects = doc.getObjects(getExtensionClassName());
-            if (objects != null) {
-                for (BaseObject obj : objects) {
-                    if (obj == null) {
-                        continue;
-                    }
-                    if (obj.getStringValue(USE_FIELDNAME).equals("currentPage")) {
-                        return true;
-                    }
+        boolean result = false;
+        if (doc != null && this.hasCurrentPageExtensionObjects(doc)) {
+            if (getAuthorizationManager().hasAccess(Right.SCRIPT, doc.getAuthorReference(),
+                doc.getDocumentReference())) {
+                result = true;
+            } else {
+                displayScriptRightLog(doc.getDocumentReference());
+            }
+        }
+        return result;
+    }
+
+    private void displayScriptRightLog(Object documentReference)
+    {
+        LOGGER.warn("Extensions present in [{}] ignored because of lack of script right from the author.",
+            documentReference);
+    }
+
+    private boolean hasCurrentPageExtensionObjects(XWikiDocument doc)
+    {
+        List<BaseObject> objects = doc.getObjects(getExtensionClassName());
+        if (objects != null) {
+            for (BaseObject obj : objects) {
+                if (obj == null) {
+                    continue;
+                }
+                if (StringUtils.equals(obj.getStringValue(USE_FIELDNAME), "currentPage")) {
+                    return true;
                 }
             }
         }
@@ -253,19 +277,48 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     }
 
     @Override
-    public void use(String resource, XWikiContext context)
-    {
-        String canonicalResource = getCanonicalDocumentName(resource);
-
-        super.use(canonicalResource, context);
-    }
-
-    @Override
     public void use(String resource, Map<String, Object> parameters, XWikiContext context)
     {
         String canonicalResource = getCanonicalDocumentName(resource);
 
-        super.use(canonicalResource, parameters, context);
+        if (this.canResourceBeUsed(canonicalResource, context)) {
+            super.use(canonicalResource, parameters, context);
+        } else {
+            displayScriptRightLog(canonicalResource);
+        }
+    }
+
+    private DocumentReferenceResolver<String> getDocumentReferenceResolver()
+    {
+        if (this.stringDocumentReferenceResolver == null) {
+            this.stringDocumentReferenceResolver = Utils.getComponent(DocumentReferenceResolver.TYPE_STRING);
+        }
+        return this.stringDocumentReferenceResolver;
+    }
+
+    private AuthorizationManager getAuthorizationManager()
+    {
+        if (this.authorizationManager == null) {
+            this.authorizationManager = Utils.getComponent(AuthorizationManager.class);
+        }
+        return this.authorizationManager;
+    }
+
+    private boolean canResourceBeUsed(String resource, XWikiContext context)
+    {
+        DocumentReferenceResolver<String> documentReferenceResolver = getDocumentReferenceResolver();
+        DocumentReference documentReference = documentReferenceResolver.resolve(resource);
+
+        try {
+            XWikiDocument document = context.getWiki().getDocument(documentReference, context);
+            DocumentReference authorReference = document.getAuthorReference();
+            return getAuthorizationManager().hasAccess(Right.SCRIPT, authorReference, documentReference);
+        } catch (XWikiException e) {
+            LOGGER.error("Error while loading [{}] for checking script right: [{}]", documentReference,
+                ExceptionUtils.getRootCauseMessage(e));
+            LOGGER.debug("Original error stack trace: ", e);
+            return false;
+        }
     }
 
     /**
@@ -332,7 +385,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
         if (document.getObject(getExtensionClassName()) != null) {
             // new or already existing object
             if (document.getObject(getExtensionClassName(), USE_FIELDNAME, "always", false) != null) {
-                if (Utils.getComponent(AuthorizationManager.class).hasAccess(Right.PROGRAM,
+                if (getAuthorizationManager().hasAccess(Right.PROGRAM,
                     document.getAuthorReference(), document.getDocumentReference())) {
                     getAlwaysUsedExtensions().add(document.getDocumentReference());
 
@@ -355,6 +408,14 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
         }
     }
 
+    private EntityReferenceResolver<String> getCurrentEntityReferenceResolver()
+    {
+        if (this.currentEntityReferenceResolver == null) {
+            this.currentEntityReferenceResolver = Utils.getComponent(EntityReferenceResolver.TYPE_STRING, "current");
+        }
+        return this.currentEntityReferenceResolver;
+    }
+
     /**
      * Get the canonical serialization of a document name, in the {@code wiki:Space.Document} format.
      *
@@ -363,10 +424,8 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
      */
     private String getCanonicalDocumentName(String documentName)
     {
-        @SuppressWarnings("unchecked")
-        EntityReferenceResolver<String> resolver = Utils.getComponent(EntityReferenceResolver.TYPE_STRING, "current");
-        @SuppressWarnings("unchecked")
-        EntityReferenceSerializer<String> serializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
+        EntityReferenceResolver<String> resolver = getCurrentEntityReferenceResolver();
+        EntityReferenceSerializer<String> serializer = getDefaultEntityReferenceSerializer();
         return serializer.serialize(resolver.resolve(documentName, EntityType.DOCUMENT));
     }
 

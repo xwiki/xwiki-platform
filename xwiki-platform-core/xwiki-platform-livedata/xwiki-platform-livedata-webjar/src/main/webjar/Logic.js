@@ -105,6 +105,7 @@ define('xwiki-livedata', [
   const Logic = function (element) {
     this.element = element;
     this.data = JSON.parse(element.getAttribute("data-config") || "{}");
+    this.contentTrusted = element.getAttribute("data-config-content-trusted") === "true"; 
     this.data.entries = Object.freeze(this.data.entries);
 
     // Reactive properties must be initialized before Vue is instantiated.
@@ -583,6 +584,7 @@ define('xwiki-livedata', [
       return this.fetchEntries()
         .then(data => {
           this.data.data = Object.freeze(data);
+          Vue.nextTick(() => this.triggerEvent('entriesUpdated', {}));
           // Remove the outdated footnotes, they will be recomputed by the new entries.
           this.footnotes.reset()
         })
@@ -1518,6 +1520,18 @@ define('xwiki-livedata', [
       } else {
         this.panels.splice(index, 0, panel);
       }
+    },
+
+    //
+    // Content status
+    //
+
+    /**
+     * @returns {boolean} when false, the content is not trusted will be sanitized whenever Vue integrated escaping
+     * is not enough. When true, the content is never sanitized
+     */
+    isContentTrusted() {
+      return this.contentTrusted;
     }
   };
 

@@ -24,6 +24,7 @@ import java.io.File;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,16 +37,22 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.FrameConsumerResultCallback;
 import org.testcontainers.containers.output.OutputFrame;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.utility.DockerLoggerFactory;
+import org.testcontainers.utility.ResourceReaper;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 
+import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.LogContainerCmd;
+import com.github.dockerjava.api.command.SyncDockerCmd;
+import com.github.dockerjava.api.exception.NotFoundException;
+import com.github.dockerjava.api.model.Container;
 
 import ch.qos.logback.classic.Level;
 
@@ -453,5 +460,45 @@ public final class DockerTestUtils
     {
         ExtensionContext.Store store = DockerTestUtils.getStore(context);
         return store.get(TestConfiguration.class, TestConfiguration.class);
+    }
+
+    /**
+     * This method is usually called before test execution in order to:
+     * <ul>
+     * <li>Cleanup the existing Docker containers with the specified labels (they might be from a previous test
+     * execution)</li>
+     * <li>Cleanup the future Docker containers with the specified labels, after the test execution.</li>
+     * </ul>
+     * 
+     * @param labels the labels used to match the Docker containers to cleanup
+     * @since 14.9
+     */
+    public static void cleanupContainersWithLabels(Map<String, String> labels)
+    {
+        // Cleanup the future Docker containers with the specified labels after the tests are executed.
+        ResourceReaper.instance().registerLabelsFilterForCleanup(labels);
+
+        // Cleanup the existing Docker containers with the specified labels.
+        List<Container> containers = exec(DockerClientFactory.lazyClient().listContainersCmd().withLabelFilter(labels));
+        containers.stream().map(Container::getId).forEach(DockerTestUtils::cleanupContainer);
+    }
+
+    private static void cleanupContainer(String containerId)
+    {
+        DockerClient dockerClient = DockerClientFactory.lazyClient();
+        try {
+            exec(dockerClient.removeContainerCmd(containerId).withForce(true).withRemoveVolumes(true));
+        } catch (NotFoundException e) {
+            // Do nothing (the container doesn't exist anymore).
+        }
+    }
+
+    private static <T> T exec(SyncDockerCmd<T> command)
+    {
+        // Can't write simply try(command) because spoon complains about "Variable resource not allowed here for source
+        // level below 9".
+        try (SyncDockerCmd<T> cmd = command) {
+            return cmd.exec();
+        }
     }
 }

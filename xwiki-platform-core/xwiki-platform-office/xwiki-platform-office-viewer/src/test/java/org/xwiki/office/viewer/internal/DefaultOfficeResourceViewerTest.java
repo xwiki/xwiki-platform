@@ -162,7 +162,7 @@ class DefaultOfficeResourceViewerTest
     private XDOMOfficeDocumentBuilder officeDocumentBuilder;
 
     @MockComponent
-    private ResourceReferenceTypeSerializer resourceReferenceSerializer;
+    private ResourceReferenceTypeSerializer resourceReferenceTypeSerializer;
 
     @MockComponent
     private EntityReferenceSerializer<String> entityReferenceSerializer;
@@ -181,9 +181,7 @@ class DefaultOfficeResourceViewerTest
     private PresentationBuilder presentationBuilder;
 
     @MockComponent
-    @Named("standard/tmp")
-    private ResourceReferenceSerializer<TemporaryResourceReference, ExtendedURL>
-        urlTemporaryResourceReferenceSerializer;
+    private ResourceReferenceSerializer<org.xwiki.resource.ResourceReference, ExtendedURL> resourceReferenceSerializer;
 
     @MockComponent
     private TemporaryResourceStore temporaryResourceStore;
@@ -229,7 +227,7 @@ class DefaultOfficeResourceViewerTest
             STRING_DOCUMENT_REFERENCE);
 
         when(attachmentReferenceResolver.resolve(STRING_ATTACHMENT_REFERENCE)).thenReturn(ATTACHMENT_REFERENCE);
-        when(this.resourceReferenceSerializer.serialize(ATTACHMENT_RESOURCE_REFERENCE)).thenReturn(
+        when(this.resourceReferenceTypeSerializer.serialize(ATTACHMENT_RESOURCE_REFERENCE)).thenReturn(
             STRING_ATTACHMENT_RESOURCE_REFERENCE);
 
         when(converterManager.convert(boolean.class, null)).thenReturn(false);
@@ -380,7 +378,7 @@ class DefaultOfficeResourceViewerTest
     {
         ResourceReference resourceReference = new ResourceReference("http://resource", ResourceType.URL);
 
-        when(this.resourceReferenceSerializer.serialize(resourceReference)).thenReturn(
+        when(this.resourceReferenceTypeSerializer.serialize(resourceReference)).thenReturn(
             "url:" + resourceReference.getReference());
 
         OfficeDocumentView officeDocumentView =
@@ -397,7 +395,7 @@ class DefaultOfficeResourceViewerTest
     {
         ResourceReference resourceReference = new ResourceReference("http://resource", ResourceType.URL);
 
-        when(this.resourceReferenceSerializer.serialize(resourceReference)).thenReturn(
+        when(this.resourceReferenceTypeSerializer.serialize(resourceReference)).thenReturn(
             "url:" + resourceReference.getReference());
 
         Map<String, Object> parameters = Collections.emptyMap();
@@ -488,7 +486,7 @@ class DefaultOfficeResourceViewerTest
             Arrays.asList(String.valueOf(viewParameters.hashCode()), "slide0.png"), documentReference);
 
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("url", "to", "slide0.png"));
-        when(urlTemporaryResourceReferenceSerializer.serialize(temporaryResourceReference)).thenReturn(extendedURL);
+        when(this.resourceReferenceSerializer.serialize(temporaryResourceReference)).thenReturn(extendedURL);
 
         XDOM output = this.officeResourceViewer.createView(attachResourceRef, viewParameters);
 

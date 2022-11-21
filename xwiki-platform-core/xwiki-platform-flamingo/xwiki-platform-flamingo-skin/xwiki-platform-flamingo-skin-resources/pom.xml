@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-flamingo-skin</artifactId>
-    <version>14.7-SNAPSHOT</version>
+    <version>14.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
   <name>XWiki Platform - Flamingo - Skin - Resources</name>
@@ -242,6 +242,13 @@
                   <includes>
                     META-INF/resources/webjars/bootstrap/${bootstrap.version}/less/**
                   </includes>
+                  <!-- Exclude Bootstrap's default print styles because Bootstrap assumes that paper is always the target
+                    paged media, forcing rules that are hard to overwrite (using * selector and !important flag). We
+                    provide instead a copy of Bootstrap's print styles that has been modified to support other paged
+                    media (such as PDF documents displayed on screen). -->
+                  <excludes>
+                    **/print.less*
+                  </excludes>
                 </artifactItem>
               </artifactItems>
             </configuration>

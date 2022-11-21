@@ -44,4 +44,13 @@ public interface PDFPrinter<T>
      * @return the PDF input stream
      */
     InputStream print(T input) throws IOException;
+
+    /**
+     * @return {@code true} if this PDF printer is ready to be used, {@code false} otherwise
+     * @since 14.8
+     */
+    default boolean isAvailable()
+    {
+        return true;
+    }
 }

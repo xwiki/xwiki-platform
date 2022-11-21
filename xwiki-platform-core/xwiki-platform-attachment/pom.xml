@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>14.7-SNAPSHOT</version>
+    <version>14.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-attachment</artifactId>
   <name>XWiki Platform - Attachment - Parent POM</name>
@@ -35,6 +35,7 @@
     <module>xwiki-platform-attachment-ui</module>
     <module>xwiki-platform-attachment-api</module>
     <module>xwiki-platform-attachment-picker</module>
+    <module>xwiki-platform-attachment-validation</module>
   </modules>
   <profiles>
     <profile>

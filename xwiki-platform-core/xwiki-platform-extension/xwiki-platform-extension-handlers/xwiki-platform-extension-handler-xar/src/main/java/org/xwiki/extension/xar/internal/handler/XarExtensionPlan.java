@@ -54,7 +54,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 public class XarExtensionPlan implements Closeable
 {
-    public static final String CONTEXTKEY_XARINSTALLPLAN = "extension.xar.installplan";
+    public static final String SESSIONTKEY_XARINSTALLPLAN = "extension.xar.installplan";
 
     /**
      * Logging helper object.

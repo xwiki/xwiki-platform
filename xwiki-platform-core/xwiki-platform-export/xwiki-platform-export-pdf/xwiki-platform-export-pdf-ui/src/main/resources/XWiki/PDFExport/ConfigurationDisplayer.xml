@@ -1,0 +1,92 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.PDFExport.ConfigurationDisplayer" locale="">
+  <web>XWiki.PDFExport</web>
+  <name>ConfigurationDisplayer</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.PDFExport.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+{{html clean="false"}}
+#set ($configPropertyValue = $NULL)
+## Remove non-word characters from the property name in order to prevent code injection when evaluating the property
+## value below.
+#set ($configPropertyGetter = $name.replace('xwiki', 'xWiki').replaceAll('\W', ''))
+#if ("$!configPropertyGetter" != '')
+  #set ($getConfigPropertyValue = '#set ($configPropertyValue = $services.export.pdf.configuration.' +
+    $configPropertyGetter + ')')
+  #evaluate($getConfigPropertyValue)
+#end
+#set ($escapedName = $escapetool.xml("$!{prefix}$!{name}"))
+#set ($escapedId = $escapetool.xml("$!{prefix}$!{name}$!{options.idSuffix}"))
+#set ($escapedValue = $escapetool.xml($value))
+#if ($type == 'edit' || $type == 'search')
+  #set ($placeholder = '')
+  #if ("$!value" == '')
+    ## We show the inherited / default value as placeholder only when there's no value set, because we can't get the
+    ## inherited / default value when the value is set (the "default" value would be the actual value set).
+    #set ($placeholder = $configPropertyValue)
+  #end
+  #set ($inputType = 'text')
+  #if ($field.type == 'NumberClass')
+    #set ($inputType = 'number')
+  #end
+  #set ($pattern = $field.getProperty('validationRegExp').value)
+  &lt;input type="$escapetool.xml($inputType)" id="$!escapedId" name="$!escapedName" value="$!escapedValue"
+    #if ("$!placeholder" != '') placeholder="$!escapetool.xml($placeholder)"#end
+    #if ($options.required) required#end
+    #if ($options.min) min="$!escapetool.xml($options.min)"#end
+    #if ($options.max) max="$!escapetool.xml($options.max)"#end
+    #if ("$!pattern" != '') pattern="$escapetool.xml($pattern)"#end /&gt;
+#elseif ($type == 'view' || $type == 'rendered')
+  #if ("$!value" == '')
+    #set ($escapedValue = $escapetool.xml($configPropertyValue))
+  #end
+  &lt;span
+    #if ("$!value" == '')
+      data-default-label="$!escapetool.xml($services.localization.render('export.pdf.config.default'))"
+      #if ("$!configPropertyValue" == '')
+        data-empty-label="$!escapetool.xml($services.localization.render('export.pdf.config.empty'))"
+      #end
+    #end
+  &gt;$!escapedValue&lt;/span&gt;
+#elseif ($type == 'hidden')
+  &lt;input type="hidden" id="$!escapedId" name="$!escapedName" value="$!escapedValue" /&gt;
+#else
+  ## In order for the custom displayer to be taken into account, the result of its evaluation with an unknown display
+  ## mode must not be empty. Let's output something.
+  Unknown display mode.
+#end
+{{/html}}
+{{/velocity}}</content>
+</xwikidoc>

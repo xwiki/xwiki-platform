@@ -119,11 +119,9 @@ public class DefaultBlockAsyncRenderer extends AbstractBlockAsyncRenderer
                 block = PARSERUTILS.convertToInline(block, true);
             }
 
-            // Create a XDOM instance for the transformation context
-            XDOM xdom;
-            if (block instanceof XDOM) {
-                xdom = (XDOM) block;
-            } else {
+            // Get the XDOM instance for the transformation context
+            XDOM xdom = this.configuration.getXDOM();
+            if (xdom == null) {
                 Block rootBlock = block.getRoot();
 
                 if (rootBlock instanceof XDOM) {
@@ -149,7 +147,7 @@ public class DefaultBlockAsyncRenderer extends AbstractBlockAsyncRenderer
     private Block tranform(XDOM xdom, Block block) throws RenderingException
     {
         TransformationContext transformationContext =
-            new TransformationContext(xdom, this.configuration.getDefaultSyntax(), false);
+            new TransformationContext(xdom, this.configuration.getDefaultSyntax(), this.configuration.isResricted());
         transformationContext.setTargetSyntax(this.configuration.getTargetSyntax());
         transformationContext.setId(this.configuration.getTransformationId());
 

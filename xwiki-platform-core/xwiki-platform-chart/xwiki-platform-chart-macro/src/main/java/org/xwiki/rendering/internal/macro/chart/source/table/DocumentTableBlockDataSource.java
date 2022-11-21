@@ -225,10 +225,20 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
                 throw new MacroExecutionException("You do not have permission to view the document.");
             }
 
-            if (!this.docBridge.exists(this.documentReference)) {
+            if (!exists()) {
                 throw new MacroExecutionException(
                     String.format("Document [%s] does not exist.", this.documentReference));
             }
+        }
+    }
+
+    private boolean exists() throws MacroExecutionException
+    {
+        try {
+            return this.docBridge.exists(this.documentReference);
+        } catch (Exception e) {
+            throw new MacroExecutionException(
+                "Failed to check the existence of the document with reference [" + this.documentReference + "]", e);
         }
     }
 

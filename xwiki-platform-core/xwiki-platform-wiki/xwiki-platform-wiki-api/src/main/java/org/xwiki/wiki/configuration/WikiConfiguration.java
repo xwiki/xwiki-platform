@@ -20,6 +20,7 @@
 package org.xwiki.wiki.configuration;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Configuration options for the Wiki module.
@@ -35,4 +36,15 @@ public interface WikiConfiguration
      * when path mode is used.
      */
     String getAliasSuffix();
+
+    /**
+     * @return if XWiki should create the database (and/or schema/user depending on the DB) for the new wiki or not.
+     *         Default is true.
+     * @since 14.9RC1
+     */
+    @Unstable
+    default boolean shouldCreateDatabase()
+    {
+        return true;
+    }
 }

@@ -84,7 +84,7 @@ viewers.Attachments = Class.create({
   attachHTML5Uploader : function(input) {
     if (typeof(XWiki.FileUploader) != 'undefined') {
       input.multiple = true;
-      // Since the attachments livetable is refreshed on file upload, we skip updating the attachments container.
+      // Since the attachments liveData is refreshed on file upload, we skip updating the attachments container.
       return new XWiki.FileUploader(input, {
         'responseContainer' : document.createElement('div'),
         'responseURL' : '',
@@ -202,10 +202,10 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     e.preventDefault();
     var modal = $(e.currentTarget).closest('.deleteAttachment');
     var button = $(modal.data('relatedTarget'));
-    var thisLivetableName = button.closest('.xwiki-livetable').data('settings').name;
+    var liveData = button.closest('.liveData').data('liveData');
     var notification;
     /**
-     * Ajax request made for deleting an attachment. Refresh livetable on success. Disable the delete button
+     * Ajax request made for deleting an attachment. Refresh liveData on success. Disable the delete button
      * before the request is send, so the user cannot resend it in case it takes longer.
      * Display error message on failure.
      */
@@ -216,10 +216,11 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         notification = new XWiki.widgets.Notification(l10n['core.viewers.attachments.delete.inProgress'], 'inprogress');
       },
       success : function() {
-        window[thisLivetableName].refresh();
-        if (thisLivetableName === 'docAttachments') {
-          updateCount();
-        }
+        liveData.updateEntries().then(() => {
+          if (liveData.data.id === 'docAttachments') {
+            updateCount(liveData.data.data.count);
+          }
+        });
         notification.replace(new XWiki.widgets.Notification(l10n['core.viewers.attachments.delete.done'], 'done'));
       },
       error: function() {
@@ -230,19 +231,12 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     })
   });
   /**
-   * Make sure the number of attachments displayed matches after the livetable has been refreshed, as is the case after
-   * attachment upload.  
-   */
-  $(document).on("xwiki:livetable:docAttachments:loadingComplete", function() {
-    updateCount(docAttachmentsLivetable.totalRows);
-  })
-  /**
    * On delete action, show a confirmation modal and save the element that triggered this event to be able to access
    * information after confirmation.
    */
   $(document).on('click', '.attachmentActions .actiondelete', function(event) {
     event.preventDefault();
-    var modal = $(event.currentTarget).closest('.xwiki-livetable-container').next('.deleteAttachment');
+    var modal = $(event.currentTarget).closest('.liveData').next('.deleteAttachment');
     modal.data('relatedTarget', event.currentTarget);
     modal.modal('show');
   });
@@ -286,8 +280,9 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
    * Firing updateCount event when an attachment is successfully uploaded.
    */
   $(document).on('xwiki:html5upload:done', function() {
-    docAttachmentsLivetable.refresh();
-    updateCount();
+    $("#docAttachments").data('liveData').updateEntries().then(() => {
+      updateCount($("#docAttachments").data('liveData').data.data.count);
+    });
   });
 
   /**

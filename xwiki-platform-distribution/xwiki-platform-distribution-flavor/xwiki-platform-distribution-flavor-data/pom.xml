@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor</artifactId>
-    <version>14.7-SNAPSHOT</version>
+    <version>14.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-data</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Data</name>
@@ -159,12 +159,22 @@
             <dependency>
               <groupId>javax.servlet</groupId>
               <artifactId>javax.servlet-api</artifactId>
-              <version>3.0.1</version>
+              <version>${servlet.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>org.mortbay.jasper</groupId>
+              <artifactId>apache-el</artifactId>
+              <version>${apachache-el.version}</version>
             </dependency>
             <!-- Ratings API has a migrator to migrate old Ratings xobjects to the new store -->
             <dependency>
               <groupId>org.xwiki.platform</groupId>
               <artifactId>xwiki-platform-ratings-api</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-search-solr-api</artifactId>
               <version>${project.version}</version>
             </dependency>
           </dependencies>

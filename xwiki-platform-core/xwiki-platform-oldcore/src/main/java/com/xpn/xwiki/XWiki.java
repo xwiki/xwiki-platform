@@ -470,6 +470,8 @@ public class XWiki implements EventListener
 
     private DocumentReferenceResolver<EntityReference> currentgetdocumentResolver;
 
+    private DocumentReferenceResolver<PageReference> currentPageDocumentResolver;
+
     private PageReferenceResolver<EntityReference> currentgetpageResolver;
 
     private AttachmentReferenceResolver<EntityReference> currentAttachmentReferenceResolver;
@@ -673,6 +675,15 @@ public class XWiki implements EventListener
         }
 
         return this.currentgetdocumentResolver;
+    }
+
+    private DocumentReferenceResolver<PageReference> getCurrentPageDocumentResolver()
+    {
+        if (this.currentPageDocumentResolver == null) {
+            this.currentPageDocumentResolver = Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
+        }
+
+        return this.currentPageDocumentResolver;
     }
 
     private PageReferenceResolver<EntityReference> getCurrentGetPageResolver()
@@ -2270,19 +2281,16 @@ public class XWiki implements EventListener
      */
     public DocumentReference getDocumentReference(EntityReference reference, XWikiContext context)
     {
-        DocumentReference documentReference = getCurrentGetDocumentResolver().resolve(reference);
+        DocumentReference documentReference;
 
-        // If the document has been found or it's top level space, return the reference
-        if (documentReference.getParent().getParent().getType() != EntityType.SPACE
-            || exists(documentReference, context)) {
-            return documentReference;
+        if (reference.getType() == EntityType.PAGE || reference.getType().isAllowedAncestor(EntityType.PAGE)) {
+            documentReference =
+                getCurrentPageDocumentResolver().resolve(getCurrentGetPageResolver().resolve(reference));
+        } else {
+            documentReference = getCurrentGetDocumentResolver().resolve(reference);
         }
 
-        // Try final page
-        DocumentReference finalPageReference = new DocumentReference(documentReference.getParent().getName(),
-            documentReference.getParent().getParent(), documentReference.getParameters());
-
-        return exists(finalPageReference, context) ? finalPageReference : documentReference;
+        return documentReference;
     }
 
     /**
@@ -2938,16 +2946,6 @@ public class XWiki implements EventListener
     public String getSpacePreference(String preference, String defaultValue, XWikiContext context)
     {
         return getSpacePreference(preference, (SpaceReference) null, defaultValue, context);
-    }
-
-    /**
-     * @deprecated since 7.4M1, use {@link #getSpacePreference(String, SpaceReference, String, XWikiContext)} instead
-     */
-    @Deprecated
-    public String getSpacePreference(String preference, String space, String defaultValue, XWikiContext context)
-    {
-        return getSpacePreference(preference, new SpaceReference(space, context.getWikiReference()), defaultValue,
-            context);
     }
 
     /**
@@ -6508,12 +6506,22 @@ public class XWiki implements EventListener
      * @deprecated since 2.2.1 use {@link #exists(DocumentReference, XWikiContext)}
      */
     @Deprecated
-    public boolean exists(String fullname, XWikiContext context)
+    public boolean exists(String fullname, XWikiContext context) throws XWikiException
     {
         return exists(getCurrentMixedDocumentReferenceResolver().resolve(fullname), context);
     }
 
-    public boolean exists(DocumentReference documentReference, XWikiContext context)
+    /**
+     * Check if a document exist.
+     * <p>
+     * Since 14.9, if the check fail an exception is thrown.
+     * 
+     * @param documentReference the reference of the document
+     * @param context the XWiki context
+     * @return true if the document exist or false if it does not
+     * @throws XWikiException when failing to check document existence
+     */
+    public boolean exists(DocumentReference documentReference, XWikiContext context) throws XWikiException
     {
         String currentWiki = context.getWikiId();
 
@@ -6523,8 +6531,6 @@ public class XWiki implements EventListener
             context.setWikiId(documentReference.getWikiReference().getName());
 
             return getStore().exists(doc, context);
-        } catch (XWikiException e) {
-            return false;
         } finally {
             context.setWikiId(currentWiki);
         }
@@ -6532,14 +6538,17 @@ public class XWiki implements EventListener
 
     /**
      * Returns whether a page exists or not.
+     * <p>
+     * Since 14.9, if the check fail an exception is thrown.
      * 
      * @param reference the reference of the page to check for its existence
      * @return true if the page exists, false if not
+     * @throws XWikiException when failing to check page existence
      * @since 13.3RC1
      * @since 12.10.7
      */
     @Unstable
-    public boolean exists(PageReference reference, XWikiContext context)
+    public boolean exists(PageReference reference, XWikiContext context) throws XWikiException
     {
         // Try as space
         DocumentReference documentReference = getCurrentReferenceDocumentReferenceResolver().resolve(reference);
@@ -7297,14 +7306,35 @@ public class XWiki implements EventListener
 
     }
 
-    public String getUniquePageName(String space, XWikiContext context)
+    /**
+     * Generates a unique page name based on initial page name and already existing pages.
+     * <p>
+     * Since 14.9, if the document exist check fail an exception is thrown.
+     * 
+     * @param space the space where to add a new document
+     * @param context the XWiki context
+     * @return a unique document name
+     * @throws XWikiException when failing to check document existence
+     */
+    public String getUniquePageName(String space, XWikiContext context) throws XWikiException
     {
         String pageName = generateRandomString(16);
 
         return getUniquePageName(space, pageName, context);
     }
 
-    public String getUniquePageName(String space, String name, XWikiContext context)
+    /**
+     * Generates a unique page name based on initial page name and already existing pages.
+     * <p>
+     * Since 14.9, if the document exist check fail an exception is thrown.
+     * 
+     * @param space the space where to add a new document
+     * @param name the prefix of the document name
+     * @param context the XWiki context
+     * @return a unique document name
+     * @throws XWikiException when failing to check document existence
+     */
+    public String getUniquePageName(String space, String name, XWikiContext context) throws XWikiException
     {
         String pageName = clearName(name, context);
         if (exists(space + "." + pageName, context)) {

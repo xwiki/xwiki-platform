@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
@@ -59,6 +60,9 @@ public class CurrentPageReferenceDocumentReferenceResolver implements DocumentRe
     @Inject
     private DocumentAccessBridge dab;
 
+    @Inject
+    private Logger logger;
+
     @Override
     public DocumentReference resolve(PageReference reference, Object... parameters)
     {
@@ -67,12 +71,12 @@ public class CurrentPageReferenceDocumentReferenceResolver implements DocumentRe
         // Try first to see if the reference is pointing to an existing non-terminal page. The conversion to a
         // DocumentReference will convert into a non-terminal document reference.
         DocumentReference documentReference = this.currentReferenceDocumentReferenceResolver.resolve(reference);
-        if (this.dab.exists(documentReference)) {
+        if (exists(documentReference)) {
             result = documentReference;
         } else if (documentReference.getParent().getParent().getType() == EntityType.SPACE) {
             result = new DocumentReference(documentReference.getParent().getName(),
                 documentReference.getParent().getParent(), documentReference.getParameters());
-            if (!this.dab.exists(result)) {
+            if (!exists(result)) {
                 result = documentReference;
             }
         } else {
@@ -80,5 +84,17 @@ public class CurrentPageReferenceDocumentReferenceResolver implements DocumentRe
         }
 
         return result;
+    }
+
+    private boolean exists(DocumentReference documentReference)
+    {
+        try {
+            return this.dab.exists(documentReference);
+        } catch (Exception e) {
+            this.logger.error("Failed to check the existence of the document with reference [{}]", documentReference,
+                e);
+        }
+
+        return false;
     }
 }

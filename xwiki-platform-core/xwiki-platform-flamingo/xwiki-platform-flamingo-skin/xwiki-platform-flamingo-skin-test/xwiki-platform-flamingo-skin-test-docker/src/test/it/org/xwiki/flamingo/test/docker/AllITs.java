@@ -155,13 +155,31 @@ public class AllITs
 
     @Nested
     @DisplayName("Restore deleted Page tests")
-    class NestedRestoreDeletedPageIT extends RestoreDeletedPageIT
+    class NestedRecycleBinIT extends RecycleBinIT
     {
     }
     
     @Nested
     @DisplayName("Invitation tests")
     class NestedInvitationIT extends InvitationIT
+    {
+    }
+
+    @Nested
+    @DisplayName("PDF Export Tests")
+    class NestedPDFExportIT extends PDFExportIT
+    {
+    }
+    
+    @Nested
+    @DisplayName("Backlinks Tests")
+    class NestedBacklinksIT extends BacklinksIT
+    {
+    }
+
+    @Nested
+    @DisplayName("TextArea property Tests")
+    class NestedTextAreaIT extends TextAreaIT
     {
     }
 }

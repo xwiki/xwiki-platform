@@ -54,7 +54,11 @@ public class CreateJob extends AbstractEntityJob<CreateRequest, EntityJobStatus<
 
         switch (entityReference.getType()) {
             case DOCUMENT:
-                process(new DocumentReference(entityReference));
+                try {
+                    process(new DocumentReference(entityReference));
+                } catch (Exception e) {
+                    this.logger.error("Failed to create document with reference [{}]", entityReference, e);
+                }
                 break;
             case SPACE:
                 process(new SpaceReference(entityReference));
@@ -64,7 +68,7 @@ public class CreateJob extends AbstractEntityJob<CreateRequest, EntityJobStatus<
         }
     }
 
-    private void process(DocumentReference documentReference)
+    private void process(DocumentReference documentReference) throws Exception
     {
         // The template, if specified, must be a document.
         DocumentReference templateDocumentReference = null;
@@ -121,17 +125,27 @@ public class CreateJob extends AbstractEntityJob<CreateRequest, EntityJobStatus<
                 {
                     DocumentReference newDocumentReference =
                         templateDocumentReference.replaceParent(templateSpaceReference, newSpaceReference);
-                    maybeCreate(newDocumentReference, templateDocumentReference);
+                    try {
+                        maybeCreate(newDocumentReference, templateDocumentReference);
+                    } catch (Exception e) {
+                        logger.error("Failed to create document with reference [{}] and template [{}]",
+                            newDocumentReference, templateDocumentReference, e);
+                    }
                 }
             });
         } else {
             // Empty space (webhome document).
             DocumentReference newSpaceWebHomeReference = new DocumentReference("WebHome", newSpaceReference);
-            maybeCreate(newSpaceWebHomeReference, null);
+            try {
+                maybeCreate(newSpaceWebHomeReference, null);
+            } catch (Exception e) {
+                this.logger.error("Failed to create home page for space with reference [{}]", newSpaceReference, e);
+            }
         }
     }
 
     private void maybeCreate(DocumentReference newDocumentReference, DocumentReference templateDocumentReference)
+        throws Exception
     {
         if (request.getSkippedEntities().contains(newDocumentReference)) {
             this.logger.debug("Skipping creation of document [{}], as specified in the request.", newDocumentReference);

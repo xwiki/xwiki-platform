@@ -23,7 +23,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.namespace.NamespaceContextExecutor;
@@ -101,13 +100,8 @@ public class LegacyEventDeleter
         namespaceContextExecutor.execute(new WikiNamespace(wikiId), () -> {
             XWikiContext context = contextProvider.get();
             XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
-            boolean bTransaction = true;
 
-            try {
-                hibernateStore.checkHibernate(context);
-                bTransaction = hibernateStore.beginTransaction(context);
-                Session session = hibernateStore.getSession(context);
-
+            hibernateStore.executeWrite(context, session -> {
                 // Make sure to delete all associated statuses first
                 if (this.statusManager instanceof LegacyEventStatusManager) {
                     ((LegacyEventStatusManager) this.statusManager).deleteAllForEventInStore(session,
@@ -116,16 +110,8 @@ public class LegacyEventDeleter
 
                 session.delete(event);
 
-                if (bTransaction) {
-                    hibernateStore.endTransaction(context, true);
-                }
-
-            } catch (Exception e) {
-                if (bTransaction) {
-                    hibernateStore.endTransaction(context, false);
-                }
-                throw e;
-            }
+                return null;
+            });
 
             return null;
         });

@@ -219,7 +219,11 @@ public class ClassSheetPage extends ViewPage
      */
     public InlinePage clickCreateDocumentButton()
     {
+        // The create document form is submitted by JavaScript code in case the create button is clicked before the
+        // asynchronous validation ends, and in this case Selenium doesn't wait for the new page to load.
+        getDriver().addPageNotYetReloadedMarker();
         createDocumentButton.click();
+        getDriver().waitUntilPageIsReloaded();
         return new InlinePage();
     }
 

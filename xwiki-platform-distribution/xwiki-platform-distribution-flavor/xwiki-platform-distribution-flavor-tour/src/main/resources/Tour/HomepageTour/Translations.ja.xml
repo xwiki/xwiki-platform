@@ -1,0 +1,67 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc reference="Tour.HomepageTour.Translations" locale="ja">
+  <web>Tour.HomepageTour</web>
+  <name>Translations</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>Tour.HomepageTour.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## Homepage Tour (by steps order)
+tour.homepageTour.welcome.title=XWikiにようこそ
+tour.homepageTour.welcome.content=XWikiのインターフェースと基本的な機能についてご紹介します。
+tour.homepageTour.panels.title=パネル
+tour.homepageTour.panels.contentA=現在のパネルから、ウィキのアプリケーションとページにアクセスできます。
+tour.homepageTour.panels.contentB=管理者はパネルをカスタマイズしたり、どのパネルを表示するかを選択したりできます。
+tour.homepageTour.breadcrumbs.title=パンくずリスト
+tour.homepageTour.breadcrumbs.contentA=パンくずリストからは、ページがどこに位置しているかを特定したり、階層間を移動したりすることができます。
+tour.homepageTour.breadcrumbs.contentB={0}ボタンから、いつでもウィキのトップページに移動できます。
+tour.homepageTour.pageContent.title=ページのコンテンツ
+tour.homepageTour.pageContent.contentA=ここに現在のページのコンテンツが表示されます。
+tour.homepageTour.pageContent.contentB=このページを編集して、表やリスト、マクロや階層を追加し、あなたの知識やデータを整理しましょう。
+tour.homepageTour.pageMenu.title=ページのメニュー
+tour.homepageTour.pageMenu.contentA=このメニューには、ページに関するアクションが表示されます。与えられた権限に応じて、ページを編集、作成、管理、削除することができます。
+tour.homepageTour.pageMenu.contentB={0}ボタンからは、エクスポートや印刷、共有など他のアクションが表示されます。
+tour.homepageTour.pageTabs.title=ページのタブ
+tour.homepageTour.pageTabs.contentA=コメントを活用して、ページのコンテンツについて話し合いましょう。
+tour.homepageTour.pageTabs.contentB=ファイルの添付、ページのバージョン比較、ページの情報の確認を行うこともできます。
+tour.homepageTour.header.title=ヘッダー
+tour.homepageTour.header.contentA=コンテンツの検索、ページの変更の監視を行ったり、ユーザーのプロフィールにアクセスしたりできます。
+tour.homepageTour.header.contentB={0}ボタンからは、管理やインデックスなどウィキに関するアクションを表示するドローワーを開きます。
+tour.homepageTour.tourComplete.title=ツアーは完了です
+tour.homepageTour.tourComplete.contentA=以上でXWikiのインターフェースと基本的な機能の紹介を終わります。
+tour.homepageTour.tourComplete.contentB=それぞれの機能の詳細に関しては、{0}ドキュメンテーション{1}をご覧ください。
+</content>
+</xwikidoc>

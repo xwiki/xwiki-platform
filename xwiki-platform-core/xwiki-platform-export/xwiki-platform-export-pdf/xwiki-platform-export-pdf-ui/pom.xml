@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-export-pdf</artifactId>
-    <version>14.7-SNAPSHOT</version>
+    <version>14.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-export-pdf-ui</artifactId>
   <name>XWiki Platform - Export - PDF - UI</name>
@@ -81,11 +81,13 @@
       <artifactId>xwiki-platform-localization-rest-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- We're using the icon script service. -->
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>xwiki-platform-localization-webjar</artifactId>
+      <artifactId>xwiki-platform-icon-script</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- We're using the default xclass sheet. -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>xwiki-platform-xclass-ui</artifactId>
@@ -93,7 +95,20 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
+    <!-- We publish a template provider and an administration section. -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-administration-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
     <!-- JavaScript dependencies -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-localization-webjar</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>requirejs</artifactId>
@@ -109,7 +124,7 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>pagedjs</artifactId>
-      <version>0.2.0</version>
+      <version>0.3.5</version>
       <scope>runtime</scope>
       <!-- Exclude all transitive dependencies because they aren't really needed and, what's worse, they fail the build. -->
       <exclusions>

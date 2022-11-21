@@ -60,9 +60,11 @@ class MentionsIT
 {
     private static final String U1_USERNAME = "U1";
 
-    private static final String USERS_PWD = "password";
-
     private static final String U2_USERNAME = "U2";
+
+    private static final String U3_USERNAME = "U3";
+
+    private static final String USERS_PWD = "password";
 
     /**
      * A duplicate of {@link Runnable} which allows to throw checked {@link Exception}.
@@ -150,11 +152,17 @@ class MentionsIT
             // create the users.
             setup.createUser(U1_USERNAME, USERS_PWD, null);
             setup.createUser(U2_USERNAME, USERS_PWD, null);
+            setup.createUser(U3_USERNAME, USERS_PWD, null);
         });
 
         runAsUser(setup, U1_USERNAME, USERS_PWD, () -> {
             setup.deletePage(reference);
             setup.createPage(reference, "", pageName);
+        });
+
+        // We comment with a user distinct from the one who created the page (U1) to make sure that the emitter of 
+        // the mention is correct.
+        runAsUser(setup, U3_USERNAME, USERS_PWD, () -> {
             Map<String, Object> properties = new HashMap<>();
             properties.put("author", "xwiki:XWiki.U1");
             properties.put("date", "17/08/2020 14:55:18");
@@ -184,7 +192,7 @@ class MentionsIT
             mentionNotificationPage.openGroup(0);
             assertEquals("mentioned you on a comment on page Mention Comment Test Page",
                 mentionNotificationPage.getText(0, 0));
-            assertEquals("U1", mentionNotificationPage.getEmitter(0, 0));
+            assertEquals("U3", mentionNotificationPage.getEmitter(0, 0));
             assertTrue(mentionNotificationPage.hasSummary(0, 0));
             assertEquals("@U2 XYZ", mentionNotificationPage.getSummary(0, 0));
             tray.clearAllNotifications();

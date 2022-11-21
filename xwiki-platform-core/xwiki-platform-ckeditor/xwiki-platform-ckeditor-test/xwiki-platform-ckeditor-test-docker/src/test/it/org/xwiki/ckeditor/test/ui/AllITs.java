@@ -37,4 +37,16 @@ public class AllITs
     class NestedSaveIT extends SaveIT
     {
     }
+
+    @Nested
+    @DisplayName("Image Plugin")
+    class NestedImagePluginIT extends ImagePluginIT
+    {
+    }
+
+    @Nested
+    @DisplayName("TextArea Editor")
+    class NestedTextAreaIT extends TextAreaIT
+    {
+    }
 }

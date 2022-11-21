@@ -137,6 +137,7 @@ public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
             }
             Map<String, Object> annotationMetaData = getMap(updateRequest.getAnnotation());
 
+            this.handleTemporaryUploadedFiles(documentReference, annotationMetaData);
             // skip these fields as we don't want to overwrite them with whatever is in this map. Setters should be used
             // for these values or constructor
             Collection<String> skippedFields =
@@ -154,6 +155,7 @@ public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
             newAnnotation.setAuthor(getXWikiUser());
             // and update
             annotationService.updateAnnotation(documentName, newAnnotation);
+            this.cleanTemporaryUploadedFiles(documentReference);
             // and then return the annotated content, as specified by the annotation request
             AnnotationResponse response = getSuccessResponseWithAnnotatedContent(documentName, updateRequest);
             return response;

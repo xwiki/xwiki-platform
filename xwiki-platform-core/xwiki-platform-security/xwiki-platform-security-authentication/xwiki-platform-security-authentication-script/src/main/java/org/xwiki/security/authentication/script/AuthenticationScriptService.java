@@ -45,6 +45,8 @@ import org.xwiki.security.authentication.AuthenticationFailureStrategy;
 import org.xwiki.security.authentication.AuthenticationResourceReference;
 import org.xwiki.security.authentication.ResetPasswordException;
 import org.xwiki.security.authentication.ResetPasswordManager;
+import org.xwiki.security.authentication.RetrieveUsernameException;
+import org.xwiki.security.authentication.RetrieveUsernameManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.script.SecurityScriptService;
@@ -91,6 +93,9 @@ public class AuthenticationScriptService implements ScriptService
 
     @Inject
     private ResetPasswordManager resetPasswordManager;
+
+    @Inject
+    private RetrieveUsernameManager retrieveUsernameManager;
 
     @Inject
     @Named("contextpath")
@@ -239,5 +244,23 @@ public class AuthenticationScriptService implements ScriptService
     {
         this.resetPasswordManager.checkVerificationCode(user, verificationCode);
         this.resetPasswordManager.resetPassword(user, newPassword);
+    }
+
+    /**
+     * Retrieve users information associated to the given email address and send them by email.
+     *
+     * @param userEmail the email address for which to find associated accounts
+     * @throws RetrieveUsernameException in case of problem for finding the information or for sending the email
+     * @since 14.9
+     * @since 13.10.10
+     * @since 14.4.6
+     */
+    @Unstable
+    public void retrieveUsernameAndSendEmail(String userEmail) throws RetrieveUsernameException
+    {
+        Set<UserReference> users = this.retrieveUsernameManager.findUsers(userEmail);
+        if (!users.isEmpty()) {
+            this.retrieveUsernameManager.sendRetrieveUsernameEmail(userEmail, users);
+        }
     }
 }

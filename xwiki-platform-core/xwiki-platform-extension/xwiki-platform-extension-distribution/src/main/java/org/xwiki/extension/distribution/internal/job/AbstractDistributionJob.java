@@ -33,7 +33,6 @@ import org.xwiki.extension.distribution.internal.job.step.DistributionStep.State
 import org.xwiki.extension.distribution.internal.job.step.ReportDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.WelcomeDistributionStep;
 import org.xwiki.job.AbstractJob;
-import org.xwiki.job.Request;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
@@ -81,19 +80,6 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest>
     }
 
     protected abstract List<DistributionStep> createSteps();
-
-    @Override
-    protected R castRequest(Request request)
-    {
-        DistributionRequest distributionRequest;
-        if (request instanceof DistributionRequest) {
-            distributionRequest = (DistributionRequest) request;
-        } else {
-            distributionRequest = new DistributionRequest(request);
-        }
-
-        return (R) distributionRequest;
-    }
 
     @Override
     protected DistributionJobStatus createNewStatus(R request)
@@ -167,17 +153,23 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest>
         WelcomeDistributionStep welcomeStep = (WelcomeDistributionStep) getStep(steps, WelcomeDistributionStep.ID);
         ReportDistributionStep reportStep = (ReportDistributionStep) getStep(steps, ReportDistributionStep.ID);
 
-        for (DistributionStep step : steps) {
-            step.initialize(this);
+        // Initialize steps
+        steps.forEach(s -> s.initialize(this));
 
-            // Enable Welcome step if one of the steps is enabled
+        // Prepare steps until reaching the first enabled step and enabled welcome/report steps if they exist
+        for (DistributionStep step : steps) {
+            // Prepare the step to check if there is something to do
+            step.prepare();
+
             if (step.getState() == null) {
+                // Enable Welcome and report steps if one of the steps is enabled
                 if (welcomeStep != null) {
                     welcomeStep.setState(null);
-                }
-                if (reportStep != null) {
                     reportStep.setState(null);
                 }
+
+                // Don't prepare following steps as it might be too early
+                break;
             }
         }
 

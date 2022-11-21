@@ -51,7 +51,10 @@ public class PDFExportJobStatus extends DefaultJobStatus<PDFExportJobRequest>
     {
         private final DocumentReference documentReference;
 
-        private final XDOM xdom;
+        /**
+         * Don't serialize the XDOM because it can lead to a huge XML.
+         */
+        private final transient XDOM xdom;
 
         private final String html;
 
@@ -121,6 +124,7 @@ public class PDFExportJobStatus extends DefaultJobStatus<PDFExportJobRequest>
         } else {
             this.pdfFileReference = new TemporaryResourceReference("export",
                 Arrays.asList("pdf", UUID.randomUUID().toString() + ".pdf"), request.getDocuments().get(0));
+            this.pdfFileReference.addParameter("fileName", request.getFileName());
         }
     }
 

@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -101,7 +102,7 @@ public class PDFTocMacro extends AbstractMacro<PDFTocMacroParameters>
     {
         super("PDF Table of Contents", "Generates the table of contents for the PDF export.",
             PDFTocMacroParameters.class);
-        setDefaultCategory(DEFAULT_CATEGORY_INTERNAL);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_INTERNAL));
     }
 
     @Override
@@ -109,7 +110,7 @@ public class PDFTocMacro extends AbstractMacro<PDFTocMacroParameters>
     {
         super.initialize();
 
-        this.tocTreeBuilder = new TocTreeBuilder(new TocBlockFilter(this.plainTextParser, this.linkLabelGenerator));
+        this.tocTreeBuilder = new PDFTocTreeBuilder(new TocBlockFilter(this.plainTextParser, this.linkLabelGenerator));
     }
 
     @Override

@@ -25,6 +25,8 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebElement;
 import org.xwiki.attachment.test.po.AttachmentPane;
+import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
+import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.model.jaxb.Object;
@@ -34,7 +36,6 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.AttachmentHistoryPage;
-import org.xwiki.test.ui.po.AttachmentsPane;
 import org.xwiki.test.ui.po.ViewPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -76,8 +77,8 @@ class MoveAttachmentIT
         String serializedSourceAttachmentReference = setup.serializeReference(sourceAttachmentReference);
         setup.createPage(targetPage, String.format("[[attach:%s]]", serializedSourceAttachmentReference));
 
-        ViewPage viewSourcePage = setup.gotoPage(sourcePage);
-        AttachmentsPane sourceAttachmentsPane = viewSourcePage.openAttachmentsDocExtraPane();
+        setup.gotoPage(sourcePage);
+        AttachmentsPane sourceAttachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         sourceAttachmentsPane.setFileToUpload(buildMovemePath(testConfiguration, "v0"));
         sourceAttachmentsPane.waitForUploadToFinish(SOURCE_FILENAME);
         sourceAttachmentsPane.setFileToUpload(buildMovemePath(testConfiguration, "v1"));
@@ -85,7 +86,8 @@ class MoveAttachmentIT
 
         // Switch to a second user U2 and come back to the attachment pane of the source page.
         setup.createUserAndLogin("U1", "pU2");
-        setup.gotoPage(sourcePage).openAttachmentsDocExtraPane();
+        setup.gotoPage(sourcePage);
+        new AttachmentsViewPage().openAttachmentsDocExtraPane();
 
         AttachmentPane attachmentsPane = AttachmentPane.moveAttachment(SOURCE_FILENAME);
 
@@ -103,7 +105,7 @@ class MoveAttachmentIT
         assertEquals("U1", viewTargetPage.openHistoryDocExtraPane().getCurrentAuthor());
 
         // Validate the attachments pane.
-        AttachmentsPane attachmentsPaneTarget = viewTargetPage.openAttachmentsDocExtraPane();
+        AttachmentsPane attachmentsPaneTarget = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         WebElement attachmentLink = attachmentsPaneTarget.getAttachmentLink(TARGET_FILENAME);
         assertNotNull(attachmentLink);
         // Verify that the author is correct in the attachments pane.

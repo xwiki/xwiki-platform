@@ -57,7 +57,6 @@ import com.xpn.xwiki.internal.export.OfficeExporterURLFactory;
 import com.xpn.xwiki.pdf.api.PdfExport;
 import com.xpn.xwiki.pdf.api.PdfExport.ExportType;
 import com.xpn.xwiki.pdf.impl.PdfExportImpl;
-import com.xpn.xwiki.pdf.impl.PdfURLFactory;
 import com.xpn.xwiki.plugin.packaging.PackageAPI;
 import com.xpn.xwiki.util.Util;
 
@@ -165,9 +164,7 @@ public class ExportAction extends XWikiAction
         // Note 1: exportType will be null if no office server is started or it doesn't support the passed format
         // Note 2: we don't use the office server for PDF exports since it doesn't work OOB. Instead we use FOP.
         if ("pdf".equalsIgnoreCase(format)) {
-            // The export format is PDF or the office converter can't be used (either it doesn't support the specified
-            // format or the office server is not started).
-            urlFactory = new PdfURLFactory();
+            urlFactory = new ExternalServletURLFactory();
             exporter = new PdfExportImpl();
             exportType = ExportType.PDF;
         } else if (exportType == null) {

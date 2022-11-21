@@ -20,6 +20,7 @@
 package org.xwiki.ckeditor.test.ui;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 import org.xwiki.ckeditor.test.po.CKEditor;
@@ -37,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Integration tests for the Save plugin.
- * 
+ *
  * @version $Id$
  * @since 1.13
  */
@@ -52,6 +53,7 @@ public class SaveIT
     }
 
     @Test
+    @Order(1)
     void save(TestUtils setup, TestReference testReference)
     {
         WYSIWYGEditPage editPage = setup.gotoPage(testReference).editWYSIWYG();
@@ -64,6 +66,7 @@ public class SaveIT
     }
 
     @Test
+    @Order(2)
     void saveAfterSyntaxChange(TestUtils setup, TestReference testReference)
     {
         setup.createPage(testReference, "[[label>>#target]]", "", "xwiki/2.0").edit();

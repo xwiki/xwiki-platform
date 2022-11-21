@@ -24,6 +24,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -64,6 +65,9 @@ public class CurrentColorThemeGetter
     @Inject
     private AuthorizationManager authorizationManager;
 
+    @Inject
+    private Logger logger;
+
     /**
      * @param fallbackValue value to return if the current color theme is invalid
      * @return the full name of the current color theme or fallbackValue if the current color theme is invalid
@@ -102,7 +106,7 @@ public class CurrentColorThemeGetter
         // Check that the color theme exists, to avoid a DOS if some user tries to getResult a skin file
         // with random colorTheme names
         // Also check that the user has the right to see the color theme
-        if (!xwiki.exists(colorThemeReference, context) || (checkRights && !authorizationManager.hasAccess(Right.VIEW,
+        if (!exists(colorThemeReference, context) || (checkRights && !authorizationManager.hasAccess(Right.VIEW,
             context.getUserReference(), colorThemeReference))) {
             colorTheme = fallbackValue;
         }
@@ -110,4 +114,15 @@ public class CurrentColorThemeGetter
         return colorTheme;
     }
 
+    private boolean exists(DocumentReference colorThemeReference, XWikiContext context)
+    {
+        try {
+            return context.getWiki().exists(colorThemeReference, context);
+        } catch (Exception e) {
+            this.logger.error("Failed to check the existence of the color theme with reference [{}]",
+                colorThemeReference, e);
+        }
+
+        return false;
+    }
 }

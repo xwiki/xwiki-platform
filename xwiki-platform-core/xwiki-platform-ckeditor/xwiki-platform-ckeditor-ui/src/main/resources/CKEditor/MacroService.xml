@@ -115,7 +115,7 @@
   ## categories.
   ## TODO: Make the list of hidden by default categories configurable from the administration (XWIKI-19993).
   #if(!$services.user.getProperties().displayHiddenDocuments())
-    #set ($hiddenCategories = ['Internal', 'Deprecated'])
+    #set ($hiddenCategories = $services.rendering.getHiddenMacroCategories())
   #else
     #set ($hiddenCategories = [])
   #end

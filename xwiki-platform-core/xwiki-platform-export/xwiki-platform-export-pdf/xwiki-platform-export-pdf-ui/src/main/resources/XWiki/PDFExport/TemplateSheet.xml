@@ -36,9 +36,9 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
-{{info}}{{translation key="export.pdf.template.skinExtensionInfo"/}}{{/info}}
+  <content>{{info}}{{translation key="export.pdf.template.skinExtensionInfo"/}}{{/info}}
 
+{{velocity}}
 ## We have to use wiki=true because $doc.display() can produce wiki syntax.
 {{html wiki="true" clean="false"}}
 ## Load the JavaScript code required to make the object properties editable in-place.

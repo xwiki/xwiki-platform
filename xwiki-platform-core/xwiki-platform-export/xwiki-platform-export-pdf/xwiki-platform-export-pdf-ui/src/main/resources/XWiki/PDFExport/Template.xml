@@ -55,13 +55,13 @@
         <contenttype>FullyRenderedText</contenttype>
         <customDisplay/>
         <disabled>0</disabled>
-        <editor>---</editor>
+        <editor>Text</editor>
         <hint>XWiki.PDFExport.TemplateClass_cover.hint</hint>
         <name>cover</name>
         <number>1</number>
-        <picker>1</picker>
+        <picker>0</picker>
         <prettyName>Cover</prettyName>
-        <rows>5</rows>
+        <rows>20</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -72,13 +72,13 @@
         <contenttype>FullyRenderedText</contenttype>
         <customDisplay/>
         <disabled>0</disabled>
-        <editor>---</editor>
+        <editor>Text</editor>
         <hint>XWiki.PDFExport.TemplateClass_footer.hint</hint>
         <name>footer</name>
         <number>4</number>
-        <picker>1</picker>
+        <picker>0</picker>
         <prettyName>Footer</prettyName>
-        <rows>5</rows>
+        <rows>20</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -89,13 +89,13 @@
         <contenttype>FullyRenderedText</contenttype>
         <customDisplay/>
         <disabled>0</disabled>
-        <editor>---</editor>
+        <editor>Text</editor>
         <hint>XWiki.PDFExport.TemplateClass_header.hint</hint>
         <name>header</name>
         <number>3</number>
-        <picker>1</picker>
+        <picker>0</picker>
         <prettyName>Header</prettyName>
-        <rows>5</rows>
+        <rows>20</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -106,13 +106,13 @@
         <contenttype>FullyRenderedText</contenttype>
         <customDisplay/>
         <disabled>0</disabled>
-        <editor>---</editor>
+        <editor>Text</editor>
         <hint>XWiki.PDFExport.TemplateClass_toc.hint</hint>
         <name>toc</name>
         <number>2</number>
-        <picker>1</picker>
+        <picker>0</picker>
         <prettyName>Table of Contents</prettyName>
-        <rows>5</rows>
+        <rows>20</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -131,12 +131,19 @@
 {{/velocity}}</cover>
     </property>
     <property>
-      <footer/>
+      <footer>{{html clean="false"}}
+&lt;span class="pdf-page-number"&gt;&lt;/span&gt; / &lt;span class="pdf-page-count"&gt;&lt;/span&gt;
+{{/html}}</footer>
     </property>
     <property>
       <header>{{velocity}}
 {{html clean="false"}}
-$escapetool.xml($tdoc.plainTitle)
+#if ("$!request.jobId" != '' &amp;&amp; $services.job.getJobStatus($request.jobId.split('/')).request.isWithTitle())
+  ## The title is extracted from the rendered content.
+  &lt;span class="pdf-chapter-name"&gt;&lt;/span&gt;
+#else
+  $escapetool.xml($tdoc.plainTitle)
+#end
 {{/html}}
 {{/velocity}}</header>
     </property>
@@ -261,13 +268,6 @@ $escapetool.xml($tdoc.plainTitle)
   /**
    * Cover Page
    */
-  @page cover {
-    @bottom-center {
-      /* Hide the page number on the cover page. */
-      content: none;
-    }
-  }
-
   .pdf-cover {
     border-top: 1px solid @nav-tabs-border-color;
     border-bottom: 1px solid @nav-tabs-border-color;
@@ -276,47 +276,40 @@ $escapetool.xml($tdoc.plainTitle)
   .pdf-cover h1 {
     font-weight: bolder;
   }
-  .pdf-cover a.user-name {
-    text-decoration: none;
-  }
 
   /**
-   * Standard Page
+   * Table of Contents
    */
-  @page {
-    size: A4;
-    margin: .5in;
-    padding: .2in 0;
+  /* Distinguish the table of contents entries that correspond to document titles from those that correspond to headings
+    found in the document content. */
+  .pdf-toc &gt; ul &gt; li[data-xwiki-document-reference] {
+    margin-top: 1em;
 
-    /* Header */
-    @top-center {
-      content: element(header);
-    }
-
-    /* Footer */
-    @bottom-center {
-      content: counter(page) " / " counter(pages);
+    &gt; span {
+      font-weight: bolder;
     }
   }
 
-  .pdf-header {
-    position: running(header);
-    color: @text-muted !important;
-  }
-
-  .pagedjs_page .pagedjs_margin-bottom-center .pagedjs_margin-content::after {
-    color: @text-muted !important;
+  /**
+   * Header
+   */
+  .pdf-chapter-name:before {
+    content: string(chapter-name);
   }
 
   /**
-   * Landscape Page
+   * Content
    */
-  @page landscape {
-    size: A4 landscape;
-  }
+  /* Marks the beginning of a new XWiki document. */
+  h1[data-xwiki-document-reference] {
+    /* Distinguish document titles from the rest of the level 1 headings that may appear in the document content. */
+    font-weight: bolder;
+    string-set: chapter-name content(text);
 
-  .page-landscape {
-    page: landscape;
+    /* Start each XWiki document on a new print page. */
+    &amp; ~ h1[data-xwiki-document-reference] {
+      break-before: page;
+    }
   }
 }</code>
     </property>

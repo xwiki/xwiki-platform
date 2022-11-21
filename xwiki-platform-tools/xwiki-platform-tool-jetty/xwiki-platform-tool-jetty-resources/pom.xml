@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tool-jetty</artifactId>
-    <version>14.7-SNAPSHOT</version>
+    <version>14.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
   <name>XWiki Platform - Tools - Jetty - Jetty Configuration Resources</name>
@@ -40,7 +40,7 @@
          Following versions of some specific Jetty dependencies should be kept in sync when upgrading Jetty.
     -->
     <jetty.version>10.0.7</jetty.version>
-    <!-- Jetty requires an alpha version of slf4j -->
+    <!-- Jetty expects a different version of slf4j -->
     <slf4j.version>2.0.0-alpha5</slf4j.version>
   </properties>
 

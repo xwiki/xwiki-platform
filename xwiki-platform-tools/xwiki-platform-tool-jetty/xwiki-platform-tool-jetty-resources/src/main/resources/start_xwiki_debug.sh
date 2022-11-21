@@ -138,7 +138,7 @@ if [ -z "$XWIKI_OPTS" ] ; then
   XWIKI_OPTS="-Xmx1024m"
 fi
 XWIKI_OPTS="$XWIKI_OPTS -Xdebug -Xnoagent -Djava.compiler=NONE"
-XWIKI_OPTS="$XWIKI_OPTS -Xrunjdwp:transport=dt_socket,server=y,suspend=${SUSPEND},address=${JETTY_DEBUG_PORT}"
+XWIKI_OPTS="$XWIKI_OPTS -Xrunjdwp:transport=dt_socket,server=y,suspend=${SUSPEND},address=*:${JETTY_DEBUG_PORT}"
 
 # Check if a lock file already exists for the specified port  which means an XWiki instance is already running
 XWIKI_LOCK_FILE="${XWIKI_LOCK_DIR}/xwiki-${JETTY_PORT}.lck"

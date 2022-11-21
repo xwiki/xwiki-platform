@@ -19,7 +19,7 @@
  */
 
 define('imageEditorTranslationKeys', [], [
-  'modal.backToEditor.button',
+  'modal.changeImage.button',
   'modal.loadFail.message',
   'modal.title',
   'modal.insertButton',
@@ -78,6 +78,7 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
             .then(function(defaultStyle) {
               var settings = {
                 preload: true,
+                persist: true,
                 onChange: function(value) {
                   updateAdvancedFromStyle(value, modal);
                 },
@@ -93,10 +94,13 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
                     callback(imageStyles);
                     // Sets the default value once the values are loaded.
                     imageStylesField.data('selectize').addItem(defaultStyle.defaultStyle || '');
-                    resolve(values.imageStyles);
                   }, function(err) {
                     reject(err);
                   });
+                },
+                onLoad: function() {
+                  // Wait for the selectize field to be fully loaded before continuing.
+                  resolve();
                 }
               };
 
@@ -112,7 +116,7 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
 
     function addChangeImageButton(insertButton, modal) {
       var selectImageButton = $('<button type="button" class="btn btn-default pull-left"></button>')
-        .text(translations.get('modal.backToEditor.button'))
+        .text(translations.get('modal.changeImage.button'))
         .prependTo(insertButton.parent());
       selectImageButton.on('click', function() {
         var imageData = getFormData(modal);

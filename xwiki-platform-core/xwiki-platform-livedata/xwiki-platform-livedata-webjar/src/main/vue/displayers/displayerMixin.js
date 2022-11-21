@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import * as DOMPurify from 'dompurify';
 
 /**
  * The displayerMixin is a vue mixin containing all the needed
@@ -58,6 +59,9 @@ export default {
     // The value to be displayed
     value () {
       return this.entry[this.propertyId];
+    },
+    safeValue() {
+      return this.sanitizeHtml(this.value)
     },
     // The property descriptor of `this.propertyId`
     propertyDescriptor () {
@@ -106,6 +110,22 @@ export default {
     genericSave(value) {
       const savedValue =  value || this.editedValue;
       this.logic.getEditBus().save(this.entry, this.propertyId, {[this.propertyId]: savedValue})
+    },
+    sanitizeHtml(value) {
+      if (!this.logic.isContentTrusted()) {
+        // TODO: Take into account xml.htmlElementSanitizer properties when sanitizing (see XWIKI-20249).
+        return DOMPurify.sanitize(value);
+      } else {
+        return value;
+      }
+    },
+    sanitizeUrl(url, subtitute) {
+      // TODO: Take into account xml.htmlElementSanitizer properties when sanitizing (see XWIKI-20249).
+      if (this.logic.isContentTrusted() || DOMPurify.isValidAttribute('a', 'href', url)) {
+        return url;
+      } else {
+        return (subtitute || '#');
+      }
     }
   },
   

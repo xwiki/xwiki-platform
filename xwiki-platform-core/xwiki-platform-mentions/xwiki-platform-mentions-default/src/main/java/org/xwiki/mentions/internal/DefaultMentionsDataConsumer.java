@@ -84,7 +84,7 @@ public class DefaultMentionsDataConsumer implements TaskConsumer
             XWikiDocument doc = this.documentRevisionProvider.getRevision(documentReference, version);
             if (doc != null) {
                 String authorReference =
-                    this.userReferenceSerializer.serialize(doc.getAuthors().getEffectiveMetadataAuthor());
+                    this.userReferenceSerializer.serialize(doc.getAuthors().getOriginalMetadataAuthor());
                 List<MentionNotificationParameters> mentionNotificationParameters;
                 if (doc.getPreviousVersion() == null) {
                     // CREATE

@@ -17,6 +17,12 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
+##!source.syntax=xwiki/2.1
+{{velocity output="false"}}
 #if ("$!{request.forceTestRights}" == "1")#template("xwikivars.vm")#end
 #template('attachment_macros.vm')
-#showAttachmentsLivetable($doc 'docAttachments')
+{{/velocity}}
+
+{{velocity}}
+#showAttachmentsLiveData($doc 'docAttachments')
+{{/velocity}}

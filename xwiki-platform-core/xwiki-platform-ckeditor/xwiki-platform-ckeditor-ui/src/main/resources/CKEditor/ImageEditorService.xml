@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="CKEditor.ImageEditorService" locale="">
+<xwikidoc version="1.5" reference="CKEditor.ImageEditorService" locale="">
   <web>CKEditor</web>
   <name>ImageEditorService</name>
   <language/>
@@ -170,22 +170,22 @@
               $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.advancedTab.alignment.hint'))
             &lt;/span&gt;
           &lt;/dt&gt;
-          &lt;dd&gt;
+          &lt;dd class="alignments"&gt;
             &lt;label&gt;
-              &lt;input type="radio" name="alignment" value="none"/&gt;
-              $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.none'))
+              #set ($noneOptionLabel = $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.none')))
+              &lt;input type="radio" name="alignment" value="none"/&gt;$noneOptionLabel
             &lt;/label&gt;
             &lt;label&gt;
-              &lt;input type="radio" name="alignment" value="start"/&gt;
-              $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.start'))
+              #set ($startOptionLabel = $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.start')))
+              &lt;input type="radio" name="alignment" value="start"/&gt;$startOptionLabel
             &lt;/label&gt;
             &lt;label&gt;
-              &lt;input type="radio" name="alignment" value="center"/&gt;
-              $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.center'))
+              #set ($centerOptionLabel = $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.center')))
+              &lt;input type="radio" name="alignment" value="center"/&gt;$centerOptionLabel
             &lt;/label&gt;
             &lt;label&gt;
-              &lt;input type="radio" name="alignment" value="end"/&gt;
-              $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.end'))
+              #set ($endOptionLabel = $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.end')))
+              &lt;input type="radio" name="alignment" value="end"/&gt;$endOptionLabel
             &lt;/label&gt;
           &lt;/dd&gt;
           &lt;dt&gt;
@@ -325,16 +325,24 @@
     <property>
       <code>#advanced .image-size-lock {
   margin-top: -2px;
+}
+
+#advanced .alignments label {
+  margin-right: 1em;
+}
+
+#standard .xform, #advanced .xform {
+  margin-top: floor(@font-size-base * 1.4);
 }</code>
     </property>
     <property>
-      <contentType>CSS</contentType>
+      <contentType>LESS</contentType>
     </property>
     <property>
       <name/>
     </property>
     <property>
-      <parse>1</parse>
+      <parse>0</parse>
     </property>
     <property>
       <use>onDemand</use>

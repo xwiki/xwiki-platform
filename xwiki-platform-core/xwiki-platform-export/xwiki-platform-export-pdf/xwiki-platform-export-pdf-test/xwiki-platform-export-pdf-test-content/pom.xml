@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-export-pdf-test</artifactId>
-    <version>14.7-SNAPSHOT</version>
+    <version>14.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-export-pdf-test-content</artifactId>
   <name>XWiki Platform - Export - PDF - Test - Content</name>
@@ -40,6 +40,12 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>xwiki-platform-skin-skinx</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <!-- Used to set the PDF export log level to debug. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-logging-script</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- JavaScript dependencies -->

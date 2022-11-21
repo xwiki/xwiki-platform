@@ -84,14 +84,15 @@
           &lt;ul class="nav nav-pills applicationsPanel"&gt;
             #foreach($app in $apps)
               #set($params = $app.uix.getParameters())
-              #if("$!params.icon" != '' &amp;&amp; "$!params.label" != '' &amp;&amp; "$!params.target" != '' &amp;&amp; $xwiki.hasAccessLevel('view', $xcontext.user, $params.target))
-                #if ($params.icon.startsWith('icon:'))
-                  #set($icon = $services.icon.renderHTML($params.icon.substring(5)))
+              #set($normalizedIcon = $stringtool.substringBefore($!params.icon, ' '))
+              #if("$!normalizedIcon" != '' &amp;&amp; "$!params.label" != '' &amp;&amp; "$!params.target" != '' &amp;&amp; $xwiki.hasAccessLevel('view', $xcontext.user, $params.target))
+                #if ($normalizedIcon.startsWith('icon:'))
+                  #set($icon = $services.icon.renderHTML($normalizedIcon.substring(5)))
                 #else
-                  #set($icon = $services.rendering.render($services.rendering.parse("image:${params.icon}", 'xwiki/2.1'), 'xhtml/1.0'))
+                  #set($icon = $services.rendering.render($services.rendering.parse("image:${normalizedIcon}", 'xwiki/2.1'), 'xhtml/1.0'))
                 #end
-                &lt;li class="draggableApp" id="$app.uix.id"&gt;
-                  &lt;a&gt;&lt;span class="application-img"&gt;$icon &lt;/span&gt; &lt;span class="application-label"&gt;$params.label&lt;/a&gt;
+                &lt;li class="draggableApp" id="$escapetool.xml($app.uix.id)"&gt;
+                  &lt;a&gt;&lt;span class="application-img"&gt;$icon &lt;/span&gt; &lt;span class="application-label"&gt;$escapetool.xml($params.label)&lt;/a&gt;
                 &lt;/li&gt;
               #end
             #end

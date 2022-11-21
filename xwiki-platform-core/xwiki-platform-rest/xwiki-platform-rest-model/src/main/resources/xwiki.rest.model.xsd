@@ -353,6 +353,16 @@
     </sequence>
   </complexType>
 
+  <complexType name="Client">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <sequence>
+          <element name="ip" type="string"></element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
   <!--
   *
   * ELEMENTS
@@ -604,6 +614,7 @@
 
   <element name="jobRequest" type="xwiki:JobRequest"></element>
 
+  <element name="client" type="xwiki:Client"></element>
 
   <complexType name="MapEntry">
     <sequence>
@@ -632,8 +643,8 @@
       <element name="type" type="string"></element>
       <element name="url" type="string"></element>
     </sequence>
-
   </complexType>
+
   <complexType name="Hierarchy">
     <sequence>
       <element name="item" type="xwiki:HierarchyItem" minOccurs="0" maxOccurs="unbounded"></element>

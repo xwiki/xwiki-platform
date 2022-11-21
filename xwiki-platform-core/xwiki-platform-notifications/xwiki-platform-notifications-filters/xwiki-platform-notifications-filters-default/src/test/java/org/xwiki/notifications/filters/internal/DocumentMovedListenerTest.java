@@ -23,9 +23,11 @@ import javax.inject.Provider;
 
 import org.hibernate.Session;
 import org.hibernate.query.Query;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.xwiki.component.namespace.NamespaceContextExecutor;
 import org.xwiki.model.namespace.WikiNamespace;
 import org.xwiki.model.reference.DocumentReference;
@@ -33,66 +35,98 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.annotation.AfterComponent;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
+ * Validate {@link DocumentMovedListener}.
+ * 
  * @version $Id$
- * @since
  */
-public class DocumentMovedListenerTest
+@ComponentTest
+class DocumentMovedListenerTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<DocumentMovedListener> mocker =
-        new MockitoComponentMockingRule<>(DocumentMovedListener.class);
+    @InjectComponentManager
+    protected MockitoComponentManager componentManager;
 
+    @MockComponent
     private Provider<XWikiContext> contextProvider;
 
+    @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
 
-    private XWikiContext xwikicontext;
-
-    private XWiki xwiki;
-
+    @MockComponent
     private EntityReferenceSerializer<String> serializer;
 
+    @MockComponent
     private NotificationFilterPreferenceConfiguration filterPreferencesConfiguration;
 
+    @MockComponent
     private NamespaceContextExecutor namespaceContextExecutor;
+
+    @InjectMockComponents
+    private DocumentMovedListener listener;
 
     private CachedModelBridge cachedModelBridge;
 
-    @Before
-    public void setUp() throws Exception
-    {
-        contextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        xwikicontext = mock(XWikiContext.class);
-        when(contextProvider.get()).thenReturn(xwikicontext);
-        xwiki = mock(XWiki.class);
-        when(xwikicontext.getWiki()).thenReturn(xwiki);
-        wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        serializer = mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
+    @Mock
+    private XWikiContext xwikicontext;
 
-        filterPreferencesConfiguration = mocker.getInstance(NotificationFilterPreferenceConfiguration.class);
-        namespaceContextExecutor = mocker.getInstance(NamespaceContextExecutor.class);
-        cachedModelBridge = mock(CachedModelBridge.class);
-        mocker.registerComponent(ModelBridge.class, "cached", cachedModelBridge);
+    @Mock
+    private XWiki xwiki;
+
+    @Mock
+    private XWikiHibernateStore hibernateStore;
+
+    @Mock
+    private Session session;
+
+    @AfterComponent
+    private void afterComponent() throws Exception
+    {
+        this.cachedModelBridge = mock(CachedModelBridge.class);
+        this.componentManager.registerComponent(ModelBridge.class, "cached", this.cachedModelBridge);
+    }
+
+    @BeforeEach
+    public void beforeEach() throws Exception
+    {
+        when(this.contextProvider.get()).thenReturn(this.xwikicontext);
+        when(this.xwikicontext.getWiki()).thenReturn(this.xwiki);
+        when(this.xwiki.getHibernateStore()).thenReturn(this.hibernateStore);
+        when(this.hibernateStore.executeWrite(same(this.xwikicontext), any())).thenAnswer(new Answer<Void>()
+        {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable
+            {
+                invocation.<HibernateCallback<Void>>getArgument(1).doInHibernate(session);
+
+                return null;
+            }
+        });
     }
 
     @Test
-    public void onEventWhenNonTerminalDocumentOnMainWiki() throws Exception
+    void onEventWhenNonTerminalDocumentOnMainWiki() throws Exception
     {
         DocumentReference source = new DocumentReference("xwiki", "PageA", "WebHome");
         DocumentReference target = new DocumentReference("xwiki", "PageB", "WebHome");
@@ -107,9 +141,7 @@ public class DocumentMovedListenerTest
         when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("mainWiki");
         when(wikiDescriptorManager.isMainWiki("mainWiki")).thenReturn(true);
 
-        XWikiHibernateStore hibernateStore = mock(XWikiHibernateStore.class);
-        when(xwiki.getHibernateStore()).thenReturn(hibernateStore);
-        Session session = mock(Session.class);
+        session = mock(Session.class);
         when(hibernateStore.getSession(eq(xwikicontext))).thenReturn(session);
         Query query = mock(Query.class);
         when(session.createQuery(
@@ -124,7 +156,7 @@ public class DocumentMovedListenerTest
 
         // Test
         DocumentRenamedEvent event = new DocumentRenamedEvent(source, target);
-        mocker.getComponentUnderTest().onEvent(event, null, null);
+        this.listener.onEvent(event, null, null);
 
         // Verify
         verify(cachedModelBridge).clearCache();
@@ -138,7 +170,7 @@ public class DocumentMovedListenerTest
     }
 
     @Test
-    public void onEventWhenNonTerminalDocumentOnSubWiki() throws Exception
+    void onEventWhenNonTerminalDocumentOnSubWiki() throws Exception
     {
         DocumentReference source = new DocumentReference("xwiki", "PageA", "WebHome");
         DocumentReference target = new DocumentReference("xwiki", "PageB", "WebHome");
@@ -154,9 +186,7 @@ public class DocumentMovedListenerTest
         when(wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
         when(wikiDescriptorManager.isMainWiki("subwiki")).thenReturn(false);
 
-        XWikiHibernateStore hibernateStore = mock(XWikiHibernateStore.class);
-        when(xwiki.getHibernateStore()).thenReturn(hibernateStore);
-        Session session = mock(Session.class);
+        session = mock(Session.class);
         when(hibernateStore.getSession(eq(xwikicontext))).thenReturn(session);
         Query query = mock(Query.class);
         when(session.createQuery(
@@ -171,7 +201,7 @@ public class DocumentMovedListenerTest
 
         // Test
         DocumentRenamedEvent event = new DocumentRenamedEvent(source, target);
-        mocker.getComponentUnderTest().onEvent(event, null, null);
+        this.listener.onEvent(event, null, null);
 
         // Verify
         verify(cachedModelBridge).clearCache();
@@ -185,7 +215,7 @@ public class DocumentMovedListenerTest
     }
 
     @Test
-    public void onEventNonTerminalDocumentOnMainWiki() throws Exception
+    void onEventNonTerminalDocumentOnMainWiki() throws Exception
     {
         DocumentReference source = new DocumentReference("xwiki", "PageA", "Terminal");
         DocumentReference target = new DocumentReference("xwiki", "PageB", "Terminal");
@@ -198,9 +228,7 @@ public class DocumentMovedListenerTest
         when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("mainWiki");
         when(wikiDescriptorManager.isMainWiki("mainWiki")).thenReturn(true);
 
-        XWikiHibernateStore hibernateStore = mock(XWikiHibernateStore.class);
-        when(xwiki.getHibernateStore()).thenReturn(hibernateStore);
-        Session session = mock(Session.class);
+        session = mock(Session.class);
         when(hibernateStore.getSession(eq(xwikicontext))).thenReturn(session);
         Query query = mock(Query.class);
         when(session.createQuery(
@@ -210,7 +238,7 @@ public class DocumentMovedListenerTest
 
         // Test
         DocumentRenamedEvent event = new DocumentRenamedEvent(source, target);
-        mocker.getComponentUnderTest().onEvent(event, null, null);
+        this.listener.onEvent(event, null, null);
 
         // Verify
         verify(cachedModelBridge).clearCache();

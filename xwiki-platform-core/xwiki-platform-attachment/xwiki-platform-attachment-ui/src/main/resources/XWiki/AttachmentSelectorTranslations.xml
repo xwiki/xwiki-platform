@@ -40,7 +40,11 @@
 attachmentSelector.replace.hint=The effect may not be visible immediately due to browser caching.
 
 rendering.macro.attachmentSelector.parameter.versionSummary.name=Version Summary
-rendering.macro.attachmentSelector.parameter.versionSummary.description=Whether to allow the user to enter a version summary that will be recorded in the history. An automatic message is used when no version summary is provided or if the version summary input is not displayed.</content>
+rendering.macro.attachmentSelector.parameter.versionSummary.description=Whether to allow the user to enter a version summary that will be recorded in the history. An automatic message is used when no version summary is provided or if the version summary input is not displayed.
+  
+attachment.attachmentSelector.temporaryUpload.success=Attachment upload succeeded.
+attachment.attachmentSelector.temporaryUpload.failure=Attachment upload failed.
+attachment.attachmentSelector.attachmentBox.temporaryAttachmentTitle=Temporary attachment</content>
   <object>
     <name>XWiki.AttachmentSelectorTranslations</name>
     <number>0</number>

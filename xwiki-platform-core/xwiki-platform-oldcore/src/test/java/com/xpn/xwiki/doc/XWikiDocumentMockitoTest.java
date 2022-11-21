@@ -26,9 +26,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
@@ -37,6 +39,8 @@ import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.link.LinkException;
+import org.xwiki.link.LinkStore;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -125,6 +129,9 @@ public class XWikiDocumentMockitoTest
     @MockComponent
     @Named("compactwiki/document")
     private UserReferenceSerializer<String> compactWikiUserReferenceSerializer;
+
+    @MockComponent
+    private LinkStore linkStore;
 
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
@@ -1147,7 +1154,7 @@ public class XWikiDocumentMockitoTest
         template.setTitle("Enter title here");
         template.setSyntax(Syntax.XWIKI_2_0);
         template.setContent("Enter content here");
-        
+
         DocumentReference templateAuthor = new DocumentReference("test", "Users", "John");
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -1493,8 +1500,7 @@ public class XWikiDocumentMockitoTest
         assertEquals("Some title", newDoc.getTitle());
         assertEquals(Locale.ENGLISH, newDoc.getLocale());
         assertEquals(newReference, newDoc.getDocumentReference());
-        assertEquals(new DocumentReference(newReference, Locale.ENGLISH),
-            newDoc.getDocumentReferenceWithLocale());
+        assertEquals(new DocumentReference(newReference, Locale.ENGLISH), newDoc.getDocumentReferenceWithLocale());
         assertTrue(newDoc.isNew());
     }
 
@@ -1777,5 +1783,23 @@ public class XWikiDocumentMockitoTest
         assertEquals("author", diff.get(0).getField());
         assertEquals("XWiki.alice", diff.get(0).getPrevValue());
         assertEquals("XWiki.bob", diff.get(0).getNewValue());
+    }
+
+    @Test
+    void getBackLinkedReferences() throws XWikiException, LinkException
+    {
+        XWikiDocument doc = new XWikiDocument(DOCUMENT_REFERENCE);
+
+        DocumentReference backlink1 = new DocumentReference("wiki", "space", "page1");
+        DocumentReference backlink21 = new DocumentReference("wiki", "space", "page2", Locale.ENGLISH);
+        DocumentReference backlink22 = new DocumentReference("wiki", "space", "page2", Locale.FRENCH);
+
+        assertEquals(Set.of(), new HashSet<>(doc.getBackLinkedReferences(this.oldcore.getXWikiContext())));
+
+        when(this.linkStore.resolveBackLinkedEntities(DOCUMENT_REFERENCE))
+            .thenReturn(Set.of(backlink1, backlink21, backlink22));
+
+        assertEquals(Set.of(backlink1, backlink21.withoutLocale()),
+            new HashSet<>(doc.getBackLinkedReferences(this.oldcore.getXWikiContext())));
     }
 }

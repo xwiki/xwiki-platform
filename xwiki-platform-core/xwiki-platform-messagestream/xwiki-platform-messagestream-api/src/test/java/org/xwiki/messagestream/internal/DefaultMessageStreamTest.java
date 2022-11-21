@@ -145,7 +145,7 @@ class DefaultMessageStreamTest
     }
 
     @Test
-    void postDirectMessageToUserRecipientDoesNotExist()
+    void postDirectMessageToUserRecipientDoesNotExist() throws Exception
     {
         DefaultEvent t = new DefaultEvent();
         t.setId("eid");
@@ -190,7 +190,7 @@ class DefaultMessageStreamTest
     }
 
     @Test
-    void postMessageToGroupRecipientDoesNotExist()
+    void postMessageToGroupRecipientDoesNotExist() throws Exception
     {
         DefaultEvent t = new DefaultEvent();
         t.setId("eid");

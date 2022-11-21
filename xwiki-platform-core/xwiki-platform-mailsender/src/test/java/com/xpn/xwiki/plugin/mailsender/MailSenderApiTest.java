@@ -150,12 +150,12 @@ public class MailSenderApiTest
         MimeMessage johnMessage = receivedEmails[0];
         assertEquals("Test subject", johnMessage.getSubject());
         assertEquals("steve@acme.org", johnMessage.getFrom()[0].toString());
-        assertEquals("Test content\r\n", johnMessage.getContent());
+        assertEquals("Test content", johnMessage.getContent());
         assertEquals("value", johnMessage.getHeader("header")[0]);
         MimeMessage peterMessage = receivedEmails[0];
         assertEquals("Test subject", peterMessage.getSubject());
         assertEquals("steve@acme.org", peterMessage.getFrom()[0].toString());
-        assertEquals("Test content\r\n", peterMessage.getContent());
+        assertEquals("Test content", peterMessage.getContent());
         assertEquals("value", peterMessage.getHeader("header")[0]);
     }
 }

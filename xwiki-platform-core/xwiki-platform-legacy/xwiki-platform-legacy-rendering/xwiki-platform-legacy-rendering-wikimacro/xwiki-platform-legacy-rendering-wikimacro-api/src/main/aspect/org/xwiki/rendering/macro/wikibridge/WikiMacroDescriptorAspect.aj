@@ -100,4 +100,9 @@ public privileged aspect WikiMacroDescriptorAspect
         this.defaultCategories = Set.of(defaultCategory);
         this.visibility = visibility;
     }
+
+    public String WikiMacroDescriptor.getDefaultCategory()
+    {
+        return this.getDefaultCategories().stream().findFirst().orElse(null);
+    }
 }

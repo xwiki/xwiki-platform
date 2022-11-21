@@ -57,6 +57,9 @@
         <!-- Note: Remote cache authentication is handled in the Maven settings.xml file. The id below is the one
        found in settings.xml -->
         <id>gradleEnterpriseCache</id>
+        <!-- We override the default built-in node to use a EU node closer to our CI to reduce the cache lag (and thus
+             to make caching more beneficial vs rebuilding) -->
+        <url>https://eu-build-cache-ge.xwiki.org/cache/</url>
       </server>
     </remote>
   </buildCache>

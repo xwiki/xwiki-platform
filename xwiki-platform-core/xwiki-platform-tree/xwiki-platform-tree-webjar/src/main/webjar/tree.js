@@ -47,6 +47,27 @@ define(['jquery', 'xwiki-page-ready', 'xwiki-job-runner', 'jsTree', 'tree-finder
     return types;
   };
 
+  // The tree URL (used to retrieve the child nodes, the paths, the context menu, etc.) can have a large query string,
+  // especially when the list of exclusions is specified (which can be long when the current user has opted to view the
+  // hidden pages). This, coupled with a deep hierarchy and long page names, can make the tree URL exceed the allowed
+  // maximum length or the request header maximum size. We prevent such problems by using POST and passing the query
+  // string in the request body.
+  var post = function(url, data) {
+    url = new URL(url, window.location.href);
+    const urlParams = {};
+    for (var pair of url.searchParams.entries()) {
+      if (urlParams.hasOwnProperty(pair[0])) {
+        if (!Array.isArray(urlParams[pair[0]])) {
+          urlParams[pair[0]] = [urlParams[pair[0]]];
+        }
+        urlParams[pair[0]].push(pair[1]);
+      } else {
+        urlParams[pair[0]] = pair[1];
+      }
+    }
+    return $.post(new URL('?', url), $.param($.extend(urlParams, data), true));
+  };
+
   var getChildren = function(node, callback, parameters) {
     // 'this' is the tree instance.
     callback = callback.bind(this);
@@ -80,7 +101,7 @@ define(['jquery', 'xwiki-page-ready', 'xwiki-job-runner', 'jsTree', 'tree-finder
       }, parameters);
     }
     if (childrenURL) {
-      $.get(childrenURL, parameters).then(callback, () => callback([]));
+      post(childrenURL, parameters).then(callback, () => callback([]));
     } else {
       callback([]);
     }
@@ -263,7 +284,7 @@ define(['jquery', 'xwiki-page-ready', 'xwiki-job-runner', 'jsTree', 'tree-finder
       callbackWrapper(tree.contextMenuByNodeType[node.data.type]);
     } else {
       var nodeType = node.data.type;
-      $.get(tree.element.attr('data-url'), {data: 'contextMenu'}, function(contextMenuByNodeType) {
+      post(tree.element.attr('data-url'), {data: 'contextMenu'}).then(contextMenuByNodeType => {
         tree.contextMenuByNodeType = fixContextMenusActions(contextMenuByNodeType);
         callbackWrapper(tree.contextMenuByNodeType[nodeType]);
       });
@@ -323,7 +344,7 @@ define(['jquery', 'xwiki-page-ready', 'xwiki-job-runner', 'jsTree', 'tree-finder
       // We need to retrieve the node path from the server.
       var url = this.element.attr('data-url');
       if (url) {
-        return Promise.resolve($.get(url, {data: 'path', 'id': nodeId}));
+        return Promise.resolve(post(url, {data: 'path', 'id': nodeId}));
       } else {
         return Promise.reject();
       }
@@ -675,6 +696,15 @@ define(['jquery', 'xwiki-page-ready', 'xwiki-job-runner', 'jsTree', 'tree-finder
       }
       if (data.menu.remove) {
         data.menu.remove._disabled = !canRemoveNodes(selectedNodes);
+      }
+
+    }).on('changed.jstree', function(event, data) {
+      if (data.instance.settings.xwiki && typeof data.instance.settings.xwiki.fieldName !== 'undefined') {
+        var fieldName = data.instance.settings.xwiki.fieldName;
+        var fieldValue = data.selected.join('|');
+        $('input[type="hidden"]').filter(function() {
+          return $(this).attr('name') === fieldName;
+        }).val(fieldValue);
       }
 
     //

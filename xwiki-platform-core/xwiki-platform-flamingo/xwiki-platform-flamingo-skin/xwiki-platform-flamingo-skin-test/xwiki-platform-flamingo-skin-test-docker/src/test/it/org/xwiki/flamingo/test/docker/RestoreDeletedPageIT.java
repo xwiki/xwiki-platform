@@ -23,11 +23,12 @@ import java.io.File;
 
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
+import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
+import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.AttachmentsPane;
 import org.xwiki.test.ui.po.DeletePageOutcomePage;
 import org.xwiki.test.ui.po.DeletingPage;
 import org.xwiki.test.ui.po.HistoryPane;
@@ -60,8 +61,8 @@ class RestoreDeletedPageIT
         ViewPage page = setup.createPage(testReference, "Once upon a time..", "A story");
 
         // Add an attachment.
-        page.openAttachmentsDocExtraPane()
-            .setFileToUpload(new File(testConfiguration.getBrowser().getTestResourcesPath(),
+        new AttachmentsViewPage().openAttachmentsDocExtraPane().setFileToUpload(
+            new File(testConfiguration.getBrowser().getTestResourcesPath(),
                 "AttachmentIT/SmallAttachment.txt").getAbsolutePath());
 
         // Delete the page.
@@ -92,7 +93,7 @@ class RestoreDeletedPageIT
         assertEquals("2.1", historyPane.getCurrentVersion());
 
         // Check the attachment.
-        AttachmentsPane attachmentsPane = page.openAttachmentsDocExtraPane();
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertEquals(1, attachmentsPane.getNumberOfAttachments());
         assertEquals("1.1", attachmentsPane.getLatestVersionOfAttachment("SmallAttachment.txt"));
 

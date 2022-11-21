@@ -26,8 +26,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -52,10 +54,12 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.search.solr.internal.SolrSearchCoreUtils;
 import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrFieldNameEncoder;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -76,6 +80,7 @@ import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -94,6 +99,8 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
+@ComponentList({SolrSearchCoreUtils.class, SolrLinkSerializer.class})
+@ReferenceComponentList
 class DocumentSolrMetadataExtractorTest
 {
     @InjectMockComponents
@@ -108,13 +115,6 @@ class DocumentSolrMetadataExtractorTest
     @MockComponent
     @Named("plain/1.0")
     private BlockRenderer renderer;
-
-    @MockComponent
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
-
-    @MockComponent
-    @Named("local")
-    private EntityReferenceSerializer<String> localEntityReferenceSerializer;
 
     @MockComponent
     private UserReferenceSerializer<String> userReferenceSerializer;
@@ -203,17 +203,6 @@ class DocumentSolrMetadataExtractorTest
         String id = "wiki:Space.Name_" + Locale.ROOT.toString();
         when(documentSolrReferenceResolver.getId(documentReference)).thenReturn(id);
 
-        // Full Name
-        String fullName = "Space.Name";
-        when(localEntityReferenceSerializer.serialize(this.documentReference)).thenReturn(fullName);
-
-        // Hierarchy
-        when(localEntityReferenceSerializer.serialize(this.documentReference.getParent())).thenReturn("Path.To.Page");
-        when(localEntityReferenceSerializer.serialize(this.documentReference.getParent().getParent()))
-            .thenReturn("Path.To");
-        when(localEntityReferenceSerializer.serialize(this.documentReference.getParent().getParent().getParent()))
-            .thenReturn("Path");
-
         // Creator.
         UserReference creatorUserReference = mock(UserReference.class);
         when(this.documentAuthors.getCreator()).thenReturn(creatorUserReference);
@@ -254,6 +243,10 @@ class DocumentSolrMetadataExtractorTest
         // Version summary
         String comment = "1.1 comment";
         when(this.document.getComment()).thenReturn(comment);
+
+        // Links
+        when(this.document.getUniqueLinkedEntities(any(XWikiContext.class))).thenReturn(Set.of(
+            new DocumentReference("wiki", "space", "document1"), new DocumentReference("wiki", "space", "document2")));
 
         // XObjects.
         when(this.document.getXObjects()).thenReturn(Collections.<DocumentReference, List<BaseObject>>emptyMap());
@@ -310,7 +303,7 @@ class DocumentSolrMetadataExtractorTest
         assertEquals(this.document.isHidden(), solrDocument.getFieldValue(FieldUtils.HIDDEN));
         assertEquals(EntityType.DOCUMENT.name(), solrDocument.getFieldValue(FieldUtils.TYPE));
 
-        assertEquals(fullName, solrDocument.getFieldValue(FieldUtils.FULLNAME));
+        assertEquals("Path.To.Page.WebHome", solrDocument.getFieldValue(FieldUtils.FULLNAME));
 
         assertEquals(title, solrDocument.getFieldValue(FieldUtils.getFieldName(FieldUtils.TITLE, Locale.US)));
         assertEquals(rawContent,
@@ -328,6 +321,15 @@ class DocumentSolrMetadataExtractorTest
 
         assertEquals(creationDate, solrDocument.getFieldValue(FieldUtils.CREATIONDATE));
         assertEquals(date, solrDocument.get(FieldUtils.DATE).getValue());
+
+        assertEquals("document:wiki:Path.To.Page.WebHome", solrDocument.getFieldValue(FieldUtils.REFERENCE));
+
+        assertEquals(Set.of("entity:document:wiki:space.document2", "entity:document:wiki:space.document1"),
+            new HashSet<>(solrDocument.getFieldValues(FieldUtils.LINKS)));
+        assertEquals(
+            Set.of("entity:wiki:wiki", "entity:space:wiki:space", "entity:document:wiki:space.document2",
+                "entity:document:wiki:space.document1"),
+            new HashSet<>(solrDocument.getFieldValues(FieldUtils.LINKS_EXTENDED)));
     }
 
     @Test
@@ -411,8 +413,6 @@ class DocumentSolrMetadataExtractorTest
         DocumentReference commentsClassReference = new DocumentReference("wiki", "space", "commentsClass");
         when(this.document.getXObjects())
             .thenReturn(Collections.singletonMap(commentsClassReference, Arrays.asList(comment)));
-
-        when(localEntityReferenceSerializer.serialize(commentsClassReference)).thenReturn("space.commentsClass");
 
         BaseClass xclass = mock(BaseClass.class);
         when(comment.getXClass(this.xcontext)).thenReturn(xclass);
@@ -551,12 +551,8 @@ class DocumentSolrMetadataExtractorTest
         when(attachment.getLongSize()).thenReturn((long)content.length);
         when(attachment.getContentInputStream(this.xcontext)).thenReturn(new ByteArrayInputStream(content));
 
-        String authorFullName = "XWiki." + authorAlias;
         DocumentReference authorReference = new DocumentReference("wiki", "XWiki", authorAlias);
         when(attachment.getAuthorReference()).thenReturn(authorReference);
-
-        String authorStringReference = "wiki:" + authorFullName;
-        when(this.entityReferenceSerializer.serialize(authorReference)).thenReturn(authorStringReference);
 
         when(this.xcontext.getWiki().getPlainUserName(authorReference, this.xcontext)).thenReturn(authorDisplayName);
 
@@ -624,8 +620,7 @@ class DocumentSolrMetadataExtractorTest
     @Test
     void testAttachmentExtractFromOpenDocument() throws Exception
     {
-        // TODO: See XWIKI-19447 to decide if we should index the embedded content of OpenDocument files.
-        assertAttachmentExtract("OpenDocument content\nThumbnails/thumbnail.png\n\n", "opendocument.odt");
+        assertAttachmentExtract("OpenDocument content\n", "opendocument.odt");
     }
 
     @Test

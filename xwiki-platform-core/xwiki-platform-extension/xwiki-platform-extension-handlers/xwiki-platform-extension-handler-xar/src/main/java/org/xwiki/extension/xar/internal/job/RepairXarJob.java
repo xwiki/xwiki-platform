@@ -46,7 +46,6 @@ import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepositoryException;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.job.DefaultJobStatus;
-import org.xwiki.job.Request;
 import org.xwiki.logging.marker.BeginTranslationMarker;
 import org.xwiki.logging.marker.EndTranslationMarker;
 
@@ -104,19 +103,6 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
     public String getType()
     {
         return JOBTYPE;
-    }
-
-    @Override
-    protected InstallRequest castRequest(Request request)
-    {
-        InstallRequest installRequest;
-        if (request instanceof InstallRequest) {
-            installRequest = (InstallRequest) request;
-        } else {
-            installRequest = new InstallRequest(request);
-        }
-
-        return installRequest;
     }
 
     @Override

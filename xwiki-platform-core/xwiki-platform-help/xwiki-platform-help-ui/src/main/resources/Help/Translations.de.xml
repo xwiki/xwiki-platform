@@ -47,7 +47,20 @@ help.tipsPanel.linkAutocompleteWYSIWYGTip=Geben Sie beim Bearbeiten im WYSIWYG-E
 help.macroList.title=Verfügbare Makros
 help.macroList.id=Id
 help.macroList.name=Name
-help.macroList.category=Kategorie
+help.macroList.categories=Kategorien
 help.macroList.description=Beschreibung
-help.macroList.visibility=Sichtbarkeit</content>
+help.macroList.visibility=Sichtbarkeit
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+############################################################################### 
+
+#@deprecatedstart
+
+## until 14.6RC1
+help.macroList.category=Kategorie
+
+#@deprecatedend
+</content>
 </xwikidoc>

@@ -22,6 +22,7 @@ package org.xwiki.export.pdf.job;
 import java.util.Collections;
 import java.util.List;
 
+import org.xwiki.job.Request;
 import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.stability.Unstable;
@@ -31,7 +32,7 @@ import org.xwiki.stability.Unstable;
  * 
  * @version $Id$
  * @since 14.4.2
- * @since 14.5RC1
+ * @since 14.5
  */
 @Unstable
 public class PDFExportJobRequest extends AbstractCheckRightsRequest
@@ -53,7 +54,27 @@ public class PDFExportJobRequest extends AbstractCheckRightsRequest
 
     private static final String PROPERTY_FOOTER = "footer";
 
+    private static final String PROPERTY_TITLE = "title";
+
     private static final String PROPERTY_SERVER_SIDE = "serverSide";
+
+    /**
+     * Default constructor.
+     */
+    public PDFExportJobRequest()
+    {
+    }
+
+    /**
+     * @param request the request to copy
+     * @since 14.7RC1
+     * @since 14.4.4
+     * @since 13.10.9
+     */
+    public PDFExportJobRequest(Request request)
+    {
+        super(request);
+    }
 
     /**
      * @return the list of documents to include in the PDF export; the PDF export job will render each of these
@@ -174,7 +195,7 @@ public class PDFExportJobRequest extends AbstractCheckRightsRequest
      */
     public boolean isServerSide()
     {
-        return getProperty(PROPERTY_SERVER_SIDE, true);
+        return getProperty(PROPERTY_SERVER_SIDE, false);
     }
 
     /**
@@ -186,5 +207,29 @@ public class PDFExportJobRequest extends AbstractCheckRightsRequest
     public void setServerSide(boolean serverSide)
     {
         setProperty(PROPERTY_SERVER_SIDE, serverSide);
+    }
+
+    /**
+     * @return whether to render the document title before the document content, using a level 1 heading; when not set
+     *         it defaults to {@code true} if {@link #getDocuments()} has multiple entries, otherwise to {@code false},
+     *         when a single document is rendered; note that this has an impact on the table of contents (when we
+     *         generate one)
+     * @since 14.9RC1
+     */
+    public boolean isWithTitle()
+    {
+        return getProperty(PROPERTY_TITLE, getDocuments().size() > 1);
+    }
+
+    /**
+     * Sets whether to render the document title, before the document content, or not.
+     *
+     * @param withTitle {@code true} to include the document title, {@code false} to omit the document title,
+     *            {@code null} to include the document title only when multiple documents are rendered
+     * @since 14.9RC1
+     */
+    public void setWithTitle(Boolean withTitle)
+    {
+        setProperty(PROPERTY_TITLE, withTitle);
     }
 }

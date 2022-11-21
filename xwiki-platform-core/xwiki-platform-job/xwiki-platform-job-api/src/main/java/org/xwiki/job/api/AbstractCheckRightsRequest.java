@@ -20,6 +20,7 @@
 package org.xwiki.job.api;
 
 import org.xwiki.job.AbstractRequest;
+import org.xwiki.job.Request;
 import org.xwiki.model.reference.DocumentReference;
 
 /**
@@ -51,6 +52,24 @@ public abstract class AbstractCheckRightsRequest extends AbstractRequest
      * @see #isCheckAuthorRights()
      */
     private static final String PROPERTY_CHECK_AUTHOR_RIGHTS = "checkAuthorRights";
+
+    /**
+     * Default constructor.
+     */
+    public AbstractCheckRightsRequest()
+    {
+    }
+
+    /**
+     * @param request the request to copy
+     * @since 14.7RC1
+     * @since 14.4.4
+     * @since 13.10.9
+     */
+    protected AbstractCheckRightsRequest(Request request)
+    {
+        super(request);
+    }
 
     /**
      * @return {@code true} in case the job should check if the author specified by {@link #getAuthorReference()} is

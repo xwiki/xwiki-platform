@@ -29,6 +29,7 @@ import javax.inject.Singleton;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -38,6 +39,7 @@ import org.xwiki.store.TemporaryAttachmentSessionsManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 
 /**
@@ -86,6 +88,13 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
     public XWikiAttachment uploadAttachment(DocumentReference documentReference, Part part)
         throws TemporaryAttachmentException
     {
+        return uploadAttachment(documentReference, part, null);
+    }
+
+    @Override
+    public XWikiAttachment uploadAttachment(DocumentReference documentReference, Part part, String filename)
+        throws TemporaryAttachmentException
+    {
         XWikiAttachment xWikiAttachment;
         long uploadMaxSize = getUploadMaxSize(documentReference);
         if (part.getSize() > uploadMaxSize) {
@@ -96,9 +105,19 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
         XWikiContext context = this.contextProvider.get();
         try {
             xWikiAttachment = new XWikiAttachment();
-            xWikiAttachment.setFilename(part.getSubmittedFileName());
+            String actualFilename;
+            if (StringUtils.isNotBlank(filename)) {
+                actualFilename = filename;
+            } else {
+                actualFilename = part.getSubmittedFileName();
+            }
+            xWikiAttachment.setFilename(actualFilename);
             xWikiAttachment.setContent(part.getInputStream());
             xWikiAttachment.setAuthorReference(context.getUserReference());
+            // Initialize an empty document with the right document reference and locale. We don't set the actual 
+            // document since it's a temporary attachment, but it is still useful to have a minimal knowledge of the
+            // document it is stored for.
+            xWikiAttachment.setDoc(new XWikiDocument(documentReference, documentReference.getLocale()), false);
             temporaryAttachmentSession.addAttachment(documentReference, xWikiAttachment);
         } catch (IOException e) {
             throw new TemporaryAttachmentException("Error while reading the content of a request part", e);

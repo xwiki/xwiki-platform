@@ -342,7 +342,7 @@ public final class DockerTestUtils
     /**
      * @param context the context where to find the store
      * @return the store
-     * @since 14.5RC1
+     * @since 14.5
      */
     public static ExtensionContext.Store getStore(ExtensionContext context)
     {
@@ -352,7 +352,7 @@ public final class DockerTestUtils
     /**
      * @param context the context where to find the store
      * @return the XWiki URL
-     * @since 14.5RC1
+     * @since 14.5
      */
     public static String getXWikiURL(ExtensionContext context)
     {
@@ -363,7 +363,7 @@ public final class DockerTestUtils
     /**
      * @param context the context where to find the store
      * @param xwikiURL the XWiki URL
-     * @since 14.5RC1
+     * @since 14.5
      */
     public static void setXWikiURL(ExtensionContext context, String xwikiURL)
     {
@@ -374,7 +374,7 @@ public final class DockerTestUtils
     /**
      * @param context the context where to find the store
      * @return the helper to create wikis
-     * @since 14.5RC1
+     * @since 14.5
      */
     public static WikiCreator getWikiCreator(ExtensionContext context)
     {
@@ -393,7 +393,7 @@ public final class DockerTestUtils
     /**
      * @param context the context where to find the store
      * @return the component manager
-     * @since 14.5RC1
+     * @since 14.5
      */
     public static ComponentManager getComponentManager(ExtensionContext context)
     {
@@ -415,7 +415,7 @@ public final class DockerTestUtils
     /**
      * @param context the context where to find the store
      * @return the helper to install extensions
-     * @since 14.5RC1
+     * @since 14.5
      */
     public static ExtensionInstaller getExtensionInstaller(ExtensionContext context)
     {
@@ -427,7 +427,7 @@ public final class DockerTestUtils
     /**
      * @param context the context where to find the store
      * @param installer the helper to install extensions
-     * @since 14.5RC1
+     * @since 14.5
      */
     public static void setExtensionInstaller(ExtensionContext context, ExtensionInstaller installer)
     {

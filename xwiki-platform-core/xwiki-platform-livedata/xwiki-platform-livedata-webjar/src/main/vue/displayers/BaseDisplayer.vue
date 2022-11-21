@@ -39,6 +39,7 @@
     :trigger="isEditable && !duringEditing ? 'mouseenter focus' : 'manual'"
     theme="light-border"
     placement="bottom"
+    followCursor="horizontal"
     arrow
     ref="tippy"
     :ignoreAttributes="true"

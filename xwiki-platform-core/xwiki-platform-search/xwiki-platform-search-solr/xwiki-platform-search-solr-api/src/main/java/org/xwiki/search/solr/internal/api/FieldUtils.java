@@ -49,6 +49,13 @@ public final class FieldUtils
     public static final String ID = "id";
 
     /**
+     * The reference of the entity, including the parameters and the entity type.
+     * 
+     * @since 14.8RC1
+     */
+    public static final String REFERENCE = "reference";
+
+    /**
      * Language of the document.
      */
     public static final String LANGUAGE = "language";
@@ -118,6 +125,20 @@ public final class FieldUtils
      * @since 7.2RC1
      */
     public static final String SPACE_PREFIX = "space_prefix";
+
+    /**
+     * The links found in the entity.
+     * 
+     * @since 14.8RC1
+     */
+    public static final String LINKS = "links";
+
+    /**
+     * The links found in the entity plus their parents.
+     * 
+     * @since 14.8RC1
+     */
+    public static final String LINKS_EXTENDED = "links_extended";
 
     /**
      * Name of the document.

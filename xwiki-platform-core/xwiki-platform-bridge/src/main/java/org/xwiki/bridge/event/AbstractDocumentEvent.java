@@ -50,7 +50,7 @@ public abstract class AbstractDocumentEvent extends AbstractCancelableEvent
      * The reference of the targeted document.
      * 
      * @since 14.4.2
-     * @since 14.5RC1
+     * @since 14.5
      */
     private final DocumentReference documentReference;
 
@@ -90,7 +90,7 @@ public abstract class AbstractDocumentEvent extends AbstractCancelableEvent
     /**
      * @return the reference of the document targeted by this event, or {@code null} if it was not specified
      * @since 14.4.2
-     * @since 14.5RC1
+     * @since 14.5
      */
     @Unstable
     public DocumentReference getDocumentReference()

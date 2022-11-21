@@ -88,6 +88,7 @@ public class TestConfiguration
 
     /**
      * @param testConfiguration the configuration to merge with the current one
+     * @throws DockerTestException when a merge error occurs
      */
     public void merge(TestConfiguration testConfiguration) throws DockerTestException
     {
@@ -706,7 +707,7 @@ public class TestConfiguration
     }
 
     /**
-     * @param savePermanentDirectoryData see {@link ##isPermanentDirectoryDataSaved()}
+     * @param savePermanentDirectoryData see {@link #isPermanentDirectoryDataSaved()}
      * @since 14.5
      */
     public void setSavePermanentDirectoryData(boolean savePermanentDirectoryData)

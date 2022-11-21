@@ -24,9 +24,6 @@
 
 <configuration>
 
-  <!-- Register SLF4J against the JMX MBean Server automatically -->
-  <jmxConfigurator objectName="logback:type=xwiki"/>
-
   <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
     <!-- Direct log messages to stdout -->
     <Target>System.out</Target>
@@ -35,7 +32,11 @@
     </encoder>
   </appender>
 
+  <!-- Logback 1.3+ is very verbose by default when loading the configuration but it's mostly noise from XWiki log point of view -->
+  <logger name="ch.qos.logback.classic.model.processor" level="warn"/>
+
   <logger name="org.xwiki" level="info"/>
+  <logger name="com.xwiki" level="info"/>
 
   <!-- Old code is using the com.xpn.xwiki package and is logging too much stuff at INFO level, which is why we use
        the default WARN level. -->

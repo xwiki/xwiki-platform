@@ -19,18 +19,24 @@
  */
 package org.xwiki.export.pdf.script;
 
+import java.net.URL;
+
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
+import org.xwiki.export.pdf.PDFExportConfiguration;
+import org.xwiki.export.pdf.PDFPrinter;
 import org.xwiki.export.pdf.internal.job.PDFExportJob;
 import org.xwiki.export.pdf.job.PDFExportJobRequest;
 import org.xwiki.export.pdf.job.PDFExportJobRequestFactory;
 import org.xwiki.export.script.ExportScriptService;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobExecutor;
+import org.xwiki.script.internal.safe.ScriptSafeProvider;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -41,7 +47,7 @@ import org.xwiki.stability.Unstable;
  * 
  * @version $Id$
  * @since 14.4.2
- * @since 14.5RC1
+ * @since 14.5
  */
 @Component
 @Named(PDFExportScriptService.ROLE_HINT)
@@ -66,6 +72,18 @@ public class PDFExportScriptService implements ScriptService
     private PDFExportJobRequestFactory requestFactory;
 
     /**
+     * Used to check if server-side printing is available. We use a provider instead of direct injection because we want
+     * the printer to be initialized only when server-side printing is requested, as per
+     * {@link PDFExportJobRequest#isServerSide()}.
+     */
+    @Inject
+    @Named("chrome")
+    private Provider<PDFPrinter<URL>> pdfPrinterProvider;
+
+    @Inject
+    private PDFExportConfiguration configuration;
+
+    /**
      * Used to check user rights.
      */
     @Inject
@@ -82,6 +100,13 @@ public class PDFExportScriptService implements ScriptService
      */
     @Inject
     private Execution execution;
+
+    /**
+     * Used to return script-safe objects.
+     */
+    @Inject
+    @SuppressWarnings("rawtypes")
+    private ScriptSafeProvider scriptSafeProvider;
 
     /**
      * @return a new PDF export request, initialized based on the current HTTP request
@@ -122,6 +147,43 @@ public class PDFExportScriptService implements ScriptService
     }
 
     /**
+     * You should call this only when server-side printing is requested (either by the PDF export configuration or by
+     * the PDF export job request) because the availability check can be expensive: the PDF printer needs to be
+     * initialized and it needs to verify that the connection between XWiki and the remote web browser (headless Chrome)
+     * used for PDF printing is fine.
+     * 
+     * @return {@code true} if server-side printing is available, {@code false} otherwise
+     * @since 14.8
+     */
+    public boolean isServerSidePrintingAvailable()
+    {
+        setError(null);
+
+        try {
+            return this.pdfPrinterProvider.get().isAvailable();
+        } catch (Exception e) {
+            setError(e);
+            return false;
+        }
+    }
+
+    /**
+     * @return the PDF export configuration
+     * @since 14.8
+     */
+    public PDFExportConfiguration getConfiguration()
+    {
+        setError(null);
+
+        try {
+            return this.authorization.hasAccess(Right.ADMIN) ? this.configuration : safe(this.configuration);
+        } catch (Exception e) {
+            setError(e);
+            return null;
+        }
+    }
+
+    /**
      * Get the error generated while performing the previously called action.
      *
      * @return an eventual exception or {@code null} if no exception was thrown
@@ -141,4 +203,16 @@ public class PDFExportScriptService implements ScriptService
     {
         this.execution.getContext().setProperty(PDF_EXPORT_ERROR_KEY, e);
     }
+
+    /**
+     * @param <T> the type of the object
+     * @param unsafe the unsafe object
+     * @return the safe version of the passed object
+     */
+    @SuppressWarnings("unchecked")
+    protected <T> T safe(T unsafe)
+    {
+        return (T) this.scriptSafeProvider.get(unsafe);
+    }
+
 }

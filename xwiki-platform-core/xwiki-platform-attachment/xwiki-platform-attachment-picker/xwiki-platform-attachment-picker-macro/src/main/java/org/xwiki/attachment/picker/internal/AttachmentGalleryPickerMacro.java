@@ -22,6 +22,7 @@ package org.xwiki.attachment.picker.internal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -83,6 +84,7 @@ public class AttachmentGalleryPickerMacro extends AbstractMacro<AttachmentGaller
     public AttachmentGalleryPickerMacro()
     {
         super("Attachment Picker", "Grid based attachment picker.", AttachmentGalleryPickerMacroParameters.class);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_DEVELOPMENT));
     }
 
     @Override

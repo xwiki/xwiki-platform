@@ -33,7 +33,6 @@ import org.xwiki.extension.distribution.internal.job.step.DistributionStep.State
 import org.xwiki.extension.distribution.internal.job.step.ReportDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.WelcomeDistributionStep;
 import org.xwiki.job.AbstractJob;
-import org.xwiki.job.Request;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
@@ -81,19 +80,6 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest>
     }
 
     protected abstract List<DistributionStep> createSteps();
-
-    @Override
-    protected R castRequest(Request request)
-    {
-        DistributionRequest distributionRequest;
-        if (request instanceof DistributionRequest) {
-            distributionRequest = (DistributionRequest) request;
-        } else {
-            distributionRequest = new DistributionRequest(request);
-        }
-
-        return (R) distributionRequest;
-    }
 
     @Override
     protected DistributionJobStatus createNewStatus(R request)
@@ -171,11 +157,13 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest>
             step.initialize(this);
 
             // Enable Welcome step if one of the steps is enabled
-            if (step.getState() == null) {
-                if (welcomeStep != null) {
+            // but don't prepare the following steps as it might be too early
+            if (welcomeStep.getState() != null) {
+                // Prepare the step to check if there is something to do
+                step.prepare();
+
+                if (step.getState() == null) {
                     welcomeStep.setState(null);
-                }
-                if (reportStep != null) {
                     reportStep.setState(null);
                 }
             }

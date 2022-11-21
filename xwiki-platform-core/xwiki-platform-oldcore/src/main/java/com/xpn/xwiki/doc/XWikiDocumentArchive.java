@@ -77,7 +77,7 @@ public class XWikiDocumentArchive
      * @param id the local identifier of the document
      * @since 13.10.7
      * @since 14.4.1
-     * @since 14.5RC1
+     * @since 14.5
      */
     public XWikiDocumentArchive(WikiReference wikiReference, long id)
     {
@@ -87,7 +87,7 @@ public class XWikiDocumentArchive
 
     /**
      * @param id the local identifier of the document
-     * @deprecated since 13.10.7, 14.4.1, 14.5RC1, use {@link #XWikiDocumentArchive(WikiReference, long)} instead
+     * @deprecated since 13.10.7, 14.4.1, 14.5, use {@link #XWikiDocumentArchive(WikiReference, long)} instead
      */
     @Deprecated(since = "13.10.7")
     public XWikiDocumentArchive(long id)
@@ -96,7 +96,7 @@ public class XWikiDocumentArchive
     }
 
     /**
-     * @deprecated since 13.10.7, 14.4.1, 14.5RC1, use {@link #XWikiDocumentArchive(WikiReference, long)} instead
+     * @deprecated since 13.10.7, 14.4.1, 14.5, use {@link #XWikiDocumentArchive(WikiReference, long)} instead
      */
     @Deprecated(since = "13.10.7")
     public XWikiDocumentArchive()
@@ -171,7 +171,7 @@ public class XWikiDocumentArchive
      * @return the wikiReference the wiki of the document
      * @since 13.10.7
      * @since 14.4.1
-     * @since 14.5RC1
+     * @since 14.5
      */
     public WikiReference getWikiReference()
     {
@@ -186,7 +186,7 @@ public class XWikiDocumentArchive
 
     /**
      * @param id = {@link XWikiDocument#getId()}
-     * @deprecated since 13.10.7, 14.4.1, 14.5RC1, use {@link #XWikiDocumentArchive(WikiReference, long)} instead
+     * @deprecated since 13.10.7, 14.4.1, 14.5, use {@link #XWikiDocumentArchive(WikiReference, long)} instead
      */
     @Deprecated(since = "13.10.7")
     public void setId(long id)

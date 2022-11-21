@@ -32,6 +32,7 @@ import org.mockito.MockitoAnnotations;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.platform.svg.SVGRasterizer;
+import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -78,8 +79,8 @@ public class SVGScriptServiceTest
         when(this.internal.rasterizeToTemporaryResource(SVG, 100, 200, this.dref)).thenReturn(this.tref);
 
         Type stype = new DefaultParameterizedType(null, ResourceReferenceSerializer.class,
-            TemporaryResourceReference.class, ExtendedURL.class);
-        this.serializer = this.mocker.getInstance(stype, "standard/tmp");
+            ResourceReference.class, ExtendedURL.class);
+        this.serializer = this.mocker.getInstance(stype);
         when(this.serializer.serialize(this.tref)).thenReturn(this.eurl);
     }
 

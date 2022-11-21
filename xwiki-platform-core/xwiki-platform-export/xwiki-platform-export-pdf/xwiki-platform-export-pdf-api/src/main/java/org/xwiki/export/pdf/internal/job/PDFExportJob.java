@@ -45,7 +45,7 @@ import org.xwiki.security.authorization.Right;
  * 
  * @version $Id$
  * @since 14.4.2
- * @since 14.5RC1
+ * @since 14.5
  */
 @Component
 @Named(PDFExportJob.JOB_TYPE)
@@ -71,19 +71,11 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
     private RequiredSkinExtensionsRecorder requiredSkinExtensionsRecorder;
 
     /**
-     * We use a provider instead of direct injection because:
-     * <ul>
-     * <li>the PDF printer connects to the Docker container in its initialization phase which can take some time and,
-     * more importantly, can easily fail if the environment where XWiki runs was not set up properly (e.g. Docker not
-     * installed, wrong version of Docker, missing network connection, Docker hub not accessible, etc.)</li>
-     * <li>in case the PDF printer fails to be initialized we want the exception to appear in the job log</li>
-     * <li>the PDF printer is used only when {@link PDFExportJobRequest#isServerSide()} returns {@code true} so it
-     * doesn't make sense to initialize it (e.g. pull the Docker image, create and start the container, connect to the
-     * head-less Chrome browser, etc.) unless it's used.</li>
-     * </ul>
+     * We use a provider instead of direct injection because we want the printer to be initialized only when server-side
+     * PDF printing is requested, as per {@link PDFExportJobRequest#isServerSide()}.
      */
     @Inject
-    @Named("docker")
+    @Named("chrome")
     private Provider<PDFPrinter<URL>> pdfPrinterProvider;
 
     @Inject
@@ -106,7 +98,7 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
     {
         if (!this.request.getDocuments().isEmpty()) {
             this.requiredSkinExtensionsRecorder.start();
-            render(this.request.getDocuments());
+            render(this.request.getDocuments(), this.request.isWithTitle());
             if (!this.status.isCanceled()) {
                 this.status.setRequiredSkinExtensions(this.requiredSkinExtensionsRecorder.stop());
             }
@@ -118,7 +110,7 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
         }
     }
 
-    private void render(List<DocumentReference> documentReferences) throws Exception
+    private void render(List<DocumentReference> documentReferences, boolean withTitle) throws Exception
     {
         this.progressManager.pushLevelProgress(documentReferences.size(), this);
 
@@ -129,7 +121,8 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
                 } else {
                     this.progressManager.startStep(this);
                     if (hasAccess(Right.VIEW, documentReference)) {
-                        this.status.getDocumentRenderingResults().add(this.documentRenderer.render(documentReference));
+                        this.status.getDocumentRenderingResults()
+                            .add(this.documentRenderer.render(documentReference, withTitle));
                     }
                     Thread.yield();
                     this.progressManager.endStep(this);
@@ -160,7 +153,9 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
     {
         URL printPreviewURL = (URL) this.request.getContext().get("request.url");
         try (InputStream pdfContent = this.pdfPrinterProvider.get().print(printPreviewURL)) {
-            this.temporaryResourceStore.createTemporaryFile(this.status.getPDFFileReference(), pdfContent);
+            if (!this.status.isCanceled()) {
+                this.temporaryResourceStore.createTemporaryFile(this.status.getPDFFileReference(), pdfContent);
+            }
         }
     }
 }

@@ -30,6 +30,7 @@ import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.livetable.LiveDataLivetableException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -86,6 +87,9 @@ public class LiveTableLiveDataResultsRenderer
         this.authorization.checkAccess(Right.VIEW, documentReference);
 
         return this.liveTableRequestHandler.getLiveTableResults(query, () -> {
+            XWikiContext xcontext = this.xcontextProvider.get();
+            WikiReference currentWiki = xcontext.getWikiReference();
+            xcontext.setWikiReference(documentReference.getWikiReference());
             try {
                 // The live table results page may use "global" variables.
                 this.templateManager.render("xwikivars.vm");
@@ -94,7 +98,7 @@ public class LiveTableLiveDataResultsRenderer
                     "Failed to evaluate [xwikivars.vm] when getting the Livetable results from page [{}]. Cause: [{}].",
                     page, getRootCauseMessage(e));
             }
-            XWikiContext xcontext = this.xcontextProvider.get();
+
             try {
                 XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
                 if (document.isNew()) {
@@ -103,6 +107,8 @@ public class LiveTableLiveDataResultsRenderer
                 return document.getRenderedContent(Syntax.PLAIN_1_0, xcontext);
             } catch (Exception e) {
                 throw new RuntimeException(e);
+            } finally {
+                xcontext.setWikiReference(currentWiki);
             }
         });
     }

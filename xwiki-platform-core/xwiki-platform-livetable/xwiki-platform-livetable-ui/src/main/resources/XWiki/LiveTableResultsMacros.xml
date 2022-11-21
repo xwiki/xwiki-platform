@@ -73,7 +73,15 @@
   ##
   #set($tablelist = [])
   #foreach($colname in $collist)
-    #livetable_addColumnToQuery($colname)
+    ## If a classname is defined and the class field corresponding to the column name,
+    ## we check the type of the field and skip it if it's Password.
+    #if ($className != '' &amp;&amp; $class.get($colname))
+      #if ($class.get($colname).classType != 'Password')
+        #livetable_addColumnToQuery($colname)
+      #end
+    #else
+      #livetable_addColumnToQuery($colname)
+    #end
   #end
   ##
   ## Tag filtering
@@ -336,7 +344,12 @@
   #set ($query = $query.setLimit($limit).setOffset($offset).bindValues($sqlParams))
   #set($items = $query.execute())
   #set($discard = $map.put('totalrows', $query.count()))
-  #set($discard = $map.put('returnedrows', $mathtool.min($items.size(), $limit)))
+  #if ($limit > 0)
+    #set($discard = $map.put('returnedrows', $mathtool.min($items.size(), $limit)))
+  #else
+    ## When the limit is 0, it's equivalent to no limit at all and the actual number of returned results can be used.
+    #set($discard = $map.put('returnedrows', $items.size()))
+  #end
   #set($discard = $map.put('offset', $mathtool.add($offset, 1)))
   #set($rows = [])
   #foreach($item in $items)

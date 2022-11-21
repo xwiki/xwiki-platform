@@ -214,6 +214,10 @@ platform.appwithinminutes.deleteAppInvalidAppError=Für den angegebenen Namen wu
 platform.appwithinminutes.deleteAppNotSpecifiedError=Bitte geben Sie einen Anwendungsnamen an.
 
 ### Rename Application
+appWithinMinutes.renameApp.label=Anwendung umbenennen
+appWithinMinutes.renameApp.close=Schließen
+
+### Rename Application
 appWithinMinutes.renameApp.changeAppTitleInfo=Sie können den Titel der Anwendung ändern, ohne die Anwendung umzubenennen, indem Sie einfach die Startseite der Anwendung bearbeiten.
 appWithinMinutes.renameApp.regenerateAppCodeWarning=Der Anwendungscode wird neu generiert, wenn Sie die Anwendung umbenennen. Dadurch werden Codeanpassungen überschrieben.
 appWithinMinutes.renameApp.newName.label=Neuer Name

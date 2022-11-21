@@ -44,7 +44,7 @@ import org.xwiki.observation.ObservationManager;
  * disposal of the component: this ensures that all listeners relying on the session disposal can be executed.
  *
  * @version $Id$
- * @since 14.5RC1
+ * @since 14.5
  * @since 14.4.1
  */
 @Component(roles = HttpSessionManager.class)

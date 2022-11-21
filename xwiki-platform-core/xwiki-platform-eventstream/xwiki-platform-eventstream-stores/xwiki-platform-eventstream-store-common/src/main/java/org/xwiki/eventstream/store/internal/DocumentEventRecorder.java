@@ -33,9 +33,9 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.eventstream.EventFactory;
 import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStreamException;
-import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.event.Event;
@@ -75,6 +75,9 @@ public class DocumentEventRecorder
     @Inject
     @Named("document")
     private UserReferenceSerializer<DocumentReference> userReferenceSerializer;
+
+    @Inject
+    private EventFactory eventFactory;
 
     /**
      * Record the given event.
@@ -139,7 +142,7 @@ public class DocumentEventRecorder
     {
         final String msgPrefix = "activitystream.event.";
 
-        DefaultEvent event = new DefaultEvent();
+        org.xwiki.eventstream.Event event = this.eventFactory.createRawEvent();
         event.setStream(streamName);
         event.setDocument(doc.getDocumentReference());
         event.setDate(doc.getDate());

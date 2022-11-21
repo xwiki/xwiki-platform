@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="AppWithinMinutes.Translations" locale="">
+<xwikidoc version="1.5" reference="AppWithinMinutes.Translations" locale="">
   <web>AppWithinMinutes</web>
   <name>Translations</name>
   <language/>
@@ -221,6 +221,8 @@ platform.appwithinminutes.deleteAppInvalidAppError=The specified name is not a v
 platform.appwithinminutes.deleteAppNotSpecifiedError=No application name was specified.
 
 ### Rename Application
+appWithinMinutes.renameApp.label=Rename Application
+appWithinMinutes.renameApp.close=Close
 appWithinMinutes.renameApp.changeAppTitleInfo=You can change the application title without renaming the application just by editing the application home page.
 appWithinMinutes.renameApp.regenerateAppCodeWarning=The application code is going to be regenerated if you rename the application. Code customizations will be overwritten as a consequence.
 appWithinMinutes.renameApp.newName.label=New Name
@@ -285,6 +287,8 @@ appWithinMinutes.templateProviderEditor.title={0} Entries</content>
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>scope</name>
         <number>1</number>

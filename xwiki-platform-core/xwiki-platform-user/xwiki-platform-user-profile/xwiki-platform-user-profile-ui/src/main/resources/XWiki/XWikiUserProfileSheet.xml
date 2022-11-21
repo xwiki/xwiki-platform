@@ -141,7 +141,46 @@
     <property>
       <code>require(['jquery', 'xwiki-meta'], function ($, xm) {
   'use strict';
-  $(function() {
+  
+   $(function() {
+    /** Add autocomplete attributes to ease form filling. */
+    var fieldsPurposes = [
+        {
+          'name': 'first_name',
+          'purpose': 'given-name'
+        },
+        {
+          'name': 'last_name',
+          'purpose': 'family-name'
+        },
+        {
+          'name': 'company',
+          'purpose': 'organization'
+        },
+        {
+          'name': 'email',
+          'purpose': 'email'
+        },
+        {
+          'name': 'phone',
+          'purpose': 'tel'
+        },
+        {
+          'name': 'address',
+          'purpose': 'street-address'
+        },
+        {
+          'name': 'blog',
+          'purpose': 'url'
+        }
+      ];
+    fieldsPurposes.forEach(function (entry) {
+      var inputField = $('[name$="' + entry.name + '"]');
+      if (inputField.length === 1) {
+        inputField.attr('autocomplete', entry.purpose);
+      }
+    });
+
     /**
      * Save the new user status.
      */
@@ -568,8 +607,9 @@ $services.localization.render('platform.core.profile.category.profile.disabled')
     &lt;div class='userInfo'&gt;
     #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
       &lt;div class='editProfileCategory'&gt;
-        &lt;a title="$escapetool.xml($services.localization.render('platform.core.profile.category.profile.edit'))" 
-              href="$doc.getURL('edit', 'editor=inline&amp;amp;category=profile')"&gt;
+        &lt;a title="$escapetool.xml($services.localization.render('platform.core.profile.category.profile.edit'))"
+           href="$doc.getURL('edit', 'editor=inline&amp;amp;category=profile')" class="btn btn-xs"&gt;
+          &lt;span class="action-icon"&gt;$services.icon.renderHTML('pencil')&lt;/span&gt;
           &lt;span class='sr-only'&gt;$escapetool.xml($services.localization.render('platform.core.profile.category.profile.edit'))&lt;/span&gt;
         &lt;/a&gt;
       &lt;/div&gt;

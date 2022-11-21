@@ -27,6 +27,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
@@ -39,11 +41,13 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -52,7 +56,7 @@ import static org.mockito.Mockito.when;
  * Test of {@link NotificationFilterPreferenceStore}.
  *
  * @version $Id$
- * @since 14.5RC1
+ * @since 14.5
  * @since 14.4.1
  * @since 13.10.7
  */
@@ -88,7 +92,7 @@ class NotificationFilterPreferenceStoreTest
     private Query query;
 
     @BeforeEach
-    void setUp()
+    void setUp() throws XWikiException
     {
         when(this.contextProvider.get()).thenReturn(this.context);
         when(this.context.getWikiId()).thenReturn(PREVIOUS_WIKI_ID);
@@ -96,6 +100,16 @@ class NotificationFilterPreferenceStoreTest
         XWiki wiki = mock(XWiki.class);
         when(this.context.getWiki()).thenReturn(wiki);
         when(wiki.getHibernateStore()).thenReturn(this.hibernateStore);
+        when(this.hibernateStore.executeWrite(same(this.context), any())).thenAnswer(new Answer<Void>()
+        {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable
+            {
+                invocation.<HibernateCallback<Void>>getArgument(1).doInHibernate(session);
+
+                return null;
+            }
+        });
         when(this.hibernateStore.getSession(this.context)).thenReturn(this.session);
         when(this.session.createQuery(anyString())).thenReturn(this.query);
         when(this.query.setParameter(anyString(), any())).thenReturn(this.query);
@@ -115,7 +129,6 @@ class NotificationFilterPreferenceStoreTest
         if (useMainStore) {
             verify(this.context).setWikiId(MAIN_WIKI_ID);
         }
-        verify(this.hibernateStore).beginTransaction(this.context);
         verify(this.session).createQuery("delete from DefaultNotificationFilterPreference "
             + "where page like :wikiPrefix "
             + "or pageOnly like :wikiPrefix "
@@ -124,7 +137,6 @@ class NotificationFilterPreferenceStoreTest
         verify(this.query).setParameter("wikiPrefix", "wikiid:%");
         verify(this.query).setParameter("wikiId", "wikiid");
         verify(this.query).executeUpdate();
-        verify(this.hibernateStore).endTransaction(this.context, true);
         if (useMainStore) {
             verify(this.context).setWikiId(PREVIOUS_WIKI_ID);
         }
@@ -136,7 +148,7 @@ class NotificationFilterPreferenceStoreTest
     {
         when(this.filterPreferenceConfiguration.useMainStore()).thenReturn(useMainStore);
 
-        when(this.hibernateStore.beginTransaction(this.context)).thenThrow(XWikiException.class);
+        when(this.hibernateStore.executeWrite(same(context), any())).thenThrow(XWikiException.class);
         if (useMainStore) {
             when(this.context.getWikiId()).thenReturn(PREVIOUS_WIKI_ID, MAIN_WIKI_ID);
         }
@@ -152,8 +164,6 @@ class NotificationFilterPreferenceStoreTest
         if (useMainStore) {
             verify(this.context).setWikiId(MAIN_WIKI_ID);
         }
-        verify(this.hibernateStore).beginTransaction(this.context);
-        verify(this.hibernateStore).endTransaction(this.context, false);
         if (useMainStore) {
             verify(this.context).setWikiId(PREVIOUS_WIKI_ID);
         }
@@ -177,12 +187,10 @@ class NotificationFilterPreferenceStoreTest
         if (useMainStore) {
             verify(this.context).setWikiId(MAIN_WIKI_ID);
         }
-        verify(this.hibernateStore).beginTransaction(this.context);
         verify(this.session).createQuery("delete from DefaultNotificationFilterPreference where owner = :user "
             + "or user = :user");
         verify(this.query).setParameter("user", "xwiki:XWiki.UnknownUser");
         verify(this.query).executeUpdate();
-        verify(this.hibernateStore).endTransaction(this.context, true);
         if (useMainStore) {
             verify(this.context).setWikiId(PREVIOUS_WIKI_ID);
         }
@@ -197,7 +205,7 @@ class NotificationFilterPreferenceStoreTest
         when(this.filterPreferenceConfiguration.useMainStore()).thenReturn(useMainStore);
         when(this.entityReferenceSerializer.serialize(unknownUserDocumentReference))
             .thenReturn("xwiki:XWiki.UnknownUser");
-        when(this.hibernateStore.beginTransaction(this.context)).thenThrow(XWikiException.class);
+        when(this.hibernateStore.executeWrite(same(context), any())).thenThrow(XWikiException.class);
         if (useMainStore) {
             when(this.context.getWikiId()).thenReturn(PREVIOUS_WIKI_ID, MAIN_WIKI_ID);
         }
@@ -212,8 +220,6 @@ class NotificationFilterPreferenceStoreTest
         if (useMainStore) {
             verify(this.context).setWikiId(MAIN_WIKI_ID);
         }
-        verify(this.hibernateStore).beginTransaction(this.context);
-        verify(this.hibernateStore).endTransaction(this.context, false);
         if (useMainStore) {
             verify(this.context).setWikiId(PREVIOUS_WIKI_ID);
         }

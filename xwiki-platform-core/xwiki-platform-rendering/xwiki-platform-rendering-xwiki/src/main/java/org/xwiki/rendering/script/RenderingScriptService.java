@@ -22,6 +22,7 @@ package org.xwiki.rendering.script;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -37,6 +38,7 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
+import org.xwiki.rendering.macro.MacroCategoryManager;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.MacroIdFactory;
 import org.xwiki.rendering.macro.MacroLookupException;
@@ -50,6 +52,7 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 
 /**
  * Provides Rendering-specific Scripting APIs.
@@ -80,6 +83,9 @@ public class RenderingScriptService implements ScriptService
 
     @Inject
     private MacroManager macroManager;
+
+    @Inject
+    private MacroCategoryManager macroCategoryManager;
     
     @Inject
     private MacroIdFactory macroIdFactory;
@@ -300,6 +306,29 @@ public class RenderingScriptService implements ScriptService
             }
         }
         return null;
+    }
+
+    /**
+     * Return the list of categories of a given macro.
+     *
+     * @param macroId the macro id
+     * @return the list of categories of the macro
+     * @since 14.6RC1
+     */
+    @Unstable
+    public Set<String> getMacroCategories(MacroId macroId)
+    {
+        return this.macroCategoryManager.getMacroCategories(macroId);
+    }
+
+    /**
+     * @return the set of hidden macro categories
+     * @since 14.8RC1
+     */
+    @Unstable
+    public Set<String> getHiddenMacroCategories()
+    {
+        return this.macroCategoryManager.getHiddenCategories();
     }
 
     private char getEscapeCharacter(Syntax syntax) throws IllegalArgumentException

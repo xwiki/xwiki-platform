@@ -28,9 +28,13 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.test.docker.junit5.ExtensionOverride;
+import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
+import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
 import org.xwiki.test.ui.po.RenamePage;
@@ -62,7 +66,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     },
     extraJARs = {
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
-        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
         "org.xwiki.platform:xwiki-platform-notifications-filters-default",
         // Required by components located in a core extensions
         "org.xwiki.platform:xwiki-platform-wiki-template-default",
@@ -92,7 +96,8 @@ class SubWikiIT
 
     @Test
     @Order(1)
-    void movePageToSubwiki(TestUtils setup, TestReference testReference) throws Exception
+    void movePageToSubwiki(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
     {
         createSubWiki(setup);
 
@@ -118,6 +123,9 @@ class SubWikiIT
         // For checking the link update.
         setup.createPage(mainWikiLinkPage, String.format("[[%s.WebHome]]", space));
 
+        // Wait for the Solr indexing to be completed before moving the page
+        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmpyQueue();
+
         // Move the page to subwiki.
         ViewPage viewPage = setup.gotoPage(testReference);
         RenamePage renamePage = viewPage.rename();
@@ -141,6 +149,13 @@ class SubWikiIT
         assertEquals(String.format("[[subwiki:%s.WebHome]]", space), wikiEditPage.getContent());
 
         deleteSubWiki(setup);
+    }
+
+    private String computedHostURL(TestConfiguration testConfiguration)
+    {
+        ServletEngine servletEngine = testConfiguration.getServletEngine();
+        return String.format("http://%s:%d%s", servletEngine.getIP(), servletEngine.getPort(),
+            XWikiExecutor.DEFAULT_CONTEXT);
     }
 
     /**

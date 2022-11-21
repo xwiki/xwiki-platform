@@ -22,6 +22,7 @@ package org.xwiki.livedata.test.ui;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.IntStream;
 
@@ -271,6 +272,8 @@ class LiveDataIT
         assertEquals(1, tableLayout.countRows());
         tableLayout.assertRow("count", "1");
         tableLayout.assertRow("label", "first result");
+
+        assertEquals(Set.of("100", "25", "15", "50"), tableLayout.getPaginationSizes());
     }
 
     private void initLocalization(TestUtils testUtils, TestReference testReference) throws Exception

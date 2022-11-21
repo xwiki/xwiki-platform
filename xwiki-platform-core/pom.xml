@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>14.5-SNAPSHOT</version>
+    <version>14.9-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -125,7 +125,26 @@
 
                  Single justification example:
             -->
-
+            
+            <revapi.differences>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.xpn.xwiki.doc.XWikiAttachment org.xwiki.store.script.TemporaryAttachmentsScriptService::uploadTemporaryAttachment(org.xwiki.model.reference.DocumentReference, java.lang.String)</old>
+                  <new>method com.xpn.xwiki.api.Attachment org.xwiki.store.script.TemporaryAttachmentsScriptService::uploadTemporaryAttachment(org.xwiki.model.reference.DocumentReference, java.lang.String)</new>
+                  <justification>Unstable API change: Script services are not supposed to expose classes from com.xpn.xwiki.doc.*</justification>
+                  <criticality>documented</criticality>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.addedToInterface</code>
+                  <new>method com.xpn.xwiki.doc.XWikiAttachment org.xwiki.store.TemporaryAttachmentSessionsManager::uploadAttachment(org.xwiki.model.reference.DocumentReference, javax.servlet.http.Part, java.lang.String) throws org.xwiki.store.TemporaryAttachmentException</new>
+                  <justification>We can't provide a default implementation for this new method, it needs to be implemented on upgrade</justification>
+                  <criticality>documented</criticality>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>
@@ -144,6 +163,7 @@
     <module>xwiki-platform-bridge</module>
     <module>xwiki-platform-captcha</module>
     <module>xwiki-platform-chart</module>
+    <module>xwiki-platform-ckeditor</module>
     <module>xwiki-platform-classloader</module>
     <module>xwiki-platform-component</module>
     <module>xwiki-platform-configuration</module>
@@ -163,7 +183,6 @@
     <module>xwiki-platform-filter</module>
     <module>xwiki-platform-flamingo</module>
     <module>xwiki-platform-flavor</module>
-    <module>xwiki-platform-formula</module>
     <module>xwiki-platform-graphviz</module>
     <module>xwiki-platform-groovy</module>
     <module>xwiki-platform-help</module>
@@ -176,6 +195,7 @@
     <module>xwiki-platform-jodatime</module>
     <module>xwiki-platform-lesscss</module>
     <module>xwiki-platform-like</module>
+    <module>xwiki-platform-link</module>
     <module>xwiki-platform-linkchecker</module>
     <module>xwiki-platform-livedata</module>
     <module>xwiki-platform-livetable</module>

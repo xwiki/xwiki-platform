@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-livedata</artifactId>
-    <version>14.5-SNAPSHOT</version>
+    <version>14.9-SNAPSHOT</version>
   </parent>
   <packaging>webjar</packaging>
   <artifactId>xwiki-platform-livedata-webjar</artifactId>
@@ -42,18 +42,25 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>vue-i18n</artifactId>
-      <version>8.27.1</version>
+      <version>8.27.2</version>
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>jquery</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.webjars</groupId>
+      <groupId>org.webjars.npm</groupId>
       <artifactId>vue</artifactId>
-      <version>2.6.14</version>
-    </dependency>
-    <!-- Used by the date filter. -->
+      <version>2.7.10</version>
+      <exclusions>
+        <!-- Excluded because this dependency is 1) not used at runtime since all out components are pre-compiled 2) 
+        not currently deployable on webjars.org (see https://github.com/webjars/webjars/issues/1976)  -->
+        <exclusion>
+          <groupId>org.webjars.npm</groupId>
+          <artifactId>vue__compiler-sfc</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>    <!-- Used by the date filter. -->
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>momentjs</artifactId>
@@ -159,7 +166,7 @@
               <goal>install-node-and-npm</goal>
             </goals>
             <configuration>
-              <nodeVersion>v16.15.0</nodeVersion>
+              <nodeVersion>v16.17.0</nodeVersion>
             </configuration>
           </execution>
           <execution>

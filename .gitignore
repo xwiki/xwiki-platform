@@ -56,6 +56,7 @@ nbproject
 # Debugging stuff to not commit
 xwiki-platform-core/xwiki-platform-search/xwiki-platform-search-solr/xwiki-platform-search-solr-api/src/main/resources/xwiki-platform-search-solr-server-core.zip
 xwiki-platform-core/xwiki-platform-search/xwiki-platform-search-solr/xwiki-platform-search-solr-api/src/main/resources/xwiki-platform-search-solr-server-core-minimal.zip
+xwiki-platform-core/xwiki-platform-web/xwiki-platform-web-templates/src/main/resources/templates/replication
 
 # XVNC
 .Xauthority-*

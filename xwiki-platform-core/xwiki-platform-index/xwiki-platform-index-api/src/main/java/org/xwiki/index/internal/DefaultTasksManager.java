@@ -48,6 +48,7 @@ import org.xwiki.doc.tasks.XWikiDocumentIndexingTask;
 import org.xwiki.index.TaskManager;
 import org.xwiki.index.internal.jmx.JMXTasks;
 import org.xwiki.management.JMXBeanRegistration;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
@@ -230,11 +231,13 @@ public class DefaultTasksManager implements TaskManager, Initializable, Disposab
                 deleteTask(task);
             }
         } catch (InterruptedException e) {
-            this.logger.warn("The task manager consumer thread was interrupted. Cause: [{}].",
+            this.logger.warn("The task manager consumer thread was interrupted while processing task [{}] for "
+                + "document [{}]. Cause: [{}].", task, getTaskDocumentReferenceForLogging(task),
                 getRootCauseMessage(e));
             Thread.currentThread().interrupt();
         } catch (Exception e) {
-            this.logger.warn("Error during the execution of task [{}]. Cause: [{}].", task, getRootCauseMessage(e));
+            this.logger.warn("Error during the execution of task [{}] for document [{}]. Cause: [{}].", task,
+                getTaskDocumentReferenceForLogging(task), getRootCauseMessage(e));
             if (task != null && isTimestampValid(task)) {
                 if (!task.tooManyAttempts()) {
                     // Push back the failed task at the beginning of the queue by resetting its timestamp.
@@ -243,7 +246,7 @@ public class DefaultTasksManager implements TaskManager, Initializable, Disposab
                     task.setTimestamp(newTimestamp);
                     this.queue.put(task);
                 } else {
-                    this.logger.error("[{}] abandoned because it has failed too many times.", task);
+                    this.logger.error("[{}] abandoned because it has failed too many times.", task, e);
                     deleteTask(task);
                     task.getFuture().cancel(false);
                 }
@@ -277,7 +280,7 @@ public class DefaultTasksManager implements TaskManager, Initializable, Disposab
             // Check for each task if it is already in the queue. This is necessary as tasks might
             // have been added before this call, see XWIKI-19471.
             // For this, get a snapshot of all existing tasks. This doesn't include insertions afterwards but that's
-            // not important as they are not in the tasks from the DB, either. For this property to hold it is
+            // not important as they are not in the tasks from the DB, either. For this property to hold, it is
             // important, though, to first get the tasks from the DB and then from the queue.
             // Note that if this queried the queue for every task, the running time would be quadratic in the number of
             // tasks, that's why there is this snapshot in a hash set.
@@ -351,5 +354,19 @@ public class DefaultTasksManager implements TaskManager, Initializable, Disposab
         } finally {
             this.writeLock.unlock();
         }
+    }
+
+    private DocumentReference getTaskDocumentReferenceForLogging(TaskData taskData)
+    {
+        DocumentReference result;
+        try {
+            result =
+                this.tasksStore.get().getDocument(taskData.getWikiId(), taskData.getDocId()).getDocumentReference();
+        } catch (XWikiException e) {
+            // Failed to get the document for some reason, return null since this method is only used to provide
+            // more information for debugging
+            result = null;
+        }
+        return result;
     }
 }

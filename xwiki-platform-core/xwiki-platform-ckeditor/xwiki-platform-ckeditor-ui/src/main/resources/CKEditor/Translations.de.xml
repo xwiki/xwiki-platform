@@ -1,0 +1,205 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="CKEditor.Translations" locale="de">
+  <web>CKEditor</web>
+  <name>Translations</name>
+  <language>de</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>CKEditor.ConfigClass_removePlugins=Deaktivierte Plugins
+CKEditor.ConfigClass_removePlugins.hint=Die Liste der deaktivierten Plugins.
+CKEditor.ConfigClass_removeButtons=Deaktivierte Toolbar Funktionen
+CKEditor.ConfigClass_removeButtons.hint=Die Liste der deaktivierten Toolbar Funktionen.
+CKEditor.ConfigClass_linkShowAdvancedTab=Link: Registerkarte Erweitert anzeigen
+CKEditor.ConfigClass_linkShowAdvancedTab.hint=Ermöglicht das Festlegen von Linkattributen wie ID, Name, Klasse oder Stil.
+CKEditor.ConfigClass_linkShowTargetTab=Link: Registerkarte Ziel anzeigen
+CKEditor.ConfigClass_linkShowTargetTab.hint=Ermöglicht das Festlegen des Link Ziel Attributs (z.B. Link in neuem Tab öffnen).
+CKEditor.ConfigClass_loadJavaScriptSkinExtensions=Lade JavaScript-Skin-Erweiterungen
+CKEditor.ConfigClass_loadJavaScriptSkinExtensions.hint=Einige Rendering-Makros werden mit JavaScript-Code angezeigt. Das Laden des JavaScript-Codes verbessert den WYSIWYG-Aspekt des Editors, kann aber zu Problemen führen, wenn der JavaScript-Code den CKEditor-Code stört oder wenn er Inhalte außerhalb der Makroausgabegrenzen ändert.
+CKEditor.ConfigClass_advanced=Erweiterte Konfiguration
+CKEditor.ConfigClass_advanced.hint=Sie können ein JavaScript-Schnipsel schreiben, um direkt das Konfigurationsobjekt zu ändern. Die Liste der verfügbaren Konfigurationseigenschaften finden Sie in der {0}CKEditor Dokumentation{1}.
+ckeditor.content.placeholder=Beginnen Sie hier zu tippen...
+ckeditor.admin.saveComment=CKEditor Konfiguration in Administration aktualisiert
+ckeditor.admin.reset=Zurücksetzen
+ckeditor.admin.reset.hint=Wiederherstellen der Standard-Konfiguration
+ckeditor.admin.reset.confirmation=Sind Sie sicher, dass Sie die Standard-Konfiguration wiederherstellen möchten? Alle Änderungen werden verloren gehen.
+ckeditor.plugin.link.options=Optionen
+ckeditor.plugin.link.anchor=Anker
+ckeditor.plugin.link.queryString=Query Zeichenfolge
+ckeditor.plugin.link.defaultLabel=Link-Text eingeben
+ckeditor.plugin.link.openInNewTab=Link in neuem Tab öffnen
+ckeditor.plugin.list.listType.none=Kein
+ckeditor.plugin.macro.placeholder=Makro:{0}
+ckeditor.plugin.macro.buttonHint=XWiki Makro
+ckeditor.plugin.macro.editButtonHint=Makro bearbeiten
+ckeditor.plugin.macro.refreshFailed=Fehler beim Aktualisieren des bearbeiteten Inhalts.
+ckeditor.plugin.macro.dedicatedInsertButtonHint={0} Makro einfügen
+ckeditor.plugin.office.importer.title=Office-Datei importieren
+ckeditor.plugin.office.importer.filePath=Dateipfad
+ckeditor.plugin.office.importer.filePath.hint=Wählen Sie die zu importierende Office-Datei. Die Datei wird hochgeladen und an diese Seite anhängt und ihr Inhalt wird in den Inhalt der Seite eingefügt.
+ckeditor.plugin.office.importer.filterStyles=Stile filtern
+ckeditor.plugin.office.importer.filterStyles.hint=Filtere Textstile wie Schriftarten, Farben, Ausrichtungen, Ränder. Die Inhaltsstruktur einschließlich der Überschriftenebenen, Absätze, Listen und Tabellen bleibt erhalten.
+ckeditor.plugin.office.importer.useOfficeViewer=Verwende Office-Betrachter
+ckeditor.plugin.office.importer.useOfficeViewer.hint=Aktivieren Sie diese Option, wenn Sie nicht vorhaben, den Inhalt der Office-Datei nach dem Import zu bearbeiten oder wenn Sie nicht möchten, dass der Inhalt der Office-Datei mit dem Inhalt vermischt wird, den Sie bereits bearbeiten.
+ckeditor.plugin.office.importer.required=Pflichtfeld
+ckeditor.plugin.office.importer.import=Importieren
+ckeditor.plugin.office.importer.inProgress=Office-Datei importieren…
+ckeditor.plugin.office.importer.done=Office-Datei wurde erfolgreich importiert.
+ckeditor.plugin.office.importer.fail=Office Import fehlgeschlagen.
+ckeditor.plugin.office.importer.noUploadURL=Datei-Upload-URL ist nicht konfiguriert.
+ckeditor.plugin.office.importer.failedToLoadForm=Fehler beim Laden des Formulars.
+ckeditor.plugin.resource.notSpecified={0} ist nicht angegeben.
+ckeditor.plugin.save.leaveConfirmationMessage=Es existieren ungespeicherte Änderungen. Wollen Sie diese verwerfen?
+ckeditor.plugin.save.failed=Der Inhalt kann nicht gespeichert werden aufgrund eines internen Fehlers im CKEditor. Sie sollten versuchen wichtige Änderungen zu kopieren und den Editor neu zu laden.
+ckeditor.plugin.source.conversionFailed=Fehler beim Ausführen der Konvertierung.
+ckeditor.plugin.toolbar.basicStyles=Einfache Stile
+ckeditor.plugin.toolbar.lists=Listen
+ckeditor.plugin.toolbar.bulletedlist=Liste mit Aufzählungszeichen
+ckeditor.plugin.toolbar.numberedlist=Nummerierte Liste
+ckeditor.plugin.toolbar.insert=Einfügen
+ckeditor.plugin.toolbar.horizontalrule=Horizontale Linie
+ckeditor.plugin.toolbar.specialchar=Sonderzeichen
+ckeditor.plugin.toolbar.infoBox=Infobox
+ckeditor.plugin.toolbar.successBox=Erfolgbox
+ckeditor.plugin.toolbar.warningBox=Warnbox
+ckeditor.plugin.toolbar.errorBox=Fehlerbox
+ckeditor.plugin.toolbar.toc=Inhaltsverzeichnis
+ckeditor.plugin.toolbar.include=Enthalten
+ckeditor.plugin.toolbar.code=Codeausschnitt
+ckeditor.plugin.toolbar.otherMacros=Andere Makros
+ckeditor.plugin.syntax.update.inProgress=Aktualisieren des WYSIWYG-Editors
+ckeditor.plugin.syntax.update.done=WYSIWYG-Editor aktualisiert
+ckeditor.plugin.syntax.update.failed=Fehler beim Aktualisieren des WYSIWYG-Editors
+ckeditor.plugin.syntax.wysiwygModeUnsupported=Der WYSIWYG-Bearbeitungsmodus wird von der {0}-Syntax nicht unterstützt.
+ckeditor.plugin.image.imageEditor.standardTab.title=Standard
+ckeditor.plugin.image.imageEditor.advancedTab.title=Erweitert
+ckeditor.plugin.image.imageEditor.standardTab.imageStyles.label=Bildstile
+ckeditor.plugin.image.imageEditor.standardTab.imageStyles.hint=Wählen Sie den Stil aus, der auf das Bild angewendet werden soll.
+ckeditor.plugin.image.imageEditor.standardTab.alt.label=Alternativer Text
+ckeditor.plugin.image.imageEditor.standardTab.alt.hint=Definieren Sie einen alternativen Text für ein Bild, wenn das Bild nicht angezeigt werden kann.
+ckeditor.plugin.image.imageEditor.standardTab.caption.label=Bildunterschrift
+ckeditor.plugin.image.imageEditor.standardTab.caption.hint=Aktivieren und definieren Sie eine Bildunterschrift.
+ckeditor.plugin.image.imageEditor.standardTab.caption.ariaLabel=Aktivieren und definieren Sie eine Bildunterschrift.
+ckeditor.plugin.image.imageEditor.advancedTab.size.label=Größe
+ckeditor.plugin.image.imageEditor.advancedTab.size.width.label=Breite
+ckeditor.plugin.image.imageEditor.advancedTab.size.height.label=Höhe
+ckeditor.plugin.image.imageEditor.advancedTab.size.hint=Definieren Sie die Bildgröße.
+ckeditor.plugin.image.imageEditor.advancedTab.border.label=Rahmen
+ckeditor.plugin.image.imageEditor.advancedTab.border.hint=Wenn diese Option aktiviert ist, wird das Bild mit einem Rahmen angezeigt
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.label=Ausrichtung
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.hint=Definieren Sie die Bildausrichtung.
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.none=Kein
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.start=Start
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.center=Mitte
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.end=Ende
+ckeditor.plugin.image.imageEditor.advancedTab.textWrap.label=Textumbruch
+ckeditor.plugin.image.imageEditor.advancedTab.textWrap.hint=Wenn diese Option aktiviert ist, umfließt der Text das Bild.
+ckeditor.plugin.image.imageSelector.documentTreeTab.title=Dokumentenbaum
+ckeditor.plugin.image.imageSelector.uploadTab.title=Hochladen
+ckeditor.plugin.image.imageSelector.uploadTab.file.title=Datei
+ckeditor.plugin.image.imageSelector.uploadTab.file.hint=Wählen Sie eine lokale Datei aus, die der Seite hinzugefügt werden soll.
+ckeditor.plugin.image.imageSelector.uploadTab.uploadButton=Hochladen
+ckeditor.plugin.image.imageSelector.iconTab.title=Symbol
+ckeditor.plugin.image.imageSelector.iconTab.icon.title=Symbol
+ckeditor.plugin.image.imageSelector.iconTab.icon.hint=Der Bezeichner des Symbols, das als Bild angezeigt werden soll.
+ckeditor.plugin.image.imageSelector.iconTab.icon.placeholder=annehmen
+ckeditor.plugin.image.imageSelector.urlTab.title=URL
+ckeditor.plugin.image.imageSelector.urlTab.url.title=URL
+ckeditor.plugin.image.imageSelector.urlTab.url.hint=Die URL des anzuzeigenden Bildes.
+ckeditor.plugin.image.imageSelector.urlTab.url.placeholder=https://...
+ckeditor.inline.failedToInit=Der Editor konnte nicht initialisiert werden.
+ckeditor.upload.error.csrf=Das CSRF-Token fehlt.
+ckeditor.upload.error.emptyReturn=Fehler beim Hochladen der Datei: möglicherweise ist die konfigurierte maximale Upload-Größe überschritten.
+modal.ok=OK
+modal.cancel=Abbrechen
+modal.close=Schließen
+resource.attach.label=Anhang
+resource.attach.placeholder=Pfad.zur.Seite@Anhang.png
+resource.data.label=Daten-URI
+resource.doc.label=Seite
+resource.doc.placeholder=Pfad.zur.Seite
+resource.icon.label=Icon
+resource.mailto.label=E-Mail-Adresse
+resource.mailto.placeholder=benutzer@beispiel.org
+resource.path.label=Pfad
+resource.path.placeholder=/Pfad/zur/Datei
+resource.unc.label=UNC Pfad
+resource.unc.placeholder=//server/share/Pfad/zur/Datei
+resource.unknown.label=Unbekannt
+resource.url.label=URL
+resource.url.placeholder=http://www.example.org/bild.png
+resource.user.label=Benutzer
+resource.user.placeholder=Alias
+resourcePicker.attach.hint=Wählen Sie einen Anhang
+resourcePicker.doc.hint=Wählen Sie eine Seite
+entityResourceSuggester.doc.placeholder=Eine Seite zu finden…
+entityResourceSuggester.attach.placeholder=Einen Anhang finden…
+entityResourcePicker.select=Auswählen
+entityResourcePicker.doc.title=Seite auswählen
+entityResourcePicker.attach.title=Anhang auswählen
+macroSelector.title=Makro auswählen
+macroSelector.filter.text.placeholder=Zum Filtern tippen
+macroSelector.filter.category.all=Alle Makros
+macroSelector.filter.category.other=Andere
+macroSelector.filter.category.notinstalled=Nicht installiert
+macroSelector.failedToRetrieveMacros=Fehler beim Abrufen der Liste verfügbarer Makros.
+macroSelector.select=Auswählen
+macroSelector.recommended=Empfohlen
+macroSelector.install=Installieren
+macroSelector.install.confirm=Sie sind dabei, die Erweiterung {0} {1} zu installieren. Sind Sie sicher, dass Sie weitermachen wollen?
+macroSelector.install.notAllowed=Sie dürfen diese Erweiterung nicht installieren
+macroSelector.filter.category.placeholder=Eine Kategorie auswählen…
+macroEditor.title=Makro bearbeiten
+macroEditor.more=Mehr
+macroEditor.changeMacro=Makro ändern
+macroEditor.submit=Übernehmen
+macroEditor.content=Inhalt
+macroEditor.noParameters=Dieses Makro hat keine Parameter.
+macroEditor.descriptorRequestFailed=Fehler beim Abrufen des {0} Makro Deskriptors.
+macroEditor.installRequestFailed=Das Makro {0} konnte nicht installiert werden.
+
+
+imageEditor.modal.backToEditor.button=Zurück
+imageEditor.modal.loadFail.message=Fehler beim Abrufen des Bildbearbeitungsformulars.
+imageEditor.modal.title=Bild bearbeiten
+imageEditor.modal.insertButton=Einfügen
+imageEditor.modal.initialization.fail=Fehler beim Abrufen des Bildauswahlformulars.
+imageSelector.modal.title=Bild auswählen
+imageSelector.modal.selectButton=Auswählen
+imageSelector.modal.loadFail.message=Fehler beim Abrufen des Bildauswahlformulars.
+imageSelector.modal.fileUpload.success=Dateiupload erfolgreich.
+imageSelector.modal.fileUpload.fail=Datei-Upload fehlgeschlagen.
+imageSelector.modal.fileUpload.abort=Datei-Upload abgebrochen.
+imageSelector.modal.initialization.fail=Fehler beim Abrufen des Bildauswahlformulars.
+</content>
+</xwikidoc>

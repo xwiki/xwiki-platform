@@ -90,6 +90,7 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.environment.Environment;
 import org.xwiki.logging.LoggerConfiguration;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.internal.store.hibernate.legacy.LegacySessionImplementor;
@@ -587,7 +588,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
 
         return new StringBuilder(2000).append("<?xml version=\"1.1\" encoding=\"UTF-8\"?>\n")
             .append("<!DOCTYPE hibernate-mapping PUBLIC\n").append("\t\"-//Hibernate/Hibernate Mapping DTD//EN\"\n")
-            .append("\t\"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd\">\n").append("<hibernate-mapping>")
+            .append("\t\"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd\">\n").append("<hibernate-mapping>")
             .append("<class entity-name=\"").append(className).append("\" table=\"")
             .append(toDynamicMappingTableName(className)).append("\">\n")
             .append(" <id name=\"id\" type=\"long\" unsaved-value=\"any\">\n")
@@ -707,8 +708,8 @@ public class HibernateStore implements Disposable, Integrator, Initializable
 
             Object[] args = {wikiId};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE, "Exception while switching to database {0}",
-                e, args);
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE, "Exception while switching to wiki {0}", e,
+                args);
         }
     }
 
@@ -807,9 +808,10 @@ public class HibernateStore implements Disposable, Integrator, Initializable
             return false;
         }
 
+        String contextWikiId = this.wikis.getCurrentWikiId();
+
         if (session != null) {
             String sessionDatabase = (String) session.getProperties().get("xwiki.database");
-            String contextWikiId = this.wikis.getCurrentWikiId();
             String contextDatabase = getDatabaseFromWikiName(contextWikiId);
 
             // The current context is trying to manipulate a database different from the one in the current session
@@ -824,6 +826,16 @@ public class HibernateStore implements Disposable, Integrator, Initializable
             this.logger.debug("Taking transaction from context [{}]", transaction);
 
             return false;
+        }
+
+        // We should not try to access the schema/database which is not a registered wiki
+        try {
+            if (!this.wikis.isMainWiki(contextWikiId) && this.wikis.getById(contextWikiId) == null) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_DOES_NOT_EXIST,
+                    "No wiki with id [" + contextWikiId + "] could be found");
+            }
+        } catch (WikiManagerException e) {
+            throw new XWikiException("Failed to load the wiki descriptor", e);
         }
 
         // session is obviously null here

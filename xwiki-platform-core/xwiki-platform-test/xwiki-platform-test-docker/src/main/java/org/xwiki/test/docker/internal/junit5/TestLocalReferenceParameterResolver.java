@@ -28,7 +28,7 @@ import org.xwiki.test.docker.junit5.TestLocalReference;
  * Automatically inject {@link TestLocalReference} into test method parameters.
  *
  * @version $Id$
- * @since 14.5RC1
+ * @since 14.5
  */
 public class TestLocalReferenceParameterResolver implements ParameterResolver
 {

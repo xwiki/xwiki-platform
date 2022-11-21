@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -57,7 +58,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * 
  * @version $Id$
  * @since 14.4.2
- * @since 14.5RC1
+ * @since 14.5
  */
 @Component
 @Named("pdftoc")
@@ -101,7 +102,7 @@ public class PDFTocMacro extends AbstractMacro<PDFTocMacroParameters>
     {
         super("PDF Table of Contents", "Generates the table of contents for the PDF export.",
             PDFTocMacroParameters.class);
-        setDefaultCategory(DEFAULT_CATEGORY_INTERNAL);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_INTERNAL));
     }
 
     @Override

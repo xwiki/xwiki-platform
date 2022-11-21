@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-attachment-picker</artifactId>
-    <version>14.5-SNAPSHOT</version>
+    <version>14.9-SNAPSHOT</version>
   </parent>
   <packaging>webjar</packaging>
   <artifactId>xwiki-platform-attachment-picker-webjar</artifactId>
@@ -46,14 +46,6 @@
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>jquery</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- Provides XWiki.SuggestSolrService required to search for the attachments through solr. -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-search-solr-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
       <scope>runtime</scope>
     </dependency>
     <!-- Solr backend implementation. -->

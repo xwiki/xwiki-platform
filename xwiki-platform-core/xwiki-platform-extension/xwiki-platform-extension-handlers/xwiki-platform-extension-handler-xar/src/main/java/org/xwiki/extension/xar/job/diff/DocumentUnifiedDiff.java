@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.ClassPropertyReference;
+import org.xwiki.model.reference.DocumentVersionReference;
 import org.xwiki.model.reference.ObjectReference;
 
 /**
@@ -56,7 +57,7 @@ public class DocumentUnifiedDiff extends EntityUnifiedDiff<DocumentVersionRefere
 
     /**
      * Creates a new instance to hold the differences between the specified document versions.
-     * 
+     *
      * @param previousReference the reference to the previous version of the document
      * @param nextReference the reference to the next version of the document
      */

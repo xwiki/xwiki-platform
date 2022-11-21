@@ -43,9 +43,9 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.search.solr.internal.SolrSearchCoreUtils;
 import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
-import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 import org.xwiki.tika.internal.TikaUtils;
 
 import com.xpn.xwiki.XWikiContext;
@@ -97,6 +97,10 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     @Named("local")
     protected EntityReferenceSerializer<String> localSerializer;
 
+    @Inject
+    @Named("withparameters")
+    protected EntityReferenceSerializer<String> parametersSerializer;
+
     /**
      * Used to access current {@link XWikiContext}.
      */
@@ -108,6 +112,15 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      */
     @Inject
     protected ComponentManager componentManager;
+
+    @Inject
+    protected SolrMetadataExtractorUtils extractorUtils;
+
+    @Inject
+    protected SolrSearchCoreUtils seachUtils;
+
+    @Inject
+    protected SolrLinkSerializer linkSerializer;
 
     private int shortTextLimit = -1;
 
@@ -139,7 +152,9 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
         try {
             LengthSolrInputDocument solrDocument = new LengthSolrInputDocument();
 
-            solrDocument.setField(FieldUtils.ID, getResolver(entityReference).getId(entityReference));
+            solrDocument.setField(FieldUtils.ID, this.seachUtils.getId(entityReference));
+            solrDocument.setField(FieldUtils.REFERENCE,
+                entityReference.getType().getLowerCase() + ':' + this.parametersSerializer.serialize(entityReference));
 
             if (!setDocumentFields(new DocumentReference(entityReference.extractReference(EntityType.DOCUMENT)),
                 solrDocument)) {
@@ -167,22 +182,6 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      */
     protected abstract boolean setFieldsInternal(LengthSolrInputDocument solrDocument, EntityReference entityReference)
         throws Exception;
-
-    /**
-     * @param entityReference the reference of the entity
-     * @return the Solr resolver associated to the entity type
-     * @throws SolrIndexerException if any error
-     */
-    protected SolrReferenceResolver getResolver(EntityReference entityReference) throws SolrIndexerException
-    {
-        try {
-            return this.componentManager.getInstance(SolrReferenceResolver.class,
-                entityReference.getType().getLowerCase());
-        } catch (ComponentLookupException e) {
-            throw new SolrIndexerException(
-                "Faile to find solr reference resolver for type reference [" + entityReference + "]");
-        }
-    }
 
     /**
      * Utility method to retrieve the default translation of a document using its document reference.
@@ -548,6 +547,15 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
             // trailing slash in order to distinguish between space names with the same prefix (e.g. 0/Gallery/ and
             // 0/GalleryCode/).
             solrDocument.addField(FieldUtils.SPACE_FACET, (i - 1) + "/" + localAncestorReference + ".");
+        }
+    }
+
+    protected void extendLink(EntityReference reference, Set<String> linksExtended)
+    {
+        for (EntityReference parent =
+            reference.getParameters().isEmpty() ? reference : new EntityReference(reference.getName(),
+                reference.getType(), reference.getParent(), null); parent != null; parent = parent.getParent()) {
+            linksExtended.add(this.linkSerializer.serialize(parent));
         }
     }
 }

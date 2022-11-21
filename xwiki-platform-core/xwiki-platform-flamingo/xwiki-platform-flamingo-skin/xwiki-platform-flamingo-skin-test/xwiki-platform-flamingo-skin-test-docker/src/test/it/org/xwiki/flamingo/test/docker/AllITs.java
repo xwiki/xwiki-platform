@@ -164,4 +164,16 @@ public class AllITs
     class NestedInvitationIT extends InvitationIT
     {
     }
+
+    @Nested
+    @DisplayName("PDF Export Tests")
+    class NestedPDFExportIT extends PDFExportIT
+    {
+    }
+    
+    @Nested
+    @DisplayName("Backlinks Tests")
+    class NestedBacklinksIT extends BacklinksIT
+    {
+    }
 }

@@ -38,7 +38,7 @@ import org.xwiki.url.URLSecurityManager;
 public class XWikiServletResponse implements XWikiResponse
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiServletResponse.class);
-    private static final Pattern ABSOLUTE_URL_PATTERN = Pattern.compile("[a-z0-9]+://.*");
+    private static final Pattern ABSOLUTE_URL_PATTERN = Pattern.compile("[a-z0-9]+:/[/]?.*");
 
     private HttpServletResponse response;
 
@@ -68,6 +68,13 @@ public class XWikiServletResponse implements XWikiResponse
         }
         if (StringUtils.containsAny(redirect, '\r', '\n')) {
             LOGGER.warn("Possible HTTP Response Splitting attack, attempting to redirect to [{}]", redirect);
+            return;
+        }
+
+        if (StringUtils.startsWith(redirect, "//")) {
+            LOGGER.warn("Possible phishing attack, attempting to redirect to [{}]. If this request is legitimate, "
+                + "use an actual absolute URL and pay attention to configure properly url.trustedDomains in "
+                + "xwiki.properties", redirect);
             return;
         }
 

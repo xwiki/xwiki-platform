@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-administration-test</artifactId>
-    <version>14.5-SNAPSHOT</version>
+    <version>14.9-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-administration-test-docker</artifactId>
   <name>XWiki Platform - Administration - Tests - Functional Docker Tests</name>
@@ -87,6 +87,12 @@
     <dependency>
       <groupId>com.sun.mail</groupId>
       <artifactId>jakarta.mail</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-flamingo-skin-test-pageobjects</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

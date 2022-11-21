@@ -34,12 +34,13 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
+import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MailStatusResult;
 import org.xwiki.mail.MimeMessageFactory;
@@ -48,6 +49,9 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.security.authentication.ResetPasswordException;
+import org.xwiki.user.UserProperties;
+import org.xwiki.user.UserPropertiesResolver;
+import org.xwiki.user.UserReference;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -64,6 +68,10 @@ public class ResetPasswordMailSender
     private static final LocalDocumentReference RESET_PASSWORD_MAIL_TEMPLATE_REFERENCE =
         new LocalDocumentReference("XWiki", "ResetPasswordMailContent");
 
+    private static final String NO_REPLY = "no-reply@";
+    private static final String FROM = "from";
+    private static final String TO = "to";
+
     @Inject
     private MailSenderConfiguration mailSenderConfiguration;
 
@@ -75,11 +83,11 @@ public class ResetPasswordMailSender
     private MimeMessageFactory<MimeMessage> mimeMessageFactory;
 
     @Inject
-    private MailSender mailSender;
+    @Named("text")
+    private MimeMessageFactory<MimeMessage> textMimeMessageFactory;
 
     @Inject
-    @Named("context")
-    private ComponentManager componentManager;
+    private MailSender mailSender;
 
     @Inject
     private SessionFactory sessionFactory;
@@ -93,6 +101,12 @@ public class ResetPasswordMailSender
     @Inject
     @Named("database")
     private Provider<MailListener> mailListenerProvider;
+
+    @Inject
+    private Provider<UserPropertiesResolver> userPropertiesResolverProvider;
+
+    @Inject
+    private Logger logger;
 
     /**
      * Send the reset password information by email.
@@ -108,13 +122,13 @@ public class ResetPasswordMailSender
         XWikiContext context = this.contextProvider.get();
         String fromAddress = this.mailSenderConfiguration.getFromAddress();
         if (StringUtils.isEmpty(fromAddress)) {
-            fromAddress = "no-reply@" + context.getRequest().getServerName();
+            fromAddress = NO_REPLY + context.getRequest().getServerName();
         }
 
         Map<String, Object> parameters = new HashMap<>();
-        parameters.put("from", fromAddress);
-        parameters.put("to", email);
-        parameters.put("language", context.getLocale());
+        parameters.put(FROM, fromAddress);
+        parameters.put(TO, email);
+        parameters.put("language", this.contextProvider.get().getLocale());
         parameters.put("type", "Reset Password");
         Map<String, String> velocityVariables = new HashMap<>();
         velocityVariables.put("userName", username);
@@ -124,27 +138,91 @@ public class ResetPasswordMailSender
         String localizedError =
             this.localizationManager.getTranslationPlain("xe.admin.passwordReset.error.emailFailed");
 
-        MimeMessage message;
         try {
-            message =
+            MimeMessage message =
                 this.mimeMessageFactory.createMessage(
                     this.documentReferenceResolver.resolve(RESET_PASSWORD_MAIL_TEMPLATE_REFERENCE), parameters);
+            if (!this.sendMessage(message, localizedError)) {
+                this.logger.debug("The reset password mail to [{}] has not been sent after 1 second, check the status "
+                    + "in the administration", username);
+            }
         } catch (MessagingException e) {
             throw new ResetPasswordException(localizedError, e);
         }
+    }
+
+    /**
+     * Allows to send a text email for security purpose.
+     *
+     * @param userReference the user to whom to send the email.
+     * @param subject the localized subject of the email
+     * @param mailContent the localized content of the email
+     * @throws ResetPasswordException in case of problem for preparing or sending the email
+     * @since 14.6RC1
+     * @since 14.4.3
+     * @since 13.10.8
+     */
+    public void sendAuthenticationSecurityEmail(UserReference userReference, String subject, String mailContent)
+        throws ResetPasswordException
+    {
+        XWikiContext context = this.contextProvider.get();
+        String fromAddress = this.mailSenderConfiguration.getFromAddress();
+        if (StringUtils.isEmpty(fromAddress)) {
+            fromAddress = NO_REPLY + context.getRequest().getServerName();
+        }
+        UserProperties userProperties = this.userPropertiesResolverProvider.get().resolve(userReference);
+        InternetAddress email = userProperties.getEmail();
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put(FROM, fromAddress);
+        parameters.put(TO, email);
+        parameters.put("subject", subject);
+
+        String localizedError =
+            this.localizationManager.getTranslationPlain("security.authentication.security.email.error");
+
+        try {
+            MimeMessage message = this.textMimeMessageFactory.createMessage(mailContent, parameters);
+            if (!this.sendMessage(message, localizedError)) {
+                this.logger.info("The security mail to [{}] has not been sent after 1 second, check the status in the "
+                    + "administration of the wiki.", userReference);
+            }
+        } catch (MessagingException e) {
+            throw new ResetPasswordException(localizedError, e);
+        }
+    }
+
+    /**
+     * Send the given message and throw an exception with the localized error in case of mail errors.
+     *
+     * @param message the message to be sent
+     * @param localizedError the error message in case of exception
+     * @return {@code true} only if the mail state is {@link MailState#SEND_SUCCESS}.
+     * @throws ResetPasswordException in case of mail errors.
+     */
+    private boolean sendMessage(MimeMessage message, String localizedError) throws ResetPasswordException
+    {
         MailListener mailListener = this.mailListenerProvider.get();
         this.mailSender.sendAsynchronously(Collections.singleton(message),
             this.sessionFactory.create(Collections.emptyMap()),
             mailListener);
 
         MailStatusResult mailStatusResult = mailListener.getMailStatusResult();
-        mailStatusResult.waitTillProcessed(30L);
+        mailStatusResult.waitTillProcessed(1000L);
         Iterator<MailStatus> mailErrors = mailStatusResult.getAllErrors();
 
         if (mailErrors != null && mailErrors.hasNext()) {
             MailStatus lastError = mailErrors.next();
             throw new ResetPasswordException(
                 String.format("%s - %s", localizedError, lastError.getErrorDescription()));
+        }
+
+        if (mailStatusResult.isProcessed() && mailStatusResult.getAll().hasNext()) {
+            MailStatus mailStatus = mailStatusResult.getAll().next();
+            MailState mailState = MailState.parse(mailStatus.getState());
+            return (mailState == MailState.SEND_SUCCESS);
+        } else {
+            return false;
         }
     }
 }

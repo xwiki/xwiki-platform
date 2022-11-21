@@ -19,53 +19,102 @@
  */
 package org.xwiki.export.pdf.internal;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.export.pdf.PDFExportConfiguration;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 
 /**
  * Default implementation of {@link PDFExportConfiguration}.
  * 
  * @version $Id$
  * @since 14.4.2
- * @since 14.5RC1
+ * @since 14.5
  */
 @Component
 @Singleton
 public class DefaultPDFExportConfiguration implements PDFExportConfiguration
 {
-    private static final String PREFIX = "export.pdf.";
-
     @Inject
     @Named("xwikiproperties")
-    private ConfigurationSource configurationSource;
+    private ConfigurationSource xwikiProperties;
+
+    @Inject
+    @Named("export/pdf")
+    private ConfigurationSource configDocument;
+
+    @Inject
+    @Named("current")
+    private DocumentReferenceResolver<String> documentReferenceResolver;
 
     @Override
     public String getChromeDockerImage()
     {
-        return this.configurationSource.getProperty(PREFIX + "chromeDockerImage", "zenika/alpine-chrome:latest");
+        return getProperty("chromeDockerImage", "zenika/alpine-chrome:latest");
     }
 
     @Override
     public String getChromeDockerContainerName()
     {
-        return this.configurationSource.getProperty(PREFIX + "chromeDockerContainerName",
-            "headless-chrome-pdf-printer");
+        return getProperty("chromeDockerContainerName", "headless-chrome-pdf-printer");
     }
 
     @Override
-    public String getChromeDockerHostName()
+    public String getDockerNetwork()
     {
-        return this.configurationSource.getProperty(PREFIX + "chromeDockerHostName", "host.docker.internal");
+        return getProperty("dockerNetwork", "bridge");
+    }
+
+    @Override
+    public String getChromeHost()
+    {
+        return getProperty("chromeHost", "");
     }
 
     @Override
     public int getChromeRemoteDebuggingPort()
     {
-        return this.configurationSource.getProperty(PREFIX + "chromeRemoteDebuggingPort", 9222);
+        return getProperty("chromeRemoteDebuggingPort", 9222);
+    }
+
+    @Override
+    public String getXWikiHost()
+    {
+        return getProperty("xwikiHost", "host.xwiki.internal");
+    }
+
+    @Override
+    public boolean isServerSide()
+    {
+        return getProperty("serverSide", PDFExportConfiguration.super.isServerSide());
+    }
+
+    @Override
+    public List<DocumentReference> getTemplates()
+    {
+        @SuppressWarnings("unchecked")
+        List<String> templates = this.configDocument.getProperty("templates", List.class,
+            Collections.singletonList("XWiki.PDFExport.Template"));
+        return templates.stream().filter(StringUtils::isNotBlank)
+            .map(template -> this.documentReferenceResolver.resolve(template)).collect(Collectors.toList());
+    }
+
+    private <T> T getProperty(String key, T defaultValue)
+    {
+        if (this.configDocument.containsKey(key)) {
+            return this.configDocument.getProperty(key, defaultValue);
+        } else {
+            return this.xwikiProperties.getProperty("export.pdf." + key, defaultValue);
+        }
     }
 }

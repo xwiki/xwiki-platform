@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tika</artifactId>
-    <version>14.5-SNAPSHOT</version>
+    <version>14.9-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tika-parsers</artifactId>
   <name>XWiki Platform - Tika - Parsers</name>
@@ -48,13 +48,6 @@
     <dependency>
       <groupId>org.apache.tika</groupId>
       <artifactId>tika-parser-advancedmedia-module</artifactId>
-      <exclusions>
-        <!-- Wrong id -->
-        <exclusion>
-          <groupId>javax.annotation</groupId>
-          <artifactId>javax.annotation-api</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.tika</groupId>
@@ -120,18 +113,21 @@
       <groupId>org.apache.tika</groupId>
       <artifactId>tika-parser-image-module</artifactId>
     </dependency>
+    <!-- Add back Bouncy Castle dependencies required by Tika but with the right id -->
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcmail-jdk18on</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk18on</artifactId>
+    </dependency>
 
     <!-- We need a Log4j 2.x implementation since some Tika parsers use Log4j 2.x -->
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-to-slf4j</artifactId>
       <scope>runtime</scope>
-    </dependency>
-
-    <!-- Replace the version triggered by Tika parsers by a more accurate one -->
-    <dependency>
-      <groupId>jakarta.annotation</groupId>
-      <artifactId>jakarta.annotation-api</artifactId>
     </dependency>
 
     <!-- Test Dependencies -->

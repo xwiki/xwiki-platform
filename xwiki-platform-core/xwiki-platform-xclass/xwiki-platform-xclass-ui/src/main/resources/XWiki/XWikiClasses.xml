@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.XWikiClasses" locale="">
+<xwikidoc version="1.5" reference="XWiki.XWikiClasses" locale="">
   <web>XWiki</web>
   <name>XWikiClasses</name>
   <language/>
@@ -87,6 +87,7 @@ $services.localization.render('platform.xclass.classes.createClass.description',
 #end
 {{html}}
 &lt;form action="$doc.URL" method="post" class="xform half"&gt;
+  &lt;fieldset&gt;
   &lt;div class="hidden"&gt;
     &lt;input type="hidden" name="parent" value="XWiki.XWikiClasses"/&gt;
     &lt;input type="hidden" name="template" value="XWiki.ClassTemplate"/&gt;
@@ -123,6 +124,7 @@ $services.localization.render('platform.xclass.classes.createClass.description',
         $services.localization.render('platform.xclass.classes.createClass.label'))"/&gt;
     &lt;/span&gt;
   &lt;/p&gt;
+  &lt;/fieldset&gt;
 &lt;/form&gt;
 {{/html}}
 {{/velocity}}

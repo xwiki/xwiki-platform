@@ -55,13 +55,13 @@
         <contenttype>FullyRenderedText</contenttype>
         <customDisplay/>
         <disabled>0</disabled>
-        <editor>---</editor>
+        <editor>Text</editor>
         <hint>XWiki.PDFExport.TemplateClass_cover.hint</hint>
         <name>cover</name>
         <number>1</number>
-        <picker>1</picker>
+        <picker>0</picker>
         <prettyName>Cover</prettyName>
-        <rows>5</rows>
+        <rows>20</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -72,13 +72,13 @@
         <contenttype>FullyRenderedText</contenttype>
         <customDisplay/>
         <disabled>0</disabled>
-        <editor>---</editor>
+        <editor>Text</editor>
         <hint>XWiki.PDFExport.TemplateClass_footer.hint</hint>
         <name>footer</name>
         <number>4</number>
-        <picker>1</picker>
+        <picker>0</picker>
         <prettyName>Footer</prettyName>
-        <rows>5</rows>
+        <rows>20</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -89,13 +89,13 @@
         <contenttype>FullyRenderedText</contenttype>
         <customDisplay/>
         <disabled>0</disabled>
-        <editor>---</editor>
+        <editor>Text</editor>
         <hint>XWiki.PDFExport.TemplateClass_header.hint</hint>
         <name>header</name>
         <number>3</number>
-        <picker>1</picker>
+        <picker>0</picker>
         <prettyName>Header</prettyName>
-        <rows>5</rows>
+        <rows>20</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -106,13 +106,13 @@
         <contenttype>FullyRenderedText</contenttype>
         <customDisplay/>
         <disabled>0</disabled>
-        <editor>---</editor>
+        <editor>Text</editor>
         <hint>XWiki.PDFExport.TemplateClass_toc.hint</hint>
         <name>toc</name>
         <number>2</number>
-        <picker>1</picker>
+        <picker>0</picker>
         <prettyName>Table of Contents</prettyName>
-        <rows>5</rows>
+        <rows>20</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -136,7 +136,12 @@
     <property>
       <header>{{velocity}}
 {{html clean="false"}}
-$escapetool.xml($tdoc.plainTitle)
+#if ("$!request.jobId" != '' &amp;&amp; $services.job.getJobStatus($request.jobId.split('/')).request.isWithTitle())
+  ## The title is extracted from the rendered content.
+  &lt;span class="pdf-chapter-name"&gt;&lt;/span&gt;
+#else
+  $escapetool.xml($tdoc.plainTitle)
+#end
 {{/html}}
 {{/velocity}}</header>
     </property>
@@ -300,10 +305,25 @@ $escapetool.xml($tdoc.plainTitle)
   }
 
   .pdf-header {
-    position: running(header);
     color: @text-muted !important;
+    position: running(header);
   }
 
+  /* Marks the beginning of a new XWiki document. */
+  h1[data-xwiki-document-reference] {
+    string-set: chapter-name content(text);
+
+    &amp; ~ h1[data-xwiki-document-reference] {
+      break-before: page;
+    }
+  }
+
+  .pdf-chapter-name:before {
+    color: @text-muted !important;
+    content: string(chapter-name);
+  }
+
+  /* Style the footer. We use PagedJS classes because the footer is currently generated using only CSS. */
   .pagedjs_page .pagedjs_margin-bottom-center .pagedjs_margin-content::after {
     color: @text-muted !important;
   }

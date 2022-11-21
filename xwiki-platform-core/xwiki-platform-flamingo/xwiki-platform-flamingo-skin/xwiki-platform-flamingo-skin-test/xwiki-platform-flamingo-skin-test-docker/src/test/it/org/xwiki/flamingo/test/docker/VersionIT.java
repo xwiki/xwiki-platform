@@ -23,11 +23,12 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
+import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
+import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.AttachmentsPane;
 import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
@@ -142,20 +143,20 @@ class VersionIT
         ViewPage vp = utils.gotoPage(testReference);
 
         // Make sure expected attachment is there
-        AttachmentsPane attachmentsPane = vp.openAttachmentsDocExtraPane();
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertEquals(1, attachmentsPane.getNumberOfAttachments());
         assertEquals("1.2", attachmentsPane.getLatestVersionOfAttachment(attachmentReference.getName()));
 
         // Revert to 1.1 (empty page)
         vp = vp.openHistoryDocExtraPane().rollbackToVersion("1.1");
 
-        attachmentsPane = vp.openAttachmentsDocExtraPane();
+        attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertEquals(0, attachmentsPane.getNumberOfAttachments());
 
         // Revert to 3.1 (second update of the attachment)
         vp = vp.openHistoryDocExtraPane().rollbackToVersion("3.1");
 
-        attachmentsPane = vp.openAttachmentsDocExtraPane();
+        attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertEquals(1, attachmentsPane.getNumberOfAttachments());
         assertEquals("1.2", attachmentsPane.getLatestVersionOfAttachment(attachmentReference.getName()));
         attachmentsPane.getAttachmentLink(attachmentReference.getName()).click();
@@ -164,7 +165,7 @@ class VersionIT
         // Revert to 2.1 (first update of the attachment)
         vp = utils.gotoPage(testReference).openHistoryDocExtraPane().rollbackToVersion("2.1");
 
-        attachmentsPane = vp.openAttachmentsDocExtraPane();
+        attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertEquals(1, attachmentsPane.getNumberOfAttachments());
         assertEquals("1.3", attachmentsPane.getLatestVersionOfAttachment(attachmentReference.getName()));
         attachmentsPane.getAttachmentLink(attachmentReference.getName()).click();
@@ -173,13 +174,13 @@ class VersionIT
         // Back to empty page again
         vp = utils.gotoPage(testReference).openHistoryDocExtraPane().rollbackToVersion("1.1");
 
-        attachmentsPane = vp.openAttachmentsDocExtraPane();
+        attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertEquals(0, attachmentsPane.getNumberOfAttachments());
 
         // Revert to 2.1 (first update of the attachment)
         vp = vp.openHistoryDocExtraPane().rollbackToVersion("2.1");
 
-        attachmentsPane = vp.openAttachmentsDocExtraPane();
+        attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertEquals(1, attachmentsPane.getNumberOfAttachments());
         assertEquals("1.3", attachmentsPane.getLatestVersionOfAttachment(attachmentReference.getName()));
         attachmentsPane.getAttachmentLink(attachmentReference.getName()).click();
@@ -214,7 +215,7 @@ class VersionIT
         utils.rest().attachFile(attachmentReference, "2".getBytes(), true);
 
         ViewPage viewPage = utils.gotoPage(testReference);
-        AttachmentsPane attachmentsPane = viewPage.openAttachmentsDocExtraPane();
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertTrue(attachmentsPane.attachmentExistsByFileName("file.txt"));
         assertEquals("1.1", attachmentsPane.getLatestVersionOfAttachment("file.txt"));
 
@@ -223,7 +224,7 @@ class VersionIT
         HistoryPane historyPane = viewPage.openHistoryDocExtraPane();
 
         viewPage = historyPane.rollbackToVersion("2.1");
-        attachmentsPane = viewPage.openAttachmentsDocExtraPane();
+        attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertTrue(attachmentsPane.attachmentExistsByFileName("file.txt"));
         assertEquals("1.1", attachmentsPane.getLatestVersionOfAttachment("file.txt"));
         attachmentsPane.getAttachmentLink("file.txt").click();

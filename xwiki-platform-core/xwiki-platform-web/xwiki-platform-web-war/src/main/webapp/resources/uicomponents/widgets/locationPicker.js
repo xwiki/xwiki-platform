@@ -133,15 +133,10 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
 });
 
 // Live synchronization between the Title, Location, Wiki, Parent and Name (as you type)
-require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
+require(['jquery', 'xwiki-meta', 'xwiki-events-bridge', 'xwiki-form-validation-async'], function($, xm) {
   $('.location-picker').each(function() {
     var picker = $(this);
     var form = picker.closest('form');
-    // We get all buttons but only those not disabled yet, since we will disable and enable them back.
-    var formRealButtons = form.find('input[type=submit]:not([disabled=disabled]),' +
-      'input[type=button]:not([disabled=disabled]),' +
-      'button:not([disabled=disabled])');
-    var formLinkButtons = form.find('a.button:not(.disabled)');
 
     var titleInput = picker.find('input.location-title-field');
     // The wiki field can be either a select (drop down) or an input (text or hidden).
@@ -151,7 +146,6 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
     var locationContainer = picker.find('.breadcrumb');
     // Input timeouts used to avoid handling too soon each individual letter, as the user types.
     var inputDelay = 500;
-    var spaceReferenceInputTimeout;
 
     /**
      * Compute a page name from a given title.
@@ -179,52 +173,32 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
       lastElement.text(value);
     };
 
-    var disableButtons = function() {
-      formRealButtons.prop("disabled", true);
-      formLinkButtons.addClass("disabled");
-    };
-
-    var enableButtons = function() {
-      formRealButtons.prop("disabled", false);
-      formLinkButtons.removeClass("disabled");
-    };
-
     /**
      * Event handler for the title input that updates both the location preview's last element and the name input.
      **/
-    var titleInputTimeout;
     var scheduleUpdateOfLocationAndNameFromTitleInput = function(event) {
-      clearTimeout(titleInputTimeout);
-      if (event.type === 'input') {
+      // Disable the page name input while its value is being updated based on the page title. This also disables the
+      // page name validation (client-side) until we receive the computed page name (a 'change' event is triggered
+      // afterwards in order to perform the synchronous client-side page name validation).
+      nameInput.prop('disabled', true);
+      if (event?.type === 'input') {
         // Delay the update.
-        titleInputTimeout = setTimeout(updateLocationAndNameFromTitleInput, inputDelay);
-      } else if (event.type === 'change') {
+        titleInput.validateAsync(updateLocationAndNameFromTitleInput, inputDelay, 'locationPicker');
+      } else {
         // Update right away.
-        updateLocationAndNameFromTitleInput();
-      } else if (event.type === 'keyup' && event.keyCode === 13) {
-        // Update right away and submit the form since the user hit enter, so he's expecting the form to be submitted.
-        // Note that the reason we need this is because we disable the submit button in
-        // updateLocationAndNameFromTitleInput: by default the event when clicking Enter on an text input field is
-        // to simulate a click button on the input submit button. But since the button is disabled, this submit
-        // cannot occur here.
-        // So we're actually actively listening on the enter input, to manually trigger the submit.
-        // Also note that we cannot perform a submit on each change event, since those are also triggered whenever
-        // the input text looses focus. And in such case, we don't want to trigger a submit.
-        updateLocationAndNameFromTitleInput(true);
+        titleInput.validateAsync(updateLocationAndNameFromTitleInput(), 'locationPicker');
       }
     };
 
-    var updateLocationAndNameFromTitleInput = function(submit) {
-      // ensure the buttons are disabled before we got the name answer
-      disableButtons();
+    var updateLocationAndNameFromTitleInput = function() {
       var titleInputVal = titleInput.val();
       // Update the name field.
-      getPageName(titleInputVal).then(data => {
+      return getPageName(titleInputVal).then(data => {
         // Ensure that the input didn't change while we were waiting the answer.
         // It also protects the value if a previous request was slow to arrive.
         if (titleInputVal === titleInput.val()) {
-          // we trigger a change so we can validate the name
-          nameInput.val(data.transformedName).trigger('change');
+          // Re-enable the page name input and trigger a change event to execute the client-side validations.
+          nameInput.prop('disabled', false).val(data.transformedName).trigger('change');
 
           // Update the location preview.
           updateLocationFromTitleInput();
@@ -232,16 +206,10 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
       }).catch(() => {
         if (titleInputVal === titleInput.val()) {
           new XWiki.widgets.Notification(l10n['entitynamevalidation.nametransformation.error'], 'error');
-          // we trigger a change so we can validate the name
-          nameInput.val(titleInputVal).trigger('change');
+          // Re-enable the page name input and trigger a change event to execute the client-side validations.
+          nameInput.prop('disabled', false).val(titleInputVal).trigger('change');
           // Update the location preview.
           updateLocationFromTitleInput();
-        }
-      }).finally(() => {
-        // Enable back the buttons
-        enableButtons();
-        if (submit) {
-          titleInput.closest('form').submit();
         }
       });
     };
@@ -282,16 +250,15 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
       }
 
       // Delay the execution in case the user is still typing.
-      clearTimeout(spaceReferenceInputTimeout);
-      spaceReferenceInputTimeout = setTimeout(function() {
-        updateLocation(wikiField.val(), spaceReference);
-      }, inputDelay);
+      locationContainer.validateAsync(() => {
+        return updateLocation(wikiField.val(), spaceReference);
+      }, inputDelay, 'locationPicker');
     };
 
     var updateLocationFromWikiField = function(event) {
       // TODO: Don't reload the entire location when the wiki changes. We should be able to update only the wiki element,
       // but we need to be able to "detect" it (e.g. the breadcrumb should add some CSS classes on the path elements).
-      updateLocation(wikiField.val());
+      locationContainer.validateAsync(updateLocation, 'locationPicker');
     };
 
     var updateLocation = function(wiki, localSpaceReference) {
@@ -305,12 +272,14 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
       var documentReference = new XWiki.EntityReference('WebHome', XWiki.EntityType.DOCUMENT, spaceReference);
       wiki && spaceReference.appendParent(new XWiki.WikiReference(wiki));
 
-      $.post(getCurrentPageURL(), {
+      return $.post(getCurrentPageURL(), {
         'xpage': 'hierarchy_reference',
         'reference': XWiki.Model.serialize(documentReference)
       }, function(data) {
         // Update the space reference part of the new location.
         var newLocationContainer = $(data);
+        // Preserve the id because it is needed for the asynchronous validation key.
+        newLocationContainer.attr('id', locationContainer.attr('id'));
         locationContainer.replaceWith(newLocationContainer);
         locationContainer = newLocationContainer;
 
@@ -343,7 +312,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
     // Synchronize the location fields while the user types.
     // We catch the change event because we want to make sure everything's updated when the user change fields
     // (particulary useful in our automated tests).
-    titleInput.on('input change keyup', scheduleUpdateOfLocationAndNameFromTitleInput);
+    titleInput.on('input change', scheduleUpdateOfLocationAndNameFromTitleInput);
     wikiField.on('change', updateLocationFromWikiField);
     nameInput.on('input change', updateLocationFromNameInput);
     spaceReferenceInput.on('input change xwiki:suggest:selected', updateLocationFromSpaceReference);
@@ -355,7 +324,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
 
     // Update the location with whatever the initial value of the title is.
     if (nameInput.val() !== undefined && !nameInput.val() && titleInput.val()) {
-      updateLocationAndNameFromTitleInput();
+      scheduleUpdateOfLocationAndNameFromTitleInput();
     } else {
       updateLocationFromTitleInput();
     }
@@ -396,24 +365,17 @@ require(['jquery'], function($) {
       // Show the validation message after the title input for simple users because they can't access the page input.
       insertAfterWhatNode: isSimpleUser ? titleInput[0] : pageInput[0]
     });
-    // We use a custom validation in order to handle the default value on browsers that don't support the placeholder
-    // attribute.
     pageValidator.displayMessageWhenEmpty = true;
     pageValidator.add(Validate.Custom, {
       failureMessage: l10n['core.validation.required.message'],
       against: function(value) {
-        return !pageInput.hasClass('empty') && typeof value === 'string' && value.strip().length > 0;
+        // The page name must not be blank.
+        return typeof value === 'string' && value.strip().length > 0;
       }
     });
 
-    // The page input is filled automatically when the user types in the title input so we should validate the page
-    // input at the same time.
-    titleInput.on('input', function() {
-      // Validate after the value of the page input is set.
-      setTimeout(function() {
-        pageValidator.validate();
-      }, 0);
-    });
+    // The page name can be set either directly, by typing in the page input, or indirectly, by typing in the title
+    // input. In the second case the code that updates the page name based on the page title triggers a 'change' event. 
     pageInput.on('change', function() {
       pageValidator.validate();
     });
@@ -500,7 +462,6 @@ require(['jquery'], function($) {
     });
   };
 
-  var validators = [];
   $('.location-picker').each(function() {
     var picker = $(this);
     var pickerValidators = [];
@@ -515,7 +476,6 @@ require(['jquery'], function($) {
       pickerValidators.push(pageValidator);
       picker.data('pageValidator', pageValidator);
     }
-    validators.push.apply(validators, pickerValidators);
 
     var locationEdit = picker.find('.location-edit');
     var locationEditToggle = picker.find('.location-action-edit');
@@ -525,7 +485,10 @@ require(['jquery'], function($) {
     picker.closest('form').on('submit', function(event) {
       var isValid = LiveValidation.massValidate(pickerValidators);
       if (!isValid && locationEdit.hasClass('hidden')) {
-        locationEditToggle.click();
+        // Triggering the click event while handling a click event (the submit event is caused most of the time by
+        // clicking the submit button) has no effect (jQuery simply ignores the trigger call). The workaround is to
+        // trigger the click event right after the current click event is handled.
+        setTimeout(() => locationEditToggle.click(), 0);
       }
     });
 

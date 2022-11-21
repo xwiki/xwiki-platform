@@ -43,6 +43,7 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.concurrent.ContextStoreManager;
+import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.job.PDFExportJobRequest;
 import org.xwiki.export.pdf.job.PDFExportJobRequestFactory;
 import org.xwiki.model.internal.reference.comparator.DocumentReferenceComparator;
@@ -60,7 +61,7 @@ import com.xpn.xwiki.web.XWikiRequest;
  * 
  * @version $Id$
  * @since 14.4.2
- * @since 14.5RC1
+ * @since 14.5
  */
 @Component
 @Singleton
@@ -85,6 +86,9 @@ public class DefaultPDFExportJobRequestFactory implements PDFExportJobRequestFac
     @Inject
     private ContextStoreManager contextStoreManager;
 
+    @Inject
+    private PDFExportConfiguration configuration;
+
     private DocumentReferenceComparator documentReferenceComparator = new DocumentReferenceComparator(true);
 
     @Override
@@ -98,6 +102,9 @@ public class DefaultPDFExportJobRequestFactory implements PDFExportJobRequestFac
     {
         PDFExportJobRequest request = new PDFExportJobRequest();
         request.setId(EXPORT, "pdf", suffix);
+        // The job status is not needed after the PDF is generated.
+        request.setStatusSerialized(false);
+        request.setServerSide(this.configuration.isServerSide());
 
         setRightsProperties(request);
         setContextProperties(request);

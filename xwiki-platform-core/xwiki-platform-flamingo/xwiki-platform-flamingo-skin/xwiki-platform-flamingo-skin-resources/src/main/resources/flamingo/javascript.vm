@@ -29,6 +29,8 @@
 <script src="$escapetool.xml($services.webjars.url('requirejs', "require$jsExtension"))" data-wysiwyg="true"></script>
 ## Load the JavaScript module used to determine when the page is ready (no pending HTTP requests or promises).
 <script src="$escapetool.xml($xwiki.getSkinFile('uicomponents/tools/pageReady.js'))" data-wysiwyg="true"></script>
+## Fix some Prototype.js breaking changes. 
+<script src="$escapetool.xml($xwiki.getSkinFile('js/xwiki/prototypeJSPatches.js'))"></script>
 ## FIXME: We still have code depending on Prototype.js without declaring it (i.e. without using RequireJS). Short term
 ## goal is to stop loading Prototype.js by default and change the existing code to load it when needed. Long term goal is
 ## to stop relying on Prototype.js . Note that we load Prototype.js before the following inline script because we have to
@@ -79,21 +81,26 @@
     'jquery': "#removeJsSuffix($services.webjars.url('jquery', ""jquery${jsExtension}""))",
     'jquery-migrate': "#removeJsSuffix($services.webjars.url('jquery-migrate', ""jquery-migrate${jsExtension}""))",
     'moment-jdateformatparser': $services.webjars.url('moment-jdateformatparser', 'moment-jdateformatparser.min'),
+    'moment-timezone': $services.webjars.url('org.webjars.npm:moment-timezone', 'builds/moment-timezone-with-data.min'),
     'prototype': "#removeJsSuffix($services.webjars.url('prototype', 'prototype.js'))",
+    'selectize': "#removeJsSuffix($services.webjars.url('selectize.js', ""js/standalone/selectize${jsExtension}""))",
     'xwiki-attachments-icon': $xwiki.getSkinFile('uicomponents/attachments/icons.js', true),
     'xwiki-entityReference': $xwiki.getSkinFile('uicomponents/model/entityReference.js'),
     'xwiki-events-bridge': $xwiki.getSkinFile('js/xwiki/eventsBridge.js'),
+    'xwiki-form-validation-async': $xwiki.getSkinFile('uicomponents/tools/formAsyncValidation.js'),
     'xwiki-job-runner': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-job-webjar', ""jobRunner${jsExtension}""))",
     'xwiki-l10n': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-localization-webjar', ""l10n${jsExtension}""))",
     'xwiki-locale-picker': $xwiki.getSkinFile('localePicker.js', true),
-    'xwiki-meta': $xwiki.getSkinFile('js/xwiki/meta.js')
+    'xwiki-meta': $xwiki.getSkinFile('js/xwiki/meta.js'),
+    'xwiki-selectize': $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js')
   },
   'shim': {
+    'bootstrap': ['jquery'],
     'prototype': {
       'exports': '$'
     },
     'scriptaculous/dragdrop': ['scriptaculous/effects'],
-    'bootstrap' : ['jquery'],
+    'selectize': ['jquery'],
     'xwiki-entityReference': {
       'exports': 'XWiki'
     }

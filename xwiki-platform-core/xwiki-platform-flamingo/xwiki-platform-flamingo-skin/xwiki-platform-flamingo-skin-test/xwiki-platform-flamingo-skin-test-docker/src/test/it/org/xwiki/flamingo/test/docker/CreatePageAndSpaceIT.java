@@ -84,7 +84,7 @@ class CreatePageAndSpaceIT
         // Since the Flamingo skin no longer supports creating a space from the UI, trigger the Space creation UI
         // by using directly the direct action URL for it. This time on a non-exsiting page.
         setup.gotoPage(setup.getURL("create", new String[]{ spaceName, "NonExistingPage" },
-                "tocreate=space&type=blank"));
+                "tocreate=space&type=blank&template="));
         EditPage editPage = new EditPage();
 
         assertEquals(spaceName, editPage.getMetaDataValue("space"));

@@ -28,7 +28,7 @@ import org.xwiki.model.reference.LocalDocumentReference;
  * Make it easy for tests to get a unique page reference for testing (when needed).
  *
  * @version $Id$
- * @since 14.5RC1
+ * @since 14.5
  */
 public class TestLocalReference extends LocalDocumentReference
 {

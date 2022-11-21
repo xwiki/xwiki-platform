@@ -28,16 +28,16 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.xwiki.test.ui.po.BaseModal;
-import org.xwiki.test.ui.po.Select;
 
 /**
  * Represents the actions possible on the modal used to configure and trigger the PDF export.
  * 
  * @version $Id$
  * @since 14.4.2
- * @since 14.5RC1
+ * @since 14.5
  */
 public class PDFExportOptionsModal extends BaseModal
 {
@@ -66,8 +66,7 @@ public class PDFExportOptionsModal extends BaseModal
         super(By.id("pdfExportOptions"));
 
         getDriver().waitUntilCondition(ExpectedConditions.elementToBeClickable(this.exportButtonLocator));
-        getDriver().waitUntilCondition(
-            ExpectedConditions.numberOfElementsToBe(By.cssSelector("#pdfExportOptions .modal-body.loading"), 0));
+        getDriver().waitUntilElementHasAttributeValue(By.id("pdfExportOptions"), "data-state", "loaded");
     }
 
     /**
@@ -125,9 +124,10 @@ public class PDFExportOptionsModal extends BaseModal
 
         getDriver().findElement(this.exportButtonLocator).click();
 
-        // Use a bigger timeout (30s) because the PDF export might have to fetch the headless Chrome Docker image,
+        // Use a bigger timeout (60s) because the PDF export might have to fetch the headless Chrome Docker image,
         // create the container and start it (if it's the first PDF export).
-        new WebDriverWait(getDriver(), Duration.ofSeconds(30))
+        // Note that the timeout was previously 30s which was too little for the CI.
+        new WebDriverWait(getDriver(), Duration.ofSeconds(60))
             .until((ExpectedCondition<Boolean>) driver -> !currentURL.equals(driver.getCurrentUrl()));
 
         // The browser used for running the test might be on a different machine than the one running XWiki and the test

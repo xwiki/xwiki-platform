@@ -34,6 +34,8 @@ import org.xwiki.wiki.manager.WikiManagerException;
  */
 public abstract class AbstractWikiReferenceExtractor implements WikiReferenceExtractor
 {
+    private static final String XWIKI_CONTEXT = "xwikicontext";
+
     @Inject
     private StandardURLConfiguration configuration;
 
@@ -70,7 +72,7 @@ public abstract class AbstractWikiReferenceExtractor implements WikiReferenceExt
         // Note: We also support not having an Execution Context available. This allows this code to work at request
         // initialization time, when no Context has been set up yet. In the future, we need to move the Context init
         // as the first thing along with Database initialization.
-        if (this.execution.getContext() == null) {
+        if (this.execution.getContext() == null || this.execution.getContext().getProperty(XWIKI_CONTEXT) == null) {
             return null;
         }
 
@@ -86,7 +88,7 @@ public abstract class AbstractWikiReferenceExtractor implements WikiReferenceExt
         // Note: We also support not having an Execution Context available. This allows this code to work at request
         // initialization time, when no Context has been set up yet. In the future, we need to move the Context init
         // as the first thing along with Database initialization.
-        if (this.execution.getContext() == null) {
+        if (this.execution.getContext() == null || this.execution.getContext().getProperty(XWIKI_CONTEXT) == null) {
             return null;
         }
 

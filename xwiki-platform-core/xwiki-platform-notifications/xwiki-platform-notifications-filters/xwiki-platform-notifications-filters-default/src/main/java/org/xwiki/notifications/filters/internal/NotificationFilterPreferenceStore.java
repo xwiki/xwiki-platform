@@ -32,7 +32,6 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.Session;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -149,8 +148,9 @@ public class NotificationFilterPreferenceStore
         try {
             return getPreferencesOfEntity(wikiReference, WikiNotificationPreferenceProvider.NAME);
         } catch (QueryException e) {
-            throw new NotificationException(String.format(
-                "Error while loading the notification filter preferences of the wiki [%s].", wikiReference.getName()),
+            throw new NotificationException(
+                String.format("Error while loading the notification filter preferences of the wiki [%s].",
+                    wikiReference.getName()),
                 e);
         }
     }
@@ -159,7 +159,7 @@ public class NotificationFilterPreferenceStore
      * @param limit the maximum number of results to return
      * @param offset the offset of the first result to return
      * @return all the notification filter preferences
-     * @since 14.5RC1
+     * @since 14.5
      * @since 14.4.1
      * @since 13.10.7
      */
@@ -169,12 +169,10 @@ public class NotificationFilterPreferenceStore
         return configureContextWrapper(() -> {
             try {
                 List<DefaultNotificationFilterPreference> list = this.queryManager
-                    .createQuery("select nfp from DefaultNotificationFilterPreference nfp "
-                        + "order by nfp.internalId", Query.HQL)
-                    .setLimit(limit)
-                    .setOffset(offset)
-                    .execute();
-                // We return DefaultNotificationFilterPreference instead of NotificationFilterPreference because we 
+                    .createQuery("select nfp from DefaultNotificationFilterPreference nfp " + "order by nfp.internalId",
+                        Query.HQL)
+                    .setLimit(limit).setOffset(offset).execute();
+                // We return DefaultNotificationFilterPreference instead of NotificationFilterPreference because we
                 // need to have access to the owner of the notification filter preferences.
                 return new HashSet<>(list);
             } catch (QueryException e) {
@@ -229,7 +227,7 @@ public class NotificationFilterPreferenceStore
      *
      * @param user the document reference of a user
      * @throws NotificationException in case of error during the hibernate operations
-     * @since 14.5RC1
+     * @since 14.5
      * @since 14.4.1
      * @since 13.10.7
      */
@@ -243,19 +241,19 @@ public class NotificationFilterPreferenceStore
             String serializedUser = this.entityReferenceSerializer.serialize(user);
 
             try {
-                hibernateStore.beginTransaction(context);
-                Session session = hibernateStore.getSession(context);
-                session.createQuery("delete from DefaultNotificationFilterPreference where owner = :user "
-                        + "or user = :user")
-                    .setParameter("user", serializedUser)
-                    .executeUpdate();
-                hibernateStore.endTransaction(context, true);
+                hibernateStore.executeWrite(context, session -> {
+                    session
+                        .createQuery(
+                            "delete from DefaultNotificationFilterPreference where owner = :user " + "or user = :user")
+                        .setParameter("user", serializedUser).executeUpdate();
+
+                    return null;
+                });                
             } catch (XWikiException e) {
-                hibernateStore.endTransaction(context, false);
                 throw new NotificationException(
-                    String.format("Failed to delete the notification preferences for user [%s]", user),
-                    e);
+                    String.format("Failed to delete the notification preferences for user [%s]", user), e);
             }
+
             return null;
         });
     }
@@ -280,7 +278,7 @@ public class NotificationFilterPreferenceStore
      *
      * @param wikiReference the reference of a wiki
      * @throws NotificationException in case of error during the hibernate operations
-     * @since 14.5RC1
+     * @since 14.5
      * @since 14.4.1
      * @since 13.10.7
      */
@@ -292,23 +290,18 @@ public class NotificationFilterPreferenceStore
             XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
 
             try {
-                hibernateStore.beginTransaction(context);
-                Session session = hibernateStore.getSession(context);
-                session.createQuery("delete from DefaultNotificationFilterPreference "
-                        + "where page like :wikiPrefix "
-                        + "or pageOnly like :wikiPrefix "
-                        + "or user like :wikiPrefix "
-                        + "or wiki = :wikiId")
-                    .setParameter("wikiPrefix", wikiReference.getName() + ":%")
-                    .setParameter("wikiId", wikiReference.getName())
-                    .executeUpdate();
-                hibernateStore.endTransaction(context, true);
+                hibernateStore.executeWrite(context, session -> {
+                    session
+                        .createQuery("delete from DefaultNotificationFilterPreference " + "where page like :wikiPrefix "
+                            + "or pageOnly like :wikiPrefix " + "or user like :wikiPrefix " + "or wiki = :wikiId")
+                        .setParameter("wikiPrefix", wikiReference.getName() + ":%")
+                        .setParameter("wikiId", wikiReference.getName()).executeUpdate();
+
+                    return null;
+                });
             } catch (XWikiException e) {
-                hibernateStore.endTransaction(context, false);
-                throw new NotificationException(
-                    String.format("Failed to delete the notification preferences for wiki [%s]",
-                        wikiReference.getName()),
-                    e);
+                throw new NotificationException(String
+                    .format("Failed to delete the notification preferences for wiki [%s]", wikiReference.getName()), e);
             }
 
             return null;
@@ -320,7 +313,7 @@ public class NotificationFilterPreferenceStore
      *
      * @param preference the preference to delete.
      */
-    private void deleteFilterPreference(NotificationFilterPreference preference)
+    private void deleteFilterPreference(NotificationFilterPreference preference) throws NotificationException
     {
         configureContextWrapper(() -> {
             if (preference == null) {
@@ -330,13 +323,16 @@ public class NotificationFilterPreferenceStore
             XWikiContext context = this.contextProvider.get();
 
             XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
+
             try {
-                hibernateStore.beginTransaction(context);
-                Session session = hibernateStore.getSession(context);
-                session.delete(preference);
-                hibernateStore.endTransaction(context, true);
+                hibernateStore.executeWrite(context, session -> {
+                    session.delete(preference);
+
+                    return null;
+                });
             } catch (XWikiException e) {
-                hibernateStore.endTransaction(context, false);
+                throw new NotificationException(
+                    String.format("Failed to delete the notification preference [%s]", preference), e);
             }
 
             // Notify listeners about the delete.
@@ -392,25 +388,25 @@ public class NotificationFilterPreferenceStore
 
             XWikiContext context = this.contextProvider.get();
 
-            XWikiHibernateStore hibernateStore = null;
+            XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
 
             try {
-                hibernateStore = context.getWiki().getHibernateStore();
-                hibernateStore.beginTransaction(context);
-                Session session = hibernateStore.getSession(context);
-
                 List<DefaultNotificationFilterPreference> preferencesToSend = new ArrayList<>(filterPreferences.size());
-                for (NotificationFilterPreference preference : filterPreferences) {
-                    // Hibernate mapping only describes how to save NotificationFilterPreference objects and does not
-                    // handle extended objects (like ScopeNotificationFilterPreference).
-                    // So we create a copy just in case we are not saving a basic NotificationFilterPreference object.
-                    DefaultNotificationFilterPreference copy = new DefaultNotificationFilterPreference(preference);
-                    copy.setOwner(serializedEntity);
-                    session.saveOrUpdate(copy);
-                    preferencesToSend.add(copy);
-                }
+                hibernateStore.executeWrite(context, session -> {
+                    for (NotificationFilterPreference preference : filterPreferences) {
+                        // Hibernate mapping only describes how to save NotificationFilterPreference objects and
+                        // does not
+                        // handle extended objects (like ScopeNotificationFilterPreference).
+                        // So we create a copy just in case we are not saving a basic NotificationFilterPreference
+                        // object.
+                        DefaultNotificationFilterPreference copy = new DefaultNotificationFilterPreference(preference);
+                        copy.setOwner(serializedEntity);
+                        session.saveOrUpdate(copy);
+                        preferencesToSend.add(copy);
+                    }
 
-                hibernateStore.endTransaction(context, true);
+                    return null;
+                });
 
                 // Notify listeners about the update
                 for (DefaultNotificationFilterPreference filterPreference : preferencesToSend) {
@@ -418,11 +414,9 @@ public class NotificationFilterPreferenceStore
                         entityReference);
                 }
             } catch (Exception e) {
-                if (hibernateStore != null) {
-                    hibernateStore.endTransaction(context, false);
-                }
                 throw new NotificationException("Failed to save the notification filter preferences.", e);
             }
+
             return null;
         });
     }

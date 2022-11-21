@@ -25,20 +25,18 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-image-style</artifactId>
-    <version>14.5-SNAPSHOT</version>
+    <version>14.9-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-image-style-model</artifactId>
   <name>XWiki Platform - Image - Style - Model</name>
   <packaging>jar</packaging>
-  <description>The (JAXB) model the for image styles REST module.</description>
+  <description>JAXB model for the image styles REST endpoints.</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager. -->
-    <xwiki.extension.name>Model for the Image Style Rest Endpoint.</xwiki.extension.name>
-    <!-- Description to display by the Extension Manager. -->
-    <xwiki.extension.description>Provides the Model for the Image Style configurations Rest Endpoint.</xwiki.extension.description>
+    <xwiki.extension.name>Model for the Image Style Rest Endpoint</xwiki.extension.name>
     <!-- Category to display in the Extension Manager. -->
-    <xwiki.extension.category>other</xwiki.extension.category>
+    <xwiki.extension.category>api</xwiki.extension.category>
   </properties>
   <dependencies>
     <dependency>

@@ -49,14 +49,3 @@
   }))
 #end
 #tree($dbTreeListSettings)
-<script>
-require(['jquery'], function($) {
-  $('.xtree.dbTreeList').on('changed.jstree', function(event, data) {
-    var fieldName = data.instance.settings.xwiki.fieldName;
-    var fieldValue = data.selected.join('|');
-    $('input[type="hidden"]').filter(function() {
-      return $(this).attr('name') === fieldName;
-    }).val(fieldValue);
-  });
-});
-</script>

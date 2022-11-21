@@ -793,7 +793,7 @@ public class EditIT
         SpaceReference spaceReference = new SpaceReference(reference.getWikiReference().getName(),
             Arrays.asList(spaceName1, spaceName2));
         DocumentReference documentReference = new DocumentReference(documentName, spaceReference);
-        setup.gotoPage(documentReference, "create");
+        setup.gotoPage(documentReference, "create", "template=");
         CreatePagePage createPagePage = new CreatePagePage();
         createPagePage.waitForErrorMessage();
         assertTrue(createPagePage.getErrorMessage()

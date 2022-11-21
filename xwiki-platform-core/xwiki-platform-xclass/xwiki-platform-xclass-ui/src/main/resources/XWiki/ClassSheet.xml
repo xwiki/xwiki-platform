@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.ClassSheet" locale="">
+<xwikidoc version="1.5" reference="XWiki.ClassSheet" locale="">
   <web>XWiki</web>
   <name>ClassSheet</name>
   <language/>
@@ -161,6 +161,7 @@
 
     {{html}}
     &lt;form action="$doc.getURL()" id="newdoc" method="post" class="xform half"&gt;
+      &lt;fieldset&gt;
       &lt;div class="hidden"&gt;
         &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
         &lt;input type="hidden" name="parent" value="${defaultParent}"/&gt;
@@ -199,6 +200,7 @@
             'platform.xclass.defaultClassSheet.createPage.label'))"/&gt;
         &lt;/span&gt;
       &lt;/p&gt;
+      &lt;/fieldset&gt;
     &lt;/form&gt;
     {{/html}}
 

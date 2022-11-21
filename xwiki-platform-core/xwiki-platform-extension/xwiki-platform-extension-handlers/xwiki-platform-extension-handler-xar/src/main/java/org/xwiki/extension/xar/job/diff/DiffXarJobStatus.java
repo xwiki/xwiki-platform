@@ -28,6 +28,7 @@ import org.xwiki.extension.xar.internal.job.DiffXarJob;
 import org.xwiki.job.DefaultJobStatus;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentVersionReference;
 import org.xwiki.observation.ObservationManager;
 
 /**

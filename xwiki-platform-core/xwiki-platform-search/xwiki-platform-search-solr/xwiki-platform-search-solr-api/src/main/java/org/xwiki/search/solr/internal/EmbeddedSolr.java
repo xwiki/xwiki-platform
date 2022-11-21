@@ -29,6 +29,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -47,9 +49,9 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.core.CoreContainer;
-import org.apache.solr.core.SolrCore;
 import org.apache.solr.core.CoreContainer.CoreLoadFailure;
 import org.apache.solr.core.CoreDescriptor;
+import org.apache.solr.core.SolrCore;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.DisposePriority;
 import org.xwiki.component.phase.Disposable;
@@ -77,6 +79,8 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
      * Solr instance type for this implementation.
      */
     public static final String TYPE = "embedded";
+
+    private final String SOLRCONFIG_PATH = "conf/solrconfig.xml";
 
     /**
      * Solr configuration.
@@ -106,6 +110,8 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
             // Create the Solr home if it does not already exist
             if (!Files.exists(this.solrHomePath)) {
                 createHomeDirectory();
+            } else {
+                updateHomeDirectory();
             }
 
             // Validate and create the search core
@@ -176,7 +182,8 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
 
         // Indicate the path of the data
         if (initializer.isCache()) {
-            parameters.put(CoreDescriptor.CORE_DATADIR, getCacheCoreDataDir(corePath, initializer.getCoreName()).toString());
+            parameters.put(CoreDescriptor.CORE_DATADIR,
+                getCacheCoreDataDir(corePath, initializer.getCoreName()).toString());
         }
 
         // Don't load the core on startup to workaround a possible dead lock during Solr init
@@ -198,7 +205,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
 
         // Copy configuration
         try (InputStream stream = this.solrConfiguration.getMinimalCoreDefaultContent()) {
-            copyCoreConfiguration(stream, corePath, true);
+            copyCoreConfiguration(stream, corePath, true, null);
         }
 
         return corePath;
@@ -258,7 +265,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
         }
 
         // Check solrconfig.xml
-        File solrconfigFile = this.solrSearchCorePath.resolve("conf/solrconfig.xml").toFile();
+        File solrconfigFile = this.solrSearchCorePath.resolve(SOLRCONFIG_PATH).toFile();
         return solrconfigFile.exists() && isExpectedSolrVersion(solrconfigFile);
     }
 
@@ -280,6 +287,11 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
         createSearchCore();
     }
 
+    private void writeHomeConfiguration() throws IOException
+    {
+        FileUtils.write(this.solrHomePath.resolve("solr.xml").toFile(), "<solr/>", StandardCharsets.UTF_8);
+    }
+
     private void createHomeDirectory() throws IOException
     {
         // Initialize the Solr Home with the default configuration files if the folder does not already exist.
@@ -290,8 +302,8 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
         // Create the home directory
         Files.createDirectories(this.solrHomePath);
 
-        // Copy the default solr.xml configuration file
-        FileUtils.write(this.solrHomePath.resolve("solr.xml").toFile(), "<solr/>", StandardCharsets.UTF_8);
+        // Write the default solr.xml configuration file
+        writeHomeConfiguration();
 
         // [RETRO COMPATIBILITY for < 12.3]
         // Check if the solr home is not already at the old location (/solr) and move things
@@ -308,15 +320,51 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
         }
     }
 
-    private void copyCoreConfiguration(InputStream stream, Path corePath, boolean skipCoreProperties) throws IOException
+    private void updateHomeDirectory() throws IOException
+    {
+        // Make sure the Solr Home contains expected configuration
+
+        this.logger.info("Updating Solr home directory at [{}]", this.solrHomePath);
+
+        // Reset the solr.xml configuration file
+        writeHomeConfiguration();
+
+        // Make sure cores have the expected configuration
+        try (Stream<Path> stream = Files.list(this.solrHomePath)) {
+            stream.filter(Files::isDirectory).forEach(this::updateCore);
+        }
+    }
+
+    private void updateCore(Path corePath)
+    {
+        try {
+            if (this.componentManager.hasComponent(SolrCoreInitializer.class, corePath.getFileName().toString())) {
+                Path solrconfig = corePath.resolve(SOLRCONFIG_PATH);
+
+                // If Solr was upgraded, reset the solrconfig.xml
+                if (Files.exists(solrconfig) && !isExpectedSolrVersion(solrconfig.toFile())) {
+                    // Reset solr configuration
+                    try (InputStream stream = this.solrConfiguration.getMinimalCoreDefaultContent()) {
+                        copyCoreConfiguration(stream, corePath, true, Set.of(SOLRCONFIG_PATH));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            this.logger.error("Failed to update Solr core located at [{}]", corePath, e);
+        }
+    }
+
+    private void copyCoreConfiguration(InputStream stream, Path corePath, boolean skipCoreProperties, Set<String> force)
+        throws IOException
     {
         try (ZipInputStream zstream = new ZipInputStream(stream)) {
             for (ZipEntry entry = zstream.getNextEntry(); entry != null; entry = zstream.getNextEntry()) {
                 Path targetPath = corePath.resolve(entry.getName());
                 if (entry.isDirectory()) {
                     Files.createDirectories(targetPath);
-                } else if (!skipCoreProperties || !entry.getName().equals("core.properties")) {
-                    FileUtils.copyInputStreamToFile(new CloseShieldInputStream(zstream), targetPath.toFile());
+                } else if ((force != null && force.contains(entry.getName())) || (!Files.exists(targetPath)
+                    && (!skipCoreProperties || !entry.getName().equals("core.properties")))) {
+                    FileUtils.copyInputStreamToFile(CloseShieldInputStream.wrap(zstream), targetPath.toFile());
                 }
             }
         }
@@ -325,7 +373,8 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
     private void createSearchCore() throws IOException
     {
         // Copy configuration
-        copyCoreConfiguration(this.solrConfiguration.getSearchCoreDefaultContent(), this.solrSearchCorePath, false);
+        copyCoreConfiguration(this.solrConfiguration.getSearchCoreDefaultContent(), this.solrSearchCorePath, false,
+            null);
 
         // Indicate the path of the data
         createCacheCore(this.solrSearchCorePath, SolrClientInstance.CORE_NAME);

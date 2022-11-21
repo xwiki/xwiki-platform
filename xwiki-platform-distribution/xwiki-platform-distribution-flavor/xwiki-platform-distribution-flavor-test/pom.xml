@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor</artifactId>
-    <version>14.5-SNAPSHOT</version>
+    <version>14.9-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Parent POM</name>
@@ -131,12 +131,6 @@
             </execution>
           </executions>
           <dependencies>
-            <dependency>
-              <groupId>org.xwiki.platform</groupId>
-              <artifactId>xwiki-platform-eventstream-store-hibernate</artifactId>
-              <version>${project.version}</version>
-              <scope>runtime</scope>
-            </dependency>
             <dependency>
               <groupId>org.xwiki.platform</groupId>
               <artifactId>xwiki-platform-instance</artifactId>

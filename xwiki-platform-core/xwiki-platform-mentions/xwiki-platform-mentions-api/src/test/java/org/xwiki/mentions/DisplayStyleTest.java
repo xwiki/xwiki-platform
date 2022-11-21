@@ -34,7 +34,7 @@ import static org.xwiki.mentions.DisplayStyle.LOGIN;
  * @version $Id$
  * @since 13.10.7
  * @since 14.4.2
- * @since 14.5RC1
+ * @since 14.5
  */
 @ComponentTest
 class DisplayStyleTest

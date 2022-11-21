@@ -53,10 +53,12 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
  *
  * @version $Id$
  * @since 14.3RC1
+ * @deprecated link storage and indexing moved to Solr (implemented in xwiki-platform-search-solr-api)
  */
 @Component
 @Singleton
 @Named(R140300001XWIKI19571DataMigration.HINT)
+@Deprecated(since = "14.8RC1")
 public class R140300001XWIKI19571DataMigration extends AbstractHibernateDataMigration
 {
     /**

@@ -20,10 +20,12 @@
 package org.xwiki.eventstream.events;
 
 /**
- * Event triggered when an event is deleted from the {@link org.xwiki.eventstream.EventStream}.
- *
- * This event also send the following parameters:
- * source: the event removed from the event stream that triggered this event
+ * Event triggered when an event is deleted from the store.
+ * <p>
+ * This event also send the following parameters
+ * <ul>
+ * <li>source: the event inserted in the event stream that triggered this event</li>
+ * </ul>
  *
  * @since 9.6RC1
  * @version $Id$

@@ -26,7 +26,6 @@ import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.xwiki.activeinstalls2.internal.XWikiElasticSearchExtension;
-import org.xwiki.test.docker.internal.junit5.XWikiDockerExtension;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 
 /**
@@ -34,13 +33,10 @@ import org.xwiki.test.docker.junit5.TestConfiguration;
  * property to point to the ES instance started dynamically (on a dynamic port) during the test.
  *
  * @version $Id$
- * @since 14.5RC1
+ * @since 14.5
  */
 public class DynamicTestConfigurationExtension implements BeforeAllCallback
 {
-    private static final ExtensionContext.Namespace XWIKIDOCKEREXTENSION_NAMESPACE =
-        ExtensionContext.Namespace.create(XWikiDockerExtension.class);
-
     @Override
     public void beforeAll(ExtensionContext extensionContext)
     {
@@ -61,10 +57,5 @@ public class DynamicTestConfigurationExtension implements BeforeAllCallback
         // https://www.testcontainers.org/features/networking/#exposing-host-ports-to-the-container.
         configuration.setSSHPorts(List.of(esContainer.getMappedPort(9200)));
         globalStore.put(TestConfiguration.class, configuration);
-    }
-
-    private static ExtensionContext.Store getXWikiDockerExtensionStore(ExtensionContext context)
-    {
-        return context.getRoot().getStore(XWIKIDOCKEREXTENSION_NAMESPACE);
     }
 }

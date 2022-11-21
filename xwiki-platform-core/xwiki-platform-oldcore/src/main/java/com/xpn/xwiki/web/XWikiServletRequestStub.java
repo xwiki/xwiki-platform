@@ -113,7 +113,7 @@ public class XWikiServletRequestStub implements XWikiRequest
 
     /**
      * @since 14.4.2
-     * @since 14.5RC1
+     * @since 14.5
      */
     public XWikiServletRequestStub(URL requestURL, String contextPath, Map<String, String[]> requestParameters,
         Cookie[] cookies)

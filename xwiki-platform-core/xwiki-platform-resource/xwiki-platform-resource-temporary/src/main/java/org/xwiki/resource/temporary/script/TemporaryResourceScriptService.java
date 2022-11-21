@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
+import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.script.ResourceScriptService;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
@@ -38,7 +39,7 @@ import org.xwiki.url.ExtendedURL;
  * 
  * @version $Id$
  * @since 14.4.2
- * @since 14.5RC1
+ * @since 14.5
  */
 @Component
 @Named(TemporaryResourceScriptService.ROLE_HINT)
@@ -60,8 +61,7 @@ public class TemporaryResourceScriptService implements ScriptService
      * Used to obtain the URL that corresponds to a temporary resource.
      */
     @Inject
-    @Named("standard/tmp")
-    private ResourceReferenceSerializer<TemporaryResourceReference, ExtendedURL> urlTempResourceReferenceSerializer;
+    private ResourceReferenceSerializer<ResourceReference, ExtendedURL> resourceReferenceSerializer;
     
     @Inject
     private TemporaryResourceStore temporaryResourceStore;
@@ -81,7 +81,7 @@ public class TemporaryResourceScriptService implements ScriptService
         setError(null);
 
         try {
-            return this.urlTempResourceReferenceSerializer.serialize(tempResourceReference).serialize();
+            return this.resourceReferenceSerializer.serialize(tempResourceReference).serialize();
         } catch (Exception e) {
             setError(e);
             return null;

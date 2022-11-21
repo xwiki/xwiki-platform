@@ -22,10 +22,13 @@ package org.xwiki.security.authentication.internal.resource;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.resource.CreateResourceReferenceException;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
@@ -33,6 +36,8 @@ import org.xwiki.security.authentication.AuthenticationAction;
 import org.xwiki.security.authentication.AuthenticationResourceReference;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.internal.AbstractResourceReferenceResolver;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * Default resolver for {@link AuthenticationResourceReference}.
@@ -47,26 +52,38 @@ import org.xwiki.url.internal.AbstractResourceReferenceResolver;
 @Singleton
 public class AuthenticationResourceReferenceResolver extends AbstractResourceReferenceResolver
 {
+    @Inject
+    private Provider<XWikiContext> contextProvider;
+
     @Override
     public AuthenticationResourceReference resolve(ExtendedURL representation, ResourceType resourceType,
         Map<String, Object> parameters) throws CreateResourceReferenceException, UnsupportedResourceReferenceException
     {
         AuthenticationResourceReference result;
         List<String> segments = representation.getSegments();
+        WikiReference wikiReference = new WikiReference(contextProvider.get().getMainXWiki());
+
         if (segments.size() == 1) {
-            String actionName = segments.get(0);
-            try {
-                AuthenticationAction authenticationAction = AuthenticationAction.getFromRequestParameter(actionName);
-                result = new AuthenticationResourceReference(authenticationAction);
-                copyParameters(representation, result);
-                return result;
-            } catch (IllegalArgumentException e) {
-                throw new CreateResourceReferenceException(
-                    String.format("Cannot find an authentication action for name [%s]", actionName));
-            }
+            result = new AuthenticationResourceReference(wikiReference, getAuthenticationAction(segments.get(0)));
+            copyParameters(representation, result);
+        } else if (segments.size() == 3 && "wiki".equals(segments.get(0))) {
+            wikiReference = new WikiReference(segments.get(1));
+            result = new AuthenticationResourceReference(wikiReference, getAuthenticationAction(segments.get(2)));
+            copyParameters(representation, result);
         } else {
             throw new CreateResourceReferenceException(
                 String.format("Invalid Authentication URL format: [%s]", representation.toString()));
+        }
+        return result;
+    }
+
+    private AuthenticationAction getAuthenticationAction(String actionName) throws CreateResourceReferenceException
+    {
+        try {
+            return AuthenticationAction.getFromRequestParameter(actionName);
+        } catch (IllegalArgumentException e) {
+            throw new CreateResourceReferenceException(
+                String.format("Cannot find an authentication action for name [%s]", actionName));
         }
     }
 }

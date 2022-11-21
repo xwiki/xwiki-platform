@@ -91,7 +91,11 @@ public class RenamePage extends ViewPage
 
     public CopyOrRenameOrDeleteStatusPage clickRenameButton()
     {
+        // The rename page form is submitted by JavaScript code in case the rename button is clicked before the
+        // asynchronous validation ends, and in this case Selenium doesn't wait for the new page to load.
+        getDriver().addPageNotYetReloadedMarker();
         this.renameButton.click();
+        getDriver().waitUntilPageIsReloaded();
         return new CopyOrRenameOrDeleteStatusPage();
     }
 

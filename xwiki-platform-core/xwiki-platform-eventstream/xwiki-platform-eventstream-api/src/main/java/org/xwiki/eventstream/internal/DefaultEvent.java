@@ -111,6 +111,8 @@ public class DefaultEvent implements Event
 
     private boolean prefiltered;
 
+    private String observationInstanceId;
+
     @Override
     public String getId()
     {
@@ -422,6 +424,21 @@ public class DefaultEvent implements Event
     public void setPrefiltered(boolean prefiltered)
     {
         this.prefiltered = prefiltered;
+    }
+    
+    @Override
+    public String getRemoteObservationId()
+    {
+        return this.observationInstanceId;
+    }
+
+    /**
+     * @param observationInstanceId the unique identifier of the instance in the cluster
+     * @since 14.7RC1
+     */
+    public void setRemoteObservationId(String observationInstanceId)
+    {
+        this.observationInstanceId = observationInstanceId;
     }
 
     /**

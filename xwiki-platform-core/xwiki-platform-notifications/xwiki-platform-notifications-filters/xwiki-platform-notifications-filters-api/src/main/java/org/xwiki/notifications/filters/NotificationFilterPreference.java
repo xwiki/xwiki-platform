@@ -152,7 +152,7 @@ public interface NotificationFilterPreference
      *
      * @param wikiId a wiki identifier
      * @return {@code true} if the notification filter preference is related to a given wiki, {@code false} otherwise
-     * @since 14.5RC1
+     * @since 14.5
      * @since 14.4.1
      * @since 13.10.7
      */
@@ -172,7 +172,7 @@ public interface NotificationFilterPreference
      *
      * @return the wiki identifier of the resource concerned by the filter preference, {@link Optional#empty()} if no
      *     wiki identifier can be found
-     * @since 14.5RC1
+     * @since 14.5
      * @since 14.4.1
      * @since 13.10.7
      */

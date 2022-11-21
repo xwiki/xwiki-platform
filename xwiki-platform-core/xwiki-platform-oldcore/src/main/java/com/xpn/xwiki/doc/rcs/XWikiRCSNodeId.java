@@ -62,7 +62,7 @@ public class XWikiRCSNodeId extends AbstractSimpleClass implements Serializable,
      * @param version the version of document
      * @since 13.10.7
      * @since 14.4.1
-     * @since 14.5RC1
+     * @since 14.5
      */
     public XWikiRCSNodeId(WikiReference wikiReference, long docId, Version version)
     {
@@ -74,7 +74,7 @@ public class XWikiRCSNodeId extends AbstractSimpleClass implements Serializable,
     /**
      * @param docId the local identifier of the document
      * @param version the version of document
-     * @deprecated since 13.10.7, 14.4.1, 14.5RC1, use {@link #XWikiRCSNodeId(WikiReference, long, Version)} instead
+     * @deprecated since 13.10.7, 14.4.1, 14.5, use {@link #XWikiRCSNodeId(WikiReference, long, Version)} instead
      */
     @Deprecated(since = "13.10.7")
     public XWikiRCSNodeId(long docId, Version version)
@@ -86,7 +86,7 @@ public class XWikiRCSNodeId extends AbstractSimpleClass implements Serializable,
      * @return the reference of the wiki where this node is located or null if unknown
      * @since 13.10.7
      * @since 14.4.1
-     * @since 14.5RC1
+     * @since 14.5
      */
     public WikiReference getWikiReference()
     {
@@ -111,7 +111,7 @@ public class XWikiRCSNodeId extends AbstractSimpleClass implements Serializable,
 
     /**
      * @param docId = {@link com.xpn.xwiki.doc.XWikiDocument#getId()}
-     * @deprecated since 13.10.7, 14.4.1, 14.5RC1, use {@link #XWikiRCSNodeId(WikiReference, long, Version)} instead
+     * @deprecated since 13.10.7, 14.4.1, 14.5, use {@link #XWikiRCSNodeId(WikiReference, long, Version)} instead
      */
     @Deprecated(since = "13.10.7")
     protected void setDocId(long docId)

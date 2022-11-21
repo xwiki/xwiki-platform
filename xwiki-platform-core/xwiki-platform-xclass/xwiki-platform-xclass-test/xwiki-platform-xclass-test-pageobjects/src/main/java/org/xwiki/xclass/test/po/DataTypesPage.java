@@ -73,7 +73,13 @@ public class DataTypesPage extends ViewPage
     {
         this.documentPicker.setParent(spaceName);
         this.documentPicker.setName(className);
+
+        // The create class form is submitted by JavaScript code in case the create button is clicked before the
+        // asynchronous validation ends, and in this case Selenium doesn't wait for the new page to load.
+        getDriver().addPageNotYetReloadedMarker();
         this.createClassButton.click();
+        getDriver().waitUntilPageIsReloaded();
+
         new WikiEditPage().clickSaveAndView();
         return new ClassSheetPage();
     }

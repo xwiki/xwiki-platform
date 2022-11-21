@@ -19,8 +19,8 @@
  */
 package org.xwiki.refactoring.internal.listener;
 
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,9 +29,10 @@ import org.mockito.Mock;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.job.JobContext;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.refactoring.RefactoringException;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
-import org.xwiki.refactoring.internal.LinkRefactoring;
 import org.xwiki.refactoring.internal.ModelBridge;
+import org.xwiki.refactoring.internal.ReferenceUpdater;
 import org.xwiki.refactoring.internal.job.DeleteJob;
 import org.xwiki.refactoring.internal.job.RenameJob;
 import org.xwiki.refactoring.job.DeleteRequest;
@@ -43,7 +44,6 @@ import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -64,13 +64,10 @@ class BackLinkUpdaterListenerTest
     private BackLinkUpdaterListener listener;
 
     @MockComponent
-    private LinkRefactoring linkRefactoring;
+    private ReferenceUpdater updater;
 
     @MockComponent
     private ModelBridge modelBridge;
-
-    @MockComponent
-    private WikiDescriptorManager wikiDescriptorManager;
 
     @MockComponent
     private ContextualAuthorizationManager authorization;
@@ -106,9 +103,8 @@ class BackLinkUpdaterListenerTest
     @BeforeEach
     public void configure() throws Exception
     {
-        when(wikiDescriptorManager.getAllIds()).thenReturn(Arrays.asList("foo", "bar"));
-        when(this.modelBridge.getBackLinkedReferences(aliceReference, "foo")).thenReturn(Arrays.asList(carolReference));
-        when(this.modelBridge.getBackLinkedReferences(aliceReference, "bar")).thenReturn(Arrays.asList(denisReference));
+        when(this.modelBridge.getBackLinkedDocuments(aliceReference))
+            .thenReturn(Set.of(carolReference, denisReference));
 
         when(this.jobContext.getCurrentJob()).thenReturn(deleteJob);
         when(this.deleteJob.getRequest()).thenReturn(deleteRequest);
@@ -119,63 +115,57 @@ class BackLinkUpdaterListenerTest
     void onDocumentRenamedWithUpdateLinksOnFarm()
     {
         renameRequest.setUpdateLinks(true);
-        renameRequest.setUpdateLinksOnFarm(true);
 
         when(this.renameJob.hasAccess(Right.EDIT, carolReference)).thenReturn(true);
         when(this.renameJob.hasAccess(Right.EDIT, denisReference)).thenReturn(true);
 
         this.listener.onEvent(documentRenamedEvent, renameJob, renameRequest);
 
-        verify(this.linkRefactoring).renameLinks(carolReference, aliceReference, bobReference);
-        verify(this.linkRefactoring).renameLinks(denisReference, aliceReference, bobReference);
+        verify(this.updater).update(carolReference, aliceReference, bobReference);
+        verify(this.updater).update(denisReference, aliceReference, bobReference);
 
-        assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [foo].", logCapture.getMessage(0));
-        assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [bar].", logCapture.getMessage(1));
+        assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
     }
 
     @Test
     void onDocumentRenamedWithUpdateLinksOnFarmAndNoEditRight()
     {
         renameRequest.setUpdateLinks(true);
-        renameRequest.setUpdateLinksOnFarm(true);
 
         when(this.renameJob.hasAccess(Right.EDIT, carolReference)).thenReturn(true);
         when(this.renameJob.hasAccess(Right.EDIT, denisReference)).thenReturn(false);
 
         this.listener.onEvent(documentRenamedEvent, renameJob, renameRequest);
 
-        verify(this.linkRefactoring).renameLinks(carolReference, aliceReference, bobReference);
-        verify(this.linkRefactoring, never()).renameLinks(eq(denisReference), any(DocumentReference.class), any());
+        verify(this.updater).update(carolReference, aliceReference, bobReference);
+        verify(this.updater, never()).update(eq(denisReference), any(DocumentReference.class), any());
 
-        assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [foo].", logCapture.getMessage(0));
-        assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [bar].", logCapture.getMessage(1));
+        assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
     }
 
     @Test
     void onDocumentRenamedWithUpdateLinksOnWiki()
     {
         renameRequest.setUpdateLinks(true);
-        renameRequest.setUpdateLinksOnFarm(false);
 
         when(this.renameJob.hasAccess(Right.EDIT, carolReference)).thenReturn(true);
 
         this.listener.onEvent(documentRenamedEvent, renameJob, renameRequest);
 
-        verify(this.linkRefactoring).renameLinks(carolReference, aliceReference, bobReference);
-        verify(this.linkRefactoring, never()).renameLinks(eq(denisReference), any(DocumentReference.class), any());
+        verify(this.updater).update(carolReference, aliceReference, bobReference);
+        verify(this.updater, never()).update(eq(denisReference), any(DocumentReference.class), any());
 
-        assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [foo].", logCapture.getMessage(0));
+        assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
     }
 
     @Test
     void onDocumentRenamedWithoutUpdateLinks()
     {
         renameRequest.setUpdateLinks(false);
-        renameRequest.setUpdateLinksOnFarm(true);
 
         this.listener.onEvent(documentRenamedEvent, renameJob, renameRequest);
 
-        verify(this.linkRefactoring, never()).renameLinks(any(), any(DocumentReference.class), any());
+        verify(this.updater, never()).update(any(), any(DocumentReference.class), any());
     }
 
     @Test
@@ -186,11 +176,10 @@ class BackLinkUpdaterListenerTest
 
         this.listener.onEvent(documentRenamedEvent, null, null);
 
-        verify(this.linkRefactoring).renameLinks(carolReference, aliceReference, bobReference);
-        verify(this.linkRefactoring).renameLinks(denisReference, aliceReference, bobReference);
+        verify(this.updater).update(carolReference, aliceReference, bobReference);
+        verify(this.updater).update(denisReference, aliceReference, bobReference);
 
-        assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [foo].", logCapture.getMessage(0));
-        assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [bar].", logCapture.getMessage(1));
+        assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
     }
 
     @Test
@@ -201,44 +190,40 @@ class BackLinkUpdaterListenerTest
 
         this.listener.onEvent(documentRenamedEvent, null, null);
 
-        verify(this.linkRefactoring, never()).renameLinks(eq(carolReference), any(DocumentReference.class), any());
-        verify(this.linkRefactoring).renameLinks(denisReference, aliceReference, bobReference);
+        verify(this.updater, never()).update(eq(carolReference), any(DocumentReference.class), any());
+        verify(this.updater).update(denisReference, aliceReference, bobReference);
 
-        assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [foo].", logCapture.getMessage(0));
-        assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [bar].", logCapture.getMessage(1));
+        assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
     }
 
     @Test
     void onDocumentDeletedWithUpdateLinksOnFarm()
     {
         deleteRequest.setUpdateLinks(true);
-        deleteRequest.setUpdateLinksOnFarm(true);
 
         when(this.deleteJob.hasAccess(Right.EDIT, carolReference)).thenReturn(true);
         when(this.deleteJob.hasAccess(Right.EDIT, denisReference)).thenReturn(true);
 
         this.listener.onEvent(documentDeletedEvent, null, null);
 
-        verify(this.linkRefactoring).renameLinks(carolReference, aliceReference, bobReference);
-        verify(this.linkRefactoring).renameLinks(denisReference, aliceReference, bobReference);
+        verify(this.updater).update(carolReference, aliceReference, bobReference);
+        verify(this.updater).update(denisReference, aliceReference, bobReference);
 
-        assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [foo].", logCapture.getMessage(0));
-        assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [bar].", logCapture.getMessage(1));
+        assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
     }
 
     @Test
-    void onDocumentDeletedWithUpdateLinksOnFarmOnDocWithoutTarget()
+    void onDocumentDeletedWithUpdateLinksOnFarmOnDocWithoutTarget() throws RefactoringException
     {
         deleteRequest.setUpdateLinks(true);
-        deleteRequest.setUpdateLinksOnFarm(true);
 
         DocumentReference docReference = new DocumentReference("wiki", "Users", "Ana");
-        when(this.modelBridge.getBackLinkedReferences(docReference, "wiki")).thenReturn(Arrays.asList(aliceReference));
+        when(this.modelBridge.getBackLinkedDocuments(docReference)).thenReturn(Set.of(aliceReference));
         when(this.deleteJob.hasAccess(Right.EDIT, docReference)).thenReturn(true);
 
         this.listener.onEvent(new DocumentDeletedEvent(docReference), null, null);
 
-        verify(this.linkRefactoring, never()).renameLinks(eq(aliceReference), eq(docReference),
+        verify(this.updater, never()).update(eq(aliceReference), eq(docReference),
             any(DocumentReference.class));
     }
 
@@ -246,45 +231,26 @@ class BackLinkUpdaterListenerTest
     void onDocumentDeleteWithUpdateLinksOnFarmAndNoEditRight()
     {
         deleteRequest.setUpdateLinks(true);
-        deleteRequest.setUpdateLinksOnFarm(true);
 
         when(this.deleteJob.hasAccess(Right.EDIT, carolReference)).thenReturn(true);
         when(this.deleteJob.hasAccess(Right.EDIT, denisReference)).thenReturn(false);
 
         this.listener.onEvent(documentDeletedEvent, null, null);
 
-        verify(this.linkRefactoring).renameLinks(carolReference, aliceReference, bobReference);
-        verify(this.linkRefactoring, never()).renameLinks(eq(denisReference), any(DocumentReference.class), any());
+        verify(this.updater).update(carolReference, aliceReference, bobReference);
+        verify(this.updater, never()).update(eq(denisReference), any(DocumentReference.class), any());
 
-        assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [foo].", logCapture.getMessage(0));
-        assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [bar].", logCapture.getMessage(1));
-    }
-
-    @Test
-    void onDocumentDeleteWithUpdateLinksOnWiki()
-    {
-        deleteRequest.setUpdateLinks(true);
-        deleteRequest.setUpdateLinksOnFarm(false);
-
-        when(this.deleteJob.hasAccess(Right.EDIT, carolReference)).thenReturn(true);
-
-        this.listener.onEvent(documentDeletedEvent, null, null);
-
-        verify(this.linkRefactoring).renameLinks(carolReference, aliceReference, bobReference);
-        verify(this.linkRefactoring, never()).renameLinks(eq(denisReference), any(DocumentReference.class), any());
-
-        assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [foo].", logCapture.getMessage(0));
+        assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
     }
 
     @Test
     void onDocumentDeletedWithoutUpdateLinks()
     {
         deleteRequest.setUpdateLinks(false);
-        deleteRequest.setUpdateLinksOnFarm(true);
 
         this.listener.onEvent(documentDeletedEvent, null, null);
 
-        verify(this.linkRefactoring, never()).renameLinks(any(), any(DocumentReference.class), any());
+        verify(this.updater, never()).update(any(), any(DocumentReference.class), any());
     }
 
     @Test
@@ -296,6 +262,6 @@ class BackLinkUpdaterListenerTest
 
         this.listener.onEvent(documentDeletedEvent, null, null);
 
-        verify(this.linkRefactoring, never()).renameLinks(any(), any(DocumentReference.class), any());
+        verify(this.updater, never()).update(any(), any(DocumentReference.class), any());
     }
 }

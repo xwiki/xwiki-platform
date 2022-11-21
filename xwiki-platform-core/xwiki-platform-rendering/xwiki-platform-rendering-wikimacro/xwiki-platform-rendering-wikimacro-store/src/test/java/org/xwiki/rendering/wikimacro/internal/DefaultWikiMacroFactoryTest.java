@@ -20,6 +20,7 @@
 package org.xwiki.rendering.wikimacro.internal;
 
 import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -95,7 +96,7 @@ class DefaultWikiMacroFactoryTest
         this.macroObject.setStringValue(WikiMacroConstants.MACRO_NAME_PROPERTY, "Test Macro");
         this.macroObject.setStringValue(WikiMacroConstants.MACRO_DESCRIPTION_PROPERTY,
             "This is a macro used for testing purposes.");
-        this.macroObject.setStringValue(WikiMacroConstants.MACRO_DEFAULT_CATEGORY_PROPERTY, "Test");
+        this.macroObject.setStringListValue(WikiMacroConstants.MACRO_DEFAULT_CATEGORIES_PROPERTY, List.of("Test"));
         this.macroObject.setStringValue(WikiMacroConstants.MACRO_VISIBILITY_PROPERTY, "Current User");
         this.macroObject.setIntValue(WikiMacroConstants.MACRO_INLINE_PROPERTY, 1);
         this.macroObject.setStringValue(WikiMacroConstants.MACRO_CONTENT_TYPE_PROPERTY, "No content");
@@ -129,7 +130,7 @@ class DefaultWikiMacroFactoryTest
         assertEquals("Test Macro", macro.getDescriptor().getName());
         assertEquals(42, macro.getPriority());
         assertEquals("This is a macro used for testing purposes.", macro.getDescriptor().getDescription());
-        assertEquals("Test", macro.getDescriptor().getDefaultCategory());
+        assertEquals(Set.of("Test"), macro.getDescriptor().getDefaultCategories());
         assertEquals(WikiMacroVisibility.USER, ((WikiMacroDescriptor) macro.getDescriptor()).getVisibility());
         assertTrue(macro.supportsInlineMode());
         assertNull(macro.getDescriptor().getContentDescriptor());

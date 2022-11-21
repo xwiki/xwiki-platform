@@ -77,7 +77,7 @@ class PDFExportJobTest
     private RequiredSkinExtensionsRecorder requiredSkinExtensionsRecorder;
 
     @MockComponent
-    @Named("docker")
+    @Named("chrome")
     private PDFPrinter<URL> pdfPrinter;
 
     @MockComponent
@@ -121,12 +121,12 @@ class PDFExportJobTest
         when(this.authorization.hasAccess(Right.VIEW, this.bobReference, this.firstPageReference)).thenReturn(true);
         when(this.authorization.hasAccess(Right.VIEW, this.bobReference, this.secondPageReference)).thenReturn(true);
 
-        when(this.documentRenderer.render(this.firstPageReference)).thenReturn(this.firstPageRendering);
-        when(this.documentRenderer.render(this.secondPageReference)).thenReturn(this.secondPageRendering);
+        when(this.documentRenderer.render(this.firstPageReference, true)).thenReturn(this.firstPageRendering);
+        when(this.documentRenderer.render(this.secondPageReference, true)).thenReturn(this.secondPageRendering);
     }
 
     @Test
-    void run() throws Exception
+    void runServerSide() throws Exception
     {
         when(this.requiredSkinExtensionsRecorder.stop()).thenReturn("required skin extensions");
 
@@ -135,6 +135,7 @@ class PDFExportJobTest
         this.request.getContext().put("request.url", printPreviewURL);
         when(this.pdfPrinter.print(printPreviewURL)).thenReturn(pdfContent);
 
+        this.request.setServerSide(true);
         this.pdfExportJob.initialize(this.request);
         this.pdfExportJob.runInternal();
 
@@ -151,7 +152,6 @@ class PDFExportJobTest
     @Test
     void runClientSide() throws Exception
     {
-        this.request.setServerSide(false);
         this.pdfExportJob.initialize(this.request);
         this.pdfExportJob.runInternal();
 

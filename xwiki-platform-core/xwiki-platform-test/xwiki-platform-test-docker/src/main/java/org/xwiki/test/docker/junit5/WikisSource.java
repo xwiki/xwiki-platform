@@ -31,7 +31,7 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
  * {@code WikiSource} is an {@link ArgumentsSource} which allow executing a test on several wikis.
  * 
  * @version $Id$
- * @since 14.5RC1
+ * @since 14.5
  */
 @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

@@ -215,6 +215,7 @@ com.xpn.xwiki.store.migration.hibernate.R130200000XWIKI17200DataMigration
 com.xpn.xwiki.store.migration.hibernate.R140000000XWIKI19125DataMigration
 com.xpn.xwiki.store.migration.hibernate.R140200010XWIKI19207DataMigration
 com.xpn.xwiki.store.migration.hibernate.R140200000XWIKI19352DataMigration
+com.xpn.xwiki.store.migration.hibernate.R140600000XWIKI19869DataMigration
 com.xpn.xwiki.store.VoidAttachmentVersioningStore
 com.xpn.xwiki.store.XWikiHibernateStore
 com.xpn.xwiki.store.XWikiHibernateVersioningStore
@@ -258,7 +259,6 @@ com.xpn.xwiki.web.SaveAction
 com.xpn.xwiki.web.SaveAndContinueAction
 com.xpn.xwiki.web.SkinAction
 com.xpn.xwiki.web.SVGAction
-com.xpn.xwiki.web.TexAction
 com.xpn.xwiki.web.UndeleteAction
 com.xpn.xwiki.web.UnknownAction
 com.xpn.xwiki.web.UploadAction

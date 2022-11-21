@@ -22,7 +22,6 @@ package org.xwiki.store.filesystem.internal;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +32,10 @@ import javax.servlet.http.Part;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mock;
 import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -45,10 +48,11 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static com.xpn.xwiki.plugin.fileupload.FileUploadPlugin.UPLOAD_MAXSIZE_PARAMETER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -56,6 +60,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -79,16 +84,17 @@ class DefaultTemporaryAttachmentSessionsManagerTest
     @XWikiTempDir
     private File tmpDir;
 
+    @Mock
     private XWikiContext context;
+
+    @Mock
     private HttpSession httpSession;
 
     @BeforeEach
     void setup(MockitoComponentManager mockitoComponentManager) throws Exception
     {
-        this.context = mock(XWikiContext.class);
         when(this.contextProvider.get()).thenReturn(this.context);
 
-        this.httpSession = mock(HttpSession.class);
         XWikiRequest xWikiRequest = mock(XWikiRequest.class);
         when(xWikiRequest.getSession()).thenReturn(this.httpSession);
         when(this.context.getRequest()).thenReturn(xWikiRequest);
@@ -104,36 +110,84 @@ class DefaultTemporaryAttachmentSessionsManagerTest
         String sessionId = "mySession";
         when(this.httpSession.getId()).thenReturn(sessionId);
 
-        DocumentReference documentReference = mock(DocumentReference.class);
-        SpaceReference spaceReference = mock(SpaceReference.class);
-        when(documentReference.getLastSpaceReference()).thenReturn(spaceReference);
+        DocumentReference documentReference = new DocumentReference("xwiki", "Space", "Document");
         Part part = mock(Part.class);
 
         String filename = "fileFoo.xml";
         when(part.getSubmittedFileName()).thenReturn(filename);
-        InputStream inputStream = new ByteArrayInputStream("foo".getBytes(StandardCharsets.UTF_8));
+        InputStream inputStream = new ByteArrayInputStream("foo".getBytes(UTF_8));
         when(part.getInputStream()).thenReturn(inputStream);
 
         XWiki xwiki = mock(XWiki.class);
         when(this.context.getWiki()).thenReturn(xwiki);
         DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "User");
         when(this.context.getUserReference()).thenReturn(userReference);
-        when(xwiki.getSpacePreference(FileUploadPlugin.UPLOAD_MAXSIZE_PARAMETER, spaceReference, this.context))
-            .thenReturn("42");
+        SpaceReference lastSpaceReference = documentReference.getLastSpaceReference();
+        when(xwiki.getSpacePreference(UPLOAD_MAXSIZE_PARAMETER, lastSpaceReference, this.context)).thenReturn("42");
         when(part.getSize()).thenReturn(41L);
 
         doAnswer(invocationOnMock -> {
             TemporaryAttachmentSession temporaryAttachmentSession = invocationOnMock.getArgument(1);
             assertEquals(sessionId, temporaryAttachmentSession.getSessionId());
             return null;
-        }).when(httpSession).setAttribute(eq(ATTRIBUTE_KEY), any(TemporaryAttachmentSession.class));
+        }).when(this.httpSession).setAttribute(eq(ATTRIBUTE_KEY), any(TemporaryAttachmentSession.class));
 
         XWikiAttachment attachment = this.attachmentManager.uploadAttachment(documentReference, part);
         assertNotNull(attachment);
         assertEquals(filename, attachment.getFilename());
         assertEquals(userReference, attachment.getAuthorReference());
+        assertEquals(documentReference, attachment.getDoc().getDocumentReference());
 
-        verify(httpSession).setAttribute(eq(ATTRIBUTE_KEY), any(TemporaryAttachmentSession.class));
+        verify(this.httpSession).setAttribute(eq(ATTRIBUTE_KEY), any(TemporaryAttachmentSession.class));
+        verify(part).getSubmittedFileName();
+    }
+
+    @Test
+    void uploadAttachmentWithFilename() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", "XWiki", "Document");
+        SpaceReference spaceReference = documentReference.getLastSpaceReference();
+
+        XWiki xwiki = mock(XWiki.class);
+        Part part = mock(Part.class);
+
+        when(this.context.getWiki()).thenReturn(xwiki);
+        when(xwiki.getSpacePreference(UPLOAD_MAXSIZE_PARAMETER, spaceReference, this.context))
+            .thenReturn("42");
+
+        when(part.getInputStream()).thenReturn(new ByteArrayInputStream("foo".getBytes(UTF_8)));
+
+        XWikiAttachment xWikiAttachment =
+            this.attachmentManager.uploadAttachment(documentReference, part, "newFilename");
+        assertEquals("newFilename", xWikiAttachment.getFilename());
+        verify(part, never()).getSubmittedFileName();
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {
+        "",
+        " ",
+        "  ",
+        "\t"
+    })
+    void uploadAttachmentWithEmptyFilename(String filename) throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", "XWiki", "Document");
+        SpaceReference spaceReference = documentReference.getLastSpaceReference();
+
+        XWiki xwiki = mock(XWiki.class);
+        Part part = mock(Part.class);
+
+        when(this.context.getWiki()).thenReturn(xwiki);
+        when(xwiki.getSpacePreference(UPLOAD_MAXSIZE_PARAMETER, spaceReference, this.context))
+            .thenReturn("42");
+
+        when(part.getInputStream()).thenReturn(new ByteArrayInputStream("foo".getBytes(UTF_8)));
+        when(part.getSubmittedFileName()).thenReturn("partFilename");
+
+        XWikiAttachment xWikiAttachment = this.attachmentManager.uploadAttachment(documentReference, part, filename);
+        assertEquals("partFilename", xWikiAttachment.getFilename());
     }
 
     @Test

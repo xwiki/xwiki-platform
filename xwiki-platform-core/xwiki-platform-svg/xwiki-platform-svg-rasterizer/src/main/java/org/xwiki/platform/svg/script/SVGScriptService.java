@@ -28,8 +28,8 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.platform.svg.SVGRasterizer;
+import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceSerializer;
-import org.xwiki.resource.temporary.TemporaryResourceReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.url.ExtendedURL;
 
@@ -51,8 +51,7 @@ public class SVGScriptService implements ScriptService
     private SVGRasterizer component;
 
     @Inject
-    @Named("standard/tmp")
-    private ResourceReferenceSerializer<TemporaryResourceReference, ExtendedURL> serializer;
+    private ResourceReferenceSerializer<ResourceReference, ExtendedURL> serializer;
 
     /**
      * Rasterize an image as PNG into a temporary resource belonging to the current document, accessible through the

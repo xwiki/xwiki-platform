@@ -31,6 +31,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * A recorded event that occurred at some point in the wiki.
@@ -72,6 +73,7 @@ import org.xwiki.model.reference.WikiReference;
  * <li>the {@link #getDocumentTitle() display title} of the target document at the time that the event occurred</li>
  * <li>the {@link #getUrl() requested URL} that caused the event</li>
  * </ul>
+ * Use {@link org.xwiki.eventstream.EventFactory} to create a new {@link Event} instance.
  * 
  * @version $Id$
  * @since 3.0M2
@@ -196,6 +198,13 @@ public interface Event
      * @since 12.5RC1
      */
     String FIELD_PREFILTERED = "preFiltered";
+
+    /**
+     * @see #getRemoteObservationId()
+     * @since 14.7RC1
+     */
+    @Unstable
+    String FIELD_REMOTE_OBSERVATION_ID = "observationInstanceId";
 
     /** The importance of an event. */
     enum Importance
@@ -555,5 +564,16 @@ public interface Event
     {
         LoggerFactory.getLogger(Event.class)
             .warn("org.xwiki.eventstream.Event#setPrefiltered(boolean) has been called without being reimplemented.");
+    }
+
+    /**
+     * @return the unique identifier of the instance in the cluster, or {@code null} if the event was produced in a
+     *         version of XWiki older than 14.7
+     * @since 14.7RC1
+     */
+    @Unstable
+    default String getRemoteObservationId()
+    {
+        return null;
     }
 }

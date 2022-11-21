@@ -29,17 +29,21 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
+import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.flamingo.skin.test.po.JobQuestionPane;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
+import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.AttachmentsPane;
 import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
 import org.xwiki.test.ui.po.DocumentPicker;
 import org.xwiki.test.ui.po.RenamePage;
@@ -53,7 +57,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @UITest
-public class RenamePageIT
+class RenamePageIT
 {
     @BeforeAll
     public void setup(TestUtils setup)
@@ -61,9 +65,16 @@ public class RenamePageIT
         setup.loginAsSuperAdmin();
     }
 
+    private String computedHostURL(TestConfiguration testConfiguration)
+    {
+        ServletEngine servletEngine = testConfiguration.getServletEngine();
+        return String.format("http://%s:%d%s", servletEngine.getIP(), servletEngine.getPort(),
+            XWikiExecutor.DEFAULT_CONTEXT);
+    }
+
     @Order(1)
     @Test
-    public void convertNestedPageToTerminalPage(TestUtils setup) throws Exception
+    void convertNestedPageToTerminalPage(TestUtils setup, TestConfiguration testConfiguration) throws Exception
     {
         // Note: we use a 3-level-deep nested page since 2 levels wouldn't show problems such as the regression
         // we've had with https://jira.xwiki.org/browse/XWIKI-16170
@@ -75,6 +86,9 @@ public class RenamePageIT
 
         // Create 1.2.3.WebHome
         ViewPage vp = setup.createPage(reference, "", "");
+
+        // Wait for the solr indexing to be completed before doing any rename
+        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmpyQueue();
 
         // Go to the Rename page view for 1.2.3.WebHome and check the Terminal checkbox. We also need to uncheck the
         // Auto Redirect checkbox so the page 1.2.3.WebHome will not appear as existing after the Rename operation.
@@ -90,7 +104,8 @@ public class RenamePageIT
 
     @Order(2)
     @Test
-    public void renamePageCheckConfirmationPreserveChildrenUpdateLinksSetAutoRedirect(TestUtils setup) throws Exception
+    void renamePageCheckConfirmationPreserveChildrenUpdateLinksSetAutoRedirect(TestUtils setup,
+        TestConfiguration testConfiguration) throws Exception
     {
         // Clean-up: delete the pages that will be used in this test
         setup.rest().deletePage("My", "Page");
@@ -109,6 +124,9 @@ public class RenamePageIT
         setup.gotoPage(Arrays.asList("1", "2"), "WebHome", "", "");
 
         ViewPage vp = new ViewPage();
+
+        // Wait for the solr indexing to be completed before doing any rename
+        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmpyQueue();
 
         // Go to the Rename page view for 1.2.WebHome.
         RenamePage renamePage = vp.rename();
@@ -143,7 +161,7 @@ public class RenamePageIT
      */
     @Order(3)
     @Test
-    public void renamePageWithUsedClass(TestUtils setup, TestReference testReference)
+    void renamePageWithUsedClass(TestUtils setup, TestReference testReference)
     {
         // Create 4 pages under the same parent
         // 2 of them are free pages (WebHome and FreePage)
@@ -356,8 +374,8 @@ public class RenamePageIT
             setup.createPage(sourcePageReference2, "Some content to be linked in macro. number 2");
         ViewPage nestedMacroLinkPage =
             setup.createPage(sourcePageReference3, "Some content to be linked in nested macro. number 3");
-        ViewPage imageLinkPage = setup.createPage(sourcePageReference4, "A page with image to be linked. number 4");
-        AttachmentsPane attachmentsPane = imageLinkPage.openAttachmentsDocExtraPane();
+        setup.createPage(sourcePageReference4, "A page with image to be linked. number 4");
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         File image = new File(testConfiguration.getBrowser().getTestResourcesPath(), "AttachmentIT/image.gif");
         attachmentsPane.setFileToUpload(image.getAbsolutePath());
         attachmentsPane.waitForUploadToFinish("image.gif");
@@ -371,6 +389,9 @@ public class RenamePageIT
             + "{{include reference=\"%5$s\"/}}";
         setup.createPage(testReference,
             String.format(testPageContent, sourcePage1, sourcePage2, sourcePage3, sourcePage4, sourcePage5));
+
+        // Wait for the solr indexing to be completed before doing any rename
+        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmpyQueue();
 
         // rename link 1
         ViewPage viewPage = setup.gotoPage(sourcePageReference1);
@@ -386,6 +407,9 @@ public class RenamePageIT
         assertEquals(String.format(testPageContent, targetPage1, sourcePage2, sourcePage3, sourcePage4, sourcePage5),
             wikiEditPage.getContent());
 
+        // Wait for the solr indexing to be completed before doing any rename
+        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmpyQueue();
+
         // rename link 2
         viewPage = setup.gotoPage(sourcePageReference2);
         rename = viewPage.rename();
@@ -399,6 +423,9 @@ public class RenamePageIT
         wikiEditPage = viewPage.editWiki();
         assertEquals(String.format(testPageContent, targetPage1, targetPage2, sourcePage3, sourcePage4, sourcePage5),
             wikiEditPage.getContent());
+
+        // Wait for the solr indexing to be completed before doing any rename
+        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmpyQueue();
 
         // rename link 3
         viewPage = setup.gotoPage(sourcePageReference3);
@@ -414,6 +441,9 @@ public class RenamePageIT
         assertEquals(String.format(testPageContent, targetPage1, targetPage2, targetPage3, sourcePage4, sourcePage5),
             wikiEditPage.getContent());
 
+        // Wait for the solr indexing to be completed before doing any rename
+        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmpyQueue();
+
         // rename link 4
         viewPage = setup.gotoPage(sourcePageReference4);
         rename = viewPage.rename();
@@ -427,6 +457,9 @@ public class RenamePageIT
         wikiEditPage = viewPage.editWiki();
         assertEquals(String.format(testPageContent, targetPage1, targetPage2, targetPage3, targetPage4, sourcePage5),
             wikiEditPage.getContent());
+
+        // Wait for the solr indexing to be completed before doing any rename
+        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmpyQueue();
 
         // rename link 5
         viewPage = setup.gotoPage(sourcePageReference5);
@@ -460,6 +493,9 @@ public class RenamePageIT
         setup.rest().savePage(new LocalDocumentReference(reference, Locale.FRENCH), "fr [[OtherPage]]", "");
 
         assertEquals("[[OtherPage]]", setup.rest().<Page>get(reference).getContent());
+
+        // Wait for the solr indexing to be completed before doing any rename
+        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmpyQueue();
 
         // Rename the page
         ViewPage vp = setup.gotoPage(reference);

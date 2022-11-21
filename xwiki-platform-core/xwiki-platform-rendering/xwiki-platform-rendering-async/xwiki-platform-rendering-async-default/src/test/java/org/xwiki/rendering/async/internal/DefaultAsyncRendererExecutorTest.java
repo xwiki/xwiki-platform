@@ -31,20 +31,20 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.concurrent.ContextStoreManager;
-import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.job.JobGroupPath;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import static com.xpn.xwiki.internal.context.XWikiContextContextStore.PROP_DOCUMENT_REFERENCE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -52,6 +52,8 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -60,7 +62,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class DefaultAsyncRendererExecutorTest
+class DefaultAsyncRendererExecutorTest
 {
     private static final String CELEMENT1 = "celement1";
 
@@ -82,6 +84,9 @@ public class DefaultAsyncRendererExecutorTest
     @MockComponent
     private ContextStoreManager context;
 
+    @MockComponent
+    private DocumentAccessBridge documentAccessBridge;
+
     @InjectMockComponents
     private DefaultAsyncRendererExecutor executor;
 
@@ -94,7 +99,7 @@ public class DefaultAsyncRendererExecutorTest
     private JobGroupPath jobGroupPath;
 
     @BeforeEach
-    private void beforeEach() throws RenderingException, ComponentLookupException, JobException
+    void beforeEach() throws RenderingException, ComponentLookupException, JobException
     {
         this.renderer = mock(AsyncRenderer.class);
 
@@ -105,7 +110,7 @@ public class DefaultAsyncRendererExecutorTest
         this.jobGroupPath = new JobGroupPath(Arrays.asList("Something", "Foo", "Bar"));
         when(this.renderer.getJobGroupPath()).thenReturn(this.jobGroupPath);
 
-        when(cache.getLock()).thenReturn(this.lock);
+        when(this.cache.getLock()).thenReturn(this.lock);
 
         this.configuration = new AsyncRendererConfiguration();
         this.configuration.setContextEntries(CELEMENTS);
@@ -118,24 +123,19 @@ public class DefaultAsyncRendererExecutorTest
         this.job = mock(AsyncRendererJob.class);
 
         when(this.jobs.execute(same(AsyncRendererJobStatus.JOBTYPE), any(AsyncRendererJobRequest.class)))
-            .thenAnswer(new Answer<Job>()
-            {
-                @Override
-                public Job answer(InvocationOnMock invocation) throws Throwable
-                {
-                    AsyncRendererJobStatus status = new AsyncRendererJobStatus(invocation.getArgument(1), null, null);
+            .thenAnswer(invocation -> {
+                AsyncRendererJobStatus status = new AsyncRendererJobStatus(invocation.getArgument(1), null, null);
 
-                    status.setResult(renderer.render(true, renderer.isCacheAllowed()));
+                status.setResult(this.renderer.render(true, this.renderer.isCacheAllowed()));
 
-                    when(job.getStatus()).thenReturn(status);
+                when(this.job.getStatus()).thenReturn(status);
 
-                    return job;
-                }
+                return this.job;
             });
     }
 
     @Test
-    public void rendererAsyncCachedContextDisabled() throws JobException, RenderingException
+    void rendererAsyncCachedContextDisabled() throws JobException, RenderingException
     {
         // Disabled async in the context
         when(this.asyncContext.isEnabled()).thenReturn(false);
@@ -154,7 +154,7 @@ public class DefaultAsyncRendererExecutorTest
     }
 
     @Test
-    public void rendererAsyncCachedContextEnabled() throws JobException, RenderingException
+    void rendererAsyncCachedContextEnabled() throws JobException, RenderingException
     {
         // Enable async in the context
         when(this.asyncContext.isEnabled()).thenReturn(true);
@@ -174,7 +174,34 @@ public class DefaultAsyncRendererExecutorTest
     }
 
     @Test
-    public void rendererNotAsyncCachedContextEnabled() throws JobException, RenderingException
+    void renderAsyncDocumentRequested() throws Exception
+    {
+        DocumentReference currentDocumentReference = new DocumentReference("xwiki", "XWiki", "CurrentDoc");
+
+        this.configuration.setContextEntries(Set.of(PROP_DOCUMENT_REFERENCE, "Document"));
+
+        when(this.renderer.isCacheAllowed()).thenReturn(true);
+        when(this.documentAccessBridge.getCurrentDocumentReference()).thenReturn(currentDocumentReference);
+
+        this.executor.render(this.renderer, this.configuration);
+
+        verify(this.asyncContext).useEntity(currentDocumentReference);
+    }
+
+    @Test
+    void renderAsyncDocumentRequestedButNotInContext() throws Exception
+    {
+        this.configuration.setContextEntries(Set.of(PROP_DOCUMENT_REFERENCE, "Document"));
+
+        when(this.renderer.isCacheAllowed()).thenReturn(true);
+
+        this.executor.render(this.renderer, this.configuration);
+
+        verify(this.asyncContext, never()).useEntity(any());
+    }
+
+    @Test
+    void rendererNotAsyncCachedContextEnabled() throws JobException, RenderingException
     {
         // Enable async in the context
         when(this.asyncContext.isEnabled()).thenReturn(true);
@@ -194,7 +221,7 @@ public class DefaultAsyncRendererExecutorTest
     }
 
     @Test
-    public void rendererAsyncNotCachedContextEnabled() throws JobException, RenderingException
+    void rendererAsyncNotCachedContextEnabled() throws JobException, RenderingException
     {
         // Enable async in the context
         when(this.asyncContext.isEnabled()).thenReturn(true);
@@ -215,7 +242,7 @@ public class DefaultAsyncRendererExecutorTest
     }
 
     @Test
-    public void rendererNotAsyncNotCachedContextEnabled() throws JobException, RenderingException
+    void rendererNotAsyncNotCachedContextEnabled() throws JobException, RenderingException
     {
         // Enable async in the context
         when(this.asyncContext.isEnabled()).thenReturn(true);
@@ -234,7 +261,7 @@ public class DefaultAsyncRendererExecutorTest
     }
 
     @Test
-    public void rendererAsyncAlreadyRunning() throws JobException, RenderingException
+    void rendererAsyncAlreadyRunning() throws JobException, RenderingException
     {
         List<String> jobId = Arrays.asList("1", "2", "celement1", "value1%5c", "celement2", "value2%2f");
 

@@ -21,6 +21,7 @@ package org.xwiki.rendering.internal.macro.display;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 
 import javax.inject.Named;
@@ -67,7 +68,7 @@ public class DisplayMacro extends AbstractIncludeMacro<DisplayMacroParameters>
         // The display macro must execute first since if it runs with the current context it needs to bring
         // all the macros from the displayed page before the other macros are executed.
         setPriority(10);
-        setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_CONTENT));
     }
 
     @Override

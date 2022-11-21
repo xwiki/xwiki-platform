@@ -61,7 +61,8 @@ public class EntityReferenceConverter extends AbstractConverter<EntityReference>
     private Logger logger;
 
     @Inject
-    private EntityReferenceSerializer<String> serialier;
+    @Named("withtype")
+    private EntityReferenceSerializer<String> serializer;
 
     @Override
     protected EntityReference convertToType(Type type, Object value)
@@ -110,6 +111,6 @@ public class EntityReferenceConverter extends AbstractConverter<EntityReference>
             return null;
         }
 
-        return new Namespace(value.getType().getLowerCase(), this.serialier.serialize(value)).toString();
+        return this.serializer.serialize(value);
     }
 }

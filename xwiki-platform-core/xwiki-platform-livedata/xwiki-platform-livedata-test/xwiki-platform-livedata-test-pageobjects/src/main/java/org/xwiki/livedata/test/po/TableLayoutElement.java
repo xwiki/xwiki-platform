@@ -24,7 +24,9 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.http.NameValuePair;
@@ -60,6 +62,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
  */
 public class TableLayoutElement extends BaseElement
 {
+    /**
+     * Option for {@link #filterColumn(String, String, boolean, Map)} to wait for selectize fields suggestions before
+     * continuing. The default behavior being to use the typed text as the selected value without waiting.
+     */
+    public static final String FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS = "selectized.waitForSuggestions";
+    
     private static final String INNER_HTML_ATTRIBUTE = "innerHTML";
 
     private static final String CLASS_HTML_ATTRIBUTE = "class";
@@ -443,13 +451,38 @@ public class TableLayoutElement extends BaseElement
      */
     public void filterColumn(String columnLabel, String content, boolean wait)
     {
+        filterColumn(columnLabel, content, wait, Map.of());
+    }
+
+    /**
+     * Set the value in the filter of a column. Waits for the new filtered values to be displayed before continuing when
+     * {@code waits} is {@code true}.
+     *
+     * @param columnLabel the label of the column to filter, for instance {@code "Creation Date"}
+     * @param content the content to set on the filter
+     * @param wait when {@code true} waits for the filtered results to be displayed before continuing, otherwise
+     *     continues without waiting (useful when updating several filters in a row).
+     * @param options additional options that are only relevant for specific type of fields (e.g., for selectize
+     *     based fields only)
+     * @see #filterColumn(String, String)
+     * @see #filterColumn(String, String, boolean)
+     * @since 14.8RC1
+     */
+    public void filterColumn(String columnLabel, String content, boolean wait, Map<String, Object> options)
+    {
         WebElement element = getFilter(columnLabel);
 
         List<String> classes = Arrays.asList(getClasses(element));
         if (classes.contains("filter-list")) {
             if (element.getAttribute(CLASS_HTML_ATTRIBUTE).contains("selectized")) {
                 SuggestInputElement suggestInputElement = new SuggestInputElement(element);
-                suggestInputElement.sendKeys(content).selectTypedText();
+                // Wait for the suggestions on selectize fields only if this is explicitly asked.
+                suggestInputElement.clearSelectedSuggestions().sendKeys(content);
+                if (Objects.equals(options.get(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS), Boolean.TRUE)) {
+                    suggestInputElement.waitForSuggestions().selectByVisibleText(content);
+                } else {
+                    suggestInputElement.selectTypedText();
+                }
             } else {
                 new Select(element).selectByVisibleText(content);
             }
@@ -528,6 +561,23 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
+     * Get the 1-based row index of an element, relative to the number of currently displayed rows.
+     *
+     * @param by the selector of the searched element
+     * @return the 1-based row index where the element was found, or 0 if it doesn't exist
+     * @since 14.8RC1
+     */
+    public int getRowIndexForElement(By by)
+    {
+        WebElement rowElement = getRoot().findElement(by);
+        if (rowElement.isDisplayed()) {
+            // Count the preceding rows.
+            return rowElement.findElements(By.xpath("./ancestor::tr[1]/preceding-sibling::tr")).size() + 1;
+        }
+        return 0;
+    }
+
+    /**
      * Get the filter for the given column.
      *
      * @param columnLabel the label of the column to get the filter element for, for instance {@code "Title"}
@@ -540,6 +590,17 @@ public class TableLayoutElement extends BaseElement
         return getRoot()
             .findElement(By.cssSelector(String.format(".column-filters > th:nth-child(%d) input", columnIndex)));
     }
+
+    /**
+     * @return the list of pagination size choices proposed by the pagination select field
+     * @since 14.7RC1
+     */
+    public Set<String> getPaginationSizes()
+    {
+        return new Select(getRoot().findElement(By.cssSelector(".pagination-page-size select"))).getOptions().stream()
+            .map(it -> it.getAttribute("value")).collect(Collectors.toSet());
+    }
+
 
     /**
      * Clicks on an action button identified by its name, on a given row.
@@ -751,13 +812,16 @@ public class TableLayoutElement extends BaseElement
         int columnIndex = getColumnIndex(columnLabel);
         WebElement element = getCellsByColumnIndex(columnIndex).get(rowNumber - 1);
 
-        // Hover on the property and click on the edit button on the displayed popover.
-        // We move slightly at the right of the center of the targeted element to prevent to popover of the surrounding 
-        // cells to hide the targeted location of the mouse.
-        new Actions(getDriver().getWrappedDriver()).moveToElement(element, 50, 0).perform();
+        // Hover on the property and click on the edit button on the displayed popover. We move slightly at the right of
+        // the center of the targeted element, then slightly to the left, towards the center of the element. This
+        // simulates the mouse trajectory of a real user hovering the cell above the one he/she wants to edit.
+        new Actions(getDriver().getWrappedDriver())
+            .moveToElement(element, 50, 0)
+            .moveToElement(element, 0, 0)
+            .perform();
         By editActionSelector = By.cssSelector(".displayer-action-list span[title='Edit']");
         // Waits to have at least one popover visible and click on the edit action of the last one. While it does not
-        // seems to be possible in normal conditions, using selenium and moveToElement, several popover can be visible
+        // seem to be possible in normal conditions, using selenium and moveToElement, several popover can be visible
         // at the same time (especially on Chrome). We select the latest edit action, which is the one of the targeted
         // property because the popover actions are appended at the end of the document.
         getDriver().waitUntilCondition(input -> !getDriver().findElementsWithoutWaiting(editActionSelector).isEmpty());
@@ -770,7 +834,7 @@ public class TableLayoutElement extends BaseElement
         By selector = By.cssSelector(String.format("[name$='_%s']", fieldName));
 
         // Waits for the text input to be displayed.
-        getDriver().waitUntilCondition(input -> !getDriver().findElementsWithoutWaiting(element, selector).isEmpty());
+        getDriver().waitUntilElementIsVisible(element, selector);
 
         // Reuse the FormContainerElement to avoid code duplication of the interaction with the form elements 
         // displayed in the live data (they are the same as the one of the inline edit mode).

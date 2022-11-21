@@ -21,12 +21,16 @@ package org.xwiki.attachment;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -34,53 +38,64 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.internal.bridge.DefaultContentParser;
+import org.xwiki.icon.IconManagerScriptService;
+import org.xwiki.icon.internal.DefaultIconManagerComponentList;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.observation.EventListener;
+import org.xwiki.rendering.RenderingScriptServiceComponentList;
 import org.xwiki.rendering.internal.configuration.DefaultExtendedRenderingConfiguration;
 import org.xwiki.rendering.internal.configuration.RenderingConfigClassDocumentConfigurationSource;
 import org.xwiki.rendering.internal.macro.wikibridge.DefaultWikiMacroManager;
 import org.xwiki.rendering.internal.macro.wikibridge.WikiMacroEventListener;
-import org.xwiki.rendering.internal.syntax.SyntaxConverter;
-import org.xwiki.rendering.script.RenderingScriptService;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.wikimacro.internal.DefaultWikiMacroFactory;
 import org.xwiki.rendering.wikimacro.internal.DefaultWikiMacroRenderer;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.store.TemporaryAttachmentSessionsManager;
+import org.xwiki.store.script.TemporaryAttachmentsScriptService;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.page.HTML50ComponentList;
+import org.xwiki.test.page.IconSetup;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
 import org.xwiki.xml.internal.html.filter.ControlCharactersFilter;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.model.reference.DocumentReferenceConverter;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
  * Test of {@code XWiki.AttachmentSelector}.
  *
  * @version $Id$
- * @since 14.5RC1
+ * @since 14.5
  * @since 14.4.2
  * @since 13.10.7
  */
 @HTML50ComponentList
 @XWikiSyntax21ComponentList
+@RenderingScriptServiceComponentList
+@DefaultIconManagerComponentList
 @ComponentList({
-    // Start RenderingScriptService
-    RenderingScriptService.class,
+    // Start -  Required in addition of RenderingScriptServiceComponentList
     DefaultExtendedRenderingConfiguration.class,
     RenderingConfigClassDocumentConfigurationSource.class,
-    SyntaxConverter.class,
-    // End RenderingScriptService
+    // Start -  Required in addition of RenderingScriptServiceComponentList
     ControlCharactersFilter.class,
     ModelScriptService.class,
     TestNoScriptMacro.class,
@@ -90,11 +105,30 @@ import static org.mockito.Mockito.when;
     DefaultWikiMacroManager.class,
     DefaultContentParser.class,
     org.xwiki.rendering.internal.parser.DefaultContentParser.class,
-    DefaultWikiMacroRenderer.class
+    DefaultWikiMacroRenderer.class,
     // End WikiMacroEventListener
+    TemporaryAttachmentsScriptService.class,
+    IconManagerScriptService.class,
+    DocumentReferenceConverter.class
 })
 class AttachmentSelectorPageTest extends PageTest
 {
+    /**
+     * Mocked because we don't want to deal with actual sessions for this test.
+     */
+    @MockComponent
+    private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
+
+    @BeforeEach
+    void setUp() throws Exception
+    {
+        when(this.temporaryAttachmentSessionsManager.getUploadedAttachments(any(DocumentReference.class)))
+            .thenReturn(List.of());
+
+        // Initializes then environment for the icon extension.
+        IconSetup.setUp(this, "/icons.properties");
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {
         "{{noscript}}println(\"Hello from noscript!\"){{/noscript}}.png",
@@ -115,7 +149,7 @@ class AttachmentSelectorPageTest extends PageTest
         Document document = renderHTMLPage(new DocumentReference("xwiki", "XWiki", "AttachmentSelector"));
 
         assertNotNull(document);
-        Element galleryAttachmentTitle = document.select(".gallery_attachmenttitle").get(1);
+        Element galleryAttachmentTitle = document.select(".current .gallery_attachmenttitle").get(0);
         assertEquals(fileName, galleryAttachmentTitle.attr("title"));
         assertEquals(fileName, galleryAttachmentTitle.text());
         assertEquals(fileName, document.select(".gallery_attachmentframe .filename").text());
@@ -142,7 +176,7 @@ class AttachmentSelectorPageTest extends PageTest
 
         Document document = renderHTMLPage(new DocumentReference("xwiki", "XWiki", "AttachmentSelector"));
         assertNotNull(document);
-        Element galleryAttachmentTitle = document.select(".gallery_attachmenttitle").get(1);
+        Element galleryAttachmentTitle = document.select(".current .gallery_attachmenttitle").get(0);
         assertEquals(fileName, galleryAttachmentTitle.attr("title"));
         assertEquals(fileName, galleryAttachmentTitle.text());
         assertEquals(String.format("attach:xwiki:Space.Test@%s", fileName),
@@ -266,6 +300,39 @@ class AttachmentSelectorPageTest extends PageTest
         xwikiDocument.setSyntax(Syntax.XWIKI_2_1);
         Document document = renderHTMLPage(xwikiDocument);
         assertEquals(expectedWidth, document.select(".displayed img").attr("alt"));
+    }
+
+    @Test
+    void withTemporaryAttachment() throws Exception
+    {
+        String fileName = "test.png";
+
+        XWikiDocument xWikiDocument = commonFixup(fileName);
+
+        XWikiAttachment xWikiAttachment = mock(XWikiAttachment.class);
+        when(xWikiAttachment.getFilename()).thenReturn(fileName);
+        AttachmentReference attachmentReference =
+            new AttachmentReference(fileName, xWikiDocument.getDocumentReference());
+        when(xWikiAttachment.getReference()).thenReturn(attachmentReference);
+        when(this.temporaryAttachmentSessionsManager.getUploadedAttachments(xWikiDocument.getDocumentReference()))
+            .thenReturn(List.of(xWikiAttachment));
+        when(this.temporaryAttachmentSessionsManager.getUploadedAttachment(attachmentReference))
+            .thenReturn(Optional.of(xWikiAttachment));
+
+        this.request.put("docname", "xwiki:Space.Test");
+        this.request.put("classname", "xwiki:Space.Test");
+        this.request.put("property", "avatar");
+        this.request.put("object", "0");
+        this.request.put("filter", "png");
+        this.request.put("displayImage", "true");
+        this.request.put("xpage", "plain");
+
+        Document document = renderHTMLPage(new DocumentReference("xwiki", "XWiki", "AttachmentSelector"));
+        Element element = document.selectFirst(".gallery_attachmentbox.current");
+        assertTrue(element.classNames().contains("temporary_attachment"),
+            String.format("temporary_attachment class not found in %s", element.classNames()));
+        assertNotNull(element.selectFirst(".fake-attach"), "An icon with class fake-attach is expected to "
+            + "be found");
     }
 
     private void attachmentSelectorMacroFixup() throws Exception

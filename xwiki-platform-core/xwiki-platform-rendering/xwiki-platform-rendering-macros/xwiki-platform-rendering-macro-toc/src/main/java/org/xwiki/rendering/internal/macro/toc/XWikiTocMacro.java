@@ -66,8 +66,9 @@ public class XWikiTocMacro extends AbstractTocMacro<XWikiTocMacroParameters>
         throws MacroExecutionException
     {
         List<Block> blocks = super.execute(parameters, content, context);
+        /** Wrap the TOC blocks in a Group with a CSS class in order to ease styling. */
         GroupBlock wrapper = new GroupBlock();
-        wrapper.setParameter(CLASS, "xtoc");
+        wrapper.setParameter(CLASS, "xwiki-toc");
         wrapper.addChildren(blocks);
         return singletonList(wrapper);
     }

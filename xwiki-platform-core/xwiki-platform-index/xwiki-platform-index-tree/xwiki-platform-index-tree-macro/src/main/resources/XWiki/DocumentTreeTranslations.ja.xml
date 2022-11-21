@@ -1,0 +1,94 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1" locale="ja">
+  <web>XWiki</web>
+  <name>DocumentTreeTranslations</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.DocumentTree</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Document Tree Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>rendering.macro.documentTree.name=ページツリー
+rendering.macro.documentTree.description=XWikiページのツリーを表示します。
+rendering.macro.documentTree.parameter.readOnly.name=読み取り専用
+### Missing: rendering.macro.documentTree.parameter.readOnly.description=
+rendering.macro.documentTree.parameter.showWikis.name=ウィキを表示
+rendering.macro.documentTree.parameter.showWikis.description=ウィキのノードを表示するか否か。メインウィキで、ツリーのソースがプログラミング権限で保存されている場合にのみ表示できます。
+rendering.macro.documentTree.parameter.showWikiPrettyName.name=ウィキの名称を表示
+### Missing: rendering.macro.documentTree.parameter.showWikiPrettyName.description=
+rendering.macro.documentTree.parameter.showSpaces.name=スペースを表示
+rendering.macro.documentTree.parameter.showSpaces.description=スペースのノードを表示するか否か。スペースのノードを表示する際、ページはスペースによってまとめられます。
+rendering.macro.documentTree.parameter.showDocumentTitle.name=ページのタイトルを表示
+### Missing: rendering.macro.documentTree.parameter.showDocumentTitle.description=
+rendering.macro.documentTree.parameter.showTranslations.name=翻訳を表示
+rendering.macro.documentTree.parameter.showTranslations.description=ページの翻訳を表示するか否か。
+rendering.macro.documentTree.parameter.showAttachments.name=添付ファイルを表示
+rendering.macro.documentTree.parameter.showAttachments.description=添付ファイルを表示するか否か。
+rendering.macro.documentTree.parameter.showObjects.name=オブジェクトを表示
+rendering.macro.documentTree.parameter.showObjects.description=ページのオブジェクトを表示するか否か。
+rendering.macro.documentTree.parameter.showClassProperties.name=クラスプロパティーを表示
+rendering.macro.documentTree.parameter.showClassProperties.description=クラスを規定するページのクラスのプロパティーを表示するか否か。
+rendering.macro.documentTree.parameter.root.name=ルート
+### Missing: rendering.macro.documentTree.parameter.root.description=
+rendering.macro.documentTree.parameter.showRoot.name=ルートを表示
+### Missing: rendering.macro.documentTree.parameter.showRoot.description=
+### Missing: rendering.macro.documentTree.parameter.compact.name=
+### Missing: rendering.macro.documentTree.parameter.compact.description=
+rendering.macro.documentTree.parameter.links.name=リンク
+### Missing: rendering.macro.documentTree.parameter.links.description=
+rendering.macro.documentTree.parameter.checkboxes.name=チェックボックス
+### Missing: rendering.macro.documentTree.parameter.checkboxes.description=
+### Missing: rendering.macro.documentTree.parameter.openTo.name=
+### Missing: rendering.macro.documentTree.parameter.openTo.description=
+### Missing: rendering.macro.documentTree.parameter.showOnlyViewable.name=
+### Missing: rendering.macro.documentTree.parameter.showOnlyViewable.description=
+rendering.macro.documentTree.parameter.filterByClass.name=クラスでフィルタリング
+### Missing: rendering.macro.documentTree.parameter.filterByClass.description=
+### Missing: rendering.macro.documentTree.parameter.finder.name=
+### Missing: rendering.macro.documentTree.parameter.finder.description=
+### Missing: rendering.macro.documentTree.parameter.hierarchyMode.name=
+### Missing: rendering.macro.documentTree.parameter.hierarchyMode.description=
+### Missing: rendering.macro.documentTree.parameter.filterHiddenDocuments.name=
+### Missing: rendering.macro.documentTree.parameter.filterHiddenDocuments.description=
+rendering.macro.documentTree.parameter.limit.name=制限
+### Missing: rendering.macro.documentTree.parameter.limit.description=
+rendering.macro.documentTree.parameter.exclusions.name=除外
+### Missing: rendering.macro.documentTree.parameter.exclusions.description=
+index.documentTree.empty=ページが見つかりません
+### Missing: index.documentTree.more=
+
+## Deprecated translation keys
+
+## Until 7.2M2
+### Missing: rendering.macro.documentTree.parameter.showChildDocuments.name=
+### Missing: rendering.macro.documentTree.parameter.showChildDocuments.description=
+</content>
+  </xwikidoc>

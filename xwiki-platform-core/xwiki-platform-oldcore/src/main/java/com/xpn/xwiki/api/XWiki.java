@@ -571,14 +571,17 @@ public class XWiki extends Api
 
     /**
      * Returns whether a page exists or not.
+     * <p>
+     * Since 14.9, if the check fail an exception is thrown.
      *
      * @param reference the reference of the page to check for its existence
      * @return true if the page exists, false if not
+     * @throws XWikiException when failing to check page existence
      * @since 13.3RC1
      * @since 12.10.7
      */
     @Unstable
-    public boolean exists(PageReference reference)
+    public boolean exists(PageReference reference) throws XWikiException
     {
         return this.xwiki.exists(reference, getXWikiContext());
     }
@@ -2742,24 +2745,30 @@ public class XWiki extends Api
     }
 
     /**
-     * Generates a unique page name based on initial page name and already existing pages
+     * Generates a unique document name based on initial page name and already existing pages.
+     * <p>
+     * Since 14.9, if the document exist check fail an exception is thrown.
      *
-     * @param name
-     * @return a unique page name
+     * @param space the space where to add the document
+     * @return a unique document name
+     * @throws XWikiException when failing to check document existence
      */
-    public String getUniquePageName(String name)
+    public String getUniquePageName(String space) throws XWikiException
     {
-        return this.xwiki.getUniquePageName(name, getXWikiContext());
+        return this.xwiki.getUniquePageName(space, getXWikiContext());
     }
 
     /**
-     * Generates a unique page name based on initial page name and already existing pages
+     * Generates a unique document name based on initial page name and already existing pages
+     * <p>
+     * Since 14.9, if the document exist check fail an exception is thrown.
      *
-     * @param space
-     * @param name
-     * @return a unique page name
+     * @param space the space where to add the document
+     * @param name the prefix of the document name
+     * @return a unique document name
+     * @throws XWikiException when failing to check document existence
      */
-    public String getUniquePageName(String space, String name)
+    public String getUniquePageName(String space, String name) throws XWikiException
     {
         return this.xwiki.getUniquePageName(space, name, getXWikiContext());
     }

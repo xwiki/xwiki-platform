@@ -103,4 +103,35 @@ public interface PDFExportConfiguration
     {
         return Collections.emptyList();
     }
+
+    /**
+     * @return the number of seconds to wait for the web page to be ready (for print) before timing out
+     * @since 14.9
+     */
+    default int getPageReadyTimeout()
+    {
+        return 60;
+    }
+
+    /**
+     * @return the maximum content size, in kilobytes (KB), an user is allowed to export to PDF; in order to compute the
+     *         content size we sum the size of the HTML rendering for each of the XWiki documents included in the
+     *         export; the size of external resources, such as images, style sheets, JavaScript code is not taken into
+     *         account; {@code 0} means no limit; defaults to {@code 100KB}
+     * @since 14.10RC1
+     */
+    default int getMaxContentSize()
+    {
+        return 100;
+    }
+
+    /**
+     * @return the maximum number of PDF exports that can be executed in parallel (each PDF export needs a separate
+     *         thread); defaults to {@code 3}
+     * @since 14.10RC1
+     */
+    default int getThreadPoolSize()
+    {
+        return 3;
+    }
 }

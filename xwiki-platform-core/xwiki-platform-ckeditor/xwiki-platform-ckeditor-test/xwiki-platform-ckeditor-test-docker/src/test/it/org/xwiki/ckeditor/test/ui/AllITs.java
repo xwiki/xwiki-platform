@@ -43,4 +43,10 @@ public class AllITs
     class NestedImagePluginIT extends ImagePluginIT
     {
     }
+
+    @Nested
+    @DisplayName("TextArea Editor")
+    class NestedTextAreaIT extends TextAreaIT
+    {
+    }
 }

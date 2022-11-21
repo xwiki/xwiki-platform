@@ -19,30 +19,21 @@
  */
 package org.xwiki.flamingo;
 
-import java.util.Locale;
-
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
-import org.xwiki.localization.Translation;
-import org.xwiki.localization.TranslationBundle;
-import org.xwiki.localization.TranslationBundleContext;
 import org.xwiki.localization.macro.internal.TranslationMacro;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;
-import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.internal.configuration.DefaultExtendedRenderingConfiguration;
 import org.xwiki.rendering.internal.configuration.RenderingConfigClassDocumentConfigurationSource;
 import org.xwiki.rendering.internal.macro.message.ErrorMessageMacro;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
+import org.xwiki.test.page.TestNoScriptMacro;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Test of the {@code FlamingoThemesCode.WebHomeSheet} page.
@@ -71,20 +62,9 @@ class WebHomeSheetPageTest extends PageTest
         this.request.put("form_token", "1");
         this.request.put("action", "create");
 
-        TranslationBundleContext translationBundleContext = this.componentManager
-            .getInstance(TranslationBundleContext.class);
-        TranslationBundle translationBundle = mock(TranslationBundle.class);
-        Translation translation = mock(Translation.class);
-        when(translation.getLocale()).thenReturn(Locale.ENGLISH);
-        when(translation.render(any(), any())).thenAnswer(invocationOnMock -> new WordBlock(
-            "platform.flamingo.themes.home.create.csrf " + invocationOnMock.getArgument(1)));
-        when(translationBundle.getTranslation(eq("platform.flamingo.themes.home.create.csrf"), any()))
-            .thenReturn(translation);
-        translationBundleContext.addBundle(translationBundle);
-
         Document document = this.renderHTMLPage(new DocumentReference("xwiki", "FlamingoThemesCode", "WebHomeSheet"));
 
-        assertEquals("platform.flamingo.themes.home.create.csrf some content\"/}}{{noscript/}}",
+        assertEquals("platform.flamingo.themes.home.create.csrf [some content\"/}}{{noscript/}}]",
             document.select(".box.errormessage").text());
     }
 }

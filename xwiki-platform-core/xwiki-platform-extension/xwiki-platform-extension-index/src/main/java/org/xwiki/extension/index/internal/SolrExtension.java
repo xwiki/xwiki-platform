@@ -315,4 +315,10 @@ public class SolrExtension extends AbstractWrappingExtension<Extension> implemen
     {
         this.last = last;
     }
+
+    @Override
+    public String toString()
+    {
+        return getId().toString();
+    }
 }

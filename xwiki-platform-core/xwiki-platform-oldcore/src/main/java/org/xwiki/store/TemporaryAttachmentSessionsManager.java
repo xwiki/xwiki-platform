@@ -20,16 +20,19 @@
 package org.xwiki.store;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.Part;
 
+import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Interface for operations related to temporary upload of attachments.
@@ -51,11 +54,12 @@ public interface TemporaryAttachmentSessionsManager
      * @param documentReference the reference of the document that the attachment should be attached to.
      * @param part the actual data that is uploaded.
      * @return an attachment that is not saved yet but cached and contains the data of the given part.
-     * @throws TemporaryAttachmentException if the part size exceeds the maximum upload size, or in case of problem
-     *                                      when reading the part.
+     * @throws TemporaryAttachmentException in case of problem when reading the part
+     * @throws AttachmentValidationException in case of error when validating the attachment (e.g., the maximum
+     *     filesize is reached)
      */
     XWikiAttachment uploadAttachment(DocumentReference documentReference, Part part)
-        throws TemporaryAttachmentException;
+        throws TemporaryAttachmentException, AttachmentValidationException;
 
     /**
      * Temporary store the given {@link Part} to a cached {@link XWikiAttachment} attached to the given
@@ -66,12 +70,29 @@ public interface TemporaryAttachmentSessionsManager
      * @param filename an optional filename used instead of using {@link Part#getSubmittedFileName()}, ignored when
      *     {@code null} or blank
      * @return an attachment that is not saved yet but cached and contains the data of the given part
-     * @throws TemporaryAttachmentException if the part size exceeds the maximum upload size, or in case of problem
-     *     when reading the part
+     * @throws TemporaryAttachmentException in case of problem when reading the part
+     * @throws AttachmentValidationException in case of error when validating the attachment (e.g., the maximum
+     *     filesize is reached)
      * @since 14.9RC1
      */
     @Unstable
     XWikiAttachment uploadAttachment(DocumentReference documentReference, Part part, String filename)
+        throws TemporaryAttachmentException, AttachmentValidationException;
+
+    /**
+     * Allow to temporarily attach the given instance of {@link XWikiAttachment} to the given document reference.
+     * This can be useful if an API manipulates an {@link XWikiAttachment} without saving it, and want it to be
+     * discoverable when parsing a document through the download action for example.
+     * Note that consumer of this API needs to be aware that the file attached to the {@link XWikiAttachment} might be
+     * deleted at the end of the session, as any temporary attachment.
+     *
+     * @param attachment the attachment to be temporarily attached to the document
+     * @param documentReference the reference of the document to link this attachment to
+     * @throws TemporaryAttachmentException in case of problem when performing the link
+     * @since 14.10RC1
+     */
+    @Unstable
+    void temporarilyAttach(XWikiAttachment attachment, DocumentReference documentReference)
         throws TemporaryAttachmentException;
 
     /**
@@ -125,4 +146,21 @@ public interface TemporaryAttachmentSessionsManager
      *          current user session, {@code false} if there was no matching temporary attachment in cache.
      */
     boolean removeUploadedAttachments(DocumentReference documentReference);
+
+    /**
+     * This method aims at attaching the {@link XWikiAttachment} that might have been previously temporary upload to the
+     * {@link XWikiDocument} they are targeting.
+     * This method should only be called before performing a save of the document to actually persist them. Also note
+     * that this method cannot call {@link #removeUploadedAttachment(DocumentReference, String)} as removing the
+     * attachment would delete the data before they can be properly saved in the persistent storage. So the consumer of
+     * the API should take care of properly calling this API when needed.
+     *
+     * @param document the actual document instance that should receive the attachments
+     * @param fileNames the names of the uploaded files to attach
+     * @since 14.10RC1
+     */
+    @Unstable
+    default void attachTemporaryAttachmentsInDocument(XWikiDocument document, List<String> fileNames)
+    {
+    }
 }

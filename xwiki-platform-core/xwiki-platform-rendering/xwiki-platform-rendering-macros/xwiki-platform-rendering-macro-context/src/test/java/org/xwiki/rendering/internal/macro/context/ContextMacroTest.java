@@ -21,6 +21,7 @@ package org.xwiki.rendering.internal.macro.context;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import javax.inject.Named;
 
@@ -35,13 +36,16 @@ import org.xwiki.properties.BeanDescriptor;
 import org.xwiki.properties.BeanManager;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererConfiguration;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererExecutor;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.context.ContextMacroParameters;
+import org.xwiki.rendering.macro.context.TransformationContextMode;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.security.authorization.AccessDeniedException;
@@ -64,6 +68,7 @@ import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -142,17 +147,11 @@ class ContextMacroTest
     @Test
     void executeWithReferencedDocumentNotViewableByTheAuthor() throws Exception
     {
-        MacroTransformationContext macroContext = new MacroTransformationContext();
-        MacroBlock macroBlock = new MacroBlock("context", Collections.emptyMap(), false);
-        macroContext.setCurrentMacroBlock(macroBlock);
-
         doThrow(AccessDeniedException.class).when(this.authorization).checkAccess(Right.VIEW, AUTHOR, TARGET_REFERENCE);
 
-        ContextMacroParameters parameters = new ContextMacroParameters();
-        parameters.setDocument("target");
-
         try {
-            this.macro.execute(parameters, "", macroContext);
+            executeInDOCUMENTContext();
+
             fail("Should have thrown an exception");
         } catch (MacroExecutionException expected) {
             assertEquals("Author [wiki:XWiki.author] is not allowed to access target document [wiki:space.target]",
@@ -161,7 +160,7 @@ class ContextMacroTest
     }
 
     @Test
-    void executeOk() throws Exception
+    void executeInCURRENTContext() throws Exception
     {
         MacroBlock macroBlock = new MacroBlock("context", Collections.<String, String>emptyMap(), false);
         MetaData metadata = new MetaData();
@@ -175,11 +174,67 @@ class ContextMacroTest
         DocumentModelBridge dmb = mock(DocumentModelBridge.class);
         when(this.dab.getTranslatedDocumentInstance(TARGET_REFERENCE)).thenReturn(dmb);
 
-        XDOM contentXDOM = new XDOM(Arrays.asList(new WordBlock("test")), metadata);
-        when(this.parser.parse(eq(""), same(macroContext), eq(false), any(MetaData.class), eq(false))).thenReturn(contentXDOM);
+        MetaData parserMetadata = new MetaData();
+        parserMetadata.addMetaData(MetaData.SOURCE, "target");
+        parserMetadata.addMetaData(MetaData.BASE, "target");
+
+        XDOM contentXDOM = new XDOM(Arrays.asList(new WordBlock("test")), parserMetadata);
+        when(this.parser.parse(eq(""), same(macroContext), eq(false), eq(parserMetadata), eq(false)))
+            .thenReturn(contentXDOM);
 
         ContextMacroParameters parameters = new ContextMacroParameters();
         parameters.setDocument("target");
+        parameters.setTransformationContext(TransformationContextMode.CURRENT);
+
+        when(this.executor.execute(any())).thenReturn(new WordBlock("result"));
+
+        List<Block> result = this.macro.execute(parameters, "", macroContext);
+
+        verifyNoInteractions(this.executor);
+
+        assertEquals(Arrays.asList(new MetaDataBlock(contentXDOM.getChildren(), parserMetadata)), result);
+    }
+
+    @Test
+    void executeInDOCUMENTContext() throws Exception
+    {
+        execute(false);
+    }
+
+    @Test
+    void executeInDOCUMENTContextInRestrictedMode() throws Exception
+    {
+        execute(true);
+    }
+
+    private void execute(boolean restricted) throws Exception
+    {
+        MacroBlock macroBlock = new MacroBlock("context", Collections.<String, String>emptyMap(), false);
+        MetaData metadata = new MetaData();
+        metadata.addMetaData(MetaData.SOURCE, "source");
+        XDOM pageXDOM = new XDOM(Arrays.asList(macroBlock), metadata);
+        MacroTransformationContext macroContext = new MacroTransformationContext();
+        macroContext.setSyntax(Syntax.XWIKI_2_0);
+        macroContext.setCurrentMacroBlock(macroBlock);
+        macroContext.setXDOM(pageXDOM);
+        macroContext.getTransformationContext().setRestricted(restricted);
+
+        DocumentModelBridge dmb = mock(DocumentModelBridge.class);
+        when(this.dab.getTranslatedDocumentInstance(TARGET_REFERENCE)).thenReturn(dmb);
+        XDOM targetXDOM = new XDOM(Arrays.asList(new WordBlock("word")), metadata);
+        when(dmb.getXDOM()).thenReturn(targetXDOM);
+
+        MetaData parserMetadata = new MetaData();
+        parserMetadata.addMetaData(MetaData.SOURCE, "target");
+        parserMetadata.addMetaData(MetaData.BASE, "target");
+
+        XDOM contentXDOM = new XDOM(Arrays.asList(new WordBlock("test")), parserMetadata);
+        when(this.parser.parse(eq(""), same(macroContext), eq(false), eq(parserMetadata), eq(false)))
+            .thenReturn(contentXDOM);
+
+        ContextMacroParameters parameters = new ContextMacroParameters();
+        parameters.setDocument("target");
+        parameters.setTransformationContext(TransformationContextMode.DOCUMENT);
 
         when(this.executor.execute(any())).thenReturn(new WordBlock("result"));
 
@@ -192,6 +247,7 @@ class ContextMacroTest
         BlockAsyncRendererConfiguration configuration = configurationCaptor.getValue();
         assertEquals(AUTHOR, configuration.getSecureAuthorReference());
         assertEquals(SOURCE_REFERENCE, configuration.getSecureDocumentReference());
-        assertSame(pageXDOM, configuration.getXDOM());
+        assertSame(targetXDOM, configuration.getXDOM());
+        assertEquals(restricted, configuration.isResricted());
     }
 }

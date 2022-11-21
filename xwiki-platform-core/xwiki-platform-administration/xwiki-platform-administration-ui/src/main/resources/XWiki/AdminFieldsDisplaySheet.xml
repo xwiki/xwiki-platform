@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.AdminFieldsDisplaySheet" locale="">
+<xwikidoc version="1.5" reference="XWiki.AdminFieldsDisplaySheet" locale="">
   <web>XWiki</web>
   <name>AdminFieldsDisplaySheet</name>
   <language/>
@@ -100,6 +100,7 @@
 ### - $params (mandatory): list of properties to display and their associated sections
 ### - $paramDoc (optional): document object which contains the $paramClass
 ### - $paramClass (optional): name of the xclass type for the xobject from which to read/save from
+### - $objectPolicy (since 14.10RC1) (optional): the update policy to use when saving the form
 #if ("$!section" != '')
   ## clean="false" due to bug #XWIKI-4122 - the &lt;legend&gt; element is dropped.
   {{html clean="false"}}
@@ -145,6 +146,9 @@
       &lt;input type="hidden" name="xcontinue" value="$xwiki.getURL($currentDoc, 'admin', "editor=${escapetool.url(${editor})}&amp;amp;section=${escapetool.url(${section})}&amp;amp;space=${escapetool.url(${currentSpace})}")" /&gt;
       &lt;input type="hidden" name="xredirect" value="$xwiki.getURL($currentDoc, 'admin', "editor=${escapetool.url(${editor})}&amp;amp;section=${escapetool.url(${section})}&amp;amp;space=${escapetool.url(${currentSpace})}")" /&gt;
       &lt;input type="hidden" name="classname" value="$configClassName" /&gt;
+      #if ("$!objectPolicy" != '')
+      &lt;input type="hidden" name="objectPolicy" value="$escapetool.xml($objectPolicy)" /&gt;
+      #end
     &lt;/div&gt;
     &lt;div class="bottombuttons"&gt;
       &lt;p class="admin-buttons"&gt;

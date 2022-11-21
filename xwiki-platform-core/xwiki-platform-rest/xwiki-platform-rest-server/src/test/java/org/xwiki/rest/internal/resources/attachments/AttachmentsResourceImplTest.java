@@ -35,6 +35,8 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.attachment.validation.AttachmentValidationException;
+import org.xwiki.attachment.validation.AttachmentValidator;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -56,8 +58,10 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -83,6 +87,9 @@ class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
 
     @MockComponent
     private ContextualAuthorizationManager authorization;
+
+    @MockComponent
+    private AttachmentValidator attachmentValidator;
 
     @BeforeEach
     @Override
@@ -178,6 +185,31 @@ class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
         assertEquals("myBio.txt", xwikiAttachment.getFilename());
         assertEquals("text/plain", xwikiAttachment.getMimeType());
         assertEquals("blah", IOUtils.toString(xwikiAttachment.getContentInputStream(this.xcontext)));
+    }
+
+    @Test
+    void createAttachmentNotValid() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("test", Arrays.asList("Path", "To"), "Page");
+        XWikiDocument cachedDocument = prepareXWikiDocument(documentReference, "test:Path.To.Page", true, true, false);
+
+        AttachmentReference attachmentReference = new AttachmentReference("myBio.txt", documentReference);
+        when(this.currentGetDocumentReferenceResolver.resolve(attachmentReference)).thenReturn(documentReference);
+
+        Multipart multipart = createMultipart("bio.txt", "myBio.txt", "blah", "text/plain");
+
+        Attachment attachment = mock(Attachment.class);
+        when(this.modelFactory.toRestAttachment(eq(this.uriInfo.getBaseUri()), any(com.xpn.xwiki.api.Attachment.class),
+            eq(false), eq(false))).thenReturn(attachment);
+
+        doThrow(AttachmentValidationException.class).when(this.attachmentValidator)
+            .validateAttachment(any());
+
+        assertThrows(AttachmentValidationException.class,
+            () -> this.attachmentsResource.addAttachment("test", "Path/spaces/To", "Page", multipart, false, true));
+
+        // The cached document should not have been modified.
+        assertNull(cachedDocument.getAttachment("myBio.txt"));
     }
 
     @Test

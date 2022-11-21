@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.ExecutionContext;
@@ -102,9 +103,15 @@ public class TasksStore extends XWikiHibernateBaseStore
     {
         initWikiContext(xWikiContext -> {
             executeWrite(xWikiContext, session -> {
-                session.createQuery("delete from XWikiDocumentIndexingTask t where t.docId = :docId "
-                        + "and t.version = :version "
-                        + "and t.type = :type")
+                String query = "delete from XWikiDocumentIndexingTask t where t.docId = :docId ";
+                if (StringUtils.isEmpty(version)) {
+                    // The is null part is required for Oracle.
+                    query += "and (t.version = :version or t.version is null)";
+                } else {
+                    query += "and t.version = :version ";
+                }
+                query = query + "and t.type = :type";
+                session.createQuery(query)
                     .setParameter("docId", docId)
                     .setParameter("version", version)
                     .setParameter("type", type)

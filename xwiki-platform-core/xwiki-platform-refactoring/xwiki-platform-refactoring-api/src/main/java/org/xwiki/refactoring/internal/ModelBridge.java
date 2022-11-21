@@ -109,10 +109,15 @@ public interface ModelBridge
     boolean canOverwriteSilently(DocumentReference documentReference);
 
     /**
+     * Returns whether a document exists or not.
+     * <p>
+     * Since 14.9, if the check fail an exception is thrown.
+     * 
      * @param reference a document reference
      * @return {@code true} if the specified document exists, {@code false} otherwise
+     * @throws Exception when failing to check page existence
      */
-    boolean exists(DocumentReference reference);
+    boolean exists(DocumentReference reference) throws Exception;
 
     /**
      * @param reference a document reference

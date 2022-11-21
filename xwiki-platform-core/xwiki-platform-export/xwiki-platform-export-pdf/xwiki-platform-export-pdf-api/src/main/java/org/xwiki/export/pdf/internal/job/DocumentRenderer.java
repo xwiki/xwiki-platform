@@ -21,11 +21,12 @@ package org.xwiki.export.pdf.internal.job;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
@@ -40,6 +41,7 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
+import org.xwiki.rendering.util.IdGenerator;
 
 /**
  * Component used to render documents.
@@ -49,9 +51,15 @@ import org.xwiki.rendering.transformation.RenderingContext;
  * @since 14.5
  */
 @Component(roles = DocumentRenderer.class)
-@Singleton
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class DocumentRenderer
 {
+    /**
+     * The parameter used to mark header blocks that correspond to document titles. In other words, this marks the
+     * beginning of a new document when multiple documents are exported.
+     */
+    public static final String PARAMETER_DOCUMENT_REFERENCE = "data-xwiki-document-reference";
+
     @Inject
     private DocumentAccessBridge documentAccessBridge;
 
@@ -68,6 +76,11 @@ public class DocumentRenderer
 
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    /**
+     * Used to generate unique identifiers across multiple rendered documents.
+     */
+    private IdGenerator idGenerator = new IdGenerator();
 
     /**
      * Renders the specified document.
@@ -90,6 +103,10 @@ public class DocumentRenderer
         parameters.setTransformationContextRestricted(false);
         parameters.setContentTranslated(false);
         parameters.setTargetSyntax(targetSyntax);
+        // Use the same id generator while rendering all the documents included in a PDF export in order to ensure that
+        // the generated identifiers are unique across the aggregated content (as if all the exported documents are
+        // included in the same parent document).
+        parameters.setIdGenerator(this.idGenerator);
 
         DocumentModelBridge document = this.documentAccessBridge.getTranslatedDocumentInstance(documentReference);
         XDOM xdom = display(document, parameters, withTitle);
@@ -109,7 +126,7 @@ public class DocumentRenderer
             String id = xdom.getIdGenerator().generateUniqueId("H", documentReference);
             HeaderBlock title = new HeaderBlock(titleXDOM.getChildren(), HeaderLevel.LEVEL1, id);
             // Mark the beginning of a new document when multiple documents are rendered.
-            title.setParameter("data-xwiki-document-reference", documentReference);
+            title.setParameter(PARAMETER_DOCUMENT_REFERENCE, documentReference);
             if (xdom.getChildren().isEmpty()) {
                 xdom.addChild(title);
             } else {

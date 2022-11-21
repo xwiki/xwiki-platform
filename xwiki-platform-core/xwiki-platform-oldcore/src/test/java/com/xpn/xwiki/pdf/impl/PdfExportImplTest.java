@@ -44,7 +44,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentList({
-    org.xwiki.xml.internal.DefaultXMLReaderFactory.class,
+    org.xwiki.xml.internal.XMLReaderFactoryComponent.class,
 })
 @OldcoreTest
 public class PdfExportImplTest

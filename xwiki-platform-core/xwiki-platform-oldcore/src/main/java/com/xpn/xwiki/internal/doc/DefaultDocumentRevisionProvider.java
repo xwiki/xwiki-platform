@@ -24,10 +24,14 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.security.authorization.AuthorizationException;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.user.UserReference;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.DocumentRevisionProvider;
@@ -54,10 +58,8 @@ public class DefaultDocumentRevisionProvider extends AbstractDocumentRevisionPro
     @Named("database")
     private DocumentRevisionProvider databaseDocumentRevisionProvider;
 
-    @Override
-    public XWikiDocument getRevision(DocumentReference reference, String revision) throws XWikiException
+    private Pair<String, String> parseRevision(String revision)
     {
-        // Parse the version
         String revisionPrefix = null;
         if (revision != null) {
             int revisionPrefixIndex = revision.indexOf(':');
@@ -71,7 +73,11 @@ public class DefaultDocumentRevisionProvider extends AbstractDocumentRevisionPro
         } else {
             shortRevision = revision;
         }
+        return Pair.of(revisionPrefix, shortRevision);
+    }
 
+    private DocumentRevisionProvider getProvider(String revisionPrefix) throws XWikiException
+    {
         // Find the provider
         DocumentRevisionProvider provider = this.databaseDocumentRevisionProvider;
         if (revisionPrefix != null) {
@@ -80,12 +86,30 @@ public class DefaultDocumentRevisionProvider extends AbstractDocumentRevisionPro
                 try {
                     provider = componentManager.getInstance(DocumentRevisionProvider.class, revisionPrefix);
                 } catch (ComponentLookupException e) {
-                    throw new XWikiException("Failed to get revision provider for revision [" + revision + "]", e);
+                    throw new XWikiException("Failed to get revision provider for revision [" + revisionPrefix + "]",
+                        e);
                 }
             }
         }
+        return provider;
+    }
+
+    @Override
+    public XWikiDocument getRevision(DocumentReference reference, String revision) throws XWikiException
+    {
+        Pair<String, String> parsedRevision = parseRevision(revision);
 
         // Load the document revision
-        return provider.getRevision(reference, shortRevision);
+        return getProvider(parsedRevision.getLeft()).getRevision(reference, parsedRevision.getRight());
+    }
+
+    @Override
+    public void checkAccess(Right right, UserReference userReference, DocumentReference documentReference,
+        String revision) throws AuthorizationException, XWikiException
+    {
+        Pair<String, String> parsedRevision = parseRevision(revision);
+
+        getProvider(parsedRevision.getLeft())
+            .checkAccess(right, userReference, documentReference, parsedRevision.getRight());
     }
 }

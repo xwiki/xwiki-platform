@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-panels</artifactId>
-    <version>14.9-SNAPSHOT</version>
+    <version>14.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-panels-ui</artifactId>
   <name>XWiki Platform - Panels - UI</name>
@@ -146,6 +146,14 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-page</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Provides the component list for RenderingScriptService. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-xwiki</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
       <scope>test</scope>
     </dependency>
   </dependencies>

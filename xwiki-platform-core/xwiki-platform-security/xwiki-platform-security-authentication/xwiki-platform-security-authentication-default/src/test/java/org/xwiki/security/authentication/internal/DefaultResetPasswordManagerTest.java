@@ -109,7 +109,7 @@ class DefaultResetPasswordManagerTest
     private UserReferenceSerializer<String> referenceSerializer;
 
     @MockComponent
-    private Provider<ResetPasswordMailSender> resetPasswordMailSenderProvider;
+    private Provider<AuthenticationMailSender> resetPasswordMailSenderProvider;
 
     @MockComponent
     @Named("xwikiproperties")
@@ -118,7 +118,7 @@ class DefaultResetPasswordManagerTest
     @RegisterExtension
     LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
-    private ResetPasswordMailSender resetPasswordMailSender;
+    private AuthenticationMailSender authenticationMailSender;
 
     private DocumentUserReference userReference;
     private DocumentReference userDocumentReference;
@@ -143,8 +143,8 @@ class DefaultResetPasswordManagerTest
         when(this.context.getWiki()).thenReturn(this.xWiki);
         this.userDocument = mock(XWikiDocument.class);
         when(this.xWiki.getDocument(this.userDocumentReference, this.context)).thenReturn(this.userDocument);
-        this.resetPasswordMailSender = mock(ResetPasswordMailSender.class);
-        when(this.resetPasswordMailSenderProvider.get()).thenReturn(this.resetPasswordMailSender);
+        this.authenticationMailSender = mock(AuthenticationMailSender.class);
+        when(this.resetPasswordMailSenderProvider.get()).thenReturn(this.authenticationMailSender);
         when(this.configurationSource.getProperty(DefaultResetPasswordManager.TOKEN_LIFETIME, 0)).thenReturn(0);
     }
 
@@ -251,7 +251,7 @@ class DefaultResetPasswordManagerTest
         DefaultResetPasswordRequestResponse requestResponse =
             new DefaultResetPasswordRequestResponse(this.userReference, verificationCode);
         this.resetPasswordManager.sendResetPasswordEmailRequest(requestResponse);
-        verify(this.resetPasswordMailSender).sendResetPasswordEmail("Foo Bar", email,
+        verify(this.authenticationMailSender).sendResetPasswordEmail("Foo Bar", email,
             new URL("http://xwiki.org/xwiki/authenticate/reset?u=user%3AFoobar&v=foobar4242"));
     }
 

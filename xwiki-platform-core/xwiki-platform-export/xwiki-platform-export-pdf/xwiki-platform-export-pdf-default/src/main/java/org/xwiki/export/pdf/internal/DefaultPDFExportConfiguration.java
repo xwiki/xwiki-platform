@@ -109,6 +109,26 @@ public class DefaultPDFExportConfiguration implements PDFExportConfiguration
             .map(template -> this.documentReferenceResolver.resolve(template)).collect(Collectors.toList());
     }
 
+    @Override
+    public int getPageReadyTimeout()
+    {
+        return getProperty("pageReadyTimeout", PDFExportConfiguration.super.getPageReadyTimeout());
+    }
+
+    @Override
+    public int getMaxContentSize()
+    {
+        return getProperty("maxContentSize", PDFExportConfiguration.super.getMaxContentSize());
+    }
+
+    @Override
+    public int getThreadPoolSize()
+    {
+        // The thread pool size cannot be modified once set so we read it only from xwiki.properties file.
+        return this.xwikiProperties.getProperty("export.pdf.threadPoolSize",
+            PDFExportConfiguration.super.getThreadPoolSize());
+    }
+
     private <T> T getProperty(String key, T defaultValue)
     {
         if (this.configDocument.containsKey(key)) {

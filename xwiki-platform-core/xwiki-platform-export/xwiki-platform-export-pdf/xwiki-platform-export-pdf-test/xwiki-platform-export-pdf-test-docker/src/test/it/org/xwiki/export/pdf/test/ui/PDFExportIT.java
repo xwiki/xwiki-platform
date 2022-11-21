@@ -27,9 +27,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.testcontainers.containers.Network;
+import org.xwiki.export.pdf.internal.docker.ContainerManager;
 import org.xwiki.export.pdf.test.po.ExportModal;
 import org.xwiki.export.pdf.test.po.PDFDocument;
 import org.xwiki.export.pdf.test.po.PDFExportAdministrationSectionPage;
@@ -39,6 +42,7 @@ import org.xwiki.export.pdf.test.po.PDFTemplateEditPage;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -57,13 +61,24 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 14.5
  */
 @UITest(extraJARs = {"org.xwiki.platform:xwiki-platform-resource-temporary"})
+@ExtendWith(PDFExportExecutionCondition.class)
 class PDFExportIT
 {
+    @BeforeAll
+    static void configure()
+    {
+        // Cleanup the Chrome Docker containers used for PDF export.
+        DockerTestUtils.cleanupContainersWithLabels(ContainerManager.DEFAULT_LABELS);
+    }
+
     @Test
     @Order(1)
-    void configurePDFExport(TestUtils setup, TestConfiguration testConfiguration)
+    void configurePDFExport(TestUtils setup, TestConfiguration testConfiguration) throws Exception
     {
         setup.loginAsSuperAdmin();
+        // Restrict view access for guests in order to verify that the Chrome Docker container properly authenticates
+        // the user (the authentication cookies are copied and updated to match the Chrome Docker container IP address).
+        setup.setWikiPreference("authenticate_view", "1");
         setup.gotoPage(new LocalDocumentReference("PDFExportIT", "EnableDebugLogs"), "get");
 
         // Make sure we start with the default settings.
@@ -92,7 +107,7 @@ class PDFExportIT
             setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent"), "WebHome"));
         PDFExportOptionsModal exportOptions = ExportModal.open(viewPage).clickExportAsPDFButton();
 
-        try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration))) {
+        try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration), "John", "pass")) {
             // We should have 4 pages: cover page, table of contents, one page for the parent document and one page for
             // the child document.
             assertEquals(4, pdf.getNumberOfPages());
@@ -121,9 +136,6 @@ class PDFExportIT
             //
 
             String tocPageText = pdf.getTextFromPage(1);
-            // The footer shows the page number and the page count.
-            assertTrue(tocPageText.startsWith("2 / 4\n"),
-                "Unexpected footer on table of contents page: " + tocPageText);
             assertTrue(tocPageText.contains("Table of Contents\nParent\nChapter 1\nChild\nSection 1\n"),
                 "Unexpected table of contents: " + tocPageText);
 
@@ -182,7 +194,7 @@ class PDFExportIT
             setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent", "Child"), "WebHome"));
         PDFExportOptionsModal exportOptions = ExportModal.open(viewPage).clickExportAsPDFButton();
 
-        try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration))) {
+        try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration), "John", "pass")) {
             // We should have 3 pages: cover page, table of contents and one page for the content.
             assertEquals(3, pdf.getNumberOfPages());
 
@@ -227,6 +239,7 @@ class PDFExportIT
         templateEditPage
             .setTableOfContents(templateEditPage.getTableOfContents().replace("core.pdf.tableOfContents", "Chapters"));
         templateEditPage.setHeader(templateEditPage.getHeader().replace("<span ", "Chapter: <span "));
+        templateEditPage.setFooter(templateEditPage.getFooter().replaceFirst("<span ", "Page <span "));
         templateEditPage.clickSaveAndContinue();
 
         // Register the template in the PDF export administration section.
@@ -246,7 +259,7 @@ class PDFExportIT
         PDFExportOptionsModal exportOptions = ExportModal.open(new ViewPage()).clickExportAsPDFButton();
         exportOptions.getTemplateSelect().selectByVisibleText("My cool template");
 
-        try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration))) {
+        try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration), "John", "pass")) {
             // Verify that the custom PDF template was used.
 
             // We should have 4 pages: cover page, table of contents, one page for the parent document and one page for
@@ -261,10 +274,10 @@ class PDFExportIT
             String tocPageText = pdf.getTextFromPage(1);
             assertTrue(tocPageText.contains("Chapters"), "Unexpected table of contents: " + tocPageText);
 
-            // Verify the custom PDF header.
+            // Verify the custom PDF header and footer.
             String contentPageText = pdf.getTextFromPage(2);
-            assertTrue(contentPageText.startsWith("Chapter: Parent"),
-                "Unexpected header on the content page: " + contentPageText);
+            assertTrue(contentPageText.startsWith("Chapter: Parent\nPage 3 / 4\n"),
+                "Unexpected header and footer on the content page: " + contentPageText);
         }
     }
 
@@ -304,7 +317,7 @@ class PDFExportIT
         exportOptions.getCoverCheckbox().click();
         exportOptions.getTocCheckbox().click();
 
-        try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration))) {
+        try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration), "John", "pass")) {
             // One page for the parent document and one page for the child document.
             assertEquals(2, pdf.getNumberOfPages());
             String content = pdf.getTextFromPage(0);

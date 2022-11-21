@@ -27,6 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.configuration.internal.RestrictedConfigurationSourceProvider;
 import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.livedata.LiveDataConfiguration;
@@ -43,6 +44,7 @@ import org.xwiki.rendering.internal.renderer.xhtml.image.DefaultXHTMLImageTypeRe
 import org.xwiki.rendering.internal.renderer.xhtml.link.DefaultXHTMLLinkRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.link.DefaultXHTMLLinkTypeRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -80,7 +82,8 @@ import static org.xwiki.rendering.test.integration.junit5.BlockAssert.assertBloc
     HTMLDefinitions.class,
     MathMLDefinitions.class,
     SVGDefinitions.class,
-    DefaultExecution.class
+    DefaultExecution.class,
+    LiveDataMacroConfiguration.class
 })
 class LiveDataMacroTest
 {
@@ -92,6 +95,12 @@ class LiveDataMacroTest
 
     @MockComponent
     private LiveDataConfigurationResolver<String> stringConfigResolver;
+
+    @MockComponent
+    private DocumentAccessBridge documentAccessBridge;
+
+    @MockComponent
+    private ContextualAuthorizationManager contextualAuthorizationManager;
 
     private PrintRendererFactory rendererFactory;
 
@@ -117,7 +126,8 @@ class LiveDataMacroTest
     void executeWithoutParams() throws Exception
     {
         String expectedConfig = json("{'query':{'source':{}},'meta':{'pagination':{}}}");
-        String expected = "<div class=\"liveData loading\" data-config=\"" + escapeXML(expectedConfig) + "\"></div>";
+        String expected = "<div class=\"liveData loading\" data-config=\"" + escapeXML(expectedConfig) + "\" "
+            + "data-config-content-trusted=\"true\"></div>";
 
         List<Block> blocks = this.liveDataMacro.execute(new LiveDataMacroParameters(), null, null);
         assertBlocks(expected, blocks, this.rendererFactory);
@@ -155,8 +165,8 @@ class LiveDataMacroTest
         expectedConfig.append("  }".trim());
         expectedConfig.append("}");
 
-        String expected = "<div class=\"liveData loading\" id=\"test\" data-config=\""
-            + escapeXML(json(expectedConfig.toString())) + "\"></div>";
+        String expected = String.format("<div class=\"liveData loading\" id=\"test\" data-config=\"%s\" "
+            + "data-config-content-trusted=\"true\"></div>", escapeXML(json(expectedConfig.toString())));
 
         LiveDataMacroParameters parameters = new LiveDataMacroParameters();
         parameters.setId("test");
@@ -214,8 +224,8 @@ class LiveDataMacroTest
         expectedConfig.append("  }".trim());
         expectedConfig.append("}");
 
-        String expected = "<div class=\"liveData loading\" id=\"test\" data-config=\""
-            + escapeXML(json(expectedConfig.toString())) + "\"></div>";
+        String expected = String.format("<div class=\"liveData loading\" id=\"test\" data-config=\"%s\" "
+            + "data-config-content-trusted=\"false\"></div>", escapeXML(json(expectedConfig.toString())));
 
         List<Block> blocks = this.liveDataMacro.execute(parameters, "{...}", null);
         assertBlocks(expected, blocks, this.rendererFactory);

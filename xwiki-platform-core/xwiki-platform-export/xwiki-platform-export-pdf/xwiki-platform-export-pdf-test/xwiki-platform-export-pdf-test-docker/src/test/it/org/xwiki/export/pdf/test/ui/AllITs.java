@@ -21,6 +21,7 @@ package org.xwiki.export.pdf.test.ui;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.xwiki.test.docker.junit5.UITest;
 
 /**
@@ -31,6 +32,7 @@ import org.xwiki.test.docker.junit5.UITest;
  * @since 14.5
  */
 @UITest(extraJARs = {"org.xwiki.platform:xwiki-platform-resource-temporary"})
+@ExtendWith(PDFExportExecutionCondition.class)
 class AllITs
 {
     @Nested

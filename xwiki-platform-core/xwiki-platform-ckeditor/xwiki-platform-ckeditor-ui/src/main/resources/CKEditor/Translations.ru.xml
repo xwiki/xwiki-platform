@@ -124,7 +124,7 @@ ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.center=Центр
 ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.end=Окончание
 ckeditor.plugin.image.imageEditor.advancedTab.textWrap.label=Обтекание текстом
 ckeditor.plugin.image.imageEditor.advancedTab.textWrap.hint=Если галочка установлена, окружающий текст обтекает изображение.
-ckeditor.plugin.image.imageSelector.documentTreeTab.title=Дерево документов
+ckeditor.plugin.image.imageSelector.treeTab.title=Дерево
 ckeditor.plugin.image.imageSelector.uploadTab.title=Загрузка
 ckeditor.plugin.image.imageSelector.uploadTab.file.title=Файл
 ckeditor.plugin.image.imageSelector.uploadTab.file.hint=Выберите локальный файл для добавления на страницу.
@@ -189,7 +189,9 @@ macroEditor.descriptorRequestFailed=Не удалось получить {0} д�
 macroEditor.installRequestFailed=Не удалось установить макрос {0}.
 
 
-imageEditor.modal.backToEditor.button=Назад
+imageEditor.modal.changeImage.button=Заменить изображение
+
+
 imageEditor.modal.loadFail.message=Не удалось получить диалог настройки изображения.
 imageEditor.modal.title=Настройка изображения
 imageEditor.modal.insertButton=Вставить
@@ -201,5 +203,15 @@ imageSelector.modal.fileUpload.success=Загрузка файла прошла 
 imageSelector.modal.fileUpload.fail=Загрузка файла не удалась.
 imageSelector.modal.fileUpload.abort=Загрузка файла прервана.
 imageSelector.modal.initialization.fail=Не удалось получить диалог выбора изображения.
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## Deprecated since 14.10RC1
+imageEditor.modal.backToEditor.button=Назад
+ckeditor.plugin.image.imageSelector.documentTreeTab.title=Дерево документов
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
 </xwikidoc>

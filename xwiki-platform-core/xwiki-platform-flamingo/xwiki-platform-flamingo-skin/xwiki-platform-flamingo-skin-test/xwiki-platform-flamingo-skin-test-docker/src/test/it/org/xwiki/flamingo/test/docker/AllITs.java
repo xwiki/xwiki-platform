@@ -155,7 +155,7 @@ public class AllITs
 
     @Nested
     @DisplayName("Restore deleted Page tests")
-    class NestedRestoreDeletedPageIT extends RestoreDeletedPageIT
+    class NestedRecycleBinIT extends RecycleBinIT
     {
     }
     
@@ -174,6 +174,12 @@ public class AllITs
     @Nested
     @DisplayName("Backlinks Tests")
     class NestedBacklinksIT extends BacklinksIT
+    {
+    }
+
+    @Nested
+    @DisplayName("TextArea property Tests")
+    class NestedTextAreaIT extends TextAreaIT
     {
     }
 }

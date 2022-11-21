@@ -124,7 +124,7 @@ ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.center=Mitte
 ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.end=Ende
 ckeditor.plugin.image.imageEditor.advancedTab.textWrap.label=Textumbruch
 ckeditor.plugin.image.imageEditor.advancedTab.textWrap.hint=Wenn diese Option aktiviert ist, umfließt der Text das Bild.
-ckeditor.plugin.image.imageSelector.documentTreeTab.title=Dokumentenbaum
+ckeditor.plugin.image.imageSelector.treeTab.title=Baum
 ckeditor.plugin.image.imageSelector.uploadTab.title=Hochladen
 ckeditor.plugin.image.imageSelector.uploadTab.file.title=Datei
 ckeditor.plugin.image.imageSelector.uploadTab.file.hint=Wählen Sie eine lokale Datei aus, die der Seite hinzugefügt werden soll.
@@ -189,7 +189,9 @@ macroEditor.descriptorRequestFailed=Fehler beim Abrufen des {0} Makro Deskriptor
 macroEditor.installRequestFailed=Das Makro {0} konnte nicht installiert werden.
 
 
-imageEditor.modal.backToEditor.button=Zurück
+imageEditor.modal.changeImage.button=Bild ändern
+
+
 imageEditor.modal.loadFail.message=Fehler beim Abrufen des Bildbearbeitungsformulars.
 imageEditor.modal.title=Bild bearbeiten
 imageEditor.modal.insertButton=Einfügen
@@ -201,5 +203,15 @@ imageSelector.modal.fileUpload.success=Dateiupload erfolgreich.
 imageSelector.modal.fileUpload.fail=Datei-Upload fehlgeschlagen.
 imageSelector.modal.fileUpload.abort=Datei-Upload abgebrochen.
 imageSelector.modal.initialization.fail=Fehler beim Abrufen des Bildauswahlformulars.
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## Deprecated since 14.10RC1
+imageEditor.modal.backToEditor.button=Zurück
+ckeditor.plugin.image.imageSelector.documentTreeTab.title=Dokumentenbaum
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
 </xwikidoc>

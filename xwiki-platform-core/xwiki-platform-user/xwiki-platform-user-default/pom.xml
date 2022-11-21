@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-user</artifactId>
-    <version>14.9-SNAPSHOT</version>
+    <version>14.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-user-default</artifactId>
   <name>XWiki Platform - User - Default</name>
@@ -102,6 +102,7 @@
             <configuration>
               <includes>
                 <include>**/DefaultUserComponentList.class</include>
+                <include>**/UserReferenceComponentList.class</include>
               </includes>
             </configuration>
           </execution>

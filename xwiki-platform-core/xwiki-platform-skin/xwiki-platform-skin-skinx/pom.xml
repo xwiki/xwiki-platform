@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-skin</artifactId>
-    <version>14.9-SNAPSHOT</version>
+    <version>14.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-skin-skinx</artifactId>
   <name>XWiki Platform - Skin - Skin Extensions</name>
@@ -83,8 +83,20 @@
     <!-- Used to minify and optimize the JavaScript code. -->
     <dependency>
       <groupId>com.google.javascript</groupId>
-      <artifactId>closure-compiler</artifactId>
+      <artifactId>closure-compiler-unshaded</artifactId>
       <version>${closure-compiler.version}</version>
+      <exclusions>
+        <exclusion>
+          <!-- Wrong id -->
+          <groupId>javax.annotation</groupId>
+          <artifactId>jsr250-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!-- Dependency needed by closure-compiler-unshaded -->
+    <dependency>
+      <groupId>jakarta.annotation</groupId>
+      <artifactId>jakarta.annotation-api</artifactId>
     </dependency>
 
     <!-- Test dependencies -->

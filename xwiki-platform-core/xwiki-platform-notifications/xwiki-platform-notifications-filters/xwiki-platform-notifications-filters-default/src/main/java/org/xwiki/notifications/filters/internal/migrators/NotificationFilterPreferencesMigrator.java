@@ -54,6 +54,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -280,7 +281,7 @@ public class NotificationFilterPreferencesMigrator extends AbstractEventListener
         }
     }
 
-    private void migrateWiki(String wikiId)
+    private void migrateWiki(String wikiId) throws XWikiException
     {
         WikiReference wikiReference = new WikiReference(wikiId);
 

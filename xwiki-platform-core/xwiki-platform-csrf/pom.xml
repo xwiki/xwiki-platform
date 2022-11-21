@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>14.9-SNAPSHOT</version>
+    <version>14.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-csrf</artifactId>
   <name>XWiki Platform - CSRF</name>
   <packaging>jar</packaging>
   <description>XWiki CSRF Protection Module</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.80</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.78</xwiki.jacoco.instructionRatio>
     </properties>
   <dependencies>
     <dependency>

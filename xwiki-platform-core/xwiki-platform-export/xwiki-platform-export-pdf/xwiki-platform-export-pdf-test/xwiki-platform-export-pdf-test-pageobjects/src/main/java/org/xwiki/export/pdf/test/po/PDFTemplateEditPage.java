@@ -40,6 +40,9 @@ public class PDFTemplateEditPage extends InlinePage
     @FindBy(id = "XWiki.PDFExport.TemplateClass_0_header")
     private WebElement headerTextArea;
 
+    @FindBy(id = "XWiki.PDFExport.TemplateClass_0_footer")
+    private WebElement footerTextArea;
+
     /**
      * @return the code that controls the PDF cover
      */
@@ -95,5 +98,25 @@ public class PDFTemplateEditPage extends InlinePage
     {
         // The value may be large so we set it without typing.
         getDriver().executeScript("arguments[0].value = arguments[1];", this.headerTextArea, value);
+    }
+
+    /**
+     * @return the code that controls the PDF footer
+     */
+    public String getFooter()
+    {
+        return this.footerTextArea.getAttribute("value");
+    }
+
+    /**
+     * Sets the code that controls the PDF footer.
+     * 
+     * @param value the new code for the PDF footer
+     * @since 14.10RC1
+     */
+    public void setFooter(String value)
+    {
+        // The value may be large so we set it without typing.
+        getDriver().executeScript("arguments[0].value = arguments[1];", this.footerTextArea, value);
     }
 }

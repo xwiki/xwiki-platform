@@ -48,6 +48,7 @@ export.pdf.canceling=Canceling PDF export...
 export.pdf.canceled=PDF export canceled
 export.pdf.cancelFailed=Failed to cancel the PDF export
 export.pdf.loading=Loading...
+export.pdf.pageReadyTimeout=Timeout waiting for web page to be ready for print.
 
 export.pdf.templates.default=Default template
 export.pdf.templates.default.versionInfo=Version {0} authored by {1} on {2}
@@ -106,7 +107,11 @@ XWiki.PDFExport.ConfigurationClass_chromeDockerImage.hint=The Docker image used 
 XWiki.PDFExport.ConfigurationClass_chromeDockerContainerName=Chrome Docker Container Name
 XWiki.PDFExport.ConfigurationClass_chromeDockerContainerName.hint=The name of the Docker container running the headless Chrome web browser. This is especially useful when reusing an existing container.
 XWiki.PDFExport.ConfigurationClass_dockerNetwork=Docker Network
-XWiki.PDFExport.ConfigurationClass_dockerNetwork.hint=The name or id of the Docker network to add the Chrome Docker container to. This is useful when XWiki itself runs inside a Docker container and you want to have the Chrome container in the same network in order for them to communicate.</content>
+XWiki.PDFExport.ConfigurationClass_dockerNetwork.hint=The name or id of the Docker network to add the Chrome Docker container to. This is useful when XWiki itself runs inside a Docker container and you want to have the Chrome container in the same network in order for them to communicate.
+XWiki.PDFExport.ConfigurationClass_pageReadyTimeout=Page Ready Timeout
+XWiki.PDFExport.ConfigurationClass_pageReadyTimeout.hint=The number of seconds to wait for the web page to be ready for print before timing out.
+XWiki.PDFExport.ConfigurationClass_maxContentSize=Maximum Content Size
+XWiki.PDFExport.ConfigurationClass_maxContentSize.hint=The maximum content size, in kilobytes (KB), that can be included in a single PDF export. Use 0 to disable the limit.</content>
   <object>
     <name>XWiki.PDFExport.Translations</name>
     <number>0</number>

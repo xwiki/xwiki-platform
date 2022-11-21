@@ -22,6 +22,8 @@ package org.xwiki.export.pdf.browser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collections;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -29,12 +31,16 @@ import javax.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.export.pdf.PDFExportConfiguration;
+import org.xwiki.export.pdf.internal.browser.CookieFilter;
+import org.xwiki.export.pdf.internal.browser.CookieFilter.CookieFilterContext;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
@@ -44,6 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -66,6 +73,9 @@ class BrowserPDFPrinterTest
     private PDFExportConfiguration configuration;
 
     @Mock
+    private CookieFilter cookieFilter;
+
+    @Mock
     private HttpServletRequest request;
 
     @Mock
@@ -74,17 +84,22 @@ class BrowserPDFPrinterTest
     @Mock(answer = Answers.CALLS_REAL_METHODS)
     private BrowserTab browserTab;
 
+    @Captor
+    ArgumentCaptor<CookieFilterContext> cookieFilterContextCaptor;
+
     @BeforeEach
     void configure()
     {
         ReflectionUtils.setFieldValue(this.printer, "logger", this.logger);
         ReflectionUtils.setFieldValue(this.printer, "configuration", this.configuration);
+        ReflectionUtils.setFieldValue(this.printer, "cookieFilters", Collections.singletonList(this.cookieFilter));
 
         when(this.printer.getBrowserManager()).thenReturn(this.browserManager);
         when(this.printer.getRequest()).thenReturn(this.request);
 
         when(this.request.getContextPath()).thenReturn("/xwiki");
         when(this.configuration.getXWikiHost()).thenReturn("xwiki-host");
+        when(this.configuration.getPageReadyTimeout()).thenReturn(30);
     }
 
     @Test
@@ -108,8 +123,9 @@ class BrowserPDFPrinterTest
         when(this.request.getCookies()).thenReturn(cookies);
 
         when(this.browserManager.createIncognitoTab()).thenReturn(this.browserTab);
-        when(this.browserTab.navigate(new URL("http://xwiki-host:9293/xwiki/rest"), null, false)).thenReturn(true);
-        when(this.browserTab.navigate(browserPrintPreviewURL, cookies, true)).thenReturn(true);
+        when(this.browserTab.navigate(new URL("http://xwiki-host:9293/xwiki/rest/client?media=json"))).thenReturn(true);
+        when(this.browserTab.getSource()).thenReturn("{\"ip\":\"172.12.0.3\"}");
+        when(this.browserTab.navigate(browserPrintPreviewURL, cookies, true, 30)).thenReturn(true);
 
         InputStream pdfInputStream = mock(InputStream.class);
         when(this.browserTab.printToPDF(any(Runnable.class))).then(new Answer<InputStream>()
@@ -126,6 +142,10 @@ class BrowserPDFPrinterTest
         });
 
         assertSame(pdfInputStream, this.printer.print(printPreviewURL));
+
+        verify(this.cookieFilter).filter(eq(Arrays.asList(cookies)), this.cookieFilterContextCaptor.capture());
+        assertEquals("172.12.0.3", this.cookieFilterContextCaptor.getValue().getBrowserIPAddress());
+        assertEquals(browserPrintPreviewURL, this.cookieFilterContextCaptor.getValue().getTargetURL());
 
         verify(this.browserTab).setBaseURL(printPreviewURL);
         verify(this.browserTab).close();
@@ -144,5 +164,13 @@ class BrowserPDFPrinterTest
         assertFalse(this.printer.isAvailable());
 
         verify(this.logger).warn("Failed to connect to the web browser used for server-side PDF printing.", exception);
+    }
+
+    @Test
+    void navigate() throws Exception
+    {
+        URL url = new URL("http://xwiki.org");
+        when(this.browserTab.navigate(url, null, false, 60)).thenReturn(true);
+        assertTrue(this.browserTab.navigate(url));
     }
 }

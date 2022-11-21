@@ -45,7 +45,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -1603,6 +1602,26 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         XWikiContext context)
     {
         return getRenderedContent(text, sourceSyntaxId, getOutputSyntax(), false, sDocument, isolated, context);
+    }
+
+    /**
+     * @param text the text to render
+     * @param sourceSyntaxId the id of the Syntax used by the passed text (e.g. {@code xwiki/2.1})
+     * @param restrictedTransformationContext see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
+     * @param sDocument the {@link XWikiDocument} to use as secure document, if null keep the current one
+     * @param isolated true of the content should be executed in this document's context
+     * @param context the XWiki context
+     * @return the given text rendered in the context of this document using the passed Syntax
+     * @since 14.10RC1
+     * @since 14.4.7
+     * @since 13.10.11
+     */
+    @Unstable
+    public String getRenderedContent(String text, Syntax sourceSyntaxId, boolean restrictedTransformationContext,
+        XWikiDocument sDocument, boolean isolated, XWikiContext context)
+    {
+        return getRenderedContent(text, sourceSyntaxId, getOutputSyntax(), restrictedTransformationContext, sDocument,
+            isolated, context);
     }
 
     /**
@@ -4332,20 +4351,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Unstable
     public void readTemporaryUploadedFiles(EditForm editForm)
     {
-        List<String> temporaryUploadedFiles = editForm.getTemporaryUploadedFiles();
-        if (!temporaryUploadedFiles.isEmpty()) {
-            TemporaryAttachmentSessionsManager attachmentManager = getTemporaryAttachmentManager();
-            for (String temporaryUploadedFile : temporaryUploadedFiles) {
-                Optional<XWikiAttachment> uploadedAttachmentOpt =
-                    attachmentManager.getUploadedAttachment(getDocumentReference(), temporaryUploadedFile);
-                uploadedAttachmentOpt.ifPresent(uploadedAttachment -> {
-                    XWikiAttachment previousAttachment = this.setAttachment(uploadedAttachment);
-                    if (previousAttachment != null) {
-                        uploadedAttachment.setVersion(previousAttachment.getNextVersion());
-                    }
-                });
-            }
-        }
+        getTemporaryAttachmentManager().attachTemporaryAttachmentsInDocument(this, editForm.getTemporaryUploadedFiles());
     }
 
     /**

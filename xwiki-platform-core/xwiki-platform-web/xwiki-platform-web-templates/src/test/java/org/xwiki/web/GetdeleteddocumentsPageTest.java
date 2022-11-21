@@ -31,9 +31,12 @@ import org.xwiki.query.QueryException;
 import org.xwiki.query.internal.ScriptQuery;
 import org.xwiki.query.script.QueryManagerScriptService;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.PageTest;
+import org.xwiki.user.GuestUserReference;
+import org.xwiki.user.UserReferenceComponentList;
 import org.xwiki.velocity.tools.JSONTool;
 
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
@@ -64,6 +67,7 @@ import static org.mockito.Mockito.when;
 @ComponentList({
     StoreConfiguration.class
 })
+@UserReferenceComponentList
 class GetdeleteddocumentsPageTest extends PageTest
 {
     private static final String GETDELETEDDOCUMENTS = "getdeleteddocuments.vm";
@@ -100,12 +104,15 @@ class GetdeleteddocumentsPageTest extends PageTest
         when(this.recycleBinStore.getDeletedDocument(1L, this.context, true))
             .thenReturn(new XWikiDeletedDocument("fullName1", null, null, null, null, null));
         XWikiDeletedDocumentContent xWikiDeletedDocumentContent = mock(XWikiDeletedDocumentContent.class);
+        DocumentReference documentReference = new DocumentReference("xwiki", "XWiki", "fullName2");
         when(xWikiDeletedDocumentContent.getXWikiDocument(null)).thenReturn(
-            new XWikiDocument(new DocumentReference("xwiki", "XWiki", "fullName2")));
+            new XWikiDocument(documentReference));
+        XWikiDeletedDocument deletedDocument2 =
+            new XWikiDeletedDocument("fullName2", null, null, null, null, xWikiDeletedDocumentContent);
         when(this.recycleBinStore.getDeletedDocument(2L, this.context, true))
-            .thenReturn(new XWikiDeletedDocument("fullName2", null, null, null, null, xWikiDeletedDocumentContent));
+            .thenReturn(deletedDocument2);
 
-        when(this.xwiki.getRightService().hasAccessLevel("admin", "XWiki.XWikiGuest", "fullName2", this.context))
+        when(this.recycleBinStore.hasAccess(Right.EDIT, GuestUserReference.INSTANCE, deletedDocument2))
             .thenReturn(true);
 
         Map<String, Object> results = getJsonResultMap();

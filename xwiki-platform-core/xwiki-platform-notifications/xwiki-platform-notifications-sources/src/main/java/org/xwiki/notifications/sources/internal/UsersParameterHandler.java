@@ -69,8 +69,9 @@ public class UsersParameterHandler
      * 
      * @param users the parameter
      * @param parameters the notifications parameters to fill
+     * @throws Exception when failing to handler the users parameter
      */
-    public void handleUsersParameter(String users, NotificationParameters parameters)
+    public void handleUsersParameter(String users, NotificationParameters parameters) throws Exception
     {
         if (StringUtils.isNotBlank(users)) {
             String[] userArray = users.split(FIELD_SEPARATOR);

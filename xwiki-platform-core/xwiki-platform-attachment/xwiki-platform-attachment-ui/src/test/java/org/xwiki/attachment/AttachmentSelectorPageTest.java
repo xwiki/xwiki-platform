@@ -61,6 +61,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.IconSetup;
 import org.xwiki.test.page.PageTest;
+import org.xwiki.test.page.TestNoScriptMacro;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
 import org.xwiki.xml.internal.html.filter.ControlCharactersFilter;
 

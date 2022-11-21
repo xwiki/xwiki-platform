@@ -37,6 +37,8 @@ import org.xwiki.resource.ResourceReferenceHandlerChain;
 import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.security.authentication.AuthenticationResourceReference;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiContextInitializer;
@@ -59,6 +61,9 @@ public class AuthenticationResourceReferenceHandler extends AbstractResourceRefe
     @Inject
     private Execution execution;
 
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
+
     @Override
     public List<ResourceType> getSupportedResourceReferences()
     {
@@ -70,6 +75,17 @@ public class AuthenticationResourceReferenceHandler extends AbstractResourceRefe
         throws ResourceReferenceHandlerException
     {
         AuthenticationResourceReference authenticationResourceReference = (AuthenticationResourceReference) reference;
+
+        WikiReference wikiReference = authenticationResourceReference.getWikiReference();
+        try {
+            if (!this.wikiDescriptorManager.exists(wikiReference.getName())) {
+                throw new ResourceReferenceHandlerException(
+                    String.format("The wiki [%s] does not exist.", wikiReference.getName()));
+            }
+        } catch (WikiManagerException e) {
+            throw new ResourceReferenceHandlerException(
+                String.format("Error when checking if wiki [%s] exists.", wikiReference.getName()), e);
+        }
 
         switch (authenticationResourceReference.getAction()) {
             case RETRIEVE_USERNAME:

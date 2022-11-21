@@ -38,6 +38,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.XWikiRestException;
@@ -49,6 +50,7 @@ import org.xwiki.rest.resources.attachments.AttachmentsResource;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 
 /**
@@ -78,23 +80,31 @@ public class AttachmentsResourceImpl extends BaseAttachmentsResource implements 
 
     @Override
     public Response addAttachment(String wikiName, String spaceName, String pageName, Multipart multipart,
-        Boolean withPrettyNames, Boolean createPage) throws XWikiRestException
+        Boolean withPrettyNames, Boolean createPage)
+        throws XWikiRestException, AttachmentValidationException
     {
+        Document doc;
+        ImmutablePair<String, InputStream> file;
+        List<String> spaces;
         try {
-            List<String> spaces = parseSpaceSegments(spaceName);
+            spaces = parseSpaceSegments(spaceName);
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaces, pageName, null, null, !createPage, true);
-            Document doc = documentInfo.getDocument();
+            doc = documentInfo.getDocument();
 
             if (!this.authorization.hasAccess(Right.EDIT, doc.getDocumentReference())) {
                 throw new WebApplicationException(Status.UNAUTHORIZED);
             }
 
-            ImmutablePair<String, InputStream> file = getFile(multipart);
+            file = getFile(multipart);
             if (file.getKey() == null || file.getValue() == null) {
                 throw new WebApplicationException(Status.BAD_REQUEST);
             }
+        } catch (Exception e) {
+            throw new XWikiRestException(e);
+        }
 
-            // Attach the file and retrieve the attachment information.
+        // Attach the file and retrieve the attachment information.
+        try {
             AttachmentInfo attachmentInfo =
                 storeAndRetrieveAttachment(doc, file.getKey(), file.getValue(), withPrettyNames);
 
@@ -104,7 +114,7 @@ public class AttachmentsResourceImpl extends BaseAttachmentsResource implements 
                 return Response.created(Utils.createURI(this.uriInfo.getBaseUri(), AttachmentResource.class, wikiName,
                     spaces, pageName, file.getKey())).entity(attachmentInfo.getAttachment()).build();
             }
-        } catch (Exception e) {
+        } catch (XWikiException e) {
             throw new XWikiRestException(e);
         }
     }

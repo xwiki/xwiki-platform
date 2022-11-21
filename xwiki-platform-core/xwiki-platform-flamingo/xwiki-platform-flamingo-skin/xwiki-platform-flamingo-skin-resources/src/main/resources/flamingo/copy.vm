@@ -310,6 +310,7 @@
   #template('refactoring_macros.vm')
   <div class="main layoutsubsection">
   <div id="mainContentArea">
+    #template("hierarchy.vm")
     #if ("$!request.copyId" != '')
       ## Display the copy status
       #handleCopyStatusRequest

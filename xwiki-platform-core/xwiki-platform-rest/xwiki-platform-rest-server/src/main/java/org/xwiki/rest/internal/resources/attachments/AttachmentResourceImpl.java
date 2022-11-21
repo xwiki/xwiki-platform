@@ -28,6 +28,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.Utils;
@@ -72,7 +73,7 @@ public class AttachmentResourceImpl extends BaseAttachmentsResource implements A
 
     @Override
     public Response putAttachment(String wikiName, String spaceName, String pageName, String attachmentName,
-        byte[] content) throws XWikiRestException
+        byte[] content) throws XWikiRestException, AttachmentValidationException
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, true);

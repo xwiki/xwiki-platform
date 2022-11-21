@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-refactoring</artifactId>
-    <version>14.9-SNAPSHOT</version>
+    <version>14.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-refactoring-api</artifactId>
   <name>XWiki Platform - Refactoring - API</name>
@@ -33,7 +33,7 @@
   <properties>
     <!-- Skipping revapi since xwiki-platform-legacy-refactoring-api wraps this module and runs checks on it -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
-    <xwiki.jacoco.instructionRatio>0.93</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.91</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Refactoring API</xwiki.extension.name>
   </properties>

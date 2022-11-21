@@ -28,15 +28,18 @@ import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.doc.tasks.XWikiDocumentIndexingTask;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
-import org.xwiki.doc.tasks.XWikiDocumentIndexingTask;
 import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -161,6 +164,23 @@ class TasksStoreTest
             + "and t.version = :version and t.type = :type");
         verify(this.query).setParameter("docId", 42L);
         verify(this.query).setParameter("version", "7.1");
+        verify(this.query).setParameter("type", "testtask");
+        verify(this.query).executeUpdate();
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = { "" })
+    void deleteTaskNoVersion(String version) throws Exception
+    {
+        this.tasksStore.deleteTask("wikiId", 42, version, "testtask");
+        verify(this.contextManager).initialize(any());
+        verify(this.context).setWikiId("wikiId");
+        verify(this.session).createQuery(
+            "delete from XWikiDocumentIndexingTask t where t.docId = :docId and "
+                + "(t.version = :version or t.version is null)and t.type = :type");
+        verify(this.query).setParameter("docId", 42L);
+        verify(this.query).setParameter("version", version);
         verify(this.query).setParameter("type", "testtask");
         verify(this.query).executeUpdate();
     }

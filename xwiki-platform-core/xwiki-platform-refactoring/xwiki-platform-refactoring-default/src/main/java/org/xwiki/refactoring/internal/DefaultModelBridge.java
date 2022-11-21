@@ -244,8 +244,8 @@ public class DefaultModelBridge implements ModelBridge
         XWikiContext xcontext = this.xcontextProvider.get();
         DocumentReference redirectClassReference =
             new DocumentReference(REDIRECT_CLASS_REFERENCE, oldReference.getWikiReference());
-        if (xcontext.getWiki().exists(redirectClassReference, xcontext)) {
-            try {
+        try {
+            if (xcontext.getWiki().exists(redirectClassReference, xcontext)) {
                 XWikiDocument oldDocument = xcontext.getWiki().getDocument(oldReference, xcontext);
                 int number = oldDocument.createXObject(redirectClassReference, xcontext);
                 String location = this.defaultEntityReferenceSerializer.serialize(newReference);
@@ -253,13 +253,12 @@ public class DefaultModelBridge implements ModelBridge
                 oldDocument.setHidden(true);
                 xcontext.getWiki().saveDocument(oldDocument, "Create automatic redirect.", xcontext);
                 this.logger.info("Created automatic redirect from [{}] to [{}].", oldReference, newReference);
-            } catch (XWikiException e) {
-                this.logger.error("Failed to create automatic redirect from [{}] to [{}].", oldReference, newReference,
-                    e);
+            } else {
+                this.logger.warn("We can't create an automatic redirect from [{}] to [{}] because [{}] is missing.",
+                    oldReference, newReference, redirectClassReference);
             }
-        } else {
-            this.logger.warn("We can't create an automatic redirect from [{}] to [{}] because [{}] is missing.",
-                oldReference, newReference, redirectClassReference);
+        } catch (XWikiException e) {
+            this.logger.error("Failed to create automatic redirect from [{}] to [{}].", oldReference, newReference, e);
         }
     }
 
@@ -281,7 +280,7 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
-    public boolean exists(DocumentReference reference)
+    public boolean exists(DocumentReference reference) throws Exception
     {
         XWikiContext xcontext = this.xcontextProvider.get();
         return xcontext.getWiki().exists(reference, xcontext);

@@ -109,7 +109,7 @@ public class DefaultMessageStream implements MessageStream
     @Override
     public void postDirectMessageToUser(String message, DocumentReference user)
     {
-        if (!this.bridge.exists(user)) {
+        if (!exists(user)) {
             throw new IllegalArgumentException("Target user does not exist");
         }
         Event e = createMessageEvent(message, DirectMessageDescriptor.EVENT_TYPE);
@@ -123,7 +123,7 @@ public class DefaultMessageStream implements MessageStream
     @Override
     public void postMessageToGroup(String message, DocumentReference group) throws IllegalAccessError
     {
-        if (!this.bridge.exists(group)) {
+        if (!exists(group)) {
             throw new IllegalArgumentException("Target group does not exist");
         }
         Event e = createMessageEvent(message, GroupMessageDescriptor.EVENT_TYPE);
@@ -132,6 +132,16 @@ public class DefaultMessageStream implements MessageStream
         e.setImportance(Importance.MAJOR);
         e.setTitle("messagestream.descriptors.rss.groupMessage.title");
         saveEvent(e);
+    }
+
+    private boolean exists(DocumentReference userReference) throws IllegalAccessError
+    {
+        try {
+            return this.bridge.exists(userReference);
+        } catch (Exception e) {
+            throw new IllegalAccessError("Failed to check if the document [" + userReference + "] exists: "
+                + ExceptionUtils.getRootCauseMessage(e));
+        }
     }
 
     private void saveEvent(Event event)

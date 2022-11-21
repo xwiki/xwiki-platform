@@ -58,6 +58,8 @@ public class PDFExportJobRequest extends AbstractCheckRightsRequest
 
     private static final String PROPERTY_SERVER_SIDE = "serverSide";
 
+    private static final String PROPERTY_FILE_NAME = "fileName";
+
     /**
      * Default constructor.
      */
@@ -231,5 +233,25 @@ public class PDFExportJobRequest extends AbstractCheckRightsRequest
     public void setWithTitle(Boolean withTitle)
     {
         setProperty(PROPERTY_TITLE, withTitle);
+    }
+
+    /**
+     * @return the file name proposed by the user agent when the user saves the generated PDF on their file system
+     * @since 14.9
+     */
+    public String getFileName()
+    {
+        return getProperty(PROPERTY_FILE_NAME);
+    }
+
+    /**
+     * Sets the file name proposed by the user agent when the user saves the generated PDF on their file system.
+     * 
+     * @param fileName the PDF file name
+     * @since 14.9
+     */
+    public void setFileName(String fileName)
+    {
+        setProperty(PROPERTY_FILE_NAME, fileName);
     }
 }

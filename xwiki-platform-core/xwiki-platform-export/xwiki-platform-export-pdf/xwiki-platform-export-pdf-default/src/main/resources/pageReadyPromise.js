@@ -20,6 +20,14 @@
 new Promise((resolve, reject) => {
   const waitForPageReady = () => {
     require(['xwiki-page-ready'], function(pageReady) {
+      // Don't wait indefinitely for the web page to be ready because it's possible that the page ready promise never
+      // gets resolved, like when:
+      // * the JavaScript code enters an infinite loop (e.g. Paged.js may enter such an infinite loop when paginating
+      //   tables that overflow both the print page width and height)
+      // * a JavaScript exception is thrown preventing the page ready to be fired.
+      setTimeout(() => {
+        reject('Timeout waiting for page to be ready.');
+      }, __pageReadyTimeout__);
       pageReady.afterPageReady(() => {
         // Print to PDF only after all page ready callbacks were executed,
         // because the print preview is initialized as a page ready callback.

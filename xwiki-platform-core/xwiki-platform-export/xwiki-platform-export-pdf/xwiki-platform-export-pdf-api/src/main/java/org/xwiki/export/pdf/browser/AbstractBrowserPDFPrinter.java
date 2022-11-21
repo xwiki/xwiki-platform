@@ -21,20 +21,29 @@ package org.xwiki.export.pdf.browser;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.PDFPrinter;
+import org.xwiki.export.pdf.internal.browser.CookieFilter;
+import org.xwiki.export.pdf.internal.browser.CookieFilter.CookieFilterContext;
 import org.xwiki.stability.Unstable;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Base class for {@link PDFPrinter} implementations that rely on a web browser to perform the PDF printing.
@@ -51,6 +60,9 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
     @Inject
     protected PDFExportConfiguration configuration;
 
+    @Inject
+    private List<CookieFilter> cookieFilters;
+
     @Override
     public InputStream print(URL printPreviewURL) throws IOException
     {
@@ -60,14 +72,15 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
         this.logger.debug("Printing [{}]", printPreviewURL);
 
         BrowserTab browserTab = getBrowserManager().createIncognitoTab();
-        URL browserPrintPreviewURL = getBrowserPrintPreviewURL(printPreviewURL, browserTab);
+        CookieFilterContext cookieFilterContext = findCookieFilterContext(printPreviewURL, browserTab);
+        Cookie[] cookies = getCookies(cookieFilterContext);
         try {
-            Cookie[] cookies = getRequest().getCookies();
-            if (!browserTab.navigate(browserPrintPreviewURL, cookies, true)) {
-                throw new IOException("Failed to load the print preview URL: " + browserPrintPreviewURL);
+            if (!browserTab.navigate(cookieFilterContext.getTargetURL(), cookies, true,
+                this.configuration.getPageReadyTimeout())) {
+                throw new IOException("Failed to load the print preview URL: " + cookieFilterContext.getTargetURL());
             }
 
-            if (!printPreviewURL.toString().equals(browserPrintPreviewURL.toString())) {
+            if (!printPreviewURL.toString().equals(cookieFilterContext.getTargetURL().toString())) {
                 // Make sure the relative URLs are resolved based on the original print preview URL otherwise the user
                 // won't be able to open the links from the generated PDF because they use a host name accessible only
                 // from the browser that generated the PDF. See PDFExportConfiguration#getXWikiHost()
@@ -87,6 +100,28 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
     }
 
     /**
+     * @param cookieFilterContext the contextual information needed by the cookie filters
+     * @return the cookies to pass to the web browser when printing the PDF
+     */
+    private Cookie[] getCookies(CookieFilterContext cookieFilterContext)
+    {
+        Cookie[] cookiesArray = getRequest().getCookies();
+        List<Cookie> cookies = new LinkedList<>();
+        if (cookiesArray != null) {
+            Stream.of(cookiesArray).forEach(cookie -> cookies.add(cookie));
+        }
+        this.cookieFilters.forEach(cookieFilter -> {
+            try {
+                cookieFilter.filter(cookies, cookieFilterContext);
+            } catch (Exception e) {
+                this.logger.warn("Failed to apply cookie filter [{}]. Root cause is: [{}].", cookieFilter,
+                    ExceptionUtils.getRootCauseMessage(e));
+            }
+        });
+        return cookies.isEmpty() ? null : cookies.toArray(new Cookie[cookies.size()]);
+    }
+
+    /**
      * The given print preview URL was created based on the request made by the users's browser so it represents the way
      * the users's browser can access the print preview. The browser that we're using for PDF printing, that may be
      * running inside a dedicated Docker container, is not necessarily able to access the print preview in the same way,
@@ -102,20 +137,21 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
      * 
      * @param printPreviewURL the print preview URL used by the user's browser
      * @param browserTab browser tab that should be able to access the print preview URL
-     * @return the print preview URL to be used by the browser performing the PDF printing
-     * @throws IOException if building the print preview URL fails
+     * @return the cookie filter context, including the print preview URL to be used by the browser performing the PDF
+     *         printing
+     * @throws IOException if finding the cookie filter context fails, or we can't find any
      */
-    private URL getBrowserPrintPreviewURL(URL printPreviewURL, BrowserTab browserTab) throws IOException
+    private CookieFilterContext findCookieFilterContext(URL printPreviewURL, BrowserTab browserTab) throws IOException
     {
         return getBrowserPrintPreviewURLs(printPreviewURL).stream()
-            .filter(url -> this.isURLAccessibleFromBrowser(url, browserTab)).findFirst()
+            .map(url -> this.getCookieFilterContext(url, browserTab)).flatMap(Optional::stream).findFirst()
             .orElseThrow(() -> new IOException("Couldn't find an alternative print preview URL that the web browser "
                 + "used for PDF printing can access."));
     }
 
     private List<URL> getBrowserPrintPreviewURLs(URL printPreviewURL) throws IOException
     {
-        List<URL> browserPrintPreviewURLs = new ArrayList<>();
+        List<URL> browserPrintPreviewURLs = new LinkedList<>();
 
         // 1. Try first with the same URL as the user (this may work in a domain-based multi-wiki setup).
         browserPrintPreviewURLs.add(printPreviewURL);
@@ -131,14 +167,39 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
         return browserPrintPreviewURLs;
     }
 
-    private boolean isURLAccessibleFromBrowser(URL printPreviewURL, BrowserTab browserTab)
+    private Optional<CookieFilterContext> getCookieFilterContext(URL targetURL, BrowserTab browserTab)
+    {
+        return getBrowserIPAddress(targetURL, browserTab).map(browserIPAddress -> new CookieFilterContext()
+        {
+            @Override
+            public String getBrowserIPAddress()
+            {
+                return browserIPAddress;
+            }
+
+            @Override
+            public URL getTargetURL()
+            {
+                return targetURL;
+            }
+        });
+    }
+
+    private Optional<String> getBrowserIPAddress(URL targetURL, BrowserTab browserTab)
     {
         try {
-            URL restURL = new URL(printPreviewURL, getRequest().getContextPath() + "/rest");
-            return browserTab.navigate(restURL);
+            URL restURL = new URL(targetURL, getRequest().getContextPath() + "/rest/client?media=json");
+            if (browserTab.navigate(restURL)) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                String browserIPAddress = objectMapper.readTree(browserTab.getSource()).path("ip").asText();
+                if (!StringUtils.isEmpty(browserIPAddress)) {
+                    return Optional.of(InetAddress.getByName(browserIPAddress).getHostAddress());
+                }
+            }
         } catch (IOException e) {
-            return false;
         }
+
+        return Optional.empty();
     }
 
     @Override

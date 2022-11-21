@@ -1,4 +1,4 @@
-package com.xpn.xwiki.web;/*
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,8 +17,7 @@ package com.xpn.xwiki.web;/*
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
-import java.util.Collections;
+package com.xpn.xwiki.web;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletRequest;
@@ -32,6 +31,8 @@ import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
+import static java.util.Collections.enumeration;
+import static java.util.Collections.singletonList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -45,7 +46,7 @@ import static org.mockito.Mockito.when;
  * @since 12.4RC1
  */
 @ComponentTest
-public class ActionFilterTest
+class ActionFilterTest
 {
     private final ActionFilter filter = new ActionFilter();
 
@@ -64,7 +65,7 @@ public class ActionFilterTest
         ServletResponse response = mock(ServletResponse.class);
         FilterChain chain = mock(FilterChain.class);
 
-        filter.doFilter(request, response, chain);
+        this.filter.doFilter(request, response, chain);
 
         verify(request, never()).getParameterValues("xaction");
         verify(chain).doFilter(request, response);
@@ -79,7 +80,7 @@ public class ActionFilterTest
 
         when(request.getAttribute(ActionFilter.class.getName() + ".actionDispatched")).thenReturn("true");
 
-        filter.doFilter(request, response, chain);
+        this.filter.doFilter(request, response, chain);
 
         verify(request, never()).getParameterValues("xaction");
         verify(chain).doFilter(request, response);
@@ -93,9 +94,9 @@ public class ActionFilterTest
         FilterChain chain = mock(FilterChain.class);
 
         when(request.getParameterValues("xaction")).thenReturn(null);
-        when(request.getParameterNames()).thenReturn(Collections.enumeration(Collections.singletonList("a")));
+        when(request.getParameterNames()).thenReturn(enumeration(singletonList("a")));
 
-        filter.doFilter(request, response, chain);
+        this.filter.doFilter(request, response, chain);
 
         verify(request).getParameterValues("xaction");
         verify(chain).doFilter(request, response);
@@ -110,12 +111,12 @@ public class ActionFilterTest
         FilterChain chain = mock(FilterChain.class);
 
         when(request.getParameterValues("xaction")).thenReturn(null);
-        when(request.getParameterNames()).thenReturn(Collections.enumeration(Collections.singletonList("action_a")));
+        when(request.getParameterNames()).thenReturn(enumeration(singletonList("action_a")));
         when(request.getRequestURI()).thenReturn("/segment1/segment2/segment3/");
         when(request.getServletPath()).thenReturn("/serv");
         when(request.getContextPath()).thenReturn("/ctx/");
 
-        filter.doFilter(request, response, chain);
+        this.filter.doFilter(request, response, chain);
 
         verify(request).getParameterValues("xaction");
         verify(chain).doFilter(request, response);
@@ -133,13 +134,13 @@ public class ActionFilterTest
             "a"
         });
 
-        when(request.getParameterNames()).thenReturn(Collections.enumeration(Collections.singletonList("action_a")));
+        when(request.getParameterNames()).thenReturn(enumeration(singletonList("action_a")));
 
         when(request.getRequestURI()).thenReturn("/segment1/segment2/segment3/");
         when(request.getServletPath()).thenReturn("/serv");
         when(request.getContextPath()).thenReturn("/ctx/");
 
-        filter.doFilter(request, response, chain);
+        this.filter.doFilter(request, response, chain);
 
         verify(request).getParameterValues("xaction");
         verify(chain).doFilter(request, response);
@@ -157,13 +158,13 @@ public class ActionFilterTest
             "b"
         });
 
-        when(request.getParameterNames()).thenReturn(Collections.enumeration(Collections.singletonList("action_a")));
+        when(request.getParameterNames()).thenReturn(enumeration(singletonList("action_a")));
 
         when(request.getRequestURI()).thenReturn("/segment1/segment2/segment3/");
         when(request.getServletPath()).thenReturn("/serv");
         when(request.getContextPath()).thenReturn("/ctx/");
 
-        filter.doFilter(request, response, chain);
+        this.filter.doFilter(request, response, chain);
 
         verify(request).getParameterValues("xaction");
         verify(chain).doFilter(request, response);

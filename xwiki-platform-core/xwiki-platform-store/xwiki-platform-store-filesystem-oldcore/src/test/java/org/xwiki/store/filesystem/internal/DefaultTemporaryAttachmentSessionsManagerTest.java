@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,9 +37,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
+import org.xwiki.attachment.validation.AttachmentValidationException;
+import org.xwiki.attachment.validation.AttachmentValidator;
 import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.store.TemporaryAttachmentException;
 import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -48,20 +52,24 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static com.xpn.xwiki.plugin.fileupload.FileUploadPlugin.UPLOAD_MAXSIZE_PARAMETER;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -80,6 +88,12 @@ class DefaultTemporaryAttachmentSessionsManagerTest
 
     @MockComponent
     private Provider<XWikiContext> contextProvider;
+
+    @MockComponent
+    private Provider<AttachmentValidator> attachmentValidatorProvider;
+
+    @Mock
+    private AttachmentValidator attachmentValidator;
 
     @XWikiTempDir
     private File tmpDir;
@@ -102,6 +116,8 @@ class DefaultTemporaryAttachmentSessionsManagerTest
 
         Environment environment = mockitoComponentManager.registerMockComponent(Environment.class);
         when(environment.getTemporaryDirectory()).thenReturn(this.tmpDir);
+
+        when(this.attachmentValidatorProvider.get()).thenReturn(this.attachmentValidator);
     }
 
     @Test
@@ -161,6 +177,33 @@ class DefaultTemporaryAttachmentSessionsManagerTest
             this.attachmentManager.uploadAttachment(documentReference, part, "newFilename");
         assertEquals("newFilename", xWikiAttachment.getFilename());
         verify(part, never()).getSubmittedFileName();
+    }
+
+    @Test
+    void uploadAttachmentInvalid() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", "XWiki", "Document");
+        SpaceReference spaceReference = documentReference.getLastSpaceReference();
+
+        XWiki xwiki = mock(XWiki.class);
+        Part part = mock(Part.class);
+
+        when(this.context.getWiki()).thenReturn(xwiki);
+        when(xwiki.getSpacePreference(UPLOAD_MAXSIZE_PARAMETER, spaceReference, this.context))
+            .thenReturn("42");
+
+        when(part.getInputStream()).thenReturn(new ByteArrayInputStream("foo".getBytes(UTF_8)));
+
+        doThrow(AttachmentValidationException.class).when(this.attachmentValidator).validateAttachment(any());
+
+        TemporaryAttachmentSession temporaryAttachmentSession = mock(TemporaryAttachmentSession.class);
+        when(this.httpSession.getAttribute(ATTRIBUTE_KEY)).thenReturn(temporaryAttachmentSession);
+
+        assertThrows(AttachmentValidationException.class,
+            () -> this.attachmentManager.uploadAttachment(documentReference, part, "newFilename"));
+
+        verify(part, never()).getSubmittedFileName();
+        verifyNoInteractions(temporaryAttachmentSession);
     }
 
     @ParameterizedTest
@@ -253,5 +296,64 @@ class DefaultTemporaryAttachmentSessionsManagerTest
         DocumentReference documentReference = mock(DocumentReference.class);
         when(temporaryAttachmentSession.removeAttachments(documentReference)).thenReturn(true);
         assertTrue(this.attachmentManager.removeUploadedAttachments(documentReference));
+    }
+
+    @Test
+    void temporarilyAttach() throws TemporaryAttachmentException
+    {
+        DocumentReference documentReference = mock(DocumentReference.class);
+        XWikiAttachment attachment = mock(XWikiAttachment.class);
+        String sessionId = "removeUploadedAttachmentsPlural";
+        when(httpSession.getId()).thenReturn(sessionId);
+        TemporaryAttachmentSession temporaryAttachmentSession = mock(TemporaryAttachmentSession.class);
+        when(httpSession.getAttribute(ATTRIBUTE_KEY)).thenReturn(temporaryAttachmentSession);
+
+        this.attachmentManager.temporarilyAttach(attachment, documentReference);
+        verify(temporaryAttachmentSession).addAttachment(documentReference, attachment);
+
+        verifyNoInteractions(attachment);
+    }
+
+    @Test
+    void attachTemporaryAttachmentsInDocument()
+    {
+        XWikiDocument document = mock(XWikiDocument.class);
+        this.attachmentManager.attachTemporaryAttachmentsInDocument(document, Collections.emptyList());
+        verifyNoInteractions(this.context);
+
+        String sessionId = "removeUploadedAttachmentsPlural";
+        when(httpSession.getId()).thenReturn(sessionId);
+        TemporaryAttachmentSession temporaryAttachmentSession = mock(TemporaryAttachmentSession.class);
+        when(httpSession.getAttribute(ATTRIBUTE_KEY)).thenReturn(temporaryAttachmentSession);
+
+        DocumentReference documentReference = mock(DocumentReference.class);
+        when(document.getDocumentReference()).thenReturn(documentReference);
+
+        String file1 = "myfile.txt";
+        String file2 = "otherfile.gif";
+
+        XWikiAttachment attachment1 = mock(XWikiAttachment.class, "file1");
+        XWikiAttachment attachment2 = mock(XWikiAttachment.class, "file2");
+
+        XWikiAttachment previousAttachment1 = mock(XWikiAttachment.class, "previousFile1");
+        when(document.setAttachment(attachment1)).thenReturn(previousAttachment1);
+
+        String version = "4.5";
+        when(previousAttachment1.getNextVersion()).thenReturn(version);
+
+        when(temporaryAttachmentSession.getAttachment(documentReference, file1)).thenReturn(Optional.of(attachment1));
+        when(temporaryAttachmentSession.getAttachment(documentReference, file2)).thenReturn(Optional.of(attachment2));
+
+        this.attachmentManager.attachTemporaryAttachmentsInDocument(document, List.of(
+            "foo",
+            file1,
+            "bar",
+            file2,
+            ""
+        ));
+        verify(document).setAttachment(attachment1);
+        verify(document).setAttachment(attachment2);
+        verify(attachment1).setVersion(version);
+        verifyNoInteractions(attachment2);
     }
 }

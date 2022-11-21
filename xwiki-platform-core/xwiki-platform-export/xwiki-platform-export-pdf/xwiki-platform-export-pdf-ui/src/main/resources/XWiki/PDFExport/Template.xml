@@ -131,7 +131,9 @@
 {{/velocity}}</cover>
     </property>
     <property>
-      <footer/>
+      <footer>{{html clean="false"}}
+&lt;span class="pdf-page-number"&gt;&lt;/span&gt; / &lt;span class="pdf-page-count"&gt;&lt;/span&gt;
+{{/html}}</footer>
     </property>
     <property>
       <header>{{velocity}}
@@ -266,13 +268,6 @@
   /**
    * Cover Page
    */
-  @page cover {
-    @bottom-center {
-      /* Hide the page number on the cover page. */
-      content: none;
-    }
-  }
-
   .pdf-cover {
     border-top: 1px solid @nav-tabs-border-color;
     border-bottom: 1px solid @nav-tabs-border-color;
@@ -281,62 +276,40 @@
   .pdf-cover h1 {
     font-weight: bolder;
   }
-  .pdf-cover a.user-name {
-    text-decoration: none;
+
+  /**
+   * Table of Contents
+   */
+  /* Distinguish the table of contents entries that correspond to document titles from those that correspond to headings
+    found in the document content. */
+  .pdf-toc &gt; ul &gt; li[data-xwiki-document-reference] {
+    margin-top: 1em;
+
+    &gt; span {
+      font-weight: bolder;
+    }
   }
 
   /**
-   * Standard Page
+   * Header
    */
-  @page {
-    size: A4;
-    margin: .5in;
-    padding: .2in 0;
-
-    /* Header */
-    @top-center {
-      content: element(header);
-    }
-
-    /* Footer */
-    @bottom-center {
-      content: counter(page) " / " counter(pages);
-    }
-  }
-
-  .pdf-header {
-    color: @text-muted !important;
-    position: running(header);
-  }
-
-  /* Marks the beginning of a new XWiki document. */
-  h1[data-xwiki-document-reference] {
-    string-set: chapter-name content(text);
-
-    &amp; ~ h1[data-xwiki-document-reference] {
-      break-before: page;
-    }
-  }
-
   .pdf-chapter-name:before {
-    color: @text-muted !important;
     content: string(chapter-name);
   }
 
-  /* Style the footer. We use PagedJS classes because the footer is currently generated using only CSS. */
-  .pagedjs_page .pagedjs_margin-bottom-center .pagedjs_margin-content::after {
-    color: @text-muted !important;
-  }
-
   /**
-   * Landscape Page
+   * Content
    */
-  @page landscape {
-    size: A4 landscape;
-  }
+  /* Marks the beginning of a new XWiki document. */
+  h1[data-xwiki-document-reference] {
+    /* Distinguish document titles from the rest of the level 1 headings that may appear in the document content. */
+    font-weight: bolder;
+    string-set: chapter-name content(text);
 
-  .page-landscape {
-    page: landscape;
+    /* Start each XWiki document on a new print page. */
+    &amp; ~ h1[data-xwiki-document-reference] {
+      break-before: page;
+    }
   }
 }</code>
     </property>

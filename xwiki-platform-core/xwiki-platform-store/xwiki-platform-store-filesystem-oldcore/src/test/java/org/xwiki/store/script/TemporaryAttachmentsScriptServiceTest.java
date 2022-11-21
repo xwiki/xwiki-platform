@@ -61,6 +61,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -161,19 +162,15 @@ class TemporaryAttachmentsScriptServiceTest
     }
 
     @Test
-    void uploadTemporaryAttachmentWithException()
-        throws Exception
+    void uploadTemporaryAttachmentWithException() throws Exception
     {
         when(this.request.getPart("upload")).thenReturn(this.part);
         when(this.temporaryAttachmentSessionsManager.uploadAttachment(DOCUMENT_REFERENCE, this.part, null))
             .thenThrow(TemporaryAttachmentException.class);
 
-        assertNull(this.temporaryAttachmentsScriptService.uploadTemporaryAttachment(DOCUMENT_REFERENCE,
-            "upload"));
-
-        assertEquals("Error while uploading the attachment: [TemporaryAttachmentException: ]",
-            this.logCapture.getMessage(0));
-        assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
+        assertThrows(TemporaryAttachmentException.class,
+            () -> this.temporaryAttachmentsScriptService.uploadTemporaryAttachment(DOCUMENT_REFERENCE,
+                "upload"));
     }
 
     @Test

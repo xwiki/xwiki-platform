@@ -73,7 +73,7 @@ class AttachmentValidationIT
         // Only allow images to be uploaded on this space.
         AttachmentRestrictionAdministrationSectionPage administrationSectionPage =
             AttachmentRestrictionAdministrationSectionPage.goToPage(testReference.getLastSpaceReference());
-        administrationSectionPage.setAllowedMimetypes("image/.*");
+        administrationSectionPage.setAllowedMimetypes("image/*");
         administrationSectionPage.save();
 
         // Go to a sub-page before uploading to validate that the space configuration is used when validating.
@@ -85,7 +85,7 @@ class AttachmentValidationIT
         upload(attachmentsPane, testConfiguration, TEXT_FILE_NAME);
         WebElement errorMimetype = getNotificationError(setup);
         assertEquals("File text.txt has an invalid mimetype text/plain.\n"
-            + "Allowed mimetypes: image/.*", errorMimetype.getText());
+            + "Allowed mimetypes: image/*", errorMimetype.getText());
 
         cleanNotification(setup, errorMimetype);
 
@@ -100,7 +100,7 @@ class AttachmentValidationIT
         assertEquals("{"
             + "\"message\":\"Invalid mimetype [text/plain]\","
             + "\"translationKey\":\"attachment.validation.mimetype.rejected\","
-            + "\"translationParameters\":\"[[image/.*], []]\""
+            + "\"translationParameters\":\"[[image/*], []]\""
             + "}", putMethodText.getResponseBodyAsString());
 
         PutMethod putMethodImage = restUploadImage(setup, subPage, IMAGE_FILE_NAME);

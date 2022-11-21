@@ -84,15 +84,11 @@ class TextAreaIT
         ViewPage viewPage = testUtils.createPage(testReference2, "{{velocity}}$xwiki.getDocument('"
             + testUtils.serializeReference(testReference) + "').display('textarea'){{/velocity}}");
 
-        assertEquals(
-        // @formatter:off
-            "document: xwiki:TextAreaIT.authors.WebHome\n"
+        assertEquals(String.format("document: %s\n"
             + "content author: xwiki:XWiki.user\n"
             + "effective author: XWiki.superadmin\n"
             + "original author: XWiki.superadmin\n"
-            + "current author: XWiki.superadmin",
-        // @formatter:on
-            viewPage.getContent());
+            + "current author: XWiki.superadmin", testUtils.serializeReference(testReference)), viewPage.getContent());
     }
 
     @Test

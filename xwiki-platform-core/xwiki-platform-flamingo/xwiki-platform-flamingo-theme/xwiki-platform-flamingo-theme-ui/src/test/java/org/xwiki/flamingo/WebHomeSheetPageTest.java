@@ -19,10 +19,19 @@
  */
 package org.xwiki.flamingo;
 
+import java.util.List;
+
+import javax.script.ScriptContext;
+
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.localization.macro.internal.TranslationMacro;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.script.ModelScriptService;
+import org.xwiki.query.Query;
+import org.xwiki.query.script.QueryManagerScriptService;
 import org.xwiki.rendering.internal.configuration.DefaultExtendedRenderingConfiguration;
 import org.xwiki.rendering.internal.configuration.RenderingConfigClassDocumentConfigurationSource;
 import org.xwiki.rendering.internal.macro.DefaultMacroCategoryManager;
@@ -30,13 +39,30 @@ import org.xwiki.rendering.internal.macro.message.ErrorMessageMacro;
 import org.xwiki.rendering.internal.syntax.SyntaxConverter;
 import org.xwiki.rendering.internal.transformation.macro.DefaultMacroTransformationConfiguration;
 import org.xwiki.rendering.script.RenderingScriptService;
+import org.xwiki.script.ScriptContextManager;
+import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.security.script.SecurityScriptServiceComponentList;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.TestNoScriptMacro;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
+import org.xwiki.wiki.script.WikiManagerScriptServiceComponentList;
+import org.xwiki.xml.internal.html.filter.ControlCharactersFilter;
 
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+
+import static javax.script.ScriptContext.GLOBAL_SCOPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Test of the {@code FlamingoThemesCode.WebHomeSheet} page.
@@ -48,11 +74,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 @HTML50ComponentList
 @XWikiSyntax21ComponentList
+@SecurityScriptServiceComponentList
+@WikiManagerScriptServiceComponentList
 @ComponentList({
     ErrorMessageMacro.class,
     TranslationMacro.class,
     TestNoScriptMacro.class,
     DefaultExtendedRenderingConfiguration.class,
+    RenderingConfigClassDocumentConfigurationSource.class,
+    ModelScriptService.class,
     RenderingConfigClassDocumentConfigurationSource.class,
     RenderingScriptService.class,
     SyntaxConverter.class,
@@ -62,10 +92,34 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
     RenderingScriptService.class,
     SyntaxConverter.class,
     DefaultMacroCategoryManager.class,
-    DefaultMacroTransformationConfiguration.class
+    DefaultMacroTransformationConfiguration.class,
+    ControlCharactersFilter.class
 })
 class WebHomeSheetPageTest extends PageTest
 {
+    private static final DocumentReference WEBHOME_SHEET =
+        new DocumentReference("xwiki", "FlamingoThemesCode", "WebHomeSheet");
+
+    private static final DocumentReference NEW_THEME_DOCUMENT_REFERENCE =
+        new DocumentReference("xwiki", "Space", "NewTheme");
+
+    private QueryManagerScriptService queryManagerScriptService;
+
+    private AuthorizationManager authorizationManager;
+
+    private ScriptContext scriptContext;
+
+    @BeforeEach
+    void setUp() throws Exception
+    {
+        this.queryManagerScriptService =
+            this.componentManager.registerMockComponent(ScriptService.class, "query", QueryManagerScriptService.class,
+                false);
+        this.authorizationManager = this.componentManager.getInstance(AuthorizationManager.class);
+        this.scriptContext = this.oldcore.getMocker().<ScriptContextManager>getInstance(ScriptContextManager.class)
+            .getCurrentScriptContext();
+    }
+
     @Test
     void createAction() throws Exception
     {
@@ -73,9 +127,59 @@ class WebHomeSheetPageTest extends PageTest
         this.request.put("form_token", "1");
         this.request.put("action", "create");
 
-        Document document = this.renderHTMLPage(new DocumentReference("xwiki", "FlamingoThemesCode", "WebHomeSheet"));
+        Document document = renderHTMLPage(WEBHOME_SHEET);
 
         assertEquals("platform.flamingo.themes.home.create.csrf [some content\"/}}{{noscript/}}]",
             document.select(".box.errormessage").text());
+    }
+
+    @Test
+    void listAvailableThemes() throws Exception
+    {
+        loadPage(new DocumentReference("xwiki", "FlamingoThemes", "Charcoal"));
+        initNewTheme();
+
+        // Mock the database.
+        Query query = mock(Query.class);
+        when(this.queryManagerScriptService.xwql("from doc.object(FlamingoThemesCode.ThemeClass) obj WHERE doc"
+            + ".fullName <> 'FlamingoThemesCode.ThemeTemplate' ORDER BY doc.name")).thenReturn(query);
+        when(query.setWiki(anyString())).thenReturn(query);
+        when(query.execute()).thenReturn(List.of("Space.NewTheme"));
+
+        // Allow the current user to have access to the resources.
+        when(this.authorizationManager.hasAccess(eq(Right.VIEW), any(), eq(NEW_THEME_DOCUMENT_REFERENCE)))
+            .thenReturn(true);
+        this.scriptContext.setAttribute("hasAdmin", true, GLOBAL_SCOPE);
+
+        Document document = renderHTMLPage(WEBHOME_SHEET);
+
+        // Validate the links and styles.
+        Element newThemeHeader = document.select("h3").get(1);
+        String newThemeHeaderText = newThemeHeader.text();
+        String newThemeHeaderLinkHref = newThemeHeader.selectFirst("a").attr("href");
+        assertEquals("]] &#123;&#123;noscript}}println(\"Hello from title!\")&#123;&#123;/noscript}}",
+            newThemeHeaderText);
+        assertEquals("Space.NewTheme", newThemeHeaderLinkHref);
+
+        String newThemeMockupPageStyle = document.select(".mockup-page").get(1).attr("style");
+        assertEquals("background-color: {{/html}} {{noscript}}println(\"Hello from body-bg!\"){{/noscript}} \"/>"
+                + "<script>...</script/>",
+            newThemeMockupPageStyle);
+    }
+
+    /**
+     * Creates a new page describing a theme.
+     *
+     * @throws XWikiException in case of error
+     */
+    private void initNewTheme() throws XWikiException
+    {
+        XWikiDocument newTheme = this.xwiki.getDocument(NEW_THEME_DOCUMENT_REFERENCE, this.context);
+        newTheme.setTitle("]] {{noscript}}println(\"Hello from title!\"){{/noscript}}");
+        BaseObject baseObject =
+            newTheme.newXObject(new DocumentReference("xwiki", "FlamingoThemesCode", "ThemeClass"), this.context);
+        baseObject.setStringValue("body-bg",
+            "{{/html}} {{noscript}}println(\"Hello from body-bg!\"){{/noscript}} \"/><script>...</script/>");
+        this.xwiki.saveDocument(newTheme, this.context);
     }
 }

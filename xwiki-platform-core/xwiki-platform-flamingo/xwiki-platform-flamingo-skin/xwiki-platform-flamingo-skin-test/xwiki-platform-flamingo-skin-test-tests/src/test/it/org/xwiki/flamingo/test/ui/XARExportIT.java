@@ -25,8 +25,7 @@ import java.util.List;
 
 import org.junit.Test;
 import org.openqa.selenium.By;
-import org.xwiki.flamingo.skin.test.po.ExportModal;
-import org.xwiki.flamingo.skin.test.po.OtherFormatPane;
+import org.xwiki.flamingo.skin.test.po.ExportTreeModal;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.po.ViewPage;
@@ -34,7 +33,6 @@ import org.xwiki.tree.test.po.TreeElement;
 import org.xwiki.tree.test.po.TreeNodeElement;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Verify that the XAR export features works fine.
@@ -91,30 +89,19 @@ public class XARExportIT extends AbstractTest
         getUtil().loginAsSuperAdmin();
 
         ViewPage viewPage = getUtil().gotoPage("Foo", "WebHome");
-        // modal created before the opening to avoid fade effect. (see BaseModal)
-        ExportModal exportModal = new ExportModal();
-        viewPage.clickMoreActionsSubMenuEntry("tmExport");
+        ExportTreeModal exportTreeModal = ExportTreeModal.open(viewPage, "XAR");
 
-        OtherFormatPane otherFormatPane = exportModal.openOtherFormatPane();
-        assertTrue(otherFormatPane.isTreeAvailable());
-        assertTrue(otherFormatPane.isExportAsXARButtonAvailable());
-
-        TreeElement treeElement = otherFormatPane.getTreeElement();
+        TreeElement treeElement = exportTreeModal.getPageTree();
         List<TreeNodeElement> topLevelNodes = treeElement.getTopLevelNodes();
         assertEquals(1, topLevelNodes.size());
 
-        otherFormatPane.clickExportAsXARButton();
+        exportTreeModal.export();
 
         String postURL = getUtil().getURL("Foo", "WebHome", "export", "format=xar&name=Foo.WebHome&");
-        assertEquals(postURL, otherFormatPane.getForm().getAttribute("action"));
+        assertEquals(postURL, exportTreeModal.getAction());
 
-        List<String> expectedPages = new ArrayList<>();
-        expectedPages.add("xwiki:Foo.%");
-        assertEquals(expectedPages, otherFormatPane.getPagesValues());
-
-        List<String> expectedExcludes = new ArrayList<>();
-        expectedExcludes.add("");
-        assertEquals(expectedExcludes, otherFormatPane.getExcludesValues());
+        assertEquals(Arrays.asList("xwiki:Foo.%"), exportTreeModal.getPagesValues());
+        assertEquals(Arrays.asList(""), exportTreeModal.getExcludesValues());
         getUtil().forceGuestUser();
     }
 
@@ -128,15 +115,9 @@ public class XARExportIT extends AbstractTest
         getUtil().loginAsSuperAdmin();
 
         ViewPage viewPage = getUtil().gotoPage("Foo", "WebHome");
-        // modal created before the opening to avoid fade effect. (see BaseModal)
-        ExportModal exportModal = new ExportModal();
-        viewPage.clickMoreActionsSubMenuEntry("tmExport");
+        ExportTreeModal exportTreeModal = ExportTreeModal.open(viewPage, "XAR");
 
-        OtherFormatPane otherFormatPane = exportModal.openOtherFormatPane();
-        assertTrue(otherFormatPane.isTreeAvailable());
-        assertTrue(otherFormatPane.isExportAsXARButtonAvailable());
-
-        TreeElement treeElement = otherFormatPane.getTreeElement();
+        TreeElement treeElement = exportTreeModal.getPageTree();
         List<TreeNodeElement> topLevelNodes = treeElement.getTopLevelNodes();
         assertEquals(1, topLevelNodes.size());
 
@@ -155,23 +136,18 @@ public class XARExportIT extends AbstractTest
             lastNode.deselect();
             lastNode.select();
 
-            getDriver().waitUntilElementDisappears(exportModal.getContainer(), By.linkText(lastNodeLabel));
+            getDriver().waitUntilElementDisappears(exportTreeModal.getContainer(), By.linkText(lastNodeLabel));
         }
 
         assertEquals(50, root.getChildren().size());
 
-        otherFormatPane.clickExportAsXARButton();
+        exportTreeModal.export();
 
         String postURL = getUtil().getURL("Foo", "WebHome", "export", "format=xar&name=Foo.WebHome&");
-        assertEquals(postURL, otherFormatPane.getForm().getAttribute("action"));
+        assertEquals(postURL, exportTreeModal.getAction());
 
-        List<String> expectedPages = new ArrayList<>();
-        expectedPages.add("xwiki:Foo.%");
-        assertEquals(expectedPages, otherFormatPane.getPagesValues());
-
-        List<String> expectedExcludes = new ArrayList<>();
-        expectedExcludes.add("");
-        assertEquals(expectedExcludes, otherFormatPane.getExcludesValues());
+        assertEquals(Arrays.asList("xwiki:Foo.%"), exportTreeModal.getPagesValues());
+        assertEquals(Arrays.asList(""), exportTreeModal.getExcludesValues());
 
         getUtil().forceGuestUser();
     }
@@ -184,15 +160,9 @@ public class XARExportIT extends AbstractTest
     {
         getUtil().loginAsSuperAdmin();
         ViewPage viewPage = getUtil().gotoPage("Foo", "WebHome");
-        // modal created before the opening to avoid fade effect. (see BaseModal)
-        ExportModal exportModal = new ExportModal();
-        viewPage.clickMoreActionsSubMenuEntry("tmExport");
+        ExportTreeModal exportTreeModal = ExportTreeModal.open(viewPage, "XAR");
 
-        OtherFormatPane otherFormatPane = exportModal.openOtherFormatPane();
-        assertTrue(otherFormatPane.isTreeAvailable());
-        assertTrue(otherFormatPane.isExportAsXARButtonAvailable());
-
-        TreeElement treeElement = otherFormatPane.getTreeElement();
+        TreeElement treeElement = exportTreeModal.getPageTree();
         List<TreeNodeElement> topLevelNodes = treeElement.getTopLevelNodes();
         assertEquals(1, topLevelNodes.size());
 
@@ -228,10 +198,10 @@ public class XARExportIT extends AbstractTest
         // 2 -> Foo_10/Foo_10_15
         node2.getChildren().get(7).select();
 
-        otherFormatPane.clickExportAsXARButton();
+        exportTreeModal.export();
 
         String postURL = getUtil().getURL("Foo", "WebHome", "export", "format=xar&name=Foo.WebHome&");
-        assertEquals(postURL, otherFormatPane.getForm().getAttribute("action"));
+        assertEquals(postURL, exportTreeModal.getAction());
 
         List<String> expectedPages = new ArrayList<>();
         expectedPages.add("xwiki:Foo.%");
@@ -244,8 +214,8 @@ public class XARExportIT extends AbstractTest
         expectedExcludes.add("");
         expectedExcludes.add("");
 
-        assertEquals(expectedPages, otherFormatPane.getPagesValues());
-        assertEquals(expectedExcludes, otherFormatPane.getExcludesValues());
+        assertEquals(expectedPages, exportTreeModal.getPagesValues());
+        assertEquals(expectedExcludes, exportTreeModal.getExcludesValues());
 
         getUtil().forceGuestUser();
     }

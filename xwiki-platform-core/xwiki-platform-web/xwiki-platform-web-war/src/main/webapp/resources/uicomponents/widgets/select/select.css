@@ -45,6 +45,18 @@
   vertical-align: top;
 }
 
+.xwiki-select-3-columns .xwiki-select-option {
+  width: 32%;
+}
+
+.xwiki-select-3-columns .xwiki-select-option .xHint {
+  display: none;
+}
+
+.xwiki-select-3-columns .xwiki-select-option > div {
+  vertical-align: middle;
+}
+
 .xwiki-select-options > ul > li {
   clear: both;
 }

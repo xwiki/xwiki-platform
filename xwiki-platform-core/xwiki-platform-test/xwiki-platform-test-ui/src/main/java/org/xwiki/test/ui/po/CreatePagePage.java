@@ -94,7 +94,7 @@ public class CreatePagePage extends ViewPage
 
     public void setType(String type)
     {
-        this.pageTypePicker.selectTypeByValue(type);
+        this.pageTypePicker.selectByValue(type);
     }
 
     public void clickCreate()

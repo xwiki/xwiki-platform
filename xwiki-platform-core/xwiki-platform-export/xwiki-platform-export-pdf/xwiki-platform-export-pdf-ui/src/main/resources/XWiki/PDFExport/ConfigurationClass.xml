@@ -144,6 +144,21 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
     </pageReadyTimeout>
+    <replaceFOP>
+      <customDisplay/>
+      <defaultValue/>
+      <disabled>0</disabled>
+      <displayFormType>select</displayFormType>
+      <displayType/>
+      <hint>XWiki.PDFExport.ConfigurationClass_replaceFOP.hint</hint>
+      <name>replaceFOP</name>
+      <number>11</number>
+      <prettyName>Replace FOP</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </replaceFOP>
     <serverSide>
       <customDisplay/>
       <defaultValue/>

@@ -134,4 +134,13 @@ public interface PDFExportConfiguration
     {
         return 3;
     }
+
+    /**
+     * @return whether to replace or not the old PDF export based on Apache Formatting Objects Processor (FOP)
+     * @since 14.10RC1
+     */
+    default boolean isReplacingFOP()
+    {
+        return true;
+    }
 }

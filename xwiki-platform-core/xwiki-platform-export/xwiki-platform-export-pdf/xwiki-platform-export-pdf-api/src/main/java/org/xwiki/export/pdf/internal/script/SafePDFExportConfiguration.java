@@ -122,4 +122,10 @@ public class SafePDFExportConfiguration extends AbstractSafeObject<PDFExportConf
     {
         return getWrapped().getThreadPoolSize();
     }
+
+    @Override
+    public boolean isReplacingFOP()
+    {
+        return getWrapped().isReplacingFOP();
+    }
 }

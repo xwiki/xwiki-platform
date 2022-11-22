@@ -26,6 +26,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.export.pdf.PDFExportConfiguration;
@@ -109,6 +110,12 @@ public class PDFExportScriptService implements ScriptService
     private ScriptSafeProvider scriptSafeProvider;
 
     /**
+     * Used to check if the specified PDF export templates exist.
+     */
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
+
+    /**
      * @return a new PDF export request, initialized based on the current HTTP request
      */
     public PDFExportJobRequest createRequest()
@@ -181,6 +188,24 @@ public class PDFExportScriptService implements ScriptService
             setError(e);
             return null;
         }
+    }
+
+    /**
+     * @return {@code true} if the Web browser based PDF export is enabled, {@code false} otherwise
+     * @since 14.10RC1
+     */
+    public boolean isEnabled()
+    {
+        setError(null);
+
+        return getConfiguration().getTemplates().stream().anyMatch(templateReference -> {
+            try {
+                return this.documentAccessBridge.exists(templateReference);
+            } catch (Exception e) {
+                setError(e);
+                return false;
+            }
+        });
     }
 
     /**

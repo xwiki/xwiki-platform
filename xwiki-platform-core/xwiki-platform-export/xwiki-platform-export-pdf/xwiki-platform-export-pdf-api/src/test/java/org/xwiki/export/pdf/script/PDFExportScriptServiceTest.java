@@ -20,12 +20,14 @@
 package org.xwiki.export.pdf.script;
 
 import java.net.URL;
+import java.util.Arrays;
 
 import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.export.pdf.PDFExportConfiguration;
@@ -36,6 +38,7 @@ import org.xwiki.export.pdf.job.PDFExportJobRequestFactory;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.internal.safe.ScriptSafeProvider;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -92,6 +95,9 @@ class PDFExportScriptServiceTest
     @MockComponent
     @SuppressWarnings("rawtypes")
     private ScriptSafeProvider scriptSafeProvider;
+
+    @MockComponent
+    private DocumentAccessBridge documentAccessBridge;
 
     @Mock
     private PDFExportJobRequest request;
@@ -185,5 +191,23 @@ class PDFExportScriptServiceTest
         when(this.scriptSafeProvider.get(this.configuration)).thenThrow(new RuntimeException("Failed!"));
         assertNull(this.service.getConfiguration());
         assertEquals("Failed!", this.service.getLastError().getMessage());
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    void isEnabled() throws Exception
+    {
+        DocumentReference firstTemplate = new DocumentReference("test", "First", "Template");
+        DocumentReference secondTemplate = new DocumentReference("test", "Second", "Template");
+
+        PDFExportConfiguration safeConfig = mock(PDFExportConfiguration.class, "safe");
+        when(this.scriptSafeProvider.get(this.configuration)).thenReturn(safeConfig);
+        when(safeConfig.getTemplates()).thenReturn(Arrays.asList(firstTemplate, secondTemplate));
+
+        assertFalse(this.service.isEnabled());
+
+        when(this.documentAccessBridge.exists(secondTemplate)).thenReturn(true);
+
+        assertTrue(this.service.isEnabled());
     }
 }

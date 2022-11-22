@@ -129,6 +129,12 @@ public class DefaultPDFExportConfiguration implements PDFExportConfiguration
             PDFExportConfiguration.super.getThreadPoolSize());
     }
 
+    @Override
+    public boolean isReplacingFOP()
+    {
+        return getProperty("replaceFOP", PDFExportConfiguration.super.isReplacingFOP());
+    }
+
     private <T> T getProperty(String key, T defaultValue)
     {
         if (this.configDocument.containsKey(key)) {

@@ -40,6 +40,7 @@
 export.pdf.options.template.hint=The PDF template controls the information displayed on the cover page, in the table of contents as well as in the header and footer of each page.
 export.pdf.options.loadFailure=Failed to load the PDF export options.
 
+export.pdf.hint=Export as Portable Document Format (PDF) using the Web Browser
 export.pdf.modal.close=Close
 export.pdf.inProgress=Exporting as PDF...
 export.pdf.failed=Failed to export as PDF
@@ -111,7 +112,9 @@ XWiki.PDFExport.ConfigurationClass_dockerNetwork.hint=The name or id of the Dock
 XWiki.PDFExport.ConfigurationClass_pageReadyTimeout=Page Ready Timeout
 XWiki.PDFExport.ConfigurationClass_pageReadyTimeout.hint=The number of seconds to wait for the web page to be ready for print before timing out.
 XWiki.PDFExport.ConfigurationClass_maxContentSize=Maximum Content Size
-XWiki.PDFExport.ConfigurationClass_maxContentSize.hint=The maximum content size, in kilobytes (KB), that can be included in a single PDF export. Use 0 to disable the limit.</content>
+XWiki.PDFExport.ConfigurationClass_maxContentSize.hint=The maximum content size, in kilobytes (KB), that can be included in a single PDF export. Use 0 to disable the limit.
+XWiki.PDFExport.ConfigurationClass_replaceFOP=Replace FOP
+XWiki.PDFExport.ConfigurationClass_replaceFOP.hint=Replace the old PDF export based on Apache Formatting Objects Processor (FOP).</content>
   <object>
     <name>XWiki.PDFExport.Translations</name>
     <number>0</number>

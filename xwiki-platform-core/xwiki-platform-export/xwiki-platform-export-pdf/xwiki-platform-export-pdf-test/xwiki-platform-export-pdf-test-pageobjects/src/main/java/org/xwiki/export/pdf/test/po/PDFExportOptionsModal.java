@@ -30,7 +30,10 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.xwiki.flamingo.skin.test.po.ExportModal;
+import org.xwiki.flamingo.skin.test.po.ExportTreeModal;
 import org.xwiki.test.ui.po.BaseModal;
+import org.xwiki.test.ui.po.ViewPage;
 
 /**
  * Represents the actions possible on the modal used to configure and trigger the PDF export.
@@ -57,6 +60,25 @@ public class PDFExportOptionsModal extends BaseModal
 
     @FindBy(id = "pdffooter")
     private WebElement footerCheckbox;
+
+    /**
+     * Opens the PDF export options modal for the given page.
+     * 
+     * @param viewPage the page for which to open the PDF export options modal
+     * @return the PDF export options modal
+     */
+    public static PDFExportOptionsModal open(ViewPage viewPage)
+    {
+        if (ExportTreeModal.isPresent()) {
+            // Multipage export.
+            ExportTreeModal.open(viewPage, "PDF").export();
+        } else {
+            // Single page export.
+            ExportModal.open(viewPage).exportAs("PDF");
+        }
+
+        return new PDFExportOptionsModal();
+    }
 
     /**
      * Default constructor.

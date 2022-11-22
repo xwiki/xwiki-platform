@@ -536,65 +536,47 @@ require([
     }
   });
 
-  const switchToPDFOptionsModal = function(event, url, data) {
+  const switchToPDFOptionsModal = function(event, previousModal, url, data) {
     event.preventDefault();
-    // Show the PDF Export Options modal only after the Export modal is completely hidden, otherwise the code that hides
-    // the Export modal can revert changes done by the code that shows the PDF Export Options modal (e.g. we loose the
-    // 'modal-open' CSS class on the BODY element which is needed in order to hide the page scrollbars).
-    $('#exportModal').one('hidden.bs.modal', () =&gt; {
-      // Enable the animation back for the next time the Export modal is shown.
-      $('#exportModal').addClass('fade');
+    event.stopPropagation();
+    // Show the PDF Export Options modal only after the previous modal is completely hidden, otherwise the code that
+    // hides the previous modal can revert changes done by the code that shows the PDF Export Options modal (e.g. we
+    // loose the 'modal-open' CSS class on the BODY element which is needed in order to hide the page scrollbars).
+    previousModal.one('hidden.bs.modal', () =&gt; {
+      // Enable the animation back for the next time the previous modal is shown.
+      previousModal.addClass('fade');
       openPDFOptionsModal(url, data);
     // Disable the animation when moving to the next step (PDF Export Options) in order to have a smooth transition.
     }).removeClass('fade').modal('hide');
   };
 
-  const customizeExportModal = function() {
-    const exportButton = $('#exportModelOfficeCollapse a[href*="xpage=pdfoptions"]');
-
-    // Move the "Export as PDF" button to the Other category in order to enable multiple page selection.
-    exportButton.prependTo('#exportModalOtherCollapse .export-buttons');
-
-    // Remove the accordion if the Office category is empty.
-    if (!$('#exportModelOfficeCollapse .panel-body').children().length) {
-      // We need to keep the '#exportModalOtherCollapse' element because it is used by exporter.js
-      $('#exportModalAccordion').replaceWith($('#exportModalOtherCollapse'));
-      $('#exportModalOtherCollapse').attr({
-        'class': 'xform',
-        'role': null,
-        'aria-labeledby': null,
-        'aria-expanded': null
-      }).children('.panel-body').children().unwrap();
-    }
-
-    // Remove the qs parameter because:
-    // * the PDF export options modal is loaded only once (per page load) and the query string can change afterwards
-    // * the query string can change after the page is loaded (e.g. that's how the live data component saves its state
-    //   in the URL) and we want to use the query string value at the moment when the PDF export is triggered
-    const exportOptionsURL = exportButton.attr('href').replace(/([?&amp;])qs=[^&amp;#]*/, '$1');
-
-    const exportTree = $('#exportModalOtherCollapse').find('.export-tree');
-    if (exportTree.length) {
-      // Multiple selection.
-      $(document).on('submit', 'form#export-modal-form', event =&gt; {
+  // Customize the Export Tree Modal.
+  const exportTreeModal = $('#exportTreeModal').on('show.bs.modal', event =&gt; {
+    if (exportTreeModal.data('config').id === 'org.xwiki.platform.export.pdf.exportFormats') {
+      $(document).on('submit.export.pdf', 'form#export-modal-form', event =&gt; {
         const form = $(event.target);
-        if (form.attr('action').indexOf('xpage=pdfoptions') &gt; 0) {
-          // Pass the document selection to the PDF export options modal.
-          switchToPDFOptionsModal(event, exportOptionsURL, form.serializeArray());
-        }
-      });
-    } else {
-      // Single selection. Only the current page is exported.
-      exportButton.on('click', event =&gt; {
-        switchToPDFOptionsModal(event, exportOptionsURL, [{
-          name: 'pages',
-          value: XWiki.Model.serialize(XWiki.currentDocument.documentReference)
-        }]);
+        // Pass the document selection to the PDF export options modal.
+        switchToPDFOptionsModal(event, exportTreeModal, exportTreeModal.data('config').url, form.serializeArray());
       });
     }
-  };
+  });
 
-  $(customizeExportModal);
+  exportTreeModal.on('hide.bs.modal', event =&gt; {
+    // Cleanup.
+    $(document).off('submit.export.pdf');
+  });
+
+  // Customize the Export Modal.
+  $('.xwiki-select.xwiki-export-formats').on('xwiki:select:updated', function(event) {
+    const exportFormat = $(this).find('.xwiki-select-option-selected input[name=exportFormat]');
+    if (exportFormat.val() === 'org.xwiki.platform.export.pdf.exportFormats' &amp;&amp; !$('#exportTreeModal').length) {
+      // Single selection. Only the current page is exported.
+      switchToPDFOptionsModal(event, $('#exportModal'), exportFormat.attr('data-url'), [{
+        name: 'pages',
+        value: XWiki.Model.serialize(XWiki.currentDocument.documentReference)
+      }]);
+    }
+  });
 });</code>
     </property>
     <property>
@@ -898,13 +880,21 @@ require([
 {{/velocity}}</content>
     </property>
     <property>
-      <extensionPointId>org.xwiki.plaftorm.menu.export.buttons</extensionPointId>
+      <extensionPointId>org.xwiki.platform.template.exportFormats</extensionPointId>
     </property>
     <property>
-      <name>org.xwiki.platform.export.pdf.buttons</name>
+      <name>org.xwiki.platform.export.pdf.exportFormats</name>
     </property>
     <property>
-      <parameters/>
+      <parameters>label=PDF#if (!$services.export.pdf.configuration.isReplacingFOP()) (Web)#end
+hint=export.pdf.hint
+icon=file-pdf
+category=office
+url=$doc.getURL('view', 'xpage=pdfoptions')
+multipage=true
+filterHiddenPages=true
+excludeNestedPagesByDefault=true
+enabled=$services.export.pdf.isEnabled()</parameters>
     </property>
     <property>
       <scope>wiki</scope>

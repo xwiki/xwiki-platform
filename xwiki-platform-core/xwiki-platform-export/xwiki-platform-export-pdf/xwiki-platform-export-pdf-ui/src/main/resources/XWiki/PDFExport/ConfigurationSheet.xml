@@ -164,6 +164,7 @@
   &lt;/dd&gt;
   #displayPDFExportConfigProperty('pageReadyTimeout', {'min': 0, 'max': 2147483647})
   #displayPDFExportConfigProperty('maxContentSize', {'min': 0, 'max': 2147483647})
+  #displayPDFExportConfigProperty('replaceFOP')
 #end
 {{/velocity}}
 

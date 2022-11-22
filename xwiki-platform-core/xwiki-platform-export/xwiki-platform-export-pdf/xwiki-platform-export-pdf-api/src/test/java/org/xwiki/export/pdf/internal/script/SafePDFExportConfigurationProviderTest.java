@@ -80,5 +80,8 @@ class SafePDFExportConfigurationProviderTest
 
         when(this.config.getThreadPoolSize()).thenReturn(7);
         assertEquals(7, safeConfig.getThreadPoolSize());
+
+        when(this.config.isReplacingFOP()).thenReturn(false);
+        assertEquals(false, safeConfig.isReplacingFOP());
     }
 }

@@ -33,12 +33,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.testcontainers.containers.Network;
 import org.xwiki.export.pdf.internal.docker.ContainerManager;
-import org.xwiki.export.pdf.test.po.ExportModal;
 import org.xwiki.export.pdf.test.po.PDFDocument;
 import org.xwiki.export.pdf.test.po.PDFExportAdministrationSectionPage;
 import org.xwiki.export.pdf.test.po.PDFExportOptionsModal;
 import org.xwiki.export.pdf.test.po.PDFImage;
 import org.xwiki.export.pdf.test.po.PDFTemplateEditPage;
+import org.xwiki.flamingo.skin.test.po.ExportTreeModal;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -105,7 +105,20 @@ class PDFExportIT
 
         ViewPage viewPage =
             setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent"), "WebHome"));
-        PDFExportOptionsModal exportOptions = ExportModal.open(viewPage).clickExportAsPDFButton();
+        ExportTreeModal exportTreeModal = ExportTreeModal.open(viewPage, "PDF");
+        // The title should match the selected export format.
+        assertEquals("Export as PDF", exportTreeModal.getTitle());
+        // Only the current page should be selected by default.
+        assertEquals(Collections.singletonList("document:xwiki:PDFExportIT.Parent.WebHome"),
+            exportTreeModal.getPageTree().getSelectedNodeIDs());
+        assertTrue(exportTreeModal.getPageTree().getNode("document:xwiki:PDFExportIT.Parent.WebHome").isOpen());
+        // Hidden pages should not be listed.
+        assertFalse(exportTreeModal.getPageTree().hasNode("document:xwiki:PDFExportIT.Parent.Hidden.WebHome"));
+        // Include the child page in the export.
+        exportTreeModal.getPageTree().getNode("document:xwiki:PDFExportIT.Parent.Child.WebHome").select();
+        assertEquals(Collections.emptyList(), exportTreeModal.getPagesValues());
+        exportTreeModal.export();
+        PDFExportOptionsModal exportOptions = new PDFExportOptionsModal();
 
         try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration), "John", "pass")) {
             // We should have 4 pages: cover page, table of contents, one page for the parent document and one page for
@@ -192,7 +205,7 @@ class PDFExportIT
     {
         ViewPage viewPage =
             setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent", "Child"), "WebHome"));
-        PDFExportOptionsModal exportOptions = ExportModal.open(viewPage).clickExportAsPDFButton();
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
 
         try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration), "John", "pass")) {
             // We should have 3 pages: cover page, table of contents and one page for the content.
@@ -256,15 +269,14 @@ class PDFExportIT
         // Export using the custom PDF template we created.
         setup.loginAndGotoPage("John", "pass",
             setup.getURL(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent"), "WebHome")));
-        PDFExportOptionsModal exportOptions = ExportModal.open(new ViewPage()).clickExportAsPDFButton();
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(new ViewPage());
         exportOptions.getTemplateSelect().selectByVisibleText("My cool template");
 
         try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration), "John", "pass")) {
             // Verify that the custom PDF template was used.
 
-            // We should have 4 pages: cover page, table of contents, one page for the parent document and one page for
-            // the child document.
-            assertEquals(4, pdf.getNumberOfPages());
+            // We should have 3 pages: cover page, table of contents and one content page.
+            assertEquals(3, pdf.getNumberOfPages());
 
             // Verify the custom cover page.
             String coverPageText = pdf.getTextFromPage(0);
@@ -276,7 +288,7 @@ class PDFExportIT
 
             // Verify the custom PDF header and footer.
             String contentPageText = pdf.getTextFromPage(2);
-            assertTrue(contentPageText.startsWith("Chapter: Parent\nPage 3 / 4\n"),
+            assertTrue(contentPageText.startsWith("Chapter: Parent\nPage 3 / 3\n"),
                 "Unexpected header and footer on the content page: " + contentPageText);
         }
     }
@@ -313,13 +325,13 @@ class PDFExportIT
         // Try the PDF export with the new generator.
         setup.loginAndGotoPage("John", "pass",
             setup.getURL(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent"), "WebHome")));
-        PDFExportOptionsModal exportOptions = ExportModal.open(new ViewPage()).clickExportAsPDFButton();
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(new ViewPage());
         exportOptions.getCoverCheckbox().click();
         exportOptions.getTocCheckbox().click();
 
         try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration), "John", "pass")) {
-            // One page for the parent document and one page for the child document.
-            assertEquals(2, pdf.getNumberOfPages());
+            // One content page.
+            assertEquals(1, pdf.getNumberOfPages());
             String content = pdf.getTextFromPage(0);
             assertTrue(content.contains("Chapter 1"), "Unexpected content: " + content);
         }

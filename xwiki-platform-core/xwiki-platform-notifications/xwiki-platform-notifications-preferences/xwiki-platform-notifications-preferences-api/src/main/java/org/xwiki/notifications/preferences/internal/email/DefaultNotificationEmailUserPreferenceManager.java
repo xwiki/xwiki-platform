@@ -31,10 +31,15 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.preferences.NotificationEmailInterval;
 import org.xwiki.notifications.preferences.email.NotificationEmailDiffType;
 import org.xwiki.notifications.preferences.email.NotificationEmailUserPreferenceManager;
 import org.xwiki.text.StringUtils;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.user.internal.document.DocumentUserReference;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
@@ -54,11 +59,11 @@ public class DefaultNotificationEmailUserPreferenceManager implements Notificati
     private static final String CODE = "Code";
 
     private static final LocalDocumentReference EMAIL_PREFERENCES_CLASS = new LocalDocumentReference(
-            Arrays.asList(WIKI_SPACE, NOTIFICATIONS, CODE), "NotificationEmailPreferenceClass"
+        Arrays.asList(WIKI_SPACE, NOTIFICATIONS, CODE), "NotificationEmailPreferenceClass"
     );
 
     private static final LocalDocumentReference GLOBAL_PREFERENCES = new LocalDocumentReference(
-            Arrays.asList(WIKI_SPACE, NOTIFICATIONS, CODE), "NotificationAdministration"
+        Arrays.asList(WIKI_SPACE, NOTIFICATIONS, CODE), "NotificationAdministration"
     );
 
     private static final String DIFF_TYPE = "diffType";
@@ -72,6 +77,9 @@ public class DefaultNotificationEmailUserPreferenceManager implements Notificati
     private DocumentReferenceResolver<String> referenceResolver;
 
     @Inject
+    private UserReferenceResolver<String> stringUserReferenceResolver;
+
+    @Inject
     private WikiDescriptorManager wikiDescriptorManager;
 
     @Inject
@@ -80,18 +88,17 @@ public class DefaultNotificationEmailUserPreferenceManager implements Notificati
     @Override
     public NotificationEmailDiffType getDiffType()
     {
-        return getStaticListPropertyPreference(DIFF_TYPE, NotificationEmailDiffType.class,
-            NotificationEmailDiffType.STANDARD, documentAccessBridge.getCurrentUserReference());
+        return getDiffType(CurrentUserReference.INSTANCE);
     }
 
     @Override
     public NotificationEmailDiffType getDiffType(String userId)
     {
-        return getDiffType(referenceResolver.resolve(userId));
+        return getDiffType(stringUserReferenceResolver.resolve(userId));
     }
 
     @Override
-    public NotificationEmailDiffType getDiffType(DocumentReference userReference)
+    public NotificationEmailDiffType getDiffType(UserReference userReference)
     {
         return getStaticListPropertyPreference(DIFF_TYPE, NotificationEmailDiffType.class,
             NotificationEmailDiffType.STANDARD, userReference);
@@ -100,37 +107,38 @@ public class DefaultNotificationEmailUserPreferenceManager implements Notificati
     @Override
     public NotificationEmailInterval getInterval()
     {
-        return getInterval(documentAccessBridge.getCurrentUserReference());
+        return getInterval(CurrentUserReference.INSTANCE);
     }
 
     @Override
     public NotificationEmailInterval getInterval(String userId)
     {
-        return getInterval(referenceResolver.resolve(userId));
+        return getInterval(stringUserReferenceResolver.resolve(userId));
     }
 
     @Override
-    public NotificationEmailInterval getInterval(DocumentReference userReference)
+    public NotificationEmailInterval getInterval(UserReference userReference)
     {
         return getStaticListPropertyPreference(INTERVAL, NotificationEmailInterval.class,
             NotificationEmailInterval.DAILY, userReference);
     }
 
-
     private <T extends Enum<T>> T getStaticListPropertyPreference(String propertyName,
-        Class<T> propertyEnum, T propertyDefaultValue, DocumentReference user)
+        Class<T> propertyEnum, T propertyDefaultValue, UserReference user)
     {
         try {
+            DocumentReference userDocumentReference = convertReference(user);
             // Get the config of the user
             DocumentReference emailClassReference = new DocumentReference(EMAIL_PREFERENCES_CLASS,
-                user.getWikiReference());
-            Object value = documentAccessBridge.getProperty(user, emailClassReference, propertyName);
+                userDocumentReference.getWikiReference());
+            Object value = documentAccessBridge.getProperty(userDocumentReference, emailClassReference, propertyName);
             if (value != null && StringUtils.isNotBlank((String) value)) {
                 return Enum.valueOf(propertyEnum, ((String) value).toUpperCase());
             }
 
             // Get the config of the wiki
-            DocumentReference xwikiPref = new DocumentReference(GLOBAL_PREFERENCES, user.getWikiReference());
+            DocumentReference xwikiPref =
+                new DocumentReference(GLOBAL_PREFERENCES, userDocumentReference.getWikiReference());
             value = documentAccessBridge.getProperty(xwikiPref, emailClassReference, propertyName);
             if (value != null && StringUtils.isNotBlank((String) value)) {
                 return Enum.valueOf(propertyEnum, ((String) value).toUpperCase());
@@ -138,7 +146,7 @@ public class DefaultNotificationEmailUserPreferenceManager implements Notificati
 
             // Get the config of the main wiki
             WikiReference mainWiki = new WikiReference(wikiDescriptorManager.getMainWikiId());
-            if (!user.getWikiReference().equals(mainWiki)) {
+            if (!userDocumentReference.getWikiReference().equals(mainWiki)) {
                 xwikiPref = new DocumentReference(GLOBAL_PREFERENCES, mainWiki);
                 emailClassReference = new DocumentReference(EMAIL_PREFERENCES_CLASS, mainWiki);
                 value = documentAccessBridge.getProperty(xwikiPref, emailClassReference, propertyName);
@@ -152,5 +160,20 @@ public class DefaultNotificationEmailUserPreferenceManager implements Notificati
 
         // Fallback to the default value
         return propertyDefaultValue;
+    }
+
+    private DocumentReference convertReference(UserReference userReference) throws NotificationException
+    {
+        DocumentReference result;
+        if (userReference == null || userReference == CurrentUserReference.INSTANCE) {
+            result = documentAccessBridge.getCurrentUserReference();
+        } else if (userReference instanceof DocumentUserReference) {
+            result = ((DocumentUserReference) userReference).getReference();
+        } else {
+            throw new NotificationException(
+                String.format("This should only be used with DocumentUserReference, "
+                    + "the given reference was a [%s]", userReference.getClass().getSimpleName()));
+        }
+        return result;
     }
 }

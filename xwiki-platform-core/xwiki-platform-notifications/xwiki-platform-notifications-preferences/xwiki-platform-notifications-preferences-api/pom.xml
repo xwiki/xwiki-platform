@@ -65,44 +65,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.revapi</groupId>
-        <artifactId>revapi-maven-plugin</artifactId>
-        <configuration>
-          <analysisConfiguration>
-            <revapi.differences>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.addedToInterface</code>
-                  <new>method org.xwiki.notifications.preferences.email.NotificationEmailDiffType org.xwiki.notifications.preferences.email.NotificationEmailUserPreferenceManager::getDiffType(org.xwiki.model.reference.DocumentReference)</new>
-                  <justification>This change is necessary to implement XWIKI-19756</justification>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.addedToInterface</code>
-                  <new>method org.xwiki.notifications.preferences.NotificationEmailInterval org.xwiki.notifications.preferences.email.NotificationEmailUserPreferenceManager::getInterval()</new>
-                  <justification>This change is necessary to implement XWIKI-19756</justification>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.addedToInterface</code>
-                  <new>method org.xwiki.notifications.preferences.NotificationEmailInterval org.xwiki.notifications.preferences.email.NotificationEmailUserPreferenceManager::getInterval(java.lang.String)</new>
-                  <justification>This change is necessary to implement XWIKI-19756</justification>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.addedToInterface</code>
-                  <new>method org.xwiki.notifications.preferences.NotificationEmailInterval org.xwiki.notifications.preferences.email.NotificationEmailUserPreferenceManager::getInterval(org.xwiki.model.reference.DocumentReference)</new>
-                  <justification>This change is necessary to implement XWIKI-19756</justification>
-                </item>
-              </differences>
-            </revapi.differences>
-          </analysisConfiguration>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>

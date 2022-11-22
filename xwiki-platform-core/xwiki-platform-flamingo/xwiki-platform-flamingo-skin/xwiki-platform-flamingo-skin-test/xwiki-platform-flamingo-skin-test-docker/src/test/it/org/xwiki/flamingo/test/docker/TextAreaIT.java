@@ -85,11 +85,10 @@ class TextAreaIT
             + testUtils.serializeReference(testReference) + "').display('textarea'){{/velocity}}");
 
         assertEquals(String.format("document: %s\n"
-                + "content author: xwiki:XWiki.user\n"
-                + "effective author: XWiki.superadmin\n"
-                + "original author: XWiki.superadmin\n"
-                + "current author: XWiki.superadmin", testUtils.serializeReference(testReference)),
-            viewPage.getContent());
+            + "content author: xwiki:XWiki.user\n"
+            + "effective author: XWiki.superadmin\n"
+            + "original author: XWiki.superadmin\n"
+            + "current author: XWiki.superadmin", testUtils.serializeReference(testReference)), viewPage.getContent());
     }
 
     @Test

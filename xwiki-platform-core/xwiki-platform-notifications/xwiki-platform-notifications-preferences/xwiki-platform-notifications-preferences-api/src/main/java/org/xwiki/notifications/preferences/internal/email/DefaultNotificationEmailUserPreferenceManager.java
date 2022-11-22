@@ -84,12 +84,6 @@ public class DefaultNotificationEmailUserPreferenceManager implements Notificati
     }
 
     @Override
-    public NotificationEmailDiffType getDiffType(String userId)
-    {
-        return getDiffType(referenceResolver.resolve(userId));
-    }
-
-    @Override
     public NotificationEmailDiffType getDiffType(DocumentReference userReference)
     {
         return getStaticListPropertyPreference(DIFF_TYPE, NotificationEmailDiffType.class,
@@ -100,12 +94,6 @@ public class DefaultNotificationEmailUserPreferenceManager implements Notificati
     public NotificationEmailInterval getInterval()
     {
         return getInterval(documentAccessBridge.getCurrentUserReference());
-    }
-
-    @Override
-    public NotificationEmailInterval getInterval(String userId)
-    {
-        return getInterval(referenceResolver.resolve(userId));
     }
 
     @Override

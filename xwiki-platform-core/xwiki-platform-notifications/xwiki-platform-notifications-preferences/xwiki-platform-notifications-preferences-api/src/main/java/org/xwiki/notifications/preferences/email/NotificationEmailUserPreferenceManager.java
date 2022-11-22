@@ -38,15 +38,9 @@ public interface NotificationEmailUserPreferenceManager
     NotificationEmailDiffType getDiffType();
 
     /**
-     * @param userId id of a user
-     * @return the diff type configured for the given user
-     */
-    NotificationEmailDiffType getDiffType(String userId);
-
-    /**
      * @param userReference reference of a user
      * @return the diff type configured for the given user
-     * @since 14.4.2
+     * @since 14.10
      */
     default NotificationEmailDiffType getDiffType(DocumentReference userReference)
     {
@@ -55,7 +49,7 @@ public interface NotificationEmailUserPreferenceManager
 
     /**
      * @return the notification interval configured for the current user
-     * @since 14.4.2
+     * @since 14.10
      */
     default NotificationEmailInterval getInterval()
     {
@@ -63,19 +57,9 @@ public interface NotificationEmailUserPreferenceManager
     }
 
     /**
-     * @param userId id of a user
-     * @return the notification interval configured for the given user
-     * @since 14.4.2
-     */
-    default NotificationEmailInterval getInterval(String userId)
-    {
-        return this.getInterval();
-    }
-
-    /**
      * @param userReference reference of a user
      * @return the notification interval configured for the given user
-     * @since 14.4.2
+     * @since 14.10
      */
     default NotificationEmailInterval getInterval(DocumentReference userReference)
     {

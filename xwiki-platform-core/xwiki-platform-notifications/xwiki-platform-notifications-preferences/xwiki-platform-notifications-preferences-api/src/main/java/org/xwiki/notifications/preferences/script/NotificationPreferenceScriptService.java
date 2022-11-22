@@ -293,7 +293,7 @@ public class NotificationPreferenceScriptService implements ScriptService
      */
     public NotificationEmailDiffType getDiffType(String userId)
     {
-        return emailUserPreferenceManager.getDiffType(userId);
+        return emailUserPreferenceManager.getDiffType(documentReferenceResolver.resolve(userId));
     }
 
     /**
@@ -312,7 +312,7 @@ public class NotificationPreferenceScriptService implements ScriptService
      */
     public NotificationEmailInterval getInterval(String userId)
     {
-        return emailUserPreferenceManager.getInterval(userId);
+        return emailUserPreferenceManager.getInterval(documentReferenceResolver.resolve(userId));
     }
 
     /**

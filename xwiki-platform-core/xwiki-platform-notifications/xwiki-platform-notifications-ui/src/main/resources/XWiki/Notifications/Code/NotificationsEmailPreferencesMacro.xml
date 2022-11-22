@@ -459,10 +459,10 @@
               #end
             #end
             &lt;select class="notificationEmailInterval"&gt;
-              &lt;option value="hourly" #if($interval == 'HOURLY')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly'))&lt;/option&gt;
-              &lt;option value="daily"  #if($interval == 'DAILY')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily'))&lt;/option&gt;
-              &lt;option value="weekly" #if($interval == 'WEEKLY')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_weekly'))&lt;/option&gt;
-              &lt;option value="live" #if($interval == 'LIVE')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_live'))&lt;/option&gt;
+              &lt;option value="HOURLY" #if($interval == 'HOURLY')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly'))&lt;/option&gt;
+              &lt;option value="DAILY"  #if($interval == 'DAILY')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily'))&lt;/option&gt;
+              &lt;option value="WEEKLY" #if($interval == 'WEEKLY')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_weekly'))&lt;/option&gt;
+              &lt;option value="LIVE" #if($interval == 'LIVE')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_live'))&lt;/option&gt;
             &lt;/select&gt;
           &lt;/dd&gt;
         &lt;/dl&gt;

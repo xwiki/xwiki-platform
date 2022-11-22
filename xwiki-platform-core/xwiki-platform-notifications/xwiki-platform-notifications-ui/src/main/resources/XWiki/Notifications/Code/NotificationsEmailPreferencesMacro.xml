@@ -441,15 +441,23 @@
     &lt;div class="notification-top-panel-preferences notifEmailPreferences" data-target="$escapetool.xml($wikimacro.parameters.target)" $dataUser&gt;
       &lt;div class="xform"&gt;
         &lt;dl&gt;
-          #if ($wikimacro.parameters.target == 'user')
-            #set ($interval = $services.notification.preferences.getInterval($targetUser))
-          #else
-            #set ($interval = $services.notification.preferences.getInterval())
-          #end
           &lt;dt&gt;&lt;label&gt;$escapetool.xml($services.localization.render('notifications.settings.email.frequency'))&lt;/label&gt;
-            &lt;p class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.settings.email.frequency.hint'))&lt;/p&gt;
+          &lt;p class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.settings.email.frequency.hint'))&lt;/p&gt;
           &lt;/dt&gt;
           &lt;dd&gt;
+            #if ($wikimacro.parameters.target == 'user')
+              #set ($interval = $services.notification.preferences.getInterval($targetUser))
+            #else
+              #set ($interval = 'DAILY')
+              #set ($targetDocument = $xwiki.getDocument($services.model.createDocumentReference('', ['XWiki', 'Notifications', 'Code'], 'NotificationAdministration')))
+              #set ($objPref = $targetDocument.getObject('XWiki.Notifications.Code.NotificationEmailPreferenceClass'))
+              #if ("$!objPref" != '')
+                #set ($objInterval = $objPref.getValue('interval'))
+                #if ("$!objInterval" != '')
+                  #set ($interval = $objInterval)
+                #end
+              #end
+            #end
             &lt;select class="notificationEmailInterval"&gt;
               &lt;option value="hourly" #if($interval == 'HOURLY')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly'))&lt;/option&gt;
               &lt;option value="daily"  #if($interval == 'DAILY')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily'))&lt;/option&gt;
@@ -467,6 +475,13 @@
               #set ($diffType = $services.notification.preferences.getDiffType($targetUser))
             #else
               #set ($diffType = $services.notification.preferences.getDiffType())
+            #end
+            #set ($objPref = $targetDocument.getObject('XWiki.Notifications.Code.NotificationEmailPreferenceClass'))
+            #if ("$!objPref" != '')
+              #set ($objDiffType = $objPref.getValue('diffType'))
+              #if ("$!objDiffType" != '')
+                #set ($diffType = $objDiffType)
+              #end
             #end
             &lt;select class="notificationEmailDiffType"&gt;
               &lt;option value="NOTHING" #if($diffType == 'NOTHING')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_NOTHING'))&lt;/option&gt;

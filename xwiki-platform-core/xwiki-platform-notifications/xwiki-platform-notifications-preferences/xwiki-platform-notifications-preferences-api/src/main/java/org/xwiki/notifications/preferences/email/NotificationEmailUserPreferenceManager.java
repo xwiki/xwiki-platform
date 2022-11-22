@@ -20,8 +20,8 @@
 package org.xwiki.notifications.preferences.email;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.preferences.NotificationEmailInterval;
-import org.xwiki.user.UserReference;
 
 /**
  * Configuration for the emails for each user.
@@ -48,7 +48,7 @@ public interface NotificationEmailUserPreferenceManager
      * @return the diff type configured for the given user
      * @since 14.4.2
      */
-    default NotificationEmailDiffType getDiffType(UserReference userReference)
+    default NotificationEmailDiffType getDiffType(DocumentReference userReference)
     {
         return getDiffType();
     }
@@ -77,7 +77,7 @@ public interface NotificationEmailUserPreferenceManager
      * @return the notification interval configured for the given user
      * @since 14.4.2
      */
-    default NotificationEmailInterval getInterval(UserReference userReference)
+    default NotificationEmailInterval getInterval(DocumentReference userReference)
     {
         return this.getInterval();
     }

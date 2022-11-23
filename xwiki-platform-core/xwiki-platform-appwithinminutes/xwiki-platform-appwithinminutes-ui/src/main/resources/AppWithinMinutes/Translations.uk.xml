@@ -120,7 +120,7 @@ platform.appwithinminutes.classEditorNumberFieldName=Число
 platform.appwithinminutes.classEditorTextAreaFieldName=Довгий текст
 platform.appwithinminutes.classEditorStringFieldName=Короткий текст
 platform.appwithinminutes.classEditorContentFieldName=Вміст
-platform.appwithinminutes.classEditorTitleFieldName=Заголовок
+platform.appwithinminutes.classEditorTitleFieldName=Найменування
 platform.appwithinminutes.classEditorPageFieldName=Сторінка
 platform.appwithinminutes.classEditorDeleteFieldLabel=Вилучити
 platform.appwithinminutes.classEditorConfigureFieldLabel=Налаштувати
@@ -163,7 +163,7 @@ platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=Заголо�
 platform.appwithinminutes.liveTableEditorDocNameColumnDescription=Назва сторінки, яка містить дані програми
 ### Missing: platform.appwithinminutes.liveTableEditorDocLocationColumnName=Location
 platform.appwithinminutes.liveTableEditorDocLocationColumnDescription=Місцезнаходження сторінки, яка містить дані програми
-### Missing: platform.appwithinminutes.liveTableEditorDocAuthorColumnName=Last Author
+platform.appwithinminutes.liveTableEditorDocAuthorColumnName=Редактор
 platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=Користувач, який востаннє редагував дані програми
 ### Missing: platform.appwithinminutes.liveTableEditorDocCreatorColumnName=Creator
 platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription=Користувач, який створив дані програми
@@ -212,6 +212,10 @@ platform.appwithinminutes.liveTableEditorAvatarColumnDescription=Спеціал�
 ### Missing: platform.appwithinminutes.deleteAppDoesNotExistError=The specified application does not exist.
 platform.appwithinminutes.deleteAppInvalidAppError=Зазначена назва не є коректною для програми Додаток За Хвилину.
 ### Missing: platform.appwithinminutes.deleteAppNotSpecifiedError=No application name was specified.
+
+### Rename Application
+### Missing: appWithinMinutes.renameApp.label=Rename Application
+### Missing: appWithinMinutes.renameApp.close=Close
 
 ### Rename Application
 ### Missing: appWithinMinutes.renameApp.changeAppTitleInfo=You can change the application title without renaming the application just by editing the application home page.

@@ -57,7 +57,6 @@ import org.xwiki.stability.Unstable;
 import org.xwiki.text.StringUtils;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
-import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.internal.document.DocumentUserReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -84,9 +83,6 @@ public class NotificationPreferenceScriptService implements ScriptService
 
     @Inject
     private NotificationPreferenceManager notificationPreferenceManager;
-
-    @Inject
-    private UserReferenceResolver<String> userReferenceResolver;
 
     @Inject
     private Provider<TargetableNotificationPreferenceBuilder> targetableNotificationPreferenceBuilderProvider;
@@ -291,32 +287,35 @@ public class NotificationPreferenceScriptService implements ScriptService
     }
 
     /**
-     * @param userId id of a user
+     * @param user reference of a user
      * @return the diff type for emails configured for the given user
-     * @since 9.11RC1
+     * @since 14.10
      */
-    public NotificationEmailDiffType getDiffType(String userId)
+    @Unstable
+    public NotificationEmailDiffType getDiffType(UserReference user)
     {
-        return emailUserPreferenceManager.getDiffType(userReferenceResolver.resolve(userId));
+        return emailUserPreferenceManager.getDiffType(user);
     }
 
     /**
      * @return the email notification interval configured for the current user
-     * @since 14.4.2
+     * @since 14.10
      */
+    @Unstable
     public NotificationEmailInterval getInterval()
     {
         return emailUserPreferenceManager.getInterval();
     }
 
     /**
-     * @param userId id of a user
+     * @param user reference of a user
      * @return the notification email interval configured for the given user
-     * @since 14.4.2
+     * @since 14.10
      */
-    public NotificationEmailInterval getInterval(String userId)
+    @Unstable
+    public NotificationEmailInterval getInterval(UserReference user)
     {
-        return emailUserPreferenceManager.getInterval(userReferenceResolver.resolve(userId));
+        return emailUserPreferenceManager.getInterval(user);
     }
 
     /**

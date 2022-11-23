@@ -37,6 +37,7 @@ import org.xwiki.notifications.preferences.email.NotificationEmailUserPreference
 import org.xwiki.text.StringUtils;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
@@ -72,6 +73,9 @@ public class DefaultNotificationEmailUserPreferenceManager implements Notificati
     private DocumentAccessBridge documentAccessBridge;
 
     @Inject
+    private UserReferenceResolver<String> userReferenceResolver;
+
+    @Inject
     @Named("document")
     private UserReferenceSerializer<DocumentReference> documentUserSerializer;
 
@@ -85,6 +89,12 @@ public class DefaultNotificationEmailUserPreferenceManager implements Notificati
     public NotificationEmailDiffType getDiffType()
     {
         return getDiffType(CurrentUserReference.INSTANCE);
+    }
+
+    @Override
+    public NotificationEmailDiffType getDiffType(String userId)
+    {
+        return getDiffType(userReferenceResolver.resolve(userId));
     }
 
     @Override

@@ -57,6 +57,7 @@ import org.xwiki.stability.Unstable;
 import org.xwiki.text.StringUtils;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.internal.document.DocumentUserReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -80,6 +81,9 @@ public class NotificationPreferenceScriptService implements ScriptService
 
     @Inject
     private DocumentReferenceResolver<String> documentReferenceResolver;
+
+    @Inject
+    private UserReferenceResolver<String> userReferenceResolver;
 
     @Inject
     private NotificationPreferenceManager notificationPreferenceManager;
@@ -284,6 +288,17 @@ public class NotificationPreferenceScriptService implements ScriptService
     public NotificationEmailDiffType getDiffType()
     {
         return emailUserPreferenceManager.getDiffType();
+    }
+
+    /**
+     * @param userId id of a user
+     * @return the diff type for emails configured for the given user
+     * @since 9.11RC1
+     * @deprecated use {@link #getDiffType(UserReference)} instead
+     */
+    public NotificationEmailDiffType getDiffType(String userId)
+    {
+        return emailUserPreferenceManager.getDiffType(userReferenceResolver.resolve(userId));
     }
 
     /**

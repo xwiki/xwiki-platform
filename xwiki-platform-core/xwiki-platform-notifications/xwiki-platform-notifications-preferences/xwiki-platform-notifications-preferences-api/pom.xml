@@ -65,42 +65,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.revapi</groupId>
-        <artifactId>revapi-maven-plugin</artifactId>
-        <configuration>
-          <analysisConfiguration>
-            <revapi.differences>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.parameterTypeChanged</code>
-                  <old>parameter org.xwiki.notifications.preferences.email.NotificationEmailDiffType org.xwiki.notifications.preferences.email.NotificationEmailUserPreferenceManager::getDiffType(===java.lang.String===)
-                  </old>
-                  <new>parameter org.xwiki.notifications.preferences.email.NotificationEmailDiffType org.xwiki.notifications.preferences.email.NotificationEmailUserPreferenceManager::getDiffType(===org.xwiki.user.UserReference===)
-                  </new>
-                  <parameterIndex>0</parameterIndex>
-                  <justification>This change was introduced to implement XWIKI-19756</justification>
-                  <criticality>highlight</criticality>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.parameterTypeChanged</code>
-                  <old>parameter org.xwiki.notifications.preferences.email.NotificationEmailDiffType org.xwiki.notifications.preferences.script.NotificationPreferenceScriptService::getDiffType(===java.lang.String===)
-                  </old>
-                  <new>parameter org.xwiki.notifications.preferences.email.NotificationEmailDiffType org.xwiki.notifications.preferences.script.NotificationPreferenceScriptService::getDiffType(===org.xwiki.user.UserReference===)
-                  </new>
-                  <parameterIndex>0</parameterIndex>
-                  <justification>This change was introduced to implement XWIKI-19756</justification>
-                  <criticality>highlight</criticality>
-                </item>
-              </differences>
-            </revapi.differences>
-          </analysisConfiguration>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>

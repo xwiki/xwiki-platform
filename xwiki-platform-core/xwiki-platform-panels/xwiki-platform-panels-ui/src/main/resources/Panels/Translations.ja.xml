@@ -44,7 +44,7 @@ panels.category=カテゴリー
 panels._actions=アクション
 ### Missing: panels.emptyvalue=
 panels.children.title=子ページ
-panels.siblings.title=兄弟ページ
+panels.siblings.title=同レベルのページ
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart

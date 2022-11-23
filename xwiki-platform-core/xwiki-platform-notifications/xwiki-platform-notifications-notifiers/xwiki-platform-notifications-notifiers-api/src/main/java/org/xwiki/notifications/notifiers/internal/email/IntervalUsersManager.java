@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -38,6 +39,8 @@ import org.xwiki.notifications.preferences.email.NotificationEmailUserPreference
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 /**
  * Gather and cache users depending on each {@link NotificationEmailInterval}.
@@ -77,6 +80,10 @@ public class IntervalUsersManager
 
     @Inject
     private DocumentReferenceResolver<String> referenceResolver;
+
+    @Inject
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> userReferenceResolver;
 
     @Inject
     private EntityReferenceFactory referenceFactory;
@@ -123,7 +130,8 @@ public class IntervalUsersManager
 
     private NotificationEmailInterval loadInterval(DocumentReference userDocumentReference)
     {
-        return emailUserPreferenceManager.getInterval(userDocumentReference);
+        UserReference userReference = userReferenceResolver.resolve(userDocumentReference);
+        return emailUserPreferenceManager.getInterval(userReference);
     }
 
     private List<DocumentReference> loadUsers(NotificationEmailInterval targetInterval, String wiki)

@@ -30,6 +30,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.notifications.preferences.email.NotificationEmailDiffType;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.junit.Assert.assertEquals;
@@ -51,6 +52,7 @@ public class DefaultNotificationEmailUserPreferenceManagerTest
     private DocumentReferenceResolver<String> referenceResolver;
     private WikiDescriptorManager wikiDescriptorManager;
     private DocumentReference currentUser;
+    private UserReferenceResolver<String> userReferenceResolver;
 
     @Before
     public void setUp() throws Exception
@@ -91,7 +93,8 @@ public class DefaultNotificationEmailUserPreferenceManagerTest
                 "NotificationAdministration"), new DocumentReference("mainWiki",
                 getCodeSpace(), "NotificationEmailPreferenceClass"),
                 "diffType")).thenReturn("NOTHING");
-        assertEquals(NotificationEmailDiffType.NOTHING, mocker.getComponentUnderTest().getDiffType(user2Id));
+        assertEquals(NotificationEmailDiffType.NOTHING,
+            mocker.getComponentUnderTest().getDiffType(userReferenceResolver.resolve(user2Id)));
 
         // Value from the user's wiki config
         when(documentAccessBridge.getProperty(new DocumentReference("someWiki", getCodeSpace(),
@@ -99,6 +102,7 @@ public class DefaultNotificationEmailUserPreferenceManagerTest
                         getCodeSpace(), "NotificationEmailPreferenceClass"),
                 "diffType")).thenReturn("NOTHING");
 
-        assertEquals(NotificationEmailDiffType.NOTHING, mocker.getComponentUnderTest().getDiffType(user2Id));
+        assertEquals(NotificationEmailDiffType.NOTHING,
+            mocker.getComponentUnderTest().getDiffType(userReferenceResolver.resolve(user2Id)));
     }
 }

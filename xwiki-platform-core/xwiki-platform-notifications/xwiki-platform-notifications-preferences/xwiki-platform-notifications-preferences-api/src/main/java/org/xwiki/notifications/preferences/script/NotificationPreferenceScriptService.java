@@ -57,6 +57,7 @@ import org.xwiki.stability.Unstable;
 import org.xwiki.text.StringUtils;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.internal.document.DocumentUserReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -83,6 +84,9 @@ public class NotificationPreferenceScriptService implements ScriptService
 
     @Inject
     private NotificationPreferenceManager notificationPreferenceManager;
+
+    @Inject
+    private UserReferenceResolver<String> userReferenceResolver;
 
     @Inject
     private Provider<TargetableNotificationPreferenceBuilder> targetableNotificationPreferenceBuilderProvider;
@@ -293,7 +297,7 @@ public class NotificationPreferenceScriptService implements ScriptService
      */
     public NotificationEmailDiffType getDiffType(String userId)
     {
-        return emailUserPreferenceManager.getDiffType(documentReferenceResolver.resolve(userId));
+        return emailUserPreferenceManager.getDiffType(userReferenceResolver.resolve(userId));
     }
 
     /**
@@ -312,7 +316,7 @@ public class NotificationPreferenceScriptService implements ScriptService
      */
     public NotificationEmailInterval getInterval(String userId)
     {
-        return emailUserPreferenceManager.getInterval(documentReferenceResolver.resolve(userId));
+        return emailUserPreferenceManager.getInterval(userReferenceResolver.resolve(userId));
     }
 
     /**

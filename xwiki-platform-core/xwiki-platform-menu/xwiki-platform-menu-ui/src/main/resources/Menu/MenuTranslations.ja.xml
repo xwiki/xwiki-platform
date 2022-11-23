@@ -65,7 +65,7 @@ admin.menu.name=メニュー
 
 # UIX keys
 menu.uix.extensionPoint.label=メニューの表示場所
-menu.uix.extensionPoint.hint=メニューを表示する場所を指定してください。メニューは指定した場所に、水平または垂直に表示されます。
+menu.uix.extensionPoint.hint=メニューを表示する場所を指定。メニューは指定した場所に、水平または垂直に表示されます。
 menu.uix.extensionPoint.value.nowhere=表示しない
 menu.uix.extensionPoint.value.template.header.after=ページのヘッダーの後
 menu.uix.extensionPoint.value.panels.rightPanels=右のパネルの内側
@@ -81,10 +81,10 @@ rendering.macro.menu.description=単純なウィキシンタックス（入れ�
 rendering.macro.menu.parameter.id.name=ID
 rendering.macro.menu.parameter.id.description=メニューを囲むHTMLの要素に設定する識別子（オプション）。この識別子は、メニューのDOMにアクセスするJavaScriptのコードや、メニューの項目をアサートする機能テストで使用できます。
 rendering.macro.menu.parameter.type.name=種類
-### Missing: rendering.macro.menu.parameter.type.description=
-### Missing: rendering.macro.menu.content.description=
+rendering.macro.menu.parameter.type.description=メニューの種類は、メニューの表示と動作を決定します（オプション）。サポートする値はhorizontal（既定値）とverticalです。
+rendering.macro.menu.content.description=メニューの構造をウィキのシンタックスで規定。メニューの各項目はリストの項目とし、メニュー項目のラベルあるいはリンクを含めてください。サブメニューの項目には入れ子式のリストが使えます。
 
 # Menu WebHome
-### Missing: menu.description=
+menu.description=これはナビゲーションのメニューを、ページのヘッダーの直後にトップバーとして水平に、あるいはサイドパネルの中で垂直に表示するためのシンプルなアプリケーションです。
 </content>
   </xwikidoc>

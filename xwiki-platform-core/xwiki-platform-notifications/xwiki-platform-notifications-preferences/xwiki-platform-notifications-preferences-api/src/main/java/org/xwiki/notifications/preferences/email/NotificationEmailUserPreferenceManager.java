@@ -21,6 +21,7 @@ package org.xwiki.notifications.preferences.email;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.notifications.preferences.NotificationEmailInterval;
+import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
 /**
@@ -42,6 +43,7 @@ public interface NotificationEmailUserPreferenceManager
      * @return the diff type configured for the given user
      * @since 14.10
      */
+    @Unstable
     default NotificationEmailDiffType getDiffType(UserReference userReference)
     {
         return getDiffType();
@@ -51,6 +53,7 @@ public interface NotificationEmailUserPreferenceManager
      * @return the notification interval configured for the current user
      * @since 14.10
      */
+    @Unstable
     default NotificationEmailInterval getInterval()
     {
         return NotificationEmailInterval.DAILY;
@@ -61,6 +64,7 @@ public interface NotificationEmailUserPreferenceManager
      * @return the notification interval configured for the given user
      * @since 14.10
      */
+    @Unstable
     default NotificationEmailInterval getInterval(UserReference userReference)
     {
         return this.getInterval();

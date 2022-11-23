@@ -70,17 +70,17 @@ menu.uix.extensionPoint.value.nowhere=表示しない
 menu.uix.extensionPoint.value.template.header.after=ページのヘッダーの後
 menu.uix.extensionPoint.value.panels.rightPanels=右のパネルの内側
 menu.uix.extensionPoint.value.panels.leftPanels=左のパネルの内側
-### Missing: menu.uix.content.label=UI Extension Content
+menu.uix.content.label=UI拡張機能の内容
 menu.uix.content.hint=これが表示されている場合、おそらくJavaScriptが無効化されています。メニューの表示場所と同じ値を選択してください。
-### Missing: menu.uix.scope.label=
-### Missing: menu.uix.scope.hint=
+menu.uix.scope.label=メニューの見え方のスコープ
+menu.uix.scope.hint=どのコンテクストでメニューを表示するかを指定。
 
 # Menu Macro
-### Missing: rendering.macro.menu.name=Menu
-### Missing: rendering.macro.menu.description=
-### Missing: rendering.macro.menu.parameter.id.name=Id
-### Missing: rendering.macro.menu.parameter.id.description=
-### Missing: rendering.macro.menu.parameter.type.name=Type
+rendering.macro.menu.name=メニュー
+rendering.macro.menu.description=単純なウィキシンタックス（入れ子式のリストとリンク）で作成したメニューを表示。
+rendering.macro.menu.parameter.id.name=ID
+rendering.macro.menu.parameter.id.description=メニューを囲むHTMLの要素に設定する識別子（オプション）。この識別子は、メニューのDOMにアクセスするJavaScriptのコードや、メニューの項目をアサートする機能テストで使用できます。
+rendering.macro.menu.parameter.type.name=種類
 ### Missing: rendering.macro.menu.parameter.type.description=
 ### Missing: rendering.macro.menu.content.description=
 

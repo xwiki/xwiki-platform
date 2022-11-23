@@ -28,6 +28,7 @@ import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.notifications.preferences.NotificationEmailInterval;
 import org.xwiki.notifications.preferences.email.NotificationEmailDiffType;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.user.UserReferenceResolver;
@@ -104,5 +105,39 @@ public class DefaultNotificationEmailUserPreferenceManagerTest
 
         assertEquals(NotificationEmailDiffType.NOTHING,
             mocker.getComponentUnderTest().getDiffType(userReferenceResolver.resolve(user2Id)));
+    }
+
+    @Test
+    public void getInterval() throws Exception
+    {
+        // Default value
+        assertEquals(NotificationEmailInterval.DAILY, mocker.getComponentUnderTest().getInterval());
+
+        // Value from the user profile
+        DocumentReference emailClassReference = new DocumentReference("someWiki", Arrays.asList("XWiki",
+            "Notifications", "Code"), "NotificationEmailPreferenceClass");
+        when(documentAccessBridge.getProperty(currentUser, emailClassReference, "interval"))
+            .thenReturn("DAILY");
+        assertEquals(NotificationEmailInterval.DAILY, mocker.getComponentUnderTest().getInterval());
+
+        // Value from the main wiki config
+        DocumentReference user2 = new DocumentReference("someWiki", "XWiki", "User2");
+        String user2Id = "someWiki:XWiki.User2";
+        when(referenceResolver.resolve(user2Id)).thenReturn(user2);
+        when(documentAccessBridge.getProperty(new DocumentReference("mainWiki", getCodeSpace(),
+                "NotificationAdministration"), new DocumentReference("mainWiki",
+                getCodeSpace(), "NotificationEmailPreferenceClass"),
+            "interval")).thenReturn("DAILY");
+        assertEquals(NotificationEmailInterval.DAILY,
+            mocker.getComponentUnderTest().getInterval(userReferenceResolver.resolve(user2Id)));
+
+        // Value from the user's wiki config
+        when(documentAccessBridge.getProperty(new DocumentReference("someWiki", getCodeSpace(),
+                "NotificationAdministration"), new DocumentReference("mainWiki",
+                getCodeSpace(), "NotificationEmailPreferenceClass"),
+            "interval")).thenReturn("DAILY");
+
+        assertEquals(NotificationEmailInterval.DAILY,
+            mocker.getComponentUnderTest().getInterval(userReferenceResolver.resolve(user2Id)));
     }
 }

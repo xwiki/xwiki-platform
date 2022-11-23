@@ -118,7 +118,7 @@ public class DefaultNotificationEmailUserPreferenceManager implements Notificati
             DocumentReference emailClassReference = new DocumentReference(EMAIL_PREFERENCES_CLASS,
                 userDocumentReference.getWikiReference());
             Object value = documentAccessBridge.getProperty(userDocumentReference, emailClassReference, propertyName);
-            if (value != null && StringUtils.isNotBlank((String) value)) {
+            if (StringUtils.isNotBlank((String) value)) {
                 return Enum.valueOf(propertyEnum, ((String) value).toUpperCase());
             }
 
@@ -126,7 +126,7 @@ public class DefaultNotificationEmailUserPreferenceManager implements Notificati
             DocumentReference xwikiPref =
                 new DocumentReference(GLOBAL_PREFERENCES, userDocumentReference.getWikiReference());
             value = documentAccessBridge.getProperty(xwikiPref, emailClassReference, propertyName);
-            if (value != null && StringUtils.isNotBlank((String) value)) {
+            if (StringUtils.isNotBlank((String) value)) {
                 return Enum.valueOf(propertyEnum, ((String) value).toUpperCase());
             }
 
@@ -136,7 +136,7 @@ public class DefaultNotificationEmailUserPreferenceManager implements Notificati
                 xwikiPref = new DocumentReference(GLOBAL_PREFERENCES, mainWiki);
                 emailClassReference = new DocumentReference(EMAIL_PREFERENCES_CLASS, mainWiki);
                 value = documentAccessBridge.getProperty(xwikiPref, emailClassReference, propertyName);
-                if (value != null && StringUtils.isNotBlank((String) value)) {
+                if (StringUtils.isNotBlank((String) value)) {
                     return Enum.valueOf(propertyEnum, ((String) value).toUpperCase());
                 }
             }

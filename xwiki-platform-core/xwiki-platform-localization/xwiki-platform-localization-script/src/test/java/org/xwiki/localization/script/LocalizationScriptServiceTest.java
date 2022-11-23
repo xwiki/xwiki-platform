@@ -20,6 +20,7 @@
 package org.xwiki.localization.script;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
 
@@ -138,6 +139,24 @@ public class LocalizationScriptServiceTest
         assertEquals("print result", localizationScriptService.render("key", Arrays.asList()));
         assertEquals("print result", localizationScriptService
             .render(Arrays.asList(null, "not existing key", "key", "another key"), Arrays.asList()));
+    }
+
+    @Test
+    public void xWikiEscaping()
+    {
+        String output = "Some placeholders {0} [{}] {{/html}} {{html}} {";
+        WordBlock escaping = new WordBlock("escaping");
+        doAnswer(invocation -> {
+            WikiPrinter printer = (WikiPrinter) invocation.getArguments()[1];
+            printer.print(output);
+            return null;
+        }).when(this.renderer).render(eq(escaping), any(WikiPrinter.class));
+        when(this.translation.render(Locale.ROOT, ArrayUtils.EMPTY_OBJECT_ARRAY)).thenReturn(escaping);
+
+        assertEquals("Some placeholders {0} [{}] \u2774\u2774/html}} \u2774\u2774html}} \u2774",
+            this.localizationScriptService.render("key", Collections.emptyList()));
+        // Make sure that escaping is not used when explicitly specifying the output syntax.
+        assertEquals(output, this.localizationScriptService.render("key", Syntax.PLAIN_1_0, Collections.emptyList()));
     }
 
     @Test

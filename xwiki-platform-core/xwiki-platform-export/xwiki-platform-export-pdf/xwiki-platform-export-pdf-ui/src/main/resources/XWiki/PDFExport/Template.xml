@@ -148,7 +148,8 @@
 {{/velocity}}</header>
     </property>
     <property>
-      <toc>= {{translation key="core.pdf.tableOfContents"/}} =
+      <toc>(% id="Hcore.pdf.tableOfContents" %)
+= {{translation key="core.pdf.tableOfContents"/}} =
 
 {{velocity}}
 #if ("$!request.jobId" != '')
@@ -199,6 +200,7 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>

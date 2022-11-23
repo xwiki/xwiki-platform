@@ -2607,13 +2607,22 @@ Recursive title display detected!##
 ###                 ])
 ### #xwikiSelect('nameOfTheField', $options, 'option1', false, 'xwiki-select-small', '', true)
 #########################################################
-#macro(xwikiSelect $fieldName $options $defaultValue $firstIsDefaultIfDefaultNull $cssClass $id $enableFilter $filterPlaceHolder)
+#macro(xwikiSelect $fieldName $options $defaultValue $firstIsDefaultIfDefaultNull $cssClass $id $enableFilter)
   ## TODO: put this in a webjar instead
   #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/select/select.css', {'forceSkinAction': true}))
   #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/select/select.js' , {'forceSkinAction': true}))
-  <div class="xwiki-select $!cssClass" #if("$!id" != '')id="$id"#end>
-    ## Here we let a place to add a filter in the future, that is why the options are inside the following div block.
-    <p><input type="text" class="xwiki-select-filter" placeholder="$escapetool.xml($services.localization.render('web.widgets.select.filter.placeholder'))"/></p>
+  #if ("$!id" == '')
+    #set ($id = "xwiki-select-$util.generateRandomString(3)")
+  #end
+  #set ($escapedId = $escapetool.xml($id))
+  <div class="xwiki-select $!escapetool.xml($cssClass)" id="$escapedId">
+    <p>
+      <label for="${escapedId}-filter" class="sr-only">
+        $escapetool.xml($services.localization.render('web.widgets.select.filter'))
+      </label>
+      <input type="text" id="${escapedId}-filter" class="xwiki-select-filter"
+        placeholder="$escapetool.xml($services.localization.render('web.widgets.select.filter.placeholder'))" />
+    </p>
     <div class="xwiki-select-options">
       <ul>
         #set ($count = 0)

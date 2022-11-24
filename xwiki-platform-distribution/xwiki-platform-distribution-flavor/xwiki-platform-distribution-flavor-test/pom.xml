@@ -257,7 +257,6 @@
                     -->
                     templates/accessdenied\.vm <!-- simply returns 403 -->
                     templates/ad\.vm <!-- not used, needs special configuration -->
-                    templates/analytics\.vm <!-- commented out -->
                     templates/attach\.vm <!-- only redirects to attachments.vm -->
                     templates/changeavatar\.vm <!-- does not produce any output, just redirects -->
                     templates/deletegroupmember\.vm <!-- does not produce any output, expects "fullname" to be a valid user name -->

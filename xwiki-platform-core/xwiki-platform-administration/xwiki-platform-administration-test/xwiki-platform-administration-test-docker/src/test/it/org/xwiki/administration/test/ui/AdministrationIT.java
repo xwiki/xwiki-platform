@@ -62,7 +62,7 @@ class AdministrationIT
 
         // TODO: Move these tests in their own modules, i.e. the modules that brought the Administration UI extension.
         Arrays.asList("Users", "Groups", "Rights", "Registration", "Themes", "Presentation", "Templates",
-            "Localization", "Import", "Export", "Editing", "emailSend", "emailStatus", "emailGeneral", "analytics")
+            "Localization", "Import", "Export", "Editing", "emailSend", "emailStatus", "emailGeneral")
             .stream().forEach(sectionId -> assertTrue(wikiAdministrationPage.hasSection(sectionId),
                 String.format("Menu section [%s] is missing.", sectionId)));
 
@@ -85,7 +85,7 @@ class AdministrationIT
 
         // All these sections should not be present (they provide wiki-wide configuration).
         Arrays.asList("Users", "Groups", "Rights", "Registration", "Templates", "Localization", "Import", "Export",
-            "Editing", "emailSend", "emailStatus", "emailGeneral", "analytics")
+            "Editing", "emailSend", "emailStatus", "emailGeneral")
             .stream().forEach(sectionId -> assertTrue(pageAdministrationPage.hasNotSection(sectionId),
                 String.format("Menu section [%s] shouldn't be present.", sectionId)));
     }

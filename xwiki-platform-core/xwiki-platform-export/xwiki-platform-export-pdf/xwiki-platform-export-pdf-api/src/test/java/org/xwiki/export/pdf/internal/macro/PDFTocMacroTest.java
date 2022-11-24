@@ -97,7 +97,7 @@ class PDFTocMacroTest
 
     @Inject
     @Named("event/1.0")
-    BlockRenderer eventRenderer;
+    private BlockRenderer eventRenderer;
 
     private PDFTocMacroParameters parameters = new PDFTocMacroParameters();
 
@@ -171,9 +171,9 @@ class PDFTocMacroTest
         when(this.documentAccessBridge.getCurrentUserReference()).thenReturn(this.aliceReference);
 
         List<Block> output = this.pdfTocMacro.execute(this.parameters, null, this.context);
-        
+
         List<String> events = Arrays.asList(
-            "beginList [BULLETED]",
+            "beginList [BULLETED] [[class]=[wikitoc]]",
             "beginListItem",
             "beginLink [Typed = [true] Type = [doc]] [false]",
             "onWord [First Heading]",
@@ -186,7 +186,7 @@ class PDFTocMacroTest
             "endListItem",
             "endList [BULLETED]",
             "endListItem",
-            "endList [BULLETED]",
+            "endList [BULLETED] [[class]=[wikitoc]]",
             ""
         );
         assertBlockEvents(StringUtils.join(events, "\n"), output.get(0));
@@ -202,13 +202,13 @@ class PDFTocMacroTest
         List<Block> output = this.pdfTocMacro.execute(this.parameters, null, this.context);
 
         List<String> events = Arrays.asList(
-            "beginList [BULLETED]",
+            "beginList [BULLETED] [[class]=[wikitoc]]",
             "beginListItem",
             "beginLink [Typed = [true] Type = [doc]] [false]",
             "onWord [First Heading]",
             "endLink [Typed = [true] Type = [doc]] [false]",
             "endListItem",
-            "endList [BULLETED]",
+            "endList [BULLETED] [[class]=[wikitoc]]",
             ""
         );
         assertBlockEvents(StringUtils.join(events, "\n"), output.get(0));
@@ -233,13 +233,13 @@ class PDFTocMacroTest
         List<Block> output = this.pdfTocMacro.execute(this.parameters, null, this.context);
 
         List<String> events = Arrays.asList(
-            "beginList [BULLETED]",
+            "beginList [BULLETED] [[class]=[wikitoc]]",
             "beginListItem [[data-xwiki-document-reference]=[test:Some.Page]]",
             "beginLink [Typed = [true] Type = [doc]] [false]",
             "onWord [Document Title]",
             "endLink [Typed = [true] Type = [doc]] [false]",
             "endListItem [[data-xwiki-document-reference]=[test:Some.Page]]",
-            "endList [BULLETED]",
+            "endList [BULLETED] [[class]=[wikitoc]]",
             ""
         );
         assertBlockEvents(StringUtils.join(events, "\n"), output.get(0));

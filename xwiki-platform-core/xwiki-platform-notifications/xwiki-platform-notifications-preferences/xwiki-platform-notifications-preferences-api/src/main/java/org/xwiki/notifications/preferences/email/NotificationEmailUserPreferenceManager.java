@@ -43,6 +43,7 @@ public interface NotificationEmailUserPreferenceManager
      * @return the diff type configured for the given user
      * @deprecated since 14.10, use {@link #getDiffType(UserReference)} instead
      */
+    @Deprecated(since = "14.10")
     NotificationEmailDiffType getDiffType(String userId);
 
     /**

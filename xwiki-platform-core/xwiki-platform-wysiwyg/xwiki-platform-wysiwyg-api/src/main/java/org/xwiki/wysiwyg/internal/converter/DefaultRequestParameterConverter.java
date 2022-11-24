@@ -99,7 +99,7 @@ public class DefaultRequestParameterConverter implements RequestParameterConvert
     }
 
     @Override
-    public RequestParameterConversionResult convert(ServletRequest request) throws IOException
+    public RequestParameterConversionResult convert(ServletRequest request)
     {
         MutableServletRequest mutableServletRequest = this.mutableServletRequestFactory.newInstance(request);
         RequestParameterConversionResult result = new RequestParameterConversionResult(mutableServletRequest);
@@ -138,9 +138,10 @@ public class DefaultRequestParameterConverter implements RequestParameterConvert
     private void handleConversionErrors(RequestParameterConversionResult conversionResult, ServletResponse res)
         throws IOException
     {
-        ServletRequest req = conversionResult.getRequest().getRequest();
-        if (req instanceof HttpServletRequest
-            && "XMLHttpRequest".equals(((HttpServletRequest) req).getHeader("X-Requested-With"))) {
+        MutableServletRequest mutableRequest = conversionResult.getRequest();
+        ServletRequest originalRequest = mutableRequest.getRequest();
+        if (originalRequest instanceof HttpServletRequest
+            && "XMLHttpRequest".equals(((HttpServletRequest) originalRequest).getHeader("X-Requested-With"))) {
             // If this is an AJAX request then we should simply send back the error.
             StringBuilder errorMessage = new StringBuilder();
             // Aggregate all error messages (for all fields that have conversion errors).
@@ -154,10 +155,10 @@ public class DefaultRequestParameterConverter implements RequestParameterConvert
         // Otherwise, if this is a normal request, we have to redirect the request back and provide a key to
         // access the exception and the value before the conversion from the session.
         // Redirect to the error page specified on the request.
-        String redirectURL = conversionResult.getRequest().getParameter("xerror");
+        String redirectURL = mutableRequest.getParameter("xerror");
         if (redirectURL == null) {
             // Redirect to the referrer page.
-            redirectURL = conversionResult.getRequest().getReferer();
+            redirectURL = mutableRequest.getReferer();
         }
         // Extract the query string.
         String queryString = StringUtils.substringAfterLast(redirectURL, String.valueOf('?'));
@@ -171,7 +172,7 @@ public class DefaultRequestParameterConverter implements RequestParameterConvert
         }
         // Save the output and the caught exceptions on the session.
         queryString += "key=" + save(conversionResult);
-        conversionResult.getRequest().sendRedirect(res, redirectURL + '?' + queryString);
+        mutableRequest.sendRedirect(res, redirectURL + '?' + queryString);
     }
 
     /**

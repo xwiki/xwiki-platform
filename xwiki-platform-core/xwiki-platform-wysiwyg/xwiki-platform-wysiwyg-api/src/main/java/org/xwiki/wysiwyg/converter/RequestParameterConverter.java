@@ -62,11 +62,10 @@ public interface RequestParameterConverter
      * @param request the request that might contain parameter needing conversion
      * @return an instance of {@link RequestParameterConversionResult} containing the modified request and the output
      *         and errors that might have occurred
-     * @throws IOException in case of problem to write an answer in the response
      * @since 14.10
      */
     @Unstable
-    default RequestParameterConversionResult convert(ServletRequest request) throws IOException
+    default RequestParameterConversionResult convert(ServletRequest request)
     {
         return null;
     }

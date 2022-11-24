@@ -132,29 +132,53 @@ public class DefaultNotificationEmailUserPreferenceManager implements Notificati
             if (StringUtils.isNotBlank((String) value)) {
                 returnValue = Enum.valueOf(propertyEnum, ((String) value).toUpperCase());
             } else {
-                // Get the config of the wiki
-                DocumentReference xwikiPref =
-                    new DocumentReference(GLOBAL_PREFERENCES, userDocumentReference.getWikiReference());
-                value = documentAccessBridge.getProperty(xwikiPref, emailClassReference, propertyName);
-                if (StringUtils.isNotBlank((String) value)) {
-                    returnValue = Enum.valueOf(propertyEnum, ((String) value).toUpperCase());
-                } else {
-                    // Get the config of the main wiki
-                    WikiReference mainWiki = new WikiReference(wikiDescriptorManager.getMainWikiId());
-                    if (!userDocumentReference.getWikiReference().equals(mainWiki)) {
-                        xwikiPref = new DocumentReference(GLOBAL_PREFERENCES, mainWiki);
-                        emailClassReference = new DocumentReference(EMAIL_PREFERENCES_CLASS, mainWiki);
-                        value = documentAccessBridge.getProperty(xwikiPref, emailClassReference, propertyName);
-                        if (StringUtils.isNotBlank((String) value)) {
-                            returnValue = Enum.valueOf(propertyEnum, ((String) value).toUpperCase());
-                        }
-                    }
+                // Get the config from the user wiki or from the main wiki
+                T propertyValue = getWikiPreference(userDocumentReference, propertyEnum, propertyName);
+                if (propertyValue != null) {
+                    returnValue = propertyValue;
                 }
             }
         } catch (Exception e) {
             logger.warn("Failed to get the email property [{}] for the user [{}].", propertyName, user, e);
         }
 
+        return returnValue;
+    }
+
+    /**
+     * Gets preference property value from same wiki as @userDocumentReference if it exists, otherwise from the main
+     * wiki.
+     *
+     * @param userDocumentReference a user document reference
+     * @param propertyEnum a property enum
+     * @param propertyName a property name
+     * @param <T>
+     * @return
+     */
+    private <T extends Enum<T>> T getWikiPreference(DocumentReference userDocumentReference, Class<T> propertyEnum,
+        String propertyName)
+    {
+        T returnValue = null;
+        // Get the config of the wiki
+        DocumentReference emailClassReference = new DocumentReference(EMAIL_PREFERENCES_CLASS,
+            userDocumentReference.getWikiReference());
+        DocumentReference xwikiPref =
+            new DocumentReference(GLOBAL_PREFERENCES, userDocumentReference.getWikiReference());
+        Object value = documentAccessBridge.getProperty(xwikiPref, emailClassReference, propertyName);
+        if (StringUtils.isNotBlank((String) value)) {
+            returnValue = Enum.valueOf(propertyEnum, ((String) value).toUpperCase());
+        } else {
+            // Get the config of the main wiki
+            WikiReference mainWiki = new WikiReference(wikiDescriptorManager.getMainWikiId());
+            if (!userDocumentReference.getWikiReference().equals(mainWiki)) {
+                xwikiPref = new DocumentReference(GLOBAL_PREFERENCES, mainWiki);
+                emailClassReference = new DocumentReference(EMAIL_PREFERENCES_CLASS, mainWiki);
+                value = documentAccessBridge.getProperty(xwikiPref, emailClassReference, propertyName);
+                if (StringUtils.isNotBlank((String) value)) {
+                    returnValue = Enum.valueOf(propertyEnum, ((String) value).toUpperCase());
+                }
+            }
+        }
         return returnValue;
     }
 }

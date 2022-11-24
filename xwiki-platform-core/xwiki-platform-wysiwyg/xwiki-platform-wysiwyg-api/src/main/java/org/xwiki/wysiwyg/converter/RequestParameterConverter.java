@@ -65,8 +65,5 @@ public interface RequestParameterConverter
      * @since 14.10
      */
     @Unstable
-    default RequestParameterConversionResult convert(ServletRequest request)
-    {
-        throw new RuntimeException("Not implemented.");
-    }
+    RequestParameterConversionResult convert(ServletRequest request);
 }

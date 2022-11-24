@@ -67,6 +67,6 @@ public interface RequestParameterConverter
     @Unstable
     default RequestParameterConversionResult convert(ServletRequest request)
     {
-        return null;
+        throw new RuntimeException("Not implemented.");
     }
 }

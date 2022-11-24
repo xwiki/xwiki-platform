@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @version $Id$
  * @since 13.10.11
  * @since 14.4.7
- * @since 14.10RC1
+ * @since 14.10
  */
 @HTML50ComponentList
 @XWikiSyntax21ComponentList

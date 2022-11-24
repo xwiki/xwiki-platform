@@ -43,7 +43,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * Pack of default Components that are needed for the wiki manager script service.
  *
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  */
 @Documented
 @Retention(RUNTIME)

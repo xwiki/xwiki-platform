@@ -28,7 +28,7 @@ import org.xwiki.stability.Unstable;
  * to localize the error messages.
  *
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  */
 @Unstable
 public class AttachmentValidationException extends Exception

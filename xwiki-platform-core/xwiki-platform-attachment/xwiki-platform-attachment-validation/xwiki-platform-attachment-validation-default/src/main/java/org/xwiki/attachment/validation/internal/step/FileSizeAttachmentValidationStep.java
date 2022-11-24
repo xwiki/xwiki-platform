@@ -41,7 +41,7 @@ import static javax.servlet.http.HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE
  * Validate the attachment size.
  *
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  */
 @Component
 @Singleton

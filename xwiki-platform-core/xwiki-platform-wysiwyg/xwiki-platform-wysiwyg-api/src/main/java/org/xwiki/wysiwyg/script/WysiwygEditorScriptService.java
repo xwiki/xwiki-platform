@@ -184,7 +184,7 @@ public class WysiwygEditorScriptService implements ScriptService
      * @param restricted true if the content of this property should be executed in a restricted content, false
      *            otherwise
      * @return the XHTML result of rendering the given HTML fragment
-     * @since 14.10RC1
+     * @since 14.10
      * @since 14.4.7
      * @since 13.10.11
      */
@@ -301,7 +301,7 @@ public class WysiwygEditorScriptService implements ScriptService
      * @param restricted true if the content of this property should be executed in a restricted content, false
      *            otherwise
      * @return the annotated XHTML result of the conversion
-     * @since 14.10RC1
+     * @since 14.10
      * @since 14.4.7
      * @since 13.10.11
      */

@@ -47,7 +47,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * Note that some components might still be missing, those should be added when needed.
  *
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  * @since 13.10.11
  * @since 14.4.7
  */

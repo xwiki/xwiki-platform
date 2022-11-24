@@ -47,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Docker test of the attachment validation feature.
  *
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  */
 @UITest
 class AttachmentValidationIT

@@ -89,7 +89,7 @@ public interface TemporaryAttachmentSessionsManager
      * @param attachment the attachment to be temporarily attached to the document
      * @param documentReference the reference of the document to link this attachment to
      * @throws TemporaryAttachmentException in case of problem when performing the link
-     * @since 14.10RC1
+     * @since 14.10
      */
     @Unstable
     void temporarilyAttach(XWikiAttachment attachment, DocumentReference documentReference)
@@ -157,7 +157,7 @@ public interface TemporaryAttachmentSessionsManager
      *
      * @param document the actual document instance that should receive the attachments
      * @param fileNames the names of the uploaded files to attach
-     * @since 14.10RC1
+     * @since 14.10
      */
     @Unstable
     default void attachTemporaryAttachmentsInDocument(XWikiDocument document, List<String> fileNames)

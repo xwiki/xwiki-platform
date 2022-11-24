@@ -291,7 +291,7 @@ public class ScriptQuery implements SecureQuery
      *            test the author right)
      * @return this query.
      * @throws AccessDeniedException when switching the query author is not allowed
-     * @since 14.10RC1
+     * @since 14.10
      * @since 14.4.7
      * @since 13.10.11
      */

@@ -38,7 +38,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * @version $Id$
  * @since 13.10.11
  * @since 14.4.7
- * @since 14.10RC1
+ * @since 14.10
  */
 @Documented
 @Retention(RUNTIME)

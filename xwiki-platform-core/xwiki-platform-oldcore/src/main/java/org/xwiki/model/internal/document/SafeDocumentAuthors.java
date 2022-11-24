@@ -31,7 +31,7 @@ import org.xwiki.user.UserReference;
  * being used in script services. All setters throw an {@link UnsupportedOperationException}.
  *
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  * @since 14.4.7
  */
 public class SafeDocumentAuthors extends AbstractWrappingObject<DocumentAuthors> implements DocumentAuthors

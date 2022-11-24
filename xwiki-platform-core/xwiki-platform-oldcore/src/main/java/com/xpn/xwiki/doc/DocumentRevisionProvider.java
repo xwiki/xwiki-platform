@@ -73,7 +73,7 @@ public interface DocumentRevisionProvider
      * @param revision the revision of the document
      * @throws AuthorizationException if the access is denied
      * @throws XWikiException in case of problem when loading the revision
-     * @since 14.10RC1
+     * @since 14.10
      * @since 14.4.7
      * @since 13.10.11
      */

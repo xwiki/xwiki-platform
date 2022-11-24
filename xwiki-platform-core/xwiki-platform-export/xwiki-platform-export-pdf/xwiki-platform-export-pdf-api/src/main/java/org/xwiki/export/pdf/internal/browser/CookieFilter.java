@@ -30,7 +30,7 @@ import org.xwiki.component.annotation.Role;
  * Filter the cookies passed to the web browser used for PDF printing.
  * 
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  */
 @Role
 public interface CookieFilter

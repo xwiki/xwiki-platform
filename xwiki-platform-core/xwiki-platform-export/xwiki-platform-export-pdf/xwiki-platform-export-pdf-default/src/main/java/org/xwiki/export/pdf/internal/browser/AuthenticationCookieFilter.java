@@ -54,7 +54,7 @@ import com.xpn.xwiki.XWikiContext;
  * should't use the {@code X-Forwarded-For} header at all).
  * 
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  */
 @Component
 @Singleton

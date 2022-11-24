@@ -27,7 +27,7 @@ import org.xwiki.test.docker.junit5.UITest;
  * All UI tests for the Attachment validation feature.
  *
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  */
 @UITest
 public class AllITs

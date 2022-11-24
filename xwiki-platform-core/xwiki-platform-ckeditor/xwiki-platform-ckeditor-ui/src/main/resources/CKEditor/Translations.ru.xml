@@ -207,7 +207,7 @@ imageSelector.modal.initialization.fail=Не удалось получить д�
 ## Used to indicate where deprecated keys start
 #@deprecatedstart
 
-## Deprecated since 14.10RC1
+## Deprecated since 14.10
 imageEditor.modal.backToEditor.button=Назад
 ckeditor.plugin.image.imageSelector.documentTreeTab.title=Дерево документов
 

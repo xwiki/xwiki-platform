@@ -58,7 +58,7 @@ import static org.xwiki.component.wiki.internal.bridge.DefaultWikiObjectComponen
  * Test of {@code Panels.IncludedPagesDocumentInformation}.
  *
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  * @since 14.4.7
  */
 @XWikiSyntax21ComponentList

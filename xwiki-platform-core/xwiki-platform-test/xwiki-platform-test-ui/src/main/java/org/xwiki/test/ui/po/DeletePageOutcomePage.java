@@ -42,10 +42,10 @@ public class DeletePageOutcomePage extends ViewPage
     /**
      * Return first page deleted deleter.
      * @since 3.2M3
-     * @deprecated Since 14.10RC1 prefer using {@link #getDeletedPagesEntries()} and
+     * @deprecated Since 14.10 prefer using {@link #getDeletedPagesEntries()} and
      *             {@link DeletedPageEntry#getDeleter()}.
      */
-    @Deprecated(since = "14.10RC1")
+    @Deprecated(since = "14.10")
     public String getPageDeleter()
     {
         List<DeletedPageEntry> deletedPagesEntries = getDeletedPagesEntries();
@@ -80,7 +80,7 @@ public class DeletePageOutcomePage extends ViewPage
 
     /**
      * @return the list of non-terminal deleted page entries.
-     * @since 14.10RC1
+     * @since 14.10
      */
     public List<DeletedPageEntry> getDeletedPagesEntries()
     {
@@ -112,10 +112,10 @@ public class DeletePageOutcomePage extends ViewPage
      * 
      * @return the restored view page
      * @since 5.2M2
-     * @deprecated Since 14.10RC1 prefer using {@link #getDeletedPagesEntries()} and
+     * @deprecated Since 14.10 prefer using {@link #getDeletedPagesEntries()} and
      *              {@link DeletedPageEntry#clickRestore()}.
      */
-    @Deprecated(since = "14.10RC1")
+    @Deprecated(since = "14.10")
     public ViewPage clickRestore()
     {
         List<DeletedPageEntry> deletedPagesEntries = getDeletedPagesEntries();
@@ -141,10 +141,10 @@ public class DeletePageOutcomePage extends ViewPage
      *
      * @return the recycle bin page updated
      * @since 7.2RC1
-     * @deprecated Since 14.10RC1 prefer using {@link #getDeletedPagesEntries()} and
+     * @deprecated Since 14.10 prefer using {@link #getDeletedPagesEntries()} and
      *             {@link DeletedPageEntry#clickDelete()}.
      */
-    @Deprecated(since = "14.10RC1")
+    @Deprecated(since = "14.10")
     public DeletePageOutcomePage clickDeletePage()
     {
         List<DeletedPageEntry> deletedPagesEntries = getDeletedPagesEntries();
@@ -160,10 +160,10 @@ public class DeletePageOutcomePage extends ViewPage
      *
      * @return the restored view page
      * @since 7.2RC1
-     * @deprecated Since 14.10RC1 prefer using {@link #getDeletedTerminalPagesEntries()} and
+     * @deprecated Since 14.10 prefer using {@link #getDeletedTerminalPagesEntries()} and
      *             {@link DeletedPageEntry#clickDelete()}.
      */
-    @Deprecated(since = "14.10RC1")
+    @Deprecated(since = "14.10")
     public DeletePageOutcomePage clickDeleteTerminalPage()
     {
         List<DeletedPageEntry> deletedPagesEntries = getDeletedTerminalPagesEntries();
@@ -181,10 +181,10 @@ public class DeletePageOutcomePage extends ViewPage
      * @return the view page of the deleted page
      * @since 13.10.4
      * @since 14.2RC1
-     * @deprecated Since 14.10RC1 prefer using {@link #getDeletedPagesEntries()} and
+     * @deprecated Since 14.10 prefer using {@link #getDeletedPagesEntries()} and
      *            {@link DeletedPageEntry#clickDelete()}.
      */
-    @Deprecated(since = "14.10RC1")
+    @Deprecated(since = "14.10")
     public ViewPage clickViewDocument(int row)
     {
         int actualEntryNumber = row - 1;

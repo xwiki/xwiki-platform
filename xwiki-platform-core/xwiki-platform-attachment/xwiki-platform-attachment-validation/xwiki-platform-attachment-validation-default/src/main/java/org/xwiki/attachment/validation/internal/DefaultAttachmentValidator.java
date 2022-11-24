@@ -45,7 +45,7 @@ import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
  * configuration values are retrieved using {@link AttachmentValidationConfiguration}.
  *
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  */
 @Component
 @Singleton

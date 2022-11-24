@@ -2180,7 +2180,7 @@ public class Document extends Api
      * Verifies if the context user has the access identified by {@code right} on the current context document.
      * @param right the right to check
      * @return {@code true} if the user has the specified right on this document, {@code false} otherwise
-     * @since 14.10RC1
+     * @since 14.10
      * @since 14.4.7
      */
     @Unstable

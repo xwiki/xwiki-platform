@@ -353,7 +353,7 @@ public class TextAreaClass extends StringClass
      * that this content should be executed).
      * 
      * @return true if the content of this property should be executed in a restricted content, false otherwise
-     * @since 14.10RC1
+     * @since 14.10
      * @since 14.4.7
      * @since 13.10.11
      */
@@ -369,7 +369,7 @@ public class TextAreaClass extends StringClass
      * 
      * @param restricted true if the content of this property should be executed in a restricted content, false
      *            otherwise
-     * @since 14.10RC1
+     * @since 14.10
      * @since 14.4.7
      * @since 13.10.11
      */

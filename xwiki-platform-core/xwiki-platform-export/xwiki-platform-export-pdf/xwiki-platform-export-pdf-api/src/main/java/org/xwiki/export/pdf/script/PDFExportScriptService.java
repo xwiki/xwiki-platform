@@ -192,7 +192,7 @@ public class PDFExportScriptService implements ScriptService
 
     /**
      * @return {@code true} if the Web browser based PDF export is enabled, {@code false} otherwise
-     * @since 14.10RC1
+     * @since 14.10
      */
     public boolean isEnabled()
     {

@@ -610,7 +610,7 @@ public class TestUtils
      *              empty of null
      * @param rights the comma-separated list of rights to give (e.g. {@code edit,admin})
      * @param enabled true if the rights should be allowed, false if they should be denied
-     * @since 14.10RC1
+     * @since 14.10
      */
     public void setRightsOnSpace(SpaceReference space, String groups, String users, String rights, boolean enabled)
     {

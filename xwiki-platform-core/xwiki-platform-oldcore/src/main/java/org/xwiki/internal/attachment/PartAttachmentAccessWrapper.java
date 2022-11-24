@@ -32,7 +32,7 @@ import org.xwiki.attachment.AttachmentAccessWrapper;
  * meant to be saved as an attachment.
  *
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  */
 public class PartAttachmentAccessWrapper implements AttachmentAccessWrapper
 {

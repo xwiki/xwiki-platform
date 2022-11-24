@@ -36,7 +36,7 @@ public interface BlockAsyncRendererDecorator
      * @param renderer the renderer to execute
      * @return the result of the renderer execution
      * @throws RenderingException when failing to execute the renderer
-     * @since 14.10RC1
+     * @since 14.10
      */
     BlockAsyncRendererResult render(BlockAsyncRenderer renderer, boolean async, boolean cached)
         throws RenderingException;

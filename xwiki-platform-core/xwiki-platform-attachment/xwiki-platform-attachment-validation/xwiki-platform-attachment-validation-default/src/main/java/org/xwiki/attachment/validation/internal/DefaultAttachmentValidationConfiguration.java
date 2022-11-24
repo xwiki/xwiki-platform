@@ -41,7 +41,7 @@ import static org.xwiki.attachment.validation.internal.AttachmentMimetypeRestric
  * </ol>
  *
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  */
 @Component
 @Singleton

@@ -48,7 +48,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * Special class editor tests that address only the User class field type.
  * 
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  * @since 14.4.7
  * @since 13.10.10
  */

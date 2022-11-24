@@ -66,7 +66,7 @@ public interface HTMLConverter
      * @param restricted true if the content of this property should be executed in a restricted content, false
      *            otherwise
      * @return the HTML result of the conversion
-     * @since 14.10RC1
+     * @since 14.10
      * @since 14.4.7
      * @since 13.10.11
      */
@@ -119,7 +119,7 @@ public interface HTMLConverter
      * @param restricted true if the content of this property should be executed in a restricted content, false
      *            otherwise
      * @return the XHTML result of rendering the given HTML fragment
-     * @since 14.10RC1
+     * @since 14.10
      * @since 14.4.7
      * @since 13.10.11
      */

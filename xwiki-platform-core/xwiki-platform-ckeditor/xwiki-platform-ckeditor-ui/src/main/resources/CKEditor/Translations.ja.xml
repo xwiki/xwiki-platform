@@ -205,7 +205,7 @@ imageSelector.modal.initialization.fail=画像の選択フォームを取得で�
 ## Used to indicate where deprecated keys start
 #@deprecatedstart
 
-## Deprecated since 14.10RC1
+## Deprecated since 14.10
 imageEditor.modal.backToEditor.button=戻る
 ckeditor.plugin.image.imageSelector.documentTreeTab.title=ドキュメントツリー
 

@@ -138,14 +138,14 @@ public class XWikiContextContextStore extends AbstractContextStore
     /**
      * The suffix of the entry containing the request headers.
      * 
-     * @since 14.10RC1
+     * @since 14.10
      */
     public static final String SUFFIX_PROP_REQUEST_HEADERS = "headers";
 
     /**
      * The suffix of the entry containing the request remote address.
      * 
-     * @since 14.10RC1
+     * @since 14.10
      */
     public static final String SUFFIX_PROP_REQUEST_REMOTE_ADDR = "remoteAddr";
 
@@ -187,14 +187,14 @@ public class XWikiContextContextStore extends AbstractContextStore
     /**
      * Name of the entry containing the request headers.
      * 
-     * @since 14.10RC1
+     * @since 14.10
      */
     public static final String PROP_REQUEST_HEADERS = PREFIX_PROP_REQUEST + SUFFIX_PROP_REQUEST_HEADERS;
 
     /**
      * Name of the entry containing the request remote address.
      * 
-     * @since 14.10RC1
+     * @since 14.10
      */
     public static final String PROP_REQUEST_REMOTE_ADDR = PREFIX_PROP_REQUEST + SUFFIX_PROP_REQUEST_REMOTE_ADDR;
 

@@ -45,7 +45,7 @@ import static org.mockito.Mockito.when;
  * Test of {@link MimetypeAttachmentValidationStep}.
  *
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  */
 @ComponentTest
 class MimetypeAttachmentValidationStepTest

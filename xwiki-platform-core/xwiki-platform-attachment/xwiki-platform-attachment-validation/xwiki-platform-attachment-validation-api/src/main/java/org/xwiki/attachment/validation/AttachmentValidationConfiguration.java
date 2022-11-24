@@ -28,7 +28,7 @@ import org.xwiki.stability.Unstable;
  * Configuration values for the attachment validation.
  *
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  */
 @Role
 @Unstable

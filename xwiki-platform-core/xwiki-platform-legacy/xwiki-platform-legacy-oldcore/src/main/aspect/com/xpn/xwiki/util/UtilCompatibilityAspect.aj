@@ -107,7 +107,7 @@ public privileged aspect UtilCompatibilityAspect
      * @return A DOM document element corresponding to the string, or null on error
      * @deprecated use {@code $services.xml.parse()} instead
      */
-    @Deprecated(since = "14.10RC1")
+    @Deprecated(since = "14.10")
     public org.w3c.dom.Document Util.getDOMForString(String str)
     {
         try {
@@ -132,7 +132,7 @@ public privileged aspect UtilCompatibilityAspect
      * @return a new DOM document element, or null on error
      * @deprecated use {@code XMLScriptService#createDOMDocument()} instead
      */
-    @Deprecated(since = "14.10RC1")
+    @Deprecated(since = "14.10")
     public org.w3c.dom.Document Util.getDOMDocument()
     {
         try {

@@ -49,7 +49,7 @@ public class ExportModal extends BaseModal
      * 
      * @param viewPage the page for which to open the export modal
      * @return the export modal
-     * @since 14.10RC1
+     * @since 14.10
      */
     public static ExportModal open(ViewPage viewPage)
     {
@@ -64,7 +64,7 @@ public class ExportModal extends BaseModal
 
     /**
      * @return the widget used to select the export format
-     * @since 14.10RC1
+     * @since 14.10
      */
     public XWikiSelectWidget getExportFormatSelect()
     {
@@ -75,7 +75,7 @@ public class ExportModal extends BaseModal
      * Select the specified export format.
      * 
      * @param format the export format to select
-     * @since 14.10RC1
+     * @since 14.10
      */
     public void exportAs(String format)
     {

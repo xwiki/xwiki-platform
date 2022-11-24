@@ -29,7 +29,7 @@ import org.xwiki.test.ui.po.ViewPage;
  * Page object for the attachment restriction page administration.
  *
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  */
 public class AttachmentRestrictionAdministrationSectionPage extends ViewPage
 {

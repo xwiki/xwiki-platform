@@ -56,7 +56,7 @@ import static org.mockito.Mockito.when;
  * Test of {@code CKEditor.FileUploader}.
  *
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  */
 @XWikiSyntax21ComponentList
 @HTML50ComponentList

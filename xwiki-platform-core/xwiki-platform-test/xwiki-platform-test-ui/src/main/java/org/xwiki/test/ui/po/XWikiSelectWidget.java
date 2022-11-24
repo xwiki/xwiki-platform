@@ -35,7 +35,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
  * Represents the XWiki Select Widget (select.js).
  * 
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  */
 public class XWikiSelectWidget extends BaseElement
 {

@@ -37,7 +37,7 @@ import static com.xpn.xwiki.objects.classes.ListClass.DISPLAYTYPE_INPUT;
  * to configure restrictions on the kind of attachments that can be uploaded.
  *
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  */
 @Component
 @Named(AttachmentMimetypeRestrictionClassDocumentInitializer.HINT)

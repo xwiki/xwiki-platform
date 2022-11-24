@@ -74,7 +74,7 @@ public interface AnnotationRightService
      * @param target the target of the page where to upload the attachment
      * @param userName the name of the user performing the upload
      * @return {@code true} if the user can upload the attachment, {@code false} otherwise
-     * @since 14.10RC1
+     * @since 14.10
      */
     @Unstable
     default boolean canUploadAttachment(String target, String userName)

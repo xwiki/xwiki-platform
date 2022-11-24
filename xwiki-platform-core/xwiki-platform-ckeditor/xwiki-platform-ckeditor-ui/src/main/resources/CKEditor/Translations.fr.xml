@@ -207,7 +207,7 @@ imageSelector.modal.initialization.fail=Impossible d'afficher le formulaire de s
 ## Used to indicate where deprecated keys start
 #@deprecatedstart
 
-## Deprecated since 14.10RC1
+## Deprecated since 14.10
 imageEditor.modal.backToEditor.button=Retour
 ckeditor.plugin.image.imageSelector.documentTreeTab.title=Arbre de document
 

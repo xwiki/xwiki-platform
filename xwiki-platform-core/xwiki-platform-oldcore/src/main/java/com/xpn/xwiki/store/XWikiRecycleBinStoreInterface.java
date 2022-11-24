@@ -245,7 +245,7 @@ public interface XWikiRecycleBinStoreInterface
      * @param userReference the user for whom to check access
      * @param deletedDocument the document to be accessed
      * @throws AuthorizationException if the user doesn't have appropriate right
-     * @since 14.10RC1
+     * @since 14.10
      * @since 14.4.7
      * @since 13.10.11
      */
@@ -262,7 +262,7 @@ public interface XWikiRecycleBinStoreInterface
      * @param userReference the user for whom to check access
      * @param deletedDocument the document to be accessed
      * @return {@code true} if the user have appropriate right
-     * @since 14.10RC1
+     * @since 14.10
      * @since 14.4.7
      * @since 13.10.11
      */

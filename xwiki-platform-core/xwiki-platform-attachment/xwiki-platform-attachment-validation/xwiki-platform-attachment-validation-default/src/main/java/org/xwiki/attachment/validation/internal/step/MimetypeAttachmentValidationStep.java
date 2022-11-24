@@ -44,7 +44,7 @@ import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessa
  * Validate the attachment mimetype based on configured lists of allowed and blocker mimetypes.
  *
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  */
 @Component
 @Singleton

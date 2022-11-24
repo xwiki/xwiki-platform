@@ -26,7 +26,7 @@ import org.openqa.selenium.WebElement;
  * Represents a deleted page row in the recycle bin.
  *
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  */
 public class DeletedPageEntry extends BaseElement
 {

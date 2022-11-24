@@ -118,7 +118,7 @@ public interface PDFExportConfiguration
      *         content size we sum the size of the HTML rendering for each of the XWiki documents included in the
      *         export; the size of external resources, such as images, style sheets, JavaScript code is not taken into
      *         account; {@code 0} means no limit; defaults to {@code 100KB}
-     * @since 14.10RC1
+     * @since 14.10
      */
     default int getMaxContentSize()
     {
@@ -128,7 +128,7 @@ public interface PDFExportConfiguration
     /**
      * @return the maximum number of PDF exports that can be executed in parallel (each PDF export needs a separate
      *         thread); defaults to {@code 3}
-     * @since 14.10RC1
+     * @since 14.10
      */
     default int getThreadPoolSize()
     {
@@ -137,7 +137,7 @@ public interface PDFExportConfiguration
 
     /**
      * @return whether to replace or not the old PDF export based on Apache Formatting Objects Processor (FOP)
-     * @since 14.10RC1
+     * @since 14.10
      */
     default boolean isReplacingFOP()
     {

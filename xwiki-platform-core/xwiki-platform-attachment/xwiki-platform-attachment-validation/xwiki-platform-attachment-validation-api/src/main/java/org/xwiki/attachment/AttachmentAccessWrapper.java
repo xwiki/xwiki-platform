@@ -29,7 +29,7 @@ import org.xwiki.stability.Unstable;
  * TODO: Should be moved to xwiki-platform-attachment-api as soon at its dependency to oldcore is removed.
  *
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  */
 @Unstable
 public interface AttachmentAccessWrapper

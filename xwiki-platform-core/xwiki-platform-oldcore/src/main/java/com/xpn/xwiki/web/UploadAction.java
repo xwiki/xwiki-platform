@@ -63,7 +63,7 @@ public class UploadAction extends XWikiAction
 {
     /**
      * The prefix of the accepted file input field name.
-     * @since 14.10RC1
+     * @since 14.10
      */
     @Unstable
     public static final String FILE_FIELD_NAME = "filepath";

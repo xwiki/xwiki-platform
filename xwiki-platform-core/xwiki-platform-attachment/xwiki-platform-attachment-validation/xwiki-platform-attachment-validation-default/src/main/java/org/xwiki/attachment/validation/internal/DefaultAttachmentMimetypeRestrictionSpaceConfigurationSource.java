@@ -35,7 +35,7 @@ import org.xwiki.model.reference.SpaceReference;
  * XObject in a {@code WebPreferences} document aside the current document.
  *
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  */
 @Component
 @Singleton

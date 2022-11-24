@@ -173,7 +173,7 @@ public class DeletedDocument extends Api
      * original user who deleted it.
      *
      * @return {code true} if the current user is allowed to view the deleted document.
-     * @since 14.10RC1
+     * @since 14.10
      * @since 14.4.7
      * @since 13.10.11
      */

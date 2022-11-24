@@ -79,7 +79,7 @@ public class PDFDocument implements AutoCloseable
      * @param userName the user name used to access the PDF document
      * @param password the password used to access the PDF document
      * @throws IOException if fetching and parsing the PDF document fails
-     * @since 14.10RC1
+     * @since 14.10
      */
     public PDFDocument(URL url, String userName, String password) throws IOException
     {

@@ -67,7 +67,7 @@ public class XWikiServletRequestStub implements XWikiRequest
      * Builder for {@link XWikiServletRequestStub}.
      * 
      * @version $Id$
-     * @since 14.10RC1
+     * @since 14.10
      */
     public static class Builder
     {

@@ -90,7 +90,7 @@ public interface BrowserTab extends AutoCloseable
 
     /**
      * @return the source of the web page loaded in this browser tab
-     * @since 14.10RC1
+     * @since 14.10
      */
     String getSource();
 

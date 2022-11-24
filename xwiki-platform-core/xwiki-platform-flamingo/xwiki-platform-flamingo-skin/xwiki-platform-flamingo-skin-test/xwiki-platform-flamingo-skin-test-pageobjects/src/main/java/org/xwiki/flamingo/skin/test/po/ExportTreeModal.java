@@ -33,7 +33,7 @@ import org.xwiki.tree.test.po.TreeElement;
  * Represents the Export Tree Modal.
  * 
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  */
 public class ExportTreeModal extends BaseModal
 {

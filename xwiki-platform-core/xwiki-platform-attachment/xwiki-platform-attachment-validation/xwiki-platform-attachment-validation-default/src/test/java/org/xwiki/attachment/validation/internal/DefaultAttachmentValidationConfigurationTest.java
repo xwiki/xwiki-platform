@@ -41,7 +41,7 @@ import static org.xwiki.attachment.validation.internal.AttachmentMimetypeRestric
  * Test of {@link DefaultAttachmentValidationConfiguration}.
  *
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  */
 @ComponentTest
 class DefaultAttachmentValidationConfigurationTest

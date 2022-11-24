@@ -33,7 +33,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
  * For instance, its size, name, and an input steam of its content.
  *
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  */
 public class XWikiAttachmentAccessWrapper implements AttachmentAccessWrapper
 {

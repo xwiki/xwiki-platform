@@ -227,7 +227,7 @@ imageSelector.modal.initialization.fail=Failed to retrieve the image selection f
 ## Used to indicate where deprecated keys start
 #@deprecatedstart
 
-## Deprecated since 14.10RC1
+## Deprecated since 14.10
 imageEditor.modal.backToEditor.button=Back
 ckeditor.plugin.image.imageSelector.documentTreeTab.title=Document Tree
 

@@ -37,7 +37,7 @@ import com.xpn.xwiki.user.impl.xwiki.MyPersistentLoginManager;
  * Default provider of {@link MyPersistentLoginManager}.
  * 
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  */
 @Component
 @Singleton

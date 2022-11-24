@@ -35,7 +35,7 @@ import static org.xwiki.component.wiki.internal.WikiComponentConstants.CLASS_SPA
  * Look for the attachment mimetype restriction configuration in a space.
  *
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  */
 @Component
 @Singleton

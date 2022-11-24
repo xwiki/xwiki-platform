@@ -35,7 +35,7 @@ import org.xwiki.component.annotation.Component;
  * {@code xwiki-platform-attachment-validation-default}.
  *
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  */
 @Component
 @Singleton

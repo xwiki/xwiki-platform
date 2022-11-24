@@ -112,7 +112,7 @@ public class PDFTemplateEditPage extends InlinePage
      * Sets the code that controls the PDF footer.
      * 
      * @param value the new code for the PDF footer
-     * @since 14.10RC1
+     * @since 14.10
      */
     public void setFooter(String value)
     {

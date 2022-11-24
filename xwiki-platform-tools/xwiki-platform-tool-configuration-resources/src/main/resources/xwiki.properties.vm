@@ -933,7 +933,7 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-# with programming rights, while this configuration affect any attachment.
 # attachment.download.forceDownload=
 
-#-# [Since 14.10RC1]
+#-# [Since 14.10]
 #-# Define the list of allowed attachment mimetypes. By default, this list is empty, but you can specify a 
 #-# comma-separated list of allowed mimetypes. Note that a joker (*) can be used to accept any media type. Once this
 #-# list is not empty, any attachment with an unlisted mimetype will be rejected.
@@ -941,7 +941,7 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-# text/plain,image/*
 # attachment.upload.allowList=
 
-#-# [Since 14.10RC1]
+#-# [Since 14.10]
 #-# Define the list of blocked attachment mimetypes. By default, this list is empty, but you can specify a 
 #-# comma-separated list of blocked mimetypes. Note that a joker (*) can be used to accept any media type. Once this 
 #-# list is not empty, any attachment matching one of the listed mimetype will be rejected.

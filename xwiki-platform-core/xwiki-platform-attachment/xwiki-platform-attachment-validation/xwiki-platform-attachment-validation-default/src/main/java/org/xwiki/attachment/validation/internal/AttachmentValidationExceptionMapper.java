@@ -36,7 +36,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
  * Exception mapper for {@link AttachmentValidationException}.
  *
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  */
 @Component
 @Named("org.xwiki.attachment.validation.internal.AttachmentValidationExceptionMapper")

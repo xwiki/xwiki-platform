@@ -38,7 +38,7 @@ import org.xwiki.stability.Unstable;
  * Script service for the attachment validation. Provide the attachment validation configuration values.
  *
  * @version $Id$
- * @since 14.10RC1
+ * @since 14.10
  */
 @Component
 @Singleton

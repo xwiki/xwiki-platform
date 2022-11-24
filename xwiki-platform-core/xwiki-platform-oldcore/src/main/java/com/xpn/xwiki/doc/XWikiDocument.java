@@ -1612,7 +1612,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param isolated true of the content should be executed in this document's context
      * @param context the XWiki context
      * @return the given text rendered in the context of this document using the passed Syntax
-     * @since 14.10RC1
+     * @since 14.10
      * @since 14.4.7
      * @since 13.10.11
      */

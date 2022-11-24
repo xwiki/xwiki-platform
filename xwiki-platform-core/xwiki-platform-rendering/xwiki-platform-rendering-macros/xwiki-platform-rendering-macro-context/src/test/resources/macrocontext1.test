@@ -12,7 +12,7 @@ beginDocument
 beginMacroMarkerStandalone [context] [document=Space.Page|transformationContext=transformations] [{{toc/}}]
 beginMetaData [[base]=[Space.Page][source]=[Space.Page][syntax]=[XWiki 2.1]]
 beginMacroMarkerStandalone [toc] []
-beginList [BULLETED]
+beginList [BULLETED] [[class]=[wikitoc]]
 beginListItem
 beginLink [Typed = [true] Type = [doc] Parameters = [[anchor] = [Hheading1]]] [false]
 onWord [heading1]
@@ -25,7 +25,7 @@ endLink [Typed = [true] Type = [doc] Parameters = [[anchor] = [Hheading2]]] [fal
 endListItem
 endList [BULLETED]
 endListItem
-endList [BULLETED]
+endList [BULLETED] [[class]=[wikitoc]]
 endMacroMarkerStandalone [toc] []
 endMetaData [[base]=[Space.Page][source]=[Space.Page][syntax]=[XWiki 2.1]]
 endMacroMarkerStandalone [context] [document=Space.Page|transformationContext=transformations] [{{toc/}}]

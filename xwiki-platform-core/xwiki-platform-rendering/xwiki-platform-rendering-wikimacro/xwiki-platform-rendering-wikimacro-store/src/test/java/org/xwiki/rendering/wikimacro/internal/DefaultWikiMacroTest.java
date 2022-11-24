@@ -253,7 +253,9 @@ class DefaultWikiMacroTest
 
         assertXHTML(
             "<h1 id=\"Hheading\" class=\"wikigeneratedid\"><span>heading</span></h1>"
-                + "<ul><li><span class=\"wikilink\"><a href=\"#Hheading\">heading</a></span></li></ul>",
+                + "<ul class=\"wikitoc\">"
+                + "<li><span class=\"wikilink\"><a href=\"#Hheading\">heading</a></span></li>"
+                + "</ul>",
             "= heading\n\n{{wikimacro1 param1=\"value1\" param2=\"value2\"/}}");
     }
 

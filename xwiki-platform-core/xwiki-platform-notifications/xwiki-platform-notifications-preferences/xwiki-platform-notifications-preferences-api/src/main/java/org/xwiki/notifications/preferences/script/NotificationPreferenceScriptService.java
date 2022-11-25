@@ -294,9 +294,7 @@ public class NotificationPreferenceScriptService implements ScriptService
      * @param userId id of a user
      * @return the diff type for emails configured for the given user
      * @since 9.11RC1
-     * @deprecated since 14.10, use {@link #getDiffType(UserReference)} instead
      */
-    @Deprecated(since = "14.10")
     public NotificationEmailDiffType getDiffType(String userId)
     {
         return emailUserPreferenceManager.getDiffType(userReferenceResolver.resolve(userId));

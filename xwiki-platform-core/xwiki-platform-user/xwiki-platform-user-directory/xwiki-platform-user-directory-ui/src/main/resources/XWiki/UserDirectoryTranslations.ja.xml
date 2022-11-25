@@ -37,18 +37,18 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>XWiki.UserDirectoryPreferencesClass_columns=表示するカラム
-### Missing: XWiki.UserDirectoryPreferencesClass_columns_hint=
-### Missing: XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles=
+XWiki.UserDirectoryPreferencesClass_columns_hint=ユーザーのクラスのプロパティーに対応し、ユーザーディレクトリーに表示するカラムの一覧
+XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles=無効化されたユーザーのプロフィールを表示しない
 XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles_hint=プロフィールを無効にしているユーザーをユーザーディレクトリーから除外
-### Missing: userdirectory.userScopeFilter=
-### Missing: userdirectory.userScopeFilter.hint=
+userdirectory.userScopeFilter=ユーザーの範囲：
+userdirectory.userScopeFilter.hint=表示したいユーザーのカテゴリーを選択してください。
 userdirectory.userScopeFilter.local=ローカルのユーザー
-### Missing: userdirectory.userScopeFilter.global=
+userdirectory.userScopeFilter.global=このウィキのメンバーである共通ユーザー
 userdirectory.configuration.title=設定
 userdirectory.configuration.columns.editHint=クリックしてカラムを選択
 platform.userdirectory.customizeNotAllowed=ユーザーディレクトリーを変更することは許可されていません。
 platform.userdirectory.configTitle=ユーザーディレクトリーの設定
 platform.userdirectory.configSheetTitle=ユーザーディレクトリーの設定用シート
-### Missing: platform.userdirectory.configSheetApplyOnConfiguration=
+platform.userdirectory.configSheetApplyOnConfiguration=このシートは、ユーザーディレクトリーの設定ドキュメントに適用する必要があります。
 </content>
   </xwikidoc>

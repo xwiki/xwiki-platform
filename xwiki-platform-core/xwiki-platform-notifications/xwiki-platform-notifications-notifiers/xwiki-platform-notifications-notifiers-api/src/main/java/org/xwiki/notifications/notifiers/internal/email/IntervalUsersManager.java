@@ -28,7 +28,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
@@ -57,9 +56,11 @@ public class IntervalUsersManager
 
     private static class WikiEntry
     {
-        private Map<NotificationEmailInterval, List<DocumentReference>> usersPerInterval = new ConcurrentHashMap<>();
+        private final Map<NotificationEmailInterval, List<DocumentReference>> usersPerInterval =
+            new ConcurrentHashMap<>();
 
-        private Map<DocumentReference, NotificationEmailInterval> intervalPerUser = new ConcurrentHashMap<>();
+        private final Map<DocumentReference, NotificationEmailInterval> intervalPerUser =
+            new ConcurrentHashMap<>();
     }
 
     /**
@@ -88,10 +89,7 @@ public class IntervalUsersManager
     @Inject
     private EntityReferenceFactory referenceFactory;
 
-    @Inject
-    private DocumentAccessBridge documentAccessBridge;
-
-    private Map<String, WikiEntry> usersCache = new ConcurrentHashMap<>();
+    private final Map<String, WikiEntry> usersCache = new ConcurrentHashMap<>();
 
     @Inject
     private NotificationEmailUserPreferenceManager emailUserPreferenceManager;

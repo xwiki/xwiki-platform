@@ -38,7 +38,7 @@
   <hidden>true</hidden>
   <content>rendering.macro.tree.name=ツリー
 rendering.macro.tree.description=マクロのコンテンツあるいはソースのパラメーターにより規定されたツリーの階層を表示します。
-### Missing: rendering.macro.tree.parameter.reference.name=
+rendering.macro.tree.parameter.reference.name=参照
 ### Missing: rendering.macro.tree.parameter.reference.description=
 rendering.macro.tree.parameter.root.name=ルート
 rendering.macro.tree.parameter.root.description=ルートのノードのIDです。特定のノード（指定したルート）以下のノードを表示する際に役立ちます。ツリーは、ルートにあるノードの子供を最初のレベルに表示するため、ルートのノードは実際には表示されません。ルートのノードが指定されていない場合は、ツリー全体を表示します。

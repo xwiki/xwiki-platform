@@ -182,7 +182,7 @@ platform.wiki.browse._actions.delete=削除
 
 ## Classes
 WikiManager.WikiUserClass_membershipType_open=誰でも参加可能
-### Missing: WikiManager.WikiUserClass_membershipType_request=
+WikiManager.WikiUserClass_membershipType_request=どの共通のユーザーも参加を要求できますが、管理者が受け入れる必要があります
 WikiManager.WikiUserClass_membershipType_invite=管理者のみウィキへの招待を送信することが可能
 WikiManager.WikiUserClass_userScope_local_only=ローカルユーザーのみ利用可能
 ### Missing: WikiManager.WikiUserClass_userScope_global_only=

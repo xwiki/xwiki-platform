@@ -39,11 +39,11 @@
   <content>administration.title=管理
 administration.title.page=ページの管理
 administration.title.wiki=ウィキの管理
-### Missing: administration.title.global=
+administration.title.global=共通設定
 administration.sectionTitle=管理：{0}
 administration.sectionTitle.page=ページの管理：{0}
 administration.sectionTitle.wiki=ウィキの管理：{0}
-### Missing: administration.sectionTitle.global=
+administration.sectionTitle.global=共通設定：{0}
 administration.menu.search.hint=検索…
 administration.menu.search.noResults=結果がありません。
 
@@ -71,7 +71,7 @@ XWiki.Registration_passwordRuleOneSymbolEnabled.hint=パスワードに1つ以�
 admin.themes=テーマ
 admin.themes.description=色とアイコンのテーマ、スキンとロゴをカスタマイズ。
 admin.colorthemes.local=ローカル
-### Missing: admin.colorthemes.global=
+admin.colorthemes.global=共通
 XWiki.XWikiPreferences_showannotations.hint=ページのレイアウトに注釈のセクションを表示。
 XWiki.XWikiPreferences_showcomments.hint=ページのレイアウトにコメントのセクションを表示。
 XWiki.XWikiPreferences_showattachments.hint=ページのレイアウトに添付ファイルのセクションを表示。
@@ -102,7 +102,7 @@ XWiki.XWikiPreferences_multilingual.hint=ウィキに複数の言語によるコ
 XWiki.XWikiPreferences_languages.hint=インターフェースで利用可能な言語を選択してください。選択した言語でウィキのページを翻訳できるようになります（多言語モードが有効の場合）。
 XWiki.XWikiPreferences_default_language.hint=ウィキの既定の言語を選択
 XWiki.XWikiPreferences_dateformat.hint=日付（ページの作成日など）を表示する際に使用するフォーマットを選択
-### Missing: XWiki.XWikiPreferences_timezone.hint=
+XWiki.XWikiPreferences_timezone.hint=日付のタイムゾーンを共通設定
 
 # Import Section
 administration.section.import.hint=新しいパッケージをアップロードするか、利用可能なパッケージの一覧から選択してください。選択したパッケージの内容は、インポートのオプションとあわせて表示されます。

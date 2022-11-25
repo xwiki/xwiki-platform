@@ -287,19 +287,4 @@ public class XWikiMessageToolTest
         assertEquals("some\u00E9value", this.tool.get("somekey"));
         assertEquals("some\u00E9value2", this.tool.get("somekey2"));
     }
-
-    @Test
-    void testEscaping() throws XWikiException
-    {
-        saveTranslations("somekey=Some placeholders {0} '[{}] {{/html}} {{html}} {'");
-
-        assertEquals(
-            "Some placeholders {0} '[{}] \u2774\u2774/html}} \u2774\u2774html}} \u2774'",
-            this.tool.get("somekey")
-        );
-        assertEquals(
-            "Some placeholders \u2774hi [{}] \u2774\u2774/html}} \u2774\u2774html}} \u2774",
-            this.tool.get("somekey", "{hi")
-        );
-    }
 }

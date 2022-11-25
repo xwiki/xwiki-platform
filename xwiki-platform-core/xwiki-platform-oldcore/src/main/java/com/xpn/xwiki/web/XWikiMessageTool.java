@@ -38,7 +38,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.localization.ContextualLocalizationManager;
-import org.xwiki.localization.internal.TranslationEscapeTool;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -153,10 +152,17 @@ public class XWikiMessageTool
         if (this.localization != null) {
             translation = get(key, ArrayUtils.EMPTY_OBJECT_ARRAY);
         } else {
-            translation = getTranslationWithoutLocalizationManager(key);
+            translation = getTranslation(key);
+            if (translation == null) {
+                try {
+                    translation = this.bundle.getString(key);
+                } catch (Exception e) {
+                    translation = key;
+                }
+            }
         }
 
-        return TranslationEscapeTool.escapeForMacros(translation);
+        return translation;
     }
 
     /**
@@ -196,14 +202,14 @@ public class XWikiMessageTool
                 translation = key;
             }
         } else {
-            translation = getTranslationWithoutLocalizationManager(key);
+            translation = get(key);
 
             if (params != null && translation != null) {
                 translation = MessageFormat.format(translation, params);
             }
         }
 
-        return TranslationEscapeTool.escapeForMacros(translation);
+        return translation;
     }
 
     /**
@@ -400,25 +406,5 @@ public class XWikiMessageTool
         }
 
         return returnValue;
-    }
-
-    /**
-     * Tries getting a translation without using the localization manager.
-     *
-     * @param key the key identifying the translation
-     * @return the translation or the key if there is none
-     */
-    private String getTranslationWithoutLocalizationManager(String key)
-    {
-        String translation = getTranslation(key);
-        if (translation == null) {
-            try {
-                translation = this.bundle.getString(key);
-            } catch (Exception e) {
-                translation = key;
-            }
-        }
-
-        return translation;
     }
 }

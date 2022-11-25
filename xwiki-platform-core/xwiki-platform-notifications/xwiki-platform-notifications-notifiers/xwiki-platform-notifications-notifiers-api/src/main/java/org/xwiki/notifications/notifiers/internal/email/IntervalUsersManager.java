@@ -20,16 +20,14 @@
 package org.xwiki.notifications.notifiers.internal.email;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.EnumUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.internal.reference.EntityReferenceFactory;
@@ -37,9 +35,12 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.preferences.NotificationEmailInterval;
+import org.xwiki.notifications.preferences.email.NotificationEmailUserPreferenceManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 /**
  * Gather and cache users depending on each {@link NotificationEmailInterval}.
@@ -81,12 +82,19 @@ public class IntervalUsersManager
     private DocumentReferenceResolver<String> referenceResolver;
 
     @Inject
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> userReferenceResolver;
+
+    @Inject
     private EntityReferenceFactory referenceFactory;
 
     @Inject
     private DocumentAccessBridge documentAccessBridge;
 
     private Map<String, WikiEntry> usersCache = new ConcurrentHashMap<>();
+
+    @Inject
+    private NotificationEmailUserPreferenceManager emailUserPreferenceManager;
 
     /**
      * Get all users in a wiki which are configured with the passed interval.
@@ -122,16 +130,8 @@ public class IntervalUsersManager
 
     private NotificationEmailInterval loadInterval(DocumentReference userDocumentReference)
     {
-        DocumentReference classReference = new DocumentReference(userDocumentReference.getWikiReference().getName(),
-            Arrays.asList("XWiki", "Notifications", "Code"), "NotificationEmailPreferenceClass");
-
-        Object userInterval = this.documentAccessBridge.getProperty(userDocumentReference, classReference, "interval");
-        if (userInterval instanceof String && StringUtils.isNotEmpty((String) userInterval)) {
-            return EnumUtils.getEnum(NotificationEmailInterval.class, StringUtils.upperCase((String) userInterval),
-                NotificationEmailInterval.DAILY);
-        }
-
-        return NotificationEmailInterval.DAILY;
+        UserReference userReference = userReferenceResolver.resolve(userDocumentReference);
+        return emailUserPreferenceManager.getInterval(userReference);
     }
 
     private List<DocumentReference> loadUsers(NotificationEmailInterval targetInterval, String wiki)

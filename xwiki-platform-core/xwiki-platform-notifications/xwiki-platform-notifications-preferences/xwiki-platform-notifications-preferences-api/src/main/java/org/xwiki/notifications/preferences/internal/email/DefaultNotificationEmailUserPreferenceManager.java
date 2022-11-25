@@ -22,18 +22,23 @@ package org.xwiki.notifications.preferences.internal.email;
 import java.util.Arrays;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.notifications.preferences.NotificationEmailInterval;
 import org.xwiki.notifications.preferences.email.NotificationEmailDiffType;
 import org.xwiki.notifications.preferences.email.NotificationEmailUserPreferenceManager;
 import org.xwiki.text.StringUtils;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
@@ -53,20 +58,26 @@ public class DefaultNotificationEmailUserPreferenceManager implements Notificati
     private static final String CODE = "Code";
 
     private static final LocalDocumentReference EMAIL_PREFERENCES_CLASS = new LocalDocumentReference(
-            Arrays.asList(WIKI_SPACE, NOTIFICATIONS, CODE), "NotificationEmailPreferenceClass"
+        Arrays.asList(WIKI_SPACE, NOTIFICATIONS, CODE), "NotificationEmailPreferenceClass"
     );
 
     private static final LocalDocumentReference GLOBAL_PREFERENCES = new LocalDocumentReference(
-            Arrays.asList(WIKI_SPACE, NOTIFICATIONS, CODE), "NotificationAdministration"
+        Arrays.asList(WIKI_SPACE, NOTIFICATIONS, CODE), "NotificationAdministration"
     );
 
     private static final String DIFF_TYPE = "diffType";
+
+    private static final String INTERVAL = "interval";
 
     @Inject
     private DocumentAccessBridge documentAccessBridge;
 
     @Inject
-    private DocumentReferenceResolver<String> referenceResolver;
+    private UserReferenceResolver<String> userReferenceResolver;
+
+    @Inject
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> documentUserSerializer;
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
@@ -77,49 +88,97 @@ public class DefaultNotificationEmailUserPreferenceManager implements Notificati
     @Override
     public NotificationEmailDiffType getDiffType()
     {
-        return getDiffType(documentAccessBridge.getCurrentUserReference());
+        return getDiffType(CurrentUserReference.INSTANCE);
     }
 
     @Override
     public NotificationEmailDiffType getDiffType(String userId)
     {
-        DocumentReference user = referenceResolver.resolve(userId);
-        return getDiffType(user);
+        return getDiffType(userReferenceResolver.resolve(userId));
     }
 
-    private NotificationEmailDiffType getDiffType(DocumentReference user)
+    @Override
+    public NotificationEmailDiffType getDiffType(UserReference userReference)
     {
+        return getStaticListPropertyPreference(DIFF_TYPE, NotificationEmailDiffType.class,
+            NotificationEmailDiffType.STANDARD, userReference);
+    }
+
+    @Override
+    public NotificationEmailInterval getInterval()
+    {
+        return getInterval(CurrentUserReference.INSTANCE);
+    }
+
+    @Override
+    public NotificationEmailInterval getInterval(UserReference userReference)
+    {
+        return getStaticListPropertyPreference(INTERVAL, NotificationEmailInterval.class,
+            NotificationEmailInterval.DAILY, userReference);
+    }
+
+    private <T extends Enum<T>> T getStaticListPropertyPreference(String propertyName,
+        Class<T> propertyEnum, T propertyDefaultValue, UserReference user)
+    {
+        T returnValue = propertyDefaultValue;
+
         try {
+            DocumentReference userDocumentReference = documentUserSerializer.serialize(user);
+
             // Get the config of the user
             DocumentReference emailClassReference = new DocumentReference(EMAIL_PREFERENCES_CLASS,
-                    user.getWikiReference());
-            Object diffType = documentAccessBridge.getProperty(user, emailClassReference, DIFF_TYPE);
-            if (diffType != null && StringUtils.isNotBlank((String) diffType)) {
-                return NotificationEmailDiffType.valueOf((String) diffType);
-            }
-
-            // Get the config of the wiki
-            DocumentReference xwikiPref = new DocumentReference(GLOBAL_PREFERENCES, user.getWikiReference());
-            diffType = documentAccessBridge.getProperty(xwikiPref, emailClassReference, DIFF_TYPE);
-            if (diffType != null && StringUtils.isNotBlank((String) diffType)) {
-                return NotificationEmailDiffType.valueOf((String) diffType);
-            }
-
-            // Get the config of the main wiki
-            WikiReference mainWiki = new WikiReference(wikiDescriptorManager.getMainWikiId());
-            if (!user.getWikiReference().equals(mainWiki)) {
-                xwikiPref = new DocumentReference(GLOBAL_PREFERENCES, mainWiki);
-                emailClassReference = new DocumentReference(EMAIL_PREFERENCES_CLASS, mainWiki);
-                diffType = documentAccessBridge.getProperty(xwikiPref, emailClassReference, DIFF_TYPE);
-                if (diffType != null && StringUtils.isNotBlank((String) diffType)) {
-                    return NotificationEmailDiffType.valueOf((String) diffType);
+                userDocumentReference.getWikiReference());
+            Object value = documentAccessBridge.getProperty(userDocumentReference, emailClassReference, propertyName);
+            if (StringUtils.isNotBlank((String) value)) {
+                returnValue = Enum.valueOf(propertyEnum, ((String) value).toUpperCase());
+            } else {
+                // Get the config from the user wiki or from the main wiki
+                T propertyValue = getWikiPreference(userDocumentReference, propertyEnum, propertyName);
+                if (propertyValue != null) {
+                    returnValue = propertyValue;
                 }
             }
         } catch (Exception e) {
-            logger.warn("Failed to get the email diff type for the user [{}].", user, e);
+            logger.warn("Failed to get the email property [{}] for the user [{}].", propertyName, user, e);
         }
 
-        // Fallback to the default value
-        return NotificationEmailDiffType.STANDARD;
+        return returnValue;
+    }
+
+    /**
+     * Gets preference property value from same wiki as @userDocumentReference if it exists, otherwise from the main
+     * wiki.
+     *
+     * @param userDocumentReference a user document reference
+     * @param propertyEnum a property enum
+     * @param propertyName a property name
+     * @param <T>
+     * @return
+     */
+    private <T extends Enum<T>> T getWikiPreference(DocumentReference userDocumentReference, Class<T> propertyEnum,
+        String propertyName)
+    {
+        T returnValue = null;
+        // Get the config of the wiki
+        DocumentReference emailClassReference = new DocumentReference(EMAIL_PREFERENCES_CLASS,
+            userDocumentReference.getWikiReference());
+        DocumentReference xwikiPref =
+            new DocumentReference(GLOBAL_PREFERENCES, userDocumentReference.getWikiReference());
+        Object value = documentAccessBridge.getProperty(xwikiPref, emailClassReference, propertyName);
+        if (StringUtils.isNotBlank((String) value)) {
+            returnValue = Enum.valueOf(propertyEnum, ((String) value).toUpperCase());
+        } else {
+            // Get the config of the main wiki
+            WikiReference mainWiki = new WikiReference(wikiDescriptorManager.getMainWikiId());
+            if (!userDocumentReference.getWikiReference().equals(mainWiki)) {
+                xwikiPref = new DocumentReference(GLOBAL_PREFERENCES, mainWiki);
+                emailClassReference = new DocumentReference(EMAIL_PREFERENCES_CLASS, mainWiki);
+                value = documentAccessBridge.getProperty(xwikiPref, emailClassReference, propertyName);
+                if (StringUtils.isNotBlank((String) value)) {
+                    returnValue = Enum.valueOf(propertyEnum, ((String) value).toUpperCase());
+                }
+            }
+        }
+        return returnValue;
     }
 }

@@ -38,6 +38,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.preferences.NotificationEmailInterval;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
@@ -56,6 +57,7 @@ import org.xwiki.stability.Unstable;
 import org.xwiki.text.StringUtils;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.internal.document.DocumentUserReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -79,6 +81,9 @@ public class NotificationPreferenceScriptService implements ScriptService
 
     @Inject
     private DocumentReferenceResolver<String> documentReferenceResolver;
+
+    @Inject
+    private UserReferenceResolver<String> userReferenceResolver;
 
     @Inject
     private NotificationPreferenceManager notificationPreferenceManager;
@@ -289,10 +294,44 @@ public class NotificationPreferenceScriptService implements ScriptService
      * @param userId id of a user
      * @return the diff type for emails configured for the given user
      * @since 9.11RC1
+     * @deprecated since 14.10, use {@link #getDiffType(UserReference)} instead
      */
+    @Deprecated(since = "14.10")
     public NotificationEmailDiffType getDiffType(String userId)
     {
-        return emailUserPreferenceManager.getDiffType(userId);
+        return emailUserPreferenceManager.getDiffType(userReferenceResolver.resolve(userId));
+    }
+
+    /**
+     * @param user reference of a user
+     * @return the diff type for emails configured for the given user
+     * @since 14.10
+     */
+    @Unstable
+    public NotificationEmailDiffType getDiffType(UserReference user)
+    {
+        return emailUserPreferenceManager.getDiffType(user);
+    }
+
+    /**
+     * @return the email notification interval configured for the current user
+     * @since 14.10
+     */
+    @Unstable
+    public NotificationEmailInterval getInterval()
+    {
+        return emailUserPreferenceManager.getInterval();
+    }
+
+    /**
+     * @param user reference of a user
+     * @return the notification email interval configured for the given user
+     * @since 14.10
+     */
+    @Unstable
+    public NotificationEmailInterval getInterval(UserReference user)
+    {
+        return emailUserPreferenceManager.getInterval(user);
     }
 
     /**

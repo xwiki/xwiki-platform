@@ -36,107 +36,104 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>= Editing =
+  <content>= 編集 =
 
-== Images ==
+== 画像 ==
 
-=== 1.0 Images ===
+=== 画像1.0 ===
 
-|=Feature|=XWiki Syntax 1.0|=Result
-|Image from attachment on current page|(((
-{{info}}See [[Image Macro&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Image%20Macro%20%28Radeox%29]] for details{{/info}}
+|=機能|=XWikiシンタックス1.0|=結果
+|現在のページの添付ファイルの画像|(((
+{{info}}詳細は[[画像マクロ&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Image%20Macro%20%28Radeox%29]]を参照してください{{/info}}
 {{{{image:img.png}}}}
 )))|image:XWiki.XWikiSyntaxImages@img.png
-|Image from attachment on another page|{{{{image:img.png|document=Space.Page}}}}|image:XWiki.XWikiSyntaxImages@img.png
-|Image with parameters|{{{{image:img.png|width=25|height=25}}}}|[[image:XWiki.XWikiSyntaxImages@img.png||width="25" height="25"]]
-|Images located at URL|{{{https://some/url/img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+|他のページの添付ファイルの画像|{{{{image:img.png|document=スペース.ページ}}}}|image:XWiki.XWikiSyntaxImages@img.png
+|パラメーターのある画像|{{{{image:img.png|width=25|height=25}}}}|[[image:XWiki.XWikiSyntaxImages@img.png||width="25" height="25"]]
+|URLで指定する画像|{{{https://some/url/img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
 
-=== 2.0 Images ===
+=== 画像2.0 ===
 
-|=Feature|=XWiki Syntax 2.0|=Result
-|Image from attachment on current page|{{{image:img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
-|Image from attachment on another page|{{{image:Space.Page@img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
-|Image with parameters|{{{[[image:img.png||width="25" height="25"]]}}}|[[image:XWiki.XWikiSyntaxImages@img.png||width="25" height="25"]]
-|Image with caption|{{{[[~[~[XWiki~&gt;~&gt;https://www.xwiki.org~]~] supports captions.&gt;&gt;image:img.png]]}}}|((([[~[~[XWiki~&gt;~&gt;https://www.xwiki.org~]~] supports captions.&gt;&gt;image:XWiki.XWikiSyntaxImages@img.png]])))
-|Images located at URL|{{{image:https://some/url/img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+|=機能|=XWikiシンタックス2.0|=結果
+|現在のページの添付ファイルの画像|{{{image:img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+|他のページの添付ファイルの画像|{{{image:スペース.ページ@img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+|パラメーターのある画像|{{{[[image:img.png||width="25" height="25"]]}}}|[[image:XWiki.XWikiSyntaxImages@img.png||width="25" height="25"]]
+|キャプション付きの画像|{{{[[~[~[XWiki~&gt;~&gt;https://www.xwiki.org~]~]はキャプションをサポートしています。&gt;&gt;image:img.png]]}}}|((([[~[~[XWiki~&gt;~&gt;https://www.xwiki.org~]~]はキャプションをサポートしています。&gt;&gt;image:XWiki.XWikiSyntaxImages@img.png]])))
+|URLで指定する画像|{{{image:https://some/url/img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
 
-{{velocity}}$subHeading XWiki Syntax 2.0 Image Specification $subHeading{{/velocity}}
-
-{{info}}
-The part in ##( )## is required, while the parts in ##{ }## are optional.
-{{/info}}
-
-The full format of an image is either **##image~: (reference)##** or **##~[~[{caption&gt;&gt;}image~: (reference) {||parameters}]]##**
-
-* **##caption##**: An optional caption. May contain arbitrary XWiki 2.0 syntax but nested link syntax must be escaped using ##~~##. The caption is only supported when the image syntax is the only content of a paragraph.
-* **##image~:##** A required string identifying the resource as image.
-* **##reference##**: The reference to the image that shall be displayed in one of the following forms:
-** **URL**: Any URL to an image in the form of **##http:~/~/path/imageName##**. Example: ##http:~/~/domain.org/path/img.png##
-** **Attachment** reference in the form **##~{~{~{wikiName:} space.} page@} (imageName)##**
-*** **##wikiName##**: An optional string containing the name of a wiki. The image reference will point to an image attached to a page inside that wiki. Example: mywiki
-*** **##space##**: An optional wiki Space name. If no space is specified the current space is used. Example: Main
-*** **##page##**: An optional string containing the name of the wiki page to which the referenced image is attached. Example: WebHome
-*** **##imageName##**: A required string containing the name of the image attached to a page as it is stored in the wiki.
-* **##parameters##**: An optional list of space-separated parameters passed to the image. Example: ##width="800" height="600" alt="img.png" title="My nice image"##
-** **HTML attributes**: All attributes defined by the HTML standard will be added to the rendered HTML ##&lt;img&gt;## tag.
-*** **##style##**: CSS style information that should be applied to the image. Examples: ##style="float:right;height:50"## (image on right side, height 50 px), ##style="display:block;margin-left:auto;margin-right:auto;width:80%"## (image centered, width 80% of block width), ##style="vertical-align:bottom"## (text starts at bottom of picture)
-*** **##height##**: A parameter that defines the height of the displayed image. The value should be presented either in pixel (example: ##height="80"##) or in pixel related to the height of the block containing the image (example: ##height="40%"##).
-*** **##width##**: A parameter that defines the width of the displayed image. The value should be presented either in pixel (example: ##width="80"##) or in pixel related to the width of the block containing the image (example: ##width="40%"##).
-*** **##title##**: A parameter that defines the title the displayed image which will be visible when hovering the mouse trigger over the image, for instance. Example: ##title="My nice image"##
-*** **##alt##**: A parameter that defines which text should be displayed if the browser is not able to display the image. Since this is a required HTML attribute XWiki will use the file name instead if the ##alt## parameter is not defined. Example: ##alt="img.png"##
-*** **More**: A more in depth explanation on the HTML ##&lt;img&gt;## tag including more attributes can be reviewed [[in the HTML standard&gt;&gt;https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element]].
-
-=== 2.1 Images ===
-
-|=Feature|=XWiki Syntax 2.1|=Result
-|Image from attachment on current page|{{{image:img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
-|Image from attachment on another page|{{{image:PageA.PageB@img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
-|Image with parameters|{{{[[image:img.png||width="25" height="25"]]}}}|[[image:XWiki.XWikiSyntaxImages@img.png||width="25" height="25"]]
-|Image with caption|{{{[[~[~[XWiki~&gt;~&gt;https://www.xwiki.org~]~] supports captions.&gt;&gt;image:img.png]]}}}|((([[~[~[XWiki~&gt;~&gt;https://www.xwiki.org~]~] supports captions.&gt;&gt;image:XWiki.XWikiSyntaxImages@img.png]])))
-|Images located at URL|{{{image:https://some/url/img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
-|Prepackaged Icons|{{{image:icon:accept}}}|image:icon:accept
-
-{{velocity}}$subHeading XWiki Syntax 2.1 Image Specification $subHeading{{/velocity}}
+{{velocity}}$subHeading XWikiシンタックス 2.0 画像仕様 $subHeading{{/velocity}}
 
 {{info}}
-Legend: The parts are ##()## are required, while the parts in ##{}## are optional.
+##( )##は必須です。##[ ]##はオプションです。
 {{/info}}
 
-The full format of an image is either **##image~: (reference)##** or **##~[~[{caption&gt;&gt;}image~: (reference) {||parameters}]]##**
+画像の完全なフォーマットは **##image~: (参照)##** あるいは **##~[~[{キャプション&gt;&gt;}image~: (参照) {||パラメーター}]]##** となります。
 
-* **##caption##**: An optional caption. May contain arbitrary XWiki 2.1 syntax but nested link syntax must be escaped using ##~~##. The caption is only supported when the image syntax is the only content of a paragraph.
-* **##image~:##** A required string identifying the resource as image.
-* **##reference##**: The reference to the image that shall be displayed in one of the following forms:
-** **URL**: Any URL to an image in the form of **##[url:](protocol:~/~/path/imageName)##**. Example: ##http:~/~/domain.org/path/img.png##
-*** **##url:##** An optional string identifying the image as an URL.
-*** **##protocol:~/~/path/imageName##**: The URL to the image
-** **Attachment**: A reference in the form **##[attach~:]~{~{~{(wikiName):}(spaceNameList).}(pageName)@}(imageName)##**
-*** **##attach~:##** An optional string identifying the reference as an XWiki Document attachment.
-*** **##wikiName##**: An optional string containing the name of a wiki. The image reference will point to an image attached to a page inside that wiki. If no wiki is specified, the current wiki is used. Example: ##mywiki##.
-*** **##spaceNameList##**: An optional dot-separated list of wiki Space names. If no space is specified the current space is used. Examples: ##Main##, ##A.B##, ##A.B.C##
-*** **##pageName##**: An optional string containing the name of the wiki page to which the referenced image is attached. Example: ##Welcome##
-*** **##imageName##**: A required string containing the name of the image attached to a page as it is stored in the wiki. Example: ##myImage.png##
-** **Page Attachment**: A reference in the form **##pageAttach~:~{~{~{(wikiName):}(pageNameList)/}(imageName)##**
-*** **##pageAttach~:##** An required string identifying the reference as an XWiki Page attachment.
-*** **##wikiName##**: An optional string containing the name of a wiki. The image reference will point to an image attached to a page inside that wiki. If no wiki is specified, the current wiki is used. Example: ##mywiki##.
-*** **##pageNameList##**: An optional dot-separated list of wiki page names. If no page is specified the current page is used. Examples: ##Main##, ##A/B##, ##A/B/C##
-*** **##imageName##**: A required string containing the name of the image attached to a page as it is stored in the wiki. Example: ##myImage.png##
-** **Icon**: A reference in the form **##icon{{{:(}}}iconName)##**. Example: **##icon:accept##**
-*** **##icon:##** A required string identifying the image reference as an icon from the [[XWiki Icon Set&gt;&gt;https://www.famfamfam.com/lab/icons/silk/previews/index_abc.png]].
-*** **##iconName##**: A required string identifying the icon referenced. Example: ##accept##
-** **Icon**: A reference in the form **##icon{{{:(}}}iconName)##**. Example: **##icon:accept##**
-*** **##icon:##** A required string identifying the image reference as an icon from the [[XWiki Icon Set&gt;&gt;https://www.famfamfam.com/lab/icons/silk/previews/index_abc.png]].
-*** **##iconName##**: A required string identifying the icon referenced. Example: ##accept##
-** **Data URI**: A reference in the form **##(data{{{:)}}}(content)##**. Example: **##{{{data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==}}}##**
-*** **##data:##** A required string identifying the image as being specified inline using the [[Data URI scheme&gt;&gt;https://en.wikipedia.org/wiki/Data_URI_scheme]].
-*** **##content##**: The encoded image. Example: ##{{{image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==}}}##
-* **##parameters##**: An optional list of space-separated parameters passed to the image. Example: ##width="800" height="600" alt="img.png" title="My nice image"##
-** **HTML attributes**: All attributes defined by the HTML standard will be added to the rendered HTML ##&lt;img&gt;## tag.
-*** **##style##**: CSS style information that should be applied to the image. Examples: ##style="float:right;height:50"## (image on right side, height 50 px), ##style="display:block;margin-left:auto;margin-right:auto;width:80%"## (image centered, width 80% of block width), ##style="vertical-align:bottom"## (text starts at bottom of picture)
-*** **##height##**: A parameter that defines the height of the displayed image. The value should be presented either in pixel (example: ##height="80"##) or in pixel related to the height of the block containing the image (example: ##height="40%"##).
-*** **##width##**: A parameter that defines the width of the displayed image. The value should be presented either in pixel (example: ##width="80"##) or in pixel related to the width of the block containing the image (example: ##width="40%"##).
-*** **##title##**: A parameter that defines the title the displayed image which will be visible when hovering the mouse trigger over the image, for instance. Example: ##title="My nice image"##
-*** **##alt##**: A parameter that defines which text should be displayed if the browser is not able to display the image. Since this is a required HTML attribute XWiki will use the file name instead if the ##alt## parameter is not defined. Example: ##alt="img.png"##
-*** **More**: A more in depth explanation on the HTML ##&lt;img&gt;## tag including more attributes can be reviewed [[in the HTML standard&gt;&gt;https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element]].
-** **##queryString##**: Allows queries to be passed to the server when creating the download link for the referenced image. Example: ##queryString="width=100&amp;height=800&amp;keepAspectRatio=true"## (**##keepAspectRatio=true## will fail if the ##width## and ##height## parameters are specified in addition to ##queryString##!**)</content>
+* **##キャプション##**：キャプション（オプション）。任意のXWiki 2.0のシンタックスを含めることができますが、入れ子式のリンクのシンタックスは##~~##でエスケープする必要があります。キャプションは、画像のシンタックスのみが段落の内容である場合にサポートされます。
+* **##image~:##** 画像としてリソースを指示する文字列（必須）。
+* **##参照##**：以下の形式で表示する画像への参照：
+** **URL**：**##http:~/~/パス/画像名##** の形式による画像へのURL。例：##http:~/~/domain.org/パス/img.png##
+** **##~{~{~{ウィキ名:} スペース.} ページ@} (画像名)##** の形式による**添付ファイル**の参照
+*** **##ウィキ名##**：ウィキの名称を含む文字列（オプション）。画像の参照は、このウィキのページに添付された画像を指示します。例：mywiki
+*** **##スペース##**：ウィキのスペース名（オプション）。スペースの指定がなければ、現在のスペースを使用します。例：Main
+*** **##ページ##**： 参照する画像を添付するウィキのページの名称を含む文字列（オプション）。例：WebHome
+*** **##画像名##**：ページに添付する画像の名称を含む文字列（必須。ウィキに保存されている名称）。
+* **##パラメーター##**：画像に渡すパラメーターの一覧（オプション。スペースで分割）。例：##width="800" height="600" alt="img.png" title="My nice image"##
+** **HTMLの属性**：HTML標準で規定されている全ての属性を、レンダリングするHTML##&lt;img&gt;##タグに追加できます。
+*** **##style##**：画像に適用するCSSスタイルの情報。例：##style="float:right;height:50"## （画像を右側に寄せて、高さを50pxに設定）、##style="display:block;margin-left:auto;margin-right:auto;width:80%"##（画像を中央に表示し、ブロックの幅の80％に設定）##style="vertical-align:bottom"##（テキストを画像の下に表示）
+*** **##height##**：表示する画像の高さを規定するパラメーター。値はピクセル（例： ##height="80"##）あるいは画像を含むブロックの高さに関連するピクセル（例：##height="40%"##）。
+*** **##width##**：表示する画像の幅を規定するパラメーター。値はピクセル（例： ##width="80"##）あるいは画像を含むブロックの幅に関連するピクセル（例：##width="40%"##）。
+*** **##title##**：画像をマウスでホバリングした際などに表示する画像のタイトルを規定するパラメーター。例：##title="My nice image"##
+*** **##alt##**:ブラウザーが画像を表示できない際に表示するテキストを規定するパラメーター。これは必須のHTML要素であるため、##alt##パラメーターが設定されていない場合は、ファイル名を代わりに使用します。例：##alt="img.png"##
+*** **その他**：その他の属性を含むHTMLの##&lt;img&gt;##タグに関する説明は[[HTML標準&gt;&gt;https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element]]で確認できます。
+
+=== 画像2.1 ===
+
+|=機能|=XWikiシンタックス2.1|=結果
+|現在のページの添付ファイルの画像|{{{image:img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+|他のページの添付ファイルの画像|{{{image:ページA.ページB@img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+|パラメーターのある画像|{{{[[image:img.png||width="25" height="25"]]}}}|[[image:XWiki.XWikiSyntaxImages@img.png||width="25" height="25"]]
+|キャプション付きの画像|{{{[[~[~[XWiki~&gt;~&gt;https://www.xwiki.org~]~]はキャプションをサポートしています。&gt;&gt;image:img.png]]}}}|((([[~[~[XWiki~&gt;~&gt;https://www.xwiki.org~]~]はキャプションをサポートしています。&gt;&gt;image:XWiki.XWikiSyntaxImages@img.png]])))
+|URLで指定する画像|{{{image:https://some/url/img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+|事前にパッケージ化したアイコン|{{{image:icon:accept}}}|image:icon:accept
+
+{{velocity}}$subHeading XWikiシンタックス 2.1 画像仕様 $subHeading{{/velocity}}
+
+{{info}}
+凡例：##( )##は必須です。##[ ]##はオプションです。
+{{/info}}
+
+画像の完全なフォーマットは **##image~: (参照)##** あるいは **##~[~[{キャプション&gt;&gt;}image~: (参照) {||パラメーター}]]##** となります。
+
+* **##キャプション##**：キャプション（オプション）。任意のXWiki 2.1のシンタックスを含めることができますが、入れ子式のリンクのシンタックスは##~~##でエスケープする必要があります。キャプションは、画像のシンタックスのみが段落の内容である場合にサポートされます。
+* **##image~:##** 画像としてリソースを指示する文字列（必須）。
+* **##参照##**：以下の形式で表示する画像への参照：
+** **URL**：**##[url:](プロトコル:~/~/パス/画像名)##** の形式による画像へのURL。例：##http:~/~/domain.org/パス/img.png##
+*** **##url:##** URLとしてリソースを指示する文字列（必須）。
+*** **##プロトコル:~/~/パス/画像名##**：画像へのURL
+** **添付ファイル**：**##[attach~:]~{~{~{(ウィキ名):}(スペース名の一覧).}(ページ名)@}(画像名)##** の形式による参照
+*** **##attach~:##** XWikiドキュメントの添付ファイルとして参照を指定する文字列（オプション）。
+*** **##ウィキ名##**：ウィキの名称を含む文字列（オプション）。画像の参照は、このウィキのページに添付された画像を指示します。ウィキの指定がなければ、現在のウィキを使用します。例：##mywiki##.
+*** **##スペース名の一覧##**：ドットで分割したスペース名の一覧（オプション）。スペースが指定されていない場合は、現在のスペースを使用します。例：##Main##、##A.B##、##A.B.C##
+*** **##ページ名##**： 参照する画像を添付するウィキのページの名称を含む文字列（オプション）。例：##Welcome##
+*** **##画像名##**：ページに添付する画像の名称を含む文字列（必須。ウィキに保存されている名称）。例：##myImage.png##
+** **ページの添付ファイル**：**##pageAttach~:~{~{~{(ウィキ名):}(ページ名の一覧)/}(画像名)##** の形式による参照
+*** **##pageAttach~:##** XWikiページの添付ファイルとして参照を指示する文字列（必須）。
+*** **##ウィキ名##**：ウィキの名称を含む文字列（オプション）。画像の参照は、このウィキのページに添付された画像を指示します。ウィキの指定がなければ、現在のウィキを使用します。例：##mywiki##.
+*** **##ページ名の一覧##**：ドットで分割したページ名の一覧（オプション）。ページが指定されていない場合は、現在のページを使用します。例：##Main##、##A/B##、##A/B/C##
+*** **##画像名##**：ページに添付する画像の名称を含む文字列（必須。ウィキに保存されている名称）。例：##myImage.png##
+** **アイコン**：**##icon{{{:(}}}アイコン名)##** の形式による参照。例：**##icon:accept##**
+*** **##icon:##** [[XWikiのアイコンセット&gt;&gt;https://www.famfamfam.com/lab/icons/silk/previews/index_abc.png]]のアイコンとして画像の参照を指示する文字列（必須）。
+*** **##アイコン名##**：参照するアイコンを指定する文字列（必須）。例：##accept##
+** **Data URI**：**##(data{{{:)}}}(content)##** の形式による参照。例：**##{{{data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==}}}##**
+*** **##data:##** [[データURIスキーマ&gt;&gt;https://en.wikipedia.org/wiki/Data_URI_scheme]]によるインラインの画像を指定する文字列（必須）。
+*** **##content##**：エンコーディングした画像。例：##{{{image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==}}}##
+* **##パラメーター##**：画像に渡すパラメーターの一覧（オプション。スペースで分割）。例：##width="800" height="600" alt="img.png" title="My nice image"##
+** **HTMLの属性**：HTML標準で規定されている全ての属性を、レンダリングするHTML##&lt;img&gt;##タグに追加できます。
+*** **##style##**：画像に適用するCSSスタイルの情報。例：##style="float:right;height:50"## （画像を右側に寄せて、高さを50pxに設定）、##style="display:block;margin-left:auto;margin-right:auto;width:80%"##（画像を中央に表示し、ブロックの幅の80％に設定）##style="vertical-align:bottom"##（テキストを画像の下に表示）
+*** **##height##**：表示する画像の高さを規定するパラメーター。値はピクセル（例： ##height="80"##）あるいは画像を含むブロックの高さに関連するピクセル（例：##height="40%"##）。
+*** **##width##**：表示する画像の幅を規定するパラメーター。値はピクセル（例： ##width="80"##）あるいは画像を含むブロックの幅に関連するピクセル（例：##width="40%"##）。
+*** **##title##**：画像をマウスでホバリングした際などに表示する画像のタイトルを規定するパラメーター。例：##title="My nice image"##
+*** **##alt##**:ブラウザーが画像を表示できない際に表示するテキストを規定するパラメーター。これは必須のHTML要素であるため、##alt##パラメーターが設定されていない場合は、ファイル名を代わりに使用します。例：##alt="img.png"##
+*** **その他**：その他の属性を含むHTMLの##&lt;img&gt;##タグに関する説明は[[HTML標準&gt;&gt;https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element]]で確認できます。
+** **##queryString##**：参照するイメージのダウンロード用のリンクの作成時にサーバーにクエリーを渡すことを許可。例：##queryString="width=100&amp;height=800&amp;keepAspectRatio=true"## (**##keepAspectRatio=true##は、##width##と##height##のパラメーターを##queryString##に加えて規定している場合は機能しません！**)</content>
   </xwikidoc>

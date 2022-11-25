@@ -111,7 +111,7 @@
   == {{translation key="admin.templates.providerslist"/}} ==
 
     #foreach($providerFullname in $availableProviders)
-      * [[$xwiki.getDocument($providerFullname).getTitle()&gt;&gt;$providerFullname]]
+      * [[$services.rendering.escape($services.rendering.escape($xwiki.getDocument($providerFullname).plainTitle, $xwiki.currentContentSyntaxId), $xwiki.currentContentSyntaxId)&gt;&gt;$services.rendering.escape($providerFullname, $xwiki.currentContentSyntaxId)]]
     #end
   )))
 #end

@@ -19,6 +19,8 @@
  */
 package org.xwiki.localization.internal;
 
+import java.util.regex.Pattern;
+
 /**
  * Tool for escaping translations.
  *
@@ -29,6 +31,8 @@ package org.xwiki.localization.internal;
  */
 public final class TranslationEscapeTool
 {
+    private static final Pattern MACRO_PATTERN = Pattern.compile("\\{(?=[^}\\d]|$)");
+
     private TranslationEscapeTool()
     {
     }
@@ -44,33 +48,12 @@ public final class TranslationEscapeTool
      */
     public static String escapeForMacros(String input)
     {
-        String result = null;
+        String result;
 
         if (input != null) {
-            StringBuilder builder = new StringBuilder(input.length());
-
-            // Escape all { following a '{' plus any amount of '~' as this could be a macro opening or closing pattern
-            // when ~ are removed (which happens in link parsing, in particular with nesting).
-            boolean shallEscape = false;
-            for (int i = 0; i < input.length(); ++i) {
-                char currentChar = input.charAt(i);
-                // Escape { if we're at the end or shallEscape is true
-                if ((!shallEscape && i < input.length() - 1) || currentChar != '{') {
-                    builder.append(currentChar);
-                } else {
-                    builder.append('\u2774');
-                }
-
-                // Set shallEscape when a first { is found (which itself is not escaped).
-                if (currentChar == '{') {
-                    shallEscape = true;
-                } else if (currentChar != '~') {
-                    // Stop escaping if we find a character that is neither { nor ~.
-                    shallEscape = false;
-                }
-            }
-
-            result = builder.toString();
+            result = MACRO_PATTERN.matcher(input).replaceAll("\u2774");
+        } else {
+            result = null;
         }
 
         return result;

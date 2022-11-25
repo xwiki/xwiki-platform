@@ -25,6 +25,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.WebElement;
 import org.xwiki.administration.test.po.TemplateProviderInlinePage;
 import org.xwiki.administration.test.po.TemplatesAdministrationSectionPage;
 import org.xwiki.model.reference.DocumentReference;
@@ -356,6 +357,29 @@ class PageTemplatesIT
 
         viewPage = wikiEditPage.clickSaveAndView();
         assertEquals("Some content in that page", viewPage.getContent());
+    }
+
+    /**
+     * The goal of this test is to check that the template provider's title is correctly escaped.
+     */
+    @Test
+    @Order(5)
+    void templateProviderTitleEscaping(TestUtils setup, TestReference testReference) throws Exception
+    {
+        cleanUp(setup, testReference);
+
+        // Create a template
+        String templateContent = "Templates are fun";
+        String providerName = "{{html}}<span>HTML</span>{{/html}}";
+        LocalDocumentReference templateProviderReference = new LocalDocumentReference(providerName,
+            testReference.getLocalDocumentReference().getParent());
+        createTemplateAndTemplateProvider(setup, templateProviderReference, templateContent,
+            "Funny templates", true);
+
+        TemplatesAdministrationSectionPage adminPage = TemplatesAdministrationSectionPage.gotoPage();
+        List<WebElement> links = adminPage.getExistingTemplatesLinks();
+        assertFalse(links.stream().anyMatch(element -> element.getText().equals("HTML")));
+        assertTrue(links.stream().anyMatch(element -> providerName.equals(element.getText())));
     }
 
     /**

@@ -71,7 +71,7 @@ platform.flamingo.themes.category.advanced=高度
 platform.flamingo.themes.defaultvalue=既定
 platform.flamingo.themes.lessCode.description=このフィールドに、スキンに追加するLESSコードを直接記述できます。
 platform.flamingo.themes.local=ローカル
-### Missing: platform.flamingo.themes.global=Global
+platform.flamingo.themes.global=共通
 
 ###############################################################################
 ## Deprecated

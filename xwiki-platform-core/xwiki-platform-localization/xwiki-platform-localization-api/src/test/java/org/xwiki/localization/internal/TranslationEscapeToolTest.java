@@ -49,9 +49,9 @@ class TranslationEscapeToolTest
     @ParameterizedTest
     @CsvSource({
         "At the end {, At the end \u2774",
-        "~{~{escaped, ~\u2774~\u2774escaped",
-        "{{/html}}, \u2774\u2774/html}}",
-        "{{macro}}, \u2774\u2774macro}}"
+        "~{~{escaped, ~{~\u2774escaped",
+        "{{/html}}, {\u2774/html}}",
+        "{{macro}}, {\u2774macro}}"
     })
     void escapeMacros(String input, String expected)
     {

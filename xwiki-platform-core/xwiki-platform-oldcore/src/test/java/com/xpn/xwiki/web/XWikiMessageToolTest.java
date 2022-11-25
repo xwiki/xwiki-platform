@@ -294,11 +294,11 @@ public class XWikiMessageToolTest
         saveTranslations("somekey=Some placeholders {0} '[{}] {{/html}} {{html}} {'");
 
         assertEquals(
-            "Some placeholders {0} '[{}] \u2774\u2774/html}} \u2774\u2774html}} \u2774'",
+            "Some placeholders {0} '[{}] {\u2774/html}} {\u2774html}} {'",
             this.tool.get("somekey")
         );
         assertEquals(
-            "Some placeholders \u2774hi [{}] \u2774\u2774/html}} \u2774\u2774html}} \u2774",
+            "Some placeholders {hi [{}] {\u2774/html}} {\u2774html}} \u2774",
             this.tool.get("somekey", "{hi")
         );
     }

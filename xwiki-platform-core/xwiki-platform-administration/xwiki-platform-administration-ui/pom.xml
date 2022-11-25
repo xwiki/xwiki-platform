@@ -70,6 +70,13 @@
       <version>${rendering.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- Required to use the error/warning/info macros. -->
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-macro-message</artifactId>
+      <version>${rendering.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Needed by the Export and Page Templates administration sections, and probably others in the future. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

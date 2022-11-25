@@ -45,7 +45,6 @@ import org.xwiki.localization.LocaleUtils;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.localization.Translation;
-import org.xwiki.localization.internal.TranslationEscapeTool;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
@@ -223,7 +222,7 @@ public class LocalizationScriptService implements ScriptService
      */
     public String render(String key, Collection<?> parameters)
     {
-        return TranslationEscapeTool.escapeForMacros(render(key, Syntax.PLAIN_1_0, parameters));
+        return render(key, Syntax.PLAIN_1_0, parameters);
     }
 
     /**
@@ -233,7 +232,7 @@ public class LocalizationScriptService implements ScriptService
      */
     public String render(Collection<String> keys, Collection<?> parameters)
     {
-        return TranslationEscapeTool.escapeForMacros(render(keys, Syntax.PLAIN_1_0, parameters));
+        return render(keys, Syntax.PLAIN_1_0, parameters);
     }
 
     /**
@@ -247,7 +246,7 @@ public class LocalizationScriptService implements ScriptService
      */
     public String render(String key, Collection<?> parameters, Locale locale)
     {
-        return TranslationEscapeTool.escapeForMacros(render(key, Syntax.PLAIN_1_0, parameters, locale));
+        return render(key, Syntax.PLAIN_1_0, parameters, locale);
     }
 
     /**
@@ -261,7 +260,7 @@ public class LocalizationScriptService implements ScriptService
      */
     public String render(Collection<String> keys, Collection<?> parameters, Locale locale)
     {
-        return TranslationEscapeTool.escapeForMacros(render(keys, Syntax.PLAIN_1_0, parameters, locale));
+        return render(keys, Syntax.PLAIN_1_0, parameters, locale);
     }
 
     /**

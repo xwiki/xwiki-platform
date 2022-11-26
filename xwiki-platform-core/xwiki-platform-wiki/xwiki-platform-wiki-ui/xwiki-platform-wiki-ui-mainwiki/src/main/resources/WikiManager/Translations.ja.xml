@@ -222,7 +222,7 @@ platform.wiki.create.wizard.flavortemplate.label=フレーバー / テンプレ�
 platform.wiki.create.wizard.flavortemplate.hint=新しいウィキの最初のコンテンツとして使用するフレーバーあるいはテンプレート
 platform.wiki.create.wizard.flavortemplate.flavorTab=フレーバー
 platform.wiki.create.wizard.flavortemplate.templateTab=テンプレート
-### Missing: platform.wiki.create.wizard.step.dw=
+platform.wiki.create.wizard.step.dw="作成"ボタンをクリックすると、ウィキを作成して、ウィキの初期化を援助するディストリビューションウィザードを開始しょます。ウィザードをスキップすると、ウィキは空となります。
 platform.wiki.create.wizard.step.previous=前のステップ
 platform.wiki.create.wizard.step.next=次のステップ
 platform.wiki.create.wizard.step.create=作成
@@ -263,8 +263,8 @@ platform.wiki.sheet.prop.description=詳細
 platform.wiki.sheet.prop.server=エイリアス
 platform.wiki.sheet.prop.homepage=トップページ
 platform.wiki.sheet.prop.iswikitemplate=ウィキのテンプレート
-### Missing: platform.wiki.sheet.descriptor=
-### Missing: platform.wiki.sheet.descriptor.admin=
+platform.wiki.sheet.descriptor=このページではウィキ"{0}"へのアクセス方法と、関連するプロパティーを規定します。他の設定に関しては、 を確認してください
+platform.wiki.sheet.descriptor.admin=ウィキの管理ページ。
 platform.wiki.sheet.aliases=エイリアスは、ウィキの別名です。エイリアスを追加すると、異なるウィキのURLを作成できます。
 
 ###############################################################################

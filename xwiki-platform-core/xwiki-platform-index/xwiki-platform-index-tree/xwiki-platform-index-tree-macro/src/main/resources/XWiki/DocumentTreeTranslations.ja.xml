@@ -66,7 +66,7 @@ rendering.macro.documentTree.parameter.links.name=リンク
 rendering.macro.documentTree.parameter.links.description=ノードのラベルをリンク（アンカー）のように表示し、機能させるかどうかを指定。
 rendering.macro.documentTree.parameter.checkboxes.name=チェックボックス
 rendering.macro.documentTree.parameter.checkboxes.description=ツリーの各ノードの前にチェックボックスを表示して、複数のノードを選択可能にするか否か。
-### Missing: rendering.macro.documentTree.parameter.openTo.name=
+rendering.macro.documentTree.parameter.openTo.name=ツリーを開くノード
 rendering.macro.documentTree.parameter.openTo.description=ツリーを開くノードのID。ツリーのルートまで、上位にある全てのルートも開きます。ノードのIDのフォーマットは、ルートのパラメーターに使用されているフォーマットです。
 rendering.macro.documentTree.parameter.showOnlyViewable.name=閲覧可能なものだけを表示
 rendering.macro.documentTree.parameter.showOnlyViewable.description=現在のユーザーが閲覧権限をもっているウィキ、スペース、ページのノードのみを表示。偽に設定すると、現在のユーザーが閲覧できないウィキ、スペース、ページのノードをツリー内に一覧表示します。ただし、ユーザーがリンクを開いても、それらの内容を見ることはできません（それらが存在することのみをユーザーに知らせます）。
@@ -83,7 +83,7 @@ rendering.macro.documentTree.parameter.limit.description=初めに親ノード�
 rendering.macro.documentTree.parameter.exclusions.name=除外
 rendering.macro.documentTree.parameter.exclusions.description=ツリーから除外するノードの一覧。ノードはIDで指定し、コンマで分割してください。
 index.documentTree.empty=ページが見つかりません
-### Missing: index.documentTree.more=
+index.documentTree.more=あと{0}件
 
 ## Deprecated translation keys
 

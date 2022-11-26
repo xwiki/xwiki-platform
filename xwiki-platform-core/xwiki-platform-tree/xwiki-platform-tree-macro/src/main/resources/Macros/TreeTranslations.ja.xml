@@ -61,9 +61,9 @@ rendering.macro.tree.parameter.checkboxes.description=ツリーの各ノード�
 rendering.macro.tree.parameter.openTo.name=開く場所
 rendering.macro.tree.parameter.openTo.description=ツリーを展開するノードのID。ツリーのルートを含めて、指定したノードの上位にある全てのノードを開きます。
 rendering.macro.tree.parameter.finder.name=ファインダー
-### Missing: rendering.macro.tree.parameter.finder.description=
+rendering.macro.tree.parameter.finder.description=ツリーのノードを探すのに使用できるテキストのインプットを表示。インプットの結果はツリーの上に表示され、入力と並行して、ツリーの内容に応じた候補を表示します。候補を選択すると、ツリーは対応するノードにまで展開されます。
 rendering.macro.tree.parameter.limit.name=制限
-### Missing: rendering.macro.tree.parameter.limit.description=
+rendering.macro.tree.parameter.limit.description=初めに親ノードを展開した際に表示する子ノードの最大数。その他の子ノードは残りのノード数を示すリンクからアクセスできます。このパラメーターは子ノードをページ化し、子ノードの数が多いときにツリーのサイズを調整するのに使用されます。このツリーがパラメーターをツリーのソースに渡す際、パラメーターは、ソースが子ノードの件数を制限している動的なツリーでのみ機能します。
 rendering.macro.tree.content.description=入れ子式の順序なしHTMLリストを使ってツリー構造を記述できます。詳細はhttp://www.jstree.com/docs/html/を参照してください。
 tree.macro.editModeWarning=このツリーは編集モードで表示できません。
 </content>

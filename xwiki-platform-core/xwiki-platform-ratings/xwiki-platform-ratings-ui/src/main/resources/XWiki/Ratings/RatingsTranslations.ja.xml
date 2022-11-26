@@ -39,27 +39,27 @@
   <content>admin.ratings=評価
 rating.rate=評価！
 rating.saveexception=評価を表示する際のエラー。
-### Missing: rating.votenotvalid=You cannot vote with 0 value.
+rating.votenotvalid=0の値では投票できません。
 ### Missing: rating.voteoutofbounds=The vote is out of the scale limit.
-### Missing: rating.setvote.inprogress=Your vote is being saved...
-### Missing: rating.setvote.success=Your vote has been saved!
-### Missing: rating.setvote.error=Error when saving your vote.
+rating.setvote.inprogress=投票を保存しています…
+rating.setvote.success=投票を保存しました！
+rating.setvote.error=投票を保存する際のエラー。
 XWiki.Ratings.RatingsConfigurationClass_enabled=評価を有効にする
-### Missing: XWiki.Ratings.RatingsConfigurationClass_enabled.hint=Enabling ratings allows users to vote on pages and display the average votes. Disabling them doesn't remove the existing vote, it just hides the interface.
+XWiki.Ratings.RatingsConfigurationClass_enabled.hint=評価を有効にすると、ページ上で投票し、平均の投票結果を表示することができます。評価を無効にすると、インターフェースを非表示とします。既存の投票は削除されません。
 
 #@deprecatedstart
 
 ## until 12.9RC1
 admin.ratings.activateratings=このウィキで評価を有効にする
-### Missing: admin.ratings.activateratingsinfo=Activating the ratings on this wiki will display a visual average rating (composed of stars) at the top right corner of each document of this wiki (except the ones in the *XWiki* space). Authenticated users will be able to rate documents by clicking on the stars. An alternative to this is to use the *Ratings Panel*, for example to only enable ratings in the desired spaces. To use the Ratings Panel, please visit the *Panel Wizard* administration section.
-### Missing: admin.ratings.resetratings=Reset all the ratings on this wiki. This will make all documents start over with no vote. Be aware that this operation is irreversible, besides on a document-per-document rollback basis. Resetting all ratings can take a while if the wiki has a large amount of documents already rated.
-### Missing: admin.ratings.uninstallratings=Uninstalling the ratings application will delete the documents that compose the application, but *all votes on rated document will be preserved*. If you reinstall the application later on, the documents will start over with the saved average rating they had before uninstalling the application. Finally, uninstalling the ratings application will *remove the ratings category* from the wiki administration.
-### Missing: admin.ratings.ratingsactivated=Ratings have been activated
+admin.ratings.activateratingsinfo=評価を有効にすると、このウィキの各ページ（*XWiki*スペースのページを除く）の右上に、平均の評価を星の形式で表示します。認証したユーザーは、星をクリックしてドキュメントを評価することができるようになります。代替の機能に*評価パネル*があります。これを使うと、たとえば、設定したスペースでのみ評価を有効にすることができます。評価パネルを使用するには、*パネルウィザード*の管理セクションを確認してください。
+admin.ratings.resetratings=このウィキの全ての評価をリセット。これは全てのドキュメントから投票結果を消去します。これは各ドキュメントごとにロールバックを行わないと、取り消すことはできません。ウィキに投票済の多くのドキュメントが存在する場合、全ての評価をリセットするには時間がかかる可能性があります。
+admin.ratings.uninstallratings=評価アプリケーションをアンインストールすると、アプリケーションを構成するドキュメントは削除されますが、*全ての投票は保持されます*。後でアプリケーションを再インストールした場合、アプリケーションをアンインストールする以前に保存されていた平均評価が再設定されます。また、評価アプリケーションをアンインストールすると、ウィキの設定から*評価のカテゴリーが削除されます*。
+admin.ratings.ratingsactivated=評価が有効になりました
 admin.ratings.ratingsdeactivated=評価は無効になっています
 admin.ratings.illegalrequest=不正なリクエスト
-### Missing: rating.yourvote=Your vote
-### Missing: rating.logintorate=Login to rate
-### Missing: rating.novotes=No votes yet
+rating.yourvote=あなたの投票
+rating.logintorate=ログインして評価
+rating.novotes=まだ投票がありません
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

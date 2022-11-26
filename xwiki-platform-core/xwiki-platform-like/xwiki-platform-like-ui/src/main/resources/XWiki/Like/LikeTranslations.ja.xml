@@ -36,32 +36,32 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: rightsmanager.like=Like
-### Missing: like.unlike.modal.title=Unlike confirmation
-### Missing: like.unlike.modal.body=Are you sure you wish to remove your Like for page {0}?
+  <content>rightsmanager.like=いいね
+like.unlike.modal.title=「いいね」の解除を確認
+like.unlike.modal.body=ページ {0} の「いいね」を解除してよろしいですか？
 like.unlike.modal.closeButton=閉じる
-### Missing: like.unlike.modal.unlikeButton=Unlike the page
-### Missing: like.unlike.modal.viewLikersButton=Likes
-### Missing: like.newlike.success=The page has been liked.
-### Missing: like.newlike.error=Error when trying to like the page.
-### Missing: like.unlike.success=The page has been unliked.
-### Missing: like.unlike.error=Error when trying to unlike the page.
-### Missing: like.userprofile.menu=Liked Pages
-### Missing: like.button.title=Number of likes on this page: {0}
-### Missing: like.button.title.like=Click to like the current page. Number of likes on this page: {0}.
-### Missing: like.button.title.unlike=Click to unlike the current page. Number of likes on this page: {0}.
-### Missing: like.likers.empty=No one likes this page yet.
-### Missing: like.likers.number={0} person(s) like this page:
-### Missing: like.likers.title=People liking {0}
+like.unlike.modal.unlikeButton=ページから「いいね」を解除
+like.unlike.modal.viewLikersButton=いいね
+like.newlike.success=このページを「いいね」しました。
+like.newlike.error=このページを「いいね」する際のエラー。
+like.unlike.success=このページから「いいね」を解除しました。
+like.unlike.error=このページから「いいね」を解除する際のエラー。
+like.userprofile.menu=「いいね」したページ
+like.button.title=このページの「いいね」の数：{0}
+like.button.title.like=クリックすると現在のページを「いいね」します。このページの「いいね」の数：{0}。
+like.button.title.unlike=クリックすると現在のページから「いいね」を解除します。このページの「いいね」の数：{0}。
+like.likers.empty=このページの「いいね」はまだありません。
+like.likers.number={0}人がこのページに「いいね」しました：
+like.likers.title={0}を「いいね」している人
 like.livetable.column.title=タイトル
 like.livetable.column.location=場所
-### Missing: like.livetable.column.likes=Likes
-### Missing: like.configuration.heading=Like Preferences
-### Missing: XWiki.Like.LikeConfigurationClass_alwaysDisplayButton=Always display Like button
-### Missing: XWiki.Like.LikeConfigurationClass_alwaysDisplayButton.hint=Display the button even if the user doesn't have the rights to interact with it. Use it if you wish to always display the Likes counter.
+like.livetable.column.likes=いいね
+like.configuration.heading=「いいね」の設定
+XWiki.Like.LikeConfigurationClass_alwaysDisplayButton=常に「いいね」ボタンを表示
+XWiki.Like.LikeConfigurationClass_alwaysDisplayButton.hint=ユーザーがボタンを使用する権限がない場合でも、ボタンを表示。常に「いいね」の件数を表示する場合は、これを使用してください。
 XWiki.Like.LikeConfigurationClass_cacheCapacity=キャッシュの大きさ
-### Missing: XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Number of Like information kept in cache. Note that you have to restart XWiki for this option change to be taken into account.
-### Missing: XWiki.Like.LikeConfigurationClass_enabled=Enable Like feature
-### Missing: XWiki.Like.LikeConfigurationClass_enabled.hint=If unchecked this will disable the Like feature and hide information related to Likes.
+XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=「いいね」の件数の情報はキャッシュに保存されています。このオプションの変更を有効にするにはXWikiを再起動する必要があります。
+XWiki.Like.LikeConfigurationClass_enabled=「いいね」の機能を有効にする
+XWiki.Like.LikeConfigurationClass_enabled.hint=チェックを解除すると「いいね」の機能が無効になり、「いいね」に関する情報を非表示とします。
 </content>
   </xwikidoc>

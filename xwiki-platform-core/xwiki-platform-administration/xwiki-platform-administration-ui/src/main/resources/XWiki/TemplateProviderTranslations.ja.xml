@@ -43,7 +43,7 @@ administration.templateProvider.icon.hint=新しいページを作成する際�
 administration.templateProvider.creationRestrictions=作成に関する制限
 administration.templateProvider.creationRestrictions.hint=このテンプレートでページを作成できる場所（子ページを含みます）の一覧
 administration.templateProvider.creationRestrictions.none=このテンプレートはどこでもページを作成できます
-### Missing: administration.templateProvider.creationRestrictionsAreSuggestions=Creation Restrictions as Suggestions
+administration.templateProvider.creationRestrictionsAreSuggestions=作成制限の候補
 ### Missing: administration.templateProvider.creationRestrictionsAreSuggestions.hint=Allows the user to select any location to create the page with this template, using the first creation restriction as the prefilled default location when the template is selected from the list.
 </content>
   </xwikidoc>

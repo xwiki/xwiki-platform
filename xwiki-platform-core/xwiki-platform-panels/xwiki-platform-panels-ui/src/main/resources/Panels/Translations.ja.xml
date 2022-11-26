@@ -53,7 +53,7 @@ panels.siblings.title=同レベルのページ
 panels.documentInformation.configureSyntaxes=他のシンタックスを設定
 panels.documentInformation.confirmChangeSyntaxWysiwyg=ドキュメントの内容とオブジェクトを選択したシンタックスに変換しますか？'キャンセル'を選択するとシンタックスを復元し、何も行いません。'はい'を選択すると修正を消去し、ドキュメントを自動的に保存します。ドキュメントの履歴画面に戻り、最新のバージョンを復旧すると、この修正をキャンセルできます。
 panels.documentInformation.confirmChangeSyntax=ドキュメントの内容とオブジェクトを選択したシンタックスに変換しますか？'キャンセル'を選択するとシンタックスだけを変更し、ドキュメントの内容は修正しません。'はい'を選択するとドキュメントを自動的に保存します。ドキュメントの履歴画面に戻り、最新のバージョンを復旧すると、この修正をキャンセルできます。
-panels.documentInformation.failedSyntaxConversion=選択したシンタックスを変換できませんでした。このシンタックスを使用したい場合は、再度選択して、変換を行わないでください。
+panels.documentInformation.failedSyntaxConversion=選択したシンタックスを変換できませんでした。このシンタックスを使用する場合は、改めて選択し、変換を行わないでください。
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

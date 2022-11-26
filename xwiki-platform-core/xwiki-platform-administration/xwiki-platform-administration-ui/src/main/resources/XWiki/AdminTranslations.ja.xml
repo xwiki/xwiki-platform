@@ -117,12 +117,12 @@ administration.section.export.targetXWikiVersion.12plus=バージョン12.0以�
 administration.section.export.targetXWikiVersion.below12=バージョン12.0未満
 administration.section.export.packageName.hint=エクスポートしたウィキページのアーカイブを生成する際に使用するファイル名。
 administration.section.export.moreOptions=他のオプション
-### Missing: administration.section.export.lessOptions=
+administration.section.export.lessOptions=他のオプションを表示しない
 administration.section.export.description.hint=パッケージの説明。インポート時に表示します。
 administration.section.export.author.hint=パッケージの作者名。インポート時に表示します。
 administration.section.export.licence.hint=コンテンツのライセンス。例：LGPL、GPLV2など。
 administration.section.export.version.hint=パッケージのバージョン。パッケージの記述子に保存されます。
-### Missing: administration.section.export.backupPack.hint=
+administration.section.export.backupPack.hint=ページをインポートする際にページの著者を保持。このオプションは、エクスポートする内容には影響せず、インポートの際に変更できます。
 
 # Users Section
 administration.section.users.enableUser.inProgress=ユーザーアカウントを有効化しています…
@@ -132,10 +132,10 @@ administration.section.users.disableUser.inProgress=ユーザーアカウント�
 administration.section.users.disableUser.done=ユーザーアカウントを無効化しました
 administration.section.users.disableUser.failed=ユーザーアカウントを無効化できませんでした
 administration.section.users.deleteUser.confirmationMessage=ユーザー {0} を削除し、所属する全ての{1}グループ{2}から削除します。続行してよろしいですか？
-### Missing: administration.section.users.deleteUser.programmingRightsWarning=
-### Missing: administration.section.users.deleteUser.scriptRightsWarning=
-### Missing: administration.section.users.deleteUser.newAuthor=
-### Missing: administration.section.users.deleteUser.newAuthor.hint=
+administration.section.users.deleteUser.programmingRightsWarning=削除しようとしているユーザーは{0}{1,choice,1#1ページ|1&lt;{1}ページ}{2}のプログラミング権限をもつ最終更新者です。{1,choice,1#このページ|1&lt;これらのページ}にプログラミング権限を必要とするスクリプトがある場合、著者を置き換えずにユーザーを削除すると、それらのスクリプトは機能しなくなります。
+administration.section.users.deleteUser.scriptRightsWarning=削除しようとしているユーザーは{0}{1,choice,1#1ページ|1&lt;{1}ページ}{2}のスクリプト権限をもつ最終更新者です。著者を置き換えずにユーザーを削除すると、{1,choice,1#このページ|1&lt;これらのページ}は機能しなくなります。
+administration.section.users.deleteUser.newAuthor=新しい著者
+administration.section.users.deleteUser.newAuthor.hint={0}の権限をもつユーザーを選択するか、著者を置き換えない場合は、このフィールドを空のままにしてください。
 administration.section.users.deleteUser.newAuthor.error=選択したユーザーには{0}の権限がありません！
 administration.section.users.deleteUser.newAuthor.programming=プログラミング
 administration.section.users.deleteUser.newAuthor.script=スクリプト
@@ -145,7 +145,7 @@ admin.usersgroups.extensionrights=拡張機能の権限
 admin.other=その他
 admin.other.description=拡張機能の様々な設定。
 administration.section.analytics.status=状態
-administration.section.analytics.status.hint=Google Analytics™による追跡を有効かどうかを判断
+administration.section.analytics.status.hint=Google Analytics™による追跡を有効かどうかを特定
 
 # Social category
 admin.social=ソーシャル
@@ -162,7 +162,7 @@ XWiki.ConfigurableClass_iconAttachment=アイコンの添付
 XWiki.ConfigurableClass_displayInCategory=カテゴリー別で表示
 XWiki.ConfigurableClass_displayBeforeCategory=カテゴリーの前に表示
 XWiki.ConfigurableClass_categoryIcon=カテゴリーのアイコン
-### Missing: XWiki.ConfigurableClass_scope=
+XWiki.ConfigurableClass_scope=範囲
 XWiki.ConfigurableClass_scope_WIKI=ウィキ
 XWiki.ConfigurableClass_scope_SPACE=現在のスペース
 XWiki.ConfigurableClass_scope_ALL_SPACES=全てのスペース

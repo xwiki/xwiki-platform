@@ -19,7 +19,7 @@
  */
 package org.xwiki.ckeditor.test.po;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -77,7 +77,7 @@ public class CKEditor extends BaseElement
         script.append("});\n");
 
         XWikiWebDriver driver = getDriver();
-        driver.manage().timeouts().setScriptTimeout(5, TimeUnit.SECONDS);
+        driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(10));
         driver.executeAsyncScript(script.toString(), this.name);
 
         return this;

@@ -71,14 +71,21 @@ class AttachmentGalleryPickerMacroTest
     private MacroTransformationContext macroTransformationContext;
 
     @Mock
-    private Block translationRenderBlock;
+    private Block translationRenderBlockNoResult;
+
+    @Mock
+    private Block translationRenderBlockGlobalSelection;
 
     @BeforeEach
     void setUp()
     {
-        Translation translation = mock(Translation.class);
-        when(this.l10n.getTranslation("attachment.picker.macro.notResult.message")).thenReturn(translation);
-        when(translation.render()).thenReturn(this.translationRenderBlock);
+        Translation translationNoResult = mock(Translation.class);
+        Translation translationGlobalSelection = mock(Translation.class);
+        when(this.l10n.getTranslation("attachment.picker.macro.notResult.message")).thenReturn(translationNoResult);
+        when(this.l10n.getTranslation("attachment.picker.macro.globalSelection.message"))
+            .thenReturn(translationGlobalSelection);
+        when(translationNoResult.render()).thenReturn(this.translationRenderBlockNoResult);
+        when(translationGlobalSelection.render()).thenReturn(this.translationRenderBlockGlobalSelection);
     }
 
     @Test
@@ -90,8 +97,12 @@ class AttachmentGalleryPickerMacroTest
         assertEquals(List.of(new GroupBlock(List.of(
             new GroupBlock(List.of(), Map.of("class", "attachmentPickerSearch")),
             new GroupBlock(Map.of("class", "attachmentPickerResults")),
-            new GroupBlock(List.of(this.translationRenderBlock),
-                Map.of("class", "attachmentPickerNoResults hidden box warningmessage"))
+            new GroupBlock(List.of(this.translationRenderBlockNoResult),
+                Map.of("class", "attachmentPickerNoResults hidden box warningmessage")),
+            new GroupBlock(
+                List.of(this.translationRenderBlockGlobalSelection),
+                Map.of("class", "attachmentPickerGlobalSelection hidden box warningmessage"))
+
         ), Map.ofEntries(
             entry("id", "my-id"),
             entry("class", "attachmentGalleryPicker"),

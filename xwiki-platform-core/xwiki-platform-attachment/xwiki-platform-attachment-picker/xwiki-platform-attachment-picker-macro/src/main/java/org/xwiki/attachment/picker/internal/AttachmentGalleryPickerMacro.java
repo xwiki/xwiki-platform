@@ -118,7 +118,10 @@ public class AttachmentGalleryPickerMacro extends AbstractMacro<AttachmentGaller
             new GroupBlock(Map.of(BLOCK_PARAM_CLASS, "attachmentPickerResults")),
             // No results block.
             new GroupBlock(List.of(this.l10n.getTranslation("attachment.picker.macro.notResult.message").render()),
-                Map.of(BLOCK_PARAM_CLASS, "attachmentPickerNoResults hidden box warningmessage"))
+                Map.of(BLOCK_PARAM_CLASS, "attachmentPickerNoResults hidden box warningmessage")),
+            new GroupBlock(
+                List.of(this.l10n.getTranslation("attachment.picker.macro.globalSelection.message").render()),
+                Map.of(BLOCK_PARAM_CLASS, "attachmentPickerGlobalSelection hidden box warningmessage"))
         ), attachmentPickerParameters));
     }
 }

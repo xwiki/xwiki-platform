@@ -233,7 +233,7 @@ h. item 2
 * item 1
 * item 2
 )))
-|Hiragana Iroah list|((({{{
+|Hiragana Iroha list|((({{{
 H. item 1
 H. item 2
 }}})))|(((
@@ -415,7 +415,7 @@ j. item 2
 * item 1
 * item 2
 )))
-|Hiragana Iroah list|((({{{
+|Hiragana Iroha list|((({{{
 (% style="list-style-type: hiragana-iroha" %)
 * item 1
 * item 2

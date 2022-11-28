@@ -37,7 +37,9 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>attachment.picker.ckeditor.pluginsImageSelector.title=Gallery
-attachment.picker.searchField.placeholder=Search...</content>
+attachment.picker.searchField.placeholder=Search...
+attachment.picker.searchField.scope.currentPage=Current Page
+attachment.picker.searchField.scope.allPages=All Pages</content>
   <object>
     <name>Attachment.Picker.Code.Translations</name>
     <number>0</number>

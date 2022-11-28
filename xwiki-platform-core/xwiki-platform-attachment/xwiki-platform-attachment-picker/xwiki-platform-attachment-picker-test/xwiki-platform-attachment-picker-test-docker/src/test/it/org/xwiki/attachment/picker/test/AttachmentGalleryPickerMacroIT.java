@@ -21,12 +21,14 @@ package org.xwiki.attachment.picker.test;
 
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.attachment.picker.test.po.AttachmentGalleryPicker;
 import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
 import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -34,11 +36,11 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.ViewPage;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -62,8 +64,11 @@ class AttachmentGalleryPickerMacroIT
     {
         // Login to be able to delete the page.
         setup.loginAsSuperAdmin();
-        setup.deletePage(testReference);
-        setup.createPage(testReference, "{{attachmentGalleryPicker id='testPicker1' /}}\n"
+        DocumentReference withSpaceDocumentReference =
+            new DocumentReference("with space", testReference.getLastSpaceReference());
+        setup.deletePage(withSpaceDocumentReference);
+
+        setup.createPage(withSpaceDocumentReference, "{{attachmentGalleryPicker id='testPicker1' /}}\n"
             + "\n"
             + "{{attachmentGalleryPicker id='testPicker2' limit=2 /}}\n"
             + "\n"
@@ -88,19 +93,44 @@ class AttachmentGalleryPickerMacroIT
         // Test initial display
         AttachmentGalleryPicker testPicker1 = new AttachmentGalleryPicker("testPicker1").waitUntilReady();
         List<String> picker1Attachments = testPicker1.getAttachmentTitles();
-        assertTrue(picker1Attachments.size() >= 3);
+        assertEquals(3, picker1Attachments.size());
         assertThat(picker1Attachments.subList(0, 3), containsInAnyOrder("image1.png", "image2.png", "textcontent.txt"));
-
+        assertEquals(Optional.empty(), testPicker1.getSelectedAttachment());
+        // Test the selection of attachments.
+        testPicker1.clickAttachment("image1.png");
+        assertEquals(Optional.of("image1.png"), testPicker1.getSelectedAttachment());
+        testPicker1.clickAttachment("image2.png");
+        assertEquals(Optional.of("image2.png"), testPicker1.getSelectedAttachment());
+        testPicker1.clickAttachment("image2.png");
+        assertEquals(Optional.empty(), testPicker1.getSelectedAttachment());
+        testPicker1.clickAttachment("image1.png");
+        assertEquals(Optional.of("image1.png"), testPicker1.getSelectedAttachment());
+        // Toggle to a global search. Verify if the attachment stays selected.
+        testPicker1.toggleAllPages().waitUntilAttachmentsCount(count -> count > 3);
+        assertEquals(Optional.of("image1.png"), testPicker1.getSelectedAttachment());
+        testPicker1.toggleCurrentPage().waitUntilAttachmentsCount(count -> count == 3);
+        assertEquals(Optional.of("image1.png"), testPicker1.getSelectedAttachment());
+        testPicker1.toggleAllPages().waitUntilAttachmentsCount(count -> count > 3);
+        assertFalse(testPicker1.isGlobalSelectionWarningDisplayed());
+        testPicker1.clickAttachment("users.png");
+        assertTrue(testPicker1.isGlobalSelectionWarningDisplayed());
+        testPicker1.setSearch("users");
+        assertTrue(testPicker1.isGlobalSelectionWarningDisplayed());
+        testPicker1.setSearch("");
+        assertTrue(testPicker1.isGlobalSelectionWarningDisplayed());
+        testPicker1.toggleCurrentPage().waitUntilAttachmentsCount(count -> count == 3);
+        assertFalse(testPicker1.isGlobalSelectionWarningDisplayed());
+        assertEquals(Optional.empty(), testPicker1.getSelectedAttachment());
         // Test on a first filter matching two attachments.
-        testPicker1.setSearch("image").waitUntilAttachmentsCount(2);
+        testPicker1.setSearch("image").waitUntilAttachmentsCount(count -> count == 2);
         assertThat(testPicker1.getAttachmentTitles(), containsInAnyOrder("image1.png", "image2.png"));
 
         // Test on a filter matching no attachment, a warning message is expected.
-        testPicker1.setSearch("doesnotexists").waitUntilAttachmentsCount(0);
+        testPicker1.setSearch("doesnotexists").waitUntilAttachmentsCount(count -> count == 0);
         testPicker1.waitNoResultMessageDisplayed();
 
         // Test with another filter.
-        testPicker1.setSearch("textcontent").waitUntilAttachmentsCount(1);
+        testPicker1.setSearch("textcontent").waitUntilAttachmentsCount(count -> count == 1);
         assertThat(testPicker1.getAttachmentTitles(), containsInAnyOrder("textcontent.txt"));
 
         // Validate that the limit is taken into account.
@@ -117,7 +147,7 @@ class AttachmentGalleryPickerMacroIT
         List<String> picker3Attachments = testPicker3.getAttachmentTitles();
         assertTrue(picker3Attachments.size() >= 2);
         assertThat(picker3Attachments.subList(0, 2), containsInAnyOrder("image1.png", "image2.png"));
-        testPicker3.setSearch("textcontent").waitUntilAttachmentsCount(0);
+        testPicker3.setSearch("textcontent").waitUntilAttachmentsCount(count -> count == 0);
         testPicker3.waitNoResultMessageDisplayed();
     }
 

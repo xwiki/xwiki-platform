@@ -20,6 +20,8 @@
 package org.xwiki.attachment.picker.test.po;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.function.IntPredicate;
 import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
@@ -54,8 +56,7 @@ public class AttachmentGalleryPicker extends BaseElement
     public AttachmentGalleryPicker waitUntilReady()
     {
         // The picker is ready when the loading class is not present.
-        WebElement attachmentPickerResults =
-            this.attachmentGalleryPickerElement.findElement(By.className("attachmentPickerResults"));
+        WebElement attachmentPickerResults = getAttachmentPickerResults();
         getDriver().waitUntilCondition(driver -> !attachmentPickerResults.getAttribute("class").contains("loading"));
         return this;
     }
@@ -78,8 +79,8 @@ public class AttachmentGalleryPicker extends BaseElement
      */
     public AttachmentGalleryPicker setSearch(String searchQuery)
     {
-        WebElement input =
-            this.attachmentGalleryPickerElement.findElement(By.cssSelector(".attachmentPickerSearch input"));
+        WebElement input = getSearchBlock()
+            .findElement(By.cssSelector("input"));
         input.clear();
         input.sendKeys(searchQuery);
         return this;
@@ -88,13 +89,13 @@ public class AttachmentGalleryPicker extends BaseElement
     /**
      * Wait until the expected number of attachments is displayed in the picker.
      *
-     * @param expectedCount the expected number of attachments
+     * @param predicate a boolean predicate taking the current attachments count in parameter
      */
-    public void waitUntilAttachmentsCount(int expectedCount)
+    public void waitUntilAttachmentsCount(IntPredicate predicate)
     {
         // Waits for the search to be finished before counting the number of results.
         waitUntilReady();
-        getDriver().waitUntilCondition(driver -> getAllAttachments().size() == expectedCount);
+        getDriver().waitUntilCondition(driver -> predicate.test(getAllAttachments().size()));
     }
 
     /**
@@ -106,8 +107,96 @@ public class AttachmentGalleryPicker extends BaseElement
             By.className("attachmentPickerNoResults"));
     }
 
+    /**
+     * Click on the "All Pages" search button to return search results from the whole farm.
+     *
+     * @return the current page object
+     * @since 14.10.1
+     * @since 15.0RC1
+     */
+    public AttachmentGalleryPicker toggleAllPages()
+    {
+        getSearchBlock().findElement(By.cssSelector("label:nth-child(2)")).click();
+        return this;
+    }
+
+    /**
+     * Click on the "Current Page" search button to return search results from the current page only.
+     *
+     * @return the current page object
+     * @since 14.10.1
+     * @since 15.0RC1
+     */
+    public AttachmentGalleryPicker toggleCurrentPage()
+    {
+        getSearchBlock().findElement(By.cssSelector("label:nth-child(1)")).click();
+        return this;
+    }
+
+    /**
+     * Click on an attachment. This will either select or un-select it according to it's initial state.
+     *
+     * @param attachmentName the name of the attachment to click on
+     * @return the current page object
+     * @since 14.10.1
+     * @since 14.5RC1
+     */
+    public AttachmentGalleryPicker clickAttachment(String attachmentName)
+    {
+        getAttachmentPickerResults()
+            .findElement(By.cssSelector(String.format(".attachmentGroup a[title='%s']", attachmentName)))
+            .click();
+        return this;
+    }
+
+    /**
+     * Returns the name of the currently selected attachment, wrapped in an {@link Optional}, or
+     * {@link Optional#empty()} if no attachment is currently selected.
+     *
+     * @return the currently selected attachment name, wrapped in an {@link Optional}, or {@link Optional#empty()} if no
+     *     attachment is currently selected
+     * @since 14.10.1
+     * @since 14.5RC1
+     */
+    public Optional<String> getSelectedAttachment()
+    {
+        List<WebElement> selectedElements =
+            getAttachmentPickerResults().findElements(By.cssSelector(".attachmentGroup.selected"));
+        if (selectedElements.size() > 1) {
+            throw new RuntimeException(
+                String.format("Too many attachments selected at the same time. Expected [0] or [1] and found [%d]",
+                    selectedElements.size()));
+        }
+
+        if (selectedElements.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(selectedElements.get(0).findElement(By.tagName("a")).getAttribute("title"));
+    }
+
+    /**
+     * @return {@code true} if the global selection warning message is displayed, {@code false} otherwise
+     * @since 14.10.1
+     * @since 14.5RC1
+     */
+    public boolean isGlobalSelectionWarningDisplayed()
+    {
+        return this.attachmentGalleryPickerElement.findElement(By.cssSelector(".attachmentPickerGlobalSelection"))
+            .isDisplayed();
+    }
+
     private List<WebElement> getAllAttachments()
     {
         return this.attachmentGalleryPickerElement.findElements(By.className("attachmentTitle"));
+    }
+
+    private WebElement getSearchBlock()
+    {
+        return this.attachmentGalleryPickerElement.findElement(By.cssSelector(".attachmentPickerSearch"));
+    }
+
+    private WebElement getAttachmentPickerResults()
+    {
+        return this.attachmentGalleryPickerElement.findElement(By.className("attachmentPickerResults"));
     }
 }

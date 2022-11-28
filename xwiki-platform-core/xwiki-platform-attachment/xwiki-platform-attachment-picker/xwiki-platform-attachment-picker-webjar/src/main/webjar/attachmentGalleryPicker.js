@@ -23,6 +23,8 @@ define('xwiki-attachment-picker-translation-keys', {
   keys: [
     'solrSearch.query.errorMessage',
     'searchField.placeholder',
+    'searchField.scope.currentPage',
+    'searchField.scope.allPages',
   ]
 });
 
@@ -61,25 +63,39 @@ define('xwiki-attachment-picker',
         this.solrOptions = this.options.solrOptions || {};
       }
 
-      search(query) {
+      search(query, isGlobal) {
         const localDocumentOnly = this.searchSolr(query, Object.assign({}, this.solrOptions, {
           fqs: [
             `wiki:${XWiki.currentWiki}`,
-            `space:${XWiki.currentSpace}`,
-            `name:${XWiki.currentPage}`
+            `space:"${XWiki.currentSpace}"`,
+            `name:"${XWiki.currentPage}"`
           ]
         }));
-        const globalSearch = this.searchSolr(query, this.solrOptions);
+
         // TODO: Make this algorithm configurable through an macro parameter.
-        return Promise.all([localDocumentOnly, globalSearch]).then(results => {
+        let values;
+        if (isGlobal) {
+          const globalSearch = this.searchSolr(query, this.solrOptions);
+          values = [localDocumentOnly, globalSearch];
+        } else {
+          values = [localDocumentOnly];
+        }
+        return Promise.all(values).then(results => {
           /*
            * Take the attachments from the current document first. Then take the attachments from the global search that
            *  are not from the current document (to avoid duplicates). At the end, only keep a fixed number of 
            * attachments (this.nb).
            */
           const localAttachments = results[0];
+          localAttachments.forEach(attachment => attachment.isLocal = true);
           const localAttachmentsId = localAttachments.map(attachment => attachment.id);
-          const globalAttachments = results[1].filter(it => !localAttachmentsId.includes(it.id));
+
+          // Check if global attachments where request before trying to merge them while removing the duplicates.
+          let globalAttachments = [];
+          if (results[1]) {
+            globalAttachments = results[1].filter(it => !localAttachmentsId.includes(it.id));
+          }
+          globalAttachments.forEach(attachment => attachment.isLocal = false);
           return localAttachments.concat(globalAttachments).slice(0, this.limit);
         });
       }
@@ -132,9 +148,39 @@ define('xwiki-attachment-picker',
 
       initialize(cb) {
         this.searchBlock.addClass('xform');
-        this.searchBlock.append($("<input/>")
+        const searchField = $("<input/>")
           .prop("type", "text")
-          .prop('placeholder', translations.get('searchField.placeholder')));
+          .addClass('form-control')
+          .prop('placeholder', translations.get('searchField.placeholder'));
+
+        const inputGroup = $('<div/>').addClass('input-group');
+        const inputGroupBtn = $('<div/>').addClass('input-group-btn')
+          .attr('data-toggle', 'buttons');
+        const labelLocal = $('<label/>')
+          .addClass('btn')
+          .addClass('btn-primary')
+          .addClass('active')
+          .append($('<input/>')
+            .attr('type', 'radio')
+            .attr('checked', true)
+            .attr('name', 'scope')
+            .attr('value', 'local'))
+          .append(document.createTextNode(translations.get('searchField.scope.currentPage')));
+        const labelGlobal = $('<label/>')
+          .addClass('btn')
+          .addClass('btn-primary')
+          .append($('<input/>')
+            .attr('type', 'radio')
+            .attr('name', 'scope')
+            .attr('value', 'global'))
+          .append(document.createTextNode(translations.get('searchField.scope.allPages')));
+
+        inputGroup.append(searchField);
+        inputGroup.append(inputGroupBtn);
+        inputGroupBtn.append(labelLocal);
+        inputGroupBtn.append(labelGlobal);
+
+        this.searchBlock.append(inputGroup);
         this.solrSearch = new SolrSearch({
           limit: parseInt(this.rootBlock.data('xwiki-attachment-picker-limit')),
           solrOptions: {
@@ -143,17 +189,27 @@ define('xwiki-attachment-picker',
         });
         this.cb = cb;
         this.search('').finally(() => {
-          this.searchBlock.find('input').on('input', debounce((event) => {
-            this.search(event.target.value);
-          }, 500));
+          const searchTextInput = this.searchBlock.find('input[type="text"]');
+          const listener = debounce(() => {
+            const isGlobal = this.searchBlock.find("input[name='scope']:checked").val() === 'global';
+            return this.search(searchTextInput.val(), isGlobal);
+          }, 500);
+          searchTextInput.on('input', listener);
+          this.searchBlock.find('input[type="radio"]').on('change', listener);
         });
       }
 
-      search(query) {
+      /**
+       * Search for the attachments matching the provided query, either on the current document, or in the whole farm.
+       * @param query the string query, for instance an attachment name
+       * @param isGlobal when true, search for the query in the whole farm, when false, only search on the current
+       * document
+       */
+      search(query, isGlobal) {
         const loadingClass = 'loading';
         this.resultsBlock.empty();
         this.resultsBlock.addClass(loadingClass);
-        return this.solrSearch.search(query).then(this.cb)
+        return this.solrSearch.search(query, isGlobal).then(this.cb)
           .catch((error) => {
             console.log(error);
             new XWiki.widgets.Notification(translations.get('solrSearch.query.errorMessage'), 'error');
@@ -174,19 +230,21 @@ define('xwiki-attachment-picker',
         this.resultsBlock = this.attachmentPicker.find('.attachmentPickerResults');
         this.searchBlock = new SearchBlock(this.attachmentPicker, attachmentPickerSearch, this.resultsBlock);
         this.noResultsBlock = this.attachmentPicker.find('.attachmentPickerNoResults');
+        this.globalSelectionBlock = this.attachmentPicker.find('.attachmentPickerGlobalSelection');
       }
 
       initialize() {
         if (!this.attachmentPicker.hasClass(ATTACHMENT_PICKER_INITIALIZED_CLASS)) {
-          this.searchBlock.initialize((results) => {
+          this.searchBlock.initialize(results => {
             this.resultsBlock.empty();
             this.noResultsBlock.addClass('hidden');
+            this.globalSelectionBlock.addClass('hidden');
             if (results.length > 0) {
               this.initializeWhenHasResults(results);
             } else {
               this.noResultsBlock.removeClass('hidden');
             }
-            if (this.resultsBlock.find('selected').length === 0 && this.selected !== undefined) {
+            if (this.resultsBlock.find('.selected').length === 0 && this.selected !== undefined) {
               this.unselect();
             }
           });
@@ -211,14 +269,24 @@ define('xwiki-attachment-picker',
             parent.addClass('selected');
             this.selected = parent.data('id');
             this.attachmentPicker.trigger('xwiki:attachmentGalleryPicker:selected', this.selected);
+            this.updateGlobalSelectionWarning(parent);
           }
         });
+      }
+
+      updateGlobalSelectionWarning(parent) {
+        if (parent.hasClass('globalAttachment')) {
+          this.globalSelectionBlock.removeClass('hidden');
+        } else {
+          this.globalSelectionBlock.addClass('hidden');
+        }
       }
 
       unselect(parent) {
         this.selected = undefined;
         if (parent) {
           parent.removeClass('selected');
+          this.globalSelectionBlock.addClass('hidden');
         }
         this.attachmentPicker.trigger('xwiki:attachmentGalleryPicker:unselected');
       }
@@ -227,26 +295,8 @@ define('xwiki-attachment-picker',
         const attachmentReference = XWiki.Model.resolve(result.id, XWiki.EntityType.ATTACHMENT);
         const downloadDocumentURL = new XWiki.Document(attachmentReference.parent).getURL('download');
         const filename = result.filename[0];
-        var preview;
-        var downloadURL = `${downloadDocumentURL}/${encodeURIComponent(attachmentReference.name)}`;
-        const mimeType = result.mimetype[0];
-        if (result.mimetype && mimeType.startsWith("image/")) {
-          preview = $('<img />')
-            .prop('loading', 'lazy')
-            .prop('src', `${downloadURL}?width=150&height=150`)
-            .prop('alt', filename);
-        } else {
-          const icon = attachmentsIcon.getIcon({
-            mimeType: mimeType,
-            name: filename
-          });
-          if (icon.iconSetType === 'FONT') {
-            preview = $('<span />').prop('class', icon.cssClass + ' attachmentIcon');
-          } else {
-            preview = $('<img />').prop('src', icon.url);
-          }
-
-        }
+        const downloadURL = `${downloadDocumentURL}/${encodeURIComponent(attachmentReference.name)}`;
+        const preview = this.initPreviewElement(result, downloadURL, filename);
 
         const textSpan = $('<span>').text(filename).prop('title', filename).addClass('attachmentTitle');
         const link = $('<a></a>')
@@ -260,10 +310,40 @@ define('xwiki-attachment-picker',
         const attachmentGroup = $('<span class="attachmentGroup">')
           .append($('<div/>').append(link))
           .data('id', result.id);
+        if (result.isLocal) {
+          attachmentGroup.addClass('localAttachment');
+        } else {
+          attachmentGroup.addClass('globalAttachment');
+        }
         if (this.selected !== undefined && result.id === this.selected) {
           attachmentGroup.addClass('selected');
+          this.updateGlobalSelectionWarning(attachmentGroup);
         }
         this.resultsBlock.append(attachmentGroup);
+      }
+
+      initPreviewElement(result, downloadURL, filename) {
+        let preview;
+        const mimeType = result.mimetype[0];
+        if (result.mimetype && mimeType.startsWith("image/")) {
+          preview = $('<img />')
+            .prop('loading', 'lazy')
+            .prop('src', `${downloadURL}?width=150&height=150`)
+            .prop('alt', filename);
+        } else {
+          const icon = attachmentsIcon.getIcon({
+            mimeType: mimeType,
+            name: filename
+          });
+          if (icon.iconSetType === 'FONT') {
+            preview = $('<span />')
+              .prop('class', icon.cssClass)
+              .addClass('attachmentIcon');
+          } else {
+            preview = $('<img />').prop('src', icon.url);
+          }
+        }
+        return preview;
       }
     }
 
@@ -274,7 +354,7 @@ define('xwiki-attachment-picker',
     };
 
     function init(_event, data) {
-      var container = $((data && data.elements) || document);
+      const container = $((data && data.elements) || document);
       container.find('.attachmentGalleryPicker').attachmentGalleryPicker();
     }
 

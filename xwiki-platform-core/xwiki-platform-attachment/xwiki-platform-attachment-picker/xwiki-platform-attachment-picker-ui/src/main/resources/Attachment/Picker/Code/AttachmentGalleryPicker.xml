@@ -310,6 +310,10 @@
   .attachmentPickerSearch {
     margin-bottom: 1em;
   }
+
+  .attachmentPickerGlobalSelection {
+    margin-top: 1em;
+  }
 }
 </code>
     </property>

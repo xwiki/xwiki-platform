@@ -400,8 +400,27 @@ define('xwiki-export-tree-filter', ['jquery', 'bootstrap', 'xwiki-export-tree'],
 
 require(['jquery', paths.treeRequireConfig], function ($) {
   // Fill the form with the selected pages from the export tree.
-  var createHiddenInputsFromExportTree = function(exportTree, container) {
+  var createHiddenInputsFromExportTree = function(exportTree, container, filterHiddenPages) {
     var exportPages = exportTree.getExportPages();
+    if (filterHiddenPages) {
+      // Make sure that all the pages that were checked (selected explicitly) are submitted also using an exact match
+      // because otherwise they might be left out by the hidden pages filter (in case they are hidden). Note that hidden
+      // nested pages are sometimes displayed in the page tree, even if the current user has opted for not showing
+      // hidden pages, because they have descendant pages that are not hidden.
+      exportTree.get_checked()
+        // Get the JSON for the corresponding tree node because we want to check the node type.
+        .map(selectedNodeId => exportTree.get_node(selectedNodeId))
+        .filter(selectedNode => {
+          // Keep only the selected page nodes that don't have an entry already in exportedPages.
+          return selectedNode.data.type === 'document' && !exportPages.hasOwnProperty(selectedNode.data.id);
+        })
+        // Map to the corresponding page reference.
+        .map(selectedPageNode => selectedPageNode.data.id)
+        // Add an explicit match to the exported pages.
+        .forEach(selectedDocumentReference => {
+          exportPages[selectedDocumentReference] = [];
+        });
+    }
     for (var pages in exportPages) {
       // Includes
       $('<input/>').attr({
@@ -591,7 +610,8 @@ require(['jquery', paths.treeRequireConfig], function ($) {
     const exportURL = exportTreeModal.data('config').url;
     form.empty().attr('action', exportURL.replace(/pages=.*?(&|$)/g, ''));
     // Fill the form and submit.
-    createHiddenInputsFromExportTree($.jstree.reference(exportTree), form);
+    const filterHiddenPages = exportTreeModal.data('config').filterHiddenPages;
+    createHiddenInputsFromExportTree($.jstree.reference(exportTree), form, filterHiddenPages);
     exportTreeModal.find('input[type="hidden"][name="filter"]').clone().appendTo(form);
     form.submit();
   });

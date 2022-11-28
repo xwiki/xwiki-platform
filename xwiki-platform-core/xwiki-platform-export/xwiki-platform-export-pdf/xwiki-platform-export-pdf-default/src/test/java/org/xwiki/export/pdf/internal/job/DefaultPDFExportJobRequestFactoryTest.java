@@ -154,7 +154,7 @@ class DefaultPDFExportJobRequestFactoryTest
 
         List<DocumentReference> selectedDocuments = Arrays.asList(new DocumentReference("test", "First", "Page"),
             new DocumentReference("test", "Second", "Page"));
-        when(this.documentSelectionResolver.getSelectedDocuments()).thenReturn(selectedDocuments);
+        when(this.documentSelectionResolver.getSelectedDocuments(true)).thenReturn(selectedDocuments);
 
         // Execution
 

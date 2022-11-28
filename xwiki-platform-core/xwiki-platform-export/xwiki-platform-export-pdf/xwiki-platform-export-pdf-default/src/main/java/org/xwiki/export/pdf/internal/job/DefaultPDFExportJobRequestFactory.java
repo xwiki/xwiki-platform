@@ -150,7 +150,7 @@ public class DefaultPDFExportJobRequestFactory implements PDFExportJobRequestFac
         request.setWithToc(!"0".equals(httpRequest.get("pdftoc")));
         request.setWithHeader(!"0".equals(httpRequest.get("pdfheader")));
         request.setWithFooter(!"0".equals(httpRequest.get("pdffooter")));
-        request.setDocuments(this.documentSelectionResolver.getSelectedDocuments().stream()
+        request.setDocuments(this.documentSelectionResolver.getSelectedDocuments(true).stream()
             .sorted(this.documentReferenceComparator).collect(Collectors.toList()));
 
         request.setFileName(xcontext.getDoc().getRenderedTitle(Syntax.PLAIN_1_0, xcontext) + ".pdf");

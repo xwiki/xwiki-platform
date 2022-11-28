@@ -55,6 +55,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -83,6 +84,10 @@ class DocumentSelectionResolverTest
     @MockComponent
     @Named("document")
     private QueryFilter documentQueryFilter;
+
+    @MockComponent
+    @Named("hidden/document")
+    private QueryFilter hiddenDocumentQueryFilter;
 
     @MockComponent
     @Named("current")
@@ -146,9 +151,10 @@ class DocumentSelectionResolverTest
         DocumentReference circleReference = new DocumentReference("test", Arrays.asList("Shape", "2D"), "Circle");
         when(query.execute()).thenReturn(Collections.singletonList(circleReference));
 
-        assertEquals(Collections.singleton(circleReference), this.documentSelectionResolver.getSelectedDocuments());
+        assertEquals(Collections.singleton(circleReference), this.documentSelectionResolver.getSelectedDocuments(true));
 
         verify(query).addFilter(this.documentQueryFilter);
+        verify(query).addFilter(this.hiddenDocumentQueryFilter);
     }
 
     private DocumentReference createDocumentReference(String... args)
@@ -191,6 +197,9 @@ class DocumentSelectionResolverTest
         when(query.execute()).thenReturn(Collections.singletonList(circleReference));
 
         assertEquals(Collections.singleton(circleReference), this.documentSelectionResolver.getSelectedDocuments());
+
+        verify(query).addFilter(this.documentQueryFilter);
+        verify(query, never()).addFilter(this.hiddenDocumentQueryFilter);
     }
 
     @SuppressWarnings("unchecked")

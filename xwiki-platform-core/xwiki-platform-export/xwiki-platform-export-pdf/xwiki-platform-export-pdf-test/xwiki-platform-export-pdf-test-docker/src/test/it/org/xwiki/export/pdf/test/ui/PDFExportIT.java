@@ -120,7 +120,7 @@ class PDFExportIT
         exportTreeModal.export();
         PDFExportOptionsModal exportOptions = new PDFExportOptionsModal();
 
-        try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration), "John", "pass")) {
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
             // We should have 4 pages: cover page, table of contents, one page for the parent document and one page for
             // the child document.
             assertEquals(4, pdf.getNumberOfPages());
@@ -201,13 +201,13 @@ class PDFExportIT
 
     @Test
     @Order(3)
-    void exportAsPDFSinglePage(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void exportSinglePageAsPDF(TestUtils setup, TestConfiguration testConfiguration) throws Exception
     {
         ViewPage viewPage =
             setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent", "Child"), "WebHome"));
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
 
-        try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration), "John", "pass")) {
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
             // We should have 3 pages: cover page, table of contents and one page for the content.
             assertEquals(3, pdf.getNumberOfPages());
 
@@ -251,7 +251,7 @@ class PDFExportIT
         templateEditPage.setCover(templateEditPage.getCover().replace("<h1>", "<h1>Book: "));
         templateEditPage
             .setTableOfContents(templateEditPage.getTableOfContents().replace("core.pdf.tableOfContents", "Chapters"));
-        templateEditPage.setHeader(templateEditPage.getHeader().replace("<span ", "Chapter: <span "));
+        templateEditPage.setHeader(templateEditPage.getHeader().replace("$esc", "Chapter: $esc"));
         templateEditPage.setFooter(templateEditPage.getFooter().replaceFirst("<span ", "Page <span "));
         templateEditPage.clickSaveAndContinue();
 
@@ -272,7 +272,7 @@ class PDFExportIT
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(new ViewPage());
         exportOptions.getTemplateSelect().selectByVisibleText("My cool template");
 
-        try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration), "John", "pass")) {
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
             // Verify that the custom PDF template was used.
 
             // We should have 3 pages: cover page, table of contents and one content page.
@@ -295,6 +295,62 @@ class PDFExportIT
 
     @Test
     @Order(5)
+    void exportHiddenPageAsPDF(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        //
+        // Export directly a nested hidden page.
+        //
+        ViewPage viewPage =
+            setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent", "Hidden"), "WebHome"));
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+        try (PDFDocument pdf = exportOnlyContent(exportOptions, testConfiguration)) {
+            assertEquals(1, pdf.getNumberOfPages());
+            // The document title is not included when a single page is exported.
+            assertEquals("Hidden content\n", pdf.getTextFromPage(0));
+        }
+
+        //
+        // Export directly a terminal hidden page.
+        //
+        LocalDocumentReference grandchildReference =
+            new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent", "Hidden"), "Grandchild");
+        viewPage = setup.gotoPage(grandchildReference);
+        exportOptions = PDFExportOptionsModal.open(viewPage);
+        try (PDFDocument pdf = exportOnlyContent(exportOptions, testConfiguration)) {
+            assertEquals(1, pdf.getNumberOfPages());
+            // The document title is not included when a single page is exported.
+            assertEquals("Once upon a time...\n", pdf.getTextFromPage(0));
+        }
+
+        //
+        // Include a hidden nested page in the export (the reason it's visible in the tree is because one of its
+        // descendant pages is not hidden).
+        //
+
+        // Make the grandchild page visible in order to make its parent page visible in the tree.
+        setup.gotoPage(grandchildReference, "save", "xhidden", false);
+
+        viewPage = setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent"), "WebHome"));
+        ExportTreeModal exportTreeModal = ExportTreeModal.open(viewPage, "PDF");
+        // Include the hidden child page in the export.
+        exportTreeModal.getPageTree().getNode("document:xwiki:PDFExportIT.Parent.Hidden.WebHome").select();
+        exportTreeModal.export();
+        exportOptions = new PDFExportOptionsModal();
+
+        try (PDFDocument pdf = exportOnlyContent(exportOptions, testConfiguration)) {
+            assertEquals(3, pdf.getNumberOfPages());
+            String pageText = pdf.getTextFromPage(0);
+            assertTrue(pageText.startsWith("Parent\nChapter 1\n"), "Unexpeced parent document content: " + pageText);
+            assertEquals("Hidden\nHidden content\n", pdf.getTextFromPage(1));
+            assertEquals("Grandchild\nOnce upon a time...\n", pdf.getTextFromPage(2));
+        }
+
+        // Restore the visibility of the grandchild page.
+        setup.gotoPage(grandchildReference, "save", "xhidden", true);
+    }
+
+    @Test
+    @Order(6)
     void updatePDFExportConfigurationWithValidation(TestUtils setup, TestConfiguration testConfiguration)
         throws Exception
     {
@@ -329,7 +385,7 @@ class PDFExportIT
         exportOptions.getCoverCheckbox().click();
         exportOptions.getTocCheckbox().click();
 
-        try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration), "John", "pass")) {
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
             // One content page.
             assertEquals(1, pdf.getNumberOfPages());
             String content = pdf.getTextFromPage(0);
@@ -341,5 +397,21 @@ class PDFExportIT
     {
         return new URL(String.format("http://%s:%d", testConfiguration.getServletEngine().getIP(),
             testConfiguration.getServletEngine().getPort()));
+    }
+
+    private PDFDocument export(PDFExportOptionsModal exportOptions, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        return exportOptions.export(getHostURL(testConfiguration), "John", "pass");
+    }
+
+    private PDFDocument exportOnlyContent(PDFExportOptionsModal exportOptions, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        exportOptions.getCoverCheckbox().click();
+        exportOptions.getTocCheckbox().click();
+        exportOptions.getHeaderCheckbox().click();
+        exportOptions.getFooterCheckbox().click();
+        return export(exportOptions, testConfiguration);
     }
 }

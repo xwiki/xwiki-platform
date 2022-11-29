@@ -116,11 +116,14 @@
     #set($configClassName = 'XWiki.XWikiPreferences')
     #set($formId = $section.toLowerCase())
   #end
-  &lt;form id="$formId" method="post" action="$xwiki.getURL($configDoc, 'saveandcontinue')" onsubmit="cancelCancelEdit()" class="xform"&gt;
+  &lt;form id="$escapetool.xml($formId)" method="post"
+      action="$escapetool.xml($xwiki.getURL($configDoc, 'saveandcontinue'))"
+      onsubmit="cancelCancelEdit()"
+      class="xform"&gt;
     #set($obj = $configDoc.getObject($configClassName))
     #foreach ($entry in $params.entrySet())
       #set ($fields = $entry.value)
-      &lt;fieldset class="$entry.key"&gt;
+      &lt;fieldset class="$escapetool.xml($entry.key)"&gt;
       ## If there is only one section, don't display the legend
       #if ($params.size() &gt; 1)
         &lt;legend&gt;$services.localization.render("admin.$entry.key")&lt;/legend&gt;
@@ -145,7 +148,7 @@
       &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
       &lt;input type="hidden" name="xcontinue" value="$xwiki.getURL($currentDoc, 'admin', "editor=${escapetool.url(${editor})}&amp;amp;section=${escapetool.url(${section})}&amp;amp;space=${escapetool.url(${currentSpace})}")" /&gt;
       &lt;input type="hidden" name="xredirect" value="$xwiki.getURL($currentDoc, 'admin', "editor=${escapetool.url(${editor})}&amp;amp;section=${escapetool.url(${section})}&amp;amp;space=${escapetool.url(${currentSpace})}")" /&gt;
-      &lt;input type="hidden" name="classname" value="$configClassName" /&gt;
+      &lt;input type="hidden" name="classname" value="$escapetool.xml($configClassName)" /&gt;
       #if ("$!objectPolicy" != '')
       &lt;input type="hidden" name="objectPolicy" value="$escapetool.xml($objectPolicy)" /&gt;
       #end

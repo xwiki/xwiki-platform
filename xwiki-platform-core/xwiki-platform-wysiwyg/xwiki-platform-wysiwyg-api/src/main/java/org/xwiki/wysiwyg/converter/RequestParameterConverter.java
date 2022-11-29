@@ -35,7 +35,6 @@ import org.xwiki.stability.Unstable;
  * @since 13.5RC1
  */
 @Role
-@Unstable
 public interface RequestParameterConverter
 {
     /**

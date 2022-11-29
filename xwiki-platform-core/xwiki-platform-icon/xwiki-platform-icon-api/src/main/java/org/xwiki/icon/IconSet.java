@@ -266,7 +266,6 @@ public class IconSet
      * @return {@code true} if the icon name exists in the icon set, {@code false} otherwise
      * @since 13.4RC1
      */
-    @Unstable
     public boolean hasIcon(String iconName)
     {
         return this.iconMap.containsKey(iconName);

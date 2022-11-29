@@ -34,7 +34,6 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.stability.Unstable;
 
 /**
  * An {@link OfficeDocument} backed by an {@link XDOM} document.
@@ -70,7 +69,6 @@ public class XDOMOfficeDocument implements OfficeDocument
      * @param converterResult the {@link OfficeConverterResult} used to build that object.
      * @since 13.1RC1
      */
-    @Unstable
     public XDOMOfficeDocument(XDOM xdom, Set<File> artifactFiles, ComponentManager componentManager,
         OfficeConverterResult converterResult)
     {

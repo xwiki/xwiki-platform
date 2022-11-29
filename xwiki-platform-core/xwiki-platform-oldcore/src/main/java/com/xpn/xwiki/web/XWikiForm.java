@@ -21,8 +21,6 @@ package com.xpn.xwiki.web;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * @version $Id$
  */
@@ -46,7 +44,6 @@ public abstract class XWikiForm
      * @param request The servlet request we are processing
      * @since 13.0
      */
-    @Unstable
     public void reset(HttpServletRequest request)
     {
         setRequest(request);
@@ -59,7 +56,6 @@ public abstract class XWikiForm
      * @param request The servlet request we are processing
      * @since 13.0
      */
-    @Unstable
     public void reset(XWikiRequest request)
     {
         this.request = request;

@@ -55,7 +55,6 @@ public interface NotificationFilterPreferenceProvider
      * @throws NotificationException if an error happened
      * @since 13.3RC1
      */
-    @Unstable
     default Set<NotificationFilterPreference> getFilterPreferences(WikiReference wikiReference)
         throws NotificationException
     {
@@ -96,7 +95,6 @@ public interface NotificationFilterPreferenceProvider
      *
      * @since 13.3RC1
      */
-    @Unstable
     default void deleteFilterPreference(WikiReference wikiReference, String filterPreferenceId)
         throws NotificationException
     {
@@ -126,7 +124,6 @@ public interface NotificationFilterPreferenceProvider
      *
      * @since 13.3RC1
      */
-    @Unstable
     default void setFilterPreferenceEnabled(WikiReference wikiReference, String filterPreferenceId, boolean enabled)
         throws NotificationException
     {

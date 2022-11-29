@@ -21,7 +21,6 @@ package org.xwiki.security.authentication;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.observation.event.Event;
-import org.xwiki.stability.Unstable;
 
 /**
  * This event is triggered every time an authentication failure occurs.
@@ -35,7 +34,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 13.1RC1
  */
-@Unstable
 public class AuthenticationFailureEvent implements Event
 {
     @Override

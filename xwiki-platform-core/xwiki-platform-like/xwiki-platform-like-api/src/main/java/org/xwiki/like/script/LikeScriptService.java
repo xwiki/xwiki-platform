@@ -112,7 +112,6 @@ public class LikeScriptService implements ScriptService
      * @return {@code true} if the Like feature is enabled.
      * @since 13.1RC1
      */
-    @Unstable
     public boolean isEnabled()
     {
         return this.likeConfiguration.isEnabled();

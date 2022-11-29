@@ -20,7 +20,6 @@
 package org.xwiki.security;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provide configuration for the security module.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @since 13.10RC1
  */
 @Role
-@Unstable
 public interface SecurityConfiguration
 {
     /**

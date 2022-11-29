@@ -20,7 +20,6 @@
 package org.xwiki.like;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Configuration API for Like.
@@ -46,7 +45,6 @@ public interface LikeConfiguration
      * @return {@code true} if the like feature is enabled.
      * @since 13.1RC1
      */
-    @Unstable
     default boolean isEnabled()
     {
         return true;

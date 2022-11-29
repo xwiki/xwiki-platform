@@ -369,7 +369,6 @@ public class NotificationPreferenceScriptService implements ScriptService
      * @throws NotificationException if an error happens
      * @since 13.2RC1
      */
-    @Unstable
     public boolean isEventTypeEnabledForUser(String eventType, NotificationFormat format, UserReference userReference)
         throws NotificationException
     {

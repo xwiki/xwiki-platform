@@ -32,7 +32,6 @@ import java.util.Set;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.xwiki.model.EntityType;
-import org.xwiki.stability.Unstable;
 
 import static org.xwiki.security.SecurityReference.FARM;
 import static org.xwiki.security.authorization.RuleState.ALLOW;
@@ -408,7 +407,6 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
      * @return the list of statically registered rights.
      * @since 13.5RC1
      */
-    @Unstable
     public static List<Right> getStandardRights()
     {
         return STANDARD_RIGHTS;
@@ -421,7 +419,6 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
      *
      * @since 13.5RC1
      */
-    @Unstable
     void unregister()
     {
         Set<EntityType> entityTypes = this.getTargetedEntityType();

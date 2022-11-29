@@ -22,7 +22,6 @@ package org.xwiki.url;
 import java.net.URL;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Dedicated component to perform security checks on URLs.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 12.10.7
  */
 @Role
-@Unstable
 public interface URLSecurityManager
 {
     /**

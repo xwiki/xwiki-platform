@@ -20,7 +20,6 @@
 package org.xwiki.security.authentication;
 
 import org.xwiki.observation.event.Event;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
 /**
@@ -29,7 +28,6 @@ import org.xwiki.user.UserReference;
  * @version $Id$
  * @since 13.3RC1
  */
-@Unstable
 public class UserAuthenticatedEvent implements Event
 {
     /**

@@ -58,7 +58,6 @@ public interface NotificationFilterManager
      * @throws NotificationException if error happens
      * @since 13.3RC1
      */
-    @Unstable
     default Collection<NotificationFilter> getAllFilters(WikiReference wikiReference) throws NotificationException
     {
         return Collections.emptyList();

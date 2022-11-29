@@ -199,7 +199,6 @@ public abstract class AbstractServletResourceReferenceHandler<R extends Resource
      * @throws IOException in case of error during the content type analysis
      * @since 13.3RC1
      */
-    @Unstable
     protected String getContentType(InputStream resourceStream, R resourceReference)
         throws IOException
     {

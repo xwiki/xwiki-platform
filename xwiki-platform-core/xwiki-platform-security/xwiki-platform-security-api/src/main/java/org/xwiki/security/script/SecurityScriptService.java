@@ -27,7 +27,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.security.SecurityConfiguration;
-import org.xwiki.stability.Unstable;
 
 /**
  * Entry point for all security related script services and for the generic security script APIs.
@@ -71,7 +70,6 @@ public class SecurityScriptService implements ScriptService
      * @return the query items limit number.
      * @since 13.10RC1
      */
-    @Unstable
     public int getQueryItemsLimit()
     {
         return this.securityConfiguration.getQueryItemsLimit();

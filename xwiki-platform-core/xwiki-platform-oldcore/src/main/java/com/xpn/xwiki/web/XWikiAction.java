@@ -200,7 +200,6 @@ public abstract class XWikiAction implements LegacyAction
      * @return the class of the XWikiForm in charge of parsing the request
      * @since 13.0
      */
-    @Unstable
     protected Class<? extends XWikiForm> getFormClass()
     {
         return null;
@@ -810,7 +809,6 @@ public abstract class XWikiAction implements LegacyAction
      * @return the name to put in the {@link XWikiContext}, by default the component role hint is used
      * @since 13.0
      */
-    @Unstable
     protected String getName()
     {
         return this.componentDescriptor.getRoleHint();
@@ -1215,7 +1213,6 @@ public abstract class XWikiAction implements LegacyAction
      * @since 12.10.6
      * @since 13.2RC1
      */
-    @Unstable
     protected boolean readFromTemplate(XWikiDocument document, String template, XWikiContext context)
         throws XWikiException
     {

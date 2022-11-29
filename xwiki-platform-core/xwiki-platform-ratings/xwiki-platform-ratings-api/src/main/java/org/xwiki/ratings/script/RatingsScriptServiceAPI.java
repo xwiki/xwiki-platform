@@ -26,7 +26,6 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.ratings.AverageRating;
 import org.xwiki.ratings.Rating;
 import org.xwiki.ratings.RatingsConfiguration;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
 import com.xpn.xwiki.util.Programming;
@@ -104,7 +103,6 @@ public interface RatingsScriptServiceAPI
      * @since 13.4.3
      * @since 12.10.9
      */
-    @Unstable
     @Programming
     default Optional<AverageRating> recomputeAverageRating(EntityReference reference)
     {

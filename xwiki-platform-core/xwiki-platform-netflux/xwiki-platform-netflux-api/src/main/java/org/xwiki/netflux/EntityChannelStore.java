@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * The component used to create and associate channels to XWiki entities.
@@ -35,7 +34,6 @@ import org.xwiki.stability.Unstable;
  * @since 13.9RC1
  */
 @Role
-@Unstable
 public interface EntityChannelStore
 {
     /**

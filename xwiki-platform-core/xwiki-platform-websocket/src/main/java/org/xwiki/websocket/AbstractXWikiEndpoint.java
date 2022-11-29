@@ -33,7 +33,6 @@ import javax.websocket.Session;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
-import org.xwiki.stability.Unstable;
 
 /**
  * Base class for WebSocket end-points that require the XWiki execution context to be properly set-up.
@@ -41,7 +40,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 13.7RC1
  */
-@Unstable
 public abstract class AbstractXWikiEndpoint extends Endpoint implements EndpointComponent
 {
     private static final String ON_MESSAGE = "onMessage";

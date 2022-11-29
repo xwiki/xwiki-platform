@@ -42,7 +42,6 @@ public class UpdatedAverageRatingEvent extends AbstractAverageRatingEvent implem
      * @since 13.1RC1
      * @since 12.10.4
      */
-    @Unstable
     public UpdatedAverageRatingEvent()
     {
     }

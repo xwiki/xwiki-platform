@@ -165,7 +165,6 @@ public interface DocumentModelBridge
      * @since 12.10.5
      * @since 12.6.8
      */
-    @Unstable
     default Boolean isHidden()
     {
         return false;

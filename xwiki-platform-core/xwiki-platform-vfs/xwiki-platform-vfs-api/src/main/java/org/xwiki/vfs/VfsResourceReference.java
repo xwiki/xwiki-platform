@@ -32,7 +32,6 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.entity.EntityResourceAction;
 import org.xwiki.resource.entity.EntityResourceReference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -70,7 +69,6 @@ public class VfsResourceReference extends EntityResourceReference
      * @param reference the reference to copy
      * @since 12.3RC1
      */
-    @Unstable
     public VfsResourceReference(VfsResourceReference reference)
     {
         this(reference.uri, reference.pathSegments);

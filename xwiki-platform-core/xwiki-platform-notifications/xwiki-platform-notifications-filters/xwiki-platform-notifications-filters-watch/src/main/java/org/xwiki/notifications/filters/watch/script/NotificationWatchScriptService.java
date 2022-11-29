@@ -35,7 +35,6 @@ import org.xwiki.notifications.filters.watch.WatchedEntitiesConfiguration;
 import org.xwiki.notifications.filters.watch.WatchedEntitiesManager;
 import org.xwiki.notifications.filters.watch.WatchedEntityFactory;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.internal.document.DocumentUserReference;
@@ -213,7 +212,6 @@ public class NotificationWatchScriptService implements ScriptService
      * @return the automatic watch mode configured for the given user
      * @since 13.2RC1
      */
-    @Unstable
     public AutomaticWatchMode getAutomaticWatchMode(UserReference userReference)
         throws NotificationException
     {

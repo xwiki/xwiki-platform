@@ -27,7 +27,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
 import org.xwiki.localization.rest.model.jaxb.Translations;
-import org.xwiki.stability.Unstable;
 
 /**
  * Exposes the wiki translations through REST.
@@ -36,7 +35,6 @@ import org.xwiki.stability.Unstable;
  * @since 13.3RC1
  */
 @Path("/wikis/{wikiName}/localization/translations")
-@Unstable
 public interface TranslationsResource
 {
     /**

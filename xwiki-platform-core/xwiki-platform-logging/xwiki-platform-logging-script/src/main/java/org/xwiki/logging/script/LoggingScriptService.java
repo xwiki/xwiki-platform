@@ -41,7 +41,6 @@ import org.xwiki.logging.event.LogEvent;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provide logging related script oriented APIs.
@@ -176,7 +175,6 @@ public class LoggingScriptService implements ScriptService
      * @param message the message to be displayed for explaining the deprecation.
      * @since 13.1RC1
      */
-    @Unstable
     public void deprecate(String loggerName, String message)
     {
         if (this.loggerConfiguration.isDeprecatedLogEnabled()) {

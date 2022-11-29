@@ -20,7 +20,6 @@
 package org.xwiki.security.authentication;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Configuration of the authentication properties.
@@ -28,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @since 13.1RC1
  * @version $Id$
  */
-@Unstable
 @Role
 public interface AuthenticationConfiguration
 {

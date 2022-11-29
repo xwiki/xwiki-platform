@@ -580,7 +580,6 @@ public class XWiki extends Api
      * @since 13.3RC1
      * @since 12.10.7
      */
-    @Unstable
     public boolean exists(PageReference reference) throws XWikiException
     {
         return this.xwiki.exists(reference, getXWikiContext());

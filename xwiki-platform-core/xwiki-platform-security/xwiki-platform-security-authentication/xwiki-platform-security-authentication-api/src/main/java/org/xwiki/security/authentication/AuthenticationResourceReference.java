@@ -25,7 +25,6 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.resource.AbstractResourceReference;
 import org.xwiki.resource.ResourceType;
-import org.xwiki.stability.Unstable;
 
 /**
  * A dedicated {@link org.xwiki.resource.ResourceReference} to perform authentication related actions.
@@ -34,7 +33,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 13.1RC1
  */
-@Unstable
 public class AuthenticationResourceReference extends AbstractResourceReference
 {
     /**

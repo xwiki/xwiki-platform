@@ -20,7 +20,6 @@
 package org.xwiki.security.authentication;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
 /**
@@ -35,7 +34,6 @@ import org.xwiki.user.UserReference;
  * @since 13.1RC1
  */
 @Role
-@Unstable
 public interface ResetPasswordManager
 {
     /**

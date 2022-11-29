@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Configuration options for the URL module.
@@ -59,7 +58,6 @@ public interface URLConfiguration
      * @since 13.3RC1
      * @since 12.10.7
      */
-    @Unstable
     default List<String> getTrustedDomains()
     {
         return Collections.emptyList();
@@ -72,7 +70,6 @@ public interface URLConfiguration
      * @since 13.3RC1
      * @since 12.10.7
      */
-    @Unstable
     default boolean isTrustedDomainsEnabled()
     {
         return true;

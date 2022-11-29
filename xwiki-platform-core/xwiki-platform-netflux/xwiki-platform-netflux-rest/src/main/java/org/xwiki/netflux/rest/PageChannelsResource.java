@@ -30,7 +30,6 @@ import javax.ws.rs.QueryParam;
 
 import org.xwiki.netflux.rest.model.jaxb.EntityChannel;
 import org.xwiki.rest.XWikiRestException;
-import org.xwiki.stability.Unstable;
 
 /**
  * Exposes the Netflux (real-time communication) channels associated to a wiki page through REST.
@@ -38,7 +37,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 13.9RC1
  */
-@Unstable
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/channels")
 public interface PageChannelsResource
 {

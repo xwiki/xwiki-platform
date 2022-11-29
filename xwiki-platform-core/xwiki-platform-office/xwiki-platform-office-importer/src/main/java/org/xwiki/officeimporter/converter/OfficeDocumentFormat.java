@@ -21,15 +21,12 @@ package org.xwiki.officeimporter.converter;
 
 import java.util.List;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Representation of an OfficeDocumentFormat.
  *
  * @version $Id$
  * @since 13.1RC1
  */
-@Unstable
 public interface OfficeDocumentFormat
 {
     /**

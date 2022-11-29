@@ -205,7 +205,6 @@ public interface IconManager
      * @throws IconException in case of error when accessing the current icon set
      * @since 13.4RC1
      */
-    @Unstable
     default boolean hasIcon(String iconName) throws IconException
     {
         return getIconNames().contains(iconName);
@@ -220,7 +219,6 @@ public interface IconManager
      * @throws IconException in case of error when accessing the current icon set
      * @since 13.4RC1
      */
-    @Unstable
     default boolean hasIcon(String iconSetName, String iconName) throws IconException
     {
         return getIconNames(iconSetName).contains(iconName);

@@ -22,7 +22,6 @@ package org.xwiki.netflux;
 import java.util.List;
 
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * A channel associated to an XWiki entity.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 13.9RC1
  */
-@Unstable
 public class EntityChannel
 {
     private final EntityReference entityReference;

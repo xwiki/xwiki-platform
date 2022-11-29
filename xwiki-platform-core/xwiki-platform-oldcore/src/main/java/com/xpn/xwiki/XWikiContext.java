@@ -780,7 +780,6 @@ public class XWikiContext extends Hashtable<Object, Object>
      *          and the template should not be parsed.
      * @since 13.3RC1
      */
-    @Unstable
     public boolean isResponseSent()
     {
         return this.responseSent;

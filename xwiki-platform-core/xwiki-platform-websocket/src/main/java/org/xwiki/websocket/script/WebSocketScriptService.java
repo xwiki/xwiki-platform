@@ -33,7 +33,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -46,7 +45,6 @@ import com.xpn.xwiki.XWikiContext;
 @Component
 @Named("websocket")
 @Singleton
-@Unstable
 public class WebSocketScriptService implements ScriptService
 {
     private static final String UTF8 = "UTF-8";

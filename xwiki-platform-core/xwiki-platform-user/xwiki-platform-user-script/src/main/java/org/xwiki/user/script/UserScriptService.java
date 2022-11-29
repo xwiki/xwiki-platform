@@ -26,7 +26,6 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.SuperAdminUserReference;
@@ -208,7 +207,6 @@ public class UserScriptService implements ScriptService
      * @return a serialization of the user reference.
      * @since 13.8RC1
      */
-    @Unstable
     public String serialize(UserReference userReference)
     {
         return this.userReferenceSerializer.serialize(userReference);

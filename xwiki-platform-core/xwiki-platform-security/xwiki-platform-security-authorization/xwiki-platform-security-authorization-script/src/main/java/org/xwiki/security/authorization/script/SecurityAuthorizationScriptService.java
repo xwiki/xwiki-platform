@@ -165,7 +165,6 @@ public class SecurityAuthorizationScriptService implements ScriptService
      * @return all the registered rights names.
      * @since 13.5RC1
      */
-    @Unstable
     public List<String> getAllRightsNames()
     {
         return Right.getAllRightsAsString();

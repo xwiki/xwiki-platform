@@ -24,7 +24,6 @@ import java.util.Set;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * This API is for checking the access rights of any users on any XWiki entities. It replaces
@@ -109,7 +108,6 @@ public interface AuthorizationManager
      * @throws AuthorizationException if the right is not custom.
      * @since 13.5RC1
      */
-    @Unstable
     default void unregister(Right right) throws AuthorizationException
     {
     };

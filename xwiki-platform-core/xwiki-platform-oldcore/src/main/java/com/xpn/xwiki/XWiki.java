@@ -4694,7 +4694,6 @@ public class XWiki implements EventListener
      * @throws XWikiException
      * @since 13.6RC1
      */
-    @Unstable
     public void deleteDocumentVersions(XWikiDocument document, String version1, String version2, XWikiContext context)
         throws XWikiException
     {
@@ -6547,7 +6546,6 @@ public class XWiki implements EventListener
      * @since 13.3RC1
      * @since 12.10.7
      */
-    @Unstable
     public boolean exists(PageReference reference, XWikiContext context) throws XWikiException
     {
         // Try as space

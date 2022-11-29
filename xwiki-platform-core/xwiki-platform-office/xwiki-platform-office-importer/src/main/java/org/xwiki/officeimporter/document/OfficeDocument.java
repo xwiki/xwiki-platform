@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.xwiki.officeimporter.converter.OfficeConverterResult;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represents an office document being imported.
@@ -62,7 +61,6 @@ public interface OfficeDocument extends Closeable
      * @return the set of artifacts related to this office document.
      * @since 13.1RC1
      */
-    @Unstable
     default Set<File> getArtifactsFiles()
     {
         return Collections.emptySet();
@@ -72,7 +70,6 @@ public interface OfficeDocument extends Closeable
      * @return the converter result.
      * @since 13.1RC1
      */
-    @Unstable
     default OfficeConverterResult getConverterResult()
     {
         return null;

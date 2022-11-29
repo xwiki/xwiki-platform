@@ -36,7 +36,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 13.4RC1
  */
-@Unstable
 @Role
 public interface MacroRefactoring
 {

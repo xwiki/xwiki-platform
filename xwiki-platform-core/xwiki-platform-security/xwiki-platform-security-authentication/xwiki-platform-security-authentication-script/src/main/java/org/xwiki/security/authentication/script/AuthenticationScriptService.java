@@ -165,7 +165,6 @@ public class AuthenticationScriptService implements ScriptService
      * @return a relative URL for the current wiki or {@code null} if an error occurs.
      * @since 13.1RC1
      */
-    @Unstable
     public String getAuthenticationURL(String action, Map<String, Object> params)
     {
         try {
@@ -198,7 +197,6 @@ public class AuthenticationScriptService implements ScriptService
      * @throws ResetPasswordException if any error occurs for performing the reset password request.
      * @since 13.1RC1
      */
-    @Unstable
     public void requestResetPassword(UserReference user) throws ResetPasswordException
     {
         if (this.authorizationManager.hasAccess(Right.PROGRAM)) {
@@ -221,7 +219,6 @@ public class AuthenticationScriptService implements ScriptService
      * @throws ResetPasswordException if the code is not correct or if an error occurs.
      * @since 13.1RC1
      */
-    @Unstable
     public String checkVerificationCode(UserReference user, String verificationCode)
         throws ResetPasswordException
     {
@@ -238,7 +235,6 @@ public class AuthenticationScriptService implements ScriptService
      * @throws ResetPasswordException if the verification code is wrong, or if an error occurs.
      * @since 13.1RC1
      */
-    @Unstable
     public void resetPassword(UserReference user, String verificationCode, String newPassword)
         throws ResetPasswordException
     {

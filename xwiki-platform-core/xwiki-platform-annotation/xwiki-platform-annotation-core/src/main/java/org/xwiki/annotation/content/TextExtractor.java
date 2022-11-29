@@ -21,7 +21,6 @@ package org.xwiki.annotation.content;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.stability.Unstable;
 
 /**
  * Component responsible for extracting plain text from inside a given {@code String} depending on the syntax associated
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @since 13.10RC1
  */
 @Role
-@Unstable
 public interface TextExtractor
 {
     /**

@@ -25,7 +25,6 @@ import java.util.Set;
 
 import org.w3c.dom.Document;
 import org.xwiki.officeimporter.converter.OfficeConverterResult;
-import org.xwiki.stability.Unstable;
 import org.xwiki.xml.html.HTMLUtils;
 
 /**
@@ -56,7 +55,6 @@ public class XHTMLOfficeDocument implements OfficeDocument
      * @param converterResult the {@link OfficeConverterResult} used to build that object.
      * @since 13.1RC1
      */
-    @Unstable
     public XHTMLOfficeDocument(Document document, Set<File> artifactFiles, OfficeConverterResult converterResult)
     {
         this.document = document;

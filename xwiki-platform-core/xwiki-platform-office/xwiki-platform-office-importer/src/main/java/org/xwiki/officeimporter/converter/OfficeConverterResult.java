@@ -23,8 +23,6 @@ import java.io.Closeable;
 import java.io.File;
 import java.util.Set;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Provide the result of an office file conversion.
  * This interface mainly returns the paths of the various files created during the conversion.
@@ -33,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 13.1RC1
  */
-@Unstable
 public interface OfficeConverterResult extends Closeable
 {
     /**

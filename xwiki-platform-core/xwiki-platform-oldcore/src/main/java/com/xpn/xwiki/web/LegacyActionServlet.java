@@ -37,7 +37,6 @@ import org.xwiki.resource.ResourceReferenceResolver;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.ResourceTypeResolver;
 import org.xwiki.resource.entity.EntityResourceReference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.url.ExtendedURL;
 
 import com.xpn.xwiki.internal.web.LegacyAction;
@@ -49,7 +48,6 @@ import com.xpn.xwiki.internal.web.LegacyAction;
  * @version $Id$
  * @since 13.0
  */
-@Unstable
 public class LegacyActionServlet extends HttpServlet
 {
     private static final long serialVersionUID = 1L;

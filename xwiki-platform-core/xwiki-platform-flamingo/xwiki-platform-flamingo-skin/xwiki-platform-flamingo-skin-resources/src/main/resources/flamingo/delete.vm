@@ -170,7 +170,7 @@
           'doc.location' : { 'type': 'text', 'filterable': true, 'html': true},
           'doc.author'   : { 'link' : 'author' }
         })
-        #set ($urlParameters = "xpage=getdocuments&childrenOf=$escapetool.url($doc.space)&queryFilters=unique")
+        #set ($urlParameters = "xpage=getdocuments&childrenOf=$escapetool.url($doc.space)&queryFilters=unique,currentlanguage")
         #set ($options = { 
           'url' : "$doc.getURL('get', $urlParameters)",
           'translationPrefix' : 'platform.index.',

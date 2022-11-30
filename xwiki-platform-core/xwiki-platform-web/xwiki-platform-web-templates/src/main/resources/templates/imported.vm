@@ -20,7 +20,9 @@
 #template("xwikivars.vm")
 #macro(showfilelist $list $text)
   #if($list.size()>0)
-    <h4 class="legend">$services.localization.render("import_listof${text}files")</h4>
+    <h4 class="legend">
+      $escapetool.xml($services.localization.render("import_listof${text}files"))
+    </h4>
     <ul>
       #foreach($item in $list)
         <li><a href="$xwiki.getURL($item)">$escapetool.xml($item)</a></li>
@@ -29,12 +31,12 @@
   #end
 #end
 #if($hasAdmin)
-  #set($status = $services.localization.render("import_install_${xwiki.package.status}"))
-  #info("$services.localization.render('importing') $!escapetool.xml($request.name): $status")
+  #set($status = $escapetool.xml($services.localization.render("import_install_${xwiki.package.status}")))
+  #info("$escapetool.xml($services.localization.render('importing')) $!escapetool.xml($request.name): $status")
   <ul>
-    <li>$xwiki.package.installed.size() $services.localization.render('import_documentinstalled')</li>
-    <li>$xwiki.package.skipped.size() $services.localization.render('import_documentskipped')</li>
-    <li>$xwiki.package.errors.size() $services.localization.render('import_documenterrors')</li>
+    <li>$xwiki.package.installed.size() $escapetool.xml($services.localization.render('import_documentinstalled'))</li>
+    <li>$xwiki.package.skipped.size() $escapetool.xml($services.localization.render('import_documentskipped'))</li>
+    <li>$xwiki.package.errors.size() $escapetool.xml($services.localization.render('import_documenterrors'))</li>
   </ul>
   #showfilelist($xwiki.package.installed 'installed')
   #showfilelist($xwiki.package.skipped 'skipped')

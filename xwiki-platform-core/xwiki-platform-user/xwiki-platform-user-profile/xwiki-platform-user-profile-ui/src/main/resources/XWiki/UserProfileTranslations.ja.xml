@@ -39,7 +39,7 @@
   <content>XWiki.XWikiUsers_displayHiddenDocuments.hint=ウィキは既定では表示しないドキュメントを含みます。これらのドキュメントには、アプリケーションのクラス、設定ページ、マクロ、スタイル、スクリプトなどの技術的な内容が記述されています。
 XWiki.XWikiUsers_accessibility.hint=追加のアクセシビリティー機能からは、フォントの拡大、リンクへの下線の追加などを有効にできます。
 XWiki.XWikiUsers_timezone.hint=タイムゾーンを設定して、現在の場所と日付を対応させることができます。
-### Missing: XWiki.XWikiUsers_editor.hint=
+XWiki.XWikiUsers_editor.hint=既定のエディターを選択。全体で既定のエディターの設定を上書きします。選択がない場合、編集されている内容に応じて既定のエディターを選択します。
 XWiki.XWikiUsers_usertype.hint=どのユーザーの種類を既定とするか設定してください。上級ユーザーは、編集機能を使用したりターミナルページを作成したりできます。
 XWiki.XWikiUsers_extensionConflictSetup.hint=拡張機能マネージャーに、競合の解決に関する既定のルールを確認させるかどうかを指示（例えば、アップグレードするドキュメントがウィキから削除された場合の対応を確認させるなど）。
 userprofile.default=既定

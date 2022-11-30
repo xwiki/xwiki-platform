@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Component to render an icon, depending on the current icon theme set on the preferences.

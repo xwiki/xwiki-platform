@@ -24,8 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * A collection of icons, with some properties to display them.
  *

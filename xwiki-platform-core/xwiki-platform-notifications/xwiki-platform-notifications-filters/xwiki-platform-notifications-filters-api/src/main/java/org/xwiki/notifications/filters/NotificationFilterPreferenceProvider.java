@@ -27,7 +27,6 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provide {@link NotificationFilterPreference} from multiple sources.

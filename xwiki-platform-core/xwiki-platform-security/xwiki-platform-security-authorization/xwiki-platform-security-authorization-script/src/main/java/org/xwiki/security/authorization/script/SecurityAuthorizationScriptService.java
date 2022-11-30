@@ -34,7 +34,6 @@ import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.script.SecurityScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
  * Security Authorization Script Service.

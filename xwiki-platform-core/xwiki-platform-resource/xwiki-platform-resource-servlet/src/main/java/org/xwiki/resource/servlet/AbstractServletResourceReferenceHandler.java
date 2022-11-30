@@ -46,7 +46,6 @@ import org.xwiki.resource.ResourceReferenceHandler;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
 import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.resource.ResourceType;
-import org.xwiki.stability.Unstable;
 import org.xwiki.tika.internal.TikaUtils;
 
 /**

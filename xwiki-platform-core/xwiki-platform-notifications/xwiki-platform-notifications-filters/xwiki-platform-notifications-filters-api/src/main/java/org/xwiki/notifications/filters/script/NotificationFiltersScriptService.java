@@ -44,7 +44,6 @@ import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.ModelBridge;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.internal.document.DocumentUserReference;

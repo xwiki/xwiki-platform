@@ -22,7 +22,6 @@ package org.xwiki.ratings.events;
 import org.xwiki.observation.event.EndEvent;
 import org.xwiki.ratings.AverageRating;
 import org.xwiki.ratings.RatingsManager;
-import org.xwiki.stability.Unstable;
 
 /**
  * Event sent whenever an {@link AverageRating} is updated. The event is sent with the following information:

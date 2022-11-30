@@ -40,7 +40,7 @@
 rating.rate=評価！
 rating.saveexception=評価を表示する際のエラー。
 rating.votenotvalid=0の値では投票できません。
-### Missing: rating.voteoutofbounds=The vote is out of the scale limit.
+rating.voteoutofbounds=投票が許容する値の幅を超えています。
 rating.setvote.inprogress=投票を保存しています…
 rating.setvote.success=投票を保存しました！
 rating.setvote.error=投票を保存する際のエラー。

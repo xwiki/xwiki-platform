@@ -128,5 +128,12 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Required to use the xar script service in the tests. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-xar-script</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 </project>

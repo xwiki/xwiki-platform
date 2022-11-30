@@ -42,13 +42,13 @@ extension.repository.name=名称
 extension.repository.summary=要約
 extension.repository.type=種類
 extension.repository.category=カテゴリー
-### Missing: extension.repository.authors=
+extension.repository.authors=作者
 extension.repository.doc.creationDate=作成日
 extension.repository.doc.date=最終更新日
 extension.repository.rating=評価
 extension.repository.installedCount=インストール数
 
 ## Administration UI
-admin.repository=拡張機能のレポジトリ
+admin.repository=拡張機能のレポジトリー
 </content>
   </xwikidoc>

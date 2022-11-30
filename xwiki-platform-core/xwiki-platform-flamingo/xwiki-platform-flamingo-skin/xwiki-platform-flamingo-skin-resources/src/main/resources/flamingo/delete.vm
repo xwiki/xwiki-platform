@@ -171,6 +171,8 @@
           'doc.location' : { 'type': 'text', 'filterable': true, 'html': true},
           'doc.author'   : { 'link' : 'author' }
         })
+        ## Note: we also display translations in the table since we want to show to the user all the pages that will
+        ## be deleted (including translations and hidden pages).
         #set ($urlParameters = "xpage=getdocuments&childrenOf=$escapetool.url($doc.space)&queryFilters=unique")
         #set ($options = { 
           'url' : "$doc.getURL('get', $urlParameters)",

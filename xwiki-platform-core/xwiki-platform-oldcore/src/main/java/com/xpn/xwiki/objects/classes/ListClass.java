@@ -36,7 +36,6 @@ import org.apache.ecs.xhtml.select;
 import org.dom4j.Element;
 import org.hibernate.collection.spi.PersistentCollection;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.xar.internal.property.ListXarObjectPropertySerializer;
 import org.xwiki.xml.XMLUtils;
 

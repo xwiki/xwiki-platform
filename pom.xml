@@ -972,6 +972,11 @@
       <!-- Docker -->
       <dependency>
         <groupId>com.github.docker-java</groupId>
+        <artifactId>docker-java-api</artifactId>
+        <version>${dockerJava.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.docker-java</groupId>
         <artifactId>docker-java</artifactId>
         <version>${dockerJava.version}</version>
       </dependency>

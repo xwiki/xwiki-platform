@@ -38,14 +38,14 @@
   <hidden>true</hidden>
   <content>rendering.macro.mention.name=ユーザーメンション
 rendering.macro.mention.description=ユーザーメンションを挿入。
-### Missing: rendering.macro.mention.parameter.reference.name=Reference
-### Missing: rendering.macro.mention.parameter.reference.description=The mentioned user or group reference.
+rendering.macro.mention.parameter.reference.name=参照
+rendering.macro.mention.parameter.reference.description=メンションされたユーザーまたはグループの参照。
 rendering.macro.mention.parameter.style.name=表示のスタイル
 rendering.macro.mention.parameter.style.description=メンションを表示するスタイル（これはユーザーメンションにのみ適用されます）。
 rendering.macro.mention.parameter.anchor.name=アンカー
 rendering.macro.mention.parameter.anchor.description=メンションへのリンクに使用するアンカー（このアンカーはできるだけドキュメントに固有であるべきです）。
 rendering.macro.mention.parameter.type.name=種類
-### Missing: rendering.macro.mention.parameter.type.description=The type of the mentioned actor.
+rendering.macro.mention.parameter.type.description=メンションされたアクターの種類。
 org.xwiki.mentions.DisplayStyle.FULL_NAME=ユーザーの氏名
 org.xwiki.mentions.DisplayStyle.FIRST_NAME=ユーザーの名のみ
 org.xwiki.mentions.DisplayStyle.LOGIN=ユーザー名
@@ -54,7 +54,7 @@ XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=現在のユーザ�
 XWiki.Mentions.MentionsConfigurationClass_selfMentionsColor=自分のメンションの色
 XWiki.Mentions.MentionsConfigurationClass_quoteActivated=引用を有効にする
 XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=メンションを囲むテキストの引用をユーザーメンションの通知に含むかどうかを規定。
-### Missing: mentions.tip=When editing in WYSIWYG, type @ and then start typing letters to get suggestions to mention a user.
+mentions.tip=WYSIWYGで編集中の場合、@の後に文字を入力すると、メンションするユーザーの候補が表示されます。
 mentions.configuration.heading=メンションの設定
 </content>
   </xwikidoc>

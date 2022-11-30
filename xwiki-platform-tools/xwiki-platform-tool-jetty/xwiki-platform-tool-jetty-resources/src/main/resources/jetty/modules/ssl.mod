@@ -18,7 +18,7 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
+# DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
 
 [description]
 Enables a TLS (SSL) connector to support secure protocols.
@@ -27,6 +27,7 @@ Secure HTTP/1.1 is provided by enabling the "https" module and secure HTTP/2 is 
 [tags]
 connector
 ssl
+internal
 
 [depend]
 server

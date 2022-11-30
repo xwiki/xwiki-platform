@@ -18,7 +18,7 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
+# DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
 
 [description]
 Enables and configures the Jetty server.
@@ -33,6 +33,7 @@ resources
 [depend]
 threadpool
 bytebufferpool
+logging
 
 [lib]
 lib/jetty-servlet-api-4.0.*.jar

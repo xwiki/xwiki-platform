@@ -30,7 +30,7 @@
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
 
   <!-- =========================================================== -->
-  <!-- Add an HTTP Connector.                                      -->
+  <!-- Add an HTTP Connector.                                       -->
   <!-- Configure an o.e.j.server.ServerConnector with a single     -->
   <!-- HttpConnectionFactory instance using the common httpConfig  -->
   <!-- instance defined in jetty.xml                               -->

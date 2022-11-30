@@ -18,7 +18,7 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
+# DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
 
 [description]
 Enables Annotation scanning for deployed web applications.
@@ -32,3 +32,4 @@ lib/annotations/*.jar
 
 [jpms]
 add-modules:org.objectweb.asm
+

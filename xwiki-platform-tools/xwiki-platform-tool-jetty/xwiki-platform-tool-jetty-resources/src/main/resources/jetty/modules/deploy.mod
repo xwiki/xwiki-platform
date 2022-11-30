@@ -18,16 +18,19 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
+# DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
 
 [description]
-Enables web application deployment from the webapps directory.
+Enables web application deployment from the $JETTY_BASE/webapps/ directory.
 
 [depend]
 webapp
 
 [lib]
 lib/jetty-deploy-${jetty.version}.jar
+
+[files]
+webapps/
 
 [xml]
 etc/jetty-deploy.xml

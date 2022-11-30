@@ -18,10 +18,13 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
+# DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
 
 [description]
 Enables and configures the Server ThreadPool.
+
+[depends]
+logging
 
 [xml]
 etc/jetty-threadpool.xml
@@ -33,8 +36,11 @@ etc/jetty-threadpool.xml
 ## Maximum number of pooled threads.
 #jetty.threadPool.maxThreads=200
 
-## Number of reserved threads (-1 for heuristic)
-# jetty.threadPool.reservedThreads=-1
+## Number of reserved threads (-1 for heuristic).
+#jetty.threadPool.reservedThreads=-1
+
+## Whether to use virtual threads, if the runtime supports them.
+#jetty.threadPool.useVirtualThreads=false
 
 ## Thread idle timeout (in milliseconds).
 #jetty.threadPool.idleTimeout=60000

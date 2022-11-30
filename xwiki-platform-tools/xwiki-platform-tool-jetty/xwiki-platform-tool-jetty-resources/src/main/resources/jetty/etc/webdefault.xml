@@ -21,11 +21,11 @@
 -->
 
 <web-app
-  xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
-  metadata-complete="false"
-  version="3.1">
+   xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+   metadata-complete="false"
+   version="3.1">
 
   <!-- ===================================================================== -->
   <!-- This file contains the default descriptor for web applications.       -->
@@ -55,7 +55,7 @@
   <!-- ensure webapp classloader can be released on undeploy                -->
   <!-- ==================================================================== -->
   <listener>
-    <listener-class>org.eclipse.jetty.servlet.listener.ELContextCleaner</listener-class>
+   <listener-class>org.eclipse.jetty.servlet.listener.ELContextCleaner</listener-class>
   </listener>
 
   <!-- ==================================================================== -->
@@ -63,7 +63,7 @@
   <!-- ensure webapp classloader can be released on undeploy                -->
   <!-- ==================================================================== -->
   <listener>
-    <listener-class>org.eclipse.jetty.servlet.listener.IntrospectorCleaner</listener-class>
+   <listener-class>org.eclipse.jetty.servlet.listener.IntrospectorCleaner</listener-class>
   </listener>
 
 
@@ -160,7 +160,7 @@
  *                    defaults to .svgz but a comma separated list of gzip equivalent file extensions can be supplied
  *
  -->
-  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  -->
+ <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  -->
   <servlet>
     <servlet-name>default</servlet-name>
     <servlet-class>org.eclipse.jetty.servlet.DefaultServlet</servlet-class>

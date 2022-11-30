@@ -18,6 +18,9 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
+# This is the top level mod used when starting Jetty in start_xwiki.*
+# It's called with "--module=xwiki" on the command line to start Jetty.
+
 [depend]
 ext
 resources
@@ -32,3 +35,15 @@ apache-jsp
 
 [xml]
 etc/jetty-xwiki.xml
+
+[ini-template]
+## Default configuration values for XWiki
+
+## Disable WAR scanning and hot deployments since we use static expanded WAR to speed up Jetty.
+jetty.deploy.scanInterval=0
+jetty.deploy.extractWars=false
+
+## Jetty 10.0.3+ has added a protection in URLs so that encoded characters such as % are prohibited by default. Since
+## XWiki uses them, we need to configure Jetty to allow for it. See
+##   https://www.eclipse.org/jetty/documentation/jetty-10/operations-guide/index.html#og-module-server-compliance
+jetty.httpConfig.uriCompliance=RFC3986

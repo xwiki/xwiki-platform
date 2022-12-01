@@ -43,7 +43,7 @@ panels.type=種類
 panels.category=カテゴリー
 panels._actions=アクション
 ### Missing: panels.emptyvalue=
-panels.children.title=子ページ
+panels.children.title=下位ページ
 panels.siblings.title=同レベルのページ
 
 ## Used to indicate where deprecated keys start

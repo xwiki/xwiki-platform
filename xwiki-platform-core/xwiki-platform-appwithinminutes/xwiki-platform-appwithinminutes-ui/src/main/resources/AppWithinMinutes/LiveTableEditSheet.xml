@@ -233,7 +233,9 @@
   ## Grant space administration rights only if the space is new. Don't overwrite existing space preferences.
   #set ($spaceHomeRef = $services.model.resolveDocument('', 'default', $spaceRef))
   #set ($spacePrefsRef = $services.model.resolveDocument('WebPreferences', 'explicit', $spaceRef))
-  #if (!$xwiki.exists($spaceHomeRef) &amp;&amp; !$xwiki.exists($spacePrefsRef))
+  ## Verify that the current user has script right on the current space home.
+  #set ($hasScript = $services.security.authorization.hasAccess('script',  $xcontext.userReference, $spaceHomeRef))
+  #if ($hasScript &amp;&amp; !$xwiki.exists($spaceHomeRef) &amp;&amp; !$xwiki.exists($spacePrefsRef))
     #set ($spacePrefsDoc = $xwiki.getDocument($spacePrefsRef))
     #set ($discard = $spacePrefsDoc.use($spacePrefsDoc.getObject('XWiki.XWikiGlobalRights', true)))
     #set ($discard = $spacePrefsDoc.set('allow', 1))
@@ -355,6 +357,10 @@
 {{/velocity}}
 
 {{velocity}}
+#if (!$services.security.authorization.hasAccess('script', $xcontext.userReference, $doc.documentReference))
+  {{error}}{{translation key="platform.appwithinminutes.appHomePageNoScriptRight" /}}{{/error}}
+
+#end
 #if ("$!request.wizard" == 'true')
   {{include reference="AppWithinMinutes.WizardStep" /}}
 #end

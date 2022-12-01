@@ -85,4 +85,10 @@ public class AllITs
     class NestedClassEditorIT extends ClassEditorIT
     {
     }
+
+    @Nested
+    @DisplayName("Without script right test")
+    class NestedWithoutScriptRightIT extends WithoutScriptRightIT
+    {
+    }
 }

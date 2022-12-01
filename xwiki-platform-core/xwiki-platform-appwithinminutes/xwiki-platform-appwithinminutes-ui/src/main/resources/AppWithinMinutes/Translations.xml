@@ -210,6 +210,7 @@ platform.appwithinminutes.appHomePageEditAppLabel=Edit application
 platform.appwithinminutes.appHomePageTranslateAppLabel=Translate application
 platform.appwithinminutes.appHomePageDeleteAppLabel=Delete application
 platform.appwithinminutes.appHomePageMovedWarning=The application might not function correctly because it has been renamed or moved without updating the code. Please edit the application and follow the steps in order to update the code.
+platform.appwithinminutes.appHomePageNoScriptRight=You don't have the script right which is necessary to create or edit an application. The application might not work correctly when you continue.
 AppWithinMinutes.LiveTableClass_description=Description
 AppWithinMinutes.LiveTableClass_columns=Live Table Columns
 

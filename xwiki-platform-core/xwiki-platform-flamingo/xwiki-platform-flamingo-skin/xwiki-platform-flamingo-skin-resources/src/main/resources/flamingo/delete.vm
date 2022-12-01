@@ -151,7 +151,9 @@
     #set ($query = $services.query.xwql($childCountXWQL))
     #set ($query = $query.bindValue('space').literal("${doc.space}.").anyChars().query())
     #set ($query = $query.bindValue('fullName', $doc.fullName))
-    #set($childCount = $query.addFilter('unique').count())
+    ## Note: we don't use any filter since we display all documents including translations and hidden documents in the
+    ## table below.
+    #set($childCount = $query.count())
     #if ($childCount > 0)
       ## Check if we should propose by default to affect children when the only remaining children (after the delete) would be the WebPreferences document.
       #set ($webPreferencesDocumentReference = $services.model.createDocumentReference('WebPreferences', $doc.documentReference.lastSpaceReference))

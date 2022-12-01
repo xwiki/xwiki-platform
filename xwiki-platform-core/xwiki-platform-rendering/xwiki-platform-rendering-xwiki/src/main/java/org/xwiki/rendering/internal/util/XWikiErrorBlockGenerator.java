@@ -35,7 +35,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.logging.event.LogEvent;
+import org.xwiki.logging.Message;
 import org.xwiki.logging.marker.TranslationMarker;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.CompositeBlock;
@@ -67,7 +67,7 @@ public class XWikiErrorBlockGenerator extends DefaultErrorBlockGenerator
     @Inject
     private Execution execution;
 
-    private List<Block> executeTemplate(String messageId, LogEvent message, LogEvent description, boolean inline)
+    private List<Block> executeTemplate(String messageId, Message message, Message description, boolean inline)
     {
         ExecutionContext econtext = this.execution.getContext();
 
@@ -103,7 +103,7 @@ public class XWikiErrorBlockGenerator extends DefaultErrorBlockGenerator
     }
 
     private List<Block> executeTemplate(Template template, TemplateManager templateManager, String messageId,
-        LogEvent message, LogEvent description, boolean inline, ExecutionContext econtext)
+        Message message, Message description, boolean inline, ExecutionContext econtext)
     {
         ScriptContext scriptContext = this.scriptContextManagerProvider.get().getCurrentScriptContext();
 
@@ -146,7 +146,7 @@ public class XWikiErrorBlockGenerator extends DefaultErrorBlockGenerator
     }
 
     @Override
-    protected List<Block> generateErrorBlocks(boolean inline, LogEvent message, LogEvent description)
+    protected List<Block> generateErrorBlocks(boolean inline, Message message, Message description)
     {
         String messageId;
         if (message.getMarker() instanceof TranslationMarker) {

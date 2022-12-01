@@ -119,6 +119,12 @@
       <version>${rendering.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-macro-message</artifactId>
+      <version>${rendering.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Used to implement drag & drop in the "Structure" (class definition) and  "Presentation" (home page) steps. -->
     <dependency>
       <groupId>org.webjars</groupId>

@@ -114,7 +114,7 @@
           &lt;label&gt;
             ## Note: Using the same input name for the "custom" option
             &lt;input type="radio" name="XWiki.Captcha.JCaptcha.ConfigurationClass_0_engine" class="customActivator" #if ($isCustom)checked="checked"#end /&gt;
-            $services.localization.render('captcha.jcaptcha.engine.custom', $services.rendering.resolveSyntax('xwiki/2.1'))
+            $escapetool.xml($services.localization.render('captcha.jcaptcha.engine.custom'))
           &lt;/label&gt;
           &lt;input type="text" class="customEngine" #if ($isCustom)checked="checked" value="$currentEngine"#end /&gt;
         &lt;/div&gt;

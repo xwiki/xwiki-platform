@@ -575,7 +575,7 @@ public class InternalTemplateManager implements Initializable
                         causes.add(e);
                     }
                 } else {
-                    this.logger.warn("Now template requirement handler could be found for key [{}] in template [{}]",
+                    this.logger.warn("No template requirement handler could be found for key [{}] in template [{}]",
                         propertyName, template.getId());
                 }
             }

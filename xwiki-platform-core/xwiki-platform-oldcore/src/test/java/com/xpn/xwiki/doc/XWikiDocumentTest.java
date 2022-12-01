@@ -59,6 +59,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.DocumentSection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
@@ -76,10 +77,12 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -645,6 +648,30 @@ public class XWikiDocumentTest
             this.document.display("string", "edit", this.oldcore.getXWikiContext()));
 
         assertEquals("<p>area</p>", this.document.display("area", "view", this.oldcore.getXWikiContext()));
+    }
+
+    @Test
+    void displayEscapesClosingHTMLMacro()
+    {
+        this.oldcore.getXWikiContext().put("isInRenderingEngine", true);
+        when(this.xWiki.getCurrentContentSyntaxId(any())).thenReturn("xwiki/2.1");
+        this.document.setSyntax(Syntax.XWIKI_2_0);
+
+        BaseObject object = mock(BaseObject.class);
+        when(object.getOwnerDocument()).thenReturn(this.document);
+
+        BaseClass xClass = mock(BaseClass.class);
+        when(object.getXClass(any())).thenReturn(xClass);
+        PropertyClass propertyInterface = mock(PropertyClass.class);
+        when(xClass.get("mock")).thenReturn(propertyInterface);
+        doAnswer(call -> {
+            call.getArgument(0, StringBuffer.class).append("{{/html}}content{{/html}}");
+            return null;
+        }).when(propertyInterface).displayView(any(StringBuffer.class), eq("mock"), any(String.class), eq(object),
+            anyBoolean(), any(XWikiContext.class));
+
+        assertEquals("{{html clean=\"false\" wiki=\"false\"}}&#123;&#123;/html}}content&#123;&#123;/html}}{{/html}}",
+            this.document.display("mock", "view", object, this.oldcore.getXWikiContext()));
     }
 
     @Test

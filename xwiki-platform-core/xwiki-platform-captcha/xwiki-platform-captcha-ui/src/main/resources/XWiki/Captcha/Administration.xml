@@ -46,21 +46,21 @@
   &lt;/div&gt;
   &lt;dl&gt;
     &lt;dt&gt;
-      &lt;label for="XWiki.Captcha.ConfigurationClass_0_captcha"&gt;$services.localization.render('captcha.admin.defaultCaptchaName.label')&lt;/label&gt;
-      &lt;span class='xHint'&gt;$services.localization.render('captcha.admin.defaultCaptchaName.hint')&lt;/span&gt;
+      &lt;label for="XWiki.Captcha.ConfigurationClass_0_captcha"&gt;$services.localization.render('captcha.admin.defaultCaptchaName.label', $services.rendering.resolveSyntax('xwiki/2.1'))&lt;/label&gt;
+      &lt;span class='xHint'&gt;$services.localization.render('captcha.admin.defaultCaptchaName.hint', $services.rendering.resolveSyntax('xwiki/2.1'))&lt;/span&gt;
     &lt;/dt&gt;
     &lt;dd&gt;
       &lt;select name="XWiki.Captcha.ConfigurationClass_0_captcha" id="XWiki.Captcha.ConfigurationClass_0_captcha"&gt;
       #foreach ($captchaName in $services.captcha.captchaNames)
         &lt;option value="${captchaName}" #if($captchaName == $services.captcha.defaultCaptchaName)selected='selected'#end&gt;
-          $services.localization.render("captcha.${captchaName}")
+          $services.localization.render("captcha.${captchaName}", $services.rendering.resolveSyntax('xwiki/2.1'))
         &lt;/option&gt;
       #end
       &lt;/select&gt;
     &lt;/dd&gt;
   &lt;/dl&gt;
   &lt;div class='buttonwrapper'&gt;
-    &lt;input value="$services.localization.render('admin.save')" class='button' type='submit'&gt;
+    &lt;input value="$services.localization.render('admin.save', $services.rendering.resolveSyntax('xwiki/2.1'))" class='button' type='submit'&gt;
   &lt;/div&gt;
 &lt;/form&gt;
 {{/html}}

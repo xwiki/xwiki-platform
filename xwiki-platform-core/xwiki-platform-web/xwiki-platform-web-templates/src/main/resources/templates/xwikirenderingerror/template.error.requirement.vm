@@ -19,15 +19,6 @@
 ## ---------------------------------------------------------------------------
 ##!source.syntax=xwiki/2.1
 {{velocity}}
-  #macro(uiExtensions $extensionPoint)
-    #if (!$services.uix.getExtensions($extensionPoint).isEmpty())
-      #if (!$renderingerror.inline)
-        ## Make sure the UI extensions are standalone
-
-      #end
-      {{uiextensions extensionPoint="$extensionPoint"/}}
-    #end
-  #end
   #set($message = $renderingerror.message.throwable.parameterizedMessage)
   {{box cssClass="templateerror"}}
     {{box cssClass="xwikirenderingerror"}}

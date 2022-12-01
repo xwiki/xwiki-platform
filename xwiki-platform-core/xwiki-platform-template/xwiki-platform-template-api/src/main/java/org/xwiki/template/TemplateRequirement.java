@@ -23,7 +23,16 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
- * Component in charge of validation a specific requirement for a given template.
+ * Component in charge of validating the a requirement for a template.
+ * <p>
+ * This requirement is generally expressed using the template content properties syntax as
+ * {@code ##!require.<hint>=<value>}. For example if the following template will trigger a call to
+ * {@link TemplateRequirement#checkRequirement(String, String, Template)} with the requirement key "my.requirement" and
+ * value "expected value":
+ * 
+ * <pre>
+ * ##!require.my.requirement=expected value
+ * </pre>
  * 
  * @version $Id$
  * @since 15.0RC1
@@ -34,9 +43,10 @@ import org.xwiki.stability.Unstable;
 public interface TemplateRequirement
 {
     /**
-     * @param requirement the requirement key to check
+     * @param requirementKey the requirement key to check
      * @param value the requirement value to check
      * @param template the template on which the requirement applies
+     * @throws TemplateRequirementException when the requirement is not met or cannot be evaluated
      */
-    void checkRequirement(String requirement, String value, Template template) throws TemplateRequirementException;
+    void checkRequirement(String requirementKey, String value, Template template) throws TemplateRequirementException;
 }

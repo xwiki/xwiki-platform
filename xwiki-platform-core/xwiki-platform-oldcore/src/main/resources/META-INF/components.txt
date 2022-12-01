@@ -140,7 +140,6 @@ com.xpn.xwiki.internal.script.DocumentScriptSafeProvider
 com.xpn.xwiki.internal.store.StoreConfiguration
 com.xpn.xwiki.internal.store.hibernate.HibernateConfiguration
 com.xpn.xwiki.internal.store.hibernate.HibernateStore
-com.xpn.xwiki.internal.template.ActionTemplateRequirement
 com.xpn.xwiki.internal.template.DefaultTemplateManager
 com.xpn.xwiki.internal.template.InternalTemplateManager
 com.xpn.xwiki.internal.template.TemplateAsyncRenderer
@@ -267,3 +266,4 @@ com.xpn.xwiki.web.UploadAction
 com.xpn.xwiki.web.ViewAction
 com.xpn.xwiki.web.ViewAttachRevAction
 2000:org.xwiki.internal.attachment.validation.VoidAttachmentValidator
+org.xwiki.internal.template.ActionTemplateRequirement

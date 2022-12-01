@@ -205,6 +205,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiDocument.class);
 
+    private static final String CLOSE_HTML_MACRO = "{{/html}}";
+
     /**
      * An attachment waiting to be deleted at next document save.
      *
@@ -3669,10 +3671,19 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             // We test if we're inside the rendering engine since it's also possible that this display() method is
             // called directly from a template and in this case we only want HTML as a result and not wiki syntax.
             // TODO: find a more generic way to handle html macro because this works only for XWiki 1.0 and XWiki 2.0
-            // Add the {{html}}{{/html}} only when result really contains html since it's not needed for pure text
-            if (isInRenderingEngine && !is10Syntax(wrappingSyntaxId) && HTMLUtils.containsElementText(result)) {
+            // Add the {{html}}{{/html}} only when result really contains html or { which could be part of an XWiki
+            // macro syntax since it's not needed for pure text
+            if (isInRenderingEngine && !is10Syntax(wrappingSyntaxId)
+                && (HTMLUtils.containsElementText(result) || result.indexOf("{") != -1))
+            {
                 result.insert(0, "{{html clean=\"false\" wiki=\"false\"}}");
-                result.append("{{/html}}");
+                // Escape closing HTML macro syntax.
+                int startIndex = 0;
+                // Start searching at the last match to avoid scanning the whole string again.
+                while ((startIndex = result.indexOf(CLOSE_HTML_MACRO, startIndex)) != -1) {
+                    result.replace(startIndex, startIndex + 2, "&#123;&#123;");
+                }
+                result.append(CLOSE_HTML_MACRO);
             }
 
             return result.toString();

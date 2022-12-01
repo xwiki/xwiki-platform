@@ -65,9 +65,6 @@ public class DisplayMacro extends AbstractIncludeMacro<DisplayMacroParameters>
     {
         super("Display", DESCRIPTION, DisplayMacroParameters.class);
 
-        // The display macro must execute first since if it runs with the current context it needs to bring
-        // all the macros from the displayed page before the other macros are executed.
-        setPriority(10);
         setDefaultCategories(Set.of(DEFAULT_CATEGORY_CONTENT));
     }
 
@@ -97,7 +94,7 @@ public class DisplayMacro extends AbstractIncludeMacro<DisplayMacroParameters>
         }
 
         // Step 3: Check right
-        if (!this.authorization.hasAccess(Right.VIEW, documentBridge.getDocumentReference())) {
+        if (!this.contextualAuthorization.hasAccess(Right.VIEW, documentBridge.getDocumentReference())) {
             throw new MacroExecutionException(
                 String.format("Current user [%s] doesn't have view rights on document [%s]",
                     this.documentAccessBridge.getCurrentUserReference(), documentBridge.getDocumentReference()));

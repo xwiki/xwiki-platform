@@ -90,9 +90,6 @@ public class ContextMacro extends AbstractExecutedContentMacro<ContextMacroParam
         super("Context", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION, true, Block.LIST_BLOCK_TYPE),
             ContextMacroParameters.class);
 
-        // The Context macro must execute early since it can contain include macros which can bring stuff like headings
-        // for other macros (TOC macro, etc). Make it the same priority as the Include macro.
-        setPriority(10);
         setDefaultCategories(Set.of(DEFAULT_CATEGORY_DEVELOPMENT));
     }
 

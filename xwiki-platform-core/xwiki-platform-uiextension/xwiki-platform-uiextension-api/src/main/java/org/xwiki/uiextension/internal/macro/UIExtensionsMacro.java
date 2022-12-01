@@ -64,9 +64,6 @@ public class UIExtensionsMacro extends AbstractMacro<UIExtensionsMacroParameters
     {
         super("UI Extensions", DESCRIPTION, UIExtensionsMacroParameters.class);
 
-        // The ui extensions macro must execute first since if it runs with the current context it needs to bring
-        // all the macros from the extension before the other macros are executed.
-        setPriority(10);
         setDefaultCategories(Set.of(DEFAULT_CATEGORY_DEVELOPMENT));
     }
 

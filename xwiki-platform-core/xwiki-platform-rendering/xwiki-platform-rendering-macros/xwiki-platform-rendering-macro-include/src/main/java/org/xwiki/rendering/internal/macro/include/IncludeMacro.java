@@ -22,7 +22,6 @@ package org.xwiki.rendering.internal.macro.include;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.Stack;
 
@@ -44,10 +43,12 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters;
+import org.xwiki.rendering.macro.include.IncludeMacroParameters.Author;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters.Context;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 /**
@@ -74,6 +75,9 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
     @Inject
     private AuthorExecutor authorExecutor;
 
+    @Inject
+    protected AuthorizationManager authorization;
+
     /**
      * Default constructor.
      */
@@ -81,9 +85,6 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
     {
         super("Include", DESCRIPTION, IncludeMacroParameters.class);
 
-        // The include macro must execute first since if it runs with the current context it needs to bring
-        // all the macros from the included page before the other macros are executed.
-        setPriority(10);
         setDefaultCategories(Set.of(DEFAULT_CATEGORY_CONTENT));
     }
 
@@ -113,7 +114,7 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
         }
 
         // Step 3: Check right
-        if (!this.authorization.hasAccess(Right.VIEW, documentBridge.getDocumentReference())) {
+        if (!this.contextualAuthorization.hasAccess(Right.VIEW, documentBridge.getDocumentReference())) {
             throw new MacroExecutionException(
                 String.format("Current user [%s] doesn't have view rights on document [%s]",
                     this.documentAccessBridge.getCurrentUserReference(), documentBridge.getDocumentReference()));
@@ -177,17 +178,17 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
             metadata.getMetaData().addMetaData(MetaData.BASE, source);
         }
 
-        // Step 7: If the included content author is different from the current author, we have to execute it right now
-        // so that it used the proper rights
-        // Get the translated version of the document to compare with the right author
+        // Step 7: The the include macro is explicitly configured to be executed with the included document content
+        // author of if that author does not have programming right, execute it right away
+        // Get the translated version of the document to get the content author
         DocumentModelBridge translatedDocumentBridge;
         try {
             translatedDocumentBridge = this.documentAccessBridge.getTranslatedDocumentInstance(documentBridge);
         } catch (Exception e) {
             throw new MacroExecutionException("Failed to retrieve the translated version of the document", e);
         }
-        if (!Objects.equals(translatedDocumentBridge.getContentAuthorReference(),
-            this.documentAccessBridge.getCurrentAuthorReference())) {
+        if (parameters.getAuthor() == Author.TARGET || parameters.getAuthor() == Author.AUTO && !this.authorization
+            .hasAccess(Right.PROGRAM, translatedDocumentBridge.getContentAuthorReference(), null)) {
             // Merge the two XDOM before executing the included content so that it's as close as possible to the expect
             // execution conditions
             MacroBlock includeMacro = context.getCurrentMacroBlock();

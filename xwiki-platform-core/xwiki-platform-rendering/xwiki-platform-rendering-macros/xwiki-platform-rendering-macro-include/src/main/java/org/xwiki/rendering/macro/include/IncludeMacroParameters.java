@@ -55,6 +55,30 @@ public class IncludeMacroParameters
     }
 
     /**
+     * Control which author to execute the included content with.
+     * 
+     * @since 15.0RC1
+     */
+    public enum Author
+    {
+        /**
+         * Apply TARGET option unless the target author has programming right in which case it applies CURRENT (mainly
+         * for retro-compatibility reasons).
+         */
+        AUTO,
+
+        /**
+         * The content is executed with the right of the current author which uses the include macro.
+         */
+        CURRENT,
+
+        /**
+         * The content is executed with the right of the included content author.
+         */
+        TARGET
+    }
+
+    /**
      * @see #getReference()
      */
     private String reference;
@@ -74,12 +98,14 @@ public class IncludeMacroParameters
      * @see #getSection()
      */
     private String section;
-    
+
     /**
      * @see #isExcludeFirstHeading()
      */
     private boolean excludeFirstHeading;
-    
+
+    private Author author;
+
     /**
      * @param reference the reference of the resource to include
      * @since 3.4M1
@@ -122,9 +148,9 @@ public class IncludeMacroParameters
     }
 
     /**
-     * @param excludeFirstHeading {@code true} to remove the first heading found inside
-     *        the document or the section, {@code false} to keep it 
-     * @since 12.4RC1 
+     * @param excludeFirstHeading {@code true} to remove the first heading found inside the document or the section,
+     *            {@code false} to keep it
+     * @since 12.4RC1
      */
     @PropertyName("Exclude First Heading")
     @PropertyDescription("Exclude the first heading from the included document or section.")
@@ -133,10 +159,10 @@ public class IncludeMacroParameters
     {
         this.excludeFirstHeading = excludeFirstHeading;
     }
-    
+
     /**
      * @return whether to exclude the first heading from the included document or section, or not.
-     * @since 12.4RC1 
+     * @since 12.4RC1
      */
     public boolean isExcludeFirstHeading()
     {
@@ -205,5 +231,25 @@ public class IncludeMacroParameters
     {
         this.reference = page;
         this.type = EntityType.PAGE;
+    }
+
+    /**
+     * @return the author to use to execute the content
+     * @since 15.0RC1
+     */
+    public Author getAuthor()
+    {
+        return this.author;
+    }
+
+    /**
+     * @param author the author to use to execute the content
+     * @since 15.0RC1
+     */
+    @PropertyDescription("The author to use to execute the content")
+    @PropertyAdvanced
+    public void setAuthor(Author author)
+    {
+        this.author = author;
     }
 }

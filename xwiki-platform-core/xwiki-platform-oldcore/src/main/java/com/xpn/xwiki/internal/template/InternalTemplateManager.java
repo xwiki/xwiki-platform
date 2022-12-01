@@ -27,7 +27,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.AbstractSet;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -83,6 +85,8 @@ import org.xwiki.skin.ResourceRepository;
 import org.xwiki.skin.Skin;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateContent;
+import org.xwiki.template.TemplateRequirement;
+import org.xwiki.template.TemplateRequirementsException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.internal.skin.AbstractSkinResource;
@@ -109,6 +113,8 @@ public class InternalTemplateManager implements Initializable
     private static final Pattern PROPERTY_LINE = Pattern.compile("^##!(.+)=(.*)$\r?\n?", Pattern.MULTILINE);
 
     private static final String TEMPLATE_RESOURCE_SUFFIX = "/templates/";
+
+    private static final String PROPERTY_REQUIRE_PREFIX = "require.";
 
     @Inject
     private Environment environment;
@@ -404,10 +410,17 @@ public class InternalTemplateManager implements Initializable
             return converter.convert(type, this.properties.get(name));
         }
 
+        @Override
+        public Collection<String> getPropertyNames()
+        {
+            return this.properties.keySet();
+        }
+
         protected void init()
         {
             Matcher matcher = PROPERTY_LINE.matcher(this.content);
 
+            int newContentIndex = 0;
             Map<String, String> map = new HashMap<>();
             while (matcher.find()) {
                 String key = matcher.group(1);
@@ -416,7 +429,11 @@ public class InternalTemplateManager implements Initializable
                 map.put(key, value);
 
                 // Remove the line from the content
-                this.content = this.content.substring(matcher.end());
+                newContentIndex = matcher.end();
+            }
+
+            if (newContentIndex > 0) {
+                this.content = this.content.substring(newContentIndex);
             }
 
             try {
@@ -533,6 +550,42 @@ public class InternalTemplateManager implements Initializable
         getTemplateRootPath();
     }
 
+    private void checkRequirements(Template template) throws Exception
+    {
+        ComponentManager componentManager = this.componentManagerProvider.get();
+
+        List<Throwable> causes = null;
+        TemplateContent templateContent = template.getContent();
+        for (String propertyName : templateContent.getPropertyNames()) {
+            if (propertyName.startsWith(PROPERTY_REQUIRE_PREFIX)) {
+                String requirementKey = propertyName.substring(PROPERTY_REQUIRE_PREFIX.length());
+
+                if (componentManager.hasComponent(TemplateRequirement.class, requirementKey)) {
+                    try {
+                        TemplateRequirement requirement =
+                            componentManager.getInstance(TemplateRequirement.class, requirementKey);
+
+                        requirement.checkRequirement(requirementKey,
+                            templateContent.getProperty(propertyName, (String) null), template);
+                    } catch (Exception e) {
+                        if (causes == null) {
+                            causes = new ArrayList<>();
+                        }
+
+                        causes.add(e);
+                    }
+                } else {
+                    this.logger.warn("Now template requirement handler could be found for key [{}] in template [{}]",
+                        propertyName, template.getId());
+                }
+            }
+        }
+
+        if (causes != null) {
+            throw new TemplateRequirementsException(template.getId(), causes);
+        }
+    }
+
     private String getTemplateRootPath()
     {
         if (this.templateRootURL == null) {
@@ -581,8 +634,14 @@ public class InternalTemplateManager implements Initializable
 
     private Block generateError(Throwable throwable, boolean inline)
     {
-        List<Block> errorBlocks = this.errorBlockGeneratorProvider.get().generateErrorBlocks(inline, null,
-            "Failed to execute template", null, throwable);
+        List<Block> errorBlocks;
+        if (throwable instanceof TemplateRequirementsException) {
+            errorBlocks = this.errorBlockGeneratorProvider.get().generateErrorBlocks(inline,
+                TemplateRequirementsException.TRANSLATION_KEY, throwable.getMessage(), null, throwable);
+        } else {
+            errorBlocks = this.errorBlockGeneratorProvider.get().generateErrorBlocks(inline, null,
+                "Failed to execute template", null, throwable);
+        }
 
         if (inline) {
             if (errorBlocks.size() == 1) {
@@ -750,15 +809,10 @@ public class InternalTemplateManager implements Initializable
         }
     }
 
-    public void render(Template template, boolean inline, Writer writer) throws Exception
+    private AsyncRendererConfiguration configure(TemplateAsyncRenderer renderer, Template template, boolean inline,
+        boolean blockMode) throws Exception
     {
-        if (!shouldExecute(template)) {
-            return;
-        }
-
-        TemplateAsyncRenderer renderer = this.rendererProvider.get();
-
-        Set<String> contextEntries = renderer.initialize(template, inline, false);
+        Set<String> contextEntries = renderer.initialize(template, inline, blockMode);
 
         AsyncRendererConfiguration configuration = new AsyncRendererConfiguration();
 
@@ -769,6 +823,22 @@ public class InternalTemplateManager implements Initializable
             configuration.setSecureReference(templateContent.getDocumentReference(),
                 templateContent.getAuthorReference());
         }
+
+        return configuration;
+    }
+
+    public void render(Template template, boolean inline, Writer writer) throws Exception
+    {
+        if (!shouldExecute(template)) {
+            return;
+        }
+
+        // Make sure executing the template is allowed
+        checkRequirements(template);
+
+        TemplateAsyncRenderer renderer = this.rendererProvider.get();
+
+        AsyncRendererConfiguration configuration = configure(renderer, template, inline, false);
 
         String result = this.asyncExecutor.render(renderer, configuration);
 
@@ -848,18 +918,12 @@ public class InternalTemplateManager implements Initializable
             return new XDOM(Collections.emptyList());
         }
 
+        // Make sure executing the template is allowed
+        checkRequirements(template);
+
         TemplateAsyncRenderer renderer = this.rendererProvider.get();
 
-        Set<String> contextEntries = renderer.initialize(template, inline, true);
-
-        AsyncRendererConfiguration configuration = new AsyncRendererConfiguration();
-
-        configuration.setContextEntries(contextEntries);
-
-        if (template.getContent().isAuthorProvided()) {
-            configuration.setSecureReference(template.getContent().getDocumentReference(),
-                template.getContent().getAuthorReference());
-        }
+        AsyncRendererConfiguration configuration = configure(renderer, template, inline, true);
 
         Block block = this.asyncExecutor.execute(renderer, configuration);
 
@@ -867,11 +931,7 @@ public class InternalTemplateManager implements Initializable
             return block;
         }
 
-        if (block instanceof XDOM) {
-            return (XDOM) block;
-        }
-
-        return new XDOM(Collections.singletonList(block));
+        return block instanceof XDOM ? block : new XDOM(Collections.singletonList(block));
     }
 
     private String evaluateContent(Template template, TemplateContent content) throws Exception

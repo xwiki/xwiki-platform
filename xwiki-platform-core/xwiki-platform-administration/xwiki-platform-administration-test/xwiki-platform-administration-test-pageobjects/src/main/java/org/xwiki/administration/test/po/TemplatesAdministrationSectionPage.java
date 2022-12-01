@@ -103,6 +103,7 @@ public class TemplatesAdministrationSectionPage extends AdministrationSectionPag
     public List<WebElement> getExistingTemplatesLinks()
     {
         // A bit unreliable here, but it's the best I can do.
-        return getDriver().findElements(By.xpath("//ul[preceding-sibling::*[. = 'Available Template Providers']]//a"));
+        return getDriver().findElementsWithoutWaiting(
+            By.xpath("//ul[preceding-sibling::*[. = 'Available Template Providers']]//a"));
     }
 }

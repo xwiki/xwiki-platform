@@ -194,7 +194,7 @@ public class ObjectEditPage extends EditPage
             return Collections.emptyList();
         }
         List<WebElement> elements =
-            classElement.findElements(By.className("xobject-content"));
+            getDriver().findElementsWithoutWaiting(classElement, By.className("xobject-content"));
         List<ObjectEditPane> objects = new ArrayList<ObjectEditPane>(elements.size());
         for (WebElement element : elements) {
             int objectNumber = Integer.parseInt(element.getAttribute("id").split("_")[2]);

@@ -133,7 +133,8 @@ public class ApplicationsLiveTableElement extends LiveTableElement
             "//tr[td[contains(@class, 'doc_title') and . = '" + escapedAppName
                 + "']]/td[@class = 'actions']//a[contains(@class, 'action" + action + "')]";
         WebElement liveTableBody = getDriver().findElement(By.id("livetable-display"));
-        return liveTableBody.findElements(By.xpath(actionLinkXPath)).size() > 0;
+        // Don't wait as this needs significant time when the action doesn't exist.
+        return !getDriver().findElementsWithoutWaiting(liveTableBody, By.xpath(actionLinkXPath)).isEmpty();
     }
 
     /**

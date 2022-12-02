@@ -191,6 +191,7 @@ public class ObjectEditPage extends EditPage
             // if we cannot find the class elements it means there's no object of this class.
             return Collections.emptyList();
         }
+        // Don't wait for objects, when the class is there, the objects should be there, too.
         List<WebElement> elements =
             getDriver().findElementsWithoutWaiting(classElement, By.className("xobject-content"));
         List<ObjectEditPane> objects = new ArrayList<ObjectEditPane>(elements.size());

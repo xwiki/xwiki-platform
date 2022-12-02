@@ -192,6 +192,7 @@ public class LiveTableElement extends BaseElement
     {
         String cellXPath = String.format(".//tr/td[position() = %s]", getColumnIndex(columnTitle) + 1);
         WebElement liveTableBody = getDriver().findElement(By.id(this.livetableId + "-display"));
+        // Don't wait as rows should be available after the LiveTable is ready.
         return getDriver().findElementsWithoutWaiting(liveTableBody, By.xpath(cellXPath));
     }
 

@@ -102,7 +102,7 @@ public class TemplatesAdministrationSectionPage extends AdministrationSectionPag
 
     public List<WebElement> getExistingTemplatesLinks()
     {
-        // A bit unreliable here, but it's the best I can do.
+        // A bit unreliable here, but it's the best I can do. Don't wait as these links are part of the static HTML.
         return getDriver().findElementsWithoutWaiting(
             By.xpath("//ul[preceding-sibling::*[. = 'Available Template Providers']]//a"));
     }

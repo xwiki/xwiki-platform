@@ -20,7 +20,7 @@
 
 [description]
 Base configuration for the jetty logging mechanism.
-Provides a ${jetty.base}/resources/jetty-logging.properties.
+Logs are configured through ${jetty.base}/resources/jetty-logging.properties.
 
 [depend]
 resources

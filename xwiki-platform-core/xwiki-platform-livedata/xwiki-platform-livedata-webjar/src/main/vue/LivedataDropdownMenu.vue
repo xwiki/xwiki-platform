@@ -37,7 +37,7 @@
       :title="$t('livedata.dropdownMenu.title')"
       data-toggle="dropdown"
       aria-haspopup="true"
-      aria-expanded="true"
+      aria-expanded="false"
       role="button"
     >
       <XWikiIcon :icon-descriptor="{name: 'more-vertical'}" />

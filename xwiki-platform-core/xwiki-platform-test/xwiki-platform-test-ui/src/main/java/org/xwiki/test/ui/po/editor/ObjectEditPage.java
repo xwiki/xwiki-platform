@@ -29,7 +29,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.SuggestInputElement;
 
 /**
@@ -183,7 +182,6 @@ public class ObjectEditPage extends EditPage
      * @return the list of {@link ObjectEditPane} corresponding to all objects of the given class.
      * @since 13.1RC1
      */
-    @Unstable
     public List<ObjectEditPane> getObjectsOfClass(String className, boolean displayAllObjects)
     {
         WebElement classElement;

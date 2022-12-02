@@ -39,5 +39,8 @@
   <content>admin.captcha=CAPTCHA
 captcha.admin.defaultCaptchaName.label=既定のCAPTCHA
 captcha.admin.defaultCaptchaName.hint=使用する既定のCAPTCHAの実装です。拡張機能マネージャーから他に使用できるCAPTCHAの実装を検索できます。
+captcha.admin.configure.title={0}を設定
+captcha.admin.sample.title=サンプルのCAPTCHA
+captcha.admin.sample.description=設定したCAPTCHAがどのように表示されるかを確認できます。
 </content>
   </xwikidoc>

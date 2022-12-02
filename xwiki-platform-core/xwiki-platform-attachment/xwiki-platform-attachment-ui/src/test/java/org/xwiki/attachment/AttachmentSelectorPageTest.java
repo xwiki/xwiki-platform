@@ -29,6 +29,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -36,6 +37,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.internal.bridge.DefaultContentParser;
+import org.xwiki.model.internal.reference.converter.EntityReferenceConverter;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.observation.EventListener;
@@ -98,8 +100,10 @@ import static org.mockito.Mockito.when;
     DefaultWikiMacroManager.class,
     DefaultContentParser.class,
     org.xwiki.rendering.internal.parser.DefaultContentParser.class,
-    DefaultWikiMacroRenderer.class
+    DefaultWikiMacroRenderer.class,
     // End WikiMacroEventListener
+    EntityReferenceConverter.class,
+    ModelScriptService.class,
 })
 class AttachmentSelectorPageTest extends PageTest
 {
@@ -281,6 +285,17 @@ class AttachmentSelectorPageTest extends PageTest
         xwikiDocument.setSyntax(Syntax.XWIKI_2_1);
         Document document = renderHTMLPage(xwikiDocument);
         assertEquals(expectedWidth, document.select(".displayed img").attr("alt"));
+    }
+
+    @Test
+    void cancelButton() throws Exception
+    {
+        commonFixup("test.png");
+
+        this.request.put("docname", "xwiki:Space.]] {{noscript/}}");
+
+        Document document = renderHTMLPage(new DocumentReference("xwiki", "XWiki", "AttachmentSelector"));
+        assertEquals("Space.]] {{noscript/}}", document.getElementById("attachment-picker-close").attr("href"));
     }
 
     private void attachmentSelectorMacroFixup() throws Exception

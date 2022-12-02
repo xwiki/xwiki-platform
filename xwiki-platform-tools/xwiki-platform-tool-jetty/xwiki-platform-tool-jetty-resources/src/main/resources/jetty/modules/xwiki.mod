@@ -32,6 +32,7 @@ deploy
 requestlog
 websocket
 apache-jsp
+console-capture
 
 [xml]
 etc/jetty-xwiki.xml

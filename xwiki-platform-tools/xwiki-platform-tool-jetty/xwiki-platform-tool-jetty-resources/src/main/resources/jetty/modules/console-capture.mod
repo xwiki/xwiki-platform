@@ -18,23 +18,34 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
+# DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/
+
 [description]
-Base configuration for the jetty logging mechanism.
-Logs are configured through ${jetty.base}/resources/jetty-logging.properties.
+Redirects the JVM console stderr and stdout to a rolling log file.
 
-[depend]
-resources
-
-[provides]
+[tags]
 logging
+
+[depends]
+logging
+
+[xml]
+etc/console-capture.xml
 
 [files]
 logs/
 
-[lib]
-lib/logging/**.jar
-resources/
+[ini-template]
+# tag::documentation[]
+## Logging directory (relative to $JETTY_BASE).
+# jetty.console-capture.dir=./logs
 
-[ini]
-jetty.webapp.addServerClasses+=,org.eclipse.jetty.logging.
-jetty.webapp.addServerClasses+=,${jetty.home.uri}/lib/logging/
+## Whether to append to existing file.
+# jetty.console-capture.append=true
+
+## How many days to retain old log files.
+# jetty.console-capture.retainDays=90
+
+## Timezone ID of the log timestamps, as specified by java.time.ZoneId.
+# jetty.console-capture.timezone=GMT
+# end::documentation[]

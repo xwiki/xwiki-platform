@@ -58,5 +58,25 @@ We brought the following changes from the default Jetty files obtained from the 
       http-forwarded
       ```
 7. Addition of `modules/xwiki-logging.mod` to configure logging for XWiki (provides the Jetty `logging` module name)
-8. Note that we don't include all `etc/*.xml` files nor all `modules/*.mod` files since we don't use these extra
+8. Modification of `etc/console-capture.xml` to send logs to both the console and files. Namely we wrapp:
+   ```
+   <Arg>
+     <New class="org.eclipse.jetty.util.RolloverFileOutputStream">
+     ...
+   </Arg>
+   ```
+   With:
+   ```
+   <Arg>
+     <!-- XWiki wants to log to both the console and also to file, and thus we're wrapping the RolloverFileOutputStream
+          class with a TeeOutputStream to split the logs. -->
+     <New class="org.apache.commons.io.output.TeeOutputStream">
+       ...
+       <!-- Since we can't send to both out and err, we choose to send to out since logs are not errors by default,
+            so it seems the most logical one to use -->
+       <Arg><Get class="java.lang.System" name="out"/></Arg>
+     </New>
+    </Arg>
+   ```
+9. Note that we don't include all `etc/*.xml` files nor all `modules/*.mod` files since we don't use these extra
    features.

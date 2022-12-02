@@ -25,7 +25,7 @@ import org.xwiki.test.ui.po.ConfirmationPage;
 import org.xwiki.test.ui.po.LiveTableElement;
 
 /**
- * Represents the live table that lists the existing applications on the AppWithinMinuts home page.
+ * Represents the live table that lists the existing applications on the AppWithinMinutes home page.
  * 
  * @version $Id$
  * @since 4.2M1

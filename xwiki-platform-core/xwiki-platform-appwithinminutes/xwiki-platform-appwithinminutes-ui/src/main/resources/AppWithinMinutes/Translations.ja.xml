@@ -43,7 +43,7 @@ platform.appwithinminutes.createAppButtonLabel=アプリケーションを作成
 platform.appwithinminutes.appsLiveTableHeading=アプリケーション
 platform.appwithinminutes.appsLiveTable.doc.title=アプリケーション
 platform.appwithinminutes.appsLiveTable.doc.author=最終更新者
-platform.appwithinminutes.appsLiveTable.doc.date=アップデートの日付
+platform.appwithinminutes.appsLiveTable.doc.date=アップデート日
 platform.appwithinminutes.appsLiveTable._actions=アクション
 platform.appwithinminutes.grantSpaceAdminRightsSaveComment=スペースの管理権限を与える。
 

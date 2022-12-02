@@ -191,8 +191,7 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
             if (parameters.getAuthor() == Author.TARGET || parameters.getAuthor() == Author.AUTO && !this.authorization
                 .hasAccess(Right.PROGRAM, translatedDocumentBridge.getContentAuthorReference(), null)) {
                 // Merge the two XDOM before executing the included content so that it's as close as possible to the
-                // expect
-                // execution conditions
+                // expect execution conditions
                 MacroBlock includeMacro = context.getCurrentMacroBlock();
                 MacroMarkerBlock includeMacroMarker = new MacroMarkerBlock(includeMacro.getId(),
                     includeMacro.getParameters(), Collections.singletonList(metadata), includeMacro.isInline());

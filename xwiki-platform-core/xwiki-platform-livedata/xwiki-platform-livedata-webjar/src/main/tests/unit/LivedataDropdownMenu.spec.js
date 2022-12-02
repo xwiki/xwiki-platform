@@ -106,4 +106,9 @@ describe('LivedataDropdownMenu.vue', () => {
 
     expect(changeLayout.mock.calls.length).toBe(0);
   })
+
+  it('Is not expanded by default', () => {
+    const {wrapper} = initWrapper();
+    expect(wrapper.find('[data-toggle="dropdown"]').attributes('aria-expanded')).toBe('false')
+  })
 })

@@ -40,6 +40,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.internal.bridge.DefaultContentParser;
 import org.xwiki.icon.IconManagerScriptService;
 import org.xwiki.icon.internal.DefaultIconManagerComponentList;
+import org.xwiki.model.internal.reference.converter.EntityReferenceConverter;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
@@ -110,7 +111,9 @@ import static org.mockito.Mockito.when;
     // End WikiMacroEventListener
     TemporaryAttachmentsScriptService.class,
     IconManagerScriptService.class,
-    DocumentReferenceConverter.class
+    DocumentReferenceConverter.class,
+    EntityReferenceConverter.class,
+    ModelScriptService.class,
 })
 class AttachmentSelectorPageTest extends PageTest
 {
@@ -334,6 +337,17 @@ class AttachmentSelectorPageTest extends PageTest
             String.format("temporary_attachment class not found in %s", element.classNames()));
         assertNotNull(element.selectFirst(".fake-attach"), "An icon with class fake-attach is expected to "
             + "be found");
+    }
+
+    @Test
+    void cancelButton() throws Exception
+    {
+        commonFixup("test.png");
+
+        this.request.put("docname", "xwiki:Space.]] {{noscript/}}");
+
+        Document document = renderHTMLPage(new DocumentReference("xwiki", "XWiki", "AttachmentSelector"));
+        assertEquals("Space.]] {{noscript/}}", document.getElementById("attachment-picker-close").attr("href"));
     }
 
     private void attachmentSelectorMacroFixup() throws Exception

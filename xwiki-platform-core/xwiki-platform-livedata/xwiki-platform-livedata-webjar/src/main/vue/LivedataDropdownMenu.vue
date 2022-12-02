@@ -19,10 +19,10 @@
 -->
 
 <!--
-  LivedataDropdownMenu is a component that propose different actions
-  to the user: chaging layout, opning advance configuration panels, ...
+  LivedataDropdownMenu is a component that provides different actions
+  to the user: switching layouts, opening advanced configuration panels, ...
   It should be included once in every layout component,
-  generaly on the leftmost of its topbar so that it stay a consistent place.
+  generally at the very left of its top bar so it stays at a consistent place.
 -->
 <template>
   <!--

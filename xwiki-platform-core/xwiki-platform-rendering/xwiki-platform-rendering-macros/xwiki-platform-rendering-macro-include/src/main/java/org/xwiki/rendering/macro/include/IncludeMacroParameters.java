@@ -104,7 +104,7 @@ public class IncludeMacroParameters
      */
     private boolean excludeFirstHeading;
 
-    private Author author;
+    private Author author = Author.AUTO;
 
     /**
      * @param reference the reference of the resource to include
@@ -234,7 +234,7 @@ public class IncludeMacroParameters
     }
 
     /**
-     * @return the author to use to execute the content
+     * @return the author to use to execute the content when {@link #getContext()} is {@value Context#CURRENT}
      * @since 15.0RC1
      */
     public Author getAuthor()
@@ -243,10 +243,10 @@ public class IncludeMacroParameters
     }
 
     /**
-     * @param author the author to use to execute the content
+     * @param author the author to use to execute the content when {@link #getContext()} is {@value Context#CURRENT}
      * @since 15.0RC1
      */
-    @PropertyDescription("The author to use to execute the content")
+    @PropertyDescription("The author to use to execute the content when context is \"Current\"")
     @PropertyAdvanced
     public void setAuthor(Author author)
     {

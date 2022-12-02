@@ -178,37 +178,40 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
             metadata.getMetaData().addMetaData(MetaData.BASE, source);
         }
 
-        // Step 7: The the include macro is explicitly configured to be executed with the included document content
-        // author of if that author does not have programming right, execute it right away
-        // Get the translated version of the document to get the content author
-        DocumentModelBridge translatedDocumentBridge;
-        try {
-            translatedDocumentBridge = this.documentAccessBridge.getTranslatedDocumentInstance(documentBridge);
-        } catch (Exception e) {
-            throw new MacroExecutionException("Failed to retrieve the translated version of the document", e);
-        }
-        if (parameters.getAuthor() == Author.TARGET || parameters.getAuthor() == Author.AUTO && !this.authorization
-            .hasAccess(Right.PROGRAM, translatedDocumentBridge.getContentAuthorReference(), null)) {
-            // Merge the two XDOM before executing the included content so that it's as close as possible to the expect
-            // execution conditions
-            MacroBlock includeMacro = context.getCurrentMacroBlock();
-            MacroMarkerBlock includeMacroMarker = new MacroMarkerBlock(includeMacro.getId(),
-                includeMacro.getParameters(), Collections.singletonList(metadata), includeMacro.isInline());
-            includeMacro.getParent().replaceChild(includeMacroMarker, includeMacro);
-
+        if (parametersContext == Context.CURRENT) {
+            // Step 7: If the include macro is explicitly configured to be executed with the included document content
+            // author of if that author does not have programming right, execute it right away
+            // Get the translated version of the document to get the content author
+            DocumentModelBridge translatedDocumentBridge;
             try {
-                // Execute the content with the right author
-                // Keep the same transformation context
-                this.authorExecutor.call(() -> {
-                    this.transformationManager.performTransformations(metadata, context.getTransformationContext());
-                    return null;
-                }, translatedDocumentBridge.getContentAuthorReference(), documentBridge.getDocumentReference());
+                translatedDocumentBridge = this.documentAccessBridge.getTranslatedDocumentInstance(documentBridge);
             } catch (Exception e) {
-                throw new MacroExecutionException("Failed to execute tranformations for document ["
-                    + translatedDocumentBridge.getDocumentReference() + "]");
-            } finally {
-                // Put back the macro in the main XDOM (it will be replaced that the current macro transformation)
-                includeMacroMarker.getParent().replaceChild(includeMacro, includeMacroMarker);
+                throw new MacroExecutionException("Failed to retrieve the translated version of the document", e);
+            }
+            if (parameters.getAuthor() == Author.TARGET || parameters.getAuthor() == Author.AUTO && !this.authorization
+                .hasAccess(Right.PROGRAM, translatedDocumentBridge.getContentAuthorReference(), null)) {
+                // Merge the two XDOM before executing the included content so that it's as close as possible to the
+                // expect
+                // execution conditions
+                MacroBlock includeMacro = context.getCurrentMacroBlock();
+                MacroMarkerBlock includeMacroMarker = new MacroMarkerBlock(includeMacro.getId(),
+                    includeMacro.getParameters(), Collections.singletonList(metadata), includeMacro.isInline());
+                includeMacro.getParent().replaceChild(includeMacroMarker, includeMacro);
+
+                try {
+                    // Execute the content with the right author
+                    // Keep the same transformation context
+                    this.authorExecutor.call(() -> {
+                        this.transformationManager.performTransformations(metadata, context.getTransformationContext());
+                        return null;
+                    }, translatedDocumentBridge.getContentAuthorReference(), documentBridge.getDocumentReference());
+                } catch (Exception e) {
+                    throw new MacroExecutionException("Failed to execute tranformations for document ["
+                        + translatedDocumentBridge.getDocumentReference() + "]");
+                } finally {
+                    // Put back the macro in the main XDOM (it will be replaced that the current macro transformation)
+                    includeMacroMarker.getParent().replaceChild(includeMacro, includeMacroMarker);
+                }
             }
         }
 

@@ -36,7 +36,7 @@
 ## - as a file in the /templates/ directory
 ##
 #macro(template $tname)
-$xwiki.parseTemplate($tname)
+$services.template.render($tname)
 #end
 ##
 ##

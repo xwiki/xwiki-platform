@@ -341,8 +341,10 @@ $xwiki.jsx.use($attachmentPickerDocName)
   $!targetDocument.use($targetDocument.getObject($options.classname, $options.object))##
   #attachmentPicker_displayAttachmentGallery($targetDocument, $targetAttachDocument, $options)
 
+  #set ($cancelLinkName = $services.rendering.escape($services.rendering.escape($services.localization.render("${translationPrefix}.cancel"), 'xwiki/2.1'), 'xwiki/2.1'))
+  #set ($cancelLinkTarget = $services.rendering.escape($services.model.serialize($targetDocument), 'xwiki/2.1'))
   (% class="gallery_buttons buttons" %)(((
-  (% class="buttonwrapper secondary" %)[[$services.localization.render("${translationPrefix}.cancel")&gt;&gt;${targetDocument}||class="button secondary" id="attachment-picker-close"]]
+  (% class="buttonwrapper secondary" %)[[$cancelLinkName&gt;&gt;$cancelLinkTarget||class="button secondary" id="attachment-picker-close"]]
   )))
 #end
 {{/velocity}}</content>

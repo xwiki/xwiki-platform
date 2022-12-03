@@ -60,7 +60,7 @@ XWiki може бути використана в якості основи зн
 
 Для максимального використання можливостей вашої вікі, авторизуйтесь і:
 
-Використовуйте кнопку  {{velocity}}$services.icon.render('pencil'){{/velocity}}  вище, щоб // правити // цю сторінку і почати налаштовувати вікі під ваші потреби.
+Використовуйте кнопку {{velocity}}$services.icon.render('pencil'){{/velocity}} вище, щоб // правити // цю сторінку і почати налаштовувати вікі під ваші потреби.
 
 Використовуйте кнопку {velocity}}$services.icon.render('add'){{/velocity}} вище, щоб // додати // більше сторінок в вашу вікі і створити // ієрархію //, яка найкращим чином впорядкує ваш контент.
 
@@ -68,17 +68,19 @@ XWiki може бути використана в якості основи зн
 
 Ви також можете використовувати [[Пісочницю &gt;&gt; Sandbox.WebHome]] для більшої кількості демо-контенту і в цілому як місце для експериментів з можливостями вашої вікі.
 
- {{box}}Дізнайтеся більше про те, як використовувати XWiki з {{velocity}}[[Getting Started Guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome?version=$xwiki.version]]{{/velocity}}.{{/box}}
+{{box}}Дізнайтеся більше про те, як використовувати XWiki з {{velocity}}[[Getting Started Guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome?version=$xwiki.version]]{{/velocity}}.{{/box}}
 
 (%class="row"%)(((
-(%class="col-xs-12 col-sm-6"%)(((
+(%class="col-xs-12 col-sm-6"%)
+(((
 = Розширте свою вікі =
 
 Щоб доповнити можливості і функціональність вікі необхідними // вам // функціями, перейдіть до {{velocity}}[[Менеджеру розширень&gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('wiki', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&amp;section=XWiki.Extensions')]]{{/velocity}}, де ви зможете знайти і встановити розширення.
 
 Для перегляду більше 900 створених спільнотою розширень для XWiki, перейдіть в [[Репозиторій розширень&gt;&gt;http://extensions.xwiki.org]].
 )))
-(%class="col-xs-12 col-sm-6"%)(((
+(%class="col-xs-12 col-sm-6"%)
+(((
 = Створіть свій додаток =
 
 Вийдіть за межі доступних розширень і визначте // структуру // даних на основі // ваших // потреб, створюйте // ваші // власні додатки через [[Додаток за кілька хвилин&gt;&gt;AppWithinMinutes]].

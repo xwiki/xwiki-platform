@@ -31,6 +31,7 @@ import org.xwiki.attachment.script.AttachmentScriptService;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.template.script.TemplateScriptService;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
@@ -50,9 +51,12 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 14.4RC1
  */
-@ComponentList({ ControlCharactersFilter.class })
 @HTML50ComponentList
 @XWikiSyntax21ComponentList
+@ComponentList({
+    ControlCharactersFilter.class,
+    TemplateScriptService.class
+})
 class RefactoringMacrosPageTest extends PageTest
 {
     public static final DocumentReference DOCUMENT_REFERENCE = new DocumentReference("xwiki", "Space", "Page");

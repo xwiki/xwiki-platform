@@ -29,6 +29,7 @@ import org.xwiki.security.authorization.Right;
 import org.xwiki.security.script.SecurityScriptServiceComponentList;
 import org.xwiki.skinx.internal.async.SkinExtensionAsync;
 import org.xwiki.template.TemplateManager;
+import org.xwiki.template.script.TemplateScriptService;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
@@ -52,7 +53,8 @@ import static org.mockito.Mockito.when;
 @SecurityScriptServiceComponentList
 @ComponentList({
     // SKin Extensions so that $jsx.* and $ssx.* calls in the vm work.
-    SkinExtensionAsync.class
+    SkinExtensionAsync.class,
+    TemplateScriptService.class
 })
 class DocumentTagsTest extends PageTest
 {

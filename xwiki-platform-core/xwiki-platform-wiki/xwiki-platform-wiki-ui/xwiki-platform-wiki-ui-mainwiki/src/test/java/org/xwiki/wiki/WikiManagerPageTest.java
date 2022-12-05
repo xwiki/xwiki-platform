@@ -78,7 +78,6 @@ class WikiManagerPageTest extends PageTest
         doReturn(new HashMap<>()).when(iconManager).getMetaData(anyString());
 
         Document htmlDocument = renderHTMLPage(new DocumentReference("xwiki", "WikiManager", "WebHome"));
-        System.out.println(htmlDocument);
         JSONArray propertyDescriptors =
             new JSONObject(htmlDocument.getElementById("wikis").attr("data-config"))
                 .getJSONObject("meta")

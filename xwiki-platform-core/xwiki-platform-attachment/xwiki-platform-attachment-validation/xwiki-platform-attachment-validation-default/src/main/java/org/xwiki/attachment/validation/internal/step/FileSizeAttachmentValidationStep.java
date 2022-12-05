@@ -36,6 +36,7 @@ import com.xpn.xwiki.XWikiContext;
 import static com.xpn.xwiki.plugin.fileupload.FileUploadPlugin.UPLOAD_DEFAULT_MAXSIZE;
 import static com.xpn.xwiki.plugin.fileupload.FileUploadPlugin.UPLOAD_MAXSIZE_PARAMETER;
 import static javax.servlet.http.HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE;
+import static org.apache.commons.io.FileUtils.byteCountToDisplaySize;
 
 /**
  * Validate the attachment size.
@@ -62,7 +63,8 @@ public class FileSizeAttachmentValidationStep implements AttachmentValidationSte
         long uploadMaxSize = getUploadMaxSize();
         if (wrapper.getSize() > uploadMaxSize) {
             throw new AttachmentValidationException("File size too big", SC_REQUEST_ENTITY_TOO_LARGE,
-                "attachment.validation.filesize.rejected", List.of(uploadMaxSize), "fileuploadislarge");
+                "attachment.validation.filesize.rejected", List.of(byteCountToDisplaySize(uploadMaxSize)),
+                "fileuploadislarge");
         }
     }
 

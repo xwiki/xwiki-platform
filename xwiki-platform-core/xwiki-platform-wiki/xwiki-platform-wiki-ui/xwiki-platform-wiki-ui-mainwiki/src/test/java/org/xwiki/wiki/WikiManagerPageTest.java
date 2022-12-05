@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.icon.IconManager;
 import org.xwiki.livedata.internal.macro.LiveDataMacroComponentList;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.template.script.TemplateScriptService;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
@@ -57,6 +58,7 @@ import static org.mockito.Mockito.when;
 @LiveDataMacroComponentList
 @ComponentList({
     ControlCharactersFilter.class,
+    TemplateScriptService.class
 })
 class WikiManagerPageTest extends PageTest
 {

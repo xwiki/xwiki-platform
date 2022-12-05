@@ -28,6 +28,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.script.SecurityScriptServiceComponentList;
 import org.xwiki.template.TemplateManager;
+import org.xwiki.template.script.TemplateScriptService;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.PageTest;
 
@@ -49,7 +50,8 @@ import static org.mockito.Mockito.when;
  */
 @SecurityScriptServiceComponentList
 @ComponentList({
-    ModelScriptService.class
+    ModelScriptService.class,
+    TemplateScriptService.class
 })
 class DisplayPageTest extends PageTest
 {

@@ -41,6 +41,7 @@ import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.script.SecurityScriptServiceComponentList;
 import org.xwiki.template.TemplateManager;
+import org.xwiki.template.script.TemplateScriptService;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.IconSetup;
 import org.xwiki.test.page.PageTest;
@@ -66,7 +67,8 @@ import static org.mockito.Mockito.when;
     AttachmentScriptService.class,
     DefaultAttachmentsManager.class,
     DocumentReferenceConverter.class,
-    EntityReferenceConverter.class
+    EntityReferenceConverter.class,
+    TemplateScriptService.class
 })
 class MovePageTest extends PageTest
 {

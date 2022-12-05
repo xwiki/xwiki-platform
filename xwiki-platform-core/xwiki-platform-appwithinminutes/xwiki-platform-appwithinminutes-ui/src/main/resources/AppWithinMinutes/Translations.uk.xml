@@ -150,7 +150,7 @@ appWithinMinutes.templateProviderEditor.creationRestrictions.name=Створен
 appWithinMinutes.templateProviderEditor.creationRestrictions.hint=Якщо розташування не вибране, записи можна створювати в будь якому місці вікі.
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Не застосовувати розташування записів
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Використовувати вказані вище місця лише як пропозиції, що дозволяє користувачеві вибрати інше місце розташування при створенні запису програми.
-appWithinMinutes.templateProviderEditor.terminal.hint=Чи мають бути записи програми термінальними сторінками, чи ні.
+appWithinMinutes.templateProviderEditor.terminal.hint=Чи мають бути записи додатку термінальними сторінками, чи ні
 
 ### Wizard Step 3: Application Presentation
 platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=Поля додатку

@@ -19,6 +19,8 @@
  */
 package org.xwiki.livedata.script;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -26,6 +28,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -34,7 +37,10 @@ import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataSource;
 import org.xwiki.livedata.LiveDataSourceManager;
+import org.xwiki.livedata.internal.LiveDataRenderer;
+import org.xwiki.livedata.internal.LiveDataRendererParameters;
 import org.xwiki.livedata.internal.script.LiveDataConfigHelper;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
 
@@ -65,6 +71,9 @@ public class LiveDataScriptService implements ScriptService
 
     @Inject
     private ScriptServiceManager scriptServiceManager;
+
+    @Inject
+    private LiveDataRenderer liveDataRenderer;
 
     /**
      * Executes a live data query.
@@ -153,6 +162,27 @@ public class LiveDataScriptService implements ScriptService
     }
 
     /**
+     * @param parameters the parameters to pass to the Live Data renderer
+     * @return the list of {@link Block}s of the Live Data
+     * @throws LiveDataException in case of error when rendering the Live Data
+     */
+    public List<Block> render(Map<String, Object> parameters) throws LiveDataException
+    {
+        return render(parameters, null);
+    }
+
+    /**
+     * @param parameters the parameters to pass to the Live Data renderer
+     * @param advancedParameters the advanced parameters to pass to the Live Data rendere
+     * @return the list of {@link Block}s of the Live Data
+     * @throws LiveDataException in case of error when rendering the Live Data
+     */
+    public List<Block> render(Map<String, Object> parameters, String advancedParameters) throws LiveDataException
+    {
+        return this.liveDataRenderer.render(convertParams(parameters), advancedParameters, false);
+    }
+
+    /**
      * @param <S> the type of the {@link ScriptService}
      * @param serviceName the name of the sub {@link ScriptService}
      * @return the {@link ScriptService} or null of none could be found
@@ -161,5 +191,20 @@ public class LiveDataScriptService implements ScriptService
     public <S extends ScriptService> S get(String serviceName)
     {
         return (S) this.scriptServiceManager.get(ROLEHINT + '.' + serviceName);
+    }
+
+    private LiveDataRendererParameters convertParams(Map<String, Object> parameters) throws LiveDataException
+    {
+        LiveDataRendererParameters liveDataRendererParameters = new LiveDataRendererParameters();
+        for (Map.Entry<String, Object> stringObjectEntry : parameters.entrySet()) {
+            try {
+                PropertyUtils.setProperty(liveDataRendererParameters, stringObjectEntry.getKey(),
+                    stringObjectEntry.getValue());
+            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                throw new LiveDataException(String.format("Failed to set property [%s] with value [%s in object [%s]",
+                    stringObjectEntry.getKey(), stringObjectEntry.getValue(), liveDataRendererParameters), e);
+            }
+        }
+        return liveDataRendererParameters;
     }
 }

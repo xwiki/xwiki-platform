@@ -20,32 +20,26 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>16.0.0-SNAPSHOT</version>
+    <artifactId>xwiki-platform-livedata</artifactId>
+    <version>15.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-livedata</artifactId>
-  <name>XWiki Platform - Live Data</name>
-  <packaging>pom</packaging>
-  <description>Display dynamic lists of data</description>
-  <modules>
-    <module>xwiki-platform-livedata-api</module>
-    <module>xwiki-platform-livedata-livetable</module>
-    <module>xwiki-platform-livedata-macro</module>
-    <module>xwiki-platform-livedata-rest</module>
-    <module>xwiki-platform-livedata-war</module>
-    <module>xwiki-platform-livedata-webjar</module>
-    <module>xwiki-platform-livedata-ui</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-livedata-test</module>
-      </modules>
-    </profile>
-  </profiles>
+  <artifactId>xwiki-platform-livedata-ui</artifactId>
+  <name>XWiki Platform - Live Data - UI</name>
+  <packaging>xar</packaging>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>LiveData Application</xwiki.extension.name>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-macro</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
 </project>

@@ -36,7 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>attachment.picker.ckeditor.pluginsImageSelector.title=Gallerie
+  <content>attachment.picker.ckeditor.pluginsImageSelector.title=Galerie
 attachment.picker.searchField.placeholder=Suchen…
 attachment.picker.searchField.scope.currentPage=Aktuelle Seite
 attachment.picker.searchField.scope.allPages=Alle Seiten

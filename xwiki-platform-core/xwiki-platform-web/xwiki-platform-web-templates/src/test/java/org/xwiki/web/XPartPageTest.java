@@ -22,6 +22,8 @@ package org.xwiki.web;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.template.TemplateManager;
+import org.xwiki.template.script.TemplateScriptService;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.PageTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,6 +36,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 14.3RC1
  * @since 13.10.5
  */
+@ComponentList({
+    TemplateScriptService.class
+})
 class XPartPageTest extends PageTest
 {
     private static final String X_PART_VM = "xpart.vm";

@@ -37,6 +37,7 @@ import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.skinx.internal.async.SkinExtensionAsync;
 import org.xwiki.template.TemplateManager;
+import org.xwiki.template.script.TemplateScriptService;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.xar.XarEntry;
@@ -67,7 +68,8 @@ import static org.mockito.Mockito.when;
  */
 @ComponentList({
     SkinExtensionAsync.class,
-    ModelScriptService.class
+    ModelScriptService.class,
+    TemplateScriptService.class
 })
 class ImportInlinePageTest extends PageTest
 {

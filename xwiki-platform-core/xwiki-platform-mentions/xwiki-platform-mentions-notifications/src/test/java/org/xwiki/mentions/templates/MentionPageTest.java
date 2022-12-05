@@ -37,6 +37,7 @@ import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.platform.date.script.DateScriptService;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.template.TemplateManager;
+import org.xwiki.template.script.TemplateScriptService;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.IconSetup;
@@ -66,6 +67,7 @@ import static org.mockito.Mockito.when;
 @DefaultIconManagerComponentList
 @ComponentList({
     IconManagerScriptService.class,
+    TemplateScriptService.class
 })
 class MentionPageTest extends PageTest
 {

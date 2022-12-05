@@ -30,6 +30,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.script.SecurityScriptServiceComponentList;
 import org.xwiki.template.TemplateManager;
+import org.xwiki.template.script.TemplateScriptService;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.velocity.VelocityManager;
 
@@ -46,6 +48,9 @@ import static org.mockito.Mockito.when;
  * @since 14.4RC1
  */
 @SecurityScriptServiceComponentList
+@ComponentList({
+    TemplateScriptService.class
+})
 class MoveStep1PageTest extends PageTest
 {
     private static final String MOVE_STEP1_TEMPLATE = "attachment/moveStep1.vm";

@@ -84,7 +84,7 @@ class FileSizeAttachmentValidationStepTest
         assertEquals("File size too big", exception.getMessage());
         assertEquals(SC_REQUEST_ENTITY_TOO_LARGE, exception.getHttpStatus());
         assertEquals("attachment.validation.filesize.rejected", exception.getTranslationKey());
-        assertEquals(List.of(42L), exception.getTranslationParameters());
+        assertEquals(List.of("42 bytes"), exception.getTranslationParameters());
         assertEquals("fileuploadislarge", exception.getContextMessage());
     }
 }

@@ -86,6 +86,7 @@ public class UploadAction extends XWikiAction
                 AttachmentValidationException exp = (AttachmentValidationException) exception;
                 response.setStatus(exp.getHttpStatus());
                 getCurrentScriptContext().setAttribute("message", exp.getTranslationKey(), ENGINE_SCOPE);
+                getCurrentScriptContext().setAttribute("parameters", exp.getTranslationParameters(), ENGINE_SCOPE);
                 context.put("message", exp.getContextMessage());
 
                 return true;

@@ -589,6 +589,13 @@ $xwiki.jsx.use($attachmentPickerDocName)
             new XWiki.widgets.Notification("$services.localization.render('xe.attachmentSelector.upload.error.badExtension')", 'error');
             hasErrors = true;
           }
+          const beforeUploadEvent = Event.fire(document, 'xwiki:actions:beforeUpload', {
+            file: fileInput
+          });
+
+          if (beforeUploadEvent.isDefaultPrevented()) {
+            hasErrors = true;
+          }
         }.bind(this));
         if (!hasErrors) {
           if (this.directSave) {

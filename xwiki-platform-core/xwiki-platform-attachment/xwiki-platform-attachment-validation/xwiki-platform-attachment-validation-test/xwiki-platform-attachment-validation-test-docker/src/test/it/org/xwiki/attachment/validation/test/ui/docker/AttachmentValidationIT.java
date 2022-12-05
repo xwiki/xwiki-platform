@@ -108,7 +108,7 @@ class AttachmentValidationIT
         assertEquals("{"
             + "\"message\":\"File size too big\","
             + "\"translationKey\":\"attachment.validation.filesize.rejected\","
-            + "\"translationParameters\":\"[10]\""
+            + "\"translationParameters\":\"[10 bytes]\""
             + "}", putMethodImage.getResponseBodyAsString());
 
         // Check that no image are saved to the document after the various upload tries.

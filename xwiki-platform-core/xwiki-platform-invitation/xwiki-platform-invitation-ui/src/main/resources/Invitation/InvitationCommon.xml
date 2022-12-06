@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="Invitation.InvitationCommon" locale="">
+<xwikidoc version="1.4" reference="Invitation.InvitationCommon" locale="">
   <web>Invitation</web>
   <name>InvitationCommon</name>
   <language/>
@@ -34,7 +34,7 @@
   <title/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
 #*
@@ -80,7 +80,7 @@
 
   {{html wiki=false clean=false}}
   &lt;div id="invitation-displaymessage" class="invitation"&gt;
-   &lt;strong&gt;$services.localization.render('xe.invitation.previewLabel')&lt;/strong&gt;
+   &lt;strong&gt;$escapetool.xml($services.localization.render('xe.invitation.previewLabel'))&lt;/strong&gt;
    &lt;div class="invitation invitation-preview"&gt;
     #set($recips = [])
     #set($invalid = [])
@@ -99,7 +99,7 @@
     #end
     ## Print the email addresses to be sent to.
     ## To:
-    &lt;strong&gt;$services.localization.render('xe.invitation.toLabel')&lt;/strong&gt;
+    &lt;strong&gt;$escapetool.xml($services.localization.render('xe.invitation.toLabel'))&lt;/strong&gt;
     &lt;div id="preview-to-field" class="invitation-preview field"&gt;
      #foreach($recip in $recips)
        #if($invalid.contains($recip))
@@ -120,24 +120,24 @@
        &lt;span class="errormessage"&gt;
         #if($recips.size() == 1)
           ## The email address given is invalid and will not be sent to.
-          $services.localization.render('xe.invitation.displayMessage.theAddressIsInvalid')
+          $escapetool.xml($services.localization.render('xe.invitation.displayMessage.theAddressIsInvalid'))
         #else
           #if($invalid.size() &gt; 1)
-            $services.localization.render('xe.invitation.displayMessage.someAddressesAreInvalid', [$invalidAddresses.size()])
+            $escapetool.xml($services.localization.render('xe.invitation.displayMessage.someAddressesAreInvalid', [$invalidAddresses.size()]))
           #else
-            $services.localization.render('xe.invitation.displayMessage.anAddressesIsInvalid')
+            $escapetool.xml($services.localization.render('xe.invitation.displayMessage.anAddressesIsInvalid'))
           #end
         #end
        &lt;/span&gt;
       &lt;/p&gt;
     #end
      ## Subject:
-     &lt;strong&gt;$services.localization.render('xe.invitation.subjectLabel')&lt;/strong&gt;
+     &lt;strong&gt;$escapetool.xml($services.localization.render('xe.invitation.subjectLabel'))&lt;/strong&gt;
     &lt;div id="preview-subjectline-field" class="invitation-preview field"&gt;
      $escapetool.xml($mail.getProperty('subjectLine').getValue())
     &lt;/div&gt;
     ## Message:
-    &lt;strong&gt;$services.localization.render('xe.invitation.contentLabel')&lt;/strong&gt;
+    &lt;strong&gt;$escapetool.xml($services.localization.render('xe.invitation.contentLabel'))&lt;/strong&gt;
     &lt;div id="preview-messagebody-field" class="invitation-preview field"&gt;
      $mail.getProperty('messageBody').getValue()
     &lt;/div&gt;
@@ -232,7 +232,8 @@
   #end
   #set($configClass = $xwiki.getDocumentAsAuthor("${doc.getSpace()}.WebHome"))
   #if($configClass.isNew())
-    {{error}}Class document [[${doc.getSpace()}.WebHome]] not found. can't run test.{{/error}}
+    #set ($classDocumentLink = $services.rendering.escape("${doc.getSpace()}.WebHome", 'xwiki/2.1'))
+    {{error}}Class document [[$classDocumentLink]] not found. can't run test.{{/error}}
   #else
     #set($config = {})
     #loadInvitationConfig($config, 'HopefullyNonexistantSpace')
@@ -496,10 +497,10 @@
         <number>5</number>
         <picker>1</picker>
         <prettyName>Email message XClass</prettyName>
-        <size>30</size>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <separators/>
+        <size>30</size>
         <sort>none</sort>
         <sql/>
         <unmodifiable>0</unmodifiable>
@@ -521,10 +522,10 @@
         <number>9</number>
         <picker>1</picker>
         <prettyName>Document containing email XObjects</prettyName>
-        <size>30</size>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <separators/>
+        <size>30</size>
         <sort>none</sort>
         <sql/>
         <unmodifiable>0</unmodifiable>
@@ -843,11 +844,14 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
-        <number>6</number>
+        <number>5</number>
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -858,9 +862,11 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
-        <number>3</number>
+        <number>2</number>
         <prettyName>Code</prettyName>
         <rows>20</rows>
         <size>50</size>
@@ -871,9 +877,11 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
-        <number>1</number>
+        <number>6</number>
         <prettyName>Content Type</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -886,7 +894,7 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
       <name>
         <disabled>0</disabled>
         <name>name</name>
-        <number>2</number>
+        <number>1</number>
         <prettyName>Name</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
@@ -897,7 +905,7 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
         <name>parse</name>
-        <number>5</number>
+        <number>4</number>
         <prettyName>Parse content</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -906,9 +914,11 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
-        <number>4</number>
+        <number>3</number>
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>

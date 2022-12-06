@@ -31,6 +31,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.management.MBeanServer;
 
+import org.jgroups.BytesMessage;
 import org.jgroups.Global;
 import org.jgroups.JChannel;
 import org.jgroups.Message;
@@ -87,7 +88,7 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
         this.logger.debug("Send JGroups remote event [{}]", remoteEvent.toString());
 
         // Send the message to the whole group
-        Message message = new Message(null, remoteEvent);
+        Message message = new BytesMessage(null,  remoteEvent);
 
         // Send message to JGroups channels
         for (Map.Entry<String, JChannel> entry : this.channels.entrySet()) {

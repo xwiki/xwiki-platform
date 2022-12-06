@@ -22,8 +22,9 @@ package org.xwiki.observation.remote.internal.jgroups;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.jgroups.BytesMessage;
 import org.jgroups.Message;
-import org.jgroups.ReceiverAdapter;
+import org.jgroups.blocks.cs.ReceiverAdapter;
 import org.slf4j.Logger;
 import org.xwiki.classloader.ClassLoaderManager;
 import org.xwiki.component.annotation.Component;
@@ -83,11 +84,13 @@ public class DefaultJGroupsReceiver extends ReceiverAdapter implements JGroupsRe
     @Override
     public void receive(Message msg)
     {
-        RemoteEventData remoteEvent =
-            (RemoteEventData) msg.getObject(this.classLoaderManager.getURLClassLoader(null, false));
+        if (msg instanceof BytesMessage) {
+            RemoteEventData remoteEvent = (RemoteEventData) ((BytesMessage) msg)
+                .getObject(this.classLoaderManager.getURLClassLoader(null, false));
 
-        this.logger.debug("Received JGroups remote event [{}]", remoteEvent);
+            this.logger.debug("Received JGroups remote event [{}]", remoteEvent);
 
-        getRemoteObservationManager().notify(remoteEvent);
+            getRemoteObservationManager().notify(remoteEvent);
+        }
     }
 }

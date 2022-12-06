@@ -53,7 +53,7 @@ platform.appwithinminutes.appPanelCreateEntry=Створити власний!
 ### Wizard step
 platform.appwithinminutes.wizardStepHeading=Крок {0} — {1}
 appWithinMinutes.wizardStep.name.name=Назва
-appWithinMinutes.wizardStep.name.title=Назвіть свою програму
+appWithinMinutes.wizardStep.name.title=Назвіть свій додаток
 appWithinMinutes.wizardStep.name.description=Виберіть назву програми
 appWithinMinutes.wizardStep.structure.name=Структура
 appWithinMinutes.wizardStep.structure.title=Структура ваших даних
@@ -97,7 +97,7 @@ platform.appwithinminutes.classEditorCanvasHint=Перетягніть поля 
 platform.appwithinminutes.classEditorUpdateTemplateLabel=Оновити шаблон
 platform.appwithinminutes.classEditorUpdateTemplateHint=Шаблон ({0}) зберігає значення полів за умовчанням.
 platform.appwithinminutes.classEditorUpdateSheetLabel=Оновити аркуш
-platform.appwithinminutes.classEditorUpdateSheetHint=Аркуш ({0}) використовується для зображення і редагування структурованих даних.
+platform.appwithinminutes.classEditorUpdateSheetHint=Аркуш ({0}) використовується для відображення і редагування структурованих даних.
 platform.appwithinminutes.classEditorUpdateTranslationsLabel=Оновити переклад
 platform.appwithinminutes.classEditorUpdateTranslationsHint=Оновлення перекладу користувацьких назв полів і значень списку ({0}).
 platform.appwithinminutes.classEditorMultipleSheetsWarning=Цей клас містить кілька аркушів.
@@ -150,7 +150,7 @@ appWithinMinutes.templateProviderEditor.creationRestrictions.name=Створен
 appWithinMinutes.templateProviderEditor.creationRestrictions.hint=Якщо розташування не вибране, записи можна створювати в будь якому місці вікі.
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Не застосовувати розташування записів
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Використовувати вказані вище місця лише як пропозиції, що дозволяє користувачеві вибрати інше місце розташування при створенні запису програми.
-appWithinMinutes.templateProviderEditor.terminal.hint=Чи мають бути записи додатку термінальними сторінками, чи ні
+appWithinMinutes.templateProviderEditor.terminal.hint=Чи мають бути записи додатку термінальними сторінками, чи ні.
 
 ### Wizard Step 3: Application Presentation
 platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=Поля додатку
@@ -162,7 +162,7 @@ platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=Заголо�
 platform.appwithinminutes.liveTableEditorDocNameColumnName=Назва сторінки
 platform.appwithinminutes.liveTableEditorDocNameColumnDescription=Назва сторінки, яка містить дані додатка
 platform.appwithinminutes.liveTableEditorDocLocationColumnName=Розташування
-platform.appwithinminutes.liveTableEditorDocLocationColumnDescription=Місцезнаходження сторінки, яка містить дані програми
+platform.appwithinminutes.liveTableEditorDocLocationColumnDescription=Місце розташування сторінки, яка містить дані додатка
 platform.appwithinminutes.liveTableEditorDocAuthorColumnName=Останній автор
 platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=Користувач, який востаннє редагував дані додатка
 platform.appwithinminutes.liveTableEditorDocCreatorColumnName=Автор
@@ -214,7 +214,7 @@ platform.appwithinminutes.deleteAppInvalidAppError=Зазначена назва
 platform.appwithinminutes.deleteAppNotSpecifiedError=Не зазначено назву додатку.
 
 ### Rename Application
-### Missing: appWithinMinutes.renameApp.label=Rename Application
+appWithinMinutes.renameApp.label=Перейменувати додаток
 appWithinMinutes.renameApp.close=Закрити
 
 ### Rename Application
@@ -223,7 +223,7 @@ appWithinMinutes.renameApp.regenerateAppCodeWarning=Код додатка буд
 appWithinMinutes.renameApp.newName.label=Нова назва
 appWithinMinutes.renameApp.pageExistsError=Сторінка з такою назвою вже існує в обраному місці.
 appWithinMinutes.renameApp.locationForbiddenError=Вам не можете переміщувати додаток в обране місце.
-appWithinMinutes.renameApp.location.label=Нове Місце
+appWithinMinutes.renameApp.location.label=Нове місце
 appWithinMinutes.renameApp.location.hint=Місце розташування в ієрархії сторінок, куди можна перемістити додаток.
 appWithinMinutes.renameApp.parent.label=Новий батько
 appWithinMinutes.renameApp.parent.hint=Нова батьківська сторінка. Залиште це поле порожнім, якщо ви хочете перемістити додаток у верхівку ієрархії сторінок.

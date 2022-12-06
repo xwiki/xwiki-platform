@@ -39,6 +39,8 @@ import org.xwiki.skinx.internal.async.SkinExtensionAsync;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.PageTest;
+import org.xwiki.velocity.tools.CollectionTool;
+import org.xwiki.velocity.tools.EscapeTool;
 import org.xwiki.xar.XarEntry;
 import org.xwiki.xar.XarPackage;
 import org.xwiki.xar.script.XarScriptService;
@@ -98,6 +100,8 @@ class ImportInlinePageTest extends PageTest
         this.xwiki.saveDocument(currentDocument, this.context);
         this.context.setDoc(currentDocument);
         this.componentManager.registerComponent(ScriptService.class, "xar", this.xarScriptService);
+        registerVelocityTool("escapetool", new EscapeTool());
+        registerVelocityTool("collectiontool", new CollectionTool());
     }
 
     @Test

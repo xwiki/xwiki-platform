@@ -1206,7 +1206,10 @@
               </extensionOverride>
               <extensionOverride>
                 <id>org.jdom:jdom</id>
-                <features>jdom:jdom</features>
+                <features>
+                  jdom:jdom,
+                  org.jdom:jdom-legacy
+                </features>
               </extensionOverride>
               <extensionOverride>
                 <id>com.sun.mail:jakarta.mail</id>

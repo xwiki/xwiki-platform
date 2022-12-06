@@ -33,8 +33,10 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import com.xpn.xwiki.XWikiContext;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -75,6 +77,7 @@ import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
 import org.xwiki.resource.temporary.TemporaryResourceStore;
 import org.xwiki.url.ExtendedURL;
+import org.xwiki.url.URLSecurityManager;
 
 /**
  * Default implementation of {@link org.xwiki.office.viewer.OfficeResourceViewer}.
@@ -92,6 +95,16 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
      * retrieve the temporary file.
      */
     private static final String MODULE_NAME = "officeviewer";
+
+    /**
+     * List of protocols that can be used in URLs to retrieve documents.
+     */
+    private static final List<String> ALLOWED_PROTOCOLS = Arrays.asList(
+        "http",
+        "https",
+        "ftp",
+        "ftps"
+    );
 
     /**
      * Used to access attachment content.
@@ -163,6 +176,12 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
 
     @Inject
     private ConverterManager converter;
+
+    @Inject
+    private Provider<XWikiContext> contextProvider;
+
+    @Inject
+    private URLSecurityManager urlSecurityManager;
 
     /**
      * The logger to log.
@@ -283,16 +302,27 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
     {
         InputStream officeFileStream;
         String officeFileName;
+        XDOMOfficeDocument result = null;
 
         if (resourceReference.getType().equals(ResourceType.URL)) {
             URL url = new URL(resourceReference.getReference());
-            officeFileStream = url.openStream();
-            officeFileName = StringUtils.substringAfterLast(url.getPath(), "/");
+            if (!ALLOWED_PROTOCOLS.contains(url.getProtocol())) {
+                throw new Exception(
+                    String.format("The requested resource [%s] uses a protocol [%s] that is not supported.", url,
+                        url.getProtocol()));
+            } else if (!this.urlSecurityManager.isDomainTrusted(url)) {
+                throw new Exception(
+                    String.format("The requested resource [%s] does not belong to the list of trusted domains. "
+                        + "Please ask your administrator to add it to the list of trusted domains to access it.", url));
+            } else {
+                officeFileStream = url.openStream();
+                officeFileName = StringUtils.substringAfterLast(url.getPath(), "/");
+                result = createXDOM(ownerDocument, officeFileStream, officeFileName, parameters);
+            }
         } else {
             throw new Exception(String.format("Unsupported resource type [%s].", resourceReference.getType()));
         }
-
-        return createXDOM(ownerDocument, officeFileStream, officeFileName, parameters);
+        return result;
     }
 
     private XDOMOfficeDocument createXDOM(DocumentReference ownerDocument, InputStream officeFileStream,
@@ -447,7 +477,7 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
         DocumentReference ownerDocument =
             this.converter.convert(DocumentReference.class, parameters.get("ownerDocument"));
         if (ownerDocument == null) {
-            this.documentAccessBridge.getCurrentDocumentReference();
+            ownerDocument = this.documentAccessBridge.getCurrentDocumentReference();
         }
 
         return ownerDocument;

@@ -228,17 +228,11 @@
     #define($heading)
      <strong>$services.localization.render('core.delete.backlinks')</strong> ($links.size())
     #end
-    #define($message)
-      <ul>
-      #foreach($docname in $links)
-        #set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
-        <li><a href="$rdoc.getURL('view')">$escapetool.xml($rdoc.getPlainTitle())</a></li>
-      #end
-      </ul>
-    #end
     #define($body)
       <p class="noitems">
-        $escapetool.xml($services.localization.render('core.delete.backlinksInfo', [$doc.backlinks.size()]))
+        #set ($backLinksURL = $escapetool.xml($doc.getURL('view', 'viewer=backlinks')))
+        $services.localization.render('core.delete.backlinksMessage',
+          ["<a href='$backLinksURL'>", $doc.backlinks.size(), '</a>'])
       </p>
       <dl>
         <dt>
@@ -260,6 +254,7 @@
         #displayLinksCheckbox({
           'label': 'core.delete.updateLinks.label',
           'hint': 'core.delete.updateLinks.hint',
+          'addBacklinksURL': false,
           'hidden': true
         })
         #displayAutoRedirectCheckbox({

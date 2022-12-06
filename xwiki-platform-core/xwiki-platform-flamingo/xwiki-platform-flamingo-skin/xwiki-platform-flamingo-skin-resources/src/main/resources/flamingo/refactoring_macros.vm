@@ -101,7 +101,12 @@
     #set ($backLinksCount = $doc.backlinks.size())
     #set ($backLinksURL = $escapetool.xml($doc.getURL('view', 'viewer=backlinks')))
     <span class="xHint">
-      $services.localization.render($options.hint, ["<a href='$backLinksURL'>", $backLinksCount, '</a>'])
+      ## The backlinks URL could already be displayed above in some cases, so the link should not be duplicated.
+      #if ($options.addBacklinksURL)
+        $services.localization.render($options.hint, ["<a href='$backLinksURL'>", $backLinksCount, '</a>'])
+      #else
+        $services.localization.render($options.hint, ['', $backLinksCount, ''])
+      #end
     </span>
   </dd>
 #end

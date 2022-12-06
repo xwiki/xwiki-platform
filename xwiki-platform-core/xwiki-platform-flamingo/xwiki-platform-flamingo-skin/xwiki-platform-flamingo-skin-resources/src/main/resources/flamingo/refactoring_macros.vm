@@ -103,9 +103,14 @@
     <span class="xHint">
       ## The backlinks URL could already be displayed above in some cases, so the link should not be duplicated.
       #if ($options.addBacklinksURL)
-        $services.localization.render($options.hint, ["<a href='$backLinksURL'>", $backLinksCount, '</a>'])
+        #set ($backlinksMessage = $escapetool.xml($services.localization.render($options.hint, [
+          '__STARTLINK__',
+          $backLinksCount,
+          '__ENDLINK__'
+        ])).replace('__STARTLINK__', "<a href='$backLinksURL'>").replace('__ENDLINK__', '</a>'))
+        $backlinksMessage
       #else
-        $services.localization.render($options.hint, ['', $backLinksCount, ''])
+        $escapetool.xml($services.localization.render($options.hint, ['', $backLinksCount, '']))
       #end
     </span>
   </dd>

@@ -73,13 +73,13 @@
       #set ($colorThemeName = $xwiki.getSpacePreference('colorTheme'))
       #set ($wikiColorTheme = $xwiki.getDocument($xwiki.getXWikiPreference('colorTheme')))
       #if (!$wikiColorTheme.isNew())
-        #set ($colorThemeHint = $services.localization.render('admin.colortheme.wikiSetting', ["&lt;a href='$wikiColorTheme.getURL()'&gt;$wikiColorTheme.plainTitle&lt;/a&gt;"]))
+        #set ($colorThemeHint = $escapetool.xml($services.localization.render('admin.colortheme.wikiSetting', ['__LINK__'])).replaceAll('__LINK__', "&lt;a href='$wikiColorTheme.getURL()'&gt;$wikiColorTheme.plainTitle&lt;/a&gt;"))
       #end
     #end
     #if ($xwiki.exists($services.model.createDocumentReference('', 'FlamingoThemes', 'WebHome')))
-      #set ($colorThemeHint = "$!{colorThemeHint} &lt;strong&gt;&lt;a href=""$xwiki.getURL($services.model.createDocumentReference('', 'FlamingoThemes', 'WebHome'))""&gt;$services.localization.render('admin.colortheme.manage')&lt;/a&gt;&lt;/strong&gt;")
+      #set ($colorThemeHint = "$!{colorThemeHint} &lt;strong&gt;&lt;a href=""$xwiki.getURL($services.model.createDocumentReference('', 'FlamingoThemes', 'WebHome'))""&gt;$escapetool.xml($services.localization.render('admin.colortheme.manage'))&lt;/a&gt;&lt;/strong&gt;")
     #elseif ($xwiki.exists($services.model.createDocumentReference('', 'ColorThemes', 'WebHome')))
-      #set ($colorThemeHint = "$!{colorThemeHint} &lt;strong&gt;&lt;a href=""$xwiki.getURL($services.model.createDocumentReference('', 'ColorThemes', 'WebHome'))""&gt;$services.localization.render('admin.colortheme.manage')&lt;/a&gt;&lt;/strong&gt;")
+      #set ($colorThemeHint = "$!{colorThemeHint} &lt;strong&gt;&lt;a href=""$xwiki.getURL($services.model.createDocumentReference('', 'ColorThemes', 'WebHome'))""&gt;$escapetool.xml($services.localization.render('admin.colortheme.manage'))&lt;/a&gt;&lt;/strong&gt;")
     #end
     &lt;span class="buttonwrapper"&gt;
       &lt;a href="$xwiki.getURL($colorThemeName, 'edit')"#if ($colorThemeName.indexOf('.') &lt; 0) class="hidden"#end&gt;
@@ -97,7 +97,7 @@
     &lt;dd class="hidden"&gt;&lt;/dd&gt;
   #end
   #if ($prop.name == 'colorTheme' &amp;&amp; $colorThemeHint)
-    &lt;dd class="xHint"&gt;$escapetool.xml($colorThemeHint)&lt;/dd&gt;
+    &lt;dd class="xHint"&gt;$colorThemeHint&lt;/dd&gt;
   #end
 #end
 {{/velocity}}

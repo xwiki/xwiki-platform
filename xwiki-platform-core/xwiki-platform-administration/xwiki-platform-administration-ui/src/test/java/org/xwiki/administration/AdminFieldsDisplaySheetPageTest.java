@@ -19,6 +19,7 @@
  */
 package org.xwiki.administration;
 
+import java.util.Collections;
 import java.util.Map;
 
 import javax.script.ScriptContext;
@@ -27,7 +28,13 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.configuration.internal.RestrictedConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.script.ModelScriptService;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryBuilder;
 import org.xwiki.rendering.internal.configuration.DefaultExtendedRenderingConfiguration;
 import org.xwiki.rendering.internal.configuration.RenderingConfigClassDocumentConfigurationSource;
 import org.xwiki.rendering.internal.macro.DefaultMacroCategoryManager;
@@ -42,10 +49,18 @@ import org.xwiki.test.page.TestNoScriptMacro;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
 import org.xwiki.xml.internal.html.filter.ControlCharactersFilter;
 
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.mandatory.XWikiPreferencesDocumentInitializer;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.DBListClass;
+
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static javax.script.ScriptContext.ENGINE_SCOPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 /**
  * Page test of {@code XWiki.AdminFieldsDisplaySheet}.
@@ -70,17 +85,28 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
     DefaultMacroCategoryManager.class,
     DefaultMacroTransformationConfiguration.class,
     // End RenderingScriptService
-    ControlCharactersFilter.class
+    ControlCharactersFilter.class,
+    RenderingConfigClassDocumentConfigurationSource.class,
+    XWikiPreferencesDocumentInitializer.class,
+    ModelScriptService.class,
+    RestrictedConfigurationSource.class
 })
 class AdminFieldsDisplaySheetPageTest extends PageTest
 {
     private ScriptContext scriptContext;
+
+    @Mock
+    private Query query;
 
     @BeforeEach
     void setUp() throws Exception
     {
         this.scriptContext =
             this.oldcore.getMocker().<ScriptContextManager>getInstance(ScriptContextManager.class).getScriptContext();
+        // Mock the database access for now as we don't need it.
+        QueryBuilder<DBListClass> queryBuilder = this.componentManager.registerMockComponent(
+            new DefaultParameterizedType(null, QueryBuilder.class, DBListClass.class));
+        when(queryBuilder.build(any())).thenReturn(this.query);
     }
 
     @Test
@@ -107,5 +133,40 @@ class AdminFieldsDisplaySheetPageTest extends PageTest
         Element fieldset = form.selectFirst("fieldset");
         assertEquals(paramsInput, fieldset.attr("class"));
         assertEquals(paramClassInput, document.selectFirst(".hidden input[name='classname']").val());
+    }
+
+    @Test
+    void displayLinkInColorThemeHint() throws Exception
+    {
+        DocumentReference flamingoThemeDocumentReference = new DocumentReference("xwiki", "FlamingoThemes", "WebHome");
+        DocumentReference xwikiPreferencesDocumentReference =
+            new DocumentReference("xwiki", "XWiki", "XWikiPreferences");
+        DocumentReference otherDocumentReference = new DocumentReference("xwiki", "Space", "Page");
+
+        // Initialize XWiki.XWikiPreferences
+        this.xwiki.initializeMandatoryDocuments(this.context);
+
+        // Initialize the flamingo theme.
+        this.xwiki.saveDocument(this.xwiki.getDocument(flamingoThemeDocumentReference, this.context), this.context);
+
+        // Initialize the document to be displayed with the sheet.
+        XWikiDocument otherDoc = this.xwiki.getDocument(otherDocumentReference, this.context);
+        BaseObject xObject =
+            otherDoc.newXObject(xwikiPreferencesDocumentReference, this.context);
+        xObject.set("colorTheme", "themeName", this.context);
+        this.xwiki.saveDocument(otherDoc, this.context);
+
+        // Initialize the sheet parameters.
+        this.scriptContext.setAttribute("section", "test-section", ENGINE_SCOPE);
+        this.scriptContext.setAttribute("paramDoc", new com.xpn.xwiki.api.Document(otherDoc, this.context),
+            ENGINE_SCOPE);
+        this.scriptContext.setAttribute("params",
+            Collections.<Object, Object>singletonMap("param-input", singletonList("colorTheme")), ENGINE_SCOPE);
+
+        Document document = renderHTMLPage(new DocumentReference("xwiki", "XWiki", "AdminFieldsDisplaySheet"));
+
+        Element xHint = document.selectFirst(".xHint");
+        assertEquals("admin.colortheme.manage", xHint.text());
+        assertEquals("/xwiki/bin/view/FlamingoThemes/", xHint.selectFirst("a").attr("href"));
     }
 }

@@ -216,6 +216,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
         XWikiContext xcontext = this.xcontextProvider.get();
         WikiReference wikiReference = new WikiReference(wiki);
 
+        List<String> documents;
         try {
             Query query =
                 this.queryManager.createQuery(String.format(
@@ -223,21 +224,25 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
                     TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE_STRING), Query.XWQL);
 
             query.setWiki(wiki);
-            
-            List<String> documents = query.execute();
-            for (String documentName : documents) {
-                DocumentReference reference = currentResolver.resolve(documentName, wikiReference);
+
+            documents = query.execute();
+        } catch (Exception e) {
+            this.logger.error("Failed to find translation documents", e);
+
+            return ;
+        }
+
+        for (String documentName : documents) {
+            DocumentReference reference = this.currentResolver.resolve(documentName, wikiReference);
+
+            try {
                 XWikiDocument document = xcontext.getWiki().getDocument(reference, xcontext);
 
-                try {
-                    registerTranslationBundle(document);
-                } catch (Exception e) {
-                    this.logger.error("Failed to register translation bundle from document [{}]",
-                        document.getDocumentReference(), e);
-                }
+                registerTranslationBundle(document);
+            } catch (Exception e) {
+                this.logger.error("Failed to load and register the translation bundle from document [{}]", reference,
+                    e);
             }
-        } catch (Exception e) {
-            this.logger.error("Failed to load existing translations", e);
         }
     }
 

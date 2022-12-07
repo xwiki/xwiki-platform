@@ -160,15 +160,15 @@ if (!params.type || params.type == 'standard') {
     currentBuild.rawBuild.getPreviousBuild().getCauses().each() {
       echoXWiki "Build trigger cause: [${it.toString()}]"
       if (it.toString().contains('SCMTriggerCause')) {
-        echoXWiki 'Executing docker-latest because it was triggered by a SCM commit - ${it.getShortDescription()}'
+        echoXWiki "Executing docker-latest because it was triggered by a SCM commit - ${it.getShortDescription()}"
         shouldExecute = true
       }
       if (it.toString().contains('BranchEventCause')) {
-        echoXWiki 'Executing docker-latest because it was triggered by a Branch Event - ${it.getShortDescription()}'
+        echoXWiki "Executing docker-latest because it was triggered by a Branch Event - ${it.getShortDescription()}"
         shouldExecute = true
       }
       if (it.toString().contains('UpstreamCause')) {
-        echoXWiki 'Executing docker-latest because it was triggered by an upstream job - ${it.getShortDescription()}'
+        echoXWiki "Executing docker-latest because it was triggered by an upstream job - ${it.getShortDescription()}"
         shouldExecute = true
       }
     }

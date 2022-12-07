@@ -1547,7 +1547,7 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
 #elseif ($xcontext.action == 'inline' || $xcontext.action == 'edit')
   (% class="attachment-picker" %)(((##
     #attachmentPicker_displayAttachment($propValue $displayImage false true) #attachmentPicker_displayButton()##
-    {{html}}&lt;input type="hidden" name="${classname}_${object}_${property}" value="${propValue}"/&gt;{{/html}}##
+    {{html}}&lt;input type="hidden" name="$escapetool.xml("${classname}_${object}_${property}")" value="$escapetool.xml("${propValue}")" /&gt;{{/html}}##
   )))
 #else
   #attachmentPicker_displayAttachment($propValue $displayImage $link false)

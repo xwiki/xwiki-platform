@@ -38,5 +38,7 @@
   <hidden>true</hidden>
   <content>attachment.picker.ckeditor.pluginsImageSelector.title=ギャラリー
 attachment.picker.searchField.placeholder=検索…
+attachment.picker.searchField.scope.currentPage=現在のページ
+attachment.picker.searchField.scope.allPages=全てのページ
 </content>
   </xwikidoc>

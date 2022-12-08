@@ -593,7 +593,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
             file: fileInput
           });
 
-          if (beforeUploadEvent.isDefaultPrevented()) {
+          if (beforeUploadEvent.defaultPrevented) {
             hasErrors = true;
           }
         }.bind(this));

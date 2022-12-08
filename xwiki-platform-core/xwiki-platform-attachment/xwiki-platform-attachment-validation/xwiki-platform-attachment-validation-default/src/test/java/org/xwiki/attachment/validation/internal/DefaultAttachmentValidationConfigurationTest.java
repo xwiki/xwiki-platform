@@ -65,7 +65,7 @@ class DefaultAttachmentValidationConfigurationTest
     void getAllowedMimetypesInConfigurationSource()
     {
         when(this.attachmentConfigurationSource.containsKey(ALLOWED_MIMETYPES_FIELD)).thenReturn(true);
-        List<String> expectedMimetypes = List.of("image/.*");
+        List<String> expectedMimetypes = List.of("image/*");
         when(this.attachmentConfigurationSource.getProperty(ALLOWED_MIMETYPES_FIELD)).thenReturn(expectedMimetypes);
         assertEquals(expectedMimetypes, this.configuration.getAllowedMimetypes());
         verifyNoInteractions(this.wikiConfigurationSource);
@@ -78,7 +78,7 @@ class DefaultAttachmentValidationConfigurationTest
     {
         when(this.attachmentConfigurationSource.containsKey(ALLOWED_MIMETYPES_FIELD)).thenReturn(false);
         when(this.wikiConfigurationSource.containsKey(ALLOWED_MIMETYPES_FIELD)).thenReturn(true);
-        List<String> expectedMimetypes = List.of("image/.*");
+        List<String> expectedMimetypes = List.of("image/*");
         when(this.wikiConfigurationSource.getProperty(ALLOWED_MIMETYPES_FIELD)).thenReturn(expectedMimetypes);
         assertEquals(expectedMimetypes, this.configuration.getAllowedMimetypes());
 
@@ -91,12 +91,13 @@ class DefaultAttachmentValidationConfigurationTest
     {
         when(this.attachmentConfigurationSource.containsKey(ALLOWED_MIMETYPES_FIELD)).thenReturn(false);
         when(this.wikiConfigurationSource.containsKey(ALLOWED_MIMETYPES_FIELD)).thenReturn(false);
-        List<String> expectedMimetypes = List.of("image/.*");
-        when(this.xWikiPropertiesConfigurationSource.<List<String>>getProperty("attachment.upload.allowList",
-            List.of())).thenReturn(expectedMimetypes);
+        List<String> expectedMimetypes = List.of("image/*");
+        when(this.xWikiPropertiesConfigurationSource.containsKey("attachment.upload.allowList")).thenReturn(true);
+        when(this.xWikiPropertiesConfigurationSource.<List<String>>getProperty(
+            "attachment.upload.allowList")).thenReturn(expectedMimetypes);
         assertEquals(expectedMimetypes, this.configuration.getAllowedMimetypes());
 
-        verify(this.xWikiPropertiesConfigurationSource).getProperty("attachment.upload.allowList", List.of());
+        verify(this.xWikiPropertiesConfigurationSource).getProperty("attachment.upload.allowList");
         verify(this.attachmentConfigurationSource, never()).getProperty(ALLOWED_MIMETYPES_FIELD);
         verify(this.wikiConfigurationSource, never()).getProperty(ALLOWED_MIMETYPES_FIELD);
     }
@@ -105,7 +106,7 @@ class DefaultAttachmentValidationConfigurationTest
     void getBlockerMimetypesInConfigurationSource()
     {
         when(this.attachmentConfigurationSource.containsKey(BLOCKED_MIMETYPES_FIELD)).thenReturn(true);
-        List<String> expectedMimetypes = List.of("image/.*");
+        List<String> expectedMimetypes = List.of("image/*");
         when(this.attachmentConfigurationSource.getProperty(BLOCKED_MIMETYPES_FIELD)).thenReturn(expectedMimetypes);
         assertEquals(expectedMimetypes, this.configuration.getBlockerMimetypes());
         verifyNoInteractions(this.wikiConfigurationSource);
@@ -118,7 +119,7 @@ class DefaultAttachmentValidationConfigurationTest
     {
         when(this.attachmentConfigurationSource.containsKey(BLOCKED_MIMETYPES_FIELD)).thenReturn(false);
         when(this.wikiConfigurationSource.containsKey(BLOCKED_MIMETYPES_FIELD)).thenReturn(true);
-        List<String> expectedMimetypes = List.of("image/.*");
+        List<String> expectedMimetypes = List.of("image/*");
         when(this.wikiConfigurationSource.getProperty(BLOCKED_MIMETYPES_FIELD)).thenReturn(expectedMimetypes);
         assertEquals(expectedMimetypes, this.configuration.getBlockerMimetypes());
 
@@ -131,14 +132,29 @@ class DefaultAttachmentValidationConfigurationTest
     {
         when(this.attachmentConfigurationSource.containsKey(BLOCKED_MIMETYPES_FIELD)).thenReturn(false);
         when(this.wikiConfigurationSource.containsKey(BLOCKED_MIMETYPES_FIELD)).thenReturn(false);
-        List<String> expectedMimetypes = List.of("image/.*");
-        when(this.xWikiPropertiesConfigurationSource.<List<String>>getProperty("attachment.upload.blockList",
-            List.of()))
+        List<String> expectedMimetypes = List.of("image/*");
+        when(this.xWikiPropertiesConfigurationSource.containsKey("attachment.upload.blockList")).thenReturn(true);
+        when(this.xWikiPropertiesConfigurationSource.<List<String>>getProperty("attachment.upload.blockList"))
             .thenReturn(expectedMimetypes);
         assertEquals(expectedMimetypes, this.configuration.getBlockerMimetypes());
 
-        verify(this.xWikiPropertiesConfigurationSource).getProperty("attachment.upload.blockList", List.of());
+        verify(this.xWikiPropertiesConfigurationSource).getProperty("attachment.upload.blockList");
         verify(this.attachmentConfigurationSource, never()).getProperty(BLOCKED_MIMETYPES_FIELD);
         verify(this.wikiConfigurationSource, never()).getProperty(BLOCKED_MIMETYPES_FIELD);
+    }
+
+    @Test
+    void getAllowedMimeTypesEmptyLists()
+    {
+        when(this.attachmentConfigurationSource.containsKey(ALLOWED_MIMETYPES_FIELD)).thenReturn(true);
+        when(this.attachmentConfigurationSource.getProperty(ALLOWED_MIMETYPES_FIELD)).thenReturn(List.of());
+        when(this.wikiConfigurationSource.containsKey(ALLOWED_MIMETYPES_FIELD)).thenReturn(true);
+        when(this.wikiConfigurationSource.getProperty(ALLOWED_MIMETYPES_FIELD)).thenReturn(List.of("image/*"));
+        assertEquals(List.of("image/*"), this.configuration.getAllowedMimetypes());
+        verify(this.attachmentConfigurationSource).containsKey(ALLOWED_MIMETYPES_FIELD);
+        verify(this.attachmentConfigurationSource).getProperty(ALLOWED_MIMETYPES_FIELD);
+        verify(this.wikiConfigurationSource).getProperty(ALLOWED_MIMETYPES_FIELD);
+        verify(this.wikiConfigurationSource).getProperty(ALLOWED_MIMETYPES_FIELD);
+        verifyNoInteractions(this.xWikiPropertiesConfigurationSource);
     }
 }

@@ -285,7 +285,7 @@ require(['jquery', 'xwiki-l10n!attachment-validation-filesize-messages', 'xwiki-
       </scope>
     </class>
     <property>
-      <async_cached>1</async_cached>
+      <async_cached>0</async_cached>
     </property>
     <property>
       <async_context/>

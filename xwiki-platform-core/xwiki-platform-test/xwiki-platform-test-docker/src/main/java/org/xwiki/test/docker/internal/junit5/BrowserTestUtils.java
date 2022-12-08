@@ -52,8 +52,10 @@ public final class BrowserTestUtils
 
     private static final String SELENIARM_VERSION = LATEST;
 
+    // FIXME: it's forced to 106.0 for now as we experienced some problems with latest version,
+    //  see https://jira.xwiki.org/browse/XWIKI-20463
     private static final String SELENIUM_FIREFOX_DOCKER_IMAGE_NAME =
-        String.format("selenium/standalone-firefox:%s", SELENIUM_VERSION);
+        String.format("selenium/standalone-firefox:%s", "106.0");
 
     private static final String SELENIUM_CHROME_DOCKER_IMAGE_NAME =
         String.format("selenium/standalone-chrome:%s", SELENIUM_VERSION);

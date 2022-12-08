@@ -112,9 +112,13 @@ class AttachmentGalleryPickerMacroIT
         assertEquals(Optional.of("image1.png"), testPicker1.getSelectedAttachment());
         testPicker1.toggleAllPages().waitUntilAttachmentsCount(count -> count > 3);
         assertFalse(testPicker1.isGlobalSelectionWarningDisplayed());
-        testPicker1.clickAttachment("users.png");
+        // Get the name of the first attachment which is not from the current page, to use for the selection of a global
+        // attachment for the next steps of the test. We can't use a constant because the order in which solr returns
+        // the attachments can change.
+        String firstGlobalAttachmentName = testPicker1.getAttachmentTitles().get(4);
+        testPicker1.clickAttachment(firstGlobalAttachmentName);
         assertTrue(testPicker1.isGlobalSelectionWarningDisplayed());
-        testPicker1.setSearch("users");
+        testPicker1.setSearch(firstGlobalAttachmentName);
         assertTrue(testPicker1.isGlobalSelectionWarningDisplayed());
         testPicker1.setSearch("");
         assertTrue(testPicker1.isGlobalSelectionWarningDisplayed());

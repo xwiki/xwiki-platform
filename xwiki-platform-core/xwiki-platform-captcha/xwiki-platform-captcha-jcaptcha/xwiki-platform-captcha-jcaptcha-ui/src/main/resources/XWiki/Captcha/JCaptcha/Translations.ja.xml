@@ -60,5 +60,6 @@ captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.BaffleListGimpyEngin
 captcha.jcaptcha.engine.com.octo.captcha.engine.sound.speller.SpellerSoundCaptchaEngine=Speller
 captcha.jcaptcha.engine.com.octo.captcha.engine.sound.gimpy.SimpleListSoundCaptchaEngine=シンプルなリスト
 captcha.jcaptcha.engine.org.xwiki.captcha.internal.SimpleMathCaptchaEngine=シンプルな算数
+captcha.jcaptcha.engine.custom=カスタム：
 </content>
   </xwikidoc>

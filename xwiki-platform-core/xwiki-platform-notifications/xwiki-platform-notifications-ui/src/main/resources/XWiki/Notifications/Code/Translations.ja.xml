@@ -69,7 +69,7 @@ notifications.filters.description.minorEventEmailNotificationFilter=ページの
 ## Translation keys for the scopeNotificationFilter
 notifications.filters.preferences.scopeNotificationFilter.name=通知のフィルタリングの範囲
 notifications.filters.preferences.scopeNotificationFilter.page=ページのみ
-notifications.filters.preferences.scopeNotificationFilter.space=ページと子ページ
+notifications.filters.preferences.scopeNotificationFilter.space=ページと下位ページ
 notifications.filters.preferences.scopeNotificationFilter.wiki=ウィキ
 
 ## Notifications toggles
@@ -218,13 +218,13 @@ rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=�
 
 ## Toggle notification filters labels
 notifications.filters.preferences.label.page=ページの通知のみを切り替える
-notifications.filters.preferences.label.space=ページと子ページの通知を切り替える
+notifications.filters.preferences.label.space=ページと下位ページの通知を切り替える
 notifications.filters.preferences.label.wiki=ウィキの通知を切り替える
 
 ## Notifications switches
 notifications.switches.tooltip.page=このページを監視
-notifications.switches.tooltip.pageAndChildren=このページと子ページを監視
-notifications.switches.tooltip.space=親ページと子ページを監視
+notifications.switches.tooltip.pageAndChildren=このページと下位ページを監視
+notifications.switches.tooltip.space=上位ページと下位ページを監視
 notifications.switches.tooltip.wiki=このウィキを監視
 notifications.switches.changeStatusError=通知の状態を変更できませんでした。
 

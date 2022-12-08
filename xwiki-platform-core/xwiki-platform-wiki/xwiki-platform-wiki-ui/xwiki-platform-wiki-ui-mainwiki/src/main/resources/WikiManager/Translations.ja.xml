@@ -99,23 +99,23 @@ platform.wiki.form.requiredField=必須
 platform.wiki.csrf.error=不正なセキュリティートークンです。再試行してください。
 
 ## Users
-### Missing: platform.wiki.users.userAlreadyMemberOfWiki=
-### Missing: platform.wiki.users.userNotMemberOfWiki=
+platform.wiki.users.userAlreadyMemberOfWiki=ユーザー {0}{1}{2} は既にウィキ {3}{4}{5} のメンバーです。
+platform.wiki.users.userNotMemberOfWiki=ユーザー {0}{1}{2} はウィキ {3}{4}{5} のメンバーではありません。
 platform.wiki.users.logInToContinue=続行するには最初に{0}ログイン{1}してください。
 platform.wiki.users.invitation.userAcceptedNotification=ユーザー''{0}''（{1}）はウィキ''{2}''（{3}）への招待を承諾しました。
-### Missing: platform.wiki.users.invitation.userAcceptedSuccess=
-### Missing: platform.wiki.users.invitation.userRejectedSuccess=
+platform.wiki.users.invitation.userAcceptedSuccess=ユーザー {0}{1}{2} はウィキ {3}{4}{5} への招待を受け入れ、ウィキに参加しました。
+platform.wiki.users.invitation.userRejectedSuccess=ユーザー {0}{1}{2} はウィキ {3}{4}{5} への招待を拒否しました。
 platform.wiki.users.join.error.needInvitation=このウィキは招待専用です。管理者から招待を受け取る必要があります。
-### Missing: platform.wiki.users.join.request.pendingRequestExists=
+platform.wiki.users.join.request.pendingRequestExists=ユーザー {0}{1}{2} にはウィキ {3}{4}{5} への保留中の参加リクエストがあります。ウィキの管理者が確認するまでお待ちください。
 platform.wiki.users.join.request.cancelConfirmation=ウィキ {0}{1}{2} の参加リクエストをキャンセルしてよろしいですか？
 platform.wiki.users.join.request.cancelYes=はい
 platform.wiki.users.join.request.cancelNo=いいえ
 platform.wiki.users.join.request.cancelSuccess=ユーザー {0}{1}{2} はウィキ {3}{4}{5} の参加リクエストをキャンセルしました。
 platform.wiki.users.join.request.saveNotification=ユーザー''{0}''（{1}）はウィキ''{2}''（{3}）への参加を要求しました。
-### Missing: platform.wiki.users.join.request.success=
+platform.wiki.users.join.request.success=ユーザー {0}{1}{2} はウィキ {3}{4}{5} への参加リクエストを送信しました。
 platform.wiki.users.join.confirmation=このウィキに参加してよろしいですか{0}{1}{2}？
 platform.wiki.users.join.yes=はい
-### Missing: platform.wiki.users.join.no=No
+platform.wiki.users.join.no=いいえ
 platform.wiki.users.join.success=ユーザー{0}{1}{2}がウィキに参加しました{3}{4}{5}。
 platform.wiki.users.leave.error.userIsOwner=ユーザー {0}{1}{2} はウィキ {3}{4}{5} の所有者です。ウィキを削除するか所有者を変更しない限り、所有者はこのウィキから退出できません。
 platform.wiki.users.leave.confirmation=ウィキ {0}{1}{2} を退出してよろしいですか？
@@ -127,10 +127,10 @@ platform.wiki.users.leave.title=ウィキ"{0}"から退出
 platform.wiki.users.leave.empty=ウィキから退出
 platform.wiki.users.delete.title=ウィキ"{0}"を削除
 platform.wiki.users.delete.empty=ウィキを削除
-### Missing: platform.wiki.users.invitation.reply.hint=
+platform.wiki.users.invitation.reply.hint=返信用メッセージ。ウィキの管理者が閲覧できます。招待に関する決定の理由を記入してください。
 platform.wiki.users.join.request.hint=ウィキ {0}{1}{2} に参加するには、参加リクエストを送信する必要があります。送信後、ウィキの管理者が参加を許可するかを確認します。
 platform.wiki.users.join.request.message.hint=参加をリクエストする際にウィキの管理者に送信するメッセージ。
-### Missing: platform.wiki.users.invitation.title=
+platform.wiki.users.invitation.title=ウィキ {0}{1}{2} に招待されました。
 platform.wiki.users.invitation.message.label=招待メッセージ
 platform.wiki.users.invitation.reply.title=返信
 platform.wiki.users.invitation.accept.label=受け入れる
@@ -150,7 +150,7 @@ platform.wiki.users.profile.activity.multipletitle=ウィキ {0} のアクティ
 platform.wiki.users.profile.activity.show=アクティビティーを表示
 
 ## Wiki Deletion
-### Missing: platform.wiki.delete.confirmation=
+platform.wiki.delete.confirmation=ウィキ {0}{1}{2} を削除してよろしいですか？これは取り消せません！
 platform.wiki.delete.confirmation.retypeWikiId=ウィキの識別子を繰り返してください：
 platform.wiki.delete.error.wikiIdDoesNotMatch=削除するウィキの識別子を入力してください。
 platform.wiki.delete.success=ユーザー {0}{1}{2} はウィキ''{3}''を削除しました。
@@ -166,7 +166,7 @@ rendering.macro.workspaces.description=互換性の理由で使用すべきで�
 
 ## Browse
 platform.wiki.browse=ウィキを閲覧
-### Missing: platform.wiki.browse.emptyvalue=N/A
+platform.wiki.browse.emptyvalue=該当なし
 platform.wiki.browse.wikiprettyname=名称
 platform.wiki.browse.description=詳細
 platform.wiki.browse.owner=オーナー

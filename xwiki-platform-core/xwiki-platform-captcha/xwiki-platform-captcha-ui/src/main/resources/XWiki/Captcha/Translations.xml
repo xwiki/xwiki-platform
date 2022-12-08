@@ -38,7 +38,10 @@
   <hidden>true</hidden>
   <content>admin.captcha=CAPTCHA
 captcha.admin.defaultCaptchaName.label=Default CAPTCHA
-captcha.admin.defaultCaptchaName.hint=The default CAPTCHA implementation to use. Use the Extension Manager to search for other implementations that you can install and use.</content>
+captcha.admin.defaultCaptchaName.hint=The default CAPTCHA implementation to use. Use the Extension Manager to search for other implementations that you can install and use.
+captcha.admin.configure.title=Configure {0}
+captcha.admin.sample.title=Sample CAPTCHA
+captcha.admin.sample.description=How the configured CAPTCHA looks like when it will be displayed in a form, for example.</content>
   <object>
     <name>XWiki.Captcha.Translations</name>
     <number>0</number>

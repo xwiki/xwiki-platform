@@ -60,5 +60,6 @@ captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.NonLinearTextGimpyEn
 ### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.sound.speller.SpellerSoundCaptchaEngine=Speller
 captcha.jcaptcha.engine.com.octo.captcha.engine.sound.gimpy.SimpleListSoundCaptchaEngine=Einfache Liste
 captcha.jcaptcha.engine.org.xwiki.captcha.internal.SimpleMathCaptchaEngine=Einfache Mathematik
+captcha.jcaptcha.engine.custom=Benutzerdefiniert:
 </content>
 </xwikidoc>

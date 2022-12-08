@@ -61,7 +61,8 @@ captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.BaffleListGimpyEngin
 captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.HotmailEngine2008=Hotmail 2008
 captcha.jcaptcha.engine.com.octo.captcha.engine.sound.speller.SpellerSoundCaptchaEngine=Speller
 captcha.jcaptcha.engine.com.octo.captcha.engine.sound.gimpy.SimpleListSoundCaptchaEngine=Simple List
-captcha.jcaptcha.engine.org.xwiki.captcha.internal.SimpleMathCaptchaEngine=Simple Math</content>
+captcha.jcaptcha.engine.org.xwiki.captcha.internal.SimpleMathCaptchaEngine=Simple Math
+captcha.jcaptcha.engine.custom=Custom:</content>
   <object>
     <name>XWiki.Captcha.JCaptcha.Translations</name>
     <number>0</number>

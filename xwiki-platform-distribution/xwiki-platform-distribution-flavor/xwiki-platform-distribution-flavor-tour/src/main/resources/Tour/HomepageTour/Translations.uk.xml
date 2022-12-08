@@ -51,10 +51,10 @@ tour.homepageTour.panels.title=Панелі
 ### Missing: tour.homepageTour.pageContent.title=Page Content
 ### Missing: tour.homepageTour.pageContent.contentA=This is the place where the content of the current page is displayed.
 ### Missing: tour.homepageTour.pageContent.contentB=Edit this page to add tables, lists, macros and structure in order to organize your knowledge.
-### Missing: tour.homepageTour.pageMenu.title=Page Menu
+tour.homepageTour.pageMenu.title=Сторінка Меню
 ### Missing: tour.homepageTour.pageMenu.contentA=This menu contains page related actions. With the appropriate rights, you can edit, create, administer or delete pages.
 ### Missing: tour.homepageTour.pageMenu.contentB=The {0} button reveals more actions like Export, Print and Share.
-### Missing: tour.homepageTour.pageTabs.title=Page Tabs
+tour.homepageTour.pageTabs.title=Сторінка Вкладок
 ### Missing: tour.homepageTour.pageTabs.contentA=Comments are a great way for users to discuss the page content.
 ### Missing: tour.homepageTour.pageTabs.contentB=You can also attach files, compare page versions or see page information.
 ### Missing: tour.homepageTour.header.title=Header
@@ -62,5 +62,6 @@ tour.homepageTour.panels.title=Панелі
 ### Missing: tour.homepageTour.header.contentB=The {0} button opens a Drawer which contains wiki related actions like Administration and Indexes.
 ### Missing: tour.homepageTour.tourComplete.title=Tour Complete
 ### Missing: tour.homepageTour.tourComplete.contentA=This completes your tour on XWiki's interface and basic functionalities.
-### Missing: tour.homepageTour.tourComplete.contentB=For more details on each feature, access the {0}documentation{1}.</content>
+### Missing: tour.homepageTour.tourComplete.contentB=For more details on each feature, access the {0}documentation{1}.
+</content>
 </xwikidoc>

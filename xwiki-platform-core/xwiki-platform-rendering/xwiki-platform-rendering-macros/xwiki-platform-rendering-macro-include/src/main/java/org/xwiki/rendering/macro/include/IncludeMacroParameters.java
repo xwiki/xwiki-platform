@@ -234,7 +234,7 @@ public class IncludeMacroParameters
     }
 
     /**
-     * @return the author to use to execute the content when {@link #getContext()} is {@value Context#CURRENT}
+     * @return the author to use to execute the content when {@link #getContext()} is {@link Context#CURRENT}
      * @since 15.0RC1
      */
     public Author getAuthor()
@@ -243,7 +243,7 @@ public class IncludeMacroParameters
     }
 
     /**
-     * @param author the author to use to execute the content when {@link #getContext()} is {@value Context#CURRENT}
+     * @param author the author to use to execute the content when {@link #getContext()} is {@link Context#CURRENT}
      * @since 15.0RC1
      */
     @PropertyDescription("The author to use to execute the content when context is \"Current\"")

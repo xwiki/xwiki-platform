@@ -150,7 +150,7 @@ appWithinMinutes.templateProviderEditor.creationRestrictions.name=エントリ�
 appWithinMinutes.templateProviderEditor.creationRestrictions.hint=場所の指定がない場合、ウィキのどの場所にもエントリーを作成できます。
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=エントリーの場所を強制しない
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=上で指定した場所は候補としてのみ使用し、アプリケーションエントリーを作成する際に異なる場所を選択することをユーザーに許可。
-appWithinMinutes.templateProviderEditor.terminal.hint=アプリケーションのエントリーをターミナルページとするか否か。
+appWithinMinutes.templateProviderEditor.terminal.hint=アプリケーションのエントリーをターミナルページとするか否かを選択。
 
 ### Wizard Step 3: Application Presentation
 platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=アプリケーションのフィールド
@@ -203,6 +203,7 @@ platform.appwithinminutes.appHomePageEditAppLabel=アプリケーションを編
 platform.appwithinminutes.appHomePageTranslateAppLabel=アプリケーションを翻訳
 platform.appwithinminutes.appHomePageDeleteAppLabel=アプリケーションを削除
 platform.appwithinminutes.appHomePageMovedWarning=このアプリケーションは、コードをアップデートせず名称が変更されたか移動されたため、適切に機能しないおそれがあります。アプリケーションを編集し、以下のステップに従ってコードをアップデートしてください。
+platform.appwithinminutes.appHomePageNoScriptRight=アプリケーションの作成または編集に必要なスクリプト権限がありません。続行するとアプリケーションが正しく動作しないおそれがあります。
 AppWithinMinutes.LiveTableClass_description=詳細
 AppWithinMinutes.LiveTableClass_columns=ライブテーブルの縦列
 

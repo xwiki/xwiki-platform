@@ -686,7 +686,6 @@ class DeletePageIT
         // Delete page and provide a new target, with updateLinks and autoRedirect enabled.
         ViewPage viewPage = testUtils.gotoPage(reference);
         DeletePageConfirmationPage confirmationPage = viewPage.deletePage();
-        confirmationPage.toggleBacklinksPane();
         confirmationPage.setNewBacklinkTarget(testUtils.serializeReference(newTargetReference));
         confirmationPage.setUpdateLinks(true);
         confirmationPage.setAutoRedirect(true);
@@ -731,8 +730,7 @@ class DeletePageIT
         DeletePageOutcomePage deleteOutcome = deletingPage.getDeletePageOutcomePage();
         assertEquals(LOGGED_USERNAME, deleteOutcome.getPageDeleter());
         assertEquals(DOCUMENT_NOT_FOUND, deleteOutcome.getMessage());
-        assertEquals(String.format("[[Link>>doc:%s]]", testUtils.serializeReference(reference).split(":")[1]),
-            testUtils.rest().<Page>get(backlinkDocReference).getContent());
+        assertEquals(backlinkDocContent, testUtils.rest().<Page>get(backlinkDocReference).getContent());
     }
 
     /**
@@ -763,7 +761,6 @@ class DeletePageIT
         ViewPage parentPage = testUtils.gotoPage(parentReference);
         DeletePageConfirmationPage confirmationPage = parentPage.deletePage();
         confirmationPage.setAffectChildren(true);
-        confirmationPage.toggleBacklinksPane();
         confirmationPage.setNewBacklinkTarget(testUtils.serializeReference(newTargetReference));
         confirmationPage.setUpdateLinks(true);
         confirmationPage.setAutoRedirect(true);

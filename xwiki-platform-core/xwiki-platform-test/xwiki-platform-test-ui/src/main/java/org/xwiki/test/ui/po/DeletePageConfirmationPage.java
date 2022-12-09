@@ -69,17 +69,6 @@ public class DeletePageConfirmationPage extends ConfirmationPage
     }
 
     /**
-     * Toggle the backlinks panel
-     *
-     * @since 14.4.2
-     * @since 14.5
-     */
-    public void toggleBacklinksPane()
-    {
-        getDriver().findElement(By.cssSelector("#delete .pull-right a[href='#panel-backlinks']")).click();
-    }
-
-    /**
      * @return {@code true} if a new target document was selected, {@code false} if the field is empty
      * @since 14.4.2
      * @since 14.5

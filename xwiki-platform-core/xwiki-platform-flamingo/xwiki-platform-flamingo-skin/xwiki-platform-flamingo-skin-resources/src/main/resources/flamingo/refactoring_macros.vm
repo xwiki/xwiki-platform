@@ -85,7 +85,7 @@
 #end
 
 #macro (displayLinksCheckbox $options)
-  #set ($hidden = !$isAdvancedUser && !$isSuperAdmin)
+  #set ($hidden = (!$isAdvancedUser && !$isSuperAdmin) || $options.hidden)
   ## We hide this option for simple users (instead of simply removing it) because we want to submit the default value
   ## (i.e. we want to make sure the links are updated for simple users).
   <dt#if ($hidden) class="hidden"#end>
@@ -128,7 +128,8 @@
   ## In the future we'll offer a config option to define the default behavior, see
   ## http://jira.xwiki.org/browse/XWIKI-13384
   #set ($checked = $request.autoRedirect == 'true')
-  <dt>
+  #set ($hidden = $options.hidden)
+  <dt #if ($hidden) class="hidden"#end>
     <label>
       <input type="checkbox" name="autoRedirect" value="true" #if ($checked)checked="checked"#end
         #if ($options.disabled)disabled#end/>
@@ -137,7 +138,7 @@
     ## The value submitted when the checkbox is not checked, used to preserve the form state.
     <input type="hidden" name="autoRedirect" value="false" />
   </dt>
-  <dd>
+  <dd #if ($hidden) class="hidden"#end>
     <span class="xHint">$escapetool.xml($services.localization.render($options.hint))</span>
   </dd>
 #end

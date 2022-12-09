@@ -19,8 +19,6 @@
  */
 require(['jquery'], function($) {
   $(document).on('keyup change', '#delete #newBacklinkTarget', function() {
-    let updateLinksContainer = $("#delete input[name=updateLinks]");
-    let autoRedirectContainer = $("#delete input[name=autoRedirect]");
-    updateLinksContainer.add(autoRedirectContainer).prop('disabled', $(this).val() === '');
+    $("#delete input[name=updateLinks], #delete input[name=autoRedirect]").prop('disabled', $(this).val() === '');
   });
 });

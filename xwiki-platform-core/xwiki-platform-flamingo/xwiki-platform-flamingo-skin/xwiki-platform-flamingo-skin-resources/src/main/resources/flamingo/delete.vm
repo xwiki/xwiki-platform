@@ -224,11 +224,9 @@
 #######################################################
 #macro(displayNewTargetOption)
   #set($links = $doc.getBacklinks())
-  #if($links && $links.size() > 0)
-    #set($hasInlinks = true)
-  #end
+  #set ($hasInlinks = $links && $links.size() > 0)
   #define($heading)
-    <strong>$services.localization.render('core.delete.backlinks')</strong> ($links.size())
+    <strong>$escapetool.xml($services.localization.render('core.delete.backlinks'))</strong> ($links.size())
   #end
   #define($body)
     <dl>

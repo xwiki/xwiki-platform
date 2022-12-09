@@ -203,6 +203,7 @@ platform.appwithinminutes.appHomePageEditAppLabel=Редагувати дода�
 platform.appwithinminutes.appHomePageTranslateAppLabel=Перекласти додаток
 platform.appwithinminutes.appHomePageDeleteAppLabel=Видалити додаток
 platform.appwithinminutes.appHomePageMovedWarning=Додаток може працювати неправильно, оскільки він був перенесений або видалений без оновлення коду. Будь ласка, налаштуйте додаток та дотримуйтесь кроків, щоб оновити код.
+platform.appwithinminutes.appHomePageNoScriptRight=Ви не маєте права сценарію, необхідного для створення чи редагування програми. Коли ви продовжите, програма може не працювати належним чином.
 AppWithinMinutes.LiveTableClass_description=Опис
 AppWithinMinutes.LiveTableClass_columns=Стовпці динамічної таблиці
 

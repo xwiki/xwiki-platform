@@ -91,7 +91,8 @@
   <dt#if ($hidden) class="hidden"#end>
     <label>
       #set ($checked = !$request.updateLinks || $request.updateLinks == 'true')
-      <input type="checkbox" name="updateLinks" value="true" #if ($checked)checked="checked"#end />
+      <input type="checkbox" name="updateLinks" value="true" #if ($checked)checked="checked"#end
+        #if ($options.disabled)disabled#end />
       $services.localization.render($options.label)
     </label>
     ## The value submitted when the checkbox is not checked, used to preserve the form state.
@@ -101,7 +102,12 @@
     #set ($backLinksCount = $doc.backlinks.size())
     #set ($backLinksURL = $escapetool.xml($doc.getURL('view', 'viewer=backlinks')))
     <span class="xHint">
-      $services.localization.render($options.hint, ["<a href='$backLinksURL'>", $backLinksCount, '</a>'])
+      #set ($backlinksMessage = $escapetool.xml($services.localization.render($options.hint, [
+        '__STARTLINK__',
+        $backLinksCount,
+        '__ENDLINK__'
+      ])).replace('__STARTLINK__', "<a href='$backLinksURL'>").replace('__ENDLINK__', '</a>'))
+      $backlinksMessage
     </span>
   </dd>
 #end
@@ -125,7 +131,8 @@
   #set ($hidden = $options.hidden)
   <dt #if ($hidden) class="hidden"#end>
     <label>
-      <input type="checkbox" name="autoRedirect" value="true" #if ($checked)checked="checked"#end />
+      <input type="checkbox" name="autoRedirect" value="true" #if ($checked)checked="checked"#end
+        #if ($options.disabled)disabled#end/>
       $escapetool.xml($services.localization.render($options.label))
     </label>
     ## The value submitted when the checkbox is not checked, used to preserve the form state.

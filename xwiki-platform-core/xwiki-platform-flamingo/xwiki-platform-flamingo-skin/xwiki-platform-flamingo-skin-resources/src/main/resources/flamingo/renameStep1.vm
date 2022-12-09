@@ -64,8 +64,7 @@
         ##------------
         #displayLinksCheckbox({
           'label': 'core.rename.links.label',
-          'hint': 'core.rename.links.hint',
-          'addBacklinksURL': true
+          'hint': 'core.rename.links.hint'
         })
         #displayAutoRedirectCheckbox({
           'label': 'core.rename.autoRedirect.label',

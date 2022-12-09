@@ -19,11 +19,8 @@
  */
 require(['jquery'], function($) {
   $(document).on('keyup change', '#delete #newBacklinkTarget', function() {
-    let updateLinksContainer = $("#delete input[name=updateLinks]").closest('dt');
-    let autoRedirectContainer = $("#delete input[name=autoRedirect]").closest('dt');
-    let elements = updateLinksContainer.add(updateLinksContainer.next('dd'))
-      .add(autoRedirectContainer).add(autoRedirectContainer.next('dd'));
-
-    elements.toggleClass('hidden', $(this).val() === '');
+    let updateLinksContainer = $("#delete input[name=updateLinks]");
+    let autoRedirectContainer = $("#delete input[name=autoRedirect]");
+    updateLinksContainer.add(autoRedirectContainer).prop('disabled', $(this).val() === '');
   });
 });

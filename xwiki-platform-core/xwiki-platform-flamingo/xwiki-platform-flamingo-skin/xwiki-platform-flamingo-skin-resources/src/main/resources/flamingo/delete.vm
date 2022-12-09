@@ -229,15 +229,6 @@
      <strong>$services.localization.render('core.delete.backlinks')</strong> ($links.size())
     #end
     #define($body)
-      <p class="noitems">
-        #set ($backLinksURL = $escapetool.xml($doc.getURL('view', 'viewer=backlinks')))
-        #set ($backlinksMessage = $escapetool.xml($services.localization.render('core.delete.backlinksMessage', [
-          '__STARTLINK__',
-          $doc.backlinks.size(),
-          '__ENDLINK__'
-        ])).replace('__STARTLINK__', "<a href='$backLinksURL'>").replace('__ENDLINK__', '</a>'))
-        $backlinksMessage
-      </p>
       <dl>
         <dt>
           <label for="newBacklinkTarget">
@@ -258,17 +249,16 @@
         #displayLinksCheckbox({
           'label': 'core.delete.updateLinks.label',
           'hint': 'core.delete.updateLinks.hint',
-          'addBacklinksURL': false,
-          'hidden': true
+          'disabled': true
         })
         #displayAutoRedirectCheckbox({
           'label': 'core.delete.autoRedirect.label',
           'hint': 'core.delete.autoRedirect.hint',
-          'hidden': true
+          'disabled': true
         })
       </dl>
     #end
-    #displayPanel('panel-backlinks', 'panel-default', $heading, $body)
+    $body
     #set($hasInlinks = true)
   #end
 #end

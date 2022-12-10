@@ -40,7 +40,7 @@
 image.style.admin.heading=画像のスタイルの管理
 image.style.administration.imageStyleList.heading=画像のスタイル
 image.style.administation.newImageStyle.button=画像のスタイルを作成
-image.style.administation.defaultImageStyle.button=既定の画像のスタイルをアップデート
+image.style.administation.defaultImageStyle.button=既定の画像のスタイルを更新
 image.style.imageStyleSheet.backToAdministration.link=管理機能に戻る
 image.style.administration.liveData.doc.title=識別子
 image.style.administration.liveData._actions=アクション

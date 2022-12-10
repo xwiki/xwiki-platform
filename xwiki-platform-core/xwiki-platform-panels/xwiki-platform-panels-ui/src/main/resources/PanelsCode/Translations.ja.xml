@@ -63,6 +63,6 @@ platform.panels.navigation.configuration.excludedPages.empty=なし
 platform.panels.navigation.configuration.topLevelExtensionPages=最上位の拡張機能のページ
 platform.panels.navigation.configuration.topLevelApplicationPages=最上位のアプリケーションのページ
 platform.panels.navigation.configuration.otherPages=その他のページ
-platform.panels.navigation.configuration.saveComment=管理機能でナビゲーションパネルの設定をアップデートしました
+platform.panels.navigation.configuration.saveComment=管理機能でナビゲーションパネルの設定を更新しました
 </content>
   </xwikidoc>

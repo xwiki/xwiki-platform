@@ -203,6 +203,7 @@ platform.appwithinminutes.appHomePageEditAppLabel=Anwendung bearbeiten
 platform.appwithinminutes.appHomePageTranslateAppLabel=Anwendung übersetzen
 platform.appwithinminutes.appHomePageDeleteAppLabel=Anwendung löschen
 platform.appwithinminutes.appHomePageMovedWarning=Die Anwendung funktioniert möglicherweise nicht richtig, da sie umbenannt oder verschoben wurde, ohne den Code zu aktualisieren. Bitte bearbeiten Sie die Anwendung und folgen Sie den Schritten, um den Code zu aktualisieren.
+platform.appwithinminutes.appHomePageNoScriptRight=Sie verfügen nicht über das Skriptrecht, das zum Erstellen oder Bearbeiten einer Anwendung erforderlich ist. Die Anwendung funktioniert möglicherweise nicht richtig, wenn Sie fortfahren.
 AppWithinMinutes.LiveTableClass_description=Beschreibung
 AppWithinMinutes.LiveTableClass_columns=Spalten der Live-Tabelle
 

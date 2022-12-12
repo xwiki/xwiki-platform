@@ -63,5 +63,10 @@
       <version>2.4.2</version>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-authorization-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 </project>

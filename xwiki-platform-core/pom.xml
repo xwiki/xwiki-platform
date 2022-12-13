@@ -125,7 +125,38 @@
 
                  Single justification example:
             -->
-            
+            <revapi.differences>
+              <justification>JGroups upgrade</justification>
+              <criticality>documented</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void org.jgroups.MembershipListener::suspect(org.jgroups.Address) @ org.xwiki.observation.remote.jgroups.JGroupsReceiver</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.noLongerImplementsInterface</code>
+                  <old>interface org.xwiki.observation.remote.jgroups.JGroupsReceiver</old>
+                  <new>interface org.xwiki.observation.remote.jgroups.JGroupsReceiver</new>
+                  <interface>org.jgroups.MessageListener</interface>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.noLongerImplementsInterface</code>
+                  <old>interface org.xwiki.observation.remote.jgroups.JGroupsReceiver</old>
+                  <new>interface org.xwiki.observation.remote.jgroups.JGroupsReceiver</new>
+                  <interface>org.jgroups.StateListener</interface>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.noLongerImplementsInterface</code>
+                  <old>interface org.xwiki.observation.remote.jgroups.JGroupsReceiver</old>
+                  <new>interface org.xwiki.observation.remote.jgroups.JGroupsReceiver</new>
+                  <interface>org.jgroups.MembershipListener</interface>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

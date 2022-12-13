@@ -111,7 +111,7 @@
   });
 
   /**
-   * Escapes the {@code --} sequence before setting the text of a comment DOM node.
+   * Escapes for insertion as text of a comment node, consistent with server-side escaping of XML comments.
    * 
    * @param text the text that needs to be put in a comment node
    * @return the escaped text, which will be put in a comment node
@@ -121,14 +121,16 @@
       return text;
     }
     var result = [];
-    var lastChar = 0;
+    // At the start of a comment, > isn't allowed.
+    if (text.charAt(0) === '>') {
+      result.push('\\');
+    }
+    // Initialize with '-', as "->" isn't allowed at the start of the comment. It is thus better to start with
+    // an escape when the comment starts with '-'.
+    var lastChar = '-';
     for (var i = 0; i < text.length; i++) {
       var c = text.charAt(i);
-      if (c === '\\') {
-        // Escape the backslash (the escaping character).
-        result.push('\\');
-      } else if (c === '-' && lastChar === '-') {
-        // Escape the second short dash.
+      if (c === '\\' || c === '{' || (c === '-' && lastChar === '-')) {
         result.push('\\');
       }
       result.push(c);

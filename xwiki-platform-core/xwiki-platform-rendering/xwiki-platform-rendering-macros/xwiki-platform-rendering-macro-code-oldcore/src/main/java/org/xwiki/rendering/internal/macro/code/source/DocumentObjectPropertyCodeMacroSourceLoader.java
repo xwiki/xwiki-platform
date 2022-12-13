@@ -79,7 +79,7 @@ public class DocumentObjectPropertyCodeMacroSourceLoader implements EntityCodeMa
             // Displaying a password is forbidden
             if (xclassProperty instanceof PasswordClass) {
                 throw new MacroExecutionException(
-                    "Displaying content of propetty [" + entityReference + "] is not allowed because it's a password");
+                    "Displaying content of property [" + entityReference + "] is not allowed because it's a password");
             }
 
             String language = null;
@@ -93,6 +93,8 @@ public class DocumentObjectPropertyCodeMacroSourceLoader implements EntityCodeMa
                     language = PygmentsUtils.syntaxToLanguage(document.getSyntax());
                 }
             }
+
+            return language;
         }
 
         return null;

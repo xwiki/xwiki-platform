@@ -5,7 +5,6 @@ org.xwiki.rendering.internal.macro.code.source.DocumentCodeMacroSourceLoader
 org.xwiki.rendering.internal.macro.code.source.DocumentObjectPropertyCodeMacroSourceFactory
 org.xwiki.rendering.internal.macro.code.source.DocumentObjectPropertyCodeMacroSourceLoader
 org.xwiki.rendering.internal.macro.code.source.EntityCodeMacroSourceFactory
-org.xwiki.rendering.internal.macro.code.source.EntityCodeMacroSourceLoader
 org.xwiki.rendering.internal.macro.code.source.PageAttachmentCodeMacroSourceFactory
 org.xwiki.rendering.internal.macro.code.source.PageCodeMacroSourceFactory
 org.xwiki.rendering.internal.macro.code.source.PageObjectPropertyCodeMacroSourceFactory

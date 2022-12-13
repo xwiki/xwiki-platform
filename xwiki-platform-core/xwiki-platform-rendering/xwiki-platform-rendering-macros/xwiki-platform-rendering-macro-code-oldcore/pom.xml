@@ -44,5 +44,10 @@
       <artifactId>xwiki-platform-rendering-macro-code</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-mail-general</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 </project>

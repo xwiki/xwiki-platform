@@ -19,9 +19,11 @@
  */
 package org.xwiki.rendering.internal.macro.code.source;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.mail.GeneralMailConfiguration;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.internal.parser.pygments.PygmentsUtils;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -35,6 +37,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.EmailClass;
 import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass.ContentType;
@@ -48,6 +51,9 @@ import com.xpn.xwiki.objects.classes.TextAreaClass.ContentType;
 @Singleton
 public class DocumentObjectPropertyCodeMacroSourceLoader implements EntityCodeMacroSourceLoader
 {
+    @Inject
+    private GeneralMailConfiguration mailConfiguration;
+
     @Override
     public CodeMacroSource load(XWikiDocument document, EntityReference entityReference,
         CodeMacroSourceReference reference, XWikiContext xcontext) throws MacroExecutionException
@@ -78,8 +84,15 @@ public class DocumentObjectPropertyCodeMacroSourceLoader implements EntityCodeMa
 
             // Displaying a password is forbidden
             if (xclassProperty instanceof PasswordClass) {
+                throw new MacroExecutionException(String.format(
+                    "Displaying content of property [%s] is not allowed because it's a passwordl", entityReference));
+            }
+
+            // Displaying email is forbidden when obfuscation is enabled
+            if (xclassProperty instanceof EmailClass && this.mailConfiguration.shouldObfuscate()) {
                 throw new MacroExecutionException(
-                    "Displaying content of property [" + entityReference + "] is not allowed because it's a password");
+                    String.format("Displaying content of property [%s] is not allowed because it's an obfuscated email",
+                        entityReference));
             }
 
             String language = null;

@@ -26,7 +26,8 @@ We brought the following changes from the default Jetty files obtained from the 
      <Arg>somethingnotmatching.jar</Arg>
    </Call>
    ```
-3. Addition of `modules/xwiki.mod`, to configure the following:
+3. Addition of `modules/xwiki.mod`, to group all modules we depend on.
+4. Addition of `start.d/xwiki.ini` to configure the following properties:
    1. Disable WAR scanning/hot deployment (since we use static deployment, and it speeds up 
       Jetty) by changing the default values for:
       ```
@@ -39,8 +40,8 @@ We brought the following changes from the default Jetty files obtained from the 
       ```
       jetty.httpConfig.uriCompliance=RFC3986
       ```
-4. Addition of `etc/jetty-xwiki.xml` to print a message in the console when XWiki is started.
-5. Remove support for JSP (since XWiki doesn't use JSPs) by removing the following from `etc/webdefault.xml`:
+5. Addition of `etc/jetty-xwiki.xml` to print a message in the console when XWiki is started.
+6. Remove support for JSP (since XWiki doesn't use JSPs) by removing the following from `etc/webdefault.xml`:
    ```
    <servlet id="jsp">
    ...
@@ -48,7 +49,7 @@ We brought the following changes from the default Jetty files obtained from the 
    ```
    Also remove the `<servlet-mapping>` just below it.
    Under `<welcome-file-list>` alors remove the `<welcome-file>index.jsp</welcome-file>` line.
-6. Remove alpn (we don't need TLS/SSL for a demo packaging) and http2 support by:
+7. Remove alpn (we don't need TLS/SSL for a demo packaging) and http2 support by:
    1. Remove `lib/jetty-alpn-client-${jetty.version}.jar` from `modules/client.mod`
    2. Remove the following from `modules/https.mod`:
       ```
@@ -57,8 +58,8 @@ We brought the following changes from the default Jetty files obtained from the 
       http2
       http-forwarded
       ```
-7. Addition of `modules/xwiki-logging.mod` to configure logging for XWiki (provides the Jetty `logging` module name)
-8. Modification of `etc/console-capture.xml` to send logs to both the console and files. Namely we wrapp:
+8. Addition of `modules/xwiki-logging.mod` to configure logging for XWiki (provides the Jetty `logging` module name)
+9. Modification of `etc/console-capture.xml` to send logs to both the console and files. Namely we wrapp:
    ```
    <Arg>
      <New class="org.eclipse.jetty.util.RolloverFileOutputStream">
@@ -78,5 +79,5 @@ We brought the following changes from the default Jetty files obtained from the 
      </New>
     </Arg>
    ```
-9. Note that we don't include all `etc/*.xml` files nor all `modules/*.mod` files since we don't use these extra
-   features.
+10. Note that we don't include all `etc/*.xml` files nor all `modules/*.mod` files since we don't use these extra
+    features.

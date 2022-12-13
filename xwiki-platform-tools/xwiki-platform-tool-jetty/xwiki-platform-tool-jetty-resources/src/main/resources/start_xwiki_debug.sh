@@ -278,4 +278,4 @@ echo $XWIKI_PID > $XWIKI_LOCK_FILE
 
 # This replaces the shell with the java process without starting a new process. This must be the last line
 # of this script as anything after won't be executed.
-exec java $XWIKI_OPTS -jar ${JETTY_HOME}/start.jar --module=xwiki $JETTY_OPTS
+exec java $XWIKI_OPTS -jar ${JETTY_HOME}/start.jar $JETTY_OPTS

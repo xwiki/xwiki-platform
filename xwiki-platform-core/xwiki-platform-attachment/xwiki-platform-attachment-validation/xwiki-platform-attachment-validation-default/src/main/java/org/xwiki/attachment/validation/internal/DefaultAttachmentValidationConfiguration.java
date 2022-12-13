@@ -20,6 +20,7 @@
 package org.xwiki.attachment.validation.internal;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -77,14 +78,25 @@ public class DefaultAttachmentValidationConfiguration implements AttachmentValid
 
     private List<String> getPropertyWithFallback(String attachmentXObjectProperty, String xWikiPropertiesProperty)
     {
-        List<String> allowedMimetypes;
-        if (this.attachmentConfigurationSource.containsKey(attachmentXObjectProperty)) {
-            allowedMimetypes = this.attachmentConfigurationSource.getProperty(attachmentXObjectProperty);
-        } else if (this.wikiConfigurationSource.containsKey(attachmentXObjectProperty)) {
-            allowedMimetypes = this.wikiConfigurationSource.getProperty(attachmentXObjectProperty);
+        return get(this.attachmentConfigurationSource, attachmentXObjectProperty)
+            .or(() -> get(this.wikiConfigurationSource, attachmentXObjectProperty))
+            .or(() -> get(this.xWikiPropertiesConfigurationSource, xWikiPropertiesProperty))
+            .orElse(List.of());
+    }
+
+    private Optional<List<String>> get(ConfigurationSource attachmentConfigurationSource, String key)
+    {
+        Optional<List<String>> result;
+        if (!attachmentConfigurationSource.containsKey(key)) {
+            result = Optional.empty();
         } else {
-            allowedMimetypes = this.xWikiPropertiesConfigurationSource.getProperty(xWikiPropertiesProperty, List.of());
+            List<String> property = attachmentConfigurationSource.getProperty(key);
+            if (property.isEmpty()) {
+                result = Optional.empty();
+            } else {
+                result = Optional.of(property);
+            }
         }
-        return allowedMimetypes;
+        return result;
     }
 }

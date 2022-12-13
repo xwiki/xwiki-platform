@@ -46,7 +46,7 @@
           #set ($link = $escapetool.xml($services.localization.render('core.importer.packageInformationExtract', [
             '__USERNAME__',
             '__FORMAT_DATE__'
-          ])).replaceAll('__USERNAME__', $userName).replaceAll('__FORMAT_DATE__', $formatDate))
+          ])).replace('__USERNAME__', $userName).replace('__FORMAT_DATE__', $formatDate))
           $link - <span class="size">(#dynamicsize($attach.longSize))</span>
         </div>
       </div>

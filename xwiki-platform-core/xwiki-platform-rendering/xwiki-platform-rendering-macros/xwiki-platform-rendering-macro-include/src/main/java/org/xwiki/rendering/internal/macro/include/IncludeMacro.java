@@ -180,7 +180,7 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
 
         if (parametersContext == Context.CURRENT) {
             // Step 7: If the include macro is explicitly configured to be executed with the included document content
-            // author of if that author does not have programming right, execute it right away
+            // author or if that author does not have programming right, execute it right away
             // Get the translated version of the document to get the content author
             DocumentModelBridge translatedDocumentBridge;
             try {

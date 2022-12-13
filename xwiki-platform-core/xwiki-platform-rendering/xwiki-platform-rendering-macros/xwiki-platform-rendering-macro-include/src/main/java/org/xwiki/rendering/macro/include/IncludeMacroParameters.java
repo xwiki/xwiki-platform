@@ -58,12 +58,14 @@ public class IncludeMacroParameters
      * Control which author to execute the included content with.
      * 
      * @since 15.0RC1
+     * @since 14.10.2
      */
     public enum Author
     {
         /**
-         * Apply TARGET option unless the target author has programming right in which case it applies CURRENT (mainly
-         * for retro-compatibility reasons).
+         * Before 15.0RC1 always apply {@link #CURRENT} but starting with 15.0RC1 apply {@link #TARGET} option unless
+         * the target author has programming right in which case it applies {@link #CURRENT} for retro-compatibility
+         * reasons).
          */
         AUTO,
 
@@ -236,6 +238,7 @@ public class IncludeMacroParameters
     /**
      * @return the author to use to execute the content when {@link #getContext()} is {@link Context#CURRENT}
      * @since 15.0RC1
+     * @since 14.10.2
      */
     public Author getAuthor()
     {
@@ -245,6 +248,7 @@ public class IncludeMacroParameters
     /**
      * @param author the author to use to execute the content when {@link #getContext()} is {@link Context#CURRENT}
      * @since 15.0RC1
+     * @since 14.10.2
      */
     @PropertyDescription("The author to use to execute the content when context is \"Current\"")
     @PropertyAdvanced

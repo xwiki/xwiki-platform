@@ -123,7 +123,7 @@
 #macro(displayConfirmationPage)
   <form id="delete" class="xform" action="$doc.getURL('delete', "$!{languageparams}")" method="post">
     #getChildren()
-    #getBacklinks()
+    #displayNewTargetOption()
     #getChildren_legacy()
     #displayConfirmMessage()
   </form>
@@ -215,61 +215,48 @@
   #end
 #end
 #######################################################
-##                 GET BACKLINKS
+##                 DISPLAY NEW TARGET OPTION
 ##
-## Get the documents having some links to the current 
-## one.
+## Display the possibility to select a new target for existing backlinks and / or to create an automatic redirect to a
+## different page.
 #######################################################
-#macro(getBacklinks)
+#macro(displayNewTargetOption)
   #set($links = $doc.getBacklinks())
-  #if($links && $links.size() > 0)
-    #define($heading)
-     <strong>$services.localization.render('core.delete.backlinks')</strong> ($links.size())
-    #end
-    #define($message)
-      <ul>
-      #foreach($docname in $links)
-        #set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
-        <li><a href="$rdoc.getURL('view')">$escapetool.xml($rdoc.getPlainTitle())</a></li>
-      #end
-      </ul>
-    #end
-    #define($body)
-      <p class="noitems">
-        $escapetool.xml($services.localization.render('core.delete.backlinksInfo', [$doc.backlinks.size()]))
-      </p>
-      <dl>
-        <dt>
-          <label for="newBacklinkTarget">
-            $escapetool.xml($services.localization.render('core.delete.backlinkTarget.label'))
-          </label>
-          <span class="xHint">$escapetool.xml($services.localization.render('core.delete.backlinkTarget.hint'))</span>
-        </dt>
-        <dd>
-          #set ($pagePickerParams = {
-            'id': 'newBacklinkTarget',
-            'name': 'newBacklinkTarget'
-          })
-          #pagePicker($pagePickerParams)
-        </dd>
-        ##------------
-        ## Links field
-        ##------------
-        #displayLinksCheckbox({
-          'label': 'core.delete.updateLinks.label',
-          'hint': 'core.delete.updateLinks.hint',
-          'hidden': true
-        })
-        #displayAutoRedirectCheckbox({
-          'label': 'core.delete.autoRedirect.label',
-          'hint': 'core.delete.autoRedirect.hint',
-          'hidden': true
-        })
-      </dl>
-    #end
-    #displayPanel('panel-backlinks', 'panel-default', $heading, $body)
-    #set($hasInlinks = true)
+  #set ($hasInlinks = $links && $links.size() > 0)
+  #define($heading)
+    <strong>$escapetool.xml($services.localization.render('core.delete.backlinks'))</strong> ($links.size())
   #end
+  #define($body)
+    <dl>
+      <dt>
+        <label for="newBacklinkTarget">
+          $escapetool.xml($services.localization.render('core.delete.backlinkTarget.label'))
+        </label>
+        <span class="xHint">$escapetool.xml($services.localization.render('core.delete.backlinkTarget.hint'))</span>
+      </dt>
+      <dd>
+        #set ($pagePickerParams = {
+          'id': 'newBacklinkTarget',
+          'name': 'newBacklinkTarget'
+        })
+        #pagePicker($pagePickerParams)
+      </dd>
+      ##------------
+      ## Links field
+      ##------------
+      #displayLinksCheckbox({
+        'label': 'core.delete.updateLinks.label',
+        'hint': 'core.delete.updateLinks.hint',
+        'disabled': true
+      })
+      #displayAutoRedirectCheckbox({
+        'label': 'core.delete.autoRedirect.label',
+        'hint': 'core.delete.autoRedirect.hint',
+        'disabled': true
+      })
+    </dl>
+  #end
+  $body
 #end
 #######################################################
 ##              DISPLAY CONFIRM MESSAGE

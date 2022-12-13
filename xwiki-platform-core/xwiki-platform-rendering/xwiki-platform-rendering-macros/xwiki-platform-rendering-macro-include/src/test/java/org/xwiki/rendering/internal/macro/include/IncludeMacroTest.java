@@ -215,6 +215,42 @@ class IncludeMacroTest
     }
 
     @Test
+    void executeWithNoPRAuthor() throws Exception
+    {
+        // @formatter:off
+        String expected = "beginDocument\n"
+            + "beginMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
+            + "beginParagraph\n"
+            + "onWord [word]\n"
+            + "endParagraph\n"
+            + "endMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
+            + "endDocument";
+        // @formatter:on
+
+        List<Block> blocks = runIncludeMacro(Context.CURRENT, Author.AUTO, "word", false);
+
+        assertBlocks(expected, blocks, this.rendererFactory);
+    }
+
+    @Test
+    void executeWithTARGETAuthor() throws Exception
+    {
+        // @formatter:off
+        String expected = "beginDocument\n"
+            + "beginMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
+            + "beginParagraph\n"
+            + "onWord [word]\n"
+            + "endParagraph\n"
+            + "endMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
+            + "endDocument";
+        // @formatter:on
+
+        List<Block> blocks = runIncludeMacro(Context.CURRENT, Author.TARGET, "word", false);
+
+        assertBlocks(expected, blocks, this.rendererFactory);
+    }
+
+    @Test
     void executeWithCurrentUserNoView() throws Exception
     {
         String referenceString = "reference";
@@ -669,7 +705,10 @@ class IncludeMacroTest
         MacroTransformationContext context = new MacroTransformationContext();
         MacroBlock includeMacro =
             new MacroBlock("include", Collections.singletonMap("reference", documentName), isInline);
+        XDOM xdom = new XDOM(List.of(includeMacro));
         context.setCurrentMacroBlock(includeMacro);
+        context.setXDOM(xdom);
+
         return context;
     }
 
@@ -760,7 +799,8 @@ class IncludeMacroTest
             verify(this.dab).pushDocumentInContext(any(Map.class), same(this.includedDocument));
             verify(this.dab).popDocumentFromContext(any(Map.class));
         } else {
-            if (author == Author.CURRENT || this.authorizationManager.hasAccess(Right.PROGRAM, INCLUDED_AUHOR, null)) {
+            if (parameters.getAuthor() == Author.CURRENT || (parameters.getAuthor() == Author.AUTO
+                && this.authorizationManager.hasAccess(Right.PROGRAM, INCLUDED_AUHOR, null))) {
                 verifyNoInteractions(this.authorExecutor);
             } else {
                 DocumentReference includedReference = this.includedDocument.getDocumentReference();

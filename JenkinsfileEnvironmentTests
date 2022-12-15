@@ -32,21 +32,7 @@
 // - If this file is triggered by a manual build, ask the user to choose between th different environment tests to
 //   execute and run them immediately.
 
-// If the build has been manually triggered, then ask the user to choose which environment tests to execute and
-// execute them immediately.
-if (currentBuild.rawBuild.getCauses()[0].toString().contains('UserIdCause')) {
-  stage('XWiki Environment Tests') {
-    def choices = 'Docker Latest\nDocker All\nDocker Unsupported'
-    def selection = askUser(choices)
-    if (selection == 'Docker Latest') {
-      buildDocker('docker-latest')
-    } else if (selection == 'Docker All') {
-      buildDocker('docker-all')
-    } else if (selection == 'Docker Unsupported') {
-      buildDocker('docker-unsupported')
-    }
-  }
-} else if (params.type && params.type != 'none') {
+if (params.type && params.type != 'none') {
   // Only execute if the "XWiki/xwiki-platform" job's last execution date is later than this current job's last
   // execution date. In other words, don't re-run the environment tests if there's been no source code changes.
   // This helps save agent build time and is better for global warming (less energy used)!
@@ -64,12 +50,16 @@ if (currentBuild.rawBuild.getCauses()[0].toString().contains('UserIdCause')) {
     // In all these cases, we just execute the environment tests.
     buildDocker(params.type)
   } else {
-    echoXWiki 'Not executing the docker tests since there''s been no rebuild of "XWiki/xwiki-platform" since last execution. Aborting.'
+    echoXWiki 'Not executing the docker tests since there' 's been no rebuild of "XWiki/xwiki-platform" since last execution. Aborting.'
     // Aborting so that the build isn't displayed as successful without doing anything.
     currentBuild.result = 'ABORTED'
   }
+} else if (params.type && params.type == 'none') {
+  // Nothing to do. This job will be called next time the crontab is triggered.
 } else {
   // We're not in the cron. Just set the crontab to schedule the job.
+  // This should happen the first time ever. Once this is called the build becomes a parameterized build and it's
+  // always called with the "type" parameter (having a default value of "none").
   properties(getCustomJobProperties())
 }
 
@@ -116,7 +106,7 @@ private def getCustomJobProperties()
   //   don't execute at the same time as docker-latest during standard week days, as it'll mean that all agents will
   //   be used and be available for standard builds during the working days.
   return [
-    parameters([string(defaultValue: 'none', description: 'Job type', name: 'type')]),
+    parameters([string(defaultValue: 'none', description: 'Docker Job type', name: 'type')]),
     pipelineTriggers([
       parameterizedCron('''H 22 * * * %type=docker-latest
 H 0 * * 6 %type=docker-all

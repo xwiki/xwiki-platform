@@ -21,15 +21,24 @@ package org.xwiki.attachment.validation.internal;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.attachment.validation.AttachmentValidationConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.model.reference.DocumentReference;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static org.xwiki.attachment.validation.internal.AttachmentMimetypeRestrictionClassDocumentInitializer.ALLOWED_MIMETYPES_FIELD;
 import static org.xwiki.attachment.validation.internal.AttachmentMimetypeRestrictionClassDocumentInitializer.BLOCKED_MIMETYPES_FIELD;
 
@@ -64,6 +73,12 @@ public class DefaultAttachmentValidationConfiguration implements AttachmentValid
     @Named("xwikiproperties")
     private ConfigurationSource xWikiPropertiesConfigurationSource;
 
+    @Inject
+    private Provider<XWikiContext> contextProvider;
+
+    @Inject
+    private Logger logger;
+
     @Override
     public List<String> getAllowedMimetypes()
     {
@@ -71,9 +86,21 @@ public class DefaultAttachmentValidationConfiguration implements AttachmentValid
     }
 
     @Override
+    public List<String> getAllowedMimetypes(DocumentReference documentReference)
+    {
+        return wrapWithScope(documentReference, this::getAllowedMimetypes);
+    }
+
+    @Override
     public List<String> getBlockerMimetypes()
     {
         return getPropertyWithFallback(BLOCKED_MIMETYPES_FIELD, ATTACHMENT_MIMETYPE_BLOCK_LIST_PROPERTY);
+    }
+
+    @Override
+    public List<String> getBlockerMimetypes(DocumentReference documentReference)
+    {
+        return wrapWithScope(documentReference, this::getBlockerMimetypes);
     }
 
     private List<String> getPropertyWithFallback(String attachmentXObjectProperty, String xWikiPropertiesProperty)
@@ -98,5 +125,20 @@ public class DefaultAttachmentValidationConfiguration implements AttachmentValid
             }
         }
         return result;
+    }
+
+    private List<String> wrapWithScope(DocumentReference documentReference, Supplier<List<String>> supplier)
+    {
+        XWikiContext xWikiContext = this.contextProvider.get();
+        XWikiDocument oldDoc = xWikiContext.getDoc();
+        try {
+            xWikiContext.setDoc(xWikiContext.getWiki().getDocument(documentReference, xWikiContext));
+            return supplier.get();
+        } catch (XWikiException e) {
+            this.logger.warn("Failed to get document [{}]. Cause: [{}]", documentReference, getRootCauseMessage(e));
+            return List.of();
+        } finally {
+            xWikiContext.setDoc(oldDoc);
+        }
     }
 }

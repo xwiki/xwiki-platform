@@ -36,7 +36,12 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content/>
+  <content>{{velocity wiki='false'}}
+#set ($spaceReference = $services.model.resolveDocument($!request.documentReference).extractReference('SPACE'))
+$jsontool.serialize({
+    "maxFileSize": $xwiki.getSpacePreferenceFor('upload_maxsize', $spaceReference)
+})
+{{/velocity}}</content>
   <object>
     <name>XWiki.Attachment.Validation.Code.FileSizeValidation</name>
     <number>0</number>
@@ -146,9 +151,30 @@ require(['jquery', 'xwiki-l10n!attachment-validation-filesize-messages', 'xwiki-
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))}${sizes[i]}`
   }
 
+  const configCache = {};
+
   $(document).on('xwiki:actions:beforeUpload', (event, data) =&gt; {
-    const configElement = document.getElementById('attachment-validation-filesize-configuration');
-    const config = JSON.parse(configElement.textContent);
+    let jsonString;
+    if (data.documentReference) {
+      if (!configCache[data.documentReference]) {
+        $.ajax({
+          url: new XWiki.Document(XWiki.Model.resolve('XWiki.Attachment.Validation.Code.FileSizeValidation',
+            XWiki.EntityType.DOCUMENT)).getURL('get', $.param({
+            outputSyntax: 'plain',
+            documentReference: data.documentReference
+          })),
+          async: false,
+          method: 'GET',
+          success: function (getData) {
+            configCache[data.documentReference] = getData;
+          }
+        })
+      }
+      jsonString = configCache[data.documentReference];
+    } else {
+      jsonString = document.getElementById('attachment-validation-filesize-configuration').textContent;
+    }
+    const config = JSON.parse(jsonString);
     const maxFileSize = config.maxFileSize;
     const tooLarge = data.file.size &gt; maxFileSize;
     if (tooLarge) {

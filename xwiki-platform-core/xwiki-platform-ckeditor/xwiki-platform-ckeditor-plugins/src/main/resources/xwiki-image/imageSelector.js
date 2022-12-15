@@ -233,6 +233,9 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'l10n!imageSelector'],
     return {
       open: createModal,
       updateSelectedImageReferences: updateSelectedImageReferences,
-      createLoader: createLoader
+      createLoader: createLoader,
+      getDocumentReference: function (element) {
+        return getDocumentReference(element.parents('.image-selector-modal').data('input'));
+      }
     };
   });

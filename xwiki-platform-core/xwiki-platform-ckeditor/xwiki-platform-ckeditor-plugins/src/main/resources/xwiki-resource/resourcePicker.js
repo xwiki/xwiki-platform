@@ -169,30 +169,13 @@ define('resourcePicker', [
     });
   };
 
-  var openPicker = function () {
+  var openPicker = function(event) {
     var resourceTypeButton = $(this);
     var resourcePicker = resourceTypeButton.closest('.resourcePicker');
     var resourceReference = getResourceReference(resourcePicker.prev('input'));
-
-    if (resourceReference.reference === "" && CKEDITOR.currentInstance !== null) {
-      // If no resource reference is currently defined (e.g., not in the context of an existing link), make the 
-      // document tree open to the source document of the current editor.
-      // In the case where the picker opens on an attachment, but the current reference is not an attachment,
-      // the reference type is forced to attachments by suffixing it with an '@'.
-      // As a consequence, the document tree opens to the 'Attachments' sub-level of the document tree. 
-      var type = resourceTypeButton.val();
-      var documentReference = CKEDITOR.currentInstance.config.sourceDocument.documentReference;
-      var reference = XWiki.Model.serialize(documentReference);
-      if (type === "attach") {
-        reference += "@";
-      }
-      resourceReference = {
-        type: type,
-        reference: reference
-      };
-    } else if (resourceReference.type !== resourceTypeButton.val()) {
-      // Use the selected resource if it matches the currently selected resource type, otherwise use the resource
-      // reference typed in the resource picker input.
+    // Use the selected resource if it matches the currently selected resource type, otherwise use the resource
+    // reference typed in the resource picker input.
+    if (resourceReference.type !== resourceTypeButton.val()) {
       resourceReference = {
         type: resourceTypeButton.val(),
         reference: resourcePicker.find('input.resourceReference').val()

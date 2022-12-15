@@ -143,6 +143,9 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
     @Inject
     private AuthorizationManager authorizationManager;
 
+    @Inject
+    private WikiTranslationConfiguration configuration;
+
     /**
      * Used to cache on demand document bundles (those that are not registered as components).
      */
@@ -446,6 +449,12 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
             case WIKI:
                 this.authorizationManager.checkAccess(Right.ADMIN, document.getAuthorReference(), document
                     .getDocumentReference().getWikiReference());
+                break;
+            case USER:
+                if (this.configuration.isRestrictUserTranslations()) {
+                    this.authorizationManager.checkAccess(Right.SCRIPT, document.getAuthorReference(),
+                        document.getDocumentReference());
+                }
                 break;
             default:
                 break;

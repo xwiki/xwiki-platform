@@ -1391,4 +1391,14 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The default value is:
 # skinx.jsStrictModeEnabled = false
 
+#-------------------------------------------------------------------------------------
+# Localization
+#-------------------------------------------------------------------------------------
+
+#-# [Since 14.10.2, 15.0RC1]
+#-# Indicate whether translations with user scope that are only applied for the user who created them shall be
+#-# restricted to users with script right. The default value is true. Disable this option only when you absolutely
+#-# trust all users on the wiki.
+# localization.wiki.restrictUserTranslations = true
+
 $!xwikiPropertiesAdditionalProperties

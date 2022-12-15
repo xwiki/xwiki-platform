@@ -125,13 +125,21 @@
     </property>
     <property>
       <code>require(['jquery', 'imageSelector'], function($, imageSelector) {
-   const picker = $('#attachmentPickerCKEditor')
-   picker.on('xwiki:attachmentGalleryPicker:selected', function(_target, attachmentReference) {
-     imageSelector.updateSelectedImageReferences([attachmentReference]);
-   });
+  function init(element) {
+    const picker = element.find('.attachmentPickerCKEditor');
+    picker.on('xwiki:attachmentGalleryPicker:selected', function(_target, attachmentReference) {
+      imageSelector.updateSelectedImageReferences([attachmentReference], $(this));
+    });
 
-  picker.on('xwiki:attachmentGalleryPicker:unselected', function() {
-    imageSelector.updateSelectedImageReferences([]);
+    picker.on('xwiki:attachmentGalleryPicker:unselected', function() {
+      imageSelector.updateSelectedImageReferences([], $(this));
+    });
+  }
+
+  init($(document).find('.image-selector'));
+
+  $(document).on('xwiki:dom:updated', (event, data) =&gt; {
+    data.elements.forEach(element =&gt; init($(element)));
   });
 });</code>
     </property>
@@ -273,7 +281,11 @@
 #set ($discard = $xwiki.jsx.use('Attachment.Picker.Code.CKEditorImagePlugin'))
 {{/velocity}}
 
-{{attachmentGalleryPicker id='attachmentPickerCKEditor' filter="image/*"/}}</content>
+{{velocity}}
+(% class='attachmentPickerCKEditor' %)(((
+  {{attachmentGalleryPicker filter="image/*" target="$services.rendering.escape($request.documentReference, 'xwiki/2.1')"/}}
+)))
+{{/velocity}}</content>
     </property>
     <property>
       <extensionPointId>org.xwiki.contrib.ckeditor.plugins.imageSelector</extensionPointId>

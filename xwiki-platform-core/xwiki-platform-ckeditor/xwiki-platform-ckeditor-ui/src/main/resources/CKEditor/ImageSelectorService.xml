@@ -53,9 +53,10 @@
   &lt;ul class="nav nav-tabs" role="tablist"&gt;
     &lt;!-- Nav tabs --&gt;
     #foreach ($uix in $selectorUIXs)
+      #set ($tabId = "${uix.parameters.id}-$request.index")
       &lt;li role="presentation" #if($foreach.index == 0)class="active"#end&gt;
-        &lt;a href="#$escapetool.url($uix.parameters.id)"
-          aria-controls="$escapetool.xml($uix.parameters.id)"
+        &lt;a href="#$escapetool.url($tabId)"
+          aria-controls="$escapetool.xml($tabId)"
           role="tab" data-toggle="tab"&gt;
           $escapetool.xml($services.localization.render($uix.parameters.title))
         &lt;/a&gt;
@@ -66,7 +67,10 @@
   &lt;!-- Tab panes --&gt;
   &lt;div class="tab-content"&gt;
     #foreach ($uix in $selectorUIXs)
-      &lt;div role="tabpanel" class="tab-pane#if($foreach.index == 0) active#end" id="$escapetool.url($uix.parameters.id)"&gt;
+      #set ($tabId = "${uix.parameters.id}-$request.index")
+      &lt;div role="tabpanel" 
+        class="$escapetool.xml(${uix.parameters.id}) tab-pane#if($foreach.index == 0) active#end" 
+        id="$escapetool.xml($tabId)"&gt;
       $services.rendering.render($uix.execute(), 'xhtml/1.0')
       &lt;/div&gt;
     #end

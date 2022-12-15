@@ -517,7 +517,7 @@ class DefaultOfficeResourceViewerTest
     void viewURLWithLocalFile() throws AccessDeniedException
     {
         ResourceReference resourceReference = new ResourceReference("file://resource", ResourceType.URL);
-        when(this.resourceReferenceTypeSerializer.serialize(resourceReference)).thenReturn(
+        when(this.resourceReferenceSerializer.serialize(resourceReference)).thenReturn(
             "url:" + resourceReference.getReference());
 
         Map<String, Object> parameters = Collections.emptyMap();
@@ -536,7 +536,7 @@ class DefaultOfficeResourceViewerTest
     void viewURLWithDistantFile() throws Exception
     {
         ResourceReference resourceReference = new ResourceReference("http://mydomain.com/myfile", ResourceType.URL);
-        when(this.resourceReferenceTypeSerializer.serialize(resourceReference)).thenReturn(
+        when(this.resourceReferenceSerializer.serialize(resourceReference)).thenReturn(
             "url:" + resourceReference.getReference());
 
         Map<String, Object> parameters = Collections.emptyMap();

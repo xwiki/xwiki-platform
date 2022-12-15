@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -121,6 +122,19 @@ public class AttachmentsPane extends BaseElement
         // Clean the field before setting the value in case of successive uploads.
         input.clear();
         input.sendKeys(filePath);
+    }
+
+    /**
+     * Fills the URL with the specified file paths.
+     *
+     * @param filePaths a list of paths to the files to upload in URL form (the files *must* exist in the target
+     *     directory).
+     * @since 14.10.2
+     * @since 15.0RC1
+     */
+    public void setFilesToUpload(List<String> filePaths)
+    {
+        setFileToUpload(StringUtils.join(filePaths, System.lineSeparator()));
     }
 
     /**

@@ -404,6 +404,27 @@ class AttachmentIT
         macroAttachmentsPane.filterColumn(1, CHOICE_EMPTY);
     }
 
+    @Test
+    @Order(7)
+    void addSeveralAttachmentsAtOnce(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+    {
+        setup.loginAsSuperAdmin();
+        setup.createPage(testReference, "");
+
+        // Upload 4 files at once.
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        attachmentsPane.setFilesToUpload(List.of(
+            getFileToUpload(testConfiguration, FIRST_ATTACHMENT).getAbsolutePath(),
+            getFileToUpload(testConfiguration, SECOND_ATTACHMENT).getAbsolutePath(),
+            getFileToUpload(testConfiguration, IMAGE_ATTACHMENT).getAbsolutePath(),
+            getFileToUpload(testConfiguration, SMALL_SIZE_ATTACHMENT).getAbsolutePath()
+        ));
+        // Wait for the last file to be uploaded.
+        attachmentsPane.waitForUploadToFinish(SMALL_SIZE_ATTACHMENT);
+
+        assertEquals(4, attachmentsPane.getNumberOfAttachments());
+    }
+
     private String getAttachmentsMacroContent(DocumentReference docRef)
     {
         StringBuilder sb = new StringBuilder();

@@ -371,7 +371,7 @@ public class WikisResourceIT extends AbstractHttpIT
         this.testUtils.rest().delete(this.reference);
         this.testUtils.rest().savePage(this.reference);
 
-        this.solrUtils.waitEmpyQueue();
+        this.solrUtils.waitEmptyQueue();
 
         GetMethod getMethod = executeGet(URIUtil.encodeQuery(String.format("%s?q=\"" + this.pageName + "\"&type=solr",
             buildURI(WikiSearchQueryResource.class, getWiki()))));
@@ -390,7 +390,7 @@ public class WikisResourceIT extends AbstractHttpIT
         this.testUtils.rest().delete(this.reference);
         this.testUtils.rest().savePage(this.reference);
 
-        this.solrUtils.waitEmpyQueue();
+        this.solrUtils.waitEmptyQueue();
 
         String query = String.format("%s?q=\"%s\"", buildURI(WikisSearchQueryResource.class, getWiki()), this.pageName);
         GetMethod getMethod = executeGet(URIUtil.encodeQuery(query));

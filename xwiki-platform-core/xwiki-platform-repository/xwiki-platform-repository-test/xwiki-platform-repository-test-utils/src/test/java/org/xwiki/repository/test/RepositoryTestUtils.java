@@ -323,7 +323,7 @@ public class RepositoryTestUtils
     public void waitUntilReady() throws Exception
     {
         // Make sure Solr queue is empty
-        this.solrUtils.waitEmpyQueue();
+        this.solrUtils.waitEmptyQueue();
     }
 
     /**

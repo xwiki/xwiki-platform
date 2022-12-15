@@ -60,15 +60,17 @@ define('xwiki-attachment-picker',
         this.sugestSolrServiceURL = doc.getURL('get');
         this.options = options || {};
         this.limit = options.limit || 20;
+        this.target = options.target;
         this.solrOptions = this.options.solrOptions || {};
       }
 
       search(query, isGlobal) {
+        const {currentWiki, currentSpace, currentPage} = this.resolveTargetFqs();
         const localDocumentOnly = this.searchSolr(query, Object.assign({}, this.solrOptions, {
           fqs: [
-            `wiki:${XWiki.currentWiki}`,
-            `space:"${XWiki.currentSpace}"`,
-            `name:"${XWiki.currentPage}"`
+            `wiki:${currentWiki}`,
+            `space:"${currentSpace}"`,
+            `name:"${currentPage}"`
           ]
         }));
 
@@ -98,6 +100,21 @@ define('xwiki-attachment-picker',
           globalAttachments.forEach(attachment => attachment.isLocal = false);
           return localAttachments.concat(globalAttachments).slice(0, this.limit);
         });
+      }
+
+      resolveTargetFqs() {
+        let currentWiki = XWiki.currentWiki;
+        let currentSpace = XWiki.currentSpace;
+        let currentPage = XWiki.currentPage;
+        if (this.target) {
+          const target = new XWiki.Document(XWiki.Model.resolve(this.target, XWiki.EntityType.DOCUMENT));
+          if (target.wiki) {
+            currentWiki = target.wiki;
+          }
+          currentSpace = target.space;
+          currentPage = target.page;
+        }
+        return {currentWiki, currentSpace, currentPage};
       }
 
       searchSolr(input, options) {
@@ -183,6 +200,7 @@ define('xwiki-attachment-picker',
         this.searchBlock.append(inputGroup);
         this.solrSearch = new SolrSearch({
           limit: parseInt(this.rootBlock.data('xwiki-attachment-picker-limit')),
+          target: this.rootBlock.data('xwiki-attachment-picker-target'),
           solrOptions: {
             filter: this.rootBlock.data('xwiki-attachment-picker-filter')
           }

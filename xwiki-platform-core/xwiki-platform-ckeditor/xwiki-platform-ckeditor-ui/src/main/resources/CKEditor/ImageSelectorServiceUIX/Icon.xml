@@ -120,12 +120,20 @@
     </property>
     <property>
       <code>require(['jquery', 'imageSelector'], function($, imageSelector) {
-  $('#iconTab input[type="text"]').on('input', function () {
-    if ($(this).val() === '') {
-      imageSelector.updateSelectedImageReferences([]);
-    } else {
-      imageSelector.updateSelectedImageReferences([{type: 'icon', reference: $(this).val()}]);
-    }
+  function init(element) {
+    element.find('.iconTab input[type="text"]').on('input', function () {
+      if ($(this).val() === '') {
+        imageSelector.updateSelectedImageReferences([], $(this));
+      } else {
+        imageSelector.updateSelectedImageReferences([{type: 'icon', reference: $(this).val()}], $(this));
+      }
+    });
+  }
+
+  init($(document).find('.image-selector'));
+
+  $(document).on('xwiki:dom:updated', (event, data) =&gt; {
+    data.elements.forEach(element =&gt; init($(element)));
   });
 });</code>
     </property>

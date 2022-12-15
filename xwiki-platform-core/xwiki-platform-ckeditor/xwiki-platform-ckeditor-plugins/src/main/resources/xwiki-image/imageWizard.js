@@ -43,6 +43,9 @@ define('imageWizard', ['imageSelector', 'imageEditor'], function(imageSelector, 
   }
 
   return function(params) {
+    if (CKEDITOR.currentInstance) {
+      params.currentDocument = CKEDITOR.currentInstance.config.sourceDocument.documentReference;
+    }
     if (params.isInsert === false) {
       return editOnly(params);
     } else {

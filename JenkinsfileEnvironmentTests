@@ -60,6 +60,7 @@ if (params.type && params.type != 'none') {
   // We're not in the cron. Just set the crontab to schedule the job.
   // This should happen the first time ever. Once this is called the build becomes a parameterized build and it's
   // always called with the "type" parameter (having a default value of "none").
+  echoXWiki "Setting up the crontab..."
   properties(getCustomJobProperties())
 }
 

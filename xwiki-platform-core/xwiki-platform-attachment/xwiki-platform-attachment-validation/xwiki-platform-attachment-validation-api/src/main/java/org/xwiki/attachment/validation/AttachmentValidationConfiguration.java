@@ -22,6 +22,7 @@ package org.xwiki.attachment.validation;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -35,14 +36,32 @@ import org.xwiki.stability.Unstable;
 public interface AttachmentValidationConfiguration
 {
     /**
-     * @return the list of allowed attachment mimetypes. A joker (@code '*') can be used to match any media (e.g.,
-     *     "image/png", "text/*")
+     * @return the list of allowed attachment mimetypes of the current document. A joker (@code '*') can be used to
+     *     match any media (e.g., "image/png", "text/*")
      */
     List<String> getAllowedMimetypes();
 
     /**
-     * @return the list of blocker attachment mimetype. A joker (@code '*') can be used to match any media (e.g.,
-     *     "image/png", "text/*")
+     * @param documentReference the reference of a document
+     * @return the list of allowed attachment mimetypes of the provided document. A joker (@code '*') can be used to
+     *     match any media (e.g., * "image/png", "text/*")
+     * @since 14.10.2
+     * @since 15.0RC1
+     */
+    List<String> getAllowedMimetypes(DocumentReference documentReference);
+
+    /**
+     * @return the list of blocker attachment mimetype of the current document. A joker (@code '*') can be used to match
+     *     any media (e.g., "image/png", "text/*")
      */
     List<String> getBlockerMimetypes();
+
+    /**
+     * @param documentReference the reference of a document
+     * @return the list of blocker attachment mimetypes of the provided document. A joker (@code '*') can be used to
+     *     match any media (e.g., * "image/png", "text/*")
+     * @since 14.10.2
+     * @since 15.0RC1
+     */
+    List<String> getBlockerMimetypes(DocumentReference documentReference);
 }

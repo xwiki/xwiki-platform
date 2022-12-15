@@ -145,7 +145,10 @@
         const uploadedFile = element.find("input[type='file']").prop('files')[0];
 
         const beforeUploadEvent = $.Event("xwiki:actions:beforeUpload");
-        $(document).trigger(beforeUploadEvent, {file: uploadedFile});
+        $(document).trigger(beforeUploadEvent, {
+          file: uploadedFile,
+          documentReference: imageSelector.getDocumentReference(element)
+        });
 
         if (!beforeUploadEvent.isDefaultPrevented()) {
           element.addClass('loading');

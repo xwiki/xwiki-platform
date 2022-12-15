@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 
@@ -54,8 +55,8 @@ public class AttachmentValidationScriptService implements ScriptService
     private Logger logger;
 
     /**
-     * @return the list of allowed attachment mimetypes. A joker (@code '*') can be used to match any media (e.g.,
-     *     "image/png", "text/*")
+     * @return the list of allowed attachment mimetypes of the current document. A joker (@code '*') can be used to
+     *     match any media (e.g., "image/png", "text/*")
      */
     public List<String> getAllowedMimetypes()
     {
@@ -65,13 +66,43 @@ public class AttachmentValidationScriptService implements ScriptService
     }
 
     /**
-     * @return the list of blocker attachment mimetype. A joker (@code '*') can be used to match any media (e.g.,
-     *     "image/png", "text/*")
+     * @param documentReference the reference of a document
+     * @return the list of allowed attachment mimetypes of the provided document. A joker (@code '*') can be used to
+     *     match any media (e.g., "image/png", "text/*")
+     * @since 14.10.2
+     * @since 15.0RC1
+     */
+    public List<String> getAllowedMimetypes(DocumentReference documentReference)
+    {
+        return getAttachmentValidationConfiguration()
+            .map(attachmentValidationConfiguration -> attachmentValidationConfiguration.getAllowedMimetypes(
+                documentReference))
+            .orElse(List.of());
+    }
+
+    /**
+     * @return the list of blocker attachment mimetype of the current document. A joker (@code '*') can be used to match
+     *     any media (e.g., "image/png", "text/*")
      */
     public List<String> getBlockerMimetypes()
     {
         return getAttachmentValidationConfiguration()
             .map(AttachmentValidationConfiguration::getBlockerMimetypes)
+            .orElse(List.of());
+    }
+
+    /**
+     * @param documentReference the reference of a document
+     * @return the list of blocker attachment mimetypes of the provided document. A joker (@code '*') can be used to
+     *     match any media (e.g., "image/png", "text/*")
+     * @since 14.10.2
+     * @since 15.0RC1
+     */
+    public List<String> getBlockerMimetypes(DocumentReference documentReference)
+    {
+        return getAttachmentValidationConfiguration()
+            .map(attachmentValidationConfiguration -> attachmentValidationConfiguration.getBlockerMimetypes(
+                documentReference))
             .orElse(List.of());
     }
 

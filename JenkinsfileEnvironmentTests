@@ -50,14 +50,22 @@ if (params.type && params.type != 'none') {
     // In all these cases, we just execute the environment tests.
     buildDocker(params.type)
   } else {
-    echoXWiki 'Not executing the docker tests since there' 's been no rebuild of "XWiki/xwiki-platform" since last execution. Aborting.'
+    echoXWiki 'Not executing the docker tests since there''s been no rebuild of "XWiki/xwiki-platform" since last execution. Aborting.'
     // Aborting so that the build isn't displayed as successful without doing anything.
     currentBuild.result = 'ABORTED'
+    // Remove the current workspace in order to remove the job execution from the job history so that the history only
+    // has environment test results.
+    deleteDir()
   }
 } else {
   // We're not in the cron. Just set the crontab to schedule the job.
   echoXWiki "Nothing to build at the moment, waiting for the crontab to be triggered..."
   properties(getCustomJobProperties())
+  // Aborting so that the build isn't displayed as successful, as we want to focus on the failing env tests builds.
+  currentBuild.result = 'ABORTED'
+  // Remove the current workspace in order to remove the job execution from the job history so that the history only
+  // has environment test results.
+  deleteDir()
 }
 
 private void buildDocker(type)

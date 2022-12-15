@@ -63,7 +63,7 @@ public enum Browser
 
     Browser(Capabilities capabilities)
     {
-        this.capabilities = capabilities;
+        this.capabilities = capabilities.merge(buildCommonCapabilities());
     }
 
     /**
@@ -94,7 +94,6 @@ public enum Browser
     private static FirefoxOptions buildFirefoxOptions()
     {
         FirefoxOptions options = new FirefoxOptions();
-        options.merge(buildCommonCapabilities());
         // Create the profile on the fly, mostly for test.
         if (options.getProfile() == null) {
             options.setProfile(new FirefoxProfile());
@@ -107,7 +106,6 @@ public enum Browser
     private static ChromeOptions buildChromeOptions()
     {
         ChromeOptions options = new ChromeOptions();
-        options.merge(buildCommonCapabilities());
         LoggingPreferences logPrefs = new LoggingPreferences();
         logPrefs.enable(LogType.BROWSER, Level.ALL);
         options.setCapability(ChromeOptions.LOGGING_PREFS, logPrefs);

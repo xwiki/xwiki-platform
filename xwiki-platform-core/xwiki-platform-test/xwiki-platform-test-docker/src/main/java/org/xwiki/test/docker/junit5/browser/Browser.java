@@ -42,12 +42,12 @@ public enum Browser
     /**
      * The Firefox Browser.
      */
-    FIREFOX(new FirefoxOptions()),
+    FIREFOX(buildFirefoxOptions()),
 
     /**
      * The Chrome Browser.
      */
-    CHROME(new ChromeOptions());
+    CHROME(buildChromeOptions());
 
     /**
      * The path where to store the test-resources on the browser container.
@@ -64,40 +64,6 @@ public enum Browser
     Browser(Capabilities capabilities)
     {
         this.capabilities = capabilities;
-        this.forceDefaultCapabilities();
-    }
-
-    /**
-     * Ensure that some capabilities are set as expected for our tests.
-     */
-    private void forceDefaultCapabilities()
-    {
-        DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
-        LoggingPreferences logPrefs = new LoggingPreferences();
-        logPrefs.enable(LogType.BROWSER, Level.ALL);
-        // By default we want to be able to handle alerts.
-        desiredCapabilities.setCapability(CapabilityType.SUPPORTS_ALERTS, true);
-        desiredCapabilities.setCapability(CapabilityType.UNEXPECTED_ALERT_BEHAVIOUR, UnexpectedAlertBehaviour.IGNORE);
-        desiredCapabilities.setCapability(CapabilityType.UNHANDLED_PROMPT_BEHAVIOUR, UnexpectedAlertBehaviour.IGNORE);
-        desiredCapabilities.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
-        this.capabilities = this.capabilities.merge(desiredCapabilities);
-
-        if (this.capabilities instanceof FirefoxOptions) {
-            FirefoxOptions firefoxOptions = (FirefoxOptions) this.capabilities;
-            // Create the profile on the fly, mostly for test.
-            if (firefoxOptions.getProfile() == null) {
-                firefoxOptions.setProfile(new FirefoxProfile());
-            }
-            // We want to ensure that those events are taking into account.
-            firefoxOptions.addPreference("dom.disable_beforeunload", false);
-        } else if (this.capabilities instanceof ChromeOptions) {
-            ChromeOptions chromeOptions = (ChromeOptions) this.capabilities;
-            chromeOptions.addArguments(
-                "--whitelisted-ips",
-                "--no-sandbox",
-                "--disable-extensions"
-            );
-        }
     }
 
     /**
@@ -115,5 +81,41 @@ public enum Browser
     public String getTestResourcesPath()
     {
         return TEST_RESOURCES_PATH;
+    }
+
+    private static Capabilities buildCommonCapabilities()
+    {
+        DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
+        // By default, we want to be able to handle alerts.
+        desiredCapabilities.setCapability(CapabilityType.UNHANDLED_PROMPT_BEHAVIOUR, UnexpectedAlertBehaviour.IGNORE);
+        return desiredCapabilities;
+    }
+
+    private static FirefoxOptions buildFirefoxOptions()
+    {
+        FirefoxOptions options = new FirefoxOptions();
+        options.merge(buildCommonCapabilities());
+        // Create the profile on the fly, mostly for test.
+        if (options.getProfile() == null) {
+            options.setProfile(new FirefoxProfile());
+        }
+        // We want to ensure that those events are taking into account.
+        options.addPreference("dom.disable_beforeunload", false);
+        return options;
+    }
+
+    private static ChromeOptions buildChromeOptions()
+    {
+        ChromeOptions options = new ChromeOptions();
+        options.merge(buildCommonCapabilities());
+        LoggingPreferences logPrefs = new LoggingPreferences();
+        logPrefs.enable(LogType.BROWSER, Level.ALL);
+        options.setCapability(ChromeOptions.LOGGING_PREFS, logPrefs);
+        options.addArguments(
+            "--whitelisted-ips",
+            "--no-sandbox",
+            "--disable-extensions"
+        );
+        return options;
     }
 }

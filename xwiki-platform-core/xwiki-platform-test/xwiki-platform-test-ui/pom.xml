@@ -50,19 +50,6 @@
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-java</artifactId>
       <version>${selenium.version}</version>
-      <exclusions>
-        <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-        <!-- It has a dependency on testng which we need to exclude to prevent
-             Maven Surefire plugin to think we're executing TestNG tests. -->
-        <exclusion>
-          <groupId>org.testng</groupId>
-          <artifactId>testng</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <!-- Use Java 11+'s bundled HTTP Client instead of AsyncHttpClient.
          See https://github.com/SeleniumHQ/selenium/issues/9528#issuecomment-1282482248 and

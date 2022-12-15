@@ -54,13 +54,9 @@ if (params.type && params.type != 'none') {
     // Aborting so that the build isn't displayed as successful without doing anything.
     currentBuild.result = 'ABORTED'
   }
-} else if (params.type && params.type == 'none') {
-  // Nothing to do. This job will be called next time the crontab is triggered.
 } else {
   // We're not in the cron. Just set the crontab to schedule the job.
-  // This should happen the first time ever. Once this is called the build becomes a parameterized build and it's
-  // always called with the "type" parameter (having a default value of "none").
-  echoXWiki "Setting up the crontab..."
+  echoXWiki "Nothing to build at the moment, waiting for the crontab to be triggered..."
   properties(getCustomJobProperties())
 }
 

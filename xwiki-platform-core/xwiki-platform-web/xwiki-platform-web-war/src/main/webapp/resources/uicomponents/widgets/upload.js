@@ -514,7 +514,6 @@ var XWiki = (function(XWiki) {
           // Queue the file only if no listener cancelled the event.
           if (!event.defaultPrevented) {
             this.fileUploadItems.push(new FileUploadItem(file, this.statusUI.LIST, this.formData, this.options));
-            Event.fire(this.input, 'xwiki:html5upload:start');
           }
         } catch (ex) {
           this.showMessage(ex, 'error', {size : UploadUtils.bytesToSize(this.options && this.options.maxFilesize),
@@ -522,6 +521,7 @@ var XWiki = (function(XWiki) {
           });
         }
       }
+      Event.fire(this.input, 'xwiki:html5upload:start');
     },
 
     /**

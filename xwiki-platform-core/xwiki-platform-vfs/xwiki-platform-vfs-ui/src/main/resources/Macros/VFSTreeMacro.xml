@@ -153,7 +153,9 @@
     </class>
     <property>
       <code>{{velocity}}
-{{tree root="$xcontext.macro.params.root" reference="path:$xwiki.getURL($doc.getDocumentReference(), 'get', 'sheet=Macros.VFSTreeJSON&amp;outputSyntax=plain')" links="true"/}}
+#set ($root = $services.rendering.escape($xcontext.macro.params.root, 'xwiki/2.1'))
+#set ($reference = $services.rendering.escape("path:$xwiki.getURL($doc.getDocumentReference(), 'get', 'sheet=Macros.VFSTreeJSON&amp;outputSyntax=plain')", 'xwiki/2.1'))
+{{tree root="$root" reference="$reference" links="true"/}}
 {{/velocity}}</code>
     </property>
     <property>

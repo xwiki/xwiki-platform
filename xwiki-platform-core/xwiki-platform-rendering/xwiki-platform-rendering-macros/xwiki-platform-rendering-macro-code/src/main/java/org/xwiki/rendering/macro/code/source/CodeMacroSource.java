@@ -19,7 +19,11 @@
  */
 package org.xwiki.rendering.macro.code.source;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.stability.Unstable;
+import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * A content to use in a code macro.
@@ -71,5 +75,53 @@ public class CodeMacroSource
     public String getLanguage()
     {
         return this.language;
+    }
+
+    @Override
+    public String toString()
+    {
+        ToStringBuilder builder = new XWikiToStringBuilder(this);
+
+        builder.append("reference", getReference());
+        builder.append("language", getLanguage());
+        builder.append("content", getContent());
+
+        return builder.toString();
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (obj != null) {
+            if (obj == this) {
+                return true;
+            }
+
+            if (obj instanceof CodeMacroSource) {
+                CodeMacroSource otherSource = (CodeMacroSource) obj;
+
+                EqualsBuilder builder = new EqualsBuilder();
+
+                builder.append(getReference(), otherSource.getReference());
+                builder.append(getLanguage(), otherSource.getLanguage());
+                builder.append(getContent(), otherSource.getContent());
+
+                return builder.isEquals();
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        HashCodeBuilder builder = new HashCodeBuilder();
+
+        builder.append(getReference());
+        builder.append(getLanguage());
+        builder.append(getReference());
+
+        return builder.build();
     }
 }

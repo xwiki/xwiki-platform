@@ -40,6 +40,7 @@ import org.mockito.internal.util.MockUtil;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
@@ -186,6 +187,8 @@ public class MockitoOldcore
     private ScriptContext scriptContext;
 
     private Environment environment;
+
+    private DocumentAccessBridge documentAccessBridge;
 
     private boolean mockXWiki = true;
 
@@ -924,6 +927,25 @@ public class MockitoOldcore
             }).when(getSpyXWiki()).getGlobalRightsClass(anyXWikiContext());
         }
 
+        // DocumentAccessBridge
+        if (!this.componentManager.hasComponent(DocumentAccessBridge.class)) {
+            this.documentAccessBridge = this.componentManager.registerMockComponent(DocumentAccessBridge.class);
+        } else {
+            this.documentAccessBridge = this.componentManager.getInstance(DocumentAccessBridge.class);
+        }
+        if (MockUtil.isMock(this.documentAccessBridge)) {
+            when(this.documentAccessBridge.exists(any(DocumentReference.class))).thenAnswer(new Answer<Boolean>()
+            {
+                @Override
+                public Boolean answer(InvocationOnMock invocation) throws Throwable
+                {
+                    DocumentReference documentReference = invocation.getArgument(0);
+
+                    return spyXWiki.exists(documentReference, context);
+                }
+            });
+        }
+
         // Query Manager
         // If there's already a Query Manager registered, use it instead.
         // This allows, for example, using @ComponentList to use the real Query Manager, in integration tests.
@@ -1037,6 +1059,15 @@ public class MockitoOldcore
     public File getTemporaryDirectory()
     {
         return this.temporaryDirectory;
+    }
+
+    /**
+     * @since 15.0RC1
+     * @since 14.10.2
+     */
+    public DocumentAccessBridge getDocumentAccessBridge()
+    {
+        return this.documentAccessBridge;
     }
 
     public XWikiRightService getMockRightService()

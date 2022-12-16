@@ -86,7 +86,7 @@ public abstract class AbstractEntityCodeMacroSourceFactory implements CodeMacroS
             this.authorization.checkAccess(Right.VIEW, xcontext.getAuthorReference(), documentReference);
         } catch (AccessDeniedException e) {
             throw new MacroExecutionException(
-                "Current author is not allowed to access document [" + documentReference + "]");
+                "Current author is not allowed to access document [" + documentReference + "]", e);
         }
 
         // Current user must have view right on the document
@@ -98,9 +98,9 @@ public abstract class AbstractEntityCodeMacroSourceFactory implements CodeMacroS
         // Get the content
         XWikiDocument document;
         try {
-            document = xcontext.getWiki().getDocument(entityReference, xcontext);
+            document = xcontext.getWiki().getDocument(documentReference, xcontext);
         } catch (XWikiException e) {
-            throw new MacroExecutionException("Failed to load document [" + documentReference + "]");
+            throw new MacroExecutionException("Failed to load document [" + documentReference + "]", e);
         }
 
         // Get the current translation
@@ -109,7 +109,7 @@ public abstract class AbstractEntityCodeMacroSourceFactory implements CodeMacroS
                 document = document.getTranslatedDocument(xcontext);
             } catch (XWikiException e) {
                 throw new MacroExecutionException(
-                    "Failed to load document translation for reference [" + documentReference + "]");
+                    "Failed to load document translation for reference [" + documentReference + "]", e);
             }
         }
 
@@ -132,7 +132,7 @@ public abstract class AbstractEntityCodeMacroSourceFactory implements CodeMacroS
                 this.componentManager.getInstance(EntityCodeMacroSourceLoader.class, entityReference.getType().name());
         } catch (ComponentLookupException e) {
             throw new MacroExecutionException("Unexpected error when initializing the content loader for entity type ["
-                + entityReference.getType() + "]");
+                + entityReference.getType() + "]", e);
         }
 
         return loader.load(document, entityReference, reference, xcontext);

@@ -44,7 +44,7 @@ public class CodeMacroSource
     /**
      * @param reference the reference of the content
      * @param content the content to highlight
-     * @param language the language of the content
+     * @param language the language of the content if known, null otherwise
      */
     public CodeMacroSource(CodeMacroSourceReference reference, String content, String language)
     {
@@ -70,7 +70,7 @@ public class CodeMacroSource
     }
 
     /**
-     * @return the language of the content
+     * @return the language of the content if known, null otherwise
      */
     public String getLanguage()
     {

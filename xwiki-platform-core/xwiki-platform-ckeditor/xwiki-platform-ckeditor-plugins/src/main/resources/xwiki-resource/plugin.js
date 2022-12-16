@@ -27,14 +27,13 @@ require(['jquery', 'resource', 'resourcePicker'], function ($, $resource) {
 
   CKEDITOR.plugins.add('xwiki-resource', {
     requires: 'xwiki-marker,xwiki-dialog,xwiki-localization',
-    
+
     init : function(editor) {
       // Fill missing configuration with default values.
-      var sourceDocument = editor.config.sourceDocument || XWiki.currentDocument;
       editor.config['xwiki-resource'] = $.extend({
         // We use the source document to compute the resource dispatcher URL because the resource reference can be
         // relative and thus it needs to be resolved relative to the edited document.
-        dispatcher: sourceDocument.getURL('get', $.param({
+        dispatcher: editor.config.sourceDocument.getURL('get', $.param({
           sheet: 'CKEditor.ResourceDispatcher',
           outputSyntax: 'plain',
           language: $('html').attr('lang') || ''

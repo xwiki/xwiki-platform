@@ -74,10 +74,9 @@
 
     init : function(editor) {
       // Fill missing configuration with default values.
-      var sourceDocument = editor.config.sourceDocument || XWiki.currentDocument;
       editor.config['xwiki-office'] = $.extend({
         enabled: false,
-        importer: sourceDocument.getURL('get', $.param({
+        importer: editor.config.sourceDocument.getURL('get', $.param({
           sheet: 'CKEditor.OfficeImporter',
           language: $('html').attr('lang') || ''
         }))

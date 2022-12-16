@@ -52,6 +52,15 @@ public interface DocumentReferenceResolver<T>
         EntityReference.class);
 
     /**
+     * Type instance for {@code DocumentReferenceResolver<PageReference>}.
+     * 
+     * @since 15.0RC1
+     * @since 14.10.2
+     */
+    ParameterizedType TYPE_PAGEREFERENCE =
+        new DefaultParameterizedType(null, DocumentReferenceResolver.class, PageReference.class);
+
+    /**
      * @param documentReferenceRepresentation the representation of a document reference (eg as a String)
      * @param parameters optional parameters. Their meaning depends on the resolver implementation
      * @return the valid resolved document reference as an Object

@@ -74,7 +74,7 @@ public final class PygmentsUtils
      */
     public static String syntaxToLanguage(Syntax syntax)
     {
-        return SYNTAX_TYPE_MAPPING.get(syntax.getType());
+        return syntax != null ? SYNTAX_TYPE_MAPPING.get(syntax.getType()) : null;
     }
 
     /**
@@ -83,6 +83,6 @@ public final class PygmentsUtils
      */
     public static String mimetypeToLanguage(String mimetype)
     {
-        return MIME_MAPPING.get(mimetype);
+        return mimetype != null ? MIME_MAPPING.get(mimetype) : null;
     }
 }

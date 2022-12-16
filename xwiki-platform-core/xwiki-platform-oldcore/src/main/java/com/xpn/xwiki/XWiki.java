@@ -680,7 +680,7 @@ public class XWiki implements EventListener
     private DocumentReferenceResolver<PageReference> getCurrentPageDocumentResolver()
     {
         if (this.currentPageDocumentResolver == null) {
-            this.currentPageDocumentResolver = Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
+            this.currentPageDocumentResolver = Utils.getComponent(DocumentReferenceResolver.TYPE_PAGEREFERENCE, "current");
         }
 
         return this.currentPageDocumentResolver;

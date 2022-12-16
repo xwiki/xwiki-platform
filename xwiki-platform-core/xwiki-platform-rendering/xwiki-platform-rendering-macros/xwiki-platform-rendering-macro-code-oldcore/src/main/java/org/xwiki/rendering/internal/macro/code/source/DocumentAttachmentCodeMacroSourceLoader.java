@@ -22,6 +22,7 @@ package org.xwiki.rendering.internal.macro.code.source;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
@@ -33,6 +34,7 @@ import org.xwiki.rendering.macro.code.source.CodeMacroSource;
 import org.xwiki.rendering.macro.code.source.CodeMacroSourceReference;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -45,6 +47,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Singleton
 public class DocumentAttachmentCodeMacroSourceLoader implements EntityCodeMacroSourceLoader
 {
+    @Inject
+    private MacroCodeEntitySoureConfiguration configuration;
+
     @Override
     public CodeMacroSource load(XWikiDocument document, EntityReference entityReference,
         CodeMacroSourceReference reference, XWikiContext xcontext) throws MacroExecutionException
@@ -55,10 +60,29 @@ public class DocumentAttachmentCodeMacroSourceLoader implements EntityCodeMacroS
             throw new MacroExecutionException("Unknown attachment [" + entityReference + "]");
         }
 
+        // Refuse to load the content of too big attachment as it could have an important impact on memory and it's very
+        // unlikely to be a text file
+        long attachmentSize;
+        try {
+            attachmentSize = attachment.getContentLongSize(xcontext);
+        } catch (XWikiException e) {
+            throw new MacroExecutionException("Failed to get the size of attachment [" + entityReference + "]", e);
+        }
+        if (attachmentSize > this.configuration.getMaximumAttachmentSize()) {
+            throw new MacroExecutionException("The size of the attachment [" + entityReference + "] is too big (["
+                + attachmentSize + "]) for the maximum [" + this.configuration.getMaximumAttachmentSize() + "]");
+        }
+
+        // Load the content of the attachment
         String content;
         try (InputStream stream = attachment.getContentInputStream(xcontext)) {
-            // TODO: we would ideally need to store the encoding of the file along with the mime type
-            content = IOUtils.toString(stream, StandardCharsets.UTF_8);
+            if (attachment.getCharset() != null) {
+                // Parse the content with the stored encoding
+                content = IOUtils.toString(stream, attachment.getCharset());
+            } else {
+                // Use UTF-8 by default
+                content = IOUtils.toString(stream, StandardCharsets.UTF_8);
+            }
         } catch (Exception e) {
             throw new MacroExecutionException("Failed to read content of attachment [" + entityReference + "]", e);
         }

@@ -103,6 +103,11 @@ public abstract class AbstractEntityCodeMacroSourceFactory implements CodeMacroS
             throw new MacroExecutionException("Failed to load document [" + documentReference + "]", e);
         }
 
+        // Make sure the document exist
+        if (document.isNew()) {
+            throw new MacroExecutionException("Entity [" + reference + "] does not exist");
+        }
+
         // Get the current translation
         if (documentReference.getLocale() == null) {
             try {

@@ -237,12 +237,16 @@ define('xwiki-ckeditor', [
 
   // Extend the default CKEditor configuration with settings that depend on the source document.
   var getConfig = function(element) {
+    var sourceSyntax = $(element).attr('data-syntax');
     var sourceDocument = XWiki.currentDocument;
-    var sourceDocumentReference = $(element).attr('data-sourceDocumentReference');
-    if (sourceDocumentReference) {
-      sourceDocument = new XWiki.Document(XWiki.Model.resolve(sourceDocumentReference, XWiki.EntityType.DOCUMENT));
+    sourceDocument.syntax = XWiki.docsyntax;
+    var sourceDocumentReference = XWiki.Model.resolve($(element).attr('data-sourceDocumentReference'),
+      XWiki.EntityType.DOCUMENT, XWiki.currentDocument.documentReference);
+    if (!XWiki.currentDocument.documentReference.equals(sourceDocumentReference)) {
+      sourceDocument = new XWiki.Document(sourceDocumentReference);
+      // We assume the syntax of the source document is the same as the syntax of the edited content.
+      sourceDocument.syntax = sourceSyntax;
     }
-    sourceDocument.syntax = $(element).attr('data-sourceDocumentSyntax');
 
     var config = {
       filebrowserUploadUrl: getUploadURL(sourceDocument, 'filebrowser'),
@@ -276,7 +280,11 @@ define('xwiki-ckeditor', [
           itemsLimit: 6
         }
       ],
+      // Used to resolve and serialize relative references. Also used to make HTTP requests with the right context.
       sourceDocument: sourceDocument,
+      // The syntax of the edited content is not always the same as the syntax of the source document (which applies to
+      // the source document content, but we might be editing something else, like an object property).
+      sourceSyntax: sourceSyntax,
       uploadUrl: getUploadURL(sourceDocument, 'filetools'),
       'xwiki-link': {
         // We use the source document to compute the link label generator URL because we want the link references to be

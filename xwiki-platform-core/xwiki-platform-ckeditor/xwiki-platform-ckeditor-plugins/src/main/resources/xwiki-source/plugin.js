@@ -32,7 +32,7 @@
         // Make sure we use the syntax specified when the editor was loaded. This is especially important when the
         // edited document is new (unsaved) because we want the converter to use the syntax specified by the template
         // rather than the default wiki syntax.
-        sourceSyntax: editor.element.getAttribute('data-sourceDocumentSyntax'),
+        sourceSyntax: editor.config.sourceSyntax,
         // Indicate if the content is supposed to be executed in a restricted context
         wysiwygRestricted: editor.element.getAttribute('data-restricted') === 'true',
         // Don't wrap the returned HTML with the BODY tag and don't include the HEAD tag when the editor is used
@@ -55,11 +55,10 @@
 
     init: function(editor) {
       // Fill missing configuration with default values.
-      var sourceDocument = editor.config.sourceDocument || XWiki.currentDocument;
       editor.config['xwiki-source'] = $.extend({
         // We need the source document to be the current document when the HTML conversion is performed in order to make
         // sure relative references within the edited content are properly resolved and serialized.
-        htmlConverter: sourceDocument.getURL('get', $.param({
+        htmlConverter: editor.config.sourceDocument.getURL('get', $.param({
           sheet: 'CKEditor.HTMLConverter',
           outputSyntax: 'plain',
           language: $('html').attr('lang') || '',

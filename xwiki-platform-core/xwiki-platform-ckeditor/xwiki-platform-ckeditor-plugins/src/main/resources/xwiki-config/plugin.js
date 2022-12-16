@@ -28,8 +28,8 @@
     // The editor instance was created but it not yet initialized. The configuration object passed when the instance was
     // created has not been merged with the global configuration yet.
     event.editor.once('configLoaded', function(event) {
-      // TODO: The the complexity can onlu be lowered. Once below the default maxcomplexity (10 at the time of 
-      //  writing), the jshint annotation can be removed.
+      // TODO: The the complexity can only be lowered. Once below the default maxcomplexity (10 at the time of writing),
+      // the jshint annotation can be removed.
       /*jshint maxcomplexity:16 */
       // The editor configuration has been loaded (the instance configuration has been merged with the global
       // configuration) but the editor has not been fully initialized yet so we can modify the configuration.
@@ -38,8 +38,8 @@
 
       var allowedContent;
       var allowedContentWithoutFigure;
-      if (config.sourceDocument && config.sourceDocument.syntax in config.allowedContentBySyntax) {
-        allowedContent = $.extend(true, {}, config.allowedContentBySyntax[config.sourceDocument.syntax]);
+      if (config.sourceSyntax in config.allowedContentBySyntax) {
+        allowedContent = $.extend(true, {}, config.allowedContentBySyntax[config.sourceSyntax]);
 
         // Forbid script tags if JavaScript skin extensions are not loaded.
         if (!config.loadJavaScriptSkinExtensions && '$1' in allowedContent && 'elements' in allowedContent.$1) {

@@ -207,7 +207,7 @@
                       <!-- Force a slightly older version of the Chrome Driver in case we don't have the latest Chrome
                         installed locally. -->
                       <name>wdm.chromeDriverVersion</name>
-                      <value>103.0.5060.53</value>
+                      <value>108.0.5359.71</value>
                     </property>
                     <property>
                       <!-- Try to work around error: "[SEVERE]: bind() failed: Cannot assign requested address (99)" -->

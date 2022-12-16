@@ -109,7 +109,8 @@ public class DefaultTemporaryResourceStore implements TemporaryResourceStore
 
         // Make sure the resource path is not relative (e.g. "../../../") and tries to get outside of the safe folder.
         if (!temporaryFile.getAbsolutePath().startsWith(safeFolder.getAbsolutePath())) {
-            throw new IOException(String.format("Resource path [%s] should be within [%s]", temporaryFile.getAbsolutePath(), safeFolder.getAbsolutePath()));
+            throw new IOException(String.format("Resource path [%s] should be within [%s]",
+                temporaryFile.getAbsolutePath(), safeFolder.getAbsolutePath()));
         }
 
         return temporaryFile;

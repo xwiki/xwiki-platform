@@ -46,11 +46,9 @@
   };
 
   var matchesSyntaxChangeEvent = function(editor, event, data) {
-    var sourceDocumentReference = XWiki.Model.resolve(editor.element.getAttribute('data-sourceDocumentReference'),
-      XWiki.EntityType.DOCUMENT, XWiki.currentDocument.documentReference);
     var form = $(event.target).closest('form, .form');
     // Check if the syntax change event targets the edited document (the source document).
-    return sourceDocumentReference.equals(data.documentReference) &&
+    return editor.config.sourceDocument.documentReference.equals(data.documentReference) &&
       // Check if the syntax plugin is enabled for this editor instance.
       editor.plugins['xwiki-syntax'] &&
       // Check if the syntax change is the result of canceling the form that holds the CKEditor instance.
@@ -58,7 +56,8 @@
   };
 
   var maybeConvertSyntaxAndReload = function(editor, data) {
-    editor.element.setAttribute('data-sourceDocumentSyntax', data.syntax.id);
+    editor.element.setAttribute('data-syntax', data.syntax.id);
+    editor.config.sourceSyntax = data.syntax.id;
     return maybeConvertSyntax(editor, data).then(reloadEditor.bind(null, editor, data.syntax));
   };
 

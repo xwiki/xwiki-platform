@@ -134,4 +134,13 @@ class AttachmentGalleryPickerMacroTest
             this.attachmentGalleryPickerMacro.execute(params, null, this.macroTransformationContext);
         assertEquals("image/*,image/jpeg", actual.get(0).getParameter("data-xwiki-attachment-picker-filter"));
     }
+
+    @Test
+    void executeWithTarget()
+    {
+        AttachmentGalleryPickerMacroParameters params = new AttachmentGalleryPickerMacroParameters();
+        params.setTarget("xwiki:Space.Page");
+        List<Block> actual = this.attachmentGalleryPickerMacro.execute(params, null, this.macroTransformationContext);
+        assertEquals("xwiki:Space.Page", actual.get(0).getParameter("data-xwiki-attachment-picker-target"));
+    }
 }

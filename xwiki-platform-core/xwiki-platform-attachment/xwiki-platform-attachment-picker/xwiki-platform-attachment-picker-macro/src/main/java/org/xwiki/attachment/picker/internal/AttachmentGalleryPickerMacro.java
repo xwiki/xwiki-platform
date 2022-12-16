@@ -110,6 +110,9 @@ public class AttachmentGalleryPickerMacro extends AbstractMacro<AttachmentGaller
         if (parameters.getLimit() != null) {
             attachmentPickerParameters.put("data-xwiki-attachment-picker-limit", String.valueOf(parameters.getLimit()));
         }
+        if (parameters.getTarget() != null) {
+            attachmentPickerParameters.put("data-xwiki-attachment-picker-target", parameters.getTarget());
+        }
 
         return List.of(new GroupBlock(List.of(
             // Search block.

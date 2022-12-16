@@ -45,7 +45,6 @@
 ## See XWIKI-14818: Preview triggers ERR_BLOCKED_BY_XSS_AUDITOR in Chrome
 #set ($iframe = 'iframe')
 &lt;$iframe src="https://www.youtube.com/embed/9QTWrZ7OfzI" title="YouTube-видео о XWiki" role="presentation" allowfullscreen&gt;&lt;/$iframe&gt;
-
 {{/html}}
 {{/velocity}}
 {{/box}}
@@ -70,7 +69,8 @@ XWiki може бути використана в якості основи зн
 
 {{box}}Дізнайтеся більше про те, як використовувати XWiki з {{velocity}}[[Getting Started Guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome?version=$xwiki.version]]{{/velocity}}.{{/box}}
 
-(%class="row"%)(((
+(%class="row"%)
+(((
 (%class="col-xs-12 col-sm-6"%)
 (((
 = Розширте свою вікі =
@@ -79,6 +79,7 @@ XWiki може бути використана в якості основи зн
 
 Для перегляду більше 900 створених спільнотою розширень для XWiki, перейдіть в [[Репозиторій розширень&gt;&gt;http://extensions.xwiki.org]].
 )))
+
 (%class="col-xs-12 col-sm-6"%)
 (((
 = Створіть свій додаток =

@@ -23,7 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.xwiki.attachment.picker.internal.AttachmentGalleryPickerMacro;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyDisplayType;
 import org.xwiki.properties.annotation.PropertyName;
 import org.xwiki.stability.Unstable;
 
@@ -41,6 +43,8 @@ public class AttachmentGalleryPickerMacroParameters
     private List<String> filter = new ArrayList<>();
 
     private Integer limit = 20;
+
+    private String targetDocumentReference;
 
     /**
      * @return the id of the attachment picker macro
@@ -94,5 +98,29 @@ public class AttachmentGalleryPickerMacroParameters
     public void setLimit(Integer limit)
     {
         this.limit = limit;
+    }
+
+    /**
+     * @return the reference to the document that will be set as the current document to display the macro content
+     * @since 14.10.2
+     * @since 15.0RC1
+     */
+    @Unstable
+    public String getTarget()
+    {
+        return this.targetDocumentReference;
+    }
+
+    /**
+     * @param targetDocumentReference refer to {@link #getTarget()}
+     * @since 14.10.2
+     * @since 15.0RC1
+     */
+    @PropertyDescription("The reference to the document serving as the current document")
+    @PropertyDisplayType(DocumentReference.class)
+    @Unstable
+    public void setTarget(String targetDocumentReference)
+    {
+        this.targetDocumentReference = targetDocumentReference;
     }
 }

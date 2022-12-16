@@ -174,41 +174,40 @@
 
 #macro (ckeditor $parameters)
   #importCKEditorResources
-  #set ($sourceDocumentReference = $parameters.attributes.get('data-sourceDocumentReference'))
-  ## Use the current document as source document, if possible, because it may contain unsaved changes (e.g. changes
-  ## coming from a template specified in the URL or from other URL parameters). This is important for instance in order
-  ## to ensure that for new (unsaved) documents we use the syntax that has been copied from the template and not the
-  ## default wiki syntax.
-  #if (!$sourceDocumentReference || $sourceDocumentReference.equals($tdoc.documentReference))
-    #set ($sourceDocument = $tdoc)
-    #set ($sourceDocumentReference = $tdoc.documentReference)
-  #else
-    #set ($sourceDocument = $xwiki.getDocument($sourceDocumentReference))
-  #end
+  ##
   #set ($escapedName = $escapetool.xml($parameters.attributes.name))
   &lt;input value="$!escapedName" name="RequiresHTMLConversion" type="hidden"/&gt;
-  &lt;input value="$!escapetool.xml($sourceDocument.syntax.toIdString())" name="$!{escapedName}_syntax" type="hidden"/&gt;
+  ##
+  #set ($syntaxId = $parameters.attributes.get('data-syntax'))
+  &lt;input value="$!escapetool.xml($syntaxId)" name="$!{escapedName}_syntax" type="hidden"/&gt;
+  ##
   ## Chrome doesn't cache the enabled/disabled state of the form fields so we must store this state in the value of
   ## another form field. For instance, the enabled/disabled state of the RequiresHTMLConversion hidden input
   ## determines which editor mode (WYSIWYG vs. Source) is loaded initially.
   ## See CKEDITOR-34: Wiki syntax gets escaped when you click "Back" in the browser
   &lt;input value="" name="$!{escapedName}_cache" type="hidden" class="cache"/&gt;
+  ##
   #set ($discard = $parameters.attributes.putAll({
     'class': "$!parameters.attributes.get('class') ckeditor-textarea loading",
-    'spellcheck': false,
-    'data-sourceDocumentSyntax': $sourceDocument.syntax.toIdString()
+    'spellcheck': false
   }))
+  ##
+  #set ($sourceDocumentReference = $parameters.attributes.get('data-sourceDocumentReference'))
+  #if (!$sourceDocumentReference)
+    #set ($sourceDocumentReference = $tdoc.documentReference)
+  #end
+  #set ($source = {
+    'documentReference': $sourceDocumentReference,
+    'syntax': $syntaxId,
+    'content': $parameters.content,
+    'restricted': $parameters.attributes.data-restricted
+  })
+  ##
   &lt;textarea
     #foreach ($entry in $parameters.attributes.entrySet())
       $entry.key="$!escapetool.xml($entry.value)"
     #end
   ## We render the content sheet at the end because the edited content can overwrite the variables used by this macro.
-  #set ($source = {
-    'documentReference': $sourceDocumentReference,
-    'syntax': $sourceDocument.syntax,
-    'content': $parameters.content,
-    'restricted': $parameters.attributes.data-restricted
-  })
   #set ($content = "#ckeditor_renderContentSheet($source)")
   &gt;$!escapetool.xml($content)&lt;/textarea&gt;
 #end

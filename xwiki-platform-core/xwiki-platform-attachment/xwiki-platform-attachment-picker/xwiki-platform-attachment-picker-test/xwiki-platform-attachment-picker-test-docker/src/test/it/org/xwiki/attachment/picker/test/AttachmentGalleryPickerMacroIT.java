@@ -85,7 +85,7 @@ class AttachmentGalleryPickerMacroIT
         attachmentsPane.waitForUploadToFinish("textcontent.txt");
 
         // Waits for the uploaded files to be indexed before continuing.
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmpyQueue();
+        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
 
         // Reload the page to see the file after the uploads and solr indexing.
         setup.getDriver().navigate().refresh();

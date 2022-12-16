@@ -31,6 +31,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
@@ -75,30 +76,41 @@ public class DefaultTemporaryResourceStore implements TemporaryResourceStore
     public File getTemporaryFile(TemporaryResourceReference reference) throws IOException
     {
         List<String> segments = new ArrayList<>();
-        segments.add("tmp");
-        segments.add(reference.getModuleId());
-        int safePathLength = 2;
+
         if (reference.getOwningEntityReference() != null) {
             for (EntityReference component : reference.getOwningEntityReference().getReversedReferenceChain()) {
                 segments.add(component.getName());
-                safePathLength++;
             }
         }
         if (!reference.getParameters().isEmpty()) {
             segments.add(String.valueOf(reference.getParameters().hashCode()));
-            safePathLength++;
         }
-        segments.addAll(reference.getResourcePath());
+
         String path = StringUtils.join(encode(segments), '/');
-        String safePath = StringUtils.join(encode(segments.subList(0, safePathLength)), '/');
+        String md5 = DigestUtils.md5Hex(path);
         File rootFolder = this.environment.getTemporaryDirectory();
-        File safeFolder = new File(rootFolder, safePath);
-        File temporaryFile = new File(rootFolder, path);
+
+        List<String> finalPathSegments = new ArrayList<>();
+
+        finalPathSegments.add("tmp");
+        finalPathSegments.add(reference.getModuleId());
+
+        // Avoid having too many files in one folder because some filesystems don't perform well with large numbers of
+        // files in one folder
+        finalPathSegments.add(String.valueOf(md5.charAt(0)));
+        finalPathSegments.add(String.valueOf(md5.charAt(1)));
+        finalPathSegments.add(String.valueOf(md5.substring(2)));
+
+        File safeFolder = new File(rootFolder, StringUtils.join(finalPathSegments, '/'));
+
+        finalPathSegments.addAll(reference.getResourcePath());
+
+        File temporaryFile = new File(rootFolder, StringUtils.join(finalPathSegments, '/'));
 
         // Make sure the resource path is not relative (e.g. "../../../") and tries to get outside of the safe folder.
         if (!temporaryFile.getAbsolutePath().startsWith(safeFolder.getAbsolutePath())) {
-            String resourcePath = StringUtils.join(encode(segments.subList(safePathLength, segments.size())), '/');
-            throw new IOException(String.format("Invalid resource path [%s].", resourcePath));
+            throw new IOException(String.format("Resource path [%s] should be within [%s]",
+                temporaryFile.getAbsolutePath(), safeFolder.getAbsolutePath()));
         }
 
         return temporaryFile;

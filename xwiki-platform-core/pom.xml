@@ -157,6 +157,22 @@
                 </item>
               </differences>
             </revapi.differences>
+            <revapi.differences>
+              <criticality>documented</criticality>
+              <justification>New methods on unstable code, allowing to get the mimetype configuration for a given document.</justification>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.addedToInterface</code>
+                  <new>method java.util.List&lt;java.lang.String&gt; org.xwiki.attachment.validation.AttachmentValidationConfiguration::getAllowedMimetypes(org.xwiki.model.reference.DocumentReference)</new>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.addedToInterface</code>
+                  <new>method java.util.List&lt;java.lang.String&gt; org.xwiki.attachment.validation.AttachmentValidationConfiguration::getBlockerMimetypes(org.xwiki.model.reference.DocumentReference)</new>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

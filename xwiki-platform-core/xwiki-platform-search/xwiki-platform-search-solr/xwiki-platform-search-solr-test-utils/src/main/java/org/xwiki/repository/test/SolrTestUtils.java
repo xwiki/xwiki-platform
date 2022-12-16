@@ -65,7 +65,7 @@ public class SolrTestUtils
     /**
      * Wait until the Solr does not have anything left to index.
      */
-    public void waitEmpyQueue() throws Exception
+    public void waitEmptyQueue() throws Exception
     {
         while (getSolrQueueSize() > 0) {
             Thread.sleep(100);

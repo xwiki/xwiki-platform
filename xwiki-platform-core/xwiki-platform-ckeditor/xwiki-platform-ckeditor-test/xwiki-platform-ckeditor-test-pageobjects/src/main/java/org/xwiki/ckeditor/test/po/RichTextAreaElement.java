@@ -93,7 +93,18 @@ public class RichTextAreaElement extends BaseElement
     {
         if (keysToSend.length > 0) {
             try {
-                getActiveElement().sendKeys(keysToSend);
+                WebElement activeElement = getActiveElement();
+                // On Firefox we have to click on the editing area before typing, otherwise the typed keys are ignored.
+                // Unfortunately this can change the selection (caret position) within the editing area, but
+                // since we don't expose any API to access the selection we're safe for now. Ideally we should save the
+                // selection before clicking and then restore it after click, but it won't be easy to represent the
+                // selection because Selenium doesn't provide an API to represent text nodes and the selection is often
+                // inside a text node. We'd have to represent the selection relative to the parent element (using
+                // WebElement) but that moves us away from the standard DOM selection API.
+                // Also note that for some reason, using the Actions API (e.g. moving the mouse at a given offset within
+                // the editing area before clicking) doesn't have the same result.
+                activeElement.click();
+                activeElement.sendKeys(keysToSend);
             } finally {
                 getDriver().switchTo().defaultContent();
             }

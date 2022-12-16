@@ -126,20 +126,16 @@ def builds = [
   }
 ]
 
-// Let the user select the build to execute if manually triggered.
-// Otherwise, build everything.
-if (currentBuild.rawBuild.getCauses()[0].toString().contains('UserIdCause')) {
-  stage('Platform Builds') {
-    def choices = builds.collect { k,v -> "$k" }.join('\n')
-    def selection = askUser(choices)
-    if (selection == 'All') {
-      buildStandardAll(builds)
-    } else {
-      buildStandardSingle(builds[selection])
-    }
+// Let the user select the build to execute if manually triggered. Otherwise, build everything.
+stage('Platform Builds') {
+  def choices = builds.collect { k,v -> "$k" }.join('\n')
+  // askUser() will check if the build was triggered manually or not. If not, it'll default to 'All'.
+  def selection = askUser(choices)
+  if (selection == 'All') {
+    buildStandardAll(builds)
+  } else {
+    buildStandardSingle(builds[selection])
   }
-} else {
-  buildStandardAll(builds)
 }
 
 private void buildStandardSingle(build)

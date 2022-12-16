@@ -124,48 +124,60 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery', 'imageSelector', 'l10n!imageSelector', 'resource'], function($, imageSelector, translations, resource) {
-  const imageSelectorElement = $('.image-selector');
-  const uploadButton = $("#upload form input.button");
+      <code>require(['jquery', 'imageSelector', 'l10n!imageSelector', 'resource'],
+  function ($, imageSelector, translations, resource) {
+    function init(element) {
+      const uploadButton = element.find(".upload form input.button");
 
-  uploadButton.prop("disabled", true);
-
-  imageSelectorElement.on('change', function() {
-    if($("#fileUploadField").prop('files').length &gt; 0) {
-      uploadButton.prop("disabled", false);
-    } else {
       uploadButton.prop("disabled", true);
-    }
-  });
 
-  uploadButton.on('click', function(event) {
-    event.preventDefault();
+      element.on('change', function () {
+        if ($(this).find("input[type='file']").prop('files').length &gt; 0) {
+          uploadButton.prop("disabled", false);
+        } else {
+          uploadButton.prop("disabled", true);
+        }
+      });
 
-    const uploadedFile = $("#fileUploadField").prop('files')[0];
+      uploadButton.on('click', function (event) {
+        event.preventDefault();
 
-    const beforeUploadEvent = $.Event("xwiki:actions:beforeUpload");
-    $(document).trigger(beforeUploadEvent, {file: uploadedFile});
+        const uploadedFile = element.find("input[type='file']").prop('files')[0];
 
-    if (!beforeUploadEvent.isDefaultPrevented()) {
-      imageSelectorElement.addClass('loading');
-      imageSelector.createLoader(uploadedFile, {
-        onSuccess: function(entityReference) {
-          imageSelector.updateSelectedImageReferences([XWiki.Model.serialize(entityReference)]);
-          imageSelectorElement.removeClass('loading');
-          new XWiki.widgets.Notification(translations.get('modal.fileUpload.success'), 'done');
-        },
-        onError: function() {
-          new XWiki.widgets.Notification(translations.get('modal.fileUpload.fail'), 'error');
-          imageSelectorElement.removeClass('loading');
-        },
-        onAbort: function() {
-          new XWiki.widgets.Notification(translations.get('modal.fileUpload.abort'), 'error');
-          imageSelectorElement.removeClass('loading');
+        const beforeUploadEvent = $.Event("xwiki:actions:beforeUpload");
+        $(document).trigger(beforeUploadEvent, {
+          file: uploadedFile,
+          documentReference: imageSelector.getDocumentReference(element)
+        });
+
+        if (!beforeUploadEvent.isDefaultPrevented()) {
+          element.addClass('loading');
+          imageSelector.createLoader(uploadedFile, {
+            onSuccess: function (entityReference) {
+              imageSelector.updateSelectedImageReferences([XWiki.Model.serialize(entityReference)],
+                element);
+              element.removeClass('loading');
+              new XWiki.widgets.Notification(translations.get('modal.fileUpload.success'), 'done');
+            },
+            onError: function () {
+              new XWiki.widgets.Notification(translations.get('modal.fileUpload.fail'), 'error');
+              element.removeClass('loading');
+            },
+            onAbort: function () {
+              new XWiki.widgets.Notification(translations.get('modal.fileUpload.abort'), 'error');
+              element.removeClass('loading');
+            }
+          }, element);
         }
       });
     }
+
+    init($(document).find('.image-selector'));
+
+    $(document).on('xwiki:dom:updated', (event, data) =&gt; {
+      data.elements.forEach(element =&gt; init($(element)));
+    });
   });
-});
 </code>
     </property>
     <property>

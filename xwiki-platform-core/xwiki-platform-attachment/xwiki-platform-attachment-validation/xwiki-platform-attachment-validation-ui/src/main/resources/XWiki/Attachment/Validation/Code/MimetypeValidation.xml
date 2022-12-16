@@ -36,7 +36,14 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content/>
+  <content>{{velocity wiki="false"}}
+#if ($request.documentReference)
+$jsontool.serialize({
+  "allowedMimetypes": $services.attachmentValidation.getAllowedMimetypes($request.documentReference),
+  "blockerMimetypes": $services.attachmentValidation.getBlockerMimetypes($request.documentReference)
+})
+#end
+{{/velocity}}</content>
   <object>
     <name>XWiki.Attachment.Validation.Code.MimetypeValidation</name>
     <number>0</number>
@@ -147,9 +154,30 @@ require(['jquery', 'xwiki-l10n!attachment-validation-mimetype-messages', 'xwiki-
     });
   }
 
+  const configCache = {};
+
   $(document).on('xwiki:actions:beforeUpload', function (event, data) {
-    const configElement = document.getElementById('attachment-validation-mimetypes-configuration');
-    const config = JSON.parse(configElement.textContent);
+    let jsonString;
+    if (data.documentReference) {
+      if (!configCache[data.documentReference]) {
+        $.ajax({
+          url: new XWiki.Document(XWiki.Model.resolve('XWiki.Attachment.Validation.Code.MimetypeValidation',
+            XWiki.EntityType.DOCUMENT)).getURL('get', $.param({
+            outputSyntax: 'plain',
+            documentReference: data.documentReference
+          })),
+          async: false,
+          method: 'GET',
+          success: function (getData) {
+            configCache[data.documentReference] = getData;
+          }
+        })
+      }
+      jsonString = configCache[data.documentReference];
+    } else {
+      jsonString = document.getElementById('attachment-validation-mimetypes-configuration').textContent;
+    }
+    const config = JSON.parse(jsonString);
     const mimeType = data.file.type.toLowerCase();
     const allowedMimetypes = config.allowedMimetypes;
     const blockerMimetypes = config.blockerMimetypes;

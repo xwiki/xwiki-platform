@@ -87,7 +87,8 @@ public class DefaultTemporaryResourceStore implements TemporaryResourceStore
         }
 
         String path = StringUtils.join(encode(segments), '/');
-        String md5 = DigestUtils.sha1Hex(path);
+        String md5 = DigestUtils.md5Hex(path);
+        File rootFolder = this.environment.getTemporaryDirectory();
 
         List<String> finalPathSegments = new ArrayList<>();
 
@@ -100,11 +101,16 @@ public class DefaultTemporaryResourceStore implements TemporaryResourceStore
         finalPathSegments.add(String.valueOf(md5.charAt(1)));
         finalPathSegments.add(String.valueOf(md5.substring(2)));
 
+        File safeFolder = new File(rootFolder, StringUtils.join(finalPathSegments, '/'));
+
         finalPathSegments.addAll(reference.getResourcePath());
 
-        File rootFolder = this.environment.getTemporaryDirectory();
-
         File temporaryFile = new File(rootFolder, StringUtils.join(finalPathSegments, '/'));
+
+        // Make sure the resource path is not relative (e.g. "../../../") and tries to get outside of the safe folder.
+        if (!temporaryFile.getAbsolutePath().startsWith(safeFolder.getAbsolutePath())) {
+            throw new IOException(String.format("Resource path [%s] should be within [%s]", temporaryFile.getAbsolutePath(), safeFolder.getAbsolutePath()));
+        }
 
         return temporaryFile;
     }

@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="CKEditor.XDOMEditor" locale="">
+<xwikidoc version="1.5" reference="CKEditor.XDOMEditor" locale="">
   <web>CKEditor</web>
   <name>XDOMEditor</name>
   <language/>
@@ -66,6 +66,7 @@
         <name>code</name>
         <number>3</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -102,6 +103,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>scope</name>
         <number>6</number>

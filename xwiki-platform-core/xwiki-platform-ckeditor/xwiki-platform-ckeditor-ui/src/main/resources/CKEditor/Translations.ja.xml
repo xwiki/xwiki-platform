@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="CKEditor.Translations" locale="ja">
+<xwikidoc version="1.5" reference="CKEditor.Translations" locale="ja">
   <web>CKEditor</web>
   <name>Translations</name>
   <language>ja</language>
@@ -212,4 +212,4 @@ ckeditor.plugin.image.imageSelector.documentTreeTab.title=ドキュメントツ�
 ## Used to indicate where deprecated keys end
 #@deprecatedend
 </content>
-  </xwikidoc>
+</xwikidoc>

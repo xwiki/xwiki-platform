@@ -29,6 +29,7 @@ import org.xwiki.rendering.syntax.SyntaxType;
  * 
  * @version $Id$
  * @since 15.0RC1
+ * @since 14.10.2
  */
 public final class PygmentsUtils
 {

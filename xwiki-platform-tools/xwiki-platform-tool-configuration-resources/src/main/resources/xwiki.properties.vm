@@ -173,6 +173,13 @@ environment.permanentDirectory = $xwikiPropertiesEnvironmentPermanentDirectory
 #-# If not set "default" style is used.
 # rendering.macro.code.pygments.style = vs
 
+#-# [Since 15.0RC1]
+#-# [Since 14.10.2]
+#-# The maximum size (in bytes) of attachment to allow as code macro source.
+#-# 
+#-# The default is:
+# rendering.macro.code.source.attachmentMaximumSize = 1000000
+
 #-------------------------------------------------------------------------------------
 # Rendering Transformations
 #-------------------------------------------------------------------------------------

@@ -42,9 +42,9 @@ public class MacroCodeEntitySoureConfiguration
     private static final String PREFIX = "rendering.macro.code.source.";
 
     /**
-     * Use 10MB as maximum attachment size by default.
+     * Use 1MB as maximum attachment size by default.
      */
-    private static final int DEFAULT_MAXIMUM_ATTACHMENTSIZE = 10000000;
+    private static final int DEFAULT_MAXIMUM_ATTACHMENTSIZE = 1000000;
 
     /**
      * Defines from where to read the Pygments configuration data.

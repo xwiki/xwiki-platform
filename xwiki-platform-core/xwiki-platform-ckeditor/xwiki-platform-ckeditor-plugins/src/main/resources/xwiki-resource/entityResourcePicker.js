@@ -181,15 +181,7 @@ define('entityResourcePicker', [
       }
     });
     handler.open = function(resourceReference) {
-      // If the editor instance has a current instance defined, use it as the base entity reference to resolve the 
-      // resource reference.  
-      var baseEntityReference;
-      var currentInstance = CKEDITOR.currentInstance;
-      if (currentInstance) {
-        baseEntityReference = currentInstance.config.sourceDocument.documentReference;
-      }
-      entityTreePickerHandler
-        .open($resource.convertResourceReferenceToEntityReference(resourceReference, baseEntityReference));
+      entityTreePickerHandler.open($resource.convertResourceReferenceToEntityReference(resourceReference));
     };
     return handler;
   };

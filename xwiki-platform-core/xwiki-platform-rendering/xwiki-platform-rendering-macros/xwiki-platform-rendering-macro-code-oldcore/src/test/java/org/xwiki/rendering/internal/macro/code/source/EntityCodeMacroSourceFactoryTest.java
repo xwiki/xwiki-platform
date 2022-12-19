@@ -28,7 +28,10 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.internal.model.reference.CurrentPageReferenceDocumentReferenceResolver;
+import org.xwiki.mail.GeneralMailConfiguration;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.transformation.macro.CurrentMacroEntityReferenceResolver;
@@ -40,10 +43,14 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass.ContentType;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
@@ -51,6 +58,7 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 /**
  * Validate the various entity macro source factories.
@@ -79,6 +87,15 @@ class EntityCodeMacroSourceFactoryTest
     @InjectMockComponents
     private PageAttachmentCodeMacroSourceFactory pageAttachmentFactory;
 
+    @InjectMockComponents
+    private DocumentObjectPropertyCodeMacroSourceFactory documentObjectPropertyFactory;
+
+    @InjectMockComponents
+    private PageObjectPropertyCodeMacroSourceFactory pageObjectPropertyFactory;
+
+    @MockComponent
+    private GeneralMailConfiguration mailConfiguration;
+
     private MacroTransformationContext macroContext;
 
     @BeforeEach
@@ -94,23 +111,23 @@ class EntityCodeMacroSourceFactoryTest
     }
 
     private void assertCodeMacroSource(CodeMacroSourceFactory factory, CodeMacroSourceReference reference,
-        String expectedContent, String expectedLanguage, boolean fail) throws MacroExecutionException
+        String expectedContent, String expectedLanguage) throws MacroExecutionException
     {
-        if (fail) {
-            assertThrows(MacroExecutionException.class, () -> factory.getContent(reference, this.macroContext));
-        } else {
-            assertEquals(new CodeMacroSource(reference, expectedContent, expectedLanguage),
-                factory.getContent(reference, this.macroContext));
-        }
+        assertEquals(new CodeMacroSource(reference, expectedContent, expectedLanguage),
+            factory.getContent(reference, this.macroContext));
+    }
+
+    private void assertFailCodeMacroSource(CodeMacroSourceFactory factory, CodeMacroSourceReference reference)
+    {
+        assertThrows(MacroExecutionException.class, () -> factory.getContent(reference, this.macroContext));
     }
 
     @Test
     void getContentDocument() throws MacroExecutionException, XWikiException
     {
-        assertCodeMacroSource(this.documentFactory, new CodeMacroSourceReference("document", "wiki:Space.Document"), "",
-            null, true);
-        assertCodeMacroSource(this.pageFactory, new CodeMacroSourceReference("page", "wiki:Space/Document"), "", null,
-            true);
+        assertFailCodeMacroSource(this.documentFactory,
+            new CodeMacroSourceReference("document", "wiki:Space.Document"));
+        assertFailCodeMacroSource(this.pageFactory, new CodeMacroSourceReference("page", "wiki:Space/Document"));
 
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Document");
 
@@ -120,26 +137,26 @@ class EntityCodeMacroSourceFactoryTest
         this.oldcore.getSpyXWiki().saveDocument(document, this.oldcore.getXWikiContext());
 
         assertCodeMacroSource(this.documentFactory, new CodeMacroSourceReference("document", "wiki:Space.Document"),
-            "document content", null, false);
+            "document content", null);
         assertCodeMacroSource(this.pageFactory, new CodeMacroSourceReference("page", "wiki:Space/Document"),
-            "document content", null, false);
+            "document content", null);
 
         document.setSyntax(Syntax.HTML_5_0);
         this.oldcore.getSpyXWiki().saveDocument(document, this.oldcore.getXWikiContext());
 
         assertCodeMacroSource(this.documentFactory, new CodeMacroSourceReference("document", "wiki:Space.Document"),
-            "document content", "html", false);
+            "document content", "html");
         assertCodeMacroSource(this.pageFactory, new CodeMacroSourceReference("page", "wiki:Space/Document"),
-            "document content", "html", false);
+            "document content", "html");
     }
 
     @Test
     void getContentAttachment() throws MacroExecutionException, XWikiException, IOException
     {
-        assertCodeMacroSource(this.documentAttachmentFactory,
-            new CodeMacroSourceReference("attachment", "wiki:Space.Document@attachment.ext"), "", null, true);
-        assertCodeMacroSource(this.pageAttachmentFactory,
-            new CodeMacroSourceReference("page_attachment", "wiki:Space/Document/attachment.ext"), "", null, true);
+        assertFailCodeMacroSource(this.documentAttachmentFactory,
+            new CodeMacroSourceReference("attachment", "wiki:Space.Document@attachment.ext"));
+        assertFailCodeMacroSource(this.pageAttachmentFactory,
+            new CodeMacroSourceReference("page_attachment", "wiki:Space/Document/attachment.ext"));
 
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Document");
 
@@ -152,19 +169,110 @@ class EntityCodeMacroSourceFactoryTest
 
         assertCodeMacroSource(this.documentAttachmentFactory,
             new CodeMacroSourceReference("attachment", "wiki:Space.Document@attachment.ext"), "attachment content",
-            null, false);
+            null);
         assertCodeMacroSource(this.pageAttachmentFactory,
             new CodeMacroSourceReference("page_attachment", "wiki:Space/Document/attachment.ext"), "attachment content",
-            null, false);
+            null);
 
         attachment.setMimeType("text/html");
         this.oldcore.getSpyXWiki().saveDocument(document, this.oldcore.getXWikiContext());
 
         assertCodeMacroSource(this.documentAttachmentFactory,
             new CodeMacroSourceReference("attachment", "wiki:Space.Document@attachment.ext"), "attachment content",
-            "html", false);
+            "html");
         assertCodeMacroSource(this.pageAttachmentFactory,
             new CodeMacroSourceReference("page_attachment", "wiki:Space/Document/attachment.ext"), "attachment content",
-            "html", false);
+            "html");
+    }
+
+    @Test
+    void getContentObjectProperty() throws MacroExecutionException, XWikiException
+    {
+        assertFailCodeMacroSource(this.documentObjectPropertyFactory,
+            new CodeMacroSourceReference("object_property", "wiki:Space.Document^Space.Class.property"));
+
+        LocalDocumentReference classLocalReference = new LocalDocumentReference("Space", "Class");
+        DocumentReference classDocumentReference =
+            new DocumentReference(classLocalReference, new WikiReference("wiki"));
+        XWikiDocument classDocument =
+            this.oldcore.getSpyXWiki().getDocument(classDocumentReference, this.oldcore.getXWikiContext());
+        BaseClass xclass = classDocument.getXClass();
+        xclass.addPasswordField("password", "Password", 30);
+        xclass.addEmailField("email", "Email", 30);
+        xclass.addTextAreaField("textareasyntax", "Syntax", 5, 30);
+        xclass.addTextAreaField("textareaplain", "PURE_TEXT", 5, 30, ContentType.PURE_TEXT);
+        xclass.addTextAreaField("textareavelocitywiki", "VELOCITYWIKI", 5, 30, ContentType.VELOCITYWIKI);
+        xclass.addTextAreaField("textareavelocitycode", "VELOCITY_CODE", 5, 30, ContentType.VELOCITY_CODE);
+        xclass.addTextField("text", "Text", 30);
+        xclass.addNumberField("number", "Number", 30, "integer");
+        this.oldcore.getSpyXWiki().saveDocument(classDocument, this.oldcore.getXWikiContext());
+
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Document");
+        XWikiDocument document =
+            this.oldcore.getSpyXWiki().getDocument(documentReference, this.oldcore.getXWikiContext());
+        BaseObject object = document.newXObject(classLocalReference, this.oldcore.getXWikiContext());
+        object.setStringValue("password", "password content");
+        object.setStringValue("email", "email content");
+        object.setStringValue("text", "text content");
+        object.setLargeStringValue("textareasyntax", "syntax content");
+        object.setLargeStringValue("textareaplain", "plain content");
+        object.setLargeStringValue("textareavelocitywiki", "velocity wiki content");
+        object.setLargeStringValue("textareavelocitycode", "velocity code content");
+        object.setIntValue("number", 42);
+        object.setStringValue("other", "other content");
+        this.oldcore.getSpyXWiki().saveDocument(document, this.oldcore.getXWikiContext());
+
+        // text
+        assertCodeMacroSource(this.documentObjectPropertyFactory,
+            new CodeMacroSourceReference("object_property", "wiki:Space.Document^Space.Class.text"), "text content",
+            null);
+        // number
+        assertCodeMacroSource(this.documentObjectPropertyFactory,
+            new CodeMacroSourceReference("object_property", "wiki:Space.Document^Space.Class.number"), "42", null);
+        // other
+        assertCodeMacroSource(this.documentObjectPropertyFactory,
+            new CodeMacroSourceReference("object_property", "wiki:Space.Document^Space.Class.other"), "other content",
+            null);
+        // email
+        assertCodeMacroSource(this.documentObjectPropertyFactory,
+            new CodeMacroSourceReference("object_property", "wiki:Space.Document^Space.Class.email"), "email content",
+            null);
+        // textareasyntax
+        assertCodeMacroSource(this.documentObjectPropertyFactory,
+            new CodeMacroSourceReference("object_property", "wiki:Space.Document^Space.Class.textareasyntax"),
+            "syntax content", null);
+        // textareaplain
+        assertCodeMacroSource(this.documentObjectPropertyFactory,
+            new CodeMacroSourceReference("object_property", "wiki:Space.Document^Space.Class.textareaplain"),
+            "plain content", null);
+        // textareavelocitywiki
+        assertCodeMacroSource(this.documentObjectPropertyFactory,
+            new CodeMacroSourceReference("object_property", "wiki:Space.Document^Space.Class.textareavelocitywiki"),
+            "velocity wiki content", "velocity");
+        // textareavelocitycode
+        assertCodeMacroSource(this.documentObjectPropertyFactory,
+            new CodeMacroSourceReference("object_property", "wiki:Space.Document^Space.Class.textareavelocitycode"),
+            "velocity code content", "velocity");
+        // password
+        assertFailCodeMacroSource(this.documentObjectPropertyFactory,
+            new CodeMacroSourceReference("object_property", "wiki:Space.Document^Space.Class.passwords"));
+
+        document.setSyntax(Syntax.HTML_5_0);
+        this.oldcore.getSpyXWiki().saveDocument(document, this.oldcore.getXWikiContext());
+
+        // textareasyntax
+        assertCodeMacroSource(this.documentObjectPropertyFactory,
+            new CodeMacroSourceReference("object_property", "wiki:Space.Document^Space.Class.textareasyntax"),
+            "syntax content", "html");
+        // textareaplain
+        assertCodeMacroSource(this.documentObjectPropertyFactory,
+            new CodeMacroSourceReference("object_property", "wiki:Space.Document^Space.Class.textareaplain"),
+            "plain content", null);
+
+        when(this.mailConfiguration.shouldObfuscate()).thenReturn(true);
+
+        // email
+        assertFailCodeMacroSource(this.documentObjectPropertyFactory,
+            new CodeMacroSourceReference("object_property", "wiki:Space.Document^Space.Class.email"));
     }
 }

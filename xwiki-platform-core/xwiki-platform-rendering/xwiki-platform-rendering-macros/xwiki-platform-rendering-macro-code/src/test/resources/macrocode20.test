@@ -1,0 +1,17 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Validates forced language none with empty content
+.#-----------------------------------------------------
+{{code language="none"}}{{/code}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [code] [language=none] []
+beginGroup [[class]=[box]]
+beginGroup [[class]=[code]]
+endGroup [[class]=[code]]
+endGroup [[class]=[box]]
+endMacroMarkerStandalone [code] [language=none] []
+endDocument

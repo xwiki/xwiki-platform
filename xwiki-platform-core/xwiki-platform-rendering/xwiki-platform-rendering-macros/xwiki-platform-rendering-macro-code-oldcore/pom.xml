@@ -27,46 +27,42 @@
     <artifactId>xwiki-platform-rendering-macros</artifactId>
     <version>15.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-rendering-macro-code</artifactId>
-  <name>XWiki Platform - Rendering - Macro - Code</name>
-  <description>Highlights code</description>
+  <artifactId>xwiki-platform-rendering-macro-code-oldcore</artifactId>
+  <name>XWiki Platform - Rendering - Macro - Code Oldcore</name>
+  <description>Extend the code macro with features requiring xwiki-platform-oldcore</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.84</xwiki.jacoco.instructionRatio>
-    <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Code Macro</xwiki.extension.name>
+    <xwiki.jacoco.instructionRatio>0.71</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-macro-box</artifactId>
-      <version>${rendering.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.python</groupId>
-      <artifactId>jython-slim</artifactId>
-    </dependency>
-    <!-- We can't upgrade to version higher than 2.4.2 for two reasons:
-         - 2.5.1 and above presents and issue with the auto-detection of the language of the code (MIME and SQL 
-         syntaxes are too often detected).
-         - Pygments 2.6.0 and above requires Python 3. 
-         Pygments 2.8.0 presents a fix, but requires Python 3.
-         And upgrade to Pygments 2.5.2 is possible by backporting the fix from 
-         Pygments 2.8.0 (https://jira.xwiki.org/browse/XWIKI-18369).   
-         See https://jira.xwiki.org/browse/XWIKI-18363 -->
-    <dependency>
-      <groupId>org.pygments</groupId>
-      <artifactId>pygments</artifactId>
-      <version>2.4.2</version>
-      <scope>runtime</scope>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-security-authorization-api</artifactId>
+      <artifactId>xwiki-platform-rendering-macro-code</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-mail-general</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-oldcore</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-transformation-macro</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

@@ -39,7 +39,7 @@ define('entityResourceSuggester', [
         var results = response.getElementsByTagName('rs');
         var suggestions = [];
         for (var i = 0; i < results.length; i++) {
-          suggestions.push(convertSearchResultToResource(results.item(i), entityType));
+          suggestions.push(convertSearchResultToResource(results.item(i), entityType, base));
         }
         deferred.resolve(suggestions);
       } else {
@@ -50,14 +50,14 @@ define('entityResourceSuggester', [
     });
   };
 
-  var convertSearchResultToResource = function(result, expectedEntityType) {
+  var convertSearchResultToResource = function(result, expectedEntityType, base) {
     var entityReference, location, title = result.childNodes[0].nodeValue;
     var entityType = result.getAttribute('type');
     var serializedEntityReference = result.getAttribute('id');
     entityReference = XWiki.Model.resolve(serializedEntityReference, XWiki.EntityType.byName(entityType));
     location = result.getAttribute('info');
     return {
-      reference: $resource.convertEntityReferenceToResourceReference(entityReference),
+      reference: $resource.convertEntityReferenceToResourceReference(entityReference, base),
       entityReference: entityReference,
       title: title,
       location: location
@@ -101,7 +101,7 @@ define('entityResourceSuggester', [
         input = '*:*';
         query.push('sort=date desc');
       }
-      search(query, input, deferred, XWiki.EntityType.DOCUMENT);
+      search(query, input, deferred, XWiki.EntityType.DOCUMENT, base);
       return deferred.promise();
     },
     display: display

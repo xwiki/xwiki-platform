@@ -341,6 +341,14 @@
           // Make sure the picker doesn't try to resolve the link label as a resource reference.
           isNew: true
         };
+      },
+      getBase: function () {
+        var currentInstance = CKEDITOR.currentInstance;
+        var base;
+        if (currentInstance) {
+          base = currentInstance.config.sourceDocument.documentReference;
+        }
+        return base;
       }
     });
   };

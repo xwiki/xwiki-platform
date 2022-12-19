@@ -274,7 +274,8 @@ define('xwiki-ckeditor', [
               '&lt;/div&gt;',
               '&lt;div class="ckeditor-autocomplete-item-hint"&gt;{hint}&lt;/div&gt;',
             '&lt;/li&gt;'].join(''),
-          outputTemplate: '&lt;a href="{url}" data-reference="{typed}|-|{type}|-|{reference}"&gt;{label}&lt;/a&gt;&lt;span&gt;&amp;nbsp;&lt;/span&gt;',
+          outputTemplate: '&lt;a href="{url}" data-reference="{typed}|-|{type}|-|{reference}"&gt;{label}&lt;/a&gt;',
+          followingSpace: true,
           marker: '[',
           minChars: 0,
           itemsLimit: 6

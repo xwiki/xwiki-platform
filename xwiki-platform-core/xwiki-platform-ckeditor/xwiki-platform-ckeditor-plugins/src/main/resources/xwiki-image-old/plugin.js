@@ -190,14 +190,6 @@
               (newResourceReference.type !== 'url' || newResourceReference.reference.indexOf('://') < 0);
             widget.setData('resourceReference', CKEDITOR.tools.extend(newResourceReference, oldResourceReference));
           }
-        },
-        getBase: function () {
-          var currentInstance = CKEDITOR.currentInstance;
-          var base;
-          if (currentInstance) {
-            base = currentInstance.config.sourceDocument.documentReference;
-          }
-          return base;
         }
       });
       CKEDITOR.plugins.xwikiResource.updateResourcePickerOnFileBrowserSelect(dialogDefinition,

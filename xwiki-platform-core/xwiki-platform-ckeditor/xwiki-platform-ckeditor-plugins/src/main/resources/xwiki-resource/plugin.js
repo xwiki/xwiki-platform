@@ -193,7 +193,12 @@ require(['jquery', 'resource', 'resourcePicker'], function ($, $resource) {
           });
         },
         getBase: function () {
-          return undefined;
+          var currentInstance = CKEDITOR.currentInstance;
+          var base;
+          if (currentInstance) {
+            base = currentInstance.config.sourceDocument.documentReference;
+          }
+          return base;
         },
         //
         // Custom fields

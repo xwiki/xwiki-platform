@@ -53,13 +53,10 @@ viewers.Attachments = Class.create({
   counter : 1,
   /** Constructor. Adds all the JS improvements of the Attachment area. */
   initialize : function() {
-    if ($("attachform")) {
-      // If the upload form is already visible, enhance it.
-      this.prepareForm();
-    } else {
-      // Otherwise, we wait for a notification for the AJAX loading of the Attachments metadata tab.
-      this.addTabLoadListener();
-    }
+    // Initialize the event listener to prepare the form when it's loaded, or prepare the form straight away.
+    // prepareForm won't be called twice as it is skipped once #attachform exists. 
+    this.addTabLoadListener();
+    this.prepareForm();
   },
   /** Enhance the upload form with JS behaviors. */
   prepareForm : function() {

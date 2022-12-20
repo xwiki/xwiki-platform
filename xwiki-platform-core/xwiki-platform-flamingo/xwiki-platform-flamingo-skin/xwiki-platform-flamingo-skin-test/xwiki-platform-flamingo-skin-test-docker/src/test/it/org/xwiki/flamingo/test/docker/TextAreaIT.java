@@ -71,9 +71,8 @@ class TextAreaIT
         // @formatter:off
             "{{velocity}}\n"
             + "document: $doc.documentReference\n"
-            + "content author: $services.user.serialize($doc.authors.contentAuthor)\n"
-            + "effective author: $services.user.serialize($doc.authors.effectiveMetadataAuthor)\n"
-            + "original author: $services.user.serialize($doc.authors.originalMetadataAuthor)\n"
+            + "content author: $services.user.serialize($doc.contentAuthorReference)\n"
+            + "metadata author: $services.user.serialize($doc.authorReference)\n"
             + "current author: $services.user.serialize($xcontext.context.authorReference)\n"
             + "{{/velocity}}");
        // @formatter:on
@@ -86,8 +85,7 @@ class TextAreaIT
 
         assertEquals(String.format("document: %s\n"
             + "content author: xwiki:XWiki.user\n"
-            + "effective author: XWiki.superadmin\n"
-            + "original author: XWiki.superadmin\n"
+            + "metadata author: XWiki.superadmin\n"
             + "current author: XWiki.superadmin", testUtils.serializeReference(testReference)), viewPage.getContent());
     }
 

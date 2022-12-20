@@ -166,22 +166,26 @@ define('entityResourcePicker', [
     return handler;
   };
 
-  var convertEntityToResource = function(entity) {
+  var convertEntityToResource = function(entity, base) {
     return $.extend({}, entity, {
-      reference: $resource.convertEntityReferenceToResourceReference(entity.reference),
+      reference: $resource.convertEntityReferenceToResourceReference(entity.reference, base),
       entityReference: entity.reference
     });
   };
 
   var createResourcePicker = function(modal, handler) {
-    var entityTreePickerHandler = createEntityTreePicker(modal, {
-      entityType: $resource.types[handler.resourceType].entityType,
-      select: function(entities) {
-        handler.select(entities.map(convertEntityToResource));
-      }
-    });
-    handler.open = function(resourceReference) {
-      entityTreePickerHandler.open($resource.convertResourceReferenceToEntityReference(resourceReference));
+    var entityTreePickerHandler = function(base) {
+      return createEntityTreePicker(modal, {
+        entityType: $resource.types[handler.resourceType].entityType,
+        select: function(entities) {
+          handler.select(entities.map(function (entity) {
+            return convertEntityToResource(entity, base);
+          }));
+        }
+      });
+    };
+    handler.open = function(resourceReference, base) {
+      entityTreePickerHandler(base).open($resource.convertResourceReferenceToEntityReference(resourceReference, base));
     };
     return handler;
   };
@@ -213,13 +217,13 @@ define('entityResourcePicker', [
     });
 
     var picker = createResourcePicker(modal, {resourceType: resourceType});
-    $resource.pickers[resourceType] = function(resourceReference) {
+    $resource.pickers[resourceType] = function(resourceReference, base) {
       var deferred = $.Deferred();
       picker.select = function(resources) {
         // We assume that only one resource can be selected.
         deferred.resolve(resources[0]);
       };
-      picker.open(resourceReference);
+      picker.open(resourceReference, base);
       return deferred.promise();
     };
   };

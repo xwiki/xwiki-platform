@@ -116,8 +116,12 @@ require(['jquery', 'resource', 'resourcePicker'], function ($, $resource) {
           // before creating the resource picker because we need to catch the first changeResourceType event in order to
           // update the label (it won't be fired again when we set the value of the resource input unless the resource
           // type is different).
+          var base = this.getBase();
           $(this.getElement().$).on('changeResourceType', this.onResourceTypeChange.bind(this))
-            .find('input').resourcePicker({resourceTypes: this.resourceTypes});
+            .find('input').resourcePicker({
+              resourceTypes: this.resourceTypes,
+              base: base          
+            });
           // We register the selectResource event listener after creating the resource picker because we don't care
           // about the first selectResource event since we're going to trigger another one anyway by setting the value
           // of the resource input when the dialog is shown.
@@ -187,6 +191,14 @@ require(['jquery', 'resource', 'resourcePicker'], function ($, $resource) {
           $(this.getResourcePickerInput().$).val(serializedResourceReference).trigger('selectResource', {
             reference: resourceReference
           });
+        },
+        getBase: function () {
+          var currentInstance = CKEDITOR.currentInstance;
+          var base;
+          if (currentInstance) {
+            base = currentInstance.config.sourceDocument.documentReference;
+          }
+          return base;
         },
         //
         // Custom fields

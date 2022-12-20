@@ -66,8 +66,8 @@
 #####################
 #macro(view)
   ## Call getDefaultEditMode() for backward compatibility with existing skins.
-  * [[{{translation key="xe.admin.skin.editskin"/}}&gt;&gt;path:${doc.getURL($doc.getDefaultEditMode())}]]
-  * [[{{translation key="xe.admin.skin.testskin"/}}&gt;&gt;${services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))}||queryString="skin=${doc.fullName}"]]
+  * [[{{translation key="xe.admin.skin.editskin"/}}&gt;&gt;path:${services.rendering.escape($doc.getURL($doc.getDefaultEditMode()), 'xwiki/2.1')}]]
+  * [[{{translation key="xe.admin.skin.testskin"/}}&gt;&gt;${services.rendering.escape($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI')), 'xwiki/2.1')}||queryString="${services.rendering.escape($escapetool.url({"skin": $doc.fullName}), 'xwiki/2.1')}"]]
 #end
 #####################
 ##      EDIT
@@ -80,8 +80,10 @@
   #set ($class = $doc.getObject($className).xWikiClass)
   #foreach ($prop in $class.properties)
     #if ($prop.classType != 'TextArea')
-    ; $prop.prettyName
-    : #if($prop.name == 'logo'){{attachmentSelector classname="${className}" property="${prop.name}" filter="png,jpg,gif,svg" displayImage="true"/}}#else $doc.display($prop.name)#end
+    ; $services.rendering.escape($prop.prettyName, 'xwiki/2.1')
+    : #if($prop.name == 'logo')## Avoid line break
+      {{attachmentSelector classname="${className}" property="${services.rendering.escape($prop.name, 'xwiki/2.1')}" filter="png,jpg,gif,svg" displayImage="true"/}}## Avoid line break
+    #else$doc.display($prop.name)#end
     
     #else
       #set($discard = $deprecatedProperties.add($prop))
@@ -98,16 +100,16 @@
     {{html}}
     &lt;noscript&gt;
       &lt;div class="box errormessage"&gt;
-        $services.localization.render('skin.sheet.nojs', ["&lt;a href='$doc.getURL('edit', 'editor=object')'&gt;", '&lt;/a&gt;', 'XWiki.XWikiSkinFileOverrideClass'])
+        $escapetool.xml($services.localization.render('skin.sheet.nojs', ['LINK_START', 'LINK_END', 'XWiki.XWikiSkinFileOverrideClass'])).replace('LINK_START', "&lt;a href='$escapetool.xml($doc.getURL('edit', 'editor=object'))'&gt;").replace('LINK_END', '&lt;/a&gt;')
       &lt;/div&gt;
     &lt;/noscript&gt;
     {{/html}}
     
     {{html}}
     &lt;div id="addOverride"&gt;
-      &lt;label for="newPath" class="newPathLabel"&gt;$services.icon.renderHTML('add') $services.localization.render("skin.sheet.addTemplate")&lt;/label&gt;
+      &lt;label for="newPath" class="newPathLabel"&gt;$services.icon.renderHTML('add') $escapetool.xml($services.localization.render("skin.sheet.addTemplate"))&lt;/label&gt;
       &lt;input placeholder="file.vm" id="newPath" name="newPath" value="file.vm" size="20" class="withTip" type="text" /&gt;
-      &lt;button class="btn btn-primary" id="newPathAdd"&gt;$services.localization.render("skin.sheet.add")&lt;/button&gt;
+      &lt;button class="btn btn-primary" id="newPathAdd"&gt;$escapetool.xml($services.localization.render("skin.sheet.add"))&lt;/button&gt;
     &lt;/div&gt;
     {{/html}}
     ## Display the XWiki.XWikiSkinFileOverrideClass objects
@@ -127,7 +129,7 @@
       
       #foreach ($prop in $deprecatedProperties)
         #if ($prop.classType == 'TextArea')
-        ; $services.icon.render('file-white') $prop.prettyName
+        ; $services.icon.render('file-white') $services.rendering.escape($prop.prettyName, 'xwiki/2.1')
         : $doc.display($prop.name)
         
         #end
@@ -152,7 +154,7 @@
       #set ($className = 'XWiki.XWikiSkinFileOverrideClass')
       #set ($class = $doc.getObject($className).xWikiClass)
       #foreach ($prop in $class.properties)
-        ; $prop.prettyName
+        ; $services.rendering.escape($prop.prettyName, 'xwiki/2.1')
         : $obj.display($prop.name, 'edit')
     
       #end

@@ -20,7 +20,6 @@
 package org.xwiki.officeimporter.internal.splitter;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -79,27 +78,26 @@ public final class DocumentSplitterUtils
     }
 
     /**
-     * Move artifacts (i.e. embedded images) from the original office document to a specific wiki document corresponding
-     * to a section. Only the artifacts from that section are moved.
+     * Get the artifacts (i.e. embedded images) from the original office document that should be added
+     * a specific wiki document corresponding to a section.
+     *
+     * Note that in the end there may be reduntat attachments if the same file is
+     * referenced from several sections in the splitted document.
      * 
      * @param sectionDoc the newly created wiki document corresponding to a section of the original office document
-     * @param officeDocument the office document being splitted into wiki documents
+     * @param fileMap Map of files from the original document
      * @return the relocated artifacts
      */
-    public static Set<File> relocateArtifacts(WikiDocument sectionDoc, XDOMOfficeDocument officeDocument)
+    public static Set<File> getSectionArtifacts(WikiDocument sectionDoc, Map<String, File> fileMap)
     {
-        Set<File> artifacts = officeDocument.getArtifactsFiles();
         Set<File> result = new HashSet<>();
         List<ImageBlock> imageBlocks =
             sectionDoc.getXdom().getBlocks(new ClassBlockMatcher(ImageBlock.class), Axes.DESCENDANT);
         if (!imageBlocks.isEmpty()) {
-            Map<String, File> fileMap = new HashMap<>();
-            artifacts.forEach(item -> fileMap.put(item.getName(), item));
             for (ImageBlock imageBlock : imageBlocks) {
                 String imageReference = imageBlock.getReference().getReference();
                 File file = fileMap.get(imageReference);
                 result.add(file);
-                artifacts.remove(file);
             }
         }
         return result;

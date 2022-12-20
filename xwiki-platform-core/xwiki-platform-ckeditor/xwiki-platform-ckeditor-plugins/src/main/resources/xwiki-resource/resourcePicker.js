@@ -48,6 +48,7 @@ define('resourcePicker', [
     options = options || {};
 
     var resourcePicker = $(resourcePickerTemplate);
+    resourcePicker.data("options", options);
     element.on('selectResource', onSelectResource).hide().after(resourcePicker);
 
     // Compute the list of supported resource types.
@@ -181,7 +182,9 @@ define('resourcePicker', [
         reference: resourcePicker.find('input.resourceReference').val()
       };
     }
-    $resource.pickers[resourceReference.type](resourceReference).done(selectResource.bind(resourcePicker));
+    var base = (resourcePicker.data("options") || {}).base;
+    $resource.pickers[resourceReference.type](resourceReference, base)
+      .done(selectResource.bind(resourcePicker));
   };
 
   var selectResource = function(resource) {
@@ -289,6 +292,7 @@ define('resourcePicker', [
     resourceReferenceInput.typeahead('destroy');
     var suggester = $resource.suggesters[data.newValue];
     if (suggester) {
+      var base = (resourcePicker.data("options") || {}).base;
       resourceReferenceInput.on('keydown', stopPropagationIfShowingSuggestions).typeahead({
         afterSelect: selectResource.bind(resourcePicker),
         delay: 500,
@@ -316,7 +320,7 @@ define('resourcePicker', [
           suggester.retrieve({
             type: data.newValue,
             reference: resourceReference
-          }).done(callback);
+          }, base).done(callback);
         }
       });
     } else {

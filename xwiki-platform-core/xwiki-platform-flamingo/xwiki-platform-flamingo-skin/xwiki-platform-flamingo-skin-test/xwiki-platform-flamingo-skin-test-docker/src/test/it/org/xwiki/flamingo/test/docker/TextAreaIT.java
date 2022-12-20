@@ -108,8 +108,8 @@ class TextAreaIT
 
         viewPage = testUtils.gotoPage(testReference);
 
-        assertEquals("Failed to execute the [velocity] macro. "
-            + "Cause: [The execution of the [velocity] script macro is not allowed. "
+        assertEquals("Failed to execute the [velocity] macro. Cause:"
+            + " [The execution of the [velocity] script macro is not allowed in [xwiki:TextAreaIT.restricted.WebHome]. "
             + "Check the rights of its last author or the parameters if it's rendered from another script.]. "
             + "Click on this message for details.", viewPage.getContent());
     }

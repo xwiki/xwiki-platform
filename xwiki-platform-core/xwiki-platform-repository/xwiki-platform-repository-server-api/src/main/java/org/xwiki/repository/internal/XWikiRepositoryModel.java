@@ -91,6 +91,13 @@ public class XWikiRepositoryModel
     public static final LocalDocumentReference CONFIGURATION_REFERENCE =
         new LocalDocumentReference(EXTENSION_SPACENAME, "RepositoryConfig");
 
+    // Tools
+
+    /**
+     * @since 8.4RC1
+     */
+    public static final String PROPSUFFIX_EMPTYCOLLECTION = "_empty";
+
     // Properties
 
     public static final String PROP_EXTENSION_ID = "id";
@@ -108,6 +115,19 @@ public class XWikiRepositoryModel
     public static final String PROP_EXTENSION_WEBSITE = "website";
 
     public static final String PROP_EXTENSION_AUTHORS = "authors";
+
+    /**
+     * @since 15.0RC1
+     * @since 14.10.2
+     */
+    public static final String PROP_EXTENSION_PREVIOUSIDS = "previousIds";
+
+    /**
+     * @since 15.0RC1
+     * @since 14.10.2
+     */
+    public static final String PROP_EXTENSION_PREVIOUSIDS_EMPTY =
+        PROP_EXTENSION_PREVIOUSIDS + PROPSUFFIX_EMPTYCOLLECTION;
 
     public static final String PROP_EXTENSION_FEATURES = "features";
 
@@ -199,13 +219,6 @@ public class XWikiRepositoryModel
     public static final String PROP_EXTENSION_LASTVERSION = "lastVersion";
 
     public static final String PROP_EXTENSION_VALIDEXTENSION = "validExtension";
-
-    // Tools
-
-    /**
-     * @since 8.4RC1
-     */
-    public static final String PROPSUFFIX_EMPTYCOLLECTION = "_empty";
 
     // Solr
 

@@ -114,6 +114,9 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
         WikiDocument rootDoc = new WikiDocument(strBaseDoc, officeDocument.getContentDocument(), null);
         List<WikiDocument> documents = this.documentSplitter.split(rootDoc, splittingCriterion, namingCriterion);
 
+        final Map<String, File> fileMap = new HashMap<>();
+        officeDocument.getArtifactsFiles().forEach(item -> fileMap.put(item.getName(), item));
+
         for (WikiDocument doc : documents) {
             // Initialize a target page descriptor.
             DocumentReference targetReference = this.currentMixedDocumentReferenceResolver.resolve(doc.getFullName());
@@ -125,8 +128,8 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
                 targetDocumentDescriptor.setParentReference(targetParent);
             }
 
-            // Rewire artifacts.
-            Set<File> artifactsFiles = DocumentSplitterUtils.relocateArtifacts(doc, officeDocument);
+            // The artifact files to attach to the section document.
+            Set<File> artifactsFiles = DocumentSplitterUtils.getSectionArtifacts(doc, fileMap);
 
             // Create the resulting XDOMOfficeDocument.
             XDOMOfficeDocument splitDocument = new XDOMOfficeDocument(doc.getXdom(), artifactsFiles,

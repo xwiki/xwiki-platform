@@ -164,7 +164,6 @@ import org.xwiki.velocity.XWikiVelocityContext;
 import org.xwiki.velocity.XWikiVelocityException;
 import org.xwiki.xar.internal.model.XarDocumentModel;
 import org.xwiki.xml.XMLUtils;
-import org.xwiki.xml.html.HTMLUtils;
 
 import com.xpn.xwiki.CoreConfiguration;
 import com.xpn.xwiki.XWiki;
@@ -218,6 +217,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private static final String TM_FAILEDDOCUMENTPARSE = "core.document.error.failedParse";
 
     private static final String CLOSE_HTML_MACRO = "{{/html}}";
+
+    /**
+     * List of characters that are special in XWiki syntax or HTML.
+     */
+    private static final char[] SPECIAL_SYMBOLS = new char[] { '!', '"', '#', '$', '%', '&',
+        '\'', '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@', '[', ']', '^', '_', '`',
+        '{', '|', '}', '~', ']' };
 
     /**
      * An attachment waiting to be deleted at next document save.
@@ -3873,10 +3879,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             // We test if we're inside the rendering engine since it's also possible that this display() method is
             // called directly from a template and in this case we only want HTML as a result and not wiki syntax.
             // TODO: find a more generic way to handle html macro because this works only for XWiki 1.0 and XWiki 2.0
-            // Add the {{html}}{{/html}} only when result really contains html or { which could be part of an XWiki
-            // macro syntax since it's not needed for pure text
+            // Add the {{html}}{{/html}} only when result contains special characters from HTML or XWiki syntax since
+            // it's not needed for pure text
             if (isInRenderingEngine && !is10Syntax(wrappingSyntaxId)
-                && (HTMLUtils.containsElementText(result) || result.indexOf("{") != -1))
+                && StringUtils.containsAny(result, SPECIAL_SYMBOLS))
             {
                 result.insert(0, "{{html clean=\"false\" wiki=\"false\"}}");
                 // Escape closing HTML macro syntax.

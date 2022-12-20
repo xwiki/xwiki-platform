@@ -53,7 +53,7 @@ viewers.Attachments = Class.create({
   counter : 1,
   /** Constructor. Adds all the JS improvements of the Attachment area. */
   initialize : function() {
-    // Initialize the event listener to prepare the form when it's loaded, or prepare the form straight away.
+    // Initialize the event listener to prepare the form when the Attachments tab is loaded or reloaded, or prepare the form straight away.
     // prepareForm won't be called twice as it is skipped once #attachform exists. 
     this.addTabLoadListener();
     this.prepareForm();

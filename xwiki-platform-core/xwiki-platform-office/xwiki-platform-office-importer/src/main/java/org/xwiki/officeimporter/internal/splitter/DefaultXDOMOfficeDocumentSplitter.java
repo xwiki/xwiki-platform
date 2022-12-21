@@ -37,6 +37,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
+import org.xwiki.officeimporter.splitter.OfficeDocumentSplitterParameters;
 import org.xwiki.officeimporter.splitter.TargetDocumentDescriptor;
 import org.xwiki.officeimporter.splitter.XDOMOfficeDocumentSplitter;
 import org.xwiki.refactoring.WikiDocument;
@@ -97,20 +98,20 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
 
     @Override
     public Map<TargetDocumentDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument officeDocument,
-        int[] headingLevelsToSplit, String namingCriterionHint, DocumentReference baseDocumentReference)
-        throws OfficeImporterException
+        OfficeDocumentSplitterParameters parameters) throws OfficeImporterException
     {
-        // TODO: This code needs to be refactored along with the xwiki-refactoring module code.
-        String strBaseDoc = this.entityReferenceSerializer.serialize(baseDocumentReference);
         Map<TargetDocumentDescriptor, XDOMOfficeDocument> result =
             new HashMap<TargetDocumentDescriptor, XDOMOfficeDocument>();
 
         // Create splitting and naming criterion for refactoring.
-        SplittingCriterion splittingCriterion = new HeadingLevelSplittingCriterion(headingLevelsToSplit);
-        NamingCriterion namingCriterion = DocumentSplitterUtils.getNamingCriterion(
-            namingCriterionHint, strBaseDoc, this.docBridge, this.plainTextRenderer);
+        SplittingCriterion splittingCriterion =
+            new HeadingLevelSplittingCriterion(parameters.getHeadingLevelsToSplit());
+        NamingCriterion namingCriterion =
+            DocumentSplitterUtils.getNamingCriterion(parameters, this.docBridge, this.plainTextRenderer);
 
         // Create the root document required by refactoring module.
+        // TODO: This code needs to be refactored along with the xwiki-refactoring module code.
+        String strBaseDoc = this.entityReferenceSerializer.serialize(parameters.getBaseDocumentReference());
         WikiDocument rootDoc = new WikiDocument(strBaseDoc, officeDocument.getContentDocument(), null);
         List<WikiDocument> documents = this.documentSplitter.split(rootDoc, splittingCriterion, namingCriterion);
 

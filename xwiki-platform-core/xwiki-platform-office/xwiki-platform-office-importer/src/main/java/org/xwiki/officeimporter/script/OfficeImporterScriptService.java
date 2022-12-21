@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -34,9 +35,11 @@ import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
@@ -47,6 +50,7 @@ import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.officeimporter.server.OfficeServer.ServerState;
 import org.xwiki.officeimporter.server.OfficeServerConfiguration;
 import org.xwiki.officeimporter.server.OfficeServerException;
+import org.xwiki.officeimporter.splitter.OfficeDocumentSplitterParameters;
 import org.xwiki.officeimporter.splitter.TargetDocumentDescriptor;
 import org.xwiki.officeimporter.splitter.XDOMOfficeDocumentSplitter;
 import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
@@ -131,6 +135,9 @@ public class OfficeImporterScriptService implements ScriptService
 
     @Inject
     private ExtendedRenderingConfiguration extendedRenderingConfiguration;
+
+    @Inject
+    private EntityReferenceProvider defaultEntityReferenceProvider;
 
     /**
      * Imports the given office document into an {@link XHTMLOfficeDocument}.
@@ -268,12 +275,45 @@ public class OfficeImporterScriptService implements ScriptService
     public Map<TargetDocumentDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument xdomDocument,
         String[] headingLevels, String namingCriterionHint, DocumentReference rootDocumentReference)
     {
+        String defaultDocumentName =
+            this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName();
+        boolean useTerminalPages = !Objects.equals(rootDocumentReference.getName(), defaultDocumentName);
+        return split(xdomDocument, headingLevels, namingCriterionHint, useTerminalPages, rootDocumentReference);
+    }
+
+    /**
+     * Splits the given {@link XDOMOfficeDocument} into multiple {@link XDOMOfficeDocument} instances according to the
+     * specified criterion. This method is useful when a single office document has to be imported and split into
+     * multiple wiki pages. An auto generated TOC structure will be returned associated to <b>rootDocumentName</b>
+     * {@link TargetDocumentDescriptor} entry.
+     *
+     * @param xdomDocument {@link XDOMOfficeDocument} to be split
+     * @param headingLevels heading levels defining the split points on the original document
+     * @param namingCriterionHint hint indicating the child pages naming criterion
+     * @param useTerminalPages whether to create the child pages as terminal or not
+     * @param rootDocumentReference the reference of the root document w.r.t which splitting will occur; in the results
+     *            set the entry corresponding to the <b>root document</b> {@link TargetDocumentDescriptor} will hold an
+     *            auto-generated TOC structure
+     * @return a map holding {@link XDOMOfficeDocument} fragments against corresponding {@link TargetDocumentDescriptor}
+     *         instances or null if an error occurs
+     * @since 14.10.2
+     * @since 15.0RC1
+     */
+    public Map<TargetDocumentDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument xdomDocument,
+        String[] headingLevels, String namingCriterionHint, boolean useTerminalPages,
+        DocumentReference rootDocumentReference)
+    {
         int[] splitLevels = new int[headingLevels.length];
         for (int i = 0; i < headingLevels.length; i++) {
             splitLevels[i] = Integer.parseInt(headingLevels[i]);
         }
+        OfficeDocumentSplitterParameters parameters = new OfficeDocumentSplitterParameters();
+        parameters.setHeadingLevelsToSplit(splitLevels);
+        parameters.setNamingCriterionHint(namingCriterionHint);
+        parameters.setUseTerminalPages(useTerminalPages);
+        parameters.setBaseDocumentReference(rootDocumentReference);
         try {
-            return this.xdomSplitter.split(xdomDocument, splitLevels, namingCriterionHint, rootDocumentReference);
+            return this.xdomSplitter.split(xdomDocument, parameters);
         } catch (OfficeImporterException ex) {
             setErrorMessage(ex.getMessage());
             logger.error(ex.getMessage(), ex);
@@ -305,8 +345,8 @@ public class OfficeImporterScriptService implements ScriptService
     }
 
     /**
-     * Attempts to save the given {@link XDOMOfficeDocument} into the target wiki page specified by arguments (using
-     * the default content syntax, see {@link ExtendedRenderingConfiguration#getDefaultContentSyntax()}).
+     * Attempts to save the given {@link XDOMOfficeDocument} into the target wiki page specified by arguments (using the
+     * default content syntax, see {@link ExtendedRenderingConfiguration#getDefaultContentSyntax()}).
      *
      * @param doc {@link XDOMOfficeDocument} to be saved
      * @param documentReference the reference of the target wiki page
@@ -354,8 +394,8 @@ public class OfficeImporterScriptService implements ScriptService
                 if (!currentSyntaxId.equals(syntaxId)) {
                     String message =
                         "The target page [%s] exists but its syntax [%s] is different from the specified syntax [%s]";
-                    throw new OfficeImporterException(String.format(message, documentReference, currentSyntaxId,
-                        syntaxId));
+                    throw new OfficeImporterException(
+                        String.format(message, documentReference, currentSyntaxId, syntaxId));
                 }
 
                 // Append the content.

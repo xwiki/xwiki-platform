@@ -58,6 +58,12 @@
       <artifactId>xwiki-platform-test-ui</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- PR Test checker -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-checker</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>selenium</artifactId>

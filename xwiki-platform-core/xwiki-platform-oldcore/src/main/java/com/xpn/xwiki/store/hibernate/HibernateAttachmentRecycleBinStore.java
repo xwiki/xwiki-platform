@@ -138,7 +138,7 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
 
         try {
             DeletedAttachment deletedAttachment = getDeletedAttachment(index, context, bTransaction);
-            return deletedAttachment.restoreAttachment();
+            return deletedAttachment == null ? null : deletedAttachment.restoreAttachment();
         } finally {
             restoreExecutionXContext();
         }

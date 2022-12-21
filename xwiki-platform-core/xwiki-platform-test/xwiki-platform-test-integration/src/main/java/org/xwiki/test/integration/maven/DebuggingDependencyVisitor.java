@@ -19,6 +19,7 @@
  */
 package org.xwiki.test.integration.maven;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.graph.DependencyVisitor;
 import org.slf4j.Logger;
@@ -34,17 +35,28 @@ public class DebuggingDependencyVisitor implements DependencyVisitor
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(DebuggingDependencyVisitor.class);
 
+    private static final int SPACES_INCREMENT = 4;
+
+    private int level;
+
     @Override
     public boolean visitEnter(DependencyNode dependencyNode)
     {
-        LOGGER.info("Node enter: {}", dependencyNode.getArtifact());
+        printInfoLog(dependencyNode);
+        this.level += SPACES_INCREMENT;
         return true;
     }
 
     @Override
     public boolean visitLeave(DependencyNode dependencyNode)
     {
-        LOGGER.info("Node leave: {}", dependencyNode.getArtifact());
+        printInfoLog(dependencyNode);
+        this.level -= SPACES_INCREMENT;
         return true;
+    }
+
+    private void printInfoLog(DependencyNode dependencyNode)
+    {
+        LOGGER.info(StringUtils.repeat(" ", this.level) + "{}", dependencyNode.getArtifact());
     }
 }

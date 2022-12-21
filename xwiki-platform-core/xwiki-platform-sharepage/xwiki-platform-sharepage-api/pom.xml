@@ -24,24 +24,41 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-sharepage</artifactId>
     <version>15.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-sharepage</artifactId>
-  <name>XWiki Platform - Share Page - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>Share a wiki page by email</description>
-  <modules>
-    <!-- Sorted alphabetically -->
-    <module>xwiki-platform-sharepage-api</module>
-    <module>xwiki-platform-sharepage-ui</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-sharepage-test</module>
-      </modules>
-    </profile>
-  </profiles>
+  <artifactId>xwiki-platform-sharepage-api</artifactId>
+  <name>XWiki Platform - Share Page - API</name>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Share Page API</xwiki.extension.name>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-mailsender</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Needed to have an implementation for MailSenderConfiguration -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-mail-send-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Test dependencies. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-page</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-web-templates</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 </project>

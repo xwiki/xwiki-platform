@@ -85,25 +85,8 @@ public class SharePageIT
         setup.deletePage(this.testClassName, this.testMethodName);
     }
 
-    /**
-     * @todo move this test to a PageTest test (add support for testing templates first) and keep only 1 test in this
-     * functional test
-     */
     @Test
     @Order(1)
-    public void shareByEmailWhenNoFromAddress(TestUtils setup, TestConfiguration configuration) throws Exception
-    {
-        setup.updateObject("Mail", "MailConfig", "Mail.SendMailConfigClass", 0,
-            "host", configuration.getServletEngine().getHostIP(),
-            "port", "3025",
-            "sendWaitTime", "0",
-            "from", "");
-        shareByEmail(String.format("=?UTF-8?Q?superadmin?= <noreply@%s>",
-            configuration.getServletEngine().getInternalIP()), setup);
-    }
-
-    @Test
-    @Order(2)
     public void shareByEmailWhenFromAddressSpecified(TestUtils setup, TestConfiguration configuration) throws Exception
     {
         setup.updateObject("Mail", "MailConfig", "Mail.SendMailConfigClass", 0,
@@ -133,7 +116,6 @@ public class SharePageIT
         MimeMessage mimeMessage = this.mail.getReceivedMessages()[0];
         assertEquals("superadmin wants to share a document with you", mimeMessage.getSubject());
 
-        // Since we didn't specify any from email address, one is computed automatically, verify it.
         assertEquals(expectedEmail, mimeMessage.getFrom()[0].toString());
     }
 }

@@ -37,14 +37,7 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-mailsender</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- Needed to have an implementation for MailSenderConfiguration -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-mail-send-default</artifactId>
+      <artifactId>xwiki-platform-sharepage-api</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

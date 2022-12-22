@@ -65,7 +65,6 @@
 ###########################
   #set ($target = $request.target)
   #if ("$!target" != '')
-    ## Use the parent space if the target space is not specified.
     #set ($targetDocumentReference = $services.model.resolveDocument($target))
   #end
 ##########################
@@ -95,8 +94,7 @@
       $filterStyles))
     #if ($xdomOfficeDoc)
       #if (!$splitDocument)
-        #set ($result = $services.officeimporter.save($xdomOfficeDoc, $targetDocumentReference, $parentReference, $null,
-          $appendContent))
+        #set ($result = $services.officeimporter.save($xdomOfficeDoc, $targetDocumentReference, $appendContent))
         #if ($result)
           {{info}}
           $services.localization.render('xe.officeimporter.results.success', [$resultDocumentLink, $goBack])
@@ -109,14 +107,7 @@
           $terminalChildPages, $targetDocumentReference))
         #if ($docsMap)
           #foreach ($entry in $docsMap.entrySet())
-            #set ($targetDescriptor = $entry.key)
-            #set ($_parentReference = $targetDescriptor.parentReference)
-            #if (!$_parentReference)
-              ## Set the parent for the root document created by the split.
-              #set ($_parentReference = $parentReference)
-            #end
-            #set ($result = $services.officeimporter.save($entry.value, $targetDescriptor.documentReference,
-              $_parentReference, null, $appendContent))
+            #set ($result = $services.officeimporter.save($entry.value, $entry.key.documentReference, $appendContent))
             #if (!$result)
               {{warning}}$services.rendering.escape($services.officeimporter.errorMessage, 'xwiki/2.1'){{/warning}}
             #end

@@ -29,12 +29,13 @@ import java.util.Set;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
+import org.xwiki.officeimporter.splitter.OfficeDocumentSplitterParameters;
 import org.xwiki.refactoring.WikiDocument;
 import org.xwiki.refactoring.splitter.criterion.naming.HeadingNameNamingCriterion;
 import org.xwiki.refactoring.splitter.criterion.naming.NamingCriterion;
 import org.xwiki.refactoring.splitter.criterion.naming.PageIndexNamingCriterion;
-import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.Block.Axes;
+import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.renderer.BlockRenderer;
 
@@ -55,24 +56,24 @@ public final class DocumentSplitterUtils
     /**
      * Utility method for building a {@link NamingCriterion} based on the parameters provided.
      * 
-     * @param namingCriterionId naming criterion identifier.
-     * @param baseDocument reference document name to be used when generating names.
+     * @param parameters the split parameters
      * @param docBridge bridge needed by the actual {@link NamingCriterion} implementations
      * @param plainTextRenderer renderer needed by the actual {@link NamingCriterion} implementations
      * @return a {@link NamingCriterion} based on the parameters provided.
      * @throws OfficeImporterException if there is no naming criterion matching the given naming criterion id.
      */
-    public static NamingCriterion getNamingCriterion(String namingCriterionId, String baseDocument,
-        DocumentAccessBridge docBridge, BlockRenderer plainTextRenderer)
-        throws OfficeImporterException
+    public static NamingCriterion getNamingCriterion(OfficeDocumentSplitterParameters parameters,
+        DocumentAccessBridge docBridge, BlockRenderer plainTextRenderer) throws OfficeImporterException
     {
         // TODO: This code needs to be refactored along with the xwiki-refactoring module code.
-        if (namingCriterionId.equals("headingNames")) {
-            return new HeadingNameNamingCriterion(baseDocument, docBridge, plainTextRenderer, false);
-        } else if (namingCriterionId.equals("mainPageNameAndHeading")) {
-            return new HeadingNameNamingCriterion(baseDocument, docBridge, plainTextRenderer, true);
-        } else if (namingCriterionId.equals("mainPageNameAndNumbering")) {
-            return new PageIndexNamingCriterion(baseDocument, docBridge);
+        if (parameters.getNamingCriterionHint().equals("headingNames")) {
+            return new HeadingNameNamingCriterion(parameters.getBaseDocumentReference().toString(), docBridge,
+                plainTextRenderer, false);
+        } else if (parameters.getNamingCriterionHint().equals("mainPageNameAndHeading")) {
+            return new HeadingNameNamingCriterion(parameters.getBaseDocumentReference().toString(), docBridge,
+                plainTextRenderer, true);
+        } else if (parameters.getNamingCriterionHint().equals("mainPageNameAndNumbering")) {
+            return new PageIndexNamingCriterion(parameters.getBaseDocumentReference().toString(), docBridge);
         } else {
             throw new OfficeImporterException("The specified naming criterion is not implemented yet.");
         }

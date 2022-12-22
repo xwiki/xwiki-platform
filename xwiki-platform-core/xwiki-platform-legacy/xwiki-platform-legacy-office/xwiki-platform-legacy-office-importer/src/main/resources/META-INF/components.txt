@@ -3,3 +3,4 @@ org.xwiki.officeimporter.internal.openoffice.OpenOfficeManagerVelocityContextIni
 org.xwiki.officeimporter.internal.openoffice.OpenOfficeConfigurationVelocityContextInitializer
 org.xwiki.officeimporter.internal.openoffice.DefaultOpenOfficeConfiguration
 org.xwiki.officeimporter.internal.openoffice.DefaultOpenOfficeManager
+500:org.xwiki.officeimporter.script.LegacyOfficeImporterScriptService

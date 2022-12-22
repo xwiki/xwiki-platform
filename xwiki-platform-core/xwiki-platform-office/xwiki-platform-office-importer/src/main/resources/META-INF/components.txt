@@ -1,7 +1,9 @@
+org.xwiki.officeimporter.internal.ModelBridge
 org.xwiki.officeimporter.internal.builder.DefaultXHTMLOfficeDocumentBuilder
 org.xwiki.officeimporter.internal.builder.DefaultXDOMOfficeDocumentBuilder
 org.xwiki.officeimporter.internal.builder.DefaultPresentationBuilder
-org.xwiki.officeimporter.internal.splitter.DefaultXDOMOfficeDocumentSplitter
+org.xwiki.officeimporter.internal.cleaner.OfficeHTMLCleaner
+org.xwiki.officeimporter.internal.cleaner.WysiwygHTMLCleaner
 org.xwiki.officeimporter.internal.filter.AnchorFilter
 org.xwiki.officeimporter.internal.filter.ImageFilter
 org.xwiki.officeimporter.internal.filter.LineBreakFilter
@@ -11,10 +13,9 @@ org.xwiki.officeimporter.internal.filter.RedundancyFilter
 org.xwiki.officeimporter.internal.filter.StripperFilter
 org.xwiki.officeimporter.internal.filter.StyleFilter
 org.xwiki.officeimporter.internal.filter.TableFilter
-org.xwiki.officeimporter.internal.cleaner.OfficeHTMLCleaner
-org.xwiki.officeimporter.internal.cleaner.WysiwygHTMLCleaner
 org.xwiki.officeimporter.internal.server.DefaultOfficeServerConfiguration
 org.xwiki.officeimporter.internal.server.DefaultOfficeServer
 org.xwiki.officeimporter.internal.server.OfficeServerLifecycleListener
+org.xwiki.officeimporter.internal.splitter.DefaultXDOMOfficeDocumentSplitter
 org.xwiki.officeimporter.script.OfficeImporterScriptService
 org.xwiki.officeimporter.server.script.OfficeServerScriptService

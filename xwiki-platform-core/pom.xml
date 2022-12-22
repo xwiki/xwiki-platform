@@ -173,6 +173,47 @@
                 </item>
               </differences>
             </revapi.differences>
+            <revapi.differences>
+              <criticality>documented</criticality>
+              <justification>Added two methods to the office importer script service and moved deprecated methods to the legacy script service.</justification>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method org.xwiki.officeimporter.document.XDOMOfficeDocument org.xwiki.officeimporter.script.OfficeImporterScriptService::officeToXDOM(java.io.InputStream, java.lang.String, java.lang.String, boolean)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method org.xwiki.officeimporter.document.XHTMLOfficeDocument org.xwiki.officeimporter.script.OfficeImporterScriptService::officeToXHTML(java.io.InputStream, java.lang.String, java.lang.String, boolean)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.numberOfParametersChanged</code>
+                  <old>method boolean org.xwiki.officeimporter.script.OfficeImporterScriptService::save(org.xwiki.officeimporter.document.XDOMOfficeDocument, java.lang.String, java.lang.String, java.lang.String, java.lang.String, boolean)</old>
+                  <new>method boolean org.xwiki.officeimporter.script.OfficeImporterScriptService::save(org.xwiki.officeimporter.document.XDOMOfficeDocument, org.xwiki.model.reference.DocumentReference, boolean)</new>
+                  <justification>ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.numberOfParametersChanged</code>
+                  <old>method java.util.Map&lt;org.xwiki.officeimporter.splitter.TargetDocumentDescriptor, org.xwiki.officeimporter.document.XDOMOfficeDocument&gt; org.xwiki.officeimporter.script.OfficeImporterScriptService::split(org.xwiki.officeimporter.document.XDOMOfficeDocument, java.lang.String[], java.lang.String, java.lang.String)</old>
+                  <new>method java.util.Map&lt;org.xwiki.officeimporter.splitter.TargetDocumentDescriptor, org.xwiki.officeimporter.document.XDOMOfficeDocument&gt; org.xwiki.officeimporter.script.OfficeImporterScriptService::split(org.xwiki.officeimporter.document.XDOMOfficeDocument, java.lang.String[], java.lang.String, boolean, org.xwiki.model.reference.DocumentReference)</new>
+                  <justification>ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE</justification>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <criticality>highlight</criticality>
+              <justification>Added support for controlling whether the pages created by the office import splitter are terminal or not.</justification>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.addedToInterface</code>
+                  <new>method java.util.Map&lt;org.xwiki.officeimporter.splitter.TargetDocumentDescriptor, org.xwiki.officeimporter.document.XDOMOfficeDocument&gt; org.xwiki.officeimporter.splitter.XDOMOfficeDocumentSplitter::split(org.xwiki.officeimporter.document.XDOMOfficeDocument, org.xwiki.officeimporter.splitter.OfficeDocumentSplitterParameters) throws org.xwiki.officeimporter.OfficeImporterException</new>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

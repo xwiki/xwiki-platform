@@ -17,10 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officeimporter.script;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*;
+package org.xwiki.officeimporter.internal;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -35,33 +32,39 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxType;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 /**
- * Unit test for {@link org.xwiki.officeimporter.script.OfficeImporterScriptService}.
+ * Unit test for {@link ModelBridge}.
  * 
  * @version $Id$
  */
 @ComponentTest
-public class OfficeImporterScriptServiceTest
+class ModelBridgeTest
 {
-    /**
-     * A component manager that automatically mocks all dependencies of the component under test.
-     */
     @InjectMockComponents
-    private OfficeImporterScriptService officeImporterScriptService;
+    private ModelBridge modelBridge;
 
     @MockComponent
     private DocumentAccessBridge documentAccessBridge;
+
+    @MockComponent
+    private ContextualAuthorizationManager contextualAuthorizationManager;
 
     @XWikiTempDir
     private File tempDir;
 
     @Test
-    public void saveWithOverwrite() throws Exception
+    void saveWithOverwrite() throws Exception
     {
         XDOMOfficeDocument doc = mock(XDOMOfficeDocument.class);
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
@@ -76,11 +79,11 @@ public class OfficeImporterScriptServiceTest
             IOUtils.write(fileContent, fos);
         }
 
-        when(documentAccessBridge.isDocumentEditable(documentReference)).thenReturn(true);
+        when(this.contextualAuthorizationManager.hasAccess(Right.EDIT, documentReference)).thenReturn(true);
         when(doc.getContentAsString(syntaxId)).thenReturn(content);
         when(doc.getArtifactsFiles()).thenReturn(Collections.singleton(artifact));
 
-        assertTrue(officeImporterScriptService.save(doc, documentReference, syntaxId, parentReference, title, false));
+        this.modelBridge.save(doc, documentReference, syntaxId, parentReference, title, false);
 
         verify(documentAccessBridge).setDocumentSyntaxId(documentReference, syntaxId);
         verify(documentAccessBridge).setDocumentContent(documentReference, content, "Created by office importer.",
@@ -92,13 +95,13 @@ public class OfficeImporterScriptServiceTest
     }
 
     @Test
-    public void saveWithAppend() throws Exception
+    void saveWithAppend() throws Exception
     {
         XDOMOfficeDocument doc = mock(XDOMOfficeDocument.class);
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         String syntaxId = "test/1.0";
 
-        when(documentAccessBridge.isDocumentEditable(documentReference)).thenReturn(true);
+        when(this.contextualAuthorizationManager.hasAccess(Right.EDIT, documentReference)).thenReturn(true);
         when(documentAccessBridge.exists(documentReference)).thenReturn(true);
 
         DocumentModelBridge document = mock(DocumentModelBridge.class);
@@ -108,7 +111,7 @@ public class OfficeImporterScriptServiceTest
         when(documentAccessBridge.getDocumentContent(documentReference, null)).thenReturn("before");
         when(doc.getContentAsString(syntaxId)).thenReturn("after");
 
-        assertTrue(officeImporterScriptService.save(doc, documentReference, syntaxId, null, null, true));
+        this.modelBridge.save(doc, documentReference, syntaxId, null, null, true);
 
         verify(documentAccessBridge).setDocumentContent(documentReference, "before\nafter",
             "Updated by office importer.", false);

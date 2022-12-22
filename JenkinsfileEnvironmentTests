@@ -49,7 +49,7 @@ if (currentBuild.rawBuild.getCauses()[0].toString().contains('UserIdCause')) {
   def mainJob = jenkins.getItemByFullName("XWiki/xwiki-platform/${env.BRANCH_NAME ?: 'master'}")
   def lastMainJobBuild = mainJob?.getLastCompletedBuild()
   def lastMainJobBuildTime = lastMainJobBuild?.getTimeInMillis()
-  def lastBuildTime = currentBuild.raw.getPreviousBuild()?.getTimeInMillis()
+  def lastBuildTime = currentBuild.rawBuild.getPreviousBuild()?.getTimeInMillis()
   if (lastBuildTime != null && lastMainJobBuild != null && lastMainJobBuildTime > lastBuildTime) {
     buildDocker(params.type)
   } else if (lastMainJobBuild == null || lastBuildTime == null) {

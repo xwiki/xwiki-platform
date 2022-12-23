@@ -21,10 +21,12 @@ package org.xwiki.refactoring.splitter.criterion.naming;
 
 import java.io.StringReader;
 
+import org.junit.jupiter.api.Test;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.refactoring.internal.AbstractRefactoringTestCase;
 import org.xwiki.rendering.block.XDOM;
-import org.junit.Assert;
-import org.junit.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Test case for {@link PageIndexNamingCriterion}.
@@ -34,18 +36,15 @@ import org.junit.Test;
  */
 public class PageIndexNamingCriterionTest extends AbstractRefactoringTestCase
 {
-    /**
-     * Tests document names generated.
-     * 
-     * @throws Exception
-     */
     @Test
-    public void testDocumentNamesGeneration() throws Exception
+    public void getDocumentReference() throws Exception
     {
         XDOM xdom = xwikiParser.parse(new StringReader("=Test="));
-        NamingCriterion namingCriterion = new PageIndexNamingCriterion("Main.Test", docBridge);
+        DocumentReference documentReference = new DocumentReference("test", "Some", "Page");
+        NamingCriterion namingCriterion = new PageIndexNamingCriterion(documentReference, this.docBridge);
         for (int i = 1; i < 10; i++) {
-            Assert.assertEquals("Main.Test-" + i, namingCriterion.getDocumentName(xdom));
+            assertEquals(new DocumentReference("test", "Some", "Page-" + i),
+                namingCriterion.getDocumentReference(xdom));
         }
     }
 }

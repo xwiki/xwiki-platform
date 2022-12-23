@@ -19,7 +19,9 @@
  */
 package org.xwiki.refactoring.splitter.criterion.naming;
 
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.stability.Unstable;
 
 /**
  * Interface for defining various criteria for naming new documents generated while splitting.
@@ -30,16 +32,33 @@ import org.xwiki.rendering.block.XDOM;
 public interface NamingCriterion
 {
     /**
-     * Marker used to separate page indexes. 
+     * Marker used to separate page indexes.
      */
     String INDEX_SEPERATOR = "-";
-    
+
     /**
      * Generates a suitable name for the new document represented by 'newDoc' which is a result of the splitting
      * operation.
      * 
-     * @param newDoc the {@link XDOM} representing the newly split document.
-     * @return the name generated for the new document.
+     * @param newDoc the {@link XDOM} representing the newly split document
+     * @return the name generated for the new document
+     * @deprecated since 14.10.2, 15.0RC1 use {@link #getDocumentReference(XDOM)} instead
      */
-    String getDocumentName(XDOM newDoc);
+    @Deprecated
+    default String getDocumentName(XDOM newDoc)
+    {
+        return getDocumentReference(newDoc).toString();
+    }
+
+    /**
+     * Generates a suitable reference for the new document represented by 'newDoc' which is a result of the splitting
+     * operation.
+     * 
+     * @param newDoc the {@link XDOM} representing the newly split document
+     * @return the reference generated for the new document
+     * @since 14.10.2
+     * @since 15.0RC1
+     */
+    @Unstable
+    DocumentReference getDocumentReference(XDOM newDoc);
 }

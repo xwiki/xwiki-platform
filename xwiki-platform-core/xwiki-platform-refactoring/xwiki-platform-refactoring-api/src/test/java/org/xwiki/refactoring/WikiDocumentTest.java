@@ -20,6 +20,7 @@
 package org.xwiki.refactoring;
 
 import org.junit.Test;
+import org.xwiki.model.reference.DocumentReference;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -34,12 +35,12 @@ public class WikiDocumentTest
     @Test
     public void equalsTest()
     {
-        WikiDocument documentA = new WikiDocument("document.a", null, null);
-        WikiDocument documentA2 = new WikiDocument("document.a", null, null);
+        WikiDocument documentA = new WikiDocument(new DocumentReference("test", "Some", "Page"), null, null);
+        WikiDocument documentA2 = new WikiDocument(new DocumentReference("test", "Some", "Page"), null, null);
 
         assertEquals(documentA, documentA2);
 
-        WikiDocument documentB = new WikiDocument("document.b", null, null);
+        WikiDocument documentB = new WikiDocument(new DocumentReference("test", "Other", "Page"), null, null);
 
         assertNotEquals(documentA, documentB);
     }
@@ -47,12 +48,12 @@ public class WikiDocumentTest
     @Test
     public void hashCodeTest()
     {
-        WikiDocument documentA = new WikiDocument("document.a", null, null);
-        WikiDocument documentA2 = new WikiDocument("document.a", null, null);
+        WikiDocument documentA = new WikiDocument(new DocumentReference("test", "Some", "Page"), null, null);
+        WikiDocument documentA2 = new WikiDocument(new DocumentReference("test", "Some", "Page"), null, null);
 
         assertEquals(documentA.hashCode(), documentA2.hashCode());
 
-        WikiDocument documentB = new WikiDocument("document.b", null, null);
+        WikiDocument documentB = new WikiDocument(new DocumentReference("test", "Other", "Page"), null, null);
 
         assertNotEquals(documentA.hashCode(), documentB.hashCode());
     }

@@ -22,7 +22,10 @@ package org.xwiki.refactoring.splitter.criterion.naming;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.refactoring.internal.RefactoringUtils;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.stability.Unstable;
 
 /**
  * A {@link NamingCriterion} based on the name of the main document being split.
@@ -37,12 +40,12 @@ public class PageIndexNamingCriterion implements NamingCriterion
     /**
      * {@link DocumentAccessBridge} used to lookup for existing wiki pages and avoid name clashes.
      */
-    private DocumentAccessBridge docBridge;
+    private final DocumentAccessBridge docBridge;
 
     /**
-     * Base name to be used for generating new document names.
+     * Base reference to be used for generating new document references.
      */
-    private String baseDocumentName;
+    private final DocumentReference baseDocumentReference;
 
     /**
      * Current value of the post-fix appended to new document names.
@@ -54,34 +57,54 @@ public class PageIndexNamingCriterion implements NamingCriterion
      * 
      * @param baseDocumentName base name to be used for generating new document names.
      * @param docBridge {@link DocumentAccessBridge} used to lookup for documents.
+     * @deprecated since 14.10.2, 15.0RC1 use {@link #PageIndexNamingCriterion(DocumentReference, DocumentAccessBridge)}
+     *             instead
      */
+    @Deprecated
     public PageIndexNamingCriterion(String baseDocumentName, DocumentAccessBridge docBridge)
     {
-        this.baseDocumentName = baseDocumentName;
+        this(RefactoringUtils.resolveDocumentReference(baseDocumentName), docBridge);
+    }
+
+    /**
+     * Constructs a new {@link PageIndexNamingCriterion}.
+     * 
+     * @param baseDocumentReference base reference to be used for generating new document references
+     * @param docBridge {@link DocumentAccessBridge} used to lookup for documents
+     * @since 14.10.2
+     * @since 15.0RC1
+     */
+    @Unstable
+    public PageIndexNamingCriterion(DocumentReference baseDocumentReference, DocumentAccessBridge docBridge)
+    {
+        this.baseDocumentReference = baseDocumentReference;
         this.docBridge = docBridge;
     }
 
     @Override
-    public String getDocumentName(XDOM newDoc)
+    public DocumentReference getDocumentReference(XDOM newDoc)
     {
-        int newIndex = ++index;
-        String newDocumentName = baseDocumentName + INDEX_SEPERATOR + newIndex;
+        int newIndex = ++this.index;
+        DocumentReference newDocumentReference =
+            new DocumentReference(this.baseDocumentReference.getName() + INDEX_SEPERATOR + newIndex,
+                this.baseDocumentReference.getLastSpaceReference());
         // Resolve any name clashes.
         int localIndex = 0;
-        while (exists(newDocumentName)) {
+        while (exists(newDocumentReference)) {
             // Append a trailing local index if the page already exists
-            newDocumentName =
-                baseDocumentName + INDEX_SEPERATOR + newIndex + INDEX_SEPERATOR + (++localIndex);
+            newDocumentReference = new DocumentReference(
+                this.baseDocumentReference.getName() + INDEX_SEPERATOR + newIndex + INDEX_SEPERATOR + (++localIndex),
+                this.baseDocumentReference.getLastSpaceReference());
         }
-        return newDocumentName;
+        return newDocumentReference;
     }
 
-    private boolean exists(String document)
+    private boolean exists(DocumentReference documentReference)
     {
         try {
-            return this.docBridge.exists(document);
+            return this.docBridge.exists(documentReference);
         } catch (Exception e) {
-            LOGGER.error("Failed to check the existence of the document with reference [{}]", document, e);
+            LOGGER.error("Failed to check the existence of the document with reference [{}]", documentReference, e);
         }
 
         return false;

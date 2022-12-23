@@ -45,19 +45,16 @@ if (currentBuild.rawBuild.getCauses()[0].toString().contains('UserIdCause')) {
   // Only execute if the "XWiki/xwiki-platform/<current branch>" job's last execution date is later than this current
   // job's last execution date. In other words, don't re-run the environment tests if there's been no source code
   // changes. This helps save agent build time and is better for global warming (less energy used)!
-  def jenkins = Jenkins.getInstanceOrNull().get()
-  def mainJob = jenkins.getItemByFullName("XWiki/xwiki-platform/${env.BRANCH_NAME ?: 'master'}")
-  def lastMainJobBuild = mainJob?.getLastCompletedBuild()
-  def lastMainJobBuildTime = lastMainJobBuild?.getTimeInMillis()
-  def lastBuildTime = currentBuild.rawBuild.getPreviousBuild()?.getTimeInMillis()
-  if (lastBuildTime != null && lastMainJobBuild != null && lastMainJobBuildTime > lastBuildTime) {
+  def times = compareCurrentLastBuildTimeWithOtherJob("XWiki/xwiki-platform/${env.BRANCH_NAME ?: 'master'}")
+  if (times && times > 0) {
     buildDocker(params.type)
-  } else if (lastMainJobBuild == null || lastBuildTime == null) {
+  } else if (!times) {
     // Something is not right:
     // - there's no 'XWiki/xwiki-platform' job
     // - the 'XWiki/xwiki-platform' job has never been executed
     // - the current job has never been executed
     // In all these cases, we just execute the environment tests.
+    echoXWiki 'Error computing jobs last build times, triggering a docker tests build to be safe...'
     buildDocker(params.type)
   } else {
     echoXWiki 'Not executing the docker tests since there''s been no rebuild of "XWiki/xwiki-platform" since last execution. Aborting.'

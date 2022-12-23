@@ -32,9 +32,6 @@ import javax.inject.Singleton;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.splitter.OfficeDocumentSplitterParameters;
@@ -71,20 +68,6 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
     private BlockRenderer plainTextRenderer;
 
     /**
-     * Document name serializer used for serializing document names into strings.
-     */
-    @Inject
-    @Named("compactwiki")
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
-
-    /**
-     * Required for converting string document names to {@link org.xwiki.model.reference.DocumentReference} instances.
-     */
-    @Inject
-    @Named("currentmixed")
-    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
-
-    /**
      * The {@link DocumentSplitter} used for splitting wiki documents.
      */
     @Inject
@@ -110,20 +93,16 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
             DocumentSplitterUtils.getNamingCriterion(parameters, this.docBridge, this.plainTextRenderer);
 
         // Create the root document required by refactoring module.
-        // TODO: This code needs to be refactored along with the xwiki-refactoring module code.
-        String strBaseDoc = this.entityReferenceSerializer.serialize(parameters.getBaseDocumentReference());
-        WikiDocument rootDoc = new WikiDocument(strBaseDoc, officeDocument.getContentDocument(), null);
+        WikiDocument rootDoc =
+            new WikiDocument(parameters.getBaseDocumentReference(), officeDocument.getContentDocument(), null);
         List<WikiDocument> documents = this.documentSplitter.split(rootDoc, splittingCriterion, namingCriterion);
 
         for (WikiDocument doc : documents) {
             // Initialize a target page descriptor.
-            DocumentReference targetReference = this.currentMixedDocumentReferenceResolver.resolve(doc.getFullName());
             TargetDocumentDescriptor targetDocumentDescriptor =
-                new TargetDocumentDescriptor(targetReference, this.componentManager);
+                new TargetDocumentDescriptor(doc.getDocumentReference(), this.componentManager);
             if (doc.getParent() != null) {
-                DocumentReference targetParent =
-                    this.currentMixedDocumentReferenceResolver.resolve(doc.getParent().getFullName());
-                targetDocumentDescriptor.setParentReference(targetParent);
+                targetDocumentDescriptor.setParentReference(doc.getParent().getDocumentReference());
             }
 
             // Rewire artifacts.

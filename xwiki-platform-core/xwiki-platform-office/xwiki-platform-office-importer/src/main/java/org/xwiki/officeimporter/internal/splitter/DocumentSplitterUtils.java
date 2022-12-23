@@ -65,15 +65,14 @@ public final class DocumentSplitterUtils
     public static NamingCriterion getNamingCriterion(OfficeDocumentSplitterParameters parameters,
         DocumentAccessBridge docBridge, BlockRenderer plainTextRenderer) throws OfficeImporterException
     {
-        // TODO: This code needs to be refactored along with the xwiki-refactoring module code.
         if (parameters.getNamingCriterionHint().equals("headingNames")) {
-            return new HeadingNameNamingCriterion(parameters.getBaseDocumentReference().toString(), docBridge,
-                plainTextRenderer, false);
+            return new HeadingNameNamingCriterion(parameters.getBaseDocumentReference(), docBridge, plainTextRenderer,
+                false);
         } else if (parameters.getNamingCriterionHint().equals("mainPageNameAndHeading")) {
-            return new HeadingNameNamingCriterion(parameters.getBaseDocumentReference().toString(), docBridge,
-                plainTextRenderer, true);
+            return new HeadingNameNamingCriterion(parameters.getBaseDocumentReference(), docBridge, plainTextRenderer,
+                true);
         } else if (parameters.getNamingCriterionHint().equals("mainPageNameAndNumbering")) {
-            return new PageIndexNamingCriterion(parameters.getBaseDocumentReference().toString(), docBridge);
+            return new PageIndexNamingCriterion(parameters.getBaseDocumentReference(), docBridge);
         } else {
             throw new OfficeImporterException("The specified naming criterion is not implemented yet.");
         }

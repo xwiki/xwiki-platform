@@ -22,8 +22,11 @@ package org.xwiki.refactoring.internal.splitter;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Named;
+
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.refactoring.WikiDocument;
 import org.xwiki.refactoring.splitter.criterion.SplittingCriterion;
 import org.xwiki.refactoring.splitter.criterion.naming.NamingCriterion;
@@ -42,6 +45,7 @@ import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -62,6 +66,10 @@ class DefaultDocumentSplitterTest
 {
     @InjectMockComponents
     private DefaultDocumentSplitter splitter;
+
+    @MockComponent
+    @Named("compactwiki")
+    private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
 
     @Test
     void split() throws Exception
@@ -120,8 +128,14 @@ class DefaultDocumentSplitterTest
 
         NamingCriterion namingCriterion = mock(NamingCriterion.class);
 
+        DocumentReference baseDocumentReference = new DocumentReference("test", "Space", "Page");
         DocumentReference firstChildReference = new DocumentReference("test", "Space", "Child1");
         DocumentReference secondChildReference = new DocumentReference("test", "Space", "Child2");
+        when(this.compactWikiEntityReferenceSerializer.serialize(firstChildReference, baseDocumentReference))
+            .thenReturn("Space.Child1");
+        when(this.compactWikiEntityReferenceSerializer.serialize(firstChildReference, secondChildReference))
+            .thenReturn("Space.Child1");
+
         when(namingCriterion.getDocumentReference(any(XDOM.class))).thenReturn(firstChildReference,
             secondChildReference);
 
@@ -151,7 +165,7 @@ class DefaultDocumentSplitterTest
             new SectionBlock(Arrays.<Block>asList(header, new ParagraphBlock(Arrays.<Block>asList(link))));
 
         XDOM xdom = new XDOM(Arrays.<Block>asList(firstParagraph, secondParagraph, section1, section2));
-        WikiDocument document = new WikiDocument(new DocumentReference("test", "Space", "Page"), xdom, null);
+        WikiDocument document = new WikiDocument(baseDocumentReference, xdom, null);
 
         List<WikiDocument> result = this.splitter.split(document, splittingCriterion, namingCriterion);
 

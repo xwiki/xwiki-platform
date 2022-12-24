@@ -23,10 +23,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.refactoring.internal.RefactoringUtils;
 import org.xwiki.rendering.block.Block;
@@ -47,85 +53,87 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 1.9M1
  */
+@Component
+@Named("headingNames")
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class HeadingNameNamingCriterion implements NamingCriterion
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(HeadingNameNamingCriterion.class);
+    public static final String PARAM_PREPEND_BASE_PAGE_NAME = "prependBasePageName";
+
+    @Inject
+    private Logger logger;
 
     /**
-     * Used to render block to plain text.
+     * Plain text renderer used for rendering heading names.
      */
-    private final BlockRenderer plainSyntaxRenderer;
+    @Inject
+    @Named("plain/1.0")
+    private BlockRenderer plainTextRenderer;
 
     /**
      * {@link DocumentAccessBridge} used to lookup for existing wiki pages and avoid name clashes.
      */
-    private final DocumentAccessBridge docBridge;
+    @Inject
+    private DocumentAccessBridge docBridge;
 
     /**
      * In case if we cannot find a heading name present in the document, we will revert back to
      * {@link PageIndexNamingCriterion}.
      */
-    private final NamingCriterion mainPageNameAndNumberingNamingCriterion;
+    @Inject
+    @Named("mainPageNameAndNumbering")
+    private NamingCriterion mainPageNameAndNumberingNamingCriterion;
 
     /**
      * A list containing all the document references generated so far. This is used to avoid name clashes.
      */
     private final List<DocumentReference> documentReferences = new ArrayList<>();
 
-    /**
-     * The reference of the document being split.
-     */
-    private DocumentReference baseDocumentReference;
-
-    /**
-     * Flag indicating if each generated page name should be prepended with base page name.
-     */
-    private final boolean prependBasePageName;
+    private final NamingCriterionParameters parameters = new NamingCriterionParameters();
 
     /**
      * Constructs a new {@link HeadingNameNamingCriterion}.
      * 
      * @param baseDocumentName name of the document that is being split.
      * @param docBridge {@link DocumentAccessBridge} used to lookup for documents.
-     * @param plainSyntaxRenderer the renderer to convert to plain text
+     * @param plainTextRenderer the renderer to convert to plain text
      * @param prependBasePageName a flag indicating if each generated page name should be prepended with base page name.
-     * @deprecated since 14.10.2, 15.0RC1 use
-     *             {@link #HeadingNameNamingCriterion(DocumentReference, DocumentAccessBridge, BlockRenderer, boolean)}
-     *             instead
+     * @deprecated since 14.10.2, 15.0RC1 inject this as a component instead and set the base reference through
+     *             {@link #getParameters()}
      */
     @Deprecated
     public HeadingNameNamingCriterion(String baseDocumentName, DocumentAccessBridge docBridge,
-        BlockRenderer plainSyntaxRenderer, boolean prependBasePageName)
+        BlockRenderer plainTextRenderer, boolean prependBasePageName)
     {
-        this(RefactoringUtils.resolveDocumentReference(baseDocumentName), docBridge, plainSyntaxRenderer,
-            prependBasePageName);
+        this.parameters.setBaseDocumentReference(RefactoringUtils.resolveDocumentReference(baseDocumentName));
+        this.parameters.setParameter(PARAM_PREPEND_BASE_PAGE_NAME, prependBasePageName);
+
+        this.docBridge = docBridge;
+        this.plainTextRenderer = plainTextRenderer;
+        this.mainPageNameAndNumberingNamingCriterion = new PageIndexNamingCriterion(baseDocumentName, docBridge);
     }
 
     /**
-     * Constructs a new {@link HeadingNameNamingCriterion}.
+     * Implicit constructor. Don't use it directly. Use the component manager instead (e.g. through injection).
      * 
-     * @param baseDocumentReference reference of the document that is being split
-     * @param docBridge {@link DocumentAccessBridge} used to lookup for documents
-     * @param plainSyntaxRenderer the renderer to convert to plain text
-     * @param prependBasePageName a flag indicating if each generated page name should be prepended with base page name
      * @since 14.10.2
      * @since 15.0RC1
      */
     @Unstable
-    public HeadingNameNamingCriterion(DocumentReference baseDocumentReference, DocumentAccessBridge docBridge,
-        BlockRenderer plainSyntaxRenderer, boolean prependBasePageName)
+    public HeadingNameNamingCriterion()
     {
-        this.baseDocumentReference = baseDocumentReference;
-        this.docBridge = docBridge;
-        this.plainSyntaxRenderer = plainSyntaxRenderer;
-        this.prependBasePageName = prependBasePageName;
-        this.mainPageNameAndNumberingNamingCriterion = new PageIndexNamingCriterion(baseDocumentReference, docBridge);
+    }
+
+    @Override
+    public NamingCriterionParameters getParameters()
+    {
+        return this.parameters;
     }
 
     @Override
     public DocumentReference getDocumentReference(XDOM xdom)
     {
-        DocumentReference documentReference = truncate(computeDocumentReference(xdom));
+        DocumentReference documentReference = maybeTruncate(computeDocumentReference(xdom));
 
         // Resolve any name clashes.
         DocumentReference newDocumentReference = documentReference;
@@ -163,7 +171,7 @@ public class HeadingNameNamingCriterion implements NamingCriterion
                 XDOM heading = new XDOM(clonedHeaderBlock.getChildren());
 
                 WikiPrinter printer = new DefaultWikiPrinter();
-                this.plainSyntaxRenderer.render(heading, printer);
+                this.plainTextRenderer.render(heading, printer);
 
                 String headingName = cleanPageName(printer.toString());
                 return StringUtils.isEmpty(headingName) ? Optional.empty() : Optional.of(headingName);
@@ -175,27 +183,46 @@ public class HeadingNameNamingCriterion implements NamingCriterion
     private DocumentReference computeDocumentReference(XDOM xdom)
     {
         Optional<String> documentName = getFirstHeadingName(xdom);
+        DocumentReference baseDocumentReference = this.parameters.getBaseDocumentReference();
 
         // Fall back if necessary.
         if (documentName.isEmpty()) {
+            this.mainPageNameAndNumberingNamingCriterion.getParameters()
+                .setBaseDocumentReference(baseDocumentReference);
+            this.mainPageNameAndNumberingNamingCriterion.getParameters()
+                .setUseTerminalPages(this.parameters.isUseTerminalPages());
             return this.mainPageNameAndNumberingNamingCriterion.getDocumentReference(xdom);
-        } else if (this.prependBasePageName) {
-            return new DocumentReference(this.baseDocumentReference.getName() + INDEX_SEPERATOR + documentName,
-                this.baseDocumentReference.getLastSpaceReference());
+        } else if (this.parameters.getParameter(PARAM_PREPEND_BASE_PAGE_NAME, false)) {
+            return new DocumentReference(baseDocumentReference.getName() + INDEX_SEPERATOR + documentName.get(),
+                baseDocumentReference.getLastSpaceReference());
         } else {
-            return new DocumentReference(documentName.get(), this.baseDocumentReference.getLastSpaceReference());
+            return new DocumentReference(documentName.get(), baseDocumentReference.getLastSpaceReference());
         }
     }
 
-    private DocumentReference truncate(DocumentReference documentReference)
+    private DocumentReference maybeTruncate(DocumentReference documentReference)
     {
-        // TODO: Implement the truncate!
-        // TODO: the value should be asked to the store API instead of being hard-coded
-        // int maxWidth = (this.documentReferences.contains(documentReference) || exists(documentReference)) ? 765 :
-        // 768;
-        // if (documentName.length() > maxWidth) {
-        // documentName = documentName.substring(0, maxWidth);
-        // }
+        // Reserve 3 characters for the suffix needed to avoid name clashes in case the document reference was used
+        // previously or it exists already.
+        // TODO: The max length should be taken from the store API instead of being hard-coded.
+        int maxLength = (this.documentReferences.contains(documentReference) || exists(documentReference)) ? 765 : 768;
+
+        // We can only truncate the document name, so we can't do much if the base space reference is already too large.
+        // The document name can contain special characters that are escaped when serialized, requiring more length, so
+        // we can't simply subtract the document name length from the reference length to get the space reference
+        // length. Instead we have to compute another document reference without special characters in the name.
+        // Note: We're using toString() instead of a proper serializer in order to preserve backwards compatibility with
+        // old code that might still instantiate this class using the constructor.
+        int spaceReferenceLength =
+            new DocumentReference("x", documentReference.getLastSpaceReference()).toString().length() - 1;
+        if (spaceReferenceLength < maxLength) {
+            int maxDocumentNameLength = maxLength - spaceReferenceLength;
+            if (documentReference.getName().length() > maxDocumentNameLength) {
+                return new DocumentReference(documentReference.getName().substring(0, maxDocumentNameLength),
+                    documentReference.getLastSpaceReference());
+            }
+        }
+
         return documentReference;
     }
 
@@ -204,7 +231,8 @@ public class HeadingNameNamingCriterion implements NamingCriterion
         try {
             return this.docBridge.exists(documentReference);
         } catch (Exception e) {
-            LOGGER.error("Failed to check the existence of the document with reference [{}]", documentReference, e);
+            this.logger.warn("Failed to check the existence of the document with reference [{}]. Root cause is [{}].",
+                documentReference, ExceptionUtils.getRootCauseMessage(e));
         }
 
         return false;

@@ -19,9 +19,15 @@
  */
 package org.xwiki.refactoring.splitter.criterion.naming;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.refactoring.internal.RefactoringUtils;
 import org.xwiki.rendering.block.XDOM;
@@ -33,68 +39,74 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 1.9M1
  */
+@Component
+@Named("mainPageNameAndNumbering")
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class PageIndexNamingCriterion implements NamingCriterion
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PageIndexNamingCriterion.class);
+    @Inject
+    private Logger logger;
 
     /**
      * {@link DocumentAccessBridge} used to lookup for existing wiki pages and avoid name clashes.
      */
-    private final DocumentAccessBridge docBridge;
+    @Inject
+    private DocumentAccessBridge docBridge;
 
-    /**
-     * Base reference to be used for generating new document references.
-     */
-    private final DocumentReference baseDocumentReference;
+    private final NamingCriterionParameters parameters = new NamingCriterionParameters();
 
     /**
      * Current value of the post-fix appended to new document names.
      */
-    private int index = 0;
+    private int index;
 
     /**
      * Constructs a new {@link PageIndexNamingCriterion}.
      * 
      * @param baseDocumentName base name to be used for generating new document names.
      * @param docBridge {@link DocumentAccessBridge} used to lookup for documents.
-     * @deprecated since 14.10.2, 15.0RC1 use {@link #PageIndexNamingCriterion(DocumentReference, DocumentAccessBridge)}
-     *             instead
+     * @deprecated since 14.10.2, 15.0RC1 inject this as a component instead and set the base reference through
+     *             {@link #getParameters()}
      */
     @Deprecated
     public PageIndexNamingCriterion(String baseDocumentName, DocumentAccessBridge docBridge)
     {
-        this(RefactoringUtils.resolveDocumentReference(baseDocumentName), docBridge);
+        this.parameters.setBaseDocumentReference(RefactoringUtils.resolveDocumentReference(baseDocumentName));
+        this.docBridge = docBridge;
     }
 
     /**
-     * Constructs a new {@link PageIndexNamingCriterion}.
+     * Implicit constructor. Don't use it directly. Use the component manager instead (e.g. through injection).
      * 
-     * @param baseDocumentReference base reference to be used for generating new document references
-     * @param docBridge {@link DocumentAccessBridge} used to lookup for documents
      * @since 14.10.2
      * @since 15.0RC1
      */
     @Unstable
-    public PageIndexNamingCriterion(DocumentReference baseDocumentReference, DocumentAccessBridge docBridge)
+    public PageIndexNamingCriterion()
     {
-        this.baseDocumentReference = baseDocumentReference;
-        this.docBridge = docBridge;
+    }
+
+    @Override
+    public NamingCriterionParameters getParameters()
+    {
+        return this.parameters;
     }
 
     @Override
     public DocumentReference getDocumentReference(XDOM newDoc)
     {
         int newIndex = ++this.index;
+        DocumentReference baseDocumentReference = this.parameters.getBaseDocumentReference();
         DocumentReference newDocumentReference =
-            new DocumentReference(this.baseDocumentReference.getName() + INDEX_SEPERATOR + newIndex,
-                this.baseDocumentReference.getLastSpaceReference());
+            new DocumentReference(baseDocumentReference.getName() + INDEX_SEPERATOR + newIndex,
+                baseDocumentReference.getLastSpaceReference());
         // Resolve any name clashes.
         int localIndex = 0;
         while (exists(newDocumentReference)) {
             // Append a trailing local index if the page already exists
             newDocumentReference = new DocumentReference(
-                this.baseDocumentReference.getName() + INDEX_SEPERATOR + newIndex + INDEX_SEPERATOR + (++localIndex),
-                this.baseDocumentReference.getLastSpaceReference());
+                baseDocumentReference.getName() + INDEX_SEPERATOR + newIndex + INDEX_SEPERATOR + (++localIndex),
+                baseDocumentReference.getLastSpaceReference());
         }
         return newDocumentReference;
     }
@@ -104,7 +116,8 @@ public class PageIndexNamingCriterion implements NamingCriterion
         try {
             return this.docBridge.exists(documentReference);
         } catch (Exception e) {
-            LOGGER.error("Failed to check the existence of the document with reference [{}]", documentReference, e);
+            this.logger.warn("Failed to check the existence of the document with reference [{}]. Root cause is [{}].",
+                documentReference, ExceptionUtils.getRootCauseMessage(e));
         }
 
         return false;

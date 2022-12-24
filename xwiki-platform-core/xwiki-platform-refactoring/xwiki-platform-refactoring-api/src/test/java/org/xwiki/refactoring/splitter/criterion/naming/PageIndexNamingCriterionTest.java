@@ -19,14 +19,24 @@
  */
 package org.xwiki.refactoring.splitter.criterion.naming;
 
-import java.io.StringReader;
+import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.refactoring.internal.AbstractRefactoringTestCase;
+import org.xwiki.rendering.block.HeaderBlock;
+import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.listener.HeaderLevel;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 /**
  * Test case for {@link PageIndexNamingCriterion}.
@@ -34,17 +44,37 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @version $Id$
  * @since 1.9M1
  */
-public class PageIndexNamingCriterionTest extends AbstractRefactoringTestCase
+@ComponentTest
+class PageIndexNamingCriterionTest
 {
+    @InjectMockComponents
+    private PageIndexNamingCriterion namingCriterion;
+
+    @MockComponent
+    private DocumentAccessBridge docBridge;
+
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+
     @Test
-    public void getDocumentReference() throws Exception
+    void getDocumentReference() throws Exception
     {
-        XDOM xdom = xwikiParser.parse(new StringReader("=Test="));
         DocumentReference documentReference = new DocumentReference("test", "Some", "Page");
-        NamingCriterion namingCriterion = new PageIndexNamingCriterion(documentReference, this.docBridge);
+        this.namingCriterion.getParameters().setBaseDocumentReference(documentReference);
+
+        XDOM xdom = new XDOM(Arrays.asList(new HeaderBlock(Arrays.asList(new WordBlock("Title")), HeaderLevel.LEVEL1)));
         for (int i = 1; i < 10; i++) {
             assertEquals(new DocumentReference("test", "Some", "Page-" + i),
-                namingCriterion.getDocumentReference(xdom));
+                this.namingCriterion.getDocumentReference(xdom));
         }
+
+        when(this.docBridge.exists(new DocumentReference("test", "Some", "Page-10"))).thenReturn(true);
+        when(this.docBridge.exists(new DocumentReference("test", "Some", "Page-10-1")))
+            .thenThrow(new RuntimeException("Reason"));
+        assertEquals(new DocumentReference("test", "Some", "Page-10-1"),
+            this.namingCriterion.getDocumentReference(xdom));
+        assertEquals("Failed to check the existence of the document with reference [test:Some.Page-10-1]."
+            + " Root cause is [RuntimeException: Reason].", this.logCapture.getMessage(0));
+        assertEquals(new DocumentReference("test", "Some", "Page-11"), this.namingCriterion.getDocumentReference(xdom));
     }
 }

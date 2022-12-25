@@ -21,16 +21,18 @@ package org.xwiki.officeimporter.internal.splitter;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
@@ -42,7 +44,9 @@ import org.xwiki.refactoring.splitter.DocumentSplitter;
 import org.xwiki.refactoring.splitter.criterion.HeadingLevelSplittingCriterion;
 import org.xwiki.refactoring.splitter.criterion.SplittingCriterion;
 import org.xwiki.refactoring.splitter.criterion.naming.NamingCriterion;
-import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.block.Block.Axes;
+import org.xwiki.rendering.block.ImageBlock;
+import org.xwiki.rendering.block.match.ClassBlockMatcher;
 
 /**
  * Default implementation of {@link XDOMOfficeDocumentSplitter}.
@@ -55,19 +59,6 @@ import org.xwiki.rendering.renderer.BlockRenderer;
 public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSplitter
 {
     /**
-     * Document access bridge.
-     */
-    @Inject
-    private DocumentAccessBridge docBridge;
-
-    /**
-     * Plain text renderer used for rendering heading names.
-     */
-    @Inject
-    @Named("plain/1.0")
-    private BlockRenderer plainTextRenderer;
-
-    /**
      * The {@link DocumentSplitter} used for splitting wiki documents.
      */
     @Inject
@@ -77,20 +68,28 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
      * Used by {@link org.xwiki.officeimporter.splitter.TargetDocumentDescriptor}.
      */
     @Inject
-    private ComponentManager componentManager;
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
 
     @Override
     public Map<TargetDocumentDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument officeDocument,
         OfficeDocumentSplitterParameters parameters) throws OfficeImporterException
     {
+        ComponentManager componentManager = this.componentManagerProvider.get();
         Map<TargetDocumentDescriptor, XDOMOfficeDocument> result =
             new HashMap<TargetDocumentDescriptor, XDOMOfficeDocument>();
 
         // Create splitting and naming criterion for refactoring.
         SplittingCriterion splittingCriterion =
             new HeadingLevelSplittingCriterion(parameters.getHeadingLevelsToSplit());
-        NamingCriterion namingCriterion =
-            DocumentSplitterUtils.getNamingCriterion(parameters, this.docBridge, this.plainTextRenderer);
+        NamingCriterion namingCriterion;
+        try {
+            namingCriterion = componentManager.getInstance(NamingCriterion.class, parameters.getNamingCriterionHint());
+        } catch (ComponentLookupException e) {
+            throw new OfficeImporterException("Failed to create the naming criterion.", e);
+        }
+        namingCriterion.getParameters().setBaseDocumentReference(parameters.getBaseDocumentReference());
+        namingCriterion.getParameters().setUseTerminalPages(parameters.isUseTerminalPages());
 
         // Create the root document required by refactoring module.
         WikiDocument rootDoc =
@@ -100,20 +99,47 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
         for (WikiDocument doc : documents) {
             // Initialize a target page descriptor.
             TargetDocumentDescriptor targetDocumentDescriptor =
-                new TargetDocumentDescriptor(doc.getDocumentReference(), this.componentManager);
+                new TargetDocumentDescriptor(doc.getDocumentReference(), componentManager);
             if (doc.getParent() != null) {
                 targetDocumentDescriptor.setParentReference(doc.getParent().getDocumentReference());
             }
 
             // Rewire artifacts.
-            Set<File> artifactsFiles = DocumentSplitterUtils.relocateArtifacts(doc, officeDocument);
+            Set<File> artifactsFiles = relocateArtifacts(doc, officeDocument);
 
             // Create the resulting XDOMOfficeDocument.
-            XDOMOfficeDocument splitDocument = new XDOMOfficeDocument(doc.getXdom(), artifactsFiles,
-                this.componentManager, officeDocument.getConverterResult());
+            XDOMOfficeDocument splitDocument = new XDOMOfficeDocument(doc.getXdom(), artifactsFiles, componentManager,
+                officeDocument.getConverterResult());
             result.put(targetDocumentDescriptor, splitDocument);
         }
 
+        return result;
+    }
+
+    /**
+     * Move artifacts (i.e. embedded images) from the original office document to a specific wiki document corresponding
+     * to a section. Only the artifacts from that section are moved.
+     * 
+     * @param sectionDoc the newly created wiki document corresponding to a section of the original office document
+     * @param officeDocument the office document being splitted into wiki documents
+     * @return the relocated artifacts
+     */
+    private Set<File> relocateArtifacts(WikiDocument sectionDoc, XDOMOfficeDocument officeDocument)
+    {
+        Set<File> artifacts = officeDocument.getArtifactsFiles();
+        Set<File> result = new HashSet<>();
+        List<ImageBlock> imageBlocks =
+            sectionDoc.getXdom().getBlocks(new ClassBlockMatcher(ImageBlock.class), Axes.DESCENDANT);
+        if (!imageBlocks.isEmpty()) {
+            Map<String, File> fileMap = new HashMap<>();
+            artifacts.forEach(item -> fileMap.put(item.getName(), item));
+            for (ImageBlock imageBlock : imageBlocks) {
+                String imageReference = imageBlock.getReference().getReference();
+                File file = fileMap.get(imageReference);
+                result.add(file);
+                artifacts.remove(file);
+            }
+        }
         return result;
     }
 }

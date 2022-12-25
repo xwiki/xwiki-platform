@@ -263,6 +263,22 @@
                 <item>
                   <ignore>true</ignore>
                   <code>java.annotation.added</code>
+                  <old>field org.xwiki.refactoring.splitter.criterion.naming.HeadingNameNamingCriterion.docBridge</old>
+                  <new>field org.xwiki.refactoring.splitter.criterion.naming.AbstractNamingCriterion.docBridge @ org.xwiki.refactoring.splitter.criterion.naming.HeadingNameNamingCriterion</new>
+                  <annotation>@javax.inject.Inject</annotation>
+                  <justification>ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
+                  <old>class org.xwiki.refactoring.splitter.criterion.naming.HeadingNameNamingCriterion</old>
+                  <new>class org.xwiki.refactoring.splitter.criterion.naming.HeadingNameNamingCriterion</new>
+                  <superClass>org.xwiki.refactoring.splitter.criterion.naming.AbstractNamingCriterion</superClass>
+                  <justification>ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.added</code>
                   <old>class org.xwiki.refactoring.splitter.criterion.naming.PageIndexNamingCriterion</old>
                   <new>class org.xwiki.refactoring.splitter.criterion.naming.PageIndexNamingCriterion</new>
                   <annotation>@javax.inject.Named("mainPageNameAndNumbering")</annotation>
@@ -280,6 +296,22 @@
                   <old>class org.xwiki.refactoring.splitter.criterion.naming.PageIndexNamingCriterion</old>
                   <new>class org.xwiki.refactoring.splitter.criterion.naming.PageIndexNamingCriterion</new>
                   <annotation>@org.xwiki.component.annotation.InstantiationStrategy(org.xwiki.component.descriptor.ComponentInstantiationStrategy.PER_LOOKUP)</annotation>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.added</code>
+                  <old>field org.xwiki.refactoring.splitter.criterion.naming.PageIndexNamingCriterion.docBridge</old>
+                  <new>field org.xwiki.refactoring.splitter.criterion.naming.AbstractNamingCriterion.docBridge @ org.xwiki.refactoring.splitter.criterion.naming.PageIndexNamingCriterion</new>
+                  <annotation>@javax.inject.Inject</annotation>
+                  <justification>ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
+                  <old>class org.xwiki.refactoring.splitter.criterion.naming.PageIndexNamingCriterion</old>
+                  <new>class org.xwiki.refactoring.splitter.criterion.naming.PageIndexNamingCriterion</new>
+                  <superClass>org.xwiki.refactoring.splitter.criterion.naming.AbstractNamingCriterion</superClass>
+                  <justification>ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE</justification>
                 </item>
               </differences>
             </revapi.differences>

@@ -71,13 +71,32 @@ class HeadingNameNamingCriterionTest
     @Test
     void getDocumentReference() throws Exception
     {
+        this.namingCriterion.getParameters()
+            .setBaseDocumentReference(new DocumentReference("test", "Parent", "WebHome"));
+
+        XDOM xdom = this.xwikiParser.parse(new StringReader("=Child="));
+        Block sectionBlock = xdom.getChildren().get(0);
+        // Test normal heading-name naming for nested page.
+        assertEquals(new DocumentReference("test", Arrays.asList("Parent", "Child"), "WebHome"),
+            this.namingCriterion.getDocumentReference(new XDOM(sectionBlock.getChildren())));
+
+        this.namingCriterion.getParameters().setUseTerminalPages(true);
+        assertEquals(new DocumentReference("test", "Parent", "Child"),
+            this.namingCriterion.getDocumentReference(new XDOM(sectionBlock.getChildren())));
+
         this.namingCriterion.getParameters().setBaseDocumentReference(new DocumentReference("test", "Test", "Test"));
 
-        XDOM xdom = this.xwikiParser.parse(new StringReader("=Heading="));
-        Block sectionBlock = xdom.getChildren().get(0);
-        // Test normal heading-name naming
+        xdom = this.xwikiParser.parse(new StringReader("=Heading="));
+        sectionBlock = xdom.getChildren().get(0);
+        // Test normal heading-name naming for terminal page.
         assertEquals(new DocumentReference("test", "Test", "Heading"),
             this.namingCriterion.getDocumentReference(new XDOM(sectionBlock.getChildren())));
+
+        this.namingCriterion.getParameters().setUseTerminalPages(false);
+        assertEquals(new DocumentReference("test", Arrays.asList("Test", "Heading"), "WebHome"),
+            this.namingCriterion.getDocumentReference(new XDOM(sectionBlock.getChildren())));
+        this.namingCriterion.getParameters().setUseTerminalPages(true);
+
         // Test name clash resolution
         assertEquals(new DocumentReference("test", "Test", "Heading-1"),
             this.namingCriterion.getDocumentReference(new XDOM(sectionBlock.getChildren())));
@@ -140,9 +159,10 @@ class HeadingNameNamingCriterionTest
     @Test
     void getDocumentName() throws Exception
     {
-        this.namingCriterion.getParameters().setBaseDocumentReference(new DocumentReference("test", "Some", "Page"));
+        this.namingCriterion.getParameters()
+            .setBaseDocumentReference(new DocumentReference("test", "Parent", "WebHome"));
 
-        XDOM xdom = new XDOM(Arrays.asList(new HeaderBlock(Arrays.asList(new WordBlock("Title")), HeaderLevel.LEVEL1)));
-        assertEquals("test:Some.Title", this.namingCriterion.getDocumentName(xdom));
+        XDOM xdom = new XDOM(Arrays.asList(new HeaderBlock(Arrays.asList(new WordBlock("Child")), HeaderLevel.LEVEL1)));
+        assertEquals("test:Parent.Child.WebHome", this.namingCriterion.getDocumentName(xdom));
     }
 }

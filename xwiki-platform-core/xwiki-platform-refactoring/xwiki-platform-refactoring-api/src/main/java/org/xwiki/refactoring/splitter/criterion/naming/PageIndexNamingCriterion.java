@@ -19,11 +19,8 @@
  */
 package org.xwiki.refactoring.splitter.criterion.naming;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
@@ -42,19 +39,8 @@ import org.xwiki.stability.Unstable;
 @Component
 @Named("mainPageNameAndNumbering")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class PageIndexNamingCriterion implements NamingCriterion
+public class PageIndexNamingCriterion extends AbstractNamingCriterion
 {
-    @Inject
-    private Logger logger;
-
-    /**
-     * {@link DocumentAccessBridge} used to lookup for existing wiki pages and avoid name clashes.
-     */
-    @Inject
-    private DocumentAccessBridge docBridge;
-
-    private final NamingCriterionParameters parameters = new NamingCriterionParameters();
-
     /**
      * Current value of the post-fix appended to new document names.
      */
@@ -71,7 +57,7 @@ public class PageIndexNamingCriterion implements NamingCriterion
     @Deprecated
     public PageIndexNamingCriterion(String baseDocumentName, DocumentAccessBridge docBridge)
     {
-        this.parameters.setBaseDocumentReference(RefactoringUtils.resolveDocumentReference(baseDocumentName));
+        getParameters().setBaseDocumentReference(RefactoringUtils.resolveDocumentReference(baseDocumentName));
         this.docBridge = docBridge;
     }
 
@@ -87,39 +73,17 @@ public class PageIndexNamingCriterion implements NamingCriterion
     }
 
     @Override
-    public NamingCriterionParameters getParameters()
-    {
-        return this.parameters;
-    }
-
-    @Override
     public DocumentReference getDocumentReference(XDOM newDoc)
     {
         int newIndex = ++this.index;
-        DocumentReference baseDocumentReference = this.parameters.getBaseDocumentReference();
-        DocumentReference newDocumentReference =
-            new DocumentReference(baseDocumentReference.getName() + INDEX_SEPERATOR + newIndex,
-                baseDocumentReference.getLastSpaceReference());
+        DocumentReference newDocumentReference = newDocumentReference(getBasePageName() + INDEX_SEPERATOR + newIndex);
         // Resolve any name clashes.
         int localIndex = 0;
         while (exists(newDocumentReference)) {
             // Append a trailing local index if the page already exists
-            newDocumentReference = new DocumentReference(
-                baseDocumentReference.getName() + INDEX_SEPERATOR + newIndex + INDEX_SEPERATOR + (++localIndex),
-                baseDocumentReference.getLastSpaceReference());
+            newDocumentReference =
+                newDocumentReference(getBasePageName() + INDEX_SEPERATOR + newIndex + INDEX_SEPERATOR + (++localIndex));
         }
         return newDocumentReference;
-    }
-
-    private boolean exists(DocumentReference documentReference)
-    {
-        try {
-            return this.docBridge.exists(documentReference);
-        } catch (Exception e) {
-            this.logger.warn("Failed to check the existence of the document with reference [{}]. Root cause is [{}].",
-                documentReference, ExceptionUtils.getRootCauseMessage(e));
-        }
-
-        return false;
     }
 }

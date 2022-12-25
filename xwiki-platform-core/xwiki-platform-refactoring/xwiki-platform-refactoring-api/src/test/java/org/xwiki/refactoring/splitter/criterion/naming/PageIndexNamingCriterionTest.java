@@ -59,8 +59,8 @@ class PageIndexNamingCriterionTest
     @Test
     void getDocumentReference() throws Exception
     {
-        DocumentReference documentReference = new DocumentReference("test", "Some", "Page");
-        this.namingCriterion.getParameters().setBaseDocumentReference(documentReference);
+        this.namingCriterion.getParameters().setBaseDocumentReference(new DocumentReference("test", "Some", "Page"));
+        this.namingCriterion.getParameters().setUseTerminalPages(true);
 
         XDOM xdom = new XDOM(Arrays.asList(new HeaderBlock(Arrays.asList(new WordBlock("Title")), HeaderLevel.LEVEL1)));
         for (int i = 1; i < 10; i++) {
@@ -68,13 +68,24 @@ class PageIndexNamingCriterionTest
                 this.namingCriterion.getDocumentReference(xdom));
         }
 
-        when(this.docBridge.exists(new DocumentReference("test", "Some", "Page-10"))).thenReturn(true);
-        when(this.docBridge.exists(new DocumentReference("test", "Some", "Page-10-1")))
+        this.namingCriterion.getParameters().setUseTerminalPages(false);
+
+        when(this.docBridge.exists(new DocumentReference("test", Arrays.asList("Some", "Page-10"), "WebHome")))
+            .thenReturn(true);
+        when(this.docBridge.exists(new DocumentReference("test", Arrays.asList("Some", "Page-10-1"), "WebHome")))
             .thenThrow(new RuntimeException("Reason"));
-        assertEquals(new DocumentReference("test", "Some", "Page-10-1"),
+        assertEquals(new DocumentReference("test", Arrays.asList("Some", "Page-10-1"), "WebHome"),
             this.namingCriterion.getDocumentReference(xdom));
-        assertEquals("Failed to check the existence of the document with reference [test:Some.Page-10-1]."
+        assertEquals("Failed to check the existence of the document with reference [test:Some.Page-10-1.WebHome]."
             + " Root cause is [RuntimeException: Reason].", this.logCapture.getMessage(0));
-        assertEquals(new DocumentReference("test", "Some", "Page-11"), this.namingCriterion.getDocumentReference(xdom));
+
+        this.namingCriterion.getParameters()
+            .setBaseDocumentReference(new DocumentReference("test", "TopPage", "WebHome"));
+        assertEquals(new DocumentReference("test", Arrays.asList("TopPage", "TopPage-11"), "WebHome"),
+            this.namingCriterion.getDocumentReference(xdom));
+
+        this.namingCriterion.getParameters().setUseTerminalPages(true);
+        assertEquals(new DocumentReference("test", "TopPage", "TopPage-12"),
+            this.namingCriterion.getDocumentReference(xdom));
     }
 }

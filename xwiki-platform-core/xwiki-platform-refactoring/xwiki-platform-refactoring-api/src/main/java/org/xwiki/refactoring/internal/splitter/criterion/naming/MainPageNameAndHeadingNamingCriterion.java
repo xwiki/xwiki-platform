@@ -17,35 +17,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officeimporter.test.po;
+package org.xwiki.refactoring.internal.splitter.criterion.naming;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.ViewPage;
+import javax.inject.Named;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.refactoring.splitter.criterion.naming.HeadingNameNamingCriterion;
 
 /**
- * @since 7.3M1
+ * Naming criterion that extracts the first heading from the content and appends it to the main (base) page name.
+ * 
  * @version $Id$
+ * @since 14.10.2
+ * @since 15.0RC1
  */
-public class OfficeImporterResultPage extends ViewPage
+@Component
+@Named("mainPageNameAndHeading")
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+public class MainPageNameAndHeadingNamingCriterion extends HeadingNameNamingCriterion
 {
-    @FindBy(css = "#xwikicontent div.box.infomessage")
-    private WebElement message;
-    
-    public String getMessage()
+    /**
+     * Implicit constructor.
+     */
+    public MainPageNameAndHeadingNamingCriterion()
     {
-        return message.getText();
-    }
-    
-    public ViewPage viewResult()
-    {
-        for (WebElement link : message.findElements(By.tagName("a"))) {
-            if (link.getText().equals("result")) {
-                link.click();
-                return new ViewPage();
-            }
-        }
-        throw new RuntimeException("Failed to click on the result link.");
+        getParameters().setParameter(HeadingNameNamingCriterion.PARAM_PREPEND_BASE_PAGE_NAME, true);
     }
 }

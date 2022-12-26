@@ -25,10 +25,14 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.refactoring.WikiDocument;
 import org.xwiki.refactoring.splitter.DocumentSplitter;
 import org.xwiki.refactoring.splitter.criterion.SplittingCriterion;
@@ -65,6 +69,15 @@ public class DefaultDocumentSplitter implements DocumentSplitter
      */
     private static final String ANCHOR_PARAMETER = "anchor";
 
+    /**
+     * Used to serialize the references of the created documents in order to generate links between them (e.g. from a
+     * parent document to its child documents). We don't want to output the wiki name in the link reference if both the
+     * parent and the child document are from the same wiki.
+     */
+    @Inject
+    @Named("compactwiki")
+    private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
+
     @Override
     public List<WikiDocument> split(WikiDocument rootDoc, SplittingCriterion splittingCriterion,
         NamingCriterion namingCriterion)
@@ -97,14 +110,15 @@ public class DefaultDocumentSplitter implements DocumentSplitter
             if (splittingCriterion.shouldSplit(block, depth)) {
                 // Split a new document and add it to the results list.
                 XDOM xdom = new XDOM(block.getChildren());
-                String newDocumentName = namingCriterion.getDocumentName(xdom);
-                WikiDocument newDoc = new WikiDocument(newDocumentName, xdom, parentDoc);
+                DocumentReference newDocumentReference = namingCriterion.getDocumentReference(xdom);
+                WikiDocument newDoc = new WikiDocument(newDocumentReference, xdom, parentDoc);
                 result.add(newDoc);
                 // Remove the original block from the parent document.
                 it.remove();
                 // Place a link from the parent to child.
                 it.add(new NewLineBlock());
-                it.add(createLink(block, newDocumentName));
+                it.add(createLink(block, this.compactWikiEntityReferenceSerializer.serialize(newDocumentReference,
+                    parentDoc.getDocumentReference())));
                 // Check whether this node should be further traversed.
                 if (splittingCriterion.shouldIterate(block, depth)) {
                     split(newDoc, newDoc.getXdom().getChildren(), depth + 1, result, splittingCriterion,
@@ -134,7 +148,7 @@ public class DefaultDocumentSplitter implements DocumentSplitter
                 @Override
                 public List<Block> filter(Block block)
                 {
-                    List<Block> blocks = new ArrayList<Block>();
+                    List<Block> blocks = new ArrayList<>();
                     if (block instanceof WordBlock || block instanceof SpaceBlock
                         || block instanceof SpecialSymbolBlock) {
                         blocks.add(block);
@@ -161,7 +175,7 @@ public class DefaultDocumentSplitter implements DocumentSplitter
     private void updateAnchors(List<WikiDocument> documents)
     {
         // First we need to collect all the document fragments and map them to their new location.
-        Map<String, String> fragments = collectDocumentFragments(documents);
+        Map<String, DocumentReference> fragments = collectDocumentFragments(documents);
 
         // Update the anchors.
         for (WikiDocument document : documents) {
@@ -179,9 +193,9 @@ public class DefaultDocumentSplitter implements DocumentSplitter
      * @param document the document whose anchors to update
      * @param fragments see {@link #collectDocumentFragments(List)}
      */
-    private void updateAnchors(WikiDocument document, Map<String, String> fragments)
+    private void updateAnchors(WikiDocument document, Map<String, DocumentReference> fragments)
     {
-        for (LinkBlock linkBlock : document.getXdom().<LinkBlock> getBlocks(new ClassBlockMatcher(LinkBlock.class),
+        for (LinkBlock linkBlock : document.getXdom().<LinkBlock>getBlocks(new ClassBlockMatcher(LinkBlock.class),
             Axes.DESCENDANT)) {
             ResourceReference reference = linkBlock.getReference();
             ResourceType resoureceType = reference.getType();
@@ -193,11 +207,12 @@ public class DefaultDocumentSplitter implements DocumentSplitter
                 fragment = reference.getReference().substring(1);
             }
 
-            String targetDocument = fragments.get(fragment);
-            if (targetDocument != null && !targetDocument.equals(document.getFullName())) {
+            DocumentReference targetDocumentReference = fragments.get(fragment);
+            if (targetDocumentReference != null && !targetDocumentReference.equals(document.getDocumentReference())) {
                 // The fragment has been moved so we need to update the link.
                 reference.setType(ResourceType.DOCUMENT);
-                reference.setReference(targetDocument);
+                reference.setReference(this.compactWikiEntityReferenceSerializer.serialize(targetDocumentReference,
+                    document.getDocumentReference()));
                 reference.setParameter(ANCHOR_PARAMETER, fragment);
             }
         }
@@ -210,13 +225,13 @@ public class DefaultDocumentSplitter implements DocumentSplitter
      * @param documents the list of documents whose fragments to collect
      * @return the collection of document fragments mapped to the document that contains them
      */
-    private Map<String, String> collectDocumentFragments(List<WikiDocument> documents)
+    private Map<String, DocumentReference> collectDocumentFragments(List<WikiDocument> documents)
     {
-        Map<String, String> fragments = new HashMap<String, String>();
+        Map<String, DocumentReference> fragments = new HashMap<>();
         for (WikiDocument document : documents) {
-            for (IdBlock idBlock : document.getXdom().<IdBlock> getBlocks(new ClassBlockMatcher(IdBlock.class),
+            for (IdBlock idBlock : document.getXdom().<IdBlock>getBlocks(new ClassBlockMatcher(IdBlock.class),
                 Axes.DESCENDANT)) {
-                fragments.put(idBlock.getName(), document.getFullName());
+                fragments.put(idBlock.getName(), document.getDocumentReference());
             }
         }
         return fragments;

@@ -34,6 +34,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * An {@link OfficeDocument} backed by an {@link XDOM} document.
@@ -87,7 +88,7 @@ public class XDOMOfficeDocument implements OfficeDocument
     @Override
     public String getContentAsString()
     {
-        return getContentAsString("xwiki/2.0");
+        return getContentAsString(Syntax.XWIKI_2_1.toIdString());
     }
 
     /**

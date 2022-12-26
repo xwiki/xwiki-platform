@@ -494,6 +494,9 @@
       $('body').css('cursor', '');
     });
   };
+
+  // Everything is ready.
+  $('#officeImportForm #submit').attr('data-ready', true);
 });</code>
     </property>
     <property>

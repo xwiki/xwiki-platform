@@ -33,14 +33,13 @@ import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
 import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.test.po.OfficeImporterPage;
-import org.xwiki.officeimporter.test.po.OfficeImporterResultPage;
 import org.xwiki.officeimporter.test.po.OfficeServerAdministrationSectionPage;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.ConfirmationPage;
 import org.xwiki.test.ui.po.CreatePagePage;
+import org.xwiki.test.ui.po.DeletePageConfirmationPage;
 import org.xwiki.test.ui.po.DeletingPage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
@@ -99,8 +98,9 @@ public class OfficeImporterIT
     }
 
     /**
-     * A basic test that imports some documents and verify they are correctly imported TODO: do a more advanced check
-     * about styling and content
+     * A basic test that imports some documents and verify they are correctly imported.
+     * <p>
+     * TODO: Do a more advanced check about styling and content.
      */
     private void verifyImports(TestInfo info)
     {
@@ -280,10 +280,7 @@ public class OfficeImporterIT
         officeImporterPage.setFilterStyle(true);
         officeImporterPage.setSplitDocument(splitByHeadings);
 
-        OfficeImporterResultPage officeImporterResultPage = officeImporterPage.clickImport();
-        assertEquals("Conversion succeeded. You can view the result, or you can Go back to convert another document.",
-            officeImporterResultPage.getMessage());
-        return officeImporterResultPage.viewResult();
+        return officeImporterPage.submit();
     }
 
     /**
@@ -293,7 +290,7 @@ public class OfficeImporterIT
      */
     private void deletePageWithChildren(ViewPage pageToDelete)
     {
-        ConfirmationPage confirmationPage = pageToDelete.delete();
+        DeletePageConfirmationPage confirmationPage = pageToDelete.deletePage();
         if (confirmationPage.hasAffectChildrenOption()) {
             confirmationPage.setAffectChildren(true);
         }

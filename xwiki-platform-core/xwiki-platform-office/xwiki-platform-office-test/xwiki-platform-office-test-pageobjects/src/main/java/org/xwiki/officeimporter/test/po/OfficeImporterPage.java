@@ -38,7 +38,7 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class OfficeImporterPage extends ViewPage
 {
-    @FindBy(name = "filepath")
+    @FindBy(name = "filePath")
     private WebElement filePathInput;
 
     @FindBy(name = "overwriteContent")

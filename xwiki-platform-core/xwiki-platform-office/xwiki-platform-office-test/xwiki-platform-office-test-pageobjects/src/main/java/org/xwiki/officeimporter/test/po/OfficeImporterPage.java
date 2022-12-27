@@ -182,8 +182,11 @@ public class OfficeImporterPage extends ViewPage
         // The JavaScript code will redirect the user to the imported page after the import.
         getDriver().addPageNotYetReloadedMarker();
 
-        // Create the modal page object before the modal is shown in order to disable the fade effect.
-        ConfirmationModal confirmationModal = new ConfirmationModal(By.className("confirmation-overwriteContent"));
+        ConfirmationModal confirmationModal = null;
+        if (confirmOverwriteContent != null) {
+            // Create the modal page object before the modal is shown in order to disable the fade effect.
+            confirmationModal = new ConfirmationModal(By.className("confirmation-overwriteContent"));
+        }
 
         this.importButton.click();
 

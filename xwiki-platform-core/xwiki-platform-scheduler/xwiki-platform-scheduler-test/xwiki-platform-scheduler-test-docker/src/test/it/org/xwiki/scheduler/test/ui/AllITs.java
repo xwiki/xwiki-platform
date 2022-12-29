@@ -19,16 +19,19 @@
  */
 package org.xwiki.scheduler.test.ui;
 
-import org.junit.runner.RunWith;
-import org.xwiki.test.ui.PageObjectSuite;
+import org.junit.jupiter.api.Nested;
+import org.xwiki.test.docker.junit5.UITest;
 
 /**
- * Runs all functional tests found in the classpath. This allows to start/stop XWiki only once.
+ * All UI tests for the Scheduler Application feature.
  *
  * @version $Id$
- * @since 5.0M2
  */
-@RunWith(PageObjectSuite.class)
+@UITest
 public class AllITs
 {
+    @Nested
+    class NestedSchedulerIT extends SchedulerIT
+    {
+    }
 }

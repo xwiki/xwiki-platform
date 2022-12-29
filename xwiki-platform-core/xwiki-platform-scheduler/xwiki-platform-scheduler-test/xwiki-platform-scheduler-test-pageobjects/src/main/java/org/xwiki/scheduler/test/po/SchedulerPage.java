@@ -28,9 +28,21 @@ public class SchedulerPage extends ViewPage
     @FindBy(linkText = "Back to the job list")
     private WebElement backToHomeLink;
 
+    @FindBy(xpath = "//div[@id= 'xwikicontent']//div[@class= 'code']")
+    private WebElement script;
+
     public SchedulerHomePage backToHome()
     {
         this.backToHomeLink.click();
         return new SchedulerHomePage();
+    }
+
+    /**
+     * @since 15.0RC1
+     * @since 14.10.3
+     */
+    public String getScript()
+    {
+        return this.script.getText();
     }
 }

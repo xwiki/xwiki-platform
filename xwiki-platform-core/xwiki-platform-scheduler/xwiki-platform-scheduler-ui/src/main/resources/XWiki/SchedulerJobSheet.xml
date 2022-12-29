@@ -51,10 +51,13 @@
     #end
   &lt;/dt&gt;
   &lt;dd&gt;
-    #if ($propName == 'script' &amp;&amp; $xcontext.action == 'view' &amp;&amp; "$!job.getValue('script')" != '')
+    #if ($propName == 'script' &amp;&amp; $xcontext.action == 'view')
+      #set($schedulerScript = $!job.getValue($propName))
+      #if ($schedulerScript != '')
 
-      {{code language='groovy'}}$!job.getValue($propName){{/code}}
+        {{code language='groovy' source="script:schedulerScript"/}}
 
+      #end
     #else
       $!doc.display($propName, $obj)
     #end

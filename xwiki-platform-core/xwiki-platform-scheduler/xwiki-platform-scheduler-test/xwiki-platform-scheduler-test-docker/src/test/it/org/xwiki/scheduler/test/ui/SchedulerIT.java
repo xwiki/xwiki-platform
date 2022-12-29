@@ -19,6 +19,7 @@
  */
 package org.xwiki.scheduler.test.ui;
 
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.xwiki.scheduler.test.po.SchedulerHomePage;
@@ -27,6 +28,7 @@ import org.xwiki.scheduler.test.po.editor.SchedulerEditPage;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -56,7 +58,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 class SchedulerIT
 {
     @Test
-    void testScheduler(TestUtils setup)
+    @Order(1)
+    void verifyScheduler(TestUtils setup)
     {
         setup.loginAsSuperAdmin();
 
@@ -135,5 +138,24 @@ class SchedulerIT
         if (schedulerHomePage.hasError()) {
             fail("Failed to unschedule job.  Error [" + schedulerHomePage.getErrorMessage() + "]");
         }
+    }
+
+    @Test
+    @Order(2)
+    void verifyEscaping(TestUtils setup)
+    {
+        setup.loginAsSuperAdmin();
+
+        setup.deletePage("Scheduler", "SchedulerTestJob");
+
+        // Create Job
+        SchedulerHomePage schedulerHomePage = SchedulerHomePage.gotoPage();
+        schedulerHomePage.setJobName("SchedulerTestJob");
+        SchedulerEditPage schedulerEdit = schedulerHomePage.clickAdd();
+
+        schedulerEdit.setScript("{{/code}}");
+        SchedulerPage schedulerPage = schedulerEdit.clickSaveAndView();
+
+        assertEquals("{{/code}}", schedulerPage.getScript());
     }
 }

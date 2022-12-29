@@ -1593,7 +1593,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                     Integer.valueOf(object.getNumber() + ""), name};
                                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                                     XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_OBJECT,
-                                    "Exception while loading object '{0}' of class '{1}', number '{2}' and property '{3}'",
+                                    "Exception while loading object [{0}] of class [{1}], number [{2}] and property [{3}]",
                                     e, args);
                             }
                         }
@@ -1617,7 +1617,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             Object[] args = {object.getName(), object.getClass(), object.getNumber()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_OBJECT,
-                "Exception while loading object '{0}' of class '{1}' and number '{2}'", e, args);
+                "Exception while loading object [{0}] of class [{1}] and number [{2}]", e, args);
 
         } finally {
             restoreExecutionXContext();

@@ -39,6 +39,13 @@
   </properties>
   <modules>
     <module>xwiki-platform-scheduler-test-pageobjects</module>
-    <module>xwiki-platform-scheduler-test-tests</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>docker</id>
+      <modules>
+        <module>xwiki-platform-scheduler-test-docker</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

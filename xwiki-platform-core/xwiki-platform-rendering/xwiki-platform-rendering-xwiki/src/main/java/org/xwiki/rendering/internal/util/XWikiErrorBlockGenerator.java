@@ -40,6 +40,8 @@ import org.xwiki.logging.marker.TranslationMarker;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
@@ -60,6 +62,9 @@ public class XWikiErrorBlockGenerator extends DefaultErrorBlockGenerator
 
     @Inject
     private ComponentManager componentManager;
+
+    @Inject
+    private RenderingContext renderingContext;
 
     @Inject
     private Provider<ScriptContextManager> scriptContextManagerProvider;
@@ -110,6 +115,7 @@ public class XWikiErrorBlockGenerator extends DefaultErrorBlockGenerator
         // Remember the current value in the context
         Object currentRenderingerror = scriptContext.getAttribute(CONTEXT_ATTRIBUTE, ScriptContext.GLOBAL_SCOPE);
 
+        boolean renderingContextPushed = false;
         try {
             // Indicate that we are executing a rendering error template
             econtext.newProperty(ECONTEXT_MARKER).initial(true).declare();
@@ -127,6 +133,16 @@ public class XWikiErrorBlockGenerator extends DefaultErrorBlockGenerator
             }
             scriptContext.setAttribute(CONTEXT_ATTRIBUTE, renderingerror, ScriptContext.GLOBAL_SCOPE);
 
+            // Disable restricted context if set as the error generator template generally needs scripting
+            if (this.renderingContext.isRestricted() && this.renderingContext instanceof MutableRenderingContext) {
+                // Make the current velocity template id available
+                ((MutableRenderingContext) this.renderingContext).push(this.renderingContext.getTransformation(),
+                    this.renderingContext.getXDOM(), this.renderingContext.getDefaultSyntax(),
+                    this.renderingContext.getTransformationId(), false, this.renderingContext.getTargetSyntax());
+
+                renderingContextPushed = true;
+            }
+
             // Execute the template
             Block block = templateManager.execute(template, inline);
 
@@ -135,6 +151,11 @@ public class XWikiErrorBlockGenerator extends DefaultErrorBlockGenerator
         } catch (Exception e) {
             this.logger.error("Failed to generate error rendering message", e);
         } finally {
+            // Get rid of temporary rendering context
+            if (renderingContextPushed) {
+                ((MutableRenderingContext) this.renderingContext).pop();
+            }
+
             // Restore the previous context value
             scriptContext.setAttribute(CONTEXT_ATTRIBUTE, currentRenderingerror, ScriptContext.GLOBAL_SCOPE);
 

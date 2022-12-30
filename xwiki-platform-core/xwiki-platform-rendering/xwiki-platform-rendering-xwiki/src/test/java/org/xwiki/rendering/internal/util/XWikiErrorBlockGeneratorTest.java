@@ -32,19 +32,27 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.VerbatimBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.util.ErrorBlockGenerator;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.script.internal.CloneableSimpleScriptContext;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
+import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -61,15 +69,27 @@ class XWikiErrorBlockGeneratorTest
     @MockComponent
     private TemplateManager templateManager;
 
+    private MutableRenderingContext renderingContext;
+
     @MockComponent
     private ScriptContextManager scriptContextManager;
 
     @InjectMockComponents
     private XWikiErrorBlockGenerator errorGenerator;
 
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
     private ExecutionContext econtext;
 
     private ScriptContext scontext;
+
+    @AfterComponent
+    void afterComponent() throws Exception
+    {
+        this.renderingContext = mock(MutableRenderingContext.class);
+        this.componentManager.registerComponent(RenderingContext.class, this.renderingContext);
+    }
 
     @BeforeEach
     void beforeEach()
@@ -152,5 +172,23 @@ class XWikiErrorBlockGeneratorTest
             ((WordBlock) blocks.get(0).getChildren().get(0)).getWord());
         assertTrue(((VerbatimBlock) blocks.get(1).getChildren().get(0)).getProtectedString()
             .contains("java.lang.Exception: exception"));
+    }
+
+    @Test
+    void executeTemplateInRestrictedContext() throws Exception
+    {
+        Template template = mock(Template.class);
+        when(this.templateManager.getTemplate(ErrorBlockGenerator.CLASS_ATTRIBUTE_MESSAGE_VALUE + "/default.vm"))
+            .thenReturn(template);
+        XDOM xdom = new XDOM(Arrays.asList(new WordBlock("result")));
+        when(this.templateManager.execute(template, false)).thenReturn(xdom);
+
+        when(this.renderingContext.isRestricted()).thenReturn(true);
+
+        List<Block> blocks = this.errorGenerator.generateErrorBlocks("message.", "description.", false);
+
+        verify(this.renderingContext).push(any(), any(), any(), any(), eq(false), any());
+
+        assertSame(xdom.getChildren(), blocks);
     }
 }

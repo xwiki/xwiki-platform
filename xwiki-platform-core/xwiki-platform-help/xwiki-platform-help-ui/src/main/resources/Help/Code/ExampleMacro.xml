@@ -378,11 +378,11 @@
       <async_enabled>0</async_enabled>
     </property>
     <property>
-      <code>{{velocity output="false"}}
+      <code>{{velocity}}
 #set ($discard = $xwiki.ssx.use('Help.Code.ExampleMacro'))
 #set ($exampleId = $xcontext.macro.content.hashCode() + "-$mathtool.random(1, 100)")
-#set ($output = "
-  {{html clean='false'}}
+#set ($macrocontentsource = $xcontext.macro.content)
+{{html clean='false'}}
   &lt;div class='macroexample'&gt;
     &lt;ul class='nav nav-tabs' role='tablist'&gt;
       &lt;li role='presentation' class='active'&gt;
@@ -396,32 +396,28 @@
       &lt;div role='tabpanel' class='tab-pane active' id='example$exampleId'&gt;
       {{/html}}
 
-      $xcontext.macro.content
+      {{wikimacrocontent/}}
 
       {{html clean='false'}}
       &lt;/div&gt;
       &lt;div role='tabpanel' class='tab-pane' id='source$exampleId'&gt;
       {{/html}}
 
-      {{code language='none'}}
-      $xcontext.macro.content
-      {{/code}}
+      {{code language='none' source='script:macrocontentsource'/}}
 
       {{html clean='false'}}
       &lt;/div&gt;
       &lt;div class='clearfloats'&gt;&lt;/div&gt;
     &lt;/div&gt;
   &lt;/div&gt;
-  {{/html}}
-")
-#set ($xcontext.macro.result = $services.rendering.parse($output, $xwiki.getCurrentContentSyntaxId()).getChildren())
+{{/html}}
 {{/velocity}}</code>
     </property>
     <property>
       <contentDescription>The example code.</contentDescription>
     </property>
     <property>
-      <contentJavaType/>
+      <contentJavaType>Wiki</contentJavaType>
     </property>
     <property>
       <contentType>Mandatory</contentType>

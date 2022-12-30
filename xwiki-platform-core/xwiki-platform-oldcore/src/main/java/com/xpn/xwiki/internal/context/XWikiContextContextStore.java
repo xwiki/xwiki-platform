@@ -40,6 +40,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.container.servlet.HttpServletUtils;
 import org.xwiki.context.internal.concurrent.AbstractContextStore;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.internal.transformation.RenderingContextStore;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
@@ -354,17 +355,25 @@ public class XWikiContextContextStore extends AbstractContextStore
         }
 
         // User
+        DocumentReference userReference;
         if (contextStore.containsKey(PROP_USER)) {
-            xcontext.setUserReference((DocumentReference) contextStore.get(PROP_USER));
+            userReference = (DocumentReference) contextStore.get(PROP_USER);
 
             // If the current user is not a criteria set one which will always have all the required rights
         } else if (contextStore.containsKey(PROP_SECURE_AUTHOR)) {
             // If the author is provided use it to be as close as possible to the expected behavior
-            xcontext.setUserReference((DocumentReference) contextStore.get(PROP_SECURE_AUTHOR));
+            // Except when in case of restricted context since we cannot trust the author, by definition
+            boolean restricted = get(contextStore, RenderingContextStore.PROP_RESTRICTED, false);
+            if (restricted) {
+                userReference = null;
+            } else {
+                userReference = (DocumentReference) contextStore.get(PROP_SECURE_AUTHOR);
+            }
         } else {
             // Fallback on superadmin when no author is provided
-            xcontext.setUserReference(SUPERADMIN_REFERENCE);
+            userReference = SUPERADMIN_REFERENCE;
         }
+        xcontext.setUserReference(userReference);
 
         // Locale
         if (contextStore.containsKey(PROP_LOCALE)) {

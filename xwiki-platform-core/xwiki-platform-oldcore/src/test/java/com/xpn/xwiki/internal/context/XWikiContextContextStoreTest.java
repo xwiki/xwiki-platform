@@ -35,6 +35,7 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.container.Container;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.internal.transformation.RenderingContextStore;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -266,7 +267,7 @@ class XWikiContextContextStoreTest
 
         this.store.restore(contextStore);
 
-        assertEquals(this.oldcore.getXWikiContext().getUserReference(), authorReference);
+        assertEquals(authorReference, this.oldcore.getXWikiContext().getUserReference());
 
         XWikiDocument secureDocument1 = (XWikiDocument) this.oldcore.getXWikiContext().get(XWikiDocument.CKEY_SDOC);
         assertNotNull(secureDocument1);
@@ -276,7 +277,7 @@ class XWikiContextContextStoreTest
 
         this.store.restore(contextStore);
 
-        assertEquals(this.oldcore.getXWikiContext().getUserReference(), authorReference);
+        assertEquals(authorReference, this.oldcore.getXWikiContext().getUserReference());
 
         XWikiDocument secureDocument2 = (XWikiDocument) this.oldcore.getXWikiContext().get(XWikiDocument.CKEY_SDOC);
         assertNotNull(secureDocument2);
@@ -291,7 +292,7 @@ class XWikiContextContextStoreTest
 
         this.store.restore(contextStore);
 
-        assertEquals(this.oldcore.getXWikiContext().getUserReference(), authorReference);
+        assertEquals(authorReference, this.oldcore.getXWikiContext().getUserReference());
 
         XWikiDocument secureDocument3 = (XWikiDocument) this.oldcore.getXWikiContext().get(XWikiDocument.CKEY_SDOC);
         assertNotNull(secureDocument3);
@@ -300,5 +301,11 @@ class XWikiContextContextStoreTest
         assertEquals(authorReference, this.oldcore.getXWikiContext().getAuthorReference());
         assertNotSame(this.oldcore.getSpyXWiki().getDocument(secureDocumentReference, this.oldcore.getXWikiContext()),
             secureDocument3);
+
+        contextStore.put(RenderingContextStore.PROP_RESTRICTED, true);
+
+        this.store.restore(contextStore);
+
+        assertNull(this.oldcore.getXWikiContext().getUserReference());
     }
 }

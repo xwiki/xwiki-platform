@@ -31,6 +31,7 @@ import org.xwiki.rendering.async.internal.block.BlockAsyncRendererExecutor;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.transformation.RenderingContextStore;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.syntax.Syntax;
@@ -103,5 +104,6 @@ class AsyncMacroTest
 
         BlockAsyncRendererConfiguration configuration = configurationCaptor.getValue();
         assertTrue(configuration.isResricted());
+        assertTrue(configuration.getContextEntries().contains(RenderingContextStore.PROP_RESTRICTED));
     }
 }

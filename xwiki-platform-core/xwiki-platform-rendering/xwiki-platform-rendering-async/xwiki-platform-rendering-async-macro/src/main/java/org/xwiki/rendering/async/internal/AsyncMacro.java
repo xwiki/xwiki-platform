@@ -108,7 +108,7 @@ public class AsyncMacro extends AbstractExecutedContentMacro<AsyncMacroParameter
         // Enable/disable caching
         configuration.setCacheAllowed(parameters.isCached());
         // Indicate context entries
-        configuration.setContextEntries(parameters.getContext());
+        configuration.addContextEntries(parameters.getContext());
 
         try {
             Block result = this.executor.execute(configuration);

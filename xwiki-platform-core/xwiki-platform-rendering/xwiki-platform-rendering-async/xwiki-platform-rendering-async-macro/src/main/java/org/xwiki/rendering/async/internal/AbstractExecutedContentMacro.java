@@ -33,6 +33,7 @@ import org.xwiki.rendering.block.Block.Axes;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.match.MetadataBlockMatcher;
+import org.xwiki.rendering.internal.transformation.RenderingContextStore;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.Macro;
@@ -144,6 +145,9 @@ public abstract class AbstractExecutedContentMacro<P> extends AbstractMacro<P>
 
         // Indicate if we are in a restricted mode
         configuration.setResricted(context.getTransformationContext().isRestricted());
+        // Make sure the fact that it's restricted is taken into account by the cache and is know to the ContextStore
+        // components
+        configuration.addContextEntries(RenderingContextStore.PROP_RESTRICTED);
 
         return configuration;
     }

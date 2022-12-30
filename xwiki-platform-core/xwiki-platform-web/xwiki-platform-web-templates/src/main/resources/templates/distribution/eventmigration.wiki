@@ -23,7 +23,7 @@
   <div>
     <input type="radio" id="mode_since" name="mode" value="since"#if($request.mode == 'since')checked#end/>
     <label for="mode_since">$escapetool.html($services.localization.render('platform.extension.distributionWizard.eventmigration.since'))</label>
-    <input type="date" id="since" name="since" value="$!request.since" max="$datetool.format('yyyy-MM-dd', $datetool.date)"/>
+    <input type="date" id="since" name="since"#if($request.since) value="$escapetool.xml($request.since)"#end max="$datetool.format('yyyy-MM-dd', $datetool.date)"/>
   </div>
   <div class="buttons"><span class="buttonwrapper"><input type="submit" value="$escapetool.xml($services.localization.render('platform.extension.distributionWizard.eventmigration.startMigration'))" name="migrate" class="button"/></span></div>
 </form>

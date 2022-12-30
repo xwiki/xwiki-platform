@@ -209,4 +209,19 @@ class PDFExportJobTest
             assertEquals("Maximum content size limit exceeded.", e.getMessage());
         }
     }
+
+    @Test
+    void runWithoutMaxContentSizeLimit() throws Exception
+    {
+        when(this.configuration.getMaxContentSize()).thenReturn(0);
+        DocumentRenderingResult largeResult = new DocumentRenderingResult(this.secondPageReference,
+                new XDOM(Collections.singletonList(new WordBlock("second"))), StringUtils.repeat('x', 1000));
+        when(this.documentRenderer.render(this.secondPageReference, true)).thenReturn(largeResult);
+
+        this.pdfExportJob.initialize(this.request);
+        this.pdfExportJob.runInternal();
+
+        PDFExportJobStatus jobStatus = this.pdfExportJob.getStatus();
+        assertEquals(1000, jobStatus.getDocumentRenderingResults().get(1).getHTML().length());
+    }
 }

@@ -140,7 +140,7 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
                     this.progressManager.startStep(this);
                     if (hasAccess(Right.VIEW, documentReference)) {
                         contentSize += render(documentReference);
-                        if (contentSize > maxContentSize) {
+                        if (contentSize > maxContentSize && maxContentSize != 0) {
                             throw new RuntimeException("Maximum content size limit exceeded.");
                         }
                     }

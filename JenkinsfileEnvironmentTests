@@ -57,7 +57,7 @@ if (currentBuild.rawBuild.getCauses()[0].toString().contains('UserIdCause')) {
     echoXWiki 'Error computing jobs last build times, triggering a docker tests build to be safe...'
     buildDocker(params.type)
   } else {
-    echoXWiki 'Not executing the docker tests since there''s been no rebuild of "XWiki/xwiki-platform" since last execution. Aborting.'
+    echoXWiki 'Not executing the docker tests since there\'s been no rebuild of "XWiki/xwiki-platform" since last execution. Aborting.'
     // Aborting so that the build isn't displayed as successful without doing anything.
     currentBuild.result = 'ABORTED'
   }

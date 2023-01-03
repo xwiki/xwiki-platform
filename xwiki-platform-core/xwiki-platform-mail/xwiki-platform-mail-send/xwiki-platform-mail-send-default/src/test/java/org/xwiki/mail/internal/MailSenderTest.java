@@ -68,7 +68,7 @@ class MailSenderTest
     private Execution execution;
 
     @Test
-    void sendAsynchronouslyWhenTimeoutOrInterrupt() throws Exception
+    void sendAsynchronouslyWhenAddIsInterrupted() throws Exception
     {
         XWikiContext xcontext = mock(XWikiContext.class);
         when(xcontext.getWikiId()).thenReturn("wiki");
@@ -76,13 +76,31 @@ class MailSenderTest
         when(copiedContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY)).thenReturn(xcontext);
         when(this.executionContextCloner.copy(null)).thenReturn(copiedContext);
         Session session = Session.getInstance(new Properties());
-        doThrow(new InterruptedException("error")).when(this.prepareMailQueueManager).addMessage(
+        doThrow(new InterruptedException("error")).when(this.prepareMailQueueManager).addMessageToQueue(
             any(PrepareMailQueueItem.class), anyLong(), any(TimeUnit.class));
 
         Throwable exception = assertThrows(RuntimeException.class, () ->
             this.mailSender.sendAsynchronously(mock(Iterable.class), session, mock(MailListener.class)));
-        assertLinesMatch(List.of("Mail prepare queue is still full after waiting \\[60\\] \\[SECONDS\\]. The following "
-            + "messages will be lost: \\[batchId = \\[.*\\], context = \\[\\]\\]..."), List.of(exception.getMessage()));
+        assertLinesMatch(List.of("Mail items couldn't be added to the prepare queue as it was interrupted. "
+            + "The following messages will be lost: \\[.*\\]..."), List.of(exception.getMessage()));
+    }
+
+    @Test
+    void sendAsynchronouslyWhenAddTimesOut() throws Exception
+    {
+        XWikiContext xcontext = mock(XWikiContext.class);
+        when(xcontext.getWikiId()).thenReturn("wiki");
+        ExecutionContext copiedContext = mock(ExecutionContext.class);
+        when(copiedContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY)).thenReturn(xcontext);
+        when(this.executionContextCloner.copy(null)).thenReturn(copiedContext);
+        Session session = Session.getInstance(new Properties());
+        when(this.prepareMailQueueManager.addMessageToQueue(any(PrepareMailQueueItem.class), anyLong(),
+            any(TimeUnit.class))).thenReturn(false);
+
+        Throwable exception = assertThrows(RuntimeException.class, () ->
+            this.mailSender.sendAsynchronously(mock(Iterable.class), session, mock(MailListener.class)));
+        assertLinesMatch(List.of("The mail prepare queue is still full after waiting \\[60\\] \\[SECONDS\\]. The "
+            + "following messages will be lost: \\[.*\\]..."), List.of(exception.getMessage()));
     }
 
     @Test

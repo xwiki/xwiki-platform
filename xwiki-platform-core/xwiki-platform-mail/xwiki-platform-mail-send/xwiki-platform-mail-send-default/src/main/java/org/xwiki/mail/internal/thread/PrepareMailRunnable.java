@@ -21,6 +21,7 @@ package org.xwiki.mail.internal.thread;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -54,6 +55,8 @@ import com.xpn.xwiki.XWikiContext;
 @Singleton
 public class PrepareMailRunnable extends AbstractMailRunnable
 {
+    private static final int TIMEOUT = 60;
+
     @Inject
     private MailQueueManager<PrepareMailQueueItem> prepareMailQueueManager;
 
@@ -83,7 +86,8 @@ public class PrepareMailRunnable extends AbstractMailRunnable
                 // Note: a short pause to catch thread interruptions and to be kind on CPU.
                 Thread.sleep(100L);
             } catch (InterruptedException e) {
-                // Thread has been stopped, exit
+                Thread.currentThread().interrupt();
+                // Thread has been interrupted, exit
                 this.logger.debug("Mail Prepare Thread was forcefully stopped", e);
                 break;
             } catch (Exception e) {
@@ -136,7 +140,7 @@ public class PrepareMailRunnable extends AbstractMailRunnable
         } finally {
             if (listener != null) {
                 MailStatusResult result = listener.getMailStatusResult();
-                // Update the listener with the total number of messages prepared so that the user can known when
+                // Update the listener with the total number of messages prepared so that the user can know when
                 // all the messages have been processed for the batch. We update here, even in case of failure
                 // so that waiting process have a chance to see an end.
                 if (result instanceof UpdateableMailStatusResult) {
@@ -187,9 +191,33 @@ public class PrepareMailRunnable extends AbstractMailRunnable
 
         // Step 4: Put the MimeMessage id on the Mail Send Queue for sending
         // Extract the wiki id from the context
-        this.sendMailQueueManager.addToQueue(new SendMailQueueItem(message.getUniqueMessageId(),
-            item.getSession(), listener, item.getBatchId(), extractWikiId(item)));
-
+        SendMailQueueItem smqi = new SendMailQueueItem(message.getUniqueMessageId(),
+            item.getSession(), listener, item.getBatchId(), extractWikiId(item));
+        try {
+            // Note: addMessageToQueue() will throw an InterruptedException exception if the add is interrupted or
+            // return false if the timeout has been reached before the message could be added to the send queue.
+            boolean result = this.sendMailQueueManager.addMessageToQueue(smqi, TIMEOUT, TimeUnit.SECONDS);
+            if (!result) {
+                // The send queue is still full after waiting the timeout time (it shouldn't take that time to
+                // process a message and thus to send one message from the send queue; and if it takes more than
+                // that there's something seriously wrong going on).
+                // However, nothing is lost since the message has been persisted in the mail content store above. It'll
+                // just need to be resent (either by restarting XWiki or by having a scheduler job that regularly
+                // resends messages in the prepare_success state).
+                // There's nothing to do since the message has not been put on the mail sending queue.
+                // TODO: in the future, consider adding a new state to signify that the mail was not sent and needs to
+                // be resent.
+                this.logger.warn("The following mail items couldn't be added to the send queue, which is full: [{}]. "
+                    + "They will need to be resent later on.", smqi);
+            }
+        } catch (InterruptedException e) {
+            // The add was interrupted, restore the interrupted state for the current thread, to be a good citizen, and
+            // to propagate the interrupted state.
+            // Note that no message is lost since the message has been persisted in the mail content store above.
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(String.format("The following mail items couldn't be added to the send queue "
+                + "as it was interrupted: [%s]. The messages are not lost and can be resent later on.", smqi), e);
+        }
     }
 
     private String extractWikiId(PrepareMailQueueItem item)

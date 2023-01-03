@@ -21,8 +21,10 @@ package org.xwiki.mail.internal.thread;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Provider;
 import javax.mail.Session;
@@ -31,6 +33,7 @@ import javax.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -60,11 +63,15 @@ import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertLinesMatch;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -91,6 +98,9 @@ class PrepareMailRunnableTest
 
     @MockComponent
     private Provider<XWikiContext> xwikiContextProvider;
+
+    @MockComponent
+    private MailQueueManager<SendMailQueueItem> sendMailQueueManager;
 
     @BeforeComponent
     void beforeInitializable() throws Exception
@@ -147,7 +157,7 @@ class PrepareMailRunnableTest
         doThrow(new MailStoreException("error")).when(contentStore).save(any(String.class),
             any(ExtendedMimeMessage.class));
 
-        // Prepare 2 mails. Both will fail but we want to verify that the second one is processed even though the first
+        // Prepare 2 mails. Both will fail, but we want to verify that the second one is processed even though the first
         // one failed.
         mailQueueManager.addToQueue(item1);
         mailQueueManager.addToQueue(item2);
@@ -271,12 +281,12 @@ class PrepareMailRunnableTest
                 Object[] args = invocationOnMock.getArguments();
                 SendMailQueueItem item = (SendMailQueueItem) args[0];
                 ((UpdateableMailStatusResult)item.getListener().getMailStatusResult()).incrementCurrentSize();
-                return null;
+                return true;
             }
-        }).when(sendMailQueueManager).addToQueue(any(SendMailQueueItem.class));
+        }).when(sendMailQueueManager).addMessageToQueue(any(SendMailQueueItem.class), anyLong(), any(TimeUnit.class));
 
 
-        // Prepare 2 mails. Both will fail but we want to verify that the second one is processed even though the first
+        // Prepare 2 mails. Both will fail, but we want to verify that the second one is processed even though the first
         // one failed.
         prepareMailQueueManager.addToQueue(item1);
         prepareMailQueueManager.addToQueue(item2);
@@ -308,5 +318,97 @@ class PrepareMailRunnableTest
         assertFalse(listener2.getMailStatusResult().getByState(MailState.PREPARE_ERROR).hasNext());
 
         assertEquals("Failure during preparation phase of thread [" + batchId1 + "]", logCapture.getMessage(0));
+    }
+
+    @Test
+    void prepareMailWhenSendQueueFull() throws Exception
+    {
+        Properties properties = new Properties();
+        Session session = Session.getDefaultInstance(properties);
+
+        MimeMessage message = new MimeMessage(session);
+        message.setText("Content");
+
+        String batchId = UUID.randomUUID().toString();
+
+        ExecutionContext context = new ExecutionContext();
+        XWikiContext xContext = new XWikiContext();
+        xContext.setWikiId("wiki");
+        context.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xContext);
+
+        MemoryMailListener listener = this.componentManager.getInstance(MailListener.class, "memory");
+        PrepareMailQueueItem item =
+            new PrepareMailQueueItem(Arrays.asList(message), session, listener, batchId, context);
+
+        MailQueueManager mailQueueManager =
+            this.componentManager.getInstance(new DefaultParameterizedType(null, MailQueueManager.class,
+                PrepareMailQueueItem.class));
+
+        // Simulate a full sender queue
+        when(this.sendMailQueueManager.addMessageToQueue(any(SendMailQueueItem.class), anyLong(),
+            any(TimeUnit.class))).thenReturn(false);
+
+        // The mail is expected to fail since the queue is full.
+        mailQueueManager.addToQueue(item);
+
+        Thread thread = new Thread(this.runnable);
+        thread.start();
+
+        // Wait for the mail to have been processed.
+        try {
+            listener.getMailStatusResult().waitTillProcessed(10000L);
+        } finally {
+            this.runnable.stopProcessing();
+            thread.interrupt();
+            thread.join();
+        }
+
+        assertEquals(1, logCapture.size());
+        assertLinesMatch(List.of("The following mail items couldn't be added to the send queue, which is full: \\["
+            + ".*\\]. They will need to be resent later on."), List.of(logCapture.getMessage(0)));
+    }
+
+    @Test
+    void prepareMailWhenAddInterrupted() throws Exception
+    {
+        Properties properties = new Properties();
+        Session session = Session.getDefaultInstance(properties);
+
+        MimeMessage message = new MimeMessage(session);
+        message.setText("Content");
+
+        String batchId = UUID.randomUUID().toString();
+
+        ExecutionContext context = new ExecutionContext();
+        XWikiContext xContext = new XWikiContext();
+        xContext.setWikiId("wiki");
+        context.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xContext);
+
+        MailListener listener = mock(MailListener.class);
+        PrepareMailQueueItem item =
+            new PrepareMailQueueItem(Arrays.asList(message), session, listener, batchId, context);
+
+        MailQueueManager mailQueueManager =
+            this.componentManager.getInstance(new DefaultParameterizedType(null, MailQueueManager.class,
+                PrepareMailQueueItem.class));
+
+        // Simulate an interruption when adding to the send queue
+        doThrow(new InterruptedException("error")).when(this.sendMailQueueManager)
+            .addMessageToQueue(any(SendMailQueueItem.class), anyLong(), any(TimeUnit.class));
+
+        mailQueueManager.addToQueue(item);
+
+        Thread thread = new Thread(this.runnable);
+        thread.start();
+        // Wait at most 5mn for the thread to die. This should happen since the interrupt exception should cause it
+        // to stop. This is part of the test.
+        thread.join(5*60*1000L);
+
+        // Verify that the listener has received a fatal error and that the exception is the one we expect.
+        ArgumentCaptor<RuntimeException> exceptionArgumentCaptor = ArgumentCaptor.forClass(RuntimeException.class);
+        verify(listener).onPrepareFatalError(exceptionArgumentCaptor.capture(), any());
+        assertLinesMatch(List.of("The following mail items couldn't be added to the send queue as it was interrupted: "
+            + "\\[.*\\]. The messages are not lost and can be resent later on."),
+            List.of(exceptionArgumentCaptor.getValue().getMessage()));
     }
 }

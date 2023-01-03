@@ -35,9 +35,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryBuilder;
-import org.xwiki.rendering.RenderingScriptServiceComponentList;
-import org.xwiki.rendering.internal.configuration.DefaultExtendedRenderingConfiguration;
-import org.xwiki.rendering.internal.configuration.RenderingConfigClassDocumentConfigurationSource;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
@@ -69,11 +66,8 @@ import static org.mockito.Mockito.when;
  */
 @HTML50ComponentList
 @XWikiSyntax21ComponentList
-@RenderingScriptServiceComponentList
 @ComponentList({
     TestNoScriptMacro.class,
-    DefaultExtendedRenderingConfiguration.class,
-    RenderingConfigClassDocumentConfigurationSource.class,
     XWikiPreferencesDocumentInitializer.class,
     ModelScriptService.class,
     RestrictedConfigurationSource.class

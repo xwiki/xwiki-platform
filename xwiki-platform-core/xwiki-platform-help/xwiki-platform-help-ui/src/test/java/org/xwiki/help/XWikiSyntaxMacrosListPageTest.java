@@ -34,8 +34,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.script.QueryManagerScriptService;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;
-import org.xwiki.rendering.internal.configuration.DefaultExtendedRenderingConfiguration;
-import org.xwiki.rendering.internal.configuration.RenderingConfigClassDocumentConfigurationSource;
+import org.xwiki.rendering.internal.configuration.DefaultRenderingConfigurationComponentList;
 import org.xwiki.rendering.internal.renderer.xhtml.link.DocumentXHTMLLinkTypeRenderer;
 import org.xwiki.rendering.internal.resolver.DefaultResourceReferenceEntityReferenceResolver;
 import org.xwiki.rendering.internal.resolver.DocumentResourceReferenceEntityReferenceResolver;
@@ -74,11 +73,8 @@ import static org.xwiki.rendering.wikimacro.internal.WikiMacroConstants.WIKI_MAC
 @XWikiSyntax21ComponentList
 @HTML50ComponentList
 @RenderingScriptServiceComponentList
+@DefaultRenderingConfigurationComponentList
 @ComponentList({
-    // Start - Required in addition of RenderingScriptServiceComponentList
-    DefaultExtendedRenderingConfiguration.class,
-    RenderingConfigClassDocumentConfigurationSource.class,
-    // End - Required in additional of RenderingScriptServiceComponentList
     ControlCharactersFilter.class,
     // Start document initializer
     WikiMacroClassDocumentInitializer.class,

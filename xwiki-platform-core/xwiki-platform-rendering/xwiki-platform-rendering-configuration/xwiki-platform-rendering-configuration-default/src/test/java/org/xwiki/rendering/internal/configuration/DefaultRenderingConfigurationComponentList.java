@@ -17,17 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering;
+package org.xwiki.rendering.internal.configuration;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import org.xwiki.rendering.internal.macro.DefaultMacroCategoryManager;
-import org.xwiki.rendering.internal.syntax.SyntaxConverter;
-import org.xwiki.rendering.internal.transformation.macro.DefaultMacroTransformationConfiguration;
-import org.xwiki.rendering.script.RenderingScriptService;
 import org.xwiki.test.annotation.ComponentList;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
@@ -36,23 +32,22 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Pack of default Components that are needed for the rendering Script Service. A rendering configuration implementation
- * must be provided in addition to the components listed in this annotation. The default corresponding component list is
- * {@code DefaultRenderingConfigurationComponentList}.
+ * Component list for the rendering configuration. Can be used as a complement for
+ * {@code RenderingScriptServiceComponentList}.
  *
  * @version $Id$
- * @since 14.6RC1
+ * @since 15.0RC1
+ * @since 14.10.3
+ * @since 14.4.8
  */
 @Documented
 @Retention(RUNTIME)
 @Target({ TYPE, METHOD, ANNOTATION_TYPE })
 @ComponentList({
-    RenderingScriptService.class,
-    SyntaxConverter.class,
-    DefaultMacroCategoryManager.class,
-    DefaultMacroTransformationConfiguration.class
+    DefaultExtendedRenderingConfiguration.class,
+    RenderingConfigClassDocumentConfigurationSource.class
 })
 @Inherited
-public @interface RenderingScriptServiceComponentList
+public @interface DefaultRenderingConfigurationComponentList
 {
 }

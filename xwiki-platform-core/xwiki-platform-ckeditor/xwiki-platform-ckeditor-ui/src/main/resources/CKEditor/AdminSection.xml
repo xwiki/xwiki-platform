@@ -355,7 +355,7 @@
       <propertiesToShow/>
     </property>
     <property>
-      <scope/>
+      <scope>WIKI</scope>
     </property>
     <property>
       <sectionOrder/>

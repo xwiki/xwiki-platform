@@ -40,12 +40,14 @@
     #set ($escapedValue = $escapetool.xml($value))
     #if ($titleField.label)
       <dt>
-        <label for="$!{options.id}Title">$services.localization.render($titleField.label)</label>
-        <span class="xHint">$!services.localization.render($titleField.hint)</span>
+        <label for="$escapetool.xml($!{options.id})Title">##
+          $escapetool.xml($services.localization.render($titleField.label))##
+        </label>
+        <span class="xHint">$!escapetool.xml($services.localization.render($titleField.hint))</span>
       </dt>
       <dd>
-        <input type="text" id="$!{options.id}Title" name="$titleField.name" value="$!escapedValue"
-          class="location-title-field" placeholder="$!services.localization.render($titleField.placeholder)" />
+        <input type="text" id="$escapetool.xml($!{options.id})Title" name="$escapetool.xml($titleField.name)" value="$!escapedValue"
+          class="location-title-field" placeholder="$escapetool.xml($!services.localization.render($titleField.placeholder))" />
       </dd>
     #elseif ($titleField)
       <dt class="hidden"></dt>
@@ -60,8 +62,8 @@
     ## ---------------------------------------------------------------------------------------------------------
     ##
     <dt>
-      <label>$services.localization.render($options.preview.label)</label>
-      <span class="xHint">$services.localization.render($options.preview.hint)</span>
+      <label>$escapetool.xml($services.localization.render($options.preview.label))</label>
+      <span class="xHint">$escapetool.xml($services.localization.render($options.preview.hint))</span>
     </dt>
     <dd>
       #if ($isDocumentTreeAvailable)
@@ -113,8 +115,10 @@
       #set ($escapedValue = $escapetool.xml($value))
       #if ($wikiField.label && $displayWikiFields)
         <dt>
-          <label for="$!{options.id}Wiki">$services.localization.render($wikiField.label)</label>
-          <span class="xHint">$!services.localization.render($wikiField.hint)</span>
+          <label for="$escapetool.xml($!{options.id})Wiki">##
+            $escapetool.xml($services.localization.render($wikiField.label))##
+          </label>
+          <span class="xHint">$!escapetool.xml($services.localization.render($wikiField.hint))</span>
         </dt>
         <dd>
           <select id="$!{options.id}Wiki" name="$wikiField.name" class="location-wiki-field">
@@ -156,13 +160,15 @@
       #end
       #set ($escapedValue = $escapetool.xml($value))
       <dt>
-        <label for="$!{options.id}ParentReference">$services.localization.render($parentField.label)</label>
-        <span class="xHint">$!services.localization.render($parentField.hint)</span>
+        <label for="$escapetool.xml($!{options.id})ParentReference">##
+          $escapetool.xml($services.localization.render($parentField.label))##
+        </label>
+        <span class="xHint">$!escapetool.xml($services.localization.render($parentField.hint))</span>
       </dt>
       <dd>
-        <input type="text" id="$!{options.id}ParentReference" class="location-parent-field suggestSpaces"
-          name="$parentField.name" value="$!escapedValue"
-          placeholder="$!services.localization.render($parentField.placeholder)" />
+        <input type="text" id="$escapetool.xml($!{options.id})ParentReference" class="location-parent-field suggestSpaces"
+          name="$escapetool.xml($parentField.name)" value="$!escapedValue"
+          placeholder="$!escapetool.xml($services.localization.render($parentField.placeholder))" />
       </dd>
       ##
       ## ---------------------------------------------------------------------------------------------------------
@@ -177,13 +183,15 @@
       #set ($escapedValue = $escapetool.xml($value))
       #if ($nameField.label)
         <dt>
-          <label for="$!{options.id}Name">$services.localization.render($nameField.label)</label>
-          <span class="xHint">$!services.localization.render($nameField.hint)</span>
+          <label for="$escapetool.xml($!{options.id})Name">##
+            $escapetool.xml($services.localization.render($nameField.label))##
+          </label>
+          <span class="xHint">$escapetool.xml($services.localization.render($nameField.hint))</span>
         </dt>
         <dd>
-          <input type="text" id="$!{options.id}Name" name="$nameField.name" class="location-name-field"
+          <input type="text" id="$escapetool.xml($!{options.id})Name" name="$escapetool.xml($nameField.name)" class="location-name-field"
             value="$!escapedValue"
-            placeholder="$!services.localization.render($nameField.placeholder)" />
+            placeholder="$escapetool.xml($!services.localization.render($nameField.placeholder))" />
         </dd>
       #elseif ($nameField)
         <dt class="hidden"></dt>

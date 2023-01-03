@@ -67,7 +67,9 @@ public class ObjectsSynchronizeAction extends XWikiAction
         } else {
             for (List<BaseObject> classObjects : doc.getXObjects().values()) {
                 for (BaseObject object : classObjects) {
-                    synchronizeObject(object, context);
+                    if (object != null) {
+                        synchronizeObject(object, context);
+                    }
                 }
             }
         }

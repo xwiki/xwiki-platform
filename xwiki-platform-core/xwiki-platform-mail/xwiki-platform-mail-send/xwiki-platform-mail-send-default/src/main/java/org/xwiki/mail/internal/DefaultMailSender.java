@@ -89,15 +89,11 @@ public class DefaultMailSender implements MailSender
         }
 
         try {
-            // TODO: Note that if the queue is still full after waiting for TIMEOUT seconds, the message is not added
-            // to the prepare queue and is thus lost ATM and there's even no logs generated. We need to modify/add a
-            // new signature so that addMessage() returns a boolean or throws an exception.
             this.prepareMailQueueManager.addMessage(new PrepareMailQueueItem(messages, session, listener, batchId,
                 clonedExecutionContext), TIMEOUT, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             // Since the prepare queue is still full after waiting 1 minute, report an error in order to not make XWiki
             // become overloaded by using threads waiting up.
-            // TODO: Add explanation that the message is lost!
             throw new RuntimeException(String.format("Mail prepare queue is still full after waiting [%s] [%s]",
                 TIMEOUT, TimeUnit.SECONDS), e);
         }

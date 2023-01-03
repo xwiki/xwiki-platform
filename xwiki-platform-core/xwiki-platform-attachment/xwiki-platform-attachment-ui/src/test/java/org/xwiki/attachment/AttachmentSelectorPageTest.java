@@ -46,8 +46,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.observation.EventListener;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;
-import org.xwiki.rendering.internal.configuration.DefaultExtendedRenderingConfiguration;
-import org.xwiki.rendering.internal.configuration.RenderingConfigClassDocumentConfigurationSource;
+import org.xwiki.rendering.internal.configuration.DefaultRenderingConfigurationComponentList;
 import org.xwiki.rendering.internal.macro.wikibridge.DefaultWikiMacroManager;
 import org.xwiki.rendering.internal.macro.wikibridge.WikiMacroEventListener;
 import org.xwiki.rendering.syntax.Syntax;
@@ -92,12 +91,9 @@ import static org.mockito.Mockito.when;
 @HTML50ComponentList
 @XWikiSyntax21ComponentList
 @RenderingScriptServiceComponentList
+@DefaultRenderingConfigurationComponentList
 @DefaultIconManagerComponentList
 @ComponentList({
-    // Start -  Required in addition of RenderingScriptServiceComponentList
-    DefaultExtendedRenderingConfiguration.class,
-    RenderingConfigClassDocumentConfigurationSource.class,
-    // Start -  Required in addition of RenderingScriptServiceComponentList
     ControlCharactersFilter.class,
     ModelScriptService.class,
     TestNoScriptMacro.class,

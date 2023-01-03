@@ -33,8 +33,7 @@ import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.query.Query;
 import org.xwiki.query.script.QueryManagerScriptService;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;
-import org.xwiki.rendering.internal.configuration.DefaultExtendedRenderingConfiguration;
-import org.xwiki.rendering.internal.configuration.RenderingConfigClassDocumentConfigurationSource;
+import org.xwiki.rendering.internal.configuration.DefaultRenderingConfigurationComponentList;
 import org.xwiki.rendering.internal.macro.message.ErrorMessageMacro;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.script.service.ScriptService;
@@ -71,14 +70,13 @@ import static org.mockito.Mockito.when;
 @HTML50ComponentList
 @XWikiSyntax21ComponentList
 @RenderingScriptServiceComponentList
+@DefaultRenderingConfigurationComponentList
 @SecurityScriptServiceComponentList
 @WikiManagerScriptServiceComponentList
 @ComponentList({
     ErrorMessageMacro.class,
     TranslationMacro.class,
     TestNoScriptMacro.class,
-    DefaultExtendedRenderingConfiguration.class,
-    RenderingConfigClassDocumentConfigurationSource.class,
     ModelScriptService.class
 })
 class WebHomeSheetPageTest extends PageTest

@@ -34,8 +34,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;
 import org.xwiki.rendering.async.internal.block.DefaultBlockAsyncRenderer;
-import org.xwiki.rendering.internal.configuration.DefaultExtendedRenderingConfiguration;
-import org.xwiki.rendering.internal.configuration.RenderingConfigClassDocumentConfigurationSource;
+import org.xwiki.rendering.internal.configuration.DefaultRenderingConfigurationComponentList;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.test.annotation.ComponentList;
@@ -64,6 +63,7 @@ import static org.xwiki.component.wiki.internal.bridge.DefaultWikiObjectComponen
 @XWikiSyntax21ComponentList
 @HTML50ComponentList
 @RenderingScriptServiceComponentList
+@DefaultRenderingConfigurationComponentList
 @ComponentList({
     UIExtensionScriptService.class,
     DefaultUIExtensionManager.class,
@@ -74,10 +74,6 @@ import static org.xwiki.component.wiki.internal.bridge.DefaultWikiObjectComponen
     DefaultWikiComponentManagerContext.class,
     WikiUIExtensionComponentBuilder.class,
     DefaultContentParser.class,
-    // Start - Required in addition of RenderingScriptServiceComponentList
-    DefaultExtendedRenderingConfiguration.class,
-    RenderingConfigClassDocumentConfigurationSource.class,
-    // End - Required in additional of RenderingScriptServiceComponentList
     DefaultBlockAsyncRenderer.class,
     TestNoScriptMacro.class
 })

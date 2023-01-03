@@ -30,8 +30,7 @@ import org.xwiki.localization.macro.internal.TranslationMacro;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.properties.internal.converter.EnumConverter;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;
-import org.xwiki.rendering.internal.configuration.DefaultExtendedRenderingConfiguration;
-import org.xwiki.rendering.internal.configuration.RenderingConfigClassDocumentConfigurationSource;
+import org.xwiki.rendering.internal.configuration.DefaultRenderingConfigurationComponentList;
 import org.xwiki.rendering.internal.macro.message.ErrorMessageMacro;
 import org.xwiki.rendering.internal.macro.message.SuccessMessageMacro;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -64,12 +63,11 @@ import static org.mockito.Mockito.when;
 @XWikiSyntax21ComponentList
 @HTML50ComponentList
 @RenderingScriptServiceComponentList
+@DefaultRenderingConfigurationComponentList
 @LiveDataMacroComponentList
 @LoggingScriptServiceComponentList
 @ComponentList({
     TranslationMacro.class,
-    DefaultExtendedRenderingConfiguration.class,
-    RenderingConfigClassDocumentConfigurationSource.class,
     ErrorMessageMacro.class,
     SuccessMessageMacro.class,
     EnumConverter.class

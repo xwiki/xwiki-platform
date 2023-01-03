@@ -172,22 +172,24 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
 
         if (values != null && !values.isEmpty()) {
             for (String value : values) {
-                DefaultNotificationFilterPreference pref = createNotificationFilterPreference(
+                if (value != null) {
+                    DefaultNotificationFilterPreference pref = createNotificationFilterPreference(
                         String.format(WATCHLIST_FILTER_PREFERENCES_NAME, property.name(), sha256Hex(value)));
-                switch (property) {
-                    case PAGE:
-                        pref.setPageOnly(value);
-                        break;
-                    case SPACE:
-                        pref.setPage(value);
-                        break;
-                    case WIKI:
-                        pref.setWiki(value);
-                        break;
-                    default:
-                        break;
+                    switch (property) {
+                        case PAGE:
+                            pref.setPageOnly(value);
+                            break;
+                        case SPACE:
+                            pref.setPage(value);
+                            break;
+                        case WIKI:
+                            pref.setWiki(value);
+                            break;
+                        default:
+                            break;
+                    }
+                    results.add(pref);
                 }
-                results.add(pref);
             }
         }
     }

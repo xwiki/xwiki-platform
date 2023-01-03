@@ -19,7 +19,6 @@
  */
 package org.xwiki.mail.internal;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
@@ -82,9 +81,8 @@ class MailSenderTest
 
         Throwable exception = assertThrows(RuntimeException.class, () ->
             this.mailSender.sendAsynchronously(mock(Iterable.class), session, mock(MailListener.class)));
-        assertLinesMatch(Arrays.asList("Mail prepare queue is still full after waiting \\[60\\] \\[SECONDS\\]. The "
-            + "following messages will be lost: \\[batchId = \\[.*\\], context = \\[\\]\\]..."),
-            Arrays.asList(exception.getMessage()));
+        assertLinesMatch(List.of("Mail prepare queue is still full after waiting \\[60\\] \\[SECONDS\\]. The following "
+            + "messages will be lost: \\[batchId = \\[.*\\], context = \\[\\]\\]..."), List.of(exception.getMessage()));
     }
 
     @Test

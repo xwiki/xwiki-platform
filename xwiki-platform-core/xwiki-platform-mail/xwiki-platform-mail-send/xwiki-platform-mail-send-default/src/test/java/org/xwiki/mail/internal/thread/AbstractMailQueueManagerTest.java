@@ -19,7 +19,6 @@
  */
 package org.xwiki.mail.internal.thread;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -53,7 +52,7 @@ class AbstractMailQueueManagerTest
             manager.addMessage(new PrepareMailQueueItem(null, null, null, null, null), 1, TimeUnit.MILLISECONDS);
             manager.addMessage(new PrepareMailQueueItem(null, null, null, null, null), 1, TimeUnit.MILLISECONDS);
         });
-        assertLinesMatch(Arrays.asList("Failed to add the message \\[.*\\] to the queue as it was full, even after "
-            + "waiting \\[1\\] \\[MILLISECONDS\\]"), Arrays.asList(exception.getMessage()));
+        assertLinesMatch(List.of("Failed to add the message \\[.*\\] to the queue as it was full, even after waiting "
+            + "\\[1\\] \\[MILLISECONDS\\]"), List.of(exception.getMessage()));
     }
 }

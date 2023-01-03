@@ -76,7 +76,6 @@ public class PrepareMailQueueItem extends AbstractMailQueueItem
     @Override
     public String toString()
     {
-        return prepareToString().append("context",
-            this.executionContext == null ? null : this.executionContext.getProperties()).toString();
+        return prepareToString().append("context", this.executionContext.getProperties()).toString();
     }
 }

@@ -56,14 +56,7 @@ public abstract class AbstractMailQueueManager<T extends MailQueueItem> implemen
     @Override
     public void addMessage(T mailQueueItem, long timeout, TimeUnit unit) throws InterruptedException
     {
-        boolean result = getMailQueue().offer(mailQueueItem, timeout, unit);
-        if (!result) {
-            // The timeout has expired.
-            // TODO: In the future add a new signature to return a boolean since throwing an InterruptedException is
-            // not the best API but ATM I don't want to break anything/introduce anything new.
-            throw new InterruptedException(String.format("Failed to add the message [%s] to the queue as it was full, "
-                + "even after waiting [%s] [%s]", mailQueueItem, timeout, unit));
-        }
+        getMailQueue().offer(mailQueueItem, timeout, unit);
     }
 
     @Override

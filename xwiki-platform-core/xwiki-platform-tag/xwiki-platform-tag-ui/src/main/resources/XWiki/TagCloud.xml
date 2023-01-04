@@ -462,6 +462,7 @@ ol.tagCloud .ultraPopular {
 ## tagCloudSpace - the space to display the tag cloud for. If blank, display cloud for the whole wiki. Default is blank.
 #set ($tagCloudSpace = $xcontext.macro.params.get('space'))
 #set ($tagCloudSpaces = $xcontext.macro.params.get('spaces'))
+#set ($limit = $xcontext.macro.params.get('limit'))
 ##
 ## Configurable popularity levels. You must enter an even number of levels. Default: 6.
 #set ($popularityLevels = ["notPopular", "notVeryPopular", "somewhatPopular", "popular", "veryPopular", "ultraPopular"])
@@ -485,22 +486,36 @@ $xwiki.ssx.use('XWiki.TagCloud')##
   ## Get tag count map. Key: tag, value: number of occurrences.
   #set ($tagCount = $xwiki.tag.getTagCount("$!tagCloudSpace"))
 #end
+## Organize tags as a list of {name, count} object
+## so that it is easier to handle (sorting, limiting, ...)
+#set ($tagCountList = [])
+#foreach ($tagName in $tagCount.keySet())
+  #set ($discard = $tagCountList.add({
+    "name": $tagName,
+    "count": $tagCount[$tagName]
+  }))
+#end
+## If a limit is set, only keep n most occurring tags
+## If tags have the same occurrence, limit them in alphabetical order
+#set ($tagCountListSorted = $collectiontool.sort($tagCountList, ['count:desc', 'name']))
+#if ("$!limit" != '')
+  #set ($tagCountListSorted = $tagCountListSorted.subList(0, $limit))
+#end
 ##
 ## Only build popularity map if at least one tag exists
-#if ($tagCount.size() &gt; 0)
+#if ($tagCountListSorted.size() &gt; 0)
   ##
   ## Store the minimum and maximum number of occurrences.
-  #set ($sortedTagCounts = $collectiontool.sort($tagCount.values()))
-  #set ($maxIndex = $sortedTagCounts.size() - 1)
-  #set ($minCount = $sortedTagCounts[0])
-  #set ($maxCount = $sortedTagCounts[$maxIndex])
+  #set ($maxIndex = $tagCountListSorted.size() - 1)
+  #set ($maxCount = $tagCountListSorted[0].count)
+  #set ($minCount = $tagCountListSorted[$maxIndex].count)
   ##
   ## Calculate the total number of tags in the wiki.
   #set ($totalTagNumber = 0)
-  #foreach ($currentTagCount in $sortedTagCounts)
-    #set ($totalTagNumber = $totalTagNumber + $currentTagCount)
+  #foreach ($currentTag in $tagCountListSorted)
+    #set ($totalTagNumber = $totalTagNumber + $currentTag.count)
   #end
-  #set ($countAverage = $mathtool.div($totalTagNumber, $tagCount.size()))
+  #set ($countAverage = $mathtool.div($totalTagNumber, $tagCountListSorted.size()))
   ##
   ## Build popularity map using the difference between minimum / maximum tag occurrences counts, and the average tag occurences count.
   #set ($firstHalfIntervalSize = $mathtool.div($mathtool.sub($countAverage, $minCount), $levelsHalf))
@@ -527,17 +542,17 @@ $xwiki.ssx.use('XWiki.TagCloud')##
 ##
 ## Display tag cloud.
 {{html}}
-#if ($tagCount.size() &gt; 0)
+#if ($tagCountListSorted.size() &gt; 0)
   &lt;ol class="tagCloud"&gt;
-  #foreach ($tagEntry in $tagCount.entrySet())
+  #foreach ($tagEntry in $collectiontool.sort($tagCountListSorted, 'name'))
     #foreach ($popularityEntry in $popularityMap.entrySet())
-      #if ($popularityEntry.Key &gt;= $tagEntry.Value)
+      #if ($popularityEntry.Key &gt;= $tagEntry.count)
         #set ($liClass = $popularityEntry.Value)
         #break
       #end
     #end
     &lt;li class="$liClass"&gt;
-      &lt;a class="tag" href="$xwiki.getURL('Main.Tags', 'view', "do=viewTag&amp;amp;tag=$escapetool.url($tagEntry.Key)")" title="$services.localization.render('xe.tag.tooltip', [$tagEntry.Value])"&gt;$escapetool.xml($tagEntry.Key)&lt;/a&gt;
+      &lt;a class="tag" href="$xwiki.getURL('Main.Tags', 'view', "do=viewTag&amp;amp;tag=$escapetool.url($tagEntry.name)")" title="$services.localization.render('xe.tag.tooltip', [$tagEntry.count])"&gt;$escapetool.xml($tagEntry.name)&lt;/a&gt;
     &lt;/li&gt;
   #end
   &lt;/ol&gt;
@@ -741,6 +756,84 @@ $xwiki.ssx.use('XWiki.TagCloud')##
     </property>
     <property>
       <type/>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.TagCloud</name>
+    <number>2</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>7a100bc5-1eeb-4b81-8e64-cf1aeb453eb4</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
+    </class>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>Max count of tags to be displayed in the cloud</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>limit</name>
+    </property>
+    <property>
+      <type>java.lang.Integer</type>
     </property>
   </object>
 </xwikidoc>

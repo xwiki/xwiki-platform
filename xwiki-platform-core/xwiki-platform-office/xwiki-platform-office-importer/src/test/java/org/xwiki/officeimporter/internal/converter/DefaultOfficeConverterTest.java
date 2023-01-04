@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import org.jodconverter.core.DocumentConverter;
 import org.jodconverter.core.document.DefaultDocumentFormatRegistry;
 import org.jodconverter.core.job.ConversionJobWithOptionalSourceFormatUnspecified;
 import org.jodconverter.core.job.ConversionJobWithOptionalTargetFormatUnspecified;
@@ -61,7 +62,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(XWikiTempDirExtension.class)
 class DefaultOfficeConverterTest
 {
-    private LocalConverter localConverter;
+    private DocumentConverter localConverter;
 
     @XWikiTempDir
     private File tmpDir;
@@ -71,7 +72,7 @@ class DefaultOfficeConverterTest
     @BeforeEach
     void setup()
     {
-        this.localConverter = mock(LocalConverter.class);
+        this.localConverter = mock(DocumentConverter.class);
         this.defaultOfficeConverter = new DefaultOfficeConverter(localConverter, tmpDir);
     }
 

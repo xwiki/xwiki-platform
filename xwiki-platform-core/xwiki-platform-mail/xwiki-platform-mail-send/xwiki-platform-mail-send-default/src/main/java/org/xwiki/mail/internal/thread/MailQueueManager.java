@@ -72,7 +72,7 @@ public interface MailQueueManager<T extends MailQueueItem>
     @Unstable
     default boolean addMessageToQueue(T mailQueueItem, long timeout, TimeUnit unit) throws InterruptedException
     {
-        addMessageToQueue(mailQueueItem, timeout, unit);
+        addToQueue(mailQueueItem);
         return true;
     }
 

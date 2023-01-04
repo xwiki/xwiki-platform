@@ -486,8 +486,7 @@ $xwiki.ssx.use('XWiki.TagCloud')##
   ## Get tag count map. Key: tag, value: number of occurrences.
   #set ($tagCount = $xwiki.tag.getTagCount("$!tagCloudSpace"))
 #end
-## Organize tags as a list of {name, count} object
-## so that it is easier to handle (sorting, limiting, ...)
+## Organize tags as a list of {name, count} object so that it is easier to handle (sorting, limiting, ...)
 #set ($tagCountList = [])
 #foreach ($tagName in $tagCount.keySet())
   #set ($discard = $tagCountList.add({

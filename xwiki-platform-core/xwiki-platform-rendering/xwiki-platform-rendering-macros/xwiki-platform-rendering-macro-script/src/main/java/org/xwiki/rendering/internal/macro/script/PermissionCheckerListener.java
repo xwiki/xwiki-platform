@@ -24,6 +24,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.ComponentMandatory;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.observation.event.CancelableEvent;
@@ -49,6 +50,7 @@ import org.xwiki.security.authorization.Right;
  * @since 2.5M1
  */
 @Component
+@ComponentMandatory
 @Named("permissionchecker")
 @Singleton
 public class PermissionCheckerListener extends AbstractScriptCheckerListener

@@ -24,6 +24,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.ComponentMandatory;
 import org.xwiki.rendering.block.RawBlock;
 import org.xwiki.rendering.internal.transformation.macro.HTMLRawBlockFilter;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -39,6 +40,7 @@ import org.xwiki.security.authorization.Right;
  * @since 14.7RC1
  */
 @Component
+@ComponentMandatory
 @Singleton
 @Named("html")
 public class XWikiHTMLRawBlockFilter extends HTMLRawBlockFilter

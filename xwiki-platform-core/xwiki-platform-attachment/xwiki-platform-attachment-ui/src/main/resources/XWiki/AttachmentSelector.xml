@@ -1525,7 +1525,7 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
 #set ($property = "$!{xcontext.macro.params.property}")
 #set ($object = $numbertool.toNumber("$!{xcontext.macro.params.object}").intValue())
 #if ("$!{object}" != $!{xcontext.macro.params.object})
-  #set ($object = ${doc.getObject($classname).number})
+  #set ($object = ${targetdoc.getObject($classname).number})
   #if ("$!{object}" == '')
     #set ($object = 0)
   #end
@@ -1586,7 +1586,7 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
   #set ($savemode = 'form')
 #end
 
-#set ($propValue = "$!{doc.getObject($classname, $object).getProperty($property).value}")
+#set ($propValue = "$!{targetdoc.getObject($classname, $object).getProperty($property).value}")
 ##
 
 #macro (attachmentPicker_displayAttachment $name $displayImage $withLink $forceElement)

@@ -29,6 +29,8 @@ import java.util.Date;
 import org.apache.commons.codec.binary.Base64;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentMatchers;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
@@ -43,8 +45,12 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.web.XWikiServletRequest;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -106,7 +112,7 @@ public class ImagePluginTest
     {
         XWiki xwiki = this.oldCore.getSpyXWiki();
         doReturn("10").when(xwiki).Param("xwiki.plugin.image.cache.capacity");
-        doReturn("test").when(xwiki).Param(ArgumentMatchers.eq("xwiki.plugin.image.processorHint"),
+        doReturn("test").when(xwiki).Param(eq("xwiki.plugin.image.processorHint"),
             ArgumentMatchers.anyString());
 
         this.oldCore.getMocker().registerMockComponent(CacheManager.class);
@@ -172,5 +178,72 @@ public class ImagePluginTest
 
         verify(imageProcessor, times(1)).writeImage(renderedImage, "image/png", .5F, attachmentOutputStream);
         verify(imageCache, times(1)).set(cacheKey, attachment);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "100, 500, false, 100, 300",
+        "500, 100, false, 400, 100",
+        "100, 100, false, 100, 100",
+        "500, 100, false, 400, 100",
+        "100, 75, true, 100, 75",
+        "100, 100, true, 100, 75",
+        "120, 75, true, 100, 75",
+        "0, 75, true, 100, 75",
+        "100, 0, true, 100, 75",
+        "0, 75, false, 100, 75",
+        "100, 0, false, 100, 75",
+        "0, 0, false, 400, 300",
+        "0, 0, true, 400, 300",
+        "400, 75, true, 100, 75",
+        "500, 75, true, 100, 75",
+        "100, 300, true, 100, 75",
+        "100, 400, true, 100, 75",
+        "400, 300, true, 400, 300",
+        "500, 400, true, 400, 300"
+    })
+    void scaling(int width, int height, boolean keepAspectRatio, int expectedWidth, int expectedHeight)
+        throws Exception
+    {
+        Date date = new Date(0);
+
+        XWikiContext xcontext = this.oldCore.getXWikiContext();
+
+        XWikiAttachment attachment = mock(XWikiAttachment.class);
+        when(attachment.getMimeType(xcontext)).thenReturn("image/png");
+        InputStream attachmentInputStream = new ByteArrayInputStream(IMAGE_CONTENT);
+        when(attachment.getContentInputStream(xcontext)).thenReturn(attachmentInputStream);
+        when(attachment.clone()).thenReturn(attachment);
+        when(attachment.getDate()).thenReturn(date);
+
+        XWikiAttachmentContent attachmentContent = mock(XWikiAttachmentContent.class);
+        when(attachment.getAttachment_content()).thenReturn(attachmentContent);
+        when(attachmentContent.getContentInputStream()).thenReturn(attachmentInputStream);
+        OutputStream attachmentOutputStream = mock(OutputStream.class);
+        when(attachmentContent.getContentOutputStream()).thenReturn(attachmentOutputStream);
+
+        CacheManager cacheManager = this.oldCore.getMocker().getInstance(CacheManager.class);
+        Cache<Object> imageCache = mock(Cache.class);
+        when(cacheManager.createNewLocalCache(ArgumentMatchers.any())).thenReturn(imageCache);
+
+        XWikiServletRequest request = mock(XWikiServletRequest.class);
+        when(request.getParameter("width")).thenReturn(Integer.toString(width));
+        when(request.getParameter("height")).thenReturn(Integer.toString(height));
+        when(request.getParameter("keepAspectRatio")).thenReturn(Boolean.toString(keepAspectRatio));
+        xcontext.setRequest(request);
+
+        Image image = mock(Image.class);
+        when(image.getWidth(null)).thenReturn(400);
+        when(image.getHeight(null)).thenReturn(300);
+        when(this.imageProcessor.readImage(attachmentInputStream)).thenReturn(image);
+        RenderedImage renderedImage = mock(RenderedImage.class);
+        when(this.imageProcessor.scaleImage(eq(image), anyInt(), anyInt())).thenReturn(renderedImage);
+
+        this.plugin.downloadAttachment(attachment, xcontext);
+        if (expectedWidth == image.getWidth(null) && expectedHeight == image.getHeight(null)) {
+            verify(this.imageProcessor, never()).scaleImage(any(), anyInt(), anyInt());
+        } else {
+            verify(this.imageProcessor).scaleImage(image, expectedWidth, expectedHeight);
+        }
     }
 }

@@ -135,7 +135,7 @@ environment.permanentDirectory = $xwikiPropertiesEnvironmentPermanentDirectory
 #-# The default value is:
 # rendering.transformation.macro.hiddenCategories = Internal,Deprecated
 #-#
-#-# For instance, to make the "Development" category hidden by default, in addition to the default "Internal" and
+#-# For instance, to make the "Development" category hidden by default, in addition to the "Internal" and
 #-# "Deprecated" categories, you'd use:
 # rendering.transformation.macro.hiddenCategories = Development,Internal,Deprecated
 

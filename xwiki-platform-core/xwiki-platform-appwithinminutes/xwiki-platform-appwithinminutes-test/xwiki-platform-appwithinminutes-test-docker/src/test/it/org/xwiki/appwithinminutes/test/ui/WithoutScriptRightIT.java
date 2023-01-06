@@ -46,7 +46,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 14.10.1
  * @since 15.0RC1
  */
-@UITest
+@UITest(properties = {
+    // Exclude the AppWithinMinutes.ClassEditSheet and AppWithinMinutes.DynamicMessageTool from the PR checker since 
+    // they use the groovy macro which requires PR rights.
+    // TODO: Should be removed once XWIKI-20529 is closed.
+    // Exclude AppWithinMinutes.LiveTableEditSheet because it calls com.xpn.xwiki.api.Document.saveWithProgrammingRights
+    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:AppWithinMinutes\\.(ClassEditSheet|DynamicMessageTool|LiveTableEditSheet)"
+})
 class WithoutScriptRightIT
 {
     private static final String USER_NAME = "NoScript";

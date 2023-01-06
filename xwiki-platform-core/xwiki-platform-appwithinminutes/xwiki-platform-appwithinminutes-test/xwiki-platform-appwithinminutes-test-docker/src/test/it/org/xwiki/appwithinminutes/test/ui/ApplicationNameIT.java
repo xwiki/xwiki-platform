@@ -43,7 +43,13 @@ import static org.xwiki.appwithinminutes.test.po.ApplicationCreatePage.EMPTY_APP
  *
  * @version $Id$
  */
-@UITest
+@UITest(properties = {
+    // Exclude the AppWithinMinutes.ClassEditSheet and AppWithinMinutes.DynamicMessageTool from the PR checker since 
+    // they use the groovy macro which requires PR rights.
+    // TODO: Should be removed once XWIKI-20529 is closed.
+    // Exclude AppWithinMinutes.LiveTableEditSheet because it calls com.xpn.xwiki.api.Document.saveWithProgrammingRights
+    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:AppWithinMinutes\\.(ClassEditSheet|DynamicMessageTool|LiveTableEditSheet)"
+})
 class ApplicationNameIT
 {
     @BeforeAll

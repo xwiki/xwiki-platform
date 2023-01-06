@@ -30,6 +30,7 @@ import org.xwiki.diff.display.UnifiedDiffBlock;
 import org.xwiki.extension.xar.job.diff.DocumentUnifiedDiff;
 import org.xwiki.extension.xar.job.diff.DocumentVersionReference;
 import org.xwiki.extension.xar.job.diff.EntityUnifiedDiff;
+import org.xwiki.mail.GeneralMailConfiguration;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectReference;
@@ -61,6 +62,9 @@ public class DocumentUnifiedDiffBuilder extends AbstractUnifiedDiffBuilder
 
     @Inject
     private AttachmentUnifiedDiffBuilder attachmentDiffBuilder;
+
+    @Inject
+    private GeneralMailConfiguration emails;
 
     /**
      * Computes the differences, in unified format, between two versions of a document. A null document represents a
@@ -257,9 +261,12 @@ public class DocumentUnifiedDiffBuilder extends AbstractUnifiedDiffBuilder
             if (xclass != null) {
                 PropertyClass propertyClass = (PropertyClass) xclass.get(property.getName());
                 String propertyType = propertyClass == null ? null : propertyClass.getClassType();
-                return "Password".equals(propertyType) || "Email".equals(propertyClass);
+
+                return "Password".equals(propertyType)
+                    || ("Email".equals(propertyType) && this.emails.shouldObfuscate());
             }
         }
+
         return false;
     }
 

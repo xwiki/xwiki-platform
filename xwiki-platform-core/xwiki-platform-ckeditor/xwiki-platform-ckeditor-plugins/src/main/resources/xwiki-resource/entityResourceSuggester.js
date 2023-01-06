@@ -27,7 +27,7 @@ define('entityResourceSuggester', [
 ], function($, $resource, translations) {
   'use strict';
 
-  var search = function(query, input, deferred, entityType) {  
+  var search = function(query, input, deferred, entityType, base) {  
     $.post(new XWiki.Document('SuggestSolrService', 'XWiki').getURL('get'), {
       outputSyntax: 'plain',
       language: $('html').attr('lang'),
@@ -84,7 +84,7 @@ define('entityResourceSuggester', [
 
   $resource.types.doc.placeholder = translations.get('doc.placeholder');
   $resource.suggesters.doc = {
-    retrieve: function(resourceReference) {
+    retrieve: function(resourceReference, base) {
       var deferred = $.Deferred();
       var query = [
         'q=__INPUT__',
@@ -109,7 +109,7 @@ define('entityResourceSuggester', [
 
   $resource.types.attach.placeholder = translations.get('attach.placeholder');
   $resource.suggesters.attach = {
-    retrieve: function(resourceReference) {
+    retrieve: function(resourceReference, base) {
       var deferred = $.Deferred();
       var query = [
         'q=__INPUT__',
@@ -126,7 +126,7 @@ define('entityResourceSuggester', [
         input = '*:*';
         query.push('sort=attdate_sort desc');
       }
-      search(query, input, deferred, XWiki.EntityType.ATTACHMENT);
+      search(query, input, deferred, XWiki.EntityType.ATTACHMENT, base);
       return deferred.promise();
     },
     display: display

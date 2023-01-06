@@ -22,7 +22,6 @@ package org.xwiki.ckeditor.test.ui;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 import org.xwiki.ckeditor.test.po.CKEditor;
-import org.xwiki.ckeditor.test.po.LinkSelectorModal;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.test.docker.junit5.TestConfiguration;

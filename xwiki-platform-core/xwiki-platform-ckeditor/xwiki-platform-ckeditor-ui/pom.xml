@@ -94,6 +94,14 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- Used by the link plugin to search for resources. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-solr-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <type>xar</type>
+    </dependency>
     <!-- Test dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

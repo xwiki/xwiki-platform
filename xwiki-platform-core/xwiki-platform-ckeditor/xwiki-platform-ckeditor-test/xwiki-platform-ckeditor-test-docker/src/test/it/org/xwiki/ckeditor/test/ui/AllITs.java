@@ -49,4 +49,10 @@ public class AllITs
     class NestedTextAreaIT extends TextAreaIT
     {
     }
+
+    @Nested
+    @DisplayName("Link Plugin")
+    class NestedLinkPluginIT extends LinkPluginIT
+    {
+    }
 }

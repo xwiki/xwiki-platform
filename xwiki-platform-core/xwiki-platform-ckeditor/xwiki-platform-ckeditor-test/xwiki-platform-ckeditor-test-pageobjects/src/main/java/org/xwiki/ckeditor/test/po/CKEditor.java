@@ -106,6 +106,19 @@ public class CKEditor extends BaseElement
     }
 
     /**
+     * Click on the link button on the toolbar.
+     *
+     * @return the page object to interact with the link selection modal
+     * @since 15.0RC1
+     * @since 14.10.3
+     */
+    public LinkSelectorModal clickLinkButton()
+    {
+        getDriver().findElement(By.className("cke_button__link_icon")).click();
+        return new LinkSelectorModal();
+    }
+
+    /**
      * Click on the CKEditor image button when an image widget is on focus (i.e., the image modal will be opened in edit
      * mode).
      *

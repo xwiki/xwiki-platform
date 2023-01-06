@@ -19,7 +19,6 @@
 ## ---------------------------------------------------------------------------
 ## CSRF check
 #if ($services.csrf.isTokenValid($request.form_token))
-$!xwiki.getDocument($request.docname).delete()
 #if ("$!request.newAuthor" != '')
 #set ($oldAuthorReference = $services.model.resolveDocument($request.docname))
 #set ($newAuthorReference = $services.model.resolveDocument($request.newAuthor))
@@ -27,6 +26,7 @@ $!xwiki.getDocument($request.docname).delete()
 $!services.refactoring.changeDocumentAuthor($oldAuthorReference, $newAuthorReference).join()
 #end
 #end
+$!xwiki.getDocument($request.docname).delete()
 ## delete() doesn't return anything, so we need to print some text in order to avoid a "This template does not exist" response.
 OK
 #else

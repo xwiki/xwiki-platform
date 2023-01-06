@@ -79,8 +79,7 @@ class WithoutScriptRightIT
         assertTrue(applicationHomeEditPage.getContent().contains(NO_SCRIPT_ERROR));
 
         ApplicationHomePage applicationHomePage = applicationHomeEditPage.clickFinish();
-        // TODO: change to assert rendering errors when https://jira.xwiki.org/browse/XWIKI-20423 has been fixed.
-        assertTrue(applicationHomePage.hasEntriesLiveTable());
+        assertFalse(applicationHomePage.hasEntriesLiveTable());
 
         EntryNamePane entryNamePane = applicationHomePage.clickAddNewEntry();
         entryNamePane.setName("Test entry");

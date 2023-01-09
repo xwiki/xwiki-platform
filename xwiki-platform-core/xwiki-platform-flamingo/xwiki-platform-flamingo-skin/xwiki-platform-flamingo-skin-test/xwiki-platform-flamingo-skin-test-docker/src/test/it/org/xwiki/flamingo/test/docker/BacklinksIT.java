@@ -74,7 +74,7 @@ class BacklinksIT
             null);
 
         // Wait for the solr indexing to be completed before checking the backlinks of the target.
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmpyQueue();
+        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
 
         vp = setup.gotoPage(targetDocumentReference);
 

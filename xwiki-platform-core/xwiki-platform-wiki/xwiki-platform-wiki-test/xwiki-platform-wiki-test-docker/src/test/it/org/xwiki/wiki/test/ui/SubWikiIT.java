@@ -124,7 +124,7 @@ class SubWikiIT
         setup.createPage(mainWikiLinkPage, String.format("[[%s.WebHome]]", space));
 
         // Wait for the Solr indexing to be completed before moving the page
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmpyQueue();
+        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
 
         // Move the page to subwiki.
         ViewPage viewPage = setup.gotoPage(testReference);

@@ -38,6 +38,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.refactoring.internal.job.AbstractEntityJob;
 import org.xwiki.refactoring.job.EntityJobStatus;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 
@@ -106,17 +107,39 @@ public class MoveAttachmentJob
         // Update the author for the attribution of the attachment uploader.
         this.modelBridge.setContextUserReference(this.request.getUserReference());
         try {
-            this.progressManager.startStep(this);
-            moveAttachment(source, destination, autoRedirect, wiki);
-            this.progressManager.endStep(this);
+            if (checkMoveRights(source, destination)) {
+                this.progressManager.startStep(this);
+                moveAttachment(source, destination, autoRedirect, wiki);
+                this.progressManager.endStep(this);
 
-            this.progressManager.startStep(this);
-            this.observationManager.notify(new AttachmentMovedEvent((AttachmentReference) source, destination), this,
-                this.request);
-            this.progressManager.endStep(this);
+                this.progressManager.startStep(this);
+                this.observationManager.notify(new AttachmentMovedEvent((AttachmentReference) source, destination),
+                    this,
+                    this.request);
+                this.progressManager.endStep(this);
+            }
         } finally {
             this.progressManager.popLevelProgress(this);
         }
+    }
+
+    private boolean checkMoveRights(EntityReference source, EntityReference destination)
+    {
+        // Check view and edit right on source to ensure that the user doesn't get view right through the move.
+        // While edit right implies view right, the view right might be explicitly denied.
+        boolean hasSourceRight = hasAccess(Right.VIEW, source) && hasAccess(Right.EDIT, source);
+        boolean hasDestinationRight = hasAccess(Right.EDIT, destination);
+
+        if (!hasSourceRight) {
+            this.logger.error("You don't have sufficient permissions over the source attachment [{}].", source);
+        } else if (!hasDestinationRight) {
+            // The destination's document might be the same as the source, therefore, only log the error when there is
+            // no error regarding the source.
+            this.logger.error("You don't have sufficient permissions over the destination attachment [{}].",
+                destination);
+        }
+
+        return hasSourceRight && hasDestinationRight;
     }
 
     private void moveAttachment(EntityReference source, AttachmentReference destination, boolean autoRedirect,

@@ -136,4 +136,4 @@
 *** **##alt##**:ブラウザーが画像を表示できない際に表示するテキストを規定するパラメーター。これは必須のHTML要素であるため、##alt##パラメーターが設定されていない場合は、ファイル名を代わりに使用します。例：##alt="img.png"##
 *** **その他**：その他の属性を含むHTMLの##&lt;img&gt;##タグに関する説明は[[HTML標準&gt;&gt;https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element]]で確認できます。
 ** **##queryString##**：参照するイメージのダウンロード用のリンクの作成時にサーバーにクエリーを渡すことを許可。例：##queryString="width=100&amp;height=800&amp;keepAspectRatio=true"## (**##keepAspectRatio=true##は、##width##と##height##のパラメーターを##queryString##に加えて規定している場合は機能しません！**)</content>
-  </xwikidoc>
+</xwikidoc>

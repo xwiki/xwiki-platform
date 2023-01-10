@@ -238,4 +238,4 @@
 ** **##クエリー##**：リンクのターゲットアドレスに付けられ、レンダリングするURLで使用されるパラメーターを指定するクエリー文字列（オプション）。例： ##url:http:~/~/doMain.com/path||queryString="mydata1=5&amp;mydata2=Hello"##は、ターゲットのアドレス ##http:~/~/doMain.com/path?mydata1=5&amp;mydata2=Hello## を生成します
 ** **##アンカー##**：参照したリンクで規定するアンカーを指示するアンカー名（オプション）。XWikiでは見出しと画像のアンカーが自動的に作成されます。例： ##url:http:~/~/doMain.com/path||anchor="HTableOfContents"##は、ターゲットのアドレス ##http:~/~/doMain.com/path#HTableOfContents## を生成します
 ** **##ターゲット##**：リンクのターゲットを新しいウィンドウで開くことを可能とするパラメーター（オプション）。例： ##target="~_blank"##</content>
-  </xwikidoc>
+</xwikidoc>

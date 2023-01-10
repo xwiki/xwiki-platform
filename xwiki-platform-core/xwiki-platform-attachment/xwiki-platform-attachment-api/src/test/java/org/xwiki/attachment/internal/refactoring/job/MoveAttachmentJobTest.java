@@ -25,6 +25,8 @@ import javax.inject.Provider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.xwiki.attachment.internal.AttachmentsManager;
 import org.xwiki.attachment.internal.RedirectAttachmentClassDocumentInitializer;
@@ -36,6 +38,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.refactoring.internal.ModelBridge;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -54,8 +58,11 @@ import ch.qos.logback.classic.Level;
 
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -76,6 +83,8 @@ class MoveAttachmentJobTest
         new AttachmentReference("oldName", SOURCE_LOCATION);
 
     private static final DocumentReference AUTHOR_REFERENCE = new DocumentReference("xwiki", "XWiki", "User1");
+
+    private static final DocumentReference USER2_REFERENCE = new DocumentReference("xwiki", "XWiki", "User2");
 
     private static final DocumentReference TARGET_LOCATION = new DocumentReference("xwiki", "Space", "Target");
 
@@ -101,11 +110,14 @@ class MoveAttachmentJobTest
     private AttachmentsManager attachmentsManager;
 
     @MockComponent
-    protected ModelBridge modelBridge;
+    private ModelBridge modelBridge;
 
     @MockComponent
     @Named("document")
     private UserReferenceResolver<DocumentReference> documentReferenceUserReferenceResolver;
+
+    @MockComponent
+    private AuthorizationManager authorizationManager;
 
     @Mock
     private XWikiContext context;
@@ -129,7 +141,7 @@ class MoveAttachmentJobTest
     private UserReference authorReference;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     private MoveAttachmentRequest request;
 
@@ -153,6 +165,12 @@ class MoveAttachmentJobTest
         when(this.referenceSerializer.serialize(TARGET_LOCATION)).thenReturn("xwiki:Space.Target");
         when(this.referenceSerializer.serialize(SOURCE_LOCATION)).thenReturn("xwiki:Space.Source");
         when(this.documentReferenceUserReferenceResolver.resolve(AUTHOR_REFERENCE)).thenReturn(this.authorReference);
+
+        // Grant global view and edit right.
+        when(this.authorizationManager.hasAccess(eq(Right.VIEW), eq(AUTHOR_REFERENCE), any(AttachmentReference.class)))
+            .thenReturn(true);
+        when(this.authorizationManager.hasAccess(eq(Right.EDIT), eq(AUTHOR_REFERENCE), any(AttachmentReference.class)))
+            .thenReturn(true);
     }
 
     @Test
@@ -164,6 +182,7 @@ class MoveAttachmentJobTest
         this.request.setProperty(MoveAttachmentRequest.AUTO_REDIRECT, true);
         this.request.setInteractive(false);
         this.request.setUserReference(AUTHOR_REFERENCE);
+        this.request.setAuthorReference(AUTHOR_REFERENCE);
 
         XWikiAttachment sourceAttachment = mock(XWikiAttachment.class);
         XWikiAttachment targetAttachment = mock(XWikiAttachment.class);
@@ -204,6 +223,8 @@ class MoveAttachmentJobTest
         this.request.setProperty(MoveAttachmentRequest.DESTINATION, TARGET_ATTACHMENT_LOCATION);
         this.request.setProperty(MoveAttachmentRequest.AUTO_REDIRECT, true);
         this.request.setInteractive(false);
+        this.request.setUserReference(AUTHOR_REFERENCE);
+        this.request.setAuthorReference(AUTHOR_REFERENCE);
 
         XWikiAttachment sourceAttachment = mock(XWikiAttachment.class);
         XWikiAttachment targetAttachment = mock(XWikiAttachment.class);
@@ -257,6 +278,7 @@ class MoveAttachmentJobTest
         this.request.setProperty(MoveAttachmentRequest.AUTO_REDIRECT, true);
         this.request.setInteractive(false);
         this.request.setUserReference(AUTHOR_REFERENCE);
+        this.request.setAuthorReference(AUTHOR_REFERENCE);
 
         XWikiAttachment sourceAttachment = mock(XWikiAttachment.class);
         XWikiAttachment targetAttachment = mock(XWikiAttachment.class);
@@ -281,5 +303,46 @@ class MoveAttachmentJobTest
         verify(this.modelBridge).setContextUserReference(AUTHOR_REFERENCE);
         verify(this.sourceAuthors, times(2)).setEffectiveMetadataAuthor(this.authorReference);
         verify(this.sourceAuthors, times(2)).setOriginalMetadataAuthor(this.authorReference);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "true, true",
+        "false, true",
+        "true, false",
+        "false, false"
+    })
+    void failWithoutRights(boolean canView, boolean canEdit) throws Exception
+    {
+        // Request initialization.
+        this.request.setEntityReferences(singletonList(SOURCE_ATTACHMENT_LOCATION));
+        this.request.setProperty(MoveAttachmentRequest.DESTINATION, TARGET_ATTACHMENT_LOCATION);
+        this.request.setProperty(MoveAttachmentRequest.AUTO_REDIRECT, true);
+        this.request.setInteractive(false);
+        this.request.setUserReference(USER2_REFERENCE);
+        this.request.setAuthorReference(AUTHOR_REFERENCE);
+
+        when(this.authorizationManager.hasAccess(Right.EDIT, USER2_REFERENCE, SOURCE_ATTACHMENT_LOCATION))
+            .thenReturn(canEdit);
+        when(this.authorizationManager.hasAccess(Right.VIEW, USER2_REFERENCE, SOURCE_ATTACHMENT_LOCATION))
+            .thenReturn(canView);
+        when(this.authorizationManager.hasAccess(Right.EDIT, USER2_REFERENCE, TARGET_ATTACHMENT_LOCATION))
+            .thenReturn(false);
+
+        this.job.process(SOURCE_ATTACHMENT_LOCATION);
+
+        // Verify nothing has been modified.
+        verifyNoInteractions(this.sourceDocument, this.targetDocument);
+        verifyNoInteractions(this.attachmentsManager);
+        verify(this.wiki, never()).saveDocument(any(), any(), any());
+        verifyNoInteractions(this.targetAuthors, this.sourceAuthors);
+
+        if (!canEdit || !canView) {
+            assertEquals("You don't have sufficient permissions over the source attachment "
+                + "[Attachment xwiki:Space.Source@oldName].", this.logCapture.getMessage(0));
+        } else {
+            assertEquals("You don't have sufficient permissions over the destination attachment "
+                + "[Attachment xwiki:Space.Target@newName].", this.logCapture.getMessage(0));
+        }
     }
 }

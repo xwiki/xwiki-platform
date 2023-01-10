@@ -177,7 +177,15 @@
   #if ("$!request.document" != '')
     #set ($document = $xwiki.getDocument($request.document))
   #end
-  #if ($request.getHeader('X-XWiki-Temporary-Attachment-Support') == 'true' &amp;&amp; !$document.isTranslation())
+  ## Special handling if we're editing a translation that does not exist yet: in such case we cannot rely on $document.isTranslation because the context $tdoc
+  ## automatically fallback on the default locale in view mode, and we're getting this through a /get/ request.
+  ## See: XWIKI-20537
+  #set ($isNewTranslation = false)
+  #if ($document.locale == "" &amp;&amp; $services.localization.currentLocale != $services.localization.defaultLocale)
+    #set ($docRefWithLocale = $services.model.createDocumentReference($document.documentReference, $services.localization.currentLocale))
+    #set ($isNewTranslation = $xwiki.getDocument($docRefWithLocale).isNew())
+  #end
+  #if ($request.getHeader('X-XWiki-Temporary-Attachment-Support') == 'true' &amp;&amp; !$document.isTranslation() &amp;&amp; !$isNewTranslation)
     #handleTemporaryUploadRequest()
   #else
     #handleUploadRequest()

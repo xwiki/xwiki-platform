@@ -347,7 +347,7 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
                     // Add a successful task to the batch
                     tasks.add(task);
 
-                    // Stop the batch has been reached
+                    // Stop if the batch has been reached
                     if (tasks.size() == this.queueCapacity) {
                         break;
                     }

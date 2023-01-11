@@ -185,6 +185,8 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
 
     private Thread thread;
 
+    private int queueCapacity;
+
     private BlockingQueue<EventStoreTask<?, ?>> queue;
 
     private boolean notifyEach;
@@ -330,20 +332,32 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
     {
         this.execution.setContext(new ExecutionContext());
 
-        List<EventStoreTask<?, ?>> tasks = new ArrayList<>();
+        // Make sure to not treat more than the queue capacity in a single batch
+        List<EventStoreTask<?, ?>> tasks = new ArrayList<>(this.queueCapacity);
         try {
             for (EventStoreTask<?, ?> task = firstTask; task != null; task = this.queue.poll()) {
-                if (task != EventStoreTask.STOP) {
-                    try {
-                        processTask(task);
-                    } catch (Exception e) {
-                        task.future.completeExceptionally(e);
-                    }
+                if (task == EventStoreTask.STOP) {
+                    break;
+                }
 
+                try {
+                    // Execute the task
+                    processTask(task);
+
+                    // Add a successful task to the batch
                     tasks.add(task);
+
+                    // Stop the batch has been reached
+                    if (tasks.size() == this.queueCapacity) {
+                        break;
+                    }
+                } catch (Exception e) {
+                    // Indicate that the task failed
+                    task.future.completeExceptionally(e);
                 }
             }
         } finally {
+            // Give a chance to the extended class to do something before the tasks are declared complete
             afterTasks(tasks);
 
             this.execution.removeContext();
@@ -530,7 +544,8 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
         this.notifyEach = notifyEach;
         this.notifyAll = !notifyEach && notifyAll;
 
-        this.queue = new LinkedBlockingQueue<>(queueCapacity);
+        this.queueCapacity = queueCapacity;
+        this.queue = new LinkedBlockingQueue<>(this.queueCapacity);
 
         this.thread = new Thread(this::run);
         this.thread.setName("Asynchronous handler for event store [" + descriptor.getRoleHint() + "]");

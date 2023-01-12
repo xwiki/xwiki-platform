@@ -82,6 +82,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.mortbay.jasper</groupId>
+      <artifactId>apache-el</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-syntax-xwiki20</artifactId>
       <version>${rendering.version}</version>

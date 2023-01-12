@@ -268,13 +268,19 @@ require(['jquery', 'resource', 'resourcePicker'], function ($, $resource) {
           var resourceURL = CKEDITOR.plugins.xwikiResource.getResourceURL(resourceReference,
             this.getDialog().getParentEditor());
           var width = this.getDialog().getValueOf(resourcePickerId[0], "width");
-          if (width) {
-            resourceURL = resourceURL + '&width=' + width;
-          }
           var height = this.getDialog().getValueOf(resourcePickerId[0], "height");
-          if (height) {
-            resourceURL = resourceURL + '&height=' + height;
+
+          if (width || height) {
+            var params = [];
+            if (width) {
+              params.push("width=" + width);
+            }
+            if (height) {
+              params.push("height=" + height);
+            }
+            resourceURL += '&parameters[queryString]=' + encodeURI(params.join(','))
           }
+          
           this.setValue(resourceURL);
         }
         if (typeof oldCommit === 'function') {

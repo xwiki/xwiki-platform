@@ -189,7 +189,12 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
         };
         var data = modal.data('input');
         // Resolve the image url and assign it to a transient image object to be able to access its width and height.
-        img.src = CKEDITOR.plugins.xwikiResource.getResourceURL(data.imageData.resourceReference, data.editor);
+        var resourceReference = data.imageData.resourceReference;
+        var editor = data.editor;
+        img.src = getImageResourceURL(resourceReference, editor, {
+          width: this.width,
+          height: this.height
+        }) ;
         return promise;
       }
 
@@ -260,8 +265,16 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
       }
     }
 
+    function getImageResourceURL(resourceReference, editor, params)
+    {
+      return CKEDITOR.plugins.xwikiResource.getResourceURL(resourceReference, editor) + '&' + $.param(params || {});
+    }
+
     function getFormData(modal) {
       var resourceReference = modal.data('input').imageData.resourceReference;
+      var editor = modal.data('input').editor;
+      var width = $("#imageWidth").val();
+      var height = $("#imageHeight").val();
       return {
         resourceReference: resourceReference,
         imageStyle: $('#imageStyles').val(),
@@ -271,9 +284,12 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
         alt: $('#altText').val(),
         hasCaption: $("#imageCaptionActivation").prop('checked'),
         // TODO: Add support for editing the caption directly from the dialog (see CKEDITOR-435)
-        width: $("#imageWidth").val(),
-        height: $("#imageHeight").val(),
-        src: CKEDITOR.plugins.xwikiResource.getResourceURL(resourceReference, modal.data('input').editor)
+        width: width,
+        height: height,
+        src: getImageResourceURL(resourceReference, editor, {
+          width: width,
+          height: height
+        })
       };
     }
 

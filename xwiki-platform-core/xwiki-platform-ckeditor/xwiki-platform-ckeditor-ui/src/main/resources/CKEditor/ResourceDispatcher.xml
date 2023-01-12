@@ -43,13 +43,6 @@
 #if ($resourceType == 'attach')
   #set ($attachmentReference = $services.model.resolveAttachment($resourceReference))
   #set ($documentFullName = $services.model.serialize($attachmentReference.parent))
-  #set ($attachParams = {})
-  #if ($request.width)
-    #set ($attachParams.width = $request.width)
-  #end
-  #if ($request.height)
-    #set ($attachParams.height = $request.height)
-  #end
   #set ($resourceURL = $xwiki.getAttachmentURL($documentFullName, $attachmentReference.name))
 #elseif ($resourceType == 'doc')
   #set ($resourceURL = $xwiki.getURL($resourceReference))
@@ -74,9 +67,6 @@
     #if ($parts.size() == 2)
       ## Insert the new query string before the original one so that the new parameter values take precedence.
       #set ($queryString = "$queryString&amp;$parts.get(1)")
-    #end
-    #if($attachParams)
-    #set ($queryString = "$queryString&amp;$escapetool.url($attachParams)")
     #end
     $response.sendRedirect("$resourceURL?$queryString#$anchor")
   #else

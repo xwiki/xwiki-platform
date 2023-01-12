@@ -250,10 +250,10 @@ class DeletePageIT
      */
     @Test
     @Order(7)
-    void deleteChildren(TestUtils setup, TestReference parentReference, TestInfo info)
+    void deleteChildren(TestUtils setup, TestReference testReference, TestInfo info)
     {
         // Initialize the parent
-        ViewPage parentPage = setup.createPage(parentReference, "Content", "Parent");
+        ViewPage parentPage = setup.createPage(testReference, "Content", "Parent");
 
         // Test 1: Try to delete it to make sure we don't have the "affect children" option yet
         DeletePageConfirmationPage confirmationPage = parentPage.deletePage();
@@ -272,7 +272,7 @@ class DeletePageIT
         }
 
         // Test 2: when you don't select "affect children", the children are not deleted
-        parentPage = setup.gotoPage(parentReference);
+        parentPage = setup.gotoPage(testReference);
         confirmationPage = parentPage.deletePage();
         assertTrue(confirmationPage.hasAffectChildrenOption());
         confirmationPage.setAffectChildren(false);
@@ -294,7 +294,7 @@ class DeletePageIT
         deletingPage.waitUntilFinished();
         assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
         // Check the page have been effectively removed
-        ViewPage page = setup.gotoPage(parentReference);
+        ViewPage page = setup.gotoPage(testReference);
         assertFalse(page.exists());
         // But not the children 
         for (int i = 0; i < nbChildren; ++i) {
@@ -303,14 +303,14 @@ class DeletePageIT
         }
 
         // Test 3: when you select "affect children", the children are deleted too
-        parentPage = setup.createPage(parentReference, "Content", "Parent");
+        parentPage = setup.createPage(testReference, "Content", "Parent");
         confirmationPage = parentPage.deletePage();
         assertTrue(confirmationPage.hasAffectChildrenOption());
         confirmationPage.setAffectChildren(true);
         deletingPage = confirmationPage.confirmDeletePage();
         deletingPage.waitUntilFinished();
         // Check the page have been effectively removed
-        page = setup.gotoPage(parentReference);
+        page = setup.gotoPage(testReference);
         assertFalse(page.exists());
         // And also the children
         for (int i = 0; i < nbChildren; ++i) {
@@ -479,8 +479,8 @@ class DeletePageIT
 
     /**
      * This test checks the behaviour of the page deletion form when the user is allowed to choose between sending the
-     * page to the recycle bin or delete it permanently.
-     * In this test the user chooses to send the page to the recycle bin.
+     * page to the recycle bin or delete it permanently. In this test the user chooses to send the page to the recycle
+     * bin.
      */
     @Test
     @Order(9)
@@ -518,8 +518,7 @@ class DeletePageIT
 
     /**
      * This test checks the behaviour of the page deletion form when the user is allowed to choose between sending the
-     * page to the recycle bin or delete it permanently.
-     * In this test the user chooses to delete the page permanently.
+     * page to the recycle bin or delete it permanently. In this test the user chooses to delete the page permanently.
      */
     @Test
     @Order(10)
@@ -539,8 +538,8 @@ class DeletePageIT
 
     /**
      * This test is similar than {@link #deletePageWithUsedClass(TestUtils, TestInfo)} except that here we're checking
-     * the deletion when deleting only the xclass page alone: by default it should not be selected, and should not
-     * be deleted when confirming.
+     * the deletion when deleting only the xclass page alone: by default it should not be selected, and should not be
+     * deleted when confirming.
      */
     @Test
     @Order(11)
@@ -617,8 +616,8 @@ class DeletePageIT
     }
 
     /**
-     * This is basically the same scenario than before except that we create a translation of the xclass, and we try
-     * to delete that one: in theory it should only delete the translation.
+     * This is basically the same scenario than before except that we create a translation of the xclass, and we try to
+     * delete that one: in theory it should only delete the translation.
      */
     @Test
     @Order(12)

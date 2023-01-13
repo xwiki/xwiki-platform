@@ -76,7 +76,10 @@
     ## If a classname is defined and the class field corresponding to the column name,
     ## we check the type of the field and skip it if it's Password.
     #if ($className != '' &amp;&amp; $class.get($colname))
-      #if ($class.get($colname).classType != 'Password')
+      #set ($isPasswordType = $class.get($colname).classType == 'Password')
+      #set ($isEmailType = $class.get($colname).classType == 'Email')
+      #set ($emailObfuscated = $services.mail.general.shouldObfuscate())
+      #if (!($isPasswordType || ($isEmailType &amp;&amp; $emailObfuscated)))
         #livetable_addColumnToQuery($colname)
       #end
     #else
@@ -488,6 +491,8 @@
     #set($fieldProperty = $fieldObject.getProperty($colname))
     #if ($fieldProperty.getPropertyClass().classType == 'Password')
       #set($fieldValue = '********')
+    #elseif ($fieldProperty.getPropertyClass().classType == 'Email' &amp;&amp; $services.mail.general.shouldObfuscate())
+      #set ($fieldValue = $services.mail.general.obfuscate("$!fieldProperty.getValue()"))
     #else
       #set($fieldValue = "$!fieldProperty.getValue()")
     #end

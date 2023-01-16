@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Configuration options for the URL module.
@@ -33,6 +34,11 @@ import org.xwiki.component.annotation.Role;
 @Role
 public interface URLConfiguration
 {
+    /**
+     * Https scheme.
+     */
+    String HTTPS_SCHEME = "https";
+
     /**
      * @return the id of the URL format to use when converting a URL to a Resource. This allows to plug in different
      *         implementations and thus allows to completely control the format of XWiki URLs.
@@ -73,5 +79,37 @@ public interface URLConfiguration
     default boolean isTrustedDomainsEnabled()
     {
         return true;
+    }
+
+    /**
+     * Define which URI schemes should be trusted when checking if an URI can be trusted or not.
+     * Note that the list of defined schemes might not be enough if the scheme protocol is not supported (by default,
+     * only http, https, ftp and files are supported).
+     *
+     * @return a list of supported schemes for checking trusted URI
+     * @since 14.10.4
+     * @since 15.0RC1
+     */
+    @Unstable
+    default List<String> getTrustedSchemes()
+    {
+        return List.of("http", HTTPS_SCHEME, "ftp");
+    }
+
+    /**
+     * Define the default scheme to use if a URI is defined with an authority (a domain) but without a scheme
+     * (e.g. {@code //xwiki.org/myfile}). By default this default scheme is {@code https}, but admins might want to
+     * fallback to {@code http} in specific cases.
+     * Note that this scheme should be part of the list of trusted schemes (see {@link #getTrustedSchemes()}) or
+     * fallback to {@code https}.
+     *
+     * @return a scheme to fallback for trusted URI checking
+     * @since 14.10.4
+     * @since 15.0RC1
+     */
+    @Unstable
+    default String getDefaultURIScheme()
+    {
+        return HTTPS_SCHEME;
     }
 }

@@ -26,6 +26,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import javax.inject.Provider;
 import javax.servlet.http.HttpServletRequest;
@@ -55,6 +56,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -227,8 +229,13 @@ class DefaultURLSecurityManagerTest
         URI uri = new URI("");
         assertTrue(this.urlSecurityManager.isURITrusted(uri));
 
+        when(this.urlConfiguration.getDefaultURIScheme()).thenReturn("https");
         uri = new URI("//xwiki.org/xwiki/something/");
         assertFalse(this.urlSecurityManager.isURITrusted(uri));
+        verify(this.urlConfiguration).getDefaultURIScheme();
+
+        uri = new URI("/xwiki/somepage");
+        assertTrue(this.urlSecurityManager.isURITrusted(uri));
 
         uri = new URI("http://xwiki.org/xwiki/something/");
         assertFalse(this.urlSecurityManager.isURITrusted(uri));
@@ -238,6 +245,35 @@ class DefaultURLSecurityManagerTest
 
         uri = new URI("ftp://xwiki.org/xwiki/something/");
         assertFalse(this.urlSecurityManager.isURITrusted(uri));
+
+        uri = new URI("mailto:foo@xwiki.org");
+        assertFalse(this.urlSecurityManager.isURITrusted(uri));
+
+        uri = new URI("market://launch?id=somePackageName");
+        assertFalse(this.urlSecurityManager.isURITrusted(uri));
+
+        verify(this.urlConfiguration, times(3)).getTrustedSchemes();
+
+        // Check that using a list of trusted schemes is not enough here.
+        when(this.urlConfiguration.getTrustedSchemes()).thenReturn(List.of("http", "ftp", "mailto", "market"));
+
+        uri = new URI("http://xwiki.org/xwiki/something/");
+        assertFalse(this.urlSecurityManager.isURITrusted(uri));
+
+        uri = new URI("http:xwiki.org/xwiki/something/");
+        assertFalse(this.urlSecurityManager.isURITrusted(uri));
+
+        uri = new URI("ftp://xwiki.org/xwiki/something/");
+        assertFalse(this.urlSecurityManager.isURITrusted(uri));
+
+        uri = new URI("mailto:foo@xwiki.org");
+        assertFalse(this.urlSecurityManager.isURITrusted(uri));
+
+        uri = new URI("market://launch?id=somePackageName");
+        assertFalse(this.urlSecurityManager.isURITrusted(uri));
+        assertEquals(1, this.logCapture.size());
+        assertEquals("Error while transforming URI [market://launch?id=somePackageName] to URL: "
+            + "[MalformedURLException: unknown protocol: market]", this.logCapture.getMessage(0));
     }
 
     @Test
@@ -246,6 +282,8 @@ class DefaultURLSecurityManagerTest
         when(urlConfiguration.getTrustedDomains()).thenReturn(Collections.singletonList(
             "xwiki.org"
         ));
+        when(this.urlConfiguration.getTrustedSchemes()).thenReturn(List.of("http", "ftp", "sftp"));
+        when(this.urlConfiguration.getDefaultURIScheme()).thenReturn("https");
         URI uri = new URI("");
         assertTrue(this.urlSecurityManager.isURITrusted(uri));
 
@@ -261,10 +299,24 @@ class DefaultURLSecurityManagerTest
         uri = new URI("http:xwiki.org/xwiki/something/");
         assertFalse(this.urlSecurityManager.isURITrusted(uri));
 
-        uri = new URI("https://floo");
+        uri = new URI("http://floo");
+        assertFalse(this.urlSecurityManager.isURITrusted(uri));
+
+        // https not among accepted schemes.
+        uri = new URI("https://xwiki.org/something");
         assertFalse(this.urlSecurityManager.isURITrusted(uri));
 
         uri = new URI("/xwiki/something/");
         assertTrue(this.urlSecurityManager.isURITrusted(uri));
+
+        uri = new URI("mailto:foo@xwiki.org");
+        assertFalse(this.urlSecurityManager.isURITrusted(uri));
+
+        uri = new URI("sftp://xwiki.org/something");
+        assertFalse(this.urlSecurityManager.isURITrusted(uri));
+
+        assertEquals(1, this.logCapture.size());
+        assertEquals("Error while transforming URI [sftp://xwiki.org/something] to URL: "
+            + "[MalformedURLException: unknown protocol: sftp]", this.logCapture.getMessage(0));
     }
 }

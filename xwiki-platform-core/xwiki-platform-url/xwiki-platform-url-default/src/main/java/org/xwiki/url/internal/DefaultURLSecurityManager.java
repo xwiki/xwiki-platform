@@ -156,7 +156,8 @@ public class DefaultURLSecurityManager implements URLSecurityManager
     {
         boolean result = true;
 
-        // An opaque URI is defined with a scheme but without / i.e. http:xwiki.org
+        // An opaque URI is defined with a scheme but without //
+        // e.g. mailto:someone@acme.org or http:xwiki.org
         // We consider those URLs as untrusted even if they are parsed by browsers, as they are not parsed by URI
         // and we cannot properly check them.
         if (uri.isOpaque()) {
@@ -166,17 +167,20 @@ public class DefaultURLSecurityManager implements URLSecurityManager
             // Note that the URI might not be absolute, as it might not have a scheme
             // (e.g. //domain.org is a relative URI with an authority)
             try {
-                URI uriToTransform;
                 // We systematically put a http scheme if the scheme is missing, as it's how the browser would resolve
                 // it.
                 if (!uri.isAbsolute()) {
-                    uriToTransform = new URI("http", uri.getRawAuthority(), uri.getRawPath(), uri.getRawQuery(),
+                    URI uriWithScheme = new URI(this.urlConfiguration.getDefaultURIScheme(),
+                        uri.getRawAuthority(),
+                        uri.getRawPath(),
+                        uri.getRawQuery(),
                         uri.getRawFragment());
+                    result = this.isDomainTrusted(uriWithScheme.toURL());
+                } else if (this.urlConfiguration.getTrustedSchemes().contains(uri.getScheme().toLowerCase())) {
+                    result = this.isDomainTrusted(uri.toURL());
                 } else {
-                    uriToTransform = uri;
+                    result = false;
                 }
-
-                result = this.isDomainTrusted(uriToTransform.toURL());
             } catch (MalformedURLException e) {
                 logger.error("Error while transforming URI [{}] to URL: [{}]", uri,
                     ExceptionUtils.getRootCauseMessage(e));

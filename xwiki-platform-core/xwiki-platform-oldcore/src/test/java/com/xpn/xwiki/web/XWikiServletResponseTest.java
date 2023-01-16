@@ -93,9 +93,10 @@ class XWikiServletResponseTest
         this.servletResponse.sendRedirect("//xwiki.org/xwiki/something/");
         verify(this.httpServletResponse, never()).sendRedirect(any());
         assertEquals(2, this.logCapture.size());
-        assertEquals("Possible phishing attack, attempting to redirect to [//xwiki.org/xwiki/something/], this request "
-            + "has been blocked. If the request was legitimate, add the domain related to this request in the list of "
-            + "trusted domains in the configuration: it can be configured in xwiki.properties in url.trustedDomains.",
+        assertEquals("Possible phishing attack, attempting to redirect to [//xwiki.org/xwiki/something/], this request"
+                + " has been blocked. If the request was legitimate, please check the URL security configuration. "
+                + "You might need to add the domain related to this request in the list of trusted domains in the "
+                + "configuration: it can be configured in xwiki.properties in url.trustedDomains.",
             this.logCapture.getMessage(1));
 
         URI expectedURI = new URI("//xwiki.org/xwiki/something/");

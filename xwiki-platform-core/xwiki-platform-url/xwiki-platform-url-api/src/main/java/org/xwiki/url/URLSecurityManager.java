@@ -59,7 +59,8 @@ public interface URLSecurityManager
      * A URI can be trusted if:
      * <ul>
      *     <li>it's not opaque (see {@link URI} documentation for definition of opaque URI. TL;DR: a URI without
-     *     {@code //} is opaque)</li>
+     *     {@code //} is opaque): note that following this, any URI such as {@code mailto:acme@foo.org} won't be
+     *     trusted</li>
      *     <li>it refers to a specific domain and this domain is trusted (see {@link #isDomainTrusted(URL)})</li>
      *     <li>it's completely relative: it doesn't refer to an external domain</li>
      * </ul>

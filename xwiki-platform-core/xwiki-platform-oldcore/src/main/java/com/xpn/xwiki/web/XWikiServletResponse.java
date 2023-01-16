@@ -71,9 +71,10 @@ public class XWikiServletResponse implements XWikiResponse
                 if (!getURLSecurityManager().isURITrusted(uri)) {
                     LOGGER.warn(
                         "Possible phishing attack, attempting to redirect to [{}], this request has been blocked. "
-                            + "If the request was legitimate, add the domain related to this request in the list "
-                            + "of trusted domains in the configuration: it can be configured in xwiki.properties in "
-                            + "url.trustedDomains.", redirect);
+                            + "If the request was legitimate, please check the URL security configuration. You "
+                            + "might need to add the domain related to this request in the list of trusted domains in "
+                            + "the configuration: it can be configured in xwiki.properties in url.trustedDomains.",
+                        redirect);
                 } else {
                     this.response.sendRedirect(redirect);
                 }

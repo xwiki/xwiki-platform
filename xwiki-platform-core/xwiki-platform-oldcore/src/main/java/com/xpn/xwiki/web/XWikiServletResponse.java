@@ -21,6 +21,8 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Locale;
@@ -31,6 +33,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.url.URLSecurityManager;
@@ -62,34 +65,24 @@ public class XWikiServletResponse implements XWikiResponse
     @Override
     public void sendRedirect(String redirect) throws IOException
     {
-        if (StringUtils.isBlank(redirect)) {
-            // Nowhere to go to
-            return;
-        }
-        if (StringUtils.containsAny(redirect, '\r', '\n')) {
-            LOGGER.warn("Possible HTTP Response Splitting attack, attempting to redirect to [{}]", redirect);
-            return;
-        }
-
-        if (StringUtils.startsWith(redirect, "//")) {
-            LOGGER.warn("Possible phishing attack, attempting to redirect to [{}]. If this request is legitimate, "
-                + "use an actual absolute URL and pay attention to configure properly url.trustedDomains in "
-                + "xwiki.properties", redirect);
-            return;
-        }
-
-        // check for trusted domains, only if the given location is an absolute URL.
-        if (ABSOLUTE_URL_PATTERN.matcher(redirect).matches()) {
-            if (!getURLSecurityManager().isDomainTrusted(new URL(redirect))) {
-                LOGGER.warn(
-                    "Possible phishing attack, attempting to redirect to [{}], this request has been blocked. "
-                        + "If the request was legitimate, add the domain related to this request in the list "
-                        + "of trusted domains in the configuration: it can be configured in xwiki.properties in "
-                        + "url.trustedDomains.", redirect);
-                return;
+        if (!StringUtils.isBlank(redirect)) {
+            try {
+                URI uri = new URI(redirect);
+                if (!getURLSecurityManager().isURITrusted(uri)) {
+                    LOGGER.warn(
+                        "Possible phishing attack, attempting to redirect to [{}], this request has been blocked. "
+                            + "If the request was legitimate, add the domain related to this request in the list "
+                            + "of trusted domains in the configuration: it can be configured in xwiki.properties in "
+                            + "url.trustedDomains.", redirect);
+                } else {
+                    this.response.sendRedirect(redirect);
+                }
+            } catch (URISyntaxException e) {
+                LOGGER.error("Error while transforming redirect to [{}] to proper URI: [{}]", redirect,
+                    ExceptionUtils.getRootCauseMessage(e));
+                LOGGER.debug("Full stack trace:", e);
             }
         }
-        this.response.sendRedirect(redirect);
     }
 
     private URLSecurityManager getURLSecurityManager()

@@ -125,11 +125,28 @@
 
                  Single justification example:
             -->
-            
-            
-            
-            
-            
+            <revapi.differences>
+              <justification>Bad definition of xwiki-platform-legacy-office-viewer which use to embed
+                xwiki-platform-office-viewer where it should not have. No breakage in practice.</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.office.viewer.OfficeResourceViewer</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.office.viewer.OfficeViewerScriptService</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.office.viewer.script.DefaultOfficeViewerScriptService</old>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

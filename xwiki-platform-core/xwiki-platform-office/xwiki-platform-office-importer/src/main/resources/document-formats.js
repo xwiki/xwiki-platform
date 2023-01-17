@@ -348,7 +348,6 @@
       }
     }
   },
-  // New one
   {
     "name": "OpenDocument Presentation Flat XML",
     "extensions": [
@@ -369,7 +368,6 @@
     ],
     "mediaType": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
     "inputFamily": "PRESENTATION",
-    // Filter previously missing: keep it?
     "storeProperties": {
       "PRESENTATION": {
         "FilterName": "Impress MS PowerPoint 2007 XML"

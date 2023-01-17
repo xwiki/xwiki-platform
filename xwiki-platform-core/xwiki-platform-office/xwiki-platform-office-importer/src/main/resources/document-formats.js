@@ -34,7 +34,6 @@
       }
     }
   },
-  // New one
   {
     "name": "OpenDocument Text Template",
     "extensions": [
@@ -51,7 +50,6 @@
       }
     }
   },
-  // New one
   {
     "name": "OpenDocument Text Flat XML",
     "extensions": [
@@ -78,7 +76,6 @@
       }
     }
   },
-  // New one
   {
     "name": "Word Open XML Document Template",
     "extensions": [
@@ -111,14 +108,13 @@
       "html"
     ],
     "mediaType": "text/html",
-    "inputFamily": "TEXT", // Standard file is using "WEB"
+    "inputFamily": "WEB",
     "storeProperties": {
       "SPREADSHEET": {
         "FilterName": "HTML (StarCalc)"
       },
       "PRESENTATION": {
         "FilterName": "impress_html_Export",
-        // Not among standard file
         "FilterData": {
           "PublishMode": 0
         }
@@ -128,7 +124,6 @@
       }
     }
   },
-  // New one
   {
     "name": "XHTML",
     "extensions": [
@@ -213,7 +208,6 @@
       }
     }
   },
-  // New one
   {
     "name": "OpenDocument Spreadsheet Template",
     "extensions": [
@@ -227,7 +221,6 @@
       }
     }
   },
-  // New one
   {
     "name": "OpenDocument Spreadsheet Flat XML",
     "extensions": [
@@ -248,7 +241,6 @@
     ],
     "mediaType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     "inputFamily": "SPREADSHEET",
-    // Previously missing: keep it?
     "storeProperties": {
       "SPREADSHEET": {
         "FilterName": "Calc MS Excel 2007 XML"
@@ -343,7 +335,6 @@
       }
     }
   },
-  // New one
   {
     "name": "OpenDocument Presentation Template",
     "extensions": [
@@ -385,7 +376,6 @@
       }
     }
   },
-  // New one
   {
     "name": "Microsoft PowerPoint 2007-2013 XML Template",
     "extensions": [
@@ -438,7 +428,6 @@
       }
     }
   },
-  // New one
   {
     "name": "OpenDocument Drawing Template",
     "extensions": [
@@ -452,7 +441,6 @@
       }
     }
   },
-  // New one
   {
     "name": "OpenDocument Drawing Flat XML",
     "extensions": [
@@ -486,7 +474,6 @@
       "TEXT": {
         "FilterName": "writer_pdf_Export"
       },
-      // New property
       "WEB": {
         "FilterName": "writer_web_pdf_Export"
       }
@@ -508,7 +495,6 @@
       }
     }
   },
-  // New one
   {
     "name": "Visio XML",
     "extensions": [
@@ -522,7 +508,6 @@
       }
     }
   },
-  // New one
   {
     "name": "Visio",
     "extensions": [
@@ -536,7 +521,6 @@
       }
     }
   },
-  // New one
   {
     "name": "Windows Bitmap",
     "extensions": [
@@ -553,7 +537,6 @@
       }
     }
   },
-  // New one
   {
     "name": "Graphics Interchange Format",
     "extensions": [
@@ -570,7 +553,6 @@
       }
     }
   },
-  // New one
   {
     "name": "Joint Photographic Experts Group",
     "extensions": [
@@ -597,7 +579,6 @@
       }
     }
   },
-  // New one
   {
     "name": "Portable Network Graphics",
     "extensions": [
@@ -634,7 +615,6 @@
       "DRAWING": {
         "FilterName": "draw_svg_Export"
       },
-      // New properties
       "SPREADSHEET": {
         "FilterName": "calc_svg_Export"
       },
@@ -649,7 +629,6 @@
       }
     }
   },
-  // New one
   {
     "name": "Tagged Image File Format",
     "extensions": [
@@ -664,20 +643,6 @@
       },
       "PRESENTATION": {
         "FilterName": "impress_tif_Export"
-      }
-    }
-  },
-  // Missing from the default file
-  {
-    "name": "MediaWiki wikitext",
-    "extensions": [
-      "wiki"
-    ],
-    "mediaType": "text/x-wiki",
-    "inputFamily": "TEXT",
-    "storeProperties": {
-      "TEXT": {
-        "FilterName": "MediaWiki"
       }
     }
   }

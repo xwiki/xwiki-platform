@@ -41,19 +41,22 @@ import org.xwiki.icon.IconSetManager;
 import org.xwiki.localization.macro.internal.TranslationMacro;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
-import org.xwiki.rendering.RenderingScriptServiceComponentList;
 import org.xwiki.rendering.internal.configuration.DefaultExtendedRenderingConfiguration;
 import org.xwiki.rendering.internal.configuration.RenderingConfigClassDocumentConfigurationSource;
+import org.xwiki.rendering.internal.macro.DefaultMacroCategoryManager;
 import org.xwiki.rendering.internal.macro.message.WarningMessageMacro;
 import org.xwiki.rendering.internal.parser.reference.type.PathResourceReferenceTypeParser;
 import org.xwiki.rendering.internal.renderer.xhtml.link.DocumentXHTMLLinkTypeRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.link.PathXHTMLLinkTypeRenderer;
 import org.xwiki.rendering.internal.resolver.DefaultResourceReferenceEntityReferenceResolver;
 import org.xwiki.rendering.internal.resolver.DocumentResourceReferenceEntityReferenceResolver;
+import org.xwiki.rendering.internal.syntax.SyntaxConverter;
+import org.xwiki.rendering.internal.transformation.macro.DefaultMacroTransformationConfiguration;
 import org.xwiki.rendering.internal.wiki.XWikiWikiModel;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
+import org.xwiki.rendering.script.RenderingScriptService;
 import org.xwiki.template.script.TemplateScriptService;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -61,6 +64,7 @@ import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.TestNoScriptMacro;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
+import org.xwiki.xml.internal.html.filter.ControlCharactersFilter;
 
 import com.xpn.xwiki.DefaultSkinAccessBridge;
 import com.xpn.xwiki.XWikiException;
@@ -85,7 +89,6 @@ import static org.mockito.Mockito.when;
  */
 @HTML50ComponentList
 @XWikiSyntax21ComponentList
-@RenderingScriptServiceComponentList
 @ReferenceComponentList
 @ComponentList({
     // Class initializers
@@ -113,7 +116,14 @@ import static org.mockito.Mockito.when;
     PureTextSyntaxContentEditor.class,
     DefaultEditorDescriptorBuilder.class,
     DefaultEditorManager.class,
-    TemplateScriptService.class
+    TemplateScriptService.class,
+    // Rendering script service
+    RenderingScriptService.class,
+    SyntaxConverter.class,
+    DefaultMacroCategoryManager.class,
+    DefaultMacroTransformationConfiguration.class,
+    // For the HTML macro
+    ControlCharactersFilter.class
 })
 class XWikiSkinsSheetPageTest extends PageTest
 {

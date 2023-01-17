@@ -65,7 +65,7 @@
       <label>$escapetool.xml($services.localization.render($options.preview.label))</label>
       <span class="xHint">$escapetool.xml($services.localization.render($options.preview.hint))</span>
     </dt>
-    <dd>
+    <dd class="location-picker-preview">
       ## The breadcrumb is updated whenever the user changes the parent page. This causes the breadcrumb element to be
       ## constantly replaced, preventing us from displaying the live validation message after it. In order to overcome
       ## this, we wrap the breadcrumb element in a DIV that remains the same.

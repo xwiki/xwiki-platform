@@ -9,18 +9,17 @@
   margin-bottom: 0;
 }
 
-.location-picker .breadcrumb-container {
-  /*Allows overlapping with the location-action element with visual ordering in HTML.*/
-  float: left;
-  width: 100%;
+dd.location-picker-preview{
+  position: relative;
 }
 
 .location-actions {
-  float: right;
   /* Use the same padding as the breadcrumb. */
   padding: 8px 15px 0 15px;
   /*Allows overlapping with the breadcrumb-container.*/
-  margin-left:-70px;
+  position:absolute;
+  right:0;
+  top:0;
 }
 
 .location-action {

@@ -241,6 +241,11 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-legacy-office-viewer</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-legacy-url</artifactId>
       <version>${project.version}</version>
       <!-- Exclude transitive dependencies which are conflicting with legacy dependencies -->

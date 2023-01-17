@@ -20,6 +20,8 @@
 package org.xwiki.url.internal;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
@@ -75,7 +77,6 @@ public class DefaultURLSecurityManager implements URLSecurityManager
 
     private void computeTrustedDomains()
     {
-        Set<String> domains;
         this.trustedDomains = new HashSet<>(this.urlConfiguration.getTrustedDomains());
 
         try {
@@ -148,5 +149,50 @@ public class DefaultURLSecurityManager implements URLSecurityManager
     public void invalidateCache()
     {
         this.trustedDomains = null;
+    }
+
+    @Override
+    public boolean isURITrusted(URI uri)
+    {
+        boolean result = true;
+
+        // An opaque URI is defined with a scheme but without //
+        // e.g. mailto:someone@acme.org or http:xwiki.org
+        // We consider those URLs as untrusted even if they are parsed by browsers, as they are not parsed by URI
+        // and we cannot properly check them.
+        if (uri.isOpaque()) {
+            result = false;
+        } else if (uri.getAuthority() != null) {
+            // If the URI has an authority it means a domain has been specified and we should check it.
+            // Note that the URI might not be absolute, as it might not have a scheme
+            // (e.g. //domain.org is a relative URI with an authority)
+            try {
+                // We systematically put a https scheme if the scheme is missing, as it's how the browser would resolve
+                // it. Note that the scheme used here is only for building a proper URL for then checking domain:
+                // it's never actually used to perform any request.
+                if (!uri.isAbsolute()) {
+                    URI uriWithScheme = new URI("https",
+                        uri.getRawAuthority(),
+                        uri.getRawPath(),
+                        uri.getRawQuery(),
+                        uri.getRawFragment());
+                    result = this.isDomainTrusted(uriWithScheme.toURL());
+                } else if (this.urlConfiguration.getTrustedSchemes().contains(uri.getScheme().toLowerCase())) {
+                    result = this.isDomainTrusted(uri.toURL());
+                } else {
+                    result = false;
+                }
+            } catch (MalformedURLException e) {
+                logger.error("Error while transforming URI [{}] to URL: [{}]", uri,
+                    ExceptionUtils.getRootCauseMessage(e));
+                this.logger.debug("Full error stack trace of the URL resolution: ", e);
+                result = false;
+            } catch (URISyntaxException e) {
+                logger.error("Error while transforming URI [{}] to absolute URI with http scheme: [{}]", uri,
+                    ExceptionUtils.getRootCauseMessage(e));
+                this.logger.debug("Full error stack trace of the URI resolution: ", e);
+            }
+        }
+        return result;
     }
 }

@@ -46,10 +46,5 @@
       <artifactId>xwiki-commons-script</artifactId>
       <version>${commons.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-url-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
   </dependencies>
 </project>

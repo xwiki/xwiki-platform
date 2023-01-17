@@ -35,11 +35,6 @@ import org.xwiki.stability.Unstable;
 public interface URLConfiguration
 {
     /**
-     * Https scheme.
-     */
-    String HTTPS_SCHEME = "https";
-
-    /**
      * @return the id of the URL format to use when converting a URL to a Resource. This allows to plug in different
      *         implementations and thus allows to completely control the format of XWiki URLs.
      */
@@ -93,23 +88,6 @@ public interface URLConfiguration
     @Unstable
     default List<String> getTrustedSchemes()
     {
-        return List.of("http", HTTPS_SCHEME, "ftp");
-    }
-
-    /**
-     * Define the default scheme to use if a URI is defined with an authority (a domain) but without a scheme
-     * (e.g. {@code //xwiki.org/myfile}). By default this default scheme is {@code https}, but admins might want to
-     * fallback to {@code http} in specific cases.
-     * Note that this scheme should be part of the list of trusted schemes (see {@link #getTrustedSchemes()}) or
-     * fallback to {@code https}.
-     *
-     * @return a scheme to fallback for trusted URI checking
-     * @since 14.10.4
-     * @since 15.0RC1
-     */
-    @Unstable
-    default String getDefaultURIScheme()
-    {
-        return HTTPS_SCHEME;
+        return List.of("http", "https", "ftp");
     }
 }

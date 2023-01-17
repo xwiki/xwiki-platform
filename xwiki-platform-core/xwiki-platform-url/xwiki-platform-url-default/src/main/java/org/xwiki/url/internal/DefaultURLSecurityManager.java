@@ -167,10 +167,11 @@ public class DefaultURLSecurityManager implements URLSecurityManager
             // Note that the URI might not be absolute, as it might not have a scheme
             // (e.g. //domain.org is a relative URI with an authority)
             try {
-                // We systematically put a http scheme if the scheme is missing, as it's how the browser would resolve
-                // it.
+                // We systematically put a https scheme if the scheme is missing, as it's how the browser would resolve
+                // it. Note that the scheme used here is only for building a proper URL for then checking domain:
+                // it's never actually used to perform any request.
                 if (!uri.isAbsolute()) {
-                    URI uriWithScheme = new URI(this.urlConfiguration.getDefaultURIScheme(),
+                    URI uriWithScheme = new URI("https",
                         uri.getRawAuthority(),
                         uri.getRawPath(),
                         uri.getRawQuery(),

@@ -79,17 +79,6 @@ public class DefaultURLConfiguration implements URLConfiguration
     @Override
     public List<String> getTrustedSchemes()
     {
-        return this.configuration.get().getProperty(PREFIX + "trustedSchemes", List.of("http", HTTPS_SCHEME, "ftp"));
-    }
-
-    @Override
-    public String getDefaultURIScheme()
-    {
-        String defaultScheme = this.configuration.get().getProperty(PREFIX + "defaultScheme", HTTPS_SCHEME);
-        // Ensure that the configured default scheme is a trusted scheme.
-        if (!getTrustedSchemes().contains(defaultScheme)) {
-            defaultScheme = HTTPS_SCHEME;
-        }
-        return defaultScheme;
+        return this.configuration.get().getProperty(PREFIX + "trustedSchemes", List.of("http", "https", "ftp"));
     }
 }

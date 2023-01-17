@@ -925,17 +925,6 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-# The default is:
 # url.trustedSchemes=http,https,ftp
 
-#-# [Since 15.0RC1]
-#-# [Since 14.10.4]
-#-# Define the default scheme to fallback on in case an absolute URL is given starting with //
-#-# e.g.: //xwiki.org/myfile
-#-# Default value is https, but in some specific configuration admins might  want to switch it to http.
-#-# Note that for security reason, the value given here might be part of the trustedSchemes defined above, else it will
-#-# fallback to https.
-#-#
-#-# The default is:
-# url.defaultScheme=https
-
 #-------------------------------------------------------------------------------------
 # Attachment
 #-------------------------------------------------------------------------------------

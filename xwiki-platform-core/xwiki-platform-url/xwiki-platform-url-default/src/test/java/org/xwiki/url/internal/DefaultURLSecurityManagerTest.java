@@ -229,10 +229,8 @@ class DefaultURLSecurityManagerTest
         URI uri = new URI("");
         assertTrue(this.urlSecurityManager.isURITrusted(uri));
 
-        when(this.urlConfiguration.getDefaultURIScheme()).thenReturn("https");
         uri = new URI("//xwiki.org/xwiki/something/");
         assertFalse(this.urlSecurityManager.isURITrusted(uri));
-        verify(this.urlConfiguration).getDefaultURIScheme();
 
         uri = new URI("/xwiki/somepage");
         assertTrue(this.urlSecurityManager.isURITrusted(uri));
@@ -283,7 +281,6 @@ class DefaultURLSecurityManagerTest
             "xwiki.org"
         ));
         when(this.urlConfiguration.getTrustedSchemes()).thenReturn(List.of("http", "ftp", "sftp"));
-        when(this.urlConfiguration.getDefaultURIScheme()).thenReturn("https");
         URI uri = new URI("");
         assertTrue(this.urlSecurityManager.isURITrusted(uri));
 

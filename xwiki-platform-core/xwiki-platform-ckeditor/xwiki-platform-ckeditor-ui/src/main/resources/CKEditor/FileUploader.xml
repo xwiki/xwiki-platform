@@ -104,8 +104,18 @@
     #end
     #set ($reference = $document.documentReference)
     #try('uploadTemporaryAttachmentException')
-      #set ($attachment = $services.temporaryAttachments.uploadTemporaryAttachment($reference, 'upload',
-        $request.filename))
+      #if("$!request.filename" != '')
+        ## If the filename is explicitly provided, no need to recompute it.
+        #set ($fileName = $request.filename)
+      #else
+        #set ($fileName = $request.getPart('upload').getSubmittedFileName())
+        #if ($fileName.startsWith('__fileCreatedFromDataURI__.'))
+          ## We need to generate a new name so that we don't overwrite existing attachments.
+          #set ($extension = $stringtool.substringAfter($fileName, '.'))
+          #set ($fileName = "${datetool.date.time}-${mathtool.random(100, 1000)}.$extension")
+        #end
+      #end
+      #set ($attachment = $services.temporaryAttachments.uploadTemporaryAttachment($reference, 'upload', $fileName))
     #end
     #if ($attachment)
       #sendSuccess($document, $attachment.filename)

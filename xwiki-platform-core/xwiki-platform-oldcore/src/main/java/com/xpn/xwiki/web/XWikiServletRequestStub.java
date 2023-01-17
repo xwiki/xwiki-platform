@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -181,6 +182,8 @@ public class XWikiServletRequestStub implements XWikiRequest
 
     private Cookie[] cookies;
 
+    private List<Part> parts = new ArrayList<>();
+
     private String requestURI;
 
     private StringBuffer requestURL;
@@ -284,6 +287,7 @@ public class XWikiServletRequestStub implements XWikiRequest
 
         if (request instanceof XWikiServletRequestStub) {
             this.daemon = ((XWikiServletRequestStub) request).daemon;
+            this.parts = new ArrayList<>(((XWikiServletRequestStub) request).parts);
         }
     }
 
@@ -805,13 +809,16 @@ public class XWikiServletRequestStub implements XWikiRequest
     @Override
     public Collection<Part> getParts() throws IOException, ServletException
     {
-        return null;
+        return this.parts;
     }
 
     @Override
     public Part getPart(String s) throws IOException, ServletException
     {
-        return null;
+        return this.parts.stream()
+            .filter(part -> Objects.equals(part.getName(), s))
+            .findFirst()
+            .orElse(null);
     }
 
     @Override

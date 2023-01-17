@@ -20,6 +20,7 @@
 package org.xwiki.ckeditor;
 
 import javax.script.ScriptContext;
+import javax.servlet.http.Part;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,6 +49,8 @@ import net.sf.json.JSONObject;
 import static javax.script.ScriptContext.GLOBAL_SCOPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.matches;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -149,6 +152,60 @@ class FileUploaderPageTest extends PageTest
         assertEquals(0, json.get("uploaded"));
         assertEquals(400, json.getJSONObject("error").get("number"));
         assertEquals("ckeditor.upload.error.emptyReturn", json.getJSONObject("error").get("message"));
+    }
+
+    @Test
+    void replaceFileCreatedFromDataURIExplicitFilename() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", "CKEditor", "FileUploader");
+
+        this.context.setAction("get");
+
+        this.request.put("filename", "__fileCreatedFromDataURI__.zip");
+
+        Attachment attachment = mock(Attachment.class);
+
+        // The filename is not substituted when the filename is set explicitly in the query.
+        when(this.temporaryAttachmentsScriptService.uploadTemporaryAttachment(documentReference, "upload",
+            "__fileCreatedFromDataURI__.zip")).thenReturn(attachment);
+
+        when(attachment.getFilename()).thenReturn("__fileCreatedFromDataURI__.zip");
+
+        JSON json = renderJSONPage(documentReference);
+
+        assertEquals(1, ((JSONObject) json).get("uploaded"));
+        assertEquals("/xwiki/bin/download/CKEditor/FileUploader/__fileCreatedFromDataURI__.zip",
+            ((JSONObject) json).get("url"));
+        assertEquals("__fileCreatedFromDataURI__.zip", ((JSONObject) json).get("fileName"));
+    }
+
+    @Test
+    void replaceFileCreatedFromDataURI() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", "CKEditor", "FileUploader");
+
+        this.context.setAction("get");
+
+        Part part = mock(Part.class);
+        when(part.getName()).thenReturn("upload");
+        when(part.getSubmittedFileName()).thenReturn("__fileCreatedFromDataURI__.zip");
+        this.request.getParts().add(part);
+
+        Attachment attachment = mock(Attachment.class);
+        // The filename is not substituted when the filename is set explicitly in the query.
+        when(this.temporaryAttachmentsScriptService.uploadTemporaryAttachment(eq(documentReference), eq("upload"),
+            matches("\\d{13}-\\d+\\..+"))).thenAnswer(invocation -> {
+            when(attachment.getFilename()).thenReturn(invocation.getArgument(2));
+            return attachment;
+        });
+
+        JSON json = renderJSONPage(documentReference);
+
+        String filename = attachment.getFilename();
+        assertEquals(1, ((JSONObject) json).get("uploaded"));
+        assertEquals(String.format("/xwiki/bin/download/CKEditor/FileUploader/%s", filename),
+            ((JSONObject) json).get("url"));
+        assertEquals(filename, ((JSONObject) json).get("fileName"));
     }
 
     private void setAttachmentSupportStatus(boolean status)

@@ -1408,4 +1408,60 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# trust all users on the wiki.
 # localization.wiki.restrictUserTranslations = true
 
+#-------------------------------------------------------------------------------------
+# PDF Export
+#-------------------------------------------------------------------------------------
+
+#-# [Since 14.4.3]
+#-# [Since 14.6RC1]
+#-# Whether the PDF export should be performed server-side, e.g. using a headless Chrome web browser running inside a
+#-# Docker container, or client-side, using the user's web browser instead. Defaults to client-side PDF generation
+#-# starting with 14.8
+# export.pdf.serverSide = false
+
+#-# The host running the headless Chrome web browser, specified either by its name or by its IP address. This allows you
+#-# to use a remote Chrome instance, running on a separate machine, rather than a Chrome instance running in a Docker
+#-# container on the same machine. Defaults to empty value, meaning that by default the PDF export is done using the
+#-# Chrome instance running in the specified Docker container.
+# export.pdf.chromeHost =
+
+#-# The port number used for communicating with the headless Chrome web browser.
+# export.pdf.chromeRemoteDebuggingPort = 9222
+
+#-# The host name or IP address that the headless Chrome browser should use to access the XWiki instance (i.e. the print
+#-# preview page). Defaults to "host.xwiki.internal" which means the host running the Docker daemon; if XWiki runs
+#-# itself inside a Docker container then you should use the assigned network alias, provided both containers (XWiki and
+#-# Chrome) are in the same Docker network.
+# export.pdf.xwikiHost = host.xwiki.internal
+
+#-# The Docker image used to create the Docker container running the headless Chrome web browser.
+# export.pdf.chromeDockerImage = zenika/alpine-chrome:latest
+
+#-# The name of the Docker container running the headless Chrome web browser. This is especially useful when reusing an
+#-# existing container.
+# export.pdf.chromeDockerContainerName = headless-chrome-pdf-printer
+
+#-# The name or id of the Docker network to add the Chrome Docker container to. This is useful when XWiki itself runs
+#-# inside a Docker container and you want to have the Chrome container in the same network in order for them to
+#-# communicate. The default value "bridge" represents the default Docker network.
+# export.pdf.dockerNetwork = bridge
+
+#-# [Since 14.9]
+#-# The number of seconds to wait for the web page to be ready (for print) before timing out.
+# export.pdf.pageReadyTimeout = 60
+
+#-# [Since 14.10]
+#-# The maximum content size, in kilobytes (KB), an user is allowed to export to PDF. In order to compute the content
+#-# size we sum the size of the HTML rendering for each of the XWiki documents included in the export. The size of
+#-# external resources, such as images, style sheets, JavaScript code is not taken into account. 0 means no limit.
+# export.pdf.maxContentSize = 100
+
+#-# [Since 14.10]
+#-# The maximum number of PDF exports that can be executed in parallel (each PDF export needs a separate thread).
+# export.pdf.threadPoolSize = 3
+
+#-# [Since 14.10]
+#-# Whether to replace or not the old PDF export based on Apache Formatting Objects Processor (FOP).
+# export.pdf.replaceFOP = true
+
 $!xwikiPropertiesAdditionalProperties

@@ -911,6 +911,17 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-# By default this property is set to true:
 # url.trustedDomainsEnabled=true
 
+#-# [Since 15.0RC1]
+#-# [Since 14.10.4]
+#-# Define the list of schemes that are allowed for trusted URIs. Those schemes are checked whenever an absolute URI
+#-# needs to be checked (e.g. before performing a redirect). Any URI whose scheme doesn't belong to that list will not
+#-# be considered trustful, even if the domain of the URI is trusted.
+#-# Also note that even if a protocol is added here to be trusted, it might need a custom protocol handler. By default,
+#-# only http,https,ftp and file protocols are handled.
+#-#
+#-# The default is:
+# url.trustedSchemes=http,https,ftp
+
 #-------------------------------------------------------------------------------------
 # Attachment
 #-------------------------------------------------------------------------------------

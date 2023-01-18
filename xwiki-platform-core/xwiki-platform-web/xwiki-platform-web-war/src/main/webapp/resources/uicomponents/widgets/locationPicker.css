@@ -7,20 +7,31 @@
   /* Remove the margin so that the validation message is displayed right below the breadcrumb, for simple users.
      For advanced users the .location-edit element that follows the breadcrumb has a top margin. */
   margin-bottom: 0;
+  /*Overwrite style properties*/
+  background-color: transparent;
+  border-radius: 0px;
+  padding: 0;
+  /*Remove the ol left padding*/
+  padding-left: 0;
 }
 
 dd.location-picker-preview{
-  position: relative;
+  /*Make the location picker display the bg color*/
+  background-color: #f8f8f8;
+  border-radius: 4px;
+  /*Moved padding from both of the visible elements to the location picker*/
+  padding: 8px 15px 8px 15px;
+  /*Set up a flex display for breadcrumbs and location actions*/
+  display: flex;
+  
 }
-
+.breadcrumb-container{
+  /*Keep the same size whatever the content.*/
+  flex-grow: 1;
+}
 .location-actions {
-  /* Use the same padding as the breadcrumb. */
-  padding: 8px 15px 0 15px;
-  /*Allows overlapping with the breadcrumb-container.*/
-  position:absolute;
-  right:0;
-  top:0;
-}
+  /*Keeps all actions on one line.*/
+  white-space:nowrap;
 
 .location-action {
   /* Leave some space between the actions. */
@@ -33,6 +44,3 @@ dd.location-picker-preview{
 .location-edit {
   /* Indent the advanced location edit fields under the breadcrumb. */
   padding: 0 2em;
-  /* Leave some space after the breadcrumb and before the submit button. */
-  margin: 20px 0 2.5em 0;
-}

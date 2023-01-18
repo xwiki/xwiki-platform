@@ -37,6 +37,7 @@ dd.location-picker-preview{
   /* Leave some space between the actions. */
   margin-left: 3px;
 }
+
 .location-action:first-of-type {
   margin-left: 0;
 }
@@ -44,3 +45,4 @@ dd.location-picker-preview{
 .location-edit {
   /* Indent the advanced location edit fields under the breadcrumb. */
   padding: 0 2em;
+}

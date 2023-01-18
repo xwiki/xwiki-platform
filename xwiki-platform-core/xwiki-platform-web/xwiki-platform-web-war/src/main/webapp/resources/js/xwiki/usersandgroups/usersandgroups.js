@@ -55,6 +55,13 @@ window.MSCheckbox = Class.create({
     ];
     this.labels = ['','',''];
 
+    // Alts are the messages describing the checkbox images
+    this.alts = [
+      '$escapetool.javascript($services.localization.render("none"))',
+      '$escapetool.javascript($services.localization.render("allow_1"))',
+      '$escapetool.javascript($services.localization.render("allow_0"))'
+    ];
+
     this.draw(this.state);
     this.attachEvents();
   },
@@ -71,6 +78,9 @@ window.MSCheckbox = Class.create({
     //add new image
     var img = document.createElement('img');
     img.src = this.images[state];
+    img.alt = this.domNode.getAttribute('data-title') + " " + this.alts[state];
+    img.tabIndex = 0;
+    
     this.domNode.appendChild(img);
     //add label
     if (this.labels[state] != '') {
@@ -89,6 +99,8 @@ window.MSCheckbox = Class.create({
       delete this.table.fetchedRows[this.idx];
     }
     this.draw(this.state);
+    /*After changing the image through an interaction, put focus back on it.*/
+    this.domNode.firstChild.focus(); 
   },
 
   /* Confirmation cases:
@@ -205,10 +217,22 @@ window.MSCheckbox = Class.create({
       });
     }
   },
+  
+  createKeyboardHandler: function(self)
+  {
+    var clickHandler = self.createClickHandler(self);
+    
+    return function(event) {
+      if(event.key == "Enter"){
+        clickHandler()
+      }
+    }
+  },
 
   attachEvents: function()
   {
     Event.observe(this.domNode, 'click', this.createClickHandler(this));
+    Event.observe(this.domNode, 'keydown', this.createKeyboardHandler(this));
   }
 });
 

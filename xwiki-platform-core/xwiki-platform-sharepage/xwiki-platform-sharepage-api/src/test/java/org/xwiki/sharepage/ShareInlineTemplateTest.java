@@ -19,6 +19,8 @@
  */
 package org.xwiki.sharepage;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.template.TemplateManager;
@@ -26,6 +28,7 @@ import org.xwiki.template.script.TemplateScriptService;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.PageTest;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -69,5 +72,28 @@ class ShareInlineTemplateTest extends PageTest
         String result = templateManager.render("shareinline.vm");
 
         assertTrue(result.contains("<div class=\"infomessage\">core.viewers.share.send.success [john]</div>"));
+    }
+
+    @Test
+    void displayEmailErrorWithSpecialChars() throws Exception
+    {
+        // Log in (since the template checks that a user is logged in)
+        this.oldcore.getXWikiContext().setUserReference(new DocumentReference("xwiki", "XWiki", "SomeUser"));
+
+        // Simulate that we're using the shareinline template to send the emails
+        this.request.put("send", "1");
+        // Simulate an unknown target recipient to send the share page to, to produce an error message.
+        // The '@' is required in order to make it considered as a mail.
+        this.request.put("target", "<strong>hello</strong>@");
+
+        this.request.put("message", "Test message");
+
+        TemplateManager templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);
+
+        Document document = Jsoup.parse(templateManager.render("shareinline.vm"));
+
+        assertEquals("error: core.viewers.share.send.error "
+                + "[<strong>hello</strong>, core.viewers.share.error.serverError]",
+            document.selectFirst(".errormessage").text());
     }
 }

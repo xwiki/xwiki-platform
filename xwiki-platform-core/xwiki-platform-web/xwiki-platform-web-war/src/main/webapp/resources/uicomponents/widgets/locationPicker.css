@@ -21,17 +21,20 @@ dd.location-picker-preview{
   border-radius: 4px;
   /*Moved padding from both of the visible elements to the location picker*/
   padding: 8px 15px 8px 15px;
-  /*Set up a flex display for breadcrumbs and location actions*/
+  /*Set up a flex display for breadcrumbs, location actions and edit location.*/
   display: flex;
+  flex-wrap: wrap;
   
 }
 .breadcrumb-container{
   /*Keep the same size whatever the content.*/
   flex-grow: 1;
 }
+
 .location-actions {
   /*Keeps all actions on one line.*/
   white-space:nowrap;
+}
 
 .location-action {
   /* Leave some space between the actions. */
@@ -43,6 +46,10 @@ dd.location-picker-preview{
 }
 
 .location-edit {
+  /*Start on a new line of the flexbox*/
+  flex-basis: 100%;
   /* Indent the advanced location edit fields under the breadcrumb. */
   padding: 0 2em;
+  /* Leave some space after the breadcrumb and before the submit button. */
+  margin: 20px 0 2.5em 0;
 }

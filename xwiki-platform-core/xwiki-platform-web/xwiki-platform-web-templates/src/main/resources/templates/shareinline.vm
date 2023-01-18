@@ -84,7 +84,10 @@
   #end
   #if ($errors.size() > 0)
     #foreach ($recipient in $errors.keySet())
-      #error($services.localization.render('core.viewers.share.send.error', [${recipient}, ${errors.get($recipient)}]))
+      #set ($errorMessage = $services.localization.render('core.viewers.share.send.error', 
+        [${recipient}, ${errors.get($recipient)}])) 
+      #set ($errorMessage = $escapetool.xml($errorMessage))
+      #error($errorMessage)
     #end
   #end
   <a href='$doc.getURL()' class='share-backlink'>$services.localization.render('core.viewers.share.send.back', ["<em>${doc.displayTitle}</em>"])</a>

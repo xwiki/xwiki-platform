@@ -92,11 +92,11 @@ public final class LocalizationSetup
                 when(translation.getLocale()).thenReturn(Locale.ENGLISH);
                 String translationKey = invocationOnMockTranslation.getArgument(0);
                 when(translation.getKey()).thenReturn(translationKey);
-                when(translation.render(any())).thenAnswer(invocationOnMockRender -> {
+                when(translation.render(any(Object[].class))).thenAnswer(invocationOnMockRender -> {
                     Object[] parameters = getVarArgs(invocationOnMockRender, 0);
                     return renderBlock(translationKey, parameters);
                 });
-                when(translation.render(any(), any())).thenAnswer(invocationOnMockRender -> {
+                when(translation.render(any(), any(Object[].class))).thenAnswer(invocationOnMockRender -> {
                     Object[] parameters = getVarArgs(invocationOnMockRender, 1);
                     return renderBlock(translationKey, parameters);
                 });

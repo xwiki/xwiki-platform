@@ -217,11 +217,10 @@ window.MSCheckbox = Class.create({
       });
     }
   },
-  
+  /* Redirects towards a click eventhandler if the pressed key is Enter*/
   createKeyboardHandler: function(self)
   {
     var clickHandler = self.createClickHandler(self);
-    
     return function(event) {
       if(event.key == "Enter"){
         clickHandler()
@@ -232,7 +231,7 @@ window.MSCheckbox = Class.create({
   attachEvents: function()
   {
     Event.observe(this.domNode, 'click', this.createClickHandler(this));
-    Event.observe(this.domNode, 'keydown', this.createKeyboardHandler(this));
+    Event.observe(this.domNode, 'keydown', this.createKeyboardHandler(this));   /*Added for accessibility through keyboard*/
   }
 });
 

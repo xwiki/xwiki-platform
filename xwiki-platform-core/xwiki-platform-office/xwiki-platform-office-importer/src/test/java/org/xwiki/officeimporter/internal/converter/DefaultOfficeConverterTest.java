@@ -34,7 +34,6 @@ import org.jodconverter.core.document.DefaultDocumentFormatRegistry;
 import org.jodconverter.core.job.ConversionJobWithOptionalSourceFormatUnspecified;
 import org.jodconverter.core.job.ConversionJobWithOptionalTargetFormatUnspecified;
 import org.jodconverter.core.office.OfficeException;
-import org.jodconverter.local.LocalConverter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -1268,4 +1268,23 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The default value is:
 # skinx.jsStrictModeEnabled = false
 
+#-------------------------------------------------------------------------------------
+# Tags
+#-------------------------------------------------------------------------------------
+
+#-# [Since 14.4.8, 14.10.4, 15.0RC1]
+#-# Configure the tag selection algorithm to use.
+#-# The default algorithm is "exhaustive", which check all elements (documents and tags) for view right before returning
+#-# them. This exhaustive check can lead to tag clouds and tag lists being slow to compute on instances with very large 
+#-# amounts of tags or tagged documents (more than 5000 of elements).   
+#-# Note that it is advised to keep using the default implementation as much as possible, and to switch to the "unsafe"
+#-# option only when all performance improvements options have been exhausted 
+#-# (see https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/Performances/)
+#-# The "unsafe" algorithm does not perform any right checks. It is approximately 10 times faster than "exhaustive"
+#-# but does not provide any guarantee that the current user won't be able to view a tag he/she is not allowed to. 
+#-# Therefore, we cannot recommend to use it unless tags performance is critical AND tags and document references are 
+#-# not considered as critical information.
+# tag.rightCheckStrategy.hint=exhaustive
+# tag.rightCheckStrategy.hint=unsafe
+
 $!xwikiPropertiesAdditionalProperties

@@ -32,7 +32,7 @@
   <description>XWiki Platform - Tag - API</description>
   <properties>
     <!-- code coverage: it is not much, but it is a start -->
-    <xwiki.jacoco.instructionRatio>0.13</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.32</xwiki.jacoco.instructionRatio>
     </properties>
   <dependencies>
     <dependency>
@@ -59,6 +59,11 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-tool-test-component</artifactId>
       <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

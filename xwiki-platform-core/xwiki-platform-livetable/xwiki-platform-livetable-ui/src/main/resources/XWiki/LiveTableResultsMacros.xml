@@ -312,7 +312,13 @@
   ##
   ## TagCloud matching all the documents used by the live table
   ##
-  #set($allMatchingTags = $xwiki.tag.getTagCountForQuery($allMatchingTagsFrom, $allMatchingTagsWhere, $allMatchingParams))
+  ## If all the query parameters are the same as for $tagsMatchingFilters, no need to run the query again.
+  ## This optimization allows to divide the time to compute the tagcloud by 2 when the table has no filters applied.  
+  #if ($allMatchingTagsFrom.trim() != $tagsMatchingFiltersFrom.trim() || $allMatchingTagsWhere.trim() != $tagsMatchingFiltersWhere.trim() || $tagsMatchingParams != $allMatchingParams)
+    #set($allMatchingTags = $xwiki.tag.getTagCountForQuery($allMatchingTagsFrom, $allMatchingTagsWhere, $allMatchingParams))
+  #else
+    #set($allMatchingTags = $tagsMatchingFilters)
+  #end
   ## FIXME: We use a list of maps just because the client expects an array, but we should simply return $allMatchingTags..
   #set($tags = [])
   #foreach($tag in $allMatchingTags.keySet())
@@ -347,7 +353,7 @@
   #set ($query = $query.setLimit($limit).setOffset($offset).bindValues($sqlParams))
   #set($items = $query.execute())
   #set($discard = $map.put('totalrows', $query.count()))
-  #if ($limit > 0)
+  #if ($limit &gt; 0)
     #set($discard = $map.put('returnedrows', $mathtool.min($items.size(), $limit)))
   #else
     ## When the limit is 0, it's equivalent to no limit at all and the actual number of returned results can be used.

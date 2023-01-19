@@ -19,22 +19,19 @@
  */
 package com.xpn.xwiki.plugin.tag;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
-import org.apache.commons.lang3.StringUtils;
-import org.xwiki.query.Query;
-import org.xwiki.query.QueryException;
-import org.xwiki.query.QueryFilter;
 import org.xwiki.query.internal.HiddenDocumentFilter;
-import org.xwiki.query.internal.UniqueDocumentFilter;
+import org.xwiki.tag.internal.TagException;
+import org.xwiki.tag.internal.TagsSelector;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.web.Utils;
+
+import static com.xpn.xwiki.XWikiException.ERROR_XWIKI_UNKNOWN;
+import static com.xpn.xwiki.XWikiException.MODULE_XWIKI_STORE;
 
 /**
  * TagQueryUtils handles queries allowing to search and count tags within the wiki.
@@ -48,6 +45,8 @@ public final class TagQueryUtils
      * Hint of the "hidden" QueryFilter.
      */
     public static final String HIDDEN_QUERYFILTER_HINT = HiddenDocumentFilter.HINT;
+
+    private static TagsSelector tagsSelector;
 
     /**
      * Utility class, private constructor.
@@ -65,24 +64,11 @@ public final class TagQueryUtils
      */
     public static List<String> getAllTags(XWikiContext context) throws XWikiException
     {
-        List<String> results;
-
-        String hql = "select distinct elements(prop.list) from XWikiDocument as doc, BaseObject as obj, "
-            + "DBStringListProperty as prop where obj.name=doc.fullName and obj.className='XWiki.TagClass' and "
-            + "obj.id=prop.id.id and prop.id.name='tags'";
-
         try {
-            Query query = context.getWiki().getStore().getQueryManager().createQuery(hql, Query.HQL);
-            query.addFilter(Utils.getComponent(QueryFilter.class, HiddenDocumentFilter.HINT));
-            results = query.execute();
-        } catch (QueryException e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
-                String.format("Failed to get all tags for query [%s]", hql), e);
+            return getTagsSelector().getAllTags();
+        } catch (TagException e) {
+            throw new XWikiException(MODULE_XWIKI_STORE, ERROR_XWIKI_UNKNOWN, "Failed to get all tags", e);
         }
-
-        Collections.sort(results, String.CASE_INSENSITIVE_ORDER);
-
-        return results;
     }
 
     /**
@@ -100,7 +86,13 @@ public final class TagQueryUtils
     public static Map<String, Integer> getTagCountForQuery(String fromHql, String whereHql, List<?> parameterValues,
         XWikiContext context) throws XWikiException
     {
-        return getTagCountForQuery(fromHql, whereHql, (Object) parameterValues, context);
+        try {
+            return getTagsSelector().getTagCountForQuery(fromHql, whereHql, parameterValues);
+        } catch (TagException e) {
+            throw new XWikiException(MODULE_XWIKI_STORE, ERROR_XWIKI_UNKNOWN, String.format(
+                "Failed to count tags for where fromHql = [%s] and whereHql = [%s] and parameterValues = [%s].",
+                fromHql, whereHql, parameterValues), e);
+        }
     }
 
     /**
@@ -118,68 +110,13 @@ public final class TagQueryUtils
     public static Map<String, Integer> getTagCountForQuery(String fromHql, String whereHql, Map<String, ?> parameters,
         XWikiContext context) throws XWikiException
     {
-        return getTagCountForQuery(fromHql, whereHql, (Object) parameters, context);
-    }
-
-    private static Map<String, Integer> getTagCountForQuery(String fromHql, String whereHql, Object parameters,
-        XWikiContext context) throws XWikiException
-    {
-        List<String> results;
-        Map<String, Integer> tagCount = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-
-        String from = "select elements(prop.list) from XWikiDocument as doc, BaseObject as tagobject, "
-            + "DBStringListProperty as prop";
-        String where = " where tagobject.name=doc.fullName and tagobject.className='XWiki.TagClass' and "
-            + "tagobject.id=prop.id.id and prop.id.name='tags' and doc.translation=0";
-
-        // If at least one of the fragments is passed, the query should be matching XWiki documents
-        if (!StringUtils.isBlank(fromHql) || !StringUtils.isBlank(whereHql)) {
-            from += fromHql;
-        }
-        if (!StringUtils.isBlank(whereHql)) {
-            where += " and " + whereHql;
-        }
-
-        String hql = from + where;
-
         try {
-            Query query = context.getWiki().getStore().getQueryManager().createQuery(hql, Query.HQL);
-            if (parameters != null) {
-                if (parameters instanceof Map) {
-                    query.bindValues((Map) parameters);
-                } else {
-                    query.bindValues((List) parameters);
-                }
-            }
-            query.addFilter(Utils.getComponent(QueryFilter.class, HiddenDocumentFilter.HINT));
-            results = query.execute();
-        } catch (QueryException e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
-                String.format("Failed to get tag count for query [%s], with parameters [%s]", hql, parameters), e);
+            return getTagsSelector().getTagCountForQuery(fromHql, whereHql, parameters);
+        } catch (TagException e) {
+            throw new XWikiException(MODULE_XWIKI_STORE, ERROR_XWIKI_UNKNOWN, String.format(
+                "Failed to count tags for where fromHql = [%s] and whereHql = [%s] and parameters = [%s].", fromHql,
+                whereHql, parameters), e);
         }
-
-        Collections.sort(results, String.CASE_INSENSITIVE_ORDER);
-        Map<String, String> processedTags = new HashMap<>();
-
-        // We have to manually build a cardinality map since we have to ignore tags case.
-        for (String result : results) {
-            // This key allows to keep track of the case variants we've encountered.
-            String lowerTag = result.toLowerCase();
-
-            // We store the first case variant to reuse it in the final result set.
-            if (!processedTags.containsKey(lowerTag)) {
-                processedTags.put(lowerTag, result);
-            }
-
-            String tagCountKey = processedTags.get(lowerTag);
-            int tagCountForTag = 0;
-            if (tagCount.get(tagCountKey) != null) {
-                tagCountForTag = tagCount.get(tagCountKey);
-            }
-            tagCount.put(tagCountKey, tagCountForTag + 1);
-        }
-
-        return tagCount;
     }
 
     /**
@@ -209,27 +146,19 @@ public final class TagQueryUtils
     public static List<String> getDocumentsWithTag(String tag, boolean includeHiddenDocuments, XWikiContext context)
         throws XWikiException
     {
-        List<String> results;
-
-        String hql = ", BaseObject as obj, DBStringListProperty as prop join prop.list item"
-            + " where obj.className=:className and obj.name=doc.fullName and obj.id=prop.id.id and prop.id.name='tags'"
-            + " and lower(item)=lower(:item) order by doc.fullName";
-
         try {
-            Query query = context.getWiki().getStore().getQueryManager().createQuery(hql, Query.HQL);
-            query.bindValue("className", TagPlugin.TAG_CLASS);
-            query.bindValue("item", tag);
-            query.addFilter(Utils.getComponent(QueryFilter.class, UniqueDocumentFilter.HINT));
-            if (!includeHiddenDocuments) {
-                query.addFilter(Utils.getComponent(QueryFilter.class, HiddenDocumentFilter.HINT));
-            }
-
-            results = query.execute();
-        } catch (QueryException e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
-                String.format("Failed to search for document with tag [%s]", tag), e);
+            return getTagsSelector().getDocumentsWithTag(tag, includeHiddenDocuments);
+        } catch (TagException e) {
+            throw new XWikiException(MODULE_XWIKI_STORE, ERROR_XWIKI_UNKNOWN,
+                String.format("Failed to get all documents with tag [%s]", tag), e);
         }
+    }
 
-        return results;
+    private static TagsSelector getTagsSelector()
+    {
+        if (tagsSelector == null) {
+            tagsSelector = Utils.getComponent(TagsSelector.class);
+        }
+        return tagsSelector;
     }
 }

@@ -160,7 +160,9 @@ public class DefaultURLSecurityManager implements URLSecurityManager
         // e.g. mailto:someone@acme.org or http:xwiki.org
         // We consider those URLs as untrusted even if they are parsed by browsers, as they are not parsed by URI
         // and we cannot properly check them.
-        if (uri.isOpaque()) {
+        // Also distrust absolute URIs without authority. See
+        // https://claroty.com/team82/research/exploiting-url-parsing-confusion
+        if (uri.isOpaque() || (uri.getAuthority() == null && uri.isAbsolute())) {
             result = false;
         } else if (uri.getAuthority() != null) {
             // If the URI has an authority it means a domain has been specified and we should check it.

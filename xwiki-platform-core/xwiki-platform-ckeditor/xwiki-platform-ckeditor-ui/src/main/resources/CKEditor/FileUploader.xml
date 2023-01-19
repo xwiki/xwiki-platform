@@ -104,7 +104,7 @@
     #end
     #set ($reference = $document.documentReference)
     #try('uploadTemporaryAttachmentException')
-      #if("$!request.filename" != '')
+      #if ("$!request.filename" != '')
         ## If the filename is explicitly provided, no need to recompute it.
         #set ($fileName = $request.filename)
       #else

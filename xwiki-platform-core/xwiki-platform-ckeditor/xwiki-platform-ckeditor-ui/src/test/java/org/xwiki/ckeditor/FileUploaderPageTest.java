@@ -192,9 +192,10 @@ class FileUploaderPageTest extends PageTest
         this.request.getParts().add(part);
 
         Attachment attachment = mock(Attachment.class);
-        // The filename is not substituted when the filename is set explicitly in the query.
+        // Match the call to uploadTemporaryAttachment only when the provided filename matches the name template used as
+        // a replacement for __fileCreatedFromDataURI__: [current timestamp]-[random int between 1 and 1].[extension]
         when(this.temporaryAttachmentsScriptService.uploadTemporaryAttachment(eq(documentReference), eq("upload"),
-            matches("\\d{13}-\\d+\\..+"))).thenAnswer(invocation -> {
+            matches("\\d{13}-\\d+\\.zip"))).thenAnswer(invocation -> {
             when(attachment.getFilename()).thenReturn(invocation.getArgument(2));
             return attachment;
         });

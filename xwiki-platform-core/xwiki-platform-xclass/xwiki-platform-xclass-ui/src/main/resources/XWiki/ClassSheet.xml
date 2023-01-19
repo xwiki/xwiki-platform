@@ -83,7 +83,7 @@
 ## sheet output. Class authors can put the description of the class in the class document content.
 #set($classSheetReference = $services.model.createDocumentReference($doc.wiki, 'XWiki', 'ClassSheet'))
 #if($services.sheet.getDocumentSheets($doc).contains($classSheetReference))
-  {{include reference="" /}}
+  {{include reference="" author="target"/}}
 #end
 {{/velocity}}
 

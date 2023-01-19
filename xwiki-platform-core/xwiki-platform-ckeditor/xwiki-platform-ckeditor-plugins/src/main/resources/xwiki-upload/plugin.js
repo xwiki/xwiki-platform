@@ -162,7 +162,7 @@
         var input = $('<input>').attr({
           'type': 'hidden',
           'name': 'uploadedFiles',
-          'value': event.data.fileLoader.fileName
+          'value': JSON.parse(event.data.fileLoader.xhr.responseText).fileName
         });
         input.insertAfter($(editor.element.$));
       }

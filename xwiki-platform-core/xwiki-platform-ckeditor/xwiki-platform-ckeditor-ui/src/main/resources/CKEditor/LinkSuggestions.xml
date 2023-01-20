@@ -154,6 +154,7 @@
 #macro (searchAttachmentsSolr $input $limit $results)
   #set ($params = [
     'fq=type:ATTACHMENT',
+    'fq=locale:*',
     'qf=filename^4 attcontent',
     'fl=type wiki spaces name filename score',
     "bq=attauthor:""$services.model.serialize($xcontext.userReference, 'default')""",

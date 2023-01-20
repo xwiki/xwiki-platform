@@ -127,7 +127,7 @@ define('xwiki-attachment-picker',
         } else {
           typesFqs = [];
         }
-        const computedFqs = ['type:ATTACHMENT'].concat(optionsFqs).concat(typesFqs);
+        const computedFqs = ['type:ATTACHMENT', 'locale:*'].concat(optionsFqs).concat(typesFqs);
         const query = computedFqs.map((fq) => 'fq=' + fq).join('\n');
 
         return new Promise((resolve, reject) => {

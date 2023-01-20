@@ -113,7 +113,8 @@ define('entityResourceSuggester', [
       var deferred = $.Deferred();
       var query = [
         'q=__INPUT__',
-        'fq=type:ATTACHMENT'
+        'fq=type:ATTACHMENT',
+        'fq=locale:*'
       ];
       var input = resourceReference.reference.trim();
       if (input) {

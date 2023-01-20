@@ -905,6 +905,7 @@ qf=doccontent^2 doccontentraw</query>
     </property>
     <property>
       <query>fq=type:ATTACHMENT
+fq=locale:*
 qf=filename</query>
     </property>
     <property>
@@ -1066,6 +1067,7 @@ qf=filename</query>
     </property>
     <property>
       <query>fq=type:ATTACHMENT
+fq=locale:*
 qf=attcontent</query>
     </property>
     <property>

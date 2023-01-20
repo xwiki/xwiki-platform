@@ -134,6 +134,10 @@ public class CommentSaveAction extends CommentAddAction
 
         String comment = this.localizationManager.getTranslationPlain("core.comment.editComment");
 
+        // Users with edit right on the commented page can upload files while adding / editing the comment (e.g.
+        // upload an image to be inserted in the comment).
+        handleTemporaryUploadedFiles(doc, context.getRequest());
+
         // Make sure the user is allowed to make this modification
         context.getWiki().checkSavingDocument(context.getUserReference(), doc, comment, true, context);
 

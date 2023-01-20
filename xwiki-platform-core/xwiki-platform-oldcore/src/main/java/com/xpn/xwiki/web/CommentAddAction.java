@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.web;
 
+import java.util.Arrays;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -30,6 +32,9 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.captcha.Captcha;
 import org.xwiki.captcha.CaptchaConfiguration;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReferenceResolver;
 
@@ -64,6 +69,12 @@ public class CommentAddAction extends XWikiAction
 
     @Inject
     private UserReferenceResolver<CurrentUserReference> currentUserReferenceUserReferenceResolver;
+
+    @Inject
+    private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
+
+    @Inject
+    private ContextualAuthorizationManager authorization;
 
     @Override
     protected Class<? extends XWikiForm> getFormClass()
@@ -121,6 +132,10 @@ public class CommentAddAction extends XWikiAction
 
             String comment = localizePlainOrKey("core.comment.addComment");
 
+            // Users with edit right on the commented page can upload files while adding / editing the comment (e.g.
+            // upload an image to be inserted in the comment).
+            handleTemporaryUploadedFiles(doc, context.getRequest());
+
             // Make sure the user is allowed to make this modification
             context.getWiki().checkSavingDocument(context.getUserReference(), doc, comment, true, context);
 
@@ -172,6 +187,15 @@ public class CommentAddAction extends XWikiAction
             }
         } else {
             return true;
+        }
+    }
+
+    protected void handleTemporaryUploadedFiles(XWikiDocument document, XWikiRequest request) throws XWikiException
+    {
+        String[] uploadedFiles = request.getParameterValues("uploadedFiles");
+        if (uploadedFiles != null && this.authorization.hasAccess(Right.EDIT, document.getDocumentReference())) {
+            this.temporaryAttachmentSessionsManager.attachTemporaryAttachmentsInDocument(document,
+                Arrays.asList(uploadedFiles));
         }
     }
 }

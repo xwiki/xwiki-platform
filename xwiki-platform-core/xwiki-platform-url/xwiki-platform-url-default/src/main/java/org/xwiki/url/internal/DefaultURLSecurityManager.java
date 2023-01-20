@@ -25,6 +25,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -57,6 +59,15 @@ import com.xpn.xwiki.XWikiContext;
 public class DefaultURLSecurityManager implements URLSecurityManager
 {
     private static final char DOT = '.';
+
+    // Regular expression taken from https://www.rfc-editor.org/rfc/rfc3986#appendix-B.
+    private static final Pattern URI_PATTERN =
+        Pattern.compile("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");
+
+    private static final String ERROR_TRANSFORMING_URI_LOG =
+        "Error while transforming redirect to [{}] to proper URI: [{}]";
+
+    private static final String FULL_STACK_TRACE = "Full stack trace:";
 
     @Inject
     private URLConfiguration urlConfiguration;
@@ -196,5 +207,35 @@ public class DefaultURLSecurityManager implements URLSecurityManager
             }
         }
         return result;
+    }
+
+    @Override
+    public URI parseToSafeURI(String serializedURI) throws URISyntaxException, SecurityException
+    {
+        URI uri;
+        try {
+            uri = new URI(serializedURI);
+        } catch (URISyntaxException e) {
+            // Attempt repairing the invalid URI similar to org.eclipse.jetty.client.HttpRedirector#sanitize by
+            // extracting the different parts and then passing them to the multi-argument constructor that quotes
+            // illegal characters.
+            Matcher matcher = URI_PATTERN.matcher(serializedURI);
+            if (matcher.matches()) {
+                String scheme = matcher.group(2);
+                String authority = matcher.group(4);
+                String path = matcher.group(5);
+                String query = matcher.group(7);
+                String fragment = matcher.group(9);
+                uri = new URI(scheme, authority, path, query, fragment);
+            } else {
+                throw e;
+            }
+        }
+        if (this.isURITrusted(uri)) {
+            return uri;
+        } else {
+            throw new SecurityException(String.format("The given URI [%s] is not safe on this server.",
+                uri));
+        }
     }
 }

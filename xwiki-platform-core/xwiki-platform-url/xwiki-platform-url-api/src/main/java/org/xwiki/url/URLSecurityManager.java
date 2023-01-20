@@ -20,6 +20,7 @@
 package org.xwiki.url;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.xwiki.component.annotation.Role;
@@ -68,11 +69,30 @@ public interface URLSecurityManager
      * @param uri the URI to check if it can be trusted or not
      * @return {@code true} only if the URI can be trusted per the criteria given in the above documentation
      * @since 14.10.4
-     * @since 15.0RC1
+     * @since 15.0
      */
     @Unstable
     default boolean isURITrusted(URI uri)
     {
         return false;
+    }
+
+    /**
+     * Parse the given string to create a URI that is safe to use.
+     * This method throws a {@link SecurityException} if the parsed URI is not safe to use according to
+     * {@link #isURITrusted(URI)}. It might also return a {@link URISyntaxException} if the parameter cannot be properly
+     * parsed.
+     *
+     * @param serializedURI a string representing a URI that needs to be parsed.
+     * @return a URI safe to use
+     * @throws URISyntaxException if the given parameter cannot be properly parsed
+     * @throws SecurityException if the parsed URI is not safe according to {@link #isURITrusted(URI)}
+     * @since 14.10.4
+     * @since 15.0
+     */
+    @Unstable
+    default URI parseToSafeURI(String serializedURI) throws URISyntaxException, SecurityException
+    {
+        throw new SecurityException("Cannot guarantee safeness of " + serializedURI);
     }
 }

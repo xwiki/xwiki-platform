@@ -26,8 +26,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
@@ -38,7 +36,7 @@ import org.xwiki.url.URLSecurityManager;
  *
  * @version $Id$
  * @since 14.10.4
- * @since 15.0RC1
+ * @since 15.0
  */
 @Component
 @Named("security.url")
@@ -49,29 +47,20 @@ public class URLSecurityScriptService implements ScriptService
     @Inject
     private URLSecurityManager urlSecurityManager;
 
-    @Inject
-    private Logger logger;
-
     /**
-     * Check if the given URI representation can be trusted.
-     * The trustfulness of a URI is defined by {@link URLSecurityManager#isURITrusted(URI)}.
-     * If the given parameter cannot be parsed as a URI, then it's automatically considered not to be trusted.
+     * Parse the given string to create a URI that is safe to use.
+     * This method throws a {@link SecurityException} if the parsed URI is not safe to use according to
+     * {@link URLSecurityManager#isURITrusted(URI)}. It might also return a {@link URISyntaxException} if the parameter
+     * cannot be properly parsed.
      *
-     * @param uriRepresentation the {@code String} representation of an URI to check
-     * @return {@code true} if the {@link URLSecurityManager} determined that this URI can be trusted
-     * @see URLSecurityManager#isURITrusted(URI)
+     * @param uriRepresentation a string representing a URI that needs to be parsed.
+     * @return a URI safe to use
+     * @throws URISyntaxException if the given parameter cannot be properly parsed
+     * @throws SecurityException if the parsed URI is not safe according to {@link URLSecurityManager#isURITrusted(URI)}
+     * @see URLSecurityManager#parseToSafeURI(String)
      */
-    public boolean isURITrusted(String uriRepresentation)
+    public URI parseToSafeURI(String uriRepresentation) throws URISyntaxException, SecurityException
     {
-        boolean result;
-        try {
-            URI uri = new URI(uriRepresentation);
-            result = this.urlSecurityManager.isURITrusted(uri);
-        } catch (URISyntaxException e) {
-            this.logger.warn("Trying to check if [{}] is a trusted URI returned false because URI parsing failed: "
-                + "[{}]", uriRepresentation, ExceptionUtils.getRootCauseMessage(e));
-            result = false;
-        }
-        return result;
+        return this.urlSecurityManager.parseToSafeURI(uriRepresentation);
     }
 }

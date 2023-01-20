@@ -81,49 +81,19 @@ class XWikiServletResponseTest
         this.servletResponse.sendRedirect("");
         verify(this.httpServletResponse, never()).sendRedirect(any());
 
-        this.servletResponse.sendRedirect("//xwiki.org/xwiki/something/");
-        verify(this.httpServletResponse, never()).sendRedirect(any());
+        String location = "//xwiki.org/xwiki/something/";
+        URI expectedURI = new URI("//xwiki.org/xwiki/something/");
+        when(this.urlSecurityManager.parseToSafeURI(location)).thenReturn(expectedURI);
+        this.servletResponse.sendRedirect(location);
+        verify(this.httpServletResponse).sendRedirect(location);
+
+        when(this.urlSecurityManager.parseToSafeURI(location)).thenThrow(new SecurityException("Unsafe location"));
+        this.servletResponse.sendRedirect(location);
         assertEquals(1, this.logCapture.size());
         assertEquals("Possible phishing attack, attempting to redirect to [//xwiki.org/xwiki/something/], this request"
                 + " has been blocked. If the request was legitimate, please check the URL security configuration. "
                 + "You might need to add the domain related to this request in the list of trusted domains in the "
                 + "configuration: it can be configured in xwiki.properties in url.trustedDomains.",
             this.logCapture.getMessage(0));
-
-        URI expectedURI = new URI("//xwiki.org/xwiki/something/");
-        when(this.urlSecurityManager.isURITrusted(expectedURI)).thenReturn(true);
-        this.servletResponse.sendRedirect("//xwiki.org/xwiki/something/");
-        verify(this.httpServletResponse).sendRedirect("//xwiki.org/xwiki/something/");
     }
-
-    @Test
-    void sendRedirectWithNewline() throws URISyntaxException, IOException
-    {
-        String expectedLocation = "/xwiki/%0A/something/";
-        URI expectedURI = new URI(expectedLocation);
-        when(this.urlSecurityManager.isURITrusted(expectedURI)).thenReturn(true);
-        this.servletResponse.sendRedirect("/xwiki/\n/something/");
-        verify(this.httpServletResponse).sendRedirect(expectedLocation);
-    }
-
-    @Test
-    void sendRedirectInvalidURL() throws URISyntaxException, IOException
-    {
-        String expectedString = "/Space%20Test/?parameter=with%20space#fragment%20space";
-        URI expectedURI = new URI(expectedString);
-        when(this.urlSecurityManager.isURITrusted(expectedURI)).thenReturn(true);
-        this.servletResponse.sendRedirect("/Space Test/?parameter=with space#fragment space");
-        verify(this.httpServletResponse).sendRedirect(expectedString);
-    }
-
-    @Test
-    void sendRedirectInvalidURLWithScheme() throws URISyntaxException, IOException
-    {
-        String expectedString = "foo://www.x%20wiki.org/";
-        URI expectedURI = new URI(expectedString);
-        when(this.urlSecurityManager.isURITrusted(expectedURI)).thenReturn(true);
-        this.servletResponse.sendRedirect("foo://www.x wiki.org/");
-        verify(this.httpServletResponse).sendRedirect(expectedString);
-    }
-
 }

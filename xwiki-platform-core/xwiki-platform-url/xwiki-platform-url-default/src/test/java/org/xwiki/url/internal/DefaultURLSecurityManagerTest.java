@@ -51,6 +51,7 @@ import com.xpn.xwiki.web.XWikiRequest;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -221,7 +222,7 @@ class DefaultURLSecurityManagerTest
     }
 
     @Test
-    void isURITrustedWithEmptyTrustedDomainConfig() throws URISyntaxException
+    void isURITrusted() throws URISyntaxException
     {
         URI uri = new URI("");
         assertTrue(this.urlSecurityManager.isURITrusted(uri));
@@ -273,16 +274,14 @@ class DefaultURLSecurityManagerTest
         assertEquals(1, this.logCapture.size());
         assertEquals("Error while transforming URI [market://launch?id=somePackageName] to URL: "
             + "[MalformedURLException: unknown protocol: market]", this.logCapture.getMessage(0));
-    }
 
-    @Test
-    void isURITrustedWithTrustedDomainConfig() throws URISyntaxException
-    {
+        // invalidate cache so that we can call inject other trustedDomains
+        this.urlSecurityManager.invalidateCache();
         when(urlConfiguration.getTrustedDomains()).thenReturn(Collections.singletonList(
             "xwiki.org"
         ));
         when(this.urlConfiguration.getTrustedSchemes()).thenReturn(List.of("http", "ftp", "sftp"));
-        URI uri = new URI("");
+        uri = new URI("");
         assertTrue(this.urlSecurityManager.isURITrusted(uri));
 
         uri = new URI("http://xwiki.org/xwiki/something/");
@@ -317,8 +316,153 @@ class DefaultURLSecurityManagerTest
         uri = new URI("sftp://xwiki.org/something");
         assertFalse(this.urlSecurityManager.isURITrusted(uri));
 
-        assertEquals(1, this.logCapture.size());
+        assertEquals(2, this.logCapture.size());
         assertEquals("Error while transforming URI [sftp://xwiki.org/something] to URL: "
-            + "[MalformedURLException: unknown protocol: sftp]", this.logCapture.getMessage(0));
+            + "[MalformedURLException: unknown protocol: sftp]", this.logCapture.getMessage(1));
+    }
+
+    private void assertParseToSafeThrowSecurity(String location, String expectedExceptionLocation)
+    {
+        SecurityException securityException =
+            assertThrows(SecurityException.class, () -> this.urlSecurityManager.parseToSafeURI(location));
+        assertEquals(String.format("The given URI [%s] is not safe on this server.", expectedExceptionLocation),
+            securityException.getMessage());
+    }
+
+    @Test
+    void parseToSafeURI() throws URISyntaxException
+    {
+        String location = "";
+        URI uri = this.urlSecurityManager.parseToSafeURI(location);
+        assertEquals(location, uri.toString());
+
+        location = "//xwiki.org/xwiki/something/";
+        assertParseToSafeThrowSecurity(location, location);
+
+        location = "/xwiki/somepage";
+        uri = this.urlSecurityManager.parseToSafeURI(location);
+        assertEquals(location, uri.toString());
+
+        location = "http://xwiki.org/xwiki/something/";
+        assertParseToSafeThrowSecurity(location, location);
+
+        location = "http:xwiki.org/xwiki/something/";
+        assertParseToSafeThrowSecurity(location, location);
+
+        location = "ftp://xwiki.org/xwiki/something/";
+        assertParseToSafeThrowSecurity(location, location);
+
+        location = "mailto:foo@xwiki.org";
+        assertParseToSafeThrowSecurity(location, location);
+
+        location = "market://launch?id=somePackageName";
+        assertParseToSafeThrowSecurity(location, location);
+
+        verify(this.urlConfiguration, times(3)).getTrustedSchemes();
+
+        // Check that using a list of trusted schemes is not enough here.
+        when(this.urlConfiguration.getTrustedSchemes()).thenReturn(List.of("http", "ftp", "mailto", "market"));
+
+        location = "http:xwiki.org/xwiki/something/";
+        assertParseToSafeThrowSecurity(location, location);
+
+        location = "http:xwiki.org/xwiki/something/";
+        assertParseToSafeThrowSecurity(location, location);
+
+        // See https://claroty.com/team82/research/exploiting-url-parsing-confusion
+        location = "http:///xwiki.org/xwiki/something/";
+        assertParseToSafeThrowSecurity(location, location);
+
+        location = "ftp://xwiki.org/xwiki/something/";
+        assertParseToSafeThrowSecurity(location, location);
+
+        location = "mailto:foo@xwiki.org";
+        assertParseToSafeThrowSecurity(location, location);
+
+        location = "market://launch?id=somePackageName";
+        assertParseToSafeThrowSecurity(location, location);
+        assertEquals(1, this.logCapture.size());
+        assertEquals("Error while transforming URI [market://launch?id=somePackageName] to URL: "
+            + "[MalformedURLException: unknown protocol: market]", this.logCapture.getMessage(0));
+
+        // invalidate cache so that we can call inject other trustedDomains
+        this.urlSecurityManager.invalidateCache();
+        when(urlConfiguration.getTrustedDomains()).thenReturn(Collections.singletonList(
+            "xwiki.org"
+        ));
+        when(this.urlConfiguration.getTrustedSchemes()).thenReturn(List.of("http", "ftp", "sftp"));
+
+        location = "";
+        uri = this.urlSecurityManager.parseToSafeURI(location);
+        assertEquals(location, uri.toString());
+
+        location = "http://xwiki.org/xwiki/something/";
+        uri = this.urlSecurityManager.parseToSafeURI(location);
+        assertEquals(location, uri.toString());
+
+        location = "ftp://xwiki.org/xwiki/something/";
+        uri = this.urlSecurityManager.parseToSafeURI(location);
+        assertEquals(location, uri.toString());
+
+        location = "//xwiki.org/xwiki/something/";
+        uri = this.urlSecurityManager.parseToSafeURI(location);
+        assertEquals(location, uri.toString());
+
+        location = "http:xwiki.org/xwiki/something/";
+        assertParseToSafeThrowSecurity(location, location);
+
+        // See https://claroty.com/team82/research/exploiting-url-parsing-confusion
+        location = "http:///xwiki.org/xwiki/something/";
+        assertParseToSafeThrowSecurity(location, location);
+
+        location = "http://floo";
+        assertParseToSafeThrowSecurity(location, location);
+
+        // https not among accepted schemes.
+        location = "https://xwiki.org/xwiki/something/";
+        assertParseToSafeThrowSecurity(location, location);
+
+        location = "/xwiki/something/";
+        uri = this.urlSecurityManager.parseToSafeURI(location);
+        assertEquals(location, uri.toString());
+
+        location = "mailto:foo@xwiki.org";
+        assertParseToSafeThrowSecurity(location, location);
+
+        location = "sftp://xwiki.org/xwiki/something/";
+        assertParseToSafeThrowSecurity(location, location);
+
+        assertEquals(2, this.logCapture.size());
+        assertEquals("Error while transforming URI [sftp://xwiki.org/xwiki/something/] to URL: "
+            + "[MalformedURLException: unknown protocol: sftp]", this.logCapture.getMessage(1));
+
+        // Check behaviour with |
+        location = "http://extensions.xwiki.org/xwiki/bin/view/Main/WebHome#|t=recommendedextensions&p=1&l=15&s=doc"
+            + ".creationDate&d=desc&name=replication";
+        uri = this.urlSecurityManager.parseToSafeURI(location);
+        assertEquals("http://extensions.xwiki.org/xwiki/bin/view/Main/WebHome#%7Ct=recommendedextensions&p=1&l=15&s"
+            + "=doc.creationDate&d=desc&name=replication", uri.toString());
+
+        location = "http://xwiki.org\\@anotherserver.com";
+        assertParseToSafeThrowSecurity(location, "http://xwiki.org%5C@anotherserver.com");
+
+        // invalidate cache so that we can call inject other trustedDomains
+        this.urlSecurityManager.invalidateCache();
+        when(urlConfiguration.getTrustedDomains()).thenReturn(Collections.singletonList(
+            "anotherserver.com"
+        ));
+        uri = this.urlSecurityManager.parseToSafeURI(location);
+        assertEquals("http://xwiki.org%5C@anotherserver.com", uri.toString());
+
+        location = "/xwiki/\n/something/";
+        uri = this.urlSecurityManager.parseToSafeURI(location);
+        assertEquals("/xwiki/%0A/something/", uri.toString());
+
+        location = "/Space Test/?parameter=with space#fragment space";
+        uri = this.urlSecurityManager.parseToSafeURI(location);
+        assertEquals("/Space%20Test/?parameter=with%20space#fragment%20space", uri.toString());
+
+        location = "foo://www.x wiki.org/";
+        assertParseToSafeThrowSecurity(location, "foo://www.x%20wiki.org/");
     }
 }

@@ -23,20 +23,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import org.xwiki.test.LogLevel;
-import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.url.URLSecurityManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -55,28 +47,12 @@ class URLSecurityScriptServiceTest
     @MockComponent
     private URLSecurityManager urlSecurityManager;
 
-    @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
-
     @Test
     void isURITrusted() throws URISyntaxException
     {
-        assertFalse(this.scriptService.isURITrusted(""));
-        when(this.urlSecurityManager.isURITrusted(new URI(""))).thenReturn(true);
-        assertTrue(this.scriptService.isURITrusted(""));
-
-        assertFalse(this.scriptService.isURITrusted("/xwiki/\n/something/"));
-        assertEquals(1, this.logCapture.size());
-        assertEquals("Trying to check if [/xwiki/\n"
-            + "/something/] is a trusted URI returned false because URI parsing failed: [URISyntaxException: "
-            + "Illegal character in path at index 7: /xwiki/\n"
-            + "/something/]", this.logCapture.getMessage(0));
-        verify(this.urlSecurityManager, times(2)).isURITrusted(any());
-
-        assertFalse(this.scriptService.isURITrusted("//xwiki.org/xwiki/something/"));
-
-        URI expectedURI = new URI("//xwiki.org/xwiki/something/");
-        when(this.urlSecurityManager.isURITrusted(expectedURI)).thenReturn(true);
-        assertTrue(this.scriptService.isURITrusted("//xwiki.org/xwiki/something/"));
+        String location = "//xwiki.org/xwiki/something/";
+        URI expectedURI = new URI(location);
+        when(this.urlSecurityManager.parseToSafeURI(location)).thenReturn(expectedURI);
+        assertEquals(expectedURI, this.scriptService.parseToSafeURI(location));
     }
 }

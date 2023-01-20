@@ -25,15 +25,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.url.URLSecurityManager;
@@ -41,15 +38,6 @@ import org.xwiki.url.URLSecurityManager;
 public class XWikiServletResponse implements XWikiResponse
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiServletResponse.class);
-
-    // Regular expression taken from https://www.rfc-editor.org/rfc/rfc3986#appendix-B.
-    private static final Pattern URI_PATTERN =
-        Pattern.compile("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");
-
-    private static final String ERROR_TRANSFORMING_URI_LOG =
-        "Error while transforming redirect to [{}] to proper URI: [{}]";
-
-    private static final String FULL_STACK_TRACE = "Full stack trace:";
 
     private HttpServletResponse response;
 
@@ -74,52 +62,20 @@ public class XWikiServletResponse implements XWikiResponse
     public void sendRedirect(String redirect) throws IOException
     {
         if (!StringUtils.isBlank(redirect)) {
-            URI uri = parseURI(redirect);
-            if (uri != null) {
-                if (!getURLSecurityManager().isURITrusted(uri)) {
-                    LOGGER.warn(
-                        "Possible phishing attack, attempting to redirect to [{}], this request has been blocked. "
-                            + "If the request was legitimate, please check the URL security configuration. You "
-                            + "might need to add the domain related to this request in the list of trusted domains in "
-                            + "the configuration: it can be configured in xwiki.properties in url.trustedDomains.",
-                        redirect);
-                } else {
-                    this.response.sendRedirect(uri.toString());
-                }
+            URI uri;
+            try {
+                uri = getURLSecurityManager().parseToSafeURI(redirect);
+                this.response.sendRedirect(uri.toString());
+            } catch (URISyntaxException | SecurityException e) {
+                LOGGER.warn(
+                    "Possible phishing attack, attempting to redirect to [{}], this request has been blocked. "
+                        + "If the request was legitimate, please check the URL security configuration. You "
+                        + "might need to add the domain related to this request in the list of trusted domains in "
+                        + "the configuration: it can be configured in xwiki.properties in url.trustedDomains.",
+                    redirect);
+                LOGGER.debug("Original error preventing the redirect: ", e);
             }
         }
-    }
-
-    private URI parseURI(String location)
-    {
-        URI uri = null;
-        try {
-            uri = new URI(location);
-        } catch (URISyntaxException e) {
-            // Attempt repairing the invalid URI similar to org.eclipse.jetty.client.HttpRedirector#sanitize by
-            // extracting the different parts and then passing them to the multi-argument constructor that quotes
-            // illegal characters.
-            Matcher matcher = URI_PATTERN.matcher(location);
-            if (matcher.matches()) {
-                String scheme = matcher.group(2);
-                String authority = matcher.group(4);
-                String path = matcher.group(5);
-                String query = matcher.group(7);
-                String fragment = matcher.group(9);
-                try {
-                    uri = new URI(scheme, authority, path, query, fragment);
-                } catch (URISyntaxException ex) {
-                    LOGGER.error(ERROR_TRANSFORMING_URI_LOG, location,
-                        ExceptionUtils.getRootCauseMessage(e));
-                    LOGGER.debug(FULL_STACK_TRACE, e);
-                }
-            } else {
-                LOGGER.error(ERROR_TRANSFORMING_URI_LOG, location,
-                    ExceptionUtils.getRootCauseMessage(e));
-                LOGGER.debug(FULL_STACK_TRACE, e);
-            }
-        }
-        return uri;
     }
 
     private URLSecurityManager getURLSecurityManager()

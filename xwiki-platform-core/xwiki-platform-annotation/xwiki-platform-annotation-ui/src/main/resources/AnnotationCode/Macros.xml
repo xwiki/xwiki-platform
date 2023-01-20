@@ -37,6 +37,16 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity filter="none" output="false"}}
+## Determine the document that is being annotated.
+#if ("$!request.reference" != '')
+  #set ($annotationReference = $services.model.resolveDocument($request.reference))
+#elseif ("$!request.wiki" != '' &amp;&amp; "$!request.space" != '' &amp;&amp; "$!request.page" != '')
+  #set ($annotationReference = $services.model.createDocumentReference($request.wiki, $request.space, $request.page))
+#elseif ("$!request.sheet" != '')
+  ## When the annotation create / edit / display form is loaded as a sheet for the annotated document.
+  #set ($annotationReference = $doc.documentReference)
+#end
+##
 ## Not used here but kept for retro-compatibility
 #set($restURL = "${request.contextPath}/rest")
 ## Retrieve the annotation class from the configuration

@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="AnnotationCode.Script" locale="">
+<xwikidoc version="1.5" reference="AnnotationCode.Script" locale="">
   <web>AnnotationCode</web>
   <name>Script</name>
   <language/>
@@ -78,6 +78,7 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -511,6 +512,7 @@ return XWiki;
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -1250,14 +1252,10 @@ XWiki.Annotation = Class.create({
         return;
       } else {
         require(['xwiki-meta'], function (xm) {
-          new Ajax.Request('$xwiki.getURL("AnnotationCode.EditForm")', {
+          new Ajax.Request(XWiki.currentDocument.getURL('get'), {
             parameters: {
-              'xpage' : 'plain',
-              'wiki' : XWiki.currentWiki,
-              'space' : XWiki.currentSpace,
-              'page' : XWiki.currentPage,
-              'reference' : xm.document,
-              'id' : id
+              'sheet': 'AnnotationCode.EditForm',
+              'id': id
             },
             onCreate : function() {
               // save the original content to be able to cancel or to be able to recover at callback failure
@@ -1312,14 +1310,10 @@ XWiki.Annotation = Class.create({
 
   fetchAndShowAnnotationDetails : function(annotationId, container) {
     require(['xwiki-meta'], function (xm) {
-      new Ajax.Request('$xwiki.getURL("AnnotationCode.DisplayForm")', {
+      new Ajax.Request(XWiki.currentDocument.getURL('get'), {
         parameters: {
-          'id' : annotationId,
-          'xpage' : 'plain',
-          'wiki' : XWiki.currentWiki,
-          'space' : XWiki.currentSpace,
-          'page' : XWiki.currentPage,
-          'reference' : xm.document
+          'id': annotationId,
+          'sheet': 'AnnotationCode.DisplayForm'
         },
         onSuccess: function(response) {
           // display the annotation creation form
@@ -1642,13 +1636,12 @@ XWiki.Annotation = Class.create({
       this.selectionService.computeContext();
       require(['xwiki-meta'], function (xm) {
         // fetch the creation for this annotation and display it at the position of the selection
-        new Ajax.Request('$xwiki.getURL("AnnotationCode.CreateForm")', {
+        new Ajax.Request(XWiki.currentDocument.getURL('get'), {
           parameters: {
-            'xpage' : 'plain',
-            'selection' : selectionText,
-            'selectionContext' : this.selectionService.selectionContext,
-            'selectionOffset' : this.selectionService.selectionOffset,
-            'reference' : xm.document
+            'selection': selectionText,
+            'selectionContext': this.selectionService.selectionContext,
+            'selectionOffset': this.selectionService.selectionOffset,
+            'sheet': 'AnnotationCode.CreateForm'
           },
           onCreate: function() {
             // create nice loading panel

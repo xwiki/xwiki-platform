@@ -20,25 +20,19 @@
 package com.xpn.xwiki.web;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.BeforeComponent;
-import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.url.URLSecurityManager;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -59,9 +53,6 @@ class XWikiServletResponseTest
     private XWikiServletResponse servletResponse;
     private HttpServletResponse httpServletResponse;
 
-    @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
-
     @BeforeComponent
     void beforeComponent(MockitoComponentManager mockitoComponentManager) throws Exception
     {
@@ -77,31 +68,53 @@ class XWikiServletResponseTest
     }
 
     @Test
-    void sendRedirect() throws IOException, URISyntaxException
+    void sendRedirect() throws IOException
     {
         this.servletResponse.sendRedirect("");
         verify(this.httpServletResponse, never()).sendRedirect(any());
 
         this.servletResponse.sendRedirect("/xwiki/\n/something/");
         verify(this.httpServletResponse, never()).sendRedirect(any());
-        assertEquals(1, this.logCapture.size());
-        assertEquals("Error while transforming redirect to [/xwiki/\n"
-            + "/something/] to proper URI: [URISyntaxException: Illegal character in path at index 7: /xwiki/\n"
-            + "/something/]", this.logCapture.getMessage(0));
-
 
         this.servletResponse.sendRedirect("//xwiki.org/xwiki/something/");
         verify(this.httpServletResponse, never()).sendRedirect(any());
-        assertEquals(2, this.logCapture.size());
-        assertEquals("Possible phishing attack, attempting to redirect to [//xwiki.org/xwiki/something/], this request"
-                + " has been blocked. If the request was legitimate, please check the URL security configuration. "
-                + "You might need to add the domain related to this request in the list of trusted domains in the "
-                + "configuration: it can be configured in xwiki.properties in url.trustedDomains.",
-            this.logCapture.getMessage(1));
 
-        URI expectedURI = new URI("//xwiki.org/xwiki/something/");
-        when(this.urlSecurityManager.isURITrusted(expectedURI)).thenReturn(true);
-        this.servletResponse.sendRedirect("//xwiki.org/xwiki/something/");
-        verify(this.httpServletResponse).sendRedirect("//xwiki.org/xwiki/something/");
+        String redirect = "http://xwiki.org/xwiki/something/";
+        URL redirectUrl = new URL(redirect);
+        when(this.urlSecurityManager.isDomainTrusted(redirectUrl)).thenReturn(false);
+        this.servletResponse.sendRedirect(redirect);
+        verify(this.httpServletResponse, never()).sendRedirect(any());
+        verify(this.urlSecurityManager).isDomainTrusted(redirectUrl);
+
+        redirect = "http:/xwiki.com/xwiki/something/";
+        redirectUrl = new URL(redirect);
+        when(this.urlSecurityManager.isDomainTrusted(redirectUrl)).thenReturn(false);
+        this.servletResponse.sendRedirect(redirect);
+        verify(this.httpServletResponse, never()).sendRedirect(any());
+        verify(this.urlSecurityManager).isDomainTrusted(redirectUrl);
+
+        redirect = "https://floo";
+        redirectUrl = new URL(redirect);
+        when(this.urlSecurityManager.isDomainTrusted(redirectUrl)).thenReturn(false);
+        this.servletResponse.sendRedirect(redirect);
+        verify(this.httpServletResponse, never()).sendRedirect(any());
+        verify(this.urlSecurityManager).isDomainTrusted(redirectUrl);
+
+        redirect = "ftp://xwiki.org/xwiki/something/";
+        redirectUrl = new URL(redirect);
+        when(this.urlSecurityManager.isDomainTrusted(redirectUrl)).thenReturn(false);
+        this.servletResponse.sendRedirect(redirect);
+        verify(this.httpServletResponse, never()).sendRedirect(any());
+        verify(this.urlSecurityManager).isDomainTrusted(redirectUrl);
+
+        this.servletResponse.sendRedirect("/xwiki/something/");
+        verify(this.httpServletResponse).sendRedirect("/xwiki/something/");
+
+        redirect = "http://xwiki.org/foo/";
+        redirectUrl = new URL(redirect);
+        when(this.urlSecurityManager.isDomainTrusted(redirectUrl)).thenReturn(true);
+        this.servletResponse.sendRedirect(redirect);
+        verify(this.httpServletResponse).sendRedirect(redirect);
+        verify(this.urlSecurityManager).isDomainTrusted(redirectUrl);
     }
 }

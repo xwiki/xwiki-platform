@@ -75,10 +75,4 @@ public class DefaultURLConfiguration implements URLConfiguration
     {
         return this.configuration.get().getProperty(PREFIX + "trustedDomainsEnabled", true);
     }
-
-    @Override
-    public List<String> getTrustedSchemes()
-    {
-        return this.configuration.get().getProperty(PREFIX + "trustedSchemes", List.of("http", "https", "ftp"));
-    }
 }

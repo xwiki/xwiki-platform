@@ -19,7 +19,6 @@
  */
 package org.xwiki.url;
 
-import java.net.URI;
 import java.net.URL;
 
 import org.xwiki.component.annotation.Role;
@@ -54,26 +53,4 @@ public interface URLSecurityManager
      * @return {@code true} if the URL domain can be trusted or if the check is skipped, {@code false} otherwise
      */
     boolean isDomainTrusted(URL urlToCheck);
-
-    /**
-     * Check if the given URI can be trusted.
-     * A URI can be trusted if:
-     * <ul>
-     *     <li>it's not opaque (see {@link URI} documentation for definition of opaque URI. TL;DR: a URI without
-     *     {@code //} is opaque): note that following this, any URI such as {@code mailto:acme@foo.org} won't be
-     *     trusted</li>
-     *     <li>it refers to a specific domain and this domain is trusted (see {@link #isDomainTrusted(URL)})</li>
-     *     <li>it's completely relative: it doesn't refer to an external domain</li>
-     * </ul>
-     *
-     * @param uri the URI to check if it can be trusted or not
-     * @return {@code true} only if the URI can be trusted per the criteria given in the above documentation
-     * @since 14.10.4
-     * @since 15.0RC1
-     */
-    @Unstable
-    default boolean isURITrusted(URI uri)
-    {
-        return false;
-    }
 }

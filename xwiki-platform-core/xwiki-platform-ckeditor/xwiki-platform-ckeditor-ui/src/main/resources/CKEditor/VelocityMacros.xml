@@ -203,6 +203,15 @@
     'restricted': $parameters.attributes.data-restricted
   })
   ##
+  ## Disable the file upload and drag &amp; drop when the current user doesn't have edit right on the source document, if
+  ## the source is restricted. This is the case for instance when an user with comment right adds a comment to a page
+  ## they don't have edit right on. They are allowed to add the comment but they can't upload files because that
+  ## requires edit right. We check if the source is in restricted mode because in some cases (such as for Change Request
+  ## Application) we want to allow file upload even if the current user doesn't have edit right on the source document.
+  #if ($source.restricted == 'true' &amp;&amp; !$services.security.authorization.hasAccess('edit', $source.documentReference))
+    #set ($parameters.attributes.data-upload-disabled = 'true')
+  #end
+  ##
   &lt;textarea
     #foreach ($entry in $parameters.attributes.entrySet())
       $entry.key="$!escapetool.xml($entry.value)"

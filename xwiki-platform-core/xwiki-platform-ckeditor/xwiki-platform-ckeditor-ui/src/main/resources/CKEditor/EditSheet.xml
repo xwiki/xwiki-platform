@@ -256,8 +256,10 @@ define('xwiki-ckeditor', [
       sourceDocument.syntax = sourceSyntax;
     }
 
+    var uploadDisabled = element.hasAttribute('data-upload-disabled');
+
     var config = {
-      filebrowserUploadUrl: getUploadURL(sourceDocument, 'filebrowser'),
+      filebrowserUploadUrl: uploadDisabled ? '' : getUploadURL(sourceDocument, 'filebrowser'),
       height: $(element).height(),
       mentions: [
         {
@@ -294,7 +296,7 @@ define('xwiki-ckeditor', [
       // The syntax of the edited content is not always the same as the syntax of the source document (which applies to
       // the source document content, but we might be editing something else, like an object property).
       sourceSyntax: sourceSyntax,
-      uploadUrl: getUploadURL(sourceDocument, 'filetools'),
+      uploadUrl: uploadDisabled ? '' : getUploadURL(sourceDocument, 'filetools'),
       'xwiki-link': {
         // We use the source document to compute the link label generator URL because we want the link references to be
         // resolved relative to the edited document (as they were inserted).

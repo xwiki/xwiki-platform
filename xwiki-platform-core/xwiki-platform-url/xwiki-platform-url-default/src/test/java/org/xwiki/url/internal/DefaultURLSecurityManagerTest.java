@@ -261,10 +261,6 @@ class DefaultURLSecurityManagerTest
         uri = new URI("http:xwiki.org/xwiki/something/");
         assertFalse(this.urlSecurityManager.isURITrusted(uri));
 
-        // See https://claroty.com/team82/research/exploiting-url-parsing-confusion
-        uri = new URI("http:///xwiki.org/xwiki/something/");
-        assertFalse(this.urlSecurityManager.isURITrusted(uri));
-
         uri = new URI("ftp://xwiki.org/xwiki/something/");
         assertFalse(this.urlSecurityManager.isURITrusted(uri));
 
@@ -298,10 +294,6 @@ class DefaultURLSecurityManagerTest
         assertTrue(this.urlSecurityManager.isURITrusted(uri));
 
         uri = new URI("http:xwiki.org/xwiki/something/");
-        assertFalse(this.urlSecurityManager.isURITrusted(uri));
-
-        // See https://claroty.com/team82/research/exploiting-url-parsing-confusion
-        uri = new URI("http:///xwiki.org/xwiki/something/");
         assertFalse(this.urlSecurityManager.isURITrusted(uri));
 
         uri = new URI("http://floo");

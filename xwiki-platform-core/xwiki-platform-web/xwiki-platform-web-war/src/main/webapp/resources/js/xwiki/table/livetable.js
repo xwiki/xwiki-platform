@@ -746,6 +746,13 @@ var LiveTableHash = Class.create({
 
     var hashString = window.location.hash.substring(1);
     if (!hashString.blank()) {
+      // Recover from encoding done by URI implementations (like java.net.URI) that don't allow | in the fragment.
+      if (hashString.indexOf('%7Ct=') !== -1) {
+      // The string "%7Ct=" is safe to replace as it cannot occur in a filter as there the "=" would have been encoded,
+      // too.
+        hashString = hashString.replaceAll('%7Ct=', '|t=');
+        window.location.hash = "#" + hashString;
+      }
       var tables = hashString.split("|");
       for (var i = 0; i < tables.length; i++) {
         var params = tables[i].toQueryParams();

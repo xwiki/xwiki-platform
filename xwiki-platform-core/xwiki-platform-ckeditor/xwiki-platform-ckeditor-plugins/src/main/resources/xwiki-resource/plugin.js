@@ -266,23 +266,8 @@ require(['jquery', 'resource', 'resourcePicker'], function ($, $resource) {
         if (onlyTheReferencePart  === true) {
           this.setValue(resourceReference.reference);
         } else {
-          var resourceURL = CKEDITOR.plugins.xwikiResource.getResourceURL(resourceReference,
-            this.getDialog().getParentEditor());
-          var width = this.getDialog().getValueOf(resourcePickerId[0], "width");
-          var height = this.getDialog().getValueOf(resourcePickerId[0], "height");
-
-          if (width || height) {
-            var params = [];
-            if (width) {
-              params.push("width=" + width);
-            }
-            if (height) {
-              params.push("height=" + height);
-            }
-            resourceURL += '&parameters[queryString]=' + encodeURI(params.join(','));
-          }
-          
-          this.setValue(resourceURL);
+          this.setValue(CKEDITOR.plugins.xwikiResource.getResourceURL(resourceReference,
+            this.getDialog().getParentEditor()));
         }
         if (typeof oldCommit === 'function') {
           oldCommit.apply(this, arguments);

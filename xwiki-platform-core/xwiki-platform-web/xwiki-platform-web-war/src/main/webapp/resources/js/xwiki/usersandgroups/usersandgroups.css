@@ -50,6 +50,10 @@
 #usersandgroupstable.rights .rights {
   width: 15% !important;
 }
+#usersandgroupstable button.rights-edit {
+  border-color: transparent;
+  background: transparent;
+}
 
 .spaceName {
   margin-left: 13px;

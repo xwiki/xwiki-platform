@@ -18,6 +18,16 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 /* this represent a triple state checkbox */
+
+define('my-translation-keys', {
+  prefix: 'platform.core.rightsManagement.',
+  keys: [
+    "allowed",
+    "denied",
+    "inherit"
+  ]
+});
+
 window.MSCheckbox = Class.create({
   /**
     * @todo Make confirmations generic.
@@ -55,15 +65,32 @@ window.MSCheckbox = Class.create({
     ];
     this.labels = ['','',''];
 
-    // Alts are the messages describing the checkbox images
-    this.alts = [
-      '$escapetool.javascript($services.localization.render("none"))',
-      '$escapetool.javascript($services.localization.render("allow_1"))',
-      '$escapetool.javascript($services.localization.render("allow_0"))'
-    ];
-
+    
+    
+    this.button = document.createElement("button");
+    this.button.className = "rights-edit";
+    this.button.onclick = this.createClickHandler(this);
+    
+    var img = document.createElement("img");
+    require(['xwiki-l10n!my-translation-keys'], function(l10n) {
+      // Alts are the messages describing the checkbox images
+      alts = [
+        l10n['inherit'],
+        l10n['allowed'],
+        l10n['denied']
+      ];
+      img.alt = alts[this.state];
+    });
+    
+    this.button.appendChild(img);
+    
+    this.label = document.createElement('span');
+    this.label.hidden = true;
+    this.label.appendChild(document.createTextNode(this.labels[this.state]));
+    this.button.appendChild(this.label);
+    
+    this.domNode.appendChild(this.button);
     this.draw(this.state);
-    this.attachEvents();
   },
 
   /**
@@ -71,22 +98,27 @@ window.MSCheckbox = Class.create({
     */
   draw: function(state)
   {
-    //remove child nodes
-    while (this.domNode.childNodes.length > 0) {
-      this.domNode.removeChild(this.domNode.firstChild);
-    }
-    //add new image
-    var img = document.createElement('img');
+    //Change display image
+    var img = this.button.firstChild;
     img.src = this.images[state];
-    img.alt = this.domNode.getAttribute('data-title') + " " + this.alts[state];
-    img.tabIndex = 0;
     
-    this.domNode.appendChild(img);
+    //Update the description of the button for accessibility.
+    require(['xwiki-l10n!my-translation-keys'], function(l10n) {
+      var alts = [
+        l10n['inherit'],
+        l10n['allowed'],
+        l10n['denied']
+      ];
+      img.alt = alts[this.state];
+      this.button.title = alts[state];
+    });
+
     //add label
     if (this.labels[state] != '') {
-      var la = document.createElement('span');
-      la.appendChild(document.createTextNode(this.labels[state]));
-      this.domNode.appendChild(la);
+      while (this.label.childNodes.length > 0) {
+        this.label.removeChild(this.label.firstChild);
+      }
+      this.label.appendChild(document.createTextNode(this.labels[state]));
     }
   },
 
@@ -99,8 +131,6 @@ window.MSCheckbox = Class.create({
       delete this.table.fetchedRows[this.idx];
     }
     this.draw(this.state);
-    /*After changing the image through an interaction, put focus back on it.*/
-    this.domNode.firstChild.focus(); 
   },
 
   /* Confirmation cases:
@@ -216,22 +246,6 @@ window.MSCheckbox = Class.create({
         }
       });
     }
-  },
-  /* Redirects towards a click eventhandler if the pressed key is Enter*/
-  createKeyboardHandler: function(self)
-  {
-    var clickHandler = self.createClickHandler(self);
-    return function(event) {
-      if(event.key == "Enter"){
-        clickHandler()
-      }
-    }
-  },
-
-  attachEvents: function()
-  {
-    Event.observe(this.domNode, 'click', this.createClickHandler(this));
-    Event.observe(this.domNode, 'keydown', this.createKeyboardHandler(this));   /*Added for accessibility through keyboard*/
   }
 });
 

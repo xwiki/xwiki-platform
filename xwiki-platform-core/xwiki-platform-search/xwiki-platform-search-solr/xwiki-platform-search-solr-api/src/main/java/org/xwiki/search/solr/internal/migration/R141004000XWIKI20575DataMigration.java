@@ -42,14 +42,14 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  * @since 14.10.4
  */
 @Component
-@Named(R150000000XWIKI20575DataMigration.HINT)
+@Named(R141004000XWIKI20575DataMigration.HINT)
 @Singleton
-public class R150000000XWIKI20575DataMigration implements DataMigration
+public class R141004000XWIKI20575DataMigration implements DataMigration
 {
     /**
      * Hint of the migration.
      */
-    public static final String HINT = "R150000000XWIKI20575";
+    public static final String HINT = "R141004000XWIKI20575";
 
     @Inject
     private SolrInstance solrInstance;
@@ -69,7 +69,7 @@ public class R150000000XWIKI20575DataMigration implements DataMigration
     @Override
     public XWikiDBVersion getVersion()
     {
-        return new XWikiDBVersion(150000000);
+        return new XWikiDBVersion(141004000);
     }
 
     @Override
@@ -77,6 +77,7 @@ public class R150000000XWIKI20575DataMigration implements DataMigration
     {
         try {
             this.solrInstance.deleteByQuery("*:*");
+            this.solrInstance.commit();
         } catch (SolrServerException | IOException e) {
             throw new DataMigrationException("Error while performing Solr query to empty the search core", e);
         }
@@ -85,8 +86,6 @@ public class R150000000XWIKI20575DataMigration implements DataMigration
     @Override
     public boolean shouldExecute(XWikiDBVersion startupVersion)
     {
-        int version = startupVersion.getVersion();
-        // The regression is also fixed in XWiki 14.10.4
-        return !(version >= 141004000 && version < 150000000);
+        return true;
     }
 }

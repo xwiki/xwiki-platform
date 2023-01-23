@@ -33,6 +33,8 @@
   <properties>
     <!-- code coverage: it is not much, but it is a start -->
     <xwiki.jacoco.instructionRatio>0.32</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Tag API</xwiki.extension.name>
     </properties>
   <dependencies>
     <dependency>

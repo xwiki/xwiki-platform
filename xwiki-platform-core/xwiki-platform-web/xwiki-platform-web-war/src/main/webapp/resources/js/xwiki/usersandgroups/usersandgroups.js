@@ -72,15 +72,6 @@ window.MSCheckbox = Class.create({
     this.button.onclick = this.createClickHandler(this);
     
     var img = document.createElement("img");
-    require(['xwiki-l10n!my-translation-keys'], function(l10n) {
-      // Alts are the messages describing the checkbox images
-      alts = [
-        l10n['inherit'],
-        l10n['allowed'],
-        l10n['denied']
-      ];
-      img.alt = alts[this.state];
-    });
     
     this.button.appendChild(img);
     

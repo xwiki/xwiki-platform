@@ -133,15 +133,30 @@ class ContextMacroTest
     @Test
     void executeWhenNoDocumentSpecified() throws Exception
     {
+        MacroBlock macroBlock = new MacroBlock("context", Collections.<String, String>emptyMap(), false);
+        MetaData metadata = new MetaData();
+        metadata.addMetaData(MetaData.SOURCE, "source");
+        XDOM pageXDOM = new XDOM(Arrays.asList(macroBlock), metadata);
+        MacroTransformationContext macroContext = new MacroTransformationContext();
+        macroContext.setSyntax(Syntax.XWIKI_2_0);
+        macroContext.setCurrentMacroBlock(macroBlock);
+        macroContext.setXDOM(pageXDOM);
+
+        DocumentModelBridge dmb = mock(DocumentModelBridge.class);
+        when(this.dab.getTranslatedDocumentInstance(TARGET_REFERENCE)).thenReturn(dmb);
+
+        XDOM contentXDOM = new XDOM(Arrays.asList(new WordBlock("test")));
+        when(this.parser.parse(eq(""), same(macroContext), eq(false), eq(null), eq(false))).thenReturn(contentXDOM);
+
         ContextMacroParameters parameters = new ContextMacroParameters();
 
-        try {
-            this.macro.execute(parameters, "", new MacroTransformationContext());
-            fail("Should have thrown an exception");
-        } catch (MacroExecutionException expected) {
-            assertEquals("You must specify a 'document' parameter pointing to the document to set in the "
-                + "context as the current document.", expected.getMessage());
-        }
+        when(this.executor.execute(any())).thenReturn(new WordBlock("result"));
+
+        List<Block> result = this.macro.execute(parameters, "", macroContext);
+
+        verifyNoInteractions(this.executor);
+
+        assertEquals(Arrays.asList(new MetaDataBlock(contentXDOM.getChildren())), result);
     }
 
     @Test
@@ -198,16 +213,22 @@ class ContextMacroTest
     @Test
     void executeInDOCUMENTContext() throws Exception
     {
-        execute(false);
+        execute(false, false);
     }
 
     @Test
     void executeInDOCUMENTContextInRestrictedMode() throws Exception
     {
-        execute(true);
+        execute(true, false);
     }
 
-    private void execute(boolean restricted) throws Exception
+    @Test
+    void executeInDOCUMENTContextWithRestricted() throws Exception
+    {
+        execute(false, true);
+    }
+
+    private void execute(boolean restrictedContext, boolean restricted) throws Exception
     {
         MacroBlock macroBlock = new MacroBlock("context", Collections.<String, String>emptyMap(), false);
         MetaData metadata = new MetaData();
@@ -217,7 +238,7 @@ class ContextMacroTest
         macroContext.setSyntax(Syntax.XWIKI_2_0);
         macroContext.setCurrentMacroBlock(macroBlock);
         macroContext.setXDOM(pageXDOM);
-        macroContext.getTransformationContext().setRestricted(restricted);
+        macroContext.getTransformationContext().setRestricted(restrictedContext);
 
         DocumentModelBridge dmb = mock(DocumentModelBridge.class);
         when(this.dab.getTranslatedDocumentInstance(TARGET_REFERENCE)).thenReturn(dmb);
@@ -235,6 +256,7 @@ class ContextMacroTest
         ContextMacroParameters parameters = new ContextMacroParameters();
         parameters.setDocument("target");
         parameters.setTransformationContext(TransformationContextMode.DOCUMENT);
+        parameters.setRestricted(restricted);
 
         when(this.executor.execute(any())).thenReturn(new WordBlock("result"));
 
@@ -248,6 +270,6 @@ class ContextMacroTest
         assertEquals(AUTHOR, configuration.getSecureAuthorReference());
         assertEquals(SOURCE_REFERENCE, configuration.getSecureDocumentReference());
         assertSame(targetXDOM, configuration.getXDOM());
-        assertEquals(restricted, configuration.isResricted());
+        assertEquals(restrictedContext ? true : restricted, configuration.isResricted());
     }
 }

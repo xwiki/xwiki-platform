@@ -698,6 +698,8 @@ https://solr.apache.org/guide/solr/latest/indexing-guide/fields.html
     </fieldType>
 
     <!-- some examples for different languages (generally ordered by ISO code) -->
+    <!-- Needed to support Locale.ROOT -->
+    <dynamicField name="*__" type="text_general"  indexed="true"  stored="true" multiValued="true"/>
 
     <!-- Arabic -->
     <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->

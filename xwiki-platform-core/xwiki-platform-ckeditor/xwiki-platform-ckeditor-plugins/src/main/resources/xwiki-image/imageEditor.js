@@ -191,9 +191,10 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
         // Resolve the image url and assign it to a transient image object to be able to access its width and height.
         var resourceReference = data.imageData.resourceReference;
         var editor = data.editor;
+        console.log('HERE');
         img.src = getImageResourceURL(resourceReference, editor, {
-          width: this.width,
-          height: this.height
+          width: 100,
+          height: 100
         }) ;
         return promise;
       }

@@ -230,6 +230,7 @@ require(['jquery', 'resource', 'resourcePicker'], function ($, $resource) {
       } else if (['mailto', 'data'].indexOf(resourceReference.type) >= 0) {
         return resourceReference.type + ':' + resourceReference.reference;
       } else {
+        // TODO: here?
         var dispatcherURL = editor.config['xwiki-resource'].dispatcher;
         dispatcherURL += dispatcherURL.indexOf('?') < 0 ? '?' : '&';
         return dispatcherURL + $.param(resourceReference);
@@ -278,7 +279,7 @@ require(['jquery', 'resource', 'resourcePicker'], function ($, $resource) {
             if (height) {
               params.push("height=" + height);
             }
-            resourceURL += '&parameters[queryString]=' + encodeURI(params.join(','))
+            resourceURL += '&parameters[queryString]=' + encodeURI(params.join(','));
           }
           
           this.setValue(resourceURL);

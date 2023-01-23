@@ -51,7 +51,6 @@ window.MSCheckbox = Class.create({
       this.currentUorG = window.unregUser;
       this.isUserInGroup = false;
     }
-    this.domNode = $(domNode);
     this.right = right;
     this.saveUrl = saveUrl;
     this.defaultState = defaultState;
@@ -80,7 +79,7 @@ window.MSCheckbox = Class.create({
     this.label.appendChild(document.createTextNode(this.labels[this.state]));
     this.button.appendChild(this.label);
     
-    this.domNode.appendChild(this.button);
+    $(domNode).appendChild(this.button);
     this.draw(this.state);
   },
 

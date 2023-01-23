@@ -109,14 +109,14 @@ public class ContextMacro extends AbstractExecutedContentMacro<ContextMacroParam
     public List<Block> execute(ContextMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        if (parameters.getDocument() == null) {
-            throw new MacroExecutionException("You must specify a 'document' parameter pointing to the document to "
-                + "set in the context as the current document.");
+        MetaData metadata;
+        if (parameters.getDocument() != null) {
+            metadata = new MetaData();
+            metadata.addMetaData(MetaData.SOURCE, parameters.getDocument());
+            metadata.addMetaData(MetaData.BASE, parameters.getDocument());
+        } else {
+            metadata = null;
         }
-
-        MetaData metadata = new MetaData();
-        metadata.addMetaData(MetaData.SOURCE, parameters.getDocument());
-        metadata.addMetaData(MetaData.BASE, parameters.getDocument());
 
         XDOM xdom = this.parser.parse(content, context, false, metadata, context.isInline());
 
@@ -155,6 +155,10 @@ public class ContextMacro extends AbstractExecutedContentMacro<ContextMacroParam
         BlockAsyncRendererConfiguration configuration = createBlockAsyncRendererConfiguration(null, xdom, context);
         configuration.setAsyncAllowed(false);
         configuration.setCacheAllowed(false);
+
+        if (parameters.isRestricted()) {
+            configuration.setResricted(true);
+        }
 
         Map<String, Object> backupObjects = new HashMap<>();
         try {

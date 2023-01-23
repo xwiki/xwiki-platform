@@ -43,6 +43,8 @@ public class ContextMacroParameters
      */
     private TransformationContextMode transformationContextMode = TransformationContextMode.CURRENT;
 
+    private boolean restricted;
+
     /**
      * @return the reference to the document that will be set as the current document to evaluate the macro's content
      */
@@ -82,5 +84,28 @@ public class ContextMacroParameters
     public void setTransformationContext(TransformationContextMode mode)
     {
         this.transformationContextMode = mode;
+    }
+
+    /**
+     * @return true if the content should be executed in a restricted context
+     * @since 14.10.4
+     * @since 15.0
+     * @since 15.1RC1
+     */
+    @PropertyDescription("True if the content should be executed in a restricted context")
+    public boolean isRestricted()
+    {
+        return this.restricted;
+    }
+
+    /**
+     * @param restricted true if the content should be executed in a restricted context
+     * @since 14.10.4
+     * @since 15.0
+     * @since 15.1RC1
+     */
+    public void setRestricted(boolean restricted)
+    {
+        this.restricted = restricted;
     }
 }

@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="Invitation.InvitationGuestActions" locale="">
+<xwikidoc version="1.5" reference="Invitation.InvitationGuestActions" locale="">
   <web>Invitation</web>
   <name>InvitationGuestActions</name>
   <language/>
@@ -34,9 +34,9 @@
   <title/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{include reference="Invitation.InvitationCommon" /}}
+  <content>{{include reference="Invitation.InvitationCommon"/}}
 
 {{velocity}}
 #*
@@ -93,7 +93,9 @@
             $mail,
             $emailContainer)
 #else
-  {{info}}$services.localization.render('xe.invitation.internalDocument', ["${doc.getSpace()}.WebHome"]){{/info}}
+  #set ($linkTarget = "${doc.getSpace()}.WebHome")
+  #set ($linkTarget = $services.rendering.escape($linkTarget, 'xwiki/2.1'))
+  {{info}}$services.localization.render('xe.invitation.internalDocument', [$linkTarget]){{/info}}
 #end
 ##
 ##---------------------------------------------------------------------

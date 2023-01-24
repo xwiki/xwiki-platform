@@ -1,4 +1,5 @@
 org.xwiki.extension.xar.internal.DefaultXarExtensionConfiguration
+org.xwiki.extension.xar.internal.DefaultXARExtensionIndex
 org.xwiki.extension.xar.internal.delete.DocumentsDeletingListener
 org.xwiki.extension.xar.internal.doc.XarDocumentRevisionProvider
 org.xwiki.extension.xar.internal.doc.InstalledExtensionDocumentCustomizationDetector

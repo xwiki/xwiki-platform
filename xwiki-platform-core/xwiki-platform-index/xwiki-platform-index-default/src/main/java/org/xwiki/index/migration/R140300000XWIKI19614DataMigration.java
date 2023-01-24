@@ -21,21 +21,19 @@ package org.xwiki.index.migration;
 
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.index.TaskManager;
+import org.xwiki.internal.migration.AbstractDocumentsMigration;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
-import org.xwiki.query.QueryManager;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
-import com.xpn.xwiki.store.migration.hibernate.HibernateDataMigration;
 
 import static org.xwiki.index.internal.DefaultLinksTaskConsumer.LINKS_TASK_TYPE;
 
@@ -46,26 +44,16 @@ import static org.xwiki.index.internal.DefaultLinksTaskConsumer.LINKS_TASK_TYPE;
  * @since 14.2RC1
  * @deprecated link storage and indexing moved to Solr (implemented in xwiki-platform-search-solr-api)
  */
-// TODO: Implement DataMigration once XWIKI-19399 is fixed.
 @Component
 @Singleton
 @Named(R140300000XWIKI19614DataMigration.HINT)
 @Deprecated(since = "14.8RC1")
-public class R140300000XWIKI19614DataMigration implements HibernateDataMigration
+public class R140300000XWIKI19614DataMigration extends AbstractDocumentsMigration
 {
     /**
      * The hint for this component.
      */
     public static final String HINT = "R140300000XWIKI19614";
-
-    @Inject
-    private QueryManager queryManager;
-
-    @Inject
-    private TaskManager taskManager;
-
-    @Inject
-    private Provider<XWikiContext> contextProvider;
 
     @Override
     public String getName()
@@ -86,43 +74,47 @@ public class R140300000XWIKI19614DataMigration implements HibernateDataMigration
     }
 
     @Override
-    public void migrate() throws DataMigrationException
+    protected String getTaskType()
     {
-        XWikiContext context = this.contextProvider.get();
-        // No need to migrate if the wiki does not support backlinks.
+        return LINKS_TASK_TYPE;
+    }
+
+    @Override
+    protected List<String> selectDocuments() throws DataMigrationException
+    {
+        List<String> documents;
+        XWikiContext context = getXWikiContext();
+        XWiki wiki = getXWikiContext().getWiki();
         if (context.getWiki().hasBacklinks(context)) {
-            String wikiId = context.getWikiId();
             try {
-                List<Long> ids =
-                    this.queryManager.createQuery("SELECT doc.id FROM XWikiDocument doc", Query.HQL).setWiki(wikiId)
-                        .execute();
-                for (Long id : ids) {
-                    this.taskManager.addTask(wikiId, id, LINKS_TASK_TYPE);
-                }
+                documents = wiki.getStore().getQueryManager()
+                    .createQuery("SELECT doc.fullName FROM XWikiDocument doc", Query.HQL)
+                    .setWiki(context.getWikiId())
+                    .execute();
             } catch (QueryException e) {
                 throw new DataMigrationException(
-                    String.format("Failed retrieve the list of all the documents for wiki [%s].", wikiId), e);
+                    String.format("Failed retrieve the list of all the documents for wiki [%s].", wiki.getName()), e);
             }
+        } else {
+            documents = List.of();
         }
+        return documents;
     }
 
     @Override
-    public boolean shouldExecute(XWikiDBVersion startupVersion)
+    protected void logBeforeQueuingTask(XWikiDocument document)
     {
-        return true;
+        // No logs here as it would be too verbose (all documents of the wiki are queued).
     }
 
     @Override
-    public String getPreHibernateLiquibaseChangeLog()
+    protected void logBeforeQueuingTasks(List<XWikiDocument> documents)
     {
-        // TODO: Remove once XWIKI-19399 is fixed.
-        return null;
-    }
-
-    @Override
-    public String getLiquibaseChangeLog()
-    {
-        // TODO: Remove once XWIKI-19399 is fixed.
-        return null;
+        XWikiContext context = getXWikiContext();
+        if (context.getWiki().hasBacklinks(context)) {
+            super.logBeforeQueuingTasks(documents);
+        } else {
+            this.logger.info("Skipped because backlinks are not supported on [{}]", context.getWikiId());
+        }
     }
 }

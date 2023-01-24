@@ -267,3 +267,6 @@ com.xpn.xwiki.web.ViewAction
 com.xpn.xwiki.web.ViewAttachRevAction
 2000:org.xwiki.internal.attachment.validation.VoidAttachmentValidator
 org.xwiki.internal.template.ActionTemplateRequirement
+org.xwiki.internal.migration.R141004000XWIKI20285DataMigration
+org.xwiki.internal.migration.InvitationInternalDocumentParameterEscapingFixer
+org.xwiki.internal.migration.InvitationInternalDocumentParameterEscapingTaskConsumer

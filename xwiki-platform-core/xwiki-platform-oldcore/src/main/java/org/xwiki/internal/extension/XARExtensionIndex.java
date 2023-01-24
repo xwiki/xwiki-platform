@@ -17,42 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.index;
+package org.xwiki.internal.extension;
 
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
- * Provides the operations to interact with the task consumer from the scripts.
+ * Provides operation to access to information relative to XARs provided by extensions.
  *
  * @version $Id$
- * @since 14.2
+ * @since 15.0RC1
+ * @since 14.4.8
+ * @since 14.10.4
  */
-@Unstable
-@Named("taskConsumer")
-@Component
-@Singleton
-public class TaskConsumerScriptService implements ScriptService
+@Role
+public interface XARExtensionIndex
 {
-    @Inject
-    private TaskManager taskManager;
-
-    @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
-
     /**
-     * @return the count of queued tasks, grouped by task type
+     * @param documentReference a document reference
+     * @return {@code true} if a given document reference is provided by an extension
      */
-    public Map<String, Long> getQueueSizePerType()
-    {
-        return this.taskManager.getQueueSizePerType(this.wikiDescriptorManager.getCurrentWikiId());
-    }
+    boolean isExtensionDocument(DocumentReference documentReference);
 }

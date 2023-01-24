@@ -17,42 +17,40 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.index;
-
-import java.util.Map;
+package org.xwiki.extension.xar.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
+import org.xwiki.extension.xar.internal.repository.XarInstalledExtensionRepository;
+import org.xwiki.internal.extension.XARExtensionIndex;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
- * Provides the operations to interact with the task consumer from the scripts.
+ * Default implementation of {@link XARExtensionIndex}. Uses {@link XarInstalledExtensionRepository} to implement the
+ * operations.
  *
  * @version $Id$
- * @since 14.2
+ * @since 15.0RC1
+ * @since 14.4.8
+ * @since 14.10.4
  */
-@Unstable
-@Named("taskConsumer")
 @Component
 @Singleton
-public class TaskConsumerScriptService implements ScriptService
+public class DefaultXARExtensionIndex implements XARExtensionIndex
 {
     @Inject
-    private TaskManager taskManager;
+    @Named(XarExtensionHandler.TYPE)
+    private InstalledExtensionRepository installedXARs;
 
-    @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
-
-    /**
-     * @return the count of queued tasks, grouped by task type
-     */
-    public Map<String, Long> getQueueSizePerType()
+    @Override
+    public boolean isExtensionDocument(DocumentReference documentReference)
     {
-        return this.taskManager.getQueueSizePerType(this.wikiDescriptorManager.getCurrentWikiId());
+        return !((XarInstalledExtensionRepository) this.installedXARs).getXarInstalledExtensions(documentReference)
+            .isEmpty();
     }
 }

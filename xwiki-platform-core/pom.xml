@@ -147,6 +147,22 @@
                 </item>
               </differences>
             </revapi.differences>
+            <revapi.differences>
+              <justification>Moved to xwiki-platform-index-default</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.index.migration.R140300000XWIKI19614DataMigration</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.index.migration.R140300001XWIKI19571DataMigration</old>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

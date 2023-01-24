@@ -57,7 +57,9 @@
   {{info}}testLoadInvitationConfig{{/info}}
   #testLoadInvitationConfig()
 #elseif($doc.documentReference.name == 'InvitationCommon')
-  {{info}}$services.localization.render('xe.invitation.internalDocument', ["${doc.getSpace()}.WebHome"]){{/info}}
+  #set ($linkTarget = "${doc.getSpace()}.WebHome")
+  #set ($linkTarget = $services.rendering.escape($linkTarget, 'xwiki/2.1'))
+  {{info}}$services.localization.render('xe.invitation.internalDocument', [$linkTarget]){{/info}}
 #end
 ##
 #*
@@ -186,8 +188,10 @@
         $config.put($element.getName(), $defaultConfigObj.getProperty($element.getName()).getValue())
       #end
       ##
-      #set($configDocContent = '{{velo' + 'city}}{{info}}$services.localization.render(''xe.invitation.internalDocument'', ["'
-                               + "$!config.get('mainPage')" + '"]){{/info}}{{/velo' + 'city}}')
+      #set($configDocContent = 
+        '{{velocity}}{{info}}$services.localization.render(''xe.invitation.internalDocument'','
+          + '[$services.rendering.escape("' + "$!config.get('mainPage')" 
+          + '", ''xwiki/2.1'')]){{/info}}{{/velocity}}')
       $configDoc.setContent($configDocContent)
       $configDoc.setParent($configClassNameInternal)
       #set($configObj = $configDoc.newObject($configClassNameInternal))
@@ -275,8 +279,10 @@
 #macro(loadInvitationMail, $config, $emailContainer, $mail)
   ## If this doesn't already exist, it's created.
   #if($emailContainer.isNew())
-    #set($emailContainerContent = '{{velo' + 'city}}{{info}}$services.localization.render(''xe.invitation.internalDocument'', ["'
-                                  + "$config.get('emailContainer')" + '"]){{/info}}{{/velo' + 'city}}')
+    #set($emailContainerContent = 
+      '{{velocity}}{{info}}$services.localization.render(''xe.invitation.internalDocument'','
+        + '[$services.rendering.escape("' + "$config.get('emailContainer')" 
+        + '", ''xwiki/2.1'')]){{/info}}{{/velocity}}')
     #set($discard = $emailContainer.setContent($emailContainerContent))
     #set($discard = $emailContainer.setHidden(true))
     #set($discard = $emailContainer.saveAsAuthor())

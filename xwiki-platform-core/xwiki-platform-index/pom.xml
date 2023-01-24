@@ -33,6 +33,7 @@
   <description>XWiki Platform - Index - Parent POM</description>
   <modules>
     <module>xwiki-platform-index-api</module>
+    <module>xwiki-platform-index-default</module>
     <module>xwiki-platform-index-ui</module>
     <module>xwiki-platform-index-tree</module>
   </modules>

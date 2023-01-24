@@ -361,7 +361,7 @@
     <!-- Needed to wait for document backlink indexation queue to be consumed. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-index-api</artifactId>
+      <artifactId>xwiki-platform-index-default</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- Dependencies not needed by the plugin itself but included in the WAR it generates,

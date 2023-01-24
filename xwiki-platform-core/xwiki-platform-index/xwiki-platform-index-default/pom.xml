@@ -27,32 +27,30 @@
     <artifactId>xwiki-platform-index</artifactId>
     <version>14.4.8-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-index-api</artifactId>
-  <name>XWiki Platform - Index - API</name>
+  <artifactId>xwiki-platform-index-default</artifactId>
+  <name>XWiki Platform - Index - Default</name>
+  <description>Default implementation of the API to queue asynchronous tasks dedicated to the analysis of wiki pages.</description>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.04</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.84</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Index API</xwiki.extension.name>
-    <xwiki.extension.description>API for the Index Application.</xwiki.extension.description>
-    <xwiki.extension.category>api</xwiki.extension.category>
+    <xwiki.extension.name>Default implementation of the Index API</xwiki.extension.name>
   </properties>
   <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-index-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-component-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
-    <!-- Required to list all the wikis. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wiki-api</artifactId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-stability</artifactId>
-      <version>${commons.version}</version>
     </dependency>
     <!-- Test dependencies. -->
     <dependency>
@@ -61,5 +59,29 @@
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
+            <id>default</id>
+            <configuration>
+              <failsOnError>true</failsOnError>
+              <suppressionsLocation>${basedir}/src/checkstyle/checkstyle-suppressions.xml</suppressionsLocation>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

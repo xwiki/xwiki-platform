@@ -21,16 +21,12 @@ package org.xwiki.index;
 
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
-
-import com.xpn.xwiki.XWikiContext;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
@@ -51,16 +47,13 @@ class TaskConsumerScriptServiceTest
     private TaskManager taskManager;
 
     @MockComponent
-    private Provider<XWikiContext> xcontextProvider;
+    private WikiDescriptorManager wikiDescriptorManager;
 
-    @Mock
-    private XWikiContext xcontext;
 
     @BeforeEach
     void setUp()
     {
-        when(this.xcontextProvider.get()).thenReturn(this.xcontext);
-        when(this.xcontext.getWikiId()).thenReturn("xwiki");
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("xwiki");
     }
 
     @Test

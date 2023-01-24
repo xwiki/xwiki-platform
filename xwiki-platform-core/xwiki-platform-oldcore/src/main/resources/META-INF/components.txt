@@ -265,3 +265,6 @@ com.xpn.xwiki.web.UnknownAction
 com.xpn.xwiki.web.UploadAction
 com.xpn.xwiki.web.ViewAction
 com.xpn.xwiki.web.ViewAttachRevAction
+org.xwiki.internal.migration.R140408000XWIKI20285DataMigration
+org.xwiki.internal.migration.InvitationInternalDocumentParameterEscapingFixer
+org.xwiki.internal.migration.InvitationInternalDocumentParameterEscapingTaskConsumer

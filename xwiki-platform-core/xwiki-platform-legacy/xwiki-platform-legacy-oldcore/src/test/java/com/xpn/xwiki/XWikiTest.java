@@ -21,6 +21,9 @@ package com.xpn.xwiki;
 
 import java.net.URL;
 
+import org.xwiki.index.TaskManager;
+import org.xwiki.internal.extension.XARExtensionIndex;
+
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 
@@ -41,6 +44,9 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
 
         getContext().setRequest(new XWikiServletRequestStub());
         getContext().setURL(new URL("http://localhost:8080/xwiki/bin/view/MilkyWay/Fidis"));
+
+        registerMockComponent(XARExtensionIndex.class);
+        registerMockComponent(TaskManager.class);
 
         this.xwiki = new XWiki(new XWikiConfig(), getContext())
         {

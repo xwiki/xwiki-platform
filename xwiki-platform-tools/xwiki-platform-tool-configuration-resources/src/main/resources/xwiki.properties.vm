@@ -914,7 +914,7 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-# By default this property is set to true:
 # url.trustedDomainsEnabled=true
 
-#-# [Since 15.0RC1]
+#-# [Since 15.0]
 #-# [Since 14.10.4]
 #-# Define the list of schemes that are allowed for trusted URIs. Those schemes are checked whenever an absolute URI
 #-# needs to be checked (e.g. before performing a redirect). Any URI whose scheme doesn't belong to that list will not

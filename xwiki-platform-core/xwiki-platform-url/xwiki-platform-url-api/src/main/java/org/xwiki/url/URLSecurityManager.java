@@ -80,7 +80,7 @@ public interface URLSecurityManager
     /**
      * Parse the given string to create a URI that is safe to use.
      * This method throws a {@link SecurityException} if the parsed URI is not safe to use according to
-     * {@link #isURITrusted(URI)}. It might also return a {@link URISyntaxException} if the parameter cannot be properly
+     * {@link #isURITrusted(URI)}. It might also throw a {@link URISyntaxException} if the parameter cannot be properly
      * parsed.
      *
      * @param serializedURI a string representing a URI that needs to be parsed.

@@ -83,7 +83,7 @@ public interface URLConfiguration
      *
      * @return a list of supported schemes for checking trusted URI
      * @since 14.10.4
-     * @since 15.0RC1
+     * @since 15.0
      */
     @Unstable
     default List<String> getTrustedSchemes()

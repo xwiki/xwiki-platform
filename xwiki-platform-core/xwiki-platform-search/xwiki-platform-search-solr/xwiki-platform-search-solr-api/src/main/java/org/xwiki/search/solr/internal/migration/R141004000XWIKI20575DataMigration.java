@@ -27,11 +27,14 @@ import javax.inject.Singleton;
 
 import org.apache.solr.client.solrj.SolrServerException;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.search.solr.internal.api.SolrInstance;
 
-import com.xpn.xwiki.store.migration.DataMigration;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
+import com.xpn.xwiki.store.migration.hibernate.HibernateDataMigration;
 
 /**
  * Migration in charge of emptying the Search solr core in order to perform a reindex of all documents after a
@@ -44,7 +47,8 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 @Component
 @Named(R141004000XWIKI20575DataMigration.HINT)
 @Singleton
-public class R141004000XWIKI20575DataMigration implements DataMigration
+// Note that we implement HibernateDataMigration and not DataMigration only because of XWIKI-19399
+public class R141004000XWIKI20575DataMigration implements HibernateDataMigration
 {
     /**
      * Hint of the migration.
@@ -53,6 +57,18 @@ public class R141004000XWIKI20575DataMigration implements DataMigration
 
     @Inject
     private SolrInstance solrInstance;
+
+    @Inject
+    private Execution execution;
+
+    /**
+     * @return XWikiContext to access the store
+     */
+    private XWikiContext getXWikiContext()
+    {
+        ExecutionContext context = this.execution.getContext();
+        return (XWikiContext) context.getProperty("xwikicontext");
+    }
 
     @Override
     public String getName()
@@ -86,6 +102,19 @@ public class R141004000XWIKI20575DataMigration implements DataMigration
     @Override
     public boolean shouldExecute(XWikiDBVersion startupVersion)
     {
-        return true;
+        // We only need to execute this migration once.
+        return getXWikiContext().isMainWiki();
+    }
+
+    @Override
+    public String getPreHibernateLiquibaseChangeLog() throws DataMigrationException
+    {
+        return null;
+    }
+
+    @Override
+    public String getLiquibaseChangeLog() throws DataMigrationException
+    {
+        return null;
     }
 }

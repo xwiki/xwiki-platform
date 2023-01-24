@@ -21,27 +21,37 @@ package org.xwiki.index.migration;
 
 import java.util.List;
 
-import javax.inject.Provider;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.index.TaskManager;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.hibernate.HibernateDataMigration;
+
+import ch.qos.logback.classic.Level;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -58,14 +68,20 @@ class R140300000XWIKI19614DataMigrationTest
     @InjectMockComponents(role = HibernateDataMigration.class)
     private R140300000XWIKI19614DataMigration migration;
 
-    @MockComponent
+    @Mock
     private QueryManager queryManager;
 
     @MockComponent
     private TaskManager taskManager;
 
     @MockComponent
-    private Provider<XWikiContext> contextProvider;
+    private Execution execution;
+
+    @MockComponent
+    private DocumentReferenceResolver<String> resolver;
+
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     @Mock
     private XWikiContext context;
@@ -79,10 +95,18 @@ class R140300000XWIKI19614DataMigrationTest
     @BeforeEach
     void setUp() throws Exception
     {
-        when(this.contextProvider.get()).thenReturn(this.context);
+        ExecutionContext executionContext = mock(ExecutionContext.class);
+        XWikiStoreInterface xWikiStoreInterface = mock(XWikiStoreInterface.class);
+
+        when(this.execution.getContext()).thenReturn(executionContext);
+        when(executionContext.getProperty("xwikicontext")).thenReturn(this.context);
         when(this.context.getWiki()).thenReturn(this.wiki);
+        when(this.wiki.getName()).thenReturn("wiki1");
         when(this.context.getWikiId()).thenReturn("wiki1");
-        when(this.queryManager.createQuery("SELECT doc.id FROM XWikiDocument doc",
+        when(this.wiki.getStore()).thenReturn(xWikiStoreInterface);
+        when(xWikiStoreInterface.getQueryManager()).thenReturn(this.queryManager);
+
+        when(this.queryManager.createQuery("SELECT doc.fullName FROM XWikiDocument doc",
             Query.HQL)).thenReturn(this.query);
         when(this.query.setWiki(any())).thenReturn(this.query);
     }
@@ -90,15 +114,29 @@ class R140300000XWIKI19614DataMigrationTest
     @Test
     void migrate() throws Exception
     {
+        DocumentReference doc42 = new DocumentReference("xwiki", "XWiki", "Doc42");
+        DocumentReference doc43 = new DocumentReference("xwiki", "XWiki", "Doc43");
+        XWikiDocument xWikiDocument42 = mock(XWikiDocument.class);
+        XWikiDocument xWikiDocument43 = mock(XWikiDocument.class);
+
         when(this.wiki.hasBacklinks(this.context)).thenReturn(true);
 
-        when(this.query.execute()).thenReturn(List.of(42L, 43L));
+        when(this.query.execute()).thenReturn(List.of("xwiki.XWiki.Doc42", "xwiki.XWiki.Doc43"));
+        when(this.resolver.resolve("xwiki.XWiki.Doc42")).thenReturn(doc42);
+        when(this.resolver.resolve("xwiki.XWiki.Doc43")).thenReturn(doc43);
+        when(this.wiki.getDocument(doc42, this.context)).thenReturn(xWikiDocument42);
+        when(this.wiki.getDocument(doc43, this.context)).thenReturn(xWikiDocument43);
+        when(xWikiDocument42.getId()).thenReturn(42L);
+        when(xWikiDocument43.getId()).thenReturn(43L);
 
         this.migration.migrate();
 
         verify(this.query).setWiki("wiki1");
-        verify(this.taskManager).addTask("wiki1", 42L,  "links");
+        verify(this.taskManager).addTask("wiki1", 42L, "links");
         verify(this.taskManager).addTask("wiki1", 43L, "links");
+
+        assertEquals("[2] documents queued to task [links]", this.logCapture.getMessage(0));
+        assertEquals(Level.INFO, this.logCapture.getLogEvent(0).getLevel());
     }
 
     @Test
@@ -111,8 +149,11 @@ class R140300000XWIKI19614DataMigrationTest
         DataMigrationException queryException =
             assertThrows(DataMigrationException.class, () -> this.migration.migrate());
 
-        assertEquals("Failed retrieve the list of all the documents for wiki [wiki1].", queryException.getMessage());
-        assertEquals(QueryException.class, queryException.getCause().getClass());
+        assertEquals("Data migration R140300000XWIKI19614 failed", queryException.getMessage());
+        assertEquals("Failed retrieve the list of all the documents for wiki [wiki1].",
+            queryException.getCause().getMessage());
+        assertEquals(DataMigrationException.class, queryException.getCause().getClass());
+        assertEquals(QueryException.class, queryException.getCause().getCause().getClass());
 
         verify(this.query).setWiki("wiki1");
         verifyNoInteractions(this.taskManager);
@@ -125,5 +166,7 @@ class R140300000XWIKI19614DataMigrationTest
         this.migration.migrate();
         verifyNoInteractions(this.queryManager);
         verifyNoInteractions(this.taskManager);
+        assertEquals("Skipped because backlinks are not supported on [wiki1]", this.logCapture.getMessage(0));
+        assertEquals(Level.INFO, this.logCapture.getLogEvent(0).getLevel());
     }
 }

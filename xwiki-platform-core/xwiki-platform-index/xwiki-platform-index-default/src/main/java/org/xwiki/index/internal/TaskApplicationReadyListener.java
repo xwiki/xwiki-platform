@@ -27,7 +27,6 @@ import javax.inject.Singleton;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.index.TaskManager;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
@@ -73,7 +72,7 @@ public class TaskApplicationReadyListener extends AbstractEventListener implemen
     }
 
     @Override
-    public void initialize() throws InitializationException
+    public void initialize()
     {
         // If the application is already initialized we start the threads immediately (e.g. in case of extension
         // install) and the implementation of type DefaultTasksManager.

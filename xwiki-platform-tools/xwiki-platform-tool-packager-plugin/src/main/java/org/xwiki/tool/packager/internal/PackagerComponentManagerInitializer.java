@@ -23,24 +23,30 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.manager.ComponentManagerInitializer;
 import org.xwiki.context.ExecutionContextInitializer;
+import org.xwiki.observation.EventListener;
 
 /**
- * Cancel ThreadClassloaderExecutionContextInitializer to not mess with the Maven classloader.
- * 
+ * Dedicated component manager initializer for the packager plugin.
+ * Main role of this initializer is to unregister the components we don't want to have when the importer is used.
+ *
  * @version $Id$
- * @since 9.7RC1
+ * @since 15.0
  */
 @Component
 @Singleton
-@Named("threadclassloader")
-public class MavenBuildThreadClassloaderExecutionContextInitializer implements ExecutionContextInitializer
+@Named("packager")
+public class PackagerComponentManagerInitializer implements ComponentManagerInitializer
 {
     @Override
-    public void initialize(ExecutionContext context) throws ExecutionContextException
+    public void initialize(ComponentManager componentManager)
     {
-        // Cancel
+        // We don't want the solr indexer to be triggered whenever a document is imported.
+        componentManager.unregisterComponent(EventListener.class, "solr.update");
+        // We don't need the untyped event listener and it requires specific dependencies.
+        componentManager.unregisterComponent(EventListener.class, "Untyped Event Listener");
+        componentManager.unregisterComponent(ExecutionContextInitializer.class, "threadclassloader");
     }
 }

@@ -95,7 +95,7 @@ public class InternalSkinManager implements Initializable
     private Logger logger;
 
     @Inject
-    private URLConfiguration urlConfiguration;
+    private Provider<URLConfiguration> urlConfigurationProvider;
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
@@ -160,7 +160,7 @@ public class InternalSkinManager implements Initializable
         } else {
             EnvironmentSkin environmentSkin =
                 new EnvironmentSkin(id, this, this.skinConfiguration, this.logger, this.environment,
-                    this.xcontextProvider, this.urlConfiguration);
+                    this.xcontextProvider, this.urlConfigurationProvider.get());
             // Check if the environment skin actually exists on the environment before returning it.
             // Other fallbacks to a classloader skin.
             if (environmentSkin.exists()) {
@@ -171,7 +171,7 @@ public class InternalSkinManager implements Initializable
                 NamespaceURLClassLoader wikiClassLoader =
                     this.classLoaderManager.getURLClassLoader(wikiNamespace.serialize(), false);
                 skin = new ClassLoaderSkin(id, this, this.skinConfiguration, this.logger, this.xcontextProvider,
-                    this.urlConfiguration, wikiClassLoader);
+                    this.urlConfigurationProvider.get(), wikiClassLoader);
             }
         }
 

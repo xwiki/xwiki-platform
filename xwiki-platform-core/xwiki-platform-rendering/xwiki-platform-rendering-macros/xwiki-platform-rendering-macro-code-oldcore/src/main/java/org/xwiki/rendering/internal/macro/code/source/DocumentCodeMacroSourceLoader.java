@@ -26,7 +26,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.internal.parser.pygments.PygmentsUtils;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.code.source.CodeMacroSource;
-import org.xwiki.rendering.macro.code.source.CodeMacroSourceReference;
+import org.xwiki.rendering.macro.source.MacroContentSourceReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -42,7 +42,7 @@ public class DocumentCodeMacroSourceLoader implements EntityCodeMacroSourceLoade
 {
     @Override
     public CodeMacroSource load(XWikiDocument document, EntityReference entityReference,
-        CodeMacroSourceReference reference, XWikiContext xcontext) throws MacroExecutionException
+        MacroContentSourceReference reference, XWikiContext xcontext) throws MacroExecutionException
     {
         return new CodeMacroSource(reference, document.getContent(),
             PygmentsUtils.syntaxToLanguage(document.getSyntax()));

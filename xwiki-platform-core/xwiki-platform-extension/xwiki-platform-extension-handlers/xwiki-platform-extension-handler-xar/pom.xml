@@ -52,7 +52,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-mail-general</artifactId>
+      <artifactId>xwiki-platform-mail-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

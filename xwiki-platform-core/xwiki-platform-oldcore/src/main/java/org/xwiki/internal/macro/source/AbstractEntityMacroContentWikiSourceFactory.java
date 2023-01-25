@@ -17,18 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.macro.code.source;
+package org.xwiki.internal.macro.source;
 
 import javax.inject.Inject;
 
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.internal.macro.source.AbstractEntityMacroContentSourceFactory;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.code.source.CodeMacroSource;
-import org.xwiki.rendering.macro.code.source.CodeMacroSourceFactory;
 import org.xwiki.rendering.macro.source.MacroContentSourceReference;
+import org.xwiki.rendering.macro.source.MacroContentWikiSource;
+import org.xwiki.rendering.macro.source.MacroContentWikiSourceFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -37,28 +36,29 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * Provide content coming from XWiki model entities.
  * 
  * @version $Id$
- * @since 15.0RC1
- * @since 14.10.2
+ * @since 15.1RC1
+ * @since 14.10.5
  */
-public abstract class AbstractEntityCodeMacroSourceFactory
-    extends AbstractEntityMacroContentSourceFactory<CodeMacroSource> implements CodeMacroSourceFactory
+public abstract class AbstractEntityMacroContentWikiSourceFactory
+    extends AbstractEntityMacroContentSourceFactory<MacroContentWikiSource> implements MacroContentWikiSourceFactory
 {
     @Inject
     private ComponentManager componentManager;
 
     @Override
-    protected CodeMacroSource getContent(XWikiDocument document, EntityReference entityReference,
+    protected MacroContentWikiSource getContent(XWikiDocument document, EntityReference entityReference,
         MacroContentSourceReference reference, XWikiContext xcontext) throws MacroExecutionException
     {
-        if (!this.componentManager.hasComponent(EntityCodeMacroSourceLoader.class, entityReference.getType().name())) {
+        if (!this.componentManager.hasComponent(EntityMacroContentWikiSourceLoader.class,
+            entityReference.getType().name())) {
             throw new MacroExecutionException(
                 "Unsupported entity type [" + entityReference.getType() + "] for reference [" + entityReference + "]");
         }
 
-        EntityCodeMacroSourceLoader loader;
+        EntityMacroContentWikiSourceLoader loader;
         try {
-            loader =
-                this.componentManager.getInstance(EntityCodeMacroSourceLoader.class, entityReference.getType().name());
+            loader = this.componentManager.getInstance(EntityMacroContentWikiSourceLoader.class,
+                entityReference.getType().name());
         } catch (ComponentLookupException e) {
             throw new MacroExecutionException("Unexpected error when initializing the content loader for entity type ["
                 + entityReference.getType() + "]", e);

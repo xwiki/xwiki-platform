@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.macro.code.source;
+package org.xwiki.internal.macro.source;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -25,10 +25,10 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.mail.GeneralMailConfiguration;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.rendering.internal.parser.pygments.PygmentsUtils;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.code.source.CodeMacroSource;
 import org.xwiki.rendering.macro.source.MacroContentSourceReference;
+import org.xwiki.rendering.macro.source.MacroContentWikiSource;
+import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -44,18 +44,18 @@ import com.xpn.xwiki.objects.classes.TextAreaClass.ContentType;
 
 /**
  * @version $Id$
- * @since 15.0RC1
- * @since 14.10.2
+ * @since 15.1RC1
+ * @since 14.10.5
  */
 @Component(hints = {"OBJECT_PROPERTY", "PAGE_OBJECT_PROPERTY"})
 @Singleton
-public class DocumentObjectPropertyCodeMacroSourceLoader implements EntityCodeMacroSourceLoader
+public class ObjectPropertyMacroContentWikiSourceLoader implements EntityMacroContentWikiSourceLoader
 {
     @Inject
     private GeneralMailConfiguration mailConfiguration;
 
     @Override
-    public CodeMacroSource load(XWikiDocument document, EntityReference entityReference,
+    public MacroContentWikiSource load(XWikiDocument document, EntityReference entityReference,
         MacroContentSourceReference reference, XWikiContext xcontext) throws MacroExecutionException
     {
         BaseObject xobject = document.getXObject(entityReference.getParent());
@@ -70,11 +70,11 @@ public class DocumentObjectPropertyCodeMacroSourceLoader implements EntityCodeMa
             throw new MacroExecutionException("Unknown property [" + entityReference + "]");
         }
 
-        return new CodeMacroSource(reference, xobjectProperty.toText(),
-            getLanguage(xobject, document, entityReference, xcontext));
+        return new MacroContentWikiSource(reference, xobjectProperty.toText(),
+            getSyntax(xobject, document, entityReference, xcontext));
     }
 
-    private String getLanguage(BaseObject xobject, XWikiDocument document, EntityReference entityReference,
+    private Syntax getSyntax(BaseObject xobject, XWikiDocument document, EntityReference entityReference,
         XWikiContext xcontext) throws MacroExecutionException
     {
         BaseClass xclass = xobject.getXClass(xcontext);
@@ -85,7 +85,7 @@ public class DocumentObjectPropertyCodeMacroSourceLoader implements EntityCodeMa
             // Displaying a password is forbidden
             if (xclassProperty instanceof PasswordClass) {
                 throw new MacroExecutionException(String.format(
-                    "Displaying content of property [%s] is not allowed because it's a passwordl", entityReference));
+                    "Displaying content of property [%s] is not allowed because it's a password", entityReference));
             }
 
             // Displaying email is forbidden when obfuscation is enabled
@@ -95,19 +95,19 @@ public class DocumentObjectPropertyCodeMacroSourceLoader implements EntityCodeMa
                         entityReference));
             }
 
-            String language = null;
+            // We are not supposed to interpret wiki syntax in an object property which is not a wiki textarea so
+            // default to plain text syntax
+            Syntax syntax = Syntax.PLAIN_1_0;
             if (xclassProperty instanceof TextAreaClass) {
                 TextAreaClass textarea = (TextAreaClass) xclassProperty;
 
                 ContentType contentType = ContentType.getByValue(textarea.getContentType());
-                if (contentType == ContentType.VELOCITY_CODE || contentType == ContentType.VELOCITYWIKI) {
-                    language = "velocity";
-                } else if (contentType == ContentType.WIKI_TEXT) {
-                    language = PygmentsUtils.syntaxToLanguage(document.getSyntax());
+                if (contentType == ContentType.WIKI_TEXT) {
+                    syntax = document.getSyntax();
                 }
             }
 
-            return language;
+            return syntax;
         }
 
         return null;

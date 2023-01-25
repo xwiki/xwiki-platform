@@ -17,30 +17,46 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.macro.code.source;
+package org.xwiki.internal.macro.source;
 
-import javax.inject.Named;
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.EntityType;
-import org.xwiki.rendering.macro.source.MacroContentSourceReference;
+import org.xwiki.configuration.ConfigurationSource;
 
 /**
- * Provide content coming from XWiki model entities.
+ * Configuration related to the various entity sources for the code macro.
  * 
  * @version $Id$
- * @since 15.0RC1
- * @since 14.10.2
+ * @since 15.1RC1
+ * @since 14.10.5
  */
-@Component
+@Component(roles = MacroContentEntitySoureConfiguration.class)
 @Singleton
-@Named(MacroContentSourceReference.TYPE_PAGE_OBJECT_PROPERTY)
-public class PageObjectPropertyCodeMacroSourceFactory extends AbstractEntityCodeMacroSourceFactory
+public class MacroContentEntitySoureConfiguration
 {
-    @Override
-    protected EntityType getEntityType()
+    /**
+     * Prefix for configuration keys for content macro related properties.
+     */
+    private static final String PREFIX = "rendering.macro.content.source.";
+
+    /**
+     * Use 1MB as maximum attachment size by default.
+     */
+    private static final int DEFAULT_MAXIMUM_ATTACHMENTSIZE = 1000000;
+
+    /**
+     * Defines from where to read the Pygments configuration data.
+     */
+    @Inject
+    private ConfigurationSource configuration;
+
+    /**
+     * @return the maximum size of attachment to load
+     */
+    public int getMaximumAttachmentSize()
     {
-        return EntityType.PAGE_OBJECT_PROPERTY;
+        return this.configuration.getProperty(PREFIX + "attachmentMaximumSize", DEFAULT_MAXIMUM_ATTACHMENTSIZE);
     }
 }

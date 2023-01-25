@@ -33,6 +33,7 @@
   <description>Display and Send emails</description>
   <modules>
     <!-- Sorted Alphabetically -->
+    <module>xwiki-platform-mail-api</module>
     <module>xwiki-platform-mail-general</module>
     <module>xwiki-platform-mail-script</module>
     <module>xwiki-platform-mail-send</module>

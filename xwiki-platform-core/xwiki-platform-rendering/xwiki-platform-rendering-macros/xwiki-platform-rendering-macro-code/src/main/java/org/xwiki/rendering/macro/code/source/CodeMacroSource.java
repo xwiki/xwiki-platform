@@ -22,6 +22,7 @@ package org.xwiki.rendering.macro.code.source;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.xwiki.rendering.macro.source.MacroContentSourceReference;
 import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
@@ -35,7 +36,7 @@ import org.xwiki.text.XWikiToStringBuilder;
 @Unstable
 public class CodeMacroSource
 {
-    private final CodeMacroSourceReference reference;
+    private final MacroContentSourceReference reference;
 
     private final String content;
 
@@ -45,8 +46,10 @@ public class CodeMacroSource
      * @param reference the reference of the content
      * @param content the content to highlight
      * @param language the language of the content if known, null otherwise
+     * @since 15.1RC1
+     * @since 14.10.5
      */
-    public CodeMacroSource(CodeMacroSourceReference reference, String content, String language)
+    public CodeMacroSource(MacroContentSourceReference reference, String content, String language)
     {
         this.reference = reference;
         this.content = content;
@@ -55,8 +58,10 @@ public class CodeMacroSource
 
     /**
      * @return the reference of the content
+     * @since 15.1RC1
+     * @since 14.10.5
      */
-    public CodeMacroSourceReference getReference()
+    public MacroContentSourceReference getReference()
     {
         return this.reference;
     }

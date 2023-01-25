@@ -24,7 +24,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
-import org.xwiki.rendering.macro.code.source.CodeMacroSourceReference;
+import org.xwiki.rendering.macro.source.MacroContentSourceReference;
 
 /**
  * Provide content coming from XWiki model entities.
@@ -35,7 +35,7 @@ import org.xwiki.rendering.macro.code.source.CodeMacroSourceReference;
  */
 @Component
 @Singleton
-@Named(CodeMacroSourceReference.TYPE_PAGE)
+@Named(MacroContentSourceReference.TYPE_PAGE)
 public class PageCodeMacroSourceFactory extends AbstractEntityCodeMacroSourceFactory
 {
     @Override

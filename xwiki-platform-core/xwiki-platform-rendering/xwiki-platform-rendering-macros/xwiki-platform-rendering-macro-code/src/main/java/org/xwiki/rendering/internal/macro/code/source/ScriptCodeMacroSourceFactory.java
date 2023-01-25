@@ -22,18 +22,15 @@ package org.xwiki.rendering.internal.macro.code.source;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.script.ScriptContext;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.code.source.CodeMacroSource;
 import org.xwiki.rendering.macro.code.source.CodeMacroSourceFactory;
-import org.xwiki.rendering.macro.code.source.CodeMacroSourceReference;
+import org.xwiki.rendering.macro.source.MacroContentSourceReference;
+import org.xwiki.rendering.macro.source.MacroContentWikiSource;
+import org.xwiki.rendering.macro.source.MacroContentWikiSourceFactory;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.script.ScriptContextManager;
-import org.xwiki.security.authorization.AccessDeniedException;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
 
 /**
  * Get content from a script binding.
@@ -44,44 +41,19 @@ import org.xwiki.security.authorization.Right;
  */
 @Component
 @Singleton
-@Named(CodeMacroSourceReference.TYPE_SCRIPT)
+@Named(MacroContentSourceReference.TYPE_SCRIPT)
 public class ScriptCodeMacroSourceFactory implements CodeMacroSourceFactory
 {
     @Inject
-    private ScriptContextManager scriptContextManager;
-
-    @Inject
-    private ContextualAuthorizationManager authorization;
+    @Named(MacroContentSourceReference.TYPE_SCRIPT)
+    private MacroContentWikiSourceFactory wikiFactory;
 
     @Override
-    public CodeMacroSource getContent(CodeMacroSourceReference reference, MacroTransformationContext context)
+    public CodeMacroSource getContent(MacroContentSourceReference reference, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        // Script binding is not allowed in restricted context
-        if (context.getTransformationContext().isRestricted()) {
-            throw new MacroExecutionException("Script binding is not supported in a restricted context");
-        }
+        MacroContentWikiSource content = this.wikiFactory.getContent(reference, context);
 
-        // Current author must have script right
-        try {
-            this.authorization.checkAccess(Right.SCRIPT);
-        } catch (AccessDeniedException e) {
-            throw new MacroExecutionException("Current author must have script right to access a script binding");
-        }
-
-        ScriptContext scriptContext = this.scriptContextManager.getCurrentScriptContext();
-
-        if (scriptContext == null) {
-            throw new MacroExecutionException("No script context could be found in the current context");
-        }
-
-        Object value = scriptContext.getAttribute(reference.getReference());
-
-        if (value == null) {
-            throw new MacroExecutionException(
-                "No script context value could be found for name [" + reference.getReference() + "]");
-        }
-
-        return new CodeMacroSource(reference, value.toString(), null);
+        return new CodeMacroSource(content.getReference(), content.getContent(), null);
     }
 }

@@ -17,20 +17,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.macro.code.source;
+package org.xwiki.internal.macro.source;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
-import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.rendering.internal.parser.pygments.PygmentsUtils;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.code.source.CodeMacroSource;
 import org.xwiki.rendering.macro.source.MacroContentSourceReference;
 
 import com.xpn.xwiki.XWikiContext;
@@ -39,20 +35,26 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
+ * @param <T> the type of the source
  * @version $Id$
- * @since 15.0RC1
- * @since 14.10.2
+ * @since 15.1RC1
+ * @since 14.10.5
  */
-@Component(hints = {"ATTACHMENT", "PAGE_ATTACHMENT"})
-@Singleton
-public class DocumentAttachmentCodeMacroSourceLoader implements EntityCodeMacroSourceLoader
+public abstract class AbstractAttachmentMacroContentSourceLoader<T>
 {
     @Inject
-    private MacroCodeEntitySoureConfiguration configuration;
+    private MacroContentEntitySoureConfiguration configuration;
 
-    @Override
-    public CodeMacroSource load(XWikiDocument document, EntityReference entityReference,
-        MacroContentSourceReference reference, XWikiContext xcontext) throws MacroExecutionException
+    /**
+     * @param document the document
+     * @param entityReference the reference of the entity
+     * @param reference the reference of the source
+     * @param xcontext the XWiki context
+     * @return the source
+     * @throws MacroExecutionException when failing to access the entity
+     */
+    public T load(XWikiDocument document, EntityReference entityReference, MacroContentSourceReference reference,
+        XWikiContext xcontext) throws MacroExecutionException
     {
         XWikiAttachment attachment = document.getAttachment(entityReference.getName());
 
@@ -87,6 +89,8 @@ public class DocumentAttachmentCodeMacroSourceLoader implements EntityCodeMacroS
             throw new MacroExecutionException("Failed to read content of attachment [" + entityReference + "]", e);
         }
 
-        return new CodeMacroSource(reference, content, PygmentsUtils.mimetypeToLanguage(attachment.getMimeType()));
+        return load(reference, content);
     }
+
+    protected abstract T load(MacroContentSourceReference reference, String content) throws MacroExecutionException;
 }

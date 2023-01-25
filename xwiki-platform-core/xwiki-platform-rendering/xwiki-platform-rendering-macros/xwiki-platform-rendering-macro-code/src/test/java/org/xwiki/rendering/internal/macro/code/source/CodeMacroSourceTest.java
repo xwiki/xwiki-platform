@@ -21,7 +21,7 @@ package org.xwiki.rendering.internal.macro.code.source;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.rendering.macro.code.source.CodeMacroSource;
-import org.xwiki.rendering.macro.code.source.CodeMacroSourceReference;
+import org.xwiki.rendering.macro.source.MacroContentSourceReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -33,9 +33,9 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
  */
 class CodeMacroSourceTest
 {
-    private static final CodeMacroSourceReference REFERENCE1 = new CodeMacroSourceReference("type1", "reference1");
+    private static final MacroContentSourceReference REFERENCE1 = new MacroContentSourceReference("type1", "reference1");
 
-    private static final CodeMacroSourceReference REFERENCE2 = new CodeMacroSourceReference("type2", "reference2");
+    private static final MacroContentSourceReference REFERENCE2 = new MacroContentSourceReference("type2", "reference2");
 
     @Test
     void equalshashcode()

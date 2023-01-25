@@ -25,7 +25,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.macro.code.source.CodeMacroSource;
 import org.xwiki.rendering.macro.code.source.CodeMacroSourceFactory;
-import org.xwiki.rendering.macro.code.source.CodeMacroSourceReference;
+import org.xwiki.rendering.macro.source.MacroContentSourceReference;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
@@ -35,11 +35,11 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  */
 @Component
 @Singleton
-@Named(CodeMacroSourceReference.TYPE_STRING)
+@Named(MacroContentSourceReference.TYPE_STRING)
 public class StringCodeMacroSourceFactory implements CodeMacroSourceFactory
 {
     @Override
-    public CodeMacroSource getContent(CodeMacroSourceReference reference, MacroTransformationContext context)
+    public CodeMacroSource getContent(MacroContentSourceReference reference, MacroTransformationContext context)
     {
         return new CodeMacroSource(reference, reference.getReference(), null);
     }

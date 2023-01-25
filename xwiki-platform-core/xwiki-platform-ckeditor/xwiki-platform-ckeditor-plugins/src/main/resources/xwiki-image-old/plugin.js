@@ -206,7 +206,24 @@
       pickerDefinition = CKEDITOR.plugins.xwikiResource.createResourcePicker(pickerDefinition);
       // Bind the replaced element to the resource picker (in order to commit the resource picker value).
       var tabId = path[path.length - 1].element.id;
-      CKEDITOR.plugins.xwikiResource.bindResourcePicker(path[0].element, [tabId, pickerDefinition.id]);
+      CKEDITOR.plugins.xwikiResource.bindResourcePicker(path[0].element, [tabId, pickerDefinition.id], undefined,
+        function (url, onlyTheReferencePart, dialog, resourcePickerId) {
+          var width = dialog.getValueOf(resourcePickerId[0], "width");
+          var height = dialog.getValueOf(resourcePickerId[0], "height");
+          if (onlyTheReferencePart && (width || height)) {
+            var queryStringParams = {};
+            if (width) {
+              queryStringParams.width = width;
+            }
+            if (height) {
+              queryStringParams.height = height;
+            }
+            return url + '&' + $.param({"parameters[queryString]": $.param(queryStringParams)});
+
+          } else {
+            return url;
+          }
+        });
       // Hide the parent.
       path[1].element.hidden = true;
       // Insert the new element before the hidden parent.

@@ -265,6 +265,17 @@ com.xpn.xwiki.web.UnknownAction
 com.xpn.xwiki.web.UploadAction
 com.xpn.xwiki.web.ViewAction
 com.xpn.xwiki.web.ViewAttachRevAction
+org.xwiki.internal.macro.source.AttachmentMacroContentWikiSourceLoader
+org.xwiki.internal.macro.source.DocumentAttachmentMacroContentWikiSourceFactory
+org.xwiki.internal.macro.source.DocumentMacroContentWikiSourceFactory
+org.xwiki.internal.macro.source.DocumentMacroContentWikiSourceLoader
+org.xwiki.internal.macro.source.DocumentObjectPropertyMacroContentWikiSourceFactory
+org.xwiki.internal.macro.source.EntityCodeMacroSourceFactory
+org.xwiki.internal.macro.source.MacroContentEntitySoureConfiguration
+org.xwiki.internal.macro.source.ObjectPropertyMacroContentWikiSourceLoader
+org.xwiki.internal.macro.source.PageAttachmentMacroContentSourceFactory
+org.xwiki.internal.macro.source.PageMacroContentSourceFactory
+org.xwiki.internal.macro.source.PageObjectPropertyCodeMacroSourceFactory
 2000:org.xwiki.internal.attachment.validation.VoidAttachmentValidator
 org.xwiki.internal.template.ActionTemplateRequirement
 org.xwiki.internal.migration.R141004000XWIKI20285DataMigration

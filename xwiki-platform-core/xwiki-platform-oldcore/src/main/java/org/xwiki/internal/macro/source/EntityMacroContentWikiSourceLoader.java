@@ -17,30 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.macro.code.source;
+package org.xwiki.internal.macro.source;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.model.EntityType;
+import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.source.MacroContentSourceReference;
+import org.xwiki.rendering.macro.source.MacroContentWikiSource;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * Provide content coming from XWiki model entities.
- * 
  * @version $Id$
- * @since 15.0RC1
- * @since 14.10.2
+ * @since 15.1RC1
+ * @since 14.10.5
  */
-@Component
-@Singleton
-@Named(MacroContentSourceReference.TYPE_PAGE_OBJECT_PROPERTY)
-public class PageObjectPropertyCodeMacroSourceFactory extends AbstractEntityCodeMacroSourceFactory
+@Role
+public interface EntityMacroContentWikiSourceLoader
 {
-    @Override
-    protected EntityType getEntityType()
-    {
-        return EntityType.PAGE_OBJECT_PROPERTY;
-    }
+    /**
+     * @param document the document containing the entity
+     * @param entityReference the reference of the entity to read
+     * @param reference the reference of the content
+     * @param xcontext the XWiki context
+     * @return the content to highlight
+     * @throws MacroExecutionException when failing to get the content
+     */
+    MacroContentWikiSource load(XWikiDocument document, EntityReference entityReference,
+        MacroContentSourceReference reference, XWikiContext xcontext) throws MacroExecutionException;
 }

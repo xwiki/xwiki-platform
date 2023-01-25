@@ -23,7 +23,7 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.code.source.CodeMacroSource;
-import org.xwiki.rendering.macro.code.source.CodeMacroSourceReference;
+import org.xwiki.rendering.macro.source.MacroContentSourceReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -43,7 +43,9 @@ public interface EntityCodeMacroSourceLoader
      * @param xcontext the XWiki context
      * @return the content to highlight
      * @throws MacroExecutionException when failing to get the content
+     * @since 15.1RC1
+     * @since 14.10.5
      */
-    CodeMacroSource load(XWikiDocument document, EntityReference entityReference, CodeMacroSourceReference reference,
+    CodeMacroSource load(XWikiDocument document, EntityReference entityReference, MacroContentSourceReference reference,
         XWikiContext xcontext) throws MacroExecutionException;
 }

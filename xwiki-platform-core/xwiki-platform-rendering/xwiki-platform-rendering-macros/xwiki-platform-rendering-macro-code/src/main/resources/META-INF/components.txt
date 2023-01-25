@@ -1,5 +1,4 @@
 org.xwiki.rendering.internal.macro.code.CodeMacro
-org.xwiki.rendering.internal.macro.code.source.CodeMacroSourceReferenceConverter
 org.xwiki.rendering.internal.macro.code.source.DefaultCodeMacroSourceFactory
 org.xwiki.rendering.internal.macro.code.source.ScriptCodeMacroSourceFactory
 org.xwiki.rendering.internal.macro.code.source.StringCodeMacroSourceFactory

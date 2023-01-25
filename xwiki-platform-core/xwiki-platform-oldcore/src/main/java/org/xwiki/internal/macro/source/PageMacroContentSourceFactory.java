@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.macro.code.source;
+package org.xwiki.internal.macro.source;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -27,20 +27,20 @@ import org.xwiki.model.EntityType;
 import org.xwiki.rendering.macro.source.MacroContentSourceReference;
 
 /**
- * Provide content coming from XWiki model entities.
+ * Provide content coming from pages.
  * 
  * @version $Id$
- * @since 15.0RC1
- * @since 14.10.2
+ * @since 15.1RC1
+ * @since 14.10.5
  */
 @Component
 @Singleton
-@Named(MacroContentSourceReference.TYPE_PAGE_OBJECT_PROPERTY)
-public class PageObjectPropertyCodeMacroSourceFactory extends AbstractEntityCodeMacroSourceFactory
+@Named(MacroContentSourceReference.TYPE_PAGE)
+public class PageMacroContentSourceFactory extends AbstractEntityMacroContentWikiSourceFactory
 {
     @Override
     protected EntityType getEntityType()
     {
-        return EntityType.PAGE_OBJECT_PROPERTY;
+        return EntityType.PAGE;
     }
 }

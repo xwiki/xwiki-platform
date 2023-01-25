@@ -21,6 +21,7 @@ package org.xwiki.rendering.macro.code.source;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.source.MacroContentSourceReference;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.stability.Unstable;
 
@@ -40,7 +41,9 @@ public interface CodeMacroSourceFactory
      * @param context the context of the code macro execution
      * @return the content to highlight
      * @throws MacroExecutionException when failing to get the content
+     * @since 15.1RC1
+     * @since 14.10.5
      */
-    CodeMacroSource getContent(CodeMacroSourceReference reference, MacroTransformationContext context)
+    CodeMacroSource getContent(MacroContentSourceReference reference, MacroTransformationContext context)
         throws MacroExecutionException;
 }

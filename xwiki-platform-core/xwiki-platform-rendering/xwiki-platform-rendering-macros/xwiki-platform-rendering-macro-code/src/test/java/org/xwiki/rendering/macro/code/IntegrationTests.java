@@ -19,16 +19,16 @@
  */
 package org.xwiki.rendering.macro.code;
 
-import javax.script.ScriptContext;
-
-import org.junit.runner.RunWith;
-import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextManager;
-import org.xwiki.rendering.test.integration.RenderingTestSuite;
-import org.xwiki.script.ScriptContextManager;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.rendering.macro.source.MacroContentSourceReference;
+import org.xwiki.rendering.macro.source.MacroContentWikiSource;
+import org.xwiki.rendering.macro.source.MacroContentWikiSourceFactory;
+import org.xwiki.rendering.test.integration.junit5.RenderingTests;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManager;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 /**
  * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
@@ -37,23 +37,17 @@ import org.xwiki.test.mockito.MockitoComponentManager;
  * @version $Id$
  * @since 3.0RC1
  */
-@RunWith(RenderingTestSuite.class)
-//@RenderingTestSuite.Scope(pattern = "macrocode20.test")
 @AllComponents
-public class IntegrationTests
+// @RenderingTests.Scope(pattern = "macrocode1.test")
+public class IntegrationTests implements RenderingTests
 {
-    @RenderingTestSuite.Initialized
+    @Initialized
     public void initialize(MockitoComponentManager componentManager) throws Exception
     {
-        // Initialize a ScriptContext
-        ExecutionContextManager execution = componentManager.getInstance(ExecutionContextManager.class);
-        execution.initialize(new ExecutionContext());
-
-        // Inject a custom binding in the script context
-        ScriptContextManager scriptContextManager = componentManager.getInstance(ScriptContextManager.class);
-        scriptContextManager.getScriptContext().setAttribute("myvar", "<i>script</i>", ScriptContext.GLOBAL_SCOPE);
-
-        // Allow scripting
-        componentManager.registerMockComponent(ContextualAuthorizationManager.class);
+        MacroContentWikiSourceFactory factory =
+            componentManager.registerMockComponent(MacroContentWikiSourceFactory.class, "script");
+        MacroContentSourceReference reference = new MacroContentSourceReference("script", "myvar");
+        when(factory.getContent(eq(reference), any()))
+            .thenReturn(new MacroContentWikiSource(reference, "<i>script</i>", null));
     }
 }

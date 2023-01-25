@@ -24,27 +24,27 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-mail</artifactId>
     <version>14.10.5-SNAPSHOT</version>
   </parent>
-  <packaging>pom</packaging>
-  <artifactId>xwiki-platform-mail</artifactId>
-  <name>XWiki Platform - Mail - Parent POM</name>
-  <description>Display and Send emails</description>
-  <modules>
-    <!-- Sorted Alphabetically -->
-    <module>xwiki-platform-mail-api</module>
-    <module>xwiki-platform-mail-general</module>
-    <module>xwiki-platform-mail-script</module>
-    <module>xwiki-platform-mail-send</module>
-    <module>xwiki-platform-mail-ui</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-mail-test</module>
-      </modules>
-    </profile>
-  </profiles>
+  <packaging>jar</packaging>
+  <artifactId>xwiki-platform-mail-api</artifactId>
+  <name>XWiki Platform - Mail - API</name>
+  <description>Mail APIs not related to sending emails</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.87</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>General Mail API</xwiki.extension.name>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-component-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.mail</groupId>
+      <artifactId>jakarta.mail</artifactId>
+    </dependency>
+  </dependencies>
 </project>

@@ -17,26 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.code.source;
+package org.xwiki.internal.macro.source;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
+import org.xwiki.rendering.macro.source.MacroContentSourceReference;
 
 /**
- * Convert an object into a {@link CodeMacroSourceReference}.
+ * Provide content coming from attachments.
  * 
- * @param <T> the type of the value to convert to {@link CodeMacroSourceReference}
  * @version $Id$
- * @since 15.0RC1
- * @since 14.10.2
+ * @since 15.1RC1
+ * @since 14.10.5
  */
-@Role
-@Unstable
-public interface CodeMacroSourceReferenceConverter<T>
+@Component
+@Singleton
+@Named(MacroContentSourceReference.TYPE_PAGE_ATTACHMENT)
+public class PageAttachmentMacroContentSourceFactory extends AbstractEntityMacroContentWikiSourceFactory
 {
-    /**
-     * @param value the value to convert to a {@link CodeMacroSourceReference}
-     * @return the {@link CodeMacroSourceReference} corresponding to the provided value
-     */
-    CodeMacroSourceReference convert(T value);
+    @Override
+    protected EntityType getEntityType()
+    {
+        return EntityType.PAGE_ATTACHMENT;
+    }
 }

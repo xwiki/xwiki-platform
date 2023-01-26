@@ -20,6 +20,7 @@
 package org.xwiki.search.solr.internal.migration;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -29,6 +30,10 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.search.solr.SolrException;
+import org.xwiki.search.solr.internal.DefaultSolrUtils;
+import org.xwiki.search.solr.internal.SolrClientInstance;
+import org.xwiki.search.solr.internal.SolrSchemaUtils;
 import org.xwiki.search.solr.internal.api.SolrInstance;
 
 import com.xpn.xwiki.XWikiContext;
@@ -61,6 +66,9 @@ public class R141004000XWIKI20575DataMigration implements HibernateDataMigration
     @Inject
     private Execution execution;
 
+    @Inject
+    private SolrSchemaUtils solrSchemaUtils;
+
     /**
      * @return XWikiContext to access the store
      */
@@ -92,9 +100,18 @@ public class R141004000XWIKI20575DataMigration implements HibernateDataMigration
     public void migrate() throws DataMigrationException
     {
         try {
-            this.solrInstance.deleteByQuery("*:*");
-            this.solrInstance.commit();
-        } catch (SolrServerException | IOException e) {
+            Map<String, Map<String, Object>> fields =
+                this.solrSchemaUtils.getFields(SolrClientInstance.CORE_NAME, true);
+
+            // We only check for the presence of the title__ field, which should be representative of the dynamic field
+            if (!fields.containsKey("title__")) {
+                this.solrInstance.deleteByQuery("*:*");
+                this.solrSchemaUtils.setField(SolrClientInstance.CORE_NAME, "*__",
+                    DefaultSolrUtils.SOLR_TYPE_TEXT_GENERAL, true, "multiValued", true, "stored", true, "indexed",
+                    true);
+                this.solrSchemaUtils.commit(SolrClientInstance.CORE_NAME);
+            }
+        } catch (SolrServerException | IOException | SolrException e) {
             throw new DataMigrationException("Error while performing Solr query to empty the search core", e);
         }
     }

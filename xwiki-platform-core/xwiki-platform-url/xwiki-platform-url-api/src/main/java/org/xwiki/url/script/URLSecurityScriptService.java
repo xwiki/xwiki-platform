@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
@@ -47,20 +48,29 @@ public class URLSecurityScriptService implements ScriptService
     @Inject
     private URLSecurityManager urlSecurityManager;
 
+    @Inject
+    private Logger logger;
+
     /**
      * Parse the given string to create a URI that is safe to use.
-     * This method throws a {@link SecurityException} if the parsed URI is not safe to use according to
-     * {@link URLSecurityManager#isURITrusted(URI)}. It might also return a {@link URISyntaxException} if the parameter
+     * This method returns null if the parsed URI is not safe to use according to
+     * {@link URLSecurityManager#isURITrusted(URI)}. It might also throw a {@link URISyntaxException} if the parameter
      * cannot be properly parsed.
      *
      * @param uriRepresentation a string representing a URI that needs to be parsed.
-     * @return a URI safe to use
+     * @return a URI safe to use or {@code null}
      * @throws URISyntaxException if the given parameter cannot be properly parsed
-     * @throws SecurityException if the parsed URI is not safe according to {@link URLSecurityManager#isURITrusted(URI)}
      * @see URLSecurityManager#parseToSafeURI(String)
      */
     public URI parseToSafeURI(String uriRepresentation) throws URISyntaxException, SecurityException
     {
-        return this.urlSecurityManager.parseToSafeURI(uriRepresentation);
+        try {
+            return this.urlSecurityManager.parseToSafeURI(uriRepresentation);
+        } catch (SecurityException e)
+        {
+            this.logger.info("The URI [{}] is considered not safe: [{}]", uriRepresentation, e.getMessage());
+            this.logger.debug("Security exception stack trace: ", e);
+            return null;
+        }
     }
 }

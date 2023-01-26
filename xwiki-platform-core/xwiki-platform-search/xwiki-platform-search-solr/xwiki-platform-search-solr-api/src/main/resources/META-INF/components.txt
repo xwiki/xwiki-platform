@@ -15,6 +15,7 @@ org.xwiki.search.solr.internal.SolrIndexAvailableLocalesListener
 org.xwiki.search.solr.internal.SolrIndexEventListener
 org.xwiki.search.solr.internal.SolrIndexInitializeListener
 org.xwiki.search.solr.internal.SolrInstanceProvider
+org.xwiki.search.solr.internal.SolrSchemaUtils
 org.xwiki.search.solr.internal.SolrSearchCoreUtils
 org.xwiki.search.solr.internal.job.IndexerJob
 org.xwiki.search.solr.internal.job.DatabaseDocumentIterator

@@ -23,12 +23,16 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.url.URLSecurityManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
 /**
@@ -47,6 +51,9 @@ class URLSecurityScriptServiceTest
     @MockComponent
     private URLSecurityManager urlSecurityManager;
 
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
+
     @Test
     void isURITrusted() throws URISyntaxException
     {
@@ -54,5 +61,11 @@ class URLSecurityScriptServiceTest
         URI expectedURI = new URI(location);
         when(this.urlSecurityManager.parseToSafeURI(location)).thenReturn(expectedURI);
         assertEquals(expectedURI, this.scriptService.parseToSafeURI(location));
+
+        when(this.urlSecurityManager.parseToSafeURI(location)).thenThrow(new SecurityException("Test exception"));
+        assertNull(this.scriptService.parseToSafeURI(location));
+        assertEquals(1, logCapture.size());
+        assertEquals("The URI [//xwiki.org/xwiki/something/] is considered not safe: [Test exception]",
+            logCapture.getMessage(0));
     }
 }

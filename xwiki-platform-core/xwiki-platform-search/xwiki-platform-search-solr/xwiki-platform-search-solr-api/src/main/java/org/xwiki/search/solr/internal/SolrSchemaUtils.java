@@ -58,6 +58,7 @@ public class SolrSchemaUtils
         private final String coreName;
         private SolrClient solrClient;
         private Map<String, Map<String, Object>> fields;
+        private Map<String, Map<String, Object>> dynamicFields;
 
         SolrCoreSchema(String name)
         {
@@ -126,8 +127,34 @@ public class SolrSchemaUtils
             schema.fields = map;
         }
 
-        // Return a copy to avoid concurrency issues, in particular in case of commits
         return schema.fields;
+    }
+
+    /**
+     * Retrieve all information about existing dynamic fields of the core.
+     *
+     * @param coreName the name of the core for which to retrieve dynamic fields information
+     * @param force if {@code true} reloads all information, else gets the information from the cache
+     * @return the map of all dynamic fields
+     * @throws SolrException in case of problem to request fields information
+     */
+    public Map<String, Map<String, Object>> getDynamicFields(String coreName, boolean force) throws SolrException
+    {
+        SolrCoreSchema schema = getSchema(coreName);
+        if (schema.dynamicFields == null || force) {
+            SchemaResponse.DynamicFieldsResponse response;
+            try {
+                response = new SchemaRequest.DynamicFields().process(getClient(coreName));
+            } catch (Exception e) {
+                throw new SolrException("Failed to get the list of dynamic fields", e);
+            }
+
+            Map<String, Map<String, Object>> map = new ConcurrentHashMap<>(response.getDynamicFields().size());
+            response.getDynamicFields().forEach(e -> map.put((String) e.get(SOLR_FIELD_NAME), e));
+            schema.dynamicFields = map;
+        }
+
+        return schema.dynamicFields;
     }
 
     /**
@@ -144,21 +171,24 @@ public class SolrSchemaUtils
         String name = (String) fieldAttributes.get(SOLR_FIELD_NAME);
         try {
             SolrClient solrClient = getClient(coreName);
-            if (getFields(coreName, false).containsKey(name)) {
-                if (dynamic) {
+            if (dynamic) {
+                if (getDynamicFields(coreName, false).containsKey(name)) {
                     new SchemaRequest.ReplaceDynamicField(fieldAttributes).process(solrClient);
                 } else {
-                    new SchemaRequest.ReplaceField(fieldAttributes).process(solrClient);
-                }
-            } else {
-                if (dynamic) {
                     new SchemaRequest.AddDynamicField(fieldAttributes).process(solrClient);
+                }
+                // Add it to the cache
+                getSchema(coreName).dynamicFields.put(name, fieldAttributes);
+            } else {
+                if (getFields(coreName, false).containsKey(name)) {
+                    new SchemaRequest.ReplaceField(fieldAttributes).process(solrClient);
                 } else {
                     new SchemaRequest.AddField(fieldAttributes).process(solrClient);
                 }
+                // Add it to the cache
+                getSchema(coreName).fields.put(name, fieldAttributes);
             }
-            // Add it to the cache
-            getSchema(coreName).fields.put(name, fieldAttributes);
+
         } catch (Exception e) {
             throw new SolrException("Failed to set a field in the Solr core", e);
         }
@@ -201,5 +231,6 @@ public class SolrSchemaUtils
         }
         // Reset the cache
         getSchema(coreName).fields = null;
+        getSchema(coreName).dynamicFields = null;
     }
 }

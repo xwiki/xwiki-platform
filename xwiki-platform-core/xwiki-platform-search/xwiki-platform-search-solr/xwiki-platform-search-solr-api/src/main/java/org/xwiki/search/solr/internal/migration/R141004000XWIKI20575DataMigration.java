@@ -61,6 +61,8 @@ public class R141004000XWIKI20575DataMigration implements HibernateDataMigration
      */
     public static final String HINT = "R141004000XWIKI20575";
 
+    private static final String DYNAMIC_FIELD_NAME = "*__";
+
     @Inject
     private SolrInstance solrInstance;
 
@@ -104,19 +106,19 @@ public class R141004000XWIKI20575DataMigration implements HibernateDataMigration
     public void migrate() throws DataMigrationException
     {
         try {
-            Map<String, Map<String, Object>> fields =
-                this.solrSchemaUtils.getFields(SolrClientInstance.CORE_NAME, true);
+            Map<String, Map<String, Object>> dynamicFields =
+                this.solrSchemaUtils.getDynamicFields(SolrClientInstance.CORE_NAME, true);
 
-            // We only check for the presence of the title__ field, which should be representative of the dynamic field
-            if (!fields.containsKey("title__")) {
-                this.solrInstance.deleteByQuery("*:*");
-                this.solrSchemaUtils.setField(SolrClientInstance.CORE_NAME, "*__",
+            if (!dynamicFields.containsKey(DYNAMIC_FIELD_NAME)) {
+                this.solrSchemaUtils.setField(SolrClientInstance.CORE_NAME, DYNAMIC_FIELD_NAME,
                     DefaultSolrUtils.SOLR_TYPE_TEXT_GENERAL, true, "multiValued", true, "stored", true, "indexed",
                     true);
                 this.solrSchemaUtils.commit(SolrClientInstance.CORE_NAME);
             } else {
-                logger.info("The missing field was found, so no migration will be performed as the schema looks good.");
+                logger.info("The missing field was found, so the schema won't be updated.");
             }
+            this.solrInstance.deleteByQuery("*:*");
+            this.solrInstance.commit();
         } catch (SolrServerException | IOException | SolrException e) {
             throw new DataMigrationException("Error while performing Solr query to empty the search core", e);
         }

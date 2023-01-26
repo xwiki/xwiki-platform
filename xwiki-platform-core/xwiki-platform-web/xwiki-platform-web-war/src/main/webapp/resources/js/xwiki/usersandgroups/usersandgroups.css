@@ -50,6 +50,8 @@
 #usersandgroupstable.rights .rights {
   width: 15% !important;
 }
+
+/*Added for accessibility updates without any UI change in the rights edit form.*/
 #usersandgroupstable button.rights-edit {
   border-color: transparent;
   background: transparent;

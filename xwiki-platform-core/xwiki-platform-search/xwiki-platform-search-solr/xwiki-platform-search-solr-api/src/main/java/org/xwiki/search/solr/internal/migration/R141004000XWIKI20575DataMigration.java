@@ -27,6 +27,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.solr.client.solrj.SolrServerException;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -69,6 +70,9 @@ public class R141004000XWIKI20575DataMigration implements HibernateDataMigration
     @Inject
     private SolrSchemaUtils solrSchemaUtils;
 
+    @Inject
+    private Logger logger;
+
     /**
      * @return XWikiContext to access the store
      */
@@ -110,6 +114,8 @@ public class R141004000XWIKI20575DataMigration implements HibernateDataMigration
                     DefaultSolrUtils.SOLR_TYPE_TEXT_GENERAL, true, "multiValued", true, "stored", true, "indexed",
                     true);
                 this.solrSchemaUtils.commit(SolrClientInstance.CORE_NAME);
+            } else {
+                logger.info("The missing field was found, so no migration will be performed as the schema looks good.");
             }
         } catch (SolrServerException | IOException | SolrException e) {
             throw new DataMigrationException("Error while performing Solr query to empty the search core", e);

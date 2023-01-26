@@ -863,8 +863,6 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     protected void setField(String name, String type, boolean dynamic, Object... attributes) throws SolrException
     {
         this.solrSchemaUtils.setField(getCoreName(), name, type, dynamic, attributes);
-        // Ensure to keep internal fields updated
-        getFields(false);
     }
 
     /**
@@ -879,8 +877,6 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     {
 
         this.solrSchemaUtils.setField(getCoreName(), fieldAttributes, dynamic);
-        // Ensure to keep internal fields updated
-        getFields(false);
     }
 
     /**

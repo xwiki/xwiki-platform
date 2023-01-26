@@ -21,41 +21,54 @@ package org.xwiki.search.solr.internal;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.collections4.MapUtils;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.request.schema.FieldTypeDefinition;
 import org.apache.solr.client.solrj.request.schema.SchemaRequest;
-import org.apache.solr.client.solrj.response.schema.FieldTypeRepresentation;
 import org.apache.solr.client.solrj.response.schema.SchemaResponse;
 import org.apache.solr.schema.FieldType;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrException;
 
+/**
+ * Helper for performing operations in a solr schema.
+ *
+ * @version $Id$
+ * @since 15.0
+ * @since 14.10.4
+ */
 @Component(roles = SolrSchemaUtils.class)
 @Singleton
 public class SolrSchemaUtils
 {
     /**
-     * The name of the attribute containing the name of the Solr field.
+     * Contains data of a solr core schema.
+     *
+     * @version $Id$
+     * @since 15.0
+     * @since 14.10.4
      */
-    private static final String SOLR_FIELD_NAME = "name";
-
-    private class SolrCoreSchema
+    private static class SolrCoreSchema
     {
         private final String coreName;
-        SolrClient solrClient;
-        Map<String, Map<String, Object>> fields;
+        private SolrClient solrClient;
+        private Map<String, Map<String, Object>> fields;
 
-        public SolrCoreSchema(String name)
+        SolrCoreSchema(String name)
         {
             this.coreName = name;
         }
     }
+
+    /**
+     * The name of the attribute containing the name of the Solr field.
+     */
+    private static final String SOLR_FIELD_NAME = "name";
 
     private final Map<String, SolrCoreSchema> coreSchemaMap = new HashMap<>();
 
@@ -76,11 +89,27 @@ public class SolrSchemaUtils
         return schema.solrClient;
     }
 
+    /**
+     * Associate a client with to the given core.
+     * This method should mainly be used when initializing a core as calling {@link Solr#getClient(String)} might lead
+     * to a recursive call.
+     *
+     * @param coreName the name of the core for which to associate a client
+     * @param solrClient the solr client to associate
+     */
     public void setClient(String coreName, SolrClient solrClient)
     {
         getSchema(coreName).solrClient = solrClient;
     }
 
+    /**
+     * Retrieve all information about existing fields of the core.
+     *
+     * @param coreName the name of the core for which to retrieve fields information
+     * @param force if {@code true} reloads all information, else gets the information from the cache
+     * @return the map of all fields
+     * @throws SolrException in case of problem to request fields information
+     */
     public Map<String, Map<String, Object>> getFields(String coreName, boolean force) throws SolrException
     {
         SolrCoreSchema schema = getSchema(coreName);
@@ -92,22 +121,22 @@ public class SolrSchemaUtils
                 throw new SolrException("Failed to get the list of fields", e);
             }
 
-            Map<String, Map<String, Object>> map = new HashMap<>(response.getFields().size());
+            Map<String, Map<String, Object>> map = new ConcurrentHashMap<>(response.getFields().size());
             response.getFields().forEach(e -> map.put((String) e.get(SOLR_FIELD_NAME), e));
             schema.fields = map;
         }
 
         // Return a copy to avoid concurrency issues, in particular in case of commits
-        return new HashMap<>(schema.fields);
+        return schema.fields;
     }
 
     /**
      * Add or replace a field in the Solr schema.
      *
+     * @param coreName the name of the solr core where to add or replace the field
      * @param fieldAttributes the attributes of the field to add
      * @param dynamic true to create a dynamic field
      * @throws SolrException when failing to add the field
-     * @since 12.5RC1
      */
     public void setField(String coreName, Map<String, Object> fieldAttributes, boolean dynamic)
         throws SolrException
@@ -138,12 +167,12 @@ public class SolrSchemaUtils
     /**
      * Add or replace a field in the Solr schema.
      *
+     * @param coreName the name of the solr core where to add or replace the field
      * @param name the name of the field to set
      * @param type the type of the field to set
      * @param dynamic true to create a dynamic field
      * @param attributes attributed to add to the field definition
      * @throws SolrException when failing to add the field
-     * @since 12.5RC1
      */
     public void setField(String coreName, String name, String type, boolean dynamic, Object... attributes)
         throws SolrException
@@ -157,6 +186,12 @@ public class SolrSchemaUtils
         setField(coreName, fieldAttributes, dynamic);
     }
 
+    /**
+     * Performs an explicit commit, causing pending documents to be committed for indexing.
+     *
+     * @param coreName the solr core to commit
+     * @throws SolrException when failing to commit
+     */
     public void commit(String coreName) throws SolrException
     {
         try {

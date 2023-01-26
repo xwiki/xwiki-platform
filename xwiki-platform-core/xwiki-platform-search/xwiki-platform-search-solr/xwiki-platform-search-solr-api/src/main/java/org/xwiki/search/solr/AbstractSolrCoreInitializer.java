@@ -47,6 +47,7 @@ import org.apache.solr.schema.StrField;
 import org.apache.solr.schema.TextField;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.search.solr.internal.DefaultSolrUtils;
+import org.xwiki.search.solr.internal.SolrSchemaUtils;
 
 /**
  * Base helper class to implement {@link SolrCoreInitializer}.
@@ -140,6 +141,9 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     @Inject
     protected ComponentDescriptor<SolrCoreInitializer> descriptor;
 
+    @Inject
+    protected SolrSchemaUtils solrSchemaUtils;
+
     protected SolrClient client;
 
     protected Map<String, FieldTypeRepresentation> types;
@@ -150,6 +154,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     public void initialize(SolrClient client) throws SolrException
     {
         this.client = client;
+        this.solrSchemaUtils.setClient(getCoreName(), this.client);
 
         // Make sure the base schema (mostly default types) in in sync with this version of XWiki
         initializeBaseSchema();
@@ -183,21 +188,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
 
     protected Map<String, Map<String, Object>> getFields(boolean force) throws SolrException
     {
-        if (this.fields == null || force) {
-            SchemaResponse.FieldsResponse response;
-            try {
-                response = new SchemaRequest.Fields().process(this.client);
-            } catch (Exception e) {
-                throw new SolrException("Failed to get the list of fields", e);
-            }
-
-            Map<String, Map<String, Object>> map = new HashMap<>(response.getFields().size());
-
-            response.getFields().forEach(e -> map.put((String) e.get(SOLR_FIELD_NAME), e));
-
-            this.fields = map;
-        }
-
+        this.fields = this.solrSchemaUtils.getFields(getCoreName(), force);
         return this.fields;
     }
 
@@ -871,13 +862,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      */
     protected void setField(String name, String type, boolean dynamic, Object... attributes) throws SolrException
     {
-        Map<String, Object> fieldAttributes = new HashMap<>();
-        fieldAttributes.put(SOLR_FIELD_NAME, name);
-        fieldAttributes.put(FieldType.TYPE, type);
-
-        MapUtils.putAll(fieldAttributes, attributes);
-
-        setField(fieldAttributes, dynamic);
+        this.solrSchemaUtils.setField(getCoreName(), name, type, dynamic, attributes);
     }
 
     /**
@@ -890,28 +875,8 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      */
     protected void setField(Map<String, Object> fieldAttributes, boolean dynamic) throws SolrException
     {
-        String name = (String) fieldAttributes.get(SOLR_FIELD_NAME);
 
-        try {
-            if (getFields(false).containsKey(name)) {
-                if (dynamic) {
-                    new SchemaRequest.ReplaceDynamicField(fieldAttributes).process(this.client);
-                } else {
-                    new SchemaRequest.ReplaceField(fieldAttributes).process(this.client);
-                }
-            } else {
-                if (dynamic) {
-                    new SchemaRequest.AddDynamicField(fieldAttributes).process(this.client);
-                } else {
-                    new SchemaRequest.AddField(fieldAttributes).process(this.client);
-                }
-            }
-
-            // Add it to the cache
-            this.fields.put(name, fieldAttributes);
-        } catch (Exception e) {
-            throw new SolrException("Failed to set a field in the Solr core", e);
-        }
+        this.solrSchemaUtils.setField(getCoreName(), fieldAttributes, dynamic);
     }
 
     /**
@@ -1031,12 +996,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      */
     protected void commit() throws SolrException
     {
-        try {
-            this.client.commit();
-        } catch (Exception e) {
-            throw new SolrException("Failed to commit", e);
-        }
-
+        this.solrSchemaUtils.commit(getCoreName());
         // Reset the cache
         this.types = null;
         this.fields = null;

@@ -24,7 +24,8 @@ define('users-and-groups-translation-keys', {
   keys: [
     "allowed",
     "denied",
-    "undefined"
+    "undefined",
+    "changeStateTo"
   ]
 });
 

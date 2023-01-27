@@ -215,7 +215,7 @@ imageEditor.modal.loadFail.message=Failed to retrieve the image editor form.
 imageEditor.modal.title=Edit Image
 imageEditor.modal.insertButton=Insert
 imageEditor.modal.initialization.fail=Failed to retrieve the image selection form.
-
+imageEditor.modal.outscaleWarning=One of the dimensions is larger than the original image ({0}). This currently results in undefined behavior. It is not recommended to do this unless you are sure you understand the consequences.
 imageSelector.modal.title=Select Image
 imageSelector.modal.selectButton=Select
 imageSelector.modal.loadFail.message=Failed to retrieve the image selection form.

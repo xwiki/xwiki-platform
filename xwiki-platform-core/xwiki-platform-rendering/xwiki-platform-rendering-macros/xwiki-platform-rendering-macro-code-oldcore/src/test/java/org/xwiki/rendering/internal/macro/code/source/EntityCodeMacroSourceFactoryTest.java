@@ -19,15 +19,11 @@
  */
 package org.xwiki.rendering.internal.macro.code.source;
 
-import javax.inject.Inject;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
-
-import javax.inject.Inject;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -37,29 +37,29 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>captcha.jcaptcha=JCaptcha
-captcha.jcaptcha.displayer.image.alt=Изображение CAPTCHA
+captcha.jcaptcha.displayer.image.alt=Изображение капчи
 captcha.jcaptcha.displayer.audio.error.audioElementNotSupported=Ваш браузер не поддерживает аудио-элемент.
 captcha.jcaptcha.displayer.audio.play=Прослушать
 captcha.jcaptcha.displayer.error.unsupportedType=JCaptcha настроен неправильно
 captcha.jcaptcha.displayer.refresh=Перезагрузить
 captcha.jcaptcha.displayer.answer.placeholder=Ответ
-
 XWiki.Captcha.JCaptcha.ConfigurationClass_type=Тип
-XWiki.Captcha.JCaptcha.ConfigurationClass_type_hint=Тип отображаемой CAPTCHA.
+XWiki.Captcha.JCaptcha.ConfigurationClass_type_hint=Тип отображаемой капчи.
 XWiki.Captcha.JCaptcha.ConfigurationClass_type_image=Изображение
 XWiki.Captcha.JCaptcha.ConfigurationClass_type_sound=Звук
 XWiki.Captcha.JCaptcha.ConfigurationClass_type_text=Текст
 XWiki.Captcha.JCaptcha.ConfigurationClass_engine=Движок
-XWiki.Captcha.JCaptcha.ConfigurationClass_engine_hint=Реализация движка, используемого для отображения выбранного типа CAPTCHA.
-
+XWiki.Captcha.JCaptcha.ConfigurationClass_engine_hint=Реализация движка, используемого для отображения выбранного типа капчи.
 captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.DefaultGimpyEngine=Gimpy по умолчанию (Gmail)
 captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.SimpleListImageCaptchaEngine=Простой список
 captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.NonLinearTextGimpyEngine=Нелинейный текст Gimpy
 captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.HotmailEngine=Hotmail
-captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.DeformedBaffleListGimpyEngine=Деформированный список перегородок Gimpy
-captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.BaffleListGimpyEngine=Перегородка Список Gimpy
+captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.DeformedBaffleListGimpyEngine=Deformed Baffle List Gimpy
+captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.BaffleListGimpyEngine=Baffle List Gimpy
 captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.HotmailEngine2008=Hotmail 2008
 captcha.jcaptcha.engine.com.octo.captcha.engine.sound.speller.SpellerSoundCaptchaEngine=Speller
 captcha.jcaptcha.engine.com.octo.captcha.engine.sound.gimpy.SimpleListSoundCaptchaEngine=Простой список
-captcha.jcaptcha.engine.org.xwiki.captcha.internal.SimpleMathCaptchaEngine=Простой математический вопрос</content>
+captcha.jcaptcha.engine.org.xwiki.captcha.internal.SimpleMathCaptchaEngine=Простой математический вопрос
+captcha.jcaptcha.engine.custom=Пользовательский:
+</content>
 </xwikidoc>

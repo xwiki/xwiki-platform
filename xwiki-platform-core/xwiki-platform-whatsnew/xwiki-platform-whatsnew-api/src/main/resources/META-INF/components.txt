@@ -1,0 +1,3 @@
+org.xwiki.whatsnew.internal.xwikiorgblog.XWikiOrgBlogNewsSourceFactory
+org.xwiki.whatsnew.internal.DefaultNewsConfiguration
+org.xwiki.whatsnew.script.NewsScriptService

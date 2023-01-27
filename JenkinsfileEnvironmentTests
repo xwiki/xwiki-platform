@@ -32,13 +32,17 @@
 // - If this file is triggered by a manual build, ask the user to choose between th different environment tests to
 //   execute and run them immediately.
 
-// If the build has been manually triggered and the type is known, then execute the tests
+// If the build has been manually triggered:
+// - if the type is known, then execute the tests
+// - if the type is not known, it means it's the first execution and the job is not parameterized yet. Thus,
+//   parameterize it and schedule the next run.
 if (currentBuild.rawBuild.getCauses()[0].toString().contains('UserIdCause')) {
   def validValues = ['docker-latest', 'docker-all', 'docker-unsupported']
   if (validValues.contains(params.type)) {
     buildDocker(params.type)
   } else {
-    echoXWiki "Unknown type '${params.type}'. Valid values are ${validValues}."
+    properties(getCustomJobProperties())
+    // Aborting so that the build isn't displayed as successful, as we want to focus on the failing env tests builds.
     currentBuild.result = 'ABORTED'
   }
 } else if (params.type && params.type != 'none') {

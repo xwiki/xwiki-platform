@@ -89,7 +89,7 @@ public abstract class AbstractEntityMacroContentSourceFactory<T>
         }
 
         // Current user must have view right on the document
-        if (this.authorization.hasAccess(Right.VIEW, xcontext.getUserReference(), documentReference)) {
+        if (!this.authorization.hasAccess(Right.VIEW, xcontext.getUserReference(), documentReference)) {
             throw new MacroExecutionException(
                 "Current user is not allowed to access document [" + documentReference + "]");
         }

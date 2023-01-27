@@ -603,7 +603,7 @@ public class Context extends Api
      * @return the display mode, one of "view", "edit", "hidden", "search" or "rendered"
      * @since 13.4.7
      * @since 13.10.3
-     * @since 14.0-rc-1
+     * @since 14.0RC1
      */
     public String getDisplayMode()
     {

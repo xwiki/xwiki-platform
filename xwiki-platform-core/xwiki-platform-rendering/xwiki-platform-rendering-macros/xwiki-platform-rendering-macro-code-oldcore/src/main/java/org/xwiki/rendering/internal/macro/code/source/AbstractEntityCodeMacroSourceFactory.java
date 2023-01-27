@@ -20,17 +20,26 @@
 package org.xwiki.rendering.internal.macro.code.source;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.internal.macro.source.AbstractEntityMacroContentSourceFactory;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.code.source.CodeMacroSource;
 import org.xwiki.rendering.macro.code.source.CodeMacroSourceFactory;
 import org.xwiki.rendering.macro.source.MacroContentSourceReference;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.security.authorization.AccessDeniedException;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -40,14 +49,81 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @since 15.0RC1
  * @since 14.10.2
  */
-public abstract class AbstractEntityCodeMacroSourceFactory
-    extends AbstractEntityMacroContentSourceFactory<CodeMacroSource> implements CodeMacroSourceFactory
+public abstract class AbstractEntityCodeMacroSourceFactory implements CodeMacroSourceFactory
 {
+    @Inject
+    @Named("macro")
+    private EntityReferenceResolver<String> resolver;
+
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
+    @Inject
+    private AuthorizationManager authorization;
+
     @Inject
     private ComponentManager componentManager;
 
     @Override
-    protected CodeMacroSource getContent(XWikiDocument document, EntityReference entityReference,
+    public CodeMacroSource getContent(MacroContentSourceReference reference, MacroTransformationContext context)
+        throws MacroExecutionException
+    {
+        // Resolve the reference
+        EntityReference entityReference =
+            this.resolver.resolve(reference.getReference(), getEntityType(), context.getCurrentMacroBlock());
+
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        if (xcontext == null) {
+            throw new MacroExecutionException("No XWiki context could be found in the current context");
+        }
+
+        // Resolve the document reference
+        DocumentReference documentReference = xcontext.getWiki().getDocumentReference(entityReference, xcontext);
+
+        // Current author must have view right on the document
+        try {
+            this.authorization.checkAccess(Right.VIEW, xcontext.getAuthorReference(), documentReference);
+        } catch (AccessDeniedException e) {
+            throw new MacroExecutionException(
+                "Current author is not allowed to access document [" + documentReference + "]", e);
+        }
+
+        // Current user must have view right on the document
+        if (!this.authorization.hasAccess(Right.VIEW, xcontext.getUserReference(), documentReference)) {
+            throw new MacroExecutionException(
+                "Current user is not allowed to access document [" + documentReference + "]");
+        }
+
+        // Get the content
+        XWikiDocument document;
+        try {
+            document = xcontext.getWiki().getDocument(documentReference, xcontext);
+        } catch (XWikiException e) {
+            throw new MacroExecutionException("Failed to load document [" + documentReference + "]", e);
+        }
+
+        // Make sure the document exist
+        if (document.isNew()) {
+            throw new MacroExecutionException("Entity [" + reference + "] does not exist");
+        }
+
+        // Get the current translation
+        if (documentReference.getLocale() == null) {
+            try {
+                document = document.getTranslatedDocument(xcontext);
+            } catch (XWikiException e) {
+                throw new MacroExecutionException(
+                    "Failed to load document translation for reference [" + documentReference + "]", e);
+            }
+        }
+
+        return getContent(document, entityReference, reference, xcontext);
+    }
+
+    protected abstract EntityType getEntityType();
+
+    private CodeMacroSource getContent(XWikiDocument document, EntityReference entityReference,
         MacroContentSourceReference reference, XWikiContext xcontext) throws MacroExecutionException
     {
         if (!this.componentManager.hasComponent(EntityCodeMacroSourceLoader.class, entityReference.getType().name())) {

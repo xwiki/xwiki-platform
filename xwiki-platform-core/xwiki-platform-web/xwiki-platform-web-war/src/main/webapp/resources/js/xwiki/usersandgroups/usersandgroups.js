@@ -24,8 +24,7 @@ define('users-and-groups-translation-keys', {
   keys: [
     "allowed",
     "denied",
-    "undefined",
-    "changeStateTo"
+    "undefined"
   ]
 });
 
@@ -94,14 +93,15 @@ window.MSCheckbox = Class.create({
     img.src = this.images[state];
     
     //Update the description of the button for accessibility.
-    require(['xwiki-l10n!users-and-group-translation-keys'], function(l10n) {
+    var button = this.button;
+    require(['xwiki-l10n!users-and-groups-translation-keys'], function(l10n) {
       var alts = [
         l10n['undefined'],
         l10n['allowed'],
         l10n['denied']
       ];
-      img.alt = alts[this.state] + " . " + l10n.get('changeStateTo', alts[this.nextState()]);
-      this.button.title = alts[state];
+      img.alt = alts[state];
+      button.title = alts[state];
     });
 
     //add label

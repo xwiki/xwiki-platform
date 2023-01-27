@@ -68,7 +68,7 @@ window.MSCheckbox = Class.create({
     
     this.button = document.createElement("button");
     this.button.className = "rights-edit";
-    this.button.onclick = this.createClickHandler(this);
+    Event.observe(this.button, 'click', this.createClickHandler(this));
     
     var img = document.createElement("img");
     

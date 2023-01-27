@@ -20,17 +20,26 @@
 package org.xwiki.rendering.internal.macro.code.source;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.internal.macro.source.AbstractEntityMacroContentSourceFactory;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.code.source.CodeMacroSource;
 import org.xwiki.rendering.macro.code.source.CodeMacroSourceFactory;
 import org.xwiki.rendering.macro.source.MacroContentSourceReference;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.security.authorization.AccessDeniedException;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -40,14 +49,23 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @since 15.0RC1
  * @since 14.10.2
  */
-public abstract class AbstractEntityCodeMacroSourceFactory
-    extends AbstractEntityMacroContentSourceFactory<CodeMacroSource> implements CodeMacroSourceFactory
+public abstract class AbstractEntityCodeMacroSourceFactory implements CodeMacroSourceFactory
 {
+    @Inject
+    @Named("macro")
+    private EntityReferenceResolver<String> resolver;
+
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
+    @Inject
+    private AuthorizationManager authorization;
+
     @Inject
     private ComponentManager componentManager;
 
     @Override
-    public CodeMacroSource getContent(CodeMacroSourceReference reference, MacroTransformationContext context)
+    public CodeMacroSource getContent(MacroContentSourceReference reference, MacroTransformationContext context)
         throws MacroExecutionException
     {
         // Resolve the reference
@@ -105,7 +123,7 @@ public abstract class AbstractEntityCodeMacroSourceFactory
 
     protected abstract EntityType getEntityType();
 
-    protected CodeMacroSource getContent(XWikiDocument document, EntityReference entityReference,
+    private CodeMacroSource getContent(XWikiDocument document, EntityReference entityReference,
         MacroContentSourceReference reference, XWikiContext xcontext) throws MacroExecutionException
     {
         if (!this.componentManager.hasComponent(EntityCodeMacroSourceLoader.class, entityReference.getType().name())) {

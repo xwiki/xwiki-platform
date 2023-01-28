@@ -138,7 +138,8 @@
     #end
     #if($hasedit || !$tags.isEmpty())
         $services.localization.render('core.tags.list.label')
-        #foreach($tag in $tags)
+    #end
+    #foreach($tag in $tags)
         #displayTag($tag)
     #end
     #if($hasedit && $xwiki.tag)

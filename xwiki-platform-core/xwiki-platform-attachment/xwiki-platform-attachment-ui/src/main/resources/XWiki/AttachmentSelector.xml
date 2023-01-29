@@ -1615,7 +1615,7 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
   #if ($displayImage)
     (% class="$!{cssClass}#if (!$attachment) hidden#end" %)(((#if ("$!{attachmentResource}" != '' || $forceElement)#if($withLink)[[#end[[image:$services.rendering.escape(${attachmentResource}, 'xwiki/2.1')$!{imageParams}]]#if($withLink)&gt;&gt;attach:$services.rendering.escape(${attachmentResource},'xwiki/2.1')||rel=lightbox]]#{end}#end)))##
   #else
-    (% class="$!{cssClass}" %)#if ("$!{attachmentResource}" != '' || $forceElement)#if ($withLink)[[attach:${attachmentResource}||rel=__blank]]#{else}(% class="displayed" %)#if($targetPermView)$services.rendering.escape($!{attachmentName}, 'xwiki/2.1')#{else}Access Denied#{end}(% %)#{end}#end(%%)##
+      (% class="$!{cssClass}" %)#if ("$!{attachmentResource}" != '' || $forceElement)#if ($withLink)[[attach:${attachmentResource}||rel=__blank]]#{else}(% class="displayed" %)#if($targetPermView)$!{services.rendering.escape($!{attachmentName}, 'xwiki/2.1')}#{else}Access Denied#{end}(% %)#{end}#end(%%)##
   #end
 #end
 

@@ -6782,7 +6782,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param context the XWiki Context
      * @return the document in the provided language or this if the provided language does not exists
      * @throws XWikiException error when loading the document
-     * @deprecated use {@link #getTranslatedDocument(Locale, XWikiContext)} insead
+     * @deprecated use {@link #getTranslatedDocument(Locale, XWikiContext)} instead
      */
     @Deprecated(since = "4.3M2")
     public XWikiDocument getTranslatedDocument(String language, XWikiContext context) throws XWikiException

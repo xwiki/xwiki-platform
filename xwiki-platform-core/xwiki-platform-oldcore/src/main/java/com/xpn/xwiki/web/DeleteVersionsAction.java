@@ -31,7 +31,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
 
 /**
- * Struts action for deleting document versions.
+ * Action for deleting document versions.
  *
  * @version $Id$
  */

@@ -77,6 +77,8 @@
         #documentPickerModal($options)
         #locationPickerActions()
       #end
+    </dd>
+    <dd>
       ##
       ## ---------------------------------------------------------------------------------------------------------
       ## Location advanced edit

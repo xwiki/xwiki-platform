@@ -17,13 +17,12 @@
 
 dd.location-picker-preview{
   /*Make the location picker display the bg color*/
-  background-color: #f8f8f8;
   border-radius: 4px;
   /*Moved padding from both of the visible elements to the location picker*/
   padding: 8px 15px 8px 15px;
   /*Set up a flex display for breadcrumbs, location actions and edit location.*/
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   
 }
 .breadcrumb-container{

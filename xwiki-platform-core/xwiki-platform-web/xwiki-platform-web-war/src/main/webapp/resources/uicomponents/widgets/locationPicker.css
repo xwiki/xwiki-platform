@@ -11,8 +11,10 @@
   background-color: transparent;
   border-radius: 0px;
   padding: 0;
-  /*Remove the ol left padding*/
-  padding-left: 0;
+  /*Overwrite extra style properties (such as those changed in the Lumen color theme*/
+  border-color: transparent;
+  border-style: none;
+  border-width: 0;
 }
 
 dd.location-picker-preview{

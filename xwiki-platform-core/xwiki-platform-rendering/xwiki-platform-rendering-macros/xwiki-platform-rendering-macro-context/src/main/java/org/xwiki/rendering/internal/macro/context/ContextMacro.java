@@ -44,6 +44,9 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.context.ContextMacroParameters;
 import org.xwiki.rendering.macro.context.TransformationContextMode;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
+import org.xwiki.rendering.macro.source.MacroContentWikiSource;
+import org.xwiki.rendering.macro.source.MacroContentWikiSourceFactory;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
@@ -79,6 +82,9 @@ public class ContextMacro extends AbstractExecutedContentMacro<ContextMacroParam
     private TransformationManager transformationManager;
 
     @Inject
+    private MacroContentWikiSourceFactory contentFactory;
+
+    @Inject
     @Named("macro")
     private DocumentReferenceResolver<String> macroReferenceResolver;
 
@@ -87,7 +93,7 @@ public class ContextMacro extends AbstractExecutedContentMacro<ContextMacroParam
      */
     public ContextMacro()
     {
-        super("Context", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION, true, Block.LIST_BLOCK_TYPE),
+        super("Context", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION, false, Block.LIST_BLOCK_TYPE),
             ContextMacroParameters.class);
 
         setDefaultCategories(Set.of(DEFAULT_CATEGORY_DEVELOPMENT));
@@ -106,8 +112,8 @@ public class ContextMacro extends AbstractExecutedContentMacro<ContextMacroParam
     }
 
     @Override
-    public List<Block> execute(ContextMacroParameters parameters, String content, MacroTransformationContext context)
-        throws MacroExecutionException
+    public List<Block> execute(ContextMacroParameters parameters, String macroContent,
+        MacroTransformationContext context) throws MacroExecutionException
     {
         MetaData metadata;
         if (parameters.getDocument() != null) {
@@ -117,8 +123,15 @@ public class ContextMacro extends AbstractExecutedContentMacro<ContextMacroParam
         } else {
             metadata = null;
         }
+        String content = macroContent;
+        Syntax syntax = null;
+        if (parameters.getSource() != null) {
+            MacroContentWikiSource wikiSource = this.contentFactory.getContent(parameters.getSource(), context);
+            syntax = wikiSource.getSyntax();
+            content = wikiSource.getContent();
+        }
 
-        XDOM xdom = this.parser.parse(content, context, false, metadata, context.isInline());
+        XDOM xdom = this.parser.parse(content, syntax, context, false, metadata, context.isInline());
 
         if (xdom.getChildren().isEmpty()) {
             return Collections.emptyList();

@@ -560,13 +560,17 @@ public class TestUtils
      */
     public void createAdminUser()
     {
-        createUser(ADMIN_CREDENTIALS.getUserName(), ADMIN_CREDENTIALS.getPassword(), null);
+        // Note that we cannot use ADMIN_CREDENTIALS.getPassword() since that password is less than 6 characters, and
+        // we now have a check in XWiki on password length by default. We're keeping the default admin password in
+        // ADMIN_CREDENTIALS.getPassword() to not break XS tests (since in XS the Admin user exists and has password
+        // with value ADMIN_CREDENTIALS.getPassword()).
+        createUser(ADMIN_CREDENTIALS.getUserName(), "administrator", null);
         addObject("XWiki", "XWikiAdminGroup", "XWiki.XWikiGroups", "member", "XWiki.Admin");
-        loginAsAdmin();
+        login(ADMIN_CREDENTIALS.getUserName(), "administrator");
     }
 
     /**
-     * Add or update a {@code XWikiGlobalRights} xobject to the current wiki's {@code XWikiPrefrences} document.
+     * Add or update a {@code XWikiGlobalRights} xobject to the current wiki's {@code XWikiPreferences} document.
      *
      * @param groups the comma-separated list of groups that will have the rights (e.g. {@code XWiki.XWikiAdminGroup}.
      *               Can be empty or null

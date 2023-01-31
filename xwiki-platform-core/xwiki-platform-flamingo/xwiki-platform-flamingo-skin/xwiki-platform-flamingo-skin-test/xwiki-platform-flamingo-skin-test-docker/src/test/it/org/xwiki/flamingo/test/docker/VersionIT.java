@@ -93,19 +93,27 @@ class VersionIT
     }
 
     /**
-     * See XWIKI-8781
+     * See XWIKI-8781 & XWIKI-20589
      */
     @Test
     @Order(2)
-    void testDeleteLatestVersion(TestUtils utils, TestReference testReference) throws Exception
+    void testDeleteLatestVersion(TestUtils setup, TestReference testReference) throws Exception
     {
-        utils.rest().delete(testReference);
+        setup.rest().delete(testReference);
 
-        // Create first version of the page
-        ViewPage vp = utils.createPage(testReference, CONTENT1, TITLE);
+        // Create first version of the page, as superadmin
+        setup.createPage(testReference, CONTENT1, TITLE);
 
-        // Adds second version
-        WikiEditPage wikiEditPage = vp.editWiki();
+        // Log as another user having admin permissions (to be able to delete a revision)
+        // By default the minimal distribution used for the tests doesn't have any rights setup. Let's create an Admin
+        // user part of the Admin Group and make sure that this Admin Group has admin rights in the wiki.
+        setup.setGlobalRights("XWiki.XWikiAdminGroup", "", "admin", true);
+        setup.createAdminUser();
+
+        // Adds second version, as Admin
+        ViewPage vp = setup.gotoPage(testReference);
+        vp.edit();
+        WikiEditPage wikiEditPage = new WikiEditPage();
         wikiEditPage.setContent(CONTENT2);
         wikiEditPage.clickSaveAndView();
 
@@ -121,6 +129,9 @@ class VersionIT
         // Verify that the current version is now the previous one.
         assertEquals("1.1", historyTab.getCurrentVersion());
         assertEquals("superadmin", historyTab.getCurrentAuthor());
+
+        // Verify that the last modified author of the page is the author from revision 1.1
+        assertTrue(vp.getLastModifiedText().startsWith("Last modified by superadmin"));
     }
 
     @Test

@@ -7634,9 +7634,16 @@ public class XWiki implements EventListener
 
         document.apply(rolledbackDoc);
 
-        // Prepare the XWikiDocument before save
+        // Prepare the XWikiDocument before save.
         document.setAuthorReference(xcontext.getUserReference());
         document.setContentAuthorReference(xcontext.getUserReference());
+
+        // Note: In the case where we don't add a new revision, there'll be no new entry in the history and thus
+        // the author displayed for the current document must be the same as the last revision in the history. Set
+        // the original metadata author to reflect this.
+        if (!addRevision) {
+            document.getAuthors().setOriginalMetadataAuthor(rolledbackDoc.getAuthors().getOriginalMetadataAuthor());
+        }
 
         // Make sure the history is not modified if addRevision is disabled
         String message;

@@ -82,8 +82,7 @@ class LanguageIT
 
         // Now language must be "fr".
         vp = testUtils.gotoPage("Test", "LanguageTest");
-        assertThat("Page not in French!", getGetLastModifiedByLocalizedText(testUtils),
-            containsStringIgnoringCase("modifié par"));
+        assertThat("Page not in French!", vp.getLastModifiedText(), containsStringIgnoringCase("modifié par"));
         assertEquals(vp.getContent(), "context = (fr), doc = (), default = (en), tdoc = (), tdocdefault = (en)",
             "Invalid content");
     }
@@ -94,8 +93,8 @@ class LanguageIT
     {
         testUtils.createPage(testReference, "");
         testUtils.gotoPage(testReference, "view", "language=fr");
-        assertThat("Page not in English!", getGetLastModifiedByLocalizedText(testUtils),
-            containsStringIgnoringCase("last modified by"));
+        ViewPage vp = new ViewPage();
+        assertThat("Page not in English!", vp.getLastModifiedText(), containsStringIgnoringCase("last modified by"));
     }
 
     @Test
@@ -106,8 +105,8 @@ class LanguageIT
         setLanguageSettings(true, Arrays.asList("en", "fr"));
         testUtils.createPage(testReference, "");
         testUtils.gotoPage(testReference, "view", "language=fr");
-        assertThat("Page not in French!", getGetLastModifiedByLocalizedText(testUtils),
-            containsStringIgnoringCase("modifié par"));
+        ViewPage vp = new ViewPage();
+        assertThat("Page not in French!", vp.getLastModifiedText(), containsStringIgnoringCase("modifié par"));
     }
 
     @Test
@@ -140,11 +139,6 @@ class LanguageIT
 
         String content = testUtils.getDriver().getPageSource();
         assertTrue(content.contains("language=" + language));
-    }
-
-    private String getGetLastModifiedByLocalizedText(TestUtils testUtils)
-    {
-        return testUtils.getDriver().findElement(By.className("xdocLastModification")).getText();
     }
 
     private void resetLanguageSettings()

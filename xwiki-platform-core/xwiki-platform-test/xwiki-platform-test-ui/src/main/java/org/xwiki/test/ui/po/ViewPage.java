@@ -300,4 +300,13 @@ public class ViewPage extends BasePage
     {
         return getDriver().findElement(locator).getCssValue(attribute);
     }
+
+    /**
+     * @return the last modified text displayed under the title in a wiki page
+     * @since 15.1RC1
+     */
+    public String getLastModifiedText()
+    {
+        return getDriver().findElement(By.className("xdocLastModification")).getText();
+    }
 }

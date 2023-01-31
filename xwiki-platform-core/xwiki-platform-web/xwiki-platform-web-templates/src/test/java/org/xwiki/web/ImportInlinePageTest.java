@@ -61,7 +61,7 @@ import static org.mockito.Mockito.when;
  * Test of template {@code importinline.vm}.
  *
  * @version $Id$
- * @since 15.0-rc-1
+ * @since 15.0RC1
  * @since 14.10.1
  * @since 14.4.8
  * @since 13.10.11

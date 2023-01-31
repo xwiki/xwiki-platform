@@ -146,7 +146,8 @@ class ContextMacroTest
         when(this.dab.getTranslatedDocumentInstance(TARGET_REFERENCE)).thenReturn(dmb);
 
         XDOM contentXDOM = new XDOM(Arrays.asList(new WordBlock("test")));
-        when(this.parser.parse(eq(""), same(macroContext), eq(false), eq(null), eq(false))).thenReturn(contentXDOM);
+        when(this.parser.parse(eq(""), same(null), same(macroContext), eq(false), eq(null), eq(false)))
+            .thenReturn(contentXDOM);
 
         ContextMacroParameters parameters = new ContextMacroParameters();
 
@@ -194,7 +195,7 @@ class ContextMacroTest
         parserMetadata.addMetaData(MetaData.BASE, "target");
 
         XDOM contentXDOM = new XDOM(Arrays.asList(new WordBlock("test")), parserMetadata);
-        when(this.parser.parse(eq(""), same(macroContext), eq(false), eq(parserMetadata), eq(false)))
+        when(this.parser.parse(eq(""), same(null), same(macroContext), eq(false), eq(parserMetadata), eq(false)))
             .thenReturn(contentXDOM);
 
         ContextMacroParameters parameters = new ContextMacroParameters();
@@ -250,7 +251,7 @@ class ContextMacroTest
         parserMetadata.addMetaData(MetaData.BASE, "target");
 
         XDOM contentXDOM = new XDOM(Arrays.asList(new WordBlock("test")), parserMetadata);
-        when(this.parser.parse(eq(""), same(macroContext), eq(false), eq(parserMetadata), eq(false)))
+        when(this.parser.parse(eq(""), same(null), same(macroContext), eq(false), eq(parserMetadata), eq(false)))
             .thenReturn(contentXDOM);
 
         ContextMacroParameters parameters = new ContextMacroParameters();

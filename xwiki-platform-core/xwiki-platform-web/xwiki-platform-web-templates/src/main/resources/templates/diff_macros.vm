@@ -570,7 +570,7 @@
     </div>
     <div class="changes-info-content">
       #if ($targetDoc)
-        $services.localization.render('core.viewers.diff.editedBy', [$xwiki.getUserName($targetDoc.author)])
+        $services.localization.render('core.viewers.diff.editedBy', [$xwiki.getUserName($targetDoc.authors.originalMetadataAuthor)])
         <br/>
         $services.localization.render('core.viewers.diff.editedOn', [$xwiki.formatDate($targetDoc.date)])
       #end

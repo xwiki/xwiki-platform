@@ -246,8 +246,6 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
 
             // restore "context" binding
             restoreBinding(currentEngineBindings, scriptContext, BINDING_CONTEXT);
-            // restore "javax.script.filename" binding
-            restoreBinding(currentEngineBindings, scriptContext, ScriptEngine.FILENAME);
         }
 
         return result;

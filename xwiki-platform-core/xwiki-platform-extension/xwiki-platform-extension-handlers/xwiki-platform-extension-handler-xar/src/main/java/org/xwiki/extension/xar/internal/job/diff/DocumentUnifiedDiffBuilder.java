@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -64,7 +65,7 @@ public class DocumentUnifiedDiffBuilder extends AbstractUnifiedDiffBuilder
     private AttachmentUnifiedDiffBuilder attachmentDiffBuilder;
 
     @Inject
-    private GeneralMailConfiguration emails;
+    private Provider<GeneralMailConfiguration> emailProvider;
 
     /**
      * Computes the differences, in unified format, between two versions of a document. A null document represents a
@@ -263,7 +264,7 @@ public class DocumentUnifiedDiffBuilder extends AbstractUnifiedDiffBuilder
                 String propertyType = propertyClass == null ? null : propertyClass.getClassType();
 
                 return "Password".equals(propertyType)
-                    || ("Email".equals(propertyType) && this.emails.shouldObfuscate());
+                    || ("Email".equals(propertyType) && this.emailProvider.get().shouldObfuscate());
             }
         }
 

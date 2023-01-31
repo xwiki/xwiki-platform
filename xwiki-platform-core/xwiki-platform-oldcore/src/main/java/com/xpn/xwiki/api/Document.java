@@ -452,7 +452,8 @@ public class Document extends Api
     /**
      * Get fullName of the profile document of the author of the current version of the document. Example: XWiki.Admin.
      *
-     * @return The fullName of the profile document of the author of the current version of the document.
+     * @return The fullName of the profile document of the effective metadata author of the current version of the
+     *         document.
      */
     public String getAuthor()
     {

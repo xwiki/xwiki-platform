@@ -20,7 +20,7 @@
 package org.xwiki.image.lightbox.test.po;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -32,11 +32,6 @@ import org.xwiki.test.ui.po.BaseElement;
  */
 public class ImagePopover extends BaseElement
 {
-    public ImagePopover()
-    {
-        waitUntilReady();
-    }
-
     /**
      * Click on the open lightbox action of the image popover.
      *
@@ -48,16 +43,6 @@ public class ImagePopover extends BaseElement
         getDriver().findElement(By.cssSelector(".popover .openLightbox")).click();
 
         return new Lightbox();
-    }
-
-    public boolean isImagePopoverDisplayed()
-    {
-        try {
-            By popoverSelector = By.cssSelector(".popover");
-            return getDriver().findElementWithoutWaiting(popoverSelector).isDisplayed();
-        } catch (NoSuchElementException e) {
-            return false;
-        }
     }
 
     public String getImageId()
@@ -81,7 +66,13 @@ public class ImagePopover extends BaseElement
         return getDriver().findElement(By.cssSelector(".popover .permalink"));
     }
 
-    private ImagePopover waitUntilReady()
+    /**
+     * Wait for a popover to be visible and continue.
+     *
+     * @return the current page object
+     * @throws TimeoutException if no popover is found
+     */
+    public ImagePopover waitUntilReady()
     {
         getDriver().waitUntilElementIsVisible(By.cssSelector("#imagePopoverContainer .popover"));
 

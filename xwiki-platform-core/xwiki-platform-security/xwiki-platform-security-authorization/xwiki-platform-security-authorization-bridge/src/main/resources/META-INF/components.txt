@@ -6,3 +6,4 @@ org.xwiki.security.authorization.internal.DefaultSecurityEntryReader
 org.xwiki.security.authorization.internal.RightsFilterListener
 org.xwiki.security.internal.DefaultUserBridge
 org.xwiki.security.internal.DefaultXWikiBridge
+org.xwiki.security.internal.DocumentInitializerRightsManager

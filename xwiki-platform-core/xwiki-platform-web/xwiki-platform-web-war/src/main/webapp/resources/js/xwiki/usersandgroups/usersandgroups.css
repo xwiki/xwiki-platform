@@ -51,7 +51,7 @@
   width: 15% !important;
 }
 
-/*Added for accessibility updates without any UI change in the rights edit form.*/
+/* This button has no border or background, but wraps an image to allow keyboard navigation. */
 #usersandgroupstable button.rights-edit {
   border-color: transparent;
   background: transparent;

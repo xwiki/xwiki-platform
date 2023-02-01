@@ -62,7 +62,6 @@ window.MSCheckbox = Class.create({
       "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow.png')",
       "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/deny1.png')"
     ];
-    this.labels = ['','',''];
 
     
     
@@ -73,11 +72,6 @@ window.MSCheckbox = Class.create({
     var img = document.createElement("img");
     
     this.button.appendChild(img);
-    
-    this.label = document.createElement('span');
-    this.label.hidden = true;
-    this.label.appendChild(document.createTextNode(this.labels[this.state]));
-    this.button.appendChild(this.label);
     
     $(domNode).appendChild(this.button);
     this.draw(this.state);
@@ -103,14 +97,6 @@ window.MSCheckbox = Class.create({
       img.alt = alts[state];
       button.title = alts[state];
     });
-
-    //add label
-    if (this.labels[state] != '') {
-      while (this.label.childNodes.length > 0) {
-        this.label.removeChild(this.label.firstChild);
-      }
-      this.label.appendChild(document.createTextNode(this.labels[state]));
-    }
   },
 
   nextState: function(){

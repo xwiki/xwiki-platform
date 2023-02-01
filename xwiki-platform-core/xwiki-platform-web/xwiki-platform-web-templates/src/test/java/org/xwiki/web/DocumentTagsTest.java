@@ -42,8 +42,8 @@ import com.xpn.xwiki.plugin.tag.TagPlugin;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;
-import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests the {@code documentTags.vm} template.

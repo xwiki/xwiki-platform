@@ -87,7 +87,7 @@ class DocumentTagsTest extends PageTest
         String result = templateManager.render("documentTags.vm").trim().replaceAll("\\s+", " ");
 
         // Verify that the generated HTML matches the expectation:
-        // - The tag label is displayed
+        // - The tag label is not displayed since there is/are no tag(s)
         // - No tag is listed after the tag label
         // - No "+" link is displayed since the user doesn't have edit rights
         assertThat(result, matchesPattern("<div class=\"doc-tags\" id=\"xdocTags\"> </div>"));

@@ -43,6 +43,7 @@ import com.xpn.xwiki.plugin.tag.TagPlugin;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests the {@code documentTags.vm} template.
@@ -90,7 +91,7 @@ class DocumentTagsTest extends PageTest
         // - The tag label is not displayed since there is/are no tag(s)
         // - No tag is listed after the tag label
         // - No "+" link is displayed since the user doesn't have edit rights
-        assertThat(result, matchesPattern("<div class=\"doc-tags\" id=\"xdocTags\"> </div>"));
+        assertEquals("<div class=\"doc-tags\" id=\"xdocTags\"> </div>", result);
     }
 
     @Test

@@ -32,6 +32,7 @@ import org.xwiki.mail.internal.configuration.SendMailConfigClassDocumentConfigur
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.security.internal.DocumentInitializerRightsManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import javax.inject.Inject;
@@ -61,6 +62,9 @@ public class MailConfigMandatoryDocumentInitializer implements MandatoryDocument
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
+
+    @Inject
+    private DocumentInitializerRightsManager documentInitializerRightsManager;
 
     @Override
     public EntityReference getDocumentReference()
@@ -104,6 +108,10 @@ public class MailConfigMandatoryDocumentInitializer implements MandatoryDocument
         // duplicate Admin UI entries...
         // TODO: Ideally this code should be executed only once.
         if (removeConfigurableClass(document)) {
+            needsUpdate = true;
+        }
+
+        if (this.documentInitializerRightsManager.restrictToAdmin(document)) {
             needsUpdate = true;
         }
 

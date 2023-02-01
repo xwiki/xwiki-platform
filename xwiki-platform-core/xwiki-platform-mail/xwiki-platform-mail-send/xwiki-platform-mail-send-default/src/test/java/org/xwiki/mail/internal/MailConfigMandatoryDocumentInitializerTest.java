@@ -19,6 +19,16 @@
  */
 package org.xwiki.mail.internal;
 
+import javax.inject.Provider;
+
+import org.junit.jupiter.api.Test;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.security.internal.DocumentInitializerRightsManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -27,17 +37,13 @@ import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
-import org.junit.jupiter.api.Test;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.test.junit5.mockito.InjectMockComponents;
-import org.xwiki.test.junit5.mockito.MockComponent;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
-import javax.inject.Provider;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link MailConfigMandatoryDocumentInitializer}.
@@ -60,6 +66,9 @@ public class MailConfigMandatoryDocumentInitializerTest
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
 
+    @MockComponent
+    private DocumentInitializerRightsManager documentInitializerRightsManager;
+
     @Test
     public void updateDocument()
     {
@@ -81,5 +90,6 @@ public class MailConfigMandatoryDocumentInitializerTest
             document.getXObject(new LocalDocumentReference("Mail", "SendMailConfigClass"));
         assertNotNull(sendMailConfigObject);
         assertNotNull(document.getXObject(new LocalDocumentReference("Mail", "GeneralMailConfigClass")));
+        verify(this.documentInitializerRightsManager).restrictToAdmin(document);
     }
 }

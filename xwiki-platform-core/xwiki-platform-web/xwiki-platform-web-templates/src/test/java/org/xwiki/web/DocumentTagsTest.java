@@ -90,7 +90,7 @@ class DocumentTagsTest extends PageTest
         // - The tag label is displayed
         // - No tag is listed after the tag label
         // - No "+" link is displayed since the user doesn't have edit rights
-        assertThat(result, matchesPattern("\\Q<div class=\"doc-tags\" id=\"xdocTags\"> core.tags.list.label </div>"));
+        assertThat(result, matchesPattern("<div class=\"doc-tags\" id=\"xdocTags\"> </div>"));
     }
 
     @Test

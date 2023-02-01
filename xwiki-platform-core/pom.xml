@@ -126,6 +126,22 @@
                  Single justification example:
             -->
             <revapi.differences>
+              <justification>Moved to xwiki-platform-mail-api</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.mail.EmailAddressObfuscator</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.mail.GeneralMailConfiguration</old>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
               <justification>Young API. Refactored into a more generic version exposed by xwiki-rendering.</justification>
               <criticality>documented</criticality>
               <differences>

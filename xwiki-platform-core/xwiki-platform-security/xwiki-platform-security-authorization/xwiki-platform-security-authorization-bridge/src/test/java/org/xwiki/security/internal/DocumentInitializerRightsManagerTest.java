@@ -69,7 +69,7 @@ class DocumentInitializerRightsManagerTest
     private DocumentInitializerRightsManager rightsManager;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     private XWikiDocument document;
 

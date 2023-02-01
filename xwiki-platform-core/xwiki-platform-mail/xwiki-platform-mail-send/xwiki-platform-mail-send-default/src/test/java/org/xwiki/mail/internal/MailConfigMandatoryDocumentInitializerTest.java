@@ -27,14 +27,12 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.security.internal.DocumentInitializerRightsManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.user.SuperAdminUserReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.test.MockitoOldcore;
-import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
@@ -52,28 +50,22 @@ import static org.mockito.Mockito.when;
  */
 @OldcoreTest
 @ReferenceComponentList
-public class MailConfigMandatoryDocumentInitializerTest
+class MailConfigMandatoryDocumentInitializerTest
 {
     @InjectMockComponents
     private MailConfigMandatoryDocumentInitializer initializer;
 
     @MockComponent
-    private WikiDescriptorManager wikiDescriptorManager;
-
-    @MockComponent
     private Provider<XWikiContext> xcontextProvider;
-
-    @InjectMockitoOldcore
-    private MockitoOldcore oldcore;
 
     @MockComponent
     private DocumentInitializerRightsManager documentInitializerRightsManager;
 
     @Test
-    public void updateDocument()
+    void updateDocument()
     {
-        when(this.wikiDescriptorManager.getMainWikiId()).thenReturn("mainwiki");
-        XWikiDocument document = new XWikiDocument(new DocumentReference("mainwiki", "Mail", "MailConfig"));
+        DocumentReference mailConfigDocumentReference = new DocumentReference("mainwiki", "Mail", "MailConfig");
+        XWikiDocument document = new XWikiDocument(mailConfigDocumentReference);
 
         XWikiContext xcontext = mock(XWikiContext.class);
         XWiki xwiki = mock(XWiki.class);
@@ -82,8 +74,8 @@ public class MailConfigMandatoryDocumentInitializerTest
 
         this.initializer.updateDocument(document);
 
-        assertEquals("mainwiki:XWiki.superadmin", document.getCreatorReference().toString());
-        assertEquals("mainwiki:XWiki.superadmin", document.getAuthorReference().toString());
+        assertEquals(SuperAdminUserReference.INSTANCE, document.getAuthors().getCreator());
+        assertEquals(SuperAdminUserReference.INSTANCE, document.getAuthors().getEffectiveMetadataAuthor());
         assertTrue(document.isHidden());
         assertEquals("Mail Configuration", document.getTitle());
         BaseObject sendMailConfigObject =

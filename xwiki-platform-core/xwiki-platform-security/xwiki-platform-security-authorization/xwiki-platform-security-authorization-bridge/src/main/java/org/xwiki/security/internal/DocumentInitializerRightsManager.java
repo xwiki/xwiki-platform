@@ -32,6 +32,7 @@ import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -44,8 +45,7 @@ import static org.xwiki.security.internal.XWikiConstants.LEVELS_FIELD_NAME;
 import static org.xwiki.security.internal.XWikiConstants.LOCAL_CLASS_REFERENCE;
 
 /**
- * Service provided to {@link com.xpn.xwiki.doc.MandatoryDocumentInitializer}s to initialize documents with the correct
- * rights.
+ * Service provided to {@link MandatoryDocumentInitializer}s to initialize documents with the correct rights.
  *
  * @version $Id$
  * @since 14.4.8
@@ -68,7 +68,6 @@ public class DocumentInitializerRightsManager
      * Restrict the rights of the provided document so that it can only be viewed, edited and deleted by the
      * {@code XWiki.XWikiAdminGroup} group. Note that this restriction is only applied if no rights are already applied
      * on the current document.
-     * <br>
      *
      * @param document the document to updated rights on
      * @return {@code true} if the document has been modified, {@code false} otherwise (including if the document hasn't

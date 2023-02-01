@@ -87,7 +87,7 @@ class DocumentTagsTest extends PageTest
         // Remove extra spaces to make it easy to assert the result below.
         String result = templateManager.render("documentTags.vm").trim().replaceAll("\\s+", " ");
 
-        // Verify that the generated HTML matches the expectation:
+        // Verify that the generated HTML matches the expectations:
         // - The tag label is not displayed since there is/are no tag(s)
         // - No tag is listed after the tag label
         // - No "+" link is displayed since the user doesn't have edit rights
@@ -104,7 +104,7 @@ class DocumentTagsTest extends PageTest
         // Remove extra spaces to make it easy to assert the result below.
         String result = templateManager.render("documentTags.vm").trim().replaceAll("\\s+", " ");
 
-        // Verify that the generated HTML matches the expectation:
+        // Verify that the generated HTML matches the expectations:
         // - The tag label is displayed
         // - No tag is listed after the tag label
         // - The "+" link is displayed since the user has edit rights
@@ -128,7 +128,7 @@ class DocumentTagsTest extends PageTest
         // Remove extra spaces to make it easy to assert the result below.
         String result = templateManager.render("documentTags.vm").trim().replaceAll("\\s+", " ");
 
-        // Verify that the generated HTML matches the expectation:
+        // Verify that the generated HTML matches the expectations:
         // - The tag label is displayed
         // - The tags after the tag label
         // - No "+" link is displayed since the user doesn't have edit rights

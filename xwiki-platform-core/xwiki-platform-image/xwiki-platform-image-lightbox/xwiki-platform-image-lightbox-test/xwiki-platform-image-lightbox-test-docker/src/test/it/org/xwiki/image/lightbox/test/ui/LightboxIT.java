@@ -21,12 +21,12 @@ package org.xwiki.image.lightbox.test.ui;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.image.lightbox.test.po.ImagePopover;
@@ -42,6 +42,7 @@ import org.xwiki.test.ui.TestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -87,8 +88,8 @@ class LightboxIT
         // Make sure that the images are displayed.
         lightboxPage.reloadPage();
 
-        Optional<ImagePopover> imagePopover = lightboxPage.hoverImage(0);
-        assertFalse(imagePopover.isPresent());
+        ImagePopover imagePopover = lightboxPage.hoverImage(0);
+        assertThrows(TimeoutException.class, imagePopover::waitUntilReady);
     }
 
     @Test
@@ -108,10 +109,7 @@ class LightboxIT
         lightboxPage.reloadPage();
 
         // Verify the image ID popover actions.
-        Optional<ImagePopover> imagePopover = lightboxPage.hoverImage(0);
-        assertTrue(imagePopover.isPresent());
-        ImagePopover currentImagePopover = imagePopover.get();
-        assertTrue(currentImagePopover.isImagePopoverDisplayed());
+        ImagePopover currentImagePopover = lightboxPage.hoverImage(0).waitUntilReady();
 
         WebElement imagePermalinkButton = currentImagePopover.getImagePermalinkButton();
         String[] elements = imagePermalinkButton.getAttribute("href").split("#");
@@ -149,10 +147,7 @@ class LightboxIT
         lightboxPage.reloadPage();
 
         // Verify the image ID popover actions.
-        Optional<ImagePopover> imagePopover = lightboxPage.hoverImage(0);
-        assertTrue(imagePopover.isPresent());
-        ImagePopover currentImagePopover = imagePopover.get();
-        assertTrue(currentImagePopover.isImagePopoverDisplayed());
+        ImagePopover currentImagePopover = lightboxPage.hoverImage(0).waitUntilReady();
 
         WebElement imagePermalinkButton = currentImagePopover.getImagePermalinkButton();
         String[] elements = imagePermalinkButton.getAttribute("href").split("#");
@@ -209,8 +204,8 @@ class LightboxIT
 
         LightboxPage lightboxPage = new LightboxPage();
 
-        Optional<ImagePopover> imagePopover = lightboxPage.hoverImage(0);
-        assertFalse(imagePopover.isPresent());
+        ImagePopover imagePopover = lightboxPage.hoverImage(0);
+        assertThrows(TimeoutException.class, imagePopover::waitUntilReady);
     }
 
     @Test
@@ -355,10 +350,7 @@ class LightboxIT
         lightboxPage.reloadPage();
 
         // Verify the image popover download action.
-        Optional<ImagePopover> imagePopover = lightboxPage.hoverImage(0);
-        assertTrue(imagePopover.isPresent());
-        ImagePopover currentImagePopover = imagePopover.get();
-        assertTrue(currentImagePopover.isImagePopoverDisplayed());
+        ImagePopover currentImagePopover = lightboxPage.hoverImage(0).waitUntilReady();
 
         WebElement popoverDownload = currentImagePopover.getDownloadButton();
         assertEquals(lightboxPage.getImageElement(0).getAttribute("src"), popoverDownload.getAttribute("href"));
@@ -388,11 +380,10 @@ class LightboxIT
         // Make sure that the images are displayed.
         lightboxPage.reloadPage();
 
-        Optional<ImagePopover> imagePopover = lightboxPage.hoverImage(0);
-        assertFalse(imagePopover.isPresent());
+        ImagePopover imagePopover = lightboxPage.hoverImage(0);
+        assertThrows(TimeoutException.class, imagePopover::waitUntilReady);
 
-        imagePopover = lightboxPage.hoverImage(1);
-        assertTrue(imagePopover.isPresent());
+        lightboxPage.hoverImage(1).waitUntilReady();
     }
 
     @Test
@@ -409,10 +400,7 @@ class LightboxIT
         // Make sure that the images are displayed.
         lightboxPage.reloadPage();
 
-        Optional<ImagePopover> imagePopover = lightboxPage.hoverImage(0);
-        assertTrue(imagePopover.isPresent());
-        ImagePopover currentImagePopover = imagePopover.get();
-        assertTrue(currentImagePopover.isImagePopoverDisplayed());
+        ImagePopover currentImagePopover = lightboxPage.hoverImage(0).waitUntilReady();
         assertFalse(currentImagePopover.getImagePermalinkButton().isDisplayed());
         assertFalse(currentImagePopover.getCopyImageIdButton().isDisplayed());
 

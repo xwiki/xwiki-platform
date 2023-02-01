@@ -17,36 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.panels.test.po;
+package org.xwiki.help.test.ui.docker;
 
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.ViewPage;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.xwiki.test.docker.junit5.UITest;
 
 /**
- * Represents a panel page in view mode.
- * 
+ * All UI Tests for the Help Application.
+ *
  * @version $Id$
- * @since 4.3.1
  */
-public class PanelViewPage extends ViewPage
+@UITest
+class AllITs
 {
-    @FindBy(className = "xwikipanelcontents")
-    private WebElement content;
-
-    @SuppressWarnings("unchecked")
-    @Override
-    protected PanelEditPage createInlinePage()
+    @Nested
+    @DisplayName("Tips panel")
+    class NestedPanelIT extends TipsPanelIT
     {
-        return new PanelEditPage();
-    }
-
-    /**
-     * @since 15.1RC1
-     * @since 14.10.5
-     */
-    public WebElement getPanelContent()
-    {
-        return this.content;
     }
 }

@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -86,6 +87,7 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.model.jaxb.Property;
 import org.xwiki.rest.model.jaxb.Xwiki;
@@ -1120,15 +1122,23 @@ public class TestUtils
      */
     public String executeAndGetBodyAsString(EntityReference reference, Map<String, ?> queryParameters) throws Exception
     {
-        String url = getURL(reference, "get", toQueryString(queryParameters));
+        gotoPage(getURL(reference, "get", toQueryString(queryParameters)));
+        
+        return getDriver().getPageSource();
+    }
 
-        GetMethod getMethod = executeGet(url);
+    /**
+     * @since 15.1RC1
+     * @since 14.10.5
+     */
+    public String executeWiki(String wikiContent, Syntax wikiSyntax) throws Exception
+    {
+        LocalDocumentReference reference =
+            new LocalDocumentReference(List.of("Test", "Execute"), UUID.randomUUID().toString());
 
-        String result = getMethod.getResponseBodyAsString();
+        rest().savePage(reference, wikiContent, wikiSyntax.toIdString(), null, null);
 
-        getMethod.releaseConnection();
-
-        return result;
+        return executeAndGetBodyAsString(reference, null);
     }
 
     /**
@@ -1591,9 +1601,11 @@ public class TestUtils
     {
         StringBuilder builder = new StringBuilder();
 
-        for (Map.Entry<String, ?> entry : queryParameters.entrySet()) {
-            addQueryStringEntry(builder, entry.getKey(), entry.getValue());
-            builder.append('&');
+        if (queryParameters != null) {
+            for (Map.Entry<String, ?> entry : queryParameters.entrySet()) {
+                addQueryStringEntry(builder, entry.getKey(), entry.getValue());
+                builder.append('&');
+            }
         }
 
         return builder.toString();

@@ -63,7 +63,7 @@ public class UIExtensionMacro extends AbstractMacro<UIExtensionMacroParameters>
      */
     public UIExtensionMacro()
     {
-        super("UI Extensions", DESCRIPTION, UIExtensionsMacroParameters.class);
+        super("UI Extensions", DESCRIPTION, UIExtensionMacroParameters.class);
 
         // The ui extensions macro must execute first since if it runs with the current context it needs to bring
         // all the macros from the extension before the other macros are executed.
@@ -83,7 +83,7 @@ public class UIExtensionMacro extends AbstractMacro<UIExtensionMacroParameters>
     {
         UIExtension extension;
         try {
-            extension = this.contextComponentManagerProvider.get().getInstance(UIExtension.class);
+            extension = this.contextComponentManagerProvider.get().getInstance(UIExtension.class, parameters.getId());
         } catch (ComponentLookupException e) {
             throw new MacroExecutionException(
                 "Failed to lookup UIExtension component with hint [" + parameters.getId() + "]", e);

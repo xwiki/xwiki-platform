@@ -23,7 +23,7 @@ import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyMandatory;
 
 /**
- * Parameters for the {@link UIExtensionsMacro} Macro.
+ * Parameters for the {@link UIExtensionMacro} Macro.
  *
  * @version $Id$
  * @since 14.0RC1

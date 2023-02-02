@@ -47,6 +47,7 @@ public class PackagerComponentManagerInitializer implements ComponentManagerInit
         componentManager.unregisterComponent(EventListener.class, "solr.update");
         // We don't need the untyped event listener and it requires specific dependencies.
         componentManager.unregisterComponent(EventListener.class, "Untyped Event Listener");
+        //  Cancel ThreadClassloaderExecutionContextInitializer to not mess with the Maven classloader.
         componentManager.unregisterComponent(ExecutionContextInitializer.class, "threadclassloader");
     }
 }

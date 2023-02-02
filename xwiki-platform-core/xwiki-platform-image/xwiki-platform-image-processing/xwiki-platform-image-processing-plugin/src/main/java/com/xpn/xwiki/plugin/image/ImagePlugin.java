@@ -33,6 +33,7 @@ import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.cache.eviction.EntryEvictionConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 
 import com.xpn.xwiki.XWikiContext;
@@ -88,7 +89,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
      * @param name the name of the plugin
      * @param className the class name
      * @param context the XWiki context
-     * @see XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
+     * @see XWikiDefaultPlugin#XWikiDefaultPlugin(String, String, com.xpn.xwiki.XWikiContext)
      */
     public ImagePlugin(String name, String className, XWikiContext context)
     {
@@ -131,7 +132,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
     }
 
     /**
-     * Tries to initializes the image cache. If the initialization fails the image cache remains {@code null}.
+     * Tries to initialize the image cache. If the initialization fails the image cache remains {@code null}.
      *
      * @param context the XWiki context
      */
@@ -144,7 +145,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
 
             // Set cache constraints.
             LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
-            configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
+            configuration.put(EntryEvictionConfiguration.CONFIGURATIONID, lru);
 
             String capacityParam = context.getWiki().Param("xwiki.plugin.image.cache.capacity");
             if (!StringUtils.isBlank(capacityParam) && StringUtils.isNumeric(capacityParam.trim())) {
@@ -209,9 +210,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
         float quality = -1;
         try {
             quality = Float.parseFloat(context.getRequest().getParameter("quality"));
-        } catch (NumberFormatException e) {
-            // Ignore.
-        } catch (NullPointerException e) {
+        } catch (NumberFormatException | NullPointerException e) {
             // Ignore.
         }
 
@@ -233,10 +232,10 @@ public class ImagePlugin extends XWikiDefaultPlugin
      * Transforms the given image (i.e. shrinks the image and changes its quality) before it is downloaded.
      *
      * @param image the image to be downloaded
-     * @param width the desired image width; this value is taken into account only if it is greater than zero and less
-     *            than the current image width
-     * @param height the desired image height; this value is taken into account only if it is greater than zero and less
-     *            than the current image height
+     * @param width the desired image width; this value is taken into account only if it is greater than zero and
+     *     less than the current image width
+     * @param height the desired image height; this value is taken into account only if it is greater than zero and
+     *     less than the current image height
      * @param quality the desired compression quality
      * @param context the XWiki context
      * @return the transformed image
@@ -267,11 +266,12 @@ public class ImagePlugin extends XWikiDefaultPlugin
      * Downloads the given image from cache.
      *
      * @param image the image to be downloaded
-     * @param width the desired image width; this value is taken into account only if it is greater than zero and less
-     *            than the current image width
-     * @param height the desired image height; this value is taken into account only if it is greater than zero and less
-     *            than the current image height
-     * @param keepAspectRatio {@code true} to preserve aspect ratio when resizing the image, {@code false} otherwise
+     * @param width the desired image width; this value is taken into account only if it is greater than zero and
+     *     less than the current image width
+     * @param height the desired image height; this value is taken into account only if it is greater than zero and
+     *     less than the current image height
+     * @param keepAspectRatio {@code true} to preserve aspect ratio when resizing the image, {@code false}
+     *     otherwise
      * @param quality the desired compression quality
      * @param context the XWiki context
      * @return the transformed image
@@ -296,13 +296,13 @@ public class ImagePlugin extends XWikiDefaultPlugin
      * compression quality. This helps decreasing the time needed to download the image attachment.
      *
      * @param attachment the image to be shrunk
-     * @param requestedWidth the desired image width; this value is taken into account only if it is greater than zero
-     *            and less than the current image width
-     * @param requestedHeight the desired image height; this value is taken into account only if it is greater than zero
-     *            and less than the current image height
-     * @param keepAspectRatio {@code true} to preserve the image aspect ratio even when both requested dimensions are
-     *            properly specified (in this case the image will be resized to best fit the rectangle with the
-     *            requested width and height), {@code false} otherwise
+     * @param requestedWidth the desired image width; this value is taken into account only if it is greater than
+     *     zero and less than the current image width
+     * @param requestedHeight the desired image height; this value is taken into account only if it is greater than
+     *     zero and less than the current image height
+     * @param keepAspectRatio {@code true} to preserve the image aspect ratio even when both requested dimensions
+     *     are properly specified (in this case the image will be resized to best fit the rectangle with the requested
+     *     width and height), {@code false} otherwise
      * @param requestedQuality the desired compression quality
      * @param context the XWiki context
      * @return the modified image attachment
@@ -332,7 +332,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
         RenderedImage shrunkImage = this.imageProcessor.scaleImage(image, dimensions[0], dimensions[1]);
 
         // Create an image attachment for the shrunk image.
-        XWikiAttachment thumbnail = (XWikiAttachment) attachment.clone();
+        XWikiAttachment thumbnail = attachment.clone();
         thumbnail.loadAttachmentContent(context);
 
         OutputStream acos = thumbnail.getAttachment_content().getContentOutputStream();
@@ -355,13 +355,13 @@ public class ImagePlugin extends XWikiDefaultPlugin
      *
      * @param currentWidth the current image width
      * @param currentHeight the current image height
-     * @param requestedWidth the desired image width; this value is taken into account only if it is greater than zero
-     *            and less than the current image width
-     * @param requestedHeight the desired image height; this value is taken into account only if it is greater than zero
-     *            and less than the current image height
-     * @param keepAspectRatio {@code true} to preserve the image aspect ratio even when both requested dimensions are
-     *            properly specified (in this case the image will be resized to best fit the rectangle with the
-     *            requested width and height), {@code false} otherwise
+     * @param requestedWidth the desired image width; this value is taken into account only if it is greater than
+     *     zero and less than the current image width
+     * @param requestedHeight the desired image height; this value is taken into account only if it is greater than
+     *     zero and less than the current image height
+     * @param keepAspectRatio {@code true} to preserve the image aspect ratio even when both requested dimensions
+     *     are properly specified (in this case the image will be resized to best fit the rectangle with the requested
+     *     width and height), {@code false} otherwise
      * @return new width and height values
      */
     private int[] reduceImageDimensions(int currentWidth, int currentHeight, int requestedWidth, int requestedHeight,

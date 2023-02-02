@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.plugin.image;
 
-import java.awt.Image;
+import java.awt.*;
 import java.awt.image.RenderedImage;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -57,11 +57,11 @@ import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the {@link ImagePlugin} class.
- * 
+ *
  * @version $Id$
  */
 @OldcoreTest
-public class ImagePluginTest
+class ImagePluginTest
 {
     private static final byte[] IMAGE_CONTENT =
         Base64.decodeBase64("iVBORw0KGgoAAAANSUhEUgAAAJYAAAA8CAMAAACzWLNYAAACZFBMVEXUVQD////+"
@@ -98,7 +98,8 @@ public class ImagePluginTest
             + "Q7NYJ8BSX8UPAG2iDA7NRlcMsR+BEv/dtFryk0SdvytG/RgXMu+OMwX4KVDzM7DJ"
             + "lmNfyPKNsFaOdX1t7fD6ll8CNTuhxZFjX1/HGV1f52zl15GX/d/i/J4tmMYfqUBN"
             + "eyl/ej2wRnfoItr8l/3WeLn4PXSq3EbDXz2j/DTy9z++V3ViJlSzrGa9K5M1tdpX"
-            + "bwl+otAu7U4p4/Hv5kPqQhwJx0cWWWSRRRZZZNH4DzmZwO7NW2cKAAAAAElFTkSu" + "QmCC");
+            + "bwl+otAu7U4p4/Hv5kPqQhwJx0cWWWSRRRZZZNH4DzmZwO7NW2cKAAAAAElFTkSu"
+            + "QmCC");
 
     @InjectMockitoOldcore
     private MockitoOldcore oldCore;
@@ -108,7 +109,7 @@ public class ImagePluginTest
     private ImageProcessor imageProcessor;
 
     @BeforeEach
-    public void configure() throws Exception
+    void configure() throws Exception
     {
         XWiki xwiki = this.oldCore.getSpyXWiki();
         doReturn("10").when(xwiki).Param("xwiki.plugin.image.cache.capacity");
@@ -124,16 +125,16 @@ public class ImagePluginTest
     }
 
     @Test
-    public void testDownloadAttachmentWithUnsupportedFileType()
+    void downloadAttachmentWithUnsupportedFileType()
     {
         XWikiAttachment attachment = mock(XWikiAttachment.class);
         when(attachment.getMimeType()).thenReturn("image/notsupported");
         when(attachment.getDate()).thenReturn(new Date(0));
-        assertSame(attachment, plugin.downloadAttachment(attachment, new XWikiContext()));
+        assertSame(attachment, this.plugin.downloadAttachment(attachment, new XWikiContext()));
     }
 
     @Test
-    public void testCacheOfScaledAttachment() throws Exception
+    void cacheOfScaledAttachment() throws Exception
     {
         Date date = new Date(0);
 
@@ -164,19 +165,19 @@ public class ImagePluginTest
         Image image = mock(Image.class);
         when(image.getWidth(null)).thenReturn(400);
         when(image.getHeight(null)).thenReturn(300);
-        when(imageProcessor.readImage(attachmentInputStream)).thenReturn(image);
+        when(this.imageProcessor.readImage(attachmentInputStream)).thenReturn(image);
         RenderedImage renderedImage = mock(RenderedImage.class);
-        when(imageProcessor.scaleImage(image, 30, 30)).thenReturn(renderedImage);
+        when(this.imageProcessor.scaleImage(image, 30, 30)).thenReturn(renderedImage);
 
-        XWikiAttachment scaled = plugin.downloadAttachment(attachment, xcontext);
+        XWikiAttachment scaled = this.plugin.downloadAttachment(attachment, xcontext);
 
         String cacheKey = "0;null;0;30;30;false;-1.0";
         when(imageCache.get(cacheKey)).thenReturn(scaled);
 
         // Load again, this time from cache.
-        assertSame(scaled, plugin.downloadAttachment(attachment, xcontext));
+        assertSame(scaled, this.plugin.downloadAttachment(attachment, xcontext));
 
-        verify(imageProcessor, times(1)).writeImage(renderedImage, "image/png", .5F, attachmentOutputStream);
+        verify(this.imageProcessor, times(1)).writeImage(renderedImage, "image/png", .5F, attachmentOutputStream);
         verify(imageCache, times(1)).set(cacheKey, attachment);
     }
 

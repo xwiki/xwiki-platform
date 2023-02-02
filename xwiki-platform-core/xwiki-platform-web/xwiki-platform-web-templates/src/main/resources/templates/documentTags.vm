@@ -152,7 +152,7 @@
             #else
                 #displayAddForm()
             #end
-        </div>##
+        </div>
     #end
 </div>
     #if($tagErrorMessage != '')

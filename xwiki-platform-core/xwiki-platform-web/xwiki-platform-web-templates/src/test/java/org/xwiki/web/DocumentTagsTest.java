@@ -118,10 +118,10 @@ class DocumentTagsTest extends PageTest
     {
         // Add tags to the current document
         XWikiDocument currentDocument = this.context.getDoc();
-        BaseObject bo = new BaseObject();
-        bo.setXClassReference(new DocumentReference("xwiki", "XWiki", "TagClass"));
-        bo.setStringListValue("tags", Arrays.asList("tag1", "tag2"));
-        currentDocument.addXObject(bo);
+        BaseObject baseObject = new BaseObject();
+        baseObject.setXClassReference(new DocumentReference("xwiki", "XWiki", "TagClass"));
+        baseObject.setStringListValue("tags", Arrays.asList("tag1", "tag2"));
+        currentDocument.addXObject(baseObject);
         this.xwiki.saveDocument(currentDocument, this.context);
 
         TemplateManager templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);
@@ -153,10 +153,10 @@ class DocumentTagsTest extends PageTest
 
         // Add tags to the current document
         XWikiDocument currentDocument = this.context.getDoc();
-        BaseObject bo = new BaseObject();
-        bo.setXClassReference(new DocumentReference("xwiki", "XWiki", "TagClass"));
-        bo.setStringListValue("tags", Arrays.asList("tag1", "tag2"));
-        currentDocument.addXObject(bo);
+        BaseObject baseObject = new BaseObject();
+        baseObject.setXClassReference(new DocumentReference("xwiki", "XWiki", "TagClass"));
+        baseObject.setStringListValue("tags", Arrays.asList("tag1", "tag2"));
+        currentDocument.addXObject(baseObject);
         this.xwiki.saveDocument(currentDocument, this.context);
 
         TemplateManager templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);

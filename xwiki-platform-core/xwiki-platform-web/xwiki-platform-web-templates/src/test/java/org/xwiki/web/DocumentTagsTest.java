@@ -144,4 +144,41 @@ class DocumentTagsTest extends PageTest
             + "</span> "
             + "</div>"));
     }
+
+    @Test
+    void displayTagsWhenEditRightsAndTagPluginAvailableAndTags() throws Exception
+    {
+        // Give edit rights ($hasEdit = true)
+        when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(Right.EDIT)).thenReturn(true);
+
+        // Add tags to the current document
+        XWikiDocument currentDocument = this.context.getDoc();
+        BaseObject bo = new BaseObject();
+        bo.setXClassReference(new DocumentReference("xwiki", "XWiki", "TagClass"));
+        bo.setStringListValue("tags", Arrays.asList("tag1", "tag2"));
+        currentDocument.addXObject(bo);
+        this.xwiki.saveDocument(currentDocument, this.context);
+
+        TemplateManager templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);
+        // Remove extra spaces to make it easy to assert the result below.
+        String result = templateManager.render("documentTags.vm").trim().replaceAll("\\s+", " ");
+
+        // Verify that the generated HTML matches the expectations:
+        // - The tag label is displayed
+        // - The tags after the tag label
+        // - The "+" link is displayed since the user has edit rights
+        assertThat(result, matchesPattern("\\Q<div class=\"doc-tags\" id=\"xdocTags\"> core.tags.list.label "
+        + "<span class=\"tag-wrapper\"> <span class=\"tag\">"
+        + "<a href=\"/xwiki/bin/view/Main/Tags?do=viewTag&amp;tag=tag1\">tag1</a></span> "
+        + "<span class=\"separator\">[</span>"
+        + "<a href=\"/xwiki/bin/view/space/page?xpage=documentTags&amp;xaction=delete&amp;tag=tag1&amp;form_token=&amp;xredirect=%2Fxwiki%2Fbin%2Fview%2Fspace%2Fpage%23xdocTags\" "
+        + "class=\"tag-tool tag-delete\" title=\"core.tags.remove.tooltip\">X</a><span class=\"separator\">]</span></span> "
+        + "<span class=\"tag-wrapper\"> <span class=\"tag\">"
+        + "<a href=\"/xwiki/bin/view/Main/Tags?do=viewTag&amp;tag=tag2\">tag2</a></span> "
+        + "<span class=\"separator\">[</span>"
+        + "<a href=\"/xwiki/bin/view/space/page?xpage=documentTags&amp;xaction=delete&amp;tag=tag2&amp;form_token=&amp;xredirect=%2Fxwiki%2Fbin%2Fview%2Fspace%2Fpage%23xdocTags\" "
+        + "class=\"tag-tool tag-delete\" title=\"core.tags.remove.tooltip\">X</a><span class=\"separator\">]</span></span> "
+        + "<div class=\"tag-tool tag-add\"> <a href=\"/xwiki/bin/view/space/page?showTagAddForm=true#xdocTags\" "
+        + "title=\"core.tags.add.tooltip\" rel=\"nofollow\">[+]</a> </div> </div>"));
+    }
 }

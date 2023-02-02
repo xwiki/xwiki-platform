@@ -372,6 +372,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
         if (keepAspectRatio || requestedWidth <= 0 || requestedHeight <= 0) {
             dimensions = reduceImageDimensions(currentWidth, currentHeight, requestedWidth, requestedHeight);
         } else if (requestedWidth > currentWidth || requestedHeight > currentHeight) {
+            // Resize the image to preserve the requested image ratio while preventing outscaling.
             dimensions = reduceImageDimensions(requestedWidth, requestedHeight, currentWidth, currentHeight);
         } else {
             dimensions = new int[] { requestedWidth, requestedHeight };
@@ -381,39 +382,38 @@ public class ImagePlugin extends XWikiDefaultPlugin
     }
 
     /**
-     * Reduce the image of dimension {@code currentWidth*currentHeight} so that it fits a box of dimension
-     * {@code requestedWidth*requestedHeight} while preserving its current dimensions. If {@code requestedWidth} or
-     * {@code requestedHeight} is 0, negative, or larger than respectively {@code currentWidth} and
-     * {@code currentHeight}, it is ignored.
+     * Reduce the image of dimension {@code baseWidth*baseHeight} so that it fits a box of dimension
+     * {@code targetWidth*targetHeight} while preserving its current dimensions. If {@code targetWidth} or
+     * {@code targetHeight} is 0, negative, or larger than respectively {@code baseWidth} and
+     * {@code baseHeight}, it is ignored.
      *
-     * @param currentWidth the current width of the image
-     * @param currentHeight the current height of the image
-     * @param requestedWidth the requested width of the image
-     * @param requestedHeight the requested height of the image
-     * @return the new dimensions of the image, preserving to current aspect ratio.
+     * @param baseWidth the current width of the image
+     * @param baseHeight the current height of the image
+     * @param targetWidth the requested width of the image
+     * @param targetHeight the requested height of the image
+     * @return the new dimensions of the image, preserving to base aspect ratio
      */
-    private int[] reduceImageDimensions(int currentWidth, int currentHeight,
-        int requestedWidth, int requestedHeight)
+    private int[] reduceImageDimensions(int baseWidth, int baseHeight, int targetWidth, int targetHeight)
     {
-        int width = currentWidth;
-        int height = currentHeight;
+        int width = baseWidth;
+        int height = baseHeight;
 
-        double aspectRatio = (double) currentWidth / (double) currentHeight;
+        double aspectRatio = (double) baseWidth / (double) baseHeight;
         // Ignore the width if it is not given or too large, i.e., larger than the current width or larger than the
         // width derived from the requested height.
-        if (requestedWidth <= 0 || requestedWidth >= currentWidth
-            || (requestedHeight > 0 && requestedWidth > (int) (requestedHeight * aspectRatio)))
+        if (targetWidth <= 0 || targetWidth >= baseWidth
+            || (targetHeight > 0 && targetWidth > (int) (targetHeight * aspectRatio)))
         {
             // Ignore the requested width. Check the requested height.
-            if (requestedHeight > 0 && requestedHeight < currentHeight) {
+            if (targetHeight > 0 && targetHeight < baseHeight) {
                 // Reduce the height, keeping aspect ratio.
-                width = (int) (requestedHeight * aspectRatio);
-                height = requestedHeight;
+                width = (int) (targetHeight * aspectRatio);
+                height = targetHeight;
             }
         } else {
             // Ignore the requested height. Reduce the width, keeping aspect ratio.
-            width = requestedWidth;
-            height = (int) (requestedWidth / aspectRatio);
+            width = targetWidth;
+            height = (int) (targetWidth / aspectRatio);
         }
 
         return new int[] { width, height };

@@ -154,42 +154,60 @@ $menuTemplateDoc.content.replace('{', '')
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery'], function($) {
+      <code>define('menu-ui-translation-keys', {
+  prefix: 'menu.ui.',
+  keys: [
+    "openSubMenu",
+    "closeSubMenu"
+  ]
+});
+require(['jquery'], function($) {
   // It's not possible to write a CSS selector that targets list items containing lists so we rely on JavaScript.
   // The 'dropdown' CSS class is used only to display the down/left arrow.
-  $('.menu-horizontal li ul').parent().addClass('xDropdown');
+  $('.menu-horizontal li ul,.menu-vertical li ul').parent().addClass('xDropdown');
 
   // Make sure the menu separators are really empty.
   $('.menu-horizontal, .menu-vertical').find('li &gt; br:first-child').remove();
 
-  //Make sure there is no simple text content. There needs to be an indexable object instead inside of each menu
-  $('.menu-horizontal .xDropdown').each(function(){
+  $('.menu-vertical.collapsible').each(function(){
+    var open = $(this).hasClass('open');
+    $(this).find('li ul').each(function() {
+      $(this).addClass('xDropdown-menu').parent().addClass('xDropdown' + (open ? ' open' : ''));
+    });
+  });
+
+  $('.menu-horizontal .xDropdown,.menu-vertical .xDropdown').each(function(){
     console.log("FoundElement.");
     var dropDownHeader = this.ownerDocument.createElement("div");
     $(dropDownHeader).addClass("xDropdown-header");
     var dropDownButton = this.ownerDocument.createElement("button");
     $(dropDownButton).addClass("xDropdown-header-toggle");
-    $(dropDownButton).setAttribute('title',"Open menu");
+    require(['xwiki-l10n!menu-ui-translation-keys'], function(l10n) {
+      if($(dropDownButton).parent().parent().hasClass('open')){
+        $(dropDownButton).attr('title',l10n['closeSubMenu']);
+      }else{
+        $(dropDownButton).attr('title',l10n['openSubMenu']);
+      }
+    });
+
+    dropDownButton.addEventListener('click',function(){
+      console.log("Clicked toggle button.");
+      //Swaps the state of the submenu.
+      var toggable = $(this).parent().parent();
+      toggable.toggleClass('open');
+      $(dropDownButton).attr('title',"Open menu");
+      require(['xwiki-l10n!menu-ui-translation-keys'], function(l10n) {
+        if(toggable.hasClass('open')){
+          $(dropDownButton).attr('title',l10n['closeSubMenu']);
+        }else{
+          $(dropDownButton).attr('title',l10n['openSubMenu']);
+        }
+      });
+    });
     dropDownHeader.append($(this).contents()[0]);
     dropDownHeader.append(dropDownButton);
     $(this).prepend(dropDownHeader);
-  });
-
-  // Collapsible menu behavior.
-  $('.menu-vertical.collapsible').each(function(){
-    var open = $(this).hasClass('open');
-    $(this).find('li ul').each(function() {
-      $(this).addClass('xDropdown-menu').parent().addClass('xDropdown' + (open ? ' open' : ''));
-      // Wrap everything (including text nodes) before the sub-menu in a DIV that will toggle its state.
-      var toggle = this.ownerDocument.createElement('div');
-      $(this).parent().prepend(toggle);
-      for(var next = toggle.nextSibling; next != this; next = toggle.nextSibling) {
-        toggle.appendChild(next);
-      }
-      $(toggle).addClass('xDropdown-toggle').on('click', function() {
-        $(this).parent().toggleClass('open');
-      });
-    });
+    $(dropDownHeader).next().addClass('xDropdown-menu');
   });
 
   // In case of horizontal responsive menus, make sub-submenus in the navbar work on mobile devices
@@ -421,7 +439,7 @@ $menuTemplateDoc.content.replace('{', '')
   z-index: 1000;
 }
 
-.skin-colibri .menu-horizontal li:hover &gt; ul, li:focus-within &gt; ul {
+.skin-colibri .menu-horizontal li:hover &gt; ul {
   display: block;
 }
 
@@ -466,7 +484,7 @@ $menuTemplateDoc.content.replace('{', '')
   cursor: pointer;
 }
 
-.skin-colibri .menu-vertical .xDropdown-toggle:hover, .xDropdown-toggle:focus-within {
+.skin-colibri .menu-vertical .xDropdown-toggle:hover {
   background-color: $theme.highlightColor;
 }
 
@@ -611,6 +629,29 @@ $menuTemplateDoc.content.replace('{', '')
   }
 }
 .menu {
+  .xDropdown{
+    &gt; .xDropdown-header &gt; .xDropdown-header-toggle:before{
+        transform: rotate(90deg);
+      }
+    &amp;.open &gt; .xDropdown-header &gt; .xDropdown-header-toggle:before{
+      transform: rotate(0);
+    }
+  }
+  .xDropdown-header-toggle{
+    background: transparent;
+    border:none;
+    border-radius: @border-radius-base;
+    margin: (@line-height-computed / 4);
+    line-height: (@line-height-computed / 2) + 2;
+    &amp;:hover, :focus{
+      background-color: @dropdown-bg;
+    }
+    &amp;:before{
+      .caret;
+      margin-left: 0px;
+      content: '';
+    }
+  }
   &amp;.menu-vertical {
     ul {
       list-style-type: none;
@@ -632,32 +673,8 @@ $menuTemplateDoc.content.replace('{', '')
     .xDropdown-menu {
       display: none;
     }
-    .xDropdown-toggle {
-      cursor: pointer;
-      position: relative;
-      &amp;:hover, &amp;:focus-within {
-        background-color: @nav-link-hover-bg;
-      }
-      &amp;:after {
-        .caret;
-        content: '';
-        /* Positioning */
-        position: absolute;
-        margin-top: @line-height-computed / 3;
-        right: 1em;
-        /* Collapsed arrow style */
-        border-bottom: 4px solid transparent;
-        border-right: 4px solid;
-        border-top: 4px solid transparent;
-      }
-    }
     .xDropdown.open {
-      &gt; .xDropdown-toggle:after {
-        /* Expanded arrow style */
-        .caret;
-        margin-top: @line-height-computed / 2;
-      }
-      &gt; .xDropdown-menu {
+      &gt; ul {
         display: block;
       }
     }
@@ -671,6 +688,14 @@ $menuTemplateDoc.content.replace('{', '')
     .box-shadow(0 2px 8px rgba(0,0,0,0.4) inset);
     min-height: @navbar-height;
     padding-left: 25px;
+    .xDropdown.open {
+      &gt; ul {
+        display: block;
+      }
+    }
+    .xDropdown:hover &gt; .xDropdown-header &gt; .xDropdown-header-toggle:before{
+      transform: rotate(0);
+    }
     &amp; &gt; ul {
       padding-left: 0;
       list-style-type: none;
@@ -686,7 +711,7 @@ $menuTemplateDoc.content.replace('{', '')
         }
         line-height: @line-height-computed;
         color: @navbar-default-link-color;
-        &amp;:hover, &amp;:focus-within {
+        &amp;:hover {
           color: @navbar-default-link-hover-color;
           background-color: @navbar-default-link-hover-bg;
           background-color: @navbar-default-link-active-bg;
@@ -700,7 +725,7 @@ $menuTemplateDoc.content.replace('{', '')
         /* Links inside menu */
         a {
           color: @navbar-default-link-color;
-          &amp;:hover, &amp;:focus-within {
+          &amp;:hover{
             text-decoration: none;
           }
         }
@@ -709,6 +734,17 @@ $menuTemplateDoc.content.replace('{', '')
           /* Limit the height to the nav height minus the padding and minus border */
           max-height: @navbar-height - (2 * @navbar-padding-vertical) - 2px;
           overflow: hidden;
+          &amp;.xDropdown-header{
+            /* No border on the dropdown header */
+            max-height: @navbar-height - (2 * @navbar-padding-vertical);
+          }
+        }
+        /*Navbar headers.*/
+        &amp; &gt; .xDropdown-header &gt; .xDropdown-header-toggle{
+          &amp;:hover, &amp;:focus{
+            /* Change background color of the caret when hovering on the navbar.*/
+            background-color: @navbar-default-bg;
+          }
         }
         /* Separator vertical inside menu */
         &amp;:empty {
@@ -753,7 +789,7 @@ $menuTemplateDoc.content.replace('{', '')
             color: @dropdown-link-color;
             overflow: hidden;
             text-overflow: ellipsis; // Displaying ... if the text is too long
-            &amp;:hover, &amp;:focus-within {
+            &amp;:hover {
               /* &amp;:extend(.dropdown-menu&gt;li&gt;a:hover); */
               text-decoration: none;
               color: @dropdown-link-hover-color;
@@ -771,7 +807,7 @@ $menuTemplateDoc.content.replace('{', '')
             color: @dropdown-link-color;
             /* Empty dropdowns should have height in order to display the arrow */
             min-height: 2 * @font-size-base;
-            &amp;:hover, &amp;:focus-within {
+            &amp;:hover{
               text-decoration: none;
               color: @dropdown-link-hover-color;
               background-color: @dropdown-link-hover-bg;
@@ -803,23 +839,8 @@ $menuTemplateDoc.content.replace('{', '')
     /* Stylization: Generic */
     li {
       /* Display submenus on hover */
-      &amp;:hover &gt; ul, &amp;:focus-within &gt; ul {
+      &amp;:hover &gt; ul {
         display: block;
-      }
-      /* Display an arrow for expandable items */
-      &amp;.xDropdown {
-        &amp; .xDropdown-header {
-          display: inline-block;
-          &amp; .xDropdown-header-toggle{
-            all: inherit;
-            .caret;
-            content: '';
-            margin-left: .5em;
-            &amp;:focus{
-              outline:unset;
-            }
-          }
-        }
       }
     }
     /* The only way to have a menu with more than 2 levels without JavaScript is to use a fixed width. */
@@ -864,14 +885,14 @@ $menuTemplateDoc.content.replace('{', '')
             /* Links inside menu */
             a {
               color: @navbar-default-link-color;
-              &amp;:hover, &amp;:focus-within {
+              &amp;:hover {
                 /* Preserve the styling from dropdown */
               }
             }
             /* Submenus inside menu */
             &amp;.xDropdown {
               color: @navbar-default-link-color;
-              &amp;:hover, &amp;:focus-within {
+              &amp;:hover {
                 background-color: transparent;
                 color: inherit;
               }

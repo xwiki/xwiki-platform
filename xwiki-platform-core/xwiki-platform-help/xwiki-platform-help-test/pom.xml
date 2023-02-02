@@ -41,7 +41,7 @@
     <profile>
       <id>docker</id>
       <modules>
-        <module>xwiki-platform-panels-test-docker</module>
+        <module>xwiki-platform-help-test-docker</module>
       </modules>
     </profile>
   </profiles>

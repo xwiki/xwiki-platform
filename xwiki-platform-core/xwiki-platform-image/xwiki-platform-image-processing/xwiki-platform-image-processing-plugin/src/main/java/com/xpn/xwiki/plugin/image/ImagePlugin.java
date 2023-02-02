@@ -367,33 +367,53 @@ public class ImagePlugin extends XWikiDefaultPlugin
     private int[] reduceImageDimensions(int currentWidth, int currentHeight, int requestedWidth, int requestedHeight,
         boolean keepAspectRatio)
     {
-        double aspectRatio = (double) currentWidth / (double) currentHeight;
+        int[] dimensions;
+        // Keep the aspect ratio when requested or width or height are missing.
+        if (keepAspectRatio || requestedWidth <= 0 || requestedHeight <= 0) {
+            dimensions = reduceImageDimensions(currentWidth, currentHeight, requestedWidth, requestedHeight);
+        } else if (requestedWidth > currentWidth || requestedHeight > currentHeight) {
+            dimensions = reduceImageDimensions(requestedWidth, requestedHeight, currentWidth, currentHeight);
+        } else {
+            dimensions = new int[] { requestedWidth, requestedHeight };
+        }
 
+        return dimensions;
+    }
+
+    /**
+     * Reduce the image of dimension {@code currentWidth*currentHeight} so that it fits a box of dimension
+     * {@code requestedWidth*requestedHeight} while preserving its current dimensions. If {@code requestedWidth} or
+     * {@code requestedHeight} is 0, negative, or larger than respectively {@code currentWidth} and
+     * {@code currentHeight}, it is ignored.
+     *
+     * @param currentWidth the current width of the image
+     * @param currentHeight the current height of the image
+     * @param requestedWidth the requested width of the image
+     * @param requestedHeight the requested height of the image
+     * @return the new dimensions of the image, preserving to current aspect ratio.
+     */
+    private int[] reduceImageDimensions(int currentWidth, int currentHeight,
+        int requestedWidth, int requestedHeight)
+    {
         int width = currentWidth;
         int height = currentHeight;
 
-        // Keep the aspect ratio when requested or width or height are missing.
-        if (keepAspectRatio || requestedWidth <= 0 || requestedHeight <= 0) {
-            // Ignore the width if it is not given or too large, i.e., larger than the current width or larger than the
-            // width derived from the requested height.
-            if (requestedWidth <= 0 || requestedWidth >= currentWidth
-                || (requestedHeight > 0 && requestedWidth > (int) (requestedHeight * aspectRatio)))
-            {
-                // Ignore the requested width. Check the requested height.
-                if (requestedHeight > 0 && requestedHeight < currentHeight) {
-                    // Reduce the height, keeping aspect ratio.
-                    width = (int) (requestedHeight * aspectRatio);
-                    height = requestedHeight;
-                }
-            } else {
-                // Ignore the requested height. Reduce the width, keeping aspect ratio.
-                width = requestedWidth;
-                height = (int) (requestedWidth / aspectRatio);
+        double aspectRatio = (double) currentWidth / (double) currentHeight;
+        // Ignore the width if it is not given or too large, i.e., larger than the current width or larger than the
+        // width derived from the requested height.
+        if (requestedWidth <= 0 || requestedWidth >= currentWidth
+            || (requestedHeight > 0 && requestedWidth > (int) (requestedHeight * aspectRatio)))
+        {
+            // Ignore the requested width. Check the requested height.
+            if (requestedHeight > 0 && requestedHeight < currentHeight) {
+                // Reduce the height, keeping aspect ratio.
+                width = (int) (requestedHeight * aspectRatio);
+                height = requestedHeight;
             }
         } else {
-            // Reduce both width and height, possibly loosing aspect ratio.
-            width = Math.min(requestedWidth, currentWidth);
-            height = Math.min(requestedHeight, currentHeight);
+            // Ignore the requested height. Reduce the width, keeping aspect ratio.
+            width = requestedWidth;
+            height = (int) (requestedWidth / aspectRatio);
         }
 
         return new int[] { width, height };

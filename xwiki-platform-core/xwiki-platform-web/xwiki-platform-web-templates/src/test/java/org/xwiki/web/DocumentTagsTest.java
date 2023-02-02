@@ -109,8 +109,8 @@ class DocumentTagsTest extends PageTest
         // - No tag is listed after the tag label
         // - The "+" link is displayed since the user has edit rights
         assertThat(result, matchesPattern("\\Q<div class=\"doc-tags\" id=\"xdocTags\"> core.tags.list.label "
-            + "<div class=\"tag-tool tag-add\"><a href=\"\\E.*\"\\Q title=\"core.tags.add.tooltip\" "
-            + "rel=\"nofollow\">[+]</a></div> </div>\\E"));
+            + "<div class=\"tag-tool tag-add\"> <a href=\"/xwiki/bin/view/space/page?showTagAddForm=true#xdocTags\" title=\"core.tags.add.tooltip\" "
+            + "rel=\"nofollow\">[+]</a> </div> </div>"));
     }
 
     @Test

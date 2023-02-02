@@ -306,11 +306,10 @@ class MacrosTest extends PageTest
         SecurityScriptService securityScriptService = mock(SecurityScriptService.class);
         this.oldcore.getMocker().registerComponent(ScriptService.class, "security", securityScriptService);
         URLSecurityScriptService urlSecurityScriptService = mock(URLSecurityScriptService.class);
-        this.oldcore.getMocker().registerComponent(ScriptService.class, "security.url", urlSecurityScriptService);
         when(securityScriptService.get("url")).thenReturn(urlSecurityScriptService);
 
-        String htmlElement = "input";
-        String attributeName = "value";
+        String htmlElement = "form";
+        String attributeName = "action";
         String url = "javascript:alert('foobar')";
         String fallbackUrl = "xwiki/bin/view/Sandbox";
         String script = "#getSanitizedURLAttributeValue($myHtmlElement,$myAttributeName,$myUrl,$myFallback,"
@@ -348,7 +347,7 @@ class MacrosTest extends PageTest
         out = new StringWriter();
         this.velocityManager.evaluate(out, "getSanitizedURLAttributeValue", new StringReader(script));
         assertEquals("", velocityContext.get("sanitizedResult"));
-        // This should not have been called this time.
+        // Since the URLSecurityScriptService returns false for both URLs the HTMLScriptService should not be called.
         verify(htmlScriptService, times(2)).isAttributeSafe(htmlElement, attributeName, fallBackUri.toString());
 
         // Fourth check: the given URL is valid and there's no fallback
@@ -365,7 +364,7 @@ class MacrosTest extends PageTest
         this.velocityManager.evaluate(out, "getSanitizedURLAttributeValue", new StringReader(script));
         assertEquals("http://xwiki.org/?query=foo&#38;bar=%20space%4F#éâ", velocityContext.get("sanitizedResult"));
 
-        // Fourth check: the given URL is not valid and there's no fallback
+        // Fifth check: the given URL is not valid and there's no fallback
         when(urlSecurityScriptService.parseToSafeURI(url)).thenReturn(null);
         out = new StringWriter();
         this.velocityManager.evaluate(out, "getSanitizedURLAttributeValue", new StringReader(script));

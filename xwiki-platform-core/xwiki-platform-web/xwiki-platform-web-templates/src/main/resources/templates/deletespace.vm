@@ -29,8 +29,9 @@
     #end
     #set ($cancelURL = $doc.getURL())
     #if ($request.xredirect)
+      ## We don't sanitize this as it will be handled by the server
       #set ($redirectparam = "&amp;xredirect=$escapetool.url($request.xredirect)")
-      #set ($cancelURL = $request.xredirect)
+      #getSanitizedURLAttributeValue('a','href',$request.xredirect,$doc.getURL(),$cancelURL)
     #end
     #if ($xwiki.hasRecycleBin())
       #set ($confirmationMessage = $services.localization.render('core.space.recyclebin.confirm', ["<em>${escapetool.xml($doc.space)}</em>"]))

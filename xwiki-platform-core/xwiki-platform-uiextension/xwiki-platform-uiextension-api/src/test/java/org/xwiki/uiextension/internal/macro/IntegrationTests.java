@@ -36,6 +36,7 @@ import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.uiextension.UIExtension;
+import org.xwiki.uiextension.UIExtensionManager;
 
 import static org.mockito.Mockito.when;
 
@@ -66,19 +67,23 @@ public class IntegrationTests implements RenderingTests
         componentManager.registerMockComponent(ContextualAuthorizationManager.class);
 
         // Inject ui extensions
-        UIExtension testextension1 = componentManager.registerMockComponent(UIExtension.class, "testextension1");
+        UIExtension testextension1 = componentManager.registerMockComponent(UIExtension.class, "testextension1hint");
         when(testextension1.getId()).thenReturn("testextension1");
         when(testextension1.getExtensionPointId()).thenReturn("extensionpoint");
         when(testextension1.getParameters()).thenReturn(Map.of());
         when(testextension1.execute(true)).thenReturn(new WordBlock("extension1"));
         when(testextension1.execute(false)).thenReturn(new ParagraphBlock(List.of(new WordBlock("extension1"))));
         when(testextension1.execute()).thenReturn(new ParagraphBlock(List.of(new WordBlock("extension1"))));
-        UIExtension testextension2 = componentManager.registerMockComponent(UIExtension.class, "testextension2");
+        UIExtension testextension2 = componentManager.registerMockComponent(UIExtension.class, "testextension2hint");
         when(testextension2.getId()).thenReturn("testextension2");
         when(testextension2.getExtensionPointId()).thenReturn("extensionpoint");
         when(testextension2.getParameters()).thenReturn(Map.of());
         when(testextension2.execute(true)).thenReturn(new WordBlock("extension2"));
         when(testextension2.execute(false)).thenReturn(new ParagraphBlock(List.of(new WordBlock("extension2"))));
         when(testextension2.execute()).thenReturn(new ParagraphBlock(List.of(new WordBlock("extension2"))));
+
+        // Provider a custom UIExtensionManager to have a stable list
+        UIExtensionManager manager = componentManager.registerMockComponent(UIExtensionManager.class, "extensionpoint");
+        when(manager.get("extensionpoint")).thenReturn(List.of(testextension1, testextension2));
     }
 }

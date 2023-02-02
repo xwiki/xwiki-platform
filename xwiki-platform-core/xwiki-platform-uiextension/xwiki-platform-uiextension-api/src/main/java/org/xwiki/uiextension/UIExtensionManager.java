@@ -20,6 +20,7 @@
 package org.xwiki.uiextension;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.xwiki.component.annotation.Role;
 
@@ -39,4 +40,18 @@ public interface UIExtensionManager
      * @return the list of {@link UIExtension} for the given Extension Point
      */
     List<UIExtension> get(String extensionPointId);
+
+    /**
+     * Get the UI extension from the id.
+     * 
+     * @param id the identifier of the UI extension
+     * @return the UI extension
+     * @since 15.1RC1
+     * @since 14.10.5
+     * @since 14.4.4
+     */
+    default Optional<UIExtension> getUIExtension(String id)
+    {
+        return Optional.empty();
+    }
 }

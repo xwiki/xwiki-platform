@@ -21,6 +21,7 @@ package org.xwiki.uiextension.internal;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -46,6 +47,8 @@ import org.xwiki.uiextension.UIExtensionManager;
 @Singleton
 public class DefaultUIExtensionManager implements UIExtensionManager
 {
+    private static final String FAILED_INSTANCES = "Failed to lookup UIExtension instances";
+
     /**
      * The logger to log.
      */
@@ -98,9 +101,28 @@ public class DefaultUIExtensionManager implements UIExtensionManager
             // soon as a UIExtension component is modified
             this.asyncContext.useComponent(UIExtension.class);
         } catch (ComponentLookupException e) {
-            this.logger.error("Failed to lookup UIExtension instances", e);
+            this.logger.error(FAILED_INSTANCES, e);
         }
 
         return extensions;
+    }
+
+    @Override
+    public Optional<UIExtension> getUIExtension(String id)
+    {
+        ComponentManager componentManager = this.contextComponentManagerProvider.get();
+
+        try {
+            List<UIExtension> allExtensions = componentManager.getInstanceList(UIExtension.class);
+            for (UIExtension extension : allExtensions) {
+                if (id.equals(extension.getId())) {
+                    return Optional.of(extension);
+                }
+            }
+        } catch (ComponentLookupException e) {
+            this.logger.error(FAILED_INSTANCES, e);
+        }
+
+        return Optional.empty();
     }
 }

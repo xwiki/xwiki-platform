@@ -333,11 +333,11 @@
       </div>
       <input type="submit" class="btn btn-primary" value="$services.localization.render('yes')"/>
       #if("$!{request.xredirect}" != '')
-        #set($cancelUrl = "$request.xredirect")
+        #getSanitizedURLAttributeValue('a','href',$request.xredirect,$doc.getURL(),$cancelUrl)
       #else
-        #set($cancelUrl = $doc.getURL())
+        #set($cancelUrl = $escapetool.xml($doc.getURL()))
       #end
-      <a class="btn btn-default" href="$!{escapetool.xml(${cancelUrl})}">$services.localization.render('no')</a>
+      <a class="btn btn-default" href="$cancelUrl">$services.localization.render('no')</a>
     </form>
   #xwikimessageboxend()
 #end

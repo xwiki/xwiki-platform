@@ -1,3 +1,3 @@
 500:org.xwiki.tool.packager.internal.MavenBuildJarExtensionHandler
-500:org.xwiki.tool.packager.internal.MavenBuildThreadClassloaderExecutionContextInitializer
+org.xwiki.tool.packager.internal.PackagerComponentManagerInitializer
 org.xwiki.tool.utils.OldCoreHelper

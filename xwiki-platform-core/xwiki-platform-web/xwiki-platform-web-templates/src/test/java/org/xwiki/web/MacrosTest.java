@@ -21,19 +21,25 @@ package org.xwiki.web;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.URI;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.velocity.VelocityContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
+import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.script.SecurityScriptService;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.PageTest;
+import org.xwiki.url.script.URLSecurityScriptService;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.internal.XWikiDateTool;
+import org.xwiki.xml.html.script.HTMLScriptService;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
@@ -41,6 +47,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Integration tests for {@code macros.vm}.
@@ -286,5 +296,78 @@ class MacrosTest extends PageTest
             + "alt=\"Foo\" />"
             + "<a class=\"user-name\" href=\"/xwiki/bin/view/XWiki/Foo\">Foo</a>"
             + "</div>", out.toString().trim());
+    }
+
+    @Test
+    void getSanitizedURLAttributeValue() throws Exception
+    {
+        HTMLScriptService htmlScriptService = mock(HTMLScriptService.class);
+        this.oldcore.getMocker().registerComponent(ScriptService.class, "html", htmlScriptService);
+        SecurityScriptService securityScriptService = mock(SecurityScriptService.class);
+        this.oldcore.getMocker().registerComponent(ScriptService.class, "security", securityScriptService);
+        URLSecurityScriptService urlSecurityScriptService = mock(URLSecurityScriptService.class);
+        when(securityScriptService.get("url")).thenReturn(urlSecurityScriptService);
+
+        String htmlElement = "form";
+        String attributeName = "action";
+        String url = "javascript:alert('foobar')";
+        String fallbackUrl = "xwiki/bin/view/Sandbox";
+        String script = "#getSanitizedURLAttributeValue($myHtmlElement,$myAttributeName,$myUrl,$myFallback,"
+            + "$sanitizedResult)";
+
+        VelocityContext velocityContext = this.velocityManager.getVelocityContext();
+        velocityContext.put("myHtmlElement", htmlElement);
+        velocityContext.put("myAttributeName", attributeName);
+        velocityContext.put("myUrl", url);
+        velocityContext.put("myFallback", fallbackUrl);
+
+        URI fallBackUri = new URI(fallbackUrl);
+        when(urlSecurityScriptService.parseToSafeURI(url)).thenReturn(null);
+        when(urlSecurityScriptService.parseToSafeURI(fallbackUrl)).thenReturn(fallBackUri);
+        when(htmlScriptService.isAttributeSafe(htmlElement, attributeName, fallBackUri.toString())).thenReturn(true);
+
+        // First check: given URL is not secure according to security.url, so we fallback and the HTMLScriptService
+        // allows the fallback URL.
+        StringWriter out = new StringWriter();
+        this.velocityManager.evaluate(out, "getSanitizedURLAttributeValue", new StringReader(script));
+        verify(urlSecurityScriptService).parseToSafeURI(url);
+
+        assertEquals(fallbackUrl, velocityContext.get("sanitizedResult"));
+
+        // Second check: given URL is not secure according to security.url, so we fallback but the HTMLScriptService
+        // does not allow the fallback URL.
+        when(htmlScriptService.isAttributeSafe(htmlElement, attributeName, fallBackUri.toString())).thenReturn(false);
+        out = new StringWriter();
+        this.velocityManager.evaluate(out, "getSanitizedURLAttributeValue", new StringReader(script));
+        verify(htmlScriptService, times(2)).isAttributeSafe(htmlElement, attributeName, fallBackUri.toString());
+        assertEquals("", velocityContext.get("sanitizedResult"));
+
+        // Third check: both the given URL and the fallback URL are not secure according to security.url
+        when(urlSecurityScriptService.parseToSafeURI(fallbackUrl)).thenReturn(null);
+        out = new StringWriter();
+        this.velocityManager.evaluate(out, "getSanitizedURLAttributeValue", new StringReader(script));
+        assertEquals("", velocityContext.get("sanitizedResult"));
+        // Since the URLSecurityScriptService returns false for both URLs the HTMLScriptService should not be called.
+        verify(htmlScriptService, times(2)).isAttributeSafe(htmlElement, attributeName, fallBackUri.toString());
+
+        // Fourth check: the given URL is valid and there's no fallback
+        url = "http://xwiki.org/?query=foo&bar=%20space%4F#éâ";
+        fallbackUrl = "";
+        velocityContext.put("myUrl", url);
+        velocityContext.put("myFallback", fallbackUrl);
+
+        URI xwikiOrgURI = new URI(url);
+        when(urlSecurityScriptService.parseToSafeURI(url)).thenReturn(xwikiOrgURI);
+        when(htmlScriptService.isAttributeSafe(htmlElement, attributeName, xwikiOrgURI.toString())).thenReturn(true);
+
+        out = new StringWriter();
+        this.velocityManager.evaluate(out, "getSanitizedURLAttributeValue", new StringReader(script));
+        assertEquals("http://xwiki.org/?query=foo&#38;bar=%20space%4F#éâ", velocityContext.get("sanitizedResult"));
+
+        // Fifth check: the given URL is not valid and there's no fallback
+        when(urlSecurityScriptService.parseToSafeURI(url)).thenReturn(null);
+        out = new StringWriter();
+        this.velocityManager.evaluate(out, "getSanitizedURLAttributeValue", new StringReader(script));
+        assertEquals("", velocityContext.get("sanitizedResult"));
     }
 }

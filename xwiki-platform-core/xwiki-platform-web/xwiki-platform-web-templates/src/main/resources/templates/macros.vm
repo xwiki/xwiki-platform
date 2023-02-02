@@ -2978,3 +2978,42 @@ Recursive title display detected!##
     #end
   #end
 #end
+
+## The goal of this macro is to ensure to obtain a safe URL to inject in HTML, especially whenever the URL might come
+## from a parameter to avoid any XSS. This macro should not be used to check valid external links (e.g. link to an
+## external documentation page). Its main purpose is checking links in technical forms.
+## The macro performs two kinds of sanitation check:
+##   1. it checks if the html attribute value is safe according to HTMLElementSanitizer through the HtmlScriptService
+##   2. it checks if the given URL is safe according to the URLSecurityScriptService, which takes into account the
+##      trusted domains configuration in case of absolute URLs
+## and finally it returns an XML-escaped URL to be injected in HTML attribute.
+## Note that the macro performs checks both on the given URL value, but also on the fallback URL to avoid any security
+## issue.
+## The macro takes the following parameter:
+##    - $htmlElement: the name of the html element where the URL will be injected (e.g. 'a', 'input' or 'form')
+##    - $attributeName: the name of html attribute where the URL will be injected (e.g. 'href', 'value', or 'action')
+##    - $urlValue: the actual URL that should be injected (e.g. 'http://xwiki.org', '/xwiki/bin/view/Sandbox')
+##    - $fallbackUrl: the fallback URL that should be used if the $urlValue is not safe. This parameter can be empty
+##    - $resultValue: the velocity variable where to store the result. It will contain either an XML-escaped version of
+##                    $urlValue or of $fallbackUrl, or it will contain an empty value, if neither URLs are safe there
+## @since 14.10.4
+## @since 15.1RC1
+#macro (getSanitizedURLAttributeValue $htmlElement $attributeName $urlValue $fallbackUrl $resultValue)
+  #set ($useSafeURI = false)
+  #set ($safeURI = $services.security.url.parseToSafeURI($urlValue))
+  #if ("$!safeURI" != '' && $services.html.isAttributeSafe($htmlElement,$attributeName,$safeURI.toString()))
+    #set ($useSafeURI = true)
+  #elseif ("$!fallbackUrl" != '')
+    #set ($safeURI = $services.security.url.parseToSafeURI($fallbackUrl))
+    #if ("$!safeURI" != '' && $services.html.isAttributeSafe($htmlElement,$attributeName,$safeURI.toString()))
+      #set ($useSafeURI = true)
+    #end
+  #end
+
+  #set ($resultValue = $NULL)
+  #if ($useSafeURI)
+    #setVariable("$resultValue" $!{escapetool.xml($safeURI.toString())})
+  #else
+    #setVariable("$resultValue" '')
+  #end
+#end

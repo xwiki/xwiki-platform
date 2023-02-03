@@ -47,21 +47,23 @@ import com.xpn.xwiki.store.migration.hibernate.HibernateDataMigration;
  * regression has been fixed.
  *
  * @version $Id$
- * @since 15.0
- * @since 14.10.4
+ * @since 15.1RC
+ * @since 14.10.5
  */
 @Component
-@Named(R141004000XWIKI20575DataMigration.HINT)
+@Named(R141005000XWIKI20575XWIKI20619DataMigration.HINT)
 @Singleton
 // Note that we implement HibernateDataMigration and not DataMigration only because of XWIKI-19399
-public class R141004000XWIKI20575DataMigration implements HibernateDataMigration
+public class R141005000XWIKI20575XWIKI20619DataMigration implements HibernateDataMigration
 {
     /**
      * Hint of the migration.
      */
-    public static final String HINT = "R141004000XWIKI20575";
+    public static final String HINT = "R141005000XWIKI20575XWIKI20619";
 
-    private static final String DYNAMIC_FIELD_NAME = "*__";
+    private static final String DYNAMIC_FIELD_ROOT_NAME = "*__";
+
+    private static final String DYNAMIC_FIELD_PTBR_NAME = "*_pt_BR";
 
     @Inject
     private SolrInstance solrInstance;
@@ -93,13 +95,14 @@ public class R141004000XWIKI20575DataMigration implements HibernateDataMigration
     @Override
     public String getDescription()
     {
-        return "Empty the Solr Search Core to trigger indexing of pages for fixing a regression.";
+        return "Add potentially missing dynamic field and empty the Solr Search Core to trigger indexing of pages"
+            + " for fixing a regression.";
     }
 
     @Override
     public XWikiDBVersion getVersion()
     {
-        return new XWikiDBVersion(141004000);
+        return new XWikiDBVersion(141005000);
     }
 
     @Override
@@ -109,18 +112,30 @@ public class R141004000XWIKI20575DataMigration implements HibernateDataMigration
             Map<String, Map<String, Object>> dynamicFields =
                 this.solrSchemaUtils.getDynamicFields(SolrClientInstance.CORE_NAME, true);
 
-            if (!dynamicFields.containsKey(DYNAMIC_FIELD_NAME)) {
-                this.solrSchemaUtils.setField(SolrClientInstance.CORE_NAME, DYNAMIC_FIELD_NAME,
-                    DefaultSolrUtils.SOLR_TYPE_TEXT_GENERAL, true, "multiValued", true, "stored", true, "indexed",
-                    true);
-                this.solrSchemaUtils.commit(SolrClientInstance.CORE_NAME);
-            } else {
-                logger.info("The missing field was found, so the schema won't be updated.");
-            }
+            // Make sure the dynamic field for Local.ROOT is registered
+            maybeAddField(DYNAMIC_FIELD_ROOT_NAME, DefaultSolrUtils.SOLR_TYPE_TEXT_GENERAL, dynamicFields);
+
+            // Make sure the dynamic field for Local.ROOT is registered
+            maybeAddField(DYNAMIC_FIELD_PTBR_NAME, "text_pt_BR", dynamicFields);
+
             this.solrInstance.deleteByQuery("*:*");
             this.solrInstance.commit();
         } catch (SolrServerException | IOException | SolrException e) {
             throw new DataMigrationException("Error while performing Solr query to empty the search core", e);
+        }
+    }
+
+    private void maybeAddField(String name, String type, Map<String, Map<String, Object>> dynamicFields)
+        throws SolrException
+    {
+        if (!dynamicFields.containsKey(name)) {
+            this.solrSchemaUtils.setField(SolrClientInstance.CORE_NAME, name, type, true, "multiValued", true, "stored",
+                true, "indexed", true);
+            this.solrSchemaUtils.commit(SolrClientInstance.CORE_NAME);
+
+            this.logger.info("Missing dynamic field [{}] has been added.", name);
+        } else {
+            this.logger.info("Dynamic field [{}] was already defined.", name);
         }
     }
 

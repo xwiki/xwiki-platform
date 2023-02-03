@@ -132,11 +132,6 @@ public class Document extends Api
      */
     private EntityReferenceSerializer<String> localEntityReferenceSerializer;
 
-    /**
-     * Used to convert user references to string.
-     */
-    private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
-
     private DocumentRevisionProvider documentRevisionProvider;
 
     private ConfigurationSource configuration;
@@ -167,16 +162,6 @@ public class Document extends Api
         }
 
         return this.localEntityReferenceSerializer;
-    }
-
-    private EntityReferenceSerializer<String> getCompactWikiEntityReferenceSerializer()
-    {
-        if (this.compactWikiEntityReferenceSerializer == null) {
-            this.compactWikiEntityReferenceSerializer =
-                Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
-        }
-
-        return this.compactWikiEntityReferenceSerializer;
     }
 
     private DocumentRevisionProvider getDocumentRevisionProvider()

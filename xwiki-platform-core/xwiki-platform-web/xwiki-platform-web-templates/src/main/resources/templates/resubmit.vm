@@ -29,8 +29,8 @@ $response.addHeader( "X-FRAME-OPTIONS", "DENY" )
 <div class="main layoutsubsection">
 <div id="mainContentArea">
 #xwikimessageboxstart($services.localization.render('warning') $services.localization.render('csrf.confirmation'))
-#set($resubmit = "$!{escapetool.xml($request.getParameter('resubmit'))}")
-#set($xback = "$!{escapetool.xml($request.getParameter('xback'))}")
+#getSanitizedURLAttributeValue('form','action', $request.getParameter('resubmit'), '', $resubmit)
+#getSanitizedURLAttributeValue('a','href', $request.getParameter('xback'), $doc.getURL(), $xback)
 <form action="$resubmit" method="post">
   <div class="hidden">
     ## Valid CSRF token

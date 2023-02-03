@@ -106,6 +106,8 @@ import org.xwiki.test.ui.po.editor.ObjectEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.xwiki.test.ui.TestUtils.RestTestUtils.object;
+import static org.xwiki.test.ui.TestUtils.RestTestUtils.property;
 
 /**
  * Helper methods for testing, not related to a specific Page Object. Also made available to tests classes.
@@ -532,43 +534,70 @@ public class TestUtils
         Object... properties)
     {
         createUser(username, password, getURLToLoginAndGotoPage(username, password, url), properties);
-
-        setDefaultCredentials(username, password);
+        loginAndGotoPage(username, password, url);
     }
 
     public void createUser(final String username, final String password, String redirectURL, Object... properties)
     {
-        Map<String, String> parameters = new HashMap<String, String>();
-        parameters.put("register", "1");
-        parameters.put("xwikiname", username);
-        parameters.put("register_password", password);
-        parameters.put("register2_password", password);
-        parameters.put("register_email", "");
+        LocalDocumentReference userReference = new LocalDocumentReference("XWiki", username);
+        Page userPage = rest().page(userReference);
+        userPage.setObjects(new org.xwiki.rest.model.jaxb.Objects());
+        org.xwiki.rest.model.jaxb.Object tipObject = object("XWiki.XWikiUsers");
+
+        // Set password
+        tipObject.getProperties().add(property("password", password));
+
+        // Set custom properties
+        for (int i = 0; i < properties.length; i += 2) {
+            int nextIndex = i + 1;
+            tipObject.getProperties().add(property((String) properties[i], nextIndex < properties.length ? properties[nextIndex] : null));
+        }
+
+        userPage.getObjects().getObjectSummaries().add(tipObject);
+
+        // Save the user page
+        try {
+            rest().save(userPage);
+        } catch (Exception e) {
+            fail("Failed to save the user with name [" + username + "]", e);
+        }
+
         if (!StringUtils.isEmpty(redirectURL)) {
-            parameters.put("xredirect", redirectURL);
+            getDriver().get(redirectURL);
         }
-        parameters.put("form_token", getSecretToken());
-        getDriver().get(getURL("XWiki", "Register", "register", parameters));
-        recacheSecretToken();
-        if (properties.length > 0) {
-            updateObject("XWiki", username, "XWiki.XWikiUsers", 0, properties);
-        }
+
+        // Add the user to XWikiAllGroup
+        addObject("XWiki", "XWikiAllGroup", "XWiki.XWikiGroups", "member", serializeReference(userReference));
     }
 
     /**
-     * Creates the Admin user and add it to the XWikiAdminGroup.
+     * Creates the Admin user, add it to the XWikiAdminGroup and login.
      *
      * @since 12.2
      */
     public void createAdminUser()
     {
-        // Note that we cannot use ADMIN_CREDENTIALS.getPassword() since that password is less than 6 characters, and
-        // we now have a check in XWiki on password length by default. We're keeping the default admin password in
-        // ADMIN_CREDENTIALS.getPassword() to not break XS tests (since in XS the Admin user exists and has password
-        // with value ADMIN_CREDENTIALS.getPassword()).
-        createUser(ADMIN_CREDENTIALS.getUserName(), "administrator", null);
+        createAdminUser(false);
+    }
+
+    /**
+     * Creates the Admin user, add it to the XWikiAdminGroup and login.
+     *
+     * @param programming true of the user should also be given programming right
+     * @since 15.1RC1
+     * @since 14.10.5
+     */
+    public void createAdminUser(boolean programming)
+    {
+        // Create the user and login
+        createUser(ADMIN_CREDENTIALS.getUserName(), ADMIN_CREDENTIALS.getPassword(), null);
+
+        // Add the user to XWikiAdminGroup group (before we login as the user does not have admin right at first)
         addObject("XWiki", "XWikiAdminGroup", "XWiki.XWikiGroups", "member", "XWiki.Admin");
-        login(ADMIN_CREDENTIALS.getUserName(), "administrator");
+        // Give ADMIN right (and maybe PROGRAMMING right) to XWikiAdminGroup
+        setGlobalRights("XWiki.XWikiAdminGroup", "", programming ? "admin,programming" : "admin", true);
+
+        loginAsAdmin();
     }
 
     /**

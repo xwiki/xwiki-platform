@@ -180,6 +180,14 @@
       <scope>runtime</scope>
       <type>xar</type>
     </dependency>
+    <dependency>
+      <!-- Used to manipulate tips. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-uiextension-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+
     <!-- Test Dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

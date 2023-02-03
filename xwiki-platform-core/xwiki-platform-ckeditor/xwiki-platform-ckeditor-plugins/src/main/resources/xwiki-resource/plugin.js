@@ -257,16 +257,30 @@ require(['jquery', 'resource', 'resourcePicker'], function ($, $resource) {
       }
     },
 
-    bindResourcePicker: function(element, resourcePickerId, onlyTheReferencePart) {
+    /**
+     * Bind the source picker to replace an existing CKEditor field element.
+     *
+     * @param element the element to bind
+     * @param resourcePickerId the html id of the resource picker
+     * @param onlyTheReferencePart when true, only the reference part is set, otherwise the resource url is used as the
+     *   value
+     * @param setValueWrapper optional wrapper function, allowing to intercept and transform the set value
+     */
+    bindResourcePicker: function(element, resourcePickerId, onlyTheReferencePart, setValueWrapper) {
+      // If the wrapper parameter is not provided, a simple wrapper that always return the provided value is defined. 
+      var wrapper = setValueWrapper || function (value) {
+        return value;
+      };
       // Use the resource picker value when the given element is committed.
       var oldCommit = element.commit;
       element.commit = function() {
         var resourceReference = this.getDialog().getValueOf(resourcePickerId[0], resourcePickerId[1]);
-        if (onlyTheReferencePart  === true) {
-          this.setValue(resourceReference.reference);
+        if (onlyTheReferencePart === true) {
+          this.setValue(wrapper(resourceReference.reference, onlyTheReferencePart, this.getDialog(), resourcePickerId));
         } else {
-          this.setValue(CKEDITOR.plugins.xwikiResource.getResourceURL(resourceReference,
-            this.getDialog().getParentEditor()));
+          var resourceURL = CKEDITOR.plugins.xwikiResource.getResourceURL(resourceReference,
+            this.getDialog().getParentEditor());
+          this.setValue(wrapper(resourceURL, onlyTheReferencePart, this.getDialog(), resourcePickerId));
         }
         if (typeof oldCommit === 'function') {
           oldCommit.apply(this, arguments);

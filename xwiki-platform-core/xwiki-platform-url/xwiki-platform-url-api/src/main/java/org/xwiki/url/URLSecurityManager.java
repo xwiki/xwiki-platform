@@ -37,6 +37,15 @@ import org.xwiki.stability.Unstable;
 public interface URLSecurityManager
 {
     /**
+     * Dedicated string used to escape {@code %} character.
+     * @see #parseToSafeURI(String)
+     * @since 15.1RC1
+     * @since 14.10.5
+     */
+    @Unstable
+    String PERCENT_ESCAPE = "__XWIKI_URL_SECURITY_PERCENT__";
+
+    /**
      * Constant to be used in {@link org.xwiki.context.ExecutionContext} with the value {@code "true"} to bypass a
      * check of {@link #isDomainTrusted(URL)}.
      */
@@ -82,6 +91,10 @@ public interface URLSecurityManager
      * This method throws a {@link SecurityException} if the parsed URI is not safe to use according to
      * {@link #isURITrusted(URI)}. It might also throw a {@link URISyntaxException} if the parameter cannot be properly
      * parsed.
+     * Note that this method might try to "repair" URI that are not parsed correctly by {@link URI#URI(String)}
+     * (e.g. serialized uri containing spaces). As part of that repair we need to perform escaping of the {@code %}
+     * character and we use {@link #PERCENT_ESCAPE} value as replacement string: the chain contained in
+     * {@link #PERCENT_ESCAPE} is then a protected token that should never be present in your serialized URI.
      *
      * @param serializedURI a string representing a URI that needs to be parsed.
      * @return a URI safe to use

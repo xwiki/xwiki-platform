@@ -489,5 +489,19 @@ class DefaultURLSecurityManagerTest
         uri = this.urlSecurityManager.parseToSafeURI(location);
         assertEquals("/xwiki/bin/edit/Some%20Space/%25"
             + "?query=03%20f%C3%A9vrier%202023%25C#anchor%25C%A9%25e", uri.toString());
+
+        // invalidate cache so that we can call inject other trustedDomains
+        this.urlSecurityManager.invalidateCache();
+        when(urlConfiguration.getTrustedDomains()).thenReturn(List.of(
+            "faß.example",
+            "fa%C3%9F%25.example"
+        ));
+        location = "http://faß.example/Some%20Space/%C";
+        uri = this.urlSecurityManager.parseToSafeURI(location);
+        assertEquals("http://faß.example/Some%20Space/%25C", uri.toString());
+
+        location = "http://fa%C3%9F%.example/Some Space/Test#anchor%202";
+        uri = this.urlSecurityManager.parseToSafeURI(location);
+        assertEquals("http://fa%C3%9F%25.example/Some%20Space/Test#anchor%202", uri.toString());
     }
 }

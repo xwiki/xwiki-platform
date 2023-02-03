@@ -60,7 +60,6 @@ public class DefaultURLSecurityManager implements URLSecurityManager
 {
     private static final char DOT = '.';
     private static final char PERCENT = '%';
-    private static final String PERCENT_ESCAPE = "__XWIKI_PERCENT__";
 
     // Regular expression taken from https://www.rfc-editor.org/rfc/rfc3986#appendix-B.
     private static final Pattern URI_PATTERN =
@@ -224,7 +223,7 @@ public class DefaultURLSecurityManager implements URLSecurityManager
             Matcher matcher = URI_PATTERN.matcher(serializedURI);
             if (matcher.matches()) {
                 String scheme = matcher.group(2);
-                String authority = matcher.group(4);
+                String authority = replaceUnquotedPercent(matcher.group(4));
                 String path = replaceUnquotedPercent(matcher.group(5));
                 String query = replaceUnquotedPercent(matcher.group(7));
                 String fragment = replaceUnquotedPercent(matcher.group(9));
@@ -234,7 +233,7 @@ public class DefaultURLSecurityManager implements URLSecurityManager
                 uri = new URI(scheme, authority, path, query, fragment);
                 // the URI should be parsed again after properly replacing the escape chain by the % character since
                 // it won't be encoded anymore with the single argument constructor.
-                uri = new URI(uri.toString().replaceAll(PERCENT_ESCAPE, "%"));
+                uri = new URI(uri.toString().replace(PERCENT_ESCAPE, "%"));
             } else {
                 throw e;
             }

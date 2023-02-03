@@ -59,6 +59,8 @@ import com.xpn.xwiki.XWikiContext;
 public class DefaultURLSecurityManager implements URLSecurityManager
 {
     private static final char DOT = '.';
+    private static final char PERCENT = '%';
+    private static final String PERCENT_ESCAPE = "__XWIKI_PERCENT__";
 
     // Regular expression taken from https://www.rfc-editor.org/rfc/rfc3986#appendix-B.
     private static final Pattern URI_PATTERN =
@@ -223,10 +225,16 @@ public class DefaultURLSecurityManager implements URLSecurityManager
             if (matcher.matches()) {
                 String scheme = matcher.group(2);
                 String authority = matcher.group(4);
-                String path = matcher.group(5);
-                String query = matcher.group(7);
-                String fragment = matcher.group(9);
+                String path = replaceUnquotedPercent(matcher.group(5));
+                String query = replaceUnquotedPercent(matcher.group(7));
+                String fragment = replaceUnquotedPercent(matcher.group(9));
+                // This constructor automatically encodes all % characters, that's why we replaced them all first by
+                // a chain if they belonged to a percent-encoded byte: if they don't, they will be encoded and that's
+                // correct. By doing so we avoid any double-encoding.
                 uri = new URI(scheme, authority, path, query, fragment);
+                // the URI should be parsed again after properly replacing the escape chain by the % character since
+                // it won't be encoded anymore with the single argument constructor.
+                uri = new URI(uri.toString().replaceAll(PERCENT_ESCAPE, "%"));
             } else {
                 throw e;
             }
@@ -237,5 +245,59 @@ public class DefaultURLSecurityManager implements URLSecurityManager
             throw new SecurityException(String.format("The given URI [%s] is not safe on this server.",
                 uri));
         }
+    }
+
+    /**
+     * The goal of this method is to parse the given String and to replace all {@code %} character by an internal
+     * replacement chain if and only if this {@code %} character belongs to a percent encoded byte.
+     *
+     * @param originalString the string to parse
+     * @return a string containing a replacement chain for all {@code %} characters not belonging to a percent
+     *         encoded byte
+     */
+    private String replaceUnquotedPercent(String originalString)
+    {
+        if (!StringUtils.isBlank(originalString) && originalString.indexOf(PERCENT) > -1) {
+            StringBuilder result = new StringBuilder();
+            char[] charArray = originalString.toCharArray();
+            for (int i = 0; i < charArray.length; i++) {
+                char currentChar = charArray[i];
+                if ((currentChar == PERCENT) && (i < (charArray.length - 2))
+                    && isQuotedChar(charArray[i + 1]) && isQuotedChar(charArray[i + 2])) {
+                    result.append(PERCENT_ESCAPE);
+                } else {
+                    result.append(currentChar);
+                }
+            }
+            return result.toString();
+        } else {
+            return originalString;
+        }
+    }
+
+    /**
+     * Check if the given char belongs to the range of character that forms a percent encoded byte.
+     * @param nextChar the char to check if it belongs to the range
+     * @return {@code true} if it belongs to the range
+     */
+    private boolean isQuotedChar(char nextChar)
+    {
+        // Definition of % encoded bytes with ranges is given in https://url.spec.whatwg.org/#percent-encoded-bytes
+        // the next two bytes are in the ranges 0x30 (0) to 0x39 (9), 0x41 (A) to 0x46 (F),
+        // and 0x61 (a) to 0x66 (f), all inclusive
+
+        boolean result;
+        // Not assigning the result with a boolean expression to comply with checkstyle which is not happy if the
+        // boolean expression is too complex...
+        if (nextChar >= 0x30 && nextChar <= 0x39) {
+            result = true;
+        } else if (nextChar >= 0x41 && nextChar <= 0x46) {
+            result = true;
+        } else if (nextChar >= 0x61 && nextChar <= 0x66) {
+            result = true;
+        } else {
+            result = false;
+        }
+        return result;
     }
 }

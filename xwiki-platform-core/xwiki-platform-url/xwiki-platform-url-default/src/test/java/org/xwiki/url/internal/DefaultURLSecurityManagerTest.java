@@ -465,30 +465,29 @@ class DefaultURLSecurityManagerTest
         location = "foo://www.x wiki.org/";
         assertParseToSafeThrowSecurity(location, "foo://www.x%20wiki.org/");
 
-        location = "/xwiki/bin/edit/GroupeInformatique/Comptes%20Rendus/03%20f%C3%A9vrier%202023";
+        location = "/xwiki/bin/edit/Some%20Space/03%20f%C3%A9vrier%202023";
         uri = this.urlSecurityManager.parseToSafeURI(location);
         assertEquals(location, uri.toString());
 
-        location = "/xwiki/bin/edit/GroupeInformatique/Comptes Rendus/03%20f%C3%A9vrier%202023";
+        location = "/xwiki/bin/edit/Some Space/03%20f%C3%A9vrier%202023";
         uri = this.urlSecurityManager.parseToSafeURI(location);
-        assertEquals("/xwiki/bin/edit/GroupeInformatique/Comptes%20Rendus/03%20f%C3%A9vrier%202023", uri.toString());
+        assertEquals("/xwiki/bin/edit/Some%20Space/03%20f%C3%A9vrier%202023", uri.toString());
 
-        location = "/xwiki/bin/edit/GroupeInformatique/Comptes Rendus/%%%%";
+        location = "/xwiki/bin/edit/Some Space/%%%%";
         uri = this.urlSecurityManager.parseToSafeURI(location);
-        assertEquals("/xwiki/bin/edit/GroupeInformatique/Comptes%20Rendus/%25%25%25%25", uri.toString());
+        assertEquals("/xwiki/bin/edit/Some%20Space/%25%25%25%25", uri.toString());
 
-        location = "/xwiki/bin/edit/GroupeInformatique/Comptes Rendus/%C3";
+        location = "/xwiki/bin/edit/Some Space/%C3";
         uri = this.urlSecurityManager.parseToSafeURI(location);
-        assertEquals("/xwiki/bin/edit/GroupeInformatique/Comptes%20Rendus/%C3", uri.toString());
+        assertEquals("/xwiki/bin/edit/Some%20Space/%C3", uri.toString());
 
-        location = "/xwiki/bin/edit/GroupeInformatique/Comptes Rendus/%C";
+        location = "/xwiki/bin/edit/Some Space/%C";
         uri = this.urlSecurityManager.parseToSafeURI(location);
-        assertEquals("/xwiki/bin/edit/GroupeInformatique/Comptes%20Rendus/%25C", uri.toString());
+        assertEquals("/xwiki/bin/edit/Some%20Space/%25C", uri.toString());
 
-        location = "/xwiki/bin/edit/GroupeInformatique/Comptes "
-            + "Rendus/%?query=03%20f%C3%A9vrier%202023%C#anchor%25C%A9%e";
+        location = "/xwiki/bin/edit/Some Space/%?query=03%20f%C3%A9vrier%202023%C#anchor%25C%A9%e";
         uri = this.urlSecurityManager.parseToSafeURI(location);
-        assertEquals("/xwiki/bin/edit/GroupeInformatique/Comptes%20Rendus/%25"
+        assertEquals("/xwiki/bin/edit/Some%20Space/%25"
             + "?query=03%20f%C3%A9vrier%202023%25C#anchor%25C%A9%25e", uri.toString());
     }
 }

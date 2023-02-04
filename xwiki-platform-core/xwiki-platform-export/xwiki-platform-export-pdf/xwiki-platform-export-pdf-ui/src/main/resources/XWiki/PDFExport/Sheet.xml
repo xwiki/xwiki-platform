@@ -179,6 +179,7 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -270,17 +271,69 @@
   };
 
   // Remove the Table of Contents if empty.
-  const removeEmptyToC = function() {
+  const removeEmptyTableOfContents = function() {
     const toc = $('.pdf-toc');
     if (!toc.find('li').length) {
       toc.remove();
     }
   };
 
+  /**
+   * The anchors from the PDF table of contents must target existing sections within the PDF content, otherwise Paged.js
+   * cannot compute the print page number where those sections appear, in order to show this to the right of the anchor.
+   * Anchors that don't targer an existing section or that use an invalid section id are especially problematic because
+   * they break Paged.js (e.g. "Failed to execute 'querySelector' on 'Element': '#...' is not a valid selector"). We
+   * mark the invalid table of contents anchors in order to skip them when determining the page number, otherwise we
+   * would get 0 which is misleading. Of course, the code that generates those invalid anchors should to be fixed also.
+   */
+  const validateTableOfContentsAnchors = function() {
+    $('.pdf-toc ul a[href]').each(function() {
+      const target = $(this).attr('href');
+      try {
+        // We replicate the behavior of Paged.js which performs CSS escaping before calling querySelector. The problem
+        // is that it does CSS escaping using an internal querySelectorEscape function that we can't access. Instead of
+        // duplicating the code we rely on the standard CSS#escape function which should lead to similar results.
+        if (document.querySelector(querySelectorEscape(target))) {
+          // Valid anchor. Don't touch it.
+          return;
+        } else {
+          console.warn('Missing section expected by the PDF table of contents: ' + target);
+        }
+      } catch (e) {
+        console.warn('Invalid anchor in PDF table of contents: ' + target);
+      }
+      $(this).removeAttr('href').attr('data-invalid-href', target);
+    });
+  };
+
+  const querySelectorEscape = function(value) {
+    // querySelectorEscape from Paged.js doesn't escape # (Hash) and . (Dot, when the string doesn't start with #) so we
+    // need to do the same. Replace # (Hash) and . (Dot) with _ (Underscore) in order to not escape them.
+    const escapeIndex = [];
+    const doesNotStartWithHash = value.charAt(0) !== '#';
+    let escapedValue = [...value].map(char =&gt; {
+      if (char === '_' || char === '#' || (doesNotStartWithHash &amp;&amp; char === '.')) {
+        escapeIndex.push(char);
+        return '_';
+      }
+      return char;
+    }).join('');
+    escapedValue = CSS.escape(escapedValue);
+    // Restore the # (Hash) and . (Dot) that were previously replaced with _ (Underscore).
+    let escapeCount = 0;
+    return [...escapedValue].map(char =&gt; {
+      if (char === '_') {
+        return escapeIndex[escapeCount++];
+      }
+      return char;
+    }).join('');
+  };
+
   // Adjust the exported content before performing the print layout.
   pageReady.afterPageReady(() =&gt; {
     fixInternalAnchors($('#xwikicontent, .pdf-toc'));
-    removeEmptyToC();
+    removeEmptyTableOfContents();
+    validateTableOfContentsAnchors();
   });
 
   // Trigger the print preview after the page is ready. Note that by returning a promise we're making the next page
@@ -360,6 +413,7 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -544,7 +598,7 @@
   }
 
   /* Page number */
-  .pdf-toc ul a::after {
+  .pdf-toc ul a[href]::after {
     content: target-counter(attr(href), page);
     /* For the fake dotted leader. */
     position: absolute;
@@ -636,7 +690,7 @@
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -656,6 +710,7 @@
         <name>content</name>
         <number>1</number>
         <prettyName>Executed Content</prettyName>
+        <restricted>0</restricted>
         <rows>25</rows>
         <size>120</size>
         <unmodifiable>0</unmodifiable>
@@ -686,6 +741,7 @@
         <name>parameters</name>
         <number>7</number>
         <prettyName>Extension Parameters</prettyName>
+        <restricted>0</restricted>
         <rows>10</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>

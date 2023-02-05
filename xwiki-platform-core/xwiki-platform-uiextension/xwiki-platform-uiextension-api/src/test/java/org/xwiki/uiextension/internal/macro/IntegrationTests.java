@@ -24,7 +24,6 @@ import java.util.Map;
 
 import org.xwiki.query.QueryManager;
 import org.xwiki.refactoring.internal.ModelBridge;
-import org.xwiki.refactoring.internal.ReferenceUpdater;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.test.integration.junit5.RenderingTests;
@@ -62,7 +61,6 @@ public class IntegrationTests implements RenderingTests
         componentManager.registerMockComponent(TemplateManager.class);
         componentManager.registerMockComponent(ModelBridge.class);
         componentManager.registerMockComponent(QueryManager.class);
-        componentManager.registerMockComponent(ReferenceUpdater.class);
         componentManager.registerMockComponent(AuthorizationManager.class);
         componentManager.registerMockComponent(ContextualAuthorizationManager.class);
 

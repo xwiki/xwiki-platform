@@ -19,6 +19,7 @@
  */
 package org.xwiki.model.validation;
 
+import java.util.List;
 import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
@@ -49,7 +50,9 @@ public interface EntityNameValidationManager
     Set<String> getAvailableEntityNameValidations();
 
     /**
-     * Allow to reset the configuration of the strategies.
+     * @return the list of available {@link EntityNameValidation} components.
+     * @since 13.4
+     * @since 12.10.8
      */
-    void resetStrategies();
+    List<EntityNameValidation> getAvailableEntityNameValidationsComponents();
 }

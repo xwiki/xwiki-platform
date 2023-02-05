@@ -65,4 +65,16 @@ public interface EntityNameValidation
      * @return {@code true} if the policy is respected.
      */
     boolean isValid(EntityReference entityReference);
+
+    /**
+     * Clean the configuration cache of a wiki.
+     *
+     * @param wikiId the identifier of the wiki's cache to clean (e.g., {@code "wikiA"})
+     * @since 13.4
+     * @since 12.10.8
+     */
+    default void cleanConfigurationCache(String wikiId)
+    {
+        // Does nothing by default.
+    }
 }

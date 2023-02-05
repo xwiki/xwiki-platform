@@ -20,10 +20,10 @@
 package org.xwiki.model.validation.internal;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -51,14 +51,7 @@ public class DefaultEntityNameValidationManager implements EntityNameValidationM
     private EntityNameValidationConfiguration entityNameValidationConfiguration;
 
     @Inject
-    private ReplaceCharacterEntityNameValidationConfiguration replaceCharacterEntityNameValidationConfiguration;
-
-    @Inject
     private Logger logger;
-
-    @Inject
-    @Named(ReplaceCharacterEntityNameValidation.COMPONENT_NAME)
-    private EntityNameValidation replaceCharacterValidator;
 
     @Override
     public EntityNameValidation getEntityReferenceNameStrategy()
@@ -89,10 +82,13 @@ public class DefaultEntityNameValidationManager implements EntityNameValidationM
     }
 
     @Override
-    public void resetStrategies()
+    public List<EntityNameValidation> getAvailableEntityNameValidationsComponents()
     {
-        ((ReplaceCharacterEntityNameValidation) this.replaceCharacterValidator)
-            .setReplacementCharacters(this.replaceCharacterEntityNameValidationConfiguration
-                .getCharacterReplacementMap());
+        try {
+            return this.componentManager.getInstanceList(EntityNameValidation.class);
+        } catch (ComponentLookupException e) {
+            this.logger.error("Error while getting the instance list of the EntityNameValidation", e);
+            return Collections.emptyList();
+        }
     }
 }

@@ -67,8 +67,8 @@ public class ReplaceCharacterEntityNameValidationConfiguration
     }
 
     /**
-     * Create the map of forbidden and replacement characters which aims at being used in
-     * {@link ReplaceCharacterEntityNameValidation#setReplacementCharacters(Map)}.
+     * Create the map of forbidden and replacement characters which aims at being used in {@link
+     * ReplaceCharacterEntityNameValidation}.
      *
      * @return a replacement map to configure the component.
      */

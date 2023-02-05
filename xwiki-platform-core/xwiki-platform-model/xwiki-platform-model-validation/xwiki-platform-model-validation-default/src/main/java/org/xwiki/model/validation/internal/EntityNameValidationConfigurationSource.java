@@ -43,11 +43,9 @@ public class EntityNameValidationConfigurationSource extends AbstractDocumentCon
 {
     private static final List<String> SPACE_NAMES = Arrays.asList("XWiki", "EntityNameValidation");
 
-    private static final LocalDocumentReference CLASS_REFERENCE =
-        new LocalDocumentReference(SPACE_NAMES, "ConfigurationClass");
+    static final LocalDocumentReference CLASS_REFERENCE = new LocalDocumentReference(SPACE_NAMES, "ConfigurationClass");
 
-    private static final LocalDocumentReference DOC_REFERENCE =
-        new LocalDocumentReference(SPACE_NAMES, "Configuration");
+    static final LocalDocumentReference DOC_REFERENCE = new LocalDocumentReference(SPACE_NAMES, "Configuration");
 
     @Override
     protected DocumentReference getDocumentReference()

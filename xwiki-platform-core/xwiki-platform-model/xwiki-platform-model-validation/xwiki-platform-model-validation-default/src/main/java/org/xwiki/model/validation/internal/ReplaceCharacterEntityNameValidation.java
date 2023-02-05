@@ -20,6 +20,7 @@
 package org.xwiki.model.validation.internal;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -27,13 +28,12 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.validation.AbstractEntityNameValidation;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
- * Name strategy that aims at replacing some forbidden characters with others.
- * In case a character replacement is not defined, the forbidden character will just be removed.
+ * Name strategy that aims at replacing some forbidden characters with others. In case a character replacement is not
+ * defined, the forbidden character will just be removed.
  *
  * @version $Id$
  * @since 12.0RC1
@@ -42,58 +42,82 @@ import org.xwiki.model.validation.AbstractEntityNameValidation;
 @Singleton
 @Named(ReplaceCharacterEntityNameValidation.COMPONENT_NAME)
 public class ReplaceCharacterEntityNameValidation extends AbstractEntityNameValidation
-    implements Initializable
 {
+    /**
+     * An object encapsulating an entity name validation configuration.
+     */
+    private static class Configuration
+    {
+        private String[] forbiddenCharacters;
+
+        private String[] replacementCharacters;
+    }
+
     /**
      * Name of the component.
      */
     protected static final String COMPONENT_NAME = "ReplaceCharacterEntityNameValidation";
 
-    private String[] forbiddenCharacters;
-    private String[] replacementCharacters;
+    /**
+     * A map used as a cache of the current configurations of the wikis.
+     */
+    private final Map<String, Configuration> wikiConfigurationCache = new ConcurrentHashMap<>();
 
     @Inject
     private ReplaceCharacterEntityNameValidationConfiguration replaceCharacterEntityNameValidationConfiguration;
 
-    @Override
-    public void initialize() throws InitializationException
-    {
-        this.setReplacementCharacters(this.replaceCharacterEntityNameValidationConfiguration
-            .getCharacterReplacementMap());
-    }
-
-    /**
-     * Configure the component based on a replacement map.
-     *
-     * @param replacementMap keys of the map are the forbidden characters and values are the replacement characters.
-     *                      If a value is null, then the forbidden character will be removed during transformation.
-     */
-    public void setReplacementCharacters(Map<String, String> replacementMap)
-    {
-        this.forbiddenCharacters = new String[replacementMap.size()];
-        this.replacementCharacters = new String[replacementMap.size()];
-        int index = 0;
-
-        for (Map.Entry<String, String> characterCharacterEntry : replacementMap.entrySet()) {
-            this.forbiddenCharacters[index] = characterCharacterEntry.getKey();
-            if (characterCharacterEntry.getValue() != null) {
-                this.replacementCharacters[index] = characterCharacterEntry.getValue();
-            } else {
-                this.replacementCharacters[index] = "";
-            }
-            index++;
-        }
-    }
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @Override
     public String transform(String name)
     {
-        return StringUtils.replaceEach(name, this.forbiddenCharacters, this.replacementCharacters);
+        return StringUtils.replaceEach(name, this.getForbiddenCharacters(), this.getReplacementCharacters());
     }
 
     @Override
     public boolean isValid(String name)
     {
-        return !StringUtils.containsAny(name, this.forbiddenCharacters);
+        return !StringUtils.containsAny(name, this.getForbiddenCharacters());
+    }
+
+    @Override
+    public void cleanConfigurationCache(String wikiId)
+    {
+        this.wikiConfigurationCache.remove(wikiId);
+    }
+
+    private String[] getReplacementCharacters()
+    {
+        return getWikiConfigurationCache().replacementCharacters;
+    }
+
+    private String[] getForbiddenCharacters()
+    {
+        return getWikiConfigurationCache().forbiddenCharacters;
+    }
+
+    private Configuration getWikiConfigurationCache()
+    {
+        String currentWikiId = this.wikiDescriptorManager.getCurrentWikiId();
+        return this.wikiConfigurationCache.computeIfAbsent(currentWikiId, wikiId -> {
+            Configuration configuration = new Configuration();
+            Map<String, String> replacementMap =
+                this.replaceCharacterEntityNameValidationConfiguration.getCharacterReplacementMap();
+            configuration.forbiddenCharacters = new String[replacementMap.size()];
+            configuration.replacementCharacters = new String[replacementMap.size()];
+
+            int index = 0;
+            for (Map.Entry<String, String> characterCharacterEntry : replacementMap.entrySet()) {
+                configuration.forbiddenCharacters[index] = characterCharacterEntry.getKey();
+                if (characterCharacterEntry.getValue() != null) {
+                    configuration.replacementCharacters[index] = characterCharacterEntry.getValue();
+                } else {
+                    configuration.replacementCharacters[index] = "";
+                }
+                index++;
+            }
+            return configuration;
+        });
     }
 }

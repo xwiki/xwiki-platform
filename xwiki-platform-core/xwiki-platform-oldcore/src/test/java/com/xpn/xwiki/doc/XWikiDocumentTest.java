@@ -137,7 +137,7 @@ public class XWikiDocumentTest
     private BaseObject baseObject2;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @BeforeEach
     protected void setUp() throws Exception

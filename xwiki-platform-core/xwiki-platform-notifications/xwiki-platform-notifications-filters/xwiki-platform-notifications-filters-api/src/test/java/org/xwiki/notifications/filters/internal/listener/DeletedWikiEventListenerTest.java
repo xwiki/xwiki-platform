@@ -63,7 +63,7 @@ class DeletedWikiEventListenerTest
     private ModelBridge modelBridge;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @BeforeEach
     void setUp()

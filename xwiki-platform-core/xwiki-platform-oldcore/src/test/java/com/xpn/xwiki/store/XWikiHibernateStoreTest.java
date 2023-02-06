@@ -147,7 +147,7 @@ public class XWikiHibernateStoreTest
     private WikiDescriptorManager wikiDescriptorManager;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @BeforeEach
     void setUp(MockitoComponentManager componentManager) throws Exception

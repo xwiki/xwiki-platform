@@ -52,7 +52,7 @@ import static org.mockito.Mockito.*;
 public class DefaultMailSenderConfigurationTest
 {
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @InjectMockComponents
     private DefaultMailSenderConfiguration configuration;

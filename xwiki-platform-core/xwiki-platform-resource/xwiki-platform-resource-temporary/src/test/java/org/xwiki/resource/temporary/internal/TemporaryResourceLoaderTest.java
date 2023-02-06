@@ -50,7 +50,7 @@ import static org.mockito.Mockito.when;
 class TemporaryResourceLoaderTest
 {
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.DEBUG);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.DEBUG);
 
     @InjectMockComponents
     private TemporaryResourceLoader resourceLoader;

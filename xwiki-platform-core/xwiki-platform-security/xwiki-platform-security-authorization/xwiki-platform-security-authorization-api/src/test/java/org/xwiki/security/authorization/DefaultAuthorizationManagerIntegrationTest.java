@@ -117,7 +117,7 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
     private DefaultAuthorizationManager authorizationManager;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     /** Mocked xWikiBridge */
     @MockComponent

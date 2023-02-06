@@ -53,7 +53,7 @@ import static org.mockito.Mockito.when;
 class EnvironmentSkinTest
 {
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     private EnvironmentSkin skin;
 

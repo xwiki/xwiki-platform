@@ -74,7 +74,7 @@ public class DefaultMergeConflictDecisionManagerTest
     private ConfigurationSource configurationSource;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.ERROR);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.ERROR);
 
     @BeforeEach
     public void setup()

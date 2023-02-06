@@ -80,7 +80,7 @@ class MovedAttachmentListenerTest
     private AuthorizationManager authorization;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     @Test
     void onEventNoUpdateReference()

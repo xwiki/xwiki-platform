@@ -88,7 +88,7 @@ import static org.mockito.Mockito.when;
 class PrepareMailRunnableTest
 {
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @InjectMockComponents
     private PrepareMailRunnable runnable;

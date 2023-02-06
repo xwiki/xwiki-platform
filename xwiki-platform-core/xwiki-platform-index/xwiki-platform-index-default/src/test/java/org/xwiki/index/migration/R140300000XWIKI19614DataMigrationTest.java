@@ -81,7 +81,7 @@ class R140300000XWIKI19614DataMigrationTest
     private DocumentReferenceResolver<String> resolver;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     @Mock
     private XWikiContext context;

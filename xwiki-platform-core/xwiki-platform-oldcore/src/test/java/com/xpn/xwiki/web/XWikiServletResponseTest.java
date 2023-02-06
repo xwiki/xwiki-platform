@@ -59,7 +59,7 @@ class XWikiServletResponseTest
     private HttpServletResponse httpServletResponse;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @BeforeComponent
     void beforeComponent(MockitoComponentManager mockitoComponentManager) throws Exception

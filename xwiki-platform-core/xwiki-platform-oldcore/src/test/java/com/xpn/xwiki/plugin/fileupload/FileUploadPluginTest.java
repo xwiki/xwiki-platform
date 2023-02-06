@@ -75,7 +75,7 @@ class FileUploadPluginTest
     private MockitoComponentManager componentManager;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.DEBUG);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.DEBUG);
 
     @Mock
     private XWikiRequest request;

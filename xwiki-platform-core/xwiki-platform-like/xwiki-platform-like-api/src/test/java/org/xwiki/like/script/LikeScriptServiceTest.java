@@ -97,7 +97,7 @@ class LikeScriptServiceTest
     private DocumentReference docUserReference;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @BeforeEach
     void setup()

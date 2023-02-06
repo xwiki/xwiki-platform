@@ -94,7 +94,7 @@ class DefaultOfficeViewerScriptServiceTest
     private BlockRenderer blockRenderer;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
     void isMimeTypeSupported() throws Exception

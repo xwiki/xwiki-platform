@@ -91,7 +91,7 @@ class XClassDeletingListenerTest
     private DocumentAccessBridge documentAccessBridge;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @InjectMockComponents
     private XClassDeletingListener deletingListener;

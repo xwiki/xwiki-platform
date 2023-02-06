@@ -83,7 +83,7 @@ public class LegacyEventMigrationJobTest
     private JobProgressManager progressManager;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
     void runInternalNoStoreOrDisabled() throws Exception

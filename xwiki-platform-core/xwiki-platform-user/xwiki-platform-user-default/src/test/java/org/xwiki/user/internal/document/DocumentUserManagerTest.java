@@ -66,7 +66,7 @@ class DocumentUserManagerTest
     private WikiDescriptorManager wikiDescriptorManager;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
     void exists() throws Exception

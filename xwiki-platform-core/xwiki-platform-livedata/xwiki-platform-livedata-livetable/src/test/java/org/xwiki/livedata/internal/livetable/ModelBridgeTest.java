@@ -76,7 +76,7 @@ import static org.mockito.Mockito.when;
 class ModelBridgeTest
 {
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @InjectMockComponents
     private ModelBridge modelBridge;

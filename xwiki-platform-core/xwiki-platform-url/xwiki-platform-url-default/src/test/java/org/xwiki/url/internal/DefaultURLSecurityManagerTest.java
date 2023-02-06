@@ -88,7 +88,7 @@ class DefaultURLSecurityManagerTest
     private ExecutionContext executionContext;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
     
     @BeforeEach
     void setup()

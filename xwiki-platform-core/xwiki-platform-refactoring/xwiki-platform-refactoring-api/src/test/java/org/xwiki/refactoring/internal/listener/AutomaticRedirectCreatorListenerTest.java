@@ -64,7 +64,7 @@ class AutomaticRedirectCreatorListenerTest
     private JobContext jobContext;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     @Mock
     private DeleteJob deleteJob;

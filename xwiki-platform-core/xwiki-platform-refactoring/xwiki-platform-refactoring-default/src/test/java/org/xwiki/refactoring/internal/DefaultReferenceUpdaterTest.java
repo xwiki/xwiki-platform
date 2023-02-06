@@ -167,7 +167,7 @@ class DefaultReferenceUpdaterTest
     private DefaultReferenceUpdater updater;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension();
+    private LogCaptureExtension logCapture = new LogCaptureExtension();
 
     @Mock
     private XWikiContext xcontext;

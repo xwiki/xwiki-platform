@@ -71,7 +71,7 @@ import static org.mockito.Mockito.when;
 public class XWikiAttachmentTest
 {
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @InjectMockitoOldcore
     private MockitoOldcore oldCore;

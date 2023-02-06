@@ -107,7 +107,7 @@ class AuthenticationScriptServiceTest
     private URLNormalizer<ExtendedURL> urlNormalizer;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     private XWikiContext xWikiContext;
 

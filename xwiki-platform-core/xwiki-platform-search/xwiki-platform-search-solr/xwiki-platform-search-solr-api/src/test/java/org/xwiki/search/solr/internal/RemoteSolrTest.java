@@ -45,7 +45,7 @@ import static org.mockito.Mockito.when;
 class RemoteSolrTest
 {
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     @MockComponent
     SolrConfiguration solrConfiguration;

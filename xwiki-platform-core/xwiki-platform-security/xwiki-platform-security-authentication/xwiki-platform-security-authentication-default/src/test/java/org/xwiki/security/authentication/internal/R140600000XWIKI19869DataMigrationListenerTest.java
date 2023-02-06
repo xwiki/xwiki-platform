@@ -88,7 +88,7 @@ class R140600000XWIKI19869DataMigrationListenerTest
     private Environment environment;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
     void onEvent(@XWikiTempDir File tmpDir) throws Exception

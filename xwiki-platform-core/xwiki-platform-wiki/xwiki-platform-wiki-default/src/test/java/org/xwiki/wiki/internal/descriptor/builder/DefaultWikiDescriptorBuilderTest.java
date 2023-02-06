@@ -62,7 +62,7 @@ import static org.mockito.Mockito.when;
 class DefaultWikiDescriptorBuilderTest
 {
     @RegisterExtension
-    public LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.ERROR);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.ERROR);
 
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;

@@ -66,7 +66,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class SharePageIT
 {
     @RegisterExtension
-    static GreenMailExtension mail = new GreenMailExtension(ServerSetupTest.SMTP);
+    private static GreenMailExtension mail = new GreenMailExtension(ServerSetupTest.SMTP);
 
     private String testClassName;
 

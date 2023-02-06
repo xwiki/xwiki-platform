@@ -120,7 +120,7 @@ class R140401000XWIKI15460DataMigrationTest
     private XWikiContext context;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     @BeforeEach
     void setUp() throws Exception

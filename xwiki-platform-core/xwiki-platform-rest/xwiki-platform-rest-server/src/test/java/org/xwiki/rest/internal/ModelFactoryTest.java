@@ -91,7 +91,7 @@ class ModelFactoryTest
     private static final String TEST_PASSWORD_VALUE = "secret";
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @InjectComponentManager
     private ComponentManager componentManager;

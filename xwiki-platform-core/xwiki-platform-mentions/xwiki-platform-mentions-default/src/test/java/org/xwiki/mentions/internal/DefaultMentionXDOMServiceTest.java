@@ -74,7 +74,7 @@ class DefaultMentionXDOMServiceTest
     private DefaultMentionXDOMService xdomService;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(WARN);
 
     @MockComponent
     @Named("context")

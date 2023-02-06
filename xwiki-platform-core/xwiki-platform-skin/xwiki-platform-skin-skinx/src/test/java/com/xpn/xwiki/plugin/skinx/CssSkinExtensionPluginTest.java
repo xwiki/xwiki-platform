@@ -125,7 +125,7 @@ class CssSkinExtensionPluginTest
     private SkinExtensionAsync skinExtensionAsync;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     private XWikiContext context;
     private BaseClass pluginClass;

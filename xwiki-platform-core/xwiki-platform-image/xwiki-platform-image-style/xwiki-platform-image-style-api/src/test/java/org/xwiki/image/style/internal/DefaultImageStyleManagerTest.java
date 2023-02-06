@@ -83,7 +83,7 @@ class DefaultImageStyleManagerTest
         new DocumentReference("wiki", "space", "docfail");
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @InjectMockComponents
     private DefaultImageStyleManager manager;

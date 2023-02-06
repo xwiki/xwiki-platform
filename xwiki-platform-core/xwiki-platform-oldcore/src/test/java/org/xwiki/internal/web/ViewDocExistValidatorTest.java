@@ -58,7 +58,7 @@ class ViewDocExistValidatorTest
     public static final DocumentReference DOCUMENT_REFERENCE = new DocumentReference("wiki", "space", "page");
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @InjectMockComponents
     private ViewDocExistValidator validator;

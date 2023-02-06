@@ -107,7 +107,7 @@ class RenderingScriptServiceTest
     private BlockRenderer blockRenderer;
 
     @RegisterExtension
-    public LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
     void parseAndRender() throws Exception

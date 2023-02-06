@@ -56,7 +56,7 @@ class DefaultMentionsFormatterProviderTest
     private MentionsFormatter defaultFormatter;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(DEBUG);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(DEBUG);
 
     @Test
     void get() throws Exception

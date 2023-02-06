@@ -21,6 +21,7 @@ package org.xwiki.test.docker.internal.junit5;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
@@ -48,10 +49,13 @@ import org.xwiki.test.ui.PersistentTestContext;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
 
+import com.deque.html.axecore.results.Rule;
+
 import com.google.common.primitives.Ints;
 
 import ch.qos.logback.classic.Level;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.followOutput;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.getAgentName;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.getResultFileLocation;
@@ -247,6 +251,9 @@ public class XWikiDockerExtension extends AbstractExtension
             }
         }
 
+        //Set up the wcag validation in the test suite fixture.
+        loadPersistentTestContext(extensionContext).getUtil().setWcagSetup(testConfiguration.wcag());
+
         LOGGER.info("(*) Starting test [{}]", extensionContext.getTestMethod().get().getName());
     }
 
@@ -306,6 +313,8 @@ public class XWikiDockerExtension extends AbstractExtension
     @Override
     public void afterAll(ExtensionContext extensionContext) throws Exception
     {
+        TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
+
         // If the current tests has parents and one of them has the @UITest annotation, it means the containers should
         // be stopped by the parent having the annotation.
         if (hasParentTestContainingUITestAnnotation(extensionContext)) {
@@ -313,11 +322,17 @@ public class XWikiDockerExtension extends AbstractExtension
         }
 
         PersistentTestContext testContext = loadPersistentTestContext(extensionContext);
+        if (testConfiguration.wcag()) {
+            LOGGER.info("Time spend on WCAG validation [{}] (in s)",
+                testContext.getUtil().getWcagContext().wcagTimer/1000);
+            //Retrieve the wcag report from testUtil and assert it's empty.
+            List<Rule> wcagRuleViolations = testContext.getUtil().getWcagContext().wcagResults;
+            assertTrue(wcagRuleViolations.size() == 0, String.valueOf(wcagRuleViolations.size())+" violations found.");
+            LOGGER.info(wcagRuleViolations.toString());
+        }
 
         // Shutdown the test context
         shutdownPersistentTestContext(testContext);
-
-        TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
 
         // Only stop DB and Servlet Engine if we have started them
         if (!testConfiguration.getServletEngine().equals(ServletEngine.EXTERNAL)) {

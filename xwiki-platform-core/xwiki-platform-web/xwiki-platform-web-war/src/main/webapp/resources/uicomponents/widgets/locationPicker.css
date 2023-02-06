@@ -10,27 +10,29 @@
   /* Keep the same size whatever the content. */
   flex-grow: 1;
   /* Remove rounded corners on the right so that the transition is seamless. */
-  border-radius: 4px 0px 0px 4px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
   /* Combine with .location-actions. */
   border-right: none;
-  padding: 8px 0 8px 15px;
+  padding-right: 0;
 }
 
-.breadcrumb-container{
-  /* Set up a flex display for breadcrumbs and location actions. */
+.breadcrumb-container {
+  /* Sets up a flex display for breadcrumbs and location actions. */
   display: flex;
   flex-wrap: nowrap;
 }
 
-.location-actions {
+.location-picker > dd > .location-actions {
   margin-bottom: 0;
   /* Keeps all actions on one line. */
   white-space: nowrap;
   /* Remove rounded corners on the left so that the transition is seamless. */
-  border-radius: 0px 4px 4px 0px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
   /* Combine with .breadcrumb. */
   border-left: none;
-  padding: 8px 15px 8px 3px;
+  padding-left: 3px;
 }
 
 .location-action {

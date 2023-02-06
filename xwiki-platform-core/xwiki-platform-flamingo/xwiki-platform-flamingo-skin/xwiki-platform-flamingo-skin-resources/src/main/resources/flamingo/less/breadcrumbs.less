@@ -53,7 +53,9 @@
   }
 }
 
-dd .location-actions {
+/* TODO: Update the JS code to use a more specific CSS selector when updating the content of the actual breadcrumb,
+  in order to eventually remove this rule and add the 'breadcrumb' class to the 'location-actions' node. */
+dd > .location-actions {
   /* Retrieve style from the breadcrumb block. Needed for keyboard accessibility reorganization of the
   location-picker component. */
   .breadcrumb;

@@ -51,7 +51,7 @@ import static org.mockito.Mockito.when;
 class EntityResourceLoaderTest
 {
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.DEBUG);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.DEBUG);
 
     @InjectMockComponents
     private EntityResourceLoader resourceLoader;

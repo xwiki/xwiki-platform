@@ -73,7 +73,7 @@ import static org.mockito.Mockito.when;
 class NotificationUserIteratorTest
 {
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @InjectMockComponents
     private NotificationUserIterator userIterator;

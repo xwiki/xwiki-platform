@@ -72,7 +72,7 @@ class DatabaseMailResenderTest
     private MockitoComponentManager componentManager;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
     void resendAsynchronouslySingleMesssage() throws Exception

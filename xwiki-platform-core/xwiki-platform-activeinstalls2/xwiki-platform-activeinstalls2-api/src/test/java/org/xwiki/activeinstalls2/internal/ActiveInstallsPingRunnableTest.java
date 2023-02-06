@@ -49,7 +49,7 @@ class ActiveInstallsPingRunnableTest
     private PingSender pingSender;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
     void sendPingWhenFailing() throws Exception

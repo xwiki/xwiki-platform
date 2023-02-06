@@ -50,7 +50,7 @@ import static org.xwiki.test.LogLevel.DEBUG;
 class MentionsUpdatedEventListenerTest
 {
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(DEBUG);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(DEBUG);
 
     @InjectMockComponents
     private MentionsUpdatedEventListener listener;

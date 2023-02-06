@@ -82,7 +82,7 @@ class BackLinkUpdaterListenerTest
     private DeleteJob deleteJob;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     private DocumentReference aliceReference = new DocumentReference("foo", "Users", "Alice");
 

@@ -54,7 +54,7 @@ class PageIndexNamingCriterionTest
     private DocumentAccessBridge docBridge;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
     void getDocumentReference() throws Exception

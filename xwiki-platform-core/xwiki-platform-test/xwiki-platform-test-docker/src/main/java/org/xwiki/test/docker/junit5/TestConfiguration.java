@@ -62,6 +62,8 @@ public class TestConfiguration
 
     private boolean vnc;
 
+    private boolean wcag;
+
     private Properties properties;
 
     private List<ExtensionOverride> extensionOverrides;
@@ -102,6 +104,7 @@ public class TestConfiguration
         mergeServletEngineTag(testConfiguration.getServletEngineTag());
         mergeJDBCDriverVersion(testConfiguration.getJDBCDriverVersion());
         mergeVNC(testConfiguration.vnc());
+        mergeWCAG(testConfiguration.wcag());
         mergeProperties(testConfiguration.getProperties());
         mergeExtraJARs(testConfiguration.getExtraJARs());
         mergeResolveExtraJARs(testConfiguration.isResolveExtraJARs());
@@ -231,6 +234,11 @@ public class TestConfiguration
         if (!vnc() && vnc) {
             this.vnc = true;
         }
+    }
+
+    private void mergeWCAG(boolean wcag)
+    {
+        this.wcag = wcag() || wcag;
     }
 
     private void mergeOffice(boolean office)
@@ -482,6 +490,22 @@ public class TestConfiguration
     public void setVNC(boolean vnc)
     {
         this.vnc = vnc;
+    }
+
+    /**
+     * @return true if WCAG rules should be checked.
+     */
+    public boolean wcag()
+    {
+        return this.wcag;
+    }
+
+    /**
+     * @param wcag see {@link #wcag()}
+     */
+    public void setWCAG(boolean wcag)
+    {
+        this.wcag = wcag;
     }
 
     /**

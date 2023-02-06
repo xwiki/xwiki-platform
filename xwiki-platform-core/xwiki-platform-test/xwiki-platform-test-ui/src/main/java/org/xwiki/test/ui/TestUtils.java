@@ -104,6 +104,8 @@ import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 
+import com.deque.html.axecore.results.Rule;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -214,6 +216,13 @@ public class TestUtils
     /** Cached secret token. TODO cache for each user. */
     private String secretToken = null;
 
+    /** Cached accessibility results. */
+    public class WCAGContext{
+        public boolean wcagSetup = true;
+        public List<Rule> wcagResults = new ArrayList<Rule>();
+        public long wcagTimer = 0;
+    }
+    private WCAGContext wcagContext = new WCAGContext();
     private HttpClient httpClient;
 
     /**
@@ -1371,6 +1380,43 @@ public class TestUtils
             return "";
         }
         return this.secretToken;
+    }
+    /**
+     * Set the WCAG validation setup parameter for the test suite.
+     *
+     */
+    public void setWcagSetup(boolean wcag)
+    {
+        this.wcagContext.wcagSetup = wcag;
+    }
+
+    /**
+     * Appends WCAG results to the test suite cache.
+     *
+     */
+    public void addWcagResults(List<Rule> newViolations)
+    {
+        if(this.wcagContext.wcagSetup) {
+            this.wcagContext.wcagResults.addAll(newViolations);
+        }
+    }
+    /**
+     * Adds time used for WCAG validation to the test suite cache.
+     *
+     */
+    public void addWcagTime(long time)
+    {
+        this.wcagContext.wcagTimer += time;
+    }
+
+    /**
+     * Get the WCAG results for the test suite.
+     *
+     * @return WCAG rules violations list
+     */
+    public WCAGContext getWcagContext()
+    {
+        return this.wcagContext;
     }
 
     /**

@@ -167,22 +167,20 @@ require(['jquery'], function($) {
   $('.menu-horizontal li ul,.menu-vertical li ul').parent().addClass('xDropdown');
 
   // Make sure the menu separators are really empty.
-  $('.menu-horizontal, .menu-vertical').find('li > br:first-child').remove();
+  $('.menu-horizontal, .menu-vertical').find('li &gt; br:first-child').remove();
 
-  //add aria attributes to the different elements
+  // Add aria attributes to the different elements.
   $('.menu-horizontal').attr('role', 'menubar');
   $('.menu-vertical').attr('role', 'menu');
-  $('.xDropdown').each(function(){
+  $('.xDropdown').each(function() {
     $(this).attr('role', 'menuitem');
     $(this).attr('aria-haspopup', 'menu');
   });
   $('.menu-horizontal, .menu-vertical').find('li')
-    .filter(function(index){return this.textContent.trim() === ""})
+    .filter(function(index) {return this.textContent.trim() === ""; })
     .attr("role","separator");
 
-
-
-  $('.menu-vertical.collapsible').each(function(){
+  $('.menu-vertical.collapsible').each(function() {
     var open = $(this).hasClass('open');
     $(this).find('li ul').each(function() {
       $(this).addClass('xDropdown-menu').parent().addClass('xDropdown' + (open ? ' open' : ''));
@@ -202,13 +200,13 @@ require(['jquery'], function($) {
     });
   }
 
-  $('.menu-horizontal .xDropdown,.menu-vertical .xDropdown').each(function(){
+  $('.menu-horizontal .xDropdown,.menu-vertical .xDropdown').each(function() {
     var dropDownHeader = this.ownerDocument.createElement("div");
     $(dropDownHeader).addClass("xDropdown-header");
     var dropDownButton = this.ownerDocument.createElement("button");
     $(dropDownButton).addClass("xDropdown-header-toggle");
     setDropdownButtonTitle(dropDownButton);
-    dropDownButton.addEventListener('click',function(){
+    dropDownButton.addEventListener('click',function() {
       //Swaps the state of the submenu.
       var xDropdown = $(this).parent().parent();
       xDropdown.toggleClass('open');
@@ -220,13 +218,13 @@ require(['jquery'], function($) {
     $(dropDownHeader).next().addClass('xDropdown-menu');
   });
 
-  $('.menu-horizontal .xDropdown').each(function(){
+  $('.menu-horizontal .xDropdown').each(function() {
     // In case of horizontal menus, make it so that a class is added on hover, instead of using the :hover pseudo-class
-    this.addEventListener("mouseover", function(){
+    this.addEventListener("mouseover", function() {
       $(this).addClass('open');
       setDropdownButtonTitle(this.firstChild.lastChild);
     });
-    this.addEventListener("mouseout", function(){
+    this.addEventListener("mouseout", function() {
       $(this).removeClass('open');
       setDropdownButtonTitle(this.firstChild.lastChild);
     });
@@ -651,24 +649,25 @@ require(['jquery'], function($) {
   }
 }
 .menu {
+  /* Rotate the carets when the menu is opened. */
   .xDropdown{
-    &gt; .xDropdown-header &gt; .xDropdown-header-toggle:before{
+    &gt; .xDropdown-header &gt; .xDropdown-header-toggle:before {
         transform: rotate(90deg);
       }
-    &amp;.open &gt; .xDropdown-header &gt; .xDropdown-header-toggle:before{
+    &amp;.open &gt; .xDropdown-header &gt; .xDropdown-header-toggle:before {
       transform: rotate(0);
     }
   }
-  .xDropdown-header-toggle{
+  .xDropdown-header-toggle {
     background: transparent;
     border:none;
     border-radius: @border-radius-base;
     margin: (@line-height-computed / 8) .3em;
-    line-height: (@line-height-computed / 2) ;
+    line-height: (@line-height-computed / 2);
     &amp;:hover, &amp;:focus-within {
       background-color: @dropdown-bg;
     }
-    &amp;:before{
+    &amp;:before {
       .caret;
       margin-left: 0px;
       content: '';
@@ -711,10 +710,10 @@ require(['jquery'], function($) {
     min-height: @navbar-height;
     padding-left: 25px;
     .xDropdown.open {
-      &gt; .xDropdown-header &gt; .xDropdown-header-toggle:before{
+      &gt; .xDropdown-header &gt; .xDropdown-header-toggle:before {
         transform: rotate(0);
       }
-      > ul {
+      &gt; ul {
         display: block;
       }
     }
@@ -757,14 +756,13 @@ require(['jquery'], function($) {
           max-height: @navbar-height - (2 * @navbar-padding-vertical) - 2px;
           overflow: hidden;
           &amp;.xDropdown-header{
-            /* No border on the dropdown header */
             max-height: unset;
           }
         }
-        /*Navbar headers.*/
-        &amp; &gt; .xDropdown-header &gt; .xDropdown-header-toggle{
-          &amp;:hover, &amp;:focus-within{
-            /* Change background color of the caret when hovering on the navbar.*/
+        /* Horizontal menu top-level headers. */
+        &amp; &gt; .xDropdown-header &gt; .xDropdown-header-toggle {
+          &amp;:hover, &amp;:focus-within {
+            /* Change background color of the caret when hovering on the navbar. */
             background-color: @navbar-default-bg;
           }
         }
@@ -844,7 +842,7 @@ require(['jquery'], function($) {
               display: inherit;
             }
             /* Place the arrow on the right */
-            &amp;:after  {
+            &amp;:after {
               position: absolute;
               margin-top: @line-height-computed / 2;
               right: 8px;

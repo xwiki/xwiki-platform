@@ -83,6 +83,8 @@ public interface URLSecurityManager
      * This method throws a {@link SecurityException} if the parsed URI is not safe to use according to
      * {@link #isURITrusted(URI)}. It might also throw a {@link URISyntaxException} if the parameter cannot be properly
      * parsed.
+     * Note that this method might try to "repair" URI that are not parsed correctly by {@link URI#URI(String)}
+     * (e.g. serialized uri containing spaces).
      *
      * @param serializedURI a string representing a URI that needs to be parsed.
      * @return a URI safe to use

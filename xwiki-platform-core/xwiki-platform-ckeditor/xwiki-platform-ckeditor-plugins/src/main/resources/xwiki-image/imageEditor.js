@@ -146,7 +146,7 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
       };
       var data = modal.data('input');
       // Resolve the image url and assign it to a transient image object to be able to access its width and height.
-      img.src = CKEDITOR.plugins.xwikiResource.getResourceURL(data.imageData.resourceReference, data.editor);
+      img.src = getImageResourceURL(data.imageData.resourceReference, data.editor);
       return promise;
     }
 
@@ -243,13 +243,9 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
             result = resvalue + suffix;
           }
 
-          promise.resolve(result);
+          return result;
 
-        };
-        var data = modal.data('input');
-        // Resolve the image url and assign it to a transient image object to be able to access its width and height.
-        img.src = getImageResourceURL(data.imageData.resourceReference, data.editor);
-        return promise;
+        });
       }
 
       /**

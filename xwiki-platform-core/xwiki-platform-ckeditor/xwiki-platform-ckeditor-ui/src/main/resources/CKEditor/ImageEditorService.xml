@@ -151,7 +151,7 @@
                 $services.icon.renderHTML('unlock')
             &lt;/button&gt;
           &lt;/dd&gt;
-          &lt;dd class='hidden has-error'&gt;
+          &lt;dd class='hidden has-warning'&gt;
             &lt;span class="help-block outscaleWarning"&gt;&lt;/span&gt;
           &lt;/dd&gt;
           &lt;dt&gt;

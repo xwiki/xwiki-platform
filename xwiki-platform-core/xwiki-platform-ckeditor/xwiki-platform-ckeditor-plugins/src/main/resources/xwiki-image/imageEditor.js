@@ -169,22 +169,23 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
         var widthOutscaled = newWidth > width;
         var heightOutscaled = newHeight > height;
 
+        var hasWarningClass = 'has-warning';
         if (widthOutscaled) {
-          widthField.parent('label').addClass('has-error');
+          widthField.parent('label').addClass(hasWarningClass);
         } else {
-          widthField.parent('label').removeClass('has-error');
+          widthField.parent('label').removeClass(hasWarningClass);
         }
         if (heightOutscaled) {
-          heightField.parent('label').addClass('has-error');
+          heightField.parent('label').addClass(hasWarningClass);
         } else {
-          heightField.parent('label').removeClass('has-error');
+          heightField.parent('label').removeClass(hasWarningClass);
         }
 
         if (widthOutscaled || heightOutscaled) {
-          errorField.parent('.has-error').removeClass('hidden');
+          errorField.parent('.has-warning').removeClass('hidden');
           errorField.text(translations.get('modal.outscaleWarning', width + 'x' + height + 'px'));
         } else {
-          errorField.parent('.has-error').addClass('hidden');
+          errorField.parent('.has-warning').addClass('hidden');
         }
       });
     }

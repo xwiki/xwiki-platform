@@ -503,5 +503,12 @@ class DefaultURLSecurityManagerTest
         location = "http://fa%C3%9F%.example/Some Space/Test#anchor%202";
         uri = this.urlSecurityManager.parseToSafeURI(location);
         assertEquals("http://fa%C3%9F%25.example/Some%20Space/Test#anchor%202", uri.toString());
+
+        String locationWithForbiddenToken = "//xwiki.org/xwiki/__XWIKI_URL_SECURITY_PERCENT__/something/";
+        IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
+            () -> this.urlSecurityManager.parseToSafeURI(locationWithForbiddenToken));
+        assertEquals("The given uri [//xwiki.org/xwiki/__XWIKI_URL_SECURITY_PERCENT__/something/] contains the string "
+            + "[__XWIKI_URL_SECURITY_PERCENT__] which is used internally for performing escaping operations. "
+            + "Please use another marker.", illegalArgumentException.getMessage());
     }
 }

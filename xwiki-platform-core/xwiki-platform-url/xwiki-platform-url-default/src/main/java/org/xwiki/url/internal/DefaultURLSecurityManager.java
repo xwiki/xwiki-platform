@@ -61,6 +61,12 @@ public class DefaultURLSecurityManager implements URLSecurityManager
     private static final char DOT = '.';
     private static final char PERCENT = '%';
 
+    /**
+     * Dedicated string used to escape {@code %} character.
+     * @see #parseToSafeURI(String)
+     */
+    private static final String PERCENT_ESCAPE = "__XWIKI_URL_SECURITY_PERCENT__";
+
     // Regular expression taken from https://www.rfc-editor.org/rfc/rfc3986#appendix-B.
     private static final Pattern URI_PATTERN =
         Pattern.compile("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");
@@ -214,6 +220,11 @@ public class DefaultURLSecurityManager implements URLSecurityManager
     public URI parseToSafeURI(String serializedURI) throws URISyntaxException, SecurityException
     {
         URI uri;
+        if (serializedURI.contains(PERCENT_ESCAPE)) {
+            throw new IllegalArgumentException(
+                String.format("The given uri [%s] contains the string [%s] which is used internally "
+                + "for performing escaping operations. Please use another marker.", serializedURI, PERCENT_ESCAPE));
+        }
         try {
             uri = new URI(serializedURI);
         } catch (URISyntaxException e) {

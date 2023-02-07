@@ -550,7 +550,8 @@ public class TestUtils
         // Set custom properties
         for (int i = 0; i < properties.length; i += 2) {
             int nextIndex = i + 1;
-            tipObject.getProperties().add(property((String) properties[i], nextIndex < properties.length ? properties[nextIndex] : null));
+            tipObject.getProperties().add(
+                property((String) properties[i], nextIndex < properties.length ? properties[nextIndex] : null));
         }
 
         userPage.getObjects().getObjectSummaries().add(tipObject);
@@ -562,12 +563,14 @@ public class TestUtils
             fail("Failed to save the user with name [" + username + "]", e);
         }
 
+        // Ensure to use proper secret token before adding the object.
+        this.recacheSecretToken();
+        // Add the user to XWikiAllGroup
+        addObject("XWiki", "XWikiAllGroup", "XWiki.XWikiGroups", "member", serializeReference(userReference));
+
         if (!StringUtils.isEmpty(redirectURL)) {
             getDriver().get(redirectURL);
         }
-
-        // Add the user to XWikiAllGroup
-        addObject("XWiki", "XWikiAllGroup", "XWiki.XWikiGroups", "member", serializeReference(userReference));
     }
 
     /**

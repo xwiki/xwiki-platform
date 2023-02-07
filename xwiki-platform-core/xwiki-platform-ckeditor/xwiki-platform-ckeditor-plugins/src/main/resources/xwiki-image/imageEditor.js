@@ -23,7 +23,8 @@ define('imageEditorTranslationKeys', [], [
   'modal.loadFail.message',
   'modal.title',
   'modal.insertButton',
-  'modal.initialization.fail'
+  'modal.initialization.fail',
+  'modal.outscaleWarning'
 ]);
 
 define('imageStyleClient', ['jquery'], function($) {
@@ -128,6 +129,67 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
       });
     }
 
+    /**
+     * Asynchronously load the currently selected image. If this method is called several times for the same image, a
+     * single http request is made.
+     *
+     * @param modal the current modal
+     * @returns {*} a promise containing the image object
+     */
+    function loadImage(modal) {
+      var img = new Image();
+
+      var promise = $.Deferred();
+
+      img.onload = function () {
+        promise.resolve(this);
+      };
+      var data = modal.data('input');
+      // Resolve the image url and assign it to a transient image object to be able to access its width and height.
+      img.src = getImageResourceURL(data.imageData.resourceReference, data.editor);
+      return promise;
+    }
+
+    /**
+     * Check the dimensions of the current image and raise and error if the dimensions are larger than the dimensions 
+     * of the original image.
+     * 
+     * @param modal the current modal
+     */
+    function checkDimensions(modal) {
+      loadImage(modal).then(function (image) {
+        var widthField = modal.find('[name="imageWidth"]');
+        var heightField = modal.find('[name="imageHeight"]');
+        var errorField = modal.find('.outscaleWarning');
+        var width = image.width;
+        var height = image.height;
+        var newWidth = widthField.val();
+        var newHeight = heightField.val();
+
+        var widthOutscaled = newWidth > width;
+        var heightOutscaled = newHeight > height;
+
+        var hasWarningClass = 'has-warning';
+        if (widthOutscaled) {
+          widthField.parent('label').addClass(hasWarningClass);
+        } else {
+          widthField.parent('label').removeClass(hasWarningClass);
+        }
+        if (heightOutscaled) {
+          heightField.parent('label').addClass(hasWarningClass);
+        } else {
+          heightField.parent('label').removeClass(hasWarningClass);
+        }
+
+        if (widthOutscaled || heightOutscaled) {
+          errorField.parent('.has-warning').removeClass('hidden');
+          errorField.text(translations.get('modal.outscaleWarning', width + 'x' + height + 'px'));
+        } else {
+          errorField.parent('.has-warning').addClass('hidden');
+        }
+      });
+    }
+    
     function addToggleImageWidthLock(modal) {
       var imageSizeLocked = modal.find('.image-size-locked');
       var imageSizeUnlocked = modal.find('.image-size-unlocked');
@@ -151,11 +213,9 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
        * @returns {*|jQuery} a Defered, resolved with the computed value
        */
       function updateRatio(field, inputvalue) {
-        var promise = $.Deferred();
-        var img = new Image();
-        img.onload = function () {
-          var width = this.width;
-          var height = this.height;
+        return loadImage(modal).then(function (image) {
+          var width = image.width;
+          var height = image.height;
 
           var extract = /^(\d+)(.*)/.exec(inputvalue);
 
@@ -184,13 +244,9 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
             result = resvalue + suffix;
           }
 
-          promise.resolve(result);
+          return result;
 
-        };
-        var data = modal.data('input');
-        // Resolve the image url and assign it to a transient image object to be able to access its width and height.
-        img.src = getImageResourceURL(data.imageData.resourceReference, data.editor);
-        return promise;
+        });
       }
 
       /**
@@ -201,13 +257,14 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
        * @param inputField the field to read the value from
        * @param targetField the field to update with the computed dimension (height for the width field, and width for
        *  the height field)
+       * @param a promise, resolved when the size is updated
        */
       function updateSize(field, inputField, targetField) {
         var inputValue = inputField.val();
         if (locked) {
           imageWidthField.prop('disabled', true);
           imageHeightField.prop('disabled', true);
-          $.when(updateRatio(field, inputValue)).then(function (value) {
+          return $.when(updateRatio(field, inputValue)).then(function (value) {
             targetField.val(value);
             imageWidthField.prop('disabled', false);
             imageHeightField.prop('disabled', false);
@@ -215,15 +272,21 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
             // updated.
             inputField.focus();
           });
+        } else {
+          return $.Deferred().resolve();
         }
       }
 
       imageWidthField.on('input', function () {
-        updateSize('width', $(this), imageHeightField);
+        updateSize('width', $(this), imageHeightField).then(function () {
+          checkDimensions(modal);
+        });
       });
 
       imageHeightField.on('input', function () {
-        updateSize('height', $(this), imageWidthField);
+        updateSize('height', $(this), imageWidthField).then(function () {
+          checkDimensions(modal);
+        });
       });
     }
 
@@ -393,6 +456,8 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
 
       //  Override with the style values only if it's a new image.
       updateAdvancedFromStyle($('#imageStyles')[0].selectize.getValue(), modal);
+      // Initial check of the image dimensions on load.
+      checkDimensions(modal);
     }
 
     return $modal.createModalStep({

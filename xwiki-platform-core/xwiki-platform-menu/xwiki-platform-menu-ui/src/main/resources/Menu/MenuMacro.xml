@@ -167,7 +167,20 @@ require(['jquery'], function($) {
   $('.menu-horizontal li ul,.menu-vertical li ul').parent().addClass('xDropdown');
 
   // Make sure the menu separators are really empty.
-  $('.menu-horizontal, .menu-vertical').find('li &gt; br:first-child').remove();
+  $('.menu-horizontal, .menu-vertical').find('li > br:first-child').remove();
+
+  //add aria attributes to the different elements
+  $('.menu-horizontal').attr('role', 'menubar');
+  $('.menu-vertical').attr('role', 'menu');
+  $('.xDropdown').each(function(){
+    $(this).attr('role', 'menuitem');
+    $(this).attr('aria-haspopup', 'menu');
+  });
+  $('.menu-horizontal, .menu-vertical').find('li')
+    .filter(function(index){return this.textContent.trim() === ""})
+    .attr("role","separator");
+
+
 
   $('.menu-vertical.collapsible').each(function(){
     var open = $(this).hasClass('open');
@@ -176,38 +189,47 @@ require(['jquery'], function($) {
     });
   });
 
+  function setDropdownButtonTitle(dropDownButton) {
+    var xDropdown = $(dropDownButton).parent().parent();
+    require(['xwiki-l10n!menu-ui-translation-keys'], function(l10n) {
+      if($(dropDownButton).parent().parent().hasClass('open')){
+        $(dropDownButton).attr('title',l10n['closeSubMenu']);
+        $(xDropdown).attr('aria-expanded', "true");
+      }else{
+        $(dropDownButton).attr('title',l10n['openSubMenu']);
+        $(xDropdown).attr('aria-expanded', "false");
+      }
+    });
+  }
+
   $('.menu-horizontal .xDropdown,.menu-vertical .xDropdown').each(function(){
-    console.log("FoundElement.");
     var dropDownHeader = this.ownerDocument.createElement("div");
     $(dropDownHeader).addClass("xDropdown-header");
     var dropDownButton = this.ownerDocument.createElement("button");
     $(dropDownButton).addClass("xDropdown-header-toggle");
-    require(['xwiki-l10n!menu-ui-translation-keys'], function(l10n) {
-      if($(dropDownButton).parent().parent().hasClass('open')){
-        $(dropDownButton).attr('title',l10n['closeSubMenu']);
-      }else{
-        $(dropDownButton).attr('title',l10n['openSubMenu']);
-      }
-    });
-
+    setDropdownButtonTitle(dropDownButton);
     dropDownButton.addEventListener('click',function(){
-      console.log("Clicked toggle button.");
       //Swaps the state of the submenu.
-      var toggable = $(this).parent().parent();
-      toggable.toggleClass('open');
-      $(dropDownButton).attr('title',"Open menu");
-      require(['xwiki-l10n!menu-ui-translation-keys'], function(l10n) {
-        if(toggable.hasClass('open')){
-          $(dropDownButton).attr('title',l10n['closeSubMenu']);
-        }else{
-          $(dropDownButton).attr('title',l10n['openSubMenu']);
-        }
-      });
+      var xDropdown = $(this).parent().parent();
+      xDropdown.toggleClass('open');
+      setDropdownButtonTitle(dropDownButton);
     });
     dropDownHeader.append($(this).contents()[0]);
     dropDownHeader.append(dropDownButton);
     $(this).prepend(dropDownHeader);
     $(dropDownHeader).next().addClass('xDropdown-menu');
+  });
+
+  $('.menu-horizontal .xDropdown').each(function(){
+    // In case of horizontal menus, make it so that a class is added on hover, instead of using the :hover pseudo-class
+    this.addEventListener("mouseover", function(){
+      $(this).addClass('open');
+      setDropdownButtonTitle(this.firstChild.lastChild);
+    });
+    this.addEventListener("mouseout", function(){
+      $(this).removeClass('open');
+      setDropdownButtonTitle(this.firstChild.lastChild);
+    });
   });
 
   // In case of horizontal responsive menus, make sub-submenus in the navbar work on mobile devices
@@ -641,9 +663,9 @@ require(['jquery'], function($) {
     background: transparent;
     border:none;
     border-radius: @border-radius-base;
-    margin: (@line-height-computed / 4);
-    line-height: (@line-height-computed / 2) + 2;
-    &amp;:hover, :focus{
+    margin: (@line-height-computed / 8) .3em;
+    line-height: (@line-height-computed / 2) ;
+    &amp;:hover, &amp;:focus-within {
       background-color: @dropdown-bg;
     }
     &amp;:before{
@@ -689,12 +711,12 @@ require(['jquery'], function($) {
     min-height: @navbar-height;
     padding-left: 25px;
     .xDropdown.open {
-      &gt; ul {
+      &gt; .xDropdown-header &gt; .xDropdown-header-toggle:before{
+        transform: rotate(0);
+      }
+      > ul {
         display: block;
       }
-    }
-    .xDropdown:hover &gt; .xDropdown-header &gt; .xDropdown-header-toggle:before{
-      transform: rotate(0);
     }
     &amp; &gt; ul {
       padding-left: 0;
@@ -711,7 +733,7 @@ require(['jquery'], function($) {
         }
         line-height: @line-height-computed;
         color: @navbar-default-link-color;
-        &amp;:hover {
+        &amp;:hover, &amp;:focus-within {
           color: @navbar-default-link-hover-color;
           background-color: @navbar-default-link-hover-bg;
           background-color: @navbar-default-link-active-bg;
@@ -725,7 +747,7 @@ require(['jquery'], function($) {
         /* Links inside menu */
         a {
           color: @navbar-default-link-color;
-          &amp;:hover{
+          &amp;:hover, &amp;:focus-within {
             text-decoration: none;
           }
         }
@@ -736,12 +758,12 @@ require(['jquery'], function($) {
           overflow: hidden;
           &amp;.xDropdown-header{
             /* No border on the dropdown header */
-            max-height: @navbar-height - (2 * @navbar-padding-vertical);
+            max-height: unset;
           }
         }
         /*Navbar headers.*/
         &amp; &gt; .xDropdown-header &gt; .xDropdown-header-toggle{
-          &amp;:hover, &amp;:focus{
+          &amp;:hover, &amp;:focus-within{
             /* Change background color of the caret when hovering on the navbar.*/
             background-color: @navbar-default-bg;
           }
@@ -789,7 +811,7 @@ require(['jquery'], function($) {
             color: @dropdown-link-color;
             overflow: hidden;
             text-overflow: ellipsis; // Displaying ... if the text is too long
-            &amp;:hover {
+            &amp;:hover, &amp;:focus-within {
               /* &amp;:extend(.dropdown-menu&gt;li&gt;a:hover); */
               text-decoration: none;
               color: @dropdown-link-hover-color;
@@ -807,7 +829,7 @@ require(['jquery'], function($) {
             color: @dropdown-link-color;
             /* Empty dropdowns should have height in order to display the arrow */
             min-height: 2 * @font-size-base;
-            &amp;:hover{
+            &amp;:hover, &amp;:focus-within {
               text-decoration: none;
               color: @dropdown-link-hover-color;
               background-color: @dropdown-link-hover-bg;
@@ -839,7 +861,7 @@ require(['jquery'], function($) {
     /* Stylization: Generic */
     li {
       /* Display submenus on hover */
-      &amp;:hover &gt; ul {
+      &amp;.open &gt; ul {
         display: block;
       }
     }
@@ -885,14 +907,11 @@ require(['jquery'], function($) {
             /* Links inside menu */
             a {
               color: @navbar-default-link-color;
-              &amp;:hover {
-                /* Preserve the styling from dropdown */
-              }
             }
             /* Submenus inside menu */
             &amp;.xDropdown {
               color: @navbar-default-link-color;
-              &amp;:hover {
+              &amp;.open {
                 background-color: transparent;
                 color: inherit;
               }

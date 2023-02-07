@@ -220,14 +220,18 @@ public class DefaultURLSecurityManager implements URLSecurityManager
     public URI parseToSafeURI(String serializedURI) throws URISyntaxException, SecurityException
     {
         URI uri;
-        if (serializedURI.contains(PERCENT_ESCAPE)) {
-            throw new IllegalArgumentException(
-                String.format("The given uri [%s] contains the string [%s] which is used internally "
-                + "for performing escaping operations. Please use another marker.", serializedURI, PERCENT_ESCAPE));
-        }
         try {
             uri = new URI(serializedURI);
         } catch (URISyntaxException e) {
+            // We don't try to repair URI if they use our internal marker to avoid mistakes.
+            if (serializedURI.contains(PERCENT_ESCAPE)) {
+                throw new IllegalArgumentException(
+                    String.format("The given uri [%s] contains the string [%s] which is used internally "
+                        + "for performing escaping operations when trying to 'repair' a URI which cannot be parsed. "
+                        + "Check the original error for repairing the URI or try to use a different marker.",
+                        serializedURI,
+                        PERCENT_ESCAPE), e);
+            }
             // Attempt repairing the invalid URI similar to org.eclipse.jetty.client.HttpRedirector#sanitize by
             // extracting the different parts and then passing them to the multi-argument constructor that quotes
             // illegal characters.

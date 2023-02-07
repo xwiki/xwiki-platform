@@ -164,7 +164,7 @@ $menuTemplateDoc.content.replace('{', '')
 require(['jquery'], function($) {
   // It's not possible to write a CSS selector that targets list items containing lists so we rely on JavaScript.
   // The 'dropdown' CSS class is used only to display the down/left arrow.
-  $('.menu-horizontal li ul,.menu-vertical li ul').parent().addClass('xDropdown');
+  $('.menu-horizontal li ul, .menu-vertical li ul').parent().addClass('xDropdown');
 
   // Make sure the menu separators are really empty.
   $('.menu-horizontal, .menu-vertical').find('li &gt; br:first-child').remove();
@@ -200,7 +200,7 @@ require(['jquery'], function($) {
     });
   }
 
-  $('.menu-horizontal .xDropdown,.menu-vertical .xDropdown').each(function() {
+  $('.menu-horizontal .xDropdown, .menu-vertical .xDropdown').each(function() {
     var dropDownHeader = this.ownerDocument.createElement("div");
     $(dropDownHeader).addClass("xDropdown-header");
     var dropDownButton = this.ownerDocument.createElement("button");

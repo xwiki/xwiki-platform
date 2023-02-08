@@ -164,16 +164,15 @@ $menuTemplateDoc.content.replace('{', '')
 require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($,l10n) {
   // It's not possible to write a CSS selector that targets list items containing lists so we rely on JavaScript.
   // The 'dropdown' CSS class is used only to display the down/left arrow.
-  $('.menu-horizontal li ul, .menu-vertical li ul').parent().addClass('xDropdown');
+  $('.menu-horizontal li ul, .menu-vertical li ul').parent()
+    .addClass('xDropdown')
+    .attr('role', 'menuitem')
+    .attr('aria-haspopup', 'menu');
 
   // Make sure the menu separators are really empty.
   $('.menu-horizontal, .menu-vertical').find('li &gt; br:first-child').remove();
 
-  // Add aria attributes to the different elements.
-  $('.xDropdown').each(function() {
-    $(this).attr('role', 'menuitem');
-    $(this).attr('aria-haspopup', 'menu');
-  });
+  // Add aria attributes to the menu separators.
   $('.menu-horizontal, .menu-vertical').find('li')
     .filter(function(index) {return this.textContent.trim() === ""; })
     .attr("role","separator");
@@ -186,9 +185,9 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($,l10n) {
     });
   });
 
-  function setDropdownButtonTitle(dropDownButton) {
+  function setDropdownStateInfo(dropDownButton) {
     var xDropdown = $(dropDownButton).parent().parent();
-    if($(dropDownButton).parent().parent().hasClass('open')){
+    if($(xDropdown).hasClass('open')){
       $(dropDownButton).attr('title',l10n['closeSubMenu']);
       $(xDropdown).attr('aria-expanded', "true");
     }else{
@@ -197,17 +196,17 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($,l10n) {
     }
   }
 
-  $('.menu-horizontal .xDropdown, .menu-vertical .xDropdown').each(function() {
+  $('.xDropdown').each(function() {
     var dropDownHeader = this.ownerDocument.createElement("div");
     $(dropDownHeader).addClass("xDropdown-header");
     var dropDownButton = this.ownerDocument.createElement("button");
     $(dropDownButton).addClass("xDropdown-header-toggle");
-    setDropdownButtonTitle(dropDownButton);
+    setDropdownStateInfo(dropDownButton);
     dropDownButton.addEventListener('click',function() {
       //Swaps the state of the submenu.
       var xDropdown = $(this).parent().parent();
       xDropdown.toggleClass('open');
-      setDropdownButtonTitle(dropDownButton);
+      setDropdownStateInfo(dropDownButton);
     });
     dropDownHeader.append($(this).contents()[0]);
     dropDownHeader.append(dropDownButton);

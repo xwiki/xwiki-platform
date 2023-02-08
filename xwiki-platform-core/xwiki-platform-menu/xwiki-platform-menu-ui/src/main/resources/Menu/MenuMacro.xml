@@ -161,7 +161,7 @@ $menuTemplateDoc.content.replace('{', '')
     "closeSubMenu"
   ]
 });
-require(['jquery'], function($) {
+require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($,l10n) {
   // It's not possible to write a CSS selector that targets list items containing lists so we rely on JavaScript.
   // The 'dropdown' CSS class is used only to display the down/left arrow.
   $('.menu-horizontal li ul, .menu-vertical li ul').parent().addClass('xDropdown');
@@ -170,8 +170,6 @@ require(['jquery'], function($) {
   $('.menu-horizontal, .menu-vertical').find('li &gt; br:first-child').remove();
 
   // Add aria attributes to the different elements.
-  $('.menu-horizontal').attr('role', 'menubar');
-  $('.menu-vertical').attr('role', 'menu');
   $('.xDropdown').each(function() {
     $(this).attr('role', 'menuitem');
     $(this).attr('aria-haspopup', 'menu');
@@ -180,6 +178,7 @@ require(['jquery'], function($) {
     .filter(function(index) {return this.textContent.trim() === ""; })
     .attr("role","separator");
 
+  // Vertical menus are initially expanded
   $('.menu-vertical.collapsible').each(function() {
     var open = $(this).hasClass('open');
     $(this).find('li ul').each(function() {
@@ -189,15 +188,13 @@ require(['jquery'], function($) {
 
   function setDropdownButtonTitle(dropDownButton) {
     var xDropdown = $(dropDownButton).parent().parent();
-    require(['xwiki-l10n!menu-ui-translation-keys'], function(l10n) {
-      if($(dropDownButton).parent().parent().hasClass('open')){
-        $(dropDownButton).attr('title',l10n['closeSubMenu']);
-        $(xDropdown).attr('aria-expanded', "true");
-      }else{
-        $(dropDownButton).attr('title',l10n['openSubMenu']);
-        $(xDropdown).attr('aria-expanded', "false");
-      }
-    });
+    if($(dropDownButton).parent().parent().hasClass('open')){
+      $(dropDownButton).attr('title',l10n['closeSubMenu']);
+      $(xDropdown).attr('aria-expanded', "true");
+    }else{
+      $(dropDownButton).attr('title',l10n['openSubMenu']);
+      $(xDropdown).attr('aria-expanded', "false");
+    }
   }
 
   $('.menu-horizontal .xDropdown, .menu-vertical .xDropdown').each(function() {
@@ -1240,12 +1237,12 @@ require(['jquery'], function($) {
         &lt;/button&gt;
       {{/html}}
     )))
-    (% id="$!{services.rendering.escape($id, 'xwiki/2.1')}" class="menu menu-${services.rendering.escape($!type, 'xwiki/2.1')} collapse navbar-collapse" %)(((
+    (% id="$!{services.rendering.escape($id, 'xwiki/2.1')}" class="menu menu-${services.rendering.escape($!type, 'xwiki/2.1')} collapse navbar-collapse" role="menubar" %)(((
       {{wikimacrocontent/}}
     )))
   )))
 #else
-  (% #if ("$!id" != '') id="${services.rendering.escape($id, 'xwiki/2.1')}"#end class="menu menu-${services.rendering.escape($!type, 'xwiki/2.1')}" %)(((
+  (% #if ("$!id" != '') id="${services.rendering.escape($id, 'xwiki/2.1')}"#end class="menu menu-${services.rendering.escape($!type, 'xwiki/2.1')}" role="menu" %)(((
     {{wikimacrocontent/}}
   )))
 #end

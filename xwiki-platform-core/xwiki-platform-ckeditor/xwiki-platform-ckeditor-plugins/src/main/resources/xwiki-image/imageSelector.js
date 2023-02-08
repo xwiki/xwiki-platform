@@ -90,8 +90,10 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'l10n!imageSelector'],
             value = resource.convertEntityReferenceToResourceReference(getEntityReference(imageReference));
           } else {
             value = imageReference;
-            value.typed = true;
           }
+          // Always make the image reference untyped to stay compatible with syntaxes that does not support them
+          // (e.g., xwiki/2.1).
+          value.typed = false;
           imageReferenceValue = value;
         }
 

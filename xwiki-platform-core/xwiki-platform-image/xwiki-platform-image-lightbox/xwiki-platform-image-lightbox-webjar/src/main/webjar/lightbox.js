@@ -225,6 +225,9 @@ define('xwiki-lightbox', [
       // Remember the index of the image to show first.
       $('.openLightbox').data('index', [...lightboxImages].indexOf(img));
     }).on('inserted.bs.popover', function() {
+      // Move the popover 2 pixels below, in order to still have the cursor over the image when the popover is
+      // displayed.
+      $(this).css('top', $(this).position().top + 2 +'px');
       var img = $("#imagePopoverContainer").data('target');
       $('.popover .imageDownload').attr('href', img.src);
       $('.popover .imageDownload').attr('download', getImageName(img.src));

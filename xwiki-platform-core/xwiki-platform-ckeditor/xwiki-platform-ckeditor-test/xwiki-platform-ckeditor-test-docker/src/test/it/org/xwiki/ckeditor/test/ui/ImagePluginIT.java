@@ -87,9 +87,9 @@ class ImagePluginIT
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
         // Verify that the content matches what we did using CKEditor.
-        assertEquals("[[image:attach:image.gif]]\n"
+        assertEquals("[[image:image.gif]]\n"
             + "\n"
-            + "[[Caption>>image:attach:image.gif]]", savedPage.editWiki().getContent());
+            + "[[Caption>>image:image.gif]]", savedPage.editWiki().getContent());
     }
 
     @Test
@@ -137,7 +137,7 @@ class ImagePluginIT
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
         // Verify that the content matches what we did using CKEditor.
-        assertEquals("[[image:attach:image.gif||data-xwiki-image-style=\"bordered\"]]",
+        assertEquals("[[image:image.gif||data-xwiki-image-style=\"bordered\"]]",
             savedPage.editWiki().getContent());
 
         // Re-edit the page.

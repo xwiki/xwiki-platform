@@ -415,7 +415,7 @@
       #set($propType = "$!propClass.get($colname).type")
     #end
     #set($fieldValue = "$!itemDoc.getValue($colname)")
-    #set($fieldDisplayValue = "$!itemDoc.display($colname, 'view')")
+    #set($fieldDisplayValue = "#unwrapXPropertyDisplay($itemDoc.display($colname, 'view'))")
     #if($fieldDisplayValue == '')
       #set($fieldDisplayValue = $services.localization.render("${request.transprefix}emptyvalue"))
     #end
@@ -427,7 +427,7 @@
         #set($fieldUrl = '')
       #end
     #end
-    #set($discard = $row.put($colname, $fieldDisplayValue.replaceFirst($regextool.quote('{{html clean="false" wiki="false"}}'), '').replaceAll("$regextool.quote('{{/html}}')$", '')))
+    #set($discard = $row.put($colname, $fieldDisplayValue))
     #set($discard = $row.put("${colname}_value", $fieldValue))
     ######## WIKI UI MAINWIKI CUSTOMIZATION #########
     #if($colname == 'wikiprettyname')

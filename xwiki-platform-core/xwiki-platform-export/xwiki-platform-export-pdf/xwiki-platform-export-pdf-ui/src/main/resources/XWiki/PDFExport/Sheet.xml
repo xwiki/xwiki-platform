@@ -105,10 +105,7 @@
 #end
 
 #macro (renderPDFElement $pdfTemplateObj $element)
-  #set ($output = $tdoc.display($element, $pdfTemplateObj))
-  #set ($output = $stringtool.removeStart($output, '{{html clean="false" wiki="false"}}'))
-  #set ($output = $stringtool.removeEnd($output, '{{/html}}'))
-  $!output
+  #unwrapXPropertyDisplay($tdoc.display($element, $pdfTemplateObj))
 #end
 
 #macro (renderPDFContent)

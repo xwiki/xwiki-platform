@@ -241,10 +241,7 @@
 #end
 
 #macro (displayCKEditorConfigPropertyValue $configDoc $propName $action)
-  #set ($output = $configDoc.display($propName, $action))
-  #set ($output = $stringtool.removeStart($output, '{{html clean="false" wiki="false"}}'))
-  #set ($output = $stringtool.removeEnd($output, '{{/html}}'))
-  $output
+  #unwrapXPropertyDisplay($configDoc.display($propName, $action))
 #end
 
 #macro (displayCKEditorConfig $configDoc $action)

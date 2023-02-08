@@ -276,8 +276,7 @@
 #macro (displayProperty $propertyName $object $action)
   #set ($propertyClass = $object.xWikiClass.get($propertyName))
   #set ($isCheckbox = $propertyClass.getValue('displayFormType') == 'checkbox')
-  #set ($fieldDisplay = $stringtool.removeEnd($stringtool.removeStart($object.display($propertyName, $action),
-    '{{html clean="false" wiki="false"}}'), '{{/html}}'))
+  #set ($fieldDisplay = "#unwrapXPropertyDisplay($object.display($propertyName, $action))")
   &lt;dt&gt;
     &lt;label #if ($action == 'edit' &amp;&amp; !$isCheckbox)
         for="$escapetool.xml("${object.xWikiClass.name}_${object.number}_$propertyName")"#end&gt;

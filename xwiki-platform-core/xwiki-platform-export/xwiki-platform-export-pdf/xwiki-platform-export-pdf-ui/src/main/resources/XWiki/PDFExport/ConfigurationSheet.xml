@@ -78,10 +78,7 @@
 #end
 
 #macro (displayPDFExportConfigPropertyValue $configProperty $displayMode)
-  #set ($output = $doc.display($configProperty.name, $displayMode))
-  #set ($output = $stringtool.removeStart($output, '{{html clean="false" wiki="false"}}'))
-  #set ($output = $stringtool.removeEnd($output, '{{/html}}'))
-  $!output
+  #unwrapXPropertyDisplay($doc.display($configProperty.name, $displayMode))
 #end
 
 #macro (viewPDFExportConfig)

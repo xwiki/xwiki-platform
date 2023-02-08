@@ -17,22 +17,28 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
-#if ($type == 'edit' || $type == 'search')
-  #if($xwiki.jodatime)
-    <select id='$prefix$name' name='$prefix$name'>
-      <option value="" #if($value == $tz)selected="selected"#end>$services.localization.render('XWiki.XWikiPreferences_timezone_default')</option>
-      #foreach($tz in $xwiki.jodatime.getServerTimezone().getAvailableIDs())
-        <option value="$tz" #if($value == $tz)selected="selected"#end>$tz</option>
+#if ($type == 'edit' || $type == 'search' || $type == 'hidden')
+  #set ($escapedId = $escapetool.xml("${prefix}${name}"))
+  #if ($xwiki.jodatime && $type != 'hidden')
+    <select id="$!escapedId" name="$!escapedId">
+      <option value="">$!escapetool.xml($services.localization.render(
+        'XWiki.XWikiPreferences_timezone_default'))</option>
+      #foreach ($timeZoneId in $xwiki.jodatime.getServerTimezone().getAvailableIDs())
+        <option value="$!escapetool.xml($timeZoneId)"#if ($value == $timeZoneId) selected#end
+          >$!escapetool.xml($timeZoneId)</option>
       #end
     </select>
   #else
-    <input id='$prefix$name' name='$prefix$name' type="text" value="$!value"/>
+    #set ($inputType = "#if ($type == 'hidden')hidden#{else}text#end")
+    <input id="$!escapedId" name="$!escapedId" type="$!escapetool.xml($inputType)" value="$!escapetool.xml($value)" />
   #end
 #elseif ($type == 'view' || $type == 'rendered')
-$!value
-#elseif ($type == 'hidden')
-  #set ($id = $escapetool.xml("${prefix}${name}"))
-  <input type="hidden" id="$!id" name="$!id" value="$!escapetool.xml($value)" />
+## $defaultValue may be set before calling the displayer.
+#if ("$!value" == '' && "$!defaultValue" != '')
+$!escapetool.xml($defaultValue) <small>($escapetool.xml($services.localization.render('userprofile.default')))</small>
+#else
+$!escapetool.xml($value)
+#end
 #else
   ## In order for the custom displayer to be taken into account, the result of its evaluation with an unknown display
   ## mode must not be empty. Let's output something.

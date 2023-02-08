@@ -3018,3 +3018,17 @@ Recursive title display detected!##
 #setVariable("$resultValue" '')
 #end
 #end
+
+#**
+ * The output of the api.Document#display(...) methods is wrapped in an HTML (wiki syntax) rendering macro if it contains
+ * HTML special characters or if it tries to close the outer HTML macro. This can be annoying when the output is going to
+ * be insered in another HTML macro with wiki syntax disabled, or if the output is meant to be included in a JSON and
+ * thus used on the client-side where we can't render the wiki syntax. For these use cases we need to get rid of the HTML
+ * macro wrapping.
+ *
+ * @since 14.10.5
+ * @since 15.1RC1
+ *#
+#macro (unwrapXPropertyDisplay $displayOutput)
+$!stringtool.removeEnd($stringtool.removeStart($displayOutput, '{{html clean="false" wiki="false"}}'), '{{/html}}')##
+#end

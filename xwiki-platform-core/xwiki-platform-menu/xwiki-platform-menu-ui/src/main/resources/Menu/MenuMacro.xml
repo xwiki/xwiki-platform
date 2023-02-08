@@ -161,7 +161,7 @@ $menuTemplateDoc.content.replace('{', '')
     "closeSubMenu"
   ]
 });
-require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($,l10n) {
+require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
   // It's not possible to write a CSS selector that targets list items containing lists so we rely on JavaScript.
   // The 'dropdown' CSS class is used only to display the down/left arrow.
   $('.menu-horizontal li ul, .menu-vertical li ul').parent()
@@ -187,10 +187,10 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($,l10n) {
 
   function setDropdownStateInfo(dropDownButton) {
     var xDropdown = $(dropDownButton).parent().parent();
-    if($(xDropdown).hasClass('open')){
+    if($(xDropdown).hasClass('open')) {
       $(dropDownButton).attr('title',l10n['closeSubMenu']);
       $(xDropdown).attr('aria-expanded', "true");
-    }else{
+    } else {
       $(dropDownButton).attr('title',l10n['openSubMenu']);
       $(xDropdown).attr('aria-expanded', "false");
     }

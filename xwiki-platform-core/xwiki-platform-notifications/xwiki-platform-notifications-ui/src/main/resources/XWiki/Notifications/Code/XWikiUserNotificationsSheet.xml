@@ -360,7 +360,7 @@
       <parameters>id=notifications
 icon=bell
 # isActive: The user is seeing her own profile or can administrate the current document
-isActive=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) || $services.security.authorization.hasAccess('admin', $doc.documentReference))true#{else}false#end
+isActive=#if($services.notification.isEnabled() &amp;&amp; ($services.model.resolveDocument($xcontext.user) == $doc.documentReference || $services.security.authorization.hasAccess('admin', $doc.documentReference)))true#{else}false#end
 priority=60</parameters>
     </property>
     <property>

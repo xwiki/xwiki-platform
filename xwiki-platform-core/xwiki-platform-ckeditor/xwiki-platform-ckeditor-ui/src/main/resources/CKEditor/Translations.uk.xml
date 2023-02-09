@@ -194,6 +194,7 @@ imageEditor.modal.loadFail.message=Не вдалося отримати форм
 imageEditor.modal.title=Редагувати зображення
 imageEditor.modal.insertButton=Вставити
 imageEditor.modal.initialization.fail=Не вдалося отримати форму вибору зображення.
+imageEditor.modal.outscaleWarning=Один із розмірів більший за вихідне зображення ({0}). Результатом може бути зниження якості показаного зображення.
 imageSelector.modal.title=Вибрати зображення
 imageSelector.modal.selectButton=Вибрати
 imageSelector.modal.loadFail.message=Не вдалося отримати форму вибору зображення.

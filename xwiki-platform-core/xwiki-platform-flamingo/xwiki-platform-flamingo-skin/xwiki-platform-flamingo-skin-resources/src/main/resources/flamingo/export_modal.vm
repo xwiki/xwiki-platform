@@ -224,7 +224,7 @@
         </div>
         <div class="modal-footer">
           ## Disable the button until the export tree is ready.
-          <button class="btn btn-primary" disabled>
+          <button type="button" class="btn btn-primary" disabled>
             $escapetool.xml($services.localization.render('core.menu.export'))
           </button>
           <span class="buttonwrapper">

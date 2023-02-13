@@ -20,8 +20,8 @@
 require(['jquery', 'bootstrap'], function($) {
   $(function() {
 
-    // Fix the bad location of the dropdown menu when the trigger is close to the end of the screen.
-    // See: http://jira.xwiki.org/browse/XWIKI-12609
+    /* Fix the bad location of the dropdown menu when the trigger is close to the end of the screen.
+     See: http://jira.xwiki.org/browse/XWIKI-12609 */
     $(document).on('shown.bs.dropdown', function (event) {
       var toggle    = $(event.relatedTarget);
       var menu      = toggle.next('.dropdown-menu');
@@ -49,5 +49,25 @@ require(['jquery', 'bootstrap'], function($) {
     // Activate the popover when hovering the Translate button.
     var translateButton = $('#tmTranslate [data-toggle="popover"]');
     translateButton.attr('title', translateButton.attr('data-title')).popover();
+  });
+});
+require(['jquery', 'iscroll', 'drawer'], function($, IScroll) {
+  // Unfortunately drawer doesn't declare the dependency on iscroll and expects it to be defined as a global variable.
+  window.IScroll = IScroll;
+  $(function() {
+    /* Note that the 'drawer-open' and 'drawer-close' CSS classes are added before the open and close animations end
+     which prevents us from using them in automated tests. We need something more reliable so we listen to
+     'drawer.opened' and 'drawer.closed' events and add our own markers. */
+    $('.drawer-nav').closest('body').drawer().on('drawer.opened', function(event) {
+      $('#tmDrawerActivator').attr('aria-expanded', 'true');
+    }).on('drawer.closed', function(event) {
+      $('#tmDrawerActivator').attr('aria-expanded', 'false');
+    });
+  });
+  // Drawer can be closed by pressing the ESC key, regardless of how it was opened, whether by keyboard or clicking.
+  $(document).on('keydown', function (event) {
+    if (event.key === 'Escape') {
+      $('.drawer-nav').closest('body').drawer('close');
+    }
   });
 });

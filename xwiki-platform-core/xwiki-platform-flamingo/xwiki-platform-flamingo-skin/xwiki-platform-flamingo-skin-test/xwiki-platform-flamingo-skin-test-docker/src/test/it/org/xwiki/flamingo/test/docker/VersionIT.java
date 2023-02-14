@@ -105,9 +105,6 @@ class VersionIT
         setup.createPage(testReference, CONTENT1, TITLE);
 
         // Log as another user having admin permissions (to be able to delete a revision)
-        // By default the minimal distribution used for the tests doesn't have any rights setup. Let's create an Admin
-        // user part of the Admin Group and make sure that this Admin Group has admin rights in the wiki.
-        setup.setGlobalRights("XWiki.XWikiAdminGroup", "", "admin", true);
         setup.createAdminUser();
 
         // Adds second version, as Admin

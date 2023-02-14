@@ -55,7 +55,7 @@ import static org.mockito.Mockito.when;
 class DatabaseMailStatusStoreTest
 {
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.DEBUG);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.DEBUG);
 
     @InjectMockComponents
     private DatabaseMailStatusStore store;

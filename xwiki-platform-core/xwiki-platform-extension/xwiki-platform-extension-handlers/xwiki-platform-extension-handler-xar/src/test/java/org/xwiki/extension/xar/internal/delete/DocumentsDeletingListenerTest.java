@@ -73,7 +73,7 @@ class DocumentsDeletingListenerTest
     private XarInstalledExtensionRepository repository;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @BeforeComponent
     void setUp(MockitoComponentManager mockitoComponentManager) throws Exception

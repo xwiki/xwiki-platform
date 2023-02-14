@@ -62,7 +62,7 @@ import static org.mockito.Mockito.when;
 class ExceptionExceptionMapperTest
 {
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.ERROR);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.ERROR);
 
     @InjectMockComponents
     private ExceptionExceptionMapper exceptionExceptionMapper;

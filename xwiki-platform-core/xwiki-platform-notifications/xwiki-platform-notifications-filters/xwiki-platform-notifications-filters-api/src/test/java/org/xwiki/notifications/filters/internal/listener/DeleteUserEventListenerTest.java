@@ -68,7 +68,7 @@ class DeleteUserEventListenerTest
     private ModelBridge modelBridge;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Mock
     private XWikiDocument xWikiDocument;

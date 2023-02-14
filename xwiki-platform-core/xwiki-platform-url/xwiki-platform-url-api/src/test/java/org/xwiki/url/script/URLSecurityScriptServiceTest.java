@@ -52,7 +52,7 @@ class URLSecurityScriptServiceTest
     private URLSecurityManager urlSecurityManager;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     @Test
     void isURITrusted() throws URISyntaxException

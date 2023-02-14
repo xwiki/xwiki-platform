@@ -275,7 +275,7 @@ class InvitationIT
      * will work and message will say mail was sent.
      */
     @Test
-    @Order(4)
+    @Order(5)
     void unpermittedUserCannotSendToMultipleAddresses(TestUtils setup) throws Exception
     {
         TestUtils.Session admin = setup.getSession();

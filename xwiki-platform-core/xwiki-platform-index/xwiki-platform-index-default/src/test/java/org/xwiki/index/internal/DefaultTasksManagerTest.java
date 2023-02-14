@@ -102,7 +102,7 @@ class DefaultTasksManagerTest
     private TasksStore tasksStore;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @BeforeEach
     void setUp() throws Exception

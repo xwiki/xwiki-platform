@@ -33,7 +33,20 @@
   $services.progress.pushLevel(1)
 #end
 $services.progress.startStep('Compute the content to display')
-## Make sure we don't escape the content since we want HTML to be rendered
+## Set the content type to text/plain when the output syntax is not HTML to avoid that other content is interpreted
+## as HTML by the browser. This needs to be done before calling contentvars.vm as rendering the content can modify
+## the content type when the document, e.g., produces JSON.
+#if ($response.getContentType() != 'text/plain')
+  #set ($outputSyntax = $xwiki.getAvailableRendererSyntax($request.outputSyntax, $request.outputSyntaxVersion))
+  #if ($outputSyntax)
+    #set ($syntaxType = $outputSyntax.type.toIdString())
+    #if ($syntaxType != "xhtml" && $syntaxType != "html")
+      $response.setContentType('text/plain')
+    #end
+  #end
+#end
+## Make sure we don't escape the content since non-HTML output like JSON is produced by some documents when plain
+## output syntax is specified.
 #set ($noEscapeContent = true)
 #template("contentvars.vm")
 $services.progress.endStep()

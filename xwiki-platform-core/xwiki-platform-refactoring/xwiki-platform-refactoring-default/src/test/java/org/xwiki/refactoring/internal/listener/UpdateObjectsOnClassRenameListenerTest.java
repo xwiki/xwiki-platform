@@ -86,7 +86,7 @@ class UpdateObjectsOnClassRenameListenerTest
     private XWiki wiki;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     private DocumentReference oldClassReference = new DocumentReference("foo", "Code", "OldClass");
 

@@ -571,13 +571,17 @@ public class TestUtils
      */
     public void createAdminUser()
     {
-        // Note that we cannot use ADMIN_CREDENTIALS.getPassword() since that password is less than 6 characters, and
-        // we now have a check in XWiki on password length by default. We're keeping the default admin password in
-        // ADMIN_CREDENTIALS.getPassword() to not break XS tests (since in XS the Admin user exists and has password
-        // with value ADMIN_CREDENTIALS.getPassword()).
-        createUser(ADMIN_CREDENTIALS.getUserName(), "administrator", null);
+        // By default, we have a policy which doesn't allow passwords with a length < 6
+        // so we force using a longer password here and we set it to the admin credentials so that further
+        // calls to #loginAsAdmin works.
+        // Note that we currently cannot change the password in a permanent way, as our default admin password
+        // for the demo package is still "admin", and we rely on #loginAsAdmin which uses it in the distribution
+        // tests.
+        String strongAdminPassword = "administrator";
+        ADMIN_CREDENTIALS.setPassword(strongAdminPassword);
+        createUser(ADMIN_CREDENTIALS.getUserName(), ADMIN_CREDENTIALS.getPassword(), null);
         addObject("XWiki", "XWikiAdminGroup", "XWiki.XWikiGroups", "member", "XWiki.Admin");
-        login(ADMIN_CREDENTIALS.getUserName(), "administrator");
+        loginAsAdmin();
     }
 
     /**

@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.plugin.image;
 
-import java.awt.*;
+import java.awt.Image;
 import java.awt.image.RenderedImage;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -183,10 +183,12 @@ class ImagePluginTest
 
     @ParameterizedTest
     @CsvSource({
-        "100, 500, false, 100, 300",
-        "500, 100, false, 400, 100",
+        "100, 500, false, 60, 300",
+        "1000, 5000, false, 60, 300",
+        "500, 100, false, 400, 80",
+        "5000, 1000, false, 400, 80",
+        "800, 600, false, 400, 300",
         "100, 100, false, 100, 100",
-        "500, 100, false, 400, 100",
         "100, 75, true, 100, 75",
         "100, 100, true, 100, 75",
         "120, 75, true, 100, 75",

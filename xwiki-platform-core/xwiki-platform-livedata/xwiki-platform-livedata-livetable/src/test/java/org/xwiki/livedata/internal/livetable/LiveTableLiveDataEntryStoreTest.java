@@ -67,7 +67,7 @@ import static org.mockito.Mockito.when;
 class LiveTableLiveDataEntryStoreTest
 {
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @InjectMockComponents
     private LiveTableLiveDataEntryStore entryStore;

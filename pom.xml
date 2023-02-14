@@ -68,7 +68,7 @@
          Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
          (e.g. 7.2.7).
     -->
-    <libreoffice.version>7.3.7</libreoffice.version>
+    <libreoffice.version>7.4.5</libreoffice.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
@@ -714,7 +714,7 @@
       <dependency>
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j</artifactId>
-        <version>3.9.0</version>
+        <version>3.9.1</version>
       </dependency>
       <dependency>
         <groupId>io.sf.carte</groupId>
@@ -726,7 +726,7 @@
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j-dom4j</artifactId>
         <!-- Note: has a different release cycle than CSS4J "core" -->
-        <version>3.9.0</version>
+        <version>3.9.1</version>
       </dependency>
 
       <!-- Carte XML DTD -->
@@ -734,7 +734,7 @@
         <groupId>io.sf.carte</groupId>
         <artifactId>xml-dtd</artifactId>
         <!-- Note: has a different release cycle than CSS4J -->
-        <version>4.1.0</version>
+        <version>4.1.1</version>
       </dependency>
 
       <!-- Restlet -->

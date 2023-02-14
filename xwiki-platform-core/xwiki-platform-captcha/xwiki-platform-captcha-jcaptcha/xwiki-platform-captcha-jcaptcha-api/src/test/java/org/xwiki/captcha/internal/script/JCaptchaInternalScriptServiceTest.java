@@ -59,7 +59,7 @@ public class JCaptchaInternalScriptServiceTest
     private ResourceReferenceSerializer<ResourceReference, ExtendedURL> serializer;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
     public void getURL() throws UnsupportedResourceReferenceException, SerializeResourceReferenceException

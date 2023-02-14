@@ -80,7 +80,7 @@ public class DefaultCSRFTokenTest
     private DocumentAccessBridge mockDocumentAccessBridge;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     /**
      * This class is here because it doesn't require a SecureRandom generator

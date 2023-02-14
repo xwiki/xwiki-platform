@@ -19,28 +19,32 @@
  */
 package org.xwiki.mail.internal;
 
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.mail.internal.configuration.AbstractMailConfigClassDocumentConfigurationSource;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.security.internal.DocumentInitializerRightsManager;
+import org.xwiki.user.GuestUserReference;
+import org.xwiki.user.SuperAdminUserReference;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.mail.internal.configuration.SendMailConfigClassDocumentConfigurationSource;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import static org.xwiki.mail.internal.configuration.AbstractMailConfigClassDocumentConfigurationSource.MAIL_SPACE;
+import static org.xwiki.mail.internal.configuration.AbstractSendMailConfigClassDocumentConfigurationSource.SENDMAILCONFIGCLASS_REFERENCE;
 
 /**
  * Create the mandatory {@code Mail.MailConfig} document in the current wiki.
@@ -57,25 +61,21 @@ public class MailConfigMandatoryDocumentInitializer implements MandatoryDocument
     private Logger logger;
 
     @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
+    private Provider<XWikiContext> xcontextProvider;
 
     @Inject
-    private Provider<XWikiContext> xcontextProvider;
+    private DocumentInitializerRightsManager documentInitializerRightsManager;
 
     @Override
     public EntityReference getDocumentReference()
     {
-        return SendMailConfigClassDocumentConfigurationSource.MAILCONFIG_REFERENCE;
+        return AbstractMailConfigClassDocumentConfigurationSource.MAILCONFIG_REFERENCE;
     }
 
     @Override
     public boolean updateDocument(XWikiDocument document)
     {
-        boolean needsUpdate = false;
-
-        if (updateReferences(document)) {
-            needsUpdate = true;
-        }
+        boolean needsUpdate = updateReferences(document);
 
         // Ensure the document is hidden, like every technical document
         if (!document.isHidden()) {
@@ -107,6 +107,10 @@ public class MailConfigMandatoryDocumentInitializer implements MandatoryDocument
             needsUpdate = true;
         }
 
+        if (this.documentInitializerRightsManager.restrictToAdmin(document)) {
+            needsUpdate = true;
+        }
+
         return needsUpdate;
     }
 
@@ -115,22 +119,20 @@ public class MailConfigMandatoryDocumentInitializer implements MandatoryDocument
         boolean needsUpdate = false;
 
         // Ensure the document has a creator
-        if (document.getCreatorReference() == null) {
-            document.setCreatorReference(new DocumentReference(this.wikiDescriptorManager.getMainWikiId(),
-                    XWiki.SYSTEM_SPACE, "superadmin"));
+        if (document.getAuthors().getCreator() == GuestUserReference.INSTANCE) {
+            document.getAuthors().setCreator(SuperAdminUserReference.INSTANCE);
             needsUpdate = true;
         }
 
         // Ensure the document has an author
-        if (document.getAuthorReference() == null) {
-            document.setAuthorReference(document.getCreatorReference());
+        if (document.getAuthors().getEffectiveMetadataAuthor() == GuestUserReference.INSTANCE) {
+            document.getAuthors().setEffectiveMetadataAuthor(document.getAuthors().getCreator());
             needsUpdate = true;
         }
 
         // Ensure the document has a parent
         if (document.getParentReference() == null) {
-            LocalDocumentReference parentReference = new LocalDocumentReference(
-                    SendMailConfigClassDocumentConfigurationSource.MAIL_SPACE, "WebHome");
+            LocalDocumentReference parentReference = new LocalDocumentReference(MAIL_SPACE, "WebHome");
             document.setParentReference(parentReference);
             needsUpdate = true;
         }
@@ -143,7 +145,7 @@ public class MailConfigMandatoryDocumentInitializer implements MandatoryDocument
         boolean needsUpdate = false;
 
         LocalDocumentReference configurableClassReference =
-                new LocalDocumentReference(XWiki.SYSTEM_SPACE, "ConfigurableClass");
+            new LocalDocumentReference(XWiki.SYSTEM_SPACE, "ConfigurableClass");
         if (document.getXObject(configurableClassReference) != null) {
             document.removeXObjects(configurableClassReference);
             needsUpdate = true;
@@ -154,24 +156,20 @@ public class MailConfigMandatoryDocumentInitializer implements MandatoryDocument
 
     private boolean addGeneralMailConfigClassXObject(XWikiDocument document)
     {
-        LocalDocumentReference generalMailClassReference = new LocalDocumentReference(
-                SendMailConfigClassDocumentConfigurationSource.MAIL_SPACE, "GeneralMailConfigClass");
-        return addXObject(document, generalMailClassReference,
-            Collections.singletonMap("obfuscateEmailAddresses", "obfuscate"));
+        return addXObject(document, new LocalDocumentReference(MAIL_SPACE, "GeneralMailConfigClass"),
+            Map.of("obfuscateEmailAddresses", "obfuscate"));
     }
 
     private boolean addSendMailConfigClassXObject(XWikiDocument document)
     {
-        LocalDocumentReference sendMailClassReference =
-                SendMailConfigClassDocumentConfigurationSource.SENDMAILCONFIGCLASS_REFERENCE;
-        Map<String, String> fieldMappings = new HashMap<>();
-        fieldMappings.put("admin_email", "from");
-        fieldMappings.put("smtp_server", "host");
-        fieldMappings.put("smtp_port", "port");
-        fieldMappings.put("smtp_server_username", "username");
-        fieldMappings.put("smtp_server_password", "password");
-        fieldMappings.put("javamail_extra_props", "properties");
-        return addXObject(document, sendMailClassReference, fieldMappings);
+        return addXObject(document, SENDMAILCONFIGCLASS_REFERENCE, Map.of(
+            "admin_email", "from",
+            "smtp_server", "host",
+            "smtp_port", "port",
+            "smtp_server_username", "username",
+            "smtp_server_password", "password",
+            "javamail_extra_props", "properties"
+        ));
     }
 
     private boolean addXObject(XWikiDocument document, LocalDocumentReference classReference,

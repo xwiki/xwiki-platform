@@ -367,33 +367,53 @@ public class ImagePlugin extends XWikiDefaultPlugin
     private int[] reduceImageDimensions(int currentWidth, int currentHeight, int requestedWidth, int requestedHeight,
         boolean keepAspectRatio)
     {
-        double aspectRatio = (double) currentWidth / (double) currentHeight;
-
-        int width = currentWidth;
-        int height = currentHeight;
-
+        int[] dimensions;
         // Keep the aspect ratio when requested or width or height are missing.
         if (keepAspectRatio || requestedWidth <= 0 || requestedHeight <= 0) {
-            // Ignore the width if it is not given or too large, i.e., larger than the current width or larger than the
-            // width derived from the requested height.
-            if (requestedWidth <= 0 || requestedWidth >= currentWidth
-                || (requestedHeight > 0 && requestedWidth > (int) (requestedHeight * aspectRatio)))
-            {
-                // Ignore the requested width. Check the requested height.
-                if (requestedHeight > 0 && requestedHeight < currentHeight) {
-                    // Reduce the height, keeping aspect ratio.
-                    width = (int) (requestedHeight * aspectRatio);
-                    height = requestedHeight;
-                }
-            } else {
-                // Ignore the requested height. Reduce the width, keeping aspect ratio.
-                width = requestedWidth;
-                height = (int) (requestedWidth / aspectRatio);
+            dimensions = reduceImageDimensions(currentWidth, currentHeight, requestedWidth, requestedHeight);
+        } else if (requestedWidth > currentWidth || requestedHeight > currentHeight) {
+            // Resize the image to preserve the requested image ratio while preventing outscaling.
+            dimensions = reduceImageDimensions(requestedWidth, requestedHeight, currentWidth, currentHeight);
+        } else {
+            dimensions = new int[] { requestedWidth, requestedHeight };
+        }
+
+        return dimensions;
+    }
+
+    /**
+     * Reduce the image of dimension {@code baseWidth*baseHeight} so that it fits a box of dimension
+     * {@code targetWidth*targetHeight} while preserving its current dimensions. If {@code targetWidth} or
+     * {@code targetHeight} is 0, negative, or larger than respectively {@code baseWidth} and
+     * {@code baseHeight}, it is ignored.
+     *
+     * @param baseWidth the current width of the image
+     * @param baseHeight the current height of the image
+     * @param targetWidth the requested width of the image
+     * @param targetHeight the requested height of the image
+     * @return the new dimensions of the image, preserving to base aspect ratio
+     */
+    private int[] reduceImageDimensions(int baseWidth, int baseHeight, int targetWidth, int targetHeight)
+    {
+        int width = baseWidth;
+        int height = baseHeight;
+
+        double aspectRatio = (double) baseWidth / (double) baseHeight;
+        // Ignore the width if it is not given or too large, i.e., larger than the current width or larger than the
+        // width derived from the requested height.
+        if (targetWidth <= 0 || targetWidth >= baseWidth
+            || (targetHeight > 0 && targetWidth > (int) (targetHeight * aspectRatio)))
+        {
+            // Ignore the requested width. Check the requested height.
+            if (targetHeight > 0 && targetHeight < baseHeight) {
+                // Reduce the height, keeping aspect ratio.
+                width = (int) (targetHeight * aspectRatio);
+                height = targetHeight;
             }
         } else {
-            // Reduce both width and height, possibly loosing aspect ratio.
-            width = Math.min(requestedWidth, currentWidth);
-            height = Math.min(requestedHeight, currentHeight);
+            // Ignore the requested height. Reduce the width, keeping aspect ratio.
+            width = targetWidth;
+            height = (int) (targetWidth / aspectRatio);
         }
 
         return new int[] { width, height };

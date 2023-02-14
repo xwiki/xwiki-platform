@@ -66,7 +66,7 @@ public class AbstractPanelsUIExtensionManagerTest
     private TestablePanelsUIExtensionManager panelUIExtensionManager;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.ERROR);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.ERROR);
 
     @Test
     public void get() throws Exception

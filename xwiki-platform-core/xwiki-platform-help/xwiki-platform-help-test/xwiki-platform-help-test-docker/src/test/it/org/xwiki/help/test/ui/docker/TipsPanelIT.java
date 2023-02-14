@@ -58,7 +58,7 @@ class TipsPanelIT
 
     @Test
     @Order(1)
-    void verifyTipsPropertyIsRestricted(TestUtils testUtils, TestReference testReference) throws Exception
+    void verifyTipsParameterIsRestricted(TestUtils testUtils, TestReference testReference) throws Exception
     {
         // Unregister all tips
         switchUIXs(TIPS_UIXP, TIPS_UIXP_DISABLED, testUtils);
@@ -66,13 +66,13 @@ class TipsPanelIT
         // Register a macro to check if the context is restricted
         registerIsrestrictedMacro(testUtils);
 
-        // Create a tip with tip property
+        // Create a parameter based tip
         Page tipPage = testUtils.rest().page(testReference);
         tipPage.setObjects(new Objects());
         org.xwiki.rest.model.jaxb.Object tipObject = object(UIExtensionClassDocumentInitializer.CLASS_REFERENCE_STRING);
+        tipObject.getProperties().add(property("name", testUtils.serializeReference(testReference)));
         tipObject.getProperties().add(property("extensionPointId", "org.xwiki.platform.help.tipsPanel"));
-        tipObject.getProperties().add(property("parameters",
-            "tip=execution is restricted: {{isrestricted/}}"));
+        tipObject.getProperties().add(property("parameters", "tip=execution is restricted: {{isrestricted/}}"));
         tipPage.getObjects().getObjectSummaries().add(tipObject);
         testUtils.rest().save(tipPage);
 
@@ -80,6 +80,42 @@ class TipsPanelIT
         testUtils.gotoPage(new DocumentReference("xwiki", "Help", "TipsPanel", "WebHome"));
         PanelViewPage panelPage = new PanelViewPage();
         assertEquals("execution is restricted: true", panelPage.getPanelContent().getText());
+
+        // Put back all tips
+        switchUIXs(TIPS_UIXP_DISABLED, TIPS_UIXP, testUtils);
+    }
+
+    @Test
+    @Order(2)
+    void verifyTipsContentIsExecutedWithTheRightAuthor(TestUtils testUtils, TestReference testReference)
+        throws Exception
+    {
+        // Unregister all tips
+        switchUIXs(TIPS_UIXP, TIPS_UIXP_DISABLED, testUtils);
+
+        // Register a macro to check if the context is restricted
+        registerIsrestrictedMacro(testUtils);
+
+        // Switch to a different user than tips panel author
+        testUtils.createAdminUser(true);
+
+        // Create a content based tip
+        Page tipPage = testUtils.rest().page(testReference);
+        tipPage.setObjects(new Objects());
+        org.xwiki.rest.model.jaxb.Object tipObject = object(UIExtensionClassDocumentInitializer.CLASS_REFERENCE_STRING);
+        tipObject.getProperties().add(property("name", testUtils.serializeReference(testReference)));
+        tipObject.getProperties().add(property("extensionPointId", "org.xwiki.platform.help.tipsPanel"));
+        tipObject.getProperties().add(property("content",
+            "execution is restricted: {{isrestricted/}}, executed by {{velocity}}$xcontext.context.authorReference{{/velocity}}"));
+        tipPage.getObjects().getObjectSummaries().add(tipObject);
+        testUtils.rest().save(tipPage);
+
+        // Execute the tip panel and verify the result is the expected one
+        testUtils.gotoPage(new DocumentReference("xwiki", "Help", "TipsPanel", "WebHome"));
+        PanelViewPage panelPage = new PanelViewPage();
+        assertEquals(
+            "execution is restricted: false, executed by xwiki:XWiki." + TestUtils.ADMIN_CREDENTIALS.getUserName(),
+            panelPage.getPanelContent().getText());
 
         // Put back all tips
         switchUIXs(TIPS_UIXP_DISABLED, TIPS_UIXP, testUtils);
@@ -108,8 +144,8 @@ class TipsPanelIT
         org.xwiki.rest.model.jaxb.Object tipObject = object(WikiMacroClassDocumentInitializer.WIKI_MACRO_CLASS);
         tipObject.getProperties().add(property("id", "isrestricted"));
         tipObject.getProperties().add(property("supportsInlineMode", 1));
-        tipObject.getProperties().add(property("code",
-            "{{velocity}}$wikimacro.context.transformationContext.isRestricted(){{/velocity}}"));
+        tipObject.getProperties()
+            .add(property("code", "{{velocity}}$wikimacro.context.transformationContext.isRestricted(){{/velocity}}"));
         macroPage.getObjects().getObjectSummaries().add(tipObject);
         testUtils.rest().save(macroPage);
     }

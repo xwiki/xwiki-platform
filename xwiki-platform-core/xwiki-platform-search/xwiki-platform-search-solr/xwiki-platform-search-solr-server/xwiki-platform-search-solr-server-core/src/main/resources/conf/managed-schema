@@ -1140,6 +1140,7 @@ https://solr.apache.org/guide/solr/latest/indexing-guide/fields.html
     </fieldType>
 
     <!-- XWIKI: Brazilian Portuguese -->
+    <dynamicField name="*_pt_BR" type="text_pt_BR"  indexed="true" stored="true" multiValued="true" />
     <fieldType name="text_pt_BR" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>

@@ -103,7 +103,7 @@ class IncludeMacroRefactoringTest
     private EntityReferenceResolver<String> macroEntityReferenceResolver;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
     void replaceDocumentReferenceWhenNoReferenceParameterSet() throws Exception

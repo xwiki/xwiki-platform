@@ -76,7 +76,7 @@ class LiveTableLiveDataResultsRendererTest
     private static final String PAGE = "Space.Page";
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @InjectMockComponents
     private LiveTableLiveDataResultsRenderer resultsRenderer;

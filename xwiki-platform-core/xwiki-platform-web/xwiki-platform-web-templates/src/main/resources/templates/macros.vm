@@ -2996,24 +2996,39 @@ Recursive title display detected!##
 ##    - $fallbackUrl: the fallback URL that should be used if the $urlValue is not safe. This parameter can be empty
 ##    - $resultValue: the velocity variable where to store the result. It will contain either an XML-escaped version of
 ##                    $urlValue or of $fallbackUrl, or it will contain an empty value, if neither URLs are safe there
-## @since 14.10.4
+## Note: We don't use any indentation on purpose to avoid any character to be inserted when calling this macro.
+##       The idea is to remain as close as possible to a call to #set() in velocity.
+## @since 14.10.5
 ## @since 15.1RC1
 #macro (getSanitizedURLAttributeValue $htmlElement $attributeName $urlValue $fallbackUrl $resultValue)
-  #set ($useSafeURI = false)
-  #set ($safeURI = $services.security.url.parseToSafeURI($urlValue))
-  #if ("$!safeURI" != '' && $services.html.isAttributeSafe($htmlElement,$attributeName,$safeURI.toString()))
-    #set ($useSafeURI = true)
-  #elseif ("$!fallbackUrl" != '')
-    #set ($safeURI = $services.security.url.parseToSafeURI($fallbackUrl))
-    #if ("$!safeURI" != '' && $services.html.isAttributeSafe($htmlElement,$attributeName,$safeURI.toString()))
-      #set ($useSafeURI = true)
-    #end
-  #end
+#set ($useSafeURI = false)
+#set ($safeURI = $services.security.url.parseToSafeURI($urlValue))
+#if ("$!safeURI" != '' && $services.html.isAttributeSafe($htmlElement,$attributeName,$safeURI.toString()))
+#set ($useSafeURI = true)
+#elseif ("$!fallbackUrl" != '')
+#set ($safeURI = $services.security.url.parseToSafeURI($fallbackUrl))
+#if ("$!safeURI" != '' && $services.html.isAttributeSafe($htmlElement,$attributeName,$safeURI.toString()))
+#set ($useSafeURI = true)
+#end
+#end
+#set ($resultValue = $NULL)
+#if ($useSafeURI)
+#setVariable("$resultValue" $!{escapetool.xml($safeURI.toString())})
+#else
+#setVariable("$resultValue" '')
+#end
+#end
 
-  #set ($resultValue = $NULL)
-  #if ($useSafeURI)
-    #setVariable("$resultValue" $!{escapetool.xml($safeURI.toString())})
-  #else
-    #setVariable("$resultValue" '')
-  #end
+#**
+ * The output of the api.Document#display(...) methods is wrapped in an HTML (wiki syntax) rendering macro if it contains
+ * HTML special characters or if it tries to close the outer HTML macro. This can be annoying when the output is going to
+ * be insered in another HTML macro with wiki syntax disabled, or if the output is meant to be included in a JSON and
+ * thus used on the client-side where we can't render the wiki syntax. For these use cases we need to get rid of the HTML
+ * macro wrapping.
+ *
+ * @since 14.10.5
+ * @since 15.1RC1
+ *#
+#macro (unwrapXPropertyDisplay $displayOutput)
+$!stringtool.removeEnd($stringtool.removeStart($displayOutput, '{{html clean="false" wiki="false"}}'), '{{/html}}')##
 #end

@@ -393,6 +393,44 @@ class PDFExportIT
         }
     }
 
+    @Test
+    @Order(7)
+    void invalidTOCAnchors(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "InvalidTOCAnchors"));
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // We should have 3 pages: cover page, table of contents and one page for the content.
+            assertEquals(3, pdf.getNumberOfPages());
+
+            //
+            // Verify the table of contents page.
+            //
+
+            String tocPageText = pdf.getTextFromPage(1);
+            // The document title is not included when a single page is exported.
+            assertTrue(tocPageText.contains("Table of Contents\nWithoutID\nDigitsAndSpace\nSymbols\nValid"),
+                "Unexpected table of contents: " + tocPageText);
+
+            // The table of contents should have internal links (anchors) to each section, provided the sections have a
+            // valid id (otherwise the section title is displayed but without a link).
+            Map<String, String> tocPageLinks = pdf.getLinksFromPage(1);
+            assertEquals(Collections.singletonList("HValid"),
+                tocPageLinks.values().stream().collect(Collectors.toList()));
+
+            //
+            // Verify the content page.
+            //
+
+            String contentPageText = pdf.getTextFromPage(2);
+            // The document title is not included when a single page is exported.
+            assertTrue(
+                contentPageText.startsWith("InvalidTOCAnchors\n3 / 3\nWithoutID\nDigitsAndSpace\nSymbols\nValid"),
+                "Unexpected content: " + contentPageText);
+        }
+    }
+
     private URL getHostURL(TestConfiguration testConfiguration) throws Exception
     {
         return new URL(String.format("http://%s:%d", testConfiguration.getServletEngine().getIP(),

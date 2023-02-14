@@ -60,7 +60,7 @@ public class PropertyTypeSupplierTest
     private PropertyTypeSupplier propertyTypeSupplier;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @MockComponent
     private Provider<XWikiContext> xcontextProvider;

@@ -40,10 +40,7 @@
 
 {{velocity output="false"}}
 #macro (displayObjectPropertyValue $propertyName $mode)
-  #set ($output = $doc.display($propertyName, $mode))
-  #set ($output = $stringtool.removeStart($output, '{{html clean="false" wiki="false"}}'))
-  #set ($output = $stringtool.removeEnd($output, '{{/html}}'))
-  $output
+  #unwrapXPropertyDisplay($doc.display($propertyName, $mode))
 #end
 
 #macro (displaySearchSuggestSource $source)

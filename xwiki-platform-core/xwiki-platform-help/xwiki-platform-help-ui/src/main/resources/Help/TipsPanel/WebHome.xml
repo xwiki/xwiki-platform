@@ -175,7 +175,7 @@
   #set ($index = $mathtool.random(0, $uixs.size()))
   #set ($tip = $uixs.get($index).getParameters().get('tip'))
   ## Execute the content in restricted mode as it's not executed with the right author
-  {{context restricted="true" transformationContext="transformations" source="script:tip"/}}
+  {{context restricted="true" source="script:tip"/}}
 #else
   $services.localization.render('help.tipsPanel.noTipMessage')
 #end

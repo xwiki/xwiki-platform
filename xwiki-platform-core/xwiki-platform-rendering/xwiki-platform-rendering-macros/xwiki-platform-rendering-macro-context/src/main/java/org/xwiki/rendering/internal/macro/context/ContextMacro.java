@@ -141,7 +141,7 @@ public class ContextMacro extends AbstractExecutedContentMacro<ContextMacroParam
         }
 
         List<Block> blocks;
-        if (parameters.getTransformationContext() == TransformationContextMode.DOCUMENT
+        if (parameters.isRestricted() || parameters.getTransformationContext() == TransformationContextMode.DOCUMENT
             || parameters.getTransformationContext() == TransformationContextMode.TRANSFORMATIONS) {
             // Execute the content in the context of the target document
             blocks = executeContext(xdom, parameters, context);
@@ -158,12 +158,17 @@ public class ContextMacro extends AbstractExecutedContentMacro<ContextMacroParam
     private List<Block> executeContext(XDOM xdom, ContextMacroParameters parameters, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        DocumentReference currentAuthor = this.documentAccessBridge.getCurrentAuthorReference();
-        DocumentReference referencedDocReference =
-            this.macroReferenceResolver.resolve(parameters.getDocument(), context.getCurrentMacroBlock());
+        DocumentReference referencedDocReference;
+        if (parameters.getDocument() != null) {
+            referencedDocReference =
+                this.macroReferenceResolver.resolve(parameters.getDocument(), context.getCurrentMacroBlock());
+            DocumentReference currentAuthor = this.documentAccessBridge.getCurrentAuthorReference();
 
-        // Make sure the author is allowed to use the target document
-        checkAccess(currentAuthor, referencedDocReference);
+            // Make sure the author is allowed to use the target document
+            checkAccess(currentAuthor, referencedDocReference);
+        } else {
+            referencedDocReference = null;
+        }
 
         // Reuse the very generic async rendering framework (even if we don't do async and caching) since it's
         // taking
@@ -176,30 +181,34 @@ public class ContextMacro extends AbstractExecutedContentMacro<ContextMacroParam
             configuration.setResricted(true);
         }
 
-        Map<String, Object> backupObjects = new HashMap<>();
+        Map<String, Object> backupObjects = null;
         try {
-            // Switch the context document
-            this.documentAccessBridge.pushDocumentInContext(backupObjects, referencedDocReference);
+            if (referencedDocReference != null) {
+                backupObjects = new HashMap<>();
 
-            // Apply the transformations but with a Transformation Context having the XDOM of the passed
-            // document so that macros execute on the passed document's XDOM (e.g. the TOC macro will generate
-            // the toc for the passed document instead of the current document).
-            DocumentModelBridge referencedDoc =
-                this.documentAccessBridge.getTranslatedDocumentInstance(referencedDocReference);
-            XDOM referencedXDOM = referencedDoc.getXDOM();
+                // Switch the context document
+                this.documentAccessBridge.pushDocumentInContext(backupObjects, referencedDocReference);
 
-            if (parameters.getTransformationContext() == TransformationContextMode.TRANSFORMATIONS) {
-                // Get the XDOM from the referenced doc but with Transformations applied so that all macro are
-                // executed and contribute XDOM elements.
-                // IMPORTANT: This can be dangerous since it means executing macros, and thus also script macros
-                // defined in the referenced document. To be used with caution.
-                TransformationContext referencedTxContext =
-                    new TransformationContext(referencedXDOM, referencedDoc.getSyntax());
-                this.transformationManager.performTransformations(referencedXDOM, referencedTxContext);
+                // Apply the transformations but with a Transformation Context having the XDOM of the passed
+                // document so that macros execute on the passed document's XDOM (e.g. the TOC macro will generate
+                // the toc for the passed document instead of the current document).
+                DocumentModelBridge referencedDoc =
+                    this.documentAccessBridge.getTranslatedDocumentInstance(referencedDocReference);
+                XDOM referencedXDOM = referencedDoc.getXDOM();
+
+                if (parameters.getTransformationContext() == TransformationContextMode.TRANSFORMATIONS) {
+                    // Get the XDOM from the referenced doc but with Transformations applied so that all macro are
+                    // executed and contribute XDOM elements.
+                    // IMPORTANT: This can be dangerous since it means executing macros, and thus also script macros
+                    // defined in the referenced document. To be used with caution.
+                    TransformationContext referencedTxContext =
+                        new TransformationContext(referencedXDOM, referencedDoc.getSyntax());
+                    this.transformationManager.performTransformations(referencedXDOM, referencedTxContext);
+                }
+
+                // Configure the Transformation Context XDOM depending on the mode asked.
+                configuration.setXDOM(referencedXDOM);
             }
-
-            // Configure the Transformation Context XDOM depending on the mode asked.
-            configuration.setXDOM(referencedXDOM);
 
             // Execute the content
             Block result = this.executor.execute(configuration);
@@ -208,8 +217,10 @@ public class ContextMacro extends AbstractExecutedContentMacro<ContextMacroParam
         } catch (Exception e) {
             throw new MacroExecutionException("Failed start the execution of the macro", e);
         } finally {
-            // Restore the context document
-            this.documentAccessBridge.popDocumentFromContext(backupObjects);
+            if (backupObjects != null) {
+                // Restore the context document
+                this.documentAccessBridge.popDocumentFromContext(backupObjects);
+            }
         }
     }
 }

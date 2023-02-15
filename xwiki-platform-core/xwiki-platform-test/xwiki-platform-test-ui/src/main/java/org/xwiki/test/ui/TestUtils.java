@@ -565,22 +565,49 @@ public class TestUtils
     }
 
     /**
-     * Creates the Admin user and add it to the XWikiAdminGroup.
+     * Creates the Admin user, add it to the XWikiAdminGroup and login.
+     * Note that this method requires to be superadmin to be effective.
      *
      * @since 12.2
      */
     public void createAdminUser()
     {
-        // By default, we have a policy which doesn't allow passwords with a length < 6
-        // so we force using a longer password here and we set it to the admin credentials so that further
-        // calls to #loginAsAdmin works.
-        // Note that we currently cannot change the password in a permanent way, as our default admin password
-        // for the demo package is still "admin", and we rely on #loginAsAdmin which uses it in the distribution
-        // tests.
-        String strongAdminPassword = "administrator";
-        ADMIN_CREDENTIALS.setPassword(strongAdminPassword);
-        createUser(ADMIN_CREDENTIALS.getUserName(), ADMIN_CREDENTIALS.getPassword(), null);
-        addObject("XWiki", "XWikiAdminGroup", "XWiki.XWikiGroups", "member", "XWiki.Admin");
+        createAdminUser(false);
+    }
+
+    /**
+     * Creates the Admin user, add it to the XWikiAdminGroup and login.
+     * Note that this method requires to be superadmin to be effective.
+     *
+     * @param programming true of the user should also be given programming right
+     * @since 15.1RC1
+     * @since 14.10.5
+     */
+    public void createAdminUser(boolean programming)
+    {
+        String username = ADMIN_CREDENTIALS.getUserName();
+        String password = ADMIN_CREDENTIALS.getPassword();
+        LocalDocumentReference userReference = new LocalDocumentReference("XWiki", username);
+        Page userPage = rest().page(userReference);
+        userPage.setObjects(new org.xwiki.rest.model.jaxb.Objects());
+        org.xwiki.rest.model.jaxb.Object userObject = RestTestUtils.object("XWiki.XWikiUsers");
+
+        // Set password
+        userObject.getProperties().add(RestTestUtils.property("password", password));
+        userPage.getObjects().getObjectSummaries().add(userObject);
+
+        // Save the user page
+        try {
+            rest().save(userPage);
+        } catch (Exception e) {
+            fail("Failed to save the user with name [" + username + "]", e);
+        }
+        // Add the user to XWikiAllGroup
+        addObject("XWiki", "XWikiAllGroup", "XWiki.XWikiGroups", "member", serializeReference(userReference));
+        // Add the user to XWikiAdminGroup group (before we login as the user does not have admin right at first)
+        addObject("XWiki", "XWikiAdminGroup", "XWiki.XWikiGroups", "member", serializeReference(userReference));
+        // Give ADMIN right (and maybe PROGRAMMING right) to XWikiAdminGroup
+        setGlobalRights("XWiki.XWikiAdminGroup", "", programming ? "admin,programming" : "admin", true);
         loginAsAdmin();
     }
 
@@ -1141,7 +1168,7 @@ public class TestUtils
     {
         gotoPage(getURL(reference, "get", toQueryString(queryParameters)));
         
-        return getDriver().getPageSource();
+        return getDriver().findElementWithoutWaiting(By.tagName("body")).getText();
     }
 
     /**

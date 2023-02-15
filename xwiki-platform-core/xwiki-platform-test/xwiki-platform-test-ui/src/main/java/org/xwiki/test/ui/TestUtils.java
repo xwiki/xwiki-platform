@@ -1159,7 +1159,7 @@ public class TestUtils
     {
         gotoPage(getURL(reference, "get", toQueryString(queryParameters)));
         
-        return getDriver().getPageSource();
+        return getDriver().findElementWithoutWaiting(By.tagName("body")).getText();
     }
 
     /**

@@ -235,7 +235,7 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
           .getURL('get');
         $.get(url, $.param({
           language: $('html').attr('lang'),
-          isHTML5: params.editor.config.stylesSet === 'html5'
+          isHTML5: params.editor.config.htmlSyntax === 'annotatedhtml/5.0'
         }))
           .done(function(html, textState, jqXHR) {
             var imageEditor = $('.image-editor');
@@ -271,7 +271,7 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
         border: $('#advanced [name="imageBorder"]').prop('checked'),
         textWrap: $('#advanced [name="textWrap"]').prop('checked'),
         alt: $('#altText').val(),
-        hasCaption: $("#imageCaptionActivation").prop('checked'),
+        hasCaption: !!$("#imageCaptionActivation").prop('checked'),
         // TODO: Add support for editing the caption directly from the dialog (see CKEDITOR-435)
         width: width,
         height: height,

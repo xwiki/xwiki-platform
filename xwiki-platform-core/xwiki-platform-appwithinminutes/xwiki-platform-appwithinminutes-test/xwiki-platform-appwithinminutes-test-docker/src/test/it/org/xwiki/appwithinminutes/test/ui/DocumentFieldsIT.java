@@ -23,6 +23,7 @@ import java.util.Arrays;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.appwithinminutes.test.po.ApplicationClassEditPage;
 import org.xwiki.appwithinminutes.test.po.ApplicationCreatePage;
@@ -53,6 +54,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 class DocumentFieldsIT
 {
+    private String appName = RandomStringUtils.randomAlphabetic(6);
+
     @BeforeAll
     static void beforeAll(TestUtils setup)
     {
@@ -67,14 +70,12 @@ class DocumentFieldsIT
     }
 
     @Test
+    @Order(1)
     void titleAndContent(TestUtils setup)
     {
-        setup.loginAsAdmin();
-
         // Create a new application.
-        String appName = RandomStringUtils.randomAlphabetic(6);
         ApplicationCreatePage appCreatePage = ApplicationCreatePage.gotoPage();
-        appCreatePage.setApplicationName(appName);
+        appCreatePage.setApplicationName(this.appName);
         ApplicationClassEditPage classEditPage = appCreatePage.clickNextStep();
 
         // Add a standard field.
@@ -120,14 +121,14 @@ class DocumentFieldsIT
         assertTrue(entryViewPage.getContent().contains("Bar"));
 
         // Verify that we can edit the document fields in-place.
-        String propertyReference = String.format("%s.Code.%1$sClass[0].title1", appName);
+        String propertyReference = String.format("%s.Code.%1$sClass[0].title1", this.appName);
         EditablePropertyPane<String> titleProperty = new EditablePropertyPane<>(propertyReference);
         assertEquals("Foo", titleProperty.clickEdit().getValue());
         titleProperty.setValue("Book").clickSave();
         assertEquals("Book", titleProperty.getDisplayValue());
 
         // Check the entries live table.
-        entryViewPage.clickBreadcrumbLink(appName);
+        entryViewPage.clickBreadcrumbLink(this.appName);
         LiveTableElement liveTable = new ApplicationHomePage().getEntriesLiveTable();
         liveTable.waitUntilReady();
         assertEquals(1, liveTable.getRowCount());
@@ -135,15 +136,38 @@ class DocumentFieldsIT
         assertTrue(liveTable.hasRow("My Content", "Bar"));
 
         // Check that the title and the content of the class have not been changed.
-        setup.gotoPage(new LocalDocumentReference(Arrays.asList(appName, "Code"), appName + "Class"), "edit",
+        setup.gotoPage(new LocalDocumentReference(Arrays.asList(this.appName, "Code"), this.appName + "Class"), "edit",
             "editor=wiki");
         WikiEditPage editPage = new WikiEditPage();
-        assertEquals(appName + " Class", editPage.getTitle());
+        assertEquals(this.appName + " Class", editPage.getTitle());
         assertEquals("", editPage.getContent());
 
         // Now edit the class and check if the default values for title and content are taken from the template.
         editPage.edit();
         assertEquals(defaultTitle, new ClassFieldEditPane("title1").getDefaultValue());
         assertEquals(defaultContent, new ClassFieldEditPane("content1").getDefaultValue());
+    }
+
+    @Test
+    @Order(2)
+    void contentFromSimpleUser(TestUtils setup)
+    {
+        // Create an application entry with a simple user that doesn't have script rights.
+        setup.createUserAndLogin("Alice", "pass");
+
+        ApplicationHomePage appHomePage = ApplicationHomePage.gotoPage(this.appName);
+        appHomePage.getEntriesLiveTable().waitUntilReady();
+
+        EntryNamePane entryNamePage = appHomePage.clickAddNewEntry();
+        entryNamePage.setName("ByAlice");
+
+        EntryEditPage entryEditPage = entryNamePage.clickAdd();
+        entryEditPage.setTitle("Title by $services.localization.render('Alice')");
+        entryEditPage.setContent("Content by {{velocity}}$services.localization.render('Alice'){{/velocity}}");
+
+        ViewPage entryViewPage = entryEditPage.clickSaveAndView();
+        assertEquals("Title by $services.localization.render('Alice')", entryViewPage.getDocumentTitle());
+        assertTrue(entryViewPage.getContent().contains("Content by"));
+        assertTrue(entryViewPage.getContent().contains("The execution of the [velocity] script macro is not allowed"));
     }
 }

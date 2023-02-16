@@ -48,6 +48,11 @@ public class EntityTreeElement extends BaseElement
         return waitForSpace(spaceName, false);
     }
 
+    private String getSpaceLocator(String spaceName)
+    {
+        return "Located in xwiki \u00BB " + spaceName;
+    }
+
     /**
      * Waits for the node corresponding to the specified space to be present.
      * 
@@ -57,7 +62,7 @@ public class EntityTreeElement extends BaseElement
      */
     public EntityTreeElement waitForSpace(String spaceName, boolean selected)
     {
-        return waitForNodeWithHintAndLabel("Located in xwiki \u00BB " + spaceName, spaceName, selected);
+        return waitForNodeWithHintAndLabel(getSpaceLocator(spaceName), spaceName, selected);
     }
 
     /**
@@ -67,7 +72,7 @@ public class EntityTreeElement extends BaseElement
      */
     public boolean hasSpace(String spaceName)
     {
-        return hasNodeWithHintAndLabel("Located in xwiki \u00BB " + spaceName, spaceName);
+        return hasNodeWithHintAndLabel(getSpaceLocator(spaceName), spaceName);
     }
 
     /**
@@ -110,6 +115,11 @@ public class EntityTreeElement extends BaseElement
         return waitForPage(spaceName, pageName, pageName, selected);
     }
 
+    private String getPageLocator(String spaceName, String pageName)
+    {
+        return String.format("Located in xwiki \u00BB %s \u00BB %s", spaceName, pageName);
+    }
+
     /**
      * Waits for the node corresponding to the specified page to be present.
      * 
@@ -121,8 +131,7 @@ public class EntityTreeElement extends BaseElement
      */
     public EntityTreeElement waitForPage(String spaceName, String pageName, String pageTitle, boolean selected)
     {
-        return waitForNodeWithHintAndLabel(String.format("Located in xwiki \u00BB %s \u00BB %s", spaceName, pageName),
-            pageTitle, selected);
+        return waitForNodeWithHintAndLabel(getPageLocator(spaceName, pageName), pageTitle, selected);
     }
 
     /**
@@ -144,8 +153,7 @@ public class EntityTreeElement extends BaseElement
      */
     public boolean hasPage(String spaceName, String pageName, String pageTitle)
     {
-        return hasNodeWithHintAndLabel(String.format("Located in xwiki \u00BB %s \u00BB %s", spaceName, pageName),
-            pageTitle);
+        return hasNodeWithHintAndLabel(getPageLocator(spaceName, pageName), pageTitle);
     }
 
     /**
@@ -172,8 +180,7 @@ public class EntityTreeElement extends BaseElement
      */
     public EntityTreeElement waitForAttachment(String spaceName, String pageName, String fileName, boolean selected)
     {
-        return waitForNodeWithHintAndLabel(String.format("Attached to xwiki \u00BB %s \u00BB %s", spaceName, pageName),
-            fileName, selected);
+        return waitForNodeWithHintAndLabel(getPageLocator(spaceName, pageName), fileName, selected);
     }
 
     /**
@@ -184,8 +191,7 @@ public class EntityTreeElement extends BaseElement
      */
     public boolean hasAttachment(String spaceName, String pageName, String fileName)
     {
-        return hasNodeWithHintAndLabel(String.format("Attached to xwiki \u00BB %s \u00BB %s", spaceName, pageName),
-            fileName);
+        return hasNodeWithHintAndLabel(getPageLocator(spaceName, pageName), fileName);
     }
 
     /**

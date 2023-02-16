@@ -59,18 +59,29 @@ public class CopyOrRenameOrDeleteStatusPage extends BasePage
         return this;
     }
 
+    /**
+     * Go to the original page and return a new instance of {@link ViewPage}.
+     * @return a new instance of {@link ViewPage}.
+     */
     public ViewPage gotoOriginalPage()
     {
         this.oldPage.click();
         return new ViewPage();
     }
 
+    /**
+     * Go to the new page and return a new instance of {@link ViewPage}.
+     * @return a new instance of {@link ViewPage}.
+     */
     public ViewPage gotoNewPage()
     {
         this.newPage.click();
         return new ViewPage();
     }
 
+    /**
+     * @return the info message displayed in the status.
+     */
     public String getInfoMessage()
     {
         return this.message.getText();

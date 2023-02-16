@@ -36,11 +36,14 @@ import org.openqa.selenium.support.FindBy;
  */
 public class DeletePageOutcomePage extends ViewPage
 {
+    private static final String NO_DELETED_ENTRIES = "There's no deleted entries.";
+
     @FindBy(xpath = "//p[@class='xwikimessage']")
     private WebElement message;
 
     /**
      * Return first page deleted deleter.
+     * @return first page deleted deleter.
      * @since 3.2M3
      * @deprecated Since 14.10 prefer using {@link #getDeletedPagesEntries()} and
      *             {@link DeletedPageEntry#getDeleter()}.
@@ -58,6 +61,7 @@ public class DeletePageOutcomePage extends ViewPage
 
     /**
      * @since 4.0M2
+     * @return the displayed message.
      */
     public String getMessage()
     {
@@ -120,7 +124,7 @@ public class DeletePageOutcomePage extends ViewPage
     {
         List<DeletedPageEntry> deletedPagesEntries = getDeletedPagesEntries();
         if (deletedPagesEntries == null) {
-            throw new RuntimeException("There's no deleted entries.");
+            throw new RuntimeException(NO_DELETED_ENTRIES);
         } else {
             return deletedPagesEntries.get(0).clickRestore();
         }

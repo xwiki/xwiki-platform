@@ -23,6 +23,11 @@ package org.xwiki.test.ui.po;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+/**
+ * Page object representing the rename page UI.
+ *
+ * @version $Id$
+ */
 public class RenamePage extends ViewPage
 {
     @FindBy(name = "deep")
@@ -45,11 +50,19 @@ public class RenamePage extends ViewPage
 
     private DocumentPicker documentPicker;
 
+    /**
+     * @return {@code true} if the preserve children checkbox is checked.
+     */
     public boolean isPreserveChildren()
     {
         return this.preserveChildrenCheckbox.isSelected();
     }
 
+    /**
+     * Set the preserve children checkbox value.
+     *
+     * @param preserveChildren {@code true} to check the box.
+     */
     public void setPreserveChildren(boolean preserveChildren)
     {
         if (preserveChildren != isPreserveChildren()) {
@@ -57,11 +70,18 @@ public class RenamePage extends ViewPage
         }
     }
 
+    /**
+     * @return {@code true} if the update links checkbox is checked
+     */
     public boolean isUpdateLinks()
     {
         return this.updateLinksCheckbox.isSelected();
     }
 
+    /**
+     * Set the update links checkbox value.
+     * @param updateLinks {@code true} to check the box
+     */
     public void setUpdateLinks(boolean updateLinks)
     {
         if (updateLinks != isUpdateLinks()) {
@@ -69,11 +89,18 @@ public class RenamePage extends ViewPage
         }
     }
 
+    /**
+     * @return {@code true} if the auto redirect checkbox is checked
+     */
     public boolean isAutoRedirect()
     {
         return this.autoRedirectCheckbox.isSelected();
     }
 
+    /**
+     * Set the auto redirect checkbox value
+     * @param isAutoRedirect {@code true} to check the box
+     */
     public void setAutoRedirect(boolean isAutoRedirect)
     {
         if (isAutoRedirect != isAutoRedirect()) {
@@ -81,6 +108,9 @@ public class RenamePage extends ViewPage
         }
     }
 
+    /**
+     * @return the document picker used to choose the target location
+     */
     public DocumentPicker getDocumentPicker()
     {
         if (this.documentPicker == null) {
@@ -89,6 +119,12 @@ public class RenamePage extends ViewPage
         return this.documentPicker;
     }
 
+    /**
+     * Click on the rename button, then wait for the page to be reloaded and return an instance of
+     * {@link CopyOrRenameOrDeleteStatusPage} to assert the result.
+     *
+     * @return a new instance of {@link CopyOrRenameOrDeleteStatusPage} to assert the result
+     */
     public CopyOrRenameOrDeleteStatusPage clickRenameButton()
     {
         // The rename page form is submitted by JavaScript code in case the rename button is clicked before the
@@ -99,11 +135,18 @@ public class RenamePage extends ViewPage
         return new CopyOrRenameOrDeleteStatusPage();
     }
 
+    /**
+     * @return {@code true} if the is terminal checkbox is checked
+     */
     public boolean isTerminal()
     {
         return this.terminalCheckbox.isSelected();
     }
 
+    /**
+     * Set the value of the is terminal checkbox
+     * @param isTerminal {@code true} to check the box
+     */
     public void setTerminal(boolean isTerminal)
     {
         if (isTerminal != isTerminal()) {

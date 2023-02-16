@@ -39,6 +39,8 @@ public class CommentForm extends BaseElement
      */
     private By containerLocator;
 
+    private final By textareaLocator = By.tagName("textarea");
+
     /**
      * Creates a new form instance.
      * 
@@ -59,7 +61,7 @@ public class CommentForm extends BaseElement
      */
     public WebElement getContentField()
     {
-        return getContainer().findElement(By.tagName("textarea"));
+        return getContainer().findElement(this.textareaLocator);
     }
 
     /**
@@ -70,7 +72,7 @@ public class CommentForm extends BaseElement
     private void runOnContentField(Consumer<WebElement> action)
     {
         List<WebElement> textareas = getContainer()
-                                         .findElements(By.tagName("textarea"))
+                                         .findElements(this.textareaLocator)
                                          .stream()
                                          .filter(it -> !it.getAttribute("class").contains("ckeditor-textarea"))
                                          .collect(Collectors.toList());
@@ -121,7 +123,7 @@ public class CommentForm extends BaseElement
     }
 
     /**
-     * Clicks on the back button to cancel the preview and show the content text area
+     * Clicks on the back button to cancel the preview and show the content text area.
      */
     public void clickBack()
     {

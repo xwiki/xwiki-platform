@@ -40,10 +40,4 @@ class ConfiguredNewsSourceFactoryTest
         NewsSource source = this.factory.create(Collections.emptyMap());
         assertNotNull(source);
     }
-
-    @Test
-    void createWithExistingSourceConfiguration()
-    {
-
-    }
 }

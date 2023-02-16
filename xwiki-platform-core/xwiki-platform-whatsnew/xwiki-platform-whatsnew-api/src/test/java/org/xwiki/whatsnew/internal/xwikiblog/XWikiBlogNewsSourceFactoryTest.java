@@ -26,7 +26,6 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.whatsnew.NewsException;
 import org.xwiki.whatsnew.NewsSource;
-import org.xwiki.whatsnew.NewsSourceDescriptor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -47,16 +46,14 @@ class XWikiBlogNewsSourceFactoryTest
     @Test
     void create() throws Exception
     {
-        NewsSource source =
-            this.factory.create(new NewsSourceDescriptor("id", "hint", Collections.singletonMap("rssURL", "some url")));
+        NewsSource source = this.factory.create(Collections.singletonMap("rssURL", "some url"));
         assertNotNull(source);
     }
 
     @Test
     void createWhenNoRSSURLParameter()
     {
-        Throwable exception = assertThrows(NewsException.class, () -> this.factory.create(new NewsSourceDescriptor(
-            "id", "hint", Collections.emptyMap())));
+        Throwable exception = assertThrows(NewsException.class, () -> this.factory.create(Collections.emptyMap()));
         assertEquals("Failed to create a XWiki Blog news source. A 'rssURL' parameter must be passed",
             exception.getMessage());
     }

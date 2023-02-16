@@ -19,6 +19,8 @@
  */
 package org.xwiki.whatsnew;
 
+import java.util.Map;
+
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
@@ -40,10 +42,10 @@ import org.xwiki.stability.Unstable;
 public interface NewsSourceFactory
 {
     /**
-     * @param descriptor the definition of a news source to be instantiated
+     * @param parameters the source-dependent list of parameters to configure the source
      * @return the News source instance
      * @throws NewsException when there's a problem creating the news source (e.g. not specific RSS URL for XWiki Blog
      *         source type)
      */
-    NewsSource create(NewsSourceDescriptor descriptor) throws NewsException;
+    NewsSource create(Map<String, String> parameters) throws NewsException;
 }

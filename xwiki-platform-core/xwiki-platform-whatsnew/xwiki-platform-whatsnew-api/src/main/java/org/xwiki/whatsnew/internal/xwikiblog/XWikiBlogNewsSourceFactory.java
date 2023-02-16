@@ -19,13 +19,14 @@
  */
 package org.xwiki.whatsnew.internal.xwikiblog;
 
+import java.util.Map;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.whatsnew.NewsException;
 import org.xwiki.whatsnew.NewsSource;
-import org.xwiki.whatsnew.NewsSourceDescriptor;
 import org.xwiki.whatsnew.NewsSourceFactory;
 
 /**
@@ -40,9 +41,9 @@ import org.xwiki.whatsnew.NewsSourceFactory;
 public class XWikiBlogNewsSourceFactory implements NewsSourceFactory
 {
     @Override
-    public NewsSource create(NewsSourceDescriptor descriptor) throws NewsException
+    public NewsSource create(Map<String, String> parameters) throws NewsException
     {
-        String rssURL = descriptor.getParameters().get("rssURL");
+        String rssURL = parameters.get("rssURL");
         if (rssURL == null) {
             throw new NewsException("Failed to create a XWiki Blog news source. A 'rssURL' parameter must be passed");
         }

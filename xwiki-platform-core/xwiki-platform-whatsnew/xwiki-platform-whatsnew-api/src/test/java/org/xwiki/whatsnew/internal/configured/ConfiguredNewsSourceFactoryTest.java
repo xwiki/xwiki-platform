@@ -19,6 +19,8 @@
  */
 package org.xwiki.whatsnew.internal.configured;
 
+import java.util.Collections;
+
 import org.junit.jupiter.api.Test;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -35,7 +37,7 @@ class ConfiguredNewsSourceFactoryTest
     @Test
     void createWhenEmptyConfiguration()
     {
-        NewsSource source = this.factory.create(null);
+        NewsSource source = this.factory.create(Collections.emptyMap());
         assertNotNull(source);
     }
 

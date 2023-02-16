@@ -24,14 +24,9 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.pagefactory.AjaxElementLocatorFactory;
 import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.test.ui.PersistentTestContext;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
-
-import com.deque.html.axecore.extensions.WebDriverExtensions;
-import com.deque.html.axecore.results.Results;
 
 /**
  * Represents all elements which include web pages as well as parts of web pages.
@@ -41,7 +36,6 @@ import com.deque.html.axecore.results.Results;
  */
 public class BaseElement
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BaseElement.class);
 
     private static PersistentTestContext context;
 
@@ -55,23 +49,6 @@ public class BaseElement
     {
         ElementLocatorFactory finder = new AjaxElementLocatorFactory(getDriver(), getDriver().getTimeout());
         PageFactory.initElements(finder, this);
-        //
-        if(BaseElement.context.getUtil().getWcagContext().wcagSetup){
-            /* Perform accessibility checks on the element when instanciated if the wcag is activated in build. */
-            long startTime = System.currentTimeMillis();
-            XWikiWebDriver driver = this.getDriver();
-            try {
-                Results axeResult = WebDriverExtensions.analyze(driver);
-                /* Store the results in the testUtil cache. */
-                BaseElement.context.getUtil().addWcagResults(axeResult.getViolations());
-            }catch (Exception e){
-                System.out.println("Exception when calling axe core validation on the BaseElement.");
-            }
-            long stopTime = System.currentTimeMillis();
-            long deltaTime = stopTime - startTime;
-            LOGGER.info("The wcag validation on this base element took [{}] milliseconds.", deltaTime);
-            BaseElement.context.getUtil().addWcagTime(deltaTime);
-        }
     }
 
     protected XWikiWebDriver getDriver()

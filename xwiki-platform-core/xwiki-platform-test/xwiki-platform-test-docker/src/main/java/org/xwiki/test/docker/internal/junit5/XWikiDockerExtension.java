@@ -49,13 +49,14 @@ import org.xwiki.test.ui.PersistentTestContext;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
 
-import com.deque.html.axecore.results.Rule;
+import com.deque.html.axecore.results.Results;
+import com.deque.html.axecore.selenium.AxeReporter;
 
 import com.google.common.primitives.Ints;
 
 import ch.qos.logback.classic.Level;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.followOutput;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.getAgentName;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.getResultFileLocation;
@@ -323,12 +324,15 @@ public class XWikiDockerExtension extends AbstractExtension
 
         PersistentTestContext testContext = loadPersistentTestContext(extensionContext);
         if (testConfiguration.wcag()) {
-            LOGGER.info("Time spend on WCAG validation [{}] (in s)",
-                testContext.getUtil().getWcagContext().wcagTimer/1000);
-            //Retrieve the wcag report from testUtil and assert it's empty.
-            List<Rule> wcagRuleViolations = testContext.getUtil().getWcagContext().wcagResults;
-            assertTrue(wcagRuleViolations.size() == 0, String.valueOf(wcagRuleViolations.size())+" violations found.");
-            LOGGER.info(wcagRuleViolations.toString());
+            float totalTime = testContext.getUtil().getWcagContext().wcagTimer / 1000;
+            LOGGER.info("Time spend on WCAG validation [{}] (in s)", totalTime);
+            // Retrieve the wcag report from testUtil and assert it's empty.
+            List<Results> wcagRuleViolations = testContext.getUtil().getWcagContext().wcagResults;
+            for (Results result : wcagRuleViolations) {
+                assertFalse(AxeReporter.getReadableAxeResults("WCAG2.1",
+                    this.loadXWikiWebDriver(extensionContext), result.getViolations()),
+                    AxeReporter.getAxeResultString());
+            }
         }
 
         // Shutdown the test context

@@ -20,12 +20,15 @@
 package org.xwiki.test.ui.po;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.LocaleUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
@@ -33,12 +36,16 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.EditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.test.ui.po.editor.RightsEditPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
+
+import com.deque.html.axecore.results.Results;
+import com.deque.html.axecore.selenium.AxeBuilder;
 
 /**
  * Represents the common actions possible on all Pages.
@@ -118,6 +125,37 @@ public class BasePage extends BaseElement
     {
         super();
         waitUntilPageIsReady();
+
+        Logger LOGGER = LoggerFactory.getLogger(BasePage.class);
+        if(this.getUtil().checkAccessibility(this.getPageURL(), this.getClass())){
+            /* Perform accessibility checks on the element when instanciated if the wcag is activated in build. */
+            long startTime = System.currentTimeMillis();
+            XWikiWebDriver driver = this.getDriver();
+            try {
+                if (driver == null) {
+                    throw new NullPointerException("the webDriver is null");
+                } else {
+                    AxeBuilder axeBuilder = new AxeBuilder();
+                    axeBuilder.withTags(Arrays.asList("wcag2a", "wcag2aa", "wcag21a", "wcag21aa"));
+                    Results axeResult = axeBuilder.analyze(driver);
+                    this.getUtil().addWcagResults(this.getPageURL(), this.getClass(), axeResult);
+
+
+                    long stopTime = System.currentTimeMillis();
+                    long deltaTime = stopTime - startTime;
+                    LOGGER.info("[{} : {}] ",  this.getPageURL(), this.getClass());
+                    LOGGER.info("The wcag validation on this base element took [{}] ms.", deltaTime);
+                    LOGGER.info("[{}] violations found.", axeResult.getViolations().size());
+                    this.getUtil().addWcagTime(deltaTime);
+                }
+            }catch (Exception e){
+                System.out.println(e.getStackTrace());
+                System.out.println("Exception when calling axe core validation on the BaseElement.");
+            }
+        }
+        else{
+            LOGGER.warn("[{} : {}] This class on this URL is already checked.", this.getPageURL(), this.getClass());
+        }
     }
 
     public String getPageTitle()

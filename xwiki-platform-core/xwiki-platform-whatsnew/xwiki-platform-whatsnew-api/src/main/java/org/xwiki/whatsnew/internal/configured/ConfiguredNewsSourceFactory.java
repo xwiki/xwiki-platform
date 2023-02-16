@@ -21,7 +21,6 @@ package org.xwiki.whatsnew.internal.configured;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -56,8 +55,8 @@ public class ConfiguredNewsSourceFactory implements NewsSourceFactory, Initializ
     private ComponentManager componentManager;
 
     /**
-     * Cached news source so that calling several times {@link #create(Map)} will be performant and return the same
-     * News source.
+     * Cached news source so that calling several times {@link #create(NewsSourceDescriptor)} will be performant and
+     * return the same News source.
      */
     private NewsSource source;
 
@@ -73,7 +72,7 @@ public class ConfiguredNewsSourceFactory implements NewsSourceFactory, Initializ
     }
 
     @Override
-    public NewsSource create(Map<String, String> parameters)
+    public NewsSource create(NewsSourceDescriptor descriptor)
     {
         return this.source;
     }
@@ -84,7 +83,7 @@ public class ConfiguredNewsSourceFactory implements NewsSourceFactory, Initializ
         for (NewsSourceDescriptor descriptor : this.configuration.getNewsSourceDescriptors()) {
             NewsSourceFactory factory = getFactory(descriptor.getSourceTypeHint());
             if (factory != null) {
-                sources.add(factory.create(descriptor.getParameters()));
+                sources.add(factory.create(descriptor));
             }
         }
         return new CompositeNewsSource(sources);

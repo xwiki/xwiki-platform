@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.xwiki.whatsnew.NewsCategory;
+import org.xwiki.whatsnew.NewsContent;
 import org.xwiki.whatsnew.NewsSourceItem;
 
 /**
@@ -37,7 +38,7 @@ public class DefaultNewsSourceItem implements NewsSourceItem
 {
     private Optional<String> title;
 
-    private Optional<String> content;
+    private Optional<NewsContent> description;
 
     private Set<NewsCategory> categories = new HashSet<>();
 
@@ -62,17 +63,17 @@ public class DefaultNewsSourceItem implements NewsSourceItem
     }
 
     @Override
-    public Optional<String> getContent()
+    public Optional<NewsContent> getDescription()
     {
-        return this.content;
+        return this.description;
     }
 
     /**
-     * @param content see {@link #getContent()}
+     * @param description see {@link #getDescription()}
      */
-    public void setContent(Optional<String> content)
+    public void setDescription(Optional<NewsContent> description)
     {
-        this.content = content;
+        this.description = description;
     }
 
     @Override

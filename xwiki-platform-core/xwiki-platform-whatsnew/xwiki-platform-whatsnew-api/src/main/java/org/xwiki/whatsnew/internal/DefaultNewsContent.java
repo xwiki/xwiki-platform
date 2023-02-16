@@ -17,31 +17,46 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.whatsnew.internal.xwikiorgblog;
+package org.xwiki.whatsnew.internal;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.whatsnew.NewsSource;
-import org.xwiki.whatsnew.NewsSourceFactory;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.whatsnew.NewsContent;
 
 /**
- * The factory that returns a XWiki.org Blog source.
+ * Represents some content from a news source item. It holds both the raw content and the syntax in which the content
+ * is written in.
  *
  * @version $Id$
- * @since 15.1RC1
  */
-@Component
-@Named("xwikiorgblog")
-@Singleton
-public class XWikiOrgBlogNewsSourceFactory implements NewsSourceFactory
+public class DefaultNewsContent implements NewsContent
 {
-    private static final String RSS_URL = "https://www.xwiki.org/xwiki/bin/view/Blog/BlogRss?xpage=plain";
+    private String content;
 
-    @Override
-    public NewsSource create()
+    private Syntax syntax;
+
+    /**
+     * @param content see {@link #getContent()}
+     * @param syntax see {@link #getSyntax()}
+     */
+    public DefaultNewsContent(String content, Syntax syntax)
     {
-        return new XWikiOrgBlogNewsSource(RSS_URL);
+        this.content = content;
+        this.syntax = syntax;
+    }
+
+    /**
+     * @return the raw content in the specified syntax
+     */
+    public String getContent()
+    {
+        return this.content;
+    }
+
+    /**
+     * @return the syntax in which the content is written in
+     */
+    public Syntax getSyntax()
+    {
+        return this.syntax;
     }
 }

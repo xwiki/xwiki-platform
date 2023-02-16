@@ -17,34 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.whatsnew.internal.xwikiorgblog;
+package org.xwiki.whatsnew;
 
-import org.junit.jupiter.api.Test;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.test.junit5.mockito.ComponentTest;
-import org.xwiki.test.junit5.mockito.InjectMockComponents;
-import org.xwiki.whatsnew.NewsSource;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.xwiki.stability.Unstable;
 
 /**
- * Unit tests for {@link XWikiOrgBlogNewsSourceFactory}.
+ * Represents a {@link NewsSourceItem} content.
  *
  * @version $Id$
  * @since 15.1RC1
  */
-@ComponentTest
-class XWikiOrgBlogNewsSourceFactoryTest
+@Unstable
+public interface NewsContent
 {
-    @InjectMockComponents
-    private XWikiOrgBlogNewsSourceFactory factory;
+    /**
+     * @return the content in the syntax of {@link #getSyntax()}
+     */
+    String getContent();
 
-    @Test
-    void create() throws Exception
-    {
-        NewsSource source = this.factory.create();
-        assertNotNull(source);
-        assertEquals(Syntax.XHTML_1_0, source.getContentSyntax());
-    }
+    /**
+     * @return the syntax in which the content is written in
+     */
+    Syntax getSyntax();
 }

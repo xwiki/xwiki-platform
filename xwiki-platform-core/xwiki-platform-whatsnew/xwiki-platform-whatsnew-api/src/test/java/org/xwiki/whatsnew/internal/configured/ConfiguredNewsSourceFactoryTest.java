@@ -17,49 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.whatsnew;
+package org.xwiki.whatsnew.internal.configured;
 
-import java.util.Optional;
-import java.util.Set;
+import java.util.Collections;
 
-import org.xwiki.stability.Unstable;
+import org.junit.jupiter.api.Test;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.whatsnew.NewsSource;
 
-/**
- * Data for a source item.
- *
- * @version $Id$
- * @since 15.1RC1
- */
-@Unstable
-public interface NewsSourceItem
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+@ComponentTest
+class ConfiguredNewsSourceFactoryTest
 {
-    /**
-     * @return the news item title
-     */
-    Optional<String> getTitle();
+    @InjectMockComponents
+    private ConfiguredNewsSourceFactory factory;
 
-    /**
-     * @return the news item content
-     */
-    Optional<NewsContent> getDescription();
+    @Test
+    void createWhenEmptyConfiguration()
+    {
+        NewsSource source = this.factory.create(Collections.emptyMap());
+        assertNotNull(source);
+    }
 
-    /**
-     * @return the news item categories
-     */
-    Set<NewsCategory> getCategories();
+    @Test
+    void createWithExistingSourceConfiguration()
+    {
 
-    /**
-     * @return the news item publication date
-     */
-    Optional<String> getPublishedDate();
-
-    /**
-     * @return the news item author
-     */
-    Optional<String> getAuthor();
-
-    /**
-     * @return the news item origin URL
-     */
-    Optional<String> getOriginURL();
+    }
 }

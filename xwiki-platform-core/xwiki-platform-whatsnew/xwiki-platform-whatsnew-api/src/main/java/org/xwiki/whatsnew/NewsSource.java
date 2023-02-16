@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.xwiki.extension.version.Version;
-import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
@@ -72,21 +71,16 @@ public interface NewsSource
     NewsSource forExtraParameters(Map<String, Object> extraParameters);
 
     /**
-     * Filter the news to only return a subset of news based on a range.
+     * Filter the news to only return a certain number of news items.
      *
-     * @param range the range to filter for
+     * @param count the max number of new items to return
      * @return the news source itself to allow for a fluent API
      */
-    NewsSource withRange(NewsRange range);
+    NewsSource withCount(int count);
 
     /**
      * @return the list of news items, filtered with the passed constraints
      * @throws NewsException if there's an error while fetching the news
      */
     List<NewsSourceItem> build() throws NewsException;
-
-    /**
-     * @return the syntax in which the news source item is written in
-     */
-    Syntax getContentSyntax();
 }

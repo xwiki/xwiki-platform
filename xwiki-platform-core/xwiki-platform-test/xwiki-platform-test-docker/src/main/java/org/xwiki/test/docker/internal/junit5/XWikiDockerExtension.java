@@ -20,6 +20,7 @@
 package org.xwiki.test.docker.internal.junit5;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -253,7 +254,7 @@ public class XWikiDockerExtension extends AbstractExtension
         }
 
         //Set up the wcag validation in the test suite fixture.
-        loadPersistentTestContext(extensionContext).getUtil().setWcagSetup(testConfiguration.wcag());
+        loadPersistentTestContext(extensionContext).getUtil().getWcagContext().setWcagEnabled(testConfiguration.wcag());
 
         LOGGER.info("(*) Starting test [{}]", extensionContext.getTestMethod().get().getName());
     }
@@ -324,15 +325,11 @@ public class XWikiDockerExtension extends AbstractExtension
 
         PersistentTestContext testContext = loadPersistentTestContext(extensionContext);
         if (testConfiguration.wcag()) {
-            float totalTime = testContext.getUtil().getWcagContext().wcagTimer / 1000;
+            TestUtils.WCAGContext wcagContext = testContext.getUtil().getWcagContext();
+            float totalTime = (float) wcagContext.wcagTimer / 1000;
             LOGGER.info("Time spend on WCAG validation [{}] (in s)", totalTime);
-            // Retrieve the wcag report from testUtil and assert it's empty.
-            List<Results> wcagRuleViolations = testContext.getUtil().getWcagContext().wcagResults;
-            for (Results result : wcagRuleViolations) {
-                assertFalse(AxeReporter.getReadableAxeResults("WCAG2.1",
-                    this.loadXWikiWebDriver(extensionContext), result.getViolations()),
-                    AxeReporter.getAxeResultString());
-            }
+            // Assert the results of the different WCAG Checks are all empty
+            assertFalse(wcagContext.hasWCAGViolations(),wcagContext.buildReport());
         }
 
         // Shutdown the test context

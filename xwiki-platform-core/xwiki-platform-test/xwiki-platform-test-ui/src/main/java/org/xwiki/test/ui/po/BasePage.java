@@ -36,6 +36,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.EditPage;
@@ -127,7 +128,8 @@ public class BasePage extends BaseElement
         waitUntilPageIsReady();
 
         Logger LOGGER = LoggerFactory.getLogger(BasePage.class);
-        if(this.getUtil().checkAccessibility(this.getPageURL(), this.getClass())){
+        TestUtils.WCAGContext wcagContext = getUtil().getWcagContext();
+        if(wcagContext.checkAccessibility(this.getPageURL(), this.getClass())){
             /* Perform accessibility checks on the element when instanciated if the wcag is activated in build. */
             long startTime = System.currentTimeMillis();
             XWikiWebDriver driver = this.getDriver();
@@ -138,23 +140,23 @@ public class BasePage extends BaseElement
                     AxeBuilder axeBuilder = new AxeBuilder();
                     axeBuilder.withTags(Arrays.asList("wcag2a", "wcag2aa", "wcag21a", "wcag21aa"));
                     Results axeResult = axeBuilder.analyze(driver);
-                    this.getUtil().addWcagResults(this.getPageURL(), this.getClass(), axeResult);
-
+                    wcagContext.addWcagResults(this.getPageURL(), this.getClass(), axeResult);
 
                     long stopTime = System.currentTimeMillis();
                     long deltaTime = stopTime - startTime;
                     LOGGER.info("[{} : {}] ",  this.getPageURL(), this.getClass());
-                    LOGGER.info("The wcag validation on this base element took [{}] ms.", deltaTime);
-                    LOGGER.info("[{}] violations found.", axeResult.getViolations().size());
-                    this.getUtil().addWcagTime(deltaTime);
+                    LOGGER.info("The wcag validation on this base element took [{}] ms and found [{}] violations.",
+                      deltaTime, axeResult.getViolations().size());
+
+                    wcagContext.addWcagTime(deltaTime);
                 }
             }catch (Exception e){
-                System.out.println(e.getStackTrace());
                 System.out.println("Exception when calling axe core validation on the BaseElement.");
             }
         }
         else{
-            LOGGER.warn("[{} : {}] This class on this URL is already checked.", this.getPageURL(), this.getClass());
+            LOGGER.info("[{} : {}]", this.getPageURL(), this.getClass());
+            LOGGER.info("This combination of URL:class was already WCAG checked.");
         }
     }
 

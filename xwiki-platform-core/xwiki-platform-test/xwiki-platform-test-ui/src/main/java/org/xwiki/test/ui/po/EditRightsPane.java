@@ -72,7 +72,7 @@ public class EditRightsPane extends BaseElement
             return values()[(ordinal() + 1) % values().length];
         }
 
-        static State getButtonState(WebElement button)
+        static State getButtonImageState(WebElement button)
         {
             for (State s : values()) {
                 //  The URL may contain query string parameters (e.g. starting with 11.1RC1 the resource URLs can now
@@ -119,9 +119,9 @@ public class EditRightsPane extends BaseElement
      */
     public State getGuestRight(String rightName)
     {
-        final By iconLocator = By.xpath(String.format("//tr[@id='unregistered']/td[@data-title='%s']/img", rightName));
+        final By iconLocator = By.xpath(String.format("//tr[@id='unregistered']/td[@data-title='%s']/button/img", rightName));
         final WebElement icon = getDriver().findElement(iconLocator);
-        return State.getButtonState(icon);
+        return State.getButtonImageState(icon);
     }
 
     public State getRight(String entityName, Right right)
@@ -142,10 +142,10 @@ public class EditRightsPane extends BaseElement
         final By iconLocator =
             By.xpath(String.format(
                 "//*[@id='usersandgroupstable-display']//td[@class='username']/a[contains(@href, '%s')]"
-                    + "/../../td[@data-title='%s']/img",
+                    + "/../../td[@data-title='%s']/button/img",
                 entityName, rightName));
         final WebElement icon = getDriver().findElement(iconLocator);
-        return State.getButtonState(icon);
+        return State.getButtonImageState(icon);
     }
 
     public boolean hasEntity(String entityName)
@@ -172,9 +172,9 @@ public class EditRightsPane extends BaseElement
             getDriver().executeJavascript(
                 "window.__oldConfirm = window.confirm; window.confirm = function() { return true; };");
             final By buttonLocator = By.xpath(
-                String.format("*//tr[@id='unregistered']/td[@data-title='%s']/img", rightName));
+                String.format("*//tr[@id='unregistered']/td[@data-title='%s']/button/img", rightName));
             final WebElement button = getDriver().findElement(buttonLocator);
-            State currentState = State.getButtonState(button);
+            State currentState = State.getButtonImageState(button);
             button.click();
             // Note: Selenium 2.0a4 returns a relative URL when calling getAttribute("src") but since we moved to
             // Selenium 2.0a7 it returns a *full* URL even though the DOM has a relative URL as in:
@@ -212,9 +212,9 @@ public class EditRightsPane extends BaseElement
             final By buttonLocator =
                 By.xpath(
                     String.format("//*[@id='usersandgroupstable-display']//td[@class='username']"
-                        + "/a[contains(@href, '%s')]/../../td[@data-title='%s']/img", entityName, rightName));
+                        + "/a[contains(@href, '%s')]/../../td[@data-title='%s']/button/img", entityName, rightName));
             final WebElement button = getDriver().findElement(buttonLocator);
-            State currentState = State.getButtonState(button).getNextState();
+            State currentState = State.getButtonImageState(button).getNextState();
             button.click();
             // Note: Selenium 2.0a4 returns a relative URL when calling getAttribute("src") but since we moved to
             // Selenium 2.0a7 it returns a *full* URL even though the DOM has a relative URL as in:

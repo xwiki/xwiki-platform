@@ -42,6 +42,7 @@ import com.xpn.xwiki.plugin.tag.TagPlugin;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 /**
@@ -86,11 +87,11 @@ class DocumentTagsTest extends PageTest
         // Remove extra spaces to make it easy to assert the result below.
         String result = templateManager.render("documentTags.vm").trim().replaceAll("\\s+", " ");
 
-        // Verify that the generated HTML matches the expectation:
-        // - The tag label is displayed
+        // Verify that the generated HTML matches the expectations:
+        // - The tag label is not displayed since there is/are no tag(s)
         // - No tag is listed after the tag label
         // - No "+" link is displayed since the user doesn't have edit rights
-        assertThat(result, matchesPattern("\\Q<div class=\"doc-tags\" id=\"xdocTags\"> core.tags.list.label </div>"));
+        assertEquals("<div class=\"doc-tags\" id=\"xdocTags\"> </div>", result);
     }
 
     @Test
@@ -103,13 +104,13 @@ class DocumentTagsTest extends PageTest
         // Remove extra spaces to make it easy to assert the result below.
         String result = templateManager.render("documentTags.vm").trim().replaceAll("\\s+", " ");
 
-        // Verify that the generated HTML matches the expectation:
+        // Verify that the generated HTML matches the expectations:
         // - The tag label is displayed
         // - No tag is listed after the tag label
         // - The "+" link is displayed since the user has edit rights
         assertThat(result, matchesPattern("\\Q<div class=\"doc-tags\" id=\"xdocTags\"> core.tags.list.label "
-            + "<div class=\"tag-tool tag-add\"><a href=\"\\E.*\"\\Q title=\"core.tags.add.tooltip\" "
-            + "rel=\"nofollow\">[+]</a></div> </div>\\E"));
+            + "<div class=\"tag-tool tag-add\"> <a href=\"/xwiki/bin/view/space/page?showTagAddForm=true#xdocTags\" title=\"core.tags.add.tooltip\" "
+            + "rel=\"nofollow\">[+]</a> </div> </div>"));
     }
 
     @Test
@@ -117,17 +118,17 @@ class DocumentTagsTest extends PageTest
     {
         // Add tags to the current document
         XWikiDocument currentDocument = this.context.getDoc();
-        BaseObject bo = new BaseObject();
-        bo.setXClassReference(new DocumentReference("xwiki", "XWiki", "TagClass"));
-        bo.setStringListValue("tags", Arrays.asList("tag1", "tag2"));
-        currentDocument.addXObject(bo);
+        BaseObject baseObject = new BaseObject();
+        baseObject.setXClassReference(new DocumentReference("xwiki", "XWiki", "TagClass"));
+        baseObject.setStringListValue("tags", Arrays.asList("tag1", "tag2"));
+        currentDocument.addXObject(baseObject);
         this.xwiki.saveDocument(currentDocument, this.context);
 
         TemplateManager templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);
         // Remove extra spaces to make it easy to assert the result below.
         String result = templateManager.render("documentTags.vm").trim().replaceAll("\\s+", " ");
 
-        // Verify that the generated HTML matches the expectation:
+        // Verify that the generated HTML matches the expectations:
         // - The tag label is displayed
         // - The tags after the tag label
         // - No "+" link is displayed since the user doesn't have edit rights
@@ -142,5 +143,42 @@ class DocumentTagsTest extends PageTest
             + "</span> "
             + "</span> "
             + "</div>"));
+    }
+
+    @Test
+    void displayTagsWhenEditRightsAndTagPluginAvailableAndTags() throws Exception
+    {
+        // Give edit rights ($hasEdit = true)
+        when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(Right.EDIT)).thenReturn(true);
+
+        // Add tags to the current document
+        XWikiDocument currentDocument = this.context.getDoc();
+        BaseObject baseObject = new BaseObject();
+        baseObject.setXClassReference(new DocumentReference("xwiki", "XWiki", "TagClass"));
+        baseObject.setStringListValue("tags", Arrays.asList("tag1", "tag2"));
+        currentDocument.addXObject(baseObject);
+        this.xwiki.saveDocument(currentDocument, this.context);
+
+        TemplateManager templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);
+        // Remove extra spaces to make it easy to assert the result below.
+        String result = templateManager.render("documentTags.vm").trim().replaceAll("\\s+", " ");
+
+        // Verify that the generated HTML matches the expectations:
+        // - The tag label is displayed
+        // - The tags after the tag label
+        // - The "+" link is displayed since the user has edit rights
+        assertThat(result, matchesPattern("\\Q<div class=\"doc-tags\" id=\"xdocTags\"> core.tags.list.label "
+        + "<span class=\"tag-wrapper\"> <span class=\"tag\">"
+        + "<a href=\"/xwiki/bin/view/Main/Tags?do=viewTag&amp;tag=tag1\">tag1</a></span> "
+        + "<span class=\"separator\">[</span>"
+        + "<a href=\"/xwiki/bin/view/space/page?xpage=documentTags&amp;xaction=delete&amp;tag=tag1&amp;form_token=&amp;xredirect=%2Fxwiki%2Fbin%2Fview%2Fspace%2Fpage%23xdocTags\" "
+        + "class=\"tag-tool tag-delete\" title=\"core.tags.remove.tooltip\">X</a><span class=\"separator\">]</span></span> "
+        + "<span class=\"tag-wrapper\"> <span class=\"tag\">"
+        + "<a href=\"/xwiki/bin/view/Main/Tags?do=viewTag&amp;tag=tag2\">tag2</a></span> "
+        + "<span class=\"separator\">[</span>"
+        + "<a href=\"/xwiki/bin/view/space/page?xpage=documentTags&amp;xaction=delete&amp;tag=tag2&amp;form_token=&amp;xredirect=%2Fxwiki%2Fbin%2Fview%2Fspace%2Fpage%23xdocTags\" "
+        + "class=\"tag-tool tag-delete\" title=\"core.tags.remove.tooltip\">X</a><span class=\"separator\">]</span></span> "
+        + "<div class=\"tag-tool tag-add\"> <a href=\"/xwiki/bin/view/space/page?showTagAddForm=true#xdocTags\" "
+        + "title=\"core.tags.add.tooltip\" rel=\"nofollow\">[+]</a> </div> </div>"));
     }
 }

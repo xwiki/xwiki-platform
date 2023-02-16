@@ -56,6 +56,10 @@
         <denyGroup name="groupA" />
         <allowGroup name="groupB" />
       </document>
+      <document name="docDeleteAllowA" alt="A document with access to groupE and only delete to groupA">
+        <allowGroup name="groupE" />
+        <allowGroup type="delete" name="groupA" />
+      </document>
     </space>
   </wiki>
   <wiki name="subwiki" alt="local wiki">

@@ -23,6 +23,7 @@ package org.xwiki.security.authorization;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -694,6 +695,9 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
             getXDoc("docAllowGroupB", "any space"));
         assertAccess(ALL_RIGHTS_EXCEPT_ADMIN_AND_CREATE_WIKI, getXUser("userB"),
             getXDoc("docAllowGroupB", "any space"));
+
+        assertAccess(new RightSet(List.of(LOGIN, REGISTER, VIEW, DELETE)), getXUser("userA") ,
+            getXDoc("docDeleteAllowA", "any space"));
     }
 
     @Test

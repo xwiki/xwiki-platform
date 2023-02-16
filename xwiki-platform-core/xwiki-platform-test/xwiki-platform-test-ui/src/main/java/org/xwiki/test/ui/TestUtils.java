@@ -104,7 +104,7 @@ import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 
-import com.deque.html.axecore.results.Rule;
+import com.deque.html.axecore.results.Results;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -219,8 +219,10 @@ public class TestUtils
     /** Cached accessibility results. */
     public class WCAGContext{
         public boolean wcagSetup = true;
-        public List<Rule> wcagResults = new ArrayList<Rule>();
+        public List<Results> wcagResults = new ArrayList<Results>();
         public long wcagTimer = 0;
+        private HashMap<String, List<Class> > wcagCache = new HashMap<String, List<Class> >();
+
     }
     private WCAGContext wcagContext = new WCAGContext();
     private HttpClient httpClient;
@@ -1422,13 +1424,26 @@ public class TestUtils
     }
 
     /**
+     * Checks if there's a need to check accessibility of a basePage.
+     *
+     */
+    public boolean checkAccessibility(String url, Class pageClass)
+    {
+        return this.wcagContext.wcagSetup &&
+          (!this.wcagContext.wcagCache.containsKey(url) ||
+            !this.wcagContext.wcagCache.get(url).contains(pageClass));
+    }
+
+    /**
      * Appends WCAG results to the test suite cache.
      *
      */
-    public void addWcagResults(List<Rule> newViolations)
+    public void addWcagResults(String url, Class pageClass , Results newViolations)
     {
-        if(this.wcagContext.wcagSetup) {
-            this.wcagContext.wcagResults.addAll(newViolations);
+        if(this.checkAccessibility(url,pageClass)) {
+            this.wcagContext.wcagResults.add(newViolations);
+            this.wcagContext.wcagCache.putIfAbsent(url, new ArrayList<Class>() );
+            this.wcagContext.wcagCache.get(url).add(pageClass);
         }
     }
     /**

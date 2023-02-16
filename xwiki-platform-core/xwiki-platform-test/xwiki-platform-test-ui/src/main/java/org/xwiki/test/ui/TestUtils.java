@@ -52,6 +52,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import com.deque.html.axecore.selenium.AxeReporter;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
@@ -218,13 +219,100 @@ public class TestUtils
 
     /** Cached accessibility results. */
     public class WCAGContext{
-        public boolean wcagSetup = true;
-        public List<Results> wcagResults = new ArrayList<Results>();
-        public long wcagTimer = 0;
-        private HashMap<String, List<Class> > wcagCache = new HashMap<String, List<Class> >();
+        private class TestResults{
+            String url;
+            Class validationClass;
+            Results results;
+            String report;
 
+            public TestResults(String url, Class validationClass, Results results){
+                this.url =url;
+                this.validationClass = validationClass;
+                this.results = results;
+
+                // Generate the report as soon as the results are in.
+                if(!isEmpty()) {
+                    AxeReporter.getReadableAxeResults(String.format("WCAG on %s", this.validationClass.getName()),
+                      getDriver(), this.results.getViolations());
+                    this.report = AxeReporter.getAxeResultString();
+                }
+            }
+            @Override
+            public String toString() {
+                return this.report;
+            }
+            protected boolean isEmpty() {
+                return this.results.getViolations().size()==0;
+            }
+        }
+        public boolean wcagEnabled = true;
+        public ArrayList<TestResults> wcagResults = new ArrayList<TestResults>();
+        public long wcagTimer = 0;
+        private HashMap<String, ArrayList<Class> > wcagValidationCache = new HashMap<String, ArrayList<Class> >();
+
+        /**
+         * Checks if there's a need to check accessibility of a basePage.
+         *
+         */
+        public boolean checkAccessibility(String url, Class pageClass) {
+            return this.isWcagEnabled() &&
+              (!this.wcagValidationCache.containsKey(url) ||
+                !this.wcagValidationCache.get(url).contains(pageClass));
+        }
+
+        /**
+         * Appends WCAG results to the test suite cache.
+         *
+         */
+        public void addWcagResults(String url, Class pageClass , Results newViolations) {
+            if (this.checkAccessibility(url,pageClass)) {
+                this.wcagResults.add(new TestResults(url, pageClass, newViolations));
+                this.wcagValidationCache.putIfAbsent(url, new ArrayList<Class>());
+                this.wcagValidationCache.get(url).add(pageClass);
+            }
+        }
+        /**
+         * Adds time used for WCAG validation to the test suite cache.
+         *
+         */
+        public void addWcagTime(long time)
+        {
+            this.wcagTimer += time;
+        }
+
+
+        /**
+         * Set the WCAG validation setup parameter for the test suite.
+         *
+         */
+        public void setWcagEnabled(boolean wcag)
+        {
+            this.wcagEnabled = wcag;
+        }
+        public boolean isWcagEnabled()
+        {
+            return this.wcagEnabled;
+        }
+        public boolean hasWCAGViolations(){
+            for (TestResults results : this.wcagResults){
+                if(!results.isEmpty()){
+                    return true;
+                }
+            }
+            return false;
+        }
+        public String buildReport(){
+            String report = "";
+            for(TestResults result : this.wcagResults){
+                if(!result.isEmpty()){
+                    report+=result.toString();
+                }
+                report+="\n\n";
+            }
+            return report;
+        }
     }
-    private WCAGContext wcagContext = new WCAGContext();
+    private final WCAGContext wcagContext = new WCAGContext();
     private HttpClient httpClient;
 
     /**
@@ -1413,46 +1501,6 @@ public class TestUtils
             return "";
         }
         return this.secretToken;
-    }
-    /**
-     * Set the WCAG validation setup parameter for the test suite.
-     *
-     */
-    public void setWcagSetup(boolean wcag)
-    {
-        this.wcagContext.wcagSetup = wcag;
-    }
-
-    /**
-     * Checks if there's a need to check accessibility of a basePage.
-     *
-     */
-    public boolean checkAccessibility(String url, Class pageClass)
-    {
-        return this.wcagContext.wcagSetup &&
-          (!this.wcagContext.wcagCache.containsKey(url) ||
-            !this.wcagContext.wcagCache.get(url).contains(pageClass));
-    }
-
-    /**
-     * Appends WCAG results to the test suite cache.
-     *
-     */
-    public void addWcagResults(String url, Class pageClass , Results newViolations)
-    {
-        if(this.checkAccessibility(url,pageClass)) {
-            this.wcagContext.wcagResults.add(newViolations);
-            this.wcagContext.wcagCache.putIfAbsent(url, new ArrayList<Class>() );
-            this.wcagContext.wcagCache.get(url).add(pageClass);
-        }
-    }
-    /**
-     * Adds time used for WCAG validation to the test suite cache.
-     *
-     */
-    public void addWcagTime(long time)
-    {
-        this.wcagContext.wcagTimer += time;
     }
 
     /**

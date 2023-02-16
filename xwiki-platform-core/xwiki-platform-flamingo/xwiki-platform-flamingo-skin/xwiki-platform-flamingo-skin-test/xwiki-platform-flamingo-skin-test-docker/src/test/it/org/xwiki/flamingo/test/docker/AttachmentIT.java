@@ -30,12 +30,14 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
 import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.BasePage;
 import org.xwiki.test.ui.po.ChangesPane;
 import org.xwiki.test.ui.po.ComparePage;
 import org.xwiki.test.ui.po.DeletePageOutcomePage;
@@ -423,6 +425,25 @@ class AttachmentIT
         attachmentsPane.waitForUploadToFinish(SMALL_SIZE_ATTACHMENT);
 
         assertEquals(4, attachmentsPane.getNumberOfAttachments());
+    }
+
+    /**
+     * Check the display of delete attachment message when it contains special characters.
+     */
+    @Test
+    @Order(8)
+    void deleteAttachmentWithSpecialChar(TestUtils setup, TestReference testReference)
+    {
+        setup.loginAsSuperAdmin();
+        setup.createPage(testReference, "Empty content");
+        String attachmentName = "<img src=x>";
+        AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
+        setup.gotoPage(attachmentReference, "delattachment");
+        BasePage basePage = new BasePage();
+        assertEquals(String.format("Error\n"
+                + "Failed to delete attachment %s\n"
+                + "This attachment does not exist.", attachmentName),
+                basePage.getXWikiMessageContent());
     }
 
     private String getAttachmentsMacroContent(DocumentReference docRef)

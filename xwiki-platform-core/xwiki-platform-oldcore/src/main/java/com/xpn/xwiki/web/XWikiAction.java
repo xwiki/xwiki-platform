@@ -90,6 +90,7 @@ import org.xwiki.template.TemplateManager;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.xml.XMLUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xpn.xwiki.XWiki;
@@ -234,7 +235,7 @@ public abstract class XWikiAction implements LegacyAction
 
     protected String localizePlainOrKey(String key, Object... parameters)
     {
-        return StringUtils.defaultString(getLocalization().getTranslationPlain(key, parameters), key);
+        return XMLUtils.escape(StringUtils.defaultString(getLocalization().getTranslationPlain(key, parameters), key));
     }
 
     protected JobProgressManager getProgress()

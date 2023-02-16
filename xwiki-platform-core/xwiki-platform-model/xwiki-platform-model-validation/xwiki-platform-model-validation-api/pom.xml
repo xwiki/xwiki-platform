@@ -26,12 +26,16 @@
     <version>15.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-model-validation-api</artifactId>
-  <name>XWiki Platform - Name Strategies - API</name>
-  <description>XWiki Platform - Model Validation API to handle model validation in XWiki</description>
+  <name>XWiki Platform - Model - Validation - API</name>
+  <description>API to handle Model validation in XWiki</description>
   <packaging>jar</packaging>
   <properties>
     <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
-    </properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Model Validation API</xwiki.extension.name>
+    <!-- Category to display by the Extension Manager -->
+    <xwiki.extension.category>jar</xwiki.extension.category>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

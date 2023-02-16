@@ -27,7 +27,7 @@
   </parent>
   <artifactId>xwiki-platform-model-validation-default</artifactId>
   <name>XWiki Platform - Model - Validation - Default</name>
-  <description>Default implementation for Model validation in XWiki</description>
+  <description>Default Strategies for Model Validation</description>
   <packaging>jar</packaging>
   <properties>
     <xwiki.jacoco.instructionRatio>0.74</xwiki.jacoco.instructionRatio>

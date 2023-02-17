@@ -35,18 +35,23 @@ import org.xwiki.stability.Unstable;
 public interface NewsConfiguration
 {
     /**
-     * @return the default list of news sources to use, defined as a list of component hints for components implementing
-     *         the {@link NewsSource} component role (e.g. {@code xwikiblog} for the XWiki Blog news source)
+     * @return the list of news sources to use
      */
-    List<String> getNewsSourceHints();
+    List<NewsSourceDescriptor> getNewsSourceDescriptors();
 
     /**
-     * @return the time after which a check for new news should be performed
+     * @return the time after which a check for new news should be performed (in seconds)
      */
     long getNewsRefreshRate();
 
     /**
-     * @return the maximum number of news items to display at once
+     * @return the maximum number of news items to display at once, from each source
      */
     int getNewsDisplayCount();
+
+    /**
+     * @return true if the feature is active or false otherwise (not configuring any News source makes the feature
+     *         inactive)
+     */
+    boolean isActive();
 }

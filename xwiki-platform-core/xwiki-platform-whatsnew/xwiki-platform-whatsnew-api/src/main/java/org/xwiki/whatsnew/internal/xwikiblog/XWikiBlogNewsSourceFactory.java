@@ -17,49 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.whatsnew;
+package org.xwiki.whatsnew.internal.xwikiblog;
 
-import java.util.Optional;
-import java.util.Set;
+import java.util.Map;
 
-import org.xwiki.stability.Unstable;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.whatsnew.NewsException;
+import org.xwiki.whatsnew.NewsSource;
+import org.xwiki.whatsnew.NewsSourceFactory;
 
 /**
- * Data for a source item.
+ * The factory that returns a XWiki Blog source.
  *
  * @version $Id$
  * @since 15.1RC1
  */
-@Unstable
-public interface NewsSourceItem
+@Component
+@Named("xwikiblog")
+@Singleton
+public class XWikiBlogNewsSourceFactory implements NewsSourceFactory
 {
-    /**
-     * @return the news item title
-     */
-    Optional<String> getTitle();
-
-    /**
-     * @return the news item content
-     */
-    Optional<NewsContent> getDescription();
-
-    /**
-     * @return the news item categories
-     */
-    Set<NewsCategory> getCategories();
-
-    /**
-     * @return the news item publication date
-     */
-    Optional<String> getPublishedDate();
-
-    /**
-     * @return the news item author
-     */
-    Optional<String> getAuthor();
-
-    /**
-     * @return the news item origin URL
-     */
-    Optional<String> getOriginURL();
+    @Override
+    public NewsSource create(Map<String, String> parameters) throws NewsException
+    {
+        String rssURL = parameters.get("rssURL");
+        if (rssURL == null) {
+            throw new NewsException("Failed to create a XWiki Blog news source. A 'rssURL' parameter must be passed");
+        }
+        return new XWikiBlogNewsSource(rssURL);
+    }
 }

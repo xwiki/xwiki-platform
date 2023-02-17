@@ -17,30 +17,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.whatsnew.internal.xwikiorgblog;
+package org.xwiki.whatsnew.internal.xwikiblog;
 
 import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.whatsnew.NewsCategory;
 import org.xwiki.whatsnew.NewsSourceItem;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Unit tests for {@link XWikiOrgBlogNewsSource}.
+ * Unit tests for {@link XWikiBlogNewsSource}.
  *
  * @version $Id$
  * @since 15.1RC1
  */
-class XWikiOrgBlogNewsSourceTest
+class XWikiBlogNewsSourceTest
 {
     @Test
     void buildWithNoConstraint() throws Exception
     {
-        XWikiOrgBlogNewsSource source =new XWikiOrgBlogNewsSource(
-            XWikiOrgBlogNewsSource.class.getClassLoader().getResourceAsStream("blogrss.xml"));
+        XWikiBlogNewsSource source =new XWikiBlogNewsSource(
+            XWikiBlogNewsSource.class.getClassLoader().getResourceAsStream("blogrss.xml"));
         List<NewsSourceItem> items = source.build();
 
         assertEquals(10, items.size());
@@ -49,7 +50,9 @@ class XWikiOrgBlogNewsSourceTest
             + "candidate of XWiki 15.0. This release consists mostly of dependency upgrades and bug fixes including "
             + "security fixes with some small new features for admins and developers. <span class=\"wikilink\">"
             + "<a title=\"Read the full entry\" href=\"/xwiki/bin/view/Blog/XWiki%2015"
-            + ".0%20Release%20Candidate%201%20Released\">...</a></span></p>", items.get(0).getContent().get());
+            + ".0%20Release%20Candidate%201%20Released\">...</a></span></p>",
+            items.get(0).getDescription().get().getContent());
+        assertEquals(Syntax.HTML_5_0, items.get(0).getDescription().get().getSyntax());
         assertEquals("Michael Hamann", items.get(0).getAuthor().get());
         assertEquals(NewsCategory.ADMIN_USER, items.get(0).getCategories().iterator().next());
         assertEquals("2023-01-23T05:34:15+01:00", items.get(0).getPublishedDate().get());
@@ -60,8 +63,8 @@ class XWikiOrgBlogNewsSourceTest
     @Test
     void buildWithAdminUserCategory() throws Exception
     {
-        XWikiOrgBlogNewsSource source =new XWikiOrgBlogNewsSource(
-            XWikiOrgBlogNewsSource.class.getClassLoader().getResourceAsStream("blogrss.xml"));
+        XWikiBlogNewsSource source =new XWikiBlogNewsSource(
+            XWikiBlogNewsSource.class.getClassLoader().getResourceAsStream("blogrss.xml"));
         List<NewsSourceItem> items = source.forCategories(Set.of(NewsCategory.ADMIN_USER)).build();
 
         assertEquals(8, items.size());
@@ -73,8 +76,8 @@ class XWikiOrgBlogNewsSourceTest
     @Test
     void buildWithSimpleUserCategory() throws Exception
     {
-        XWikiOrgBlogNewsSource source =new XWikiOrgBlogNewsSource(
-            XWikiOrgBlogNewsSource.class.getClassLoader().getResourceAsStream("blogrss.xml"));
+        XWikiBlogNewsSource source =new XWikiBlogNewsSource(
+            XWikiBlogNewsSource.class.getClassLoader().getResourceAsStream("blogrss.xml"));
         List<NewsSourceItem> items = source.forCategories(Set.of(NewsCategory.SIMPLE_USER)).build();
 
         assertEquals(2, items.size());

@@ -17,49 +17,46 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.whatsnew;
+package org.xwiki.whatsnew.internal;
 
-import java.util.Optional;
-import java.util.Set;
-
-import org.xwiki.stability.Unstable;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.whatsnew.NewsContent;
 
 /**
- * Data for a source item.
+ * Represents some content from a news source item. It holds both the raw content and the syntax in which the content
+ * is written in.
  *
  * @version $Id$
- * @since 15.1RC1
  */
-@Unstable
-public interface NewsSourceItem
+public class DefaultNewsContent implements NewsContent
 {
-    /**
-     * @return the news item title
-     */
-    Optional<String> getTitle();
+    private String content;
+
+    private Syntax syntax;
 
     /**
-     * @return the news item content
+     * @param content see {@link #getContent()}
+     * @param syntax see {@link #getSyntax()}
      */
-    Optional<NewsContent> getDescription();
+    public DefaultNewsContent(String content, Syntax syntax)
+    {
+        this.content = content;
+        this.syntax = syntax;
+    }
 
     /**
-     * @return the news item categories
+     * @return the raw content in the specified syntax
      */
-    Set<NewsCategory> getCategories();
+    public String getContent()
+    {
+        return this.content;
+    }
 
     /**
-     * @return the news item publication date
+     * @return the syntax in which the content is written in
      */
-    Optional<String> getPublishedDate();
-
-    /**
-     * @return the news item author
-     */
-    Optional<String> getAuthor();
-
-    /**
-     * @return the news item origin URL
-     */
-    Optional<String> getOriginURL();
+    public Syntax getSyntax()
+    {
+        return this.syntax;
+    }
 }

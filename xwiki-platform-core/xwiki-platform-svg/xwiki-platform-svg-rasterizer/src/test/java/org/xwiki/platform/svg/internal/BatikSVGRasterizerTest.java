@@ -301,7 +301,7 @@ public class BatikSVGRasterizerTest
         }
     }
 
-    private class CapturingOutputStream extends ServletOutputStream
+    private final class CapturingOutputStream extends ServletOutputStream
     {
         private ByteArrayOutputStream out = new ByteArrayOutputStream();
 

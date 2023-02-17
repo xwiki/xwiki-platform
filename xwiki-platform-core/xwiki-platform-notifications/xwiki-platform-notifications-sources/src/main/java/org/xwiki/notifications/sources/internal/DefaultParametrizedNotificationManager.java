@@ -259,7 +259,7 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
         return events.stream().map(Event::getId).collect(Collectors.toList());
     }
 
-    private class BestSimilarity
+    private final class BestSimilarity
     {
         public int value;
 

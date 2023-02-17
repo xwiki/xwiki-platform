@@ -94,7 +94,7 @@ class DefaultRecordableEventConverterTest
         when(this.eventFactory.createRawEvent()).thenReturn(new DefaultEvent());
     }
 
-    private class MockedRecordableEvent implements RecordableEvent, TargetableEvent
+    private final class MockedRecordableEvent implements RecordableEvent, TargetableEvent
     {
         @Override
         public boolean matches(Object otherEvent) {

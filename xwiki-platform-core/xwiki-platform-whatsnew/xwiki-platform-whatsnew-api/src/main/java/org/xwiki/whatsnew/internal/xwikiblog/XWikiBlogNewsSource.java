@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.whatsnew.internal.xwikiorgblog;
+package org.xwiki.whatsnew.internal.xwikiblog;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -36,22 +37,23 @@ import org.xwiki.extension.version.Version;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.user.UserReference;
 import org.xwiki.whatsnew.NewsCategory;
+import org.xwiki.whatsnew.NewsContent;
 import org.xwiki.whatsnew.NewsException;
-import org.xwiki.whatsnew.NewsRange;
 import org.xwiki.whatsnew.NewsSource;
 import org.xwiki.whatsnew.NewsSourceItem;
+import org.xwiki.whatsnew.internal.DefaultNewsContent;
 import org.xwiki.whatsnew.internal.DefaultNewsSourceItem;
 
 import com.apptasticsoftware.rssreader.Item;
 import com.apptasticsoftware.rssreader.RssReader;
 
 /**
- * The XWiki.org Blog source (gathers RSS feed from xwiki.org).
+ * The XWiki Blog source (returns news from an XWiki Blog Application installed on an XWiki instance).
  *
  * @version $Id$
  * @since 15.1RC1
  */
-public class XWikiOrgBlogNewsSource implements NewsSource
+public class XWikiBlogNewsSource implements NewsSource
 {
     private UserReference userReference;
 
@@ -61,25 +63,25 @@ public class XWikiOrgBlogNewsSource implements NewsSource
 
     private Map<String, Object> extraParameters;
 
-    private NewsRange range;
+    private int count;
 
     private String rssURL;
 
     private InputStream rssStream;
 
     /**
-     * @param rssURL the URL to the xwiki.org blog RSS
+     * @param rssURL the URL to the XWiki Blog RSS
      */
-    public XWikiOrgBlogNewsSource(String rssURL)
+    public XWikiBlogNewsSource(String rssURL)
     {
         this.rssURL = rssURL;
     }
 
     /**
-     * @param rssStream the stream containing the xwiki.org blog RSS data (mostly needed for tests to avoid having
-     *        to connect to xwiki.org)
+     * @param rssStream the stream containing the XWiki Blog RSS data (mostly needed for tests to avoid having
+     *        to connect to an XWiki instance)
      */
-    public XWikiOrgBlogNewsSource(InputStream rssStream)
+    public XWikiBlogNewsSource(InputStream rssStream)
     {
         this.rssStream = rssStream;
     }
@@ -113,9 +115,9 @@ public class XWikiOrgBlogNewsSource implements NewsSource
     }
 
     @Override
-    public NewsSource withRange(NewsRange range)
+    public NewsSource withCount(int count)
     {
-        this.range = range;
+        this.count = count;
         return this;
     }
 
@@ -124,26 +126,18 @@ public class XWikiOrgBlogNewsSource implements NewsSource
     {
         // Known limitations:
         // - The number of news entries returned by the XWiki Blog application is not configurable and depends
-        //   on the blog type. For XWiki.org, ATM it's set to 10 entries. See:
+        //   on the blog type. See:
         //   - https://tinyurl.com/ycyyms76
-        //   - "<itemsPerPage>10</itemsPerPage>" at https://www.xwiki.org/xwiki/bin/view/Blog/?xpage=xml
+        //   - For example for xwiki.org: "<itemsPerPage>10</itemsPerPage>"
+        //     at https://www.xwiki.org/xwiki/bin/view/Blog/?xpage=xml
         // - We don't support targeting news for a given user or for a given XWiki version
 
-        // Fetch the XWiki.org Blog RSS
+        // Fetch the XWiki Blog RSS
         List<Item> articles;
         try {
             RssReader rssReader = new RssReader();
             // Add support for Dublin Core (dc) that XWiki's RSS feeds uses.
-            rssReader.addItemExtension("dc:subject", (item, categoryString) -> {
-                // The category string can contain subcategories. For example:
-                //   <dc:subject>Blog.Development, Blog.GSoC, Blog.Tutorials, Blog.XWiki Days</dc:subject>
-                // Thus we need to parse this string
-                for (String singleCategory : StringUtils.split(categoryString, ",")) {
-                    item.addCategory(singleCategory.trim());
-                }
-            });
-            rssReader.addItemExtension("dc:creator", Item::setAuthor);
-            rssReader.addItemExtension("dc:date", Item::setPubDate);
+            addXWikiDublinCoreSupport(rssReader);
             Stream<Item> itemStream;
             if (this.rssURL != null) {
                 itemStream = rssReader.read(this.rssURL);
@@ -164,7 +158,10 @@ public class XWikiOrgBlogNewsSource implements NewsSource
         for (Item item : articles) {
             DefaultNewsSourceItem newsItem = new DefaultNewsSourceItem();
             newsItem.setTitle(item.getTitle());
-            newsItem.setContent(item.getDescription());
+            Optional<NewsContent> content = item.getDescription().isPresent()
+                ? Optional.of(new DefaultNewsContent(item.getDescription().get(), getContentSyntax()))
+                : Optional.empty();
+            newsItem.setDescription(content);
             newsItem.setAuthor(item.getAuthor());
             newsItem.setCategories(getMappedCategories(item.getCategories()));
             newsItem.setPublishedDate(item.getPubDate());
@@ -173,6 +170,20 @@ public class XWikiOrgBlogNewsSource implements NewsSource
         }
 
         return newsItems;
+    }
+
+    private void addXWikiDublinCoreSupport(RssReader rssReader)
+    {
+        rssReader.addItemExtension("dc:subject", (item, categoryString) -> {
+            // The category string can contain subcategories. For example:
+            //   <dc:subject>Blog.Development, Blog.GSoC, Blog.Tutorials, Blog.XWiki Days</dc:subject>
+            // Thus we need to parse this string
+            for (String singleCategory : StringUtils.split(categoryString, ",")) {
+                item.addCategory(singleCategory.trim());
+            }
+        });
+        rssReader.addItemExtension("dc:creator", Item::setAuthor);
+        rssReader.addItemExtension("dc:date", Item::setPubDate);
     }
 
     private Predicate<Item> categoriesPredicate()
@@ -218,9 +229,9 @@ public class XWikiOrgBlogNewsSource implements NewsSource
         return mappedCategories;
     }
 
-    @Override
-    public Syntax getContentSyntax()
+    private Syntax getContentSyntax()
     {
-        return Syntax.XHTML_1_0;
+        // The XWiki Blog Application uses the syntax of the Skin and the Skin used on xwiki.org is using HTML 5.0.
+        return Syntax.HTML_5_0;
     }
 }

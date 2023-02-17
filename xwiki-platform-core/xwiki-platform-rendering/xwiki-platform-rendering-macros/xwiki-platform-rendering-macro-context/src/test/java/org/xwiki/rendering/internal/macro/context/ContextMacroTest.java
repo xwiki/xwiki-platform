@@ -214,22 +214,22 @@ class ContextMacroTest
     @Test
     void executeInDOCUMENTContext() throws Exception
     {
-        execute(false, false);
+        execute(false, TransformationContextMode.DOCUMENT, false);
     }
 
     @Test
     void executeInDOCUMENTContextInRestrictedMode() throws Exception
     {
-        execute(true, false);
+        execute(true, TransformationContextMode.DOCUMENT, false);
     }
 
     @Test
-    void executeInDOCUMENTContextWithRestricted() throws Exception
+    void executeWithRestricted() throws Exception
     {
-        execute(false, true);
+        execute(false, null, true);
     }
 
-    private void execute(boolean restrictedContext, boolean restricted) throws Exception
+    private void execute(boolean restrictedContext, TransformationContextMode mode, boolean restricted) throws Exception
     {
         MacroBlock macroBlock = new MacroBlock("context", Collections.<String, String>emptyMap(), false);
         MetaData metadata = new MetaData();
@@ -241,23 +241,31 @@ class ContextMacroTest
         macroContext.setXDOM(pageXDOM);
         macroContext.getTransformationContext().setRestricted(restrictedContext);
 
-        DocumentModelBridge dmb = mock(DocumentModelBridge.class);
-        when(this.dab.getTranslatedDocumentInstance(TARGET_REFERENCE)).thenReturn(dmb);
-        XDOM targetXDOM = new XDOM(Arrays.asList(new WordBlock("word")), metadata);
-        when(dmb.getXDOM()).thenReturn(targetXDOM);
+        XDOM targetXDOM;
+        MetaData parserMetadata;
+        ContextMacroParameters parameters = new ContextMacroParameters();
+        if (mode != null) {
+            DocumentModelBridge dmb = mock(DocumentModelBridge.class);
+            when(this.dab.getTranslatedDocumentInstance(TARGET_REFERENCE)).thenReturn(dmb);
+            targetXDOM = new XDOM(Arrays.asList(new WordBlock("word")), metadata);
+            when(dmb.getXDOM()).thenReturn(targetXDOM);
 
-        MetaData parserMetadata = new MetaData();
-        parserMetadata.addMetaData(MetaData.SOURCE, "target");
-        parserMetadata.addMetaData(MetaData.BASE, "target");
+            parameters.setDocument("target");
+            parameters.setTransformationContext(mode);
+
+            parserMetadata = new MetaData();
+            parserMetadata.addMetaData(MetaData.SOURCE, "target");
+            parserMetadata.addMetaData(MetaData.BASE, "target");
+        } else {
+            targetXDOM = null;
+            parserMetadata = null;
+        }
+        parameters.setRestricted(restricted);
 
         XDOM contentXDOM = new XDOM(Arrays.asList(new WordBlock("test")), parserMetadata);
         when(this.parser.parse(eq(""), same(null), same(macroContext), eq(false), eq(parserMetadata), eq(false)))
             .thenReturn(contentXDOM);
 
-        ContextMacroParameters parameters = new ContextMacroParameters();
-        parameters.setDocument("target");
-        parameters.setTransformationContext(TransformationContextMode.DOCUMENT);
-        parameters.setRestricted(restricted);
 
         when(this.executor.execute(any())).thenReturn(new WordBlock("result"));
 
@@ -270,7 +278,9 @@ class ContextMacroTest
         BlockAsyncRendererConfiguration configuration = configurationCaptor.getValue();
         assertEquals(AUTHOR, configuration.getSecureAuthorReference());
         assertEquals(SOURCE_REFERENCE, configuration.getSecureDocumentReference());
-        assertSame(targetXDOM, configuration.getXDOM());
+        if (targetXDOM != null) {
+            assertSame(targetXDOM, configuration.getXDOM());
+        }
         assertEquals(restrictedContext ? true : restricted, configuration.isResricted());
     }
 }

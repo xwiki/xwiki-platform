@@ -184,7 +184,7 @@
   #set ($uix = $uixs.get($index))
   #set ($tip = $uix.getParameters().get('tip'))
   #if ($tip)
-    {{context restricted="true" transformationContext="transformations" source="script:tip"/}}
+    {{context restricted="true" source="script:tip"/}}
   #else
     {{uiextension id="$services.rendering.escape($uix.id, 'xwiki/2.1')"/}}
   #end

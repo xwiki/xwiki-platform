@@ -175,7 +175,7 @@ public class TableLayoutElement extends BaseElement
         }
     }
 
-    private static class DatePatternMatcher extends TypeSafeMatcher<WebElement>
+    private static final class DatePatternMatcher extends TypeSafeMatcher<WebElement>
     {
         private static final String REGEX = "\\d{4}/\\d{2}/\\d{2} \\d{2}:\\d{2}";
 

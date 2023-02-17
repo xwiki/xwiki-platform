@@ -85,6 +85,11 @@ public class UserScriptService implements ScriptService
     }
 
     /**
+     * Get the properties defined explicitly for a user (e.g. in the user profile wiki page), such as Editor to use,
+     * Advanced or Simple user, First name, etc), without fallbacks (i.e. without checking for properties defined in
+     * the current space - in {@code <space>.WebPreferences}, in the current wiki - in {@code XWiki.XWikiPreferences},
+     * and ultimately in the {@code xwiki.properties} configuration file).
+     *
      * @param userReference the reference to the user properties to resolve
      * @param parameters optional parameters that have a meaning only for the specific resolver implementation used
      * @return the User Properties object
@@ -96,6 +101,11 @@ public class UserScriptService implements ScriptService
     }
 
     /**
+     * Get the properties defined explicitly for a user (e.g. in the user profile wiki page), such as Editor to use,
+     * Advanced or Simple user, First name, etc), without fallbacks (i.e. without checking for properties defined in
+     * the current space - in {@code <space>.WebPreferences}, in the current wiki - in {@code XWiki.XWikiPreferences},
+     * and ultimately in the {@code xwiki.properties} configuration file).
+     * <p>
      * Note that we have a {@code UserReferenceConverter} component to automatically convert from
      * String to {@link UserReference} but since in the signature we accept a vararg of Object, the
      * {@link #getProperties(Object...)} is called instead when a single string is passed. This is the reason for this
@@ -112,6 +122,11 @@ public class UserScriptService implements ScriptService
     }
 
     /**
+     * Get the properties defined explicitly for the current user (e.g. in the user profile wiki page), such as Editor
+     * to use, Advanced or Simple user, First name, etc), without fallbacks (i.e. without checking for properties
+     * defined in the current space - in {@code <space>.WebPreferences}, in the current wiki - in
+     * {@code XWiki.XWikiPreferences}, and ultimately in the {@code xwiki.properties} configuration file).
+     *
      * @param parameters optional parameters that have a meaning only for the specific resolver implementation used
      * @return the User Properties object for the current user
      * @since 12.2
@@ -122,6 +137,11 @@ public class UserScriptService implements ScriptService
     }
 
     /**
+     * Get the properties defined explicitly for the current user (e.g. in the user profile wiki page), such as Editor
+     * to use, Advanced or Simple user, First name, etc), without fallbacks (i.e. without checking for properties
+     * defined in the current space - in {@code <space>.WebPreferences}, in the current wiki - in
+     * {@code XWiki.XWikiPreferences}, and ultimately in the {@code xwiki.properties} configuration file).
+     *
      * @return the User Properties object for the current user
      * @since 12.2
      */
@@ -131,6 +151,11 @@ public class UserScriptService implements ScriptService
     }
 
     /**
+     * Get the properties defined explicitly for the current user (e.g. in the user profile wiki page), such as Editor
+     * to use, Advanced or Simple user, First name, etc), with fallbacks (i.e. by also checking for properties
+     * defined in the current space - in {@code <space>.WebPreferences}, in the current wiki - in
+     * {@code XWiki.XWikiPreferences}, and ultimately in the {@code xwiki.properties} configuration file).
+     *
      * @param userReference the reference to the user properties to resolve
      * @param parameters optional parameters that have a meaning only for the specific resolver implementation used
      * @return the User Properties object
@@ -142,6 +167,11 @@ public class UserScriptService implements ScriptService
     }
 
     /**
+     * Get the properties defined explicitly for the current user (e.g. in the user profile wiki page), such as Editor
+     * to use, Advanced or Simple user, First name, etc), with fallbacks (i.e. by also checking for properties
+     * defined in the current space - in {@code <space>.WebPreferences}, in the current wiki - in
+     * {@code XWiki.XWikiPreferences}, and ultimately in the {@code xwiki.properties} configuration file).
+     *
      * @param parameters optional parameters that have a meaning only for the specific resolver implementation used
      * @return the User Properties object for the current user
      * @since 12.2
@@ -152,6 +182,11 @@ public class UserScriptService implements ScriptService
     }
 
     /**
+     * Get the properties defined explicitly for the current user (e.g. in the user profile wiki page), such as Editor
+     * to use, Advanced or Simple user, First name, etc), with fallbacks (i.e. by also checking for properties
+     * defined in the current space - in {@code <space>.WebPreferences}, in the current wiki - in
+     * {@code XWiki.XWikiPreferences}, and ultimately in the {@code xwiki.properties} configuration file).
+     *
      * @return the User Properties object for the current user
      * @since 12.2
      */

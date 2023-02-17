@@ -761,6 +761,9 @@ public class TestUtils
         String normalizedGroups = groups == null ? "" : groups;
         addObject(entityReference, rightClassName, "groups", normalizedGroups, "levels", rights,
             "users", normalizedUsers, "allow", enabled ? "1" : "0");
+        // Click Cancel to avoid locking the page (the xobject has been saved automatically when it was added).
+        ObjectEditPage oep = new ObjectEditPage();
+        oep.clickCancel();
     }
 
     public ViewPage gotoPage(String space, String page)
@@ -1292,7 +1295,7 @@ public class TestUtils
         for (EntityReference singleReference : spaceReference.removeParent(wikiReference).getReversedReferenceChain()) {
             path.add(singleReference.getName());
         }
-        if (reference.getType() == EntityType.DOCUMENT) {
+        if (reference.getType() == EntityType.DOCUMENT || reference.getType() == EntityType.ATTACHMENT) {
             path.add(reference.getName());
         }
         return path;

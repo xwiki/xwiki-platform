@@ -709,6 +709,18 @@ public class BasePage extends BaseElement
     }
 
     /**
+     * @return the full text of an {@code xwikimessage} box displayed in the full content (e.g. in case of error).
+     * @since 15.1RC1
+     * @since 14.10.6
+     */
+    public String getXWikiMessageContent()
+    {
+        return getDriver()
+            .findElementWithoutWaiting(By.xpath("//div[@id = 'mainContentArea']/div[contains(@class, 'xwikimessage')]"))
+            .getText();
+    }
+
+    /**
      * Use the following keyboard shortcut and wait for a new page to load. This should be only used for shortcuts that
      * indeed loads a new page.
      * 

@@ -379,7 +379,7 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
     /**
      * A comparator which compares attachments by version number.
      */
-    private static class XWikiAttachmentVersionComparator implements Comparator<XWikiAttachment>
+    private static final class XWikiAttachmentVersionComparator implements Comparator<XWikiAttachment>
     {
         /**
          * A single instance to use instead of constructing one each time.

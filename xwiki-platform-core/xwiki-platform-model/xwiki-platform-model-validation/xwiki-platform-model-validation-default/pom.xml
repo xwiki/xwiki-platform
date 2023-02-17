@@ -26,11 +26,15 @@
     <version>15.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-model-validation-default</artifactId>
-  <name>XWiki Platform - Model Validation - Default</name>
-  <description>XWiki Platform - Model Validation Default implementations for model validation in XWiki</description>
+  <name>XWiki Platform - Model - Validation - Default</name>
+  <description>Default Strategies for Model Validation</description>
   <packaging>jar</packaging>
   <properties>
     <xwiki.jacoco.instructionRatio>0.74</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Model Validation Strategies</xwiki.extension.name>
+    <!-- Category to display by the Extension Manager -->
+    <xwiki.extension.category>jar</xwiki.extension.category>
     </properties>
   <dependencies>
     <dependency>

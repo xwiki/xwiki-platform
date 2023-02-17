@@ -106,7 +106,7 @@ public abstract class AbstractTestWiki
     /**
      * A SAX handler for building a test wiki.
      */
-    private class WikiBuilder extends DefaultHandler
+    private final class WikiBuilder extends DefaultHandler
     {
 
         /**
@@ -157,7 +157,7 @@ public abstract class AbstractTestWiki
         /**
          * Convenience class for declaring element builders.
          */
-        private class DeclareElementBuilders {
+        private final class DeclareElementBuilders {
 
             /**
              * @param name The XML element name.

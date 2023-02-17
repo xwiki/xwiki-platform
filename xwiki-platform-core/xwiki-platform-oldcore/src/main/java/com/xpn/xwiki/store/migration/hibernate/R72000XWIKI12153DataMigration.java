@@ -85,7 +85,7 @@ public class R72000XWIKI12153DataMigration extends AbstractHibernateDataMigratio
         });
     }
 
-    private class R72000Work implements Work
+    private final class R72000Work implements Work
     {
         @Override
         public void execute(Connection connection) throws SQLException

@@ -18,6 +18,16 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 /* this represent a triple state checkbox */
+
+define('users-and-groups-translation-keys', {
+  prefix: 'platform.core.rightsManagement.',
+  keys: [
+    "allowed",
+    "denied",
+    "undefined"
+  ]
+});
+
 window.MSCheckbox = Class.create({
   /**
     * @todo Make confirmations generic.
@@ -41,22 +51,30 @@ window.MSCheckbox = Class.create({
       this.currentUorG = window.unregUser;
       this.isUserInGroup = false;
     }
-    this.domNode = $(domNode);
     this.right = right;
     this.saveUrl = saveUrl;
     this.defaultState = defaultState;
     this.state = defaultState;
-    this.states = [0,1,2]; // 0 = inherit; 1 = allow, 2 == deny
+    this.states = [0,1,2]; // 0 = undefined; 1 = allow, 2 = deny
     this.nrstates = this.states.length;
     this.images = [
       "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png')",
       "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow.png')",
       "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/deny1.png')"
     ];
-    this.labels = ['','',''];
 
+    
+    
+    this.button = document.createElement("button");
+    this.button.className = "rights-edit";
+    this.button.addEventListener('click', this.createClickHandler(this));
+    
+    var img = document.createElement("img");
+    
+    this.button.appendChild(img);
+    
+    $(domNode).appendChild(this.button);
     this.draw(this.state);
-    this.attachEvents();
   },
 
   /**
@@ -64,25 +82,30 @@ window.MSCheckbox = Class.create({
     */
   draw: function(state)
   {
-    //remove child nodes
-    while (this.domNode.childNodes.length > 0) {
-      this.domNode.removeChild(this.domNode.firstChild);
-    }
-    //add new image
-    var img = document.createElement('img');
+    //Change display image
+    var img = this.button.firstChild;
     img.src = this.images[state];
-    this.domNode.appendChild(img);
-    //add label
-    if (this.labels[state] != '') {
-      var la = document.createElement('span');
-      la.appendChild(document.createTextNode(this.labels[state]));
-      this.domNode.appendChild(la);
-    }
+    
+    //Update the description of the button for accessibility.
+    var button = this.button;
+    require(['xwiki-l10n!users-and-groups-translation-keys'], function(l10n) {
+      var alts = [
+        l10n['undefined'],
+        l10n['allowed'],
+        l10n['denied']
+      ];
+      img.alt = alts[state];
+      button.title = alts[state];
+    });
+  },
+
+  nextState: function(){
+    return (this.state + 1) % this.nrstates;
   },
 
   next: function()
   {
-    this.state = (this.state + 1) % this.nrstates;
+    this.state = this.nextState();
     if (this.table != undefined) {
       // TODO: Just update the cache, don't invalidate the row, once the rights are as stored as an
       // array, and not as a string.
@@ -204,11 +227,6 @@ window.MSCheckbox = Class.create({
         }
       });
     }
-  },
-
-  attachEvents: function()
-  {
-    Event.observe(this.domNode, 'click', this.createClickHandler(this));
   }
 });
 

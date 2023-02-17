@@ -101,7 +101,7 @@ public class DefaultQuoteService implements QuoteService
         }
     }
 
-    private class RenderFunction implements Function<Block, String>
+    private final class RenderFunction implements Function<Block, String>
     {
         @Override
         public String apply(Block mentionBlock)

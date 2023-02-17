@@ -17,31 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.whatsnew.internal.xwikiorgblog;
+package org.xwiki.whatsnew.internal.configured;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import java.util.Collections;
 
-import org.xwiki.component.annotation.Component;
+import org.junit.jupiter.api.Test;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.whatsnew.NewsSource;
-import org.xwiki.whatsnew.NewsSourceFactory;
 
-/**
- * The factory that returns a XWiki.org Blog source.
- *
- * @version $Id$
- * @since 15.1RC1
- */
-@Component
-@Named("xwikiorgblog")
-@Singleton
-public class XWikiOrgBlogNewsSourceFactory implements NewsSourceFactory
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+@ComponentTest
+class ConfiguredNewsSourceFactoryTest
 {
-    private static final String RSS_URL = "https://www.xwiki.org/xwiki/bin/view/Blog/BlogRss?xpage=plain";
+    @InjectMockComponents
+    private ConfiguredNewsSourceFactory factory;
 
-    @Override
-    public NewsSource create()
+    @Test
+    void createWhenEmptyConfiguration()
     {
-        return new XWikiOrgBlogNewsSource(RSS_URL);
+        NewsSource source = this.factory.create(Collections.emptyMap());
+        assertNotNull(source);
     }
 }

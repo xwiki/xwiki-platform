@@ -26,10 +26,11 @@
     <version>15.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-model</artifactId>
-  <name>XWiki Platform - Model</name>
+  <name>XWiki Platform - Model - Parent POM</name>
   <description>XWiki Platform - Model - Parent POM</description>
   <packaging>pom</packaging>
   <modules>
+    <!-- Sorted Alphabetically -->
     <module>xwiki-platform-model-api</module>
     <module>xwiki-platform-model-validation</module>
   </modules>

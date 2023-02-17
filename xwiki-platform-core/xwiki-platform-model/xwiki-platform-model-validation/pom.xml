@@ -26,8 +26,8 @@
     <version>15.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-model-validation</artifactId>
-  <name>XWiki Platform - Model Validation</name>
-  <description>XWiki Platform - Model Validation give mechanisms to validate XWiki Model</description>
+  <name>XWiki Platform - Model - Validation - Parent POM</name>
+  <description>Validations for the XWiki Model</description>
   <packaging>pom</packaging>
   <modules>
     <module>xwiki-platform-model-validation-api</module>

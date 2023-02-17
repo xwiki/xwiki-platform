@@ -73,7 +73,7 @@
      <local-cache-configuration name="lesscss.skinfiles.cache">
         <persistence>
            <!-- Let XWiki cache module set the proper path -->
-           <file-store segmented="false" purge="false" path="" />
+           <file-store purge="false" path="" />
         </persistence>
      </local-cache-configuration>
 

@@ -662,6 +662,9 @@ public class TestUtils
         String normalizedGroups = groups == null ? "" : groups;
         addObject(entityReference, rightClassName, "groups", normalizedGroups, "levels", rights,
             "users", normalizedUsers, "allow", enabled ? "1" : "0");
+        // Click Cancel to avoid locking the page (the xobject has been saved automatically when it was added).
+        ObjectEditPage oep = new ObjectEditPage();
+        oep.clickCancel();
     }
 
     public ViewPage gotoPage(String space, String page)

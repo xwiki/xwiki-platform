@@ -269,7 +269,7 @@ public class RightMap<V> extends AbstractMap<Right, V> implements Serializable, 
     /**
      * Private right set for representing keys of this map.
      */
-    private class RightSet extends AbstractSet<Right>
+    private final class RightSet extends AbstractSet<Right>
     {
         @Override
         public Iterator<Right> iterator()
@@ -316,7 +316,7 @@ public class RightMap<V> extends AbstractMap<Right, V> implements Serializable, 
     /**
      * Private value collection for representing value of this map.
      */
-    private class Values extends AbstractCollection<V>
+    private final class Values extends AbstractCollection<V>
     {
         @Override
         public Iterator<V> iterator()
@@ -361,7 +361,7 @@ public class RightMap<V> extends AbstractMap<Right, V> implements Serializable, 
     /**
      * Private EntrySet for representing this map.
      */
-    private class EntrySet extends AbstractSet<Entry<Right, V>>
+    private final class EntrySet extends AbstractSet<Entry<Right, V>>
     {
         @Override
         public Iterator<Entry<Right, V>> iterator()
@@ -482,7 +482,7 @@ public class RightMap<V> extends AbstractMap<Right, V> implements Serializable, 
     /**
      * Private iterator for keys.
      */
-    private class RightIterator extends AbstractRightMapIterator<Right>
+    private final class RightIterator extends AbstractRightMapIterator<Right>
     {
         @Override
         public Right next()
@@ -498,7 +498,7 @@ public class RightMap<V> extends AbstractMap<Right, V> implements Serializable, 
     /**
      * Private iterator for values.
      */
-    private class ValueIterator extends AbstractRightMapIterator<V>
+    private final class ValueIterator extends AbstractRightMapIterator<V>
     {
         @Override
         public V next()
@@ -514,7 +514,7 @@ public class RightMap<V> extends AbstractMap<Right, V> implements Serializable, 
     /**
      * Private iterator for entries.
      */
-    private class EntryIterator extends AbstractRightMapIterator<Entry<Right, V>> implements Map.Entry<Right, V>
+    private final class EntryIterator extends AbstractRightMapIterator<Entry<Right, V>> implements Map.Entry<Right, V>
     {
         @Override
         public Map.Entry<Right, V> next()

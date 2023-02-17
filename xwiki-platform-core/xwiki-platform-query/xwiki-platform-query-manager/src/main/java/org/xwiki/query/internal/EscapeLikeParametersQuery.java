@@ -154,7 +154,7 @@ public class EscapeLikeParametersQuery extends WrappingQuery
         return statement.toString();
     }
 
-    private class XWikiExpressionVisitor extends ExpressionVisitorAdapter
+    private final class XWikiExpressionVisitor extends ExpressionVisitorAdapter
     {
         @Override
         public void visit(LikeExpression expr)
@@ -166,7 +166,7 @@ public class EscapeLikeParametersQuery extends WrappingQuery
         }
     }
 
-    private class XWikiLikeExpressionVisitor extends ExpressionVisitorAdapter
+    private final class XWikiLikeExpressionVisitor extends ExpressionVisitorAdapter
     {
         @Override
         public void visit(JdbcParameter parameter)

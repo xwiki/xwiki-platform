@@ -40,7 +40,7 @@ public class DefaultUntypedRecordableEventTest
 {
     private DefaultUntypedRecordableEvent defaultUntypedRecordableEvent;
 
-    private class RandomRecordableEvent implements RecordableEvent
+    private final class RandomRecordableEvent implements RecordableEvent
     {
         @Override
         public boolean matches(Object o)

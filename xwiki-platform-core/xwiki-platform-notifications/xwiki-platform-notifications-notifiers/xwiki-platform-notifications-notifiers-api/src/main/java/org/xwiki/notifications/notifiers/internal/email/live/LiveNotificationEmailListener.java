@@ -80,7 +80,7 @@ public class LiveNotificationEmailListener extends AbstractEventListener
      * Thread used for triggering {@link LiveNotificationEmailManager#run()} when needed (ie : when an event grace time
      * has ended).
      */
-    private class NotificationGraceTimeRunnable implements Runnable
+    private final class NotificationGraceTimeRunnable implements Runnable
     {
         @Override
         public void run()

@@ -45,7 +45,7 @@ public class DefaultTargetableNotificationPreferenceBuilder implements Targetabl
 {
     private TargetablePreference preference;
 
-    private class TargetablePreference extends AbstractNotificationPreference
+    private final class TargetablePreference extends AbstractNotificationPreference
             implements TargetableNotificationPreference
     {
         /*

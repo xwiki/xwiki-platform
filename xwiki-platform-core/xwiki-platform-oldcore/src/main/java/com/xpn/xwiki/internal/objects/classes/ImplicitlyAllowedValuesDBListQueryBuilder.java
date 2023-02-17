@@ -50,7 +50,7 @@ import com.xpn.xwiki.objects.classes.DBTreeListClass;
 @Singleton
 public class ImplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<DBListClass>
 {
-    private static class DBListQuerySpec
+    private static final class DBListQuerySpec
     {
         public String wiki;
 

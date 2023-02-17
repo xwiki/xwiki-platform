@@ -54,7 +54,7 @@ public class IntervalUsersManager
 {
     private static final int BATCH_SIZE = 100;
 
-    private static class WikiEntry
+    private static final class WikiEntry
     {
         private final Map<NotificationEmailInterval, List<DocumentReference>> usersPerInterval =
             new ConcurrentHashMap<>();

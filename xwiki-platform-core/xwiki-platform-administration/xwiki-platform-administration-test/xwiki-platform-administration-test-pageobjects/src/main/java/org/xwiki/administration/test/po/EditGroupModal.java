@@ -31,7 +31,7 @@ import org.xwiki.test.ui.po.LiveTableElement;
  */
 public class EditGroupModal extends BaseModal
 {
-    private static class ModalContent extends GroupEditPage
+    private static final class ModalContent extends GroupEditPage
     {
         @Override
         public void waitUntilPageIsReady()

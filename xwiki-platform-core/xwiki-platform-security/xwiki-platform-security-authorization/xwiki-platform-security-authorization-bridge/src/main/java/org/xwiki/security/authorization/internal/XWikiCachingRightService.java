@@ -150,7 +150,7 @@ public class XWikiCachingRightService implements XWikiRightService
     /**
      * Specialized map with a chainable put action to avoid exceeding code complexity during initialization.
      */
-    private static class ActionMap extends HashMap<String, Right>
+    private static final class ActionMap extends HashMap<String, Right>
     {
         /** Serialization identifier for conformance to Serializable. */
         private static final long serialVersionUID = 1;

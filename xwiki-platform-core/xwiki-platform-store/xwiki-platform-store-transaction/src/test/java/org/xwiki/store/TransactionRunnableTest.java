@@ -502,7 +502,7 @@ public class TransactionRunnableTest
         this.hasRun = true;
     }
 
-    private class CustomException extends Exception
+    private final class CustomException extends Exception
     {
         // Does nothing different.
     }

@@ -775,7 +775,7 @@ class DownloadActionTest
         verifyResponseExpectations(d.getTime(), this.fileContent.length);
     }
 
-    private static class StubServletOutputStream extends ServletOutputStream
+    private static final class StubServletOutputStream extends ServletOutputStream
     {
         public ByteArrayOutputStream baos = new ByteArrayOutputStream();
 

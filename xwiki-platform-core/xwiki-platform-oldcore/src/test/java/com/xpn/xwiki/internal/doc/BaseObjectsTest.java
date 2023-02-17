@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  */
 public class BaseObjectsTest
 {
-    private static class TestBaseObject extends BaseObject
+    private static final class TestBaseObject extends BaseObject
     {
         @Override
         public String toString()

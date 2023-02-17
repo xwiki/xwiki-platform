@@ -189,7 +189,7 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
      *
      * @version $Id$
      */
-    private class GetWorkToBeDoneHibernateCallback implements HibernateCallback<Object>
+    private final class GetWorkToBeDoneHibernateCallback implements HibernateCallback<Object>
     {
         @Override
         public Object doInHibernate(Session session) throws HibernateException, XWikiException
@@ -254,7 +254,7 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
      *
      * @version $Id$
      */
-    private class DoWorkOnDocumentHibernateCallback implements HibernateCallback<Object>
+    private final class DoWorkOnDocumentHibernateCallback implements HibernateCallback<Object>
     {
         /** @see #setDocumentReference(DocumentReference) */
         private DocumentReference documentReference;

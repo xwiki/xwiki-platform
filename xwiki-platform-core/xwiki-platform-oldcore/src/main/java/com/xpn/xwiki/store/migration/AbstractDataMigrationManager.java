@@ -124,7 +124,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
     /**
      * Internal class used to prevent double checking of the database during migration operation.
      */
-    private static class ThreadLock extends ThreadLocal<Integer>
+    private static final class ThreadLock extends ThreadLocal<Integer>
     {
         @Override
         protected Integer initialValue()
@@ -256,7 +256,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
     /**
      * Internal class used to clean the database version cache on wiki deletion.
      */
-    private class WikiDeletedEventListener implements EventListener
+    private final class WikiDeletedEventListener implements EventListener
     {
         @Override
         public String getName()

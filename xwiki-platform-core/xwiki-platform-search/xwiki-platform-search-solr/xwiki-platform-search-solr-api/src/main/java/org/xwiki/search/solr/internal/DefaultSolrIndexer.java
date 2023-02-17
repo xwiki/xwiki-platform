@@ -182,7 +182,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
      * 
      * @version $Id$
      */
-    private class Resolver extends AbstractXWikiRunnable
+    private final class Resolver extends AbstractXWikiRunnable
     {
         @Override
         public void runInternal()

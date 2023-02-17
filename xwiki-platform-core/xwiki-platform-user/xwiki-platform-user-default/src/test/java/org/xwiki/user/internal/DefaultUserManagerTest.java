@@ -58,7 +58,7 @@ class DefaultUserManagerTest
     @Named("context")
     private ComponentManager contextComponentManager;
 
-    private class TestUserReference implements UserReference
+    private final class TestUserReference implements UserReference
     {
         @Override
         public boolean isGlobal()

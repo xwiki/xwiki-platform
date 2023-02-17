@@ -40,7 +40,7 @@ import org.xwiki.model.EntityType;
  */
 public class EntityReferenceSet
 {
-    private static class EntityReferenceEntryChildren
+    private static final class EntityReferenceEntryChildren
     {
         public EntityType childrenType;
 

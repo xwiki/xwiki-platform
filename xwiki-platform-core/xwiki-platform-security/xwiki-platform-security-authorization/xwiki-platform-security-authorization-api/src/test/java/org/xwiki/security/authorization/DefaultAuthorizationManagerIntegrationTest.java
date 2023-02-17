@@ -816,7 +816,7 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
             nullValue());
     }
 
-    private class CustomRightDescription implements RightDescription
+    private final class CustomRightDescription implements RightDescription
     {
         @Override
         public String getName()

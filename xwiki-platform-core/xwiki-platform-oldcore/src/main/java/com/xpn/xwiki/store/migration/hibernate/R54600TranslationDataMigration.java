@@ -76,7 +76,7 @@ public class R54600TranslationDataMigration extends AbstractHibernateDataMigrati
         });
     }
 
-    private static class R54600Work implements Work
+    private static final class R54600Work implements Work
     {
         @Override
         public void execute(Connection connection) throws SQLException

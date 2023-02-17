@@ -125,71 +125,8 @@
 
                  Single justification example:
             -->
-            <revapi.differences>
-              <justification>Moved to xwiki-platform-mail-api</justification>
-              <criticality>allowed</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.removed</code>
-                  <old>interface org.xwiki.mail.EmailAddressObfuscator</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.removed</code>
-                  <old>interface org.xwiki.mail.GeneralMailConfiguration</old>
-                </item>
-              </differences>
-            </revapi.differences>
-            <revapi.differences>
-              <justification>Young API. Refactored into a more generic version exposed by xwiki-rendering.</justification>
-              <criticality>documented</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.returnTypeChanged</code>
-                  <old>method org.xwiki.rendering.macro.code.source.CodeMacroSourceReference org.xwiki.rendering.macro.code.CodeMacroParameters::getSource()</old>
-                  <new>method org.xwiki.rendering.macro.source.MacroContentSourceReference org.xwiki.rendering.macro.code.CodeMacroParameters::getSource()</new>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.parameterTypeChanged</code>
-                  <old>parameter void org.xwiki.rendering.macro.code.CodeMacroParameters::setSource(===org.xwiki.rendering.macro.code.source.CodeMacroSourceReference===)</old>
-                  <new>parameter void org.xwiki.rendering.macro.code.CodeMacroParameters::setSource(===org.xwiki.rendering.macro.source.MacroContentSourceReference===)</new>
-                  <parameterIndex>0</parameterIndex>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.parameterTypeChanged</code>
-                  <old>parameter void org.xwiki.rendering.macro.code.source.CodeMacroSource::&lt;init&gt;(===org.xwiki.rendering.macro.code.source.CodeMacroSourceReference===, java.lang.String, java.lang.String)</old>
-                  <new>parameter void org.xwiki.rendering.macro.code.source.CodeMacroSource::&lt;init&gt;(===org.xwiki.rendering.macro.source.MacroContentSourceReference===, java.lang.String, java.lang.String)</new>
-                  <parameterIndex>0</parameterIndex>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.returnTypeChanged</code>
-                  <old>method org.xwiki.rendering.macro.code.source.CodeMacroSourceReference org.xwiki.rendering.macro.code.source.CodeMacroSource::getReference()</old>
-                  <new>method org.xwiki.rendering.macro.source.MacroContentSourceReference org.xwiki.rendering.macro.code.source.CodeMacroSource::getReference()</new>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.parameterTypeChanged</code>
-                  <old>parameter org.xwiki.rendering.macro.code.source.CodeMacroSource org.xwiki.rendering.macro.code.source.CodeMacroSourceFactory::getContent(===org.xwiki.rendering.macro.code.source.CodeMacroSourceReference===, org.xwiki.rendering.transformation.MacroTransformationContext) throws org.xwiki.rendering.macro.MacroExecutionException</old>
-                  <new>parameter org.xwiki.rendering.macro.code.source.CodeMacroSource org.xwiki.rendering.macro.code.source.CodeMacroSourceFactory::getContent(===org.xwiki.rendering.macro.source.MacroContentSourceReference===, org.xwiki.rendering.transformation.MacroTransformationContext) throws org.xwiki.rendering.macro.MacroExecutionException</new>
-                  <parameterIndex>0</parameterIndex>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.removed</code>
-                  <old>class org.xwiki.rendering.macro.code.source.CodeMacroSourceReference</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.removed</code>
-                  <old>interface org.xwiki.rendering.macro.code.source.CodeMacroSourceReferenceConverter&lt;T&gt;</old>
-                </item>
-              </differences>
-            </revapi.differences>
+            
+            
           </analysisConfiguration>
         </configuration>
       </plugin>

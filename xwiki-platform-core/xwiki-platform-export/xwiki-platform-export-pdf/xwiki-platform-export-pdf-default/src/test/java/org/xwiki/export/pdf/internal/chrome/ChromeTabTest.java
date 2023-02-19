@@ -35,13 +35,11 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 
-import com.github.kklisura.cdt.protocol.commands.DOM;
 import com.github.kklisura.cdt.protocol.commands.IO;
 import com.github.kklisura.cdt.protocol.commands.Network;
 import com.github.kklisura.cdt.protocol.commands.Page;
 import com.github.kklisura.cdt.protocol.commands.Runtime;
 import com.github.kklisura.cdt.protocol.commands.Target;
-import com.github.kklisura.cdt.protocol.types.dom.Node;
 import com.github.kklisura.cdt.protocol.types.io.Read;
 import com.github.kklisura.cdt.protocol.types.network.CookieParam;
 import com.github.kklisura.cdt.protocol.types.page.Frame;
@@ -193,7 +191,7 @@ class ChromeTabTest
 
         verify(this.runtime).enable();
     }
-    
+
     @Test
     void navigateWithWaitAndException() throws Exception
     {
@@ -243,34 +241,6 @@ class ChromeTabTest
         when(resourceContent.getContent()).thenReturn("source");
 
         assertEquals("source", this.chromeTab.getSource());
-    }
-
-    @Test
-    void setBaseURL() throws Exception
-    {
-        URL url = new URL("http://www.xwiki.org");
-
-        Evaluate evaluate = mock(Evaluate.class);
-        when(this.runtime.evaluate("jQuery('<base/>').prependTo('head').length")).thenReturn(evaluate);
-
-        RemoteObject result = mock(RemoteObject.class);
-        when(evaluate.getResult()).thenReturn(result);
-        when(result.getValue()).thenReturn(1);
-
-        DOM dom = mock(DOM.class);
-        when(this.tabDevToolsService.getDOM()).thenReturn(dom);
-
-        Node document = mock(Node.class);
-        when(dom.getDocument()).thenReturn(document);
-        when(document.getNodeId()).thenReturn(12345);
-
-        when(dom.querySelector(12345, "base")).thenReturn(6789);
-
-        this.chromeTab.setBaseURL(url);
-
-        verify(this.runtime).enable();
-        verify(dom).enable();
-        verify(dom).setAttributeValue(6789, "href", "http://www.xwiki.org");
     }
 
     @Test

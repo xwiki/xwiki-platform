@@ -80,13 +80,6 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
                 throw new IOException("Failed to load the print preview URL: " + cookieFilterContext.getTargetURL());
             }
 
-            if (!printPreviewURL.toString().equals(cookieFilterContext.getTargetURL().toString())) {
-                // Make sure the relative URLs are resolved based on the original print preview URL otherwise the user
-                // won't be able to open the links from the generated PDF because they use a host name accessible only
-                // from the browser that generated the PDF. See PDFExportConfiguration#getXWikiHost()
-                browserTab.setBaseURL(printPreviewURL);
-            }
-
             return browserTab.printToPDF(() -> {
                 browserTab.close();
             });

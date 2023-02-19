@@ -20,6 +20,9 @@
 package org.xwiki.export.pdf.internal.job;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.inject.Named;
 
@@ -49,7 +52,6 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
@@ -115,7 +117,7 @@ class DocumentRendererTest
                 public XDOM answer(InvocationOnMock invocation) throws Throwable
                 {
                     DocumentDisplayerParameters params = (DocumentDisplayerParameters) invocation.getArgument(1);
-                    assertNotNull(params.getIdGenerator());
+                    params.getIdGenerator().generateUniqueId("H", "heading");
                     return params.isTitleDisplayed() ? titleXDOM : xdom;
                 }
             });
@@ -135,6 +137,7 @@ class DocumentRendererTest
         assertEquals(1, xdom.getChildren().size());
         assertSame(xdom, result.getXDOM());
         assertEquals("some content", result.getHTML());
+        assertEquals(Collections.singletonMap("Hheading", "Hheading"), result.getIdMap());
 
         // Now render with title.
         result = this.documentRenderer.render(documentReference, true);
@@ -144,5 +147,10 @@ class DocumentRendererTest
         assertEquals("Htest:Some.Page", title.getId());
         assertEquals("test:Some.Page", title.getParameter("data-xwiki-document-reference"));
         assertEquals("title", ((WordBlock) title.getChildren().get(0)).getWord());
+
+        Map<String, String> expectedIdMap = new HashMap<>();
+        expectedIdMap.put("Hheading", "Hheading-1");
+        expectedIdMap.put("Hheading-1", "Hheading-2");
+        assertEquals(expectedIdMap, result.getIdMap());
     }
 }

@@ -19,6 +19,7 @@
  */
 package org.xwiki.export.pdf.job;
 
+import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
@@ -59,6 +60,8 @@ public class PDFExportJobRequest extends AbstractCheckRightsRequest
     private static final String PROPERTY_SERVER_SIDE = "serverSide";
 
     private static final String PROPERTY_FILE_NAME = "fileName";
+
+    private static final String PROPERTY_BASE_URL = "baseURL";
 
     /**
      * Default constructor.
@@ -253,5 +256,30 @@ public class PDFExportJobRequest extends AbstractCheckRightsRequest
     public void setFileName(String fileName)
     {
         setProperty(PROPERTY_FILE_NAME, fileName);
+    }
+
+    /**
+     * @return the base URL used to resolve relative URLs in the exported content
+     * @since 14.10.6
+     * @since 15.1RC1
+     */
+    public URL getBaseURL()
+    {
+        return getProperty(PROPERTY_BASE_URL);
+    }
+
+    /**
+     * Sets the base URL used to resolve relative URLs in the exported content. When the base URL is not set the
+     * relative URLs are by default resolved relative to the print preview URL which uses the {@code export} action and
+     * has a long query string that is specific to PDF export. This means relative URLs may be resolved using the
+     * {@code export} action and some strange query string if the base URL is not set.
+     * 
+     * @param baseURL the base URL used to resolve URLs in the exported content
+     * @since 14.10.6
+     * @since 15.1RC1
+     */
+    public void setBaseURL(URL baseURL)
+    {
+        setProperty(PROPERTY_BASE_URL, baseURL);
     }
 }

@@ -146,6 +146,10 @@ class DefaultPDFExportJobRequestFactoryTest
         when(this.xcontext.getURLFactory().createExternalURL("Some", "Page", "export", queryString, "foo", "test",
             this.xcontext)).thenReturn(printPreviewURL);
 
+        URL baseURL = new URL("http://localhost:8080/xwiki/bin/view/Some/Page?color=red#foo");
+        when(this.xcontext.getURLFactory().createExternalURL("Some", "Page", "view", "color=red", "foo", "test",
+            this.xcontext)).thenReturn(baseURL);
+
         List<String> supportedContextEntries = Arrays.asList("one", "two");
         when(this.contextStoreManager.getSupportedEntries()).thenReturn(supportedContextEntries);
 
@@ -177,6 +181,7 @@ class DefaultPDFExportJobRequestFactoryTest
         assertEquals(Collections.singleton("key"), requestParameters.keySet());
         assertEquals(Collections.singletonList("value"), Arrays.asList(requestParameters.get("key")));
         assertEquals(printPreviewURL, request.getContext().get("request.url"));
+        assertEquals(baseURL, request.getBaseURL());
 
         assertEquals(selectedDocuments, request.getDocuments());
         assertEquals(templateReference, request.getTemplate());

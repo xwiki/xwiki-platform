@@ -41,7 +41,6 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
-import org.xwiki.rendering.util.IdGenerator;
 
 /**
  * Component used to render documents.
@@ -80,7 +79,7 @@ public class DocumentRenderer
     /**
      * Used to generate unique identifiers across multiple rendered documents.
      */
-    private IdGenerator idGenerator = new IdGenerator();
+    private PDFExportIdGenerator idGenerator = new PDFExportIdGenerator();
 
     /**
      * Renders the specified document.
@@ -111,7 +110,7 @@ public class DocumentRenderer
         DocumentModelBridge document = this.documentAccessBridge.getTranslatedDocumentInstance(documentReference);
         XDOM xdom = display(document, parameters, withTitle);
         String html = renderXDOM(xdom, targetSyntax);
-        return new DocumentRenderingResult(documentReference, xdom, html);
+        return new DocumentRenderingResult(documentReference, xdom, html, this.idGenerator.resetLocalIds());
     }
 
     private XDOM display(DocumentModelBridge document, DocumentDisplayerParameters parameters, boolean withTitle)

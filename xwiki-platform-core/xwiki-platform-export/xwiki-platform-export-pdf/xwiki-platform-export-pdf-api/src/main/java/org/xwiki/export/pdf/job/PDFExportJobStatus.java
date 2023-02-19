@@ -20,8 +20,10 @@
 package org.xwiki.export.pdf.job;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.xwiki.job.DefaultJobStatus;
@@ -58,6 +60,8 @@ public class PDFExportJobStatus extends DefaultJobStatus<PDFExportJobRequest>
 
         private final String html;
 
+        private final Map<String, String> idMap;
+
         /**
          * Create a new rendering result for the specified document.
          * 
@@ -67,9 +71,29 @@ public class PDFExportJobStatus extends DefaultJobStatus<PDFExportJobRequest>
          */
         public DocumentRenderingResult(DocumentReference documentReference, XDOM xdom, String html)
         {
+            this(documentReference, xdom, html, Collections.emptyMap());
+        }
+
+        /**
+         * Create a new rendering result for the specified document.
+         * 
+         * @param documentReference the document that has been rendered
+         * @param xdom the XDOM obtained by rendering the specified document
+         * @param html the HTML obtained by rendering the specified document
+         * @param idMap the mapping between local IDs (that would have been generated if the document were rendered
+         *            alone) and global IDs (that were actually generated when the document was rendered together with
+         *            the other documents included in the PDF export); this mapping can be used to convert external
+         *            links into internal links
+         * @since 14.10.6
+         * @since 15.1RC1
+         */
+        public DocumentRenderingResult(DocumentReference documentReference, XDOM xdom, String html,
+            Map<String, String> idMap)
+        {
             this.documentReference = documentReference;
             this.xdom = xdom;
             this.html = html;
+            this.idMap = idMap;
         }
 
         /**
@@ -96,6 +120,19 @@ public class PDFExportJobStatus extends DefaultJobStatus<PDFExportJobRequest>
         public String getHTML()
         {
             return html;
+        }
+
+        /**
+         * @return the mapping between local IDs (that would have been generated if the document were rendered alone)
+         *         and global IDs (that were actually generated when the document was rendered together with the other
+         *         documents included in the PDF export); this mapping can be used to convert external links into
+         *         internal links
+         * @since 14.10.6
+         * @since 15.1RC1
+         */
+        public Map<String, String> getIdMap()
+        {
+            return Collections.unmodifiableMap(this.idMap);
         }
     }
 

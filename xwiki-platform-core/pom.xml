@@ -190,6 +190,17 @@
                 </item>
               </differences>
             </revapi.differences>
+            <revapi.differences>
+              <justification>Removed unused method from unstable API.</justification>
+              <criticality>documented</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void org.xwiki.export.pdf.browser.BrowserTab::setBaseURL(java.net.URL) throws java.io.IOException</old>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

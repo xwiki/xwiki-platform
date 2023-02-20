@@ -148,7 +148,8 @@
                     <type>zip</type>
                   </artifactItem>
                 </artifactItems>
-                <!-- Exclude the Active Installs 2 API to disable the feature for the tests -->
+                <!-- Exclude the Active Installs API (version 1 or 2 since we're installing some old XWiki version) to
+                     disable the feature for the tests -->
                 <excludes>
                   **/xwiki-platform-activeinstalls2-*.*,
                   **/xwiki-platform-activeinstalls-*.*

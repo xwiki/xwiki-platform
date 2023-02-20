@@ -28,7 +28,6 @@ import org.xwiki.like.test.po.DashboardEditPage;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.ViewPage;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -51,7 +50,6 @@ class DashboardIT
         ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("Dashboard", "WebHome"));
         viewPage.edit();
         viewPage.waitUntilPageIsReady();
-        XWikiWebDriver driver = setup.getDriver();
         DashboardEditPage dashboardEditPage = new DashboardEditPage();
         int initialWidgetCount = dashboardEditPage.countGadgets();
         MacroDialogSelectModal macroDialogSelectModal = dashboardEditPage.clickAddGadget();
@@ -64,6 +62,6 @@ class DashboardIT
         macroEntry.click();
         MacroDialogEditModal macroDialogEditModal = macroDialogSelectModal.clickSelect();
         macroDialogEditModal.clickSubmit();
-        driver.waitUntilCondition(webDriver -> dashboardEditPage.countGadgets() == initialWidgetCount + 1);
+        dashboardEditPage.waitForDashboardsCount(initialWidgetCount + 1);
     }
 }

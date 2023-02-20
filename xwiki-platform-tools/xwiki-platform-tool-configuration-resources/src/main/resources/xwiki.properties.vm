@@ -975,7 +975,7 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 # Active Installs 2
 #-------------------------------------------------------------------------------------
 
-#-# [Since 5.2M2]
+#-# [Since 14.5]
 #-# The URL of where the Active Installs 2 module should connect to, in order to send a ping of activity. This feature
 #-# regularly sends anonymous information to xwiki.org about the current instance.
 #-# The goal is to count the number of active installs of XWiki out there and provide statistics on xwiki.org
@@ -983,7 +983,7 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-# The default is:
 # activeinstalls2.pingURL = https://extensions.xwiki.org/activeinstalls2
 
-#-# [Since 5.2M2]
+#-# [Since 14.5]
 #-# Default user agent used when sending pings.
 #-# The default is:
 # activeinstalls2.userAgent = XWikiActiveInstalls2
@@ -992,7 +992,7 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 # Wikis
 #-------------------------------------------------------------------------------------
 
-#-# [Since 14.5]
+#-# [Since 5.4.4]
 #-# Add a default suffix to the alias of a new wiki in the wiki creation wizard, only when the path mode is not used
 #-# (i.e. domain-based, see url.standard.multiwiki.isPathBased). If this value is empty, XWiki will try to compute it
 #-# automatically from the request URL.
@@ -1003,7 +1003,7 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-# The default is:
 # wiki.alias.suffix=
 
-#-# [Since 14.5]
+#-# [Since 14.9RC1]
 #-# Allows delegating the database/schema/user creation (depends on the database) for a new wiki to an infra admin.
 #-# Said differently, if the following property is false then XWiki will not create any database/schema/user when
 #-# creating a wiki. It's assumed that it will exist prior to using the Wiki creation wizard.

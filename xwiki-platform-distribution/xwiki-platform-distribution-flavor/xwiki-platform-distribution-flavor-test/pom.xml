@@ -101,6 +101,8 @@
                     <type>zip</type>
                   </artifactItem>
                 </artifactItems>
+                <!-- Exclude the Active Installs 2 API to disable the feature for the tests -->
+                <excludes>**/xwiki-platform-activeinstalls2-*.*</excludes>
                 <outputDirectory>${project.build.directory}</outputDirectory>
                 <!-- Allow skipping the unpack -->
                 <skip>${xwiki.test.skipUnpack}</skip>

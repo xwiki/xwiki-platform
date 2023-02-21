@@ -593,12 +593,25 @@ public class TestUtils
         } catch (Exception e) {
             fail("Failed to save the user with name [" + username + "]", e);
         }
+
         // Add the user to XWikiAllGroup
-        addObject("XWiki", "XWikiAllGroup", "XWiki.XWikiGroups", "member", serializeReference(userReference));
+        try {
+            rest().addObject(new LocalDocumentReference("XWiki", "XWikiAllGroup"), "XWiki.XWikiGroups", "member", serializeReference(userReference));
+        } catch (Exception e) {
+            fail("Failed to add the user in the XWikiAllGroup group", e);
+        }
+
         // Add the user to XWikiAdminGroup group (before we login as the user does not have admin right at first)
-        addObject("XWiki", "XWikiAdminGroup", "XWiki.XWikiGroups", "member", serializeReference(userReference));
+        try {
+            rest().addObject(new LocalDocumentReference("XWiki", "XWikiAdminGroup"), "XWiki.XWikiGroups", "member", serializeReference(userReference));
+        } catch (Exception e) {
+            fail("Failed to add the user in the XWikiAdminGroup group", e);
+        }
+
         // Give ADMIN right (and maybe PROGRAMMING right) to XWikiAdminGroup
         setGlobalRights("XWiki.XWikiAdminGroup", "", programming ? "admin,programming" : "admin", true);
+
+        // Also login as Admin user
         loginAsAdmin();
     }
 
@@ -615,9 +628,8 @@ public class TestUtils
      */
     public void setGlobalRights(String groups, String users, String rights, boolean enabled)
     {
-        EntityReference xwikiPreferencesReference = new EntityReference("XWikiPreferences", EntityType.DOCUMENT,
-            new EntityReference("XWiki", EntityType.SPACE));
-        setRights(xwikiPreferencesReference, "XWiki.XWikiGlobalRights", groups, users, rights, enabled);
+        setRights(new LocalDocumentReference("XWiki", "XWikiPreferences"), "XWiki.XWikiGlobalRights", groups, users,
+            rights, enabled);
     }
 
     /**
@@ -658,13 +670,21 @@ public class TestUtils
     private void setRights(EntityReference entityReference, String rightClassName, String groups, String users,
         String rights, boolean enabled)
     {
+        // Normalize users and groups
         String normalizedUsers = users == null ? "" : users;
         String normalizedGroups = groups == null ? "" : groups;
-        addObject(entityReference, rightClassName, "groups", normalizedGroups, "levels", rights,
-            "users", normalizedUsers, "allow", enabled ? "1" : "0");
-        // Click Cancel to avoid locking the page (the xobject has been saved automatically when it was added).
-        ObjectEditPage oep = new ObjectEditPage();
-        oep.clickCancel();
+
+        // Add new rights object
+        try {
+            rest().addObject(entityReference, rightClassName,
+                "groups", normalizedGroups,
+                "users", normalizedUsers,
+                "levels", rights,
+                "allow", enabled ? 1 : 0);
+        } catch (Exception e) {
+            fail("Failed to add rights object of class [" + rightClassName + "] with groups [" + normalizedGroups
+                + "], users [" + normalizedUsers + "], rights [" + rights + "] and enabled [" + enabled + "]", e);
+        }
     }
 
     public ViewPage gotoPage(String space, String page)
@@ -2747,6 +2767,33 @@ public class TestUtils
         {
             return TestUtils.assertStatusCodes(executePost(ObjectsResource.class, obj, toElements(obj, true)), release,
                 STATUS_CREATED);
+        }
+
+        /**
+         * @since 15.2RC1
+         * @since 15.1
+         * @since 14.10.6
+         */
+        private void addObject(EntityReference documentReference, String rightClassName, Object... properties)
+            throws Exception
+        {
+            // Make sure the page exist (object add fail otherwise)
+            // TODO: improve object add API to allow adding an object in a page that does not yet exist
+            if (!exists(documentReference)) {
+                savePage(documentReference);
+            }
+
+            // Create the object
+            org.xwiki.rest.model.jaxb.Object rightsObject = object(documentReference, rightClassName);
+            for (int i = 0; i < properties.length; i += 2) {
+                String name = (String) properties[i + 0];
+                Object value = properties[i + 1];
+
+                rightsObject.withProperties(RestTestUtils.property(name, value));
+            }
+
+            // Add the object
+            add(rightsObject);
         }
 
         /**

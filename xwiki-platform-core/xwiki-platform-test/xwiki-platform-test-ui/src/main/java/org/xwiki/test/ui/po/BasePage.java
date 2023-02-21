@@ -50,7 +50,7 @@ import com.deque.html.axecore.selenium.AxeBuilder;
 /**
  * Represents the common actions possible on all Pages.
  * 
- * @version $Id$
+Added  * @version $Id$
  * @since 3.2M3
  */
 public class BasePage extends BaseElement
@@ -128,6 +128,9 @@ public class BasePage extends BaseElement
 
         Logger LOGGER = LoggerFactory.getLogger(BasePage.class);
         WCAGContext wcagContext = getUtil().getWcagContext();
+        if (!wcagContext.isWcagEnabled()) {
+            return;
+        }
         if (wcagContext.checkAccessibility(this.getPageURL(), this.getClass())) {
             /* Perform accessibility checks on the element when instanciated if the wcag is activated in build. */
             long startTime = System.currentTimeMillis();
@@ -152,8 +155,7 @@ public class BasePage extends BaseElement
             }
         }
         else{
-            LOGGER.info("[{} : {}]", this.getPageURL(), this.getClass());
-            LOGGER.info("This combination of URL:class was already WCAG checked.");
+            LOGGER.info("[{} : {}] This combination of URL:class was already WCAG checked.", this.getPageURL(), this.getClass());
         }
     }
 

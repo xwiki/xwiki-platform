@@ -20,7 +20,6 @@
 package org.xwiki.test.ui.po;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -36,7 +35,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.WCAGContext;
 import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.EditPage;
@@ -128,30 +127,31 @@ public class BasePage extends BaseElement
         waitUntilPageIsReady();
 
         Logger LOGGER = LoggerFactory.getLogger(BasePage.class);
-        TestUtils.WCAGContext wcagContext = getUtil().getWcagContext();
-        if(wcagContext.checkAccessibility(this.getPageURL(), this.getClass())){
+        WCAGContext wcagContext = getUtil().getWcagContext();
+        if (wcagContext.checkAccessibility(this.getPageURL(), this.getClass())) {
             /* Perform accessibility checks on the element when instanciated if the wcag is activated in build. */
             long startTime = System.currentTimeMillis();
             XWikiWebDriver driver = this.getDriver();
             try {
                 if (driver == null) {
-                    throw new NullPointerException("the webDriver is null");
+                    throw new NullPointerException("The provided webDriver is null.");
                 } else {
-                    AxeBuilder axeBuilder = new AxeBuilder();
-                    axeBuilder.withTags(Arrays.asList("wcag2a", "wcag2aa", "wcag21a", "wcag21aa"));
+                    AxeBuilder axeBuilder = wcagContext.getAxeBuilder();
                     Results axeResult = axeBuilder.analyze(driver);
-                    wcagContext.addWcagResults(this.getPageURL(), this.getClass(), axeResult);
+                    wcagContext.addWcagResults(driver, this.getClass(), axeResult);
 
                     long stopTime = System.currentTimeMillis();
                     long deltaTime = stopTime - startTime;
                     LOGGER.info("[{} : {}] ",  this.getPageURL(), this.getClass());
-                    LOGGER.info("The wcag validation on this base element took [{}] ms and found [{}] violations.",
-                      deltaTime, axeResult.getViolations().size());
-
+                    LOGGER.info("The wcag validation on this base page took [{}] ms", deltaTime);
+                    if (axeResult.getViolations() !=null && axeResult.getViolations().size()!=0) {
+                        LOGGER.error("Found [{}] violations.", axeResult.getViolations().size());
+                    }
                     wcagContext.addWcagTime(deltaTime);
                 }
-            }catch (Exception e){
-                System.out.println("Exception when calling axe core validation on the BaseElement.");
+            }catch (Exception e) {
+                LOGGER.error("Exception when calling axe core validation on the BasePage.");
+                e.printStackTrace();
             }
         }
         else{

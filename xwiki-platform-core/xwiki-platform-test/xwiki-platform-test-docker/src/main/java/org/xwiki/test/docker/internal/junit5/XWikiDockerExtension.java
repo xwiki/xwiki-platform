@@ -20,9 +20,8 @@
 package org.xwiki.test.docker.internal.junit5;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.nio.file.Files;
 import java.util.Arrays;
-import java.util.List;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
@@ -48,10 +47,8 @@ import org.xwiki.test.integration.maven.RepositoryResolver;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.PersistentTestContext;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.WCAGContext;
 import org.xwiki.test.ui.XWikiWebDriver;
-
-import com.deque.html.axecore.results.Results;
-import com.deque.html.axecore.selenium.AxeReporter;
 
 import com.google.common.primitives.Ints;
 
@@ -66,7 +63,7 @@ import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.startContain
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.takeScreenshot;
 
 /**
- * JUnit5 Extension to inject {@link TestUtils} and {@link XWikiWebDriver} instances in tests and that peforms the
+ * JUnit5 Extension to inject {@link TestUtils} and {@link XWikiWebDriver} instances in tests and that performs the
  * following tasks.
  * <ul>
  * <li>create a minimal XWiki WAR</li>
@@ -253,9 +250,6 @@ public class XWikiDockerExtension extends AbstractExtension
             }
         }
 
-        //Set up the wcag validation in the test suite fixture.
-        loadPersistentTestContext(extensionContext).getUtil().getWcagContext().setWcagEnabled(testConfiguration.wcag());
-
         LOGGER.info("(*) Starting test [{}]", extensionContext.getTestMethod().get().getName());
     }
 
@@ -312,28 +306,50 @@ public class XWikiDockerExtension extends AbstractExtension
         }
     }
 
+
+
     @Override
     public void afterAll(ExtensionContext extensionContext) throws Exception
     {
-        TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
-
         // If the current tests has parents and one of them has the @UITest annotation, it means the containers should
         // be stopped by the parent having the annotation.
         if (hasParentTestContainingUITestAnnotation(extensionContext)) {
             return;
         }
 
-        PersistentTestContext testContext = loadPersistentTestContext(extensionContext);
-        if (testConfiguration.wcag()) {
-            TestUtils.WCAGContext wcagContext = testContext.getUtil().getWcagContext();
+        PersistentTestContext testContext;
+        testContext = loadPersistentTestContext(extensionContext);
+
+        WCAGContext wcagContext = testContext.getUtil().getWcagContext();
+        if (wcagContext.isWcagEnabled()) {
             float totalTime = (float) wcagContext.wcagTimer / 1000;
-            LOGGER.info("Time spend on WCAG validation [{}] (in s)", totalTime);
+            LOGGER.info("Time spent on WCAG validation [{}] (in s)", totalTime);
+            File wcagDir = new File("target/wcag");
+            if (wcagContext.hasWCAGWarnings()) {
+                LOGGER.warn(wcagContext.buildWarningsReport());
+                if (!wcagDir.exists()) {
+                    Files.createDirectory(wcagDir.toPath());
+                }
+                String outputName = "wcagWarnings";
+                File warningsFile = new File(wcagDir, outputName);
+                wcagContext.writeWCAGReportToFile(warningsFile, wcagContext.buildWarningsReport());
+            }
+            if (wcagContext.hasWCAGFails()) {
+                if (!wcagDir.exists()) {
+                    Files.createDirectory(wcagDir.toPath());
+                }
+                String outputName = "wcagFails";
+                File failsFile = new File(wcagDir, outputName);
+                wcagContext.writeWCAGReportToFile(failsFile, wcagContext.buildFailsReport());
+            }
             // Assert the results of the different WCAG Checks are all empty
-            assertFalse(wcagContext.hasWCAGViolations(),wcagContext.buildReport());
+            assertFalse(wcagContext.hasWCAGFails(), wcagContext.buildFailsReport());
         }
 
         // Shutdown the test context
         shutdownPersistentTestContext(testContext);
+
+        TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
 
         // Only stop DB and Servlet Engine if we have started them
         if (!testConfiguration.getServletEngine().equals(ServletEngine.EXTERNAL)) {
@@ -409,6 +425,7 @@ public class XWikiDockerExtension extends AbstractExtension
         testContext.getUtil().setURLPrefix(computeXWikiURLPrefix(
             testConfiguration.getServletEngine().getInternalIP(),
             testConfiguration.getServletEngine().getInternalPort()));
+        testContext.getUtil().getWcagContext().setWcagEnabled(testConfiguration.wcag());
 
         // - the one used by RestTestUtils, i.e. outside of any container
         testContext.getUtil().rest().setURLPrefix(loadXWikiURL(extensionContext));

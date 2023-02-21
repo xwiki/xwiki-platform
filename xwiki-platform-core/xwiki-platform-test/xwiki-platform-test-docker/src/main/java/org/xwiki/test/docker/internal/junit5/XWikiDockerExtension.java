@@ -20,7 +20,6 @@
 package org.xwiki.test.docker.internal.junit5;
 
 import java.io.File;
-import java.nio.file.Files;
 import java.util.Arrays;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -47,14 +46,12 @@ import org.xwiki.test.integration.maven.RepositoryResolver;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.PersistentTestContext;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.WCAGContext;
 import org.xwiki.test.ui.XWikiWebDriver;
 
 import com.google.common.primitives.Ints;
 
 import ch.qos.logback.classic.Level;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.followOutput;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.getAgentName;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.getResultFileLocation;
@@ -315,34 +312,9 @@ public class XWikiDockerExtension extends AbstractExtension
             return;
         }
 
-        PersistentTestContext testContext;
-        testContext = loadPersistentTestContext(extensionContext);
+        PersistentTestContext testContext = loadPersistentTestContext(extensionContext);
 
-        WCAGContext wcagContext = testContext.getUtil().getWcagContext();
-        if (wcagContext.isWcagEnabled()) {
-            float totalTime = (float) wcagContext.wcagTimer / 1000;
-            LOGGER.info("Time spent on WCAG validation [{}] (in s)", totalTime);
-            File wcagDir = new File("target/wcag");
-            if (wcagContext.hasWCAGWarnings()) {
-                LOGGER.warn(wcagContext.buildWarningsReport());
-                if (!wcagDir.exists()) {
-                    Files.createDirectory(wcagDir.toPath());
-                }
-                String outputName = "wcagWarnings";
-                File warningsFile = new File(wcagDir, outputName);
-                wcagContext.writeWCAGReportToFile(warningsFile, wcagContext.buildWarningsReport());
-            }
-            if (wcagContext.hasWCAGFails()) {
-                if (!wcagDir.exists()) {
-                    Files.createDirectory(wcagDir.toPath());
-                }
-                String outputName = "wcagFails";
-                File failsFile = new File(wcagDir, outputName);
-                wcagContext.writeWCAGReportToFile(failsFile, wcagContext.buildFailsReport());
-            }
-            // Assert the results of the different WCAG Checks are all empty
-            assertFalse(wcagContext.hasWCAGFails(), wcagContext.buildFailsReport());
-        }
+        testContext.getUtil().writeWCAGResults(LOGGER);
 
         // Shutdown the test context
         shutdownPersistentTestContext(testContext);

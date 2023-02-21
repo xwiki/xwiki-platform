@@ -306,8 +306,6 @@ public class XWikiDockerExtension extends AbstractExtension
         }
     }
 
-
-
     @Override
     public void afterAll(ExtensionContext extensionContext) throws Exception
     {

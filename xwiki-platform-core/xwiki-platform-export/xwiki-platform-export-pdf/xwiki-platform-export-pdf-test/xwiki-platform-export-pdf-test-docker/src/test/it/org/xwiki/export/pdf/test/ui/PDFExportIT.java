@@ -23,6 +23,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -178,8 +179,7 @@ class PDFExportIT
             // The content of the parent document has a link to the child document.
             Map<String, String> contentPageLinks = pdf.getLinksFromPage(2);
             assertEquals(1, contentPageLinks.size());
-            assertEquals(setup.getURL(Arrays.asList("PDFExportIT", "Parent"), "Child") + "/",
-                contentPageLinks.get("child page."));
+            assertEquals("Hxwiki:PDFExportIT.Parent.Child.WebHome", contentPageLinks.get("child page."));
 
             //
             // Verify the page corresponding to the child document.
@@ -428,6 +428,119 @@ class PDFExportIT
             assertTrue(
                 contentPageText.startsWith("InvalidTOCAnchors\n3 / 3\nWithoutID\nDigitsAndSpace\nSymbols\nValid"),
                 "Unexpected content: " + contentPageText);
+        }
+    }
+
+    @Test
+    @Order(8)
+    void refactorAnchors(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        setup.login("John", "pass");
+
+        ViewPage viewPage =
+            setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Anchors"), "WebHome"));
+        ExportTreeModal exportTreeModal = ExportTreeModal.open(viewPage, "PDF");
+        // Include the child page in the export.
+        exportTreeModal.getPageTree().getNode("document:xwiki:PDFExportIT.Anchors.Child").select();
+        exportTreeModal.export();
+        PDFExportOptionsModal exportOptions = new PDFExportOptionsModal();
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            //
+            // Verify the anchors from the parent document.
+            //
+
+            Map<String, String> expectedLinks = new LinkedHashMap<>();
+            expectedLinks.put("Self", "Hxwiki:PDFExportIT.Anchors.WebHome");
+            // Anchor to a section from this document.
+            expectedLinks.put("Usage", "HUsage");
+            // Anchor to a section from this document that is not found in the PDF.
+            // expectedLinks.put("Comments", setup.getBaseBinURL() + "view/PDFExportIT/Anchors/#Comments");
+            // Anchors that use a query string cannot be made internal.
+            expectedLinks.put("History", setup.getBaseBinURL() + "view/PDFExportIT/Anchors/?viewer=history#");
+            expectedLinks.put("Diff", setup.getBaseBinURL() + "view/PDFExportIT/Anchors/?viewer=changes#diff");
+            // Anchors that don't target the view action cannot be made internal.
+            expectedLinks.put("Edit", setup.getBaseBinURL() + "edit/PDFExportIT/Anchors/WebHome");
+            expectedLinks.put("Edit Description",
+                setup.getBaseBinURL() + "edit/PDFExportIT/Anchors/WebHome#HDescription");
+            expectedLinks.put("Edit Wiki", setup.getBaseBinURL() + "edit/PDFExportIT/Anchors/WebHome?editor=wiki");
+            expectedLinks.put("Edit Usage Wiki",
+                setup.getBaseBinURL() + "edit/PDFExportIT/Anchors/WebHome?editor=wiki#HUsage");
+
+            // Anchor to the child document that is included in the PDF.
+            expectedLinks.put("Child", "Hxwiki:PDFExportIT.Anchors.Child");
+            // Anchor to a section from the child document that is included in the PDF.
+            expectedLinks.put("Child Usage", "HUsage-1");
+            // Anchor to a section from the child document that is not found in the PDF.
+            expectedLinks.put("Child Comments", setup.getBaseBinURL() + "view/PDFExportIT/Anchors/Child#Comments");
+            // Anchors that use a query string cannot be made internal.
+            expectedLinks.put("Child History", setup.getBaseBinURL() + "view/PDFExportIT/Anchors/Child?viewer=history");
+            expectedLinks.put("Child Diff",
+                setup.getBaseBinURL() + "view/PDFExportIT/Anchors/Child?viewer=changes#diff");
+            // Anchors that don't target the view action cannot be made internal.
+            expectedLinks.put("Child Edit", setup.getBaseBinURL() + "edit/PDFExportIT/Anchors/Child");
+            expectedLinks.put("Child Edit Description",
+                setup.getBaseBinURL() + "edit/PDFExportIT/Anchors/Child#HDescription");
+            expectedLinks.put("Child Edit Wiki", setup.getBaseBinURL() + "edit/PDFExportIT/Anchors/Child?editor=wiki");
+            expectedLinks.put("Child Edit Usage Wiki",
+                setup.getBaseBinURL() + "edit/PDFExportIT/Anchors/Child?editor=wiki#HUsage");
+
+            // Anchor to another section from this document.
+            expectedLinks.put("Description", "HDescription");
+            // Anchor to another section from the child document that is included in the PDF.
+            expectedLinks.put("Child Description", "HDescription-1");
+            // Anchor to a section from a document that is not included in the PDF.
+            expectedLinks.put("Other Description", setup.getBaseBinURL() + "view/PDFExportIT/Parent/#HDescription");
+
+            assertEquals(expectedLinks, pdf.getLinksFromPage(2));
+
+            //
+            // Verify the anchors from the child document.
+            //
+
+            expectedLinks.clear();
+            expectedLinks.put("Self", "Hxwiki:PDFExportIT.Anchors.Child");
+            // Anchor to a section from this document.
+            expectedLinks.put("Usage", "HUsage-1");
+            // Anchor to a section from this document that is not found in the PDF.
+            expectedLinks.put("Comments", setup.getBaseBinURL() + "view/PDFExportIT/Anchors/Child#Comments");
+            // Anchors that use a query string cannot be made internal.
+            expectedLinks.put("History", setup.getBaseBinURL() + "view/PDFExportIT/Anchors/Child?viewer=history#");
+            expectedLinks.put("Diff", setup.getBaseBinURL() + "view/PDFExportIT/Anchors/Child?viewer=changes#diff");
+            // Anchors that don't target the view action cannot be made internal.
+            expectedLinks.put("Edit", setup.getBaseBinURL() + "edit/PDFExportIT/Anchors/Child");
+            expectedLinks.put("Edit Description",
+                setup.getBaseBinURL() + "edit/PDFExportIT/Anchors/Child#HDescription");
+            expectedLinks.put("Edit Wiki", setup.getBaseBinURL() + "edit/PDFExportIT/Anchors/Child?editor=wiki");
+            expectedLinks.put("Edit Usage Wiki",
+                setup.getBaseBinURL() + "edit/PDFExportIT/Anchors/Child?editor=wiki#HUsage");
+
+            // Anchor to the parent document that is included in the PDF.
+            expectedLinks.put("Parent", "Hxwiki:PDFExportIT.Anchors.WebHome");
+            // Anchor to a section from the parent document that is included in the PDF.
+            expectedLinks.put("Parent Usage", "HUsage");
+            // Anchor to a section from the parent document that is not found in the PDF.
+            // expectedLinks.put("Parent Comments", setup.getBaseBinURL() + "view/PDFExportIT/Anchors/#Comments");
+            // Anchors that use a query string cannot be made internal.
+            expectedLinks.put("Parent History", setup.getBaseBinURL() + "view/PDFExportIT/Anchors/?viewer=history");
+            expectedLinks.put("Parent Diff", setup.getBaseBinURL() + "view/PDFExportIT/Anchors/?viewer=changes#diff");
+            // Anchors that don't target the view action cannot be made internal.
+            expectedLinks.put("Parent Edit", setup.getBaseBinURL() + "edit/PDFExportIT/Anchors/WebHome");
+            expectedLinks.put("Parent Edit Description",
+                setup.getBaseBinURL() + "edit/PDFExportIT/Anchors/WebHome#HDescription");
+            expectedLinks.put("Parent Edit Wiki",
+                setup.getBaseBinURL() + "edit/PDFExportIT/Anchors/WebHome?editor=wiki");
+            expectedLinks.put("Parent Edit Usage Wiki",
+                setup.getBaseBinURL() + "edit/PDFExportIT/Anchors/WebHome?editor=wiki#HUsage");
+
+            // Anchor to another section from this document.
+            expectedLinks.put("Description", "HDescription-1");
+            // Anchor to another section from the parent document that is included in the PDF.
+            expectedLinks.put("Parent Description", "HDescription");
+            // Anchor to a section from a document that is not included in the PDF.
+            expectedLinks.put("Other Description", setup.getBaseBinURL() + "view/PDFExportIT/Parent/#HDescription");
+
+            assertEquals(expectedLinks, pdf.getLinksFromPage(3));
         }
     }
 

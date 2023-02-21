@@ -62,6 +62,7 @@ import com.xpn.xwiki.web.XWikiServletRequestStub;
 import com.xpn.xwiki.web.XWikiServletResponseStub;
 
 import net.sf.json.JSON;
+import net.sf.json.JSONException;
 import net.sf.json.JSONSerializer;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -213,7 +214,12 @@ public class PageTest
      */
     protected <T extends JSON> T renderJSONPage(DocumentReference reference) throws Exception
     {
-        return (T) JSONSerializer.toJSON(renderPage(reference));
+        String jsonString = renderPage(reference);
+        try {
+            return (T) JSONSerializer.toJSON(jsonString.trim());
+        } catch (JSONException e) {
+            throw new RuntimeException(String.format("Failed to parse [%s]", jsonString), e);
+        }
     }
 
     /**

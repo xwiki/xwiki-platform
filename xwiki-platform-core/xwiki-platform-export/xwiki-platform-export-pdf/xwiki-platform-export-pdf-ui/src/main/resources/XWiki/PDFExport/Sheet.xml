@@ -83,6 +83,7 @@
   ## Inject the required skin extensions.
   #if ($pdfExportJobId)
     $!services.job.getJobStatus($pdfExportJobId).requiredSkinExtensions
+    #clientSidePDFExportConfiguration()
   #end
   ## Start the BODY tag.
   $htmlHeader.substring($headTagEnd, $bodyContentStart)
@@ -102,6 +103,21 @@
   ## Close the tags opened in htmlheader.vm
     &lt;/body&gt;
   &lt;/html&gt;
+#end
+
+#macro (clientSidePDFExportConfiguration)
+  #set ($clientSideConfig = {
+    'documents': [],
+    'baseURL': $services.job.getJobStatus($pdfExportJobId).request.baseURL
+  })
+  #foreach ($renderingResult in $services.job.getJobStatus($pdfExportJobId).documentRenderingResults)
+    #set ($discard = $clientSideConfig.documents.add({
+      'reference': $services.model.serialize($renderingResult.documentReference, 'default'),
+      'idMap': $renderingResult.idMap
+    }))
+  #end
+  &lt;script id="pdfExportConfig" type="application/json"&gt;$jsontool.serialize($clientSideConfig).replace(
+    '&lt;', '\u003C')&lt;/script&gt;
 #end
 
 #macro (renderPDFElement $pdfTemplateObj $element)
@@ -227,20 +243,112 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery', 'xwiki-page-ready'], function($, pageReady) {
-  const fixInternalAnchors = function(container) {
-    var baseURL = new URL(XWiki.currentDocument.getURL(), window.location.href).toString();
+      <code>define('xwiki-export-pdf-config', ['jquery'], function($) {
+  const pdfExportConfig = {
+    documents: [],
+    baseURL: window.location.href
+  };
+  try {
+    Object.assign(pdfExportConfig, JSON.parse($('#pdfExportConfig').text()));
+  } catch (e) {
+    console.error(e);
+  }
+  return pdfExportConfig;
+});
+
+require([
+  'jquery',
+  'xwiki-page-ready',
+  'xwiki-export-pdf-config'
+], function($, pageReady, pdfExportConfig) {
+  const refactorAnchors = function() {
+    // Fix anchors that use relative URLs to point to the right document (that generated that anchor).
+    fixRelativeAnchors($('#xwikicontent'));
+    // Convert external anchors that target exported documents into internal anchor, whenever possible.
+    pdfExportConfig.documents?.forEach?.(document =&gt; {
+      const documentReference = XWiki.Model.resolve(document.reference, XWiki.EntityType.DOCUMENT,
+        XWiki.currentDocument.documentReference);
+      makeInternalAnchors($('#xwikicontent'), documentReference, document.idMap);
+    });
+    // The anchors in the PDF table of contents are already using global fragment identifiers.
+    makeInternalAnchors($('.pdf-toc'), XWiki.currentDocument.documentReference);
+  };
+
+  /**
+   * When exporting multiple documents to PDF each of them can produce anchors with relative URLs that are by default
+   * resolved based on the current document used to trigger the PDF export, which is not what we want. Those relative
+   * anchors should target the documents that generated them.
+   *
+   * @param container where to look for relative anchors that need to be fixed
+   */
+  const fixRelativeAnchors = function(container) {
+    container.find('a[href]').each(function() {
+      const anchor = $(this);
+      let documentReference = anchor.parentsUntil(container).last().prevAll('h1[data-xwiki-document-reference]')
+        .first().attr('data-xwiki-document-reference');
+      if (documentReference) {
+        documentReference = XWiki.Model.resolve(documentReference, XWiki.EntityType.DOCUMENT,
+          XWiki.currentDocument.documentReference);
+        const document = new XWiki.Document(documentReference);
+        const documentURL = new URL(document.getURL(), pdfExportConfig.baseURL);
+        try {
+          anchor.attr('href', new URL(anchor.attr('href'), documentURL).href);
+        } catch (e) {
+          console.log('Failed to fix relative URL: ' + anchor.attr('href'));
+        }
+      }
+    });
+  };
+
+  /**
+   * Look for external anchors that target the specified document (which is included in the PDF export) and convert them
+   * to internal anchors like this:
+   * &lt;ul&gt;
+   *   &lt;li&gt;/xwiki/bin/view/Path/To/Document =&gt; #documentTitleHeadingId&lt;/li&gt;
+   *   &lt;li&gt;/xwiki/bin/view/Path/To/Document#localFragmentId =&gt; #globalFragmentId&lt;/li&gt;
+   *   &lt;li&gt;/xwiki/bin/view/Path/To/Document#globalFragmentId =&gt; #globalFragmentId&lt;/li&gt;
+   * &lt;/ul&gt;
+   */
+  const makeInternalAnchors = function(container, documentReference, idMap) {
+    const document = new XWiki.Document(documentReference);
+    const documentURL = new URL(document.getURL(), pdfExportConfig.baseURL).href;
     container.find('a[href]').each(function() {
       const anchor = $(this);
       try {
-        const url = new URL(anchor.prop('href'));
-        if (url.hash &amp;&amp; baseURL + url.hash === url.toString()) {
-          anchor.attr('href', url.hash);
+        const anchorURL = new URL(anchor.attr('href'), pdfExportConfig.baseURL);
+        // Drop the '#' from the end of the URL when the hash is empty.
+        anchorURL.hash = anchorURL.hash;
+        if (anchorURL.href === documentURL + anchorURL.hash) {
+          // Assume the anchor targets a document fragment specified by its global id.
+          let fragmentId = anchorURL.hash.substring(1);
+          if (!fragmentId) {
+            // The anchor targets the start of the document.
+            fragmentId = getDocumentFragmentId(documentReference);
+          } else if (idMap) {
+            // The anchor targets a document fragment specified by its local id.
+            fragmentId = idMap[fragmentId];
+          }
+          if (fragmentId) {
+            anchor.attr('href', '#' + fragmentId);
+          }
         }
       } catch (e) {
         console.log('Failed to parse URL: ' + anchor.prop('href'));
       }
     });
+  };
+
+  /**
+   * Search for the heading that marks the start of the specified document in the rendering output and return its id,
+   * which can be used as a fragment identifier in internal links.
+   *
+   * @return the id of the heading that marks the start of the specified document
+   */
+  const getDocumentFragmentId = function(documentReference) {
+    const stringDocRef = XWiki.Model.serialize(documentReference);
+    return $('#xwikicontent &gt; h1[data-xwiki-document-reference]').filter(function() {
+      return $(this).attr('data-xwiki-document-reference') === stringDocRef;
+    }).attr('id');
   };
 
   const replaceCanvasesWithImages = function(container) {
@@ -331,7 +439,7 @@
 
   // Adjust the exported content before performing the print layout.
   pageReady.afterPageReady(() =&gt; {
-    fixInternalAnchors($('#xwikicontent, .pdf-toc'));
+    refactorAnchors();
     removeEmptyTableOfContents();
     validateTableOfContentsAnchors();
   });
@@ -357,9 +465,20 @@
     }
   });
 
-  // Revoke the object URLs previously created, after the print layout is ready.
   pageReady.afterPageReady(() =&gt; {
+    // Revoke the object URLs previously created, after the print layout is ready.
     objectURLs.forEach(url =&gt; URL.revokeObjectURL(url));
+
+    // Sets the base URL used to resolve relative URLs in the exported content. When the base URL is not set the
+    // relative URLs are by default resolved relative to the print preview URL which uses the export action and has a
+    // long query string that is specific to PDF export. This means relative URLs may be resolved using the export
+    // action and some strange query string if the base URL is not set. We set the base URL after the page is ready
+    // because we don't want to influence resource loading (images, CSS, JavaScript). This is especially important when
+    // the PDF is printed using a remote web browser (e.g. running inside a Docker container) in which case the URL used
+    // to access the print preview page can be different than the URL used by the user to trigger the PDF export (i.e.
+    // the base URL). We want the base URL to be taken into account only when resolving relative links in the generated
+    // PDF.
+    $('&lt;base/&gt;').attr('href', pdfExportConfig.baseURL).prependTo('head');
   });
 });</code>
     </property>

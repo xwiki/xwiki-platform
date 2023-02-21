@@ -972,18 +972,21 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 # attachment.upload.blockList=
 
 #-------------------------------------------------------------------------------------
-# Active Installs
+# Active Installs 2
 #-------------------------------------------------------------------------------------
 
-#-# [Since 5.2M2]
-#-# The URL of where the Active Installs module should connect to in order to send a ping of activity. This feature
-#-# regularly sends the following information to xwiki.org about the current instance:
-#-# - its unique id
-#-# - the id and versions of all installed extensions)
+#-# [Since 14.5]
+#-# The URL of where the Active Installs 2 module should connect to, in order to send a ping of activity. This feature
+#-# regularly sends anonymous information to xwiki.org about the current instance.
 #-# The goal is to count the number of active installs of XWiki out there and provide statistics on xwiki.org
 #-#
 #-# The default is:
-# activeinstalls.pingURL=http://extensions.xwiki.org/activeinstalls
+# activeinstalls2.pingURL = https://extensions.xwiki.org/activeinstalls2
+
+#-# [Since 14.5]
+#-# Default user agent used when sending pings.
+#-# The default is:
+# activeinstalls2.userAgent = XWikiActiveInstalls2
 
 #-------------------------------------------------------------------------------------
 # Wikis

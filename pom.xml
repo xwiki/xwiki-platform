@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>15.1-SNAPSHOT</version>
+    <version>15.2-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>15.1-SNAPSHOT</version>
+  <version>15.2-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
@@ -53,13 +53,13 @@
     <bootstrap.version>3.4.1</bootstrap.version>
     <batik.version>1.16</batik.version>
     <restlet.version>2.3.12</restlet.version>
-    <tika.version>2.6.0</tika.version>
+    <tika.version>2.7.0</tika.version>
     <pdfbox.version>2.0.27</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
     <jetty.version>9.4.49.v20220914</jetty.version>
-    <netty.version>4.1.87.Final</netty.version>
-    <hibernate.version>5.6.14.Final</hibernate.version>
-    <dockerJava.version>3.2.14</dockerJava.version>
+    <netty.version>4.1.89.Final</netty.version>
+    <hibernate.version>5.6.15.Final</hibernate.version>
+    <dockerJava.version>3.3.0</dockerJava.version>
 
     <!-- Versions of other software we need in our functional tests -->
     <testcontainers.version>1.17.6</testcontainers.version>
@@ -107,7 +107,7 @@
     <derby.version>10.14.2.0</derby.version>
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
-    <pgsql.version>42.5.1</pgsql.version>
+    <pgsql.version>42.5.3</pgsql.version>
     <oracle.groupId>com.oracle.ojdbc</oracle.groupId>
     <oracle.artifactId>ojdbc8</oracle.artifactId>
     <oracle.version>19.3.0.0</oracle.version>
@@ -399,12 +399,12 @@
       <dependency>
         <groupId>com.rometools</groupId>
         <artifactId>rome</artifactId>
-        <version>1.18.0</version>
+        <version>1.19.0</version>
       </dependency>
       <dependency>
         <groupId>com.rometools</groupId>
         <artifactId>rome-utils</artifactId>
-        <version>1.18.0</version>
+        <version>1.19.0</version>
       </dependency>
       <dependency>
         <!-- Replace the runtime transitive dependency we excluded above with this one which repackages the NekoHTML classes to prevent conflicts. -->
@@ -590,7 +590,7 @@
       <dependency>
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
-        <version>1.15.3</version>
+        <version>1.15.4</version>
       </dependency>
 
       <!-- PDF -->
@@ -841,7 +841,7 @@
       <dependency>
         <groupId>com.icegreen</groupId>
         <artifactId>greenmail-junit5</artifactId>
-        <version>1.6.12</version>
+        <version>1.6.13</version>
       </dependency>
 
       <!-- Make sure to use a version of the Jetty client libraries matching the Jetty version we package -->

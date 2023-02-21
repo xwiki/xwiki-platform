@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor-test</artifactId>
-    <version>15.1-SNAPSHOT</version>
+    <version>15.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test-upgrade</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Upgrade</name>
@@ -100,6 +100,8 @@
                     <type>zip</type>
                   </artifactItem>
                 </artifactItems>
+                <!-- Exclude the Active Installs 2 API to disable the feature for the tests -->
+                <excludes>**/xwiki-platform-activeinstalls2-*.*</excludes>
                 <outputDirectory>${project.build.directory}</outputDirectory>
                 <!-- Allow skipping the unpack -->
                 <skip>${xwiki.test.skipUnpack}</skip>
@@ -122,6 +124,8 @@
                     <type>xip</type>
                   </artifactItem>
                 </artifactItems>
+                <!-- Exclude the Active Installs 2 API to disable the feature for the tests -->
+                <excludes>**/xwiki-platform-activeinstalls2-*.*</excludes>
                 <outputDirectory>${xwikiExecutionDirectory}/data/extension/repository</outputDirectory>
                 <!-- Allow skipping the unpack -->
                 <skip>${xwiki.test.skipUnpack}</skip>
@@ -144,6 +148,12 @@
                     <type>zip</type>
                   </artifactItem>
                 </artifactItems>
+                <!-- Exclude the Active Installs API (version 1 or 2 since we're installing some old XWiki version) to
+                     disable the feature for the tests -->
+                <excludes>
+                  **/xwiki-platform-activeinstalls2-*.*,
+                  **/xwiki-platform-activeinstalls-*.*
+                </excludes>
                 <outputDirectory>${xwikiExecutionDirectory}/data/</outputDirectory>
                 <!-- Allow skipping the unpack -->
                 <skip>${xwiki.test.skipUnpack}</skip>

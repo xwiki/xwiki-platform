@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URLEncoder;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -74,6 +75,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.opentest4j.AssertionFailedError;
+import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
@@ -105,6 +107,7 @@ import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
@@ -1437,6 +1440,36 @@ public class TestUtils
     public WCAGContext getWcagContext()
     {
         return this.wcagContext;
+    }
+
+    public void writeWCAGResults(Logger logger) throws IOException{
+        WCAGContext wcagContext = getWcagContext();
+        if (wcagContext.isWcagEnabled()) {
+            float totalTime = (float) wcagContext.wcagTimer / 1000;
+            logger.info("Time spent on WCAG validation [{}] (in s)", totalTime);
+            File wcagDir = new File("target/wcag");
+            if (wcagContext.hasWCAGWarnings()) {
+                logger.warn("There are some accessibility issues in the test suite. " +
+                  "See target/wcag/wcagWarnings for more details.");
+                if (!wcagDir.exists()) {
+                    Files.createDirectory(wcagDir.toPath());
+                }
+                String outputName = "wcagWarnings";
+                File warningsFile = new File(wcagDir, outputName);
+                WCAGContext.writeWCAGReportToFile(warningsFile, wcagContext.buildWarningsReport());
+            }
+            if (wcagContext.hasWCAGFails()) {
+                if (!wcagDir.exists()) {
+                    Files.createDirectory(wcagDir.toPath());
+                }
+                String outputName = "wcagFails";
+                File failsFile = new File(wcagDir, outputName);
+                WCAGContext.writeWCAGReportToFile(failsFile, wcagContext.buildFailsReport());
+            }
+            // Assert the results of the different WCAG Checks are all empty
+            assertFalse(wcagContext.hasWCAGFails(), "There are some accessibility issues in the test suite." +
+              "See target/wcag/wcagFails for more details.");
+        }
     }
 
     /**

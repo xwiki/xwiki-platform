@@ -139,13 +139,10 @@ public class BasePage extends BaseElement
                     AxeBuilder axeBuilder = wcagContext.getAxeBuilder();
                     Results axeResult = axeBuilder.analyze(driver);
                     wcagContext.addWcagResults(driver, this.getClass(), axeResult);
-
                     long stopTime = System.currentTimeMillis();
                     long deltaTime = stopTime - startTime;
-                    LOGGER.info("[{} : {}] ",  this.getPageURL(), this.getClass());
-                    LOGGER.info("The wcag validation on this base page took [{}] ms", deltaTime);
                     if (axeResult.getViolations() !=null && axeResult.getViolations().size()!=0) {
-                        LOGGER.error("Found [{}] violations.", axeResult.getViolations().size());
+                        LOGGER.info("[{} : {}] Found [{}] WCAG violations.",  this.getPageURL(), this.getClass(), axeResult.getViolations().size());
                     }
                     wcagContext.addWcagTime(deltaTime);
                 }

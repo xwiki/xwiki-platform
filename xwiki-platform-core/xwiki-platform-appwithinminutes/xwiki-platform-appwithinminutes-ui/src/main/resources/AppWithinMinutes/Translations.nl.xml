@@ -94,26 +94,22 @@ platform.appwithinminutes.appNameEmptyError=Geef alstublieft de applicatienaam o
 platform.appwithinminutes.classEditorPaletteTitle=Veldenkiezer
 platform.appwithinminutes.classEditorPaletteHint=Sleep velden uit de kiezer en laat ze vallen op uw formulier om uw formulier op te bouwen.
 platform.appwithinminutes.classEditorCanvasHint=Sleep velden uit de kiezer en laat ze in dit gebied vallen.
-
 platform.appwithinminutes.classEditorUpdateTemplateLabel=Class sjabloon bijwerken
 platform.appwithinminutes.classEditorUpdateTemplateHint=Bewaar de standaardwaarden voor velden in het Class sjabloon ({0}).
 platform.appwithinminutes.classEditorUpdateSheetLabel=Class sheet bijwerken
 platform.appwithinminutes.classEditorUpdateSheetHint=Maak de sheet die wordt gebruikt voor het tonen en wijzigen van objecten van deze Class ({0}).
 platform.appwithinminutes.classEditorUpdateTranslationsLabel=Vertaalbundel van de Class bijwerken
 platform.appwithinminutes.classEditorUpdateTranslationsHint=Werk de vertalingen van de weergavenamen van velden en lijstwaarden bij ({0}).
-
 platform.appwithinminutes.classEditorMultipleSheetsWarning=Deze Class heeft meerdere sheets.
 platform.appwithinminutes.classEditorDuplicateFieldNameError=Deze Class heeft twee velden met dezelfde naam\: {0}
 platform.appwithinminutes.classEditorTemplateSaveComment=Standaardwaarden bijwerken
 platform.appwithinminutes.classEditorBindSheetSaveComment=Class sheet binden
 platform.appwithinminutes.classEditorSheetSaveComment=Class sheet bijwerken
 platform.appwithinminutes.classEditorTranslationsSaveComment=Vertalingen bijwerken
-
 platform.appwithinminutes.classEditorStandardCategoryName=Standaard
 platform.appwithinminutes.classEditorPickersCategoryName=Kiezers
 platform.appwithinminutes.classEditorDocumentCategoryName=Document
 platform.appwithinminutes.classEditorAdvancedCategoryName=Gevorderd
-
 platform.appwithinminutes.classEditorDBListFieldName=Database Lijst
 platform.appwithinminutes.classEditorGroupsFieldName=Groep
 platform.appwithinminutes.classEditorUsersFieldName=Gebruiker
@@ -126,14 +122,12 @@ platform.appwithinminutes.classEditorStringFieldName=Korte Tekst
 platform.appwithinminutes.classEditorContentFieldName=Inhoud
 platform.appwithinminutes.classEditorTitleFieldName=Titel
 ### Missing: platform.appwithinminutes.classEditorPageFieldName=Page
-
 platform.appwithinminutes.classEditorDeleteFieldLabel=Verwijderen
 platform.appwithinminutes.classEditorConfigureFieldLabel=Configureren
 platform.appwithinminutes.classEditorPreviewFieldLabel=Voorbeeld
 platform.appwithinminutes.classEditorPreviewFieldHint=Verberg configuratiepaneel en pas wijzigingen toe
 platform.appwithinminutes.classEditorMoveFieldLabel=Verplaatsen
 platform.appwithinminutes.classEditorMoveFieldHint=Sleep en laat vallen om de volgorde te wijzigen
-
 platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Standaardwaarde
 
 ### Date Picker
@@ -147,7 +141,6 @@ platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=Waarde
 platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Toevoegen
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Verwijderen
-
 ### Missing: appWithinMinutes.templateProviderEditor.hint=Application entries are wiki pages that contain structured data.
 ### Missing: appWithinMinutes.templateProviderEditor.icon.hint=The icon associated with an application entry.
 ### Missing: appWithinMinutes.templateProviderEditor.description.hint=Short description of an application entry.
@@ -210,6 +203,7 @@ platform.appwithinminutes.appHomePageEditAppLabel=Applicatie wijzigen
 platform.appwithinminutes.appHomePageTranslateAppLabel=Applicatie vertalen
 platform.appwithinminutes.appHomePageDeleteAppLabel=Applicatie verwijderen
 ### Missing: platform.appwithinminutes.appHomePageMovedWarning=The application might not function correctly because it has been renamed or moved without updating the code. Please edit the application and follow the steps in order to update the code.
+platform.appwithinminutes.appHomePageNoScriptRight=Je hebt niet de script rechten welke nodig zijn om een applicatie te creëren of te wijzigen. De applicatie werkt wellicht niet juist als je doorgaat.
 ### Missing: AppWithinMinutes.LiveTableClass_description=Description
 ### Missing: AppWithinMinutes.LiveTableClass_columns=Live Table Columns
 
@@ -219,6 +213,10 @@ platform.appwithinminutes.deleteAppEntriesConfirmation=ALLE gegevens van applica
 platform.appwithinminutes.deleteAppDoesNotExistError=De opgegeven applicatie bestaat niet.
 platform.appwithinminutes.deleteAppInvalidAppError=De opgegeven naam is geen geldige App Binnen Minuten applicatie.
 platform.appwithinminutes.deleteAppNotSpecifiedError=Er is geen applicatienaam opgegeven.
+
+### Rename Application
+appWithinMinutes.renameApp.label=Hernoem Applicatie
+appWithinMinutes.renameApp.close=Sluiten
 
 ### Rename Application
 ### Missing: appWithinMinutes.renameApp.changeAppTitleInfo=You can change the application title without renaming the application just by editing the application home page.
@@ -238,7 +236,6 @@ platform.appwithinminutes.deleteAppNotSpecifiedError=Er is geen applicatienaam o
 ### Since 8.4
 platform.appwithinminutes.appNamePreviewClassReferenceLabel=Applicatie Class
 platform.appwithinminutes.appNamePreviewDataSpaceLabel=Paginaruimte voor Applicatie-gegevens
-
 platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Paginaruimte
 platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=De naam van de paginaruimte waarin de applicatiegegevens zijn opgeslagen
 platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Volledige naam pagina
@@ -266,5 +263,6 @@ platform.appwithinminutes.wizardStep3Description=Personaliseer de homepage van u
 ### Since 11.0
 platform.appwithinminutes.appsLiveTable.doc.space=Applicatienaam
 ### Missing: appWithinMinutes.classEditor.title={0} Structure
-### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries</content>
+### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries
+</content>
 </xwikidoc>

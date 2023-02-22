@@ -309,7 +309,7 @@
   #else
     #set($cancelUrl = $escapetool.xml($doc.getURL()))
   #end
-  <a class="btn btn-default cancel" href="$!{escapetool.xml(${cancelUrl})}">$escapetool.xml($services.localization.render('cancel'))</a>
+  <a class="btn btn-default cancel" href="${cancelUrl}">$escapetool.xml($services.localization.render('cancel'))</a>
 #end
 #######################################################
 ##      DISPLAY DELETE COMPLETELY CONFIRM MESSAGE

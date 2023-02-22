@@ -103,7 +103,7 @@ class DocumentInitializerRightsManagerTest
         assertEquals(1, this.document.getXObjects(LOCAL_CLASS_REFERENCE).size());
         BaseObject xObject = this.document.getXObject(LOCAL_CLASS_REFERENCE);
         assertEquals("XWiki.XWikiAdminGroup", xObject.getStringValue(GROUPS_FIELD_NAME));
-        assertEquals("view, edit, delete", xObject.getStringValue(LEVELS_FIELD_NAME));
+        assertEquals("view,edit,delete", xObject.getStringValue(LEVELS_FIELD_NAME));
         assertEquals("1", xObject.getStringValue(ALLOW_FIELD_NAME));
     }
 

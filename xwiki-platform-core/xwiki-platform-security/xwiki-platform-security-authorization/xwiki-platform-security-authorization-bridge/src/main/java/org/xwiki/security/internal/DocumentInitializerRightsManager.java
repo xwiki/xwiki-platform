@@ -20,7 +20,6 @@
 package org.xwiki.security.internal;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -36,6 +35,7 @@ import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
+import static java.util.stream.Collectors.joining;
 import static org.xwiki.security.authorization.Right.DELETE;
 import static org.xwiki.security.authorization.Right.EDIT;
 import static org.xwiki.security.authorization.Right.VIEW;
@@ -93,11 +93,9 @@ public class DocumentInitializerRightsManager
         try {
             XWikiContext xwikiContext = this.xcontextProvider.get();
             BaseObject object = document.newXObject(LOCAL_CLASS_REFERENCE, xwikiContext);
-            XWikiContext xWikiContext = this.xcontextProvider.get();
-            object.set(GROUPS_FIELD_NAME, xwikiAdminGroupDocumentReference, xWikiContext);
-            object.set(LEVELS_FIELD_NAME, rights.stream().map(Right::getName).collect(Collectors.toList()),
-                xWikiContext);
-            object.set(ALLOW_FIELD_NAME, 1, xWikiContext);
+            object.setLargeStringValue(GROUPS_FIELD_NAME, xwikiAdminGroupDocumentReference);
+            object.setStringValue(LEVELS_FIELD_NAME, rights.stream().map(Right::getName).collect(joining(",")));
+            object.setIntValue(ALLOW_FIELD_NAME, 1);
             updated = true;
         } catch (XWikiException e) {
             this.logger.error(String.format("Error adding a [%s] object to the document [%s]", LOCAL_CLASS_REFERENCE,

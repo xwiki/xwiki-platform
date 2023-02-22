@@ -138,7 +138,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMess
 
 /**
  * Various common tools for resources.
- * 
+ *
  * @version $Id$
  * @since 7.3M1
  */
@@ -174,11 +174,13 @@ public class ModelFactory
     @Inject
     private UserReferenceSerializer<String> userReferenceSerializer;
 
+    // Needs to be a provider because some dependencies are lacking an implementation of this component at compile time.
     @Inject
-    private GeneralMailConfiguration generalMailConfiguration;
+    private Provider<GeneralMailConfiguration> generalMailConfiguration;
 
+    // Needs to be a provider because some dependencies are lacking an implementation of this component at compile time.
     @Inject
-    private EmailAddressObfuscator emailAddressObfuscator;
+    private Provider<EmailAddressObfuscator> emailAddressObfuscator;
 
     public ModelFactory()
     {
@@ -1047,7 +1049,7 @@ public class ModelFactory
     /**
      * Serializes the value of the given XObject property. In case the property is an instance of
      * {@link ComputedFieldClass}, the serialized value is the computed property value.
-     * 
+     *
      * @param property an XObject property
      * @param propertyClass the PropertyClass of that XObject proprety
      * @param context the XWikiContext
@@ -1256,7 +1258,7 @@ public class ModelFactory
 
     /**
      * Check if the given property should be exposed via REST.
-     * 
+     *
      * @param restProperty the property to be read/written
      * @return true if the property is considered accessible
      */
@@ -1279,12 +1281,12 @@ public class ModelFactory
             // We obfuscate the email only if the obfuscation has been activated, and if the current user does not have 
             // the right to edit the document containing the base property.
             // A user allowed to edit a document has to view the unescaped email to be able to edit it correctly. 
-            if (Objects.equals(type, "Email") && this.generalMailConfiguration.shouldObfuscate()
+            if (Objects.equals(type, "Email") && this.generalMailConfiguration.get().shouldObfuscate()
                 && !this.authorizationManagerProvider.get().hasAccess(Right.EDIT, baseProperty.getReference()))
             {
                 try {
                     cleanedUpStringValue =
-                        this.emailAddressObfuscator.obfuscate(InternetAddress.parse(cleanedUpStringValue)[0]);
+                        this.emailAddressObfuscator.get().obfuscate(InternetAddress.parse(cleanedUpStringValue)[0]);
                 } catch (AddressException e) {
                     this.logger.warn("Failed to parse [{}] to an email address. Cause: [{}]", cleanedUpStringValue,
                         getRootCauseMessage(e));

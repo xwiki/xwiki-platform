@@ -20,12 +20,12 @@
 package org.xwiki.security.internal;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.security.authorization.Right;
@@ -36,6 +36,7 @@ import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
+import static java.util.stream.Collectors.joining;
 import static org.xwiki.security.authorization.Right.DELETE;
 import static org.xwiki.security.authorization.Right.EDIT;
 import static org.xwiki.security.authorization.Right.VIEW;
@@ -76,28 +77,28 @@ public class DocumentInitializerRightsManager
     public boolean restrictToAdmin(XWikiDocument document)
     {
         boolean updated = false;
+        List<Right> rights = List.of(VIEW, EDIT, DELETE);
+
+        if (fixBadlyInitializedRights(document, rights)) {
+            updated = true;
+        }
+
         // If some rights have already been set on the document, we consider that it has already been protected 
         // manually.
         if (document.getXObjects(LOCAL_CLASS_REFERENCE).isEmpty()) {
-            updated = initializeRights(document, XWIKI_ADMIN_GROUP_DOCUMENT_REFERENCE, List.of(VIEW, EDIT, DELETE));
+            updated = updated || initializeRights(document, rights);
         }
 
         return updated;
     }
 
-    private boolean initializeRights(XWikiDocument document, String xwikiAdminGroupDocumentReference,
-        List<Right> rights)
+    private boolean initializeRights(XWikiDocument document, List<Right> rights)
     {
         boolean updated = false;
 
         try {
-            XWikiContext xwikiContext = this.xcontextProvider.get();
-            BaseObject object = document.newXObject(LOCAL_CLASS_REFERENCE, xwikiContext);
-            XWikiContext xWikiContext = this.xcontextProvider.get();
-            object.set(GROUPS_FIELD_NAME, xwikiAdminGroupDocumentReference, xWikiContext);
-            object.set(LEVELS_FIELD_NAME, rights.stream().map(Right::getName).collect(Collectors.toList()),
-                xWikiContext);
-            object.set(ALLOW_FIELD_NAME, 1, xWikiContext);
+            BaseObject object = document.newXObject(LOCAL_CLASS_REFERENCE, this.xcontextProvider.get());
+            setRights(object, rights);
             updated = true;
         } catch (XWikiException e) {
             this.logger.error(String.format("Error adding a [%s] object to the document [%s]", LOCAL_CLASS_REFERENCE,
@@ -105,5 +106,34 @@ public class DocumentInitializerRightsManager
         }
 
         return updated;
+    }
+
+    /**
+     * Because of XWIKI-20519, the levels of the rights of {@code XWiki.XWikiAdminGroup} can be badly initialized, and
+     * needs to be fixed. This is the case when upgrading from instances running exactly version 14.10.5 or 15.1-rc-1.
+     *
+     * @param document the document to fix
+     * @param rights the rights to set to the {@code XWiki.XWikiAdminGroup} group
+     */
+    private boolean fixBadlyInitializedRights(XWikiDocument document, List<Right> rights)
+    {
+        boolean updated = false;
+        if (document.getXObjects(LOCAL_CLASS_REFERENCE).size() == 1) {
+            BaseObject object = document.getXObject(LOCAL_CLASS_REFERENCE);
+            if (StringUtils.isEmpty(object.getStringValue(LEVELS_FIELD_NAME))
+                && StringUtils.isEmpty(object.getLargeStringValue(GROUPS_FIELD_NAME)))
+            {
+                setRights(object, rights);
+                updated = true;
+            }
+        }
+        return updated;
+    }
+
+    private void setRights(BaseObject object, List<Right> rights)
+    {
+        object.setLargeStringValue(GROUPS_FIELD_NAME, XWIKI_ADMIN_GROUP_DOCUMENT_REFERENCE);
+        object.setStringValue(LEVELS_FIELD_NAME, rights.stream().map(Right::getName).collect(joining(",")));
+        object.setIntValue(ALLOW_FIELD_NAME, 1);
     }
 }

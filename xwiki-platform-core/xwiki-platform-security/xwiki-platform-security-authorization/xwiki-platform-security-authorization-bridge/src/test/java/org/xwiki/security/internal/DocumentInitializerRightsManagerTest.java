@@ -92,8 +92,23 @@ class DocumentInitializerRightsManagerTest
     @Test
     void restrictToAdminSkipWhenAlreadyHasRights() throws Exception
     {
-        this.document.newXObject(LOCAL_CLASS_REFERENCE, this.xWikiContext);
+        BaseObject baseObject = this.document.newXObject(LOCAL_CLASS_REFERENCE, this.xWikiContext);
+        baseObject.setLargeStringValue(LEVELS_FIELD_NAME, "edit");
         assertFalse(this.rightsManager.restrictToAdmin(this.document));
+    }
+
+    @Test
+    void restrictToAdminBadlyInitialized() throws Exception
+    {
+        BaseObject object = this.document.newXObject(LOCAL_CLASS_REFERENCE, this.xWikiContext);
+        object.setLargeStringValue(GROUPS_FIELD_NAME, "");
+        object.setLargeStringValue(LEVELS_FIELD_NAME, "");
+        object.setIntValue(ALLOW_FIELD_NAME, 1);
+        assertTrue(this.rightsManager.restrictToAdmin(this.document));
+        BaseObject xObject = this.document.getXObject(LOCAL_CLASS_REFERENCE);
+        assertEquals("XWiki.XWikiAdminGroup", xObject.getStringValue(GROUPS_FIELD_NAME));
+        assertEquals("view,edit,delete", xObject.getStringValue(LEVELS_FIELD_NAME));
+        assertEquals("1", xObject.getStringValue(ALLOW_FIELD_NAME));
     }
 
     @Test
@@ -103,7 +118,7 @@ class DocumentInitializerRightsManagerTest
         assertEquals(1, this.document.getXObjects(LOCAL_CLASS_REFERENCE).size());
         BaseObject xObject = this.document.getXObject(LOCAL_CLASS_REFERENCE);
         assertEquals("XWiki.XWikiAdminGroup", xObject.getStringValue(GROUPS_FIELD_NAME));
-        assertEquals("view, edit, delete", xObject.getStringValue(LEVELS_FIELD_NAME));
+        assertEquals("view,edit,delete", xObject.getStringValue(LEVELS_FIELD_NAME));
         assertEquals("1", xObject.getStringValue(ALLOW_FIELD_NAME));
     }
 

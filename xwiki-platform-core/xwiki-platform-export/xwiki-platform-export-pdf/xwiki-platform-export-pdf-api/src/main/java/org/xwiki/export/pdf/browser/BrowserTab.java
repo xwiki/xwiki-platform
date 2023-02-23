@@ -95,13 +95,6 @@ public interface BrowserTab extends AutoCloseable
     String getSource();
 
     /**
-     * Sets the base URL for the currently loaded web page.
-     * 
-     * @param baseURL the base URL to set
-     */
-    void setBaseURL(URL baseURL) throws IOException;
-
-    /**
      * Print the current web page to PDF.
      * 
      * @param cleanup the code to execute after the PDF was generated, useful for performing cleanup

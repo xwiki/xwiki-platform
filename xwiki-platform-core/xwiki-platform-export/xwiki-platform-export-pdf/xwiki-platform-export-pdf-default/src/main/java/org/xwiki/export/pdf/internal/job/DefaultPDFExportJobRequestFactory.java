@@ -70,6 +70,10 @@ public class DefaultPDFExportJobRequestFactory implements PDFExportJobRequestFac
 {
     private static final String EXPORT = "export";
 
+    private static final String PDF_QUERY_STRING = "pdfQueryString";
+
+    private static final String PDF_HASH = "pdfHash";
+
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
@@ -134,6 +138,7 @@ public class DefaultPDFExportJobRequestFactory implements PDFExportJobRequestFac
         pdfExportContext.put(XWikiContextContextStore.PROP_REQUEST_URL, printPreviewURL);
 
         request.setContext(pdfExportContext);
+        request.setBaseURL(getBaseURL());
     }
 
     private void readPDFExportOptionsFromHTTPRequest(PDFExportJobRequest request)
@@ -178,13 +183,13 @@ public class DefaultPDFExportJobRequestFactory implements PDFExportJobRequestFac
         XWikiContext xcontext = this.xcontextProvider.get();
         XWikiRequest httpRequest = xcontext.getRequest();
 
-        String originalQueryString = Objects.toString(httpRequest.get("pdfQueryString"), "");
+        String originalQueryString = Objects.toString(httpRequest.get(PDF_QUERY_STRING), "");
         String queryString = getPrintPreviewQueryString(jobId, originalQueryString);
 
         // The request URL hash (fragment identifier) is not sent to the server but in the case of server-side PDF
         // export we need it as it can influence the behavior of the JavaScript code when the PDF template is loaded in
         // the headless web browser. In order to overcome this we receive the hash as a request parameter.
-        String hash = Objects.toString(httpRequest.get("pdfHash"), "");
+        String hash = Objects.toString(httpRequest.get(PDF_HASH), "");
 
         // We want the documents to be rendered with the same parameters (query string) and hash (anchor or fragment
         // identifier) as in print preview mode (what is used to generate the PDF in the end). For this the saved
@@ -208,5 +213,23 @@ public class DefaultPDFExportJobRequestFactory implements PDFExportJobRequestFac
             new BasicNameValuePair("jobId", StringUtils.join(jobId, '/'))
         );
         return URLEncodedUtils.format(printPreviewParams, StandardCharsets.UTF_8) + '&' + originalQueryString;
+    }
+
+    private URL getBaseURL()
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        XWikiRequest httpRequest = xcontext.getRequest();
+
+        // Get the query string and hash that were used when the user triggered the PDF export.
+        String queryString = Objects.toString(httpRequest.get(PDF_QUERY_STRING), "");
+        String hash = Objects.toString(httpRequest.get(PDF_HASH), "");
+
+        // We want the base URL to be the URL from where the user triggered the PDF export.
+        DocumentReference documentReference = xcontext.getDoc().getDocumentReference();
+        return xcontext.getURLFactory().createExternalURL(
+            this.localStringEntityReferenceSerializer.serialize(documentReference.getLastSpaceReference()),
+            // We assume the action was view, since most of the time the PDF export is triggered from view mode.
+            documentReference.getName(), "view", queryString, hash, documentReference.getWikiReference().getName(),
+            xcontext);
     }
 }

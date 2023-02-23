@@ -147,7 +147,6 @@ class BrowserPDFPrinterTest
         assertEquals("172.12.0.3", this.cookieFilterContextCaptor.getValue().getBrowserIPAddress());
         assertEquals(browserPrintPreviewURL, this.cookieFilterContextCaptor.getValue().getTargetURL());
 
-        verify(this.browserTab).setBaseURL(printPreviewURL);
         verify(this.browserTab).close();
     }
 

@@ -36,7 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.export.pdf.browser.BrowserTab;
 
-import com.github.kklisura.cdt.protocol.commands.DOM;
 import com.github.kklisura.cdt.protocol.commands.Network;
 import com.github.kklisura.cdt.protocol.commands.Page;
 import com.github.kklisura.cdt.protocol.commands.Runtime;
@@ -126,26 +125,6 @@ public class ChromeTab implements BrowserTab
         Page page = this.tabDevToolsService.getPage();
         Frame frame = page.getFrameTree().getFrame();
         return page.getResourceContent(frame.getId(), frame.getUrl()).getContent();
-    }
-
-    @Override
-    public void setBaseURL(URL baseURL) throws IOException
-    {
-        LOGGER.debug("Setting base URL [{}].", baseURL);
-        Runtime runtime = this.tabDevToolsService.getRuntime();
-        runtime.enable();
-
-        // Add the BASE tag to the page head. I couldn't find a way to create this node using the DOM domain, so I'm
-        // using JavaScript instead (i.e. the runtime domain).
-        Evaluate evaluate = runtime.evaluate("jQuery('<base/>').prependTo('head').length");
-        checkEvaluation(evaluate, 1, "Failed to insert the BASE tag.", "Unexpected page HTML.");
-
-        DOM dom = this.tabDevToolsService.getDOM();
-        dom.enable();
-
-        // Look for the BASE tag we just added and set its href attribute in order to change the page base URL.
-        Integer baseNodeId = dom.querySelector(dom.getDocument().getNodeId(), "base");
-        dom.setAttributeValue(baseNodeId, "href", baseURL.toString());
     }
 
     @Override

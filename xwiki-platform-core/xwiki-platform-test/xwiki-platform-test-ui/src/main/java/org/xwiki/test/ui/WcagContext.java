@@ -103,7 +103,7 @@ public class WcagContext
             entry("label", false),
             entry("link-in-text-block", false),
             entry("link-name", false),
-            entry("list", true),
+            entry("list", false),
             entry("listitem", false),
             entry("marquee", false),
             entry("meta-refresh", false),

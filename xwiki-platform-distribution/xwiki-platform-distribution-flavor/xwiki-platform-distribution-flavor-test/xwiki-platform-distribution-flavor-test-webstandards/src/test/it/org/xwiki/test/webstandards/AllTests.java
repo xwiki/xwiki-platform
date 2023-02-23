@@ -53,13 +53,9 @@ public class AllTests extends TestCase
         addTest(suite, DefaultValidationTest.suite(DefaultValidationTest.class, html5Validator),
             DefaultValidationTest.class);
 
-        /*
-        Removed Dutch Guidelines validation tests for https://jira.xwiki.org/browse/XWIKI-20541 .
-
         CustomDutchWebGuidelinesValidator dwgValidator = new CustomDutchWebGuidelinesValidator();
         addTest(suite, CustomDutchWebGuidelinesValidationTest.suite(CustomDutchWebGuidelinesValidationTest.class,
             dwgValidator), DefaultValidationTest.class);
-        */
 
         RSSValidator rssValidator = new RSSValidator();
         addTest(suite, RSSValidationTest.suite(RSSValidationTest.class, rssValidator), RSSValidationTest.class);

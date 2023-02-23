@@ -246,8 +246,12 @@ public class XWikiDockerExtension extends AbstractExtension
                 this.isVncStarted = false;
             }
         }
-
-        LOGGER.info("(*) Starting test [{}]", extensionContext.getTestMethod().get().getName());
+        String testMethodName = extensionContext.getTestMethod().get().getName();
+        if (testConfiguration.isWcagEnabled())
+        {
+            loadPersistentTestContext(extensionContext).getUtil().getWcagContext().setTestMethodName(testMethodName);
+        }
+        LOGGER.info("(*) Starting test [{}]", testMethodName);
     }
 
     @Override
@@ -314,7 +318,12 @@ public class XWikiDockerExtension extends AbstractExtension
 
         PersistentTestContext testContext = loadPersistentTestContext(extensionContext);
 
-        testContext.getUtil().writeWCAGResults(LOGGER);
+        if (testContext.getUtil().getWcagContext().isWcagEnabled())
+        {
+            testContext.getUtil().writeWcagResults();
+            testContext.getUtil().assertWcagResults();
+        }
+
 
         // Shutdown the test context
         shutdownPersistentTestContext(testContext);
@@ -395,7 +404,11 @@ public class XWikiDockerExtension extends AbstractExtension
         testContext.getUtil().setURLPrefix(computeXWikiURLPrefix(
             testConfiguration.getServletEngine().getInternalIP(),
             testConfiguration.getServletEngine().getInternalPort()));
-        testContext.getUtil().getWcagContext().setWcagEnabled(testConfiguration.wcag());
+        testContext.getUtil().getWcagContext().setWcagEnabled(testConfiguration.isWcagEnabled());
+        if (testConfiguration.isWcagEnabled())
+        {
+            testContext.getUtil().getWcagContext().setTestClassName(extensionContext.getTestClass().get().getName());
+        }
 
         // - the one used by RestTestUtils, i.e. outside of any container
         testContext.getUtil().rest().setURLPrefix(loadXWikiURL(extensionContext));

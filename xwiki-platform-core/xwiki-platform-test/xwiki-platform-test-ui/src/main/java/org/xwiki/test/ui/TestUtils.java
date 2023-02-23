@@ -1461,7 +1461,7 @@ public class TestUtils
             if (!wcagDir.exists()) {
                 Files.createDirectory(wcagDir.toPath());
             }
-            String outputName = "wcagWarnings";
+            String outputName = "wcagWarnings.txt";
             File warningsFile = new File(wcagDir, outputName);
             WcagContext.writeWCAGReportToFile(warningsFile, wcagContext.buildWarningsReport());
         }
@@ -1469,7 +1469,7 @@ public class TestUtils
             if (!wcagDir.exists()) {
                 Files.createDirectory(wcagDir.toPath());
             }
-            String outputName = "wcagFails";
+            String outputName = "wcagFails.txt";
             File failsFile = new File(wcagDir, outputName);
             WcagContext.writeWCAGReportToFile(failsFile, wcagContext.buildFailsReport());
         }

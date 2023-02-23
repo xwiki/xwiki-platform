@@ -24,6 +24,7 @@ import java.util.List;
 import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.xwiki.like.script.LikeScriptServiceComponentList;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
@@ -36,16 +37,21 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
 import org.xwiki.user.UserReferenceComponentList;
+import org.xwiki.velocity.tools.JSONTool;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
+import net.sf.json.JSON;
 import net.sf.json.JSONObject;
+import net.sf.json.JSONSerializer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -91,8 +97,22 @@ class LiveTableResultPagePageTest extends PageTest
         this.request.put("reqNo", "1");
         this.request.put("limit", "10");
 
-        JSONObject object = renderJSONPage(DOCUMENT_REFERENCE);
-        
+        JSONObject object = renderJSON(DOCUMENT_REFERENCE);
+
         assertEquals("xwiki:Space.With\\.ADot", object.getJSONArray("rows").getJSONObject(0).getString("doc_fullName"));
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T extends JSON> T renderJSON(DocumentReference documentReference) throws Exception
+    {
+        JSONTool jsonTool = mock(JSONTool.class);
+        registerVelocityTool("jsontool", jsonTool);
+
+        renderPage(documentReference);
+
+        ArgumentCaptor<Object> argument = ArgumentCaptor.forClass(Object.class);
+        verify(jsonTool).serialize(argument.capture());
+
+        return (T) JSONSerializer.toJSON(argument.getValue());
     }
 }

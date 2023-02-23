@@ -178,7 +178,8 @@
   </span>##
 #end
 #**
- * Display a line with the name of all users
+ * Display a line with the name of all users.
+ * The result is not HTML-escaped when the $link parameter is false.
  * @param $users the users to display
  * @param $link (since 9.5) either or not an HTML link to the user must be generated (default: true)
  *#

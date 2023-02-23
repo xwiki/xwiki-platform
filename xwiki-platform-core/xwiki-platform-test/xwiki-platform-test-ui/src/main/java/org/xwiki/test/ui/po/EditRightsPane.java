@@ -201,7 +201,7 @@ public class EditRightsPane extends BaseElement
             } else {
                 buttonLocator = By.xpath(
                     String.format("//*[@id='usersandgroupstable-display']//td[@class='username']"
-                        + "/a[contains(@href, '%s')]/../../td[@data-title='%s']/img", entityName, rightName));
+                        + "/a[contains(@href, '%s')]/../../td[@data-title='%s']/button/img", entityName, rightName));
             }
             final WebElement button = getDriver().findElement(buttonLocator);
             State currentState = State.getButtonImageState(button);

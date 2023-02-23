@@ -104,7 +104,7 @@ public class TestConfiguration
         mergeServletEngineTag(testConfiguration.getServletEngineTag());
         mergeJDBCDriverVersion(testConfiguration.getJDBCDriverVersion());
         mergeVNC(testConfiguration.vnc());
-        mergeWCAG(testConfiguration.wcag());
+        mergeWcag(testConfiguration.isWcagEnabled());
         mergeProperties(testConfiguration.getProperties());
         mergeExtraJARs(testConfiguration.getExtraJARs());
         mergeResolveExtraJARs(testConfiguration.isResolveExtraJARs());
@@ -236,9 +236,9 @@ public class TestConfiguration
         }
     }
 
-    private void mergeWCAG(boolean wcag)
+    private void mergeWcag(boolean wcag)
     {
-        this.wcag = wcag() || wcag;
+        this.wcag = isWcagEnabled() || wcag;
     }
 
     private void mergeOffice(boolean office)
@@ -495,15 +495,15 @@ public class TestConfiguration
     /**
      * @return true if WCAG rules should be checked.
      */
-    public boolean wcag()
+    public boolean isWcagEnabled()
     {
         return this.wcag;
     }
 
     /**
-     * @param wcag see {@link #wcag()}
+     * @param wcag see {@link #isWcagEnabled()}
      */
-    public void setWCAG(boolean wcag)
+    public void setWcag(boolean wcag)
     {
         this.wcag = wcag;
     }

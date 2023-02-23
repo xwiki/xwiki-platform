@@ -156,12 +156,6 @@
       <groupId>commons-httpclient</groupId>
       <artifactId>commons-httpclient</artifactId>
     </dependency>
-    <!-- Used by the wcag validation-->
-    <dependency>
-      <groupId>com.deque.html.axe-core</groupId>
-      <artifactId>selenium</artifactId>
-      <version>4.6.0</version>
-    </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>

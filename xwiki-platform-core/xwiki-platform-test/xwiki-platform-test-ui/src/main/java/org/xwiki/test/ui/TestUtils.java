@@ -76,6 +76,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.opentest4j.AssertionFailedError;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
@@ -189,6 +190,7 @@ public class TestUtils
      * @since 9.5RC1
      */
     public static final int[] STATUS_ACCEPTED = new int[] { Status.ACCEPTED.getStatusCode() };
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestUtils.class);
 
     private static PersistentTestContext context;
 
@@ -218,7 +220,7 @@ public class TestUtils
     private String secretToken = null;
 
     /** Cached accessibility results. */
-    private final WCAGContext wcagContext = new WCAGContext();
+    private final WcagContext wcagContext = new WcagContext();
     private HttpClient httpClient;
 
     /**
@@ -1437,39 +1439,65 @@ public class TestUtils
      *
      * @return WCAG Context
      */
-    public WCAGContext getWcagContext()
+    public WcagContext getWcagContext()
     {
         return this.wcagContext;
     }
 
-    public void writeWCAGResults(Logger logger) throws IOException{
-        WCAGContext wcagContext = getWcagContext();
-        if (wcagContext.isWcagEnabled()) {
-            float totalTime = (float) wcagContext.wcagTimer / 1000;
-            logger.info("Time spent on WCAG validation [{}] (in s)", totalTime);
-            File wcagDir = new File("target/wcag");
-            if (wcagContext.hasWCAGWarnings()) {
-                logger.warn("There are some accessibility issues in the test suite. " +
-                  "See target/wcag/wcagWarnings for more details.");
-                if (!wcagDir.exists()) {
-                    Files.createDirectory(wcagDir.toPath());
-                }
-                String outputName = "wcagWarnings";
-                File warningsFile = new File(wcagDir, outputName);
-                WCAGContext.writeWCAGReportToFile(warningsFile, wcagContext.buildWarningsReport());
+    /**
+     * Writes the wcag validation results to custom reports.
+     * @throws IOException can be thrown when the directory creation fails.
+     */
+
+    public void writeWcagResults() throws IOException
+    {
+        float totalTime = (float) wcagContext.getWcagTime() / 1000;
+        LOGGER.debug("Time spent on WCAG validation for {} [{}] (in s)",
+                getWcagContext().getTestClassName(), totalTime);
+        File wcagDir = new File(getWcagReportPathOnHost());
+        if (wcagContext.hasWCAGWarnings()) {
+            LOGGER.warn(String.format("There are some accessibility warnings in the test "
+                    + "suite. See %s/wcagWarnings for more details.", getWcagReportPathOnHost()));
+            if (!wcagDir.exists()) {
+                Files.createDirectory(wcagDir.toPath());
             }
-            if (wcagContext.hasWCAGFails()) {
-                if (!wcagDir.exists()) {
-                    Files.createDirectory(wcagDir.toPath());
-                }
-                String outputName = "wcagFails";
-                File failsFile = new File(wcagDir, outputName);
-                WCAGContext.writeWCAGReportToFile(failsFile, wcagContext.buildFailsReport());
-            }
-            // Assert the results of the different WCAG Checks are all empty
-            assertFalse(wcagContext.hasWCAGFails(), "There are some accessibility issues in the test suite." +
-              "See target/wcag/wcagFails for more details.");
+            String outputName = "wcagWarnings";
+            File warningsFile = new File(wcagDir, outputName);
+            WcagContext.writeWCAGReportToFile(warningsFile, wcagContext.buildWarningsReport());
         }
+        if (wcagContext.hasWCAGFails()) {
+            if (!wcagDir.exists()) {
+                Files.createDirectory(wcagDir.toPath());
+            }
+            String outputName = "wcagFails";
+            File failsFile = new File(wcagDir, outputName);
+            WcagContext.writeWCAGReportToFile(failsFile, wcagContext.buildFailsReport());
+        }
+    }
+
+    /**
+     * Assert that the results of the different WCAG Checks are all empty.
+     */
+    public void assertWcagResults(){
+        assertFalse(wcagContext.hasWCAGFails(), String.format(
+                "There are some accessibility fails in the test "
+                        + "suite. See %s/wcagFails for more details.", getWcagReportPathOnHost())
+                + wcagContext.getShortFailReport());
+    }
+
+    /**
+     * @return the path where the wcag reports are stored by Maven after validation, on the host.
+     */
+    private String getWcagReportPathOnHost()
+    {
+        String testClassesDirectory;
+        String mavenBuildDir = System.getProperty("maven.build.dir");
+        if (mavenBuildDir == null) {
+            testClassesDirectory = "target/wcag-reports";
+        } else {
+            testClassesDirectory = String.format("%s/wcag-reports", mavenBuildDir);
+        }
+        return testClassesDirectory;
     }
 
     /**

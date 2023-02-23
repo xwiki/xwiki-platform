@@ -35,7 +35,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.xwiki.test.ui.WCAGContext;
+import org.xwiki.test.ui.WcagContext;
 import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.EditPage;
@@ -50,7 +50,7 @@ import com.deque.html.axecore.selenium.AxeBuilder;
 /**
  * Represents the common actions possible on all Pages.
  * 
-Added  * @version $Id$
+ * @version $Id$
  * @since 3.2M3
  */
 public class BasePage extends BaseElement
@@ -126,36 +126,9 @@ public class BasePage extends BaseElement
         super();
         waitUntilPageIsReady();
 
-        Logger LOGGER = LoggerFactory.getLogger(BasePage.class);
-        WCAGContext wcagContext = getUtil().getWcagContext();
-        if (!wcagContext.isWcagEnabled()) {
-            return;
-        }
-        if (wcagContext.checkAccessibility(this.getPageURL(), this.getClass())) {
-            /* Perform accessibility checks on the element when instanciated if the wcag is activated in build. */
-            long startTime = System.currentTimeMillis();
-            XWikiWebDriver driver = this.getDriver();
-            try {
-                if (driver == null) {
-                    throw new NullPointerException("The provided webDriver is null.");
-                } else {
-                    AxeBuilder axeBuilder = wcagContext.getAxeBuilder();
-                    Results axeResult = axeBuilder.analyze(driver);
-                    wcagContext.addWcagResults(driver, this.getClass(), axeResult);
-                    long stopTime = System.currentTimeMillis();
-                    long deltaTime = stopTime - startTime;
-                    if (axeResult.getViolations() !=null && axeResult.getViolations().size()!=0) {
-                        LOGGER.info("[{} : {}] Found [{}] WCAG violations.",  this.getPageURL(), this.getClass(), axeResult.getViolations().size());
-                    }
-                    wcagContext.addWcagTime(deltaTime);
-                }
-            }catch (Exception e) {
-                LOGGER.error("Exception when calling axe core validation on the BasePage.");
-                e.printStackTrace();
-            }
-        }
-        else{
-            LOGGER.info("[{} : {}] This combination of URL:class was already WCAG checked.", this.getPageURL(), this.getClass());
+        WcagContext wcagContext = getUtil().getWcagContext();
+        if (wcagContext.isWcagEnabled()) {
+            this.validateWCAG(wcagContext);
         }
     }
 
@@ -730,6 +703,52 @@ public class BasePage extends BaseElement
         getDriver().addPageNotYetReloadedMarker();
         getDriver().createActions().sendKeys(shortcut).perform();
         getDriver().waitUntilPageIsReloaded();
+    }
+
+    /**
+     * Validate WCAG properties on the current base page.
+     * Default behavior is to check the cache.
+     * @param wcagContext the current wcag context
+     */
+    protected void validateWCAG(WcagContext wcagContext)
+    {
+        validateWCAG(wcagContext, true);
+    }
+
+    /**
+     * Validate WCAG properties on the current base page.
+     * @param wcagContext the current wcag context
+     * @param checkCache if set to true, the WCAGContext cache will be checked before starting validation and cancel it
+     *                   if any entry corresponds to the current BasePage.
+     */
+    protected void validateWCAG(WcagContext wcagContext, boolean checkCache)
+    {
+        long startTime = System.currentTimeMillis();
+        Logger logger = LoggerFactory.getLogger(this.getClass());
+        if (!checkCache || wcagContext.isNotCached(this.getPageURL(), this.getClass().getName())) {
+            /*
+            Performs accessibility validation on the element when instanced if
+            the page is not in the WCAGContext cache.
+             */
+            XWikiWebDriver driver = this.getDriver();
+            AxeBuilder axeBuilder = wcagContext.getAxeBuilder();
+            Results axeResult = axeBuilder.analyze(driver);
+            wcagContext.addWcagResults(driver.getCurrentUrl(), this.getClass().getName(), axeResult);
+            if (axeResult.getViolations() != null && axeResult.getViolations().isEmpty()) {
+                logger.debug("[{} : {}] Found [{}] WCAG violations.",
+                        this.getPageURL(), this.getClass(), axeResult.getViolations().size());
+            }
+            long stopTime = System.currentTimeMillis();
+            long deltaTime = stopTime - startTime;
+            logger.debug("[{} : {}] WCAG Validation on this element took [{}] ms.", this.getPageURL(), this.getClass(), deltaTime);
+            wcagContext.addWcagTime(deltaTime);
+        } else {
+            /*
+            * If the identifying pair is already in the cache, don't perform accessibility validation.
+            */
+            logger.debug("[{} : {}] This combination of URL:class was already WCAG checked.",
+                    this.getPageURL(), this.getClass());
+        }
     }
 
     /**

@@ -18,8 +18,22 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 /*
- * Alternatively, at your choice, the contents of this file may be used under the terms of the Mozilla Public License,
- * v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ * Copyright (C) 2020 Deque Systems Inc.,
+ *
+ * Your use of this Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This entire copyright notice must appear in every copy of this file you
+ * distribute or in any file that contains substantial portions of this source
+ * code.
+ */
+/*
+    Source:
+    com.deque.html.axecore.selenium.AxeReporter
+    https://github.com/dequelabs/axe-core-maven-html/blob/develop/selenium/src/main/java/com/deque/html/axecore/selenium
+    /AxeReporter.java
+
  */
 package org.xwiki.test.ui;
 
@@ -30,30 +44,13 @@ import java.util.List;
 
 /**
  * Creates a human-readable report from an axe-core scan result.
- * @since 15.1RC2
+ * @since 15.2RC1
  * @version $Id$
  */
 public final class XWikiCustomAxeReporter
 {
-    private static String axeResultString;
     private XWikiCustomAxeReporter()
     {
-    }
-
-    /**
-     * @param newAxeResult a new human-readable report to store in axeResultString.
-     */
-    private static void setAxeResultString(String newAxeResult)
-    {
-        axeResultString = newAxeResult;
-    }
-
-    /**
-     * @return the human-readable report generated in getReadableAxeResults
-     */
-    static String getAxeResultString()
-    {
-        return axeResultString;
     }
 
     /**
@@ -70,15 +67,27 @@ public final class XWikiCustomAxeReporter
     }
 
     /**
-     * Stores a human-readable summary of the violations contained in scanResults in axeResultString.
-     *
      * @param testMethodName from the current test context
      * @param pageClassName  name of the class of the page to analyze
      * @param url            of the page to analyze
-     * @param scanResults    the list of rules breached during validation.
-     * @return true if there is any rule breached in scanResults
+     * @param scanResult    the rule violated during validation.
+     * @return a human-readable summary of one violation contained in scanResults..
      */
-    static boolean getReadableAxeResults(String testMethodName, String pageClassName,
+    static String getReadableAxeResults(String testMethodName, String pageClassName,
+                                        String url, Rule scanResult)
+    {
+        return getReadableAxeResults(testMethodName, pageClassName,
+                url, List.of(scanResult));
+    }
+
+    /**
+     * @param testMethodName from the current test context
+     * @param pageClassName  name of the class of the page to analyze
+     * @param url            of the page to analyze
+     * @param scanResults    the list of rules violated during validation.
+     * @return a human-readable summary of the violations contained in scanResults in axeResultString.
+     */
+    static String getReadableAxeResults(String testMethodName, String pageClassName,
                                          String url, List<Rule> scanResults)
     {
         StringBuilder message = new StringBuilder();
@@ -90,8 +99,7 @@ public final class XWikiCustomAxeReporter
         message.append("Found ").append(axeRulesAmount).append(" items");
         message.append(System.lineSeparator());
         if (scanResults.isEmpty()) {
-            setAxeResultString(message.toString().trim());
-            return false;
+            return "";
         } else {
             message.append(System.getProperty("line.separator"));
             int elementNo = 1;
@@ -113,8 +121,8 @@ public final class XWikiCustomAxeReporter
                 }
                 message.append(System.lineSeparator());
             }
-            setAxeResultString(message.toString().trim());
-            return true;
+            message.append(System.lineSeparator());
+            return message.toString().trim();
         }
     }
 }

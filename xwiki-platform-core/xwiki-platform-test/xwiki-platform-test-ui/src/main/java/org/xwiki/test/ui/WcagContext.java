@@ -367,7 +367,6 @@ public class WcagContext
                 mergedReport.append(result.getFailReport());
                 mergedReport.append(System.lineSeparator());
                 mergedReport.append(System.lineSeparator());
-                mergedReport.append(System.lineSeparator());
             }
         }
         return mergedReport.toString();
@@ -388,7 +387,6 @@ public class WcagContext
                     warningsEmpty = false;
                 }
                 mergedReport.append(result.getWarnReport());
-                mergedReport.append(System.lineSeparator());
                 mergedReport.append(System.lineSeparator());
                 mergedReport.append(System.lineSeparator());
             }

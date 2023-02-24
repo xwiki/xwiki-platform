@@ -32,6 +32,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.ratings.RatingsManager;
 import org.xwiki.ratings.RatingsManagerFactory;
 import org.xwiki.ratings.internal.DefaultRating;
+import org.xwiki.rendering.internal.syntax.SyntaxConverter;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -39,13 +40,20 @@ import org.xwiki.security.authorization.Right;
 import org.xwiki.security.script.SecurityScriptServiceComponentList;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
+import org.xwiki.test.page.XWikiSyntax21ComponentList;
 import org.xwiki.user.DefaultUserComponentList;
 import org.xwiki.user.internal.document.DocumentUserReference;
 import org.xwiki.user.script.UserScriptService;
 import org.xwiki.velocity.tools.JSONTool;
 
 import com.xpn.xwiki.doc.XWikiDocument;
+
+import net.sf.json.JSON;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sf.json.JSONSerializer;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -65,18 +73,19 @@ import static org.mockito.Mockito.when;
  * @since 13.4.4
  */
 @ComponentList({
-    UserScriptService.class
+    UserScriptService.class,
+    SyntaxConverter.class
 })
 @DefaultUserComponentList
 @LikeScriptServiceComponentList
 @SecurityScriptServiceComponentList
+@XWikiSyntax21ComponentList
+@HTML50ComponentList
 class LikersPageTest extends PageTest
 {
     private static final String LIKERS = "likers.vm";
 
     private TemplateManager templateManager;
-
-    private Map<String, Object> results;
 
     private RatingsManager ratingsManager;
 
@@ -140,11 +149,11 @@ class LikersPageTest extends PageTest
             ));
         when(this.ratingsManager.countRatings(any())).thenReturn(2L);
 
-        render();
+        JSONObject results = render();
 
-        List<Map<String, Object>> rows = (List<Map<String, Object>>) this.results.get("rows");
+        JSONArray rows = results.getJSONArray("rows");
         assertEquals(1, rows.size());
-        assertEquals("XWiki.user1", rows.get(0).get("doc_fullName"));
+        assertEquals("XWiki.user1", rows.getJSONObject(0).getString("doc_fullName"));
     }
 
     @Test
@@ -170,11 +179,11 @@ class LikersPageTest extends PageTest
             .thenReturn(singletonList(createRating(user2DocumentReference, likedDocumentReference)));
         when(this.ratingsManager.countRatings(any())).thenReturn(2L);
 
-        render();
+        JSONObject results = render();
 
-        List<Map<String, Object>> rows = (List<Map<String, Object>>) this.results.get("rows");
+        JSONArray rows = results.getJSONArray("rows");
         assertEquals(1, rows.size());
-        assertEquals("obfuscated", rows.get(0).get("doc_fullName"));
+        assertEquals("obfuscated", rows.getJSONObject(0).getString("doc_fullName"));
     }
 
     private DefaultRating createRating(DocumentReference author, DocumentReference reference)
@@ -187,7 +196,7 @@ class LikersPageTest extends PageTest
             .setManagerId("ratings");
     }
 
-    private void render() throws Exception
+    private <T extends JSON> T render() throws Exception
     {
         JSONTool jsonTool = mock(JSONTool.class);
         registerVelocityTool("jsontool", jsonTool);
@@ -196,6 +205,6 @@ class LikersPageTest extends PageTest
         ArgumentCaptor<Object> argument = ArgumentCaptor.forClass(Object.class);
         verify(jsonTool).serialize(argument.capture());
 
-        this.results = (Map<String, Object>) argument.getValue();
+        return (T) JSONSerializer.toJSON(argument.getValue());
     }
 }

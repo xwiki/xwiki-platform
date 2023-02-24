@@ -19,6 +19,8 @@
  */
 package org.xwiki.like.test.ui;
 
+import java.util.Map;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -160,5 +162,10 @@ class LikeIT
         likeButton = new LikeButton();
         assertTrue(likeButton.isDisplayed());
         assertEquals(1, likeButton.getLikeNumber());
+
+        testUtils.gotoPage(testReference, "view", Map.of("viewer", "likers"));
+        TableLayoutElement likers = new TableLayoutElement("likers");
+        assertEquals(1, likers.countRows());
+        assertEquals("LikeUser2", likers.getCell("User", 1).getText());
     }
 }

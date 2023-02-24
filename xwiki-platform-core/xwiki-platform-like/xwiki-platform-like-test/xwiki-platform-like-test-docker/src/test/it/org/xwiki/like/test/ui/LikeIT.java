@@ -19,12 +19,11 @@
  */
 package org.xwiki.like.test.ui;
 
-import java.util.Map;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.like.test.po.LikeButton;
+import org.xwiki.like.test.po.LikersPage;
 import org.xwiki.like.test.po.UserProfileLikedPagesPage;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
@@ -36,6 +35,7 @@ import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.xwiki.like.test.po.LikersPage.goToLikers;
 import static org.xwiki.like.test.po.UserProfileLikedPagesPage.LIKES_COLUMN_NAME;
 import static org.xwiki.like.test.po.UserProfileLikedPagesPage.TITLE_COLUMN_NAME;
 
@@ -57,9 +57,12 @@ import static org.xwiki.like.test.po.UserProfileLikedPagesPage.TITLE_COLUMN_NAME
 class LikeIT
 {
     private static final String USER1 = "LikeUser1";
+
     private static final String USER2 = "LikeUser2";
+
     private static final DocumentReference LIKE_CONFIGURATION_REFERENCE =
         new DocumentReference("xwiki", asList("XWiki", "Like"), "LikeConfiguration");
+
     private static final String LIKE_CONFIGURATION_CLASSNAME = "XWiki.Like.LikeConfigurationClass";
 
     @BeforeEach
@@ -163,9 +166,8 @@ class LikeIT
         assertTrue(likeButton.isDisplayed());
         assertEquals(1, likeButton.getLikeNumber());
 
-        testUtils.gotoPage(testReference, "view", Map.of("viewer", "likers"));
-        TableLayoutElement likers = new TableLayoutElement("likers");
-        assertEquals(1, likers.countRows());
-        assertEquals("LikeUser2", likers.getCell("User", 1).getText());
+        LikersPage likersPage = goToLikers(testReference);
+        assertEquals(1, likersPage.countDisplayedLikers());
+        assertEquals("LikeUser2", likersPage.getLikerUsername(1));
     }
 }

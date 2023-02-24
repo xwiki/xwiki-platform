@@ -96,6 +96,7 @@ private void buildDocker(type)
     modules = dockerModuleList
     // Set the next execution date/time
     jobProperties = customJobProperties
+    label = 'environment'
   }
 }
 

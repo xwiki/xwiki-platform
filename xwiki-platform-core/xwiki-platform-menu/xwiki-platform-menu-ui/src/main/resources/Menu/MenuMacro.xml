@@ -164,18 +164,24 @@ $menuTemplateDoc.content.replace('{', '')
 require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
   // It's not possible to write a CSS selector that targets list items containing lists so we rely on JavaScript.
   // The 'dropdown' CSS class is used only to display the down/left arrow.
-  $('.menu-horizontal li ul, .menu-vertical li ul').parent()
-    .addClass('xDropdown')
-    .attr('role', 'menuitem')
-    .attr('aria-haspopup', 'menu');
-
+  // All nodes on the tree.
+  $('.menu-horizontal ul , .menu-vertical ul')
+    .attr('role', 'menu');
+  // All leaves on the tree.
+  $('.menu-horizontal li, .menu-vertical li')
+    .attr('role', 'menuitem');
+  $('.menu-horizontal li ul, .menu-vertical li ul')
+    .parent()
+    .addClass('xDropdown');
   // Make sure the menu separators are really empty.
-  $('.menu-horizontal, .menu-vertical').find('li &gt; br:first-child').remove();
+  var menus = $('.menu-horizontal, .menu-vertical');
+  menus.find('li &gt; br:first-child').remove();
 
   // Add aria attributes to the menu separators.
-  $('.menu-horizontal, .menu-vertical').find('li')
-    .filter(function(index) {return this.textContent.trim() === ""; })
-    .attr("role","separator");
+  menus.find('li')
+    .filter(function() {return this.textContent.trim() === ""; })
+    .attr('role', 'separator')
+    .attr('aria-hidden', 'true');
 
   // Vertical menus are initially expanded
   $('.menu-vertical.collapsible').each(function() {
@@ -185,13 +191,13 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
     });
   });
 
-  function setDropdownStateInfo(dropDownButton) {
+  function setDropdownButtonTitle(dropDownButton) {
     var xDropdown = $(dropDownButton).parent().parent();
     if($(xDropdown).hasClass('open')) {
-      $(dropDownButton).attr('title',l10n['closeSubMenu']);
+      $(dropDownButton).attr('title', l10n['closeSubMenu']);
       $(xDropdown).attr('aria-expanded', "true");
     } else {
-      $(dropDownButton).attr('title',l10n['openSubMenu']);
+      $(dropDownButton).attr('title', l10n['openSubMenu']);
       $(xDropdown).attr('aria-expanded', "false");
     }
   }
@@ -201,12 +207,12 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
     $(dropDownHeader).addClass("xDropdown-header");
     var dropDownButton = this.ownerDocument.createElement("button");
     $(dropDownButton).addClass("xDropdown-header-toggle");
-    setDropdownStateInfo(dropDownButton);
+    setDropdownButtonTitle(dropDownButton);
     dropDownButton.addEventListener('click',function() {
       //Swaps the state of the submenu.
       var xDropdown = $(this).parent().parent();
       xDropdown.toggleClass('open');
-      setDropdownStateInfo(dropDownButton);
+      setDropdownButtonTitle(dropDownButton);
     });
     dropDownHeader.append($(this).contents()[0]);
     dropDownHeader.append(dropDownButton);
@@ -658,8 +664,10 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
     background: transparent;
     border:none;
     border-radius: @border-radius-base;
-    margin: (@line-height-computed / 8) .3em;
+    margin: 0px .3em;
     line-height: (@line-height-computed / 2);
+    min-width: 24px;
+    min-height: 24px;
     &amp;:hover, &amp;:focus-within {
       background-color: @dropdown-bg;
     }
@@ -717,12 +725,17 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
       padding-left: 0;
       list-style-type: none;
       margin: 0;
+      min-height: 50px;
+      display: flex;
+      align-items: stretch;
       &amp; &gt; li {
         position: relative;
-        display: block;
+        min-height: 50px;
+        display: flex;
+        align-items: center;
         padding: @nav-link-padding;
-        padding-top: @navbar-padding-vertical;
-        padding-bottom: @navbar-padding-vertical;
+        padding-top: 0px;
+        padding-bottom: 0px;
         @media (min-width: @grid-float-breakpoint) {
           float: left;
         }
@@ -752,6 +765,7 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
           max-height: @navbar-height - (2 * @navbar-padding-vertical) - 2px;
           overflow: hidden;
           &amp;.xDropdown-header{
+            /* No border on the dropdown header */
             max-height: unset;
           }
         }

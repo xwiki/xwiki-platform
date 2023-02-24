@@ -39,5 +39,8 @@
   <content>admin.captcha=CAPTCHA
 ### Missing: captcha.admin.defaultCaptchaName.label=Default CAPTCHA
 ### Missing: captcha.admin.defaultCaptchaName.hint=The default CAPTCHA implementation to use. Use the Extension Manager to search for other implementations that you can install and use.
+captcha.admin.configure.title=Configureer {0}
+captcha.admin.sample.title=Voorbeeld CAPTCHA
+captcha.admin.sample.description=Hoe de geconfigureerde CAPTCHA eruit zien wanneer het wordt weergegeven in een formulier, bijvoorbeeld.
 </content>
 </xwikidoc>

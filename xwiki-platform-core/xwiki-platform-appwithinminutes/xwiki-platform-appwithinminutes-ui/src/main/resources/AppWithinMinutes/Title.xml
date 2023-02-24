@@ -53,7 +53,7 @@
   #end
   {{html clean="false"}}
   &lt;input type="text" name="$name" value="$!escapetool.xml($value)"
-    #if ($xwiki.getXWikiPreference('xwiki.title.mandatory') == 1)class="required"#end/&gt;
+    #if ($xwiki.getSpacePreference('xwiki.title.mandatory') == 1)class="required"#end/&gt;
   {{/html}}
 #elseif ("$!type" != '')
   ## Render the title of the current document.

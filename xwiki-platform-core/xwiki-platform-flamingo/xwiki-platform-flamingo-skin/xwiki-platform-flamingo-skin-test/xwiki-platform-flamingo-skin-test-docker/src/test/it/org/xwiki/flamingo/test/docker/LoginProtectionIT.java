@@ -52,6 +52,7 @@ public class LoginProtectionIT
     @BeforeAll
     public void setup(TestUtils setup)
     {
+        setup.loginAsSuperAdmin();
         setup.createPage(AUTHENTICATION_CONFIGURATION, "");
         setup.addObject(AUTHENTICATION_CONFIGURATION, "XWiki.Authentication.ConfigurationClass",
             "failureStrategy", "captcha",

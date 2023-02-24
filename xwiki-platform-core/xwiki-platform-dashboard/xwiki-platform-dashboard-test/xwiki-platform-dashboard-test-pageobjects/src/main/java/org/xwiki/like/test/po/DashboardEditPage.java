@@ -47,4 +47,16 @@ public class DashboardEditPage extends BaseElement
         getDriver().findElement(By.cssSelector(".dashboard .addgadget")).click();
         return new MacroDialogSelectModal().waitUntilReady();
     }
+
+    /**
+     * Wait until the number of dashboard matches the expected count.
+     *
+     * @param expectedCount the expected number of dashboards
+     * @since 15.1
+     * @since 14.10.6
+     */
+    public void waitForDashboardsCount(int expectedCount)
+    {
+        getDriver().waitUntilCondition(webDriver -> countGadgets() == expectedCount);
+    }
 }

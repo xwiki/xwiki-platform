@@ -120,7 +120,7 @@ class LoginIT
         try {
             // Test setup: disallow view right for unauthenticated users. Note that we use the UI to perform this
             // since this allows us to verify that the UI works.
-            setup.loginAsAdmin();
+            setup.loginAsSuperAdmin();
             GlobalRightsAdministrationSectionPage grasp = GlobalRightsAdministrationSectionPage.gotoPage();
             grasp.forceAuthenticatedView();
 
@@ -141,7 +141,7 @@ class LoginIT
         } finally {
             // Make sure we're logged-in since the test could fail when we're not logged in and we need to be admin
             // to go to the Rights UI.
-            setup.loginAsAdmin();
+            setup.loginAsSuperAdmin();
             GlobalRightsAdministrationSectionPage grasp = GlobalRightsAdministrationSectionPage.gotoPage();
             grasp.unforceAuthenticatedView();
             // Make sure to log out to leave a deterministic state for the following tests.

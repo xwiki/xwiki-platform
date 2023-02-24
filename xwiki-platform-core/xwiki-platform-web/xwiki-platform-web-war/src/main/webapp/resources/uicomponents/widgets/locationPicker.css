@@ -23,7 +23,7 @@
   flex-wrap: nowrap;
 }
 
-.location-picker > dd > .location-actions {
+.location-picker > dd > .breadcrumb-container > .location-actions {
   margin-bottom: 0;
   /* Keeps all actions on one line. */
   white-space: nowrap;

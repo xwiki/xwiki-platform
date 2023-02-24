@@ -19,8 +19,10 @@
  */
 package org.xwiki.test.page;
 
+import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
@@ -29,7 +31,14 @@ import org.xwiki.localization.Translation;
 import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.TranslationBundleContext;
 import org.xwiki.localization.script.LocalizationScriptService;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.rendering.block.WordBlock;
+import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.util.ParserUtils;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.TestComponentManager;
 
@@ -47,6 +56,8 @@ import static org.mockito.Mockito.when;
  */
 public final class LocalizationSetup
 {
+    private static final ParserUtils PARSERUTILS = new ParserUtils();
+
     private LocalizationSetup()
     {
         // Utility class and thus no public constructor.
@@ -71,10 +82,9 @@ public final class LocalizationSetup
         // values of the translation parameters if they exist.
         // We mock the translations instead of using their actual values because they are subject to change from
         // Weblate, possibly making the build fail unexpectedly.
-        when(lss.render(anyString())).thenAnswer(invocationOnMock -> {
-                // Return the translation key as the value
-                return renderString(invocationOnMock.getArgument(0), new Object[] {});
-            }
+        when(lss.render(anyString())).thenAnswer(invocationOnMock ->
+            // Return the translation key as the value
+            renderString(invocationOnMock.getArgument(0), new Object[] {})
         );
         when(lss.render(anyString(), anyCollection())).thenAnswer(invocationOnMock -> {
             // Displays the comma-separated list of parameters between squared brackets after the translation key as
@@ -82,6 +92,20 @@ public final class LocalizationSetup
             // For instance: my.key [paramA, paramB]
             Collection<?> parameters = invocationOnMock.getArgument(1);
             return renderString(invocationOnMock.getArgument(0), parameters.toArray());
+        });
+        when(lss.render(anyString(), any(Syntax.class), anyCollection())).thenAnswer(invocationOnMock -> {
+            // Parse and render the plain text such that we get the actual result from the renderer.
+            Collection<?> parameters = invocationOnMock.getArgument(2);
+            String plainTranslation = renderString(invocationOnMock.getArgument(0), parameters.toArray());
+            Syntax outputSyntax = invocationOnMock.getArgument(1, Syntax.class);
+            Parser parser = tcm.getInstance(Parser.class, "plain/1.0");
+            List<Block> blocks = parser.parse(new StringReader(plainTranslation)).getChildren();
+            PARSERUTILS.removeTopLevelParagraph(blocks);
+            Block block = new CompositeBlock(blocks);
+            BlockRenderer renderer = tcm.getInstance(BlockRenderer.class, outputSyntax.toIdString());
+            DefaultWikiPrinter wikiPrinter = new DefaultWikiPrinter();
+            renderer.render(block, wikiPrinter);
+            return wikiPrinter.toString();
         });
 
         TranslationBundleContext translationBundleContext = tcm.getInstance(TranslationBundleContext.class);

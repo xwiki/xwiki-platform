@@ -95,7 +95,7 @@ public class UITestTestConfigurationResolver
         configuration.setServletEngineTag(resolveServletEngineTag(uiTestAnnotation.servletEngineTag()));
         configuration.setJDBCDriverVersion(resolveJDBCDriverVersion(uiTestAnnotation.jdbcDriverVersion()));
         configuration.setVNC(resolveVNC(uiTestAnnotation.vnc()));
-        configuration.setWcag(resolveWcag(uiTestAnnotation.wcag()));
+        configuration.setWcagEnabled(resolveWcag(uiTestAnnotation.wcag()));
         configuration.setProperties(resolveProperties(uiTestAnnotation.properties()));
         configuration.setExtraJARs(resolveExtraJARs(uiTestAnnotation.extraJARs()));
         configuration.setResolveExtraJARs(resolveResolveExtraJARs(uiTestAnnotation.resolveExtraJARs()));

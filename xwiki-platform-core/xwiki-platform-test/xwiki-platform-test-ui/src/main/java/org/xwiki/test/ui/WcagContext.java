@@ -41,7 +41,7 @@ import static java.util.Map.entry;
 
 /**
  * Context related to WCAG (accessibility) validation with axe-core.
- * @since 15.1RC2
+ * @since 15.2RC1
  * @version $Id$
  */
 public class WcagContext
@@ -139,7 +139,6 @@ public class WcagContext
      * Rules to disable during axe-core validation.
      */
     private static final List<String> DISABLED_RULES = List.of();
-    private static String shortFailReport = "";
     /**
      * Stores the result of an axe-core validity scan.
      */
@@ -164,24 +163,20 @@ public class WcagContext
                 In order to resolve these test-suite fails quickly, set them as "false" in FAILS_ON_RULE.
                  */
                 .collect(Collectors.toList());
-            if (XWikiCustomAxeReporter.getReadableAxeResults(testMethodName, pageClassName, url, failingViolations))
+            if (!failingViolations.isEmpty())
             {
-                this.failReport = XWikiCustomAxeReporter.getAxeResultString();
-                if (shortFailReport.isEmpty())
-                {
-                    /* Only store the first failed rule to display in the error logs. */
-                    XWikiCustomAxeReporter.getReadableAxeResults(testMethodName, pageClassName, url,
-                            failingViolations.subList(0, 1));
-                    shortFailReport = XWikiCustomAxeReporter.getAxeResultString();
-                }
+                this.failReport = XWikiCustomAxeReporter.getReadableAxeResults(testMethodName, pageClassName,
+                        url, failingViolations);
             }
+
             List<Rule> warningViolations = axeResults.getViolations()
                     .stream()
                     .filter(rule -> FAILS_ON_RULE.containsKey(rule.getId()) && !FAILS_ON_RULE.get(rule.getId()))
                     .collect(Collectors.toList());
-            if (XWikiCustomAxeReporter.getReadableAxeResults(testMethodName, pageClassName, url, warningViolations))
+            if (!warningViolations.isEmpty())
             {
-                this.warnReport = XWikiCustomAxeReporter.getAxeResultString();
+                this.warnReport = XWikiCustomAxeReporter.getReadableAxeResults(testMethodName, pageClassName,
+                        url, warningViolations);
             }
         }
         String getFailReport()
@@ -214,13 +209,19 @@ public class WcagContext
     private String testMethodName;
 
     /**
-     *
-     * @return the current shortened version of the fail report and resets it.
+     * @return the first non-empty fail report from all the validations.
      */
-    public static String getShortFailReport()
+    public String getFirstWcagFail()
     {
-        String report = shortFailReport;
-        shortFailReport = "";
+        String report = "";
+        for (WCAGTestResults wcagResult : wcagResults)
+        {
+            if (!wcagResult.isFailEmpty())
+            {
+                report = wcagResult.getFailReport();
+                break;
+            }
+        }
         return report;
     }
 

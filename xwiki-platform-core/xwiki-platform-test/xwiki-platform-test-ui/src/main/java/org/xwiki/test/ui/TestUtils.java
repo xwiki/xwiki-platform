@@ -1452,7 +1452,7 @@ public class TestUtils
     public void writeWcagResults() throws IOException
     {
         float totalTime = (float) wcagContext.getWcagTime() / 1000;
-        LOGGER.debug("Time spent on WCAG validation for {} [{}] (in s)",
+        LOGGER.debug("Time spent on WCAG validation for [{}]: [{}] (in s)",
                 getWcagContext().getTestClassName(), totalTime);
         File wcagDir = new File(getWcagReportPathOnHost());
         if (wcagContext.hasWCAGWarnings()) {
@@ -1476,13 +1476,14 @@ public class TestUtils
     }
 
     /**
-     * Assert that the results of the different WCAG Checks are all empty.
+     * Assert that the results of the different WCAG failing checks are all empty.
      */
-    public void assertWcagResults(){
+    public void assertWcagResults()
+    {
         assertFalse(wcagContext.hasWCAGFails(), String.format(
                 "There are some accessibility fails in the test "
-                        + "suite. See %s/wcagFails for more details.", getWcagReportPathOnHost())
-                + wcagContext.getShortFailReport());
+                        + "suite. See %s/wcagFails for more details. \n", getWcagReportPathOnHost())
+                + wcagContext.getFirstWcagFail());
     }
 
     /**

@@ -503,7 +503,7 @@ public class TestConfiguration
     /**
      * @param wcag see {@link #isWcagEnabled()}
      */
-    public void setWcag(boolean wcag)
+    public void setWcagEnabled(boolean wcag)
     {
         this.wcag = wcag;
     }

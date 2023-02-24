@@ -55,6 +55,7 @@ import com.deque.html.axecore.selenium.AxeBuilder;
  */
 public class BasePage extends BaseElement
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BasePage.class);
     /**
      * Used for sending keyboard shortcuts to.
      */
@@ -127,9 +128,8 @@ public class BasePage extends BaseElement
         waitUntilPageIsReady();
 
         WcagContext wcagContext = getUtil().getWcagContext();
-        if (wcagContext.isWcagEnabled()) {
-            this.validateWCAG(wcagContext);
-        }
+
+        this.validateWCAG(wcagContext);
     }
 
     public String getPageTitle()
@@ -723,8 +723,15 @@ public class BasePage extends BaseElement
      */
     protected void validateWCAG(WcagContext wcagContext, boolean checkCache)
     {
+        if (!wcagContext.isWcagEnabled())
+        {
+            /*
+            Block wcag validation if it is not enabled, in all cases.
+             */
+            return;
+        }
+
         long startTime = System.currentTimeMillis();
-        Logger logger = LoggerFactory.getLogger(this.getClass());
         if (!checkCache || wcagContext.isNotCached(this.getPageURL(), this.getClass().getName())) {
             /*
             Performs accessibility validation on the element when instanced if
@@ -735,18 +742,19 @@ public class BasePage extends BaseElement
             Results axeResult = axeBuilder.analyze(driver);
             wcagContext.addWcagResults(driver.getCurrentUrl(), this.getClass().getName(), axeResult);
             if (axeResult.getViolations() != null && axeResult.getViolations().isEmpty()) {
-                logger.debug("[{} : {}] Found [{}] WCAG violations.",
+                LOGGER.debug("[{} : {}] Found [{}] WCAG violations.",
                         this.getPageURL(), this.getClass(), axeResult.getViolations().size());
             }
             long stopTime = System.currentTimeMillis();
             long deltaTime = stopTime - startTime;
-            logger.debug("[{} : {}] WCAG Validation on this element took [{}] ms.", this.getPageURL(), this.getClass(), deltaTime);
+            LOGGER.debug("[{} : {}] WCAG Validation on this element took [{}] ms.",
+                    this.getPageURL(), this.getClass(), deltaTime);
             wcagContext.addWcagTime(deltaTime);
         } else {
             /*
             * If the identifying pair is already in the cache, don't perform accessibility validation.
             */
-            logger.debug("[{} : {}] This combination of URL:class was already WCAG checked.",
+            LOGGER.debug("[{} : {}] This combination of URL:class was already WCAG checked.",
                     this.getPageURL(), this.getClass());
         }
     }

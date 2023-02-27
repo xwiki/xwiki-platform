@@ -19,13 +19,31 @@
  */
 package org.xwiki.observation.remote.converter;
 
+import org.xwiki.stability.Unstable;
+
+/**
+ * Exception thrown in converters and converters' helpers.
+ *
+ * @version $Id$
+ * @since 15.2RC1
+ */
+@Unstable
 public class RemoteEventConverterException extends Exception
 {
+    /**
+     * Default constructor with message.
+     * @param message exception message
+     */
     public RemoteEventConverterException(String message)
     {
         super(message);
     }
 
+    /**
+     * Default constructor with message and cause.
+     * @param message message of the exception
+     * @param throwable cause of the exception
+     */
     public RemoteEventConverterException(String message, Throwable throwable)
     {
         super(message, throwable);

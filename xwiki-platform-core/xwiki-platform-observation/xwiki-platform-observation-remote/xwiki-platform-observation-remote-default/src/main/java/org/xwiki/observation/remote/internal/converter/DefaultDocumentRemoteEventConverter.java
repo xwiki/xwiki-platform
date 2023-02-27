@@ -46,6 +46,12 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 import com.xpn.xwiki.util.XWikiStubContextProvider;
 
+/**
+ * Default implementation of {@link DocumentRemoteEventConverter}.
+ *
+ * @version $Id$
+ * @since 15.2RC1
+ */
 @Component
 @Singleton
 public class DefaultDocumentRemoteEventConverter implements DocumentRemoteEventConverter
@@ -81,12 +87,12 @@ public class DefaultDocumentRemoteEventConverter implements DocumentRemoteEventC
     {
         if (contextTable instanceof XWikiContext) {
             XWikiContext context = (XWikiContext) contextTable;
-            HashMap<String, Serializable> remoteDataMap = new HashMap<String, Serializable>();
+            Map<String, Serializable> remoteDataMap = new HashMap<>();
 
             remoteDataMap.put(CONTEXT_WIKI, context.getWikiId());
             remoteDataMap.put(CONTEXT_USER, context.getUser());
 
-            return remoteDataMap;
+            return (Serializable) remoteDataMap;
         } else {
             throw new IllegalArgumentException("This method should only be used with an XWikiContext instance.");
         }
@@ -116,7 +122,7 @@ public class DefaultDocumentRemoteEventConverter implements DocumentRemoteEventC
     public Serializable serializeDocument(DocumentModelBridge documentModelBridge)
     {
         XWikiDocument document = (XWikiDocument) documentModelBridge;
-        HashMap<String, Serializable> remoteDataMap = new HashMap<String, Serializable>();
+        Map<String, Serializable> remoteDataMap = new HashMap<>();
 
         remoteDataMap.put(DOC_NAME, document.getDocumentReference());
 
@@ -132,7 +138,7 @@ public class DefaultDocumentRemoteEventConverter implements DocumentRemoteEventC
             remoteDataMap.put(ORIGDOC_LANGUAGE, originalDocument.getLanguage());
         }
 
-        return remoteDataMap;
+        return (Serializable) remoteDataMap;
     }
 
     /**
@@ -214,6 +220,7 @@ public class DefaultDocumentRemoteEventConverter implements DocumentRemoteEventC
         return doc;
     }
 
+    @Override
     public <T extends Hashtable<Object, Object>> DocumentModelBridge unserializeDeletedDocument(Serializable remoteData,
         T context)
         throws RemoteEventConverterException

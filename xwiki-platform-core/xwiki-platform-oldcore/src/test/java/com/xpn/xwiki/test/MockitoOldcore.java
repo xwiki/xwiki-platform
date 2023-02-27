@@ -92,6 +92,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
+import com.xpn.xwiki.internal.filter.XWikiDocumentFilterUtils;
 import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
@@ -481,8 +482,10 @@ public class MockitoOldcore
             this.componentManager.registerMockComponent(EntityNameValidationConfiguration.class);
         }
 
+        boolean supportRevisionStore = this.componentManager.hasComponent(XWikiDocumentFilterUtils.class);
+
         // Mock getting document revisions using DocumentRevisionProvider.
-        if (!this.componentManager.hasComponent(DocumentRevisionProvider.class, "database")) {
+        if (supportRevisionStore && !this.componentManager.hasComponent(DocumentRevisionProvider.class, "database")) {
             DocumentRevisionProvider documentRevisionProvider =
                 this.componentManager.registerMockComponent(DocumentRevisionProvider.class, "database");
 
@@ -505,7 +508,7 @@ public class MockitoOldcore
         }
 
         // Set the default revision provider to the database-one when missing as this covers most cases.
-        if (!this.componentManager.hasComponent(DocumentRevisionProvider.class)) {
+        if (supportRevisionStore && !this.componentManager.hasComponent(DocumentRevisionProvider.class)) {
             DocumentRevisionProvider databaseRevisionProvider =
                 this.componentManager.getInstance(DocumentRevisionProvider.class, "database");
             this.componentManager.registerComponent(DocumentRevisionProvider.class, databaseRevisionProvider);
@@ -615,6 +618,11 @@ public class MockitoOldcore
 
                     document.setContentDirty(false);
                     document.setMetaDataDirty(false);
+
+                    if (supportRevisionStore) {
+                        // Save the document in the document archive.
+                        getMockVersioningStore().updateXWikiDocArchive(document, true, xcontext);
+                    }
                 }
                 document.setNew(false);
                 document.setStore(getMockStore());
@@ -623,11 +631,6 @@ public class MockitoOldcore
 
                 documents.put(document.getDocumentReferenceWithLocale(), savedDocument);
 
-                // Save the document in the document archive.
-                XWikiContext currentContext = invocation.getArgument(1);
-                XWikiDocumentArchive archiveDoc = savedDocument.getDocumentArchive(currentContext);
-                archiveDoc.updateArchive(savedDocument, savedDocument.getAuthor(), savedDocument.getDate(),
-                    savedDocument.getComment(), savedDocument.getRCSVersion(), currentContext);
 
                 // Set the document as it's original document
                 savedDocument.setOriginalDocument(savedDocument.clone());
@@ -744,6 +747,18 @@ public class MockitoOldcore
         // XWiki
 
         if (this.mockXWiki) {
+            if (!supportRevisionStore) {
+                doAnswer((Answer<XWikiDocument>) invocation -> {
+                    XWikiDocument doc = invocation.getArgument(0);
+                    String revision = invocation.getArgument(1);
+
+                    if (StringUtils.equals(revision, doc.getVersion())) {
+                        return doc;
+                    }
+
+                    return new XWikiDocument(doc.getDocumentReference());
+                }).when(getSpyXWiki()).getDocument(anyXWikiDocument(), any(), anyXWikiContext());
+            }
             doAnswer(new Answer<XWikiDocument>()
             {
                 @Override
@@ -769,6 +784,7 @@ public class MockitoOldcore
                     XWikiDocument document = invocation.getArgument(0);
                     String comment = invocation.getArgument(1);
                     boolean minorEdit = invocation.getArgument(2);
+                    XWikiContext xcontext = invocation.getArgument(3);
 
                     boolean isNew = document.isNew();
 
@@ -785,6 +801,11 @@ public class MockitoOldcore
 
                         document.setContentDirty(false);
                         document.setMetaDataDirty(false);
+
+                        // Save the document in the document archive.
+                        if (supportRevisionStore) {
+                            getMockVersioningStore().updateXWikiDocArchive(document, true, xcontext);
+                        }
                     }
                     document.setNew(false);
                     document.setStore(getMockStore());
@@ -809,12 +830,6 @@ public class MockitoOldcore
 
                     XWikiDocument savedDocument = document.clone();
                     documents.put(document.getDocumentReferenceWithLocale(), savedDocument);
-
-                    // Save the document in the document archive.
-                    XWikiContext currentContext = invocation.getArgument(3);
-                    XWikiDocumentArchive archiveDoc = savedDocument.getDocumentArchive(currentContext);
-                    archiveDoc.updateArchive(savedDocument, savedDocument.getAuthor(), savedDocument.getDate(),
-                        savedDocument.getComment(), savedDocument.getRCSVersion(), currentContext);
 
                     if (isNew) {
                         if (notifyDocumentCreatedEvent) {

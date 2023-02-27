@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -81,7 +82,7 @@ public class DefaultNewsConfiguration implements NewsConfiguration
         // whatsnew.sources = xwikisas = xwikiblog
         // whatsnew.sources.xwikisas.rssURL = https://xwiki.com/en/Blog/BlogRss?xpage=plain
         List<NewsSourceDescriptor> descriptors;
-        Map<String, String> sources = getConfiguredSources();
+        Properties sources = getConfiguredSources();
         // If there's no configuration set by the user the use a default configuration.
         if (sources != null) {
             descriptors = getConfiguredNewsSourceDescriptors(sources);
@@ -107,16 +108,16 @@ public class DefaultNewsConfiguration implements NewsConfiguration
     @Override
     public boolean isActive()
     {
-        Map<String, String> sources = getConfiguredSources();
+        Properties sources = getConfiguredSources();
         return sources == null || (sources != null && !sources.isEmpty());
     }
 
-    private Map<String, String> getConfiguredSources()
+    private Properties getConfiguredSources()
     {
-        return this.configurationSource.getProperty(getFullKeyName("sources"));
+        return this.configurationSource.getProperty(getFullKeyName("sources"), Properties.class);
     }
 
-    private List<NewsSourceDescriptor> getConfiguredNewsSourceDescriptors(Map<String, String> sources)
+    private List<NewsSourceDescriptor> getConfiguredNewsSourceDescriptors(Properties sources)
     {
         List<NewsSourceDescriptor> descriptors = new ArrayList<>();
         // Only keep the keys related to configuring news sources, for performance.
@@ -127,7 +128,7 @@ public class DefaultNewsConfiguration implements NewsConfiguration
                 keys.add(key);
             }
         }
-        for (Map.Entry<String, String> entry : sources.entrySet()) {
+        for (Map.Entry<Object, Object> entry : sources.entrySet()) {
             // Find all parameter properties for the defined source
             Map<String, String> parameters = new HashMap<>();
             String prefix = String.format("%s%s.", sourceKeyNamePrefix, entry.getKey());
@@ -138,7 +139,7 @@ public class DefaultNewsConfiguration implements NewsConfiguration
                 }
             }
             NewsSourceDescriptor descriptor =
-                new NewsSourceDescriptor(entry.getKey(), entry.getValue(), parameters);
+                new NewsSourceDescriptor((String) entry.getKey(), (String) entry.getValue(), parameters);
             descriptors.add(descriptor);
         }
         return descriptors;

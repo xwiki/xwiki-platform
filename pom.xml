@@ -841,7 +841,7 @@
       <dependency>
         <groupId>com.icegreen</groupId>
         <artifactId>greenmail-junit5</artifactId>
-        <version>1.6.13</version>
+        <version>1.6.14</version>
       </dependency>
 
       <!-- Make sure to use a version of the Jetty client libraries matching the Jetty version we package -->

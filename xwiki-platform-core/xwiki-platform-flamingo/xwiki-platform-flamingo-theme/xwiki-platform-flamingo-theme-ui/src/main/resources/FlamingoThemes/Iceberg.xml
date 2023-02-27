@@ -836,7 +836,7 @@
       <body-bg>#fafafa</body-bg>
     </property>
     <property>
-      <brand-danger/>
+      <brand-danger>#ca302c</brand-danger>
     </property>
     <property>
       <brand-info>#3bb2d0</brand-info>
@@ -854,7 +854,7 @@
       <breadcrumb-bg>#f8f8f8</breadcrumb-bg>
     </property>
     <property>
-      <breadcrumb-color/>
+      <breadcrumb-color>#727272</breadcrumb-color>
     </property>
     <property>
       <breadcrumb-separator/>
@@ -884,13 +884,13 @@
       <btn-info-color/>
     </property>
     <property>
-      <btn-primary-bg>#3E7CBC</btn-primary-bg>
+      <btn-primary-bg>#386da7</btn-primary-bg>
     </property>
     <property>
       <btn-primary-color>#fff</btn-primary-color>
     </property>
     <property>
-      <btn-success-bg/>
+      <btn-success-bg>#31754f</btn-success-bg>
     </property>
     <property>
       <btn-success-color/>
@@ -968,6 +968,10 @@
       <lessCode>/* Administration: Vertical Menus */
 @list-group-active-border: @list-group-border;
 
+/* Accessibility */
+@gray-light: #727272;
+@text-muted: @gray;
+
 /* Drawer */
 @xwiki-drawer-menu-item-hover-bg: @list-group-hover-bg;
 @xwiki-drawer-menu-item-hover-color: @list-group-link-hover-color;
@@ -979,13 +983,13 @@
 </lessCode>
     </property>
     <property>
-      <link-color>#3173b5</link-color>
+      <link-color>#2f6faf</link-color>
     </property>
     <property>
       <logo>logo.svg</logo>
     </property>
     <property>
-      <navbar-default-bg>#3E7CBC</navbar-default-bg>
+      <navbar-default-bg>#3E79BC</navbar-default-bg>
     </property>
     <property>
       <navbar-default-color>#fff</navbar-default-color>

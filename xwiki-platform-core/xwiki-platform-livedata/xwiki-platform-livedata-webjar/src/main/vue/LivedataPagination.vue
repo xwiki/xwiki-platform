@@ -28,11 +28,12 @@
 -->
 <template>
   <!-- Pagination -->
-  <nav class="livedata-pagination">
+  <nav class="livedata-pagination"
+    :aria-label="$t('livedata.pagination.label')">
 
     <!--
       Display the pagination current entry range
-      Can be shown / hiden by the `pagination.showEntryRange` property
+      Can be shown / hidden by the `pagination.showEntryRange` property
       in the Livedata meta config
     -->
     <span

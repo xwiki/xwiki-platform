@@ -37,7 +37,6 @@ import org.xwiki.rendering.internal.macro.message.InfoMessageMacro;
 import org.xwiki.rendering.internal.syntax.SyntaxConverter;
 import org.xwiki.rendering.internal.transformation.macro.DefaultMacroTransformationConfiguration;
 import org.xwiki.rendering.script.RenderingScriptService;
-import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.test.annotation.ComponentList;
@@ -56,6 +55,9 @@ import static javax.script.ScriptContext.GLOBAL_SCOPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.xwiki.rendering.syntax.Syntax.PLAIN_1_0;
+import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_0;
+import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_1;
 
 /**
  * Test of {@code Invitation.InvitationCommon}.
@@ -85,6 +87,9 @@ import static org.mockito.Mockito.when;
 })
 class InvitationCommonPageTest extends PageTest
 {
+    public static final DocumentReference INVITATION_COMMON_REFERENCE =
+        new DocumentReference("xwiki", "Invitation", "InvitationCommon");
+
     private ScriptContext scriptContext;
 
     @BeforeEach
@@ -103,8 +108,7 @@ class InvitationCommonPageTest extends PageTest
         this.context.setDoc(this.xwiki.getDocument(
             new DocumentReference("xwiki", "]]  {{noscript/}}", "InvitationCommon"), this.context));
 
-        DocumentReference invitationCommonReference = new DocumentReference("xwiki", "Invitation", "InvitationCommon");
-        Document document = Jsoup.parse(loadPage(invitationCommonReference).getRenderedContent(this.context));
+        Document document = Jsoup.parse(loadPage(INVITATION_COMMON_REFERENCE).getRenderedContent(this.context));
         assertEquals("xe.invitation.internalDocument []] {{noscript/}}.WebHome]",
             document.selectFirst(".infomessage").text());
     }
@@ -113,7 +117,6 @@ class InvitationCommonPageTest extends PageTest
     void testEq1ConfigClassIsNew() throws Exception
     {
         String spaceName = "<script>console.log</script>]]{{noscript/}}";
-        DocumentReference invitationCommonReference = new DocumentReference("xwiki", "Invitation", "InvitationCommon");
 
         XWikiDocument doc =
             this.xwiki.getDocument(new DocumentReference("xwiki", spaceName, "InvitationCommon"), this.context);
@@ -122,7 +125,7 @@ class InvitationCommonPageTest extends PageTest
 
         this.request.put("test", "1");
 
-        Document document = Jsoup.parse(loadPage(invitationCommonReference).getRenderedContent(this.context));
+        Document document = Jsoup.parse(loadPage(INVITATION_COMMON_REFERENCE).getRenderedContent(this.context));
 
         assertEquals("testLoadInvitationConfig", document.selectFirst(".infomessage").text());
         Element errorMessage = document.selectFirst(".errormessage");
@@ -160,7 +163,7 @@ class InvitationCommonPageTest extends PageTest
 
         this.request.put("test", "1");
 
-        XWikiDocument invitationCommonDoc = loadPage(new DocumentReference("xwiki", "Invitation", "InvitationCommon"));
+        XWikiDocument invitationCommonDoc = loadPage(INVITATION_COMMON_REFERENCE);
         Document document = Jsoup.parse(invitationCommonDoc.getRenderedContent(this.context));
 
         assertEquals("testLoadInvitationConfig", document.selectFirst(".infomessage").text());
@@ -199,8 +202,7 @@ class InvitationCommonPageTest extends PageTest
 
         this.request.put("test", "1");
 
-        DocumentReference reference = new DocumentReference("xwiki", "Invitation", "InvitationCommon");
-        XWikiDocument invitationCommonDoc = loadPage(reference);
+        XWikiDocument invitationCommonDoc = loadPage(INVITATION_COMMON_REFERENCE);
         Document document = Jsoup.parse(invitationCommonDoc.getRenderedContent(this.context));
 
         assertEquals("testLoadInvitationConfig", document.selectFirst(".infomessage").text());
@@ -241,8 +243,7 @@ class InvitationCommonPageTest extends PageTest
 
         this.request.put("test", "1");
 
-        DocumentReference reference = new DocumentReference("xwiki", "Invitation", "InvitationCommon");
-        XWikiDocument invitationCommonDoc = loadPage(reference);
+        XWikiDocument invitationCommonDoc = loadPage(INVITATION_COMMON_REFERENCE);
         Document document = Jsoup.parse(invitationCommonDoc.getRenderedContent(this.context));
 
         assertEquals("testLoadInvitationConfig", document.selectFirst(".infomessage").text());
@@ -253,7 +254,7 @@ class InvitationCommonPageTest extends PageTest
     @Test
     void displayMessageVelocityMacro() throws Exception
     {
-        loadPage(new DocumentReference("xwiki", "Invitation", "InvitationCommon"));
+        loadPage(INVITATION_COMMON_REFERENCE);
         DocumentReference invitationMailClassDocumentReference =
             new DocumentReference("xwiki", "Invitation", "InvitationMailClass");
         loadPage(invitationMailClassDocumentReference);
@@ -261,7 +262,7 @@ class InvitationCommonPageTest extends PageTest
         XWikiDocument page = this.xwiki.getDocument(new DocumentReference("xwiki", "Space", "Page"), this.context);
         BaseObject invitationMailXObject = page.newXObject(invitationMailClassDocumentReference, this.context);
         invitationMailXObject.set("messageBody", "<strong>message body</strong>", this.context);
-        page.setSyntax(Syntax.XWIKI_2_1);
+        page.setSyntax(XWIKI_2_1);
         page.setContent("{{include reference=\"Invitation.InvitationCommon\"/}}\n"
             + "\n"
             + "{{velocity}}\n"
@@ -273,5 +274,23 @@ class InvitationCommonPageTest extends PageTest
 
         Document document = renderHTMLPage(page);
         assertEquals("<strong>message body</strong>", document.selectFirst("#preview-messagebody-field").html());
+    }
+
+    /**
+     * Check if the value of subjectLine correctly escape its parameters.
+     */
+    @Test
+    void subjectLineTemplate() throws Exception
+    {
+        com.xpn.xwiki.api.Document invitationCommonDocument =
+            new com.xpn.xwiki.api.Document(loadPage(INVITATION_COMMON_REFERENCE), this.context);
+        String value = String.valueOf(
+            invitationCommonDocument.getObject("xwiki:Invitation.WebHome").getProperty("subjectLineTemplate")
+                .getValue());
+        this.oldcore.getScriptContext().setAttribute("subjectLine", "{{noscript/}}", GLOBAL_SCOPE);
+        com.xpn.xwiki.api.Document testDocument = new com.xpn.xwiki.api.Document(
+            this.xwiki.getDocument(new DocumentReference("xwiki", "Space", "Test"), this.context), this.context);
+        String renderedContent = testDocument.getRenderedContent(value, XWIKI_2_0.toIdString(), PLAIN_1_0.toIdString());
+        assertEquals("xe.invitation.emailContent.subjectLine [XWikiGuest, null, {{noscript/}}]", renderedContent);
     }
 }

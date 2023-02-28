@@ -39,7 +39,10 @@ import org.xwiki.test.page.XWikiSyntax21ComponentList;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
+import static javax.script.ScriptContext.GLOBAL_SCOPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.xwiki.rendering.syntax.Syntax.PLAIN_1_0;
+import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_0;
 
 /**
  * Test of {@code Invitation.InvitationConfig}.
@@ -65,13 +68,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 })
 class InvitationConfigPageTest extends PageTest
 {
-    private static final DocumentReference INVITATION_CONFIG_DOCUMENT_REFERENCE =
+    private static final DocumentReference INVITATION_CONFIG_REFERENCE =
         new DocumentReference("xwiki", "Invitation", "InvitationConfig");
 
     @Test
     void escapeInfoMessageInternalDocumentParameter() throws Exception
     {
-        XWikiDocument invitationGuestActionsDocument = loadPage(INVITATION_CONFIG_DOCUMENT_REFERENCE);
+        XWikiDocument invitationGuestActionsDocument = loadPage(INVITATION_CONFIG_REFERENCE);
 
         // Set up the current doc in the context so that $doc is bound in scripts
         this.context.setDoc(
@@ -80,5 +83,20 @@ class InvitationConfigPageTest extends PageTest
         Document document = Jsoup.parse(invitationGuestActionsDocument.getRenderedContent(this.context));
         Element infomessage = document.selectFirst(".infomessage");
         assertEquals("xe.invitation.internalDocument [Invitation.WebHome]", infomessage.text());
+    }
+
+    @Test
+    void subjectLineTemplate() throws Exception
+    {
+        com.xpn.xwiki.api.Document invitationConfigDocument =
+            new com.xpn.xwiki.api.Document(loadPage(INVITATION_CONFIG_REFERENCE), this.context);
+        String value = String.valueOf(
+            invitationConfigDocument.getObject("xwiki:Invitation.WebHome").getProperty("subjectLineTemplate")
+                .getValue());
+        this.oldcore.getScriptContext().setAttribute("subjectLine", "{{noscript/}}", GLOBAL_SCOPE);
+        com.xpn.xwiki.api.Document testDocument = new com.xpn.xwiki.api.Document(
+            this.xwiki.getDocument(new DocumentReference("xwiki", "Space", "Test"), this.context), this.context);
+        String renderedContent = testDocument.getRenderedContent(value, XWIKI_2_0.toIdString(), PLAIN_1_0.toIdString());
+        assertEquals("xe.invitation.emailContent.subjectLine [XWikiGuest, null, {{noscript/}}]", renderedContent);
     }
 }

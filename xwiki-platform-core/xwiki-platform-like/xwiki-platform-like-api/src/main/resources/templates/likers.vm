@@ -29,7 +29,6 @@
       <a href="$xwiki.getURL($userReference)">$escapetool.xml($userReference.name)</a>
     </div>
   #end
-  $response.setContentType('application/json')
   #set ($documentReference = $doc.documentReference)
   ##==============================
   ## Offset = item # at which to start displaying data
@@ -105,7 +104,7 @@
   #if ($request.livetable == "true")
     #break
   #end
-  = $escapetool.xml($services.localization.render('like.likers.title', [$doc.plainTitle])) =
+  = $services.rendering.escape($services.localization.render('like.likers.title', [$doc.plainTitle]), 'xwiki/2.1') =
   
   #set ($sourceParameters = $escapetool.url({
     'template': 'likers.vm',

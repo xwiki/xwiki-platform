@@ -72,12 +72,13 @@
 
     <!--
       The actual pagination widget
-      It dislays the the available pages numbers, and change to them on click.
+      It displays the the available pages numbers, and change to them on click.
       Not all page numbers are show depending of the `pagination.maxShownPages`
       property in the Livedata meta config.
       Arrows can be shown to go to first, last, previous, next page.
     -->
-    <nav class="pagination-indexes">
+    <nav class="pagination-indexes"
+      :aria-label="$t('livedata.pagination.index.label')">
       {{ $t('livedata.pagination.page') }}
       <!--
         Go to First Page button

@@ -86,6 +86,7 @@ rendering.macro.menu.content.description=Define the menu structure using wiki sy
 
 # Accessibility labels
 rendering.macro.menu.horizontal.label=Horizontal custom menu
+rendering.macro.menu.horizontal.label=Vertical custom menu
 
 # Menu WebHome
 menu.description=This is a simple application that helps you create navigation menus to be displayed either horizontally as a top bar after the page header or vertically in a side panel.</content>

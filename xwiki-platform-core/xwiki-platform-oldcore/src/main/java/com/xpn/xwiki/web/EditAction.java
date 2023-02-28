@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.script.ScriptContext;
@@ -28,7 +29,10 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -49,6 +53,10 @@ public class EditAction extends XWikiAction
      * The object used for logging.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(EditAction.class);
+
+    @Inject
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> documentReferenceUserReferenceResolver;
 
     /**
      * Default constructor.
@@ -107,6 +115,21 @@ public class EditAction extends XWikiAction
         // The default values from the template can be overwritten by additional request parameters.
         updateDocumentTitleAndContentFromRequest(editedDocument, context);
         editedDocument.readAddedUpdatedAndRemovedObjectsFromForm(editForm, context);
+
+        // If the metadata is modified, modify the effective metadata author
+        if (editedDocument.isMetaDataDirty()) {
+            UserReference userReference =
+                this.documentReferenceUserReferenceResolver.resolve(context.getUserReference());
+            editedDocument.getAuthors().setEffectiveMetadataAuthor(userReference);
+            editedDocument.getAuthors().setOriginalMetadataAuthor(userReference);
+        }
+
+        // If the content is modified, modify the content author
+        if (editedDocument.isContentDirty()) {
+            UserReference userReference =
+                this.documentReferenceUserReferenceResolver.resolve(context.getUserReference());
+            editedDocument.getAuthors().setContentAuthor(userReference);
+        }
 
         // Set the current user as creator, author and contentAuthor when the edited document is newly created to avoid
         // using XWikiGuest instead (because those fields were not previously initialized).

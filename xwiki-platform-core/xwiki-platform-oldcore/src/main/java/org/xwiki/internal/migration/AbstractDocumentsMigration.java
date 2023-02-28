@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 import org.slf4j.Logger;
 import org.xwiki.index.TaskManager;
@@ -58,7 +59,7 @@ public abstract class AbstractDocumentsMigration extends AbstractHibernateDataMi
     protected DocumentReferenceResolver<String> documentReferenceResolver;
 
     @Inject
-    private TaskManager taskManager;
+    private Provider<TaskManager> taskManager;
 
     @Override
     protected void hibernateMigrate() throws DataMigrationException
@@ -72,7 +73,7 @@ public abstract class AbstractDocumentsMigration extends AbstractHibernateDataMi
         logBeforeQueuingTasks(documents);
         for (XWikiDocument document : documents) {
             logBeforeQueuingTask(document);
-            this.taskManager.addTask(this.getXWikiContext().getWikiId(), document.getId(), getTaskType());
+            this.taskManager.get().addTask(this.getXWikiContext().getWikiId(), document.getId(), getTaskType());
         }
     }
 

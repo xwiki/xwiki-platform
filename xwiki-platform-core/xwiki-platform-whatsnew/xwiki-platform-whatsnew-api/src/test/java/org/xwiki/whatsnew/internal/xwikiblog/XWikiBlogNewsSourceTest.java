@@ -64,7 +64,7 @@ class XWikiBlogNewsSourceTest
     void buildWithAdminUserCategory() throws Exception
     {
         XWikiBlogNewsSource source =new XWikiBlogNewsSource(
-            XWikiBlogNewsSource.class.getClassLoader().getResourceAsStream("blogrss.xml"));
+            XWikiBlogNewsSource.class.getClassLoader().getResourceAsStream("blogrss-admin.xml"));
         List<NewsSourceItem> items = source.forCategories(Set.of(NewsCategory.ADMIN_USER)).build();
 
         assertEquals(8, items.size());
@@ -77,7 +77,7 @@ class XWikiBlogNewsSourceTest
     void buildWithSimpleUserCategory() throws Exception
     {
         XWikiBlogNewsSource source =new XWikiBlogNewsSource(
-            XWikiBlogNewsSource.class.getClassLoader().getResourceAsStream("blogrss.xml"));
+            XWikiBlogNewsSource.class.getClassLoader().getResourceAsStream("blogrss-simple.xml"));
         List<NewsSourceItem> items = source.forCategories(Set.of(NewsCategory.SIMPLE_USER)).build();
 
         assertEquals(2, items.size());

@@ -24,6 +24,7 @@
     #try()
     <div class="xwiki-whatsnew-container">
       #set ($newsSource = $services.whatsnew.configuredNewsSource)
+      #set ($newsSource = $newsSource.forCategories("simple_user, advanced_user, admin_user, extension"))
       #foreach($newsItem in $newsSource.build())
         <div class="xwiki-whatsnew-item">
           ## The title is expected to be in plain text

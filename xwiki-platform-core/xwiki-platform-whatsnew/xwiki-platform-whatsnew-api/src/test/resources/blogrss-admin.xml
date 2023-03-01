@@ -33,12 +33,10 @@
         <rdf:li rdf:resource="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki%2014.10.3%20Released?language=en" />
         <rdf:li rdf:resource="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki131011Released?language=en" />
         <rdf:li rdf:resource="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki%2014.10.2%20Released?language=en" />
-        <rdf:li rdf:resource="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki14CycleReleaseNotes?language=en" />
         <rdf:li rdf:resource="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki%2014.10.1%20Released?language=en" />
         <rdf:li rdf:resource="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki%2014.10%20Released?language=en" />
         <rdf:li rdf:resource="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki%2013.10.10%20Released?language=en" />
         <rdf:li rdf:resource="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki149Released?language=en" />
-        <rdf:li rdf:resource="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki149RC1Released?language=en" />
       </rdf:Seq>
     </items>
   </channel>
@@ -84,14 +82,6 @@
     <dc:date>2022-12-27T03:25:54+01:00</dc:date>
     <dc:creator>Simon Urli</dc:creator>
   </item>
-  <item rdf:about="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki14CycleReleaseNotes?language=en">
-    <title>Highlights of XWiki 14.x cycle</title>
-    <link>https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki14CycleReleaseNotes?language=en</link>
-    <description>&#60;p&#62;December is almost over and this means we&#39;re finishing the XWiki 14.x cycle. It&#39;s time to look back at what we achieved in 2022. Here are some links to visual reports of what was done in 14.x:&#60;/p&#62;&#60;ul&#62;&#60;li&#62;&#60;span class=&#34;wikiexternallink&#34;&#62;&#60;a href=&#34;https://www.xwiki.org/xwiki/bin/view/ReleaseNotes/Code/Report?action=report&#38;amp;displayer=grid&#38;amp;products=XWiki&#38;amp;versions=14.%25&#38;amp;categories=&#38;amp;audience=&#38;amp;importance=High&#34;&#62;High importance changes&#60;/a&#62;&#60;/span&#62;&#60;/li&#62;&#60;li&#62;&#60;span class=&#34;wikiexternallink&#34;&#62;&#60;a href=&#34;https://www.xwiki.org/xwiki/bin/view/ReleaseNotes/Code/Report?action=report&#38;amp;displayer=grid&#38;amp;products=XWiki&#38;amp;versions=14.%25&#38;amp;categories=&#38;amp;audience=&#38;amp;importance=Medium&#34;&#62;Medium importance changes&#60;/a&#62;&#60;/span&#62;&#60;/li&#62;&#60;li&#62;&#60;span class=&#34;wikiexternallink&#34;&#62;&#60;a href=&#34;https://www.xwiki.org/xwiki/bin/view/ReleaseNotes/Code/Report?action=report&#38;amp;displayer=grid&#38;amp;products=XWiki&#38;amp;versions=14.%25&#38;amp;categories=&#38;amp;audience=&#38;amp;importance=Low&#34;&#62;Low importance changes&#60;/a&#62;&#60;/span&#62;&#60;/li&#62;&#60;li&#62;&#60;span class=&#34;wikiexternallink&#34;&#62;&#60;a href=&#34;https://www.xwiki.org/xwiki/bin/view/ReleaseNotes/Code/Report?action=report&#38;amp;displayer=grid&#38;amp;products=XWiki&#38;amp;versions=14.%25&#38;amp;categories=&#38;amp;audience=&#38;amp;importance=&#38;amp;containsScreenshots=true&#34;&#62;All changes having screenshots&#60;/a&#62;&#60;/span&#62;&#60;/li&#62;&#60;li&#62;&#60;span class=&#34;wikiexternallink&#34;&#62;&#60;a href=&#34;https://www.xwiki.org/xwiki/bin/view/ReleaseNotes/Code/Report?action=report&#38;amp;displayer=grid&#38;amp;products=XWiki&#38;amp;versions=14.%25&#38;amp;categories=&#38;amp;audience=user&#38;amp;importance=&#34;&#62;All user-related changes&#60;/a&#62;&#60;/span&#62; &#60;span class=&#34;wikilink&#34;&#62;&#60;a title=&#34;Read the full entry&#34; href=&#34;/xwiki/bin/view/Blog/XWiki14CycleReleaseNotes&#34;&#62;...&#60;/a&#62;&#60;/span&#62;&#60;/li&#62;&#60;/ul&#62;</description>
-    <dc:subject>Blog.News</dc:subject>
-    <dc:date>2022-12-22T11:48:48+01:00</dc:date>
-    <dc:creator>Vincent Massol</dc:creator>
-  </item>
   <item rdf:about="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki%2014.10.1%20Released?language=en">
     <title>XWiki 14.10.1 Released</title>
     <link>https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki%2014.10.1%20Released?language=en</link>
@@ -123,13 +113,5 @@
     <dc:subject>Blog.What&#39;s New for XWiki: Admin User</dc:subject>
     <dc:date>2023-01-06T03:29:01+01:00</dc:date>
     <dc:creator>Manuel Leduc</dc:creator>
-  </item>
-  <item rdf:about="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki149RC1Released?language=en">
-    <title>XWiki 14.9 Release Candidate 1 Released</title>
-    <link>https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki149RC1Released?language=en</link>
-    <description>&#60;p&#62;This releases improves the new client-side PDF Export feature (still experimental but getting closer to being production ready) by offering the ability to configure it in the Admin UI and by enhancing the default template. It also fixes bugs and especially several security bugs, making it a recommended upgrade. &#60;span class=&#34;wikilink&#34;&#62;&#60;a title=&#34;Read the full entry&#34; href=&#34;/xwiki/bin/view/Blog/XWiki149RC1Released&#34;&#62;...&#60;/a&#62;&#60;/span&#62;&#60;/p&#62;</description>
-    <dc:subject>Blog.Development, Blog.GSoC, Blog.Tutorials, Blog.XWiki Days</dc:subject>
-    <dc:date>2023-01-06T03:29:01+01:00</dc:date>
-    <dc:creator>Vincent Massol</dc:creator>
   </item>
 </rdf:RDF>

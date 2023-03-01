@@ -271,7 +271,7 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# Comma-separated list of additional tags that should be allowed by the HTML sanitizer. These tags will be allowed
 #-# in addition to the already extensive built-in list of tags that are considered safe. Use with care to avoid
 #-# introducing security issues. By default, the following tags are allowed:
-#-# HTML tags: https://github.com/xwiki/xwiki-commons/blob/b11eae9d82cb53f32962056b5faa73f3720c6182/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/HTMLDefinitions.java#L63-L73
+#-# HTML tags: https://github.com/xwiki/xwiki-commons/blob/99484d48e899a68a1b6e33d457825b776c6fe8c3/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/HTMLDefinitions.java#L63-L74
 #-# SVG tags: https://github.com/xwiki/xwiki-commons/blob/b11eae9d82cb53f32962056b5faa73f3720c6182/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/SVGDefinitions.java#L91-L102
 #-# MathML tags: https://github.com/xwiki/xwiki-commons/blob/b11eae9d82cb53f32962056b5faa73f3720c6182/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/MathMLDefinitions.java#L62-L64
 # xml.htmlElementSanitizer.extraAllowedTags =
@@ -281,7 +281,7 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# be allowed in addition to the already extensive built-in list of attributes that are considered safe. This option
 #-# is useful if your content uses attributes that are invalid in HTML. Use with care to avoid introducing security
 #-# issues. By default, the following attributes are allowed:
-#-# HTML attributes: https://github.com/xwiki/xwiki-commons/blob/b11eae9d82cb53f32962056b5faa73f3720c6182/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/HTMLDefinitions.java#L78-L90
+#-# HTML attributes: https://github.com/xwiki/xwiki-commons/blob/99484d48e899a68a1b6e33d457825b776c6fe8c3/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/HTMLDefinitions.java#L76-L91
 #-# SVG attributes: https://github.com/xwiki/xwiki-commons/blob/b11eae9d82cb53f32962056b5faa73f3720c6182/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/SVGDefinitions.java#L66-L89
 #-# MathML attributes: https://github.com/xwiki/xwiki-commons/blob/b11eae9d82cb53f32962056b5faa73f3720c6182/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/MathMLDefinitions.java#L73-L79
 #-# XML attributes: https://github.com/xwiki/xwiki-commons/blob/b11eae9d82cb53f32962056b5faa73f3720c6182/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/SecureHTMLElementSanitizer.java#L135

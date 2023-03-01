@@ -82,8 +82,9 @@
         #set ($descriptionKey = 'mentions.event.mention.description.comment')
       #elseif($location == "ANNOTATION")
         #set ($descriptionKey = 'mentions.event.mention.description.annotation')
-      #elseif($location == "AWM_FIELD")
-        #set ($descriptionKey = 'mentions.event.mention.description.awmField')
+      #elseif($location == "AWM_FIELD" || $location == "TEXT_FIELD")
+        ## TODO: AWM_FIELD is deprecated since 14.4.8, 14.10.6, and 15.2RC1
+        #set ($descriptionKey = 'mentions.event.mention.description.textField')
       #else
         #set ($descriptionKey = 'mentions.event.mention.description')
       #end

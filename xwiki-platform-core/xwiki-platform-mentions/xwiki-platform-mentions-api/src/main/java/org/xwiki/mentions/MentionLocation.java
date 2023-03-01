@@ -43,12 +43,21 @@ public enum MentionLocation
     ANNOTATION,
 
     /**
-     * In a Application Within Minutes field.
+     * In an Application Within Minutes field.
      */
+    @Deprecated(since = "14.4.8,14.10.6,15.2RC1")
     AWM_FIELD,
 
     /**
      * When the location of the mention is unknown.
      */
-    UNDEFINED
+    UNDEFINED,
+    /**
+     * In a large text field.
+     *
+     * @since 14.4.8
+     * @since 14.10.6
+     * @since 15.2RC1
+     */
+    TEXT_FIELD
 }

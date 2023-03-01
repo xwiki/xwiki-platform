@@ -38,6 +38,10 @@
     <xwikiPropertiesAdditionalProperties>test.prchecker.excludePattern=.*:ExtensionTest\.Service</xwikiPropertiesAdditionalProperties>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+
+    <!-- Make sure to use the expected runtime version of Maven during tests -->
+    <maven.version>${maven.runtime.version}</maven.version>
+    <maven.resolver.version>${maven.resolver.runtime.version}</maven.resolver.version>
   </properties>
   <dependencies>
     <dependency>

@@ -1171,7 +1171,7 @@ $menuTemplateDoc.content.replace('{', '')
   #if ($stringtool.isBlank("$!id"))
     #set ($id = $wikimacro.context.getXDOM().getIdGenerator().generateUniqueId("M", "GeneratedMenuId"))
   #end
-  (% role="navigation" class="menu-horizontal-toggle" aria-label="$services.localization.render('rendering.macro.menu.horizontal.label')" %)(((
+  (% role="navigation" class="menu-horizontal-toggle" aria-label="${services.rendering.escape($services.localization.render('rendering.macro.menu.horizontal.label'), 'xwiki/2.1')}" %)(((
     (% class="navbar-header" %)(((
       {{html}}
         &lt;button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#$!{escapetool.xml($id)}" aria-expanded="false"&gt;
@@ -1187,7 +1187,7 @@ $menuTemplateDoc.content.replace('{', '')
     )))
   )))
 #else
-  (% role="navigation" #if ("$!id" != '') id="${services.rendering.escape($id, 'xwiki/2.1')}"#end class="menu menu-${services.rendering.escape($!type, 'xwiki/2.1')}" aria-label="$services.localization.render('rendering.macro.menu.vertical.label')" %)(((
+  (% role="navigation" #if ("$!id" != '') id="${services.rendering.escape($id, 'xwiki/2.1')}"#end class="menu menu-${services.rendering.escape($!type, 'xwiki/2.1')}" aria-label="${services.rendering.escape($services.localization.render('rendering.macro.menu.vertical.label'), 'xwiki/2.1')}" %)(((
     {{wikimacrocontent/}}
   )))
 #end

@@ -32,7 +32,7 @@
 ###
 #macro(xwikitopmenustart)
   <nav class="navbar navbar-default actionmenu"
-  aria-label="$services.localization.render('core.menu.navbar.label')">
+  aria-label="$escapetool.xml($services.localization.render('core.menu.navbar.label'))">
     <div class="container-fluid">
       ## Brand and toggle get grouped for better mobile display
       <div class="navbar-header">
@@ -164,7 +164,7 @@
 ###    Toplevel Menu entry separator
 ###
 #macro(xwikitopmenuseparator)
-  <li class="divider" role="separator" aria-hidden="true"></li>
+  <li class="divider" role="separator"></li>
 #end
 
 ###

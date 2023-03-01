@@ -77,7 +77,7 @@
       property in the Livedata meta config.
       Arrows can be shown to go to first, last, previous, next page.
     -->
-    <nav class="pagination-indexes"
+    <span class="pagination-indexes"
       :aria-label="$t('livedata.pagination.index.label')">
       {{ $t('livedata.pagination.page') }}
       <!--
@@ -182,7 +182,7 @@
         <XWikiIcon :icon-descriptor="{name: 'fast-forward'}"/>
       </a>
 
-    </nav>
+    </span>
 
   </nav>
 </template>

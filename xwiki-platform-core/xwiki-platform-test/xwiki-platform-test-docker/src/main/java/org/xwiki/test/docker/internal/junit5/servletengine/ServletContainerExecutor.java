@@ -355,10 +355,10 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                             // Note that we expose libreoffice /usr/local/libreoffice so that it can be found by
                             // JODConverter: https://bit.ly/2w8B82Q
                             .run("apt-get update && "
-                                + "apt-get --no-install-recommends -y install curl wget unzip procps libxinerama1 "
+                                + "apt-get --no-install-recommends -y install curl unzip procps libxinerama1 "
                                     + "libdbus-glib-1-2 libcairo2 libcups2 libsm6 libx11-xcb1 && "
                                 + "rm -rf /var/lib/apt/lists/* /var/cache/apt/* && "
-                                + "wget --no-verbose -O /tmp/libreoffice.tar.gz $LIBREOFFICE_DOWNLOAD_URL && "
+                                + "curl -s $LIBREOFFICE_DOWNLOAD_URL -o /tmp/libreoffice.tar.gz && "
                                 + "mkdir /tmp/libreoffice && "
                                 + "tar -C /tmp/ -xvf /tmp/libreoffice.tar.gz && "
                                 + "cd /tmp/LibreOffice_${LIBREOFFICE_VERSION}_Linux_x86-64_deb/DEBS && "

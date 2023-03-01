@@ -34,4 +34,12 @@
     <module>xwiki-platform-whatsnew-api</module>
     <module>xwiki-platform-whatsnew-ui</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-whatsnew-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

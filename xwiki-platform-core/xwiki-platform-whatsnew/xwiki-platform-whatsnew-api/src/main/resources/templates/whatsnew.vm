@@ -1,0 +1,57 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+## Displays the UI for What's New
+#template("startpage.vm")
+<div class="main layoutsubsection">
+  <div id="mainContentArea">
+    #try()
+    <div class="xwiki-whatsnew-container">
+      #set ($newsSource = $services.whatsnew.configuredNewsSource)
+      #foreach($newsItem in $newsSource.build())
+        <div class="xwiki-whatsnew-item">
+          ## The title is expected to be in plain text
+          <a class="xwiki-whatsnew-title" href="$newsItem.originURL.get()">$escapetool.xml($newsItem.title.get())</a>
+          <div class="xwiki-whatsnew-date">$newsItem.publishedDate.get()</div>
+          <div class="xwiki-whatsnew-description">
+            ## Render the description using the syntax it's written in.
+            #set ($description = $newsItem.description.get())
+            #set ($syntax = $description.syntax)
+            ## TODO: replace with the current skin syntax (don't hardcode)
+            #set ($skinSyntax = 'html/5.0')
+            #if ($skinSyntax == "$syntax.toIdString()")
+                ## TODO: How do we clean HTML to make sure there's no dangerous stuff in it?
+                $description.content
+            #else
+                ## Convert the source item description to the skin syntax
+                #set ($xdom = $services.rendering.parse($description.content, $syntax))
+                $services.rendering.render($xdom, $skinSyntax)
+            #end
+          </div>
+        </div>
+      #end
+    </div>
+    #end
+    #if ("$!exception" != '')
+      #displayException('Error displaying XWiki News', $exception)
+    #end
+    <div class="clearfloats"></div>
+  </div>## mainContentArea
+</div>## main
+#template("endpage.vm")

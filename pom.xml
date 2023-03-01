@@ -399,12 +399,12 @@
       <dependency>
         <groupId>com.rometools</groupId>
         <artifactId>rome</artifactId>
-        <version>1.19.0</version>
+        <version>2.0.0</version>
       </dependency>
       <dependency>
         <groupId>com.rometools</groupId>
         <artifactId>rome-utils</artifactId>
-        <version>1.19.0</version>
+        <version>2.0.0</version>
       </dependency>
       <dependency>
         <!-- Replace the runtime transitive dependency we excluded above with this one which repackages the NekoHTML classes to prevent conflicts. -->
@@ -675,7 +675,7 @@
       <dependency>
         <groupId>com.github.jsqlparser</groupId>
         <artifactId>jsqlparser</artifactId>
-        <version>4.2</version>
+        <version>4.6</version>
       </dependency>
 
       <!-- JNR -->
@@ -841,7 +841,7 @@
       <dependency>
         <groupId>com.icegreen</groupId>
         <artifactId>greenmail-junit5</artifactId>
-        <version>1.6.13</version>
+        <version>1.6.14</version>
       </dependency>
 
       <!-- Make sure to use a version of the Jetty client libraries matching the Jetty version we package -->

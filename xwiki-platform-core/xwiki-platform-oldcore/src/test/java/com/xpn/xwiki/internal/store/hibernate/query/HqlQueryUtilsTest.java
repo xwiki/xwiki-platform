@@ -47,6 +47,7 @@ public class HqlQueryUtilsTest
             .isSafe("select doc.fullName from XWikiDocument as doc, com.xpn.xwiki.objects.StringProperty as str"));
 
         assertTrue(HqlQueryUtils.isSafe("select count(*) from XWikiSpace"));
+        assertTrue(HqlQueryUtils.isSafe("select count(space.*) from XWikiSpace space"));
 
         assertTrue(HqlQueryUtils.isSafe("select attachment.filename from XWikiAttachment attachment"));
         assertTrue(HqlQueryUtils.isSafe("select count(*) from XWikiAttachment"));
@@ -61,6 +62,7 @@ public class HqlQueryUtilsTest
         assertFalse(HqlQueryUtils
             .isSafe("select doc.name, ot.field from XWikiDocument doc, XWikiSpace space, OtherTable as ot"));
         assertFalse(HqlQueryUtils.isSafe("select count(*) from OtherTable"));
+        assertFalse(HqlQueryUtils.isSafe("select count(other.*) from OtherTable other"));
     }
 
     @Test

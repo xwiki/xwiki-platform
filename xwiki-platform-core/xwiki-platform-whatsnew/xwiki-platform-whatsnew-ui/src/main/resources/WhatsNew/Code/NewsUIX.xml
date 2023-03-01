@@ -165,7 +165,7 @@
     <property>
       <content>{{velocity}}{{html clean="false"}} ## we need clean="false" because we want to display the raw content of #drawerItem()
   #template('drawer_macros.vm')
-  #drawerItem('someURL', 'question', $escapetool.xml($services.localization.render('platform.whatsnew.drawer.text')))
+  #drawerItem($xwiki.getURL($doc.documentReference, 'view', 'xpage=whatsnew'), 'question', $escapetool.xml($services.localization.render('platform.whatsnew.drawer.text')))
 {{/html}}{{/velocity}}</content>
     </property>
     <property>

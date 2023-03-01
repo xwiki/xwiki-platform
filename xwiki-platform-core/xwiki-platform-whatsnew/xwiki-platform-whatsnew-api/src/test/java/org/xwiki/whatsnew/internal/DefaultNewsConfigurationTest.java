@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.inject.Named;
 
@@ -56,7 +57,7 @@ class DefaultNewsConfigurationTest
     @Test
     void getNewsSourceDescriptorsWhenNoConfiguration()
     {
-        when(this.configurationSource.getProperty("whatsnew.sources")).thenReturn(null);
+        when(this.configurationSource.getProperty("whatsnew.sources", Properties.class)).thenReturn(null);
 
         List< NewsSourceDescriptor> descriptors = this.configuration.getNewsSourceDescriptors();
 
@@ -70,7 +71,8 @@ class DefaultNewsConfigurationTest
     @Test
     void getNewsSourceDescriptorsWhenEmptyConfiguration()
     {
-        when(this.configurationSource.getProperty("whatsnew.sources")).thenReturn(Collections.emptyMap());
+        when(this.configurationSource.getProperty("whatsnew.sources", Properties.class))
+            .thenReturn(new Properties());
 
         List< NewsSourceDescriptor> descriptors = this.configuration.getNewsSourceDescriptors();
 
@@ -80,10 +82,10 @@ class DefaultNewsConfigurationTest
     @Test
     void getNewsSourceDescriptorsWithNoParameters()
     {
-        Map<Object, Object> data = new HashMap<>();
-        data.put("sourceid1", "sourcetype1");
-        data.put("sourceid2", "sourcetype2");
-        when(this.configurationSource.getProperty("whatsnew.sources")).thenReturn(data);
+        Properties data = new Properties();
+        data.setProperty("sourceid1", "sourcetype1");
+        data.setProperty("sourceid2", "sourcetype2");
+        when(this.configurationSource.getProperty("whatsnew.sources", Properties.class)).thenReturn(data);
         when(this.configurationSource.getKeys()).thenReturn(List.of("whatever", "whatsnew.sources"));
 
         List< NewsSourceDescriptor> descriptors = this.configuration.getNewsSourceDescriptors();
@@ -96,10 +98,10 @@ class DefaultNewsConfigurationTest
     @Test
     void getNewsSourceDescriptorsWithParameters()
     {
-        Map<Object, Object> data = new HashMap<>();
-        data.put("sourceid1", "sourcetype1");
-        data.put("sourceid2", "sourcetype2");
-        when(this.configurationSource.getProperty("whatsnew.sources")).thenReturn(data);
+        Properties data = new Properties();
+        data.setProperty("sourceid1", "sourcetype1");
+        data.setProperty("sourceid2", "sourcetype2");
+        when(this.configurationSource.getProperty("whatsnew.sources", Properties.class)).thenReturn(data);
         when(this.configurationSource.getKeys()).thenReturn(List.of("whatever", "whatsnew.sources",
             "whatsnew.source.sourceid1.a", "whatsnew.source.sourceid1.aa", "whatsnew.source.sourceid2.c"));
         when(this.configurationSource.getProperty("whatsnew.source.sourceid1.a", String.class)).thenReturn("b");
@@ -136,7 +138,7 @@ class DefaultNewsConfigurationTest
     @Test
     void isActiveWhenNoSourceConfiguration()
     {
-        when(this.configurationSource.getProperty("whatsnew.sources")).thenReturn(null);
+        when(this.configurationSource.getProperty("whatsnew.sources", Properties.class)).thenReturn(null);
 
         assertTrue(this.configuration.isActive());
     }
@@ -144,7 +146,8 @@ class DefaultNewsConfigurationTest
     @Test
     void isActiveWhenEmptySourceConfiguration()
     {
-        when(this.configurationSource.getProperty("whatsnew.sources")).thenReturn(Collections.emptyMap());
+        when(this.configurationSource.getProperty("whatsnew.sources", Properties.class))
+            .thenReturn(new Properties());
 
         assertFalse(this.configuration.isActive());
     }
@@ -152,7 +155,10 @@ class DefaultNewsConfigurationTest
     @Test
     void isActiveWhenNotEmptySourceConfiguration()
     {
-        when(this.configurationSource.getProperty("whatsnew.sources")).thenReturn(Collections.singletonMap("a", "b"));
+        Properties data = new Properties();
+        data.setProperty("a", "b");
+        when(this.configurationSource.getProperty("whatsnew.sources", Properties.class))
+            .thenReturn(data);
 
         assertTrue(this.configuration.isActive());
     }

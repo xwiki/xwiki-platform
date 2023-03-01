@@ -84,8 +84,10 @@ class NotificationRssDefaultPageTest extends PageTest
 
         // Mock the user's name.
         when(this.oldcore.getSpyXWiki().getPlainUserName(USER_REFERENCE, this.context)).thenReturn("First & Name");
-
+        // Mock date formatting to avoid issues with timezones.
         Date testDate = mock(Date.class);
+        when(this.oldcore.getSpyXWiki().formatDate(testDate, null, this.context)).thenReturn("formattedDate");
+
         Event testEvent = new DefaultEvent();
         testEvent.setApplication("test&app");
         testEvent.setType("test&type");
@@ -102,7 +104,7 @@ class NotificationRssDefaultPageTest extends PageTest
             + "  notifications.events.by [First &amp; Name]\n"
             + "</p>\n"
             + "<p>\n"
-            + "  1970/01/01 01:00\n"
+            + "  formattedDate\n"
             + "<br/>\n"
             + "  notifications.rss.seeChanges "
             + "[<a href='http://null:0/xwiki/bin/view/Test/?viewer=changes&#38;rev1=1.1&#38;rev2=2.1'>2.1</a>]\n"

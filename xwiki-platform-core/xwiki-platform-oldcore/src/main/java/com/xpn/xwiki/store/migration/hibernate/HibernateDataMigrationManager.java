@@ -23,6 +23,7 @@ package com.xpn.xwiki.store.migration.hibernate;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -40,7 +41,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
-import com.xpn.xwiki.internal.store.hibernate.MigrationResourceAccessor;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -55,6 +55,7 @@ import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.LiquibaseException;
+import liquibase.sdk.resource.MockResourceAccessor;
 
 /**
  * Migration manager for hibernate store.
@@ -72,6 +73,11 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
      * contains at least one valid liquibase XML definition.
      */
     private static final String LIQUIBASE_RESOURCE = "liquibase-xwiki/";
+
+    /**
+     * Name for which the change log is served.
+     */
+    public static final String CHANGELOG_NAME = "liquibase.xml";
 
     /**
      * @return store system for execute store-specific actions.
@@ -296,8 +302,8 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
                         // properly (See XWIKI-8813).
                         lbDatabase.setDefaultSchemaName(store.getSchemaFromWikiName(getXWikiContext()));
 
-                        lb = new Liquibase(MigrationResourceAccessor.CHANGELOG_NAME,
-                            new MigrationResourceAccessor(changeLogs.toString()), lbDatabase);
+                        lb = new Liquibase(CHANGELOG_NAME,
+                            new MockResourceAccessor(Map.of(CHANGELOG_NAME, changeLogs.toString())), lbDatabase);
                     } catch (LiquibaseException e) {
                         throw new HibernateException(new XWikiException(
                             XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_MIGRATION, String

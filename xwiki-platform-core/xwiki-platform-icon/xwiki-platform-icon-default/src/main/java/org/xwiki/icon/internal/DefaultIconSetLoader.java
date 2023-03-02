@@ -25,6 +25,7 @@ import java.io.StringReader;
 import java.util.Properties;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -36,6 +37,9 @@ import org.xwiki.icon.IconSet;
 import org.xwiki.icon.IconSetLoader;
 import org.xwiki.icon.IconType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
@@ -72,19 +76,38 @@ public class DefaultIconSetLoader implements IconSetLoader
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
 
+    @Inject
+    private AuthorizationManager authorizationManager;
+
+    @Inject
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> documentUserSerializer;
+
     @Override
     public IconSet loadIconSet(DocumentReference iconSetReference) throws IconException
     {
         try {
             // Get the document
-            DocumentModelBridge doc = documentAccessBridge.getDocumentInstance(iconSetReference);
+            DocumentModelBridge doc = this.documentAccessBridge.getDocumentInstance(iconSetReference);
+
+            // Check that both the content (actual icon theme content) and the metadata author (icon theme object)
+            // have script right.
+            DocumentReference contentAuthor =
+                this.documentUserSerializer.serialize(doc.getAuthors().getContentAuthor());
+            this.authorizationManager.checkAccess(Right.SCRIPT, contentAuthor, iconSetReference);
+            DocumentReference metadataAuthor =
+                this.documentUserSerializer.serialize(doc.getAuthors().getEffectiveMetadataAuthor());
+            this.authorizationManager.checkAccess(Right.SCRIPT, metadataAuthor, iconSetReference);
+
             String content = doc.getContent();
             // The name of the icon set is stored in the IconThemesCode.IconThemeClass XObject of the document
-            DocumentReference iconClassRef = new DocumentReference(wikiDescriptorManager.getCurrentWikiId(),
+            DocumentReference iconClassRef = new DocumentReference(this.wikiDescriptorManager.getCurrentWikiId(),
                 "IconThemesCode", "IconThemeClass");
-            String name = (String) documentAccessBridge.getProperty(iconSetReference, iconClassRef, "name");
+            String name = (String) this.documentAccessBridge.getProperty(iconSetReference, iconClassRef, "name");
             // Load the icon set
-            return loadIconSet(new StringReader(content), name);
+            IconSet result = loadIconSet(new StringReader(content), name);
+            result.setSourceDocumentReference(iconSetReference);
+            return result;
         } catch (Exception e) {
             throw new IconException(String.format(ERROR_MSG, iconSetReference), e);
         }

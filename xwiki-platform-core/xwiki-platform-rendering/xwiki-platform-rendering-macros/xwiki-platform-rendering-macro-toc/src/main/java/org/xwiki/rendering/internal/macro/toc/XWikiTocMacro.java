@@ -19,18 +19,25 @@
  */
 package org.xwiki.rendering.internal.macro.toc;
 
+import java.util.List;
+
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.toc.XWikiTocMacroParameters;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.skinx.SkinExtension;
 
 /**
  * Generate a Table Of Contents based on the document sections.
  * <p>
  * We override the default Table of Contents macro because we want to associate a {@code DocumentReference} picker to
  * the {@code reference} parameter (using the {@code PropertyDisplayType} annotation).
- * 
+ *
  * @version $Id$
  * @since 11.5RC1
  */
@@ -39,11 +46,23 @@ import org.xwiki.rendering.macro.toc.XWikiTocMacroParameters;
 @Singleton
 public class XWikiTocMacro extends AbstractTocMacro<XWikiTocMacroParameters>
 {
+    @Inject
+    @Named("ssfx")
+    private SkinExtension ssfx;
+
     /**
      * Create and initialize the descriptor of the macro.
      */
     public XWikiTocMacro()
     {
         super(XWikiTocMacroParameters.class);
+    }
+
+    @Override
+    public List<Block> execute(XWikiTocMacroParameters parameters, String content, MacroTransformationContext context)
+        throws MacroExecutionException
+    {
+        this.ssfx.use("toc.css");
+        return super.execute(parameters, content, context);
     }
 }

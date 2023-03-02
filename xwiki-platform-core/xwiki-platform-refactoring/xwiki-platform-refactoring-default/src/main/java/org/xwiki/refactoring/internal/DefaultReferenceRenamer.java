@@ -151,7 +151,7 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
                 Optional<MacroBlock> optionalMacroBlock = handleMacroBlock(macroBlock, currentDocumentReference,
                     oldTarget, newTarget, macroRefactoringLambda);
                 if (optionalMacroBlock.isPresent()) {
-                    block.replaceChild(optionalMacroBlock.get(), macroBlock);
+                    macroBlock.getParent().replaceChild(optionalMacroBlock.get(), macroBlock);
                     modified = true;
                 }
             } else {

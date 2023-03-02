@@ -275,11 +275,11 @@
     <property>
       <code>{{velocity output="false"}}
   $xwiki.ssx.use('IconThemesCode.IconPicker')
-  ## The icons themes may need some SSX, so we ask for a rendering of an icon of each icon theme, to be able to display
-  ## all icon themes in the picker
+  ## The icons themes may need some SSX, so we ask to load the resources of all icon sets to be able to display them
+  ## in the picker.
   ## ToDo: since it is a bit hacky, a better system would be to dynamically load the needed SSX on demand
   #foreach($iconSetName in $services.icon.iconSetNames)
-    $services.icon.render('wiki', $iconSetName)
+    $services.icon.use($iconSetName)
   #end
 {{/velocity}}
 

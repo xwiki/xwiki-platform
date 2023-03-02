@@ -99,6 +99,7 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -728,28 +729,41 @@ define('editInPlace', [
     // Thus we need to use the grid for the sticky buttons also otherwise the postion is badly computed when scrolling
     // (because of the float on the previous element). This wouldn't be needed if we were using position:sticky, which
     // we can't use yet because it's not implemented on IE11 which we still have to support.
-    var actionButtonsWrapper = editContent.nextAll('.sticky-buttons-wrapper');
-    if (actionButtonsWrapper.length === 0) {
-      actionButtonsWrapper = $('&lt;div class="sticky-buttons-wrapper col-xs-12"&gt;' +
-        '&lt;div class="inplace-editing-buttons sticky-buttons"/&gt;&lt;/div&gt;').insertAfter(editContent).toggle(!!xwikiDocument);
-      var actionButtons = actionButtonsWrapper.children('.sticky-buttons')
-        .data('xwikiDocument', xwikiDocument)
-        // Expose the fake form if an extension needs to manipulate it.
-        .data('fakeForm', fakeForm);
+    let inplaceEditingForm = editContent.nextAll('form#inplace-editing');
+    if (!inplaceEditingForm.length) {
+      // The 'xwikieditcontent' id is needed for the auto-save feature (otherwise it doesn't find the form).
+      inplaceEditingForm = $(`
+        &lt;form id="inplace-editing" class="col-xs-12"&gt;
+          &lt;div hidden&gt;
+            &lt;input type="hidden" name="form_token" /&gt;
+            &lt;input type="hidden" name="async" value="true" /&gt;
+            &lt;input type="hidden" name="content" /&gt;
+            &lt;input type="hidden" name="RequiresHTMLConversion" value="content" /&gt;
+            &lt;input type="hidden" name="content_syntax" /&gt;
+            &lt;input type="hidden" name="language" /&gt;
+          &lt;/div&gt;
+          &lt;fieldset id="xwikieditcontent" class="xform inplace-editing-buttons sticky-buttons"&gt;&lt;/fieldset&gt;
+        &lt;/form&gt;
+      `).attr('action', XWiki.currentDocument.getURL('save'))
+        .insertAfter(editContent).toggle(!!xwikiDocument);
+      inplaceEditingForm.find('input[name="form_token"]').val(xcontext.form_token);
+      var actionButtons = inplaceEditingForm.children('.sticky-buttons').data('xwikiDocument', xwikiDocument);
       return loadActionButtons(actionButtons);
     } else {
       // If we're editing a page..
       if (xwikiDocument) {
         // ..then make sure the action buttons are displayed right away (don't wait for the user to scroll).
-        actionButtonsWrapper.show().children('.sticky-buttons')
+        inplaceEditingForm.show().children('.sticky-buttons')
           .data('xwikiDocument', xwikiDocument)
-          // Expose the fake form if an extension needs to manipulate it.
-          .data('fakeForm', fakeForm)
-          // but make sure the position of the action buttons is updated.
-          .trigger('xwiki:dom:refresh');
-        // The action buttons are disabled on Save &amp; View. We don't reload the page on Save &amp; View and we reuse the
-        // action buttons so we need to re-enable them each time we enter the edit mode.
-        fakeForm.enable();
+          // Make sure the position of the action buttons is updated.
+          .trigger('xwiki:dom:refresh')
+          // The action buttons are disabled on Save &amp; View. We don't reload the page on Save &amp; View and we reuse the
+          // action buttons so we need to re-enable them each time we enter the edit mode.
+          .prop('disabled', false);
+        // Cleanup the extra hidden input fields that actionButtons.js might have appended to the form. We have to do
+        // this each time the form is (re)enabled (i.e. after a failed Save &amp; View or before entering the edit mode)
+        // because they are designed to be used once.
+        inplaceEditingForm.children('fieldset').nextAll().remove();
       }
       return Promise.resolve(xwikiDocument);
     }
@@ -791,13 +805,24 @@ define('editInPlace', [
   };
 
   var loadActionButtons = function(actionButtons) {
+    // We want to update the form data as late as possible (but still before the form is validated), in order to allow
+    // the title and content editors to update their values and the 'xwikiDocument' instance. We do this by catching the
+    // event early (lower in the DOM, at the start of the event bubbling phase) and adding a one time event listener for
+    // the end of the event bubbling phase at the top level of the DOM document.
+    actionButtons.on('xwiki:actions:beforeSave', function() {
+      $(document).one('xwiki:actions:beforeSave', updateFormDataBeforeSave);
+    });
+    actionButtons.on('xwiki:actions:cancel', function(event) {
+      // We are already in view mode so there's no need to leave the page.
+      event.preventDefault();
+    });
     $(document).on('xwiki:actions:view', '.xcontent.form', function(event, data) {
       // Blur the action buttons first to re-enable the "disabled in inputs" shortcut keys (e.g. the page edit
       // shortcut), then disable the action buttons in order to disable their shortcut keys while we're not editing
       // in-place (e.g. prevent the Save shortcut while the user is only viewing the page). Finally hide the action
       // buttons to have them ready for the next editing session (the user can save or cancel and then edit again
       // without reloading the page).
-      actionButtons.find(':input').blur().prop('disabled', true).end().parent().hide();
+      actionButtons.find(':input').blur().end().prop('disabled', true).parent().hide();
       // Restore the Translate button if the locale of the viewed document doesn't match the current user interface
       // locale (because the viewed document doesn't have a translation in the current locale).
       var xwikiDocumentLocale = data.document.getRealLocale();
@@ -818,23 +843,14 @@ define('editInPlace', [
       actionButtons.html(html);
       // Fix the name of the Save &amp; View action.
       actionButtons.find('.btn-primary').first().attr('name', 'action_save');
-      // Append the hidden input field that keeps the CSRF token.
-      $('&lt;input type="hidden" name="form_token" /&gt;').val(xcontext.form_token).appendTo(actionButtons);
-      // We need a place where actionButtons.js can add more hidden inputs.
-      actionButtons.append('&lt;div class="hidden extra"/&gt;');
       // Let the others know that the DOM has been updated, in order to enhance it.
       $(document).trigger('xwiki:dom:updated', {'elements': actionButtons.toArray()});
       return new Promise((resolve, reject) =&gt; {
         require(['xwiki-actionButtons', 'xwiki-diff', 'xwiki-autoSave'], function() {
-          overrideEditActions();
           overrideAjaxSaveAndContinue();
-          // Activate the auto-save feature passing our fake edit form. Note that autosave.js also creates an instance of
-          // AutoSave but it doesn't do anything because it doesn't find a real edit form in the page. This is why we have
-          // to create our own instance of AutoSave passing the right (fake) form.
-          new XWiki.editors.AutoSave({form: fakeForm});
           var xwikiDocument = actionButtons.data('xwikiDocument');
           // Enable the action buttons (and their shortcut keys) only if we're editing a document.
-          actionButtons.find(':input').prop('disabled', !xwikiDocument);
+          actionButtons.prop('disabled', !xwikiDocument);
           resolve(xwikiDocument);
         });
       });
@@ -843,84 +859,28 @@ define('editInPlace', [
     });
   };
 
-  function addToFormData(formData, inputs) {
-    inputs.serializeArray().forEach(function(entry) {
-      formData.append(entry.name, entry.value);
-    });
-  }
+  var updateFormDataBeforeSave = function() {
+    const form = $('form#inplace-editing');
+    const xwikiDocument = form.children('.sticky-buttons').data('xwikiDocument');
 
-  // actionButtons.js expects a form so we use a fake form. Refactoring actionButtons.js is too dangerous ATM.
-  var fakeForm = {
-    action: XWiki.currentDocument.getURL('save'),
-    async: true,
-    _getActionButtons: function() {
-      if (!this._actionButtons) {
-        this._actionButtons = $('#xwikicontent').nextAll('.sticky-buttons-wrapper').children('.sticky-buttons');
-      }
-      return this._actionButtons;
-    },
-    disable: function() {
-      this._getActionButtons().find(':input').prop('disabled', true);
-    },
-    enable: function() {
-      // Clear the extra hidden input fields, that actionButtons.js might have added, each time the form is (re)enabled
-      // (i.e. after a failed Save &amp; View or before entering the edit mode) because they are designed to be used once.
-      this._getActionButtons().find('.hidden.extra').empty();
-      this._getActionButtons().find(':input').prop('disabled', false);
-    },
-    insert: function(element) {
-      this._getActionButtons().find('.hidden.extra').append(element);
-    },
-    // Note that this method only works with single argument.
-    append: function(element) {
-      this.insert(element);
-    },
-    down: function(selector) {
-      return this._getActionButtons().find(selector)[0];
-    },
-    serialize: function() {
-      var formData = new FormData();
-      addToFormData(formData, this._getActionButtons().find(':input'));
-      // retrieve all input fields listing the temporary uploaded files.
-      var xwikiDocument = this._getActionButtons().data('xwikiDocument');
-      formData.set('title', xwikiDocument.rawTitle);
-      formData.set('language', xwikiDocument.getRealLocale());
-      formData.set('isNew', xwikiDocument.isNew);
+    form.find('input[name="language"]').val(xwikiDocument.getRealLocale());
+    form.find('input[name="isNew"]').val(xwikiDocument.isNew);
 
-      if (xwikiDocument.content !== xwikiDocument.originalDocument.content) {
-        // Submit the raw (source) content. No syntax conversion is needed in this case.
-        formData.set('content', xwikiDocument.content);
-      } else {
-        // Submit the rendered content (HTML), but make sure it is converted to the document syntax on the server.
-        formData.set('content', xwikiDocument.renderedContent);
-        formData.set('RequiresHTMLConversion', 'content');
-        formData.set('content_syntax', xwikiDocument.syntax);
-      }
-      // Add the temporary uploaded files to the form.
-      addToFormData(formData, $('#xwikicontent').nextAll('input[name="uploadedFiles"]'));
+    // Submit either the raw (source) content (no syntax conversion needed in this case) or the rendered content (HTML)
+    // in which case we have to force the conversion to the document syntax on the server.
+    const submitRawContent = xwikiDocument.content !== xwikiDocument.originalDocument.content;
+    form.find('input[name="content"]').val(submitRawContent ? xwikiDocument.content : xwikiDocument.renderedContent);
+    form.find('input[name="RequiresHTMLConversion"]').prop('disabled', submitRawContent);
+    form.find('input[name="content_syntax"]').val(xwikiDocument.syntax).prop('disabled', submitRawContent);
 
-      // Check for merge conflicts only if the document is not new and we know the current version.
-      if (!xwikiDocument.isNew &amp;&amp; xwikiDocument.version) {
-        formData.set('previousVersion', xwikiDocument.version);
-        formData.set('editingVersionDate', new Date(xwikiDocument.modified).getTime());
-      }
-      // Note: if you refactor, please make sure that actionsButtons inputs have the lowest priority.
-      return formData;
+    // Add the temporary uploaded files to the form.
+    $('#xwikicontent').nextAll('input[name="uploadedFiles"]').attr('form', 'inplace-editing');
+
+    // Check for merge conflicts only if the document is not new and we know the current version.
+    if (!xwikiDocument.isNew &amp;&amp; xwikiDocument.version) {
+      form.find('input[name="previousVersion"]').val(xwikiDocument.version);
+      form.find('input[name="editingVersionDate"]').val(new Date(xwikiDocument.modified).getTime());
     }
-  };
-
-  var overrideEditActions = function() {
-    // Override the EditActions.notify() function in order to pass a fake form in the event parameters.
-    var originalNotify = XWiki.actionButtons.EditActions.prototype.notify;
-    XWiki.actionButtons.EditActions.prototype.notify = function(originalEvent, action, params) {
-      if (params &amp;&amp; $(originalEvent.element()).closest('.inplace-editing-buttons').length &gt; 0) {
-        // actionButtons.js expects a form so we use a fake form. Refactoring actionButtons.js is too dangerous ATM.
-        // Note that we do this only when the event has parameters because we want to exclude the cancel event for which
-        // actionButtons.js changes the window location if a form is specified, and we want to prevent that.
-        params.form = fakeForm;
-      }
-      return originalNotify.apply(this, arguments);
-    };
   };
 
   var overrideAjaxSaveAndContinue = function() {
@@ -951,12 +911,20 @@ define('editInPlace', [
   var initTitleEditor = function(xwikiDocument) {
     var label = $('&lt;label for="document-title-input" class="sr-only"/&gt;')
       .text(l10n['core.editors.content.titleField.label']);
-    var input = $('&lt;input type="text" id="document-title-input"/&gt;').val(xwikiDocument.rawTitle);
-    var placeholder = xwikiDocument.documentReference.name;
-    if (placeholder === 'WebHome') {
-      placeholder = xwikiDocument.documentReference.parent.name;
+    var input = $('&lt;input type="text" id="document-title-input" name="title" form="inplace-editing" /&gt;')
+      .val(xwikiDocument.rawTitle);
+    if (config.titleIsMandatory) {
+      input.attr({
+        'required': '',
+        'data-validation-value-missing': l10n['core.validation.required.message']
+      });
+    } else {
+      var placeholder = xwikiDocument.documentReference.name;
+      if (placeholder === 'WebHome') {
+        placeholder = xwikiDocument.documentReference.parent.name;
+      }
+      input.attr('placeholder', placeholder);
     }
-    input.attr('placeholder', placeholder);
     $('#document-title h1').addClass('editable').empty().append([label, input]);
     $(document).on('xwiki:actions:beforeSave.titleEditor', '.xcontent.form', function(event) {
       xwikiDocument.rawTitle = input.val();
@@ -1283,6 +1251,7 @@ require(['jquery'], function($) {
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -1359,8 +1328,6 @@ require(['jquery'], function($) {
 @document-title-input-padding-vertical: @line-height-computed / 4 - 1;
 input#document-title-input {
   /* Preserve the heading styles. */
-  border: 1px solid transparent;
-  box-shadow: none;
   color: inherit;
   font-size: inherit;
   /* It seems it's not enough to set the line height for the text input. We also need to set its height. */
@@ -1369,12 +1336,16 @@ input#document-title-input {
   padding: @document-title-input-padding-vertical (ceil(@grid-gutter-width / 2) - 1);
   width: 100%;
 }
+input#document-title-input:valid {
+  border: 1px solid transparent;
+  box-shadow: none;
+}
 
-input#document-title-input:hover {
+input#document-title-input:valid:hover {
   border-color: @input-border;
 }
 
-input#document-title-input:focus,
+input#document-title-input:valid:focus,
 #xwikicontent[contenteditable]:focus,
 #xwikicontent[tabindex]:focus {
   .form-control-focus();
@@ -1400,7 +1371,7 @@ input#document-title-input:focus,
   padding-top: @line-height-computed * 0.75;
 }
 
-.sticky-buttons-wrapper {
+form#inplace-editing {
   /* Leave some space for the bottom box shadow of the editing area. */
   margin-top: 7px;
 }</code>
@@ -1458,7 +1429,7 @@ input#document-title-input:focus,
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -1478,6 +1449,7 @@ input#document-title-input:focus,
         <name>content</name>
         <number>1</number>
         <prettyName>Executed Content</prettyName>
+        <restricted>0</restricted>
         <rows>25</rows>
         <size>120</size>
         <unmodifiable>0</unmodifiable>
@@ -1508,6 +1480,7 @@ input#document-title-input:focus,
         <name>parameters</name>
         <number>7</number>
         <prettyName>Extension Parameters</prettyName>
+        <restricted>0</restricted>
         <rows>10</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -1563,6 +1536,7 @@ $url#if ($url.contains('?'))&amp;#else?#end$escapetool.url($params)
       'edit.inplace.page.loadFailed',
       'edit.inplace.actionButtons.loadFailed',
       'core.editors.content.titleField.label',
+      'core.validation.required.message',
       ['edit.inplace.page.translate.messageBefore', $doc.realLocale.getDisplayName($xcontext.locale),
         $xcontext.locale.getDisplayName($xcontext.locale)],
       ['edit.inplace.page.translate.messageAfter', $xcontext.locale.getDisplayName($xcontext.locale)]
@@ -1606,6 +1580,7 @@ $url#if ($url.contains('?'))&amp;#else?#end$escapetool.url($params)
       },
       'l10n': $l10n
     })
+    #set ($inplaceEditingConfig.titleIsMandatory = $xwiki.getSpacePreference('xwiki.title.mandatory') == 1)
     &lt;div class="hidden" data-inplace-editing-config="$escapetool.xml($jsontool.serialize($inplaceEditingConfig))"&gt;&lt;/div&gt;
     ## We didn't move this to the file system because it uses LESS and we didn't want to include it in the skin.
     #set ($discard = $xwiki.ssx.use('XWiki.InplaceEditing'))

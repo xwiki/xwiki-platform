@@ -1,0 +1,20 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.1
+.# Verify that the icon set can be specified.
+.#-----------------------------------------------------
+{{displayIcon name="home" iconSet="special" /}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [displayIcon] [name=home|iconSet=special]
+beginMetaData [[syntax]=[XWiki 2.1]]
+beginParagraph
+onWord [special]
+onSpace
+onWord [home]
+endParagraph
+endMetaData [[syntax]=[XWiki 2.1]]
+endMacroMarkerStandalone [displayIcon] [name=home|iconSet=special]
+endDocument

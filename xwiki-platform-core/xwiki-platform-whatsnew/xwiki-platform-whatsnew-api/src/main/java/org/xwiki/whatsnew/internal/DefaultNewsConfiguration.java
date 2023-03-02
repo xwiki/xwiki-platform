@@ -80,7 +80,7 @@ public class DefaultNewsConfiguration implements NewsConfiguration
         // whatsnew.sources = xwikiorg = xwikiblog
         // whatsnew.source.xwikiorg.rssURL = https://extensions.xwiki.org/news
         // whatsnew.sources = xwikisas = xwikiblog
-        // whatsnew.sources.xwikisas.rssURL = https://xwiki.com/en/Blog/BlogRss?xpage=plain
+        // whatsnew.sources.xwikisas.rssURL = https://xwiki.com/news
         List<NewsSourceDescriptor> descriptors;
         Properties sources = getConfiguredSources();
         // If there's no configuration set by the user the use a default configuration.

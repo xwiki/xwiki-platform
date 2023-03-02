@@ -17,27 +17,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.whatsnew;
+package org.xwiki.whatsnew.internal.xwikiblog;
 
-import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.stability.Unstable;
+import org.junit.jupiter.api.Test;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.xml.html.DefaultHTMLCleanerComponentList;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Represents a {@link NewsSourceItem} content.
+ * Tests the {@link RSSContentCleaner}.
  *
  * @version $Id$
- * @since 15.1RC1
+ * @since 15.2RC1
  */
-@Unstable
-public interface NewsContent
+@ComponentTest
+@DefaultHTMLCleanerComponentList
+class RSSContentCleanerTest
 {
-    /**
-     * @return the content in the syntax of {@link #getSyntax()}, cleaned and safe to be rendered
-     */
-    String getContent();
+    @InjectMockComponents
+    private RSSContentCleaner rssContentCleaner;
 
-    /**
-     * @return the syntax in which the content is written in
-     */
-    Syntax getSyntax();
+    @Test
+    void linkTargetScript()
+    {
+        assertEquals("<p><a>XSS</a></p>", this.rssContentCleaner.clean("<a href=\"javascript:alert(1)\">XSS</a>"));
+    }
+
+    @Test
+    void iframe()
+    {
+        assertEquals("<p></p>", this.rssContentCleaner.clean(
+            "<iframe src=\"https://www.xwiki.org\" width=\"200\" height=\"400\">Iframe</iframe>"));
+    }
 }

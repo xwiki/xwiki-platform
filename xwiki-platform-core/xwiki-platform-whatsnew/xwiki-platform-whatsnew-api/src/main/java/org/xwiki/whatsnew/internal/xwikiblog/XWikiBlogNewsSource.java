@@ -81,21 +81,27 @@ public class XWikiBlogNewsSource implements NewsSource
 
     private XWikiBlogNewsCategoryConverter categoriesConverter = new XWikiBlogNewsCategoryConverter();
 
+    private RSSContentCleaner rssContentCleaner;
+
     /**
      * @param rssURL the URL to the XWiki Blog RSS
+     * @param rssContentCleaner the component to clean the RSS description content so that it's safe to be rendered
      */
-    public XWikiBlogNewsSource(String rssURL)
+    public XWikiBlogNewsSource(String rssURL, RSSContentCleaner rssContentCleaner)
     {
         this.rssURL = rssURL;
+        this.rssContentCleaner = rssContentCleaner;
     }
 
     /**
      * @param rssStream the stream containing the XWiki Blog RSS data (mostly needed for tests to avoid having
      *        to connect to an XWiki instance)
+     * @param rssContentCleaner the component to clean the RSS description content so that it's safe to be rendered
      */
-    public XWikiBlogNewsSource(InputStream rssStream)
+    public XWikiBlogNewsSource(InputStream rssStream, RSSContentCleaner rssContentCleaner)
     {
         this.rssStream = rssStream;
+        this.rssContentCleaner = rssContentCleaner;
     }
 
     @Override
@@ -171,10 +177,14 @@ public class XWikiBlogNewsSource implements NewsSource
         for (Item item : articles) {
             DefaultNewsSourceItem newsItem = new DefaultNewsSourceItem();
             newsItem.setTitle(item.getTitle());
+
+            // Clean the HTML content from the description so that it's safe to be rendered.
             Optional<NewsContent> content = item.getDescription().isPresent()
-                ? Optional.of(new DefaultNewsContent(item.getDescription().get(), getContentSyntax()))
+                ? Optional.of(new DefaultNewsContent(this.rssContentCleaner.clean(item.getDescription().get()),
+                    getContentSyntax()))
                 : Optional.empty();
             newsItem.setDescription(content);
+
             newsItem.setAuthor(item.getAuthor());
             newsItem.setCategories(this.categoriesConverter.convertFromRSS(item.getCategories()));
             newsItem.setPublishedDate(item.getPubDate());

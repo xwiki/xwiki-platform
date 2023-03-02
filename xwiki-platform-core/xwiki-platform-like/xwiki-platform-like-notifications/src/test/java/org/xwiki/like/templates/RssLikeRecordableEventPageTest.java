@@ -87,7 +87,7 @@ class RssLikeRecordableEventPageTest extends PageTest
 
         // Mock date formatting to avoid issues with timezones.
         Date mockDate = mock(Date.class);
-        when(this.oldcore.getSpyXWiki().formatDate(mockDate, null, this.context)).thenReturn("formattedDate");
+        when(this.oldcore.getSpyXWiki().formatDate(mockDate, null, this.context)).thenReturn("<formattedDate>");
 
         Event testEvent = new DefaultEvent();
         testEvent.setDate(mockDate);
@@ -104,7 +104,7 @@ class RssLikeRecordableEventPageTest extends PageTest
                 + " [First &amp; Name]\n"
                 + "</p>\n"
                 + "<p>\n"
-                + "  formattedDate\n"
+                + "  &#60;formattedDate&#62;\n"
                 + "</p>"));
     }
 }

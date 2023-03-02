@@ -1451,7 +1451,6 @@
                     <exclude>org.xwiki.contrib:application-ckeditor-ui</exclude>
                     <exclude>org.xwiki.contrib:application-ckeditor-webjar</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-eventstream</exclude>
-                    <exclude>org.xwiki.platform:xwiki-platform-filter-ui</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-flamingo-bootswatchthemes</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-flamingo-theme</exclude>
                     <exclude>org.xwiki.contrib:application-help-center</exclude>

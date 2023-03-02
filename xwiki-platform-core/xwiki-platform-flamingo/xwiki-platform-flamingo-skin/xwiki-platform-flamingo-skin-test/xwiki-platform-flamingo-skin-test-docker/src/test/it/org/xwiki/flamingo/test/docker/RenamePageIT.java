@@ -368,7 +368,13 @@ public class RenamePageIT
             + "Withing a macro: Check out this page: [[type the link label>>doc:%2$s]]\n" + "\n" + "{{error}}\n"
             + "And in nested macro: Check out this page: [[type the link label>>doc:%3$s]]\n" + "{{/error}}\n" + "\n"
             + " \n" + "{{/warning}}\n" + "\n" + "Picture: [[image:%4$s@image.gif]]\n" + "Include macro:\n" + "\n"
-            + "{{include reference=\"%5$s\"/}}";
+            + "{{include reference=\"%5$s\"/}}\n\n"
+            + "== A section ==\n\n"
+            + "First link again: [[type the link label>>doc:%1$s]]\n\n"
+            + "{{warning}}\n"
+            + "Withing a macro: Check out this page: [[type the link label>>doc:%1$s]]\n"
+            + "{{/warning}}\n\n"
+            + "Final line.";
         setup.createPage(testReference,
             String.format(testPageContent, sourcePage1, sourcePage2, sourcePage3, sourcePage4, sourcePage5));
 

@@ -575,14 +575,17 @@ class DefaultLinkRefactoringTest
         Map<String, String> includeParameters = new HashMap<String, String>();
         includeParameters.put("reference", "A.B");
         MacroBlock includeMacroBlock1 = new MacroBlock("include", includeParameters, false);
+        includeMacroBlock1.setParent(xdom);
 
         Map<String, String> includeOldParameters = new HashMap<String, String>();
         includeOldParameters.put("document", "A.B");
         MacroBlock includeMacroBlock2 = new MacroBlock("include", includeOldParameters, false);
+        includeMacroBlock2.setParent(xdom);
 
         Map<String, String> displayParameters = new HashMap<String, String>();
         displayParameters.put("reference", "A.B");
         MacroBlock displayMacroBlock = new MacroBlock("display", displayParameters, false);
+        displayMacroBlock.setParent(xdom);
 
         when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT)))
             .thenReturn(Arrays.asList(includeMacroBlock1, includeMacroBlock2, displayMacroBlock));

@@ -48,7 +48,7 @@
   #set($map = {})
   #set($discard = $map.put('iconThemes', $services.icon.iconSetNames))
   #set($discard = $map.put('currentIconTheme', $services.icon.currentIconSetName))
-  $jsontool.serialize($map)
+  #jsonResponse($map)
 ###########################
 ## DATA: ICONS
 ###########################
@@ -61,7 +61,7 @@
     #set($discard = $icon.put('render', $services.icon.renderHTML($xwikiIcon, $iconTheme)))
     #set($discard = $icons.add($icon))
   #end
-  $jsontool.serialize($icons)
+  #jsonResponse($icons)
 #else
 = Presentation =
 The Icon Picker is a jQuery plugin written by XWiki to help user selecting an icon. See [[IconPickerMacro]] for using this picker easily. If you want to use it manually, read the following.

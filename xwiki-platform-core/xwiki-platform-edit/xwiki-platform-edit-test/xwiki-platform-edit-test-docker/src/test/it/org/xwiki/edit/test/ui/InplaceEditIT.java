@@ -20,6 +20,7 @@
 package org.xwiki.edit.test.ui;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -27,6 +28,7 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -47,6 +49,7 @@ class InplaceEditIT
     }
 
     @Test
+    @Order(1)
     void editInplace(TestUtils setup, TestReference testReference)
     {
         InplaceEditablePage viewPage = new InplaceEditablePage();
@@ -120,5 +123,43 @@ class InplaceEditIT
         viewPage.setDocumentTitle("final title");
         viewPage.saveAndView();
         assertEquals("final title", viewPage.getDocumentTitle());
+    }
+
+    @Test
+    @Order(2)
+    void editInPlaceWithMandatoryTitle(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // First of all, test that we can save with an empty title.
+        InplaceEditablePage viewPage = new InplaceEditablePage().editInplace();
+        viewPage.setDocumentTitle("");
+        assertEquals(testReference.getLastSpaceReference().getName(), viewPage.getDocumentTitlePlaceholder());
+        assertFalse(viewPage.isDocumentTitleInvalid());
+        assertEquals("", viewPage.getDocumentTitleValidationMessage());
+        viewPage.saveAndView();
+
+        // Now let's make document title mandatory.
+        setup.loginAsSuperAdmin();
+        setup.setWikiPreference("xwiki.title.mandatory", "1");
+
+        setup.loginAndGotoPage("alice", "pa$$word", setup.getURL(testReference));
+        viewPage = new InplaceEditablePage().editInplace();
+
+        // The title should be empty thus invalid.
+        assertTrue(viewPage.isDocumentTitleInvalid());
+        // We don't use a placeholder when document title is mandatory because it creates confusion.
+        assertEquals("", viewPage.getDocumentTitlePlaceholder());
+
+        // Typing something should make the title input valid.
+        viewPage.setDocumentTitle("Title");
+        assertFalse(viewPage.isDocumentTitleInvalid());
+
+        // Now let's try to save with an empty title.
+        viewPage.setDocumentTitle("").save(false);
+        assertTrue(viewPage.isDocumentTitleInvalid());
+        assertEquals("This field is required.", viewPage.getDocumentTitleValidationMessage());
+
+        // Let's fix the title now.
+        viewPage.setDocumentTitle("test title").saveAndView();
+        assertEquals("test title", viewPage.getDocumentTitle());
     }
 }

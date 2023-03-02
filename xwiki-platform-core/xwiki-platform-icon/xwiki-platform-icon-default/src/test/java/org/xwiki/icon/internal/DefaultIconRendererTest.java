@@ -75,7 +75,8 @@ public class DefaultIconRendererTest
         IconSet iconSet = new IconSet("default");
         iconSet.setRenderWiki("image:$icon.png");
         iconSet.addIcon("test", new Icon("blabla"));
-        when(velocityRenderer.render("#set($icon = \"blabla\")\nimage:$icon.png")).thenReturn("image:blabla.png");
+        when(this.velocityRenderer.render("#set($icon = \"blabla\")\nimage:$icon.png", null))
+            .thenReturn("image:blabla.png");
 
         // Test
         String result = iconRenderer.render("test", iconSet);
@@ -94,7 +95,7 @@ public class DefaultIconRendererTest
         iconSet.setRenderWiki("image:$icon.png");
         iconSet.setCss("css");
         iconSet.addIcon("test", new Icon("blabla"));
-        when(velocityRenderer.render("css")).thenReturn("velocityParsedCSS");
+        when(this.velocityRenderer.render("css", null)).thenReturn("velocityParsedCSS");
 
         // Test
         iconRenderer.render("test", iconSet);
@@ -148,7 +149,7 @@ public class DefaultIconRendererTest
         iconSet.setRenderHTML("<img src=\"$icon.png\" />");
         iconSet.addIcon("test", new Icon("blabla"));
 
-        when(velocityRenderer.render("#set($icon = \"blabla\")\n<img src=\"$icon.png\" />"))
+        when(this.velocityRenderer.render("#set($icon = \"blabla\")\n<img src=\"$icon.png\" />", null))
             .thenReturn("<img src=\"blabla.png\" />");
 
         // Test
@@ -165,7 +166,7 @@ public class DefaultIconRendererTest
         iconSet.setRenderHTML("<img src=\"$icon.png\" />");
         iconSet.setCss("css");
         iconSet.addIcon("test", new Icon("blabla"));
-        when(velocityRenderer.render("css")).thenReturn("velocityParsedCSS");
+        when(this.velocityRenderer.render("css", null)).thenReturn("velocityParsedCSS");
 
         // Test
         iconRenderer.renderHTML("test", iconSet);
@@ -230,8 +231,8 @@ public class DefaultIconRendererTest
         IconSet iconSet = new IconSet("default");
         iconSet.setRenderWiki("image:$icon.png");
         iconSet.addIcon("test", new Icon("blabla"));
-        IconException exception = new IconException("exception", null);
-        when(velocityRenderer.render(any())).thenThrow(exception);
+        IconException exception = new IconException("exception");
+        when(this.velocityRenderer.render(any(), any())).thenThrow(exception);
 
         // Test
         IconException caughtException = null;
@@ -251,7 +252,7 @@ public class DefaultIconRendererTest
     {
         IconSet iconSet = new IconSet("iconSet");
         iconSet.addIcon("test", new Icon("hello"));
-        when(velocityRenderer.render("#set($icon = \"hello\")\nfa fa-$icon")).thenReturn("fa fa-hello");
+        when(this.velocityRenderer.render("#set($icon = \"hello\")\nfa fa-$icon", null)).thenReturn("fa fa-hello");
 
         // Test
         String renderedIcon1 = iconRenderer.render("test", iconSet, "fa fa-$icon");

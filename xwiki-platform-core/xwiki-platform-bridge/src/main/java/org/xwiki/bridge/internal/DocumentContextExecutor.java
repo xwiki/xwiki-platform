@@ -17,36 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.icon;
+package org.xwiki.bridge.internal;
+
+import java.util.concurrent.Callable;
+
+import org.xwiki.bridge.DocumentModelBridge;
+import org.xwiki.component.annotation.Role;
 
 /**
- * Exception relating to icon manipulations.
+ * Executes a {@link Callable} with the given document in context.
  *
- * @since 6.2M1
  * @version $Id$
+ * @since 14.10.6
+ * @since 15.2RC1
  */
-public class IconException extends Exception
+@Role
+public interface DocumentContextExecutor
 {
     /**
-     * Constructor.
+     * Execute the passed {@link Callable} with the given document in context.
      *
-     * @param message message to store in the exception
-     * @param source source of the error
+     * @param callable the task to execute
+     * @param document the document to put in context
+     * @return computed result
+     * @param <V> the result type of method {@code call}
      */
-    public IconException(String message, Throwable source)
-    {
-        super(message, source);
-    }
-
-    /**
-     * Constructor with just a message.
-     *
-     * @param message the message to store in the exception
-     * @since 14.10.6
-     * @since 15.2RC1
-     */
-    public IconException(String message)
-    {
-        super(message);
-    }
+    <V> V call(Callable<V> callable, DocumentModelBridge document) throws Exception;
 }

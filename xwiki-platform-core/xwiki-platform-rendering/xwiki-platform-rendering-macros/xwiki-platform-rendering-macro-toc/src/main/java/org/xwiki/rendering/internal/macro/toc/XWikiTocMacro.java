@@ -37,7 +37,7 @@ import org.xwiki.skinx.SkinExtension;
  * <p>
  * We override the default Table of Contents macro because we want to associate a {@code DocumentReference} picker to
  * the {@code reference} parameter (using the {@code PropertyDisplayType} annotation).
- *
+ * 
  * @version $Id$
  * @since 11.5RC1
  */
@@ -47,7 +47,7 @@ import org.xwiki.skinx.SkinExtension;
 public class XWikiTocMacro extends AbstractTocMacro<XWikiTocMacroParameters>
 {
     @Inject
-    @Named("ssfx")
+    @Named("ssrx")
     private SkinExtension ssfx;
 
     /**

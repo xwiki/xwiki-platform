@@ -109,9 +109,9 @@
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
     <pgsql.version>42.5.3</pgsql.version>
-    <oracle.groupId>com.oracle.ojdbc</oracle.groupId>
+    <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
     <oracle.artifactId>ojdbc8</oracle.artifactId>
-    <oracle.version>19.3.0.0</oracle.version>
+    <oracle.version>21.9.0.0</oracle.version>
   </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>

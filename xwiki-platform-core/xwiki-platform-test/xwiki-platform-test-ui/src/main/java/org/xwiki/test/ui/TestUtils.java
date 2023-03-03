@@ -28,7 +28,6 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URLEncoder;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -108,7 +107,6 @@ import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
@@ -190,7 +188,6 @@ public class TestUtils
      * @since 9.5RC1
      */
     public static final int[] STATUS_ACCEPTED = new int[] { Status.ACCEPTED.getStatusCode() };
-    private static final Logger LOGGER = LoggerFactory.getLogger(TestUtils.class);
 
     private static PersistentTestContext context;
 
@@ -216,12 +213,17 @@ public class TestUtils
 
     private static String urlPrefix = XWikiExecutor.URL;
 
-    /** Cached secret token. TODO cache for each user. */
+    /**
+     * Cached secret token. TODO cache for each user.
+     */
     private String secretToken = null;
 
-    /** Cached accessibility results. */
-    private final WcagContext wcagContext = new WcagContext();
     private HttpClient httpClient;
+
+    /**
+     * @since 15.2RC1
+     */
+    private WCAGUtils wcagUtils = new WCAGUtils();
 
     /**
      * @since 8.0M1
@@ -296,6 +298,14 @@ public class TestUtils
         return TestUtils.context.getDriver();
     }
 
+    /**
+     * @since 15.2RC1
+     * @return the utils concerning wcag.
+     */
+    public WCAGUtils getWCAGUtils()
+    {
+        return this.wcagUtils;
+    }
     public Session getSession()
     {
         return this.new Session(getDriver().manage().getCookies(), getSecretToken());
@@ -1435,74 +1445,7 @@ public class TestUtils
     }
 
     /**
-     * Get the WCAG context for the test suite.
-     *
-     * @return WCAG Context
-     */
-    public WcagContext getWcagContext()
-    {
-        return this.wcagContext;
-    }
-
-    /**
-     * Writes the wcag validation results to custom reports.
-     * @throws IOException can be thrown when the directory creation fails.
-     */
-
-    public void writeWcagResults() throws IOException
-    {
-        float totalTime = (float) wcagContext.getWcagTime() / 1000;
-        LOGGER.debug("Time spent on WCAG validation for [{}]: [{}] (in s)",
-                getWcagContext().getTestClassName(), totalTime);
-        File wcagDir = new File(getWcagReportPathOnHost());
-        if (wcagContext.hasWCAGWarnings()) {
-            LOGGER.warn(String.format("There are some accessibility warnings in the test "
-                    + "suite. See %s/wcagWarnings for more details.", getWcagReportPathOnHost()));
-            if (!wcagDir.exists()) {
-                Files.createDirectory(wcagDir.toPath());
-            }
-            String outputName = "wcagWarnings.txt";
-            File warningsFile = new File(wcagDir, outputName);
-            WcagContext.writeWCAGReportToFile(warningsFile, wcagContext.buildWarningsReport());
-        }
-        if (wcagContext.hasWCAGFails()) {
-            if (!wcagDir.exists()) {
-                Files.createDirectory(wcagDir.toPath());
-            }
-            String outputName = "wcagFails.txt";
-            File failsFile = new File(wcagDir, outputName);
-            WcagContext.writeWCAGReportToFile(failsFile, wcagContext.buildFailsReport());
-        }
-    }
-
-    /**
-     * Assert that the results of the different WCAG failing checks are all empty.
-     */
-    public void assertWcagResults()
-    {
-        assertFalse(wcagContext.hasWCAGFails(), String.format(
-                "There are some accessibility fails in the test "
-                        + "suite. See %s/wcagFails for more details. \n", getWcagReportPathOnHost())
-                + wcagContext.getFirstWcagFail());
-    }
-
-    /**
-     * @return the path where the wcag reports are stored by Maven after validation, on the host.
-     */
-    private String getWcagReportPathOnHost()
-    {
-        String testClassesDirectory;
-        String mavenBuildDir = System.getProperty("maven.build.dir");
-        if (mavenBuildDir == null) {
-            testClassesDirectory = "target/wcag-reports";
-        } else {
-            testClassesDirectory = String.format("%s/wcag-reports", mavenBuildDir);
-        }
-        return testClassesDirectory;
-    }
-
-    /**
-     * This class represents all cookies stored in the browser. Use with getSession() and setSession()
+     *This class represents all cookies stored in the browser. Use with getSession() and setSession()
      */
     public class Session
     {

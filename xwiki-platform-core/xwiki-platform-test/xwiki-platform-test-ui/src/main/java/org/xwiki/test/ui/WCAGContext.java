@@ -26,7 +26,6 @@ import com.deque.html.axecore.selenium.AxeBuilder;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.io.Writer;
-import java.io.BufferedWriter;
 import java.io.OutputStreamWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -37,6 +36,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.test.ui.po.BasePage;
+
 import static java.util.Map.entry;
 
 /**
@@ -44,7 +47,7 @@ import static java.util.Map.entry;
  * @since 15.2RC1
  * @version $Id$
  */
-public class WcagContext
+public class WCAGContext
 {
 
     /**
@@ -139,13 +142,19 @@ public class WcagContext
      * Rules to disable during axe-core validation.
      */
     private static final List<String> DISABLED_RULES = List.of();
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BasePage.class);
+
     /**
      * Stores the result of an axe-core validity scan.
      */
     private static final class WCAGTestResults
     {
         private String failReport = "";
+        private final long failAmount;
         private String warnReport = "";
+        private final long warnAmount;
+
         /**
          * @param testMethodName in which the validation happened.
          * @param url from which these results have been generated
@@ -158,14 +167,13 @@ public class WcagContext
             List<Rule> failingViolations = axeResults.getViolations()
                 .stream()
                 .filter(rule -> !FAILS_ON_RULE.containsKey(rule.getId()) || FAILS_ON_RULE.get(rule.getId()))
-                /* If the ruleid is not defined in FAILS_ON_RULE,
-                the default behavior will be to add it to the fails.
-                In order to resolve these test-suite fails quickly, set them as "false" in FAILS_ON_RULE.
-                 */
+                // If the ruleid is not defined in FAILS_ON_RULE,
+                // the default behavior will be to add it to the fails.
+                // In order to resolve these test-suite fails quickly, set them as "false" in FAILS_ON_RULE.
                 .collect(Collectors.toList());
-            if (!failingViolations.isEmpty())
-            {
-                this.failReport = XWikiCustomAxeReporter.getReadableAxeResults(testMethodName, pageClassName,
+            failAmount = failingViolations.size();
+            if (failAmount != 0) {
+                this.failReport = AbstractXWikiCustomAxeReporter.getReadableAxeResults(testMethodName, pageClassName,
                         url, failingViolations);
             }
 
@@ -173,9 +181,9 @@ public class WcagContext
                     .stream()
                     .filter(rule -> FAILS_ON_RULE.containsKey(rule.getId()) && !FAILS_ON_RULE.get(rule.getId()))
                     .collect(Collectors.toList());
-            if (!warningViolations.isEmpty())
-            {
-                this.warnReport = XWikiCustomAxeReporter.getReadableAxeResults(testMethodName, pageClassName,
+            warnAmount = warningViolations.size();
+            if (warnAmount != 0) {
+                this.warnReport = AbstractXWikiCustomAxeReporter.getReadableAxeResults(testMethodName, pageClassName,
                         url, warningViolations);
             }
         }
@@ -183,68 +191,49 @@ public class WcagContext
         {
             return this.failReport;
         }
+
         String getWarnReport()
         {
             return this.warnReport;
         }
 
-
-        boolean isFailEmpty()
-        {
-            return this.failReport.equals("");
-        }
-
-        boolean isWarnEmpty()
-        {
-            return this.warnReport.equals("");
-        }
     }
 
     private List<WCAGTestResults> wcagResults = new ArrayList<>();
 
     private boolean wcagEnabled = true;
     private long wcagTimer;
+    private int wcagFailCount;
+    private int wcagWarnCount;
     private final Map<String, ArrayList<String> > wcagValidationCache = new HashMap<>();
     private String testClassName;
     private String testMethodName;
 
     /**
-     * @return the first non-empty fail report from all the validations.
-     */
-    public String getFirstWcagFail()
-    {
-        String report = "";
-        for (WCAGTestResults wcagResult : wcagResults)
-        {
-            if (!wcagResult.isFailEmpty())
-            {
-                report = wcagResult.getFailReport();
-                break;
-            }
-        }
-        return report;
-    }
-
-    /**
-     * Sets the current test class name.
+     * Sets the current test class name. This name is the string representation of the TestUI class in which the
+     * current wcag validation happens.
      * @param testClassName new value to be set.
      */
     public void setTestClassName(String testClassName)
     {
         this.testClassName = testClassName;
     }
+
     protected String getTestClassName()
     {
         return this.testClassName;
     }
+
     /**
-     * Sets the current test method name.
+     * Sets the current test method name. This name is the string representation of a Test method in a testUI class in
+     * which the current wcag validation happens.
      * @param testMethodName new value to be set.
      */
     public void setTestMethodName(String testMethodName)
     {
         this.testMethodName = testMethodName;
     }
+
     protected String getTestMethodName()
     {
         return this.testMethodName;
@@ -281,12 +270,23 @@ public class WcagContext
      * @param className class of the page
      * @param newViolations violations found on the page
      */
-    public void addWcagResults(String url, String className, Results newViolations)
+    public void addWCAGResults(String url, String className, Results newViolations)
     {
-        /* Whatever the case, keep a trace of the current report. */
-        this.wcagResults.add(new WCAGTestResults(getTestMethodName(), url, className, newViolations));
+        // Whatever the case, keep a trace of the current report.
+        WCAGTestResults wcagTestResults =  new WCAGTestResults(getTestMethodName(), url, className, newViolations);
+        if (wcagTestResults.failAmount != 0) {
+            LOGGER.error("[{} : {}] Found [{}] failing WCAG violations.",
+                url, className, wcagTestResults.failAmount);
+        }
+        if (wcagTestResults.warnAmount != 0) {
+            LOGGER.warn("[{} : {}] Found [{}] warning WCAG violations.",
+                url, className, wcagTestResults.warnAmount);
+        }
+        wcagFailCount += wcagTestResults.failAmount;
+        wcagWarnCount += wcagTestResults.warnAmount;
+        this.wcagResults.add(wcagTestResults);
         if (this.isNotCached(url, className)) {
-            /* Avoid duplicate entries in the cache. */
+            // Avoid duplicate entries in the cache.
             this.wcagValidationCache.putIfAbsent(url, new ArrayList<>());
             this.wcagValidationCache.get(url).add(className);
         }
@@ -295,7 +295,7 @@ public class WcagContext
     /**
      * @param time The amount of time to count up, in ms.
      */
-    public void addWcagTime(long time)
+    public void addWCAGTime(long time)
     {
         this.wcagTimer += time;
     }
@@ -303,15 +303,31 @@ public class WcagContext
     /**
      * @return the accumulated time spent validating accessibility.
      */
-    public long getWcagTime()
+    public long getWCAGTime()
     {
         return this.wcagTimer;
     }
 
     /**
+     * @return the total amount of failing wcag violations.
+     */
+    public long getWCAGFailAmount()
+    {
+        return this.wcagFailCount;
+    }
+
+    /**
+     * @return the total amount of non failing wcag violations.
+     */
+    public long getWCAGWarnAmount()
+    {
+        return this.wcagWarnCount;
+    }
+
+    /**
      * @param wcag validation enabled setup parameter to use in the test suite.
      */
-    public void setWcagEnabled(boolean wcag)
+    public void setWCAGEnabled(boolean wcag)
     {
         this.wcagEnabled = wcag;
     }
@@ -319,35 +335,25 @@ public class WcagContext
     /**
      * @return the state of wcag validation
      */
-    public boolean isWcagEnabled()
+    public boolean isWCAGEnabled()
     {
         return this.wcagEnabled;
     }
 
     /**
-     * @return any of the results about fails stored is not empty
+     * @return any of the validations found a failing violation.
      */
     public boolean hasWCAGFails()
     {
-        for (WCAGTestResults results : this.wcagResults) {
-            if (!results.isFailEmpty()) {
-                return true;
-            }
-        }
-        return false;
+        return wcagFailCount != 0;
     }
 
     /**
-     * @return any of the results about warnings stored is not empty
+     * @return any of the validations found a warning violation.
      */
     public boolean hasWCAGWarnings()
     {
-        for (WCAGTestResults results : this.wcagResults) {
-            if (!results.isWarnEmpty()) {
-                return true;
-            }
-        }
-        return false;
+        return wcagWarnCount != 0;
     }
 
     /**
@@ -356,13 +362,13 @@ public class WcagContext
     public String buildFailsReport()
     {
         StringBuilder mergedReport = new StringBuilder();
-        boolean failsEmpty = true;
+        boolean failStillEmpty = true;
         for (WCAGTestResults result : this.wcagResults) {
-            if (!result.isFailEmpty()) {
-                if (failsEmpty) {
-                    mergedReport.append(String.format("WCAG fails in the test class %s:", getTestClassName()));
+            if (result.failAmount != 0) {
+                if (failStillEmpty) {
+                    mergedReport.append(String.format("WCAG fails in the test class [%s]:", getTestClassName()));
                     mergedReport.append(System.lineSeparator());
-                    failsEmpty = false;
+                    failStillEmpty = false;
                 }
                 mergedReport.append(result.getFailReport());
                 mergedReport.append(System.lineSeparator());
@@ -378,13 +384,13 @@ public class WcagContext
     public String buildWarningsReport()
     {
         StringBuilder mergedReport = new StringBuilder();
-        boolean warningsEmpty = true;
+        boolean warnStillEmpty = true;
         for (WCAGTestResults result : this.wcagResults) {
-            if (!result.isWarnEmpty()) {
-                if (warningsEmpty) {
-                    mergedReport.append(String.format("WCAG warnings in the test class %s:", getTestClassName()));
+            if (result.warnAmount != 0) {
+                if (warnStillEmpty) {
+                    mergedReport.append(String.format("WCAG warnings in the test class [%s]:", getTestClassName()));
                     mergedReport.append(System.lineSeparator());
-                    warningsEmpty = false;
+                    warnStillEmpty = false;
                 }
                 mergedReport.append(result.getWarnReport());
                 mergedReport.append(System.lineSeparator());
@@ -398,15 +404,10 @@ public class WcagContext
      * @param outputFile file to write the object to.
      * @param output object to keep in memory.
      */
-    public static void writeWCAGReportToFile(final File outputFile, final Object output)
+    public static void writeWCAGReportToFile(final File outputFile, final String output) throws IOException
     {
-        try (Writer writer =
-                     new BufferedWriter(
-                             new OutputStreamWriter(
-                                     new FileOutputStream(outputFile), StandardCharsets.UTF_8))) {
-            writer.write(output.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Writer writer = new OutputStreamWriter(
+                    new FileOutputStream(outputFile), StandardCharsets.UTF_8);
+        writer.write(output);
     }
 }

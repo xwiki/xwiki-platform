@@ -29,11 +29,10 @@
  * code.
  */
 /*
-    Source:
+    Class inspired by and built upon:
     com.deque.html.axecore.selenium.AxeReporter
     https://github.com/dequelabs/axe-core-maven-html/blob/develop/selenium/src/main/java/com/deque/html/axecore/selenium
     /AxeReporter.java
-
  */
 package org.xwiki.test.ui;
 
@@ -47,22 +46,69 @@ import java.util.List;
  * @since 15.2RC1
  * @version $Id$
  */
-public final class XWikiCustomAxeReporter
+abstract class AbstractXWikiCustomAxeReporter
 {
-    private XWikiCustomAxeReporter()
-    {
-    }
-
     /**
      * Appends a field to a wcag report.
      *
      * @param message to append to.
-     * @param name    of the field to report.
+     * @param label   of the field to report.
      * @param value   of the field to report
      */
-    private static void appendPropertyToReport(StringBuilder message, String name, String value)
+    private static void appendPropertyToReport(StringBuilder message, String label, String value)
     {
-        message.append(name).append(value);
+        message.append(label).append(value);
+        message.append(System.lineSeparator());
+    }
+
+    /**
+     * Appends content to a stringBuilder by trimming and putting a tab before each line.
+     * @param message in which we want to append the content
+     * @param html string content to format and append
+     */
+    private static void buildHTMLString(StringBuilder message, String html)
+    {
+        for (String line : html.split("\\r?\\n")) {
+            message.append("\t")
+                .append(line.trim())
+                .append(System.lineSeparator());
+        }
+    }
+
+    /**
+     * Appends content about one violation of one rule.
+     * @param message in which we want to append the content
+     * @param violation content to format and append.
+     */
+    private static void buildFromViolation(StringBuilder message, CheckedNode violation)
+    {
+        message.append(System.lineSeparator());
+        message.append("HTML element: ");
+        message.append(System.lineSeparator());
+        buildHTMLString(message, violation.getHtml());
+        appendPropertyToReport(message, "Selector: ", violation.getTarget().toString());
+        appendPropertyToReport(message, "", violation.getFailureSummary());
+    }
+
+    /**
+     * Appends content about one rule.
+     * @param message in which we want to append the content
+     * @param rule content to format.
+     */
+    private static void buildFromRule(StringBuilder message, Rule rule)
+    {
+        message.append(rule.getHelp());
+        message.append(System.lineSeparator());
+        appendPropertyToReport(message, "Description: ", rule.getDescription());
+        appendPropertyToReport(message, "Help URL: ", rule.getHelpUrl());
+        appendPropertyToReport(message, "Help: ", rule.getHelp());
+        appendPropertyToReport(message, "Impact: ", rule.getImpact());
+        appendPropertyToReport(message, "Tags: ", String.join(", ", rule.getTags()));
+        if (rule.getNodes() != null && !rule.getNodes().isEmpty()) {
+            for (CheckedNode item : rule.getNodes()) {
+                buildFromViolation(message, item);
+            }
+        }
         message.append(System.lineSeparator());
     }
 
@@ -74,10 +120,10 @@ public final class XWikiCustomAxeReporter
      * @return a human-readable summary of one violation contained in scanResults..
      */
     static String getReadableAxeResults(String testMethodName, String pageClassName,
-                                        String url, Rule scanResult)
+        String url, Rule scanResult)
     {
         return getReadableAxeResults(testMethodName, pageClassName,
-                url, List.of(scanResult));
+            url, List.of(scanResult));
     }
 
     /**
@@ -87,39 +133,27 @@ public final class XWikiCustomAxeReporter
      * @param scanResults    the list of rules violated during validation.
      * @return a human-readable summary of the violations contained in scanResults in axeResultString.
      */
-    static String getReadableAxeResults(String testMethodName, String pageClassName,
+    protected static String getReadableAxeResults(String testMethodName, String pageClassName,
                                          String url, List<Rule> scanResults)
     {
         StringBuilder message = new StringBuilder();
         int axeRulesAmount = scanResults.size();
-        message.append("Validation in the test method ").append(testMethodName);
+        message.append("__________");
         message.append(System.lineSeparator());
-        message.append("Check for ").append(pageClassName).append(" at ").append(url);
+        message.append(String.format("Validation in the test method [%s]", testMethodName));
         message.append(System.lineSeparator());
-        message.append("Found ").append(axeRulesAmount).append(" items");
+        message.append(String.format("Check for [%s] at [%s].", pageClassName, url));
+        message.append(System.lineSeparator());
+        message.append(String.format("Found [%s] items", axeRulesAmount));
         message.append(System.lineSeparator());
         if (scanResults.isEmpty()) {
             return "";
         } else {
-            message.append(System.getProperty("line.separator"));
+            message.append(System.lineSeparator());
             int elementNo = 1;
-
             for (Rule element : scanResults) {
-                message.append(elementNo++).append(": ").append(element.getHelp());
-                message.append(System.lineSeparator());
-                appendPropertyToReport(message, "Description: ", element.getDescription());
-                appendPropertyToReport(message, "Help URL: ", element.getHelpUrl());
-                appendPropertyToReport(message, "Help: ", element.getHelp());
-                appendPropertyToReport(message, "Impact: ", element.getImpact());
-                appendPropertyToReport(message, "Tags: ", String.join(", ", element.getTags()));
-                if (element.getNodes() != null && !element.getNodes().isEmpty()) {
-                    for (CheckedNode item : element.getNodes()) {
-                        appendPropertyToReport(message, "\tHTML element: ", item.getHtml());
-                        appendPropertyToReport(message, "\tSelector: ", item.getTarget().toString());
-                        appendPropertyToReport(message, "\t", item.getFailureSummary());
-                    }
-                }
-                message.append(System.lineSeparator());
+                message.append(elementNo++).append(": ");
+                buildFromRule(message, element);
             }
             message.append(System.lineSeparator());
             return message.toString().trim();

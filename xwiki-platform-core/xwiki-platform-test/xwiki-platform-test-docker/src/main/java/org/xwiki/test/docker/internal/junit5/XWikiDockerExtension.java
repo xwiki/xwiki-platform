@@ -247,10 +247,9 @@ public class XWikiDockerExtension extends AbstractExtension
             }
         }
         String testMethodName = extensionContext.getTestMethod().get().getName();
-        if (testConfiguration.isWcagEnabled())
-        {
-            loadPersistentTestContext(extensionContext).getUtil().getWcagContext().setTestMethodName(testMethodName);
-        }
+
+        // Update the wcag validation context.
+        loadPersistentTestContext(extensionContext).getUtil().getWCAGUtils().changeWCAGTestMethod(testMethodName);
         LOGGER.info("(*) Starting test [{}]", testMethodName);
     }
 
@@ -318,12 +317,8 @@ public class XWikiDockerExtension extends AbstractExtension
 
         PersistentTestContext testContext = loadPersistentTestContext(extensionContext);
 
-        if (testContext.getUtil().getWcagContext().isWcagEnabled())
-        {
-            testContext.getUtil().writeWcagResults();
-            testContext.getUtil().assertWcagResults();
-        }
-
+        // End the wcag validation process.
+        testContext.getUtil().getWCAGUtils().endWCAGValidation();
 
         // Shutdown the test context
         shutdownPersistentTestContext(testContext);
@@ -404,11 +399,11 @@ public class XWikiDockerExtension extends AbstractExtension
         testContext.getUtil().setURLPrefix(computeXWikiURLPrefix(
             testConfiguration.getServletEngine().getInternalIP(),
             testConfiguration.getServletEngine().getInternalPort()));
-        testContext.getUtil().getWcagContext().setWcagEnabled(testConfiguration.isWcagEnabled());
-        if (testConfiguration.isWcagEnabled())
-        {
-            testContext.getUtil().getWcagContext().setTestClassName(extensionContext.getTestClass().get().getName());
-        }
+
+        // Setup the wcag validation context.
+        testContext.getUtil().getWCAGUtils().setupWCAGValidation(testConfiguration.isWCAG(),
+            extensionContext.getTestClass().get().getName());
+
 
         // - the one used by RestTestUtils, i.e. outside of any container
         testContext.getUtil().rest().setURLPrefix(loadXWikiURL(extensionContext));

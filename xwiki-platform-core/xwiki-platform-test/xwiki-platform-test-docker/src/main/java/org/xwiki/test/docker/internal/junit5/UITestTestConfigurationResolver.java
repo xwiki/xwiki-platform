@@ -95,7 +95,7 @@ public class UITestTestConfigurationResolver
         configuration.setServletEngineTag(resolveServletEngineTag(uiTestAnnotation.servletEngineTag()));
         configuration.setJDBCDriverVersion(resolveJDBCDriverVersion(uiTestAnnotation.jdbcDriverVersion()));
         configuration.setVNC(resolveVNC(uiTestAnnotation.vnc()));
-        configuration.setWcagEnabled(resolveWcag(uiTestAnnotation.wcag()));
+        configuration.setWCAG(resolveWCAG(uiTestAnnotation.wcag()));
         configuration.setProperties(resolveProperties(uiTestAnnotation.properties()));
         configuration.setExtraJARs(resolveExtraJARs(uiTestAnnotation.extraJARs()));
         configuration.setResolveExtraJARs(resolveResolveExtraJARs(uiTestAnnotation.resolveExtraJARs()));
@@ -224,7 +224,7 @@ public class UITestTestConfigurationResolver
         return resolve(vnc, VNC_PROPERTY);
     }
 
-    private boolean resolveWcag(boolean wcag)
+    private boolean resolveWCAG(boolean wcag)
     {
         return resolve(wcag, WCAG_PROPERTY);
     }

@@ -52,6 +52,7 @@ import com.xpn.xwiki.doc.AttachmentDiff;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
+import com.xpn.xwiki.doc.merge.MergeConfiguration.ConflictFallbackVersion;
 import org.xwiki.store.merge.MergeManagerResult;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.BaseObject;
@@ -94,6 +95,12 @@ public class DefaultMergeManager implements MergeManager
                 this.mergeConflictDecisionsManager.getConflictDecisionList(concernedDocument, userReference);
             if (conflictDecisionList != null) {
                 return new org.xwiki.diff.MergeConfiguration(conflictDecisionList);
+            } else if (configuration.getConflictFallbackVersion() == ConflictFallbackVersion.CURRENT) {
+                return new org.xwiki.diff.MergeConfiguration(org.xwiki.diff.MergeConfiguration.Version.CURRENT,
+                    Collections.emptyList());
+            } else if (configuration.getConflictFallbackVersion() == ConflictFallbackVersion.NEXT) {
+                return new org.xwiki.diff.MergeConfiguration(org.xwiki.diff.MergeConfiguration.Version.NEXT,
+                    Collections.emptyList());
             }
         }
         return null;
@@ -152,8 +159,13 @@ public class DefaultMergeManager implements MergeManager
             } else if (ObjectUtils.equals(newObject, currentObject)) {
                 mergeResult.setMergeResult(currentObject);
             } else {
-                // the three objects are different, we record a conflict and fallback on the current object.
-                mergeResult.setMergeResult(currentObject);
+                // the three objects are different, we record a conflict and fallback based on the configuration.
+                if (configuration.getConflictFallbackVersion() == ConflictFallbackVersion.CURRENT) {
+                    mergeResult.setMergeResult(currentObject);
+                } else if (configuration.getConflictFallbackVersion() == ConflictFallbackVersion.NEXT) {
+                    mergeResult.setMergeResult(newObject);
+                    mergeResult.setModified(true);
+                }
                 mergeResult.getLog()
                     .error("Failed to merge objects: previous=[{}] new=[{}] current=[{}]", previousObject,
                         newObject, currentObject);
@@ -372,9 +384,14 @@ public class DefaultMergeManager implements MergeManager
                             if (!objectResult.equals(newObject)) {
                                 // collision between DB and new: object to add but already exists in the DB and not
                                 // the same
+                                // If fallback is next version then we set it.
+                                if (newObject != null &&
+                                    configuration.getConflictFallbackVersion() == ConflictFallbackVersion.NEXT) {
+                                    mergedDocument.setXObject(newObject.getNumber(), newObject.clone());
+                                    objectMergeResult.setModified(true);
+                                }
                                 // TODO: Manage properly the conflicts.
-                                objectMergeResult.getLog()
-                                    .error(ERROR_COLLISION_OBJECT, objectResult.getReference());
+                                objectMergeResult.getLog().error(ERROR_COLLISION_OBJECT, objectResult.getReference());
                             } else {
                                 // Already added, lets assume the user is prescient
                                 objectMergeResult.getLog().warn("Object [{}] already added",
@@ -389,6 +406,7 @@ public class DefaultMergeManager implements MergeManager
                             } else {
                                 // collision between DB and new: object to remove but not the same as previous
                                 // version
+                                // We don't remove any xobject as fallback
                                 // TODO: Manage properly the conflicts.
                                 objectMergeResult.getLog().error(ERROR_COLLISION_OBJECT, objectResult.getReference());
                             }
@@ -407,6 +425,12 @@ public class DefaultMergeManager implements MergeManager
                                         // collision between DB and new:
                                         // property to add but already exists in the DB and not the same
                                         // TODO: Manage properly the conflicts.
+                                        // If fallback is next version then we put next version value
+                                        if (configuration.getConflictFallbackVersion() == ConflictFallbackVersion.NEXT)
+                                        {
+                                            objectResult.safeput(diff.getPropName(), newProperty);
+                                            objectMergeResult.setModified(true);
+                                        }
                                         objectMergeResult.getLog().error(ERROR_COLLISION_OBJECT_PROPERTY,
                                             propertyResult.getReference());
                                     } else {
@@ -424,6 +448,7 @@ public class DefaultMergeManager implements MergeManager
                                         // collision between DB and new: supposed to be removed but the DB version
                                         // is not the same as the previous version
                                         // TODO: Manage properly the conflicts.
+                                        // We don't remove any property as fallback
                                         objectMergeResult.getLog().error(ERROR_COLLISION_OBJECT_PROPERTY,
                                             propertyResult.getReference());
                                     }

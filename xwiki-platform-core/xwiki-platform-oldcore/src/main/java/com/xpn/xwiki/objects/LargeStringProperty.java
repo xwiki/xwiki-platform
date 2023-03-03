@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.objects;
 
+import org.xwiki.logging.event.LogEvent;
 import org.xwiki.store.merge.MergeManagerResult;
 
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
@@ -29,11 +30,17 @@ public class LargeStringProperty extends BaseStringProperty
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
+    protected void mergeValue(Object previousValue, Object newValue, MergeConfiguration configuration,
+        MergeResult mergeResult)
     {
         MergeManagerResult<String, String> valueMergeManagerResult = getMergeManager()
-            .mergeLines((String) previousValue, (String) newValue, getValue(), new MergeConfiguration());
-        mergeResult.getLog().addAll(valueMergeManagerResult.getLog());
+            .mergeLines((String) previousValue, (String) newValue, getValue(), configuration);
+        for (LogEvent logEvent : valueMergeManagerResult.getLog()) {
+            String newMessage = String.format("%s [Location: %s]", logEvent.getMessage(), getObject().getReference());
+            LogEvent copyLog =
+                new LogEvent(logEvent.getLevel(), newMessage, logEvent.getArgumentArray(), logEvent.getThrowable());
+            mergeResult.getLog().add(copyLog);
+        }
         mergeResult.setModified(mergeResult.isModified() || valueMergeManagerResult.isModified());
         setValue(valueMergeManagerResult.getMergeResult());
     }

@@ -228,6 +228,9 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
                     setValue(newValue);
                 } else {
                     // collision between current and new
+                    if (configuration.getConflictFallbackVersion() == MergeConfiguration.ConflictFallbackVersion.NEXT) {
+                        setValue(newValue);
+                    }
                     mergeResult.getLog().error("Collision found on property [{}] between from value [{}] and to [{}]",
                         getName(), getValue(), newValue);
                 }
@@ -237,6 +240,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
                 setValue(null);
             } else {
                 // collision between current and new
+                // We don't remove the value in fallback
                 mergeResult.getLog().error("Collision found on property [{}] between from value [{}] and to [{}]",
                     getName(), getValue(), newValue);
             }
@@ -248,7 +252,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
                 mergeResult.getLog().error("Collision found on property [{}] between from value [] and to []",
                     getName(), getValue(), newValue);
             } else if (!Objects.equals(newValue, getValue())) {
-                mergeValue(previousValue, newValue, mergeResult);
+                mergeValue(previousValue, newValue, configuration, mergeResult);
             }
         }
     }
@@ -261,7 +265,8 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
      * @param mergeResult merge report
      * @since 3.2M1
      */
-    protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
+    protected void mergeValue(Object previousValue, Object newValue, MergeConfiguration mergeConfiguration,
+        MergeResult mergeResult)
     {
         // collision between current and new: don't know how to apply 3 way merge on unknown type
         mergeResult.getLog().error("Collision found on property [{}] between from value [{}] and to [{}]", getName(),

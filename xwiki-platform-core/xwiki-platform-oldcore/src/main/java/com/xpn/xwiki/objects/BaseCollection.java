@@ -833,7 +833,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             PropertyInterface previousProperty = previousCollection.getField(diff.getPropName());
             PropertyInterface newProperty = newCollection.getField(diff.getPropName());
 
-            if (diff.getAction() == ObjectDiff.ACTION_PROPERTYADDED) {
+            if (diff.getAction().equals(ObjectDiff.ACTION_PROPERTYADDED)) {
                 if (propertyResult == null) {
                     // Add if none has been added by user already
                     safeput(diff.getPropName(),
@@ -841,9 +841,15 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                     mergeResult.setModified(true);
                 } else if (!propertyResult.equals(newProperty)) {
                     // collision between DB and new: property to add but already exists in the DB
+                    // If we need to fallback on next version, set next version.
+                    if (configuration.getConflictFallbackVersion() == MergeConfiguration.ConflictFallbackVersion.NEXT) {
+                        safeput(diff.getPropName(),
+                            configuration.isProvidedVersionsModifiables() ? newProperty : newProperty.clone());
+                        mergeResult.setModified(true);
+                    }
                     mergeResult.getLog().error("Collision found on property [{}]", newProperty.getReference());
                 }
-            } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYREMOVED) {
+            } else if (diff.getAction().equals(ObjectDiff.ACTION_PROPERTYREMOVED)) {
                 if (propertyResult != null) {
                     if (propertyResult.equals(previousProperty)) {
                         // Delete if it's the same as previous one
@@ -852,13 +858,14 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                     } else {
                         // collision between DB and new: property to remove but not the same as previous
                         // version
+                        // We don't remove the field in case of fallback.
                         mergeResult.getLog().error("Collision found on property [{}]", previousProperty.getReference());
                     }
                 } else {
                     // Already removed from DB, lets assume the user is prescient
                     mergeResult.getLog().warn("Property [{}] already removed", previousProperty.getReference());
                 }
-            } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYCHANGED) {
+            } else if (diff.getAction().equals(ObjectDiff.ACTION_PROPERTYCHANGED)) {
                 if (propertyResult != null) {
                     if (propertyResult.equals(previousProperty)) {
                         // Let some automatic migration take care of that modification between DB and new

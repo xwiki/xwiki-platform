@@ -126,8 +126,30 @@
                  Single justification example:
             -->
             
-            
-            
+            <revapi.differences>
+              <justification>The MergeConfiguration should always have been specified for calling this
+                method, it became obvious when adding configurations we need to reuse.</justification>
+              <criticality>highlight</criticality>
+              <differences>
+                <item>
+                  <code>java.method.numberOfParametersChanged</code>
+                  <old>method void com.xpn.xwiki.objects.BaseProperty&lt;R extends org.xwiki.model.reference.EntityReference&gt;::mergeValue(java.lang.Object, java.lang.Object, com.xpn.xwiki.doc.merge.MergeResult)</old>
+                  <new>method void com.xpn.xwiki.objects.BaseProperty&lt;R extends org.xwiki.model.reference.EntityReference&gt;::mergeValue(java.lang.Object, java.lang.Object, com.xpn.xwiki.doc.merge.MergeConfiguration, com.xpn.xwiki.doc.merge.MergeResult)</new>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.numberOfParametersChanged</code>
+                  <old>method void com.xpn.xwiki.objects.LargeStringProperty::mergeValue(java.lang.Object, java.lang.Object, com.xpn.xwiki.doc.merge.MergeResult)</old>
+                  <new>method void com.xpn.xwiki.objects.LargeStringProperty::mergeValue(java.lang.Object, java.lang.Object, com.xpn.xwiki.doc.merge.MergeConfiguration, com.xpn.xwiki.doc.merge.MergeResult)</new>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.numberOfParametersChanged</code>
+                  <old>method void com.xpn.xwiki.objects.ListProperty::mergeValue(java.lang.Object, java.lang.Object, com.xpn.xwiki.doc.merge.MergeResult)</old>
+                  <new>method void com.xpn.xwiki.objects.ListProperty::mergeValue(java.lang.Object, java.lang.Object, com.xpn.xwiki.doc.merge.MergeConfiguration, com.xpn.xwiki.doc.merge.MergeResult)</new>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

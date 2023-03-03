@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.hibernate.collection.internal.PersistentList;
 import org.hibernate.collection.spi.PersistentCollection;
+import org.xwiki.logging.event.LogEvent;
 import org.xwiki.store.merge.MergeManagerResult;
 
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
@@ -258,11 +259,17 @@ public class ListProperty extends BaseProperty implements Cloneable
     }
 
     @Override
-    protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
+    protected void mergeValue(Object previousValue, Object newValue, MergeConfiguration configuration,
+        MergeResult mergeResult)
     {
         MergeManagerResult<List<String>, String> listStringMergeManagerResult = getMergeManager()
-            .mergeList((List<String>) previousValue, (List<String>) newValue, this.list, new MergeConfiguration());
-        mergeResult.getLog().addAll(listStringMergeManagerResult.getLog());
+            .mergeList((List<String>) previousValue, (List<String>) newValue, this.list, configuration);
+        for (LogEvent logEvent : listStringMergeManagerResult.getLog()) {
+            String newMessage = String.format("%s [Location: %s]", logEvent.getMessage(), getObject().getReference());
+            LogEvent copyLog =
+                new LogEvent(logEvent.getLevel(), newMessage, logEvent.getArgumentArray(), logEvent.getThrowable());
+            mergeResult.getLog().add(copyLog);
+        }
         mergeResult.setModified(mergeResult.isModified() || listStringMergeManagerResult.isModified());
 
         if (listStringMergeManagerResult.isModified()) {

@@ -27,6 +27,7 @@ import java.lang.annotation.Target;
 import org.xwiki.rendering.internal.macro.DefaultMacroCategoryManager;
 import org.xwiki.rendering.internal.syntax.SyntaxConverter;
 import org.xwiki.rendering.internal.transformation.macro.DefaultMacroTransformationConfiguration;
+import org.xwiki.rendering.internal.util.XWikiSyntaxEscaper;
 import org.xwiki.rendering.script.RenderingScriptService;
 import org.xwiki.test.annotation.ComponentList;
 
@@ -50,7 +51,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     RenderingScriptService.class,
     SyntaxConverter.class,
     DefaultMacroCategoryManager.class,
-    DefaultMacroTransformationConfiguration.class
+    DefaultMacroTransformationConfiguration.class,
+    XWikiSyntaxEscaper.class
 })
 @Inherited
 public @interface RenderingScriptServiceComponentList

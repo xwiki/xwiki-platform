@@ -34,10 +34,7 @@ import org.xwiki.edit.EditConfiguration;
 import org.xwiki.edit.internal.DefaultEditorDescriptorBuilder;
 import org.xwiki.edit.internal.DefaultEditorManager;
 import org.xwiki.edit.internal.PureTextSyntaxContentEditor;
-import org.xwiki.icon.IconManager;
 import org.xwiki.icon.IconManagerScriptService;
-import org.xwiki.icon.IconRenderer;
-import org.xwiki.icon.IconSetManager;
 import org.xwiki.localization.macro.internal.TranslationMacro;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
@@ -54,6 +51,7 @@ import org.xwiki.rendering.internal.wiki.XWikiWikiModel;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
+import org.xwiki.script.service.ScriptService;
 import org.xwiki.template.script.TemplateScriptService;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -95,7 +93,6 @@ import static org.mockito.Mockito.when;
     TestNoScriptMacro.class,
     // Various classes to prevent errors in the displayed document
     ModelScriptService.class,
-    IconManagerScriptService.class,
     TranslationMacro.class,
     WarningMessageMacro.class,
     DefaultExtendedRenderingConfiguration.class,
@@ -128,18 +125,6 @@ class XWikiSkinsSheetPageTest extends PageTest
     private static final String NASTY_INPUT = "\"]]<img onerror=\"alert(1)\"/>{{/html}}{{noscript/}}";
 
     /**
-     * Mock components for IconManagerScriptService.
-     */
-    @MockComponent
-    private IconManager iconManager;
-
-    @MockComponent
-    private IconSetManager iconSetManager;
-
-    @MockComponent
-    private IconRenderer iconRenderer;
-
-    /**
      * Mock the editor configuration.
      */
     @MockComponent
@@ -164,8 +149,12 @@ class XWikiSkinsSheetPageTest extends PageTest
         this.oldcore.getMocker().registerComponent(Macro.class, "attachmentSelector", this.attachmentSelectorMacro);
 
         // Make sure icons can be rendered.
-        when(this.iconManager.renderHTML(anyString())).then(call -> "HTML_ICON:" + call.getArgument(0, String.class));
-        when(this.iconManager.render(anyString())).then(call -> "ICON:" + call.getArgument(0, String.class));
+        IconManagerScriptService iconManagerScriptService = this.oldcore.getMocker()
+            .registerMockComponent(ScriptService.class, "icon", IconManagerScriptService.class, true);
+        when(iconManagerScriptService.renderHTML(anyString()))
+            .then(call -> "HTML_ICON:" + call.getArgument(0, String.class));
+        when(iconManagerScriptService.render(anyString()))
+            .then(call -> "ICON:" + call.getArgument(0, String.class));
     }
 
     @Test

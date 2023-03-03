@@ -27,8 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.skyscreamer.jsonassert.JSONAssert;
-import org.xwiki.icon.IconManagerScriptService;
-import org.xwiki.icon.internal.DefaultIconManagerComponentList;
+import org.xwiki.icon.IconManagerScriptServiceComponentList;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.query.QueryParameter;
@@ -63,10 +62,9 @@ import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
  * @since 13.4.4
  */
 @SecurityScriptServiceComponentList
-@DefaultIconManagerComponentList
+@IconManagerScriptServiceComponentList
 @ComponentList({
     ModelScriptService.class,
-    IconManagerScriptService.class
 })
 class UorgsuggestPageTest extends PageTest
 {

@@ -38,8 +38,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.internal.bridge.DefaultContentParser;
-import org.xwiki.icon.IconManagerScriptService;
-import org.xwiki.icon.internal.DefaultIconManagerComponentList;
+import org.xwiki.icon.IconManagerScriptServiceComponentList;
 import org.xwiki.model.internal.reference.converter.EntityReferenceConverter;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -92,7 +91,7 @@ import static org.mockito.Mockito.when;
 @XWikiSyntax21ComponentList
 @RenderingScriptServiceComponentList
 @DefaultRenderingConfigurationComponentList
-@DefaultIconManagerComponentList
+@IconManagerScriptServiceComponentList
 @ComponentList({
     ControlCharactersFilter.class,
     ModelScriptService.class,
@@ -106,7 +105,6 @@ import static org.mockito.Mockito.when;
     DefaultWikiMacroRenderer.class,
     // End WikiMacroEventListener
     TemporaryAttachmentsScriptService.class,
-    IconManagerScriptService.class,
     DocumentReferenceConverter.class,
     EntityReferenceConverter.class,
     ModelScriptService.class,

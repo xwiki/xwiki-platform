@@ -29,8 +29,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.eventstream.internal.DefaultEvent;
-import org.xwiki.icon.IconManagerScriptService;
-import org.xwiki.icon.internal.DefaultIconManagerComponentList;
+import org.xwiki.icon.IconManagerScriptServiceComponentList;
 import org.xwiki.mentions.internal.MentionView;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.CompositeEvent;
@@ -64,9 +63,8 @@ import static org.mockito.Mockito.when;
  */
 @HTML50ComponentList
 @XHTML10ComponentList
-@DefaultIconManagerComponentList
+@IconManagerScriptServiceComponentList
 @ComponentList({
-    IconManagerScriptService.class,
     TemplateScriptService.class
 })
 class MentionPageTest extends PageTest

@@ -30,8 +30,7 @@ import org.mockito.Mock;
 import org.xwiki.attachment.internal.DefaultAttachmentsManager;
 import org.xwiki.attachment.script.AttachmentScriptService;
 import org.xwiki.csrf.script.CSRFTokenScriptService;
-import org.xwiki.icon.IconManagerScriptService;
-import org.xwiki.icon.internal.DefaultIconManagerComponentList;
+import org.xwiki.icon.IconManagerScriptServiceComponentList;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.model.internal.reference.converter.EntityReferenceConverter;
 import org.xwiki.model.reference.DocumentReference;
@@ -60,10 +59,9 @@ import static org.mockito.Mockito.when;
  * @since 14.0RC1
  */
 @SecurityScriptServiceComponentList
-@DefaultIconManagerComponentList
+@IconManagerScriptServiceComponentList
 @ComponentList({
     ModelScriptService.class,
-    IconManagerScriptService.class,
     AttachmentScriptService.class,
     DefaultAttachmentsManager.class,
     DocumentReferenceConverter.class,

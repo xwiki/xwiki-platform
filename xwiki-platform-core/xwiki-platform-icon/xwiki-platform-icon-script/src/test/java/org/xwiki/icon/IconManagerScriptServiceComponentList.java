@@ -17,20 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.icon.internal;
+package org.xwiki.icon;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import org.xwiki.bridge.internal.DefaultDocumentContextExecutor;
-import org.xwiki.icon.internal.context.IconSetContext;
-import org.xwiki.security.authorization.AuthorExecutor;
-import org.xwiki.skinx.internal.CssDocumentSkinExtension;
-import org.xwiki.skinx.internal.JsDocumentSkinExtension;
-import org.xwiki.skinx.internal.JsFileSkinExtension;
-import org.xwiki.skinx.internal.LinkSkinExtension;
+import org.xwiki.icon.internal.DefaultIconManagerComponentList;
+import org.xwiki.rendering.internal.util.XWikiSyntaxEscaper;
 import org.xwiki.test.annotation.ComponentList;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
@@ -39,31 +34,21 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Pack of default Component implementations that are needed for running the {@link  DefaultIconManagerComponentList}.
+ * Component list for {@link IconManagerScriptService}.
  *
  * @version $Id$
- * @since 13.9RC1
- * @since 13.4.4
+ * @since 14.10.6
+ * @since 15.2RC1
  */
 @Documented
 @Retention(RUNTIME)
 @Target({ TYPE, METHOD, ANNOTATION_TYPE })
+@DefaultIconManagerComponentList
 @ComponentList({
-    DefaultIconManager.class,
-    DefaultIconSetManager.class,
-    DefaultIconSetCache.class,
-    DefaultIconSetLoader.class,
-    IconSetContext.class,
-    DefaultIconRenderer.class,
-    JsFileSkinExtension.class,
-    CssDocumentSkinExtension.class,
-    LinkSkinExtension.class,
-    JsDocumentSkinExtension.class,
-    VelocityRenderer.class,
-    DefaultDocumentContextExecutor.class,
-    AuthorExecutor.class,
+    IconManagerScriptService.class,
+    XWikiSyntaxEscaper.class
 })
 @Inherited
-public @interface DefaultIconManagerComponentList
+public @interface IconManagerScriptServiceComponentList
 {
 }

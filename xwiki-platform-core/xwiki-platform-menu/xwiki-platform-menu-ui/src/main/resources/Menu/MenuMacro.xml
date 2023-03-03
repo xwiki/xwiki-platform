@@ -1159,6 +1159,7 @@ $menuTemplateDoc.content.replace('{', '')
       <code>{{velocity}}
 #set ($id = $xcontext.macro.params.id)
 #set ($type = $xcontext.macro.params.type)
+#set ($label = $xcontext.macro.params.label)
 #set ($colorTheme = $xwiki.getUserPreference('colorTheme'))
 #if ("$!colorTheme" != '')
   ## Make sure we use an absolute reference (see XWIKI-9672)
@@ -1166,12 +1167,17 @@ $menuTemplateDoc.content.replace('{', '')
 #end
 #set ($discard = $xwiki.ssx.use("$xcontext.macro.doc.prefixedFullName", {'colorTheme': $colorTheme}))
 #set ($discard = $xwiki.jsx.use("$xcontext.macro.doc.prefixedFullName"))
+## Make sure the label is non-empty as otherwise the aria-label doesn't work.
+#if ($stringtool.isBlank("$!label"))
+  #set ($label = $wikimacro.context.getXDOM().getIdGenerator().generateUniqueId("MenuLabel"))
+#end
 #if($type.contains('horizontal'))
   ## Make sure the id is non-empty for horizontal menus as otherwise the toggle doesn't work.
   #if ($stringtool.isBlank("$!id"))
     #set ($id = $wikimacro.context.getXDOM().getIdGenerator().generateUniqueId("M", "GeneratedMenuId"))
   #end
-  (% role="navigation" class="menu-horizontal-toggle" aria-label="${services.rendering.escape($services.localization.render('rendering.macro.menu.horizontal.label'), 'xwiki/2.1')}" %)(((
+  (% role="navigation" class="menu-horizontal-toggle"
+  aria-label="${services.rendering.escape($services.localization.render('rendering.macro.menu.horizontal.label',$label), 'xwiki/2.1')}" %)(((
     (% class="navbar-header" %)(((
       {{html}}
         &lt;button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#$!{escapetool.xml($id)}" aria-expanded="false"&gt;
@@ -1187,7 +1193,8 @@ $menuTemplateDoc.content.replace('{', '')
     )))
   )))
 #else
-  (% role="navigation" #if ("$!id" != '') id="${services.rendering.escape($id, 'xwiki/2.1')}"#end class="menu menu-${services.rendering.escape($!type, 'xwiki/2.1')}" aria-label="${services.rendering.escape($services.localization.render('rendering.macro.menu.vertical.label'), 'xwiki/2.1')}" %)(((
+  (% role="navigation" #if ("$!id" != '') id="${services.rendering.escape($id, 'xwiki/2.1')}"#end class="menu menu-${services.rendering.escape($!type, 'xwiki/2.1')}"
+        aria-label="${services.rendering.escape($services.localization.render('rendering.macro.menu.vertical.label',$label), 'xwiki/2.1')}" %)(((
     {{wikimacrocontent/}}
   )))
 #end

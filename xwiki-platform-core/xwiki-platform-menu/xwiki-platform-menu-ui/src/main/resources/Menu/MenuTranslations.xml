@@ -85,8 +85,8 @@ rendering.macro.menu.parameter.type.description=The optional menu type determine
 rendering.macro.menu.content.description=Define the menu structure using wiki syntax. Each menu item should be a list item and should contain the menu item label or link. You can use nested lists for sub-menu items.
 
 # Accessibility labels
-rendering.macro.menu.horizontal.label=Horizontal custom menu
-rendering.macro.menu.horizontal.label=Vertical custom menu
+rendering.macro.menu.horizontal.label=Top navigation menu: {0}
+rendering.macro.menu.vertical.label=Side navigation menu: {0}
 
 # Menu WebHome
 menu.description=This is a simple application that helps you create navigation menus to be displayed either horizontally as a top bar after the page header or vertically in a side panel.</content>

@@ -204,26 +204,26 @@ public class XWikiWebDriver extends RemoteWebDriver
         }
     }
 
-    public <T> void waitUntilCondition(ExpectedCondition<T> condition, int timeout)
+    public <T> T waitUntilCondition(ExpectedCondition<T> condition, int timeout)
     {
         int currentTimeout = getTimeout();
 
         try {
             setTimeout(timeout);
 
-            waitUntilCondition(condition);
+            return waitUntilCondition(condition);
         } finally {
             setTimeout(currentTimeout);
         }
     }
 
-    public <T> void waitUntilCondition(ExpectedCondition<T> condition)
+    public <T> T waitUntilCondition(ExpectedCondition<T> condition)
     {
         // Temporarily remove the implicit wait on the driver since we're doing our own waits...
         manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
         Wait<WebDriver> wait = new WebDriverWait(this, Duration.ofSeconds(getTimeout()));
         try {
-            wait.until(condition::apply);
+            return wait.until(condition::apply);
         } finally {
             // Reset timeout
             setDriverImplicitWait();

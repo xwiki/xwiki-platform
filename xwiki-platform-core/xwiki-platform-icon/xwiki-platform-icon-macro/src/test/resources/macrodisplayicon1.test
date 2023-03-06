@@ -1,0 +1,36 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.1
+.# Verify the icon macro basic functionality
+.#-----------------------------------------------------
+Home icon: {{displayIcon name="home" /}}
+
+{{displayIcon name="page" /}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord [Home]
+onSpace
+onWord [icon]
+onSpecialSymbol [:]
+onSpace
+beginMacroMarkerInline [displayIcon] [name=home]
+beginMetaData [[syntax]=[XWiki 2.1]]
+beginFormat [NONE] [[class]=[icon][data-xwiki-icon]=[homeIcon]]
+onWord [i]
+endFormat [NONE] [[class]=[icon][data-xwiki-icon]=[homeIcon]]
+endMetaData [[syntax]=[XWiki 2.1]]
+endMacroMarkerInline [displayIcon] [name=home]
+endParagraph
+beginMacroMarkerStandalone [displayIcon] [name=page]
+beginMetaData [[syntax]=[XWiki 2.1]]
+beginParagraph
+beginFormat [NONE] [[class]=[icon][data-xwiki-icon]=[pageIcon]]
+onWord [i]
+endFormat [NONE] [[class]=[icon][data-xwiki-icon]=[pageIcon]]
+endParagraph
+endMetaData [[syntax]=[XWiki 2.1]]
+endMacroMarkerStandalone [displayIcon] [name=page]
+endDocument

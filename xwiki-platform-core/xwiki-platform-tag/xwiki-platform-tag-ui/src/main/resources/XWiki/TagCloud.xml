@@ -127,6 +127,7 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -285,7 +286,7 @@ ol.tagCloud .ultraPopular {
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -305,6 +306,7 @@ ol.tagCloud .ultraPopular {
         <name>code</name>
         <number>10</number>
         <prettyName>Macro code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -317,6 +319,7 @@ ol.tagCloud .ultraPopular {
         <name>contentDescription</name>
         <number>9</number>
         <prettyName>Content description (Not applicable for "No content" type)</prettyName>
+        <restricted>0</restricted>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -385,6 +388,7 @@ ol.tagCloud .ultraPopular {
         <name>description</name>
         <number>3</number>
         <prettyName>Macro description</prettyName>
+        <restricted>0</restricted>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -463,6 +467,9 @@ ol.tagCloud .ultraPopular {
 #set ($tagCloudSpace = $xcontext.macro.params.get('space'))
 #set ($tagCloudSpaces = $xcontext.macro.params.get('spaces'))
 #set ($limit = $xcontext.macro.params.get('limit'))
+#if ("$!limit" != '' &amp;&amp; $limit &lt; 0)
+  #set ($limit = 0)
+#end
 ##
 ## Configurable popularity levels. You must enter an even number of levels. Default: 6.
 #set ($popularityLevels = ["notPopular", "notVeryPopular", "somewhatPopular", "popular", "veryPopular", "ultraPopular"])
@@ -498,7 +505,7 @@ $xwiki.ssx.use('XWiki.TagCloud')##
 ## If tags have the same occurrence, limit them in alphabetical order
 #set ($tagCountListSorted = $collectiontool.sort($tagCountList, ['count:desc', 'name']))
 #if ("$!limit" != '')
-  #set ($tagCountListSorted = $tagCountListSorted.subList(0, $limit))
+  #set ($tagCountListSorted = $tagCountListSorted.subList(0, $mathtool.min($tagCountListSorted.size(), $limit)))
 #end
 ##
 ## Only build popularity map if at least one tag exists
@@ -628,6 +635,7 @@ $xwiki.ssx.use('XWiki.TagCloud')##
         <name>description</name>
         <number>2</number>
         <prettyName>Parameter description</prettyName>
+        <restricted>0</restricted>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -706,6 +714,7 @@ $xwiki.ssx.use('XWiki.TagCloud')##
         <name>description</name>
         <number>2</number>
         <prettyName>Parameter description</prettyName>
+        <restricted>0</restricted>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -785,6 +794,7 @@ $xwiki.ssx.use('XWiki.TagCloud')##
         <name>description</name>
         <number>2</number>
         <prettyName>Parameter description</prettyName>
+        <restricted>0</restricted>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>

@@ -1,0 +1,20 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.1
+.# Verify the document-based icon set is rendered in document context
+.#-----------------------------------------------------
+{{displayIcon name="document" iconSet="document" /}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [displayIcon] [name=document|iconSet=document]
+beginMetaData [[source]=[xwiki:Icon.Document][syntax]=[XWiki 2.1]]
+beginParagraph
+onWord [document]
+onSpace
+onWord [executed]
+endParagraph
+endMetaData [[source]=[xwiki:Icon.Document][syntax]=[XWiki 2.1]]
+endMacroMarkerStandalone [displayIcon] [name=document|iconSet=document]
+endDocument

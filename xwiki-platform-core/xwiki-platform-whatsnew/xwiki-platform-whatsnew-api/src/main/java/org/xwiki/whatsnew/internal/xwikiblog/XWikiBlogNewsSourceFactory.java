@@ -21,6 +21,7 @@ package org.xwiki.whatsnew.internal.xwikiblog;
 
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -40,6 +41,9 @@ import org.xwiki.whatsnew.NewsSourceFactory;
 @Singleton
 public class XWikiBlogNewsSourceFactory implements NewsSourceFactory
 {
+    @Inject
+    private RSSContentCleaner rssContentCleaner;
+
     @Override
     public NewsSource create(Map<String, String> parameters) throws NewsException
     {
@@ -47,6 +51,6 @@ public class XWikiBlogNewsSourceFactory implements NewsSourceFactory
         if (rssURL == null) {
             throw new NewsException("Failed to create a XWiki Blog news source. A 'rssURL' parameter must be passed");
         }
-        return new XWikiBlogNewsSource(rssURL);
+        return new XWikiBlogNewsSource(rssURL, this.rssContentCleaner);
     }
 }

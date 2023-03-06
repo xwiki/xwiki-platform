@@ -31,6 +31,7 @@ import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.configuration.ConfigurationSource;
@@ -44,6 +45,8 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -55,6 +58,7 @@ import com.xpn.xwiki.XWikiContext;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -111,6 +115,9 @@ class DefaultIconSetManagerTest
 
     @Mock
     private XWiki xwiki;
+
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @BeforeEach
     void setUp()
@@ -324,6 +331,70 @@ class DefaultIconSetManagerTest
         assertNotNull(caughtException);
         assertEquals(exception, caughtException.getCause());
         assertEquals("Failed to load the icon set [silk].", caughtException.getMessage());
+    }
+
+    @Test
+    void getIconSetWhenOneFails() throws Exception
+    {
+        // Mocks
+        IconSet iconSet = new IconSet("silk");
+        Query query = mock(Query.class);
+        when(this.queryManager.createQuery("FROM doc.object(IconThemesCode.IconThemeClass) obj WHERE obj.name = :name",
+            Query.XWQL)).thenReturn(query);
+        List<String> results = List.of("FakeIcon.Silk", "IconThemes.Silk");
+        when(query.<String>execute()).thenReturn(results);
+        DocumentReference fakeDocumentReference = new DocumentReference("wiki", "FakeIcon", "Silk");
+        when(this.documentReferenceResolver.resolve("FakeIcon.Silk")).thenReturn(fakeDocumentReference);
+        when(this.iconSetLoader.loadIconSet(fakeDocumentReference)).thenThrow(new IconException("Test"));
+
+        DocumentReference documentReference = new DocumentReference("wiki", "IconThemes", "Silk");
+        when(this.documentReferenceResolver.resolve("IconThemes.Silk")).thenReturn(documentReference);
+        when(this.iconSetLoader.loadIconSet(documentReference)).thenReturn(iconSet);
+
+        // Test
+        assertEquals(iconSet, this.iconSetManager.getIconSet("silk"));
+
+        // Verify
+        verify(query).bindValue("name", "silk");
+        verify(this.iconSetCache).put(documentReference, iconSet);
+        verify(this.iconSetCache).put("silk", "currentWikiId", iconSet);
+        verify(this.iconSetLoader).loadIconSet(fakeDocumentReference);
+    }
+
+    @Test
+    void getIconSetWhenAllFail() throws Exception
+    {
+        // Mocks
+        Query query = mock(Query.class);
+        when(this.queryManager.createQuery("FROM doc.object(IconThemesCode.IconThemeClass) obj WHERE obj.name = :name",
+            Query.XWQL)).thenReturn(query);
+        List<String> results = List.of("FakeIcon.Silk", "IconThemes.Silk");
+        when(query.<String>execute()).thenReturn(results);
+        DocumentReference fakeDocumentReference = new DocumentReference("wiki", "FakeIcon", "Silk");
+        when(this.documentReferenceResolver.resolve("FakeIcon.Silk")).thenReturn(fakeDocumentReference);
+        IconException fakeException = new IconException("Fake");
+        when(this.iconSetLoader.loadIconSet(fakeDocumentReference)).thenThrow(fakeException);
+
+        DocumentReference documentReference = new DocumentReference("wiki", "IconThemes", "Silk");
+        when(this.documentReferenceResolver.resolve("IconThemes.Silk")).thenReturn(documentReference);
+        when(this.iconSetLoader.loadIconSet(documentReference)).thenThrow(new IconException("Real"));
+
+        // Test
+        IconException exception = assertThrows(IconException.class, () -> this.iconSetManager.getIconSet("silk"));
+        assertEquals("Failed to load the icon set [silk] from 2 documents, reporting the first exception, see the"
+            + " log for additional errors.", exception.getMessage());
+        assertEquals(fakeException, exception.getCause());
+
+        assertEquals(1, this.logCapture.size());
+        assertEquals("Failed loading icon set [silk] from multiple matching documents, "
+                + "ignored this additional exception, reason: [IconException: Real].",
+            this.logCapture.getMessage(0));
+
+        // Verify
+        verify(query).bindValue("name", "silk");
+        verify(this.iconSetCache, never()).put(anyString(), any());
+        verify(this.iconSetCache, never()).put(any(DocumentReference.class), any());
+        verify(this.iconSetLoader).loadIconSet(fakeDocumentReference);
     }
 
     @Test

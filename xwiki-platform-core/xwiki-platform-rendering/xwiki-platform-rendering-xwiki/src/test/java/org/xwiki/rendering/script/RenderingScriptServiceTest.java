@@ -31,6 +31,7 @@ import org.xwiki.component.internal.ContextComponentManagerProvider;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
+import org.xwiki.rendering.internal.util.XWikiSyntaxEscaper;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroCategoryManager;
 import org.xwiki.rendering.macro.MacroId;
@@ -74,7 +75,7 @@ import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_1;
  * @since 3.2M3
  */
 @ComponentTest
-@ComponentList({ ContextComponentManagerProvider.class })
+@ComponentList({ ContextComponentManagerProvider.class, XWikiSyntaxEscaper.class })
 class RenderingScriptServiceTest
 {
     @InjectMockComponents

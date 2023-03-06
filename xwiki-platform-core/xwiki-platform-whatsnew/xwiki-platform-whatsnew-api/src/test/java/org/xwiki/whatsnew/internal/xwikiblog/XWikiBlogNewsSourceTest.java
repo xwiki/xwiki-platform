@@ -22,12 +22,20 @@ package org.xwiki.whatsnew.internal.xwikiblog;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.whatsnew.NewsCategory;
 import org.xwiki.whatsnew.NewsSourceItem;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link XWikiBlogNewsSource}.
@@ -35,13 +43,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @version $Id$
  * @since 15.1RC1
  */
+@ComponentTest
 class XWikiBlogNewsSourceTest
 {
+    @Mock
+    private RSSContentCleaner cleaner;
+
+    @BeforeEach
+    void before()
+    {
+        when(this.cleaner.clean(any(String.class))).thenAnswer(
+            (Answer) invocation -> invocation.getArgument(0));
+    }
+
     @Test
     void buildWithNoConstraint() throws Exception
     {
         XWikiBlogNewsSource source =new XWikiBlogNewsSource(
-            XWikiBlogNewsSource.class.getClassLoader().getResourceAsStream("blogrss.xml"));
+            XWikiBlogNewsSource.class.getClassLoader().getResourceAsStream("blogrss.xml"), this.cleaner);
         List<NewsSourceItem> items = source.build();
 
         assertEquals(10, items.size());
@@ -64,7 +83,7 @@ class XWikiBlogNewsSourceTest
     void buildWithAdminUserCategory() throws Exception
     {
         XWikiBlogNewsSource source =new XWikiBlogNewsSource(
-            XWikiBlogNewsSource.class.getClassLoader().getResourceAsStream("blogrss.xml"));
+            XWikiBlogNewsSource.class.getClassLoader().getResourceAsStream("blogrss-admin.xml"), this.cleaner);
         List<NewsSourceItem> items = source.forCategories(Set.of(NewsCategory.ADMIN_USER)).build();
 
         assertEquals(8, items.size());
@@ -77,7 +96,7 @@ class XWikiBlogNewsSourceTest
     void buildWithSimpleUserCategory() throws Exception
     {
         XWikiBlogNewsSource source =new XWikiBlogNewsSource(
-            XWikiBlogNewsSource.class.getClassLoader().getResourceAsStream("blogrss.xml"));
+            XWikiBlogNewsSource.class.getClassLoader().getResourceAsStream("blogrss-simple.xml"), this.cleaner);
         List<NewsSourceItem> items = source.forCategories(Set.of(NewsCategory.SIMPLE_USER)).build();
 
         assertEquals(2, items.size());

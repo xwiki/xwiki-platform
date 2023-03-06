@@ -37,4 +37,16 @@ public class IconException extends Exception
     {
         super(message, source);
     }
+
+    /**
+     * Constructor with just a message.
+     *
+     * @param message the message to store in the exception
+     * @since 14.10.6
+     * @since 15.2RC1
+     */
+    public IconException(String message)
+    {
+        super(message);
+    }
 }

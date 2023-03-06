@@ -39,7 +39,7 @@ public interface NewsSourceItem
     Optional<String> getTitle();
 
     /**
-     * @return the news item content
+     * @return the news item content (cleaned and safe to be rendered)
      */
     Optional<NewsContent> getDescription();
 

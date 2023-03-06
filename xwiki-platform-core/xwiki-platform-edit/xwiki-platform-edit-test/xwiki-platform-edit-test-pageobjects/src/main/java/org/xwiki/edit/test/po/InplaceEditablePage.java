@@ -112,6 +112,31 @@ public class InplaceEditablePage extends ViewPage
     }
 
     /**
+     * @return {@code true} if the document title input has an invalid value (e.g. empty value when document titles are
+     *         mandatory), {@code false} otherwise
+     */
+    public boolean isDocumentTitleInvalid()
+    {
+        return !getDriver().findElementsWithoutWaiting(By.cssSelector("input#document-title-input:invalid")).isEmpty();
+    }
+
+    /**
+     * @return the message displayed when the document title validation fails
+     */
+    public String getDocumentTitleValidationMessage()
+    {
+        return getDriver().findElement(By.id("document-title-input")).getDomProperty("validationMessage");
+    }
+
+    /**
+     * @return the value displayed in the document title input when there's no value set by the user
+     */
+    public String getDocumentTitlePlaceholder()
+    {
+        return getDriver().findElement(By.id("document-title-input")).getAttribute("placeholder");
+    }
+
+    /**
      * Clicks on the Cancel button and waits for the page to be rendered in view mode.
      * 
      * @return this page object

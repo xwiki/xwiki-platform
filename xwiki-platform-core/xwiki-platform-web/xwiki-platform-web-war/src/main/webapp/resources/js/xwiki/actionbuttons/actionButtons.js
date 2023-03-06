@@ -42,16 +42,44 @@ var XWiki = (function(XWiki) {
     }
   };
 
+  /**
+   * Allow custom validation messages to be set on the validated field usin data attributes.
+   *
+   * @param field the validated field
+   */
+  const maybeUseCustomValidationMessage = field => {
+    const failures = ['badInput', 'patternMismatch', 'rangeOverflow', 'rangeUnderflow', 'stepMismatch', 'tooLong',
+      'tooShort', 'typeMismatch', 'valueMissing'];
+    failures.find(failure => {
+      // Convert 'badInput' into 'data-validation-bad-input'.
+      const attributeName = 'data-validation-' + failure.replace(/([A-Z])/g, match => `-${match.toLowerCase()}`);
+      if (field.validity[failure] && field.getAttribute(attributeName)) {
+        field.setCustomValidity(field.getAttribute(attributeName));
+        // We need to remove our custom validation message as soon as the user changes the field value, otherwise the
+        // field remains marked (and styled) as invalid.
+        const resetValidationMessage = () => {
+          field.setCustomValidity('');
+          field.removeEventListener('input', resetValidationMessage);
+        };
+        field.addEventListener('input', resetValidationMessage);
+        // Stop here.
+        return true;
+      }
+      // Continue with the next failures.
+      return false;
+    });
+  };
+
   // Listen for versions change to update properly the version fields.
   document.observe('xwiki:document:changeVersion', refreshVersion);
 
   actionButtons.EditActions = Class.create({
-    initialize : function() {
+    initialize: function() {
       this.addListeners();
       this.addShortcuts();
-      this.addValidators();
     },
-    addListeners : function() {
+
+    addListeners: function() {
       $$('input[name=action_cancel]').each(function(item) {
         item.observe('click', this.onCancel.bindAsEventListener(this));
       }.bind(this));
@@ -65,7 +93,8 @@ var XWiki = (function(XWiki) {
         item.observe('click', this.onSubmit.bindAsEventListener(this, 'save', true));
       }.bind(this));
     },
-    addShortcuts : function() {
+
+    addShortcuts: function() {
       var shortcuts = {
         'action_cancel' : "$services.localization.render('core.shortcuts.edit.cancel')",
         'action_preview' : "$services.localization.render('core.shortcuts.edit.preview')",
@@ -85,60 +114,49 @@ var XWiki = (function(XWiki) {
         }
       }
     },
-    validators : new Array(),
-    addValidators : function() {
-      // Add live presence validation for inputs with classname 'required'.
-      var inputs = $('body').select("input.required");
-      for (var i = 0; i < inputs.length; i++) {
-        var input = inputs[i];
-        var validator = new LiveValidation(input, { validMessage: "" });
-        validator.add(Validate.Presence, {
-          failureMessage: "$services.localization.render('core.validation.required.message')"
-        });
-        validator.validate();
-        this.validators.push(validator);
+
+    validateForm: function(form) {
+      // Validate the form using the standard HTML5 Constraint Validation API.
+      if (form && !form.checkValidity()) {
+        // If the invalid fields specify custom validation messages then use them, instead of those provided by the web
+        // browser, in order to match the XWiki locale, which may be different than the web browser's locale.
+        [...form.elements].filter(field => !field.validity.valid).forEach(maybeUseCustomValidationMessage);
+        // Show the validation errors.
+        form.reportValidity();
+        return false;
       }
-    },
-    validateForm : function(form) {
-      for (var i = 0; i < this.validators.length; i++) {
-        if (!this.validators[i].validate()) {
-          return false;
-        }
-      }
-      var commentField = (form && form.comment) || $('commentinput');
-      if (commentField && (($xwiki.isEditCommentSuggested()) || $xwiki.isEditCommentMandatory())) {
-        while (commentField.value == '') {
-          var response = prompt("$services.localization.render('core.comment.prompt')", '');
+
+      var commentField = form?.comment || $('commentinput');
+      const commentIsSuggested = commentField.getAttribute('data-xwiki-edit-comment-suggested') === 'true';
+      const commentIsMandatory = commentField.getAttribute('data-xwiki-edit-comment-mandatory') === 'true';
+      if (commentField && (commentIsSuggested || commentIsMandatory)) {
+        while (commentField.value === '') {
+          var response = prompt(commentField.getAttribute('data-xwiki-edit-comment-prompt'), '');
           if (response === null) {
             return false;
           }
           commentField.value = response;
-          if (!$xwiki.isEditCommentMandatory()) break;
+          if (!commentIsMandatory) break;
         }
       }
+
       return true;
     },
-    onCancel : function(event) {
-      event.preventDefault();
 
-      // Notify the others that we are going to cancel.
-      this.notify(event, "cancel");
+    onCancel: function(event) {
+      // Notify the others that we are going to cancel and let them prevent our default behavior.
+      if (this.notify(event, 'cancel')) {
+        event.preventDefault();
 
-      // Optimisation: Do not submit the entire form's data when all we want is to cancel editing.
-      var form = event.element().form;
-      form && this.cancelForm(form);
+        // Optimisation: Do not submit the entire form's data when all we want is to cancel editing.
+        var form = event.element().form;
+        form && this.cancelForm(form);
+      }
     },
+
     cancelForm: function(form) {
       // Determine the form's action and clean it by removing any anchors.
-      var location = form.action;
-      if (typeof location != "string") {
-        location = form.attributes.getNamedItem("action");
-        if (location) {
-          location = location.nodeValue;
-        } else {
-          location = window.self.location.href;
-        }
-      }
+      var location = form.action || window.location.href;
       var parts = location.split('#', 2);
       var fragmentId = (parts.length == 2) ? parts[1] : '';
       location = parts[0];
@@ -165,6 +183,7 @@ var XWiki = (function(XWiki) {
       // Call the cancel URL directly instead of submitting the form. (optimisation)
       window.location = location + cancelActionParameter + xredirectParameter + languageParameter + fragmentId;
     },
+
     onSubmit: function(event, action, continueEditing) {
       var beforeAction = 'before' + action.substr(0, 1).toUpperCase() + action.substr(1);
       if (this.notify(event, beforeAction, {'continue': continueEditing})) {
@@ -175,7 +194,8 @@ var XWiki = (function(XWiki) {
         }
       }
     },
-    notify : function(originalEvent, action, params) {
+
+    notify: function(originalEvent, action, params) {
       // We fire the action event on the button that triggered the action. This is useful when there are multiple forms
       // on the same page and you want to catch the events that were triggered by a specific form.
       var event = originalEvent.element().fire('xwiki:actions:' + action, Object.extend({
@@ -218,25 +238,29 @@ var XWiki = (function(XWiki) {
     },
     // Allow to disable the editors (form, WikiEditor or CKEditor) while a save&view is performed.
     disableEditors : function () {
-      if (this.form) {
-        this.form.disable();
-      }
+      this._setFormDisabledState(true);
     },
     // Allow to enable back the editors (form, WikiEditor or CKEditor) in case of 401 for example.
     enableEditors : function () {
-      if (this.form) {
-        this.form.enable();
+      this._setFormDisabledState(false);
+    },
+    _setFormDisabledState: function(disabled) {
+      // If the form fields are wrapped in a field set then use that to disable / re-enable all the form fields at once.
+      // This is faster and more robust because we don't need to remember the disabled state for each field (in order to
+      // avoid enabling fields that are meant to be disabled in some cases).
+      const fieldSet = this.form?.querySelector(':scope > fieldset');
+      if (fieldSet) {
+        fieldSet.disabled = disabled;
+      } else if (disabled) {
+        this.form?.disable();
+      } else {
+        this.form?.enable();
       }
     },
     getFormData: function(action) {
-      let formData = {};
-      if (this.form instanceof HTMLFormElement) {
-        formData = new FormData(this.form);
-        if (this.hasFormAction(action)) {
-          formData.set(action, '');
-        }
-      } else if (typeof this.form.serialize === 'function') {
-        formData = this.form.serialize({hash: true, submit: action});
+      const formData = new FormData(this.form);
+      if (this.hasFormAction(action)) {
+        formData.set(action, '');
       }
       return new URLSearchParams(formData);
     },

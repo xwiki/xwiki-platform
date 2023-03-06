@@ -91,6 +91,7 @@
     <xwiki.enforcer.enforce-tika2-parsers.skip>${xwiki.enforcer.skip}</xwiki.enforcer.enforce-tika2-parsers.skip>
     <xwiki.enforcer.banneddependencytype-xar.skip>${xwiki.enforcer.skip}</xwiki.enforcer.banneddependencytype-xar.skip>
     <xwiki.enforcer.mysql-connector-id.skip>${xwiki.enforcer.skip}</xwiki.enforcer.mysql-connector-id.skip>
+    <xwiki.enforcer.enforce-no-old-xwiki-platform.skip>${xwiki.enforcer.skip}</xwiki.enforcer.enforce-no-old-xwiki-platform.skip>
 
     <!-- Versions of JDBC connectors we want to use in our distribution, in our tests and when using build tools -->
     <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
@@ -108,9 +109,9 @@
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
     <pgsql.version>42.5.3</pgsql.version>
-    <oracle.groupId>com.oracle.ojdbc</oracle.groupId>
+    <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
     <oracle.artifactId>ojdbc8</oracle.artifactId>
-    <oracle.version>19.3.0.0</oracle.version>
+    <oracle.version>21.9.0.0</oracle.version>
   </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>
@@ -165,7 +166,7 @@
       <dependency>
         <groupId>org.liquibase</groupId>
         <artifactId>liquibase-core</artifactId>
-        <version>4.19.0</version>
+        <version>4.19.1</version>
         <exclusions>
           <!-- Not the right id -->
           <exclusion>
@@ -1418,6 +1419,95 @@
                   </message>
                   <excludes>
                     <exclude>mysql:mysql-connector-java</exclude>
+                  </excludes>
+                </bannedDependencies>
+              </rules>
+            </configuration>
+          </execution>
+          <!-- Make sure we don't use old platform dependencies -->
+          <execution>
+            <id>enforce-no-old-xwiki-platform</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <skip>${xwiki.enforcer.enforce-no-old-xwiki-platform.skip}</skip>
+              <rules>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <message>These dependencies don't exist anymore</message>
+                  <excludes>
+                    <exclude>org.xwiki.platform:xwiki-platform-cache-api</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-cache-infinispan</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-classloader-api</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-extension-repository-xwiki-handler</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-extension-repository-aether</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-extension-repository-xwiki-api</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-extension-repository-xwiki-model</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-administration</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-appwithinminutes</exclude>
+                    <exclude>org.xwiki.contrib:application-ckeditor-base</exclude>
+                    <exclude>org.xwiki.contrib:application-ckeditor-plugins</exclude>
+                    <exclude>org.xwiki.contrib:application-ckeditor-ui</exclude>
+                    <exclude>org.xwiki.contrib:application-ckeditor-webjar</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-eventstream</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-flamingo-bootswatchthemes</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-flamingo-theme</exclude>
+                    <exclude>org.xwiki.contrib:application-help-center</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-font-awesome</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-image-api</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-image-plugin</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-invitation</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-eventstream-store</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-eventstream-store-hibernate</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-activitystream-ui</exclude>
+                    <exclude>com.xpn.xwiki.platform:xwiki-core</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-less-css-api</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-less-css-default</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-less-css-script</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-livetable</exclude>
+                    <exclude>flaviusolaru:navigation-menu-wiki-macro</exclude>
+                    <exclude>lucaa:navigationmenuconfigapplication</exclude>
+                    <exclude>xwiki-platform-messagestream</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-model</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-filter-instance-oldcore</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-panels</exclude>
+                    <exclude>org.xwiki.contrib.ratings:application-ratings-api</exclude>
+                    <exclude>org.xwiki.contrib:xwiki-ratings-application</exclude>
+                    <exclude>org.xwiki.contrib.ratings:application-ratings-ui</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-extension-repository-xwiki-server-api</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-extension-repository-xwiki-server-ui</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-resource</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-search-solr-plugin</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-security-bridge</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-security-script</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-statistics</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-store-filesystem-attachments</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-url-standard</exclude>
+                    <exclude>org.xwiki.contrib.membership:application-membership-api</exclude>
+                    <exclude>org.xwiki.contrib.membership:application-membership-default</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-user-ui</exclude>
+                    <exclude>org.xwiki.contrib.membership:application-membership-profile</exclude>
+                    <exclude>org.xwiki.contrib.membership:application-membership-script</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-webjars</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-workspace-ui</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-wiki-manager-ui</exclude>
+                    <exclude>com.xpn.xwiki.platform.applications:xwiki-plugin-wiki-manager</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-workspace-template-features</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-xar</exclude>
+                    <exclude>org.xwiki.enterprise:xwiki-enterprise-ui-common</exclude>
+                    <exclude>com.xpn.xwiki.products:xwiki-enterprise-wiki</exclude>
+                    <exclude>org.xwiki.platform:xwiki-enterprise-wiki</exclude>
+                    <exclude>org.xwiki.platform:xwiki-enterprise-ui</exclude>
+                    <exclude>org.xwiki.platform:xwiki-enterprise-ui-all</exclude>
+                    <exclude>org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki</exclude>
+                    <exclude>com.xpn.xwiki.products:xwiki-enterprise-manager-wiki-administrator</exclude>
+                    <exclude>org.xwiki.manager:xwiki-enterprise-manager-wiki-administrator</exclude>
+                    <exclude>org.xwiki.manager:xwiki-manager-wiki-administrator</exclude>
+                    <exclude>org.xwiki.manager:xwiki-manager-ui</exclude>
+                    <exclude>org.xwiki.enterprise:xwiki-enterprise-ui-tour</exclude>
+                    <exclude>org.xwiki.enterprise:xwiki-enterprise-ui-wiki</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-distribution-flavor</exclude>
                   </excludes>
                 </bannedDependencies>
               </rules>

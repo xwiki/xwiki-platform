@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://purl.org/rss/1.0/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel rdf:about="/xwiki/bin/view/Blog/">
+    <title>Blog</title>
+    <link>https://www.xwiki.org:443/xwiki/bin/view/Blog/</link>
+    <description>Most recent blog posts in the Blog space</description>
+    <image rdf:resource="https://www.xwiki.org/xwiki/skins/flamingo/logo.png?cache-version=1666345756000"/>
+    <dc:language></dc:language>
+    <dc:rights>This wiki is licensed under a &#60;a href=&#34;https://www.xwiki.org/xwiki/bin/view/Main/License&#34;&#62;Creative Commons Attribution&#60;/a&#62; license</dc:rights>
+    <items>
+      <rdf:Seq>
+        <rdf:li rdf:resource="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki%2015.0%20Release%20Candidate%201%20Released?language=en" />
+        <rdf:li rdf:resource="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki%2014.10.3%20Released?language=en" />
+        <rdf:li rdf:resource="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki131011Released?language=en" />
+        <rdf:li rdf:resource="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki%2014.10.2%20Released?language=en" />
+        <rdf:li rdf:resource="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki%2014.10.1%20Released?language=en" />
+        <rdf:li rdf:resource="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki%2014.10%20Released?language=en" />
+        <rdf:li rdf:resource="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki%2013.10.10%20Released?language=en" />
+        <rdf:li rdf:resource="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki149Released?language=en" />
+      </rdf:Seq>
+    </items>
+  </channel>
+  <image rdf:about="https://www.xwiki.org/xwiki/skins/flamingo/logo.png?cache-version=1666345756000">
+    <title>Wiki Logo</title>
+    <url>https://www.xwiki.org/xwiki/skins/flamingo/logo.png?cache-version=1666345756000</url>
+    <link>https://www.xwiki.org:443/xwiki/bin/view/Blog/</link>
+  </image>
+  <item rdf:about="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki%2015.0%20Release%20Candidate%201%20Released?language=en">
+    <title>XWiki 15.0 Release Candidate 1 Released</title>
+    <link>https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki%2015.0%20Release%20Candidate%201%20Released?language=en</link>
+    <description>&#60;p&#62;The XWiki development team is proud to announce the availability of the first release candidate of XWiki 15.0. This release consists mostly of dependency upgrades and bug fixes including security fixes with some small new features for admins and developers. &#60;span class=&#34;wikilink&#34;&#62;&#60;a title=&#34;Read the full entry&#34; href=&#34;/xwiki/bin/view/Blog/XWiki%2015.0%20Release%20Candidate%201%20Released&#34;&#62;...&#60;/a&#62;&#60;/span&#62;&#60;/p&#62;</description>
+    <dc:subject>Blog.What&#39;s New for XWiki: Admin User</dc:subject>
+    <dc:date>2023-01-23T05:34:15+01:00</dc:date>
+    <dc:creator>Michael Hamann</dc:creator>
+  </item>
+  <item rdf:about="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki%2014.10.3%20Released?language=en">
+    <title>XWiki 14.10.3 Released</title>
+    <link>https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki%2014.10.3%20Released?language=en</link>
+    <description>&#60;p&#62;The XWiki development team is proud to announce the availability of XWiki 14.10.3. This is a bugfix release (includes security fixes) that covers important issues that we have discovered since &#60;span class=&#34;wikilink&#34;&#62;&#60;a href=&#34;/xwiki/bin/view/Blog/XWiki%2014.10.2%20Released&#34;&#62;14.10.2&#60;/a&#62;&#60;/span&#62; has been released. &#60;span class=&#34;wikilink&#34;&#62;&#60;a title=&#34;Read the full entry&#34; href=&#34;/xwiki/bin/view/Blog/XWiki%2014.10.3%20Released&#34;&#62;...&#60;/a&#62;&#60;/span&#62;&#60;/p&#62;</description>
+    <dc:subject>Blog.What&#39;s New for XWiki: Admin User</dc:subject>
+    <dc:date>2023-01-10T05:54:25+01:00</dc:date>
+    <dc:creator>Manuel Leduc</dc:creator>
+    <dc:contributor>
+      <rdf:Description link="/xwiki/bin/view/XWiki/slauriere">
+        <rdf:value>slauriere</rdf:value>
+      </rdf:Description>
+    </dc:contributor>
+  </item>
+  <item rdf:about="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki131011Released?language=en">
+    <title>XWiki 13.10.11 Released</title>
+    <link>https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki131011Released?language=en</link>
+    <description>&#60;p&#62;The XWiki development team is proud to announce the availability of XWiki 13.10.11. This is a bugfix release and the last release of the 13.10.x branch (since the 14.10.x branch is now the new LTS branch). It is a recommended upgrade for anyone using XWiki 13.10.x and who cannot upgrade to 14.10.x yet, as it contains several security fixes. &#60;span class=&#34;wikilink&#34;&#62;&#60;a title=&#34;Read the full entry&#34; href=&#34;/xwiki/bin/view/Blog/XWiki131011Released&#34;&#62;...&#60;/a&#62;&#60;/span&#62;&#60;/p&#62;</description>
+    <dc:subject>Blog.What&#39;s New for XWiki: Admin User</dc:subject>
+    <dc:date>2023-01-05T02:09:51+01:00</dc:date>
+    <dc:creator>Vincent Massol</dc:creator>
+  </item>
+  <item rdf:about="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki%2014.10.2%20Released?language=en">
+    <title>XWiki 14.10.2 Released</title>
+    <link>https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki%2014.10.2%20Released?language=en</link>
+    <description>&#60;p&#62;This release is the first release of the new 14.10.x LTS branch (replacing the 13.10.x LTS). It is mainly a bugfix release that covers important issues that we have discovered since 14.10.1 has been released, but it also contains some improvments in code macro and include macro. It also contains fixes for several security vulnerabilities, making it a recommended upgrade. &#60;span class=&#34;wikilink&#34;&#62;&#60;a title=&#34;Read the full entry&#34; href=&#34;/xwiki/bin/view/Blog/XWiki%2014.10.2%20Released&#34;&#62;...&#60;/a&#62;&#60;/span&#62;&#60;/p&#62;</description>
+    <dc:subject>Blog.What&#39;s New for XWiki: Admin User</dc:subject>
+    <dc:date>2022-12-27T03:25:54+01:00</dc:date>
+    <dc:creator>Simon Urli</dc:creator>
+  </item>
+  <item rdf:about="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki%2014.10.1%20Released?language=en">
+    <title>XWiki 14.10.1 Released</title>
+    <link>https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki%2014.10.1%20Released?language=en</link>
+    <description>&#60;p&#62;This is mainly a bugfix release that covers important issues that we have discovered since 14.10 has been released. However, it also comes with an improved attachment gallery picker and a way for developers to restrict when it&#39;s allowed to execute a template. It also included fixes for several security vulnerabilities, making it a recommended upgrade. &#60;span class=&#34;wikilink&#34;&#62;&#60;a title=&#34;Read the full entry&#34; href=&#34;/xwiki/bin/view/Blog/XWiki%2014.10.1%20Released&#34;&#62;...&#60;/a&#62;&#60;/span&#62;&#60;/p&#62;</description>
+    <dc:subject>Blog.What&#39;s New for XWiki: Admin User</dc:subject>
+    <dc:date>2022-12-12T12:19:48+01:00</dc:date>
+    <dc:creator>Thomas Mortagne</dc:creator>
+  </item>
+  <item rdf:about="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki%2014.10%20Released?language=en">
+    <title>XWiki 14.10 Released</title>
+    <link>https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki%2014.10%20Released?language=en</link>
+    <description>&#60;p&#62;This release includes a new export dialog, makes the new browser-based PDF export and the new image selector the default, adds a feature to restrict attachment mimetypes and makes the UI more consistent by adding breadcrumbs in more cases. It also fixes bugs including several security vulnerabilities, making it a recommended upgrade. &#60;span class=&#34;wikilink&#34;&#62;&#60;a title=&#34;Read the full entry&#34; href=&#34;/xwiki/bin/view/Blog/XWiki%2014.10%20Released&#34;&#62;...&#60;/a&#62;&#60;/span&#62;&#60;/p&#62;</description>
+    <dc:subject>Blog.What&#39;s New for XWiki: Admin User</dc:subject>
+    <dc:date>2023-01-06T03:29:00+01:00</dc:date>
+    <dc:creator>Michael Hamann</dc:creator>
+  </item>
+  <item rdf:about="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki%2013.10.10%20Released?language=en">
+    <title>XWiki 13.10.10 Released</title>
+    <link>https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki%2013.10.10%20Released?language=en</link>
+    <description>&#60;p&#62;The XWiki development team is proud to announce the availability of XWiki 13.10.10. This is a bugfix release (includes security fixes) that covers important issues that we have discovered since 13.10.9 has been released. &#60;span class=&#34;wikilink&#34;&#62;&#60;a title=&#34;Read the full entry&#34; href=&#34;/xwiki/bin/view/Blog/XWiki%2013.10.10%20Released&#34;&#62;...&#60;/a&#62;&#60;/span&#62;&#60;/p&#62;</description>
+    <dc:subject>Blog.What&#39;s New for XWiki: Admin User</dc:subject>
+    <dc:date>2023-01-06T03:29:01+01:00</dc:date>
+    <dc:creator>Marius Dumitru Florea</dc:creator>
+  </item>
+  <item rdf:about="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki149Released?language=en">
+    <title>XWiki 14.9 Released</title>
+    <link>https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki149Released?language=en</link>
+    <description>&#60;p&#62;This releases improves the new client-side PDF Export feature (still experimental but getting closer to being production ready) by offering the ability to configure it in the Admin UI and by enhancing the default template. It also fixes bugs and especially several security bugs, making it a recommended upgrade. &#60;span class=&#34;wikilink&#34;&#62;&#60;a title=&#34;Read the full entry&#34; href=&#34;/xwiki/bin/view/Blog/XWiki149Released&#34;&#62;...&#60;/a&#62;&#60;/span&#62;&#60;/p&#62;</description>
+    <dc:subject>Blog.What&#39;s New for XWiki: Admin User</dc:subject>
+    <dc:date>2023-01-06T03:29:01+01:00</dc:date>
+    <dc:creator>Manuel Leduc</dc:creator>
+  </item>
+</rdf:RDF>

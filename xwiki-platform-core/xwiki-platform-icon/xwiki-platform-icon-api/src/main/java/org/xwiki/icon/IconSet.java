@@ -24,6 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.stability.Unstable;
+
 /**
  * A collection of icons, with some properties to display them.
  *
@@ -51,6 +54,8 @@ public class IconSet
     private String iconCssClass;
 
     private IconType type;
+
+    private DocumentReference sourceDocumentReference;
 
     /**
      * Constructor.
@@ -267,5 +272,28 @@ public class IconSet
     public boolean hasIcon(String iconName)
     {
         return this.iconMap.containsKey(iconName);
+    }
+
+    /**
+     * @return the document reference of the source of the icon theme, may be {@code null} if the icon set hasn't
+     * been loaded from a document
+     * @since 14.10.6
+     * @since 15.2RC1
+     */
+    @Unstable
+    public DocumentReference getSourceDocumentReference()
+    {
+        return this.sourceDocumentReference;
+    }
+
+    /**
+     * @param sourceDocumentReference the reference to the source of the icon theme
+     * @since 14.10.6
+     * @since 15.2RC1
+     */
+    @Unstable
+    public void setSourceDocumentReference(DocumentReference sourceDocumentReference)
+    {
+        this.sourceDocumentReference = sourceDocumentReference;
     }
 }

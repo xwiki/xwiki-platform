@@ -229,7 +229,7 @@ class DefaultIconThemesResourceTest
     @Test
     void getIconsIconManagerException() throws Exception
     {
-        IconException iconException = new IconException("icon error", null);
+        IconException iconException = new IconException("icon error");
 
         when(this.iconManager.hasIcon(any(), any())).thenThrow(iconException);
         when(this.iconSetManager.getCurrentIconSet()).thenReturn(new IconSet("testTheme"));

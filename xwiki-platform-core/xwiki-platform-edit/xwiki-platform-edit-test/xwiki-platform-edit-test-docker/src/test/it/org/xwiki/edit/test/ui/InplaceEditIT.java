@@ -19,14 +19,19 @@
  */
 package org.xwiki.edit.test.ui;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Alert;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -39,14 +44,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 class InplaceEditIT
 {
-    @BeforeEach
-    void setup(TestUtils setup, TestReference testReference)
+    @BeforeAll
+    static void beforeAll(TestUtils setup)
     {
         setup.createUserAndLogin("alice", "pa$$word", "editor", "Wysiwyg");
+    }
+
+    @BeforeEach
+    void beforeEach(TestUtils setup, TestReference testReference)
+    {
         setup.createPage(testReference, "before\n\n== Section ==\n\nafter", "test title");
     }
 
     @Test
+    @Order(1)
     void editInplace(TestUtils setup, TestReference testReference)
     {
         InplaceEditablePage viewPage = new InplaceEditablePage();
@@ -120,5 +131,93 @@ class InplaceEditIT
         viewPage.setDocumentTitle("final title");
         viewPage.saveAndView();
         assertEquals("final title", viewPage.getDocumentTitle());
+    }
+
+    @Test
+    @Order(2)
+    void editInPlaceWithMandatoryTitle(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // First of all, test that we can save with an empty title.
+        InplaceEditablePage viewPage = new InplaceEditablePage().editInplace();
+        viewPage.setDocumentTitle("");
+        assertEquals(testReference.getLastSpaceReference().getName(), viewPage.getDocumentTitlePlaceholder());
+        assertFalse(viewPage.isDocumentTitleInvalid());
+        assertEquals("", viewPage.getDocumentTitleValidationMessage());
+        viewPage.saveAndView();
+
+        // Now let's make document title mandatory.
+        setup.loginAsSuperAdmin();
+        setup.setWikiPreference("xwiki.title.mandatory", "1");
+
+        setup.loginAndGotoPage("alice", "pa$$word", setup.getURL(testReference));
+        viewPage = new InplaceEditablePage().editInplace();
+
+        // The title should be empty thus invalid.
+        assertTrue(viewPage.isDocumentTitleInvalid());
+        // We don't use a placeholder when document title is mandatory because it creates confusion.
+        assertEquals("", viewPage.getDocumentTitlePlaceholder());
+
+        // Typing something should make the title input valid.
+        viewPage.setDocumentTitle("Title");
+        assertFalse(viewPage.isDocumentTitleInvalid());
+
+        // Now let's try to save with an empty title.
+        viewPage.setDocumentTitle("").save(false);
+        assertTrue(viewPage.isDocumentTitleInvalid());
+        assertEquals("This field is required.", viewPage.getDocumentTitleValidationMessage());
+
+        // Let's fix the title now.
+        viewPage.setDocumentTitle("test title").saveAndView();
+        assertEquals("test title", viewPage.getDocumentTitle());
+    }
+
+    @Test
+    @Order(3)
+    void editInPlaceWithMandatoryVersionSummary(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+        // Reset for previous test.
+        setup.setWikiPreference("xwiki.title.mandatory", "0");
+        // Make version summaries mandatory.
+        setup.setWikiPreference("editcomment_mandatory", "1");
+
+        setup.loginAndGotoPage("alice", "pa$$word", setup.getURL(testReference));
+        InplaceEditablePage viewPage = new InplaceEditablePage().editInplace();
+
+        // Try to save & view without a version summary.
+        viewPage.saveAndView(false);
+        Alert alert = setup.getDriver().switchTo().alert();
+        assertEquals("Enter a brief description of your changes", alert.getText());
+        // Accept without typing any text.
+        alert.accept();
+
+        // The empty change summary is not valid so the prompt (alert) is redisplayed, but not right away. It seems the
+        // browser does this in the next event loop, so we need to wait for the prompt to reappear before interacting
+        // with it.
+        alert = setup.getDriver().waitUntilCondition(ExpectedConditions.alertIsPresent());
+
+        // Let's dismiss the prompt this time, effectively canceling the save.
+        alert.dismiss();
+
+        // Try save & continue without a version summary.
+        viewPage.save(false);
+        setup.getDriver().switchTo().alert().dismiss();
+
+        // Set the version summary. This should avoid the prompt.
+        viewPage.setVersionSummary("test").save();
+
+        // The version summary input is reset after each save.
+        viewPage.save(false);
+        alert = setup.getDriver().switchTo().alert();
+        alert.sendKeys("foo");
+        alert.accept();
+        viewPage.waitForNotificationSuccessMessage("Saved");
+
+        // Make version summaries optional again.
+        setup.loginAsSuperAdmin();
+        setup.setWikiPreference("editcomment_mandatory", "0");
+
+        setup.loginAndGotoPage("alice", "pa$$word", setup.getURL(testReference));
+        new InplaceEditablePage().editInplace().saveAndView();
     }
 }

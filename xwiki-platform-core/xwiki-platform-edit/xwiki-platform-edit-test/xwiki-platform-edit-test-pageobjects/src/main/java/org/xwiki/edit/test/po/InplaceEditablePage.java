@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -34,6 +35,9 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class InplaceEditablePage extends ViewPage
 {
+    @FindBy(id = "commentinput")
+    private WebElement versionSummaryInput;
+
     /**
      * Click on the Edit button and wait for the in-place editor to load.
      * 
@@ -109,6 +113,44 @@ public class InplaceEditablePage extends ViewPage
             // Edit (in-place) mode.
             return titleInput.get(0).getAttribute("value");
         }
+    }
+
+    /**
+     * @return {@code true} if the document title input has an invalid value (e.g. empty value when document titles are
+     *         mandatory), {@code false} otherwise
+     */
+    public boolean isDocumentTitleInvalid()
+    {
+        return !getDriver().findElementsWithoutWaiting(By.cssSelector("input#document-title-input:invalid")).isEmpty();
+    }
+
+    /**
+     * @return the message displayed when the document title validation fails
+     */
+    public String getDocumentTitleValidationMessage()
+    {
+        return getDriver().findElement(By.id("document-title-input")).getDomProperty("validationMessage");
+    }
+
+    /**
+     * @return the value displayed in the document title input when there's no value set by the user
+     */
+    public String getDocumentTitlePlaceholder()
+    {
+        return getDriver().findElement(By.id("document-title-input")).getAttribute("placeholder");
+    }
+
+    /**
+     * Sets the value of the version summary field.
+     * 
+     * @param versionSummary the new version summary
+     * @return this page object
+     */
+    public InplaceEditablePage setVersionSummary(String versionSummary)
+    {
+        this.versionSummaryInput.clear();
+        this.versionSummaryInput.sendKeys(versionSummary);
+        return this;
     }
 
     /**

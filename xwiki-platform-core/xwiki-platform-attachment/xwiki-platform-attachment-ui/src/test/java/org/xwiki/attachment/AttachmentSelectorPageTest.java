@@ -35,24 +35,15 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.xwiki.bridge.event.DocumentCreatedEvent;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.wiki.internal.bridge.DefaultContentParser;
 import org.xwiki.icon.IconManagerScriptServiceComponentList;
 import org.xwiki.model.internal.reference.converter.EntityReferenceConverter;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
-import org.xwiki.observation.EventListener;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;
 import org.xwiki.rendering.internal.configuration.DefaultRenderingConfigurationComponentList;
-import org.xwiki.rendering.internal.macro.wikibridge.DefaultWikiMacroManager;
-import org.xwiki.rendering.internal.macro.wikibridge.WikiMacroEventListener;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.wikimacro.internal.DefaultWikiMacroFactory;
-import org.xwiki.rendering.wikimacro.internal.DefaultWikiMacroRenderer;
-import org.xwiki.security.authorization.AuthorizationManager;
-import org.xwiki.security.authorization.Right;
+import org.xwiki.rendering.wikimacro.internal.WikiMacroFactoryComponentClass;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import org.xwiki.store.script.TemporaryAttachmentsScriptService;
 import org.xwiki.test.annotation.ComponentList;
@@ -78,6 +69,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.xwiki.test.page.WikiMacroSetup.loadWikiMacro;
 
 /**
  * Test of {@code XWiki.AttachmentSelector}.
@@ -92,18 +84,11 @@ import static org.mockito.Mockito.when;
 @RenderingScriptServiceComponentList
 @DefaultRenderingConfigurationComponentList
 @IconManagerScriptServiceComponentList
+@WikiMacroFactoryComponentClass
 @ComponentList({
     ControlCharactersFilter.class,
     ModelScriptService.class,
     TestNoScriptMacro.class,
-    // Start WikiMacroEventListener
-    WikiMacroEventListener.class,
-    DefaultWikiMacroFactory.class,
-    DefaultWikiMacroManager.class,
-    DefaultContentParser.class,
-    org.xwiki.rendering.internal.parser.DefaultContentParser.class,
-    DefaultWikiMacroRenderer.class,
-    // End WikiMacroEventListener
     TemporaryAttachmentsScriptService.class,
     DocumentReferenceConverter.class,
     EntityReferenceConverter.class,
@@ -111,6 +96,9 @@ import static org.mockito.Mockito.when;
 })
 class AttachmentSelectorPageTest extends PageTest
 {
+    private static final DocumentReference ATTACHMENT_SELECTOR_DOCUMENT_REFERENCE =
+        new DocumentReference("xwiki", "XWiki", "AttachmentSelector");
+
     /**
      * Mocked because we don't want to deal with actual sessions for this test.
      */
@@ -144,7 +132,7 @@ class AttachmentSelectorPageTest extends PageTest
         this.request.put("displayImage", "false");
         this.request.put("xpage", "plain");
 
-        Document document = renderHTMLPage(new DocumentReference("xwiki", "XWiki", "AttachmentSelector"));
+        Document document = renderHTMLPage(ATTACHMENT_SELECTOR_DOCUMENT_REFERENCE);
 
         assertNotNull(document);
         Element galleryAttachmentTitle = document.select(".current .gallery_attachmenttitle").get(0);
@@ -172,7 +160,7 @@ class AttachmentSelectorPageTest extends PageTest
         this.request.put("displayImage", "true");
         this.request.put("xpage", "plain");
 
-        Document document = renderHTMLPage(new DocumentReference("xwiki", "XWiki", "AttachmentSelector"));
+        Document document = renderHTMLPage(ATTACHMENT_SELECTOR_DOCUMENT_REFERENCE);
         assertNotNull(document);
         Element galleryAttachmentTitle = document.select(".current .gallery_attachmenttitle").get(0);
         assertEquals(fileName, galleryAttachmentTitle.attr("title"));
@@ -189,7 +177,7 @@ class AttachmentSelectorPageTest extends PageTest
     @MethodSource("attachmentSelectorMacroSource")
     void attachmentSelectorMacroWidth(String widthValue, String expectedWidth) throws Exception
     {
-        attachmentSelectorMacroFixup();
+        loadWikiMacro(this, this.componentManager, ATTACHMENT_SELECTOR_DOCUMENT_REFERENCE);
 
         XWikiDocument xwikiDocument = commonFixup("test.png");
 
@@ -208,7 +196,7 @@ class AttachmentSelectorPageTest extends PageTest
     @MethodSource("attachmentSelectorMacroSource")
     void attachmentSelectorMacroHeight(String widthValue, String expectedWidth) throws Exception
     {
-        attachmentSelectorMacroFixup();
+        loadWikiMacro(this, this.componentManager, ATTACHMENT_SELECTOR_DOCUMENT_REFERENCE);
 
         XWikiDocument xwikiDocument = commonFixup("test.png");
 
@@ -226,7 +214,7 @@ class AttachmentSelectorPageTest extends PageTest
     @MethodSource("attachmentSelectorMacroSource")
     void attachmentSelectorMacroAlternateText(String widthValue, String expectedWidth) throws Exception
     {
-        attachmentSelectorMacroFixup();
+        loadWikiMacro(this, this.componentManager, ATTACHMENT_SELECTOR_DOCUMENT_REFERENCE);
 
         XWikiDocument xwikiDocument = commonFixup("test.png");
 
@@ -245,7 +233,7 @@ class AttachmentSelectorPageTest extends PageTest
     @MethodSource("attachmentSelectorMacroSource")
     void attachmentSelectorMacroWidthWithLink(String widthValue, String expectedWidth) throws Exception
     {
-        attachmentSelectorMacroFixup();
+        loadWikiMacro(this, this.componentManager, ATTACHMENT_SELECTOR_DOCUMENT_REFERENCE);
 
         XWikiDocument xwikiDocument = commonFixup("test.png");
 
@@ -265,7 +253,7 @@ class AttachmentSelectorPageTest extends PageTest
     @MethodSource("attachmentSelectorMacroSource")
     void attachmentSelectorMacroHeightWithLink(String widthValue, String expectedWidth) throws Exception
     {
-        attachmentSelectorMacroFixup();
+        loadWikiMacro(this, this.componentManager, ATTACHMENT_SELECTOR_DOCUMENT_REFERENCE);
 
         XWikiDocument xwikiDocument = commonFixup("test.png");
 
@@ -284,7 +272,7 @@ class AttachmentSelectorPageTest extends PageTest
     @MethodSource("attachmentSelectorMacroSource")
     void attachmentSelectorMacroAlternateTextWithLink(String widthValue, String expectedWidth) throws Exception
     {
-        attachmentSelectorMacroFixup();
+        loadWikiMacro(this, this.componentManager, ATTACHMENT_SELECTOR_DOCUMENT_REFERENCE);
 
         XWikiDocument xwikiDocument = commonFixup("test.png");
 
@@ -325,7 +313,7 @@ class AttachmentSelectorPageTest extends PageTest
         this.request.put("displayImage", "true");
         this.request.put("xpage", "plain");
 
-        Document document = renderHTMLPage(new DocumentReference("xwiki", "XWiki", "AttachmentSelector"));
+        Document document = renderHTMLPage(ATTACHMENT_SELECTOR_DOCUMENT_REFERENCE);
         Element element = document.selectFirst(".gallery_attachmentbox.current");
         assertTrue(element.classNames().contains("temporary_attachment"),
             String.format("temporary_attachment class not found in %s", element.classNames()));
@@ -340,26 +328,8 @@ class AttachmentSelectorPageTest extends PageTest
 
         this.request.put("docname", "xwiki:Space.]] {{noscript/}}");
 
-        Document document = renderHTMLPage(new DocumentReference("xwiki", "XWiki", "AttachmentSelector"));
+        Document document = renderHTMLPage(ATTACHMENT_SELECTOR_DOCUMENT_REFERENCE);
         assertEquals("Space.]] {{noscript/}}", document.getElementById("attachment-picker-close").attr("href"));
-    }
-
-    private void attachmentSelectorMacroFixup() throws Exception
-    {
-        DocumentReference attachmentSelectorDocumentReference =
-            new DocumentReference("xwiki", "XWiki", "AttachmentSelector");
-        XWikiDocument xWikiDocument = loadPage(attachmentSelectorDocumentReference);
-
-        // TODO: The code below is more generic than this test and should be moved to be reusable. 
-        // Make the wiki component manager point to the default component manager.
-        this.componentManager.registerComponent(ComponentManager.class, "wiki",
-            this.componentManager.getInstance(ComponentManager.class));
-        when(this.componentManager.<AuthorizationManager>getInstance(AuthorizationManager.class)
-            .hasAccess(Right.ADMIN, new DocumentReference("xwiki", "XWiki", "Admin"),
-                xWikiDocument.getDocumentReference().getWikiReference())).thenReturn(true);
-        // Simulate the event not thrown by page test for now.
-        this.componentManager.<EventListener>getInstance(EventListener.class, "wikimacrolistener")
-            .onEvent(new DocumentCreatedEvent(), xWikiDocument, null);
     }
 
     private XWikiDocument commonFixup(String fileName) throws XWikiException, IOException

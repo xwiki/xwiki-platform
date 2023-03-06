@@ -31,10 +31,10 @@ import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.rendering.renderer.reference.link.URITitleGenerator;
 
 /**
- * Generate link labels for ATTACH URIs.
+ * Generate link titles for ATTACH URIs.
  *
  * @version $Id$
- * @since 15.1-RC1
+ * @since 15.2RC1
  */
 @Component
 @Named("pageAttach")
@@ -57,7 +57,7 @@ public class XWikiPageAttachmentURITitleGenerator implements URITitleGenerator
     {
         PageAttachmentReference attachmentReference =
             this.currentAttachmentReferenceResolver.resolve(reference.getReference());
-        return this.contextLocalization.getTranslationPlain("rendering.internal.renderer.link.create.title",
+        return this.contextLocalization.getTranslationPlain("core.create.inline.label",
          attachmentReference.getName());
     }
 }

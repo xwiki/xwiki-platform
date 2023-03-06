@@ -211,6 +211,7 @@ define('xwiki-livedata', [
         "selection.infoBar.selectedCount",
         "selection.infoBar.allSelected",
         "selection.infoBar.allSelectedBut",
+        "pagination.label",
         "pagination.currentEntries",
         "pagination.pageSize",
         "pagination.page",

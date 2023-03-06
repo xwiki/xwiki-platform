@@ -29,7 +29,7 @@
 <template>
   <!-- Pagination -->
   <nav class="livedata-pagination"
-    :aria-label="$t('livedata.pagination.label')">
+    :aria-label="$t('livedata.pagination.label', [this.data.query.source.className])">
 
     <!--
       Display the pagination current entry range
@@ -73,12 +73,11 @@
     <!--
       The actual pagination widget
       It displays the the available pages numbers, and change to them on click.
-      Not all page numbers are show depending of the `pagination.maxShownPages`
+      Not all page numbers are shown depending of the `pagination.maxShownPages`
       property in the Livedata meta config.
       Arrows can be shown to go to first, last, previous, next page.
     -->
-    <span class="pagination-indexes"
-      :aria-label="$t('livedata.pagination.index.label')">
+    <span class="pagination-indexes">
       {{ $t('livedata.pagination.page') }}
       <!--
         Go to First Page button

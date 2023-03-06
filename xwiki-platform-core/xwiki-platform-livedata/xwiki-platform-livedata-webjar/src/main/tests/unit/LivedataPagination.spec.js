@@ -78,7 +78,12 @@ function initWrapper({provide} = {}) {
               pageSizes: [10, 20, 30, 100]
             }
           },
-          query: {limit: 20},
+          query: {
+            limit: 20,
+            source: {
+              className: 'XWiki.TestClass'
+            }
+          },
           data: {count: 1}
         },
         getFirstIndexOfPage() {

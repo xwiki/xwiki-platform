@@ -20,27 +20,23 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.Captcha.Translations" locale="nl">
-  <web>XWiki.Captcha</web>
-  <name>Translations</name>
-  <language>nl</language>
+<xwikidoc version="1.2" reference="Help.SupportPanel.Content" locale="ro">
+  <web>Help.SupportPanel</web>
+  <name>Content</name>
+  <language>ro</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>XWiki.Captcha.WebHome</parent>
+  <parent>Help.SupportPanel.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title/>
+  <title>Ai nevoie de ajutor?</title>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>plain/1.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>admin.captcha=CAPTCHA
-### Missing: captcha.admin.defaultCaptchaName.label=Default CAPTCHA
-### Missing: captcha.admin.defaultCaptchaName.hint=The default CAPTCHA implementation to use. Use the Extension Manager to search for other implementations that you can install and use.
-captcha.admin.configure.title=Configureer {0}
-captcha.admin.sample.title=Voorbeeld CAPTCHA
-captcha.admin.sample.description=Hoe de geconfigureerde CAPTCHA eruit zien wanneer het wordt weergegeven in een formulier, bijvoorbeeld.
-</content>
+  <content>Dacă ai nevoie de ajutor cu XWiki, poți contacta:
+* [[Asistență comunitate&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Main/Support#HCommunitySupport]]
+* [[Asistență profesională&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Main/Support#HProfessionalSupport]]</content>
 </xwikidoc>

@@ -37,7 +37,8 @@
   #end
 
   <div class="main">
-  <div id="mainContentArea">
+  ## Set as an HTML main for accessibility best practices.
+  <main id="mainContentArea">
   #template("hierarchy.vm")
   #if($viewer == 'content')
     #template("contentview.vm")
@@ -45,14 +46,16 @@
     #template("${viewer}.vm")
   #end
   <div class="clearfloats"></div>
-  </div>## mainContentArea
+  </main>## mainContentArea
   #if($viewer == 'content')
     #if ($displayContentFooter)
-      <div id="xdocFooter">
+      ## This is an aside element because it is related to the main
+      ## content but not part of it.
+      <aside id="xdocFooter" aria-label="$escapetool.xml($services.localization.render('contentfooter.label'))">
         #foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.template.contentFooter', {'sortByParameter': 'order'}))
           $services.rendering.render($uix.execute(), 'xhtml/1.0')
         #end
-      </div>
+      </aside>
     #end
     #if ($displayDocExtra)
       #template('docextra.vm')

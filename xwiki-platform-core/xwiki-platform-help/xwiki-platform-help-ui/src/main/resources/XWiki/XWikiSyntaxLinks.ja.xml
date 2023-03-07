@@ -1,0 +1,241 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.XWikiSyntaxLinks" locale="ja">
+  <web>XWiki</web>
+  <name>XWikiSyntaxLinks</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.XWikiSyntax</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>XWikiSyntaxLinks</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= 編集 =
+
+== リンク ==
+
+=== リンク1.0 ===
+
+|=(% style="width:20%" %)機能|=XWikiシンタックス 1.0|=(% style="width:20%" %)結果
+|現在のスペースのページへのリンク|{{{[WebHome]}}}|[[ウェブのホーム&gt;&gt;WebHome]]
+|ラベル付きのリンク|{{{[ラベル&gt;WebHome]}}}|[[ラベル&gt;&gt;WebHome]]
+|ラベルにXWikiシンタックスをもつリンク|{{{&lt;a href="$xwiki.getURL("WebHome")"&gt;&lt;strong&gt;太字のラベル&lt;/strong&gt;&lt;/a&gt;}}}|[[**太字のラベル**&gt;&gt;WebHome]]
+|指定したスペースのページへのリンク|{{{[Main.WebHome]}}}|[[ウェブのホーム&gt;&gt;Main.WebHome]]
+|サブウィキへのリンク|{{{[subwiki:Main.WebHome]}}}|[[ウェブのホーム&gt;&gt;xwiki:Main.WebHome]]
+|新しいウィンドウで開くリンク|{{{[ラベル&gt;WebHome&gt;_blank]}}}|[[ラベル&gt;&gt;WebHome||target="_blank"]]
+|テキスト内のURLへのリンク|{{{これはURLです: https://xwiki.org}}}|これはURLです: https://xwiki.org
+|URLへのリンク|{{{[https://xwiki.org]}}}|[[https://xwiki.org]]
+|URLへのラベル付きのリンク|{{{[XWiki&gt;https://xwiki.org]}}}|[[XWiki&gt;&gt;https://xwiki.org]]
+|Eメールアドレスへのリンク|{{{[john@smith.net&gt;mailto:john@smith.net]}}}|[[john@smith.net&gt;&gt;mailto:john@smith.net]]
+|画像リンク|{{{&lt;a href="$xwiki.getURL("スペース1.ページ1")"&gt;{image:img.png|document=スペース2.ページ2}&lt;/a&gt;}}}|[[image:XWiki.XWikiSyntaxLinks@img.png&gt;&gt;Main.WebHome]]
+|パラメーター付きの画像リンク|{{{&lt;a href="$xwiki.getURL("スペース1.ページ1")"&gt;{image:img.png|document=スペース2.ページ2|width=26|height=26}&lt;/a&gt;}}}|[[[[image:XWiki.XWikiSyntaxLinks@img.png||width="26" height="26"]]&gt;&gt;Main.WebHome]]
+|現在のページの添付ファイルへのリンク|(((
+{{info}}詳細は[[添付マクロ&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Attach%20Macro%20%28Radeox%29]]を確認してください{{/info}}
+{{{{attach:text|file=img.png}}}}
+)))|[[テキスト&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
+|異なるページの添付ファイルへのリンク|(((
+{{info}}詳細は[[添付マクロ&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Attach%20Macro%20%28Radeox%29]]を確認してください{{/info}}
+{{{{attach:text|document=スペース.ページ|file=img.png}}}}
+)))|[[テキスト&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
+|ページのアンカーへのリンク|{{{[ラベル&gt;スペース.ページ#アンカー]}}}|[[ラベル&gt;&gt;XWiki.XWikiSyntax||anchor=anchor]]
+|ページの見出しへのリンク|(((
+{{{[ラベル&gt;スペース.ページ#HMyheading]}}}
+)))|[[ラベル&gt;&gt;XWiki.XWikiSyntax||anchor=HMyheading]]
+
+{{info}}見出しを追加すると、見出しのタイトルの前に"H"（見出しのH）がついたアンカーが作成されます。例えば、"My heading"という見出しには、"HMyheading"というアンカーが作成されます。{{/info}}
+
+{{velocity}}$subHeading XWikiシンタックス 1.0 リンク仕様 $subHeading{{/velocity}}
+
+{{info}}
+##( )##は必須です。##[ ]##はオプションで、オプションを使用する場合は##{ }##の2つの文字のうち1つを追加する必要があります。
+{{/info}}
+
+リンクの完全なフォーマットは **##[ラベル {&gt; または |}] (リソース) [@interWikiエイリアス] [{&gt; または |} ターゲット]##** となります。
+
+* **##ラベル##**：描写時にリンク名としてユーザーに表示される文字列です（オプション）。例： ##マイページ##
+* **##リソース##**：完全なリンク参照は次のシンタックスで設定できます： **##(参照) [?クエリー] [#アンカー]##**
+** **##参照##**：完全なリンク参照。これは以下のいずれかを指定できます
+*** **##プロトコル:パス##**形式の**URI**（例：##http:~/~/xwiki.org##、##mailto~:john@smith.com##）
+*** **##~[~[ウィキ名:] スペース名のリスト.] (ページ名)##**形式の**ウィキのページ**。例：##WebHome##、##Main.WebHome##、##ウィキ:Main.WebHome##
+**** **##ウィキ名##**：ウィキの名称を含む文字列（オプション）。そのウィキのページにリンクします。例： ##mywiki##
+**** **##スペース名の一覧##**：ドットで分割したスペース名のリスト（オプション）。指定がなければ現在のスペースを使用します。例：##Main##、##A.B##、##A.B.C##
+**** **##ページ名##**：リンクしたウィキのページの名称を含む文字列（必須）。例： ##WebHome##
+** **##クエリー##**：レンダリングするURLで使用するパラメーターを指定するクエリー（オプション）。例： ##mydata1=5&amp;mydata2=Hello##
+** **##アンカー##**：参照したリンクで規定するアンカーを指示するアンカー名（オプション）。XWikiでは見出しのアンカーが自動的に作成されます。例： ##HTableOfContents##
+* **##interWikiエイリアス##**：InterWikiマップで規定されている[[Inter Wiki&gt;&gt;en.wikipedia.org/wiki/InterWiki]]のエイリアス（オプション。[[管理者ガイド&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]を参照してください）。これはウィキのページの名称にのみ有効です。例： ##wikipedia##
+* **##ターゲット##**：HTMLの##A##リンク要素の##ターゲット##属性に対応する文字列（オプション）。この要素はリンクのレンダリングの際に使用されます。既定ではリンクを現在のウィンドウで開きます。例：##_self##、##_blank##
+
+=== リンク2.0 ===
+
+|=(% style="width:20%" %)機能|=XWikiシンタックス 2.0|=(% style="width:20%" %)結果
+|現在のスペースのページへのリンク|{{{[[WebHome]]}}}|[[WebHome]]
+|ラベル付きのリンク|(((
+{{{[[ラベル&gt;&gt;WebHome]]}}}
+{{info}}XWikiシンタックスはリンクのラベルで使用できます。{{/info}}
+)))|[[ラベル&gt;&gt;WebHome]]
+|ラベルにXWikiシンタックスをもつリンク|{{{[[**太字のラベル**&gt;&gt;WebHome]]}}}|[[**太字のラベル**&gt;&gt;WebHome]]
+|指定したスペースのページへのリンク|{{{[[Main.WebHome]]}}}|[[Main.WebHome]]
+|サブウィキへのリンク|{{{[[subwiki:Main.WebHome]]}}}|[[xwiki:Main.WebHome]]
+|新しいウィンドウで開くリンク|{{{[[ラベル&gt;&gt;WebHome||target="_blank"]]}}}|[[ラベル&gt;&gt;WebHome||target="_blank"]]
+|テキスト内のURLへのリンク|{{{これはURLです: https://xwiki.org}}}|これはURLです: https://xwiki.org
+|URLへのリンク|{{{[[https://xwiki.org]]}}}|[[https://xwiki.org]]
+|URLへのラベル付きのリンク|{{{[[XWiki&gt;&gt;https://xwiki.org]]}}}|[[XWiki&gt;&gt;https://xwiki.org]]
+|Eメールアドレスへのリンク|{{{[[john@smith.net&gt;&gt;mailto:john@smith.net]]}}}|[[john@smith.net&gt;&gt;mailto:john@smith.net]]
+|画像リンク|{{{[[image:スペース2.ページ2@img.png&gt;&gt;スペース1.ページ1]]}}}|[[image:XWiki.XWikiSyntaxLinks@img.png&gt;&gt;Main.WebHome]]
+|パラメーター付きの画像リンク|{{{[[[[image:スペース2.ページ2@img.png||width="26" height="26"]]&gt;&gt;スペース1.ページ1]]}}}|[[[[image:XWiki.XWikiSyntaxLinks@img.png||width="26" height="26"]]&gt;&gt;Main.WebHome]]
+|現在のページの添付ファイルへのリンク|{{{[[テキスト&gt;&gt;attach:img.png]]}}}|[[テキスト&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
+|異なるページの添付ファイルへのリンク|{{{[[テキスト&gt;&gt;attach:スペース.ページ@img.png]]}}}|[[テキスト&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
+|ページのアンカーへのリンク|{{{[[ラベル&gt;&gt;スペース.ページ#anchor]]}}}|[[ラベル&gt;&gt;XWiki.XWikiSyntax||anchor="anchor"]]
+|ページの見出しへのリンク|{{{[[ラベル&gt;&gt;スペース.ページ#HMyheading]]}}}|[[ラベル&gt;&gt;XWiki.XWikiSyntax||anchor="HMyheading"]]
+|現在のページのアンカーへのリンク|{{{[[ラベル&gt;&gt;#anchor]]}}}|[[ラベル&gt;&gt;||anchor="anchor"]]
+
+{{info}}見出しを追加するとき、"H"（見出しのH）と、アルファベットによる見出しのタイトルがついたアンカーが作成されます。例えば、"My heading"という見出しには、"HMyheading"というアンカーが作成されます。{{/info}}
+
+{{velocity}}$subHeading XWikiシンタックス 2.0 リンク仕様 $subHeading{{/velocity}}
+
+{{info}}
+##( )##は必須です。##[ ]##はオプションです。
+{{/info}}
+
+リンクの完全なフォーマットは **##[ラベル&gt;&gt;] (リソース) [@interWikiエイリアス] [||パラメーター]##** となります。
+
+* **##ラベル##**：描写時にリンク名としてユーザーに表示される文字列です（オプション）。ラベルにはXWikiシンタックスを含めることができます。ラベルの指定がなければ、既定のラベルを生成します。生成のパターンは変更できます。[[管理者ガイド&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]を参照してください。例： ##マイページ##
+* **##リソース##**：完全なリンク参照は次のシンタックスで設定できます： **##(参照) [?クエリー] [#アンカー]##**
+** **##参照##**：以下の形式によるリンク参照：
+*** **URL**：**##プロトコル:~/~/パス##**の形式のURL。例：##http:~/~/xwiki.org##、##https:~/~/svn.xwiki.org/##
+*** **ウィキのページ**：**##~[~[ウィキ名:] スペース名の一覧.] (ページ名)##** の形式による参照。例：##WebHome##、##Main.WebHome##、##mywiki:Main.WebHome##
+**** **##ウィキ名##**：ウィキの名称を含む文字列（オプション）。そのウィキのページにリンクします。例： ##mywiki##
+**** **##スペース名の一覧##**：ドットで分割したスペース名のリスト（オプション）。指定がなければ現在のスペースを使用します。例：##Main##、##A.B##、##A.B.C##
+**** **##ページ名##**：リンクしたウィキのページの名称を含む文字列（必須）。例： ##WebHome##
+*** **添付ファイル**：**##attach~: [ウィキのページ名@] (添付ファイル名)##** の形式による参照。例：##attach~:img.png##、##attach~:mywiki:Main.WebHome@img.png##
+**** **##attach~:##** 添付ファイルとしてリソースを指示する文字列（必須）。
+**** **##ウィキのページ名##**：添付ファイルがあるページを参照する文字列（オプション）。上記の"ウィキのページ"を参照。
+**** **##添付ファイル名##**：ウィキに保存されている添付ファイルの名称。
+*** **Eメールアドレス**：**##mailto~: (Eメールアドレス)##** の形式（###アンカー##は有効ではありません）。例： ##mailto~:john@smith.com##
+**** **##mailto~:##** Eメールとしてリソースを指示する文字列（必須）。
+**** **##Eメールアドレス##**：指定するEメールアドレス。例： "##john@smith.com##"
+** **##クエリー##**：レンダリングするURLで使用するパラメーターを指定するクエリー（オプション）。例： ##mydata1=5&amp;mydata2=Hello##
+** **##アンカー##**：参照したリンクで規定するアンカーを指示するアンカー名（オプション）。XWikiでは見出しと画像のアンカーが自動的に作成されます。例： ##HTableOfContents##
+* **##interWikiエイリアス##**：InterWikiマップで規定されている[[Inter Wiki&gt;&gt;https://en.wikipedia.org/wiki/InterWiki]]のエイリアス（オプション。[[管理者ガイド&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]を参照してください）。これはウィキのページの名称にのみ有効です。例： ##wikipedia##
+* **##パラメーター##**：リンクに渡すパラメーターの一覧（オプション）。例： ##target="~_blank"##（新しいウィンドウで開きます）
+
+=== リンク2.1 ===
+
+|=機能|=XWikiシンタックス 2.1|=結果
+|##ページA##にある##ページB##への絶対リンク|{{{[[ページA.ページB]]}}}|[[ページB&gt;&gt;]]
+|現在のページから##ページA##への相対リンク|{{{[[ページA]]}}} or {{{[[.ページA]]}}}|[[ページA&gt;&gt;]]
+|現在のページから、##ページA##にある##ページB##への相対リンク|{{{[[.ページA.ページB]]}}}|[[ページB&gt;&gt;]]
+|ラベル付きのリンク|(((
+{{{[[ラベル&gt;&gt;ページA]]}}}
+
+{{info}}XWikiシンタックスはリンクラベルで利用できます。{{/info}}
+)))|[[ラベル&gt;&gt;]]
+|ラベルでウィキのシンタックスを使用したリンク|{{{[[**太字のラベル**&gt;&gt;ページA]]}}}|[[**太字のラベル**&gt;&gt;]]
+|画像のリンク|{{{[[image:ページA@img.png&gt;&gt;ページA]]}}}|[[image:XWiki.XWikiSyntaxLinks@img.png&gt;&gt;]]
+|##ウィキA##の##ページA##にある##ページB##への絶対リンク|{{{[[ウィキA:ページA.ページB]]}}}|[[ページB&gt;&gt;]]
+|新しいウィンドウで開くリンク|{{{[[ページA||target="_blank"]]}}}|[[ページA&gt;&gt;]]
+|暗示的なURLへのリンク|{{{これはURLです: https://xwiki.org}}}|これはURLです: https://xwiki.org
+|明示的なURLへのリンク|{{{[[https://xwiki.org]]}}}|[[https://xwiki.org]]
+|明示的なURLへのラベル付きのリンク|{{{[[XWiki&gt;&gt;https://xwiki.org]]}}}|[[XWiki&gt;&gt;https://xwiki.org]]
+|Eメールアドレスへのリンク|{{{[[john@smith.net&gt;&gt;mailto:john@smith.net]]}}}|[[john@smith.net&gt;&gt;mailto:john@smith.net]]
+|現在のページの添付ファイルへのリンク|{{{[[attach:img.png]]}}}|[[img.png&gt;&gt;]]
+|異なるページの添付ファイルへのリンク|{{{[[attach:ページA.ページB@img.png]]}}}|[[img.png&gt;&gt;]]
+|ページのアンカーへのリンク|{{{[[ページA.ページB||anchor="anchor"]]}}}|[[ページB&gt;&gt;]]
+|ページの見出しへのリンク|(((
+{{{[[ページA.ページB||anchor="HMyheading"]]}}}
+
+{{info}}見出しを追加するとき、"H"（見出しのH）と、アルファベットによる見出しのタイトルがついたアンカーが作成されます。例えば、"My heading"という見出しには、"HMyheading"というアンカーが作成されます。{{/info}}
+)))|[[ページB&gt;&gt;]]
+|現在のページのアンカーへのリンク|{{{[[ラベル&gt;&gt;||anchor="anchor"]]}}}|[[ラベル&gt;&gt;]]
+|クエリー文字列付きのページへのリンク|{{{[[ページA.ページB||queryString="param1=value1&amp;param2=value2"]]}}}|[[ページB&gt;&gt;]]
+|クエリー文字列付きの現在のページへのリンク|{{{[[ラベル&gt;&gt;||queryString="param1=value1&amp;param2=value2"]]}}}|[[ラベル&gt;&gt;]]
+
+{{velocity}}$subHeading XWikiシンタックス 2.1 リンク仕様 $subHeading{{/velocity}}
+
+{{info}}
+凡例：##( )##は必須です。##[ ]##はオプションです。
+{{/info}}
+
+リンクの完全なフォーマットは **##[ラベル&gt;&gt;] (リソース) [||パラメーター]##** となります。
+
+* **##ラベル##**：描写時にリンク名としてユーザーに表示される文字列です（オプション）。ラベルにはXWikiシンタックスを含めることができます。ラベルの指定がなければ、既定のラベルを生成します。生成のパターンは変更できます。[管理者ガイド&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]を参照してください。例： ##マイページ##
+* **##リソース##**：以下の形式によるリンク参照の文字列（必須）
+** **URL**：**##[url:](プロトコル:~/~/パス)##** の形式によるURL。例：##http:~/~/xwiki.org##、##url:https:~/~/svn.xwiki.org/##
+*** **##url:##** URLとしてリソースを指示する文字列（オプション）。
+*** **##プロトコル:~/~/パス##**：URLを指定
+** **ウィキのページ**：**##page:[(ウィキ名):](ページ名の一覧)##** の形式による参照。例：##page:ページ##、##page:myxwiki:ページ##、##page:上位ページ.下位ページ.サブの下位ページ##、##page:../同レベルのページ##、##page:./下位ページ##
+*** **##page:##** XWikiのページとしてリソースを指示する文字列（必須）。同一の参照をターミナルページとそれ以外のページにも使用できます。もし両方が存在する場合は、ターミナルページ以外のページを指示します。
+*** **##ウィキ名##**：ウィキの名称を含む文字列（オプション）。リンクはウィキのページに向けられます。ウィキの指定がなければ、現在のウィキを使用します。例： ##mywiki##
+*** **##ページ名の一覧##**：最終的にリンクするuxikino のシンタックスを指示するウィキのページの名称の一覧（必須。スラッシュで分割）。##.##と##..##を使用すると現在のページ、または、上位ページあるいはウィキを指示することもできます。例：##Main##、##A/B##、##A/B/C##、##../同レベルのページ##、##./下位ページ##
+** **ウィキのドキュメント**：**##[doc:]~[~[(ウィキ名):](スペース名の一覧).](ドキュメント名)##** の形式による参照。例：##doc:Welcome##、##doc:Main.Welcome##、##doc:mywiki:Main.Welcome##、##Welcome##
+*** **##doc:##** XWikiのターミナルページとしてリソースを指示する文字列（オプション）。 ターミナルページ以外のページを参照できますが、##.WebHome##の部分を付ける必要があります（例：##doc:Sandbox.WebHome##）。
+*** **##ウィキ名##**：ウィキの名称を含む文字列（オプション）。そのウィキのページにリンクします。 ウィキの指定がなければ、現在のウィキを使用します。例： ##mywiki##。
+*** **##スペース名の一覧##**：ドットで分割したスペース名のリスト（オプション）。指定がなければ現在のスペースを使用します。例：##Main##、##A.B##、##A.B.C##
+*** **##ドキュメント名##**：リンクしたウィキのページの名称を含む文字列（必須）。例： ##Welcome##
+** **ウィキのスペース**：**##space:[(ウィキ名):](スペース名の一覧)##** の形式による参照。例：##space:Main##、##space:mywiki:Main##、##space:A.B.C##
+*** **##space:##** XWikiのターミナルでないページ（スペース）としてリソースを指示する文字列（必須）。
+*** **##ウィキ名##**：ウィキの名称を含む文字列（オプション）。そのウィキのページにリンクします。 ウィキの指定がなければ、現在のウィキを使用します。例： ##mywiki##
+*** **##スペース名の一覧##**：最終的にリンクするスペースを指示するスペースの名称の一覧（必須。ドットで分割）。例：##Main##、##A.B##、##A.B.C##
+** **InterWikiのページ**：**##interwiki:[(interWikiエイリアス):](ページ名)##** の形式による参照。例： ##interwiki:wikipedia:XWiki##
+*** **##interwiki:##** InterWikiリンクとしてリソースを指示する文字列（必須）。
+*** **##interWikiエイリアス##**：InterWikiマップで規定されている[[Inter Wiki&gt;&gt;https://en.wikipedia.org/wiki/InterWiki]]のエイリアス（オプション。[[管理者ガイド&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]を参照してください）。例： ##wikipedia##
+*** **##ページ名##**：リンクするページの名称を含む文字列（必須）。例： ##XWiki##
+** **添付ファイル**：**##attach~:~{~{~{(ウィキ名):}(スペース名の一覧).}(ページ名)@}(画像名)##** の形式による参照
+*** **##attach~:##** XWikiのドキュメントの添付ファイルとしてリソースを指示する文字列（必須）。
+*** **##ウィキ名##**：ウィキの名称を含む文字列（オプション）。 ウィキのページに添付する画像を指示する参照。ウィキの指定がなければ、現在のウィキを使用します。例： ##mywiki##。
+*** **##スペース名の一覧##**：ドットで分割したスペース名のリスト（オプション）。指定がなければ現在のスペースを使用します。例：##Main##、##A.B##、##A.B.C##
+*** **##ページ名##**：参照する画像が添付されているウィキのページの名称を含む文字列（オプション）。例： ##Welcome##
+*** **##添付ファイル名##**：ウィキに保存されている添付ファイルの名称。例： ##photo.png##
+** **ページの添付ファイル**：**##pageAttach~:~{~{~{(ウィキ名):}(ページ名の一覧)/}(画像名)##** の形式による参照
+*** **##pageAttach~:##** XWikiのページの添付ファイルとしてリソースを指示する文字列（必須）。
+*** **##ウィキ名##**：ウィキの名称を含む文字列（オプション）。 ウィキのページに添付する画像を指示する参照。ウィキが指定されていない場合は、現在のウィキを使用します。例： ##mywiki##。
+*** **##ページ名の一覧##**：ドットで分割したウィキのページの名称の一覧（オプション）。ページが指定されていない場合は、現在のページを使用します。例：##Main##、##A/B##、##A/B/C##
+*** **##添付ファイル名##**：ウィキに保存されている添付ファイルの名称。例： ##photo.png##
+** **Eメールアドレス**：**##mailto{{{:(}}}Eメールアドレス)##** の形式による参照（###アンカー##は有効ではありません）。例： ##mailto~:john@smith.com##
+*** **##mailto~:##** Eメールとしてリソースを指示する文字列（必須）。
+*** **##Eメールアドレス##**：指定するEメールアドレス。例： ##john@smith.com##
+** **相対パス**：**##path{{{:(}}}相対パス)##** の形式によるサーバー上の参照。例： ##path:$doc.getURL('reset')##はターゲットのアドレス ##http:~/~/server.doMain.com/xwiki/bin/reset/Space/Page## を生成します（ここでは##$doc.getURL('reset')##が##/xwiki/bin/reset/Space/Page##を生成します）。
+*** **##path:##** 相対パスとしてリソースを指示する文字列（必須）。
+*** **##相対パス##**：リンクするサーバー上のリソースの相対パスを含む文字列（必須）。
+** **UNC（Windowsエクスプローラー）**：**##unc{{{:(}}}パス)##** の形式による参照。リンクは ##file:~/~/## リンクとしてレンダリングされます。例：##unc:C:Windows##、##unc:~~myserverpathimg.png##、##unc:home/user/somefile##
+*** **##unc:##** UNC（Windowsエクスプローラー）のパスとしてリソースを指示する文字列（必須）。
+*** **##パス##**：ユーザーがアクセスできるリソースのローカルパスを含む文字列（必須）。例：##C:Windows##、##~~myserverpathimg.png##、##home/user/somefile##
+** **種類の設定がない場合**：以上のリソースのいずれも指定されていない場合（リンクで##type:##リソースの接頭辞が指定されていない場合)、リンクは以下のアルゴリズムを使用して、XWikiのターミナルあるいはターミナルでないページへのリンクとして扱われます：
+*** 現在のスペースの**##ターミナルページ##**（存在する場合//のみ//）。例： ##~[~[A]]##は##~[~[doc:currentSpace.A]]##と同等に解決されます
+*** 現在のスペースの**##ターミナル以外のページ##**。例： ##~[~[A]]##は##~[~[space:現在のスペース.A]]##、##~[~[doc:現在のスペース.A.WebHome]]##と同等に解決されます
+*** もし現在のページがターミナル以外のページで、上記2つに当てはまる既存のページが見つからなかった場合、追加で2つのチェックを行います：
+**** 親スペースにある同レベルのページとしての**##ターミナルページ##**（存在する場合//のみ//）。例： ターミナルでないページ ##A.C## における##~[~[B]]##リンクは##~[~[doc:A.B]]##と同等に解決されます
+**** 親スペースにある同レベルのページとしての**##ターミナル以外のページ##**。例： ターミナルでないページ ##A.C## における##~[~[B]]##リンクは##~[~[space:A.B]]##、##~[~[doc:A.B.WebHome]]##と同等に解決されます
+*** //注1 - 絶対リンク//: 種類を定めていないリンクがドットで分割した2つ以上のコンポーネントを指定している場合（スペース名とページ名に見えるものになります)、上記のアルゴリズムは、現在のスペースではなく、現在のウィキの相対ページを解決します。例： ##~[~[A.B]]##は##~[~[doc:現在のウィキ:A.B]]##（存在する場合）あるいは##~[~[space:現在のウィキ:A.B]##]（これは##~[~[doc:currentWiki:A.B.WebHome]]##に相当します）を解決し、 ##~[~[doc:現在のウィキ:現在のスペース.A.B]]##または##~[~[doc:現在のウィキ:現在のスペース.A.B.WebHome]]##は解決しません。
+*** //注2 - ##.WebHome##の特殊な扱い方//: 種類を定めていないリンクが##.WebHome##で終了する場合、//常に//ターミナルページとして扱います。例： ##~[~[A.WebHome]]##は常に##~[~[doc:A.WebHome]]##と同等に解決し、##~[~[doc:A.WebHome.WebHome]]##は解決しません。
+* **##パラメーター##**：リンクに渡すパラメーターの一覧（オプション。スペースで分割）。例： ##queryString="mydata1=5&amp;mydata2=Hello" anchor="HTableOfContents" target="~_blank"##
+** **##クエリー##**：リンクのターゲットアドレスに付けられ、レンダリングするURLで使用されるパラメーターを指定するクエリー文字列（オプション）。例： ##url:http:~/~/doMain.com/path||queryString="mydata1=5&amp;mydata2=Hello"##は、ターゲットのアドレス ##http:~/~/doMain.com/path?mydata1=5&amp;mydata2=Hello## を生成します
+** **##アンカー##**：参照したリンクで規定するアンカーを指示するアンカー名（オプション）。XWikiでは見出しと画像のアンカーが自動的に作成されます。例： ##url:http:~/~/doMain.com/path||anchor="HTableOfContents"##は、ターゲットのアドレス ##http:~/~/doMain.com/path#HTableOfContents## を生成します
+** **##ターゲット##**：リンクのターゲットを新しいウィンドウで開くことを可能とするパラメーター（オプション）。例： ##target="~_blank"##</content>
+</xwikidoc>

@@ -1,0 +1,67 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.PDFExport.Translations" locale="ja">
+  <web>XWiki.PDFExport</web>
+  <name>Translations</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>export.pdf.options.template=テンプレート
+export.pdf.options.template.hint=PDFのテンプレートでは、表紙、目次、各ページのヘッダーとフッターに表示する情報を設定できます。
+export.pdf.options.loadFailure=PDFのエクスポートのオプションを読み込めませんでした。
+export.pdf.modal.close=閉じる
+export.pdf.inProgress=PDFでエクスポートしています…
+export.pdf.failed=PDFでエクスポートできませんでした
+export.pdf.canceling=PDFのエクスポートをキャンセルしています…
+export.pdf.canceled=PDFのエクスポートをキャンセルしました
+export.pdf.cancelFailed=PDFのエクスポートをキャンセルできませんでした
+export.pdf.templates.default=既定のテンプレート
+export.pdf.templates.default.versionInfo={1}が{2}に作成したバージョン{0}
+export.pdf.template.name=PDFのテンプレート
+export.pdf.template.hint=PDFのエクスポートに使用するテンプレート
+export.pdf.template.provider=PDFのテンプレートの提供者
+export.pdf.template.skinExtensionInfo=このページが提供するCSSとJavaScriptスキンの拡張機能はPDFのテンプレートを構成するので、PDFのテンプレートを使用する際には自動的に読み込まれます。
+admin.export.pdf=PDFエクスポート
+admin.export.pdf.description=ウィキページのPDFエクスポートに関する設定。
+XWiki.PDFExport.TemplateClass_cover=表紙
+XWiki.PDFExport.TemplateClass_cover.hint=最初のページに表示する情報。タイトルや作者など
+XWiki.PDFExport.TemplateClass_toc=目次
+XWiki.PDFExport.TemplateClass_toc.hint=通常、ページの番号とコンテンツの見出しをあわせて一覧表示。
+XWiki.PDFExport.TemplateClass_header=ヘッダー
+XWiki.PDFExport.TemplateClass_header.hint=表紙ページを除く各ページの上部に表示する情報。タイトルなど
+XWiki.PDFExport.TemplateClass_footer=フッター
+XWiki.PDFExport.TemplateClass_footer.hint=表紙を除く各ページの下部に表示する情報。ページ番号など
+XWiki.PDFExport.ConfigurationClass_templates=テンプレート
+XWiki.PDFExport.ConfigurationClass_templates.hint=ユーザーがウィキのページをPDFにエクスポートする際に使用できるテンプレートの一覧。
+</content>
+  </xwikidoc>

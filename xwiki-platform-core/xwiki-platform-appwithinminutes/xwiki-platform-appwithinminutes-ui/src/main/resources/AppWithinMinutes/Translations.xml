@@ -222,8 +222,6 @@ platform.appwithinminutes.deleteAppInvalidAppError=The specified name is not a v
 platform.appwithinminutes.deleteAppNotSpecifiedError=No application name was specified.
 
 ### Rename Application
-appWithinMinutes.renameApp.label=Rename Application
-appWithinMinutes.renameApp.close=Close
 appWithinMinutes.renameApp.changeAppTitleInfo=You can change the application title without renaming the application just by editing the application home page.
 appWithinMinutes.renameApp.regenerateAppCodeWarning=The application code is going to be regenerated if you rename the application. Code customizations will be overwritten as a consequence.
 appWithinMinutes.renameApp.newName.label=New Name

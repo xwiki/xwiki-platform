@@ -1,0 +1,96 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc locale="ja">
+  <web>FlamingoThemesCode</web>
+  <name>Translations</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>FlamingoThemesCode.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>platform.flamingo.themes.home.title=Flamingoテーマ
+platform.flamingo.themes.home.currenttheme=現在のテーマ
+platform.flamingo.themes.home.otherthemes=その他の利用可能なテーマ
+platform.flamingo.themes.home.warningOldColorThemeInstalled=これはFlamingoテーマを管理するアプリケーションです’。FlamingoテーマはFlamingoに基づくスキンのカスタマイズ可能なバリエーションです。Colibriに基づくスキンの色のテーマを管理する場合は、{0}Colibri カラーテーマアプリケーション{1}を実行してください。
+platform.flamingo.themes.home.warningCurrentOldColorTheme=現在のテーマはColibriカラーテーマです。Flamingoに基づくスキンでは適切に機能しないおそれがあります。互換性を維持するよう心がけましたが、最適な結果ではない可能性があります。
+platform.flamingo.themes.home.useThisTheme=このテーマを使用
+platform.flamingo.themes.home.newThemeName=テーマの名称…
+platform.flamingo.themes.home.create=新しいテーマを作成
+platform.flamingo.themes.home.create.invalid=不正なテーマ名です！
+platform.flamingo.themes.home.create.csrf=セキュリティー上の理由から、テーマ"{0}"の作成を承認してください。
+platform.flamingo.themes.home.create.confirm=承認
+platform.flamingo.themes.home.set.success=テーマを"{0}"に設定しました。
+platform.flamingo.themes.title.variables=変数
+platform.flamingo.themes.title.preview=プレビュー
+platform.flamingo.themes.autorefresh=自動更新
+platform.flamingo.themes.refresh=更新
+platform.flamingo.themes.refreshwarning=更新には数秒かかる可能性があります。
+platform.flamingo.themes.loading=読み込んでいます…
+platform.flamingo.themes.category.logos=ロゴ
+platform.flamingo.themes.category.base-colors=ベースカラー
+platform.flamingo.themes.category.typography=タイポグラフィー
+platform.flamingo.themes.category.forms=フォーム
+platform.flamingo.themes.category.buttons=ボタン
+platform.flamingo.themes.category.tables=表
+platform.flamingo.themes.category.navbar=ナビゲーションバー
+platform.flamingo.themes.category.dropdowns=ドロップダウン
+platform.flamingo.themes.category.panels=パネル
+platform.flamingo.themes.category.breadcrumb=パンくずリスト
+platform.flamingo.themes.category.advanced=高度
+platform.flamingo.themes.defaultvalue=既定
+platform.flamingo.themes.lessCode.description=このフィールドに、スキンに追加するLESSコードを直接記述できます。
+platform.flamingo.themes.local=ローカル
+platform.flamingo.themes.global=共通
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 7.3M1
+#######################################
+platform.flamingo.themes.lessCode.warning=申し訳ありませんが、このフィールドはライブプレビューでは考慮されません。
+
+#######################################
+## until 12.9RC1
+#######################################
+platform.flamingo.themes.incompatiblebrowser=申し訳ありませんが、プレビューはこのバージョンのInternet Explorerでは機能しません。新しいブラウザーをお使いください。
+
+#@deprecatedend
+</content>
+</xwikidoc>

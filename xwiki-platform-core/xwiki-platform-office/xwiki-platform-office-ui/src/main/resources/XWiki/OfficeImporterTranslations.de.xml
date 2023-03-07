@@ -39,7 +39,6 @@
   <content>office.createForm.type.name=Office-Inhalt
 office.createForm.type.description=Office Dokumente als Wiki Seiten importieren
 office.form.error.noDocument=Sie müssen {0}"Erstellen"{1} verwenden, um ein Office Dokument zu importieren.
-office.form.append.hint=Diese Seite existiert bereits! Das Ergebnis wird an die vorhandene Seite angehängt
 office.config.serverType.hint=Die Art des Office Servers. Diese kann entweder "internally managed" (eingebetteter Dienst) oder "externally managed" (separater Dienst) sein.
 office.config.serverPort.hint=Die Port-Nummer, unter der der Office-Server läuft
 office.config.autoStart.hint=Gibt an, ob der Office-Server beim Start von XWiki automatisch mit gestartet bzw. verbunden wird
@@ -48,5 +47,13 @@ office.config.serverState.connected=Verbunden
 office.config.serverState.notConnected=Nicht verbunden
 office.config.serverState.confError=Konfiguration ungültig
 office.config.serverState.error=Fehler
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+office.form.append.hint=Diese Seite existiert bereits! Das Ergebnis wird an die vorhandene Seite angehängt
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
 </xwikidoc>

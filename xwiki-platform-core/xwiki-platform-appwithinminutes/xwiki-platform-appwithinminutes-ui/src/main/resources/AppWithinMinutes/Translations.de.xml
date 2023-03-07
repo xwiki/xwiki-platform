@@ -203,6 +203,7 @@ platform.appwithinminutes.appHomePageEditAppLabel=Anwendung bearbeiten
 platform.appwithinminutes.appHomePageTranslateAppLabel=Anwendung übersetzen
 platform.appwithinminutes.appHomePageDeleteAppLabel=Anwendung löschen
 platform.appwithinminutes.appHomePageMovedWarning=Die Anwendung funktioniert möglicherweise nicht richtig, da sie umbenannt oder verschoben wurde, ohne den Code zu aktualisieren. Bitte bearbeiten Sie die Anwendung und folgen Sie den Schritten, um den Code zu aktualisieren.
+platform.appwithinminutes.appHomePageNoScriptRight=Sie verfügen nicht über das Skriptrecht, das zum Erstellen oder Bearbeiten einer Anwendung erforderlich ist. Die Anwendung funktioniert möglicherweise nicht richtig, wenn Sie fortfahren.
 AppWithinMinutes.LiveTableClass_description=Beschreibung
 AppWithinMinutes.LiveTableClass_columns=Spalten der Live-Tabelle
 
@@ -212,10 +213,6 @@ platform.appwithinminutes.deleteAppEntriesConfirmation=ALLE Einträge der Anwend
 platform.appwithinminutes.deleteAppDoesNotExistError=Die angegebene Anwendung existiert nicht.
 platform.appwithinminutes.deleteAppInvalidAppError=Für den angegebenen Namen wurde keine gültige Anwendung gefunden.
 platform.appwithinminutes.deleteAppNotSpecifiedError=Bitte geben Sie einen Anwendungsnamen an.
-
-### Rename Application
-appWithinMinutes.renameApp.label=Anwendung umbenennen
-appWithinMinutes.renameApp.close=Schließen
 
 ### Rename Application
 appWithinMinutes.renameApp.changeAppTitleInfo=Sie können den Titel der Anwendung ändern, ohne die Anwendung umzubenennen, indem Sie einfach die Startseite der Anwendung bearbeiten.

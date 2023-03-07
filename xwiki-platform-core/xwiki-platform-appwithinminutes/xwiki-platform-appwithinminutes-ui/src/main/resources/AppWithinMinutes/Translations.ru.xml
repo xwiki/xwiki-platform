@@ -203,6 +203,7 @@ platform.appwithinminutes.appHomePageEditAppLabel=Редактировать п�
 platform.appwithinminutes.appHomePageTranslateAppLabel=Перевести приложение
 platform.appwithinminutes.appHomePageDeleteAppLabel=Удалить приложение
 platform.appwithinminutes.appHomePageMovedWarning=Приложение может работать неправильно, так как оно было переименовано или перемещено без обновления кода. Пожалуйста, отредактируйте приложение и следуйте инструкциям, чтобы обновить код.
+platform.appwithinminutes.appHomePageNoScriptRight=У вас нет прав на выполнение сценариев, необходимые для создания или редактирования приложения. Приложение может работать неправильно, когда вы продолжите.
 AppWithinMinutes.LiveTableClass_description=Описание
 AppWithinMinutes.LiveTableClass_columns=Колонки динамической таблицы
 
@@ -212,10 +213,6 @@ platform.appwithinminutes.deleteAppEntriesConfirmation=ВСЕ записи пр�
 platform.appwithinminutes.deleteAppDoesNotExistError=Указанное приложение не существует.
 platform.appwithinminutes.deleteAppInvalidAppError=Указанное имя не является действительным приложением.
 platform.appwithinminutes.deleteAppNotSpecifiedError=Имя приложения не указано.
-
-### Rename Application
-appWithinMinutes.renameApp.label=Переименовать приложение
-appWithinMinutes.renameApp.close=Закрыть
 
 ### Rename Application
 appWithinMinutes.renameApp.changeAppTitleInfo=Вы можете изменить название приложения без его переименования, просто отредактируйте домашнюю страницу приложения.

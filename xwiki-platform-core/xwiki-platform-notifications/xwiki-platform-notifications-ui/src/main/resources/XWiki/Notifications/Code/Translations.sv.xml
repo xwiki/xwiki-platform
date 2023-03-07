@@ -1,0 +1,262 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.Notifications.Code.Translations" locale="sv">
+  <web>XWiki.Notifications.Code</web>
+  <name>Translations</name>
+  <language>sv</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Notifications.Code.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>platform.core.profile.category.notifications=Notiser
+notifications.filters.cancel=Avbryt
+notifications.filters.submit=Spara
+notifications.filters.type.label=Filtertyp:
+notifications.filters.type.hint=Hur filtret skall verka på en händelse på den givna platsen
+notifications.filters.location.label=Utsträckning för filtrets verkan:
+notifications.filters.location.hint=Vilken del av wikin skall filtret verka på?
+
+## Advanced filters options
+notifications.settings.filters.advanced=Avancerade filtreringsalternativ
+notifications.filters.advanced.toggles.hint=Dessa filter är aktiverade från start. Du kan avaktivera dem med knappen vid varje filter.
+notifications.filters.advanced.toggles.table.name=Filternamn
+notifications.filters.advanced.toggles.table.description=Beskrivning
+notifications.filters.advanced.toggles.table.toggle=Växla
+notifications.filters.advanced.modal.close=Stäng
+
+## Filters names
+notifications.filters.name.systemUserNotificationFilter=Systemfilter
+notifications.filters.description.systemUserNotificationFilter=Dölj notiser från systemanvändaren om händelsen inte specifikt är riktad till dig
+notifications.filters.name.ownEventsNotificationFilter=Egna händelsefilter
+notifications.filters.description.ownEventsNotificationFilter=Dölj notiser om din egna aktivitet om händelsen inte är riktad till dig
+notifications.filters.name.eventReadAlertFilter=Filtrering av lästa händelser (notiser)
+notifications.filters.description.eventReadAlertFilter=Dölj notiser om händelser du markerat som lästa
+notifications.filters.name.eventReadEmailFilter=Filtrering av lästa händelser (epost)
+notifications.filters.description.eventReadEmailFilter=Dölj notiser om händelser du markerat som lästa
+notifications.filters.name.minorEventAlertNotificationFilter=Mindre händelse (notiser)
+notifications.filters.description.minorEventAlertNotificationFilter=Dölj notiser om mindre ändringar av sidor
+notifications.filters.name.minorEventEmailNotificationFilter=Mindre händelse (epost)
+notifications.filters.description.minorEventEmailNotificationFilter=Dölj notiser om mindre ändringar av sidor
+
+## Translation keys for the scopeNotificationFilter
+notifications.filters.preferences.scopeNotificationFilter.name=Verkningsområde för notisfilter
+notifications.filters.preferences.scopeNotificationFilter.page=Endast sidan
+notifications.filters.preferences.scopeNotificationFilter.space=Sidan med undersidor
+notifications.filters.preferences.scopeNotificationFilter.wiki=Hela wikin
+
+## Notifications toggles
+notifications.toggle.disabled.hint=Du måste aktivera notiser i dina inställningar om du vill bevaka dessa platser
+
+## Notifications formats
+notifications.format.alert=Notis
+notifications.format.email=Epost
+
+## Filter preferences settings
+notifications.filters.preferences.delete.inProgress=Tar bort...
+notifications.filters.preferences.delete.done=Filterpreferens borttagen!
+notifications.filters.preferences.delete.error=Misslyckades att ta bort filterpreferens
+notifications.filters.preferences.setEnabled.inProgress=Sparar...
+notifications.filters.preferences.setEnabled.done=Filterpreferens sparad!
+notifications.filters.preferences.setEnabled.error=Misslyckades att spara filterpreferens
+notifications.filters.preferences.allEvents=Alla händelser (även avaktiverade)
+
+## System Filter preferences settings
+notifications.settings.filters.preferences.system.title=Systemfilter
+notifications.settings.filters.preferences.system.hint=Systemfilter som du kan ställa in för att ta kontroll över vilka händelsenotiser du vill ta emot.
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.system.table.name=Namn
+notifications.settings.filters.preferences.system.table.filterType=Beskrivning
+notifications.settings.filters.preferences.system.table.notificationFormats=Format
+notifications.settings.filters.preferences.system.table.isEnabled=Är aktiverad?
+
+## Custom Filter preferences settings
+notifications.settings.filters.preferences.custom.title=Anpassade filter
+notifications.settings.filters.preferences.custom.hint=Skapa filter för att styra vilka händelsenotiser du vill ta emot.
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.custom.table.name=Plats
+notifications.settings.filters.preferences.custom.table.filterType=Filtereffekt
+notifications.settings.filters.preferences.custom.table.eventTypes=Händelser
+notifications.settings.filters.preferences.custom.table.notificationFormats=Format
+notifications.settings.filters.preferences.custom.table.isEnabled=Är aktiverad?
+notifications.settings.filters.preferences.custom.table._actions=Händelser
+notifications.filters.type.custom.inclusive=Avisera händelse
+notifications.filters.type.custom.exclusive=Ignorera händelse
+
+
+## Add filter modal
+notifications.settings.addFilter=Lägg till filter
+notifications.settings.addFilter.hint=Skapa ett filter för händelser på den angivna platsen. Filtret kan utlösa utskick av en notis eller förhindra att en notis skickas, beroende på händelse och meddelandekanal.
+notifications.filters.preferences.custom.addFilter.location.label=Plats
+notifications.filters.preferences.custom.addFilter.location.hint=Det här filtret appliceras på händelser som inträffar på platsen som anges här. Välj en eller flera platser.
+notifications.filters.preferences.custom.addFilter.type.label=Effekt
+notifications.filters.preferences.custom.addFilter.type.hint=Det här filtret kan antingen skicka en notis eller ignorera händelser på angivna platser. Välj vilken effekt du vill filtret skall ha på händelserna.
+notifications.filters.preferences.custom.addFilter.filterType.inclusive=Avisera händelse
+notifications.filters.preferences.custom.addFilter.filterType.exclusive=Ignorera händelse
+notifications.filters.preferences.custom.addFilter.notificationFormat.label=Kanal
+notifications.filters.preferences.custom.addFilter.notificationFormat.hint=Det här filtret appliceras endast på notiser skickade över vald meddelandekanal. Välj en eller flera meddelandekanaler.
+notifications.filters.preferences.custom.addFilter.eventType.label=Händelser
+notifications.filters.preferences.custom.addFilter.eventType.hint=Det här filtret appliceras på händelser valda här, på de platser valda ovan. Välj en eller flera händelser.
+notifications.menu.header=Notiser
+notifications.menu.header.settings=Inställningar
+notifications.menu.clear=Rensa alla
+notifications.menu.clearing=Rensar notiser
+notifications.menu.cleared=Notiser har rensats
+notifications.settings.title=Notisinställningar
+notifications.settings.error.notAdmin=Du måste vara administratör för att se detta.
+notifications.settings.menu=Notismeny
+notifications.settings.menu.hint=Notismenyn är placerad i övre högra hörnet, och visas genom att klicka på klockikonen ({0})
+notifications.settings.email=Epost
+notifications.settings.email.forGuest=Logga in eller registrera dig för att ställa in notiser.
+notifications.settings.email.disabled=Utskick av notiser över epost är avvaktiverat. Kontakta systemadministratör.
+notifications.settings.email.hint=Ett epostmeddelande skickas till dig regelbundet med ett sammandrag av händelser på wikin
+notifications.settings.email.title=Epostinställningar
+notifications.settings.email.frequency=Epostfrekvens
+notifications.settings.email.frequency.hint=Välj hur ofta du vill ta emot sammanställningsbrevet med händelser på wikin.
+notifications.settings.email.diffType.hint=Välj detaljnivå du vill ha på sammanfattningsbrevet med händelser.
+notifications.settings.saving=Dina inställningar sparas...
+notifications.settings.saved=Sparade!
+notifications.settings.savingfailed=Misslyckades att spara dina inställningar
+notifications.settings.filters=Filter ({0})
+notifications.settings.errorFilterWiki=Fel: du måste välja en wiki, inte en sida
+notifications.settings.preferences=Inställningar
+notifications.settings.preferences.hint=Bevaka händelser och skicka notiser i notismenyn eller med epost.
+notifications.settings.applications.title=Applikationer
+notifications.settings.applications.hint=Det här är listan med applikationer som kan skicka notiser. Du kan aktivera och avaktivera dessa.
+notifications.settings.applications.forGuest=Logga in eller registrera dig för att hantera notisinställningar.
+notifications.settings.applications.appName=Namn
+notifications.settings.events=Händelser
+notifications.settings.watch.title=Bevakade sidor
+notifications.settings.watch.autowatchmode=Automatisk övervakning av sidor
+notifications.settings.watch.autowatchmode.hint=Välj om du vill automatiskt bevaka en sida efter att du arbetat på den
+notifications.settings.watch.forGuest=Logga in eller registrera dig för att hantera notisinställningar.
+notifications.settings.watch.disabled=De bevakade entiteterna är avaktiverade. Kontakta systemadministratör.
+notifications.events.by=redigerad av {0}.
+notifications.events.lastChange=Senast ändrad: {0}.
+notifications.events.lastComment=Senaste kommentar: {0}.
+notifications.preferences.scope.table.scope=Giltighetsområde
+notifications.preferences.scope.table.location=Plats
+notifications.preferences.scope.table.scopeFilterType=Filtertyp
+notifications.preferences.scope.table._actions=Effekter
+notifications.email.title=Händelser på wikin:
+notifications.email.subject={0} händelse(r) på wikin
+notifications.email.seeChanges=Ändringar: {0}
+notifications.email.linkDetails=Visa detaljer
+notifications.rss.feedLink=RSS-flöde
+notifications.rss.feedLinkDescription=Händelseflöde för notiser
+notifications.rss.feedTitle=RSS-flöde för notiser
+notifications.rss.feedDescription=Det här RSS-flödet kan anpassas på din profilsida.
+notifications.rss.seeChanges=Ändringar: {0}
+notifications.rss.defaultTitleWithPage=Nya händelser på {0}
+notifications.rss.defaultTitle=Ny händelse
+notifications.globalsettings.email=Epostutskick av notiser
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily=Dagligen
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly=Timsvis
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_weekly=Veckovis
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_live=Omgående
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType=Detaljnivå på ändringar
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_NOTHING=Ingenting
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_STANDARD=Standard
+XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_inclusive=Inklusiv
+XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_exclusive=Exklusiv
+XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NONE=Aldrig
+XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_ALL=Varje gång jag gör en ändring
+XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_MAJOR=Varje gång jag gör en större ändring
+XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NEW=Endast då jag skapar en ny sida
+
+## Common notification settings errors
+notifications.settings.error.userReferenceNotSupported=Den givna användarreferensen stöds ej, endast DocumentUserReference stöds för närvarande.
+notifications.settings.error.userReferenceAdminForbidden=Du har inte administratörsrättigheter för användaren: {0}.
+notifications.settings.error.badCSRF=Felaktig CSRF-token.
+notifications.settings.badParameters=Felaktiga parametrar i begäran.
+
+## User profile
+notifications.userprofile.following=Följer
+notifications.userprofile.notfollowing=Följer inte
+notifications.userprofile.follow=Följ
+notifications.userprofile.unfollow=Sluta följ
+notifications.userprofile.done=Klar
+notifications.userprofile.saving=Sparar...
+notifications.userprofile.error=Fel uppstod när notisinställningarna sparades
+
+## Macros description
+rendering.macro.notificationsApplicationsPreferences.name=Notisapplikationsinställningar
+rendering.macro.notificationsApplicationsPreferences.description=Visa notisinställningar för aktuell användare.
+rendering.macro.notificationsApplicationsPreferences.parameter.target.name=Mål
+rendering.macro.notificationsApplicationsPreferences.parameter.target.description=Målet för makrot (kan vara "användare" för aktuell användare eller "wiki" för aktuell wiki)
+rendering.macro.notificationsAutoWatchPreferences.name=Inställningar för automatisk bevakning
+rendering.macro.notificationsAutoWatchPreferences.description=Visa inställningarna för aktuell användare om automatisk bevakning av sidor.
+rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=Mål
+rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=Målet för makrot (kan vara "användare" för aktuell användare eller "wiki" för aktuell wiki)
+
+## Toggle notification filters labels
+notifications.filters.preferences.label.page=Växla endast sidnotiser
+notifications.filters.preferences.label.space=Växla sid- och undersidsnotiser
+notifications.filters.preferences.label.wiki=Växla wikinotiser
+
+## Notifications switches
+notifications.switches.tooltip.page=Bevaka denna sida
+notifications.switches.tooltip.pageAndChildren=Bevaka denna sida och dess undersidor
+notifications.switches.tooltip.space=Bevaka sidan ovanför denna sida och dess undersidor
+notifications.switches.tooltip.wiki=Bevaka denna wiki
+notifications.switches.changeStatusError=Misslyckades att ändra status på notiser.
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## until 13.2RC1
+notifications.settings.filters.preferences.title=Filter
+notifications.settings.filters.preferences.hint=Skapa filter för att mer precist styra när händelser skall utlösa skickandet av notser.
+notifications.settings.filters.preferences.forGuest=Logga in eller registrera dig för att hantera notisfilter.
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.table.name=Namn
+notifications.settings.filters.preferences.table.filterType=Filtertyp
+notifications.settings.filters.preferences.table.eventTypes=Händelser
+notifications.settings.filters.preferences.table.notificationFormats=Format
+notifications.settings.filters.preferences.table.isEnabled=Är aktiverad?
+notifications.settings.filters.preferences.table._actions=Effekter
+notifications.filters.preferences.addPreference.filterType.inclusive=Inklusiv
+notifications.filters.preferences.addPreference.filterType.exclusive=Exklusiv
+notifications.filters.preferences.addPreference.notificationFormat.label=Notisformat
+notifications.filters.preferences.addPreference.notificationFormat.hint=På vilket notsiformat skall filtret appliceras?
+notifications.filters.preferences.addPreference.eventType.label=Händelsetyp
+notifications.filters.preferences.addPreference.eventType.hint=På vilken händelsetyp skall filtret appliceras?
+notifications.filters.preferences.addPreference.location.label=Filtrets giltighetsområde
+notifications.filters.preferences.addPreference.location.hint=På vilken sida skall filtret appliceras?
+
+
+## Filter Types
+notifications.filters.type.inclusive=Inklusiv
+notifications.filters.type.exclusive=Exklusiv
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+</xwikidoc>

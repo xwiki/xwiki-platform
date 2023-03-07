@@ -28,6 +28,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
+import org.xwiki.whatsnew.NewsConfiguration;
 import org.xwiki.whatsnew.NewsException;
 import org.xwiki.whatsnew.NewsSource;
 import org.xwiki.whatsnew.NewsSourceFactory;
@@ -47,6 +48,9 @@ public class NewsScriptService implements ScriptService
     @Inject
     private NewsSourceFactory configuredNewsSourceFactory;
 
+    @Inject
+    private NewsConfiguration configuration;
+
     /**
      * @return the composite new source defined in XWiki's configuration (i.e. a new source wrapping all configured
      *         news sources)
@@ -56,5 +60,15 @@ public class NewsScriptService implements ScriptService
     public NewsSource getConfiguredNewsSource() throws NewsException
     {
         return this.configuredNewsSourceFactory.create(Collections.emptyMap());
+    }
+
+    /**
+     * @return the configuration for the what's new feature (we need to be careful that it doesn't contain anything
+     *         sensitive, which should be fine for that feature)
+     * @since 15.2RC1
+     */
+    public NewsConfiguration getConfiguration()
+    {
+        return this.configuration;
     }
 }

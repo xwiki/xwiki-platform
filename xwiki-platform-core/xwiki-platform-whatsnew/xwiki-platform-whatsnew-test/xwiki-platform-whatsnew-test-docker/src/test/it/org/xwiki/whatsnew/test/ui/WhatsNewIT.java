@@ -26,9 +26,11 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.whatsnew.test.po.WhatsNewPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Verify the What's New template UI.
@@ -51,7 +53,12 @@ class WhatsNewIT
         EntityReference reference = new DocumentReference("xwiki", "Main", "WhatsNewRSS");
         setup.rest().savePage(reference, rss, "What's New RSS");
 
-        WhatsNewPage page = WhatsNewPage.gotoPage();
+        // Open and check that the Drawer Menu has an entry for What's New and click on it
+        ViewPage vp = setup.gotoPage("Main", "WebHome");
+        assertTrue(vp.getDrawerMenu().hasEntry("What's New"), "No menu entry for What's New");
+        vp.getDrawerMenu().clickEntry("What's New");
+
+        WhatsNewPage page = new WhatsNewPage();
 
         assertEquals(10, page.getNewsItemCount());
         // Assert the first news content

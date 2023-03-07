@@ -49,10 +49,14 @@
   #if($displayContentMenu)
     <nav class="document-menu col-xs-12 col-md-5"
 <<<<<<< HEAD
+<<<<<<< HEAD
       aria-label="$escapetool.xml($services.localization.render('core.menu.nav.label'))">
 =======
     aria-label="$escapetool.xml($services.localization.render('core.menu.nav.label'))">
 >>>>>>> 7d95916b00 (XWIKI-20696: Accessibility best-practice: use landmarks in view pages)
+=======
+    aria-label="$escapetool.xml($services.localization.render('core.menu.nav.label'))">
+>>>>>>> acb33f83f7 (XWIKI-20696: Accessibility best-practice: use landmarks in view pages)
       #template("menus_content.vm")
     </nav>
   #end

@@ -120,7 +120,7 @@
     </property>
     <property>
       <content>{{velocity}}
-#panelheader($doc.space)
+#navigationpanelheader($doc.space)
 #if ($hasAdmin)
   {{warning}}Deprecated: Replace with [[Children&gt;&gt;Panels.Children]] or [[Siblings&gt;&gt;Panels.Siblings]] Panels{{/warning}}
 #end

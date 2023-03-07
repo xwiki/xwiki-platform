@@ -49,11 +49,13 @@
   <div class="clearfloats"></div>
   #if($viewer == 'content')
     #if ($displayContentFooter)
-      <div id="xdocFooter">
+      ## This is an aside element because it is related to the main
+      ## content but not part of it.
+      <aside id="xdocFooter" aria-label="$escapetool.xml($services.localization.render('contentfooter.label'))">
         #foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.template.contentFooter', {'sortByParameter': 'order'}))
           $services.rendering.render($uix.execute(), 'xhtml/1.0')
         #end
-      </div>
+      </aside>
     #end
     #if ($displayDocExtra)
       #template('docextra.vm')

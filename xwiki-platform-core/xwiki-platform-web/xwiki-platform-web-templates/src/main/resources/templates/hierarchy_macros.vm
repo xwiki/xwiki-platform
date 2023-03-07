@@ -146,7 +146,10 @@
       #set ($breadCrumbParameters = "$breadCrumbParameters data-${option.toLowerCase()}='$escapetool.xml($options.get($option))'")
     #end
   #end
-  <ol #if("$!options.id" != '')id="$options.id"#end class="$breadCrumbClassNames" $breadCrumbParameters><li
+  ## Set as a navigation role because it contains mostly links.
+  <nav aria-label="#if("$!options.id" != '')$options.id#end $breadCrumbClassNames">
+  <ol #if("$!options.id" != '')id="$options.id"#end class="$breadCrumbClassNames" $breadCrumbParameters>
+  <li
     #foreach ($item in $pathData)
       #set ($classNames = $collectiontool.set)
       #set ($discard = $classNames.add($item.reference.type.toString().toLowerCase()))
@@ -168,7 +171,7 @@
       #end
       >#end$item.label#if ($item.url)</a>#end$treeNavigation$closingTag##
     #end##
-  </li></ol>
+  </li></ol></nav>
 #end
 
 #macro (getTreeNavigation $pathData $index $options)

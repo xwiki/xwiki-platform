@@ -127,14 +127,16 @@ var XWiki = (function(XWiki) {
       }
 
       var commentField = form?.comment || $('commentinput');
-      if (commentField && (($xwiki.isEditCommentSuggested()) || $xwiki.isEditCommentMandatory())) {
-        while (commentField.value == '') {
-          var response = prompt("$services.localization.render('core.comment.prompt')", '');
+      const commentIsSuggested = commentField.getAttribute('data-xwiki-edit-comment-suggested') === 'true';
+      const commentIsMandatory = commentField.getAttribute('data-xwiki-edit-comment-mandatory') === 'true';
+      if (commentField && (commentIsSuggested || commentIsMandatory)) {
+        while (commentField.value === '') {
+          var response = prompt(commentField.getAttribute('data-xwiki-edit-comment-prompt'), '');
           if (response === null) {
             return false;
           }
           commentField.value = response;
-          if (!$xwiki.isEditCommentMandatory()) break;
+          if (!commentIsMandatory) break;
         }
       }
 

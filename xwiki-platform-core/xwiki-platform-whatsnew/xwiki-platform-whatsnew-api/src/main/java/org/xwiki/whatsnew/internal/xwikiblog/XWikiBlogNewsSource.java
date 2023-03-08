@@ -215,4 +215,10 @@ public class XWikiBlogNewsSource implements NewsSource
         }
         return result;
     }
+
+    @Override
+    public String toString()
+    {
+        return String.format("XWiki Blog news source for URL [%s]", this.rssURL);
+    }
 }

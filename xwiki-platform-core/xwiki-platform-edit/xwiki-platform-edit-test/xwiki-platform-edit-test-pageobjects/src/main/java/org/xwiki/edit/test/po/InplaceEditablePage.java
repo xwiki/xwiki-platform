@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -34,6 +35,9 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class InplaceEditablePage extends ViewPage
 {
+    @FindBy(id = "commentinput")
+    private WebElement versionSummaryInput;
+
     /**
      * Click on the Edit button and wait for the in-place editor to load.
      * 
@@ -134,6 +138,19 @@ public class InplaceEditablePage extends ViewPage
     public String getDocumentTitlePlaceholder()
     {
         return getDriver().findElement(By.id("document-title-input")).getAttribute("placeholder");
+    }
+
+    /**
+     * Sets the value of the version summary field.
+     * 
+     * @param versionSummary the new version summary
+     * @return this page object
+     */
+    public InplaceEditablePage setVersionSummary(String versionSummary)
+    {
+        this.versionSummaryInput.clear();
+        this.versionSummaryInput.sendKeys(versionSummary);
+        return this;
     }
 
     /**

@@ -1325,7 +1325,7 @@
             </goals>
             <configuration>
               <rules>
-                <validateDependencyVersion implementation="org.xwiki.tool.enforcer.ValidateDependencyVersion">
+                <validateDependencyVersion>
                   <versionCheck>
                     <groupIdPrefix>org.xwiki.commons</groupIdPrefix>
                     <allowedVersionRegex>\$\{commons.version\}</allowedVersionRegex>
@@ -1394,12 +1394,12 @@
               <skip>${xwiki.enforcer.banneddependencytype-xar.skip}</skip>
               <rules>
                 <!-- Forbid JAR extensions to have XAR runtime dependencies -->
-                <validateDependencyVersion implementation="org.xwiki.tool.enforcer.BannedDependencyType">
+                <bannedDependencyType>
                   <dependencyType>xar</dependencyType>
                   <projectPackaging>jar|webjar</projectPackaging>
                   <!-- Integration test modules are never going to be installed as extension and they need to depend on XAR modules -->
                   <projectArtifactId>^((?!-test-docker|.*-test-tests).)*$</projectArtifactId>
-                </validateDependencyVersion>
+                </bannedDependencyType>
               </rules>
             </configuration>
           </execution>

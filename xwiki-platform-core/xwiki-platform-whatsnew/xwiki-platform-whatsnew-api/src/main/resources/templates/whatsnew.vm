@@ -28,29 +28,34 @@
       ## or we decide to automatically show categories based on whether the current user is a simple or advanced user,
       ## and whether he/she has Admin rights on the wiki.
       #set ($newsSource = $newsSource.forCategories("simple_user, advanced_user, admin_user, extension"))
-      #foreach($newsItem in $newsSource.build())
-        <div class="xwiki-whatsnew-item">
-          ## The title is expected to be in plain text
-          <a class="xwiki-whatsnew-title" href="$escapetool.xml($newsItem.originURL.get())">$escapetool.xml($newsItem.title.get())</a>
-          <div class="xwiki-whatsnew-date">$escapetool.xml($newsItem.publishedDate.get())</div>
-          <div class="xwiki-whatsnew-description">
-            ## Render the description using the syntax it's written in.
-            #set ($description = $newsItem.description.get())
-            #set ($syntax = $description.syntax)
-            ## Ideally we would use the rendering context syntax (fallbacking to the skin syntax) but we're missing a
-            ## way to access that information from velocity and in practice browsers use HTML 5. This could cause
-            ## issues if this vm is rendered in a non-browser context.
-            #set ($skinSyntax = 'html/5.0')
-            #if ($skinSyntax == "$syntax.toIdString()")
-                ## Note: the description content is already clean and safe to be rendered
-                $description.content
-            #else
-                ## Convert the source item description to the skin syntax
-                #set ($xdom = $services.rendering.parse($description.content, $syntax))
-                $services.rendering.render($xdom, $skinSyntax)
-            #end
+      #set ($newsItems = $newsSource.build())
+      #if ($newsItems.size() > 0)
+        #foreach($newsItem in $newsItems)
+          <div class="xwiki-whatsnew-item">
+            ## The title is expected to be in plain text
+            <a class="xwiki-whatsnew-title" href="$escapetool.xml($newsItem.originURL.get())">$escapetool.xml($newsItem.title.get())</a>
+            <div class="xwiki-whatsnew-date">$escapetool.xml($newsItem.publishedDate.get())</div>
+            <div class="xwiki-whatsnew-description">
+              ## Render the description using the syntax it's written in.
+              #set ($description = $newsItem.description.get())
+              #set ($syntax = $description.syntax)
+              ## Ideally we would use the rendering context syntax (fallbacking to the skin syntax) but we're missing a
+              ## way to access that information from velocity and in practice browsers use HTML 5. This could cause
+              ## issues if this vm is rendered in a non-browser context.
+              #set ($skinSyntax = 'html/5.0')
+              #if ($skinSyntax == "$syntax.toIdString()")
+                  ## Note: the description content is already clean and safe to be rendered
+                  $description.content
+              #else
+                  ## Convert the source item description to the skin syntax
+                  #set ($xdom = $services.rendering.parse($description.content, $syntax))
+                  $services.rendering.render($xdom, $skinSyntax)
+              #end
+            </div>
           </div>
-        </div>
+        #end
+      #else
+        No news!
       #end
     </div>
     #end

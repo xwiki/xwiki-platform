@@ -67,6 +67,10 @@ public class DefaultNewsConfiguration implements NewsConfiguration
 
     private static final String XWIKISAS_RSS_URL = "https://xwiki.com/news";
 
+    private static final String SOURCES_CONFIG_NAME = "sources";
+
+    private static final String SOURCE_CONFIG_NAME = "source";
+
     private static final long DAY = 1 * 60L * 60L * 24;
 
     @Inject
@@ -114,7 +118,13 @@ public class DefaultNewsConfiguration implements NewsConfiguration
 
     private Properties getConfiguredSources()
     {
-        return this.configurationSource.getProperty(getFullKeyName("sources"), Properties.class);
+        Properties result;
+        if (this.configurationSource.containsKey(getFullKeyName(SOURCES_CONFIG_NAME))) {
+            result = this.configurationSource.getProperty(getFullKeyName(SOURCES_CONFIG_NAME), Properties.class);
+        } else {
+            result = null;
+        }
+        return result;
     }
 
     private List<NewsSourceDescriptor> getConfiguredNewsSourceDescriptors(Properties sources)
@@ -122,7 +132,7 @@ public class DefaultNewsConfiguration implements NewsConfiguration
         List<NewsSourceDescriptor> descriptors = new ArrayList<>();
         // Only keep the keys related to configuring news sources, for performance.
         List<String> keys = new ArrayList<>();
-        String sourceKeyNamePrefix = String.format("%s.", getFullKeyName("source"));
+        String sourceKeyNamePrefix = String.format("%s.", getFullKeyName(SOURCE_CONFIG_NAME));
         for (String key : this.configurationSource.getKeys()) {
             if (key.startsWith(sourceKeyNamePrefix)) {
                 keys.add(key);

@@ -182,4 +182,10 @@ public class AllITs
     class NestedTextAreaIT extends TextAreaIT
     {
     }
+
+    @Nested
+    @DisplayName("Sheet system Tests")
+    class NestedSheetIT extends SheetIT
+    {
+    }
 }

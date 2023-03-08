@@ -5817,9 +5817,12 @@ public class XWiki implements EventListener
             context.put("tdoc", doc);
             context.put("cdoc", doc);
         } else {
-            context.put("doc", doc);
-            context.put("cdoc", doc);
-            vcontext.put("doc", doc.newDocument(context));
+            // Put a cloned document in the context so that it's not confused with the document coming from the document
+            // cache
+            XWikiDocument clonedDocument =  doc.clone();
+            context.setDoc(clonedDocument);
+            context.put("cdoc", clonedDocument);
+            vcontext.put("doc", clonedDocument.newDocument(context));
             vcontext.put("cdoc", vcontext.get("doc"));
             XWikiDocument tdoc;
 
@@ -5840,8 +5843,11 @@ public class XWiki implements EventListener
             } catch (Exception ex) {
                 // Invalid version, just use the most recent one
             }
-            context.put("tdoc", tdoc);
-            vcontext.put("tdoc", tdoc.newDocument(context));
+            // Put a cloned document in the context so that it's not confused with the document coming from the document
+            // cache
+            XWikiDocument clonedtdoc = tdoc == doc ? clonedDocument : tdoc.clone();
+            context.put("tdoc", clonedtdoc);
+            vcontext.put("tdoc", clonedtdoc.newDocument(context));
         }
 
         return true;

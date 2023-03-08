@@ -35,7 +35,7 @@
 ###
 ###
 #template("startpage.vm")
-<div class="main layoutsubsection">
+<main class="main layoutsubsection">
 <div id="mainContentArea">
 <form id="loginForm" action="$doc.getURL('loginsubmit')" method="post" class="xform">
 <div class="hidden"><input type="hidden" name="xredirect" value="$!{escapetool.xml($request.xredirect)}"/>
@@ -44,6 +44,7 @@
 #end
   <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}"/>
 </div>
+## TODO: Make the title of this panel semantically relevant by using h1.
 #xwikimessageboxstart($services.localization.render('login') '')
 #set($message = $xcontext.message)
 #if($message)
@@ -60,28 +61,29 @@
     <label for="j_username">$services.localization.render('username')</label>
     #set ($forgotUsernameURL = $services.security.authentication.getAuthenticationURL('retrieveusername', $NULL))
     #if("$!forgotUsernameURL" != "")
-      <span class="xAdditional"><a href="$forgotUsernameURL" tabindex="500">$services.localization.render('xe.admin.forgotUsername.loginMessage')</a></span>
+      <span class="xAdditional"><a href="$forgotUsernameURL">$services.localization.render('xe.admin.forgotUsername.loginMessage')</a></span>
     #end
   </dt>
   <dd class="input-group">
     <span class="input-group-addon">$services.icon.renderHTML('user')</span>
-    <input class="form-control" type="text" id="j_username" size="60" name="j_username" value="" tabindex="100"/>
+    ## Ensure that the username field of the login form has the focus to make it easy for users to log in quickly
+    <input class="form-control" type="text" id="j_username" size="60" name="j_username" value="" autofocus />
   </dd>
   <dt>
     <label for="j_password">$services.localization.render('password')</label>
     #set ($resetPasswordUrl = $services.security.authentication.getAuthenticationURL('resetpassword', $NULL))
     #if("$!resetPasswordUrl" != '')
-      <span class="xAdditional"><a href="$resetPasswordUrl" tabindex="600">$services.localization.render('xe.admin.passwordReset.loginMessage')</a></span>
+      <span class="xAdditional"><a href="$resetPasswordUrl" >$services.localization.render('xe.admin.passwordReset.loginMessage')</a></span>
     #end
   </dt>
   <dd class="input-group">
     <span class="input-group-addon">$services.icon.renderHTML('lock')</span>
-    <input type="password" id="j_password" size="60" name="j_password" value="" tabindex="200"/>
+    <input type="password" id="j_password" size="60" name="j_password" value="" />
   </dd>
   <dt></dt>
   <dd>
     <label class="xHint" for="rememberme">
-      <input id="rememberme" type="checkbox" name="j_rememberme" value="true" tabindex="300"/> $services.localization.render('remembermeonthiscomp')
+      <input id="rememberme" type="checkbox" name="j_rememberme" value="true" /> $services.localization.render('remembermeonthiscomp')
     </label>
   </dd>
   #if ("$!supplementaryForm" != "")
@@ -89,17 +91,12 @@
       $supplementaryForm
     </div>
   #end
-  <dt><input type="submit" class="btn btn-primary col-xs-12" value="$services.localization.render('login')" tabindex="400"/></dt>
+  <dt><input type="submit" class="btn btn-primary col-xs-12" value="$services.localization.render('login')"/></dt>
 </dl>
 #xwikimessageboxend()
 </form>
 </div>## mainContentArea
-</div>## main
-## Ensure that the username field of the login form has the focus to make it easy for users to log in quickly
-<script>
-//<![CDATA[
-  document.forms.loginForm.j_username.focus();
-//]]>
-</script>
+</main>## main
+
 #template("endpage.vm")
 #end

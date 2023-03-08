@@ -473,13 +473,14 @@
         #set ($btnClass = "btn-primary")
         #set ($titleMessageTranslationKey = "like.button.title.like")
       #end
-      #set ($disabledButton = "")
+      #set ($disabledButton = false)
       #if (!$services.like.isAuthorized($doc))
-        #set ($disabledButton = "disabled")
+        #set ($disabledButton = true)
         #set ($titleMessageTranslationKey = "like.button.title")
       #end
-      &lt;button class="like-button btn $btnClass $disabledButton badge"
-      title="$escapetool.xml($services.localization.render($titleMessageTranslationKey, [$likeCount]))"&gt;
+      &lt;button class="like-button btn $btnClass badge #if($disabledButton)disabled#{end}"
+        #if($disabledButton) disabled #{end}
+        title="$escapetool.xml($services.localization.render($titleMessageTranslationKey, [$likeCount]))"&gt;
           $services.icon.renderHTML('heart') &lt;span class="like-number"&gt;$likeCount&lt;/span&gt;
       &lt;/div&gt;
     &lt;/div&gt;

@@ -41,6 +41,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.store.merge.MergeManagerResult;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -821,12 +822,15 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     }
 
     @Override
-    public void merge(ElementInterface previousElement, ElementInterface newElement, MergeConfiguration configuration,
-        XWikiContext context, MergeResult mergeResult)
+    public MergeManagerResult<ElementInterface, Object> merge(ElementInterface previousElement,
+        ElementInterface newElement, MergeConfiguration configuration, XWikiContext context)
     {
+        MergeManagerResult<ElementInterface, Object> mergeResult =
+            super.merge(previousElement, newElement, configuration, context);
         BaseCollection<R> previousCollection = (BaseCollection<R>) previousElement;
         BaseCollection<R> newCollection = (BaseCollection<R>) newElement;
 
+        BaseCollection<R> modifiableResult = (BaseCollection<R>) mergeResult.getMergeResult();
         List<ObjectDiff> classDiff = newCollection.getDiff(previousCollection, context);
         for (ObjectDiff diff : classDiff) {
             PropertyInterface propertyResult = getField(diff.getPropName());
@@ -836,14 +840,14 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             if (diff.getAction().equals(ObjectDiff.ACTION_PROPERTYADDED)) {
                 if (propertyResult == null) {
                     // Add if none has been added by user already
-                    safeput(diff.getPropName(),
+                    modifiableResult.safeput(diff.getPropName(),
                         configuration.isProvidedVersionsModifiables() ? newProperty : newProperty.clone());
                     mergeResult.setModified(true);
                 } else if (!propertyResult.equals(newProperty)) {
                     // collision between DB and new: property to add but already exists in the DB
                     // If we need to fallback on next version, set next version.
                     if (configuration.getConflictFallbackVersion() == MergeConfiguration.ConflictFallbackVersion.NEXT) {
-                        safeput(diff.getPropName(),
+                        modifiableResult.safeput(diff.getPropName(),
                             configuration.isProvidedVersionsModifiables() ? newProperty : newProperty.clone());
                         mergeResult.setModified(true);
                     }
@@ -853,7 +857,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                 if (propertyResult != null) {
                     if (propertyResult.equals(previousProperty)) {
                         // Delete if it's the same as previous one
-                        removeField(diff.getPropName());
+                        modifiableResult.removeField(diff.getPropName());
                         mergeResult.setModified(true);
                     } else {
                         // collision between DB and new: property to remove but not the same as previous
@@ -869,26 +873,41 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                 if (propertyResult != null) {
                     if (propertyResult.equals(previousProperty)) {
                         // Let some automatic migration take care of that modification between DB and new
-                        safeput(diff.getPropName(),
+                        modifiableResult.safeput(diff.getPropName(),
                             configuration.isProvidedVersionsModifiables() ? newProperty : newProperty.clone());
                         mergeResult.setModified(true);
                     } else if (!propertyResult.equals(newProperty)) {
                         // Try to apply 3 ways merge on the property
-                        mergeField(propertyResult, previousProperty, newProperty, configuration, context, mergeResult);
+                        // FIXME: we should deprecate mergeField and rewrite it properly, but it's lot of work
+                        // as it involves to also rewrite PropertyClass#mergeProperty
+                        // right now we still use it, but we ensure that the configuration is used to modify the
+                        // actual values, and not clones as it was the behaviour
+                        MergeResult propertyMergeResult = new MergeResult();
+                        MergeConfiguration propertyMergeConfiguration = new MergeConfiguration();
+                        propertyMergeConfiguration.setConcernedDocument(configuration.getConcernedDocument());
+                        propertyMergeConfiguration.setUserReference(configuration.getUserReference());
+                        propertyMergeConfiguration.setProvidedVersionsModifiables(true);
+                        propertyMergeConfiguration.setConflictFallbackVersion(
+                            configuration.getConflictFallbackVersion());
+                        mergeField(propertyResult, previousProperty, newProperty, propertyMergeConfiguration, context,
+                            propertyMergeResult);
+                        mergeResult.getLog().addAll(propertyMergeResult.getLog());
+                        if (propertyMergeResult.isModified()) {
+                            mergeResult.setModified(true);
+                        }
                     }
                 } else {
                     // collision between DB and new: property to modify but does not exists in DB
                     // Lets assume it's a mistake to fix
                     mergeResult.getLog().warn("Collision found on property [{}]", newProperty.getReference());
 
-                    safeput(diff.getPropName(),
+                    modifiableResult.safeput(diff.getPropName(),
                         configuration.isProvidedVersionsModifiables() ? newProperty : newProperty.clone());
                     mergeResult.setModified(true);
                 }
             }
         }
-
-        super.merge(previousElement, newElement, configuration, context, mergeResult);
+        return mergeResult;
     }
 
     protected void mergeField(PropertyInterface currentElement, ElementInterface previousElement,

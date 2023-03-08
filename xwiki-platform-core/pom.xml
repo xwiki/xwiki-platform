@@ -125,28 +125,15 @@
 
                  Single justification example:
             -->
-            
             <revapi.differences>
-              <justification>The MergeConfiguration should always have been specified for calling this
-                method, it became obvious when adding configurations we need to reuse.</justification>
+              <justification>Needed changes for properly handling merge with fallback version.</justification>
               <criticality>highlight</criticality>
               <differences>
                 <item>
-                  <code>java.method.numberOfParametersChanged</code>
-                  <old>method void com.xpn.xwiki.objects.BaseProperty&lt;R extends org.xwiki.model.reference.EntityReference&gt;::mergeValue(java.lang.Object, java.lang.Object, com.xpn.xwiki.doc.merge.MergeResult)</old>
-                  <new>method void com.xpn.xwiki.objects.BaseProperty&lt;R extends org.xwiki.model.reference.EntityReference&gt;::mergeValue(java.lang.Object, java.lang.Object, com.xpn.xwiki.doc.merge.MergeConfiguration, com.xpn.xwiki.doc.merge.MergeResult)</new>
-                </item>
-                <item>
                   <ignore>true</ignore>
-                  <code>java.method.numberOfParametersChanged</code>
-                  <old>method void com.xpn.xwiki.objects.LargeStringProperty::mergeValue(java.lang.Object, java.lang.Object, com.xpn.xwiki.doc.merge.MergeResult)</old>
-                  <new>method void com.xpn.xwiki.objects.LargeStringProperty::mergeValue(java.lang.Object, java.lang.Object, com.xpn.xwiki.doc.merge.MergeConfiguration, com.xpn.xwiki.doc.merge.MergeResult)</new>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.numberOfParametersChanged</code>
-                  <old>method void com.xpn.xwiki.objects.ListProperty::mergeValue(java.lang.Object, java.lang.Object, com.xpn.xwiki.doc.merge.MergeResult)</old>
-                  <new>method void com.xpn.xwiki.objects.ListProperty::mergeValue(java.lang.Object, java.lang.Object, com.xpn.xwiki.doc.merge.MergeConfiguration, com.xpn.xwiki.doc.merge.MergeResult)</new>
+                  <code>java.method.addedToInterface</code>
+                  <new>method org.xwiki.store.merge.MergeManagerResult&lt;com.xpn.xwiki.objects.ElementInterface, java.lang.Object&gt; com.xpn.xwiki.objects.ElementInterface::merge(com.xpn.xwiki.objects.ElementInterface, com.xpn.xwiki.objects.ElementInterface, com.xpn.xwiki.doc.merge.MergeConfiguration, com.xpn.xwiki.XWikiContext)</new>
+                  <justification>This method replaces the now deprecated old ElementInterface#merge method.</justification>
                 </item>
               </differences>
             </revapi.differences>

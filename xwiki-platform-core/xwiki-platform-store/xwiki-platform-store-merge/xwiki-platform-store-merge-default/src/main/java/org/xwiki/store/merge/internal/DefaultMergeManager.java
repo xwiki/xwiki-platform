@@ -56,6 +56,7 @@ import com.xpn.xwiki.doc.merge.MergeConfiguration.ConflictFallbackVersion;
 import org.xwiki.store.merge.MergeManagerResult;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.ElementInterface;
 import com.xpn.xwiki.objects.ObjectDiff;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -190,20 +191,23 @@ public class DefaultMergeManager implements MergeManager
         MergeConfiguration configuration)
     {
         MergeManagerResult<String, Character> mergeResult = new MergeManagerResult<>();
-        try {
-            org.xwiki.diff.MergeResult<Character> result =
-                this.diffManager.merge(toCharacters(previousStr), toCharacters(newStr), toCharacters(currentStr),
-                    getDefaultConfiguration(configuration));
+        if (currentStr == null && newStr == null) {
+            mergeResult.setMergeResult(null);
+        } else {
+            try {
+                org.xwiki.diff.MergeResult<Character> result =
+                    this.diffManager.merge(toCharacters(previousStr), toCharacters(newStr), toCharacters(currentStr),
+                        getDefaultConfiguration(configuration));
 
-            mergeResult.getLog().addAll(result.getLog());
-            mergeResult.addConflicts(result.getConflicts());
-            String resultStr = fromCharacters(result.getMerged());
-            mergeResult.setMergeResult(resultStr);
-            mergeResult.setModified(!resultStr.equals(currentStr));
-        } catch (MergeException e) {
-            mergeResult.getLog().error("Failed to execute merge characters", e);
+                mergeResult.getLog().addAll(result.getLog());
+                mergeResult.addConflicts(result.getConflicts());
+                String resultStr = fromCharacters(result.getMerged());
+                mergeResult.setMergeResult(resultStr);
+                mergeResult.setModified(!resultStr.equals(currentStr));
+            } catch (MergeException e) {
+                mergeResult.getLog().error("Failed to execute merge characters", e);
+            }
         }
-
         return mergeResult;
     }
 
@@ -320,7 +324,7 @@ public class DefaultMergeManager implements MergeManager
             mergeResult.putMergeResult(MergeDocumentResult.DocumentPart.XOBJECTS, objectMergeManagerResult);
 
             // Class
-            MergeManagerResult<BaseClass, BaseClass> classMergeManagerResult =
+            MergeManagerResult<ElementInterface, Object> classMergeManagerResult =
                 mergeXClass(previousDoc, mergedDocument, newDoc, configuration);
             mergeResult.putMergeResult(MergeDocumentResult.DocumentPart.XCLASS, classMergeManagerResult);
 
@@ -338,20 +342,14 @@ public class DefaultMergeManager implements MergeManager
         return mergeResult;
     }
 
-    private MergeManagerResult<BaseClass, BaseClass> mergeXClass(XWikiDocument previousDoc,
+    private MergeManagerResult<ElementInterface, Object> mergeXClass(XWikiDocument previousDoc,
         XWikiDocument mergedDocument, XWikiDocument newDoc, MergeConfiguration configuration)
     {
         XWikiContext context = this.contextProvider.get();
-        MergeResult classMergeResult = new MergeResult();
         BaseClass classResult = mergedDocument.getXClass();
         BaseClass previousClass = previousDoc.getXClass();
         BaseClass newClass = newDoc.getXClass();
-        classResult.merge(previousClass, newClass, configuration, context, classMergeResult);
-        MergeManagerResult<BaseClass, BaseClass> classMergeManagerResult = new MergeManagerResult<>();
-        classMergeManagerResult.setMergeResult(mergedDocument.getXClass());
-        classMergeManagerResult.getLog().addAll(classMergeResult.getLog());
-        classMergeManagerResult.setModified(classMergeResult.isModified());
-        return classMergeManagerResult;
+        return classResult.merge(previousClass, newClass, configuration, context);
     }
 
     private MergeManagerResult<Map<DocumentReference, List<BaseObject>>, BaseObject> mergeXObjects(
@@ -359,7 +357,10 @@ public class DefaultMergeManager implements MergeManager
     {
         XWikiContext context = this.contextProvider.get();
 
-        MergeResult objectMergeResult = new MergeResult();
+        MergeManagerResult<Map<DocumentReference, List<BaseObject>>, BaseObject> objectMergeResult =
+            new MergeManagerResult<>();
+        objectMergeResult.setMergeResult(mergedDocument.getXObjects());
+
         List<List<ObjectDiff>> objectsDiff = mergedDocument.getObjectDiff(previousDoc, newDoc, context);
         if (!objectsDiff.isEmpty()) {
             // Apply diff on result
@@ -464,8 +465,14 @@ public class DefaultMergeManager implements MergeManager
                                         objectMergeResult.setModified(true);
                                     } else {
                                         // Try to apply a 3 ways merge on the property
-                                        propertyResult.merge(previousProperty, newProperty, configuration, context,
-                                            objectMergeResult);
+                                        MergeManagerResult<ElementInterface, Object> propertyManagerResult =
+                                            propertyResult.merge(previousProperty, newProperty, configuration, context);
+                                        objectMergeResult.getLog().addAll(propertyManagerResult.getLog());
+                                        if (propertyManagerResult.isModified()) {
+                                            objectMergeResult.setModified(true);
+                                            objectResult.safeput(diff.getPropName(),
+                                                (PropertyInterface) propertyManagerResult.getMergeResult());
+                                        }
                                     }
                                 } else {
                                     // collision between DB and new: property to modify but does not exists in DB
@@ -485,13 +492,8 @@ public class DefaultMergeManager implements MergeManager
                 }
             }
         }
-        MergeManagerResult<Map<DocumentReference, List<BaseObject>>, BaseObject> objectMergeManagerResult =
-            new MergeManagerResult<>();
-        objectMergeManagerResult.getLog().addAll(objectMergeResult.getLog());
-        objectMergeManagerResult.setMergeResult(mergedDocument.getXObjects());
-        objectMergeManagerResult.setModified(objectMergeResult.isModified());
 
-        return objectMergeManagerResult;
+        return objectMergeResult;
     }
 
     private MergeManagerResult<List<XWikiAttachment>, XWikiAttachment> mergeAttachments(XWikiDocument previousDoc,

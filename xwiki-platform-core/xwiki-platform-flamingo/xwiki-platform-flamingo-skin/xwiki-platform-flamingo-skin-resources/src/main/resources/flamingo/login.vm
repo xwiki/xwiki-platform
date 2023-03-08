@@ -60,9 +60,6 @@
   <dt>
     <label for="j_username">$services.localization.render('username')</label>
     #set ($forgotUsernameURL = $services.security.authentication.getAuthenticationURL('retrieveusername', $NULL))
-    #if("$!forgotUsernameURL" != "")
-      <span class="xAdditional"><a href="$forgotUsernameURL">$services.localization.render('xe.admin.forgotUsername.loginMessage')</a></span>
-    #end
   </dt>
   <dd class="input-group">
     <span class="input-group-addon">$services.icon.renderHTML('user')</span>
@@ -72,9 +69,6 @@
   <dt>
     <label for="j_password">$services.localization.render('password')</label>
     #set ($resetPasswordUrl = $services.security.authentication.getAuthenticationURL('resetpassword', $NULL))
-    #if("$!resetPasswordUrl" != '')
-      <span class="xAdditional"><a href="$resetPasswordUrl" >$services.localization.render('xe.admin.passwordReset.loginMessage')</a></span>
-    #end
   </dt>
   <dd class="input-group">
     <span class="input-group-addon">$services.icon.renderHTML('lock')</span>
@@ -91,7 +85,15 @@
       $supplementaryForm
     </div>
   #end
-  <dt><input type="submit" class="btn btn-primary col-xs-12" value="$services.localization.render('login')"/></dt>
+  <dt class="submitSection">
+    <input type="submit" class="btn btn-primary col-xs-12" value="$services.localization.render('login')"/>
+    #if("$!forgotUsernameURL" != "")
+      <span class="xAdditional"><a href="$forgotUsernameURL">$services.localization.render('xe.admin.forgotUsername.loginMessage')</a></span>
+    #end
+    #if("$!resetPasswordUrl" != '')
+      <span class="xAdditional"><a href="$resetPasswordUrl" >$services.localization.render('xe.admin.passwordReset.loginMessage')</a></span>
+    #end
+  </dt>
 </dl>
 #xwikimessageboxend()
 </form>

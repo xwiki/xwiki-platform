@@ -59,7 +59,6 @@
 <dl>
   <dt>
     <label for="j_username">$services.localization.render('username')</label>
-    #set ($forgotUsernameURL = $services.security.authentication.getAuthenticationURL('retrieveusername', $NULL))
   </dt>
   <dd class="input-group">
     <span class="input-group-addon">$services.icon.renderHTML('user')</span>
@@ -68,7 +67,6 @@
   </dd>
   <dt>
     <label for="j_password">$services.localization.render('password')</label>
-    #set ($resetPasswordUrl = $services.security.authentication.getAuthenticationURL('resetpassword', $NULL))
   </dt>
   <dd class="input-group">
     <span class="input-group-addon">$services.icon.renderHTML('lock')</span>
@@ -87,9 +85,12 @@
   #end
   <dt class="submitSection">
     <input type="submit" class="btn btn-primary col-xs-12" value="$services.localization.render('login')"/>
+
+    #set ($forgotUsernameURL = $services.security.authentication.getAuthenticationURL('retrieveusername', $NULL))
     #if("$!forgotUsernameURL" != "")
       <span class="xAdditional"><a href="$forgotUsernameURL">$services.localization.render('xe.admin.forgotUsername.loginMessage')</a></span>
     #end
+    #set ($resetPasswordUrl = $services.security.authentication.getAuthenticationURL('resetpassword', $NULL))
     #if("$!resetPasswordUrl" != '')
       <span class="xAdditional"><a href="$resetPasswordUrl" >$services.localization.render('xe.admin.passwordReset.loginMessage')</a></span>
     #end

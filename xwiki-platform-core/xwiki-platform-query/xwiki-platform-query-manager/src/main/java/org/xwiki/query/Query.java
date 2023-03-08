@@ -175,7 +175,7 @@ public interface Query
     Query setOffset(int offset);
 
     /**
-     * @return limit the limit of result list to set ({@code execute().size() <= limit})
+     * @return the limit of result list to set ({@code execute().size() <= limit}). 0 for no limit.
      * @see #setLimit(int)
      */
     int getLimit();

@@ -83,5 +83,12 @@
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
+    <!-- For Page Test -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-page</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 </project>

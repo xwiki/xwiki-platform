@@ -17,27 +17,56 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.whatsnew.internal.configured;
+package org.xwiki.whatsnew;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import org.junit.jupiter.api.Test;
-import org.xwiki.test.junit5.mockito.ComponentTest;
-import org.xwiki.test.junit5.mockito.InjectMockComponents;
-import org.xwiki.whatsnew.NewsSource;
+import org.xwiki.extension.version.Version;
+import org.xwiki.user.UserReference;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-@ComponentTest
-class ConfiguredNewsSourceFactoryTest
+/**
+ * Empty News source for the tests.
+ *
+ * @version $Id$
+ */
+public class EmptyNewsSource implements NewsSource
 {
-    @InjectMockComponents
-    private ConfiguredNewsSourceFactory factory;
-
-    @Test
-    void createWhenEmptyConfiguration() throws Exception
+    @Override
+    public NewsSource forUser(UserReference userReference)
     {
-        NewsSource source = this.factory.create(Collections.emptyMap());
-        assertNotNull(source);
+        return this;
+    }
+
+    @Override
+    public NewsSource forCategories(Set<NewsCategory> wantedCategories)
+    {
+        return this;
+    }
+
+    @Override
+    public NewsSource forXWikiVersion(Version targetXWikiVersion)
+    {
+        return this;
+    }
+
+    @Override
+    public NewsSource forExtraParameters(Map<String, Object> extraParameters)
+    {
+        return this;
+    }
+
+    @Override
+    public NewsSource withCount(int count)
+    {
+        return this;
+    }
+
+    @Override
+    public List<NewsSourceItem> build()
+    {
+        return Collections.emptyList();
     }
 }

@@ -1029,7 +1029,7 @@ var LiveTablePagination = Class.create({
    **/
   createPageSizeSelectControl: function() {
     var select = new Element('select', {'class':'pagesizeselect',
-    'aria-label':"$escapetool.xml($services.localization.render('platform.livetable.selectPageSize.label'))"});
+    'aria-label':"$escapetool.javascript($services.localization.render('platform.livetable.selectPageSize.label'))"});
     for (var i=this.startValue; i<=this.maxValue; i += this.step) {
       var attrs = {'value':i, 'text':i};
       if (i == this.currentValue) {

@@ -76,23 +76,15 @@
       #set ($eventParams = $compositeEventParams.get($event))
       #set ($location = $eventParams.location)
       ## TODO: define variation for group mention
-      #if ($location == "DOCUMENT")
-        #set ($descriptionKey = 'mentions.event.mention.description.document')
-      #elseif($location == "COMMENT")
-        #set ($descriptionKey = 'mentions.event.mention.description.comment')
-      #elseif($location == "ANNOTATION")
-        #set ($descriptionKey = 'mentions.event.mention.description.annotation')
-      #elseif($location == "AWM_FIELD" || $location == "TEXT_FIELD")
-        ## TODO: AWM_FIELD is deprecated since 14.4.8, 14.10.6, and 15.2RC1
-        #set ($descriptionKey = 'mentions.event.mention.description.textField')
+      #set ($translationKey = "mentions.event.mention.description.$location")
+      #if ($services.localization.get($translationKey))
+        #set ($descriptionKey = $translationKey)
       #else
-        #set ($descriptionKey = 'mentions.event.mention.description')
+        #set ($descriptionKey = "mentions.event.mention.description")
       #end
       #set ($tdoc = $xwiki.getDocument($eventParams.getDocument().getDocumentReference()).getTranslatedDocument())
-      #set ($description =
-        "$services.localization.render($descriptionKey) <a href='$eventParams.getDocumentURL()'>" +
-        "$tdoc.getRenderedTitle( 'xhtml/1.0')" +
-        "</a>")
+      #set ($description = $services.localization.render($descriptionKey,
+        ["<a href='$eventParams.getDocumentURL()'>$tdoc.getRenderedTitle('xhtml/1.0')</a>"]))
       #displayEventDetail($event $description)
     #end
   #end

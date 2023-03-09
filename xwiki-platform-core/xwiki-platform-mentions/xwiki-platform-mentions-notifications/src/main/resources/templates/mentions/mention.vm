@@ -80,7 +80,7 @@
       #if ($services.localization.get($translationKey))
         #set ($descriptionKey = $translationKey)
       #else
-        #set ($descriptionKey = "mentions.event.mention.description")
+        #set ($descriptionKey = 'mentions.event.mention.description.UNDEFINED')
       #end
       #set ($tdoc = $xwiki.getDocument($eventParams.getDocument().getDocumentReference()).getTranslatedDocument())
       #set ($description = $services.localization.render($descriptionKey,

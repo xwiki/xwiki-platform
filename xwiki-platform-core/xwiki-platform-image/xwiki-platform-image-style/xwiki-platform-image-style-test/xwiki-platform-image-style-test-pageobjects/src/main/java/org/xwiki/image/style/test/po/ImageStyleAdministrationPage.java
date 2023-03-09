@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.openqa.selenium.By;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.ViewPage;
@@ -40,11 +41,12 @@ public class ImageStyleAdministrationPage extends ViewPage
     private static final String DEFAULT_IMAGE_STYLE_FIELD_NAME = "Image.Style.Code.ConfigurationClass_0_defaultStyle";
 
     /**
+     * @param wikiReference the reference of the wiki containing the admin to access
      * @return the page object for the administration of the image styles
      */
-    public static ImageStyleAdministrationPage getToAdminPage()
+    public static ImageStyleAdministrationPage getToAdminPage(WikiReference wikiReference)
     {
-        getUtil().gotoPage(new DocumentReference("xwiki", "XWiki", "XWikiPreferences"), "admin", Map.of(
+        getUtil().gotoPage(new DocumentReference(wikiReference.getName(), "XWiki", "XWikiPreferences"), "admin", Map.of(
             "editor", "globaladmin",
             "section", "image.style"
         ));

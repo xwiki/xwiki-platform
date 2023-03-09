@@ -17,34 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.ckeditor.test.po;
+package org.xwiki.ckeditor.test.po.image.select;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 import org.xwiki.index.tree.test.po.DocumentTreeElement;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.test.ui.po.BaseElement;
 import org.xwiki.tree.test.po.TreeNodeElement;
 
 /**
- * Page Object for the image selection modal.
+ * Page object for the document tree selection form of the image dialog.
  *
  * @version $Id$
- * @since 14.7RC1
+ * @since 15.2RC1
+ * @since 14.10.7
  */
-public class ImageDialogSelectModal extends BaseElement
+public class ImageDialogTreeSelectForm extends BaseElement
 {
-    /**
-     * Wait until the modal is loaded.
-     *
-     * @return the current page object
-     */
-    public ImageDialogSelectModal waitUntilReady()
-    {
-        getDriver().waitUntilElementIsVisible(By.className("image-selector-modal"));
-        return this;
-    }
-
     /**
      * Find and select the given attachment in the document tree.
      *
@@ -60,18 +49,5 @@ public class ImageDialogSelectModal extends BaseElement
         documentTreeElement.clearSelection();
         documentTreeElement.selectNodes(attachmentNode);
         attachmentNode.select();
-    }
-
-    /**
-     * Click on the select button to select the image and move to the image edition/configuration modal.
-     *
-     * @return the Page Object instance for the next modal
-     */
-    public ImageDialogEditModal clickSelect()
-    {
-        WebElement element = getDriver().findElement(By.cssSelector(".image-selector-modal .btn-primary"));
-        getDriver().waitUntilElementIsEnabled(element);
-        element.click();
-        return new ImageDialogEditModal().waitUntilReady();
     }
 }

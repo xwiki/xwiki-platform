@@ -29,7 +29,10 @@
 <template>
   <!-- Pagination -->
   <nav class="livedata-pagination"
-    :aria-label="$t('livedata.pagination.label', [this.data.query.source.className])">
+       :aria-label="this.data.id
+        ? $t('livedata.pagination.label', [this.data.id])
+        : $t('livedata.pagination.label.empty')
+      ">
 
     <!--
       Display the pagination current entry range

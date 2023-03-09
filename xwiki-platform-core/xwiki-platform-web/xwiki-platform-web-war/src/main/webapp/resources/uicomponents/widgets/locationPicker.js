@@ -276,7 +276,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge', 'xwiki-form-validation-a
         'reference': XWiki.Model.serialize(documentReference)
       }, function(data) {
         // Update the space reference part of the new location.
-        var newLocationContainer = $(data);
+        var newLocationContainer = $(data).find("ol.breadcrumb");
         // Preserve the id because it is needed for the asynchronous validation key.
         newLocationContainer.attr('id', locationContainer.attr('id'));
         locationContainer.replaceWith(newLocationContainer);

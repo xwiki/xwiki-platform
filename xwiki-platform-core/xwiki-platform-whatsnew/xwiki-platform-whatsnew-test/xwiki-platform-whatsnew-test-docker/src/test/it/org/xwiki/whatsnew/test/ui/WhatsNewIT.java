@@ -67,6 +67,6 @@ class WhatsNewIT
             + "of XWiki 15.0. This release consists mostly of dependency upgrades and bug fixes including security "
             + "fixes with some small new features for admins and developers. ...", page.getNewsItemDescription(0));
         // TODO: Fix the displayed date to use the date format defined in XWiki
-        assertEquals("2023-01-23T05:34:15+01:00", page.getNewsItemDate(0));
+        assertEquals("2023/01/23 05:34", page.getNewsItemDate(0));
     }
 }

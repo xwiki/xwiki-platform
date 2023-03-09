@@ -30,6 +30,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.extension.version.Version;
@@ -44,6 +47,7 @@ import org.xwiki.whatsnew.internal.DefaultNewsContent;
 import org.xwiki.whatsnew.internal.DefaultNewsSourceItem;
 
 import com.apptasticsoftware.rssreader.Item;
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * The XWiki Blog source (returns news from an XWiki Blog Application installed on an XWiki instance). The XWiki
@@ -83,25 +87,31 @@ public class XWikiBlogNewsSource implements NewsSource
 
     private RSSContentCleaner rssContentCleaner;
 
+    private XWikiContext xwikiContext;
+
     /**
      * @param rssURL the URL to the XWiki Blog RSS
      * @param rssContentCleaner the component to clean the RSS description content so that it's safe to be rendered
+     * @param xwikiContext the context from which to get APIs to format a date with the user-defined format
      */
-    public XWikiBlogNewsSource(String rssURL, RSSContentCleaner rssContentCleaner)
+    public XWikiBlogNewsSource(String rssURL, RSSContentCleaner rssContentCleaner, XWikiContext xwikiContext)
     {
         this.rssURL = rssURL;
         this.rssContentCleaner = rssContentCleaner;
+        this.xwikiContext = xwikiContext;
     }
 
     /**
      * @param rssStream the stream containing the XWiki Blog RSS data (mostly needed for tests to avoid having
      *        to connect to an XWiki instance)
      * @param rssContentCleaner the component to clean the RSS description content so that it's safe to be rendered
+     * @param xwikiContext the context from which to get APIs to format a date with the user-defined format
      */
-    public XWikiBlogNewsSource(InputStream rssStream, RSSContentCleaner rssContentCleaner)
+    public XWikiBlogNewsSource(InputStream rssStream, RSSContentCleaner rssContentCleaner, XWikiContext xwikiContext)
     {
         this.rssStream = rssStream;
         this.rssContentCleaner = rssContentCleaner;
+        this.xwikiContext = xwikiContext;
     }
 
     @Override
@@ -187,7 +197,7 @@ public class XWikiBlogNewsSource implements NewsSource
 
             newsItem.setAuthor(item.getAuthor());
             newsItem.setCategories(this.categoriesConverter.convertFromRSS(item.getCategories()));
-            newsItem.setPublishedDate(item.getPubDate());
+            newsItem.setPublishedDate(parseAndFormatDateTime(item.getPubDate()));
             newsItem.setOriginURL(item.getLink());
             newsItems.add(newsItem);
         }
@@ -220,5 +230,19 @@ public class XWikiBlogNewsSource implements NewsSource
     public String toString()
     {
         return String.format("XWiki Blog news source for URL [%s]", this.rssURL);
+    }
+
+    private Optional<String> parseAndFormatDateTime(Optional<String> dateAsString)
+    {
+        Optional<String> result;
+        if (!dateAsString.isPresent()) {
+            result = Optional.empty();
+        } else {
+            // Example of expected date: "2023-01-23T05:34:15+01:00"
+            DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'hh:mm:ssZ");
+            DateTime dt = formatter.parseDateTime(dateAsString.get());
+            result = Optional.of(this.xwikiContext.getWiki().formatDate(dt.toDate(), null, this.xwikiContext));
+        }
+        return result;
     }
 }

@@ -3,12 +3,15 @@
  */
 #template('colorThemeInit.vm')
 
+.location-picker nav {
+  /* Keep the same size whatever the content. */
+  flex-grow: 1;
+}
+
 .location-picker .breadcrumb {
   /* Remove the margin so that the validation message is displayed right below the breadcrumb, for simple users.
      For advanced users the .location-edit element that follows the breadcrumb has a top margin. */
   margin-bottom: 0;
-  /* Keep the same size whatever the content. */
-  flex-grow: 1;
   /* Remove rounded corners on the right so that the transition is seamless. */
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;

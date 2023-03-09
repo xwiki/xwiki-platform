@@ -188,4 +188,10 @@ public class AllITs
     class NestedSheetIT extends SheetIT
     {
     }
+
+    @Nested
+    @DisplayName("Script author Tests")
+    class NestedScriptAuthorIT extends ScriptAuthorIT
+    {
+    }
 }

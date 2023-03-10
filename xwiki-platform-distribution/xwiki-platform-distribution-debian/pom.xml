@@ -185,7 +185,7 @@
             </goals>
             <configuration>
               <rules>
-                <validateDependencyVersion implementation="org.xwiki.tool.enforcer.ValidateDependencyVersion">
+                <validateDependencyVersion>
                   <versionCheck>
                     <groupIdPrefix>org.xwiki.commons</groupIdPrefix>
                     <allowedVersionRegex>\$\{commons.version\}</allowedVersionRegex>

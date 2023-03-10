@@ -74,9 +74,6 @@ public class BasePage extends BaseElement
     @FindBy(xpath = "//div[@id='tmMoreActions']/a[contains(@role, 'button')]")
     private WebElement moreActionsMenu;
 
-    @FindBy(id = "tmDrawerActivator")
-    private WebElement drawerActivator;
-
     @FindBy(xpath = "//input[@id='tmWatchDocument']/../span[contains(@class, 'bootstrap-switch-label')]")
     private WebElement watchDocumentLink;
 
@@ -115,6 +112,8 @@ public class BasePage extends BaseElement
      */
     @FindBy(id = "companylogo")
     protected WebElement logo;
+
+    private DrawerMenu drawerMenu = new DrawerMenu();
 
     /**
      * Note: when reusing instances of BasePage, the constructor is not doing the work anymore and the
@@ -300,69 +299,12 @@ public class BasePage extends BaseElement
     }
 
     /**
-     * @since 7.2M3
+     * @return the PO for the Drawer Menu
+     * @since 15.2RC1
      */
-    public void toggleDrawer()
+    public DrawerMenu getDrawerMenu()
     {
-        if (isDrawerVisible()) {
-            hideDrawer();
-        } else {
-            showDrawer();
-        }
-    }
-
-    /**
-     * @return true if the drawer used to be hidden
-     * @since 8.4.5
-     * @since 9.0RC1
-     */
-    public boolean showDrawer()
-    {
-        if (!isDrawerVisible()) {
-            // Open the drawer.
-            this.drawerActivator.click();
-            waitForDrawer(true);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @return true if the drawer used to be displayed
-     * @since 8.4.5
-     * @since 9.0RC1
-     */
-    public boolean hideDrawer()
-    {
-        if (isDrawerVisible()) {
-            // Close the drawer by clicking outside.
-            // We don't perform directly a click since it could lead to a
-            // org.openqa.selenium.ElementClickInterceptedException because of a drawer-overlay above it.
-            // The click through action is performed with a move and click, which is what we really want.
-            getDriver().createActions().click(this.mainContainerDiv).perform();
-            waitForDrawer(false);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    private void waitForDrawer(boolean visible)
-    {
-        getDriver().waitUntilCondition(
-            ExpectedConditions.attributeToBe(this.drawerActivator, "aria-expanded", String.valueOf(visible)));
-    }
-
-    /**
-     * @since 8.4.5
-     * @since 9.0RC1
-     */
-    public boolean isDrawerVisible()
-    {
-        return "true".equals(this.drawerActivator.getAttribute("aria-expanded"));
+        return this.drawerMenu;
     }
 
     /**
@@ -487,7 +429,7 @@ public class BasePage extends BaseElement
      */
     public LoginPage login()
     {
-        toggleDrawer();
+        getDrawerMenu().toggle();
         this.loginLink.click();
         return new LoginPage();
     }
@@ -499,12 +441,12 @@ public class BasePage extends BaseElement
     {
         // We need to show the drawer because #getText() does not allow getting hidden text (but allow finding the
         // element and its attributes...)
-        boolean hide = showDrawer();
+        boolean hide = getDrawerMenu().show();
 
         String user = this.userLink.getText();
 
         if (hide) {
-            hideDrawer();
+            getDrawerMenu().hide();
         }
 
         return user;
@@ -536,7 +478,7 @@ public class BasePage extends BaseElement
     public ViewPage clickLocale(Locale locale)
     {
         // Open drawer
-        toggleDrawer();
+        getDrawerMenu().toggle();
 
         // Open Languages
         WebElement languagesElement = getDriver().findElementWithoutWaiting(By.xpath("//a[@id='tmLanguages']"));
@@ -559,7 +501,7 @@ public class BasePage extends BaseElement
      */
     public void logout()
     {
-        toggleDrawer();
+        getDrawerMenu().toggle();
         getDriver().findElement(By.id("tmLogout")).click();
         // Update the CSRF token because the context user has changed (it's guest user now). Otherwise, APIs like
         // TestUtils#createUser*(), which expect the currently cached token to be valid, will fail because they would be
@@ -572,7 +514,7 @@ public class BasePage extends BaseElement
      */
     public RegistrationPage register()
     {
-        toggleDrawer();
+        getDrawerMenu().toggle();
         this.registerLink.click();
         return new RegistrationPage();
     }

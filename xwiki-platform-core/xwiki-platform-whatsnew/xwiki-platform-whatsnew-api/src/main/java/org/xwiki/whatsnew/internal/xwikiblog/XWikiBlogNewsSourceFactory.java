@@ -23,12 +23,15 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.whatsnew.NewsException;
 import org.xwiki.whatsnew.NewsSource;
 import org.xwiki.whatsnew.NewsSourceFactory;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * The factory that returns a XWiki Blog source.
@@ -44,6 +47,9 @@ public class XWikiBlogNewsSourceFactory implements NewsSourceFactory
     @Inject
     private RSSContentCleaner rssContentCleaner;
 
+    @Inject
+    private Provider<XWikiContext> xwikiContextProvider;
+
     @Override
     public NewsSource create(Map<String, String> parameters) throws NewsException
     {
@@ -51,6 +57,7 @@ public class XWikiBlogNewsSourceFactory implements NewsSourceFactory
         if (rssURL == null) {
             throw new NewsException("Failed to create a XWiki Blog news source. A 'rssURL' parameter must be passed");
         }
-        return new XWikiBlogNewsSource(rssURL, this.rssContentCleaner);
+
+        return new XWikiBlogNewsSource(rssURL, this.rssContentCleaner, this.xwikiContextProvider.get());
     }
 }

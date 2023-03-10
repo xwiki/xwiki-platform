@@ -28,8 +28,10 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.xwiki.ckeditor.test.po.CKEditor;
-import org.xwiki.ckeditor.test.po.ImageDialogEditModal;
-import org.xwiki.ckeditor.test.po.ImageDialogSelectModal;
+import org.xwiki.ckeditor.test.po.image.ImageDialogEditModal;
+import org.xwiki.ckeditor.test.po.image.ImageDialogSelectModal;
+import org.xwiki.ckeditor.test.po.image.select.ImageDialogIconSelectForm;
+import org.xwiki.ckeditor.test.po.image.select.ImageDialogUrlSelectForm;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.model.jaxb.Object;
@@ -52,10 +54,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ImagePluginIT
 {
     @BeforeEach
-    void setUp(TestUtils setup) throws Exception
+    void setUp(TestUtils setup, TestReference testReference)
     {
         // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
         createAndLoginStandardUser(setup);
+        setup.deletePage(testReference);
     }
 
     @Test
@@ -72,14 +75,14 @@ class ImagePluginIT
 
         // Insert a first image.
         ImageDialogSelectModal imageDialogSelectModal = editor.clickImageButton();
-        imageDialogSelectModal.selectAttachment(attachmentReference);
+        imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);
         ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
         imageDialogEditModal.clickInsert();
         // Move the focus out of the newly inserted image widget.
         editor.getRichTextArea().sendKeys(Keys.RIGHT);
         // Insert a second image, with a caption.
         imageDialogSelectModal = editor.clickImageButton();
-        imageDialogSelectModal.selectAttachment(attachmentReference);
+        imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);
         imageDialogEditModal = imageDialogSelectModal.clickSelect();
         imageDialogEditModal.clickCaptionCheckbox();
         imageDialogEditModal.clickInsert();
@@ -126,7 +129,7 @@ class ImagePluginIT
 
         // Insert a first image.
         ImageDialogSelectModal imageDialogSelectModal = editor.clickImageButton();
-        imageDialogSelectModal.selectAttachment(attachmentReference);
+        imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);
         ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
         // Assert the available image styles as well as the one currently selected.
         assertEquals(Set.of("", "bordered"), imageDialogEditModal.getListImageStyles());
@@ -156,9 +159,49 @@ class ImagePluginIT
         wysiwygEditPage.clickSaveAndView();
     }
 
-    private static DocumentReference getConfigPageDocumentReference(TestUtils setup)
+    @Test
+    @Order(3)
+    void insertIcon(TestUtils setup, TestReference testReference)
     {
-        return new DocumentReference(setup.getCurrentWiki(), "CKEditor", "Config");
+        setup.deletePage(testReference);
+        ViewPage newPage = setup.gotoPage(testReference);
+
+        // Move to the WYSIWYG edition page.
+        WYSIWYGEditPage wysiwygEditPage = newPage.editWYSIWYG();
+        CKEditor editor = new CKEditor("content").waitToLoad();
+
+        // Insert a first image.
+        ImageDialogSelectModal imageDialogSelectModal = editor.clickImageButton();
+        ImageDialogIconSelectForm imageDialogIconSelectForm = imageDialogSelectModal.switchToIconTab();
+        imageDialogIconSelectForm.setIconValue("accept");
+        ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
+        imageDialogEditModal.clickInsert();
+        ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
+
+        // Verify that the content matches what we did using CKEditor.
+        assertEquals("[[image:icon:accept]]", savedPage.editWiki().getContent());
+    }
+
+    @Test
+    @Order(4)
+    void insertUrl(TestUtils setup, TestReference testReference)
+    {
+        ViewPage newPage = setup.gotoPage(testReference);
+
+        // Move to the WYSIWYG edition page.
+        WYSIWYGEditPage wysiwygEditPage = newPage.editWYSIWYG();
+        CKEditor editor = new CKEditor("content").waitToLoad();
+
+        // Insert a first image.
+        ImageDialogSelectModal imageDialogSelectModal = editor.clickImageButton();
+        ImageDialogUrlSelectForm imageDialogUrlSelectForm = imageDialogSelectModal.switchToUrlTab();
+        imageDialogUrlSelectForm.setUrlValue("http://mysite.com/myimage.png");
+        ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
+        imageDialogEditModal.clickInsert();
+        ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
+
+        // Verify that the content matches what we did using CKEditor.
+        assertEquals("[[image:http://mysite.com/myimage.png]]", savedPage.editWiki().getContent());
     }
 
     private static void createAndLoginStandardUser(TestUtils setup)

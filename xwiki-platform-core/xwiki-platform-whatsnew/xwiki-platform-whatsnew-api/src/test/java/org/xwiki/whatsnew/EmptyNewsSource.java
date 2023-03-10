@@ -17,44 +17,56 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.administration.test.po;
+package org.xwiki.whatsnew;
 
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.ViewPage;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.xwiki.extension.version.Version;
+import org.xwiki.user.UserReference;
 
 /**
- * Extends the ViewPage to add support for Administration action.
+ * Empty News source for the tests.
  *
  * @version $Id$
- * @since 4.3M1
  */
-public class AdministrablePage extends ViewPage
+public class EmptyNewsSource implements NewsSource
 {
-    @FindBy(id = "tmAdminWiki")
-    private WebElement administerWikiLink;
-
-    /**
-     * Clicks on the "Administer Wiki" menu item.
-     *
-     * @return the wiki administration PO
-     */
-    public AdministrationPage clickAdministerWiki()
+    @Override
+    public NewsSource forUser(UserReference userReference)
     {
-        getDrawerMenu().toggle();
-        this.administerWikiLink.click();
-        return new AdministrationPage();
+        return this;
     }
 
-    /**
-     * Clicks on the "Administer Page" menu item.
-     *
-     * @return the page administration PO
-     * @since 12.10
-     */
-    public AdministrationPage clickAdministerPage()
+    @Override
+    public NewsSource forCategories(Set<NewsCategory> wantedCategories)
     {
-        clickMoreActionsSubMenuEntry("tmAdminSpace");
-        return new AdministrationPage();
+        return this;
+    }
+
+    @Override
+    public NewsSource forXWikiVersion(Version targetXWikiVersion)
+    {
+        return this;
+    }
+
+    @Override
+    public NewsSource forExtraParameters(Map<String, Object> extraParameters)
+    {
+        return this;
+    }
+
+    @Override
+    public NewsSource withCount(int count)
+    {
+        return this;
+    }
+
+    @Override
+    public List<NewsSourceItem> build()
+    {
+        return Collections.emptyList();
     }
 }

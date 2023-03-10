@@ -17,44 +17,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.administration.test.po;
+package org.xwiki.ckeditor.test.po.image.select;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.BaseElement;
 
 /**
- * Extends the ViewPage to add support for Administration action.
+ * Page object for the icon selection form of the image dialog.
  *
  * @version $Id$
- * @since 4.3M1
+ * @since 15.2RC1
+ * @since 14.10.7
  */
-public class AdministrablePage extends ViewPage
+public class ImageDialogIconSelectForm extends BaseElement
 {
-    @FindBy(id = "tmAdminWiki")
-    private WebElement administerWikiLink;
-
     /**
-     * Clicks on the "Administer Wiki" menu item.
+     * Set the value of the icon field.
      *
-     * @return the wiki administration PO
+     * @param iconName the icon name to set
      */
-    public AdministrationPage clickAdministerWiki()
+    public void setIconValue(String iconName)
     {
-        getDrawerMenu().toggle();
-        this.administerWikiLink.click();
-        return new AdministrationPage();
-    }
-
-    /**
-     * Clicks on the "Administer Page" menu item.
-     *
-     * @return the page administration PO
-     * @since 12.10
-     */
-    public AdministrationPage clickAdministerPage()
-    {
-        clickMoreActionsSubMenuEntry("tmAdminSpace");
-        return new AdministrationPage();
+        WebElement iconField = getDriver()
+            .findElement(By.cssSelector(".image-selector-modal .image-selector .iconTab input[name='iconField']"));
+        iconField.clear();
+        iconField.sendKeys(iconName);
     }
 }

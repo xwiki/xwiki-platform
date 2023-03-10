@@ -57,7 +57,7 @@ class DefaultNewsConfigurationTest
     @Test
     void getNewsSourceDescriptorsWhenNoConfiguration()
     {
-        when(this.configurationSource.getProperty("whatsnew.sources", Properties.class)).thenReturn(null);
+        when(this.configurationSource.containsKey("whatsnew.sources")).thenReturn(false);
 
         List< NewsSourceDescriptor> descriptors = this.configuration.getNewsSourceDescriptors();
 
@@ -71,6 +71,7 @@ class DefaultNewsConfigurationTest
     @Test
     void getNewsSourceDescriptorsWhenEmptyConfiguration()
     {
+        when(this.configurationSource.containsKey("whatsnew.sources")).thenReturn(true);
         when(this.configurationSource.getProperty("whatsnew.sources", Properties.class))
             .thenReturn(new Properties());
 
@@ -85,6 +86,7 @@ class DefaultNewsConfigurationTest
         Properties data = new Properties();
         data.setProperty("sourceid1", "sourcetype1");
         data.setProperty("sourceid2", "sourcetype2");
+        when(this.configurationSource.containsKey("whatsnew.sources")).thenReturn(true);
         when(this.configurationSource.getProperty("whatsnew.sources", Properties.class)).thenReturn(data);
         when(this.configurationSource.getKeys()).thenReturn(List.of("whatever", "whatsnew.sources"));
 
@@ -101,6 +103,7 @@ class DefaultNewsConfigurationTest
         Properties data = new Properties();
         data.setProperty("sourceid1", "sourcetype1");
         data.setProperty("sourceid2", "sourcetype2");
+        when(this.configurationSource.containsKey("whatsnew.sources")).thenReturn(true);
         when(this.configurationSource.getProperty("whatsnew.sources", Properties.class)).thenReturn(data);
         when(this.configurationSource.getKeys()).thenReturn(List.of("whatever", "whatsnew.sources",
             "whatsnew.source.sourceid1.a", "whatsnew.source.sourceid1.aa", "whatsnew.source.sourceid2.c"));
@@ -138,7 +141,7 @@ class DefaultNewsConfigurationTest
     @Test
     void isActiveWhenNoSourceConfiguration()
     {
-        when(this.configurationSource.getProperty("whatsnew.sources", Properties.class)).thenReturn(null);
+        when(this.configurationSource.containsKey("whatsnew.sources")).thenReturn(false);
 
         assertTrue(this.configuration.isActive());
     }
@@ -146,6 +149,7 @@ class DefaultNewsConfigurationTest
     @Test
     void isActiveWhenEmptySourceConfiguration()
     {
+        when(this.configurationSource.containsKey("whatsnew.sources")).thenReturn(true);
         when(this.configurationSource.getProperty("whatsnew.sources", Properties.class))
             .thenReturn(new Properties());
 

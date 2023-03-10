@@ -30,8 +30,6 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.whatsnew.NewsConfiguration;
 import org.xwiki.whatsnew.NewsException;
 import org.xwiki.whatsnew.NewsSource;
@@ -46,7 +44,7 @@ import org.xwiki.whatsnew.NewsSourceFactory;
  */
 @Component
 @Singleton
-public class ConfiguredNewsSourceFactory implements NewsSourceFactory, Initializable
+public class ConfiguredNewsSourceFactory implements NewsSourceFactory
 {
     @Inject
     private NewsConfiguration configuration;
@@ -62,20 +60,17 @@ public class ConfiguredNewsSourceFactory implements NewsSourceFactory, Initializ
     private NewsSource source;
 
     @Override
-    public void initialize() throws InitializationException
+    public NewsSource create(Map<String, String> parameters) throws NewsException
     {
-        // Create the News Source from configuration and cache it.
-        try {
-            this.source = create();
-        } catch (NewsException e) {
-            throw new InitializationException("Failed to initialize the Configured News Source", e);
+        NewsSource result;
+        if (this.source != null) {
+            result = this.source;
+        } else {
+            // Create the News Source from configuration and cache it.
+            result = create();
+            this.source = result;
         }
-    }
-
-    @Override
-    public NewsSource create(Map<String, String> parameters)
-    {
-        return this.source;
+        return result;
     }
 
     private NewsSource create() throws NewsException

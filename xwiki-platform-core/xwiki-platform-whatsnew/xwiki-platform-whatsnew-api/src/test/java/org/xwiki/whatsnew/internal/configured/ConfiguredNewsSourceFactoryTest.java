@@ -35,7 +35,7 @@ class ConfiguredNewsSourceFactoryTest
     private ConfiguredNewsSourceFactory factory;
 
     @Test
-    void createWhenEmptyConfiguration()
+    void createWhenEmptyConfiguration() throws Exception
     {
         NewsSource source = this.factory.create(Collections.emptyMap());
         assertNotNull(source);

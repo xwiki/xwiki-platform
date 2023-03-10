@@ -31,7 +31,7 @@ public class ExtendedViewPage extends ViewPage
 
     public WikiIndexPage goToWikiIndex()
     {
-        toggleDrawer();
+        getDrawerMenu().toggle();
         // Calling click() doesn't have the expected result: the mouse is moved over the link (we can see that the
         // link is hovered because it gets underlined and the link URL is displayed in the browser status bar) but
         // the link does not seems to be clicked. If we pause the test and click the link ourselves everything

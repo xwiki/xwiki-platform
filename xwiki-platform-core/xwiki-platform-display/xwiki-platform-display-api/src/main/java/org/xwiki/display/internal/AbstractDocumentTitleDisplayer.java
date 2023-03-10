@@ -176,7 +176,7 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
                 // Evaluate the title only if the document has script rights, otherwise use the raw title.
                 if (authorizationManager.hasAccess(Right.SCRIPT, document.getContentAuthorReference(),
                     document.getDocumentReference())) {
-                    title = evaluateTitle(rawTitle, document.getDocumentReference(), parameters);
+                    title = evaluateTitle(rawTitle, document, parameters);
                 }
                 return parseTitle(title);
             } catch (Exception e) {
@@ -226,12 +226,12 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
      * @param parameters display parameters
      * @return the result of evaluating the Velocity script from the given title
      */
-    protected String evaluateTitle(String title, DocumentReference documentReference,
+    protected String evaluateTitle(String title, DocumentModelBridge document,
         DocumentDisplayerParameters parameters)
     {
         StringWriter writer = new StringWriter();
         String namespace = defaultEntityReferenceSerializer.serialize(parameters.isTransformationContextIsolated()
-            ? documentReference : documentAccessBridge.getCurrentDocumentReference());
+            ? document.getDocumentReference() : documentAccessBridge.getCurrentDocumentReference());
 
         // Get the velocity engine
         VelocityEngine velocityEngine;
@@ -249,11 +249,11 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
             if (parameters.isExecutionContextIsolated()) {
                 backupObjects = new HashMap<>();
                 // The following method call also clones the execution context.
-                documentAccessBridge.pushDocumentInContext(backupObjects, documentReference);
+                documentAccessBridge.pushDocumentInContext(backupObjects, document);
                 // Pop the document from the context only if the push was successful!
                 canPop = true;
                 // Make sure to synchronize the context wiki with the context document's wiki.
-                modelContext.setCurrentEntityReference(documentReference.getWikiReference());
+                modelContext.setCurrentEntityReference(document.getDocumentReference().getWikiReference());
             }
             velocityEngine.evaluate(velocityManager.getVelocityContext(), writer, namespace, title);
         } catch (Exception e) {

@@ -129,7 +129,7 @@ public class OfficeImporterIT
         resultPage = importFile(testName, "ooffice.3.0/Test.odt");
         assertTrue(StringUtils.contains(resultPage.getContent(), "This is a test document."));
         WikiEditPage wikiEditPage = resultPage.editWiki();
-        String regex = "(?<imageName>Test_html_[\\w]+\\.png)";
+        String regex = "(?<imageName>Test_[\\w]+\\.png)";
         Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
         Matcher matcher = pattern.matcher(wikiEditPage.getContent());
         assertTrue(matcher.find());
@@ -159,27 +159,28 @@ public class OfficeImporterIT
         resultPage = importFile(testName, "ooffice.3.0/Test_accents & é$ù !-_.+();@=.odt");
         assertTrue(StringUtils.contains(resultPage.getContent(), "This is a test document."));
         wikiEditPage = resultPage.editWiki();
-        regex = "(?<imageName>Test_accents & e\\$u !-_\\.\\+\\(\\);\\\\@=_html_[\\w]+\\.png)";
+        regex = "(?<imageName>Test_accents & é\\$ù !-_\\.\\+\\(\\);\\\\@=_\\w+\\.png)";
         pattern = Pattern.compile(regex, Pattern.MULTILINE);
-        matcher = pattern.matcher(wikiEditPage.getContent());
-        assertTrue(matcher.find());
+        String wikiContent = wikiEditPage.getContent();
+        matcher = pattern.matcher(wikiContent);
+        assertTrue(matcher.find(), String.format("Pattern [%s] not found in [%s]", regex, wikiContent));
         imageName = matcher.group("imageName");
         resultPage = wikiEditPage.clickCancel();
         attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertEquals(4, attachmentsPane.getNumberOfAttachments());
         // the \ before the @ needs to be removed as it's not in the filename
-        assertTrue(attachmentsPane.attachmentExistsByFileName(imageName.replaceAll("\\\\@", "@")));
+        assertTrue(attachmentsPane.attachmentExistsByFileName(imageName.replace("\\@", "@")));
         deletePage(testName);
 
         // Test power point file with accents
         resultPage = importFile(testName, "msoffice.97-2003/Test_accents & é$ù !-_.+();@=.ppt");
         attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
-        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & e$u !-_.+();@=-slide0.jpg"));
-        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & e$u !-_.+();@=-slide1.jpg"));
-        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & e$u !-_.+();@=-slide2.jpg"));
-        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & e$u !-_.+();@=-slide3.jpg"));
+        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & é$ù !-_.+();@=-slide0.jpg"));
+        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & é$ù !-_.+();@=-slide1.jpg"));
+        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & é$ù !-_.+();@=-slide2.jpg"));
+        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & é$ù !-_.+();@=-slide3.jpg"));
         wikiEditPage = resultPage.editWiki();
-        assertTrue(wikiEditPage.getContent().contains("[[image:Test_accents & e$u !-_.+();\\@=-slide0.jpg]]"));
+        assertTrue(wikiEditPage.getContent().contains("[[image:Test_accents & é$ù !-_.+();\\@=-slide0.jpg]]"));
         resultPage = wikiEditPage.clickCancel();
         deletePage(testName);
     }

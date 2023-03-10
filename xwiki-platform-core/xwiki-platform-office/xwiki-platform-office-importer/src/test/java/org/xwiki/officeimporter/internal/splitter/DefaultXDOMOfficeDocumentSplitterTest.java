@@ -87,7 +87,7 @@ class DefaultXDOMOfficeDocumentSplitterTest extends AbstractOfficeImporterTest
 
         // Create xdom office document.
         XDOMOfficeDocument officeDocument =
-            new XDOMOfficeDocument(xdom, Collections.emptySet(), this.componentManager, null);
+            new XDOMOfficeDocument(xdom, Collections.emptyMap(), this.componentManager, null);
         final DocumentReference baseDocument = new DocumentReference("xwiki", "Test", "Test");
 
         // Add expectations to mock document name serializer.

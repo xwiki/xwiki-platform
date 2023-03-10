@@ -19,7 +19,12 @@
  */
 package org.xwiki.officeimporter.document;
 
+import java.io.File;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
+
+import org.xwiki.stability.Unstable;
 
 public interface CompatibilityOfficeDocument
 {
@@ -30,8 +35,26 @@ public interface CompatibilityOfficeDocument
      * as artifacts.
      *
      * @return a map containing artifacts for this document.
-     * @deprecated Since 13.1RC1 use {@link OfficeDocument#getArtifactsFiles()}.
+     * @deprecated Since 13.1RC1 use {@link #getArtifactsFiles()}.
      */
     @Deprecated
     Map<String, byte[]> getArtifacts();
+
+    /**
+     * Returns the files corresponding to all the artifacts for this office document, except the conversion of the
+     * document itself.
+     * Artifacts are generated during the import operation if the original office document contains embedded
+     * non-textual elements. Also, some office formats (like presentations) result in multiple output files when
+     * converted into html. In this case all these output files will be considered as artifacts.
+     *
+     * @return the set of artifacts related to this office document.
+     * @since 13.1RC1
+     * @deprecated Use {@link OfficeDocument#getArtifactsMap()} instead.
+     */
+    @Deprecated(since = "15.3RC1, 14.10.8")
+    @Unstable
+    default Set<File> getArtifactsFiles()
+    {
+        return Collections.emptySet();
+    }
 }

@@ -49,7 +49,8 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link OfficeAttachmentImporter}.
@@ -155,7 +156,7 @@ class OfficeAttachmentImporterTest
         XDOMOfficeDocument xdomOfficeDocument = mock(XDOMOfficeDocument.class);
         when(documentBuilder.build(attachmentContent, "my.doc", ATTACHMENT_REFERENCE.getDocumentReference(), true))
             .thenReturn(xdomOfficeDocument);
-        when(xdomOfficeDocument.getArtifactsFiles()).thenReturn(Collections.emptySet());
+        when(xdomOfficeDocument.getArtifactsMap()).thenReturn(Collections.emptyMap());
         when(xdomOfficeDocument.getContentAsString("annotatedxhtml/1.0")).thenReturn("test");
 
         Map<String, Object> parameters = Collections.singletonMap("filterStyles", "true");
@@ -179,7 +180,7 @@ class OfficeAttachmentImporterTest
         XDOMOfficeDocument xdomOfficeDocument = mock(XDOMOfficeDocument.class);
         when(documentBuilder.build(attachmentContent, "my.doc", ATTACHMENT_REFERENCE.getDocumentReference(), true))
             .thenReturn(xdomOfficeDocument);
-        when(xdomOfficeDocument.getArtifactsFiles()).thenReturn(Collections.emptySet());
+        when(xdomOfficeDocument.getArtifactsMap()).thenReturn(Collections.emptyMap());
         when(xdomOfficeDocument.getContentAsString("annotatedxhtml/1.0")).thenReturn("test");
 
         Map<String, Object> parameters = Collections.singletonMap("filterStyles", "true");

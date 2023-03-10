@@ -19,6 +19,7 @@
  */
 package org.xwiki.flamingo.test.docker;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -38,9 +39,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ScriptAuthorIT
 {
     @BeforeAll
-    public void setup(TestUtils setup)
+    public void beforeAll(TestUtils setup)
     {
         setup.loginAsSuperAdmin();
+    }
+
+    @AfterAll
+    public void afterAll(TestUtils setup)
+    {
+        // Make sure go back to the initial state regarding the current user
+        setup.setSession(null);
     }
 
     @Test

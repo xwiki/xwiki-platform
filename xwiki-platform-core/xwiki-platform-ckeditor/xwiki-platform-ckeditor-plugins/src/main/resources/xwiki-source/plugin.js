@@ -28,7 +28,12 @@
 
   CKEDITOR.plugins.xwikiSource = {
     convertHTML: function(editor, params) {
-      return $.post(editor.config['xwiki-source'].htmlConverter, $.extend({
+      // Empty object that can be populated by listener of the 'xwiki:ckeditor:convertHTML' event.
+      // The values of this object are then used as parameters on the html convertion request.
+      var  extendedParams = {}
+
+      $(document).trigger('xwiki:ckeditor:convertHTML', extendedParams);
+      var localParams = {
         // Make sure we use the syntax specified when the editor was loaded. This is especially important when the
         // edited document is new (unsaved) because we want the converter to use the syntax specified by the template
         // rather than the default wiki syntax.
@@ -38,7 +43,9 @@
         // Don't wrap the returned HTML with the BODY tag and don't include the HEAD tag when the editor is used
         // in-line (because the returned HTML will be inserted directly into the main page).
         stripHTMLEnvelope: editor.elementMode === CKEDITOR.ELEMENT_MODE_INLINE
-      }, params));
+      };
+      var postParams = $.extend(extendedParams, $.extend(localParams, params));
+      return $.post(editor.config['xwiki-source'].htmlConverter, postParams);
     },
 
     getFullData: function(editor) {

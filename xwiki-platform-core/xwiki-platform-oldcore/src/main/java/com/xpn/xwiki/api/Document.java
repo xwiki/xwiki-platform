@@ -3199,6 +3199,17 @@ public class Document extends Api
         return this.doc.isMostRecent();
     }
 
+    /**
+     * @return if rendering transformations shall be executed in restricted mode and the title not be executed
+     * @since 14.10.7
+     * @since 15.2RC1
+     */
+    @Unstable
+    public boolean isRestricted()
+    {
+        return this.doc.isRestricted();
+    }
+
     @Override
     public String toString()
     {

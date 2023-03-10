@@ -173,9 +173,11 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
         if (!StringUtils.isEmpty(rawTitle)) {
             try {
                 String title = rawTitle;
-                // Evaluate the title only if the document has script rights, otherwise use the raw title.
-                if (authorizationManager.hasAccess(Right.SCRIPT, document.getContentAuthorReference(),
-                    document.getDocumentReference())) {
+                // Evaluate the title only if the document is not restricted and its content's author has script
+                // right, otherwise use the raw title.
+                if (!document.isRestricted() && this.authorizationManager.hasAccess(Right.SCRIPT,
+                    document.getContentAuthorReference(), document.getDocumentReference()))
+                {
                     title = evaluateTitle(rawTitle, document, parameters);
                 }
                 return parseTitle(title);

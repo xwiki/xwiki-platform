@@ -714,6 +714,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
                     doc.setNew(false);
 
+                    // Make sure that properly saved documents aren't restricted.
+                    doc.setRestricted(false);
+
                     // We need to ensure that the saved document becomes the original document
                     doc.setOriginalDocument(doc.clone());
                 } finally {

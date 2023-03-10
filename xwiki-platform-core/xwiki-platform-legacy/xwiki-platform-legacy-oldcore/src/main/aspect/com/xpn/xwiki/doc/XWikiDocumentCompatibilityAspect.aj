@@ -282,7 +282,8 @@ privileged public aspect XWikiDocumentCompatibilityAspect
                         XDOM headerXDOM = new XDOM(Collections.<Block> singletonList(header));
 
                         // transform
-                        TransformationContext context = new TransformationContext(headerXDOM, getSyntax());
+                        TransformationContext context =
+                            new TransformationContext(headerXDOM, getSyntax(), isRestricted());
                         Utils.getComponent(TransformationManager.class).performTransformations(headerXDOM, context);
 
                         // render

@@ -180,4 +180,15 @@ public interface DocumentModelBridge
     {
         return null;
     }
+
+    /**
+     * @return {@code true} if the document is restricted, i.e., transformations should be executed in restricted mode
+     * @since 15.2RC1
+     * @since 14.10.7
+     */
+    @Unstable
+    default boolean isRestricted()
+    {
+        return false;
+    }
 }

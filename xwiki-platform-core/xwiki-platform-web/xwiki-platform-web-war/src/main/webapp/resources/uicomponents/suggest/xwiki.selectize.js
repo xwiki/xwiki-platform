@@ -102,9 +102,6 @@ define('xwiki-selectize', [
     // Append the drop down list to the BODY element as otherwise we may get scroll bars if the parent of the selectize
     // widget has limited width or height (e.g. when you change the filter value on an empty live table).
     dropdownParent: 'body',
-    // Disable the highlighting because it is buggy.
-    // See for instance https://github.com/selectize/selectize.js/issues/1149 .
-    highlight: false,
     labelField: 'label',
     loadThrottle: 500,
     onDropdownClose: function(dropdown) {

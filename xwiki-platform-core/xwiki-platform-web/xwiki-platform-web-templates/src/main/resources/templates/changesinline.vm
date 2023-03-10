@@ -17,6 +17,10 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
+#if ($xcontext.action == 'get')
+  #template('display_macros.vm')
+  #initRequiredSkinExtensions()
+#end
 #set($showactions = 0)
 <div id="changescontent" class="xwikiintracontent">
 #set($rev1 = "$!request.get('rev1')")
@@ -89,3 +93,8 @@
 #set ($nextNewdocVersion = $newdoc.documentArchive.getNextVersion($newdoc.RCSVersion))
 #template('changesdoc.vm')
 </div>
+## Pass the required skin extensions to the client side to be injected automatically in the HTML head by xwiki.js.
+#if ($xcontext.action == 'get')
+  #getRequiredSkinExtensions($requiredSkinExtensions)
+  #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
+#end

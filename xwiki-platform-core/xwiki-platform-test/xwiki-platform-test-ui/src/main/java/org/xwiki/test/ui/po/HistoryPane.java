@@ -116,6 +116,21 @@ public class HistoryPane extends BaseElement
         return new ViewPage();
     }
 
+    /**
+     * View the document at the given version.
+     *
+     * @param version the version to view
+     * @return the viewpage
+     * @since 14.10.7
+     * @since 15.2RC1
+     */
+    public ViewPage viewVersion(String version)
+    {
+        this.pane.findElement(By.xpath(".//table//tr//td[position()=3]/a[contains(., '" + version + "')]")).click();
+
+        return new ViewPage();
+    }
+
     public HistoryPane deleteVersion(String version)
     {
         getDriver().makeConfirmDialogSilent(true);

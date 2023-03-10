@@ -625,6 +625,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private XWikiDocument originalDocument;
 
     /**
+     * If the document should always be rendered in restricted mode.
+     */
+    private boolean restricted;
+
+    /**
      * Used to display the title and the content of this document. Do not inject the component here to avoid any simple
      * new XWikiDocument to cause many useless initialization, in particular, during initialization of the stub context
      * and other fake documents in tests.
@@ -1337,6 +1342,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
                 parameters.setExecutionContextIsolated(executionContextIsolated);
                 parameters.setTransformationContextIsolated(transformationContextIsolated);
+                // Don't consider isRestricted() here as this could invoke a sheet.
                 parameters.setTransformationContextRestricted(transformationContextRestricted);
                 // Render the translated content (matching the current language) using this document's syntax.
                 parameters.setContentTranslated(tdoc != this);
@@ -1664,6 +1670,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             XWikiDocument fakeDocument = new XWikiDocument(getDocumentReference());
             fakeDocument.setSyntax(sourceSyntaxId);
             fakeDocument.setContent(text);
+            fakeDocument.setRestricted(sDocument != null && sDocument.isRestricted());
 
             // We don't let displayer take care of the context isolation because we don't want the fake document to be
             // context document
@@ -4583,6 +4590,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             doc.setMinorEdit(isMinorEdit());
             doc.setSyntax(getSyntax());
             doc.setHidden(isHidden());
+            doc.setRestricted(isRestricted());
 
             if (this.xClass != null) {
                 doc.setXClass(this.xClass.clone());
@@ -4744,6 +4752,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
     }
 
+    /**
+     * Indicates whether some other document is "equal to" this one.
+     * <p>
+     * This ignores the {@link #isRestricted()} property as it is not considered to be part of the data.
+     *
+     * @param object the document to compare to
+     * @return {@code true} if this document is the same as the object argument; {@code false} otherwise
+     */
     @Override
     public boolean equals(Object object)
     {
@@ -9515,5 +9531,33 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         // There is no syntax by default in a new document and the default one is retrieved from the configuration
         setSyntax(getSyntax());
+    }
+
+    /**
+     * @return if rendering transformations shall be executed in restricted mode and the title not be executed
+     * @since 14.10.7
+     * @since 15.2RC1
+     */
+    @Override
+    @Unstable
+    public boolean isRestricted()
+    {
+        return this.restricted;
+    }
+
+    /**
+     * Set the restricted property that disables scripts and other dangerous content.
+     * <p>
+     * This property is not stored in the database as it is only supposed to be {@code true} on documents that do not
+     * correspond to the current version of the document.
+     *
+     * @param restricted if rendering transformations shall be executed in restricted mode and the title not be executed
+     * @since 14.10.7
+     * @since 15.2RC1
+     */
+    @Unstable
+    public void setRestricted(boolean restricted)
+    {
+        this.restricted = restricted;
     }
 }

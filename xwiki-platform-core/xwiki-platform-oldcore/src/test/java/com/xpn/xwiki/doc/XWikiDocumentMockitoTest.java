@@ -1583,6 +1583,9 @@ public class XWikiDocumentMockitoTest
         newDocument.fromXML(document, false);
 
         assertEquals(this.document, newDocument);
+        // Assert that the document restored from XML is restricted in contrast to the original document.
+        assertFalse(this.document.isRestricted());
+        assertTrue(newDocument.isRestricted());
     }
 
     @Test

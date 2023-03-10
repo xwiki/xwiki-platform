@@ -629,6 +629,8 @@ public class MockitoOldcore
                 document.setStore(getMockStore());
 
                 XWikiDocument savedDocument = document.clone();
+                // Make sure the saved version is not restricted.
+                savedDocument.setRestricted(false);
 
                 documents.put(document.getDocumentReferenceWithLocale(), savedDocument);
 
@@ -832,6 +834,9 @@ public class MockitoOldcore
                     }
 
                     XWikiDocument savedDocument = document.clone();
+                    // Make sure the saved version is not restricted.
+                    savedDocument.setRestricted(false);
+
                     documents.put(document.getDocumentReferenceWithLocale(), savedDocument);
 
                     if (isNew) {

@@ -93,7 +93,7 @@
 #set ($nextNewdocVersion = $newdoc.documentArchive.getNextVersion($newdoc.RCSVersion))
 #template('changesdoc.vm')
 </div>
-## Ensure to load the appropriate JSX.
+## Pass the required skin extensions to the client side to be injected automatically in the HTML head by xwiki.js.
 #if ($xcontext.action == 'get')
   #getRequiredSkinExtensions($requiredSkinExtensions)
   #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))

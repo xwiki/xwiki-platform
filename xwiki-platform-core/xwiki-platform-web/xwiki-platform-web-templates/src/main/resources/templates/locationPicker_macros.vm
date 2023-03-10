@@ -90,11 +90,14 @@
 #macro (locationPickerActions)
   <div class="location-actions">
     ## Tree picker toggle
-    <a href="#" class="location-action location-action-pick" title="Select a new location">
-      $services.icon.renderHTML('chart-organisation')</a>
+    <a href="#" class="location-action location-action-pick"
+    title="$escapetool.xml($services.localization.render('core.create.locationPreview.actions.pick'))">
+      $services.icon.renderHTML('chart-organisation')
+    </a>
     ## Location advanced edit button.
     #if ($isAdvancedUser)
-      <a href="#" class="location-action location-action-edit">
+      <a href="#" class="location-action location-action-edit"
+      title="$escapetool.xml($services.localization.render('core.create.locationPreview.actions.edit'))">
         $services.icon.renderHTML('pencil')
       </a>
     #end

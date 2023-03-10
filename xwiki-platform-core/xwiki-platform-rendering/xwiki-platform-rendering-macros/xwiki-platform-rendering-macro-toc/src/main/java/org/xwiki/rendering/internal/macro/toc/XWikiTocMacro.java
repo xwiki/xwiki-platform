@@ -19,11 +19,18 @@
  */
 package org.xwiki.rendering.internal.macro.toc;
 
+import java.util.List;
+
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.toc.XWikiTocMacroParameters;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.skinx.SkinExtension;
 
 /**
  * Generate a Table Of Contents based on the document sections.
@@ -39,11 +46,23 @@ import org.xwiki.rendering.macro.toc.XWikiTocMacroParameters;
 @Singleton
 public class XWikiTocMacro extends AbstractTocMacro<XWikiTocMacroParameters>
 {
+    @Inject
+    @Named("ssrx")
+    private SkinExtension ssfx;
+
     /**
      * Create and initialize the descriptor of the macro.
      */
     public XWikiTocMacro()
     {
         super(XWikiTocMacroParameters.class);
+    }
+
+    @Override
+    public List<Block> execute(XWikiTocMacroParameters parameters, String content, MacroTransformationContext context)
+        throws MacroExecutionException
+    {
+        this.ssfx.use("toc.css");
+        return super.execute(parameters, content, context);
     }
 }

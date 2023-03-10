@@ -28,8 +28,8 @@
 
   CKEDITOR.plugins.xwikiSource = {
     convertHTML: function(editor, params) {
-      // Empty object that can be populated by listener of the 'xwiki:ckeditor:convertHTML' event.
-      // The values of this object are then used as parameters on the html convertion request.
+      // Empty object that can be populated by listener of the 'xwiki:wysiwyg:convertHTML' event.
+      // The values of this object are then used as parameters on the html conversion request.
       var extendedParams = {};
 
       $(document).trigger('xwiki:wysiwyg:convertHTML', extendedParams);

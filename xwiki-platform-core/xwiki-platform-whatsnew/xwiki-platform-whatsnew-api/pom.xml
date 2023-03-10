@@ -68,10 +68,12 @@
       <artifactId>xwiki-commons-xml</artifactId>
       <version>${commons.version}</version>
     </dependency>
+    <!-- Needed for $xwiki.formatDate() in whatsnew.vm -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>joda-time</groupId>

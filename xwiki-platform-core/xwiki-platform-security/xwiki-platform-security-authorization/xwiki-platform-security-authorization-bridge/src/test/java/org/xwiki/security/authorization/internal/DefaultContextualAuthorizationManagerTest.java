@@ -19,18 +19,19 @@
  */
 package org.xwiki.security.authorization.internal;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.authorization.AuthorizationManager;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.mockito.ArgumentMatchers.eq;
@@ -44,23 +45,23 @@ import static org.mockito.Mockito.verify;
  * @version $Id$
  */
 @ReferenceComponentList
-public class DefaultContextualAuthorizationManagerTest
+@OldcoreTest
+class DefaultContextualAuthorizationManagerTest
 {
-    public MockitoComponentMockingRule<ContextualAuthorizationManager> mocker =
-        new MockitoComponentMockingRule<ContextualAuthorizationManager>(DefaultContextualAuthorizationManager.class);
-
-    @Rule
-    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule(mocker);
-
+    @MockComponent
     private AuthorizationManager authorizationManager;
+
+    @InjectMockComponents
+    private DefaultContextualAuthorizationManager contextualAuthorizationManager;
+
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
 
     private WikiReference currentWikiReference;
 
-    @Before
+    @BeforeEach
     public void before() throws Exception
     {
-        this.authorizationManager = this.mocker.getInstance(AuthorizationManager.class);
-
         this.currentWikiReference = new WikiReference("wiki");
         this.oldcore.getXWikiContext().setWikiId(this.currentWikiReference.getName());
     }
@@ -68,22 +69,22 @@ public class DefaultContextualAuthorizationManagerTest
     // Tests
 
     @Test
-    public void checkAccess() throws Exception
+    void checkAccess() throws Exception
     {
         LocalDocumentReference localReference = new LocalDocumentReference("space", "page");
 
-        this.mocker.getComponentUnderTest().checkAccess(Right.VIEW, localReference);
+        this.contextualAuthorizationManager.checkAccess(Right.VIEW, localReference);
 
         verify(this.authorizationManager).checkAccess(same(Right.VIEW), isNull(),
             eq(new DocumentReference(localReference, this.currentWikiReference)));
     }
 
     @Test
-    public void hasAccess() throws Exception
+    void hasAccess()
     {
         LocalDocumentReference localReference = new LocalDocumentReference("space", "page");
 
-        this.mocker.getComponentUnderTest().hasAccess(Right.VIEW, localReference);
+        this.contextualAuthorizationManager.hasAccess(Right.VIEW, localReference);
 
         verify(this.authorizationManager).hasAccess(same(Right.VIEW), isNull(),
             eq(new DocumentReference(localReference, this.currentWikiReference)));

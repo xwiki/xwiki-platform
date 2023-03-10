@@ -146,9 +146,6 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxRegistry;
 import org.xwiki.rendering.transformation.RenderingContext;
-import org.xwiki.rendering.transformation.TransformationContext;
-import org.xwiki.rendering.transformation.TransformationException;
-import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.rendering.util.ErrorBlockGenerator;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -9120,45 +9117,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         try {
             XDOM dom = parseContent(currentSyntaxId, content, source);
-            return performSyntaxConversion(dom, targetSyntax, null);
-        } catch (Exception e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
-                "Failed to convert document to syntax [" + targetSyntax + "]", e);
-        }
-    }
-
-    /**
-     * Convert the passed content from the passed syntax to the passed new syntax.
-     *
-     * @param content the XDOM content to convert, the XDOM can be modified during the transformation
-     * @param targetSyntax the new syntax after the conversion
-     * @param txContext the context when Transformation are executed or null if transformation shouldn't be executed
-     * @return the converted content in the new syntax
-     * @throws XWikiException if an exception occurred during the conversion process
-     * @since 2.4M2
-     */
-    private static String performSyntaxConversion(XDOM content, Syntax targetSyntax, TransformationContext txContext)
-        throws XWikiException
-    {
-        try {
-            if (txContext != null) {
-                // Transform XDOM
-                TransformationManager transformations = Utils.getComponent(TransformationManager.class);
-                if (txContext.getXDOM() == null) {
-                    txContext.setXDOM(content);
-                }
-                try {
-                    transformations.performTransformations(content, txContext);
-                } catch (TransformationException te) {
-                    // An error happened during one of the transformations. Since the error has been logged
-                    // continue
-                    // TODO: We should have a visual clue for the user in the future to let him know something
-                    // didn't work as expected.
-                }
-            }
-
-            // Render XDOM
-            return renderXDOM(content, targetSyntax);
+            return renderXDOM(dom, targetSyntax);
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
                 "Failed to convert document to syntax [" + targetSyntax + "]", e);

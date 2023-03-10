@@ -32,7 +32,7 @@
       // The values of this object are then used as parameters on the html convertion request.
       var extendedParams = {};
 
-      $(document).trigger('xwiki:ckeditor:convertHTML', extendedParams);
+      $(document).trigger('xwiki:wysiwyg:convertHTML', extendedParams);
       var localParams = {
         // Make sure we use the syntax specified when the editor was loaded. This is especially important when the
         // edited document is new (unsaved) because we want the converter to use the syntax specified by the template

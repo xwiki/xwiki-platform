@@ -120,7 +120,7 @@ public @interface UITest
     boolean vnc() default true;
 
     /**
-     * @return true if the test should take into account accessibility rules (WCAG)
+     * @return true if WCAG tests should be executed, false otherwise
      */
     boolean wcag() default false;
 

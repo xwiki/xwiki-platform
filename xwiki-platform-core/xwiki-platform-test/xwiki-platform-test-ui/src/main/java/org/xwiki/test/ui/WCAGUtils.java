@@ -44,8 +44,8 @@ public class WCAGUtils
     private WCAGContext wcagContext = new WCAGContext();
 
     /**
-     * @param wcag validation enabled setup parameter to use in the test suite.
-     * @param testClassName to use for logging and reporting.
+     * @param wcag true if WCAG tests must be executed, false otherwise
+     * @param testClassName the PO class name to use for logging and reporting
      */
     public void setupWCAGValidation(boolean wcag, String testClassName)
     {
@@ -58,18 +58,20 @@ public class WCAGUtils
 
     /**
      * Change the current WCAG test method for reporting.
-     * @param testMethodName the value to update
+     *
+     * @param testMethodName the test method name to update
      */
     public void changeWCAGTestMethod(String testMethodName)
     {
-        if (wcagContext.isWCAGEnabled()) {
-            wcagContext.setTestMethodName(testMethodName);
+        if (this.wcagContext.isWCAGEnabled()) {
+            this.wcagContext.setTestMethodName(testMethodName);
         }
     }
 
     /**
      * Get the WCAG context for the test suite.
-     * @return WCAG Context
+     *
+     * @return the WCAG Context
      */
     public WCAGContext getWCAGContext()
     {
@@ -88,34 +90,35 @@ public class WCAGUtils
     }
 
     /**
-     * Writes the wcag validation results to custom reports.
-     * @throws IOException can be thrown when the directory creation fails.
+     * Writes the WCAG validation results into a report file.
+     *
+     * @throws IOException if the directory creation fails
      */
     public void writeWCAGResults() throws IOException
     {
-        float totalTime = (float) wcagContext.getWCAGTime() / 1000;
+        float totalTime = (float) this.wcagContext.getWCAGTime() / 1000;
         LOGGER.debug("Time spent on WCAG validation for [{}]: [{}] (in s)",
             getWCAGContext().getTestClassName(), totalTime);
 
         File wcagDir = new File(getWCAGReportPathOnHost());
-        if (wcagContext.hasWCAGWarnings()) {
+        if (this.wcagContext.hasWCAGWarnings()) {
             String outputName = "wcagWarnings.txt";
             LOGGER.warn("There are [{}] accessibility warnings in the test suite. See [{}/{}] for more details.",
-                    wcagContext.getWCAGWarnAmount(), getWCAGReportPathOnHost(), outputName);
+                this.wcagContext.getWCAGWarnAmount(), getWCAGReportPathOnHost(), outputName);
             if (!wcagDir.exists()) {
                 Files.createDirectory(wcagDir.toPath());
             }
             File warningsFile = new File(wcagDir, outputName);
-            WCAGContext.writeWCAGReportToFile(warningsFile, wcagContext.buildWarningsReport());
+            WCAGContext.writeWCAGReportToFile(warningsFile, this.wcagContext.buildWarningsReport());
         }
-        if (wcagContext.hasWCAGFails()) {
+        if (this.wcagContext.hasWCAGFails()) {
             if (!wcagDir.exists()) {
                 Files.createDirectory(wcagDir.toPath());
             }
             String outputName = "wcagFails.txt";
-            LOGGER.error("There are [{}] accessibility fails in the test suite.", wcagContext.getWCAGFailAmount());
+            LOGGER.error("There are [{}] accessibility fails in the test suite.", this.wcagContext.getWCAGFailAmount());
             File failsFile = new File(wcagDir, outputName);
-            WCAGContext.writeWCAGReportToFile(failsFile, wcagContext.buildFailsReport());
+            WCAGContext.writeWCAGReportToFile(failsFile, this.wcagContext.buildFailsReport());
         }
     }
 
@@ -124,11 +127,11 @@ public class WCAGUtils
      */
     public void assertWCAGResults()
     {
-        assertFalse(wcagContext.hasWCAGFails(), wcagContext.buildFailsReport());
+        assertFalse(this.wcagContext.hasWCAGFails(), this.wcagContext.buildFailsReport());
     }
 
     /**
-     * @return the path where the wcag reports are stored by Maven after validation, on the host.
+     * @return the path where the WCAG reports are stored by Maven after validation, on the host.
      */
     private String getWCAGReportPathOnHost()
     {

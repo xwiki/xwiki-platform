@@ -248,8 +248,9 @@ public class XWikiDockerExtension extends AbstractExtension
         }
         String testMethodName = extensionContext.getTestMethod().get().getName();
 
-        // Update the wcag validation context.
+        // Update the WCAG validation context.
         loadPersistentTestContext(extensionContext).getUtil().getWCAGUtils().changeWCAGTestMethod(testMethodName);
+
         LOGGER.info("(*) Starting test [{}]", testMethodName);
     }
 

@@ -44,12 +44,12 @@ import static java.util.Map.entry;
 
 /**
  * Context related to WCAG (accessibility) validation with axe-core.
- * @since 15.2RC1
+ *
  * @version $Id$
+ * @since 15.2RC1
  */
 public class WCAGContext
 {
-
     /**
      * List of rules to fail on.
      * Failing rules will fail the test suite on violation, non failing rules will only return a warning if violated.
@@ -156,10 +156,10 @@ public class WCAGContext
         private final long warnAmount;
 
         /**
-         * @param testMethodName in which the validation happened.
-         * @param url from which these results have been generated
-         * @param pageClassName class of the page validated
-         * @param axeResults results of the validation
+         * @param testMethodName the method in which the validation happened
+         * @param url the URL from which these results have been generated
+         * @param pageClassName the PO class name representing the UI that has been validated
+         * @param axeResults the object to which to append the results of the validation to
          */
         private WCAGTestResults(String testMethodName, String url, String pageClassName, Results axeResults)
         {
@@ -171,20 +171,20 @@ public class WCAGContext
                 // the default behavior will be to add it to the fails.
                 // In order to resolve these test-suite fails quickly, set them as "false" in FAILS_ON_RULE.
                 .collect(Collectors.toList());
-            failAmount = failingViolations.size();
-            if (failAmount != 0) {
+            this.failAmount = failingViolations.size();
+            if (this.failAmount != 0) {
                 this.failReport = AbstractXWikiCustomAxeReporter.getReadableAxeResults(testMethodName, pageClassName,
-                        url, failingViolations);
+                    url, failingViolations);
             }
 
             List<Rule> warningViolations = axeResults.getViolations()
-                    .stream()
-                    .filter(rule -> FAILS_ON_RULE.containsKey(rule.getId()) && !FAILS_ON_RULE.get(rule.getId()))
-                    .collect(Collectors.toList());
-            warnAmount = warningViolations.size();
-            if (warnAmount != 0) {
+                .stream()
+                .filter(rule -> FAILS_ON_RULE.containsKey(rule.getId()) && !FAILS_ON_RULE.get(rule.getId()))
+                .collect(Collectors.toList());
+            this.warnAmount = warningViolations.size();
+            if (this.warnAmount != 0) {
                 this.warnReport = AbstractXWikiCustomAxeReporter.getReadableAxeResults(testMethodName, pageClassName,
-                        url, warningViolations);
+                    url, warningViolations);
             }
         }
         String getFailReport()
@@ -196,23 +196,29 @@ public class WCAGContext
         {
             return this.warnReport;
         }
-
     }
 
     private List<WCAGTestResults> wcagResults = new ArrayList<>();
 
     private boolean wcagEnabled = true;
+
     private long wcagTimer;
+
     private int wcagFailCount;
+
     private int wcagWarnCount;
+
     private final Map<String, ArrayList<String> > wcagValidationCache = new HashMap<>();
+
     private String testClassName;
+
     private String testMethodName;
 
     /**
      * Sets the current test class name. This name is the string representation of the TestUI class in which the
      * current wcag validation happens.
-     * @param testClassName new value to be set.
+     *
+     * @param testClassName the test class name to be set
      */
     public void setTestClassName(String testClassName)
     {
@@ -227,7 +233,8 @@ public class WCAGContext
     /**
      * Sets the current test method name. This name is the string representation of a Test method in a testUI class in
      * which the current wcag validation happens.
-     * @param testMethodName new value to be set.
+     *
+     * @param testMethodName the test method name to be set
      */
     public void setTestMethodName(String testMethodName)
     {
@@ -241,7 +248,8 @@ public class WCAGContext
 
     /**
      * Instantiate and initialize an axe builder with context options.
-     * @return a ready to use AxeBuilder
+     *
+     * @return a ready-to-use AxeBuilder instance
      */
     public AxeBuilder getAxeBuilder()
     {
@@ -254,9 +262,9 @@ public class WCAGContext
     }
 
     /**
-     * @param url of the page to analyze
-     * @param className class of the page to analyze
-     * @return if there's a need to perform an accessibility analysis of a basePage
+     * @param url the URL of the page to analyze
+     * @param className the class of the page to analyze
+     * @return true if there's a need to perform an accessibility analysis of a basePage or false otherwise
      */
     public boolean isNotCached(String url, String className)
     {
@@ -266,9 +274,10 @@ public class WCAGContext
 
     /**
      * Appends WCAG results to the current context.
-     * @param url where the page analyzed is available
-     * @param className class of the page
-     * @param newViolations violations found on the page
+     *
+     * @param url the URL of the page analyzed
+     * @param className the class of the page analyzed
+     * @param newViolations append violations found on the page to the passed results object
      */
     public void addWCAGResults(String url, String className, Results newViolations)
     {
@@ -282,10 +291,10 @@ public class WCAGContext
             LOGGER.warn("[{} : {}] Found [{}] warning WCAG violations.",
                 url, className, wcagTestResults.warnAmount);
         }
-        wcagFailCount += wcagTestResults.failAmount;
-        wcagWarnCount += wcagTestResults.warnAmount;
+        this.wcagFailCount += wcagTestResults.failAmount;
+        this.wcagWarnCount += wcagTestResults.warnAmount;
         this.wcagResults.add(wcagTestResults);
-        if (this.isNotCached(url, className)) {
+        if (isNotCached(url, className)) {
             // Avoid duplicate entries in the cache.
             this.wcagValidationCache.putIfAbsent(url, new ArrayList<>());
             this.wcagValidationCache.get(url).add(className);
@@ -293,7 +302,7 @@ public class WCAGContext
     }
 
     /**
-     * @param time The amount of time to count up, in ms.
+     * @param time the amount of time to count up, in ms.
      */
     public void addWCAGTime(long time)
     {
@@ -333,7 +342,7 @@ public class WCAGContext
     }
 
     /**
-     * @return the state of wcag validation
+     * @return true if WCAG validation is enabled, false otherwise
      */
     public boolean isWCAGEnabled()
     {
@@ -345,7 +354,7 @@ public class WCAGContext
      */
     public boolean hasWCAGFails()
     {
-        return wcagFailCount != 0;
+        return this.wcagFailCount != 0;
     }
 
     /**
@@ -353,11 +362,11 @@ public class WCAGContext
      */
     public boolean hasWCAGWarnings()
     {
-        return wcagWarnCount != 0;
+        return this.wcagWarnCount != 0;
     }
 
     /**
-     * @return a readable report of wcag fails found so far.
+     * @return a readable report of WCAG failures found so far.
      */
     public String buildFailsReport()
     {
@@ -379,7 +388,7 @@ public class WCAGContext
     }
 
     /**
-     * @return a readable report of wcag violations (non failing) found so far.
+     * @return a readable report of WCAG violations (non failing) found so far.
      */
     public String buildWarningsReport()
     {
@@ -400,9 +409,10 @@ public class WCAGContext
         return mergedReport.toString();
     }
     /**
-     * Writes a WCAG report to a file for proper accessibility warnings and fails examination.
-     * @param outputFile file to write the object to.
-     * @param output object to keep in memory.
+     * Writes a WCAG report to a file for proper accessibility warnings and failures examination.
+     *
+     * @param outputFile the file to write the test results to
+     * @param output the test results to write
      */
     public static void writeWCAGReportToFile(final File outputFile, final String output) throws IOException
     {

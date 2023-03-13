@@ -26,18 +26,26 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.LocaleUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.xwiki.test.ui.WCAGContext;
+import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.EditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.test.ui.po.editor.RightsEditPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
+
+import com.deque.html.axecore.results.Results;
+import com.deque.html.axecore.selenium.AxeBuilder;
 
 /**
  * Represents the common actions possible on all Pages.
@@ -47,6 +55,7 @@ import org.xwiki.test.ui.po.editor.WikiEditPage;
  */
 public class BasePage extends BaseElement
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BasePage.class);
     /**
      * Used for sending keyboard shortcuts to.
      */
@@ -116,6 +125,17 @@ public class BasePage extends BaseElement
     {
         super();
         waitUntilPageIsReady();
+
+        /*
+        WCAG validation is done in the constructor, but after the page is done loading, once it is ready.
+        This allows WCAG tests to use the already existing UITest framework and setup.
+        At every BasePage (and child classes) instantiation, a wcag validation on it will be done if the build setup
+        is configured as such.
+        This doesn't trigger any assertion in the current test.
+        However once the test suite ends, in XWikiDockerExtension.afterAll, there is an assertion made to make sure
+        no WCAG rules are broken.
+         */
+        this.validateWCAG();
     }
 
     public String getPageTitle()
@@ -632,6 +652,61 @@ public class BasePage extends BaseElement
         getDriver().addPageNotYetReloadedMarker();
         getDriver().createActions().sendKeys(shortcut).perform();
         getDriver().waitUntilPageIsReloaded();
+    }
+
+    /**
+     * Validate WCAG properties on the current base page.
+     * @since 15.2RC1
+     */
+    public void validateWCAG()
+    {
+        validateWCAG(getUtil().getWCAGUtils().getWCAGContext());
+    }
+
+    /**
+     * Validate WCAG properties on the current base page.
+     * Default behavior is to check the cache.
+     * @param wcagContext the current wcag context
+     * @since 15.2RC1
+     */
+    public void validateWCAG(WCAGContext wcagContext)
+    {
+        validateWCAG(wcagContext, true);
+    }
+
+    /**
+     * Validate WCAG properties on the current base page.
+     * @param wcagContext the current wcag context
+     * @param checkCache if set to true, the WCAGContext cache will be checked before starting validation and cancel it
+     *                   if the current BasePage is found in the cache.
+     * @since 15.2RC1
+     */
+    public void validateWCAG(WCAGContext wcagContext, boolean checkCache)
+    {
+        if (!wcagContext.isWCAGEnabled()) {
+
+            // Block wcag validation if it is not enabled, in all cases.
+            return;
+        }
+
+        long startTime = System.currentTimeMillis();
+        if (!checkCache || wcagContext.isNotCached(this.getPageURL(), this.getClass().getName())) {
+            // Performs accessibility validation on the element when instanced if
+            // the page is not in the WCAGContext cache.
+            XWikiWebDriver driver = this.getDriver();
+            AxeBuilder axeBuilder = wcagContext.getAxeBuilder();
+            Results axeResult = axeBuilder.analyze(driver);
+            wcagContext.addWCAGResults(driver.getCurrentUrl(), this.getClass().getName(), axeResult);
+            long stopTime = System.currentTimeMillis();
+            long deltaTime = stopTime - startTime;
+            LOGGER.debug("[{} : {}] WCAG Validation on this element took [{}] ms.",
+                    this.getPageURL(), this.getClass(), deltaTime);
+            wcagContext.addWCAGTime(deltaTime);
+        } else {
+            // If the identifying pair is already in the cache, don't perform accessibility validation.
+            LOGGER.debug("[{} : {}] This combination of URL:class was already WCAG checked.",
+                    this.getPageURL(), this.getClass());
+        }
     }
 
     /**

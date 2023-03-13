@@ -151,6 +151,19 @@
   }
 }
 
+#tmNotifications {
+  & > button {
+    background-color: @navbar-default-bg;
+    color: @navbar-default-link-color;
+    border: 0;
+    padding: 10px @navbar-padding-horizontal;
+
+    @media (min-width: @grid-float-breakpoint) {
+      padding: @navbar-padding-vertical @navbar-padding-horizontal;
+    }
+  }
+}
+
 @media (min-width: @screen-sm-min) {
   .navbar-nav > li > a {
     /* When the page name is long, add ellipsis. */

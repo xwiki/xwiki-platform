@@ -295,7 +295,7 @@ Get the actual notifications.
     // Create the counter if it is not present
     if (counter.length == 0) {
       counter = $('&lt;span&gt;').addClass('notifications-count badge');
-      $('#tmNotifications &gt; a.icon-navbar').after(counter);
+      $('#tmNotifications &gt; button.dropdown-toggle').append(counter);
     }
     // Update the counter
     counter.text(count);
@@ -783,13 +783,13 @@ require(['jquery', 'xwiki-meta', 'xwiki-bootstrap-switch'], function ($, xm) {
   background-color: red;
   opacity: 0.9;
   position: absolute;
-  margin-left: 1.6em;
   top: 0;
 }
 
 @media (min-width: 768px) {
   .notifications-count {
     top: 3px;
+    right: 3px;
   }
 }
 

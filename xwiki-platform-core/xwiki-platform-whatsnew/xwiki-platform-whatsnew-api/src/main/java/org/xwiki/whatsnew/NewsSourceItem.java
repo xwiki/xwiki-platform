@@ -19,6 +19,7 @@
  */
 package org.xwiki.whatsnew;
 
+import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
 
@@ -51,7 +52,7 @@ public interface NewsSourceItem
     /**
      * @return the news item publication date
      */
-    Optional<String> getPublishedDate();
+    Optional<Date> getPublishedDate();
 
     /**
      * @return the news item author

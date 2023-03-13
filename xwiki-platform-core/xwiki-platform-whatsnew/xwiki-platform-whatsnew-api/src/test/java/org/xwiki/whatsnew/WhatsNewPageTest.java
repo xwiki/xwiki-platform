@@ -30,7 +30,6 @@ import org.xwiki.test.page.PageTest;
 import org.xwiki.whatsnew.internal.CategoriesConverter;
 import org.xwiki.whatsnew.script.NewsScriptService;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 

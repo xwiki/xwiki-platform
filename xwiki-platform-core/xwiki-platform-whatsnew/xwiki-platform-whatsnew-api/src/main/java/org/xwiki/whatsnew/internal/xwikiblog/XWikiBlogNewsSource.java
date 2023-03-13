@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -47,7 +48,6 @@ import org.xwiki.whatsnew.internal.DefaultNewsContent;
 import org.xwiki.whatsnew.internal.DefaultNewsSourceItem;
 
 import com.apptasticsoftware.rssreader.Item;
-import com.xpn.xwiki.XWikiContext;
 
 /**
  * The XWiki Blog source (returns news from an XWiki Blog Application installed on an XWiki instance). The XWiki
@@ -87,31 +87,25 @@ public class XWikiBlogNewsSource implements NewsSource
 
     private RSSContentCleaner rssContentCleaner;
 
-    private XWikiContext xwikiContext;
-
     /**
      * @param rssURL the URL to the XWiki Blog RSS
      * @param rssContentCleaner the component to clean the RSS description content so that it's safe to be rendered
-     * @param xwikiContext the context from which to get APIs to format a date with the user-defined format
      */
-    public XWikiBlogNewsSource(String rssURL, RSSContentCleaner rssContentCleaner, XWikiContext xwikiContext)
+    public XWikiBlogNewsSource(String rssURL, RSSContentCleaner rssContentCleaner)
     {
         this.rssURL = rssURL;
         this.rssContentCleaner = rssContentCleaner;
-        this.xwikiContext = xwikiContext;
     }
 
     /**
      * @param rssStream the stream containing the XWiki Blog RSS data (mostly needed for tests to avoid having
      *        to connect to an XWiki instance)
      * @param rssContentCleaner the component to clean the RSS description content so that it's safe to be rendered
-     * @param xwikiContext the context from which to get APIs to format a date with the user-defined format
      */
-    public XWikiBlogNewsSource(InputStream rssStream, RSSContentCleaner rssContentCleaner, XWikiContext xwikiContext)
+    public XWikiBlogNewsSource(InputStream rssStream, RSSContentCleaner rssContentCleaner)
     {
         this.rssStream = rssStream;
         this.rssContentCleaner = rssContentCleaner;
-        this.xwikiContext = xwikiContext;
     }
 
     @Override
@@ -197,7 +191,7 @@ public class XWikiBlogNewsSource implements NewsSource
 
             newsItem.setAuthor(item.getAuthor());
             newsItem.setCategories(this.categoriesConverter.convertFromRSS(item.getCategories()));
-            newsItem.setPublishedDate(parseAndFormatDateTime(item.getPubDate()));
+            newsItem.setPublishedDate(parsetDateTime(item.getPubDate()));
             newsItem.setOriginURL(item.getLink());
             newsItems.add(newsItem);
         }
@@ -232,16 +226,20 @@ public class XWikiBlogNewsSource implements NewsSource
         return String.format("XWiki Blog news source for URL [%s]", this.rssURL);
     }
 
-    private Optional<String> parseAndFormatDateTime(Optional<String> dateAsString)
+    private Optional<Date> parsetDateTime(Optional<String> dateAsString)
     {
-        Optional<String> result;
+        Optional<Date> result;
         if (!dateAsString.isPresent()) {
             result = Optional.empty();
         } else {
             // Example of expected date: "2023-01-23T05:34:15+01:00"
+            // TODO: find how to pare the blog rss dates using ZonedDateTime:
+            // DateTimeFormatter formatter = DateTimeFormatter.ofPattern("format here");
+            // ZonedDateTime zonedDateTime = ZonedDateTime.parse(dateAsString, formatter);
+            // I could not find a format that works.
             DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'hh:mm:ssZ");
             DateTime dt = formatter.parseDateTime(dateAsString.get());
-            result = Optional.of(this.xwikiContext.getWiki().formatDate(dt.toDate(), null, this.xwikiContext));
+            result = Optional.of(dt.toDate());
         }
         return result;
     }

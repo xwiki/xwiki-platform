@@ -28,6 +28,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.diff.Conflict;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.LogQueue;
+import org.xwiki.stability.Unstable;
 
 /**
  * This represents the result of a merge operation: it contains both the result of the merge, the possible conflicts
@@ -48,7 +49,7 @@ public class MergeManagerResult<R, C>
 
     private R mergeResult;
 
-    private final LogQueue log;
+    private LogQueue log;
 
     private boolean modified;
 
@@ -110,6 +111,18 @@ public class MergeManagerResult<R, C>
     public R getMergeResult()
     {
         return this.mergeResult;
+    }
+
+    /**
+     * Specify the log queue to be used: this method should mainly be used when wrapping a result.
+     * @param logQueue the log queue to be used.
+     * @since 14.10.7
+     * @since 15.2RC1
+     */
+    @Unstable
+    public void setLog(LogQueue logQueue)
+    {
+        this.log = logQueue;
     }
 
     /**

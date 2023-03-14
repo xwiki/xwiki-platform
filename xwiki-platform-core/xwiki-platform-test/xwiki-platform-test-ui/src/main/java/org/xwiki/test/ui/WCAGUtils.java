@@ -22,6 +22,7 @@ package org.xwiki.test.ui;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,6 +106,7 @@ public class WCAGUtils
             String outputName = "wcagWarnings.txt";
             LOGGER.warn("There are [{}] accessibility warnings in the test suite. See [{}/{}] for more details.",
                 this.wcagContext.getWCAGWarnAmount(), getWCAGReportPathOnHost(), outputName);
+            logViolationAmount(false);
             if (!wcagDir.exists()) {
                 Files.createDirectory(wcagDir.toPath());
             }
@@ -117,8 +119,23 @@ public class WCAGUtils
             }
             String outputName = "wcagFails.txt";
             LOGGER.error("There are [{}] accessibility fails in the test suite.", this.wcagContext.getWCAGFailAmount());
+            logViolationAmount(true);
             File failsFile = new File(wcagDir, outputName);
             WCAGContext.writeWCAGReportToFile(failsFile, this.wcagContext.buildFailsReport());
+        }
+    }
+
+    private void logViolationAmount(boolean isFailingViolations)
+    {
+        Map<String, Integer> violationAmounts = wcagContext.getViolationAmountPerRule();
+        for (String ruleID : violationAmounts.keySet()) {
+            if (isFailingViolations
+                && wcagContext.isFailing(ruleID)) {
+                LOGGER.error("    [{}] : [{}] failures", ruleID, violationAmounts.get(ruleID));
+            } else if (!isFailingViolations
+                && !wcagContext.isFailing(ruleID)) {
+                LOGGER.warn("    [{}] : [{}] warnings", ruleID, violationAmounts.get(ruleID));
+            }
         }
     }
 

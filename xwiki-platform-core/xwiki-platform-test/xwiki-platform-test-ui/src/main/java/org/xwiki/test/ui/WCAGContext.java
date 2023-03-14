@@ -171,7 +171,7 @@ public class WCAGContext
                 // the default behavior will be to add it to the fails.
                 // In order to resolve these test-suite fails quickly, set them as "false" in FAILS_ON_RULE.
                 .collect(Collectors.toList());
-            this.failAmount = failingViolations.size();
+            this.failAmount = failingViolations.stream().mapToInt(rule -> rule.getNodes().size()).sum();
             if (this.failAmount != 0) {
                 this.failReport = AbstractXWikiCustomAxeReporter.getReadableAxeResults(testMethodName, pageClassName,
                     url, failingViolations);
@@ -181,7 +181,7 @@ public class WCAGContext
                 .stream()
                 .filter(rule -> FAILS_ON_RULE.containsKey(rule.getId()) && !FAILS_ON_RULE.get(rule.getId()))
                 .collect(Collectors.toList());
-            this.warnAmount = warningViolations.size();
+            this.warnAmount = warningViolations.stream().mapToInt(rule -> rule.getNodes().size()).sum();
             if (this.warnAmount != 0) {
                 this.warnReport = AbstractXWikiCustomAxeReporter.getReadableAxeResults(testMethodName, pageClassName,
                     url, warningViolations);
@@ -199,6 +199,8 @@ public class WCAGContext
     }
 
     private List<WCAGTestResults> wcagResults = new ArrayList<>();
+
+    private Map<String, Integer> violationAmountPerRule = new HashMap<>();
 
     private boolean wcagEnabled;
 
@@ -246,6 +248,16 @@ public class WCAGContext
         return this.testMethodName;
     }
 
+    protected Map<String, Integer> getViolationAmountPerRule()
+    {
+        return violationAmountPerRule;
+    }
+
+    protected Boolean isFailing(String ruleID)
+    {
+        return FAILS_ON_RULE.get(ruleID);
+    }
+
     /**
      * Instantiate and initialize an axe builder with context options.
      *
@@ -273,6 +285,20 @@ public class WCAGContext
     }
 
     /**
+     * Record the amount of violations per rule in order to display it in logs at the end of the test suite.
+     * @param newViolations with which the counts should be updated
+     */
+    private void updateViolationAmountPerRule(Results newViolations)
+    {
+        for (Rule violation : newViolations.getViolations()) {
+            String violationID = violation.getId();
+            int violationAmount = violation.getNodes().size();
+            violationAmountPerRule.put(violationID,
+                violationAmountPerRule.getOrDefault(violationID, 0) + violationAmount);
+        }
+    }
+
+    /**
      * Appends WCAG results to the current context.
      *
      * @param url the URL of the page analyzed
@@ -283,6 +309,7 @@ public class WCAGContext
     {
         // Whatever the case, keep a trace of the current report.
         WCAGTestResults wcagTestResults =  new WCAGTestResults(getTestMethodName(), url, className, newViolations);
+        updateViolationAmountPerRule(newViolations);
         if (wcagTestResults.failAmount != 0) {
             LOGGER.error("[{} : {}] Found [{}] failing WCAG violations.",
                 url, className, wcagTestResults.failAmount);

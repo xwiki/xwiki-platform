@@ -238,6 +238,10 @@
   @navbar-default-link-color:           #727272;
   @navbar-default-color:                #727272;
   ##
+  ## Make sure the breadcrumb links are dark enough
+  @breadcrumb-active-color:             #707070;
+  ## Ensure that all text-muted based components have sufficient contrast on white
+  @gray-light:                          #727272;
 #end
 
 ##############################################

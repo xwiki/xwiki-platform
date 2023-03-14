@@ -21,6 +21,8 @@ package com.xpn.xwiki.objects;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.stability.Unstable;
+import org.xwiki.store.merge.MergeManagerResult;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
@@ -68,9 +70,30 @@ public interface ElementInterface
      * @param context the XWiki context
      * @param mergeResult the merge report
      * @since 3.2M1
+     * @deprecated now use {@link #merge(ElementInterface, ElementInterface, MergeConfiguration, XWikiContext)}.
      */
+    @Deprecated(since = "14.10.7,15.2RC1")
     void merge(ElementInterface previousElement, ElementInterface newElement, MergeConfiguration configuration,
         XWikiContext context, MergeResult mergeResult);
+
+    /**
+     * Apply a 3 ways merge on the current element based on provided previous and new version of the element.
+     * <p>
+     * All 3 elements are supposed to have the same class and reference.
+     * <p>
+     * Note that the current element is modified only if {@link MergeConfiguration#isProvidedVersionsModifiables()}
+     * returns {@code true}.
+     *
+     * @param previousElement the previous version of the element
+     * @param newElement the next version of the element
+     * @param configuration the configuration of the merge Indicate how to deal with some conflicts use cases, etc.
+     * @param context the XWiki context
+     * @since 14.10.7
+     * @since 15.2RC1
+     */
+    @Unstable
+    MergeManagerResult<ElementInterface, Object> merge(ElementInterface previousElement, ElementInterface newElement,
+        MergeConfiguration configuration, XWikiContext context);
 
     /**
      * Apply the provided element so that the current one contains the same informations and indicate if it was

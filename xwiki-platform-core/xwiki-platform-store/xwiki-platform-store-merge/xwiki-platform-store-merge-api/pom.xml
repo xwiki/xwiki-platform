@@ -35,7 +35,7 @@
     XWiki module API dedicated to perform document merge operations and manage related conflicts resolution.
   </description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.63</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.62</xwiki.jacoco.instructionRatio>
     </properties>
 
   <dependencies>

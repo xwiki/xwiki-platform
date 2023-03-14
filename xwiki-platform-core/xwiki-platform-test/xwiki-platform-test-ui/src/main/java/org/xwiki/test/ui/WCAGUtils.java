@@ -105,8 +105,8 @@ public class WCAGUtils
         if (this.wcagContext.hasWCAGWarnings()) {
             String outputName = "wcagWarnings.txt";
             LOGGER.warn("There are [{}] accessibility warnings in the test suite. See [{}/{}] for more details.",
-                this.wcagContext.getWCAGWarnAmount(), getWCAGReportPathOnHost(), outputName);
-            logViolationAmount(false);
+                this.wcagContext.getWCAGWarnCount(), getWCAGReportPathOnHost(), outputName);
+            logViolationCount(false);
             if (!wcagDir.exists()) {
                 Files.createDirectory(wcagDir.toPath());
             }
@@ -118,23 +118,23 @@ public class WCAGUtils
                 Files.createDirectory(wcagDir.toPath());
             }
             String outputName = "wcagFails.txt";
-            LOGGER.error("There are [{}] accessibility fails in the test suite.", this.wcagContext.getWCAGFailAmount());
-            logViolationAmount(true);
+            LOGGER.error("There are [{}] accessibility fails in the test suite.", this.wcagContext.getWCAGFailCount());
+            logViolationCount(true);
             File failsFile = new File(wcagDir, outputName);
             WCAGContext.writeWCAGReportToFile(failsFile, this.wcagContext.buildFailsReport());
         }
     }
 
-    private void logViolationAmount(boolean isFailingViolations)
+    private void logViolationCount(boolean isFailingViolations)
     {
-        Map<String, Integer> violationAmounts = wcagContext.getViolationAmountPerRule();
-        for (String ruleID : violationAmounts.keySet()) {
+        Map<String, Integer> violationCounts = wcagContext.getViolationCountPerRule();
+        for (String ruleID : violationCounts.keySet()) {
             if (isFailingViolations
                 && wcagContext.isFailing(ruleID)) {
-                LOGGER.error("    [{}] : [{}] failures", ruleID, violationAmounts.get(ruleID));
+                LOGGER.error("    [{}] : [{}] failures", ruleID, violationCounts.get(ruleID));
             } else if (!isFailingViolations
                 && !wcagContext.isFailing(ruleID)) {
-                LOGGER.warn("    [{}] : [{}] warnings", ruleID, violationAmounts.get(ruleID));
+                LOGGER.warn("    [{}] : [{}] warnings", ruleID, violationCounts.get(ruleID));
             }
         }
     }

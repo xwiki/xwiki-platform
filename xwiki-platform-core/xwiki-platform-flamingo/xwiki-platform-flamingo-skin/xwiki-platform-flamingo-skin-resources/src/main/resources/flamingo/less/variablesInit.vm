@@ -232,6 +232,12 @@
   @xwiki-page-header-bg-color:          $theme.pageHeaderBackgroundColor;
   @xwiki-page-header-bg-image:          $stringtool.defaultString($theme.headerBackgroundImage, '""');
   @xwiki-page-header-bg-position:       $stringtool.defaultString($theme.headerBackgroundPosition, '""');
+
+  ## Some values are changed from the bootstrap default in order to make sure there's no accessibility contrast issue
+  ## Make sure the links are dark enough in the tmDrawer
+  @navbar-default-link-color:           #727272;
+  @navbar-default-color:                #727272;
+  ##
 #end
 
 ##############################################

@@ -70,8 +70,7 @@ public interface ElementInterface
      * @param context the XWiki context
      * @param mergeResult the merge report
      * @since 3.2M1
-     * @deprecated Since 14.10.7,15.2RC1 use
-     *              {@link #merge(ElementInterface, ElementInterface, MergeConfiguration, XWikiContext)}.
+     * @deprecated now use {@link #merge(ElementInterface, ElementInterface, MergeConfiguration, XWikiContext)}.
      */
     @Deprecated(since = "14.10.7,15.2RC1")
     void merge(ElementInterface previousElement, ElementInterface newElement, MergeConfiguration configuration,

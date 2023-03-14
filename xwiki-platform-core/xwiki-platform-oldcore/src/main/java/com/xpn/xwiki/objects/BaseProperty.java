@@ -224,7 +224,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
     {
         MergeManagerResult<ElementInterface, Object> mergeManagerResult =
             this.merge(previousElement, newElement, configuration, context);
-        mergeResult.setModified(mergeManagerResult.isModified());
+        mergeResult.setModified(mergeResult.isModified() || mergeManagerResult.isModified());
         mergeResult.getLog().addAll(mergeManagerResult.getLog());
         // this method used to always set the value, no matter the result of
         // MergeConfiguration#isProvidedVersionsModifiables.
@@ -296,13 +296,13 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
      * @param newValue the new version of the value
      * @param mergeResult merge report
      * @since 3.2M1
-     * @deprecated Since 15.2RC1,14.10.7 use {@link #mergeValue(Object, Object, MergeConfiguration)}
+     * @deprecated now use {@link #mergeValue(Object, Object, MergeConfiguration)}
      */
     @Deprecated(since = "14.10.7,15.2RC1")
     protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
     {
         MergeManagerResult<Object, Object> result = this.mergeValue(previousValue, newValue, new MergeConfiguration());
-        mergeResult.setModified(result.isModified());
+        mergeResult.setModified(mergeResult.isModified() || result.isModified());
         mergeResult.getLog().addAll(result.getLog());
         if (result.isModified()) {
             setValue(result.getMergeResult());

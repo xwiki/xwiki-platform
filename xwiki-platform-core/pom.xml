@@ -133,7 +133,7 @@
                   <ignore>true</ignore>
                   <code>java.method.addedToInterface</code>
                   <new>method org.xwiki.store.merge.MergeManagerResult&lt;com.xpn.xwiki.objects.ElementInterface, java.lang.Object&gt; com.xpn.xwiki.objects.ElementInterface::merge(com.xpn.xwiki.objects.ElementInterface, com.xpn.xwiki.objects.ElementInterface, com.xpn.xwiki.doc.merge.MergeConfiguration, com.xpn.xwiki.XWikiContext)</new>
-                  <justification>This method replaces the now deprecated old ElementInterface#merge method.</justification>
+                  <justification>Change needed to provide a merge operation taking into account the configuration: we cannot provide a default method as it would wrongly give the feeling that the operation succeeded.</justification>
                 </item>
               </differences>
             </revapi.differences>

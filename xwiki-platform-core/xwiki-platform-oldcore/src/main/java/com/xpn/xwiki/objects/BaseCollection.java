@@ -837,7 +837,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             PropertyInterface previousProperty = previousCollection.getField(diff.getPropName());
             PropertyInterface newProperty = newCollection.getField(diff.getPropName());
 
-            if (diff.getAction().equals(ObjectDiff.ACTION_PROPERTYADDED)) {
+            if (ObjectDiff.ACTION_PROPERTYADDED.equals(diff.getAction())) {
                 if (propertyResult == null) {
                     // Add if none has been added by user already
                     modifiableResult.safeput(diff.getPropName(),
@@ -853,7 +853,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                     }
                     mergeResult.getLog().error("Collision found on property [{}]", newProperty.getReference());
                 }
-            } else if (diff.getAction().equals(ObjectDiff.ACTION_PROPERTYREMOVED)) {
+            } else if (ObjectDiff.ACTION_PROPERTYREMOVED.equals(diff.getAction())) {
                 if (propertyResult != null) {
                     if (propertyResult.equals(previousProperty)) {
                         // Delete if it's the same as previous one
@@ -869,7 +869,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                     // Already removed from DB, lets assume the user is prescient
                     mergeResult.getLog().warn("Property [{}] already removed", previousProperty.getReference());
                 }
-            } else if (diff.getAction().equals(ObjectDiff.ACTION_PROPERTYCHANGED)) {
+            } else if (ObjectDiff.ACTION_PROPERTYCHANGED.equals(diff.getAction())) {
                 if (propertyResult != null) {
                     if (propertyResult.equals(previousProperty)) {
                         // Let some automatic migration take care of that modification between DB and new
@@ -878,7 +878,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                         mergeResult.setModified(true);
                     } else if (!propertyResult.equals(newProperty)) {
                         // Try to apply 3 ways merge on the property
-                        // FIXME: we should deprecate mergeField and rewrite it properly, but it's lot of work
+                        // FIXME: we should deprecate mergeField and rewrite it properly, but it's a lot of work
                         // as it involves to also rewrite PropertyClass#mergeProperty
                         // right now we still use it, but we ensure that the configuration is used to modify the
                         // actual values, and not clones as it was the behaviour

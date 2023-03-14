@@ -780,7 +780,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-bootstrap-switch'], function ($, xm) {
  * Notifications Header
  ***********************************************/
 .notifications-count {
-  background-color: firebrick;
+  background-color: red;
   opacity: 0.9;
   position: absolute;
   margin-left: 1.6em;

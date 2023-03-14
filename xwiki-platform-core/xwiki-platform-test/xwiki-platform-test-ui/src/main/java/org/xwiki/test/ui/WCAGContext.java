@@ -200,7 +200,7 @@ public class WCAGContext
 
     private List<WCAGTestResults> wcagResults = new ArrayList<>();
 
-    private boolean wcagEnabled = true;
+    private boolean wcagEnabled;
 
     private long wcagTimer;
 

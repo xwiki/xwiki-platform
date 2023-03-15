@@ -26,15 +26,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.LocaleUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
-import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.test.ui.WCAGContext;
 import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.editor.ClassEditPage;

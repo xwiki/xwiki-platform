@@ -25,11 +25,9 @@ import java.util.List;
 
 import org.hibernate.collection.internal.PersistentList;
 import org.hibernate.collection.spi.PersistentCollection;
-import org.xwiki.logging.event.LogEvent;
 import org.xwiki.store.merge.MergeManagerResult;
 
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
-import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.internal.AbstractNotifyOnUpdateList;
 import com.xpn.xwiki.internal.objects.ListPropertyPersistentList;
 import com.xpn.xwiki.objects.classes.ListClass;

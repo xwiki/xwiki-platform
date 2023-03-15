@@ -188,4 +188,10 @@ public class AllITs
     class NestedScriptAuthorIT extends ScriptAuthorIT
     {
     }
+
+    @Nested
+    @DisplayName("Form Token injection Tests")
+    class NestedFormTokenInjectionIT extends FormTokenInjectionIT
+    {
+    }
 }

@@ -281,8 +281,21 @@ public abstract class AbstractHttpIT
         return postMethod;
     }
 
+    protected String getFormToken(String userName, String password) throws Exception
+    {
+        GetMethod getMethod = executeGet(getFullUri(WikisResource.class), userName, password);
+        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        return getMethod.getResponseHeader("XWiki-Form-Token").getValue();
+    }
+
     protected PostMethod executePost(String uri, String string, String mediaType, String userName, String password)
         throws Exception
+    {
+        return executePost(uri, string, mediaType, userName, password, getFormToken(userName, password));
+    }
+
+    protected PostMethod executePost(String uri, String string, String mediaType, String userName, String password,
+        String formToken) throws Exception
     {
         HttpClient httpClient = new HttpClient();
         httpClient.getState().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(userName, password));
@@ -290,6 +303,9 @@ public abstract class AbstractHttpIT
 
         PostMethod postMethod = new PostMethod(uri);
         postMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML.toString());
+        if (formToken != null) {
+            postMethod.addRequestHeader("XWiki-Form-Token", formToken);
+        }
 
         RequestEntity entity = new StringRequestEntity(string, mediaType, "UTF-8");
         postMethod.setRequestEntity(entity);
@@ -302,6 +318,12 @@ public abstract class AbstractHttpIT
     protected PostMethod executePostForm(String uri, NameValuePair[] nameValuePairs, String userName, String password)
         throws Exception
     {
+        return executePostForm(uri, nameValuePairs, userName, password, getFormToken(userName, password));
+    }
+
+    protected PostMethod executePostForm(String uri, NameValuePair[] nameValuePairs, String userName, String password,
+        String formToken) throws Exception
+    {
         HttpClient httpClient = new HttpClient();
         httpClient.getState().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(userName, password));
         httpClient.getParams().setAuthenticationPreemptive(true);
@@ -309,6 +331,9 @@ public abstract class AbstractHttpIT
         PostMethod postMethod = new PostMethod(uri);
         postMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML.toString());
         postMethod.addRequestHeader("Content-type", MediaType.APPLICATION_WWW_FORM.toString());
+        if (formToken != null) {
+            postMethod.addRequestHeader("XWiki-Form-Token", formToken);
+        }
 
         postMethod.setRequestBody(nameValuePairs);
 

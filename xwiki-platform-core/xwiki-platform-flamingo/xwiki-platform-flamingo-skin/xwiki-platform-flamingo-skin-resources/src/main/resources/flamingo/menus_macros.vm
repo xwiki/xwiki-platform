@@ -57,7 +57,6 @@
 ###
 #macro(xwikitopmenuleftstart)
   <ul class="nav navbar-nav navbar-left">
-    #submenuseparator()
 #end
 
 ###

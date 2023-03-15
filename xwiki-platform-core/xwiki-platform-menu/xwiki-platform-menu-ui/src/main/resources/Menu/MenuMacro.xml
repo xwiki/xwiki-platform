@@ -664,7 +664,7 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
     background: transparent;
     border:none;
     border-radius: @border-radius-base;
-    margin: 0px .3em;
+    margin: 0 .3em;
     line-height: (@line-height-computed / 2);
     min-width: 24px;
     min-height: 24px;
@@ -673,7 +673,7 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
     }
     &amp;:before {
       .caret;
-      margin-left: 0px;
+      margin-left: 0;
       content: '';
     }
   }
@@ -734,8 +734,8 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
         display: flex;
         align-items: center;
         padding: @nav-link-padding;
-        padding-top: 0px;
-        padding-bottom: 0px;
+        padding-top: 0;
+        padding-bottom: 0;
         @media (min-width: @grid-float-breakpoint) {
           float: left;
         }

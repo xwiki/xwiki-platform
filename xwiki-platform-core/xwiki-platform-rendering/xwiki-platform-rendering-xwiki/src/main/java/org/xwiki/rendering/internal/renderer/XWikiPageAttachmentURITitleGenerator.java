@@ -36,7 +36,7 @@ import org.xwiki.rendering.renderer.reference.link.URITitleGenerator;
  * @version $Id$
  * @since 15.2RC1
  */
-@Component
+@Component(hints = {"doc", "page"})
 @Named("pageAttach")
 @Singleton
 public class XWikiPageAttachmentURITitleGenerator implements URITitleGenerator

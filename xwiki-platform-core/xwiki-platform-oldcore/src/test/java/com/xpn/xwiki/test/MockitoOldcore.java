@@ -628,9 +628,10 @@ public class MockitoOldcore
                 document.setNew(false);
                 document.setStore(getMockStore());
 
+                // Make sure the document is not restricted.
+                document.setRestricted(false);
+
                 XWikiDocument savedDocument = document.clone();
-                // Make sure the saved version is not restricted.
-                savedDocument.setRestricted(false);
 
                 documents.put(document.getDocumentReferenceWithLocale(), savedDocument);
 
@@ -833,9 +834,10 @@ public class MockitoOldcore
                         document.setOriginalDocument(originalDocument);
                     }
 
+                    // Make sure the document is not restricted.
+                    document.setRestricted(false);
+
                     XWikiDocument savedDocument = document.clone();
-                    // Make sure the saved version is not restricted.
-                    savedDocument.setRestricted(false);
 
                     documents.put(document.getDocumentReferenceWithLocale(), savedDocument);
 

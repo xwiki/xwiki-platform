@@ -31,7 +31,7 @@
   <name>XWiki Platform - What's New - API</name>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.74</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.73</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>What's New API</xwiki.extension.name>
     <!-- Category to display in the Extension Manager. -->

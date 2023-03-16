@@ -41,4 +41,4 @@ admin.syntaxes.description=既定のページのシンタックスを選択し�
 Rendering.RenderingConfigClass_disabledSyntaxes=無効のシンタックス
 Rendering.RenderingConfigClass_disabledSyntaxes.hint=ページの作成に使用できないマークアップのシンタックスのリスト
 </content>
-  </xwikidoc>
+</xwikidoc>

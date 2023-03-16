@@ -32,7 +32,7 @@ import org.xwiki.stability.Unstable;
  * @since 15.1RC1
  */
 @Unstable
-public interface NewsSourceItem
+public interface NewsSourceItem extends Comparable<NewsSourceItem>
 {
     /**
      * @return the news item title

@@ -132,4 +132,11 @@ public class DefaultNewsSourceItem implements NewsSourceItem
     {
         this.originURL = originURL;
     }
+
+    @Override
+    public int compareTo(NewsSourceItem other)
+    {
+        // We sort descending, i.e. the first item is the newest of the two.
+        return other.getPublishedDate().orElse(new Date()).compareTo(getPublishedDate().orElse(new Date()));
+    }
 }

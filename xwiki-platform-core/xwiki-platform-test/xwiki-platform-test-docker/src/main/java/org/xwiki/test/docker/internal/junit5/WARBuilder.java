@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -270,48 +271,28 @@ public class WARBuilder
 
     private File getJDBCDriver(Database database, ArtifactResolver resolver) throws Exception
     {
-        Artifact artifact;
-
         // Note: If the JDBC driver version is specified as "pom" or null then extract the information from the current
         // POM.
+        Properties pomProperties = this.mavenResolver.getPropertiesFromCurrentPOM();
+        String driverVersion = isJDBCDriverSpecified(this.testConfiguration.getJDBCDriverVersion())
+            ? this.testConfiguration.getJDBCDriverVersion()
+            : getPropertyForDatabase("version", database, pomProperties);
+        String groupId = getPropertyForDatabase("groupId", database, pomProperties);
+        String artifactId = getPropertyForDatabase("artifactId", database, pomProperties);
 
-        switch (database) {
-            case MYSQL:
-                String mysqlDriverVersion = isJDBCDriverSpecified(this.testConfiguration.getJDBCDriverVersion())
-                    ? this.testConfiguration.getJDBCDriverVersion()
-                    : this.mavenResolver.getPropertyFromCurrentPOM("mysql.version");
-                artifact = new DefaultArtifact("com.mysql", "mysql-connector-j", JAR, mysqlDriverVersion);
-                break;
-            case MARIADB:
-                String mariadbDriverVersion = isJDBCDriverSpecified(this.testConfiguration.getJDBCDriverVersion())
-                    ? this.testConfiguration.getJDBCDriverVersion()
-                    : this.mavenResolver.getPropertyFromCurrentPOM("mariadb.version");
-                artifact = new DefaultArtifact("org.mariadb.jdbc", "mariadb-java-client", JAR, mariadbDriverVersion);
-                break;
-            case POSTGRESQL:
-                String pgsqlDriverVersion = isJDBCDriverSpecified(this.testConfiguration.getJDBCDriverVersion())
-                    ? this.testConfiguration.getJDBCDriverVersion()
-                    : this.mavenResolver.getPropertyFromCurrentPOM("pgsql.version");
-                artifact = new DefaultArtifact("org.postgresql", "postgresql", JAR, pgsqlDriverVersion);
-                break;
-            case HSQLDB_EMBEDDED:
-                String hsqldbDriverVersion = isJDBCDriverSpecified(this.testConfiguration.getJDBCDriverVersion())
-                    ? this.testConfiguration.getJDBCDriverVersion()
-                    : this.mavenResolver.getPropertyFromCurrentPOM("hsqldb.version");
-                artifact = new DefaultArtifact("org.hsqldb", "hsqldb", JAR, hsqldbDriverVersion);
-                break;
-            case ORACLE:
-                String oracleDriverVersion = isJDBCDriverSpecified(this.testConfiguration.getJDBCDriverVersion())
-                    ? this.testConfiguration.getJDBCDriverVersion()
-                    : this.mavenResolver.getPropertyFromCurrentPOM("oracle.version");
-                artifact = new DefaultArtifact("com.oracle.ojdbc", "ojdbc8", JAR, oracleDriverVersion);
-                break;
-            default:
-                throw new RuntimeException(
-                    String.format("Failed to get JDBC driver. Database [%s] not supported yet!", database));
-        }
-
+        Artifact artifact = new DefaultArtifact(groupId, artifactId, JAR, driverVersion);
         return resolver.resolveArtifact(artifact).getArtifact().getFile();
+    }
+
+    private String getPropertyForDatabase(String propertyName, Database database, Properties properties)
+    {
+        String value = properties.getProperty(String.format("%s.%s", database.getPomPropertyPrefix(), propertyName));
+        if (value == null) {
+            throw new RuntimeException(
+                String.format("Failed to get JDBC property [%s] for database [%s]. Database may not be supported yet!",
+                    propertyName, database));
+        }
+        return value;
     }
 
     private boolean isJDBCDriverSpecified(String jdbcDriverVersion)

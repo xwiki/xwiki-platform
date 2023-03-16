@@ -26,14 +26,16 @@ import java.util.List;
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
 import org.xwiki.image.style.rest.ImageStylesResource;
 import org.xwiki.image.style.test.po.ImageStyleAdministrationPage;
 import org.xwiki.image.style.test.po.ImageStyleConfigurationForm;
 import org.xwiki.livedata.test.po.LiveDataElement;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.WikisSource;
 import org.xwiki.test.ui.TestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -48,48 +50,60 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @UITest
 class ImageStyleIT
 {
-    @Test
-    void imageStyleAdministration(TestUtils testUtils) throws Exception
+    @ParameterizedTest
+    @WikisSource(extensions = {
+        "org.xwiki.platform:xwiki-platform-image-style-ui",
+        "org.xwiki.platform:xwiki-platform-administration-ui"
+    })
+    void imageStyleAdministration(WikiReference wikiReference, TestUtils testUtils) throws Exception
     {
         testUtils.loginAsSuperAdmin();
         // Make sure that an icon theme is configured.
         testUtils.setWikiPreference("iconTheme", "IconThemes.Silk");
+        String wikiName = wikiReference.getName();
+
+        String defaultName = String.format("default-%s", wikiName);
+        String defaultPrettyName = String.format("Default-%s", wikiName);
+        String type = String.format("default-class-%s", wikiName);
+
         testUtils.deletePage(
-            new DocumentReference("xwiki", List.of("Image", "Style", "Code", "ImageStyles"), "default"));
-        testUtils.updateObject(new DocumentReference("xwiki", List.of("Image", "Style", "Code"), "Configuration"),
+            new DocumentReference(wikiName, List.of("Image", "Style", "Code", "ImageStyles"), defaultName));
+        testUtils.updateObject(new DocumentReference(wikiName, List.of("Image", "Style", "Code"), "Configuration"),
             "Image.Style.Code.ConfigurationClass", 0, "defaultStyle", "");
 
-        assertEquals("<MapN/>", getDefaultFromRest(testUtils));
+        assertEquals("<MapN/>", getDefaultFromRest(testUtils, wikiReference));
 
         assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-            + "<styles xmlns=\"http://www.xwiki.org/imageStyle\"/>", getImageStylesFromRest(testUtils));
+            + "<styles xmlns=\"http://www.xwiki.org/imageStyle\"/>", getImageStylesFromRest(testUtils, wikiReference));
 
-        ImageStyleAdministrationPage imageStyleAdministrationPage = ImageStyleAdministrationPage.getToAdminPage();
+        ImageStyleAdministrationPage imageStyleAdministrationPage =
+            ImageStyleAdministrationPage.getToAdminPage(wikiReference);
         ImageStyleConfigurationForm imageStyleConfigurationForm =
-            imageStyleAdministrationPage.submitNewImageStyleForm("default");
+            imageStyleAdministrationPage.submitNewImageStyleForm(defaultName);
         imageStyleConfigurationForm
-            .setPrettyName("Default")
-            .setType("default-class")
+            .setPrettyName(defaultPrettyName)
+            .setType(type)
             .clickSaveAndView(true);
         imageStyleAdministrationPage = imageStyleConfigurationForm.clickBackToTheAdministration();
         assertEquals("", imageStyleAdministrationPage.getDefaultStyle());
-        imageStyleAdministrationPage.submitDefaultStyleForm("default");
-        assertEquals("default", imageStyleAdministrationPage.getDefaultStyle());
+        imageStyleAdministrationPage.submitDefaultStyleForm(defaultName);
+        assertEquals(defaultName, imageStyleAdministrationPage.getDefaultStyle());
 
         TableLayoutElement tableLayout = new LiveDataElement("imageStyles").getTableLayout();
         assertEquals(1, tableLayout.countRows());
-        assertEquals("default", tableLayout.getCell("Identifier", 1).getText());
-        assertEquals("Default", tableLayout.getCell("Pretty Name", 1).getText());
-        assertEquals("default-class", tableLayout.getCell("Type", 1).getText());
+        assertEquals(defaultName, tableLayout.getCell("Identifier", 1).getText());
+        assertEquals(defaultPrettyName, tableLayout.getCell("Pretty Name", 1).getText());
+        assertEquals(type, tableLayout.getCell("Type", 1).getText());
 
-        assertEquals("<Map1><defaultStyle>default</defaultStyle></Map1>", getDefaultFromRest(testUtils));
+        assertEquals(String.format("<Map1><defaultStyle>%s</defaultStyle></Map1>", defaultName),
+            getDefaultFromRest(testUtils, wikiReference));
 
-        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+        assertEquals(String.format("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
             + "<styles xmlns=\"http://www.xwiki.org/imageStyle\">"
             + "<imageStyle>"
-            + "<identifier>default</identifier>"
-            + "<prettyName>Default</prettyName>"
-            + "<type>default-class</type>"
+            + "<identifier>%s</identifier>"
+            + "<prettyName>%s</prettyName>"
+            + "<type>%s</type>"
             + "<adjustableSize>false</adjustableSize>"
             + "<defaultWidth xsi:nil=\"true\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"/>"
             + "<defaultHeight xsi:nil=\"true\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"/>"
@@ -100,20 +114,22 @@ class ImageStyleIT
             + "<adjustableTextWrap>false</adjustableTextWrap>"
             + "<defaultTextWrap>false</defaultTextWrap>"
             + "</imageStyle>"
-            + "</styles>", getImageStylesFromRest(testUtils));
+            + "</styles>", defaultName, defaultPrettyName, type), getImageStylesFromRest(testUtils, wikiReference));
     }
 
-    private String getDefaultFromRest(TestUtils testUtils) throws Exception
+    private String getDefaultFromRest(TestUtils testUtils, WikiReference wikiReference) throws Exception
     {
-        URI imageStylesResourceURI = testUtils.rest().createUri(ImageStylesResource.class, new HashMap<>(), "xwiki");
+        URI imageStylesResourceURI =
+            testUtils.rest().createUri(ImageStylesResource.class, new HashMap<>(), wikiReference.getName());
         GetMethod getMethod =
             testUtils.rest().executeGet(UriBuilder.fromUri(imageStylesResourceURI).segment("default").build());
         return getMethod.getResponseBodyAsString();
     }
 
-    private String getImageStylesFromRest(TestUtils testUtils) throws Exception
+    private String getImageStylesFromRest(TestUtils testUtils, WikiReference wikiReference) throws Exception
     {
-        URI imageStylesResourceURI = testUtils.rest().createUri(ImageStylesResource.class, new HashMap<>(), "xwiki");
+        URI imageStylesResourceURI =
+            testUtils.rest().createUri(ImageStylesResource.class, new HashMap<>(), wikiReference.getName());
         GetMethod getMethod =
             testUtils.rest().executeGet(imageStylesResourceURI);
         return getMethod.getResponseBodyAsString().trim();

@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -66,6 +67,10 @@ public class DefaultNewsConfiguration implements NewsConfiguration
 
     private static final String XWIKISAS_RSS_URL = "https://xwiki.com/news";
 
+    private static final String SOURCES_CONFIG_NAME = "sources";
+
+    private static final String SOURCE_CONFIG_NAME = "source";
+
     private static final long DAY = 1 * 60L * 60L * 24;
 
     @Inject
@@ -79,9 +84,9 @@ public class DefaultNewsConfiguration implements NewsConfiguration
         // whatsnew.sources = xwikiorg = xwikiblog
         // whatsnew.source.xwikiorg.rssURL = https://extensions.xwiki.org/news
         // whatsnew.sources = xwikisas = xwikiblog
-        // whatsnew.sources.xwikisas.rssURL = https://xwiki.com/en/Blog/BlogRss?xpage=plain
+        // whatsnew.sources.xwikisas.rssURL = https://xwiki.com/news
         List<NewsSourceDescriptor> descriptors;
-        Map<String, String> sources = getConfiguredSources();
+        Properties sources = getConfiguredSources();
         // If there's no configuration set by the user the use a default configuration.
         if (sources != null) {
             descriptors = getConfiguredNewsSourceDescriptors(sources);
@@ -107,27 +112,33 @@ public class DefaultNewsConfiguration implements NewsConfiguration
     @Override
     public boolean isActive()
     {
-        Map<String, String> sources = getConfiguredSources();
+        Properties sources = getConfiguredSources();
         return sources == null || (sources != null && !sources.isEmpty());
     }
 
-    private Map<String, String> getConfiguredSources()
+    private Properties getConfiguredSources()
     {
-        return this.configurationSource.getProperty(getFullKeyName("sources"));
+        Properties result;
+        if (this.configurationSource.containsKey(getFullKeyName(SOURCES_CONFIG_NAME))) {
+            result = this.configurationSource.getProperty(getFullKeyName(SOURCES_CONFIG_NAME), Properties.class);
+        } else {
+            result = null;
+        }
+        return result;
     }
 
-    private List<NewsSourceDescriptor> getConfiguredNewsSourceDescriptors(Map<String, String> sources)
+    private List<NewsSourceDescriptor> getConfiguredNewsSourceDescriptors(Properties sources)
     {
         List<NewsSourceDescriptor> descriptors = new ArrayList<>();
         // Only keep the keys related to configuring news sources, for performance.
         List<String> keys = new ArrayList<>();
-        String sourceKeyNamePrefix = String.format("%s.", getFullKeyName("source"));
+        String sourceKeyNamePrefix = String.format("%s.", getFullKeyName(SOURCE_CONFIG_NAME));
         for (String key : this.configurationSource.getKeys()) {
             if (key.startsWith(sourceKeyNamePrefix)) {
                 keys.add(key);
             }
         }
-        for (Map.Entry<String, String> entry : sources.entrySet()) {
+        for (Map.Entry<Object, Object> entry : sources.entrySet()) {
             // Find all parameter properties for the defined source
             Map<String, String> parameters = new HashMap<>();
             String prefix = String.format("%s%s.", sourceKeyNamePrefix, entry.getKey());
@@ -138,7 +149,7 @@ public class DefaultNewsConfiguration implements NewsConfiguration
                 }
             }
             NewsSourceDescriptor descriptor =
-                new NewsSourceDescriptor(entry.getKey(), entry.getValue(), parameters);
+                new NewsSourceDescriptor((String) entry.getKey(), (String) entry.getValue(), parameters);
             descriptors.add(descriptor);
         }
         return descriptors;

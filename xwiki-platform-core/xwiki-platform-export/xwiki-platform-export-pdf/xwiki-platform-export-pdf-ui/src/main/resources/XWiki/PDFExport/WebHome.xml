@@ -138,6 +138,7 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -434,8 +435,15 @@ require([
             // Trigger the print only after all page ready callbacks were executed, because the print preview is
             // initialized as a page ready callback.
             pageReady.afterPageReady(() =&gt; {
+              // Chrome incorrectly uses the title of this HTML page as the default file name when saving the PDF from
+              // the Print Preview modal, instead of using the title of the HTML page loaded in the iframe for which we
+              // triger the print (like Firefox does). We workaround this by temporarily setting the title of this HTML
+              // page to match the title of the HTML page loaded in the iframe.
+              const originalTitle = document.title;
+              document.title = iframe[0].contentDocument.title;
               iframe[0].contentWindow.print();
               iframe.remove();
+              document.title = originalTitle;
               resolve();
             });
           });
@@ -629,6 +637,7 @@ require([
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -761,7 +770,7 @@ require([
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -781,6 +790,7 @@ require([
         <name>content</name>
         <number>1</number>
         <prettyName>Executed Content</prettyName>
+        <restricted>0</restricted>
         <rows>25</rows>
         <size>120</size>
         <unmodifiable>0</unmodifiable>
@@ -811,6 +821,7 @@ require([
         <name>parameters</name>
         <number>7</number>
         <prettyName>Extension Parameters</prettyName>
+        <restricted>0</restricted>
         <rows>10</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>

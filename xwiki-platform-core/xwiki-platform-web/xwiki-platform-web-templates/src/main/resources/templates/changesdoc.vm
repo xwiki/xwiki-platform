@@ -136,6 +136,10 @@
             $escapetool.xml($services.localization.render('web.history.changes.failedToCompute'))
           </div>
         #else
+          #if (($origdoc.isRestricted() || $newdoc.isRestricted()) && ($services.user.allProperties.type == 'ADVANCED'
+            || $stringtool.contains($htmlDiff, 'xwikirenderingerror')))
+            #warning($escapetool.xml($services.localization.render('web.history.changes.restrictedInfo')))
+          #end
           $htmlDiff
         #end
       #end

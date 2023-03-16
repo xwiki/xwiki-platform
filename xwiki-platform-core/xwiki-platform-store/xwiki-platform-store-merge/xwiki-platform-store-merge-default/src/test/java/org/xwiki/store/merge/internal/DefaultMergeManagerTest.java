@@ -230,6 +230,26 @@ public class DefaultMergeManagerTest
     }
 
     @Test
+    public void mergeCharactersNull()
+    {
+        MergeManagerResult<String, Character> result =
+            mergeManager.mergeCharacters(null, null, null, new MergeConfiguration());
+        assertNull(result.getMergeResult());
+        assertFalse(result.isModified());
+        assertFalse(result.hasConflicts());
+    }
+
+    @Test
+    public void mergeCharactersEmpty()
+    {
+        MergeManagerResult<String, Character> result =
+            mergeManager.mergeCharacters("", "", "", new MergeConfiguration());
+        assertEquals("", result.getMergeResult());
+        assertFalse(result.isModified());
+        assertFalse(result.hasConflicts());
+    }
+
+    @Test
     public void mergeCharactersWhileModified()
     {
         MergeManagerResult<String, Character> result =

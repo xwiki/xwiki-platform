@@ -91,4 +91,4 @@ index.documentTree.more=あと{0}件
 rendering.macro.documentTree.parameter.showChildDocuments.name=子ドキュメントを表示
 rendering.macro.documentTree.parameter.showChildDocuments.description=ドキュメントの親フィールドに基づき、子ドキュメントを表示するかどうかを選択。
 </content>
-  </xwikidoc>
+</xwikidoc>

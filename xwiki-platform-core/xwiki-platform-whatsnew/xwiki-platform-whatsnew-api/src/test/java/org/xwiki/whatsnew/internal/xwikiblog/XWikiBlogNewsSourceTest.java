@@ -22,12 +22,18 @@ package org.xwiki.whatsnew.internal.xwikiblog;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.stubbing.Answer;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.whatsnew.NewsCategory;
 import org.xwiki.whatsnew.NewsSourceItem;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link XWikiBlogNewsSource}.
@@ -35,13 +41,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @version $Id$
  * @since 15.1RC1
  */
+@ComponentTest
 class XWikiBlogNewsSourceTest
 {
+    @Mock
+    private RSSContentCleaner cleaner;
+
+    @BeforeEach
+    void before()
+    {
+        when(this.cleaner.clean(any(String.class))).thenAnswer(
+            (Answer) invocation -> invocation.getArgument(0));
+    }
+
     @Test
     void buildWithNoConstraint() throws Exception
     {
         XWikiBlogNewsSource source =new XWikiBlogNewsSource(
-            XWikiBlogNewsSource.class.getClassLoader().getResourceAsStream("blogrss.xml"));
+            XWikiBlogNewsSource.class.getClassLoader().getResourceAsStream("blogrss.xml"), this.cleaner);
         List<NewsSourceItem> items = source.build();
 
         assertEquals(10, items.size());
@@ -55,7 +72,7 @@ class XWikiBlogNewsSourceTest
         assertEquals(Syntax.HTML_5_0, items.get(0).getDescription().get().getSyntax());
         assertEquals("Michael Hamann", items.get(0).getAuthor().get());
         assertEquals(NewsCategory.ADMIN_USER, items.get(0).getCategories().iterator().next());
-        assertEquals("2023-01-23T05:34:15+01:00", items.get(0).getPublishedDate().get());
+        assertEquals(1674448455000L, items.get(0).getPublishedDate().get().getTime());
         assertEquals("https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki%2015.0%20Release%20Candidate%201%20Released"
             + "?language=en", items.get(0).getOriginURL().get());
     }
@@ -64,7 +81,7 @@ class XWikiBlogNewsSourceTest
     void buildWithAdminUserCategory() throws Exception
     {
         XWikiBlogNewsSource source =new XWikiBlogNewsSource(
-            XWikiBlogNewsSource.class.getClassLoader().getResourceAsStream("blogrss.xml"));
+            XWikiBlogNewsSource.class.getClassLoader().getResourceAsStream("blogrss-admin.xml"), this.cleaner);
         List<NewsSourceItem> items = source.forCategories(Set.of(NewsCategory.ADMIN_USER)).build();
 
         assertEquals(8, items.size());
@@ -77,7 +94,7 @@ class XWikiBlogNewsSourceTest
     void buildWithSimpleUserCategory() throws Exception
     {
         XWikiBlogNewsSource source =new XWikiBlogNewsSource(
-            XWikiBlogNewsSource.class.getClassLoader().getResourceAsStream("blogrss.xml"));
+            XWikiBlogNewsSource.class.getClassLoader().getResourceAsStream("blogrss-simple.xml"), this.cleaner);
         List<NewsSourceItem> items = source.forCategories(Set.of(NewsCategory.SIMPLE_USER)).build();
 
         assertEquals(2, items.size());

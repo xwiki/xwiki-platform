@@ -71,6 +71,11 @@
   #set ($discard = $xwiki.jsx.use($sheetReference))
   #set ($discard = $xwiki.ssx.use($pdfExportConfig.template))
   #set ($discard = $xwiki.jsx.use($pdfExportConfig.template))
+  ## Use the specified PDF file name as the title of the HTML page in order to have it suggested as file name when
+  ## saving the PDF from the browser's Print Preview dialog.
+  #if ($pdfExportJobId)
+    #set ($title = $services.job.getJobStatus($pdfExportJobId).request.fileName)
+  #end
   ## Output the HTML header but without the garbage from the start of the BODY tag.
   #set ($htmlHeader = "#template('htmlheader.vm')")
   ## The PDF export doesn't target only the paper paged media, and we want to preserve the styles from the XWiki skin as

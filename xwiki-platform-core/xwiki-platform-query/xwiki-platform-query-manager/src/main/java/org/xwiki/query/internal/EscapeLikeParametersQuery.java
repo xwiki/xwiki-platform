@@ -32,6 +32,7 @@ import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
 import net.sf.jsqlparser.expression.JdbcNamedParameter;
 import net.sf.jsqlparser.expression.JdbcParameter;
+import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.relational.LikeExpression;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
@@ -160,7 +161,7 @@ public class EscapeLikeParametersQuery extends WrappingQuery
         public void visit(LikeExpression expr)
         {
             if (expr.getEscape() == null) {
-                expr.setEscape("!");
+                expr.setEscape(new StringValue("!"));
             }
             expr.accept(new XWikiLikeExpressionVisitor());
         }

@@ -373,7 +373,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
         // Get main wiki encoding
         if (!context.isMainWiki(wikiName)) {
-            NativeQuery<Object[]> selectQuery = session.createSQLQuery(
+            NativeQuery<Object[]> selectQuery = session.createNativeQuery(
                 "select DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME from INFORMATION_SCHEMA.SCHEMATA"
                     + " where SCHEMA_NAME='" + getSchemaFromWikiName(context.getMainXWiki(), context) + "'");
             Object[] queryResult = selectQuery.uniqueResult();
@@ -713,6 +713,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     }
 
                     doc.setNew(false);
+
+                    // Make sure that properly saved documents aren't restricted.
+                    doc.setRestricted(false);
 
                     // We need to ensure that the saved document becomes the original document
                     doc.setOriginalDocument(doc.clone());

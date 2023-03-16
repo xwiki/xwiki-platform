@@ -163,10 +163,15 @@
       <async_enabled>1</async_enabled>
     </property>
     <property>
-      <content>{{velocity}}{{html clean="false"}} ## we need clean="false" because we want to display the raw content of #drawerItem()
+      <content>{{velocity}}
+#if ($services.whatsnew.configuration.active)
+{{html clean="false"}}
+  ## we need clean="false" because we want to display the raw content of #drawerItem()
   #template('drawer_macros.vm')
-  #drawerItem('someURL', 'question', $escapetool.xml($services.localization.render('platform.whatsnew.drawer.text')))
-{{/html}}{{/velocity}}</content>
+  #drawerItem($xwiki.getURL($doc.documentReference, 'view', 'xpage=whatsnew'), 'question', $escapetool.xml($services.localization.render('platform.whatsnew.drawer.text')))
+{{/html}}
+#end
+{{/velocity}}</content>
     </property>
     <property>
       <extensionPointId>org.xwiki.plaftorm.drawer</extensionPointId>

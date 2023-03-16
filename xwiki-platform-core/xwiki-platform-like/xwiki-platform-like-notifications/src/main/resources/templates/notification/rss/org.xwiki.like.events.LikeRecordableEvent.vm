@@ -41,8 +41,9 @@
 <p>
     #set ($dates = $event.dates)
     #if ($dates.size() > 1)
-        $services.localization.render('notifications.events.lastChange', [$xwiki.formatDate($event.dates.get(0))])
+        $services.localization.render('notifications.events.lastChange',
+            'html/5.0', [$xwiki.formatDate($event.dates.get(0))])
     #else
-        $xwiki.formatDate($event.dates.get(0))
+        $escapetool.xml($xwiki.formatDate($event.dates.get(0)))
     #end
 </p>

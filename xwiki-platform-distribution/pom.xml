@@ -45,8 +45,8 @@
   </modules>
   <properties>
     <!-- The version of Maven used during XWiki runtime (more recent than the one used during the build to benefit from bugfixes and improvements)-->
-    <maven.version>3.9.0</maven.version>
-    <maven.resolver.version>1.9.5</maven.resolver.version>
+    <maven.version>${maven.runtime.version}</maven.version>
+    <maven.resolver.version>${maven.resolver.runtime.version}</maven.resolver.version>
 
     <!-- Flavors known to be valid with the current distribution -->
     <!-- Using ${platform.version} on purpose here. An XWiki distribution with a different version might inherit this. -->
@@ -157,9 +157,6 @@
     <!-- The child modules don't provide APIs (those should be in xwiki-platform-core) so we don't need to check for
       backward compatibility breakages. -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
-
-    <!-- TODO: remove when https://jira.xwiki.org/browse/XWIKI-19932 is fixed -->
-    <xwiki.enforcer.no-legacy-dependencies.exclude>.*xwiki.*:.*-legacy-(?!events-hibernate-api).*</xwiki.enforcer.no-legacy-dependencies.exclude>
   </properties>
 
   <!-- Avoid enforce-upper-bounds rule complains (they're actually false positives since Extension Manager is not

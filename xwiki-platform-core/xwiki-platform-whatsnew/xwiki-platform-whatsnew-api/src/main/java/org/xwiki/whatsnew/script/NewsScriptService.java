@@ -19,12 +19,19 @@
  */
 package org.xwiki.whatsnew.script;
 
+import java.util.Collections;
+
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
+import org.xwiki.whatsnew.NewsConfiguration;
+import org.xwiki.whatsnew.NewsException;
+import org.xwiki.whatsnew.NewsSource;
+import org.xwiki.whatsnew.NewsSourceFactory;
 
 /**
  * Script service to access the What's New API in a secure way from wiki pages by using scripting.
@@ -38,4 +45,30 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class NewsScriptService implements ScriptService
 {
+    @Inject
+    private NewsSourceFactory configuredNewsSourceFactory;
+
+    @Inject
+    private NewsConfiguration configuration;
+
+    /**
+     * @return the composite new source defined in XWiki's configuration (i.e. a new source wrapping all configured
+     *         news sources)
+     * @throws NewsException
+     * @since 15.2RC1
+     */
+    public NewsSource getConfiguredNewsSource() throws NewsException
+    {
+        return this.configuredNewsSourceFactory.create(Collections.emptyMap());
+    }
+
+    /**
+     * @return the configuration for the what's new feature (we need to be careful that it doesn't contain anything
+     *         sensitive, which should be fine for that feature)
+     * @since 15.2RC1
+     */
+    public NewsConfiguration getConfiguration()
+    {
+        return this.configuration;
+    }
 }

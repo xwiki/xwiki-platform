@@ -92,8 +92,8 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'l10n!imageSelector'],
             value = imageReference;
           }
           // Always make the image reference untyped to stay compatible with syntaxes that does not support them
-          // (e.g., xwiki/2.1).
-          value.typed = false;
+          // (e.g., xwiki/2.1). Except for icons that must be typed.
+          value.typed = imageReference.type === 'icon';
           imageReferenceValue = value;
         }
 

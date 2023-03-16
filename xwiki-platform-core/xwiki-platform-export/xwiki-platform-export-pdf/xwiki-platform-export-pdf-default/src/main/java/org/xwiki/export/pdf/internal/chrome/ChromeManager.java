@@ -25,11 +25,12 @@ import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.export.pdf.browser.BrowserManager;
 import org.xwiki.export.pdf.browser.BrowserTab;
 
@@ -47,8 +48,8 @@ import com.github.kklisura.cdt.services.types.ChromeVersion;
  * @since 14.5
  */
 @Component
-@Singleton
 @Named("chrome")
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class ChromeManager implements BrowserManager
 {
     /**

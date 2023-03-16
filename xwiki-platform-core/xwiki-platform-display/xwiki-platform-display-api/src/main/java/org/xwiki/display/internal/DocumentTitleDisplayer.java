@@ -77,7 +77,7 @@ public class DocumentTitleDisplayer extends AbstractDocumentTitleDisplayer
                 try {
                     TransformationContext txContext =
                         new TransformationContext(headingXDOM, document.getSyntax(),
-                                                  parameters.isTransformationContextRestricted());
+                            parameters.isTransformationContextRestricted() || document.isRestricted());
                     txContext.setTargetSyntax(parameters.getTargetSyntax());
                     transformationManager.performTransformations(headingXDOM, txContext);
 

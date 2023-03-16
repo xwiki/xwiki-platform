@@ -28,7 +28,6 @@ import org.hibernate.collection.spi.PersistentCollection;
 import org.xwiki.store.merge.MergeManagerResult;
 
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
-import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.internal.AbstractNotifyOnUpdateList;
 import com.xpn.xwiki.internal.objects.ListPropertyPersistentList;
 import com.xpn.xwiki.objects.classes.ListClass;
@@ -258,17 +257,18 @@ public class ListProperty extends BaseProperty implements Cloneable
     }
 
     @Override
-    protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
+    protected MergeManagerResult<Object, Object> mergeValue(Object previousValue, Object newValue,
+        MergeConfiguration configuration)
     {
         MergeManagerResult<List<String>, String> listStringMergeManagerResult = getMergeManager()
-            .mergeList((List<String>) previousValue, (List<String>) newValue, this.list, new MergeConfiguration());
-        mergeResult.getLog().addAll(listStringMergeManagerResult.getLog());
-        mergeResult.setModified(mergeResult.isModified() || listStringMergeManagerResult.isModified());
+            .mergeList((List<String>) previousValue, (List<String>) newValue, this.list, configuration);
 
-        if (listStringMergeManagerResult.isModified()) {
-            this.list.clear();
-            this.list.addAll(listStringMergeManagerResult.getMergeResult());
-        }
+        MergeManagerResult<Object, Object> result = new MergeManagerResult<>();
+        result.setLog(listStringMergeManagerResult.getLog());
+        result.setMergeResult(listStringMergeManagerResult.getMergeResult());
+        // We cannot convert a Conflict<String> to Conflict<Object> right now, so we're loosing conflicts info here...
+        result.setModified(listStringMergeManagerResult.isModified());
+        return result;
     }
 
     /**

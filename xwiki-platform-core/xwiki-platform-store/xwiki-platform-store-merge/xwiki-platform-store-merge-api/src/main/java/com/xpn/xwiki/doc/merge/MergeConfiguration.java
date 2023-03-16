@@ -21,6 +21,8 @@ package com.xpn.xwiki.doc.merge;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.stability.Unstable;
+import org.xwiki.store.merge.MergeManagerResult;
 
 /**
  * Allow to define some behaviors of the merge.
@@ -31,6 +33,27 @@ import org.xwiki.model.reference.EntityReference;
 public class MergeConfiguration
 {
     /**
+     * Versions to use as fallback in case of conflicts.
+     *
+     * @version $Id$
+     * @since 15.2RC1
+     * @since 14.10.7
+     */
+    @Unstable
+    public enum ConflictFallbackVersion
+    {
+        /**
+         * Current version. Default value.
+         */
+        CURRENT,
+
+        /**
+         * Next version.
+         */
+        NEXT
+    };
+
+    /**
      * @see #isProvidedVersionsModifiables()
      */
     private boolean providedVersionsModifiables = true;
@@ -38,6 +61,8 @@ public class MergeConfiguration
     private DocumentReference concernedDocument;
 
     private EntityReference userReference;
+
+    private ConflictFallbackVersion conflictFallbackVersion = ConflictFallbackVersion.CURRENT;
 
     /**
      * @param providedVersionsModifiables true if the merge is allowed to modify input elements
@@ -95,5 +120,34 @@ public class MergeConfiguration
     public void setUserReference(EntityReference userReference)
     {
         this.userReference = userReference;
+    }
+
+    /**
+     * Get the version to use as fallback in case of conflict: this is the version that is used in
+     * {@link MergeManagerResult#getMergeResult()} whenever a conflict is found.
+     * When not set the default value is {@link ConflictFallbackVersion#CURRENT}.
+     *
+     * @return the version to use as fallback
+     * @since 15.2RC1
+     * @since 14.10.7
+     */
+    @Unstable
+    public ConflictFallbackVersion getConflictFallbackVersion()
+    {
+        return conflictFallbackVersion;
+    }
+
+    /**
+     * Specify the version to use as fallback in case of conflict.
+     *
+     * @param conflictFallbackVersion the fallback version to use
+     * @see #getConflictFallbackVersion()
+     * @since 15.2RC1
+     * @since 14.10.7
+     */
+    @Unstable
+    public void setConflictFallbackVersion(ConflictFallbackVersion conflictFallbackVersion)
+    {
+        this.conflictFallbackVersion = conflictFallbackVersion;
     }
 }

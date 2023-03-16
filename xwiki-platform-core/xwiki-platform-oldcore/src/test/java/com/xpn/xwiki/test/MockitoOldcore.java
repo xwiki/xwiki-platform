@@ -55,6 +55,7 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
+import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -627,6 +628,9 @@ public class MockitoOldcore
                 document.setNew(false);
                 document.setStore(getMockStore());
 
+                // Make sure the document is not restricted.
+                document.setRestricted(false);
+
                 XWikiDocument savedDocument = document.clone();
 
                 documents.put(document.getDocumentReferenceWithLocale(), savedDocument);
@@ -792,10 +796,12 @@ public class MockitoOldcore
                     document.setMinorEdit(minorEdit);
 
                     if (document.isContentDirty() || document.isMetaDataDirty()) {
-                        document.setDate(new Date());
+                        Date ndate = new Date();
+                        document.setDate(ndate);
                         if (document.isContentDirty()) {
-                            document.setContentUpdateDate(new Date());
-                            document.setContentAuthorReference(document.getAuthorReference());
+                            document.setContentUpdateDate(ndate);
+                            DocumentAuthors authors = document.getAuthors();
+                            authors.setContentAuthor(authors.getEffectiveMetadataAuthor());
                         }
                         document.incrementVersion();
 
@@ -828,7 +834,11 @@ public class MockitoOldcore
                         document.setOriginalDocument(originalDocument);
                     }
 
+                    // Make sure the document is not restricted.
+                    document.setRestricted(false);
+
                     XWikiDocument savedDocument = document.clone();
+
                     documents.put(document.getDocumentReferenceWithLocale(), savedDocument);
 
                     if (isNew) {

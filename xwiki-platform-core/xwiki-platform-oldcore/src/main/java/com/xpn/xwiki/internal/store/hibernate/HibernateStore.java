@@ -997,6 +997,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
      */
     public void updateDatabase(String wikiId)
     {
+        // FIXME: refactor the init to provide the StandardServiceRegistry when creating the MetadataSources
         MetadataBuilder metadataBuilder = this.metadataSources.getMetadataBuilder(this.standardServiceRegistry);
 
         setWiki(metadataBuilder, wikiId);
@@ -1114,7 +1115,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
             // Try to create the Hibernate sequence
             try (Session session = getSessionFactory().openSession()) {
                 Transaction transaction = session.beginTransaction();
-                session.createSQLQuery(String.format("create sequence %s.hibernate_sequence", schemaName))
+                session.createNativeQuery(String.format("create sequence %s.hibernate_sequence", schemaName))
                     .executeUpdate();
                 transaction.commit();
             } catch (Exception e) {

@@ -146,9 +146,6 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxRegistry;
 import org.xwiki.rendering.transformation.RenderingContext;
-import org.xwiki.rendering.transformation.TransformationContext;
-import org.xwiki.rendering.transformation.TransformationException;
-import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.rendering.util.ErrorBlockGenerator;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -626,6 +623,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @see #getOriginalDocument()
      */
     private XWikiDocument originalDocument;
+
+    /**
+     * If the document should always be rendered in restricted mode.
+     */
+    private boolean restricted;
 
     /**
      * Used to display the title and the content of this document. Do not inject the component here to avoid any simple
@@ -1340,6 +1342,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
                 parameters.setExecutionContextIsolated(executionContextIsolated);
                 parameters.setTransformationContextIsolated(transformationContextIsolated);
+                // Don't consider isRestricted() here as this could invoke a sheet.
                 parameters.setTransformationContextRestricted(transformationContextRestricted);
                 // Render the translated content (matching the current language) using this document's syntax.
                 parameters.setContentTranslated(tdoc != this);
@@ -1667,6 +1670,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             XWikiDocument fakeDocument = new XWikiDocument(getDocumentReference());
             fakeDocument.setSyntax(sourceSyntaxId);
             fakeDocument.setContent(text);
+            fakeDocument.setRestricted(sDocument != null && sDocument.isRestricted());
 
             // We don't let displayer take care of the context isolation because we don't want the fake document to be
             // context document
@@ -4586,6 +4590,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             doc.setMinorEdit(isMinorEdit());
             doc.setSyntax(getSyntax());
             doc.setHidden(isHidden());
+            doc.setRestricted(isRestricted());
 
             if (this.xClass != null) {
                 doc.setXClass(this.xClass.clone());
@@ -4747,6 +4752,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
     }
 
+    /**
+     * Indicates whether some other document is "equal to" this one.
+     * <p>
+     * This ignores the {@link #isRestricted()} property as it is not considered to be part of the data.
+     *
+     * @param object the document to compare to
+     * @return {@code true} if this document is the same as the object argument; {@code false} otherwise
+     */
     @Override
     public boolean equals(Object object)
     {
@@ -9120,45 +9133,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         try {
             XDOM dom = parseContent(currentSyntaxId, content, source);
-            return performSyntaxConversion(dom, targetSyntax, null);
-        } catch (Exception e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
-                "Failed to convert document to syntax [" + targetSyntax + "]", e);
-        }
-    }
-
-    /**
-     * Convert the passed content from the passed syntax to the passed new syntax.
-     *
-     * @param content the XDOM content to convert, the XDOM can be modified during the transformation
-     * @param targetSyntax the new syntax after the conversion
-     * @param txContext the context when Transformation are executed or null if transformation shouldn't be executed
-     * @return the converted content in the new syntax
-     * @throws XWikiException if an exception occurred during the conversion process
-     * @since 2.4M2
-     */
-    private static String performSyntaxConversion(XDOM content, Syntax targetSyntax, TransformationContext txContext)
-        throws XWikiException
-    {
-        try {
-            if (txContext != null) {
-                // Transform XDOM
-                TransformationManager transformations = Utils.getComponent(TransformationManager.class);
-                if (txContext.getXDOM() == null) {
-                    txContext.setXDOM(content);
-                }
-                try {
-                    transformations.performTransformations(content, txContext);
-                } catch (TransformationException te) {
-                    // An error happened during one of the transformations. Since the error has been logged
-                    // continue
-                    // TODO: We should have a visual clue for the user in the future to let him know something
-                    // didn't work as expected.
-                }
-            }
-
-            // Render XDOM
-            return renderXDOM(content, targetSyntax);
+            return renderXDOM(dom, targetSyntax);
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
                 "Failed to convert document to syntax [" + targetSyntax + "]", e);
@@ -9556,5 +9531,33 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         // There is no syntax by default in a new document and the default one is retrieved from the configuration
         setSyntax(getSyntax());
+    }
+
+    /**
+     * @return if rendering transformations shall be executed in restricted mode and the title not be executed
+     * @since 14.10.7
+     * @since 15.2RC1
+     */
+    @Override
+    @Unstable
+    public boolean isRestricted()
+    {
+        return this.restricted;
+    }
+
+    /**
+     * Set the restricted property that disables scripts and other dangerous content.
+     * <p>
+     * This property is not stored in the database as it is only supposed to be {@code true} on documents that do not
+     * correspond to the current version of the document.
+     *
+     * @param restricted if rendering transformations shall be executed in restricted mode and the title not be executed
+     * @since 14.10.7
+     * @since 15.2RC1
+     */
+    @Unstable
+    public void setRestricted(boolean restricted)
+    {
+        this.restricted = restricted;
     }
 }

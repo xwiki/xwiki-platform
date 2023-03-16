@@ -28,6 +28,8 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
+import org.xwiki.rendering.internal.util.XWikiSyntaxEscaper;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
 
 /**
@@ -58,6 +60,9 @@ public class IconManagerScriptService implements ScriptService
     @Inject
     private Execution execution;
 
+    @Inject
+    private XWikiSyntaxEscaper escaper;
+
     /**
      * Display an icon with wiki code from the current {@link org.xwiki.icon.IconSet}.
      *
@@ -66,12 +71,7 @@ public class IconManagerScriptService implements ScriptService
      */
     public String render(String iconName)
     {
-        try {
-            return iconManager.render(iconName);
-        } catch (IconException e) {
-            setLastError(e);
-            return null;
-        }
+        return String.format("{{displayIcon name=\"%s\"/}}", escapeXWiki21(iconName));
     }
 
     /**
@@ -84,12 +84,8 @@ public class IconManagerScriptService implements ScriptService
      */
     public String render(String iconName, String iconSetName)
     {
-        try {
-            return iconManager.render(iconName, iconSetName);
-        } catch (IconException e) {
-            setLastError(e);
-            return null;
-        }
+        return String.format("{{displayIcon name=\"%s\" iconSet=\"%s\"/}}", escapeXWiki21(iconName),
+            escapeXWiki21(iconSetName));
     }
 
     /**
@@ -103,12 +99,13 @@ public class IconManagerScriptService implements ScriptService
      */
     public String render(String iconName, String iconSetName, boolean fallback)
     {
-        try {
-            return iconManager.render(iconName, iconSetName, fallback);
-        } catch (IconException e) {
-            setLastError(e);
-            return null;
-        }
+        return String.format("{{displayIcon name=\"%s\" iconSet=\"%s\" fallback=\"%b\"/}}", escapeXWiki21(iconName),
+            escapeXWiki21(iconSetName), fallback);
+    }
+
+    private String escapeXWiki21(String value)
+    {
+        return this.escaper.escape(value, Syntax.XWIKI_2_1);
     }
 
     /**

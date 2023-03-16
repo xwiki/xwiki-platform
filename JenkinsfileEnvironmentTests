@@ -97,6 +97,7 @@ private void buildDocker(type)
     // Set the next execution date/time
     jobProperties = customJobProperties
     label = 'environment'
+    type = type
   }
 }
 

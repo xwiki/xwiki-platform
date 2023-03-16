@@ -32,7 +32,7 @@ import org.xwiki.stability.Unstable;
 public interface NewsContent
 {
     /**
-     * @return the content in the syntax of {@link #getSyntax()}
+     * @return the content in the syntax of {@link #getSyntax()}, cleaned and safe to be rendered
      */
     String getContent();
 

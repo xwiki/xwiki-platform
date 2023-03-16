@@ -66,6 +66,8 @@ public class UITestTestConfigurationResolver
 
     private static final String VNC_PROPERTY = "xwiki.test.ui.vnc";
 
+    private static final String WCAG_PROPERTY = "xwiki.test.ui.wcag";
+
     private static final String PROPERTIES_PREFIX_PROPERTY = "xwiki.test.ui.properties.";
 
     private static final String PROFILES_PROPERTY = "xwiki.test.ui.profiles";
@@ -93,6 +95,7 @@ public class UITestTestConfigurationResolver
         configuration.setServletEngineTag(resolveServletEngineTag(uiTestAnnotation.servletEngineTag()));
         configuration.setJDBCDriverVersion(resolveJDBCDriverVersion(uiTestAnnotation.jdbcDriverVersion()));
         configuration.setVNC(resolveVNC(uiTestAnnotation.vnc()));
+        configuration.setWCAG(resolveWCAG(uiTestAnnotation.wcag()));
         configuration.setProperties(resolveProperties(uiTestAnnotation.properties()));
         configuration.setExtraJARs(resolveExtraJARs(uiTestAnnotation.extraJARs()));
         configuration.setResolveExtraJARs(resolveResolveExtraJARs(uiTestAnnotation.resolveExtraJARs()));
@@ -219,6 +222,11 @@ public class UITestTestConfigurationResolver
     private boolean resolveVNC(boolean vnc)
     {
         return resolve(vnc, VNC_PROPERTY);
+    }
+
+    private boolean resolveWCAG(boolean wcag)
+    {
+        return resolve(wcag, WCAG_PROPERTY);
     }
 
     private boolean resolveOffice(boolean office)

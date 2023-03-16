@@ -108,4 +108,4 @@ XWiki.PDFExport.ConfigurationClass_maxContentSize.hint=単一のPDFファイル�
 XWiki.PDFExport.ConfigurationClass_replaceFOP=FOPを置き換える
 XWiki.PDFExport.ConfigurationClass_replaceFOP.hint=Apache Formatting Objects Processor（FOP）に基づく以前のPDFのエクスポートを置き換える。
 </content>
-  </xwikidoc>
+</xwikidoc>

@@ -46,4 +46,4 @@ administration.templateProvider.creationRestrictions.none=このテンプレー�
 administration.templateProvider.creationRestrictionsAreSuggestions=作成制限の候補
 administration.templateProvider.creationRestrictionsAreSuggestions.hint=このテンプレートでページを作成する任意の場所を選択することをユーザーに許可。テンプレートを一覧から選択する際に、最初の作成制限を事前入力した既定の場所として使用します。
 </content>
-  </xwikidoc>
+</xwikidoc>

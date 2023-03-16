@@ -171,7 +171,7 @@
 ###    Menu submenu separator
 ###
 #macro(submenuseparator)
-  <li class="divider" role="separator" aria-hidden="true"></li>
+  <li class="divider" role="separator"></li>
 #end
 
 ###

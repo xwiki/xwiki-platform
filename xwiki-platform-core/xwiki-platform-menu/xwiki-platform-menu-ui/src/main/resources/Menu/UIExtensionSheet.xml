@@ -57,7 +57,7 @@
   #set ($menuPanel = "{{velocity}}
     ${escapetool.h}panelheader(""$doc.plainTitle"")
     {{menu type=""vertical collapsible open""
-    label=""$doc.plainTitle""}}{{include
+    label=""$escapetool.velocity($doc.plainTitle)""}}{{include
     reference=""${escapetool.d}uix.doc.documentReference""
     /}}{{/menu}}
     ${escapetool.h}panelfooter()
@@ -65,7 +65,8 @@
   #set ($menuBar = "{{velocity}}
     ${escapetool.h}if (${escapetool.d}xwiki.hasAccessLevel('view', ${escapetool.d}xcontext.user, ${escapetool.d}uix.doc.documentReference))
       {{menu type=""horizontal fixedWidth""
-      id=""menu-horizontal-$doc.fullName.replaceAll('[\s|,|.|:|\[|\]|\[\/\]|\[\\\]|=|@|#]', '-')"" label=""$doc.plainTitle""}}{{include reference=""${escapetool.d}uix.doc.documentReference"" /}}{{/menu}}
+       id=""menu-horizontal-$doc.fullName.replaceAll('[\s|,|.|:|\[|\]|\[\/\]|\[\\\]|=|@|#]', '-')""
+       label=""$escapetool.velocity($doc.plainTitle)""}}{{include reference=""${escapetool.d}uix.doc.documentReference"" /}}{{/menu}}
     ${escapetool.h}end
     {{/velocity}}")
   #set ($extensionPoints = {

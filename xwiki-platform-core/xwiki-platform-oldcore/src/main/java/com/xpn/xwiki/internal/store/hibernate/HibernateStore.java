@@ -997,7 +997,8 @@ public class HibernateStore implements Disposable, Integrator, Initializable
      */
     public void updateDatabase(String wikiId)
     {
-        MetadataBuilder metadataBuilder = this.metadataSources.getMetadataBuilder();
+        // FIXME: refactor the init to provide the StandardServiceRegistry when creating the MetadataSources
+        MetadataBuilder metadataBuilder = this.metadataSources.getMetadataBuilder(this.standardServiceRegistry);
 
         setWiki(metadataBuilder, wikiId);
 

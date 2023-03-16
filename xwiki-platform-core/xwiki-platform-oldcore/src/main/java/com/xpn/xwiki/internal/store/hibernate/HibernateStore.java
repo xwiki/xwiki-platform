@@ -700,8 +700,6 @@ public class HibernateStore implements Disposable, Integrator, Initializable
 
                 session.setProperty("xwiki.database", databaseName);
             }
-
-            getDataMigrationManager().checkDatabase();
         } catch (Exception e) {
             // close session with rollback to avoid further usage
             endTransaction(false);
@@ -836,6 +834,19 @@ public class HibernateStore implements Disposable, Integrator, Initializable
             }
         } catch (WikiManagerException e) {
             throw new XWikiException("Failed to load the wiki descriptor", e);
+        }
+
+        // Makes sure the database is initialized/migrated
+        // Doing it before creating a new session because:
+        // * we don't need one for that
+        // * it seems MySQL does not like having changes in the tables structure during a session (even if those change
+        // are not done as part of this session, just at the same time)
+        try {
+            getDataMigrationManager().checkDatabase();
+        } catch (Exception e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE, "Exception while initializing the database",
+                e);
         }
 
         // session is obviously null here

@@ -353,6 +353,16 @@ var XWiki = (function(XWiki) {
       response.request.options.onFailure(response);
     },
     onSuccess : function(state, response) {
+      // We expect the response to come:
+      // * either from the save action, in which case it needs to specify the new document version
+      // * or from the REST API (job status), in which case it needs to specify the links
+      if (!response.responseJSON?.newVersion && !response.responseJSON?.links) {
+        // Unexpected response.
+        response.statusText =
+          "$escapetool.javascript($services.localization.render('core.editors.save.unexpectedResponse'))";
+        return response.request.options.onFailure(response);
+      }
+
       // If there was a 'template' field in the form, disable it to avoid 'This document already exists' errors.
       if (this.form && this.form.template) {
         this.form.template.disabled = true;
@@ -372,26 +382,25 @@ var XWiki = (function(XWiki) {
       $$('input[name=mergeChoices]').forEach(function (item) {item.remove();});
       $$('input[name=customChoices]').forEach(function (item) {item.remove();});
 
-      var hasBeenSaved = false;
+      let hasBeenSaved = true;
       if (state.isCreateFromTemplate) {
-        // We might have a responseJSON containing other information than links, if the template cannot be accessed.
-        if (response.responseJSON && response.responseJSON.links) {
-          // Start the progress display.
+        // The save action triggers the create job and redirects to its status (REST API) if the template has nested
+        // pages, in which case the returned JSON should specify the links. The first link (self) is used to fetch job
+        // status updates until the create job finishes. If the template doesn't have nested pages then the save action
+        // simply returns the new document version.
+        if (response.responseJSON.links) {
+          // The save action triggered the create job so we need to display its progress. We consider the document to be
+          // fully saved only after the create job finishes.
+          hasBeenSaved = false;
           this.getStatus(response.responseJSON.links[0].href, state);
         } else {
+          // The document was saved directly, without the need to trigger the create job.
           this.progressBox.hide();
           this.savingBox.replace(this.savedBox);
-          // in such case the page is saved, so we'll need to maybe redirect
-          hasBeenSaved = true;
         }
       } else {
         this.progressBox.hide();
-        if (response.responseJSON && response.responseJSON.mergedDocument) {
-          this.savingBox.replace(this.savedWithMergeBox);
-        } else {
-          this.savingBox.replace(this.savedBox);
-        }
-        hasBeenSaved = true;
+        this.savingBox.replace(response.responseJSON.mergedDocument ? this.savedWithMergeBox : this.savedBox);
       }
 
       if (hasBeenSaved && !state.isContinue || $('body').hasClassName('previewbody')) {
@@ -401,8 +410,8 @@ var XWiki = (function(XWiki) {
         }
       }
 
-      if (response.responseJSON && response.responseJSON.newVersion) {
-        // update the version
+      if (response.responseJSON.newVersion) {
+        // Update the version in order to perform proper merges when multiple users edit the same document.
         require(['xwiki-meta'], function (xm) {
           xm.setVersion(response.responseJSON.newVersion);
         });
@@ -413,11 +422,11 @@ var XWiki = (function(XWiki) {
         }
       }
 
-      // Announce that the document has been saved
+      // Announce that the document has been saved.
       state.saveButton.fire("xwiki:document:saved", response.responseJSON);
 
       // If documents have been merged we need to reload to get latest saved version.
-      if (response.responseJSON && response.responseJSON.mergedDocument) {
+      if (response.responseJSON.mergedDocument) {
         this.reloadEditor();
       }
     },

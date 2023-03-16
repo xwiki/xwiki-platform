@@ -18,6 +18,10 @@
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
 ## Displays the UI for What's New
+## Block indexing of this page by search engines so that the XWiki news don't get indexed for all public XWiki
+## instances and so that the source of the news remain the defined news source locations.
+## See also https://developers.google.com/search/docs/crawling-indexing/block-indexing
+#set ($discard = $response.setHeader('X-Robots-Tag', 'noindex'))
 #template("startpage.vm")
 <div class="main layoutsubsection">
   <div id="mainContentArea">

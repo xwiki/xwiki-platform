@@ -189,18 +189,38 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
         }
       });
     }
-    
-    function addToggleImageWidthLock(modal) {
+
+    function updateLockStatus(modal) {
+      // When loading an image for the first time in an edit session, it is locked by default.
+      if (modal.data('input').imageData.isLocked === undefined || modal.data('input').newImage) {
+        modal.data('input').imageData.isLocked = true;
+      }
+      updateLockAccordingToStatus(modal);
+    }
+
+    function updateLockAccordingToStatus(modal) {
       var imageSizeLocked = modal.find('.image-size-locked');
       var imageSizeUnlocked = modal.find('.image-size-unlocked');
+      var hiddenClass = 'hidden';
+      var isLocked = modal.data('input').imageData.isLocked;
+      if (isLocked) {
+        imageSizeLocked.removeClass(hiddenClass);
+        imageSizeUnlocked.addClass(hiddenClass);
+      } else {
+        imageSizeLocked.addClass(hiddenClass);
+        imageSizeUnlocked.removeClass(hiddenClass);
+      }
+      return isLocked;
+    }
+
+    function addToggleImageWidthLock(modal) {
       var imageWidthField = modal.find('[name="imageWidth"]');
       var imageHeightField = modal.find('[name="imageHeight"]');
-      var hiddenClass = 'hidden';
-      var locked = !imageSizeLocked.hasClass(hiddenClass);
+
       modal.find('.image-size-lock').on('click', function () {
-        imageSizeLocked.toggleClass(hiddenClass);
-        imageSizeUnlocked.toggleClass(hiddenClass);
-        locked = !locked;
+        // Toggle the lock status and refresh the display.
+        modal.data('input').imageData.isLocked = !modal.data('input').imageData.isLocked;
+        updateLockAccordingToStatus(modal);
       });
 
       /**
@@ -261,7 +281,7 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
        */
       function updateSize(field, inputField, targetField) {
         var inputValue = inputField.val();
-        if (locked) {
+        if (modal.data('input').imageData.isLocked) {
           imageWidthField.prop('disabled', true);
           imageHeightField.prop('disabled', true);
           return $.when(updateRatio(field, inputValue)).then(function (value) {
@@ -343,7 +363,9 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
             width: width,
             height: height
           })
-        })
+        }),
+        // Pass the data back to the widget so that it is re-loaded in the same state during the editing session.
+        isLocked: modal.data('input').imageData.isLocked
       };
     }
 
@@ -458,6 +480,7 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
       updateAdvancedFromStyle($('#imageStyles')[0].selectize.getValue(), modal);
       // Initial check of the image dimensions on load.
       checkDimensions(modal);
+      updateLockStatus(modal);
     }
 
     return $modal.createModalStep({

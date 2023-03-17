@@ -24,15 +24,15 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-flamingo-skin-test</artifactId>
+    <artifactId>xwiki-platform-invitation-test</artifactId>
     <version>14.10.7-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-flamingo-skin-test-docker</artifactId>
-  <name>XWiki Platform - Flamingo - Skin - Test - Functional Docker Tests</name>
+  <artifactId>xwiki-platform-invitation-test-docker</artifactId>
+  <name>XWiki Platform - Invitation - Test - Functional Docker Tests</name>
   <!-- TODO: Move to use "functional-test" in the future when http://jira.codehaus.org/browse/MNG-1911 is fixed,
        see https://jira.xwiki.org/browse/XWIKI-7683 -->
   <packaging>jar</packaging>
-  <description>XWiki Platform - Flamingo - Skin - Functional Tests in Docker</description>
+  <description>XWiki Platform - Invitation - Test - Functional Tests in Docker</description>
   <properties>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
@@ -45,92 +45,18 @@
          dependencies in the generated XWiki runtime -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
-      <type>pom</type>
-      <version>${project.version}</version>
-    </dependency>
-    <!-- Needed for a test with Panel translation. -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-panels-ui</artifactId>
-      <version>${project.version}</version>
+      <artifactId>xwiki-platform-invitation-ui</artifactId>
       <type>xar</type>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-panels-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-diff-script</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <!-- Needed to configure the syntax for tests -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-    </dependency>
+    <!-- We currently need to depend on mail-ui for InvitationIT because it contains the Mail.SendMailConfigClass.
+         We can not have administration-ui depend on mail-ui, because mail-ui already depends on administration-ui which
+         would create a loop. mail-ui ust needs the configurable class stuff from administration-ui, so when that gets
+         refactored out, we can fix the dependency directly in administration-ui and not have anything here specific to
+         mail. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-security-authentication-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-captcha-jcaptcha-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-captcha-jcaptcha-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-    </dependency>
-    <!--
-    Needed for the delete page tests.
-    This dependency is needed because the delete page tests need to activate the configuration that allows advanced
-    users to choose whether pages are permanently deleted or moved to the recycled bin.
-    The access to this configuration is currently only available through the refactoring UI.
-    Note that the definitive place of this configuration is still in discussion and this dependency needs to be removed
-    if it moves out of the refactoring UI.
-     -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-refactoring-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-    </dependency>
-    <!-- Needed for ObjectEditorIT to test user displayer. -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wiki-user-default</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <!-- Required to create wikis -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wiki-creationjob</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wiki-template-default</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <!-- Needed for PDFExportIT -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-dashboard-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-sandbox</artifactId>
+      <artifactId>xwiki-platform-mail-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
@@ -145,35 +71,19 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-flamingo-skin-test-pageobjects</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- Needed for the NavigationPanel -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-panels-test-pageobjects</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- Needed for RenamePageIT -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-macro-include</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- Needed or PDFExportIT -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-export-pdf-test-pageobjects</artifactId>
+      <artifactId>xwiki-platform-invitation-test-pageobject</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-search-solr-test-utils</artifactId>
+      <artifactId>xwiki-platform-administration-test-pageobjects</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.icegreen</groupId>
+      <artifactId>greenmail-junit5</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

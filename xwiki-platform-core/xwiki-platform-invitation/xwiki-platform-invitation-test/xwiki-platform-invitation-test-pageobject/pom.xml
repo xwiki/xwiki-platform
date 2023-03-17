@@ -24,22 +24,22 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-invitation-test</artifactId>
     <version>14.10.7-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-invitation</artifactId>
-  <name>XWiki Platform - Invitation</name>
-  <packaging>pom</packaging>
-  <description>Application allowing users to invite friends to join a wiki by email.</description>
-  <modules>
-    <module>xwiki-platform-invitation-ui</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-invitation-test</module>
-      </modules>
-    </profile>
-  </profiles>
+  <artifactId>xwiki-platform-invitation-test-pageobject</artifactId>
+  <name>XWiki Platform - Invitation - Test - Page Objects</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - Invitation - Test - Page Objects</description>
+  <properties>
+    <!-- None of the classes is valid -->
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-ui</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

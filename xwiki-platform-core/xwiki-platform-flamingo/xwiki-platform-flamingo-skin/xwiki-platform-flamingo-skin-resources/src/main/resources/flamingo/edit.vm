@@ -136,6 +136,12 @@
     </div>
   #end
   #template("hierarchy.vm")
+  ## Display a warning regarding restricted mode for advanced users or when there is an actual error to not to confuse
+  ## simple users. Also, only display the warning for the content viewer as other viewers shouldn't display
+  ## rendered content of old revisions and this would thus only confuse users.
+  #if ($doc.isRestricted() && $services.security.authorization.hasAccess('script'))
+    #warning($escapetool.xml($services.localization.render('core.document.restrictedEdit')))
+  #end
   <div class="row">
     #if ($displayContentMenu)
       <div class="col-xs-12 col-md-5 pull-right">

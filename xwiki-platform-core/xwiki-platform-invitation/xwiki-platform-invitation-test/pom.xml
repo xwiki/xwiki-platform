@@ -27,19 +27,19 @@
     <artifactId>xwiki-platform-invitation</artifactId>
     <version>15.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-invitation-test-pageobject</artifactId>
-  <name>XWiki Platform - Invitation - Page Objects</name>
-  <packaging>jar</packaging>
-  <description>XWiki Platform - Invitation - Page Objects</description>
-  <properties>
-    <!-- None of the classes is valid -->
-    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
-  </properties>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-test-ui</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-  </dependencies>
+  <artifactId>xwiki-platform-invitation-test</artifactId>
+  <name>XWiki Platform - Invitation - Test</name>
+  <packaging>pom</packaging>
+  <description>XWiki Platform - Invitation - Test</description>
+  <modules>
+    <module>xwiki-platform-invitation-test-pageobject</module>
+  </modules>
+  <profiles>
+    <profile>
+      <id>docker</id>
+      <modules>
+        <module>xwiki-platform-invitation-test-docker</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

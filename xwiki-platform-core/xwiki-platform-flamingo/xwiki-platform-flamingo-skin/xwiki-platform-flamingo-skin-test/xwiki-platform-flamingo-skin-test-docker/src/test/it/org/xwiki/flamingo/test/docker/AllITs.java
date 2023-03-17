@@ -158,12 +158,6 @@ public class AllITs
     class NestedRecycleBinIT extends RecycleBinIT
     {
     }
-    
-    @Nested
-    @DisplayName("Invitation tests")
-    class NestedInvitationIT extends InvitationIT
-    {
-    }
 
     @Nested
     @DisplayName("PDF Export Tests")

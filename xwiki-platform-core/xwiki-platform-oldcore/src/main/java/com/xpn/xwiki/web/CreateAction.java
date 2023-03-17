@@ -333,11 +333,9 @@ public class CreateAction extends XWikiAction
         if (title != null) {
             redirectParams += "&title=" + Util.encodeURI(title, null);
         }
-        if (actionOnCreate == ActionOnCreate.SAVE_AND_VIEW || actionOnCreate == ActionOnCreate.EDIT) {
-            // Both the save and the edit action might require a CSRF token
-            CSRFToken csrf = Utils.getComponent(CSRFToken.class);
-            redirectParams += "&form_token=" + Util.encodeURI(csrf.getToken(), null);
-        }
+        // Both the save and the edit action might require a CSRF token
+        CSRFToken csrf = Utils.getComponent(CSRFToken.class);
+        redirectParams += "&form_token=" + Util.encodeURI(csrf.getToken(), null);
 
         return redirectParams;
     }

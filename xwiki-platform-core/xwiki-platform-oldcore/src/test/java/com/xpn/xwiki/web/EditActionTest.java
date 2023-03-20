@@ -43,8 +43,10 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -151,7 +153,7 @@ public class EditActionTest
     }
 
     @Test
-    void documentAuthorsWhenDocumentExistAndContentIsModifiedAndInvalidValidCSRF() throws XWikiException
+    void documentAuthorsWhenDocumentExistAndContentIsModifiedAndInvalidCSRF() throws XWikiException
     {
         documentAuthorsWhenDocumentExistAndContentIsModified(false);
     }
@@ -190,5 +192,23 @@ public class EditActionTest
         assertSame(OTHERUSER_REFERENCE, document.getAuthors().getEffectiveMetadataAuthor());
         assertSame(OTHERUSER_REFERENCE, document.getAuthors().getOriginalMetadataAuthor());
         assertEquals(!validToken, document.isRestricted());
+    }
+
+    @Test
+    void restrictedWhenDocumentModifiedBeforeInput() throws XWikiException
+    {
+        XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getXWikiContext());
+        this.oldcore.getXWikiContext().setDoc(document);
+        this.oldcore.getXWikiContext().put("tdoc", document);
+
+        document.setMetaDataDirty(true);
+
+        initAndRenderAction();
+
+        document = this.oldcore.getXWikiContext().getDoc();
+
+        assertFalse(document.isRestricted());
+        verifyNoInteractions(this.csrf);
     }
 }

@@ -102,7 +102,9 @@ import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.document.DocumentAuthors;
+import org.xwiki.model.document.RequiredRights;
 import org.xwiki.model.internal.document.DefaultDocumentAuthors;
+import org.xwiki.model.internal.document.DefaultRequiredRights;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
@@ -724,6 +726,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @see #getAuthors()
      */
     private final DefaultDocumentAuthors authors = new DefaultDocumentAuthors(this);
+
+    private final DefaultRequiredRights requiredRights = new DefaultRequiredRights(this);
 
     /**
      * Create a document for the given reference, with the {@link Locale#ROOT} even if the reference contains a locale.
@@ -9414,6 +9418,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public DocumentAuthors getAuthors()
     {
         return this.authors;
+    }
+
+    @Override
+    public RequiredRights getRequiredRights()
+    {
+        return this.requiredRights;
     }
 
     /**

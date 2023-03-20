@@ -462,4 +462,13 @@
         <!-- The timestamp of creation of the task. Used to prioritize tasks. -->
         <property name="timestamp" type="timestamp" column="XWT_TIMESTAMP" index="TASK_TIMESTAMP" not-null="true"/>
     </class>
+    
+    <!-- XWikiDocumentRequiredRights custom mapping -->
+    <class name="org.xwiki.doc.rights.XWikiDocumentRequiredRights" table="xwikidocumentrequiredrights">
+        <id name="id" column="XRR_ID">
+            <generator class="native"/>
+        </id>
+        <property name="docId" column="XRR_DOC_ID" type="long"/>
+        <property name="right" column="XRR_RIGHT" type="long"/>
+    </class>
 </hibernate-mapping>

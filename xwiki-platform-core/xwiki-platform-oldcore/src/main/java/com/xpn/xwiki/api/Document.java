@@ -44,7 +44,9 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.model.document.DocumentAuthors;
+import org.xwiki.model.document.RequiredRights;
 import org.xwiki.model.internal.document.SafeDocumentAuthors;
+import org.xwiki.model.internal.document.SafeRequiredRights;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -3344,5 +3346,15 @@ public class Document extends Api
             // in this case we don't care if the doc is cloned or not since it's readonly
             return new SafeDocumentAuthors(this.doc.getAuthors());
         }
+    }
+
+    @Unstable
+    public RequiredRights getRequiredRights()
+    {
+        RequiredRights requiredRights = getDoc().getRequiredRights();
+        if (!hasAccess(Right.PROGRAM)) {
+            requiredRights = new SafeRequiredRights(requiredRights);
+        }
+        return requiredRights;
     }
 }

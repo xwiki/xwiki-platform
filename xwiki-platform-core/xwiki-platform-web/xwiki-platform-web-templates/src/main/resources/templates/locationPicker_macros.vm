@@ -91,7 +91,7 @@
   <div class="location-actions">
     ## Tree picker toggle
     <a href="#" class="location-action location-action-pick"
-    title="$escapetool.xml($services.localization.render('core.create.locationPreview.actions.pick'))">
+       title="$escapetool.xml($services.localization.render('core.create.locationPreview.actions.pick'))">
       $services.icon.renderHTML('chart-organisation')
     </a>
     ## Location advanced edit button.

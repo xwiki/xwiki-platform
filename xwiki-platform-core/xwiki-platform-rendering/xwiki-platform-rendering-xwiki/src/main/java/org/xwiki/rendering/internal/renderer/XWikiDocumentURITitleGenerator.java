@@ -36,21 +36,19 @@ import org.xwiki.rendering.renderer.reference.link.URITitleGenerator;
  * @version $Id$
  * @since 15.2RC1
  */
-@Component
-@Named("doc")
+@Component(hints = {"doc", "page"})
 @Singleton
-public class XWikiPageAttachmentURITitleGenerator implements URITitleGenerator
+public class XWikiDocumentURITitleGenerator implements URITitleGenerator
 {
     @Inject
     private ContextualLocalizationManager contextLocalization;
+
     /**
      * Used to extract the attachment name part in an Attachment reference.
      */
     @Inject
     @Named("current")
     private PageAttachmentReferenceResolver<String> currentAttachmentReferenceResolver;
-
-
 
     @Override
     public String generateCreateTitle(ResourceReference reference)

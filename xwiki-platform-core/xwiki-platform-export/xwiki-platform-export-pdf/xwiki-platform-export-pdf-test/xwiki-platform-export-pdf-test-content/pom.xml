@@ -48,6 +48,13 @@
       <artifactId>xwiki-platform-logging-script</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <!-- Used to test the integration with Numbered Headings Application. -->
+      <groupId>org.xwiki.contrib.numbered.content</groupId>
+      <artifactId>application-numbered-content-headings-ui</artifactId>
+      <version>1.8.1</version>
+      <type>xar</type>
+    </dependency>
     <!-- JavaScript dependencies -->
     <dependency>
       <groupId>org.webjars</groupId>

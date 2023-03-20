@@ -77,9 +77,20 @@ class PDFExportIT
     void configurePDFExport(TestUtils setup, TestConfiguration testConfiguration) throws Exception
     {
         setup.loginAsSuperAdmin();
+        
         // Restrict view access for guests in order to verify that the Chrome Docker container properly authenticates
         // the user (the authentication cookies are copied and updated to match the Chrome Docker container IP address).
         setup.setWikiPreference("authenticate_view", "1");
+
+        // Enable the 'org.xwiki.platform.html.head' UIXP which normally is provided by
+        // 'org.xwiki.platform:xwiki-platform-distribution-ui-base' but we didn't add it as a test dependency because it
+        // brings too many transitive dependencies that we don't need.
+        setup.setWikiPreference("meta",
+            "#foreach($uix in $services.uix.getExtensions(\"org.xwiki.platform.html.head\","
+                + " {'sortByParameter' : 'order'}))\n" + "  $services.rendering.render($uix.execute(), 'xhtml/1.0')\n"
+                + "#end");
+
+        // Enable debug logs for the PDF export code.
         setup.gotoPage(new LocalDocumentReference("PDFExportIT", "EnableDebugLogs"), "get");
 
         // Make sure we start with the default settings.
@@ -541,6 +552,45 @@ class PDFExportIT
             expectedLinks.put("Other Description", setup.getBaseBinURL() + "view/PDFExportIT/Parent/#HDescription");
 
             assertEquals(expectedLinks, pdf.getLinksFromPage(3));
+        }
+    }
+
+    @Test
+    @Order(9)
+    void numberedHeadings(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "NumberedHeadings"));
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // We should have 3 pages: cover page, table of contents and one page for the content.
+            assertEquals(3, pdf.getNumberOfPages());
+
+            //
+            // Verify the table of contents page.
+            //
+
+            String tocPageText = pdf.getTextFromPage(1);
+            assertTrue(
+                tocPageText.contains("Table of Contents\n" + "1 Heading 1\n" + "1.1 Heading 1-1\n"
+                    + "Heading without number\n" + "1.1.1 Heading 1-1-1\n" + "1.1.2 Heading 1-1-2\n"
+                    + "1.2 Heading 1-2\n" + "1.2.1 Heading 1-2-1\n" + "1.7 Heading 1-7\n" + "1.7.1 Heading 1-7-1\n"
+                    + "1.7.5 Heading 1-7-5\n" + "1.7.6 Heading 1-7-6\n" + "1.8 Heading 1-8\n" + "2 Heading 2\n"
+                    + "2.1 Heading 2-1\n" + "2.1.1 Heading 2-1-1\n" + ""),
+                "Unexpected table of contents: " + tocPageText);
+
+            //
+            // Verify the content page.
+            //
+
+            String contentPageText = pdf.getTextFromPage(2);
+            assertEquals("NumberedHeadings\n" + "3 / 3\n" + "1 Heading 1\n" + "1.1 Heading 1-1\n"
+                + "Heading without number\n" + "1.1.1 Heading 1-1-1\n" + "1.1.2 Heading 1-1-2\n" + "1.2 Heading 1-2\n"
+                + "1.2.1 Heading 1-2-1\n" + "1.2.1.1 Heading 1-2-1-1\n" + "1.2.1.2 Heading 1-2-1-2\n"
+                + "1.7 Heading 1-7\n" + "1.7.1 Heading 1-7-1\n" + "1.7.5 Heading 1-7-5\n" + "1.7.6 Heading 1-7-6\n"
+                + "1.8 Heading 1-8\n" + "2 Heading 2\n" + "2.1 Heading 2-1\n" + "2.1.1 Heading 2-1-1\n"
+                + "2.1.1.1 Heading 2-1-1-1\n" + "2.1.1.1.1 Heading 2-1-1-1-1\n" + "2.1.1.1.1.1 Heading 2-1-1-1-1-1\n"
+                + "2.1.1.1.1.2 Heading 2-1-1-1-1-2\n", contentPageText);
         }
     }
 

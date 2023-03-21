@@ -192,7 +192,13 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     private Map<String, String[]> validTypesMap = new HashMap<>();
 
-    private Map<Long, ReentrantLock> lockMap = Collections.synchronizedMap(new ReferenceMap<>());
+    /**
+     * Stores locks for saving documents in a map with soft references for values to ensure that they can be cleared
+     * under memory pressure but that under no circumstances a lock that is currently in use is removed from the map (as
+     * this would endanger the purpose of the lock). These locks ensure that no two threads can save the same
+     * document at the same time, see also <a href="https://jira.xwiki.org/browse/XWIKI-13473">XWIKI-13473</a>.
+     */
+    private final Map<Long, ReentrantLock> documentSavingLockMap = Collections.synchronizedMap(new ReferenceMap<>());
 
     /**
      * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
@@ -523,7 +529,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     @Override
     public void saveXWikiDoc(XWikiDocument doc, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
-        Lock lock = this.lockMap.computeIfAbsent(doc.getId(), id -> new ReentrantLock(true));
+        Lock lock = this.documentSavingLockMap.computeIfAbsent(doc.getId(), id -> new ReentrantLock(true));
         lock.lock();
 
         try {

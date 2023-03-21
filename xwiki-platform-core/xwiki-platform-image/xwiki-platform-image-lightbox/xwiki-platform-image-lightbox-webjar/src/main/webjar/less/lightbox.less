@@ -81,8 +81,14 @@
   display: none;
 }
 .imageToolbar {
-  > * {
-    margin: .5em;
+  display: flex !important;
+
+  & > *, & a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
   }
 
   .tooltip-inner {
@@ -94,5 +100,9 @@
 
   .popover {
     white-space: nowrap;
+  }
+
+  .popover-content {
+    padding: 0;
   }
 }

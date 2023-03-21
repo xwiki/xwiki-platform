@@ -39,6 +39,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 
 import javax.inject.Inject;
@@ -46,6 +48,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.map.ReferenceMap;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.FlushMode;
@@ -188,6 +191,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     private WikiDescriptorManager wikiDescriptorManager;
 
     private Map<String, String[]> validTypesMap = new HashMap<>();
+
+    private Map<Long, ReentrantLock> lockMap = Collections.synchronizedMap(new ReferenceMap<>());
 
     /**
      * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
@@ -518,9 +523,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     @Override
     public void saveXWikiDoc(XWikiDocument doc, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
-        XWikiContext context = getExecutionXContext(inputxcontext, true);
+        Lock lock = this.lockMap.computeIfAbsent(doc.getId(), id -> new ReentrantLock(true));
+        lock.lock();
 
         try {
+            XWikiContext context = getExecutionXContext(inputxcontext, true);
+
             MonitorPlugin monitor = Util.getMonitorPlugin(context);
 
             try {
@@ -739,6 +747,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
             }
         } finally {
+            lock.unlock();
             restoreExecutionXContext();
         }
     }

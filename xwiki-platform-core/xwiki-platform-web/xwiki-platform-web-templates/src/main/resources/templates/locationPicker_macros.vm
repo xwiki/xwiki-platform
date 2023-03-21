@@ -97,7 +97,7 @@
     ## Location advanced edit button.
     #if ($isAdvancedUser)
       <a href="#" class="location-action location-action-edit"
-      title="$escapetool.xml($services.localization.render('core.create.locationPreview.actions.edit'))">
+         title="$escapetool.xml($services.localization.render('core.create.locationPreview.actions.edit'))">
         $services.icon.renderHTML('pencil')
       </a>
     #end

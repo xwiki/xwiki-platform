@@ -251,11 +251,9 @@
   @btn-succes-bg:                       #31754f;
   @btn-danger-bg:                       #ca302c;
   @btn-success-bg:                      #31754f;
-  ## For the warning buttons, since the saturation is very high, we'd need to make the background way darker, going
-  ## from an orangish yellow to complete brown.
-  ## Instead, we change the text color to black and make the background a bit lighter than default.
-  @btn-warning-color:                   #000000;
-  @btn-warning-bg:                      #ffd483;
+  ##For the warning buttons, since the saturation is very high, we'd need to make the background way darker, going
+  ## from an orangish yellow to complete brown. Instead, we change the text color to black.
+  @btn-warning-color:                   #000;
 #end
 
 ##############################################

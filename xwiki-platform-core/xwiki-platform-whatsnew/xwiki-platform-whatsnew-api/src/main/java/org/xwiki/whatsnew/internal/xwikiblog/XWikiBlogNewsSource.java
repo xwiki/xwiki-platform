@@ -191,7 +191,7 @@ public class XWikiBlogNewsSource implements NewsSource
 
             newsItem.setAuthor(item.getAuthor());
             newsItem.setCategories(this.categoriesConverter.convertFromRSS(item.getCategories()));
-            newsItem.setPublishedDate(parsetDateTime(item.getPubDate()));
+            newsItem.setPublishedDate(parseDateTime(item.getPubDate()));
             newsItem.setOriginURL(item.getLink());
             newsItems.add(newsItem);
         }
@@ -226,7 +226,7 @@ public class XWikiBlogNewsSource implements NewsSource
         return String.format("XWiki Blog news source for URL [%s]", this.rssURL);
     }
 
-    private Optional<Date> parsetDateTime(Optional<String> dateAsString)
+    private Optional<Date> parseDateTime(Optional<String> dateAsString)
     {
         Optional<Date> result;
         if (!dateAsString.isPresent()) {

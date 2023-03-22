@@ -75,12 +75,18 @@ public class TemplatesAdministrationSectionPage extends AdministrationSectionPag
         documentPicker.setParent(space);
         documentPicker.setName(page);
 
+        this.clickOnCreateButton();
+
+        return new TemplateProviderInlinePage();
+    }
+
+    private void clickOnCreateButton()
+    {
         // FIXME: workaround for https://github.com/mozilla/geckodriver/issues/1026
         getDriver().addPageNotYetReloadedMarker();
         this.createButton.click();
         getDriver().waitUntilPageIsReloaded();
-
-        return new TemplateProviderInlinePage();
+        return;
     }
 
     /**

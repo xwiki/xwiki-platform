@@ -154,11 +154,15 @@
         }
 
         // Style
-        this.setData('imageStyle', this.parts.image.getAttribute('data-xwiki-image-style') || '');
+        var image = this.parts.image;
+        if (this.data.hasCaption) {
+          image = this.element;
+        }
+        this.setData('imageStyle', image.getAttribute('data-xwiki-image-style') || '');
 
-        this.setData('border', this.parts.image.getAttribute('data-xwiki-image-style-border'));
-        this.setData('alignment', this.parts.image.getAttribute('data-xwiki-image-style-alignment'));
-        this.setData('textWrap', this.parts.image.getAttribute('data-xwiki-image-style-text-wrap'));
+        this.setData('border', image.getAttribute('data-xwiki-image-style-border'));
+        this.setData('alignment', image.getAttribute('data-xwiki-image-style-alignment'));
+        this.setData('textWrap', image.getAttribute('data-xwiki-image-style-text-wrap'));
 
         moveResizer(this);
       };
@@ -218,7 +222,13 @@
          * @param value the attribute value
          */
         function setAttribute(widget, key, value) {
-          widget.parts.image.setAttribute(key, value);
+          widget.parts.image.removeAttribute(key);
+          widget.element.removeAttribute(key);
+          if(widget.data.hasCaption) {
+            widget.element.setAttribute(key, value);
+          } else {
+            widget.parts.image.setAttribute(key, value);
+          }
           widget.wrapper.setAttribute(key, value);
         }
 
@@ -229,14 +239,25 @@
          * @param key the property key to removew
          */
         function removeAttribute(widget, key) {
+          widget.element.removeAttribute(key);
           widget.parts.image.removeAttribute(key);
           widget.wrapper.removeAttribute(key);
+        }
+
+        function updateFigureDimensions(widget) {
+          if (widget.data.hasCaption) {
+            // TODO: set a style with a width instead
+            setAttribute(widget, 'style', "width: " + widget.data.width + "px");
+          } else {
+            removeAttribute(widget, 'style');
+          }
         }
 
         // Caption
         // TODO: Add support for editing the caption directly from the dialog (see CKEDITOR-435)
 
         computeStyleData(this, setAttribute, removeAttribute);
+        updateFigureDimensions(this, setAttribute, removeAttribute);
 
         originalData.call(this);
       };

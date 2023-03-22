@@ -86,7 +86,6 @@ public class TemplatesAdministrationSectionPage extends AdministrationSectionPag
         getDriver().addPageNotYetReloadedMarker();
         this.createButton.click();
         getDriver().waitUntilPageIsReloaded();
-        return;
     }
 
     /**

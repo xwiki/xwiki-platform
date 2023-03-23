@@ -259,8 +259,9 @@
       var originalDowncast = imageWidget.downcast;
       imageWidget.downcast = function (element) {
         var el = originalDowncast.apply(this, arguments);
-        if (this.parts.caption === null && el.children[0] && el.children[0].children[1]) {
-          el.children[0].children[1].remove();
+        if (this.parts.caption === null && el.children[0] && el.children[0].children[0]) {
+          el = el.children[0].children[0];
+          delete el.attributes['data-widget'];
         }
         return el;
       };

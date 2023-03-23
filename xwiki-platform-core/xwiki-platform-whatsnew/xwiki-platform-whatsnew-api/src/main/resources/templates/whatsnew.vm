@@ -50,11 +50,11 @@
           #foreach($newsItem in $newsItems)
             <div class="xwiki-whatsnew-item">
               ## The title is expected to be in plain text
-              <a class="xwiki-whatsnew-title" href="$escapetool.xml($newsItem.originURL.get())">$escapetool.xml($newsItem.title.get())</a>
+              <a class="xwiki-whatsnew-item-title" href="$escapetool.xml($newsItem.originURL.get())">$escapetool.xml($newsItem.title.get())</a>
               ## Format the date according to the user's defined format for the current wiki
               #set ($formattedDate = $xwiki.formatDate($newsItem.publishedDate.get()))
-              <div class="xwiki-whatsnew-date">$escapetool.xml($formattedDate)</div>
-              <div class="xwiki-whatsnew-description">
+              <div class="xwiki-whatsnew-item-date">$escapetool.xml($formattedDate)</div>
+              <div class="xwiki-whatsnew-item-description">
                 ## Render the description using the syntax it's written in.
                 #set ($description = $newsItem.description.get())
                 #set ($syntax = $description.syntax)

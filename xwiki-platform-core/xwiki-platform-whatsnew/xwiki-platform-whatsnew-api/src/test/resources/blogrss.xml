@@ -19,7 +19,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://purl.org/rss/1.0/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://purl.org/rss/1.0/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xwiki="https://xwiki.org">
   <channel rdf:about="/xwiki/bin/view/Blog/">
     <title>Blog</title>
     <link>https://www.xwiki.org:443/xwiki/bin/view/Blog/</link>
@@ -54,6 +54,7 @@
     <dc:subject>Blog.What&#39;s New for XWiki: Admin User</dc:subject>
     <dc:date>2023-01-23T05:34:15+01:00</dc:date>
     <dc:creator>Michael Hamann</dc:creator>
+    <xwiki:image type="image/jpeg" length="126296">http://localhost:8080/xwiki/bin/download/Blog/BlogIntroduction/blog-post-thumbnail.jpg?rev=1.1</xwiki:image>
   </item>
   <item rdf:about="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki%2014.10.3%20Released?language=en">
     <title>XWiki 14.10.3 Released</title>

@@ -137,13 +137,18 @@
               </differences>
             </revapi.differences>
             <revapi.differences>
+              <justification>Young API</justification>
+              <criticality>documented</criticality>
               <differences>
                 <item>
                   <ignore>true</ignore>
                   <code>java.method.addedToInterface</code>
                   <new>method int java.lang.Comparable&lt;T&gt;::compareTo(T) @ org.xwiki.whatsnew.NewsSourceItem</new>
-                  <justification>Young API</justification>
-                  <criticality>documented</criticality>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.addedToInterface</code>
+                  <new>method java.util.Optional&lt;java.lang.String&gt; org.xwiki.whatsnew.NewsSourceItem::getImageURL()</new>
                 </item>
               </differences>
             </revapi.differences>

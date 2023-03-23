@@ -193,6 +193,8 @@ public class XWikiBlogNewsSource implements NewsSource
             newsItem.setCategories(this.categoriesConverter.convertFromRSS(item.getCategories()));
             newsItem.setPublishedDate(parseDateTime(item.getPubDate()));
             newsItem.setOriginURL(item.getLink());
+            newsItem.setImageURL(item.getEnclosure().isPresent() ? Optional.of(item.getEnclosure().get().getUrl())
+                : Optional.empty());
             newsItems.add(newsItem);
         }
 

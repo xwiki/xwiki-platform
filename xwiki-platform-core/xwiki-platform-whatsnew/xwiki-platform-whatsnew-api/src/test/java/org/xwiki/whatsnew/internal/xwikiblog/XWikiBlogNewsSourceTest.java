@@ -75,6 +75,8 @@ class XWikiBlogNewsSourceTest
         assertEquals(1674448455000L, items.get(0).getPublishedDate().get().getTime());
         assertEquals("https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki%2015.0%20Release%20Candidate%201%20Released"
             + "?language=en", items.get(0).getOriginURL().get());
+        assertEquals("http://localhost:8080/xwiki/bin/download/Blog/BlogIntroduction/blog-post-thumbnail.jpg?rev=1.1",
+            items.get(0).getImageURL().get());
     }
 
     @Test

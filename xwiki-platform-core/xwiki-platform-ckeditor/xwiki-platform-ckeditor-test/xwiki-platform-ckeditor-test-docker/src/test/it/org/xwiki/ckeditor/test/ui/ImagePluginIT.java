@@ -41,6 +41,7 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
+import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -202,6 +203,59 @@ class ImagePluginIT
 
         // Verify that the content matches what we did using CKEditor.
         assertEquals("[[image:http://mysite.com/myimage.png]]", savedPage.editWiki().getContent());
+    }
+
+    /**
+     * Verify that the {@code wikigeneratedid} class is correctly preserved when the caption is activated on an
+     * existing image and thus the id is not persisted, see
+     * <a href="https://jira.xwiki.org/browse/XWIKI-20652">XWIKI-20652</a>.
+     * Also verify that custom ids are preserved, nevertheless.
+     */
+    @Test
+    @Order(5)
+    void activateCaptionIdPersistence(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Insert a first image.
+        String attachmentName = "image.gif";
+        AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
+        ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
+
+        // Move to the WYSIWYG edition page.
+        WYSIWYGEditPage wysiwygEditPage = newPage.editWYSIWYG();
+        CKEditor editor = new CKEditor("content").waitToLoad();
+
+        // Insert a first image.
+        ImageDialogSelectModal imageDialogSelectModal = editor.clickImageButton();
+        imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);
+        ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
+        imageDialogEditModal.clickInsert();
+
+        editor.getRichTextArea().sendKeys(Keys.RIGHT, Keys.END, Keys.ENTER, "Some text", Keys.ENTER);
+
+        imageDialogSelectModal = editor.clickImageButton();
+        imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);
+        imageDialogEditModal = imageDialogSelectModal.clickSelect();
+        imageDialogEditModal.clickInsert();
+
+        ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
+
+        WikiEditPage wikiEditPage = savedPage.editWiki();
+        // Verify that the content matches what we did using CKEditor.
+        assertEquals("[[image:image.gif]]\n\nSome text\n\n[[image:image.gif]]", wikiEditPage.getContent());
+        wikiEditPage.setContent("[[image:image.gif]]\n\nSome text\n\n[[image:image.gif||id=\"customID\"]]");
+        newPage = wikiEditPage.clickSaveAndView();
+        wysiwygEditPage = newPage.editWYSIWYG();
+        editor = new CKEditor("content").waitToLoad();
+        for (String id : List.of("Iimage.gif", "customID")) {
+            editor.executeOnIframe(() -> setup.getDriver().findElement(By.id(id)).click());
+            imageDialogEditModal = editor.clickImageButtonWhenImageExists();
+            imageDialogEditModal.clickCaptionCheckbox();
+            imageDialogEditModal.clickInsert();
+        }
+        savedPage = wysiwygEditPage.clickSaveAndView();
+
+        assertEquals("[[Caption>>image:image.gif]]\n\nSome text\n\n[[Caption>>image:image.gif||id=\"customID\"]]",
+            savedPage.editWiki().getContent());
     }
 
     private static void createAndLoginStandardUser(TestUtils setup)

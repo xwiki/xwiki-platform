@@ -123,7 +123,7 @@ public class XWikiFilter extends Filter
             StringUtils.startsWith(StringUtils.lowerCase(servletRequest.getContentType()), expectedType)))
         {
             Series<Header> requestHeaders = request.getHeaders();
-            String formToken = requestHeaders.getFirstValue(FORM_TOKEN_HEADER);
+            String formToken = requestHeaders.getFirstValue(FORM_TOKEN_HEADER, true);
 
             // Skip the main request handler but allow cleanup if either the CSRF validator failed or the token is
             // invalid.

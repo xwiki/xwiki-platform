@@ -91,6 +91,22 @@ require(['xwiki-page-ready'], function(pageReady) {
   // why we need to keep track of the URLs that are successfuly loaded.
   const loadedURLs = new Set();
 
+  /**
+   * Resolve the given (string or URL) url as absolute URL or return the URL of the given request.
+   *
+   * @param urlOrRequest the url or request
+   * @returns {string} the absolute URL (or undefined if it was not one of the expected types)
+   */
+  const getAbsoluteURL = function (urlOrRequest) {
+    if (urlOrRequest instanceof Request) {
+      return urlOrRequest.url;
+    } else if (urlOrRequest instanceof URL) {
+      return urlOrRequest.href;
+    } else if (typeof urlOrRequest === "string") {
+      return (new URL(urlOrRequest, window.location)).href;
+    }
+  };
+
   // HTTP requests made while the window is loading should delay the page ready.
   let interceptedOpen;
   const interceptXMLHttpRequest = function() {
@@ -100,7 +116,7 @@ require(['xwiki-page-ready'], function(pageReady) {
     }
     interceptedOpen = window.XMLHttpRequest.prototype.open = function() {
       try {
-        const url = arguments[1];
+        const url = getAbsoluteURL(arguments[1]);
         pageReady.delayPageReady(new Promise((resolve, reject) => {
           this.addEventListener('load', () => {
             loadedURLs.add(url);
@@ -124,7 +140,7 @@ require(['xwiki-page-ready'], function(pageReady) {
     interceptedFetch = window.fetch = function() {
       const fetchPromise = originalFetch.apply(this, arguments);
       try {
-        const url = arguments[0];
+        const url = getAbsoluteURL(arguments[0]);
         pageReady.delayPageReady(fetchPromise.then(() => {
           loadedURLs.add(url);
         }), `fetch:${url}`);
@@ -140,9 +156,12 @@ require(['xwiki-page-ready'], function(pageReady) {
     const scriptObserver = new MutationObserver(mutations => {
       mutations.forEach(mutation => {
         mutation.addedNodes.forEach(addedNode => {
-          const url = addedNode.src;
+          const src = addedNode.src;
           // Delay the page ready only if the script is not already loaded, otherwise the load event is not fired.
-          if (addedNode.tagName === 'SCRIPT' && typeof url === 'string' && url !== '' && !loadedURLs.has(url)) {
+          if (addedNode.tagName === 'SCRIPT' && typeof src === 'string' && src !== ''
+            && !loadedURLs.has(getAbsoluteURL(src)))
+          {
+            const url = getAbsoluteURL(src);
             pageReady.delayPageReady(new Promise((resolve, reject) => {
               addedNode.addEventListener('load', () => {
                 loadedURLs.add(url);

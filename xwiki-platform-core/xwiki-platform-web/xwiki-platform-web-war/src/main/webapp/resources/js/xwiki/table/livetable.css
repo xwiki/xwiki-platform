@@ -152,6 +152,7 @@ thead.xwiki-livetable-display-header th.selected {
   background-color: $theme.highlightColor;
 }
 html>body thead.xwiki-livetable-display-header  td.xwiki-livetable-display-header-filter {
+  position: relative;
   padding: 2px 5px 2px 0px;
   border-color: transparent;
 }
@@ -162,6 +163,13 @@ thead.xwiki-livetable-display-header td.xwiki-livetable-display-header-filter se
   color: $theme.textPrimaryColor;
   margin: 0;
   padding: 0 0 0 2px;
+}
+.xwiki-livetable-display-header-filter > .daterangepicker {
+  left: 90px;
+  top: 35px;
+}
+.xwiki-livetable-display-header-filter > .daterangepicker.show-calendar {
+  left: -150px;
 }
 .xwiki-livetable-filter-active {
   background-color: $theme.highlightColor !important;

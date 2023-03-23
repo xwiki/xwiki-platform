@@ -332,7 +332,9 @@
     #end
     </select>
   #elseif ($filterType == 'boolean')
-    <select id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$!escapetool.xml($column)">
+    <select id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$!escapetool.xml($column)"
+      title="$escapetool.xml($services.localization.render('platform.livetable.filtersTitle',
+      [$services.localization.render("${transprefix}$column")]))">
       <option value="">$services.localization.render('platform.livetable.selectAll')</option>
       <option value="0">$services.localization.render('no')</option>
       <option value="1">$services.localization.render('yes')</option>
@@ -356,7 +358,8 @@
       data-type="date" data-dateformat="$escapetool.xml($dateFormat)"
       #if ("$!columnProperties.size" != '')size="$!escapetool.xml($columnProperties.size)"#end
       title="$escapetool.xml($services.localization.render('platform.livetable.filtersTitle',
-      [$services.localization.render("${transprefix}$column")]))" />
+      [$services.localization.render("${transprefix}$column")]))"
+      aria-expanded="false"/>
   #elseif ($filterType == 'suggest' && $xproperty)
     #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'),
       {'type': 'text/css', 'rel': 'stylesheet'}))

@@ -44,6 +44,7 @@ public class ImageDialogEditModal extends BaseElement
     public ImageDialogEditModal waitUntilReady()
     {
         getDriver().waitUntilElementIsVisible(By.className("image-editor-modal"));
+        getDriver().waitUntilElementDisappears(By.cssSelector(".image-editor-modal .loading"));
         return this;
     }
 

@@ -58,9 +58,7 @@ class FormTokenInjectionIT
             StandardCharsets.UTF_8)
             + "</script>"
             + "{{/html}}";
-        setup.createPage(reference, content);
-
-        ViewPage viewPage = setup.gotoPage(reference);
+        ViewPage viewPage = setup.createPage(reference, content);
         String pageContent = viewPage.getContent();
 
         assertAll(

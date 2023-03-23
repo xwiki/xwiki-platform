@@ -35,7 +35,8 @@
 // If the build has been manually triggered:
 // - if the type is known, then execute the tests
 // - if the type is not known, it means it's the first execution and the job is not parameterized yet. Thus,
-//   parameterize it and schedule the next run.
+//   parameterize it and schedule the next run. If you want to execute it, you'll need to trigger the build a second
+//   time and choose the type.
 if (currentBuild.rawBuild.getCauses()[0].toString().contains('UserIdCause')) {
   def validValues = ['docker-latest', 'docker-all', 'docker-unsupported']
   if (validValues.contains(params.type)) {

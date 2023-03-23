@@ -74,17 +74,26 @@ public class TemplatesAdministrationSectionPage extends AdministrationSectionPag
         documentPicker.toggleLocationAdvancedEdit();
         documentPicker.setParent(space);
         documentPicker.setName(page);
-        
+
+        this.clickOnCreateButton();
+
+        return new TemplateProviderInlinePage();
+    }
+
+    private void clickOnCreateButton()
+    {
         // Livevalidation blocks the form submission until the validated fields are valid. Until the form is validated,
         // Livevalidation prevents the submission button to be clicked.
         // On some rare cases, the click of the button is done too early and the form submission is prevented.
-        // To be sure that the form is validated before clicking, wait for the two fields validation messages to be 
+        // To be sure that the form is validated before clicking, wait for the two fields validation messages to be
         // displayed before clicking.
         getDriver().waitUntilCondition(input ->
             getDriver().findElementsWithoutWaiting(By.cssSelector("form .LV_validation_message.LV_valid")).size() == 2);
-        this.createButton.click();
 
-        return new TemplateProviderInlinePage();
+        // FIXME: workaround for https://github.com/mozilla/geckodriver/issues/1026
+        getDriver().addPageNotYetReloadedMarker();
+        this.createButton.click();
+        getDriver().waitUntilPageIsReloaded();
     }
 
     /**

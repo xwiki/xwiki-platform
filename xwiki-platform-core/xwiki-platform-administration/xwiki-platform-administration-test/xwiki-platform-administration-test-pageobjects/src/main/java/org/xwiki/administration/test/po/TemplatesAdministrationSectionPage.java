@@ -19,8 +19,10 @@
  */
 package org.xwiki.administration.test.po;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -74,6 +76,13 @@ public class TemplatesAdministrationSectionPage extends AdministrationSectionPag
         documentPicker.toggleLocationAdvancedEdit();
         documentPicker.setParent(space);
         documentPicker.setName(page);
+        // Wait until the location has been updated such that no unexpected scrolling happens while the submit button
+        // is pressed.
+        List<String> path = new ArrayList<>();
+        path.add("");
+        path.addAll(List.of(StringUtils.split(space, ".")));
+        path.add(page);
+        documentPicker.waitForLocation(path);
 
         this.clickOnCreateButton();
 

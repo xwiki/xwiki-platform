@@ -263,9 +263,12 @@ class ImagePluginIT
 
     @Test
     @Order(6)
-    void imageWithCaption(TestUtils setup, TestReference testReference)
+    void imageWithCaption(TestUtils setup, TestReference testReference) throws Exception
     {
-        ViewPage newPage = setup.gotoPage(testReference);
+        // Upload an attachment to test with.
+        String attachmentName = "image.gif";
+        AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
+        ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
 
         // Move to the WYSIWYG edition page.
         WYSIWYGEditPage wysiwygEditPage = newPage.editWYSIWYG();
@@ -273,8 +276,7 @@ class ImagePluginIT
 
         // Insert a with caption and alignment to center.
         ImageDialogSelectModal imageDialogSelectModal = editor.clickImageButton();
-        ImageDialogUrlSelectForm imageDialogUrlSelectForm = imageDialogSelectModal.switchToUrlTab();
-        imageDialogUrlSelectForm.setUrlValue("http://mysite.com/myimage.png");
+        imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);
         ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
         imageDialogEditModal.switchToStandardTab().clickCaptionCheckbox();
         imageDialogEditModal.switchToAdvancedTab().selectCenterAlignment();
@@ -282,15 +284,15 @@ class ImagePluginIT
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
         // Verify that the content matches what we did using CKEditor.
-        assertEquals("[[Caption>>image:http://mysite.com/myimage.png"
-            + "||data-xwiki-image-style-alignment=\"center\"]]", savedPage.editWiki().getContent());
+        assertEquals("[[Caption>>image:image.gif||data-xwiki-image-style-alignment=\"center\"]]",
+            savedPage.editWiki().getContent());
 
         // Re-edit the page.
         savedPage.editWYSIWYG();
         editor = new CKEditor("content").waitToLoad();
 
         // Focus on the image to edit.
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("figure")).click());
+        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         imageDialogEditModal = editor.clickImageButtonWhenImageExists();
         imageDialogEditModal.switchToStandardTab().clickCaptionCheckbox();
@@ -298,7 +300,7 @@ class ImagePluginIT
         savedPage = wysiwygEditPage.clickSaveAndView();
 
         // Verify that the content matches what we did using CKEditor.
-        assertEquals("[[image:http://mysite.com/myimage.png||data-xwiki-image-style-alignment=\"center\"]]",
+        assertEquals("[[image:image.gif||data-xwiki-image-style-alignment=\"center\"]]",
             savedPage.editWiki().getContent());
 
         // Edit again to set the caption a second time.
@@ -314,8 +316,8 @@ class ImagePluginIT
         savedPage = wysiwygEditPage.clickSaveAndView();
 
         // Verify that the content matches what we did using CKEditor.
-        assertEquals("[[Caption>>image:http://mysite.com/myimage.png"
-            + "||data-xwiki-image-style-alignment=\"center\"]]", savedPage.editWiki().getContent());
+        assertEquals("[[Caption>>image:image.gif||data-xwiki-image-style-alignment=\"center\"]]",
+            savedPage.editWiki().getContent());
     }
 
     private static void createAndLoginStandardUser(TestUtils setup)

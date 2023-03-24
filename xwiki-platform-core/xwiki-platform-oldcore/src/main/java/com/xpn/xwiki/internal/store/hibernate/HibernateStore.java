@@ -33,6 +33,7 @@ import java.sql.Statement;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.TimeZone;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -53,19 +54,20 @@ import org.hibernate.Transaction;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataBuilder;
 import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.cfgxml.internal.ConfigLoader;
+import org.hibernate.boot.cfgxml.spi.LoadedConfig;
 import org.hibernate.boot.model.naming.Identifier;
 import org.hibernate.boot.model.relational.QualifiedSequenceName;
 import org.hibernate.boot.registry.BootstrapServiceRegistry;
 import org.hibernate.boot.registry.BootstrapServiceRegistryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
 import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 import org.hibernate.engine.jdbc.spi.JdbcServices;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.integrator.spi.Integrator;
 import org.hibernate.jdbc.Work;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.KeyValue;
@@ -73,7 +75,6 @@ import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 import org.hibernate.mapping.Table;
 import org.hibernate.query.NativeQuery;
-import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.hibernate.tool.schema.TargetType;
 import org.hibernate.tool.schema.extract.spi.ExtractionContext;
@@ -108,7 +109,7 @@ import com.xpn.xwiki.store.migration.DataMigrationManager;
 @Singleton
 // Make sure the Hibernate store is disposed at the end in case some components needs it for their own dispose
 @DisposePriority(10000)
-public class HibernateStore implements Disposable, Integrator, Initializable
+public class HibernateStore implements Disposable, Initializable
 {
     /**
      * @see #isConfiguredInSchemaMode()
@@ -156,13 +157,13 @@ public class HibernateStore implements Disposable, Integrator, Initializable
 
     private DataMigrationManager dataMigrationManager;
 
-    private BootstrapServiceRegistry bootstrapServiceRegistry;
-
     private MetadataSources metadataSources;
 
     private HibernateStoreConfiguration configuration;
 
-    private StandardServiceRegistry standardServiceRegistry;
+    private BootstrapServiceRegistry bootstrapServiceRegistry;
+
+    private StandardServiceRegistry standardRegistry;
 
     private Dialect dialect;
 
@@ -170,11 +171,13 @@ public class HibernateStore implements Disposable, Integrator, Initializable
 
     private SessionFactory sessionFactory;
 
-    private Metadata configurationMetadata;
+    private Metadata configuredMetadata;
 
     private String configurationCatalog;
 
     private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+
+    private URL configurationURL;
 
     private DataMigrationManager getDataMigrationManager()
     {
@@ -221,25 +224,65 @@ public class HibernateStore implements Disposable, Integrator, Initializable
         return url;
     }
 
-    private void createConfiguration()
-    {
-        this.bootstrapServiceRegistry = new BootstrapServiceRegistryBuilder().applyIntegrator(this).build();
-        this.metadataSources = new MetadataSources(this.bootstrapServiceRegistry);
-        this.configuration = new HibernateStoreConfiguration(this.metadataSources, this.configuration);
-    }
-
     @Override
     public void initialize() throws InitializationException
     {
-        createConfiguration();
-
-        URL url = getHibernateConfigurationURL();
-        if (url != null) {
-            this.configuration.configure(url);
-
-            // Resolve some variables
-            replaceVariables(this.configuration);
+        // Search for the base configuration file
+        this.configurationURL = getHibernateConfigurationURL();
+        if (this.configurationURL == null) {
+            throw new InitializationException("Could not find any Hibernate configuration");
         }
+
+        // For retro compatibility reasons we have to create an old Configuration object since it's exposed in the API
+        this.configuration = new HibernateStoreConfiguration(this.configurationURL);
+        replaceVariables(this.configuration);
+    }
+
+    private void disposeSessionFactory()
+    {
+        Session session = getCurrentSession();
+        closeSession(session);
+
+        if (this.sessionFactory != null) {
+            this.sessionFactory.close();
+        }
+        if (this.standardRegistry != null) {
+            this.standardRegistry.close();
+        }
+        if (this.bootstrapServiceRegistry != null) {
+            this.bootstrapServiceRegistry.close();
+        }
+    }
+
+    private void createSessionFactory()
+    {
+        this.bootstrapServiceRegistry = new BootstrapServiceRegistryBuilder().build();
+
+        // Load the base configuration file
+        ConfigLoader configLoader = new ConfigLoader(this.bootstrapServiceRegistry);
+        LoadedConfig baseConfiguration = configLoader.loadConfigXmlUrl(this.configurationURL);
+        // Resolve some variables
+        replaceVariables(baseConfiguration);
+
+        StandardServiceRegistryBuilder standardRegistryBuilder =
+            new StandardServiceRegistryBuilder(this.bootstrapServiceRegistry);
+        standardRegistryBuilder.configure(baseConfiguration);
+        this.standardRegistry = standardRegistryBuilder.build();
+
+        this.metadataSources = new MetadataSources(this.standardRegistry);
+
+        // Copy the extended configuration
+        this.configuration.copy(this.metadataSources);
+
+        MetadataBuilder metadataBuilder = this.metadataSources.getMetadataBuilder();
+        this.configuredMetadata = metadataBuilder.build();
+
+        Identifier catalog = this.configuredMetadata.getDatabase().getJdbcEnvironment().getCurrentCatalog();
+        if (catalog != null) {
+            this.configurationCatalog = catalog.getCanonicalName();
+        }
+
+        this.sessionFactory = this.configuredMetadata.getSessionFactoryBuilder().build();
     }
 
     /**
@@ -250,25 +293,22 @@ public class HibernateStore implements Disposable, Integrator, Initializable
         build();
     }
 
-    @Override
-    public void integrate(Metadata metadata, SessionFactoryImplementor sessionFactory,
-        SessionFactoryServiceRegistry serviceRegistry)
+    private String resolveURL(String url)
     {
-        this.configurationMetadata = metadata;
+        // Replace variables
+        if (StringUtils.isNotEmpty(url) && url.matches(".*\\$\\{.*\\}.*")) {
+            String newURL = StringUtils.replace(url, String.format("${%s}", PROPERTY_PERMANENTDIRECTORY),
+                this.environment.getPermanentDirectory().getAbsolutePath());
 
-        Identifier catalog = this.configurationMetadata.getDatabase().getJdbcEnvironment().getCurrentCatalog();
-        if (catalog != null) {
-            this.configurationCatalog =
-                this.configurationMetadata.getDatabase().getJdbcEnvironment().getCurrentCatalog().getCanonicalName();
+            try {
+                return StringUtils.replace(newURL, PROPERTY_TIMEZONE_VARIABLE,
+                    URLEncoder.encode(TimeZone.getDefault().getID(), "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                this.logger.error("Failedd to encode the current timezone id", e);
+            }
         }
-    }
 
-    @Override
-    public void disintegrate(SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry)
-    {
-        this.configurationMetadata = null;
-        this.databaseProductCache = DatabaseProduct.UNKNOWN;
-        this.dialect = null;
+        return null;
     }
 
     /**
@@ -280,26 +320,29 @@ public class HibernateStore implements Disposable, Integrator, Initializable
      */
     private void replaceVariables(Configuration hibernateConfiguration)
     {
-        String url = hibernateConfiguration.getProperty(org.hibernate.cfg.Environment.URL);
-        if (StringUtils.isEmpty(url)) {
-            return;
-        }
-
-        // Replace variables
-        if (url.matches(".*\\$\\{.*\\}.*")) {
-            String newURL = StringUtils.replace(url, String.format("${%s}", PROPERTY_PERMANENTDIRECTORY),
-                this.environment.getPermanentDirectory().getAbsolutePath());
-
-            try {
-                newURL = StringUtils.replace(newURL, PROPERTY_TIMEZONE_VARIABLE,
-                    URLEncoder.encode(TimeZone.getDefault().getID(), "UTF-8"));
-            } catch (UnsupportedEncodingException e) {
-                this.logger.error("Failedd to encode the current timezone id", e);
-            }
-
+        String newURL = resolveURL(hibernateConfiguration.getProperty(org.hibernate.cfg.AvailableSettings.URL));
+        if (newURL != null) {
             // Set the new URL
-            hibernateConfiguration.setProperty(org.hibernate.cfg.Environment.URL, newURL);
-            this.logger.debug("Resolved Hibernate URL [{}] to [{}]", url, newURL);
+            hibernateConfiguration.setProperty(org.hibernate.cfg.AvailableSettings.URL, newURL);
+            this.logger.debug("Resolved Hibernate URL [{}] to [{}]", newURL, newURL);
+        }
+    }
+
+    /**
+     * Replace variables defined in Hibernate properties using the <code>${variable}</code> notation. Note that right
+     * now the only variable being replaced is {@link #PROPERTY_PERMANENTDIRECTORY} and replaced with the value coming
+     * from the XWiki configuration.
+     *
+     * @param hibernateConfiguration the Hibernate Configuration object that we're evaluating
+     */
+    private void replaceVariables(LoadedConfig hibernateConfiguration)
+    {
+        Map values = hibernateConfiguration.getConfigurationValues();
+        String newURL = resolveURL((String) values.get(org.hibernate.cfg.AvailableSettings.URL));
+        if (newURL != null) {
+            // Set the new URL
+            values.put(org.hibernate.cfg.AvailableSettings.URL, newURL);
+            this.logger.debug("Resolved Hibernate URL [{}] to [{}]", newURL, newURL);
         }
     }
 
@@ -315,39 +358,21 @@ public class HibernateStore implements Disposable, Integrator, Initializable
         this.lock.writeLock().lock();
 
         try {
-            // Check if it's a rebuild
+            // Check if it's a reload
             if (this.sessionFactory != null) {
-                // Get rid of existing session factory
-                disposeInternal();
-
-                // Recreate the configuration
-                createConfiguration();
+                disposeSessionFactory();
             }
 
-            this.configuration.getStandardServiceRegistryBuilder().applySettings(this.configuration.getProperties());
-            this.standardServiceRegistry = this.configuration.getStandardServiceRegistryBuilder().build();
-
-            // Create a new session factory
-            this.sessionFactory = this.configuration.buildSessionFactory(this.standardServiceRegistry);
+            createSessionFactory();
         } finally {
             this.lock.writeLock().unlock();
-        }
-    }
-
-    private void disposeInternal()
-    {
-        Session session = getCurrentSession();
-        closeSession(session);
-
-        if (this.sessionFactory != null) {
-            this.sessionFactory.close();
         }
     }
 
     @Override
     public void dispose() throws ComponentLifecycleException
     {
-        disposeInternal();
+        disposeSessionFactory();
     }
 
     /**
@@ -521,7 +546,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
      */
     public Metadata getConfigurationMetadata()
     {
-        return this.configurationMetadata;
+        return this.configuredMetadata;
     }
 
     /**
@@ -645,7 +670,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
     public Dialect getDialect()
     {
         if (this.dialect == null) {
-            JdbcServices jdbcServices = this.standardServiceRegistry.getService(JdbcServices.class);
+            JdbcServices jdbcServices = this.standardRegistry.getService(JdbcServices.class);
             this.dialect = jdbcServices.getDialect();
         }
 
@@ -655,7 +680,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
     /**
      * Set the current wiki in the passed session.
      * 
-     * @param session the hibernate session
+     * @param session the Hibernate session
      * @throws XWikiException when failing to switch wiki
      */
     public void setWiki(Session session) throws XWikiException
@@ -666,7 +691,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
     /**
      * Set the passed wiki in the passed session
      *
-     * @param session the hibernate session
+     * @param session the Hibernate session
      * @param wikiId the id of the wiki to switch to
      * @throws XWikiException when failing to switch wiki
      */
@@ -965,7 +990,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
     public void shutdownHibernate()
     {
         // Close all connections
-        disposeInternal();
+        disposeSessionFactory();
     }
 
     /**
@@ -1010,6 +1035,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
     {
         MetadataBuilder metadataBuilder = this.metadataSources.getMetadataBuilder(this.standardServiceRegistry);
 
+        // Associate the metadata with a specific wiki
         setWiki(metadataBuilder, wikiId);
 
         updateDatabase(metadataBuilder.build());
@@ -1033,7 +1059,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
             JdbcConnectionAccess jdbcConnectionAccess = session.getJdbcConnectionAccess();
 
             try (Connection connection = jdbcConnectionAccess.obtainConnection()) {
-                JdbcEnvironment jdbcEnvironment = this.standardServiceRegistry.getService(JdbcEnvironment.class);
+                JdbcEnvironment jdbcEnvironment = this.standardRegistry.getService(JdbcEnvironment.class);
 
                 ExtractionContext extractionContext = new ExtractionContext.EmptyExtractionContext()
                 {

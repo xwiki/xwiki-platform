@@ -32,10 +32,13 @@ import org.mockito.Mock;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.environment.Environment;
+import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import com.xpn.xwiki.internal.store.hibernate.HibernateConfiguration;
 import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -53,8 +56,21 @@ class HibernateStoreTest
     @MockComponent
     private Execution execution;
 
+    @MockComponent
+    private Environment environment;
+
+    @MockComponent
+    private HibernateConfiguration configuration;
+
     @Mock
     private Transaction transaction;
+
+    @AfterComponent
+    void afterComponent()
+    {
+        when(this.configuration.getPath()).thenReturn("/WEB-INF/hibernate.cfg.xml");
+        when(this.environment.getResource("/WEB-INF/hibernate.cfg.xml")).thenReturn(getClass().getResource("/hibernate.cfg.xml"));
+    }
 
     @BeforeEach
     void before()

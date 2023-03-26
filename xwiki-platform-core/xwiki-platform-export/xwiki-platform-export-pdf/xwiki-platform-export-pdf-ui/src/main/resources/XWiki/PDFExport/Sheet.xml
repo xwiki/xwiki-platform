@@ -588,11 +588,33 @@ require([
     }).join('');
   };
 
+  /**
+   * Form field values that are set by the user after the page is loaded are lost when the fields are detached from the
+   * DOM. This happens for instance when Paged.js splits the exported content into print pages and adds its wrappers
+   * around each of these print pages. In order to overcome this we store the form field values in the DOM (e.g. using
+   * the value attribute) so they are preserved when the form fields are moved around inside the DOM document.
+   */
+  const storeFormFieldValues = function() {
+    $('input').filter(':visible').each(function() {
+      this.setAttribute('value', this.value);
+    });
+    $('input[type="checkbox"], input[type="radio"]').filter(':visible').each(function() {
+      this.toggleAttribute('checked', this.checked);
+    });
+    $('textarea').filter(':visible').each(function() {
+      this.textContent = this.value;
+    });
+    $('option').each(function() {
+      this.toggleAttribute('selected', this.selected);
+    });
+  };
+
   // Adjust the exported content before performing the print layout.
   pageReady.afterPageReady(() =&gt; {
     refactorAnchors();
     removeEmptyTableOfContents();
     validateTableOfContentsAnchors();
+    storeFormFieldValues();
   });
 
   // Trigger the print preview after the page is ready. Note that by returning a promise we're making the next page

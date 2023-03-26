@@ -48,6 +48,7 @@ import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -609,6 +610,42 @@ class PDFExportIT
             assertEquals("FormFields\n2 / 2\n" + "Title\nTitle modified\n" + " Enabled\n"
                 + "Color\n Blue  Yellow  Red\n" + "City\nParis\n" + "Genre\nComedy\nDrama\nRomance\n"
                 + "Description\ndescription modified\n" + "Submit\n", content);
+        }
+    }
+
+    @Test
+    @Order(11)
+    void liveTable(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        // Create a child page because we want to verify that the PDF export preserves the live table sort (we sort by
+        // last modification date and the child page we create should be the most recent).
+        LocalDocumentReference parent =
+            new LocalDocumentReference(Arrays.asList("PDFExportIT", "LiveTable"), "WebHome");
+        setup.createPage(new LocalDocumentReference("Child", parent.getParent()), "");
+
+        ViewPage viewPage = setup.gotoPage(parent);
+
+        // Change the state of the Live Table in order to verify that the PDF export preserves it.
+        LiveTableElement liveTable = new LiveTableElement("docs");
+        liveTable.sortDescending("Date");
+        liveTable.filterColumn("xwiki-livetable-docs-filter-2", "live");
+
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // We should have 2 pages: cover page and content page.
+            assertEquals(2, pdf.getNumberOfPages());
+
+            String content = pdf.getTextFromPage(1);
+            // Verify the pagination (result count), the headers and the filters.
+            assertTrue(
+                content
+                    .contains("Results 1 - 2 out of 2 per page of 15\nPage Location Date Last Author Actions\nlive\n"),
+                "Unexpected content: " + content);
+            // Verify the results and the order.
+            int childIndex = content.indexOf("Child PDFExportITLiveTable\nChild");
+            int parentIndex = content.indexOf("WebHome PDFExportITLiveTable");
+            assertTrue(childIndex < parentIndex, "Unexpected content: " + content);
         }
     }
 

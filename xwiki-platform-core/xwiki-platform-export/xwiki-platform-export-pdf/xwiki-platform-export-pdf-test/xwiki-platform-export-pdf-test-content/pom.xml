@@ -44,9 +44,16 @@
     </dependency>
     <dependency>
       <!-- Used to set the PDF export log level to debug. -->
-      <groupId>org.xwiki.platform</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>xwiki-platform-logging-script</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <!-- Used to test how the Live Table is exported to PDF. -->
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-livetable-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
     </dependency>
     <dependency>
       <!-- Used to test the integration with Numbered Headings Application. -->

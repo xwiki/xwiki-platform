@@ -62,6 +62,12 @@
       <version>1.8.1</version>
       <type>xar</type>
     </dependency>
+    <!-- Used to test the PDF export of the code macro. -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-rendering-macro-code</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- JavaScript dependencies -->
     <dependency>
       <groupId>org.webjars</groupId>

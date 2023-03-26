@@ -771,13 +771,49 @@ require([
       <cache>long</cache>
     </property>
     <property>
-      <code>@media print {
+      <code>//
+// Grid system for print media
+//
+@print-margin: 1in;
+// We change the values of the following standard Bootstrap variables to match standard paper sizes.
+@screen-sm-min: floor(((210mm - @print-margin) * .75)); // A4 (portrait)
+@screen-md-min: floor(((297mm - @print-margin) * .75)); // A4 (landscape)
+@screen-lg-min: floor(((420mm - @print-margin) * .75)); // A3 (landscape)
+
+// Small grid
+//
+// Columns, offsets, pushes, and pulls for the A4 portrait format.
+
+@media print and (min-width: @screen-sm-min) {
+  .make-grid(sm);
+}
+
+// Medium grid
+//
+// Columns, offsets, pushes, and pulls for the A4 landscape format.
+
+@media print and (min-width: @screen-md-min) {
+  .make-grid(md);
+}
+
+// Large grid
+//
+// Columns, offsets, pushes, and pulls for the A3 landscape format.
+
+@media print and (min-width: @screen-lg-min) {
+  .make-grid(lg);
+}
+
+//
+// Print styles
+//
+@media print {
   /**
    * Standard Page
    */
   @page {
     size: A4;
-    margin: .5in;
+    margin: (@print-margin / 2);
     padding: .2in 0;
 
     /* Header */

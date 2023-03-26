@@ -77,7 +77,7 @@ class PDFExportIT
     void configurePDFExport(TestUtils setup, TestConfiguration testConfiguration) throws Exception
     {
         setup.loginAsSuperAdmin();
-        
+
         // Restrict view access for guests in order to verify that the Chrome Docker container properly authenticates
         // the user (the authentication cookies are copied and updated to match the Chrome Docker container IP address).
         setup.setWikiPreference("authenticate_view", "1");
@@ -591,6 +591,24 @@ class PDFExportIT
                 + "1.8 Heading 1-8\n" + "2 Heading 2\n" + "2.1 Heading 2-1\n" + "2.1.1 Heading 2-1-1\n"
                 + "2.1.1.1 Heading 2-1-1-1\n" + "2.1.1.1.1 Heading 2-1-1-1-1\n" + "2.1.1.1.1.1 Heading 2-1-1-1-1-1\n"
                 + "2.1.1.1.1.2 Heading 2-1-1-1-1-2\n", contentPageText);
+        }
+    }
+
+    @Test
+    @Order(10)
+    void formFields(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "FormFields"));
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // We should have 2 pages: cover page and content page.
+            assertEquals(2, pdf.getNumberOfPages());
+
+            String content = pdf.getTextFromPage(1);
+            assertEquals("FormFields\n2 / 2\n" + "Title\nTitle modified\n" + " Enabled\n"
+                + "Color\n Blue  Yellow  Red\n" + "City\nParis\n" + "Genre\nComedy\nDrama\nRomance\n"
+                + "Description\ndescription modified\n" + "Submit\n", content);
         }
     }
 

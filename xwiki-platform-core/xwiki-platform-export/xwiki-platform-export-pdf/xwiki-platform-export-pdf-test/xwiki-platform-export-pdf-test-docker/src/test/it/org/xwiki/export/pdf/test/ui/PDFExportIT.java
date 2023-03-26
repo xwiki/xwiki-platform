@@ -649,6 +649,27 @@ class PDFExportIT
         }
     }
 
+    @Test
+    @Order(12)
+    void codeMacro(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "CodeMacro"));
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // We should have 2 pages: cover page and content page.
+            assertEquals(2, pdf.getNumberOfPages());
+
+            String content = pdf.getTextFromPage(1);
+            // A line break is inserted whenever a long is wrapped, so we need to remove line breaks in order to verify
+            // that the entire code macro content is present.
+            assertTrue(content.replace("\n", "").contains(
+                "// This is a very long comment that gets cut when exported to PDF because it exceeds the print page "
+                    + "width and the code macro preserves spaces which means it has to be displayed on a single line."),
+                "Unexpected content: " + content);
+        }
+    }
+
     private URL getHostURL(TestConfiguration testConfiguration) throws Exception
     {
         return new URL(String.format("http://%s:%d", testConfiguration.getServletEngine().getIP(),

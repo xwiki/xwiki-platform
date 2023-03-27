@@ -22,19 +22,21 @@
 ## More document related data: comments, attachments ...
 ##
 #template('display_macros.vm')
-## This content is set as an aside element because it is related to the main
-## content but not part of it.
+## This content is set as an aside element because it is related to the main content but not part of it.
 <aside id="xwikidata" aria-label="$escapetool.xml($services.localization.render('docextra.label'))">
 ##
 ## Build the list of documents extras to display, if it does not exist (default).
-## List format : ['ExtraAnchor', 'ExtraName', 'ExtraTabText', ExtraNumberOfItems, 'extratemplate.vm', 'keyboardShortcut']
+## List format : ['ExtraAnchor', 'ExtraName', 'ExtraTabText',
+## 'ExtraNumberOfItems', 'extratemplate.vm', 'keyboardShortcut']
 ##
 #if (!$docextras)
   #set ($docextras = [])
   #if ($showcomments)
     $xwiki.jsfx.use('uicomponents/viewers/comments.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})
     $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
-    #set ($discard = $docextras.add(['Comments', 'comments', $services.localization.render('docextra.comments'), $doc.getObjects('XWiki.XWikiComments').size(), 'commentsinline.vm', $services.localization.render('core.shortcuts.view.comments')]))
+    #set ($discard = $docextras.add(['Comments', 'comments', $services.localization.render('docextra.comments'),
+      $doc.getObjects('XWiki.XWikiComments').size(), 'commentsinline.vm',
+      $services.localization.render('core.shortcuts.view.comments')]))
   #end
   #if ($showannotations)
     #if (!$annotationCount)
@@ -43,7 +45,10 @@
       ## config document. This however should not happen.
       #set ($annotationCount = $services.annotations.getAnnotations($doc).size())
     #end
-    #set ($discard = $docextras.add(['Annotations', 'annotations', $services.localization.render('docextra.annotations'), $annotationCount, 'annotationsinline.vm', $services.localization.render('core.shortcuts.view.annotations')]))
+    #set ($discard = $docextras.add(['Annotations', 'annotations',
+      $services.localization.render('docextra.annotations'),
+      $annotationCount, 'annotationsinline.vm',
+      $services.localization.render('core.shortcuts.view.annotations')]))
   #end
   #if ($showattachments)
     ### Support attachment sorting
@@ -52,29 +57,39 @@
       ## Prepend request parameter
       #set ($sortAttachmentsBy = "&sortAttachmentsBy=$escapetool.url(${sortAttachmentsBy})")
     #end
-    #set ($discard = $docextras.add(['Attachments', 'attachments', $services.localization.render('docextra.attachments'), $doc.getAttachmentList().size(), "attachmentsinline.vm$!{sortAttachmentsBy}", $services.localization.render('core.shortcuts.view.attachments')]))
+    #set ($discard = $docextras.add(['Attachments', 'attachments',
+      $services.localization.render('docextra.attachments'), $doc.getAttachmentList().size(),
+      "attachmentsinline .vm$!{sortAttachmentsBy}",
+      $services.localization.render('core.shortcuts.view.attachments')]))
   #end
   #if ($showhistory)
     ## Pagination style
     $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
     $xwiki.jsfx.use('uicomponents/viewers/history.js', true)
-    #set ($discard = $docextras.add(['History', 'history', $services.localization.render('docextra.history'), -1, 'historyinline.vm', $services.localization.render('core.shortcuts.view.history')]))
+    #set ($discard = $docextras.add(['History', 'history', $services.localization.render('docextra.history'),
+      -1, 'historyinline.vm',
+      $services.localization.render('core.shortcuts.view.history')]))
   #end
   #if ($showinformation)
     $xwiki.jsfx.use('js/xwiki/viewers/information.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})
     $xwiki.ssfx.use('js/xwiki/viewers/information.css', true)
     $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {'forceSkinAction': true, 'language': $xcontext.locale})
-    #set ($discard = $docextras.add(['Information', 'information', $services.localization.render('docextra.information'), -1, 'informationinline.vm', $services.localization.render('core.shortcuts.view.information')]))
+    #set ($discard = $docextras.add(['Information', 'information',
+      $services.localization.render('docextra.information'),
+      -1, 'informationinline.vm', $services.localization.render('core.shortcuts.view.information')]))
   #end
 #end
 
-#set ($docExtraExtensions = $services.uix.getExtensions('org.xwiki.plaftorm.template.docextra', {'sortByParameter' : 'order'}))
+#set ($docExtraExtensions =
+  $services.uix.getExtensions('org.xwiki.plaftorm.template.docextra', {'sortByParameter' : 'order'}))
 #foreach($docExtraExtension in $docExtraExtensions)
   #set ($params = $docExtraExtension.parameters)
   #set ($template = "loaddocextrauix.vm&uix=$docExtraExtension.id")
   ## Params are evaluated as string
   #if ($params.show && $params.show == 'true')
-    #set ($newDocExtra = [$docExtraExtension.id, $params.name, $params.title, $params.itemnumber, $template, $params.shortcut])
+    #set ($newDocExtra = [
+      $docExtraExtension.id, $params.name, $params.title, $params.itemnumber, $template, $params.shortcut
+    ])
     #set ($discard = $docextras.add($newDocExtra))
   #end
 #end
@@ -96,9 +111,15 @@
       <ul class="xwikitabbar" id="docExtrasTabsUl">
         #foreach($docextra in $docextras)
           <li id="${docextra.get(0)}tab" data-template="$escapetool.xml($docextra.get(4))">
-            ## Note: Add rel='nofollow' to prevent search crawler from navigating the links and indexing them in search results
+            ## Note: Add rel='nofollow' to prevent search crawler from navigating the links and
+            ## indexing them in search results
             <a id="${docextra.get(0)}link" href="$doc.getURL('view', "viewer=${docextra.get(1)}")" rel="nofollow">
-              $docextra.get(2) #if($docextra.get(3) >= 0) <span class="itemCount">$services.localization.render('docextra.extranb', [$docextra.get(3)])</span> #end
+              $docextra.get(2)
+              #if($docextra.get(3) >= 0)
+                <span class="itemCount">
+                  $services.localization.render('docextra.extranb', [$docextra.get(3)])
+                </span>
+              #end
             </a>
           </li>
         #end
@@ -136,28 +157,40 @@
         ##
         if ($("${extraAnchor}link") != null) {
           $("${extraAnchor}link").href="#${extraAnchor}";
-          Event.observe($("${extraAnchor}link"), "click", function(){ XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", false); }, false);
+          Event.observe($("${extraAnchor}link"), "click",
+            function(){
+              XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", false);
+            }, false);
         }
         ##
         ## Replace top menu link (if any)
         ##
         if ($("tmShow${extraAnchor}") != null) {
           $("tmShow${extraAnchor}").href="#${extraAnchor}";
-          Event.observe($("tmShow${extraAnchor}"), "click", function(){ XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", true); }, false);
+          Event.observe($("tmShow${extraAnchor}"), "click",
+            function(){
+              XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", true);
+            }, false);
         }
         ##
         ## Replace shortcut link (if any)
         ##
         if ($("${extraName}shortcut") != null) {
           $("${extraName}shortcut").down('a').href="#${extraName}";
-          Event.observe($("${extraName}shortcut"), "click", function(){ XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", true); }, false);
+          Event.observe($("${extraName}shortcut"), "click",
+            function(){
+              XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", true);
+            }, false);
         }
         ##
         ## Override keyboard shortcut (if any)
         ##
         #if ($keyboardShortcutsEnabled && "$!extraShortcut" != "")
           shortcut.remove("$extraShortcut");
-          shortcut.add("$extraShortcut", function() { XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", true); }, { 'disable_in_input':true });
+          shortcut.add("$extraShortcut",
+            function() {
+              XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", true);
+            }, { 'disable_in_input':true });
         #end
       #end
       document.observe("dom:loaded", extraInit, false);

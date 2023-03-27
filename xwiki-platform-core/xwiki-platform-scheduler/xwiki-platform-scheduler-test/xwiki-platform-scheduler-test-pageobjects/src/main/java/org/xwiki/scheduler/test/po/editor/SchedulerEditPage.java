@@ -69,7 +69,7 @@ public class SchedulerEditPage extends EditPage
     @Override
     public SchedulerPage clickSaveAndView()
     {
-        this.save.click();
+        super.clickSaveAndView();
         return new SchedulerPage();
     }
 }

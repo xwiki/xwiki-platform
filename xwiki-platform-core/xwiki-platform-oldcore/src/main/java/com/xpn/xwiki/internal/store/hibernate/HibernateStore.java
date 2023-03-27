@@ -1033,7 +1033,7 @@ public class HibernateStore implements Disposable, Initializable
      */
     public void updateDatabase(String wikiId)
     {
-        MetadataBuilder metadataBuilder = this.metadataSources.getMetadataBuilder(this.standardServiceRegistry);
+        MetadataBuilder metadataBuilder = this.metadataSources.getMetadataBuilder();
 
         // Associate the metadata with a specific wiki
         setWiki(metadataBuilder, wikiId);

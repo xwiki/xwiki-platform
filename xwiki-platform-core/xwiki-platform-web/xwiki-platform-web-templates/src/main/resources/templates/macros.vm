@@ -843,11 +843,11 @@ aria-label="$escapetool.xml($services.localization.render('panels.label', [$titl
 #end
 
 ## Changes the semantic role of the panel.
-#macro(navigationpanelheader $title)
+#macro(navigationPanelHeader $title)
   #panelheader($title, false, false, true)
 #end
 
-#macro(largenavigationpanelheader $title)
+#macro(largeNavigationPanelHeader $title)
   #panelheader($title, true, false, true)
 #end
 

@@ -1177,7 +1177,7 @@ $menuTemplateDoc.content.replace('{', '')
     #set ($id = $wikimacro.context.getXDOM().getIdGenerator().generateUniqueId("M", "GeneratedMenuId"))
   #end
   (% role="navigation" class="menu-horizontal-toggle"
-  aria-label="${services.rendering.escape($services.localization.render('rendering.macro.menu.horizontal.label',[$label]), 'xwiki/2.1')}" %)(((
+  aria-label="${services.rendering.escape($label), 'xwiki/2.1')}" %)(((
     (% class="navbar-header" %)(((
       {{html}}
         &lt;button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#$!{escapetool.xml($id)}" aria-expanded="false"&gt;
@@ -1194,7 +1194,7 @@ $menuTemplateDoc.content.replace('{', '')
   )))
 #else
   (% role="navigation" #if ("$!id" != '') id="${services.rendering.escape($id, 'xwiki/2.1')}"#end class="menu menu-${services.rendering.escape($!type, 'xwiki/2.1')}"
-        aria-label="${services.rendering.escape($services.localization.render('rendering.macro.menu.vertical.label',[$label]), 'xwiki/2.1')}" %)(((
+        aria-label="${services.rendering.escape($label, 'xwiki/2.1')}" %)(((
     {{wikimacrocontent/}}
   )))
 #end
@@ -1456,7 +1456,7 @@ $menuTemplateDoc.content.replace('{', '')
       <defaultValue/>
     </property>
     <property>
-      <description>Optional menu label that will be set on the HTML element that wraps the menu. You can use this label in JavaScript code to label the menu DOM or in functional tests to assert the menu name.</description>
+      <description>Optional menu label used to describe the content of the menu.</description>
     </property>
     <property>
       <mandatory>0</mandatory>

@@ -34,6 +34,8 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
     <!-- page size -->
     <xsl:param name="page-width">auto</xsl:param>
     <xsl:param name="page-height">auto</xsl:param>
+    <!-- a4 page height is used to compute the maximal height of images in template "process-img" -->
+    <xsl:param name="a4-page-height">11.7in</xsl:param>
     <xsl:param name="page-margin-top">1in</xsl:param>
     <xsl:param name="page-margin-bottom">1in</xsl:param>
     <xsl:param name="page-margin-left">1in</xsl:param>
@@ -2077,7 +2079,11 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         <xsl:attribute name="inline-progression-dimension.maximum">100%</xsl:attribute>
         <!-- Min and max height -->
         <xsl:attribute name="block-progression-dimension.minimum">auto</xsl:attribute>
-        <xsl:attribute name="block-progression-dimension.maximum">700px</xsl:attribute>
+        <!-- Limit height to A4 page height minus the header and footer height minus 1in to leave space below header
+        and above footer. -->
+        <xsl:attribute name="block-progression-dimension.maximum">
+            <xsl:value-of select="$a4-page-height"/> - <xsl:value-of select="$page-margin-top"/> - <xsl:value-of select="$page-margin-bottom"/> - 1in
+        </xsl:attribute>
         <!-- Scale px lengths in order to get from 72 to 96 DPI -->
         <xsl:if test="$has-width">
             <!-- Preserve the original unit -->

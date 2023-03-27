@@ -41,9 +41,9 @@
   #set ($shortId = $stringtool.removeStart($id, 'org.xwiki.platform.'))
   #set ($shortId = $stringtool.removeStart($shortId, 'platform.'))
   #if ("$!shortId" != '')
-    $services.localization.render("menu.uix.extensionPoint.value.$shortId")
+    $escapetool.xml($services.localization.render("menu.uix.extensionPoint.value.$shortId"))
   #else
-    $services.localization.render('menu.uix.extensionPoint.value.nowhere')
+    $escapetool.xml($services.localization.render('menu.uix.extensionPoint.value.nowhere'))
   #end
 #end
 ##
@@ -85,7 +85,7 @@
         &lt;option value=""&gt;$services.localization.render('menu.uix.extensionPoint.value.nowhere')&lt;/option&gt;
         #foreach ($extensionPointId in $extensionPoints.keySet())
           #set ($selected = $extensionPointId == $selectedExtensionPointId)
-          &lt;option value="$extensionPointId"#if ($selected) selected="selected"#end&gt;
+          &lt;option value="$escapetool.xml($extensionPointId)"#if ($selected) selected="selected"#end&gt;
             #displayExtensionPointTitle($extensionPointId)
           &lt;/option&gt;
         #end

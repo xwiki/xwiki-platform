@@ -125,33 +125,8 @@
 
                  Single justification example:
             -->
-            <revapi.differences>
-              <justification>Change needed to provide a merge operation taking into account the configuration: we cannot provide a default method as it would wrongly give the feeling that the operation succeeded. We consider this breaking change acceptable since it's unlikely anyone directly implements this interface.</justification>
-              <criticality>highlight</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.addedToInterface</code>
-                  <new>method org.xwiki.store.merge.MergeManagerResult&lt;com.xpn.xwiki.objects.ElementInterface, java.lang.Object&gt; com.xpn.xwiki.objects.ElementInterface::merge(com.xpn.xwiki.objects.ElementInterface, com.xpn.xwiki.objects.ElementInterface, com.xpn.xwiki.doc.merge.MergeConfiguration, com.xpn.xwiki.XWikiContext)</new>
-                </item>
-              </differences>
-            </revapi.differences>
-            <revapi.differences>
-              <justification>Young API</justification>
-              <criticality>documented</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.addedToInterface</code>
-                  <new>method int java.lang.Comparable&lt;T&gt;::compareTo(T) @ org.xwiki.whatsnew.NewsSourceItem</new>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.addedToInterface</code>
-                  <new>method java.util.Optional&lt;java.lang.String&gt; org.xwiki.whatsnew.NewsSourceItem::getImageURL()</new>
-                </item>
-              </differences>
-            </revapi.differences>
+            
+            
           </analysisConfiguration>
         </configuration>
       </plugin>

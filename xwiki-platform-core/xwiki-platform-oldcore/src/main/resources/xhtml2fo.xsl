@@ -34,7 +34,7 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
     <!-- page size -->
     <xsl:param name="page-width">auto</xsl:param>
     <xsl:param name="page-height">auto</xsl:param>
-    <!-- a4 page height is used to compute the maximal height of images in template "process-img" -->
+    <!-- A4 page height is used to compute the maximal height of images in template "process-img" -->
     <xsl:param name="a4-page-height">11.7in</xsl:param>
     <xsl:param name="page-margin-top">1in</xsl:param>
     <xsl:param name="page-margin-bottom">1in</xsl:param>

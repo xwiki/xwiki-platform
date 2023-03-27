@@ -19,7 +19,7 @@
 ## ---------------------------------------------------------------------------
 <div class="row document-header">
   <section class="document-info col-xs-12 #if($displayContentMenu)col-md-7#end"
-  aria-labelledby="document-title">
+      aria-labelledby="document-title">
     ## --------------------------------------------------------
     ## Display UI Extensions before the title element
     ## --------------------------------------------------------

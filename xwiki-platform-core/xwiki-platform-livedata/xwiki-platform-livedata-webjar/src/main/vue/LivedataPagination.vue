@@ -312,7 +312,7 @@ export default {
 <style>
 
 .livedata-pagination {
-  color: #777777;
+  color: @text-muted;
   font-size: 0.9em;
 }
 

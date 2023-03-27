@@ -188,7 +188,7 @@
       new XWiki.widgets.Notification("$escapetool.xml($services.localization.render('like.unlike.error'))", 'error');
     });
   };
-  $('.like-button:not(.disabled)').on('click', likeClick);
+  $('.like-button:not([disabled])').on('click', likeClick);
 });</code>
     </property>
     <property>
@@ -478,7 +478,7 @@
         #set ($disabledButton = true)
         #set ($titleMessageTranslationKey = "like.button.title")
       #end
-      &lt;button class="like-button btn $btnClass badge #if($disabledButton)disabled#{end}"
+      &lt;button class="like-button btn $btnClass badge"
         #if($disabledButton) disabled #{end}
         title="$escapetool.xml($services.localization.render($titleMessageTranslationKey, [$likeCount]))"&gt;
           $services.icon.renderHTML('heart') &lt;span class="like-number"&gt;$likeCount&lt;/span&gt;

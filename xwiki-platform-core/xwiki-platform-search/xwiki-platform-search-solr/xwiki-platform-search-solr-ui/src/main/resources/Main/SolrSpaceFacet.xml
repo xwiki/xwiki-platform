@@ -79,7 +79,8 @@
 #if ($facetRequestValues &amp;&amp; $facetRequestValues.size() &gt; 0)
   #set ($localSpaceReference = $stringtool.removeEnd($stringtool.substringAfter($facetRequestValues.get(0), '/'), '.'))
   #set ($spaceReference = $services.model.resolveSpace($localSpaceReference))
-  #set ($spaceFacetHierarchyOptions = {'limit': 4})
+  #set ($spaceFacetHierarchyOptions = {'limit': 4,
+  'label': $services.localization.render('web.hierarchy.label.selectedPath')})
   #getSpaceFacetHierarchyPathData($spaceReference $pathData $spaceFacetHierarchyOptions)
   &lt;div class="selectedLocation"&gt;
     #displayHierarchyPath($pathData $spaceFacetHierarchyOptions)

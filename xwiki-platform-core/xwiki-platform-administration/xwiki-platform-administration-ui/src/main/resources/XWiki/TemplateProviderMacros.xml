@@ -54,6 +54,7 @@
   &lt;ul class="paths"&gt;
     #set ($hierarchyOptions = {
       'local': true,
+      'label': $services.localization.render('web.hierarchy.label.selectedPath')
       'selfIsActive': false
     })
     #set ($paths = $doc.getValue($property))

@@ -147,7 +147,12 @@
     #end
   #end
   ## Set as a navigation role because it contains mostly links.
-  <nav aria-label="#if("$!options.id" != '')$options.id#end $breadCrumbClassNames">
+  <nav aria-label="
+    #if("$!options.label" != '')
+      $escapetool.xml($services.localization.render('web.hierarchy.breadcrumb.label', [$options.label]))
+    #else
+      $escapetool.xml($services.localization.render('web.hierarchy.breadcrumb.label.empty'))
+    #end">
   <ol #if("$!options.id" != '')id="$options.id"#end class="$breadCrumbClassNames" $breadCrumbParameters>
   <li
     #foreach ($item in $pathData)
@@ -332,6 +337,7 @@
     #set ($discard = $path.add($doc.documentReference))
     #set ($options = {
       'id': 'hierarchy',
+      'label': $services.localization.render('web.hierarchy.label.currentPageParents'),
       'entities': {
         $doc.documentReference: $tdoc
       }

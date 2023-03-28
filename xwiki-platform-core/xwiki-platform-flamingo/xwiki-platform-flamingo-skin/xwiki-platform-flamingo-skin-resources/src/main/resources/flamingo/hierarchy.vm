@@ -33,7 +33,9 @@
     ##
     ## Default mode: display the hierarchy for the current page
     ##
-    #hierarchy($NULL {'id': 'hierarchy', 'limit': 5, 'treeNavigation': true})
+    #hierarchy($NULL {'id': 'hierarchy',
+    'label': $services.localization.render('web.hierarchy.label.currentPageParents'),
+    'limit': 5, 'treeNavigation': true})
   #end
   </nav>
 #end

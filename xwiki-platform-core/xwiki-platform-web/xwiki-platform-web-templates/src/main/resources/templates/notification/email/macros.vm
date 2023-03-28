@@ -96,7 +96,10 @@
   <div>
     <div style="background-color: #f5f5f5; color: #777777; padding: 4px 8px; border-radius: 4px; font-size: 8px;">
       #template('hierarchy_macros.vm')
-      #hierarchy($event.document, {'id': 'hierarchy', 'limit': 5, 'treeNavigation': false, 'plain': true})
+      #hierarchy($event.document, {
+      'id': 'hierarchy',
+      'label': $services.localization.render('web.hierarchy.label.currentPageParents'),
+      'limit': 5, 'treeNavigation': false, 'plain': true})
     </div>
     #set ($document = $xwiki.getDocument($event.document))
     ## See `#displayNotificationEvent()` in `templates/notification/macros.vm` to understand why we don't use escape

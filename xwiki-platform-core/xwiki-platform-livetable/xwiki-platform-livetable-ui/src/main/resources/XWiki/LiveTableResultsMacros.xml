@@ -396,7 +396,14 @@
       'doc_viewable': $isViewable,
       'doc_fullName': $services.model.serialize($docReference, 'local'),
       'doc_space': $services.model.serialize($docReference.parent, 'local'),
-      'doc_location': "#hierarchy($docReference, {'limit': 5, 'plain': false, 'local': true, 'displayTitle': false})",
+      'doc_location': "#hierarchy($docReference,
+        {'limit': 5,
+          'label': $services.localization.render('web.hierarchy.label.document')
+          'plain': false,
+          'local': true, '
+          displayTitle': false
+        }
+      )",
       'doc_url': $xwiki.getURL($docReference),
       'doc_space_url': $xwiki.getURL($docReference.parent),
       'doc_wiki': $docReference.wikiReference.name,

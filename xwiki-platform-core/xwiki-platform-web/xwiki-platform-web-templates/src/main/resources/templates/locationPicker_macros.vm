@@ -71,6 +71,9 @@
       ## this, we wrap the breadcrumb element in a DIV that remains the same.
       <div class="breadcrumb-container">
         ## Note: We display only the parent reference here. The new document part will be added from JavaScript.
+        #if(!$options.label && $titleField.label)
+          #set($options.label = $titleField.label)
+        #end
         #hierarchy($options.parent.reference $options)
         #locationPickerActions($options)
       </div>

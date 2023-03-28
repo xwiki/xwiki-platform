@@ -64,21 +64,14 @@
 ###    Toplevel Left Menu
 ###
 #macro(xwikitopmenuleftend)
-  </ul>
+ 
 #end
 
 ###
 ###    Toplevel Right Menu
 ###
 #macro(xwikitopmenurightstart)
-  <ul class="nav navbar-nav navbar-right">
-#end
-
-###
-###    Toplevel Right Menu
-###
-#macro(xwikitopmenurightend)
-  </ul>
+  
 #end
 
 ###

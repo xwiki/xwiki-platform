@@ -24,17 +24,17 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.PageAttachmentReference;
-import org.xwiki.model.reference.PageAttachmentReferenceResolver;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.rendering.renderer.reference.link.URITitleGenerator;
 
 /**
- * Generate link titles for ATTACH URIs.
+ * Generate link titles for document URIs.
  *
  * @version $Id$
- * @since 15.2RC1
+ * @since 15.3RC1
  */
 @Component(hints = {"doc", "page"})
 @Singleton
@@ -44,18 +44,18 @@ public class XWikiDocumentURITitleGenerator implements URITitleGenerator
     private ContextualLocalizationManager contextLocalization;
 
     /**
-     * Used to extract the attachment name part in an Attachment reference.
+     * Used to extract the document name part in a document reference.
      */
     @Inject
     @Named("current")
-    private PageAttachmentReferenceResolver<String> currentAttachmentReferenceResolver;
+    private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
 
     @Override
     public String generateCreateTitle(ResourceReference reference)
     {
-        PageAttachmentReference attachmentReference =
-            this.currentAttachmentReferenceResolver.resolve(reference.getReference());
+        DocumentReference documentReference =
+            this.currentDocumentReferenceResolver.resolve(reference.getReference());
         return this.contextLocalization.getTranslationPlain("core.create.inline.label",
-         attachmentReference.getName());
+            documentReference.getName());
     }
 }

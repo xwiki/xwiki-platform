@@ -19,47 +19,42 @@
  */
 package com.xpn.xwiki.doc;
 
-import org.jmock.Mock;
-import org.xwiki.bridge.DocumentAccessBridge;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
-import com.xpn.xwiki.web.XWikiURLFactory;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 
 /**
  * Unit tests for {@link DefaultDocumentAccessBridge}.
- * 
+ *
  * @version $Id$
  */
-public class DefaultDocumentAccessBridgeTest extends AbstractBridgedXWikiComponentTestCase
+@OldcoreTest
+class DefaultDocumentAccessBridgeTest
 {
-    private DocumentAccessBridge documentAccessBridge;
+    @InjectMockComponents
+    private DefaultDocumentAccessBridge documentAccessBridge;
 
-    private Mock mockXWiki;
-
-    private Mock mockURLFactory;
-
-    @Override
-    protected void setUp() throws Exception
+    @Test
+    void testGetUrlEmptyDocument(MockitoOldcore oldcore)
     {
-        super.setUp();
+        DocumentReference documentReference = new DocumentReference("Wiki", "Space", "Page");
+        XWikiDocument document = new XWikiDocument(documentReference);
+        oldcore.getXWikiContext().setDoc(document);
+        String action = "view";
+        String expectedURL = "/xwiki/bin/view/Main/WebHome";
+        doReturn(expectedURL)
+            .when(oldcore.getSpyXWiki()).getURL(eq(document.getFullName()), eq(action), anyString(), anyString(),
+                eq(oldcore.getXWikiContext()));
 
-        this.mockXWiki = mock(XWiki.class);
-        this.mockURLFactory = mock(XWikiURLFactory.class);
-
-        getContext().setURLFactory((XWikiURLFactory) mockURLFactory.proxy());
-        getContext().setWiki((XWiki) mockXWiki.proxy());
-
-        this.documentAccessBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
-    }
-
-    public void testGetUrlEmptyDocument()
-    {
-        getContext().setDoc(new XWikiDocument(new DocumentReference("Wiki", "Space", "Page")));
-        this.mockXWiki.stubs().method("getURL").will(returnValue("/xwiki/bin/view/Main/WebHome"));
-
-        assertEquals("/xwiki/bin/view/Main/WebHome", this.documentAccessBridge.getURL("", "view", "", ""));
-        assertEquals("/xwiki/bin/view/Main/WebHome", this.documentAccessBridge.getURL(null, "view", "", ""));
+        assertEquals(expectedURL, this.documentAccessBridge.getURL("", action, "", ""));
+        assertEquals(expectedURL, this.documentAccessBridge.getURL(null, action, "", ""));
     }
 }

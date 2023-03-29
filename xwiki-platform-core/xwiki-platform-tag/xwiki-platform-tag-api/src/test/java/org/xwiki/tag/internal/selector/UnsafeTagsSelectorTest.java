@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -70,6 +71,7 @@ class UnsafeTagsSelectorTest
     protected ContextualAuthorizationManager contextualAuthorizationManager;
 
     @MockComponent
+    @Named("current")
     protected DocumentReferenceResolver<String> stringDocumentReferenceResolver;
 
     @Mock

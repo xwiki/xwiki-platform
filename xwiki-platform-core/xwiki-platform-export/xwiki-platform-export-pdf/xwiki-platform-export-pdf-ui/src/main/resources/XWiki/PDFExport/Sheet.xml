@@ -609,12 +609,46 @@ require([
     });
   };
 
+  /**
+   * Tables with absolute column / cell widths are printed very badly. There's not much we can do about it besides
+   * trying to replace the absolute widths with relative widths.
+   */
+  const makeTableCellWidthRelative = function() {
+    // Remove temporarily the maximum width limitation from the table in order to compute the cell width relative to the
+    // full table width. Otherwise the cell width could be influenced by the screen width.
+    $('#xwikicontent table').each(function() {
+      this.__pdfExport_maxWidth = this.style.getPropertyValue('max-width');
+      this.style.setProperty('max-width', 'none');
+    });
+
+    // If the table cell width is specified then replace its value with the corresponding percentage of the table width.
+    $('#xwikicontent th, #xwikicontent td').each(function() {
+      const specifiedCellWidth = this.style.getPropertyValue('width') || this.getAttribute('width');
+      if (specifiedCellWidth &amp;&amp; !specifiedCellWidth.trimEnd().endsWith('%')) {
+        const computedCellWidth = $(this).width();
+        const rowWidth = $(this).parent().width();
+        const relativeCellWidth = Math.floor(computedCellWidth / rowWidth * 100);
+        $(this).removeAttr('width').css({width: relativeCellWidth + '%'});
+      }
+    });
+
+    // Remove any width set on the table itself. This width is most probably the result of a table resize performed from
+    // the WYSIWYG editor. But since the XWiki skin is making tables use the full available width by default (width:
+    // 100%) chances are that the table resize done from the WYSIWYG editor has no effect on view mode so it shouldn't
+    // have any effect on the PDF export either.
+    $('#xwikicontent table').removeAttr('width').css({width: ''}).each(function() {
+      // Restore the maximum width limitation.
+      this.style.setProperty('max-width', this.__pdfExport_maxWidth);
+    });
+  };
+
   // Adjust the exported content before performing the print layout.
   pageReady.afterPageReady(() =&gt; {
     refactorAnchors();
     removeEmptyTableOfContents();
     validateTableOfContentsAnchors();
     storeFormFieldValues();
+    makeTableCellWidthRelative();
   });
 
   // Trigger the print preview after the page is ready. Note that by returning a promise we're making the next page

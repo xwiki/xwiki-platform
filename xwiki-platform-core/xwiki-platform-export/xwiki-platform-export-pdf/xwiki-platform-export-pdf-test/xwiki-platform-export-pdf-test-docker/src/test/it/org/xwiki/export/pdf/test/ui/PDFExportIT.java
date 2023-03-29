@@ -661,12 +661,41 @@ class PDFExportIT
             assertEquals(2, pdf.getNumberOfPages());
 
             String content = pdf.getTextFromPage(1);
-            // A line break is inserted whenever a long is wrapped, so we need to remove line breaks in order to verify
-            // that the entire code macro content is present.
+            // A line break is inserted whenever a long line is wrapped, so we need to remove line breaks in order to
+            // verify that the entire code macro content is present.
             assertTrue(content.replace("\n", "").contains(
                 "// This is a very long comment that gets cut when exported to PDF because it exceeds the print page "
                     + "width and the code macro preserves spaces which means it has to be displayed on a single line."),
                 "Unexpected content: " + content);
+        }
+    }
+
+    @Test
+    @Order(13)
+    void resizedTable(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "ResizedTable"));
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // We should have 2 pages: cover page and content page. If the resized table uses absolute widths then it
+            // ends up with a very small column that spans lots of print pages. By checking that we have only 2 pages we
+            // verify that the absolute widths have been replaced with relative widths.
+            assertEquals(2, pdf.getNumberOfPages());
+
+            String rawContent = pdf.getTextFromPage(1);
+            // A line break is inserted whenever a long line is wrapped (e.g. inside a table cell), so we need to
+            // replace line breaks with spaces in order to verify that a specific text is present.
+            String content = rawContent.replace("\n", " ");
+            // Verify the text from the start of the first table cells is present.
+            assertTrue(content.contains("Lorem ipsum dolor sit amet,"), "Unexpected content: " + rawContent);
+            assertTrue(content.contains("Augue lacus viverra vitae congue eu consequat ac."),
+                "Unexpected content: " + rawContent);
+            // Verify the text from the end of the last table cells is present.
+            assertTrue(content.contains("Varius sit amet mattis vulputate enim nulla aliquet."),
+                "Unexpected content: " + rawContent);
+            assertTrue(content.contains("Felis imperdiet proin fermentum leo vel orci."),
+                "Unexpected content: " + rawContent);
         }
     }
 

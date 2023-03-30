@@ -24,8 +24,12 @@ import org.xwiki.rendering.test.integration.junit5.RenderingTests;
 import org.xwiki.test.annotation.AllComponents;
 
 /**
+ * Integration tests for the provided rendering listener (see {@link CaptionedImageRenderListenerProvider} and
+ * {@link CaptionedImageParseListenerProvider}).
+ *
  * @version $Id$
- * @since x.y.z
+ * @since 15.3RC1
+ * @since 14.10.8
  */
 @AllComponents
 public class IntegrationTests implements RenderingTests

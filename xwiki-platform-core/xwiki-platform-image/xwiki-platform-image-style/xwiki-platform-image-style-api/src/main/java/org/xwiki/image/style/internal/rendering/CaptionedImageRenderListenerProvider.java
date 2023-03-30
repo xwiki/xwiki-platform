@@ -39,40 +39,48 @@ import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_0;
 import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_1;
 
 /**
- * TODO.
+ * Provides a renderer listener for image with captions, taking into account the image styles.
  *
  * @version $Id$
- * @since x.y.z
+ * @since 15.3RC1
+ * @since 14.10.8
  */
 @Component
 @Singleton
-@Named("tmprender")
+@Named("captionedImageRender")
 public class CaptionedImageRenderListenerProvider implements ListenerProvider
 {
-    private static final String WIDTH_PROPERTY = "width";
+    static final String WIDTH_PROPERTY = "width";
 
-    private static final String STYLE_PROPERTY = "style";
+    static final String STYLE_PROPERTY = "style";
+
+    static final String DATA_XWIKI_IMAGE_STYLE = "data-xwiki-image-style";
+
+    static final String DATA_XWIKI_IMAGE_STYLE_ALIGNMENT = "data-xwiki-image-style-alignment";
+
+    static final String DATA_XWIKI_IMAGE_STYLE_BORDER = "data-xwiki-image-style-border";
+
+    static final String DATA_XWIKI_IMAGE_STYLE_TEXT_WRAP = "data-xwiki-image-style-text-wrap";
 
     private static final List<Syntax> ACCEPTED_SYNTAX = List.of(HTML_5_0, XWIKI_2_0, XWIKI_2_1);
 
+    static final List<String> KNOWN_PARAMETERS = List.of(
+        WIDTH_PROPERTY,
+        STYLE_PROPERTY,
+        DATA_XWIKI_IMAGE_STYLE,
+        DATA_XWIKI_IMAGE_STYLE_ALIGNMENT,
+        DATA_XWIKI_IMAGE_STYLE_BORDER,
+        DATA_XWIKI_IMAGE_STYLE_TEXT_WRAP
+    );
+
     private static class InternalChainingListener extends AbstractChainingListener
     {
-        private static final List<String> KNOWN_PARAMETERS = List.of(
-            WIDTH_PROPERTY,
-            STYLE_PROPERTY,
-            // TODO: reuse constant if it exists
-            "data-xwiki-image-style",
-            "data-xwiki-image-style-alignment",
-            "data-xwiki-image-style-border",
-            "data-xwiki-image-style-text-wrap"
-        );
-
         private Map<String, String> cleanedUpParameters;
 
         /**
-         * TODO.
+         * Default constructor.
          *
-         * @param listenerChain TODO
+         * @param listenerChain the listener chainer to set for this listener
          */
         protected InternalChainingListener(ListenerChain listenerChain)
         {

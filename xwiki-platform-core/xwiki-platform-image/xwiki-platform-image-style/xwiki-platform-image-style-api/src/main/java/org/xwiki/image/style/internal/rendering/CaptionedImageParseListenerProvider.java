@@ -39,24 +39,27 @@ import org.xwiki.rendering.listener.chaining.LookaheadChainingListener;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.syntax.Syntax;
 
+import static org.xwiki.image.style.internal.rendering.CaptionedImageRenderListenerProvider.DATA_XWIKI_IMAGE_STYLE;
+import static org.xwiki.image.style.internal.rendering.CaptionedImageRenderListenerProvider.DATA_XWIKI_IMAGE_STYLE_ALIGNMENT;
+import static org.xwiki.image.style.internal.rendering.CaptionedImageRenderListenerProvider.DATA_XWIKI_IMAGE_STYLE_BORDER;
+import static org.xwiki.image.style.internal.rendering.CaptionedImageRenderListenerProvider.DATA_XWIKI_IMAGE_STYLE_TEXT_WRAP;
+import static org.xwiki.image.style.internal.rendering.CaptionedImageRenderListenerProvider.STYLE_PROPERTY;
+import static org.xwiki.image.style.internal.rendering.CaptionedImageRenderListenerProvider.WIDTH_PROPERTY;
 import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_0;
 import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_1;
 
 /**
- * TODO.
+ * Provides a parser listener for image with captions, taking into account the image styles.
  *
  * @version $Id$
- * @since x.y.z
+ * @since 15.3RC1
+ * @since 14.10.8
  */
 @Component
 @Singleton
-@Named("tmpparse")
+@Named("captionedImageParse")
 public class CaptionedImageParseListenerProvider implements ListenerProvider
 {
-    private static final String WIDTH_PROPERTY = "width";
-
-    private static final String STYLE_PROPERTY = "style";
-
     private static final List<Syntax> ACCEPTED_SYNTAX = List.of(XWIKI_2_0, XWIKI_2_1);
 
     private static final String STYLE_SEPARATOR = ";";
@@ -65,19 +68,18 @@ public class CaptionedImageParseListenerProvider implements ListenerProvider
     {
         private static final List<String> KNOWN_PARAMETERS = List.of(
             WIDTH_PROPERTY,
-            // TODO: reuse constant if it exists
-            "data-xwiki-image-style",
-            "data-xwiki-image-style-alignment",
-            "data-xwiki-image-style-border",
-            "data-xwiki-image-style-text-wrap"
+            DATA_XWIKI_IMAGE_STYLE,
+            DATA_XWIKI_IMAGE_STYLE_ALIGNMENT,
+            DATA_XWIKI_IMAGE_STYLE_BORDER,
+            DATA_XWIKI_IMAGE_STYLE_TEXT_WRAP
         );
 
         private final Deque<Map<String, String>> figureParametersQueue = new ArrayDeque<>();
 
         /**
-         * TODO.
+         * Default constructor.
          *
-         * @param listenerChain TODO
+         * @param listenerChain the listener chainer to set for this listener
          */
         protected InternalChainingListener(ListenerChain listenerChain)
         {
@@ -88,7 +90,6 @@ public class CaptionedImageParseListenerProvider implements ListenerProvider
         public void beginFigure(Map<String, String> parameters)
         {
             this.figureParametersQueue.push(parameters);
-
             super.beginFigure(parameters);
         }
 
@@ -98,9 +99,9 @@ public class CaptionedImageParseListenerProvider implements ListenerProvider
         {
             QueueListener.Event nextEvent = getPreviousEvents().peekLast();
             if (nextEvent != null && nextEvent.eventType == EventType.BEGIN_FIGURE) {
-                // modify figure parameters
+                // Merge the image parameters to the figure parameters when the image is wrapped in a figure.
                 Object[] eventParameters = nextEvent.eventParameters;
-                // Note: sanity check to make sure that we are handling the expected case.
+                // Sanity check to make sure that we are handling the expected case.
                 if (eventParameters.length == 1 && eventParameters[0] instanceof Map<?, ?>) {
                     Map<String, String> figureParameters = this.figureParametersQueue.pop();
                     Map<String, String> mergedMap = new HashMap<>(figureParameters);

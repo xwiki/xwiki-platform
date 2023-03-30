@@ -1,0 +1,58 @@
+.#-----------------------------------------------------
+.inputexpect|xwiki/2.0
+.# Test captioned images with style attributes.
+.#-----------------------------------------------------
+[[Image **Caption**>>image:my.png]]
+
+[[Image **Caption**>>image:my.png||data-xwiki-image-style="style1"]]
+
+[[Image **Caption**>>image:my.png||width="200" height="100"]]
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginFigure [[class]=[image]]
+onImage [Typed = [false] Type = [url] Reference = [my.png]] [false] [Imy.png]
+beginFigureCaption
+beginParagraph
+onWord [Image]
+onSpace
+beginFormat [BOLD]
+onWord [Caption]
+endFormat [BOLD]
+endParagraph
+endFigureCaption
+endFigure [[class]=[image]]
+beginFigure [[class]=[image][data-xwiki-image-style]=[style1]]
+onImage [Typed = [false] Type = [url] Reference = [my.png]] [false] [Imy.png-1] [[data-xwiki-image-style]=[style1]]
+beginFigureCaption
+beginParagraph
+onWord [Image]
+onSpace
+beginFormat [BOLD]
+onWord [Caption]
+endFormat [BOLD]
+endParagraph
+endFigureCaption
+endFigure [[class]=[image][data-xwiki-image-style]=[style1]]
+beginFigure [[class]=[image][style]=[width: 200px;]]
+onImage [Typed = [false] Type = [url] Reference = [my.png]] [false] [Imy.png-2] [[height]=[100][width]=[200]]
+beginFigureCaption
+beginParagraph
+onWord [Image]
+onSpace
+beginFormat [BOLD]
+onWord [Caption]
+endFormat [BOLD]
+endParagraph
+endFigureCaption
+endFigure [[class]=[image][style]=[width: 200px;]]
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<img src="my.png" id="Imy.png" class="wikigeneratedid" alt="my.png"/><div class="figcaption"><p>Image <strong>Caption</strong></p></div><img src="my.png" data-xwiki-image-style="style1" id="Imy.png-1" class="wikigeneratedid" alt="my.png"/><div class="figcaption"><p>Image <strong>Caption</strong></p></div><img src="my.png" width="200" height="100" id="Imy.png-2" class="wikigeneratedid" alt="my.png"/><div class="figcaption"><p>Image <strong>Caption</strong></p></div>
+.#-----------------------------------------------------
+.expect|html/5.0
+.#-----------------------------------------------------
+<figure class="image"><img src="my.png" id="Imy.png" class="wikigeneratedid" alt="my.png"/><figcaption><p>Image <strong>Caption</strong></p></figcaption></figure><figure class="image" data-xwiki-image-style="style1"><img src="my.png" data-xwiki-image-style="style1" id="Imy.png-1" class="wikigeneratedid" alt="my.png"/><figcaption><p>Image <strong>Caption</strong></p></figcaption></figure><figure class="image" style="width: 200px;"><img src="my.png" width="200" height="100" id="Imy.png-2" class="wikigeneratedid" alt="my.png"/><figcaption><p>Image <strong>Caption</strong></p></figcaption></figure>

@@ -245,7 +245,6 @@
 
         function updateFigureDimensions(widget) {
           if (widget.data.hasCaption) {
-            // TODO: set a style with a width instead
             setAttribute(widget, 'style', "width: " + widget.data.width + "px");
           } else {
             removeAttribute(widget, 'style');

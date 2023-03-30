@@ -78,6 +78,8 @@ class UserProfileIT
 
     private static final String USER_EMAIL = "webmaster@xwiki.org";
 
+    private static final String USER_EMAIL_OBFUSCATED = "w...@xwiki.org";
+
     private static final String USER_PHONE = "0000-000-000";
 
     private static final String USER_ADDRESS = "1600 No Street";
@@ -120,8 +122,13 @@ class UserProfileIT
     /** Functionality check: changing profile information. */
     @Test
     @Order(1)
-    void editProfile()
+    void editProfile(TestUtils setup)
     {
+        // Turn on email Obfuscation to verify that the email displayed in the user profile is obfuscated.
+        setup.loginAsSuperAdmin();
+        setup.updateObject("Mail", "MailConfig", "Mail.GeneralMailConfigClass", 0, "obfuscate", "1");
+        setup.login(this.userName, DEFAULT_PASSWORD);
+
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         ProfileEditPage profileEditPage = userProfilePage.editProfile();
         profileEditPage.setUserFirstName(USER_FIRST_NAME);
@@ -141,11 +148,19 @@ class UserProfileIT
         assertEquals(USER_LAST_NAME, userProfilePage.getUserLastName());
         assertEquals(USER_COMPANY, userProfilePage.getUserCompany());
         assertEquals(USER_ABOUT, userProfilePage.getUserAbout());
-        assertEquals(USER_EMAIL, userProfilePage.getUserEmail());
+        assertEquals(USER_EMAIL_OBFUSCATED, userProfilePage.getUserEmail());
         assertEquals(USER_PHONE, userProfilePage.getUserPhone());
         assertEquals(USER_ADDRESS, userProfilePage.getUserAddress());
         assertEquals(USER_BLOG, userProfilePage.getUserBlog());
         assertEquals(USER_BLOGFEED, userProfilePage.getUserBlogFeed());
+
+        // Turn of email obfuscation and verify that the displayed email is not obfuscated anymore.
+        setup.loginAsSuperAdmin();
+        setup.updateObject("Mail", "MailConfig", "Mail.GeneralMailConfigClass", 0, "obfuscate", "0");
+        setup.login(this.userName, DEFAULT_PASSWORD);
+
+        userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+        assertEquals(USER_EMAIL, userProfilePage.getUserEmail());
     }
 
     /** Functionality check: changing the profile picture. */

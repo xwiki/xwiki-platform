@@ -60,6 +60,14 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
+    <!-- Needed in order to test email obfuscation in the User profile page -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-mail-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

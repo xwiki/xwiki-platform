@@ -145,40 +145,55 @@
     <property>
       <code>#template('colorThemeInit.vm')
 
-img[data-xwiki-image-style-border="true"], figure[data-xwiki-image-style-border="true"] {
-  border: 3px solid $theme.borderColor;
+figure[data-xwiki-image-style-border="true"],
+img[data-xwiki-image-style-border="true"],
+div[data-xwiki-image-style-border="true"] {
+  outline: 3px solid $theme.borderColor;
 }
 
-img[data-xwiki-image-style-alignment="start"],
-img[data-xwiki-image-style-text-wrap="true"],
-span[data-xwiki-image-style-alignment="start"],
-span[data-xwiki-image-style-text-wrap="true"],
+div[data-xwiki-image-style-border="true"] figure[data-xwiki-image-style-border="true"],
+figure[data-xwiki-image-style-border="true"] img[data-xwiki-image-style-border="true"] {
+  outline: none;
+}
+
 figure[data-xwiki-image-style-alignment="start"],
-figure[data-xwiki-image-style-text-wrap="true"] {
+img[data-xwiki-image-style-alignment="start"],
+div[data-xwiki-image-style-alignment="start"],
+figure[data-xwiki-image-style-text-wrap="true"],
+img[data-xwiki-image-style-text-wrap="true"],
+div[data-xwiki-image-style-text-wrap="true"] {
   float: left;
 }
 
-img[data-xwiki-image-style-alignment="center"], span[data-xwiki-image-style-alignment="center"], figure[data-xwiki-image-style-alignment="center"] {
+figure[data-xwiki-image-style-alignment="start"] img[data-xwiki-image-style-alignment="start"],
+figure[data-xwiki-image-style-text-wrap="true"] img[data-xwiki-image-style-text-wrap="true"],
+div[data-xwiki-image-style-alignment="start"] figure[data-xwiki-image-style-alignment="start"],
+div[data-xwiki-image-style-text-wrap="true"] figure[data-xwiki-image-style-text-wrap="true"] {
+  float: initial;
+}
+
+figure[data-xwiki-image-style-alignment="center"],
+img[data-xwiki-image-style-alignment="center"],
+div[data-xwiki-image-style-alignment="center"] {
   display: block;
   margin-left: auto;
   margin-right: auto;
 }
 
-figure {
-  width: fit-content;
-}
-
-figure figcaption {
-  min-width: fit-content;
-  max-width: min-content;
-}
-
+figure[data-xwiki-image-style-alignment="center"],
 span[data-xwiki-image-style-alignment="center"] {
   text-align: center;
 }
 
-img[data-xwiki-image-style-alignment="end"], span[data-xwiki-image-style-alignment="end"] {
+figure[data-xwiki-image-style-alignment="end"],
+img[data-xwiki-image-style-alignment="end"],
+div[data-xwiki-image-style-alignment="end"] {
   float: right;
+}
+
+div[data-xwiki-image-style-alignment="end"] figure[data-xwiki-image-style-alignment="end"],
+figure[data-xwiki-image-style-alignment="end"] img[data-xwiki-image-style-alignment="end"] {
+  float: initial;
 }
 
 /* CKEditor specific style. */

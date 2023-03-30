@@ -226,9 +226,8 @@
           widget.element.removeAttribute(key);
           if(widget.data.hasCaption) {
             widget.element.setAttribute(key, value);
-          } else {
-            widget.parts.image.setAttribute(key, value);
           }
+          widget.parts.image.setAttribute(key, value);
           widget.wrapper.setAttribute(key, value);
         }
 

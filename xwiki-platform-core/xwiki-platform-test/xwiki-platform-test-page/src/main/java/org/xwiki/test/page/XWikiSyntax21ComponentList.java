@@ -24,7 +24,6 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import org.xwiki.rendering.internal.listener.ListenerRegistry;
 import org.xwiki.rendering.internal.parser.reference.DefaultImageReferenceParser;
 import org.xwiki.rendering.internal.parser.reference.DefaultLinkReferenceParser;
 import org.xwiki.rendering.internal.parser.reference.DefaultResourceReferenceParser;
@@ -63,7 +62,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     XWikiSyntaxRenderer.class,
     XWikiSyntaxLinkReferenceSerializer.class,
     XWikiSyntaxImageReferenceSerializer.class,
-    ListenerRegistry.class
 })
 @Inherited
 public @interface XWikiSyntax21ComponentList

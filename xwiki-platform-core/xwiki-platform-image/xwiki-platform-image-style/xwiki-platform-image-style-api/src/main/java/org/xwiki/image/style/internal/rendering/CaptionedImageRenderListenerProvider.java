@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -64,7 +65,7 @@ public class CaptionedImageRenderListenerProvider implements ListenerProvider
 
     private static final List<Syntax> ACCEPTED_SYNTAX = List.of(HTML_5_0, XWIKI_2_0, XWIKI_2_1);
 
-    static final List<String> KNOWN_PARAMETERS = List.of(
+    static final Set<String> KNOWN_PARAMETERS = Set.of(
         WIDTH_PROPERTY,
         STYLE_PROPERTY,
         DATA_XWIKI_IMAGE_STYLE,

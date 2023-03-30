@@ -22,9 +22,9 @@ package org.xwiki.image.style.internal.rendering;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -60,13 +60,13 @@ import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_1;
 @Named("captionedImageParse")
 public class CaptionedImageParseListenerProvider implements ListenerProvider
 {
-    private static final List<Syntax> ACCEPTED_SYNTAX = List.of(XWIKI_2_0, XWIKI_2_1);
+    private static final Set<Syntax> ACCEPTED_SYNTAX = Set.of(XWIKI_2_0, XWIKI_2_1);
 
     private static final String STYLE_SEPARATOR = ";";
 
     private static class InternalChainingListener extends LookaheadChainingListener
     {
-        private static final List<String> KNOWN_PARAMETERS = List.of(
+        private static final Set<String> KNOWN_PARAMETERS = Set.of(
             WIDTH_PROPERTY,
             DATA_XWIKI_IMAGE_STYLE,
             DATA_XWIKI_IMAGE_STYLE_ALIGNMENT,

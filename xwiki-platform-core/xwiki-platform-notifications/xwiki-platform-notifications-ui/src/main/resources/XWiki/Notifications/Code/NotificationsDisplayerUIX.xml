@@ -780,8 +780,8 @@ require(['jquery', 'xwiki-meta', 'xwiki-bootstrap-switch'], function ($, xm) {
  * Notifications Header
  ***********************************************/
 .notifications-count {
-  background-color: red;
-  opacity: 0.9;
+  color: @btn-danger-color;
+  background-color: @btn-danger-bg;
   position: absolute;
   margin-left: 1.6em;
   top: 0;
@@ -833,10 +833,10 @@ require(['jquery', 'xwiki-meta', 'xwiki-bootstrap-switch'], function ($, xm) {
 }</code>
     </property>
     <property>
-      <contentType>CSS</contentType>
+      <contentType>LESS</contentType>
     </property>
     <property>
-      <name>CSS</name>
+      <name>LESS</name>
     </property>
     <property>
       <parse>1</parse>

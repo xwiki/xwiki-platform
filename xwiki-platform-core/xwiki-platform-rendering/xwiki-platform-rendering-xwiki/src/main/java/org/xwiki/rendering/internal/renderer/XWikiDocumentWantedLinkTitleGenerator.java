@@ -24,10 +24,11 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.PageReferenceResolver;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.renderer.reference.link.WantedLinkTitleGenerator;
 
 /**
@@ -51,12 +52,26 @@ public class XWikiDocumentWantedLinkTitleGenerator implements WantedLinkTitleGen
     @Named("current")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
 
+    /**
+     * Used to extract the page name part in a page reference.
+     */
+    @Inject
+    @Named("current")
+    private PageReferenceResolver<String> currentPageReferenceResolver;
+
     @Override
     public String generateWantedLinkTitle(ResourceReference reference)
     {
-        DocumentReference documentReference =
-            this.currentDocumentReferenceResolver.resolve(reference.getReference());
-        return this.contextLocalization.getTranslationPlain("rendering.xwiki.wantedLink.document.label",
-            documentReference.getName());
+        String documentTitleTranslationKey = "rendering.xwiki.wantedLink.document.label";
+        String documentName;
+        if (reference.isTyped() && reference.getType() == ResourceType.DOCUMENT) {
+            documentName = this.currentDocumentReferenceResolver.resolve(reference.getReference()).getName();
+        } else if (reference.isTyped() && reference.getType() == ResourceType.PAGE) {
+            documentName = this.currentPageReferenceResolver.resolve(reference.getReference()).getName();
+        } else {
+            documentName = reference.getReference();
+        }
+        return this.contextLocalization.getTranslationPlain(documentTitleTranslationKey,
+            documentName);
     }
 }

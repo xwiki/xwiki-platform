@@ -25,9 +25,10 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
-import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
+import org.xwiki.model.reference.PageAttachmentReferenceResolver;
 import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.renderer.reference.link.WantedLinkTitleGenerator;
 
 /**
@@ -51,12 +52,26 @@ public class XWikiAttachmentWantedLinkTitleGenerator implements WantedLinkTitleG
     @Named("current")
     private AttachmentReferenceResolver<String> currentAttachmentReferenceResolver;
 
+    /**
+     * Used to extract the page attachment name part in a page attachment reference.
+     */
+    @Inject
+    @Named("current")
+    private PageAttachmentReferenceResolver<String> currentPageAttachmentReferenceResolver;
+
     @Override
     public String generateWantedLinkTitle(ResourceReference reference)
     {
-        AttachmentReference attachmentReference =
-            this.currentAttachmentReferenceResolver.resolve(reference.getReference());
-        return this.contextLocalization.getTranslationPlain("rendering.xwiki.wantedLink.attachment.label",
-            attachmentReference.getName());
+        String attachmentTitleTranslationKey = "rendering.xwiki.wantedLink.attachment.label";
+        String attachmentName;
+        if (reference.isTyped() && reference.getType() == ResourceType.ATTACHMENT) {
+            attachmentName = this.currentAttachmentReferenceResolver.resolve(reference.getReference()).getName();
+        } else if (reference.isTyped() && reference.getType() == ResourceType.PAGE_ATTACHMENT) {
+            attachmentName = this.currentPageAttachmentReferenceResolver.resolve(reference.getReference()).getName();
+        } else {
+            attachmentName = reference.getReference();
+        }
+        return this.contextLocalization.getTranslationPlain(attachmentTitleTranslationKey,
+            attachmentName);
     }
 }

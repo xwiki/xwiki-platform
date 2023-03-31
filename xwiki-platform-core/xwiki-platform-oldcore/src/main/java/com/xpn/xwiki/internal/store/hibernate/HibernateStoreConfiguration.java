@@ -47,7 +47,9 @@ public class HibernateStoreConfiguration extends Configuration
      */
     public HibernateStoreConfiguration(URL url)
     {
-        configure(url);
+        if (url != null) {
+            configure(url);
+        }
     }
 
     @Override

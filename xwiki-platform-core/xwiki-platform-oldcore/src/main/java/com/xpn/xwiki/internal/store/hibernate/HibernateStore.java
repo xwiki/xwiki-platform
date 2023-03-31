@@ -229,9 +229,6 @@ public class HibernateStore implements Disposable, Initializable
     {
         // Search for the base configuration file
         this.configurationURL = getHibernateConfigurationURL();
-        if (this.configurationURL == null) {
-            throw new InitializationException("Could not find any Hibernate configuration");
-        }
 
         // For retro compatibility reasons we have to create an old Configuration object since it's exposed in the API
         this.configuration = new HibernateStoreConfiguration(this.configurationURL);

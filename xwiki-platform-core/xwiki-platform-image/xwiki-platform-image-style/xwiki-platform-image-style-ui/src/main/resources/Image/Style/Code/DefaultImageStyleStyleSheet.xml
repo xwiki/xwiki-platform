@@ -148,12 +148,13 @@
 figure[data-xwiki-image-style-border="true"],
 img[data-xwiki-image-style-border="true"],
 div[data-xwiki-image-style-border="true"] {
-  outline: 3px solid $theme.borderColor;
+  border: 3px solid $theme.borderColor;
+  box-sizing: content-box;
 }
 
 div[data-xwiki-image-style-border="true"] figure[data-xwiki-image-style-border="true"],
 figure[data-xwiki-image-style-border="true"] img[data-xwiki-image-style-border="true"] {
-  outline: none;
+  border: none;
 }
 
 figure[data-xwiki-image-style-alignment="start"],

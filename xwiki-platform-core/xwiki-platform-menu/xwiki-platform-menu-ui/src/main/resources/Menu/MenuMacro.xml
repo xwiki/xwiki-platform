@@ -1168,15 +1168,15 @@ $menuTemplateDoc.content.replace('{', '')
 #set ($discard = $xwiki.ssx.use("$xcontext.macro.doc.prefixedFullName", {'colorTheme': $colorTheme}))
 #set ($discard = $xwiki.jsx.use("$xcontext.macro.doc.prefixedFullName"))
 ## Make sure the label is non-empty as otherwise the aria-label doesn't work.
-#if ($stringtool.isBlank("$!label"))
-  #set ($label = $wikimacro.context.getXDOM().getIdGenerator().generateUniqueId("MenuLabel"))
+#if ("$!label" != '')
+  #set ($label = $wikimacro.context.getXDOM().getIdGenerator().generateUniqueId('Menu',''))
 #end
 #if($type.contains('horizontal'))
   ## Make sure the id is non-empty for horizontal menus as otherwise the toggle doesn't work.
-  #if ($stringtool.isBlank("$!id"))
+  #if ("$!id" != '')
     #set ($id = $wikimacro.context.getXDOM().getIdGenerator().generateUniqueId("M", "GeneratedMenuId"))
   #end
-  (% role="navigation" class="menu-horizontal-toggle"
+  (% role='navigation' class='menu-horizontal-toggle'
   aria-label="${services.rendering.escape($label), 'xwiki/2.1')}" %)(((
     (% class="navbar-header" %)(((
       {{html}}

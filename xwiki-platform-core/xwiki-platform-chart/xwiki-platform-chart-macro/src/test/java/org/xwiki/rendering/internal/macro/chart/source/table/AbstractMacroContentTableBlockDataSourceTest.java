@@ -25,16 +25,19 @@ import java.util.Map;
 
 import javax.inject.Named;
 
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.listener.ListenerRegistry;
 import org.xwiki.rendering.internal.parser.reference.DefaultUntypedLinkReferenceParser;
 import org.xwiki.rendering.internal.parser.reference.type.AttachmentResourceReferenceTypeParser;
 import org.xwiki.rendering.internal.parser.reference.type.DocumentResourceReferenceTypeParser;
 import org.xwiki.rendering.internal.parser.reference.type.SpaceResourceReferenceTypeParser;
 import org.xwiki.rendering.internal.parser.reference.type.URLResourceReferenceTypeParser;
+import org.xwiki.rendering.internal.parser.wikimodel.WikiModelParserListenerBuilder;
 import org.xwiki.rendering.internal.parser.xwiki20.XWiki20ImageReferenceParser;
 import org.xwiki.rendering.internal.parser.xwiki20.XWiki20LinkReferenceParser;
 import org.xwiki.rendering.internal.parser.xwiki20.XWiki20Parser;
@@ -42,6 +45,7 @@ import org.xwiki.rendering.internal.renderer.DefaultLinkLabelGenerator;
 import org.xwiki.rendering.internal.renderer.plain.PlainTextBlockRenderer;
 import org.xwiki.rendering.internal.renderer.plain.PlainTextRenderer;
 import org.xwiki.rendering.internal.renderer.plain.PlainTextRendererFactory;
+import org.xwiki.rendering.internal.syntax.DefaultSyntaxRegistry;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
@@ -73,7 +77,10 @@ import static org.mockito.Mockito.when;
     DocumentResourceReferenceTypeParser.class,
     SpaceResourceReferenceTypeParser.class,
     AttachmentResourceReferenceTypeParser.class,
-    RelativeStringEntityReferenceResolver.class
+    RelativeStringEntityReferenceResolver.class,
+    ListenerRegistry.class,
+    WikiModelParserListenerBuilder.class,
+    DefaultSyntaxRegistry.class
 })
 //@formatter:on
 abstract class AbstractMacroContentTableBlockDataSourceTest
@@ -98,7 +105,12 @@ abstract class AbstractMacroContentTableBlockDataSourceTest
 
     protected void setUpContentExpectation(String macroContent) throws Exception
     {
-        // In order to make it easy to write unit tests, we allow tests to pass a string written in XWiki/2.0 synyax
+        DefaultComponentDescriptor<ComponentManager> componentDescriptor = new DefaultComponentDescriptor<>();
+        componentDescriptor.setRoleType(ComponentManager.class);
+        componentDescriptor.setRoleHint("context");
+        this.componentManager.registerComponent(componentDescriptor, this.componentManager);
+
+        // In order to make it easy to write unit tests, we allow tests to pass a string written in XWiki/2.0 syntax
         // which we then parser to generate an XDOM that we use in the expectation.
         XDOM expectedXDOM = this.componentManager.<Parser>getInstance(Parser.class,
             Syntax.XWIKI_2_0.toIdString()).parse(new StringReader(macroContent));

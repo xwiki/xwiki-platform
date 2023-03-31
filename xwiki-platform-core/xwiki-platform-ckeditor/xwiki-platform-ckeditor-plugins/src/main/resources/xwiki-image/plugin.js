@@ -154,11 +154,15 @@
         }
 
         // Style
-        this.setData('imageStyle', this.parts.image.getAttribute('data-xwiki-image-style') || '');
+        var image = this.parts.image;
+        if (this.data.hasCaption) {
+          image = this.element;
+        }
+        this.setData('imageStyle', image.getAttribute('data-xwiki-image-style') || '');
 
-        this.setData('border', this.parts.image.getAttribute('data-xwiki-image-style-border'));
-        this.setData('alignment', this.parts.image.getAttribute('data-xwiki-image-style-alignment'));
-        this.setData('textWrap', this.parts.image.getAttribute('data-xwiki-image-style-text-wrap'));
+        this.setData('border', image.getAttribute('data-xwiki-image-style-border'));
+        this.setData('alignment', image.getAttribute('data-xwiki-image-style-alignment'));
+        this.setData('textWrap', image.getAttribute('data-xwiki-image-style-text-wrap'));
 
         moveResizer(this);
       };
@@ -218,6 +222,11 @@
          * @param value the attribute value
          */
         function setAttribute(widget, key, value) {
+          widget.parts.image.removeAttribute(key);
+          widget.element.removeAttribute(key);
+          if(widget.data.hasCaption) {
+            widget.element.setAttribute(key, value);
+          }
           widget.parts.image.setAttribute(key, value);
           widget.wrapper.setAttribute(key, value);
         }
@@ -229,14 +238,47 @@
          * @param key the property key to removew
          */
         function removeAttribute(widget, key) {
+          widget.element.removeAttribute(key);
           widget.parts.image.removeAttribute(key);
           widget.wrapper.removeAttribute(key);
+        }
+
+        function updateFigureWidth(widget) {
+          var figureStyles;
+          if (widget.element.hasAttribute('style')) {
+            figureStyles = widget.element.getAttribute('style');
+          } else {
+            figureStyles = "";
+          }
+          var newStyles;
+          if (widget.oldData && widget.oldData.width) {
+            newStyles = figureStyles.split(';').filter(function (item) {
+              return item.indexOf("width: " + widget.oldData.width + "px") === -1;
+            }).join(';');
+          } else if (widget.data.width) {
+            newStyles = figureStyles.split(';').filter(function (item) {
+              return item.indexOf("width: ") === -1;
+            }).join(';');
+          } else {
+            newStyles = figureStyles;
+          }
+
+          if (!newStyles.endsWith(';')) {
+            newStyles = newStyles + ';';
+          }
+
+          if (widget.data.hasCaption && widget.data.width) {
+            newStyles = newStyles + "width: " + widget.data.width + "px;";
+          }
+
+          widget.element.setAttribute('style', newStyles);
         }
 
         // Caption
         // TODO: Add support for editing the caption directly from the dialog (see CKEDITOR-435)
 
         computeStyleData(this, setAttribute, removeAttribute);
+        updateFigureWidth(this);
 
         originalData.call(this);
       };

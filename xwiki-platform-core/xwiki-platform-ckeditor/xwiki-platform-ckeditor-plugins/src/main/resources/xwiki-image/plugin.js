@@ -243,19 +243,42 @@
           widget.wrapper.removeAttribute(key);
         }
 
-        function updateFigureDimensions(widget) {
-          if (widget.data.hasCaption) {
-            setAttribute(widget, 'style', "width: " + widget.data.width + "px");
+        function updateFigureWidth(widget) {
+          var figureStyles;
+          if (widget.element.hasAttribute('style')) {
+            figureStyles = widget.element.getAttribute('style');
           } else {
-            removeAttribute(widget, 'style');
+            figureStyles = "";
           }
+          var newStyles;
+          if (widget.oldData && widget.oldData.width) {
+            newStyles = figureStyles.split(';').filter(function (item) {
+              return item.indexOf("width: " + widget.oldData.width + "px") === -1;
+            }).join(';');
+          } else if (widget.data.width) {
+            newStyles = figureStyles.split(';').filter(function (item) {
+              return item.indexOf("width: ") === -1;
+            }).join(';');
+          } else {
+            newStyles = figureStyles;
+          }
+
+          if (!newStyles.endsWith(';')) {
+            newStyles = newStyles + ';';
+          }
+
+          if (widget.data.hasCaption && widget.data.width) {
+            newStyles = newStyles + "width: " + widget.data.width + "px;";
+          }
+
+          widget.element.setAttribute('style', newStyles);
         }
 
         // Caption
         // TODO: Add support for editing the caption directly from the dialog (see CKEDITOR-435)
 
         computeStyleData(this, setAttribute, removeAttribute);
-        updateFigureDimensions(this, setAttribute, removeAttribute);
+        updateFigureWidth(this);
 
         originalData.call(this);
       };

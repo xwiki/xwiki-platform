@@ -19,20 +19,29 @@
  */
 package org.xwiki.image.style.internal.rendering;
 
-import java.util.HashMap;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.listener.ListenerProvider;
-import org.xwiki.rendering.listener.chaining.AbstractChainingListener;
+import org.xwiki.rendering.listener.QueueListener;
 import org.xwiki.rendering.listener.chaining.ChainingListener;
+import org.xwiki.rendering.listener.chaining.EventType;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
+import org.xwiki.rendering.listener.chaining.LookaheadChainingListener;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.syntax.Syntax;
 
 import static org.xwiki.rendering.syntax.Syntax.HTML_5_0;
@@ -55,6 +64,8 @@ public class CaptionedImageRenderListenerProvider implements ListenerProvider
 
     static final String STYLE_PROPERTY = "style";
 
+    static final String STYLE_SEPARATOR = ";";
+
     static final String DATA_XWIKI_IMAGE_STYLE = "data-xwiki-image-style";
 
     static final String DATA_XWIKI_IMAGE_STYLE_ALIGNMENT = "data-xwiki-image-style-alignment";
@@ -74,9 +85,9 @@ public class CaptionedImageRenderListenerProvider implements ListenerProvider
         DATA_XWIKI_IMAGE_STYLE_TEXT_WRAP
     );
 
-    private static class InternalChainingListener extends AbstractChainingListener
+    private static class InternalChainingListener extends LookaheadChainingListener
     {
-        private Map<String, String> cleanedUpParameters;
+        private final Deque<Map<String, String>> figureParametersQueue = new ArrayDeque<>();
 
         /**
          * Default constructor.
@@ -85,21 +96,67 @@ public class CaptionedImageRenderListenerProvider implements ListenerProvider
          */
         protected InternalChainingListener(ListenerChain listenerChain)
         {
-            setListenerChain(listenerChain);
+            super(listenerChain, 1);
         }
 
         @Override
         public void beginFigure(Map<String, String> parameters)
         {
-            this.cleanedUpParameters = new HashMap<>(parameters);
-            KNOWN_PARAMETERS.forEach(this.cleanedUpParameters::remove);
-            super.beginFigure(this.cleanedUpParameters);
+            this.figureParametersQueue.push(parameters);
+            super.beginFigure(parameters);
+        }
+
+        @Override
+        public void onImage(ResourceReference reference, boolean freestanding, String id,
+            Map<String, String> parameters)
+        {
+            QueueListener.Event nextEvent = getPreviousEvents().peekLast();
+            if (nextEvent != null && nextEvent.eventType == EventType.BEGIN_FIGURE) {
+                // Merge the image parameters to the figure parameters when the image is wrapped in a figure.
+                Object[] eventParameters = nextEvent.eventParameters;
+                // Sanity check to make sure that we are handling the expected case.
+                if (eventParameters.length == 1 && eventParameters[0] instanceof Map<?, ?>) {
+                    Map<String, String> figureParameters = new LinkedHashMap<>(this.figureParametersQueue.pop());
+                    cleanupFigureParameters(figureParameters, parameters);
+                    this.figureParametersQueue.push(figureParameters);
+                    eventParameters[0] = figureParameters;
+                }
+            }
+
+            super.onImage(reference, freestanding, id, parameters);
+        }
+
+        private void cleanupFigureParameters(Map<String, String> figureParameters, Map<String, String> imageParameters)
+        {
+            KNOWN_PARAMETERS.forEach(key -> {
+                if (key.equals(STYLE_PROPERTY) && figureParameters.containsKey(STYLE_PROPERTY)
+                    && imageParameters.containsKey(WIDTH_PROPERTY))
+                {
+                    String figureStyle = figureParameters.get(STYLE_PROPERTY);
+                    String cleanupStyle =
+                        Arrays.stream(figureStyle.split(STYLE_SEPARATOR))
+                            .filter(Predicate.not(value -> Objects.equals(value.trim(),
+                                String.format("width: %spx", imageParameters.get(WIDTH_PROPERTY)))))
+                            .collect(Collectors.joining(STYLE_SEPARATOR, StringUtils.EMPTY, STYLE_SEPARATOR));
+
+                    if (cleanupStyle.equals(STYLE_SEPARATOR)) {
+                        cleanupStyle = "";
+                    }
+                    if (cleanupStyle.isEmpty()) {
+                        figureParameters.remove(key);
+                    } else {
+                        figureParameters.put(key, cleanupStyle);
+                    }
+                } else if (!key.equals(STYLE_PROPERTY)) {
+                    figureParameters.remove(key);
+                }
+            });
         }
 
         @Override
         public void endFigure(Map<String, String> parameters)
         {
-            super.endFigure(this.cleanedUpParameters);
+            super.endFigure(this.figureParametersQueue.pop());
         }
     }
 

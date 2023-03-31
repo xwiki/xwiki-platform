@@ -21,7 +21,7 @@ package org.xwiki.image.style.internal.rendering;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -39,11 +39,13 @@ import org.xwiki.rendering.listener.chaining.LookaheadChainingListener;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.syntax.Syntax;
 
+import static org.apache.commons.lang3.StringUtils.SPACE;
 import static org.xwiki.image.style.internal.rendering.CaptionedImageRenderListenerProvider.DATA_XWIKI_IMAGE_STYLE;
 import static org.xwiki.image.style.internal.rendering.CaptionedImageRenderListenerProvider.DATA_XWIKI_IMAGE_STYLE_ALIGNMENT;
 import static org.xwiki.image.style.internal.rendering.CaptionedImageRenderListenerProvider.DATA_XWIKI_IMAGE_STYLE_BORDER;
 import static org.xwiki.image.style.internal.rendering.CaptionedImageRenderListenerProvider.DATA_XWIKI_IMAGE_STYLE_TEXT_WRAP;
 import static org.xwiki.image.style.internal.rendering.CaptionedImageRenderListenerProvider.STYLE_PROPERTY;
+import static org.xwiki.image.style.internal.rendering.CaptionedImageRenderListenerProvider.STYLE_SEPARATOR;
 import static org.xwiki.image.style.internal.rendering.CaptionedImageRenderListenerProvider.WIDTH_PROPERTY;
 import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_0;
 import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_1;
@@ -61,8 +63,6 @@ import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_1;
 public class CaptionedImageParseListenerProvider implements ListenerProvider
 {
     private static final Set<Syntax> ACCEPTED_SYNTAX = Set.of(XWIKI_2_0, XWIKI_2_1);
-
-    private static final String STYLE_SEPARATOR = ";";
 
     private static class InternalChainingListener extends LookaheadChainingListener
     {
@@ -104,7 +104,7 @@ public class CaptionedImageParseListenerProvider implements ListenerProvider
                 // Sanity check to make sure that we are handling the expected case.
                 if (eventParameters.length == 1 && eventParameters[0] instanceof Map<?, ?>) {
                     Map<String, String> figureParameters = this.figureParametersQueue.pop();
-                    Map<String, String> mergedMap = new HashMap<>(figureParameters);
+                    Map<String, String> mergedMap = new LinkedHashMap<>(figureParameters);
                     KNOWN_PARAMETERS.stream()
                         .filter(parameters::containsKey)
                         .forEach(key -> mergeParameter(key, mergedMap, parameters, figureParameters));
@@ -119,19 +119,31 @@ public class CaptionedImageParseListenerProvider implements ListenerProvider
         private void mergeParameter(String key, Map<String, String> mergedMap,
             Map<String, String> imageParameters, Map<String, String> figureParameters)
         {
-            String value = imageParameters.get(key);
+            String imageParameter = imageParameters.get(key);
             if (Objects.equals(key, WIDTH_PROPERTY)) {
-                String styleValue = String.format("width: %spx;", imageParameters.get(key));
-                if (figureParameters.containsKey(STYLE_PROPERTY)) {
+                mergeWidthParameter(mergedMap, figureParameters, imageParameters.get(WIDTH_PROPERTY));
+            } else {
+                mergedMap.put(key, imageParameter);
+            }
+        }
+
+        private void mergeWidthParameter(Map<String, String> mergedMap, Map<String, String> figureParameters,
+            String imageWidthParameter)
+        {
+            String styleValue = String.format("width: %spx;", imageWidthParameter);
+            if (figureParameters.containsKey(STYLE_PROPERTY)) {
+                if (figureParameters.get(STYLE_PROPERTY).contains("width:")) {
+                    styleValue = figureParameters.get(STYLE_PROPERTY);
+                } else {
                     if (!figureParameters.get(STYLE_PROPERTY).endsWith(STYLE_SEPARATOR)) {
-                        styleValue = STYLE_SEPARATOR + styleValue;
+                        styleValue = STYLE_SEPARATOR + SPACE + styleValue;
+                    } else {
+                        styleValue = SPACE + styleValue;
                     }
                     styleValue = figureParameters.get(STYLE_PROPERTY) + styleValue;
                 }
-                mergedMap.put(STYLE_PROPERTY, styleValue);
-            } else {
-                mergedMap.put(key, value);
             }
+            mergedMap.put(STYLE_PROPERTY, styleValue);
         }
 
         @Override

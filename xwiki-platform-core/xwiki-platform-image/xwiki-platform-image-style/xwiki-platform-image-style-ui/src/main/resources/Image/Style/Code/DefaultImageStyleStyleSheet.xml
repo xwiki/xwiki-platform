@@ -197,6 +197,10 @@ figure[data-xwiki-image-style-alignment="end"] img[data-xwiki-image-style-alignm
   float: initial;
 }
 
+figure {
+  max-width: 100%;
+}
+
 /* CKEditor specific style. */
 span[data-cke-display-name="image"] .cke_widget_element {
   display: block;

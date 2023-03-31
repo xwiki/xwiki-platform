@@ -17,8 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.image.style.internal.rendering
-    ;
+package org.xwiki.image.style.internal.rendering;
 
 import org.xwiki.rendering.test.integration.junit5.RenderingTests;
 import org.xwiki.test.annotation.AllComponents;

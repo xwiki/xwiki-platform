@@ -59,7 +59,7 @@
     #if ($pageDoc.isNew())
       <span class="wikicreatelink">
         <a href="$pageDoc.getURL('create')"
-          title="$escapetool.xml($services.localization.render('core.create.inline.label', [$title]))">
+          title="$escapetool.xml($services.localization.render('rendering.xwiki.wantedLink.page.label', [$title]))">
           $title
         </a>
       </span>

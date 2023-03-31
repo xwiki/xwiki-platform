@@ -20,42 +20,33 @@
 package org.xwiki.rendering.internal.renderer;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.localization.ContextualLocalizationManager;
-import org.xwiki.rendering.renderer.reference.link.URITitleGenerator;
+import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.renderer.reference.link.WantedLinkTitleGenerator;
 
 /**
- * Generate link titles for document URIs.
+ * Fallback to generate a wanted link title for a resource which type doesn't have a specific implementation yet.
+ * This implementation uses translations to generate localized titles.
+ * This implementation uses the reference itself, it should be overridden by type specific implementations using a
+ * human-readable name instead. E.g. {@link XWikiDocumentWantedLinkTitleGenerator}
  *
  * @version $Id$
  * @since 15.3RC1
  */
-@Component(hints = {"doc", "page"})
+@Component
 @Singleton
-public class XWikiDocumentURITitleGenerator implements URITitleGenerator
+public class XWikiDefaultWantedLinkTitleGenerator implements WantedLinkTitleGenerator
 {
     @Inject
     private ContextualLocalizationManager contextLocalization;
 
-    /**
-     * Used to extract the document name part in a document reference.
-     */
-    @Inject
-    @Named("current")
-    private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
-
     @Override
-    public String generateCreateTitle(ResourceReference reference)
+    public String generateWantedLinkTitle(ResourceReference reference)
     {
-        DocumentReference documentReference =
-            this.currentDocumentReferenceResolver.resolve(reference.getReference());
-        return this.contextLocalization.getTranslationPlain("core.create.inline.label",
-            documentReference.getName());
+        return this.contextLocalization.getTranslationPlain("rendering.xwiki.wantedLink.default.label",
+            reference.getReference());
     }
 }

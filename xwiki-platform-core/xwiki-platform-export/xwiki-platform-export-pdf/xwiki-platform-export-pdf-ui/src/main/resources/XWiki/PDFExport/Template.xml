@@ -313,6 +313,16 @@
       break-before: page;
     }
   }
+
+  // Make sure the content of the code macro is not cut when it exceeds the print page width by:
+  div.code {
+    // decreasing the font size when printing
+    font-size: 80%;
+  }
+  div.code, div.code * {
+    // and wrapping long lines, while still preserving the whitespace.
+    white-space: pre-wrap;
+  }
 }</code>
     </property>
     <property>

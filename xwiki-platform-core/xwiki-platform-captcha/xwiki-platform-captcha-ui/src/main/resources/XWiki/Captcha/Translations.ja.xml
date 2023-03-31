@@ -43,4 +43,4 @@ captcha.admin.configure.title={0}を設定
 captcha.admin.sample.title=サンプルのCAPTCHA
 captcha.admin.sample.description=設定したCAPTCHAがどのように表示されるかを確認できます。
 </content>
-  </xwikidoc>
+</xwikidoc>

@@ -104,4 +104,4 @@ AnnotationCode.AnnotationConfig_displayHighlight=注釈を既定でハイライ�
 AnnotationCode.AnnotationConfig_displayHighlight.hint=注釈を常にハイライトするか、あるいは注釈もしくは注釈の構造をホバリングしたときにのみハイライトするかを決定してください
 AnnotationCode.AnnotationConfig_annotationClass=注釈の構造を規定するXWikiのクラス
 </content>
-  </xwikidoc>
+</xwikidoc>

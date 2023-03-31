@@ -46,4 +46,4 @@ XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_allowedMimet
 XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_blockedMimetypes=ブロックされているmimetype 
 XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_blockedMimetypes.hint=拒否する添付ファイルのmimetypeの一覧を規定。既定ではこの一覧は空ですが、ブロックするmimetypeの一覧をコンマで分割して指定できます。アスタリスク（*）を使うと、全ての種類のファイルをブロックできます。一覧を設定すると、指定されていないmimetypeの添付ファイルはブロックされます。たとえば、プレーンテキストと全種類の画像をブロックしたい場合は、text/plain,image/*のように設定してください。
 </content>
-  </xwikidoc>
+</xwikidoc>

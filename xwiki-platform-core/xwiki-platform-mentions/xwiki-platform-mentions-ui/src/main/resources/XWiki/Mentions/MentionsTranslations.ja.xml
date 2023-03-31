@@ -57,4 +57,4 @@ XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=メンションを
 mentions.tip=WYSIWYGで編集中の場合、@の後に文字を入力すると、メンションするユーザーの候補が表示されます。
 mentions.configuration.heading=メンションの設定
 </content>
-  </xwikidoc>
+</xwikidoc>

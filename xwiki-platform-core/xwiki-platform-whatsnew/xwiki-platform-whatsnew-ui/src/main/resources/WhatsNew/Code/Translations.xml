@@ -36,7 +36,9 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>platform.whatsnew.drawer.text=What's New</content>
+  <content>platform.whatsnew.drawer.text=What's New
+platform.whatsnew.title=What's new in XWiki
+</content>
   <object>
     <name>WhatsNew.Code.Translations</name>
     <number>0</number>

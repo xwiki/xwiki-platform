@@ -46,4 +46,4 @@ attachment.validation.mimetype.allowedMimetypes=Mimetypes autorisés : {0}
 ### Missing: XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_blockedMimetypes=Blocked Mimetypes 
 ### Missing: XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_blockedMimetypes.hint=Define the list of rejected attachment mimetypes. By default, this list is empty, but you can specify a comma-separated list of blocked mimetypes. Note that a joker (*) can be used to accept any media type. Once this list is not empty, any attachment matching one of the listed mimetype will be rejected. For instance, if you want to reject plain text and any kind of images, you can set the list to: text/plain,image/*
 </content>
-  </xwikidoc>
+</xwikidoc>

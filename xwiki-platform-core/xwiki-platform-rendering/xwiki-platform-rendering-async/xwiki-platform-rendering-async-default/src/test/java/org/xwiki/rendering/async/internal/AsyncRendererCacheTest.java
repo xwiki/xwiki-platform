@@ -23,7 +23,10 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.cache.CacheException;
@@ -34,11 +37,15 @@ import org.xwiki.component.descriptor.DefaultComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.rendering.async.internal.DefaultAsyncContext.RightEntry;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
@@ -51,10 +58,13 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class AsyncRendererCacheTest
+class AsyncRendererCacheTest
 {
     @MockComponent
     private CacheManager cacheManager;
+
+    @MockComponent
+    private AuthorizationManager authorization;
 
     @InjectMockComponents
     private AsyncRendererCache asyncCache;
@@ -100,6 +110,16 @@ public class AsyncRendererCacheTest
         this.status.setReferences(new HashSet<>(Arrays.asList(references)));
     }
 
+    private void setRights(RightEntry... rights)
+    {
+        for (RightEntry right : rights) {
+            when(this.authorization.hasAccess(right.getRight(), right.getUserReference(), right.getEntityReference()))
+                .thenReturn(right.isAllowed());
+        }
+
+        this.status.setRights(Set.of(rights));
+    }
+
     private List<String> getId()
     {
         return this.status.getRequest().getId();
@@ -108,7 +128,7 @@ public class AsyncRendererCacheTest
     // Tests
 
     @Test
-    public void invalidateSyncOnComponentType()
+    void invalidateSyncOnComponentType()
     {
         setRoleTypes(String.class);
 
@@ -126,7 +146,7 @@ public class AsyncRendererCacheTest
     }
 
     @Test
-    public void invalidateSyncOnComponent()
+    void invalidateSyncOnComponent()
     {
         setRoles(new DefaultComponentRole<>(String.class, "hint"));
 
@@ -146,7 +166,7 @@ public class AsyncRendererCacheTest
     }
 
     @Test
-    public void invalidateSyncOnSameReference()
+    void invalidateSyncOnSameReference()
     {
         setReferences(new ObjectReference("name", new DocumentReference("wiki", "Space", "Document")));
 
@@ -166,7 +186,7 @@ public class AsyncRendererCacheTest
     }
 
     @Test
-    public void invalidateSyncOnChildReference()
+    void invalidateSyncOnChildReference()
     {
         setReferences(new DocumentReference("wiki", "Space", "Document"));
 
@@ -180,7 +200,7 @@ public class AsyncRendererCacheTest
     }
 
     @Test
-    public void invalidateSyncOnWiki()
+    void invalidateSyncOnWiki()
     {
         setReferences(new DocumentReference("wiki", "Space", "Document"));
 
@@ -198,7 +218,33 @@ public class AsyncRendererCacheTest
     }
 
     @Test
-    public void getAsyncSingleClient()
+    void invalidateSyncOnRight() throws IllegalAccessException
+    {
+        DocumentReference document = new DocumentReference("wiki", "Space", "Document");
+        DocumentReference user = new DocumentReference("wiki", "XWiki", "User");
+        setRights(new RightEntry(Right.VIEW, document, user, true));
+        Map<RightEntry, Set<String>> rightMapping =
+            (Map<RightEntry, Set<String>>) FieldUtils.readField(this.asyncCache, "rightMapping", true);
+
+        this.asyncCache.put(this.status);
+
+        assertSame(this.status, this.asyncCache.getSync(getId()));
+        assertEquals(1, rightMapping.size());
+
+        this.asyncCache.cleanCacheForRight();
+
+        assertSame(this.status, this.asyncCache.getSync(getId()));
+
+        when(this.authorization.hasAccess(Right.VIEW, document, user)).thenReturn(false);
+
+        this.asyncCache.cleanCacheForRight();
+
+        assertNull(this.asyncCache.getSync(getId()));
+        assertEquals(0, rightMapping.size());
+    }
+
+    @Test
+    void getAsyncSingleClient()
     {
         this.status.addClient("42");
 
@@ -210,7 +256,7 @@ public class AsyncRendererCacheTest
     }
 
     @Test
-    public void getAsyncSeveralClients()
+    void getAsyncSeveralClients()
     {
         this.status.addClient("1");
         this.status.addClient("2");

@@ -56,6 +56,11 @@
               // with the wiki syntax where it's not specified.
               delete image.attributes.alt;
             }
+            // Protect the internal class 'wikigeneratedid' from being moved to the figure.
+            if (image.hasClass('wikigeneratedid')) {
+              image.attributes['data-wikigeneratedid'] = 'true';
+              image.removeClass('wikigeneratedid');
+            }
           } else {
             // Unexpected HTML structure inside image markers. Keep the markers.
             return false;
@@ -80,6 +85,12 @@
           // Free-standing images don't have white-space in their reference and have only the src attribute set.
           if (freeStanding && !/\s+/.test(reference) && isFreeStandingImage(image)) {
             image.addClass('wikimodel-freestanding');
+          }
+          // Put the 'wikigeneratedid' class back to the image when the attribute is set.
+          var wikiGeneratedId = image.attributes['data-wikigeneratedid'] === 'true';
+          delete image.attributes['data-wikigeneratedid'];
+          if (wikiGeneratedId) {
+            image.addClass('wikigeneratedid');
           }
         }
       });

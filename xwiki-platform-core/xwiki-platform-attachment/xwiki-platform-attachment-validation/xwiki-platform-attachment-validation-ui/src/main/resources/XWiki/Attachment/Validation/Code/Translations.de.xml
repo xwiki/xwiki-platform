@@ -46,4 +46,4 @@ XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_allowedMimet
 XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_blockedMimetypes=Blockierte Mimetypen 
 XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_blockedMimetypes.hint=Definieren Sie die Liste der abgelehnten Mimetypen für Anhänge. Standardmäßig ist diese Liste leer, aber Sie können eine durch Kommas getrennte Liste blockierter Mimetypen angeben. Beachten Sie, dass ein Joker (*) verwendet werden kann, um jeden Medientyp zu akzeptieren. Sobald diese Liste nicht leer ist, wird jeder Anhang, der einem der aufgelisteten Mimetypen entspricht, abgelehnt. Wenn Sie beispielsweise einfachen Text und jede Art von Bildern ablehnen möchten, können Sie die Liste auf folgendes setzen: text/plain,image/*
 </content>
-  </xwikidoc>
+</xwikidoc>

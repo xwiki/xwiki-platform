@@ -63,4 +63,10 @@ public interface NewsSourceItem extends Comparable<NewsSourceItem>
      * @return the news item origin URL
      */
     Optional<String> getOriginURL();
+
+    /**
+     * @return the URL to an image associated with the news item
+     * @since 15.3RC1
+     */
+    Optional<String> getImageURL();
 }

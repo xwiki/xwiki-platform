@@ -49,6 +49,8 @@ public class DefaultNewsSourceItem implements NewsSourceItem
 
     private Optional<String> originURL;
 
+    private Optional<String> imageURL;
+
     @Override
     public Optional<String> getTitle()
     {
@@ -131,6 +133,20 @@ public class DefaultNewsSourceItem implements NewsSourceItem
     public void setOriginURL(Optional<String> originURL)
     {
         this.originURL = originURL;
+    }
+
+    @Override
+    public Optional<String> getImageURL()
+    {
+        return this.imageURL;
+    }
+
+    /**
+     * @param imageURL see {@link #getImageURL()} ()}
+     */
+    public void setImageURL(Optional<String> imageURL)
+    {
+        this.imageURL = imageURL;
     }
 
     @Override

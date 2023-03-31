@@ -77,6 +77,7 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -148,23 +149,34 @@ img[data-xwiki-image-style-border="true"] {
   border: 3px solid $theme.borderColor;
 }
 
-.cke_widget_image[data-xwiki-image-style-alignment="start"],
 img[data-xwiki-image-style-alignment="start"],
-.cke_widget_image[data-xwiki-image-style-text-wrap="true"],
-img[data-xwiki-image-style-text-wrap="true"] {
+img[data-xwiki-image-style-text-wrap="true"],
+span[data-xwiki-image-style-alignment="start"],
+span[data-xwiki-image-style-text-wrap="true"] {
   float: left;
 }
 
-.cke_widget_image[data-xwiki-image-style-alignment="center"],
-img[data-xwiki-image-style-alignment="center"] {
+img[data-xwiki-image-style-alignment="center"], span[data-xwiki-image-style-alignment="center"] {
   display: block;
   margin-left: auto;
   margin-right: auto;
 }
 
-.cke_widget_image[data-xwiki-image-style-alignment="end"],
-img[data-xwiki-image-style-alignment="end"] {
+span[data-xwiki-image-style-alignment="center"] {
+  text-align: center;
+}
+
+img[data-xwiki-image-style-alignment="end"], span[data-xwiki-image-style-alignment="end"] {
   float: right;
+}
+
+/* CKEditor specific style. */
+span[data-cke-display-name="image"] .cke_widget_element {
+  display: block;
+}
+
+.cke_image_resizer_wrapper &gt; img[data-xwiki-image-style-alignment="center"] {
+  display: inline-block;
 }</code>
     </property>
     <property>

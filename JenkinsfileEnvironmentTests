@@ -35,7 +35,8 @@
 // If the build has been manually triggered:
 // - if the type is known, then execute the tests
 // - if the type is not known, it means it's the first execution and the job is not parameterized yet. Thus,
-//   parameterize it and schedule the next run.
+//   parameterize it and schedule the next run. If you want to execute it, you'll need to trigger the build a second
+//   time and choose the type.
 if (currentBuild.rawBuild.getCauses()[0].toString().contains('UserIdCause')) {
   def validValues = ['docker-latest', 'docker-all', 'docker-unsupported']
   if (validValues.contains(params.type)) {
@@ -73,7 +74,7 @@ if (currentBuild.rawBuild.getCauses()[0].toString().contains('UserIdCause')) {
   currentBuild.result = 'ABORTED'
 }
 
-private void buildDocker(type)
+private void buildDocker(buildType)
 {
   def dockerConfigurationList
   def dockerModuleList
@@ -82,8 +83,8 @@ private void buildDocker(type)
     // Checkout platform to find all docker configurations and test modules so that we can then parallelize executions
     // of configs and modules across Jenkins agents.
     checkout skipChangeLog: true, scm: scm
-    dockerConfigurationList = dockerConfigurations(type)
-    if (type == 'docker-unsupported') {
+    dockerConfigurationList = dockerConfigurations(buildType)
+    if (buildType == 'docker-unsupported') {
       dockerModuleList = ['xwiki-platform-core/xwiki-platform-menu']
     } else {
       dockerModuleList = dockerModules()
@@ -97,7 +98,7 @@ private void buildDocker(type)
     // Set the next execution date/time
     jobProperties = customJobProperties
     label = 'environment'
-    type = type
+    type = buildType
   }
 }
 

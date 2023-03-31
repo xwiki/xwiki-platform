@@ -30,6 +30,7 @@ import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.csrf.CSRFToken;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -40,6 +41,7 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -77,6 +79,9 @@ class CreateActionTest
 
     @InjectMockComponents
     CreateAction action;
+
+    @MockComponent
+    private CSRFToken csrfToken;
 
     XWikiContext context;
 
@@ -132,6 +137,8 @@ class CreateActionTest
         when(document.isNew()).thenReturn(true);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
         context.setDoc(document);
+        String csrfTokenValue = "token42";
+        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Run the action
         String result = action.render(context);
@@ -141,7 +148,9 @@ class CreateActionTest
         // Verify null is returned (this means the response has been returned)
         assertNull(result);
 
-        verify(mockURLFactory).createURL("X", "Y", "edit", "template=&parent=Main.WebHome&title=Y", null, "xwiki",
+        verify(mockURLFactory).createURL("X", "Y", "edit",
+            "template=&parent=Main.WebHome&title=Y&form_token=" + csrfTokenValue,
+            null, "xwiki",
             context);
     }
 
@@ -155,6 +164,8 @@ class CreateActionTest
         when(document.isNew()).thenReturn(true);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
         context.setDoc(document);
+        String csrfTokenValue = "token432";
+        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Pass the tocreate=nonterminal request parameter
         when(mockRequest.getParameter("tocreate")).thenReturn("nonterminal");
@@ -167,7 +178,8 @@ class CreateActionTest
         // Verify null is returned (this means the response has been returned)
         assertNull(result);
 
-        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit", "template=&parent=Main.WebHome&title=Y", null,
+        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
+            "template=&parent=Main.WebHome&title=Y&form_token=" + csrfTokenValue, null,
             "xwiki", context);
     }
 
@@ -204,6 +216,8 @@ class CreateActionTest
         when(document.isNew()).thenReturn(true);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
         context.setDoc(document);
+        String csrfTokenValue = "token4234";
+        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Run the action
         String result = action.render(context);
@@ -214,7 +228,8 @@ class CreateActionTest
         assertNull(result);
 
         // Note: The title is not "WebHome", but "X" (the space's name) to avoid exposing "WebHome" in the UI.
-        verify(mockURLFactory).createURL("X", "WebHome", "edit", "template=&parent=Main.WebHome&title=X", null, "xwiki",
+        verify(mockURLFactory).createURL("X", "WebHome", "edit",
+            "template=&parent=Main.WebHome&title=X&form_token=" + csrfTokenValue, null, "xwiki",
             context);
     }
 
@@ -228,6 +243,8 @@ class CreateActionTest
         when(document.isNew()).thenReturn(true);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
         context.setDoc(document);
+        String csrfTokenValue = "token34342";
+        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Run the action
         String result = action.render(context);
@@ -239,7 +256,8 @@ class CreateActionTest
 
         // Note1: The bebavior is the same for both a top level space and a child space WebHome.
         // Note2: The title is not "WebHome", but "Y" (the space's name) to avoid exposing "WebHome" in the UI.
-        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit", "template=&parent=Main.WebHome&title=Y", null,
+        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
+            "template=&parent=Main.WebHome&title=Y&form_token=" + csrfTokenValue, null,
             "xwiki", context);
     }
 
@@ -253,6 +271,8 @@ class CreateActionTest
         when(document.isNew()).thenReturn(true);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
         context.setDoc(document);
+        String csrfTokenValue = "token4234343";
+        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Pass the tocreate=terminal request parameter
         when(mockRequest.getParameter("tocreate")).thenReturn("terminal");
@@ -266,7 +286,8 @@ class CreateActionTest
         assertNull(result);
 
         // Note: We are creating X.Y instead of X.Y.WebHome because the tocreate parameter says "terminal".
-        verify(mockURLFactory).createURL("X", "Y", "edit", "template=&parent=Main.WebHome&title=Y", null, "xwiki",
+        verify(mockURLFactory).createURL("X", "Y", "edit",
+            "template=&parent=Main.WebHome&title=Y&form_token=" + csrfTokenValue, null, "xwiki",
             context);
     }
 
@@ -334,6 +355,8 @@ class CreateActionTest
         when(document.isNew()).thenReturn(false);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
         context.setDoc(document);
+        String csrfTokenValue = "token424345";
+        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Submit from the UI spaceReference=X&name=Y
         when(mockRequest.getParameter("spaceReference")).thenReturn("X");
@@ -348,7 +371,8 @@ class CreateActionTest
         assertNull(result);
 
         // Note: We are creating X.Y.WebHome since we default to non-terminal documents.
-        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit", "template=&parent=Main.WebHome&title=Y", null,
+        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
+            "template=&parent=Main.WebHome&title=Y&form_token=" + csrfTokenValue, null,
             "xwiki", context);
     }
 
@@ -362,6 +386,8 @@ class CreateActionTest
         when(document.isNew()).thenReturn(false);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
         context.setDoc(document);
+        String csrfTokenValue = "token42124343";
+        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Submit from the UI spaceReference=X.Y&name=Z
         when(mockRequest.getParameter("spaceReference")).thenReturn("X.Y");
@@ -376,7 +402,8 @@ class CreateActionTest
         assertNull(result);
 
         // Note: We are creating X.Y.Z.WebHome since we default to non-terminal documents.
-        verify(mockURLFactory).createURL("X.Y.Z", "WebHome", "edit", "template=&parent=Main.WebHome&title=Z", null,
+        verify(mockURLFactory).createURL("X.Y.Z", "WebHome", "edit",
+            "template=&parent=Main.WebHome&title=Z&form_token=" + csrfTokenValue, null,
             "xwiki", context);
     }
 
@@ -390,6 +417,8 @@ class CreateActionTest
         when(document.isNew()).thenReturn(false);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
         context.setDoc(document);
+        String csrfTokenValue = "token424334466";
+        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Submit from the UI spaceReference=X&name=Y&tocreate=terminal
         when(mockRequest.getParameter("spaceReference")).thenReturn("X");
@@ -405,7 +434,8 @@ class CreateActionTest
         assertNull(result);
 
         // Note: We are creating X.Y instead of X.Y.WebHome because the tocreate parameter says "terminal".
-        verify(mockURLFactory).createURL("X", "Y", "edit", "template=&parent=Main.WebHome&title=Y", null, "xwiki",
+        verify(mockURLFactory).createURL("X", "Y", "edit",
+            "template=&parent=Main.WebHome&title=Y&form_token=" + csrfTokenValue, null, "xwiki",
             context);
     }
 
@@ -419,6 +449,8 @@ class CreateActionTest
         when(document.isNew()).thenReturn(false);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
         context.setDoc(document);
+        String csrfTokenValue = "token429988";
+        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Submit from the UI spaceReference=X.Y&name=Z&tocreate=termina
         when(mockRequest.getParameter("spaceReference")).thenReturn("X.Y");
@@ -434,7 +466,8 @@ class CreateActionTest
         assertNull(result);
 
         // Note: We are creating X.Y.Z instead of X.Y.Z.WebHome because the tocreate parameter says "terminal".
-        verify(mockURLFactory).createURL("X.Y", "Z", "edit", "template=&parent=Main.WebHome&title=Z", null, "xwiki",
+        verify(mockURLFactory).createURL("X.Y", "Z", "edit",
+            "template=&parent=Main.WebHome&title=Z&form_token=" + csrfTokenValue, null, "xwiki",
             context);
     }
 
@@ -548,6 +581,8 @@ class CreateActionTest
         when(document.isNew()).thenReturn(false);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
         context.setDoc(document);
+        String csrfTokenValue = "token42009";
+        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Submit from the UI name=Y
         when(mockRequest.getParameter("name")).thenReturn("Y");
@@ -561,7 +596,8 @@ class CreateActionTest
         assertNull(result);
 
         // Note: We are creating X.Y.WebHome since we default to non-terminal documents.
-        verify(mockURLFactory).createURL("Y", "WebHome", "edit", "template=&parent=Main.WebHome&title=Y", null, "xwiki",
+        verify(mockURLFactory).createURL("Y", "WebHome", "edit",
+            "template=&parent=Main.WebHome&title=Y&form_token=" + csrfTokenValue, null, "xwiki",
             context);
     }
 
@@ -579,6 +615,8 @@ class CreateActionTest
         when(document.isNew()).thenReturn(false);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
         context.setDoc(document);
+        String csrfTokenValue = "token4233311";
+        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Submit from the UI space=X&page=Y
         when(mockRequest.getParameter("space")).thenReturn("X");
@@ -593,7 +631,8 @@ class CreateActionTest
         assertNull(result);
 
         // Note: We are creating X.Y since the deprecated parameters were creating terminal documents by default.
-        verify(mockURLFactory).createURL("X", "Y", "edit", "template=&parent=Main.WebHome&title=Y", null, "xwiki",
+        verify(mockURLFactory).createURL("X", "Y", "edit",
+            "template=&parent=Main.WebHome&title=Y&form_token=" + csrfTokenValue, null, "xwiki",
             context);
     }
 
@@ -607,6 +646,8 @@ class CreateActionTest
         when(document.isNew()).thenReturn(false);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
         context.setDoc(document);
+        String csrfTokenValue = "token422112455";
+        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Submit from the UI space=X.Y&page=Z
         when(mockRequest.getParameter("space")).thenReturn("X.Y");
@@ -622,7 +663,8 @@ class CreateActionTest
 
         // Note1: The space parameter was previously considered as space name, not space reference, so it is escaped.
         // Note2: We are creating X\.Y.Z since the deprecated parameters were creating terminal documents by default.
-        verify(mockURLFactory).createURL("X\\.Y", "Z", "edit", "template=&parent=Main.WebHome&title=Z", null, "xwiki",
+        verify(mockURLFactory).createURL("X\\.Y", "Z", "edit",
+            "template=&parent=Main.WebHome&title=Z&form_token=" + csrfTokenValue, null, "xwiki",
             context);
     }
 
@@ -636,6 +678,8 @@ class CreateActionTest
         when(document.isNew()).thenReturn(false);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
         context.setDoc(document);
+        String csrfTokenValue = "token42778900";
+        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Submit from the UI space=X&tocreate=space
         when(mockRequest.getParameter("space")).thenReturn("X");
@@ -650,7 +694,8 @@ class CreateActionTest
         assertNull(result);
 
         // Note: We are creating X.WebHome because the tocreate parameter says "space".
-        verify(mockURLFactory).createURL("X", "WebHome", "edit", "template=&parent=Main.WebHome&title=X", null, "xwiki",
+        verify(mockURLFactory).createURL("X", "WebHome", "edit",
+            "template=&parent=Main.WebHome&title=X&form_token=" + csrfTokenValue, null, "xwiki",
             context);
     }
 
@@ -664,6 +709,8 @@ class CreateActionTest
         when(document.isNew()).thenReturn(false);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
         context.setDoc(document);
+        String csrfTokenValue = "token4344119982";
+        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Submit from the UI space=X&page=Y&tocreate=space
         when(mockRequest.getParameter("space")).thenReturn("X");
@@ -680,7 +727,8 @@ class CreateActionTest
 
         // Note: We are creating X.WebHome instead of X.Y because the tocreate parameter says "space" and the page
         // parameter is ignored.
-        verify(mockURLFactory).createURL("X", "WebHome", "edit", "template=&parent=Main.WebHome&title=X", null, "xwiki",
+        verify(mockURLFactory).createURL("X", "WebHome", "edit",
+            "template=&parent=Main.WebHome&title=X&form_token=" + csrfTokenValue, null, "xwiki",
             context);
     }
 
@@ -694,6 +742,8 @@ class CreateActionTest
         when(document.isNew()).thenReturn(false);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
         context.setDoc(document);
+        String csrfTokenValue = "token425553";
+        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Submit from the UI space=X.Y&tocreate=space
         when(mockRequest.getParameter("space")).thenReturn("X.Y");
@@ -709,7 +759,8 @@ class CreateActionTest
 
         // Note1: The space parameter was previously considered as space name, not space reference, so it is escaped.
         // Note2: We are creating X\.Y.WebHome because the tocreate parameter says "space".
-        verify(mockURLFactory).createURL("X\\.Y", "WebHome", "edit", "template=&parent=Main.WebHome&title=X.Y", null,
+        verify(mockURLFactory).createURL("X\\.Y", "WebHome", "edit",
+            "template=&parent=Main.WebHome&title=X.Y&form_token=" + csrfTokenValue, null,
             "xwiki", context);
     }
 
@@ -850,6 +901,8 @@ class CreateActionTest
         when(document.isNew()).thenReturn(false);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
         context.setDoc(document);
+        String csrfTokenValue = "token42008766";
+        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Submit from the UI spaceReference=X&name=Y&templateProvider=XWiki.MyTemplateProvider
         String templateProviderFullName = "XWiki.MyTemplateProvider";
@@ -871,7 +924,8 @@ class CreateActionTest
 
         // Note: We are creating X.Y and using the template extracted from the template provider.
         verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
-            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y", null, "xwiki", context);
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + csrfTokenValue, null, "xwiki",
+            context);
     }
 
     @Test
@@ -884,6 +938,8 @@ class CreateActionTest
         when(document.isNew()).thenReturn(false);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
         context.setDoc(document);
+        String csrfTokenValue = "token42557783";
+        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Submit from the UI spaceReference=X&name=Y&templateProvider=XWiki.MyTemplateProvider
         String templateProviderFullName = "XWiki.MyTemplateProvider";
@@ -907,7 +963,8 @@ class CreateActionTest
         // Note1: We are allowed to create anything under space X, be it a terminal or a non-terminal document.
         // Note2: We are creating X.Y and using the template extracted from the template provider.
         verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
-            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y", null, "xwiki", context);
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + csrfTokenValue,
+            null, "xwiki", context);
     }
 
     @Test
@@ -920,6 +977,8 @@ class CreateActionTest
         when(document.isNew()).thenReturn(false);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
         context.setDoc(document);
+        String csrfTokenValue = "token4221098";
+        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Submit from the UI spaceReference=X.Y.Z&name=W&templateProvider=XWiki.MyTemplateProvider
         String templateProviderFullName = "XWiki.MyTemplateProvider";
@@ -945,7 +1004,8 @@ class CreateActionTest
         // document
         // Note2: We are creating X.Y.Z.W and using the template extracted from the template provider.
         verify(mockURLFactory).createURL("X.Y.Z.W", "WebHome", "edit",
-            "template=XWiki.MyTemplate&parent=Main.WebHome&title=W", null, "xwiki", context);
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=W&form_token=" + csrfTokenValue,
+            null, "xwiki", context);
     }
 
     @Test
@@ -1072,6 +1132,8 @@ class CreateActionTest
         when(document.isNew()).thenReturn(true);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
         context.setDoc(document);
+        String csrfTokenValue = "token42988733";
+        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Specifying a template provider in the URL: templateprovider=XWiki.MyTemplateProvider
         String templateProviderFullName = "XWiki.MyTemplateProvider";
@@ -1092,7 +1154,8 @@ class CreateActionTest
 
         // Note: We are creating the document X.Y as terminal and using a template, as specified in the template
         // provider.
-        verify(mockURLFactory).createURL("X", "Y", "edit", "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y",
+        verify(mockURLFactory).createURL("X", "Y", "edit",
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + csrfTokenValue,
             null, "xwiki", context);
     }
 
@@ -1106,6 +1169,8 @@ class CreateActionTest
         when(document.isNew()).thenReturn(true);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
         context.setDoc(document);
+        String csrfTokenValue = "token4222113555";
+        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Specifying a template provider in the URL: templateprovider=XWiki.MyTemplateProvider
         String templateProviderFullName = "XWiki.MyTemplateProvider";
@@ -1128,7 +1193,8 @@ class CreateActionTest
         // Note: We are creating the document X.Y.WebHome as non-terminal even if the template provider says otherwise.
         // Also using a template, as specified in the template provider.
         verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
-            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y", null, "xwiki", context);
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + csrfTokenValue,
+            null, "xwiki", context);
     }
 
     @Test
@@ -1141,6 +1207,8 @@ class CreateActionTest
         when(document.isNew()).thenReturn(true);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
         context.setDoc(document);
+        String csrfTokenValue = "token4200983331";
+        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Specifying a template provider in the URL: templateprovider=XWiki.MyTemplateProvider
         String templateProviderFullName = "XWiki.MyTemplateProvider";
@@ -1162,7 +1230,8 @@ class CreateActionTest
         // Note: We are creating the document X.Y as terminal and using a template, as specified in the template
         // provider.
         verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
-            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y", null, "xwiki", context);
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + csrfTokenValue,
+            null, "xwiki", context);
     }
 
     @Test
@@ -1175,6 +1244,8 @@ class CreateActionTest
         when(document.isNew()).thenReturn(true);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
         context.setDoc(document);
+        String csrfTokenValue = "token42234456";
+        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Specifying a template provider in the URL: templateprovider=XWiki.MyTemplateProvider
         String templateProviderFullName = "XWiki.MyTemplateProvider";
@@ -1196,7 +1267,8 @@ class CreateActionTest
 
         // Note: We are creating the document X.Y as terminal and using a template, as specified in the template
         // provider.
-        verify(mockURLFactory).createURL("X", "Y", "edit", "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y",
+        verify(mockURLFactory).createURL("X", "Y", "edit",
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + csrfTokenValue,
             null, "xwiki", context);
     }
 
@@ -1211,6 +1283,8 @@ class CreateActionTest
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
 
         context.setDoc(document);
+        String csrfTokenValue = "token4298833";
+        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Submit from the UI spaceReference=X&name=Y&template=XWiki.MyTemplate
         String templateDocumentFullName = "XWiki.MyTemplate";
@@ -1233,7 +1307,8 @@ class CreateActionTest
 
         // Note: We are creating X.Y.WebHome and using the template specified in the request.
         verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
-            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y", null, "xwiki", context);
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + csrfTokenValue,
+            null, "xwiki", context);
     }
 
     @Test
@@ -1246,6 +1321,8 @@ class CreateActionTest
         when(document.isNew()).thenReturn(false);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
         context.setDoc(document);
+        String csrfTokenValue = "token4244112";
+        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Submit from the UI spaceReference=X&name=Y&templateProvider=XWiki.MyTemplateProvider
         String templateProviderFullName = "XWiki.MyTemplateProvider";
@@ -1269,7 +1346,8 @@ class CreateActionTest
 
         // Note: We are creating the document X.Y as terminal and using a template, as specified in the template
         // provider.
-        verify(mockURLFactory).createURL("X", "Y", "edit", "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y",
+        verify(mockURLFactory).createURL("X", "Y", "edit",
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + csrfTokenValue,
             null, "xwiki", context);
     }
 
@@ -1283,6 +1361,8 @@ class CreateActionTest
         when(document.isNew()).thenReturn(false);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
         context.setDoc(document);
+        String csrfTokenValue = "token422555987";
+        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Submit from the UI spaceReference=X&name=Y&templateProvider=XWiki.MyTemplateProvider
         String templateProviderFullName = "XWiki.MyTemplateProvider";
@@ -1308,7 +1388,8 @@ class CreateActionTest
         // Note: We are creating the document X.Y.WebHome as non-terminal, even if the template provider says otherwise.
         // Also using a template, as specified in the template provider.
         verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
-            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y", null, "xwiki", context);
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + csrfTokenValue,
+            null, "xwiki", context);
     }
 
     @Test
@@ -1321,6 +1402,8 @@ class CreateActionTest
         when(document.isNew()).thenReturn(false);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
         context.setDoc(document);
+        String csrfTokenValue = "token424111553";
+        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Submit from the UI spaceReference=X&name=Y&templateProvider=XWiki.MyTemplateProvider
         String templateProviderFullName = "XWiki.MyTemplateProvider";
@@ -1345,7 +1428,8 @@ class CreateActionTest
         // Note: We are creating the document X.Y.WebHome as non-terminal and using a template, as specified in the
         // template provider.
         verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
-            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y", null, "xwiki", context);
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + csrfTokenValue,
+            null, "xwiki", context);
     }
 
     @Test
@@ -1358,6 +1442,8 @@ class CreateActionTest
         when(document.isNew()).thenReturn(false);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
         context.setDoc(document);
+        String csrfTokenValue = "token42008733";
+        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Submit from the UI spaceReference=X&name=Y&templateProvider=XWiki.MyTemplateProvider
         String templateProviderFullName = "XWiki.MyTemplateProvider";
@@ -1382,7 +1468,8 @@ class CreateActionTest
 
         // Note: We are creating the document X.Y as terminal, even if the template provider says otherwise.
         // Also using a template, as specified in the template provider.
-        verify(mockURLFactory).createURL("X", "Y", "edit", "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y",
+        verify(mockURLFactory).createURL("X", "Y", "edit",
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + csrfTokenValue,
             null, "xwiki", context);
     }
 
@@ -1396,6 +1483,8 @@ class CreateActionTest
         when(document.isNew()).thenReturn(true);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
         context.setDoc(document);
+        String csrfTokenValue = "token423366";
+        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Specifying a template provider in the URL: templateprovider=XWiki.MyTemplateProvider
         String templateProviderFullName = "XWiki.MyTemplateProvider";
@@ -1417,7 +1506,8 @@ class CreateActionTest
         // Note: We are creating the document X.Y as terminal, since the template provider did not specify a "terminal"
         // property and it used the old "page" type instead. Also using a template, as specified in the template
         // provider.
-        verify(mockURLFactory).createURL("X", "Y", "edit", "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y",
+        verify(mockURLFactory).createURL("X", "Y", "edit",
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + csrfTokenValue,
             null, "xwiki", context);
     }
 
@@ -1432,6 +1522,8 @@ class CreateActionTest
         when(document.isNew()).thenReturn(true);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
         context.setDoc(document);
+        String csrfTokenValue = "token4265677398";
+        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Specifying a template provider in the URL: templateprovider=XWiki.MyTemplateProvider
         String templateProviderFullName = "XWiki.MyTemplateProvider";
@@ -1455,7 +1547,8 @@ class CreateActionTest
         // specify a "terminal" property and it used the old "page" type, the UI explicitly asked for a non-terminal
         // document. Also using a template, as specified in the template provider.
         verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
-            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y", null, "xwiki", context);
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + csrfTokenValue,
+            null, "xwiki", context);
     }
 
     @Test
@@ -1468,6 +1561,8 @@ class CreateActionTest
         when(document.isNew()).thenReturn(false);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
         context.setDoc(document);
+        String csrfTokenValue = "token421198337";
+        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Submit from the UI spaceReference=X&name=Y&templateProvider=XWiki.MyTemplateProvider
         String templateProviderFullName = "XWiki.MyTemplateProvider";
@@ -1492,7 +1587,8 @@ class CreateActionTest
         // property and we fallback on the "type" property's value. Also using the template extracted from the template
         // provider.
         verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
-            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y", null, "xwiki", context);
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + csrfTokenValue,
+            null, "xwiki", context);
     }
 
     @Test
@@ -1505,6 +1601,8 @@ class CreateActionTest
         when(document.isNew()).thenReturn(false);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
         context.setDoc(document);
+        String csrfTokenValue = "token429866333";
+        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Submit from the UI spaceReference=X&name=Y&templateProvider=XWiki.MyTemplateProvider
         String templateProviderFullName = "XWiki.MyTemplateProvider";
@@ -1528,7 +1626,8 @@ class CreateActionTest
 
         // Note: We are creating X.Y as terminal, since it is overriden from the UI, regardless of any backwards
         // compatibility resolutions. Also using the template extracted from the template provider.
-        verify(mockURLFactory).createURL("X", "Y", "edit", "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y",
+        verify(mockURLFactory).createURL("X", "Y", "edit",
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + csrfTokenValue,
             null, "xwiki", context);
     }
 

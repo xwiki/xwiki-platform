@@ -166,9 +166,15 @@
       <content>{{velocity}}
 #if ($services.whatsnew.configuration.active)
 {{html clean="false"}}
-  ## we need clean="false" because we want to display the raw content of #drawerItem()
+  ## We need clean="false" because we want to display the raw content of #drawerItem()
   #template('drawer_macros.vm')
-  #drawerItem($xwiki.getURL($doc.documentReference, 'view', 'xpage=whatsnew'), 'question', $escapetool.xml($services.localization.render('platform.whatsnew.drawer.text')))
+  ## If there's no $doc in the context, then point the link to the Wiki's home page
+  #if ("$!doc" != '')
+    #set ($url = $xwiki.getURL($doc.documentReference, 'view', 'xpage=whatsnew'))
+  #else
+    #set ($url = $xwiki.getURL($services.model.createWikiReference($xcontext.database), 'view', 'xpage=whatsnew'))
+  #end
+  #drawerItem($url, 'question', $escapetool.xml($services.localization.render('platform.whatsnew.drawer.text')))
 {{/html}}
 #end
 {{/velocity}}</content>

@@ -896,10 +896,10 @@
       <btn-success-color/>
     </property>
     <property>
-      <btn-warning-bg>#000000</btn-warning-bg>
+      <btn-warning-bg>#ffd483</btn-warning-bg>
     </property>
     <property>
-      <btn-warning-bg>#ffd483</btn-warning-bg>
+      <btn-warning-color>#000000</btn-warning-color>
     </property>
     <property>
       <component-active-bg>@list-group-hover-bg</component-active-bg>

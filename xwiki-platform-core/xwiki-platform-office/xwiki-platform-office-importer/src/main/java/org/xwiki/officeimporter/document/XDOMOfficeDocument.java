@@ -69,7 +69,7 @@ public class XDOMOfficeDocument implements OfficeDocument
      * @param componentManager {@link ComponentManager} used to lookup for various renderers.
      * @param converterResult the {@link OfficeConverterResult} used to build that object.
      * @since 14.10.8
-     * @since 15.3-rc-1
+     * @since 15.3RC1
      */
     @Unstable
     public XDOMOfficeDocument(XDOM xdom, Map<String, OfficeDocumentArtifact> artifacts,

@@ -172,7 +172,7 @@
   #if ("$!doc" != '')
     #set ($url = $xwiki.getURL($doc.documentReference, 'view', 'xpage=whatsnew'))
   #else
-    #set ($url = $xwiki.getURL($services.model.createWikiReference($xcontext.database), 'view', 'xpage=whatsnew'))
+    #set ($url = $xwiki.getURL($services.wiki.getCurrentWikiReference(), 'view', 'xpage=whatsnew'))
   #end
   #drawerItem($url, 'question', $escapetool.xml($services.localization.render('platform.whatsnew.drawer.text')))
 {{/html}}

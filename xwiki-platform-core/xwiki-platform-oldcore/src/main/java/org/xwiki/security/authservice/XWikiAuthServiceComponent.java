@@ -26,6 +26,12 @@ import com.xpn.xwiki.user.api.XWikiAuthService;
 
 /**
  * Expose {@link XWikiAuthService} instances as components.
+ * <p>
+ * A name and a description should also be exposed through translations using key of the followin form:
+ * <ul>
+ * <li>security.authservice.<id>.name for the name</li>
+ * <li>security.authservice.<id>.description for the description</li>
+ * </ul>
  * 
  * @version $Id$
  * @since 15.3RC1
@@ -34,10 +40,6 @@ import com.xpn.xwiki.user.api.XWikiAuthService;
 @Unstable
 public interface XWikiAuthServiceComponent extends XWikiAuthService
 {
-    // Name provided as translation "security.authservice.<id>.name"
-
-    // Description provided as translation "security.authservice.<id>.description"
-
     /**
      * @return the identifier of the authenticator, used as component role hint
      */

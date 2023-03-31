@@ -36,7 +36,8 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>== {{translation key="security.authservice.admin.title"/}}
+  <content>(% id='HAuthService' %)
+== {{translation key="security.authservice.admin.title"/}}
 
 {{velocity}}
 #if ($request.setauthservice &amp;&amp; $request.authServiceId)
@@ -100,6 +101,7 @@
 #end
 {{/velocity}}
 
+(% id='HAuthenticationSecurity' %)
 == {{translation key="authentication.admin.heading"/}}
 
 {{velocity}}
@@ -404,7 +406,7 @@
       <displayInSection>Authentication</displayInSection>
     </property>
     <property>
-      <heading>$services.localization.render('authentication.admin.heading')</heading>
+      <heading/>
     </property>
     <property>
       <iconAttachment/>

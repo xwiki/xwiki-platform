@@ -172,7 +172,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!like-button-title-keys'], function 
        likeButton.removeClass('btn-primary');
        likeButton.addClass('btn-default');
        likeButton.find('.like-number').text(data.counter);
-       likeButton.attr('title', l10n.get('unlike',data.counter));
+       likeButton.attr('title', l10n.get('unlike', data.counter));
        $('#is-liked').val('true');
        new XWiki.widgets.Notification("$escapetool.xml($services.localization.render('like.newlike.success'))", 'done');
      }).catch(() =&gt; {

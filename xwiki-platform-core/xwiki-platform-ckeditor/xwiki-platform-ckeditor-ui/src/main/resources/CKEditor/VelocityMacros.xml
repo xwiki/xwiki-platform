@@ -187,9 +187,12 @@
   ## See CKEDITOR-34: Wiki syntax gets escaped when you click "Back" in the browser
   &lt;input value="" name="$!{escapedName}_cache" type="hidden" class="cache"/&gt;
   ##
+  #set ($loaderDescription = $escapetool.xml($services.localization.render("ckeditor.loader.placeholder")))
   #set ($discard = $parameters.attributes.putAll({
     'class': "$!parameters.attributes.get('class') ckeditor-textarea loading",
-    'spellcheck': false
+    'spellcheck': false,
+    'title': "$!loaderDescription",
+    'aria-label': "$!loaderDescription"
   }))
   ##
   #set ($sourceDocumentReference = $parameters.attributes.get('data-sourceDocumentReference'))

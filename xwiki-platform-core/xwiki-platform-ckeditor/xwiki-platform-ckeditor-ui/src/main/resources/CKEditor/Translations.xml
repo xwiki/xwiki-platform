@@ -50,6 +50,7 @@ CKEditor.ConfigClass_advanced=Advanced Configuration
 CKEditor.ConfigClass_advanced.hint=You can write a JavaScript snippet to modify directly the configuration object. Check the {0}CKEditor documentation{1} for the list of available configuration properties.
 
 ckeditor.content.placeholder=Start typing here...
+ckeditor.loader.placeholder=Loading the content
 
 ckeditor.admin.saveComment=Updated the CKEditor configuration from the Administration
 ckeditor.admin.reset=Reset

@@ -98,7 +98,7 @@ public class WCAGUtils
     public void writeWCAGResults() throws IOException
     {
         float totalTime = (float) this.wcagContext.getWCAGTime() / 1000;
-        LOGGER.debug("Time spent on WCAG validation for [{}]: [{}] (in s)",
+        LOGGER.info("Time spent on WCAG validation for [{}]: [{}] (in s)",
             getWCAGContext().getTestClassName(), totalTime);
 
         File wcagDir = new File(getWCAGReportPathOnHost());

@@ -1028,7 +1028,10 @@ var LiveTablePagination = Class.create({
    * @return an Element containing the select
    **/
   createPageSizeSelectControl: function() {
-    var select = new Element('select', {'class':'pagesizeselect'});
+    var select = new Element('select', {
+      class: 'pagesizeselect',
+      'aria-label': '$escapetool.javascript($services.localization.render("platform.livetable.selectPageSize.label"))'
+    });
     for (var i=this.startValue; i<=this.maxValue; i += this.step) {
       var attrs = {'value':i, 'text':i};
       if (i == this.currentValue) {
@@ -1036,7 +1039,11 @@ var LiveTablePagination = Class.create({
       } else {
         var prevStep = i - this.step;
         if (this.currentValue > prevStep && this.currentValue < i) {
-          select.appendChild(new Element('option', {'value':this.currentValue, 'text':this.currentValue, selected:true}).update(this.currentValue));
+          select.appendChild(new Element('option', {
+            value: this.currentValue,
+            text: this.currentValue,
+            selected: true
+          }).update(this.currentValue));
         }
       }
       select.appendChild(new Element('option', attrs).update(i));

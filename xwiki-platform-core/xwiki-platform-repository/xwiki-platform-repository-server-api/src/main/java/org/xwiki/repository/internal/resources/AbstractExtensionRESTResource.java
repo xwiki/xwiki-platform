@@ -92,7 +92,7 @@ import com.xpn.xwiki.objects.classes.ListClass;
  */
 public abstract class AbstractExtensionRESTResource extends XWikiResource implements Initializable
 {
-    public static final String[] EPROPERTIES_SUMMARY = new String[] {XWikiRepositoryModel.PROP_EXTENSION_ID,
+    protected static final String[] EPROPERTIES_SUMMARY = new String[] {XWikiRepositoryModel.PROP_EXTENSION_ID,
         XWikiRepositoryModel.PROP_EXTENSION_TYPE, XWikiRepositoryModel.PROP_EXTENSION_NAME};
 
     protected static final String DEFAULT_BOOST;
@@ -400,22 +400,19 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
                 extensionDocument.getXObjects(XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSREFERENCE);
             if (dependencies != null) {
                 for (BaseObject dependencyObject : dependencies) {
-                    if (dependencyObject != null) {
-                        if (StringUtils.equals(getValue(dependencyObject,
+                    if (dependencyObject != null && StringUtils.equals(getValue(dependencyObject,
                             XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION, (String) null), version)) {
-                            ExtensionDependency dependency = extensionObjectFactory.createExtensionDependency();
-                            dependency
+                        ExtensionDependency dependency = extensionObjectFactory.createExtensionDependency();
+                        dependency
                                 .setId((String) getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_ID));
-                            dependency.setConstraint(
+                        dependency.setConstraint(
                                 (String) getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_CONSTRAINT));
-                            dependency.setOptional(getBooleanValue(dependencyObject,
+                        dependency.setOptional(getBooleanValue(dependencyObject,
                                 XWikiRepositoryModel.PROP_DEPENDENCY_OPTIONAL, false));
-                            List<String> repositories = (List<String>) getValue(dependencyObject,
+                        List<String> repositories = (List<String>) getValue(dependencyObject,
                                 XWikiRepositoryModel.PROP_DEPENDENCY_REPOSITORIES);
-                            dependency.withRepositories(toExtensionRepositories(repositories));
-
-                            extensionVersion.getDependencies().add(dependency);
-                        }
+                        dependency.withRepositories(toExtensionRepositories(repositories));
+                        extensionVersion.getDependencies().add(dependency);
                     }
                 }
             }
@@ -797,12 +794,11 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
     protected ExtensionSummary createExtensionSummaryFromQueryResult(Object[] entry)
     {
         ExtensionSummary extension;
-        ExtensionVersionSummary extensionVersion;
+        ExtensionVersionSummary extensionVersion = null;
         int versionIndex = EPROPERTIES_INDEX.get(EPROPERTIES_SUMMARY[EPROPERTIES_SUMMARY.length - 1]) + 1;
         if (entry.length == versionIndex) {
             // It's a extension summary without version
             extension = this.extensionObjectFactory.createExtensionSummary();
-            extensionVersion = null;
         } else {
             extension = extensionVersion = this.extensionObjectFactory.createExtensionVersionSummary();
             extensionVersion.setVersion((String) entry[versionIndex]);

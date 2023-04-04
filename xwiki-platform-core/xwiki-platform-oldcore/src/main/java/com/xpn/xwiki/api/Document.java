@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,7 @@ import org.xwiki.model.reference.PageReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 import org.xwiki.user.CurrentUserReference;
@@ -3165,20 +3167,26 @@ public class Document extends Api
      * Allow to easily access any revision of a document
      *
      * @param revision the version to access
-     * @return the document corresponding to the requested revision or {@code null} if the revision does not exist.
+     * @return the document corresponding to the requested revision or {@code null} if the revision does not exist or
+     * access is denied.
      */
     public Document getDocumentRevision(String revision)
     {
         try {
-            XWikiDocument documentRevision = getDocumentRevisionProvider().getRevision(this.doc, revision);
+            DocumentRevisionProvider revisionProvider = getDocumentRevisionProvider();
+            revisionProvider.checkAccess(Right.VIEW, CurrentUserReference.INSTANCE, getDocumentReference(), revision);
+            XWikiDocument documentRevision = revisionProvider.getRevision(this.doc, revision);
 
             return documentRevision != null ? new Document(documentRevision, this.context) : null;
+        } catch (AuthorizationException e) {
+            LOGGER.info("Access denied for loading revision [{}] of document [{}]: [{}]", revision,
+                getDocumentReferenceWithLocale(), ExceptionUtils.getRootCauseMessage(e));
         } catch (Exception e) {
             LOGGER.error("Failed to load revision [{}] of document [{}]", revision, getDocumentReferenceWithLocale(),
                 e);
-
-            return null;
         }
+
+        return null;
     }
 
     /**

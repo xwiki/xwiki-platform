@@ -27,14 +27,22 @@ import org.xwiki.filter.type.FilterStreamType;
 import org.xwiki.filter.xar.input.XARInputProperties;
 import org.xwiki.filter.xar.internal.XARFilterUtils;
 
+import static org.xwiki.filter.xar.internal.XARFilterUtils.*;
+
 /**
  * Generate events from XAR FilterStream package.
  * 
  * @version $Id$
  * @since 6.2M1
  */
-@Component(hints = {XARFilterUtils.ROLEHINT_15, XARFilterUtils.ROLEHINT_14, XARFilterUtils.ROLEHINT_13,
-    XARFilterUtils.ROLEHINT_12, XARFilterUtils.ROLEHINT_11})
+@Component(hints = {
+    ROLEHINT_16,
+    ROLEHINT_15,
+    ROLEHINT_14,
+    ROLEHINT_13,
+    ROLEHINT_12,
+    ROLEHINT_11
+})
 @Singleton
 public class XARInputFilterStreamFactory
     extends AbstractBeanInputFilterStreamFactory<XARInputProperties, XARInputFilter>

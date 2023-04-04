@@ -25,8 +25,10 @@ import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 
 /**
+ * Stores the required rights of a {@link org.xwiki.bridge.DocumentModelBridge}.
+ *
  * @version $Id$
- * @since x.y.z
+ * @since 15.3RC1
  */
 @Unstable
 public interface RequiredRights

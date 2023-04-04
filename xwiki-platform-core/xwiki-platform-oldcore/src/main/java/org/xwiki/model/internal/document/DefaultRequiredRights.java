@@ -29,8 +29,11 @@ import org.xwiki.security.authorization.Right;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
+ * Default implementation of the required rights, with no specific restrictions. A read-only implementation exists to be
+ * exposed to users with restricted rights, see {@link SafeRequiredRights}.
+ *
  * @version $Id$
- * @since x.y.z
+ * @since 15.3RC1
  */
 public class DefaultRequiredRights implements RequiredRights
 {

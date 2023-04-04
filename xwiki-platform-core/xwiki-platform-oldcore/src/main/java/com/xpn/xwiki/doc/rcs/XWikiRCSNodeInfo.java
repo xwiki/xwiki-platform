@@ -21,8 +21,11 @@ package com.xpn.xwiki.doc.rcs;
 
 import java.lang.ref.SoftReference;
 import java.util.Date;
+import java.util.Set;
 
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -66,6 +69,8 @@ public class XWikiRCSNodeInfo extends AbstractSimpleClass implements Comparable<
      * reference to its XWikiRCSNodeContent.
      */
     private SoftReference<XWikiRCSNodeContent> contentRef;
+
+    private Set<Right> requiredRights;
 
     /**
      * default constructor used in Hibernate to load this class.
@@ -131,6 +136,26 @@ public class XWikiRCSNodeInfo extends AbstractSimpleClass implements Comparable<
     public void setAuthor(String updateAuthor)
     {
         this.author = updateAuthor;
+    }
+
+    /**
+     * @param requiredRights the required rights of the revision
+     * @since 15.3RC1
+     */
+    @Unstable
+    public void setRequiredRights(Set<Right> requiredRights)
+    {
+        this.requiredRights = requiredRights;
+    }
+
+    /**
+     * @return the required rights of the revision
+     * @since 15.3RC1
+     */
+    @Unstable
+    public Set<Right> getRequiredRights()
+    {
+        return this.requiredRights;
     }
 
     /**

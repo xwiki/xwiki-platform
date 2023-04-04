@@ -62,11 +62,19 @@ public class XarDocumentModel
     public static final String VERSION_15 = "1.5";
 
     /**
+     * Introduce the concept of required rights.
+     *
+     * @since 15.3RC1
+     */
+    public static final String VERSION_16 = "1.6";
+
+
+    /**
      * The current version.
      * 
      * @since 9.0RC1
      */
-    public static final String VERSION_CURRENT = VERSION_15;
+    public static final String VERSION_CURRENT = VERSION_16;
 
     public static final String ELEMENT_DOCUMENT = "xwikidoc";
 
@@ -162,6 +170,11 @@ public class XarDocumentModel
      * @since 14.0RC1
      */
     public static final String ELEMENT_REVISION_ORIGINALMEDATAAUTHOR = "originalMetadataAuthor";
+
+    /**
+     * @since 15.3RC1
+     */
+    public static final String ELEMENT_REVISION_REQUIRED_RIGHTS = "requiredRights";
 
     public static final String ELEMENT_REVISION_COMMENT = "comment";
 

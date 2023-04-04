@@ -309,6 +309,9 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
             }
         }
 
+        // TODO: handle merge of required rights.
+        
+        
         // Calculate the conflict type
         ConflictQuestion.ConflictType type;
         List<Conflict<?>> documentContentConflicts = null;

@@ -36,16 +36,28 @@ import org.xwiki.filter.input.InputSource;
 import org.xwiki.filter.input.InputStreamInputSource;
 import org.xwiki.filter.input.ReaderInputSource;
 import org.xwiki.filter.xar.input.XARInputProperties;
-import org.xwiki.filter.xar.internal.XARFilterUtils;
 import org.xwiki.filter.xml.input.SourceInputSource;
 import org.xwiki.model.reference.EntityReference;
+
+import static org.xwiki.filter.xar.internal.XARFilterUtils.ROLEHINT_11;
+import static org.xwiki.filter.xar.internal.XARFilterUtils.ROLEHINT_12;
+import static org.xwiki.filter.xar.internal.XARFilterUtils.ROLEHINT_13;
+import static org.xwiki.filter.xar.internal.XARFilterUtils.ROLEHINT_14;
+import static org.xwiki.filter.xar.internal.XARFilterUtils.ROLEHINT_15;
+import static org.xwiki.filter.xar.internal.XARFilterUtils.ROLEHINT_16;
 
 /**
  * @version $Id$
  * @since 6.2M1
  */
-@Component(hints = {XARFilterUtils.ROLEHINT_15, XARFilterUtils.ROLEHINT_14, XARFilterUtils.ROLEHINT_13,
-    XARFilterUtils.ROLEHINT_12, XARFilterUtils.ROLEHINT_11})
+@Component(hints = {
+    ROLEHINT_16,
+    ROLEHINT_15,
+    ROLEHINT_14,
+    ROLEHINT_13,
+    ROLEHINT_12, 
+    ROLEHINT_11
+})
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class XARInputFilterStream extends AbstractBeanInputFilterStream<XARInputProperties, XARInputFilter>
 {

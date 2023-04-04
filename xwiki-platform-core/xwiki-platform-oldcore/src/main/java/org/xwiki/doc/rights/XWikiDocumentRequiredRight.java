@@ -21,16 +21,20 @@ package org.xwiki.doc.rights;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
+import org.xwiki.text.XWikiToStringBuilder;
+
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
+ * Database level object to store a required {@link Right} of a {@link XWikiDocument}.
+ *
  * @version $Id$
- * @since x.y.z
+ * @since 15.3RC1
  */
 @Unstable
-public class XWikiDocumentRequiredRights
+public class XWikiDocumentRequiredRight
 {
     private long id;
 
@@ -38,6 +42,9 @@ public class XWikiDocumentRequiredRights
 
     private Right right;
 
+    /**
+     * @return the table id of the required right
+     */
     public long getId()
     {
         return this.id;
@@ -55,27 +62,44 @@ public class XWikiDocumentRequiredRights
         this.id = id;
     }
 
+    /**
+     * @return the document id of the required right
+     */
     public long getDocId()
     {
         return this.docId;
     }
 
+    /**
+     * @param docId the document id of the required right
+     */
     public void setDocId(long docId)
     {
         this.docId = docId;
     }
 
-    // @Enumerated(EnumType.STRING) if we want to map the string representation
+    /**
+     * @return a required right of a document
+     */
     public Right getRight()
     {
         return this.right;
     }
 
+    /**
+     * @param right a required right of a document
+     */
     public void setRight(Right right)
     {
         this.right = right;
     }
 
+    /**
+     * @return the right name, derived from the stored {@link #right} by calling {@link Right#getName()}. {@code null}
+     *     in case of {@code null} {@link #right}
+     */
+    // This method is private because it is only used reflexively by Hibernate.
+    @SuppressWarnings("java:S1144")
     private String getRightName()
     {
         if (this.right == null) {
@@ -84,6 +108,12 @@ public class XWikiDocumentRequiredRights
         return this.right.getName();
     }
 
+    /**
+     * @param rightName the right name, set from the string representation of the right stored in database and
+     *     converted to a {@link Right} by calling {@link Right#toRight(String)}
+     */
+    // This method is private because it is only used reflexively by Hibernate.
+    @SuppressWarnings("java:S1144")
     private void setRightName(String rightName)
     {
         this.right = Right.toRight(rightName);
@@ -100,7 +130,7 @@ public class XWikiDocumentRequiredRights
             return false;
         }
 
-        XWikiDocumentRequiredRights that = (XWikiDocumentRequiredRights) o;
+        XWikiDocumentRequiredRight that = (XWikiDocumentRequiredRight) o;
 
         return new EqualsBuilder()
             .append(this.id, that.id)
@@ -122,7 +152,7 @@ public class XWikiDocumentRequiredRights
     @Override
     public String toString()
     {
-        return new ToStringBuilder(this)
+        return new XWikiToStringBuilder(this)
             .append("id", this.id)
             .append("docId", this.docId)
             .append("right", this.right)

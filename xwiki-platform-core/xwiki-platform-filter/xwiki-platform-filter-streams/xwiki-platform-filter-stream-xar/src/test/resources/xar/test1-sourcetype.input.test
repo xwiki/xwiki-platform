@@ -52,6 +52,10 @@
                 <string>XWiki.originalMetadataAuthor</string>
               </entry>
               <entry>
+                <string>revision_required_rights</string>
+                <string>script,programming</string>
+              </entry>
+              <entry>
                 <string>customclass</string>
                 <string></string>
               </entry>
@@ -436,6 +440,10 @@
             <entry>
               <string>revision_original_author</string>
               <string>XWiki.originalMetadataAuthor</string>
+            </entry>
+            <entry>
+              <string>revision_required_rights</string>
+              <string></string>
             </entry>
             <entry>
               <string>customclass</string>

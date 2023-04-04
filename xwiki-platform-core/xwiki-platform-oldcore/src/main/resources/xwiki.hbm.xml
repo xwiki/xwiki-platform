@@ -463,8 +463,8 @@
         <property name="timestamp" type="timestamp" column="XWT_TIMESTAMP" index="TASK_TIMESTAMP" not-null="true"/>
     </class>
     
-    <!-- XWikiDocumentRequiredRights custom mapping -->
-    <class name="org.xwiki.doc.rights.XWikiDocumentRequiredRights" table="xwikidocumentrequiredrights">
+    <!-- XWikiDocumentRequiredRight custom mapping -->
+    <class name="org.xwiki.doc.rights.XWikiDocumentRequiredRight" table="xwikidocumentrequiredright">
         <id name="id" column="XRR_ID">
             <generator class="native"/>
         </id>

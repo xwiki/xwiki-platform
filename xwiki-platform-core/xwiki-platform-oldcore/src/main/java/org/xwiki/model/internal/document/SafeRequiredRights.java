@@ -27,10 +27,11 @@ import org.xwiki.security.authorization.Right;
 import static org.xwiki.script.internal.safe.AbstractSafeObject.FORBIDDEN;
 
 /**
- * A safe version of the required rights, where update operations are disabled.
+ * A safe (i.e., read-only) version of the required rights, where update operations are disabled. The read and right
+ * version is {@link DefaultRequiredRights}.
  *
  * @version $Id$
- * @since x.y.z
+ * @since 15.3RC1
  */
 public class SafeRequiredRights implements RequiredRights
 {

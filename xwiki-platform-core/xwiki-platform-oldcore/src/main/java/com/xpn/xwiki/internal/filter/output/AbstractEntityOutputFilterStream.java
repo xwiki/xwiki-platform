@@ -23,9 +23,12 @@ import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -42,6 +45,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.properties.ConverterManager;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 
@@ -285,6 +289,14 @@ public abstract class AbstractEntityOutputFilterStream<E> implements EntityOutpu
         }
 
         return userReference;
+    }
+
+    protected Set<Right> getRequiredRights(String parameterRevisionRequiredRights, FilterEventParameters parameters)
+    {
+        return this.<List<String>>get(List.class, parameterRevisionRequiredRights, parameters, List.of(), false, true)
+            .stream()
+            .map(Right::toRight)
+            .collect(Collectors.toSet());
     }
 
     protected DocumentReference getUserDocumentReference(String key, FilterEventParameters parameters,

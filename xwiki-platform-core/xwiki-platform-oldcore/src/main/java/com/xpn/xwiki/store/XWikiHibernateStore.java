@@ -71,7 +71,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.doc.rights.XWikiDocumentRequiredRights;
+import org.xwiki.doc.rights.XWikiDocumentRequiredRight;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.internal.document.DefaultRequiredRights;
@@ -1884,12 +1884,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     {
         executeRead(context, session -> {
             try {
-                Set<Right> rights = session.createQuery("from XWikiDocumentRequiredRights rr where rr.docId = :docId",
-                        XWikiDocumentRequiredRights.class)
+                Set<Right> rights = session.createQuery("from XWikiDocumentRequiredRight rr where rr.docId = :docId",
+                        XWikiDocumentRequiredRight.class)
                     .setParameter("docId", doc.getId())
                     .list()
                     .stream()
-                    .map(XWikiDocumentRequiredRights::getRight)
+                    .map(XWikiDocumentRequiredRight::getRight)
                     .collect(Collectors.toSet());
                 doc.setRequiredRights(new DefaultRequiredRights(doc, rights));
                 return null;
@@ -1946,10 +1946,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             if (!rights.isEmpty()) {
                 for (Right right : rights) {
-                    XWikiDocumentRequiredRights xWikiDocumentRequiredRights = new XWikiDocumentRequiredRights();
-                    xWikiDocumentRequiredRights.setDocId(doc.getId());
-                    xWikiDocumentRequiredRights.setRight(right);
-                    session.save(xWikiDocumentRequiredRights);
+                    XWikiDocumentRequiredRight xWikiDocumentRequiredRight = new XWikiDocumentRequiredRight();
+                    xWikiDocumentRequiredRight.setDocId(doc.getId());
+                    xWikiDocumentRequiredRight.setRight(right);
+                    session.save(xWikiDocumentRequiredRight);
                 }
             }
 
@@ -2414,7 +2414,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         executeWrite(inputxcontext, session -> {
             try {
                 Query<?> query =
-                    session.createQuery("delete from XWikiDocumentRequiredRights as link where link.id.docId = :docId");
+                    session.createQuery("delete from XWikiDocumentRequiredRight as link where link.id.docId = :docId");
                 query.setParameter("docId", docId);
                 query.executeUpdate();
             } catch (Exception e) {
@@ -3398,7 +3398,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         return executeRead(inputxcontext, session -> {
             try {
                 Query<Long> query =
-                    session.createQuery("select count(*) from XWikiDocumentRequiredRights as rr where rr.id = :docId")
+                    session.createQuery("select count(*) from XWikiDocumentRequiredRight as rr where rr.id = :docId")
                         .setParameter("docId", docId);
                 return query.getSingleResult();
             } catch (Exception e) {

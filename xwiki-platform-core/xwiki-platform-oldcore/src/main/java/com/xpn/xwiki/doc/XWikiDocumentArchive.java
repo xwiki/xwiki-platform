@@ -298,6 +298,7 @@ public class XWikiDocumentArchive
         newNode.setAuthor(author);
         newNode.setComment(comment);
         newNode.setDate(date);
+        newNode.setRequiredRights(doc.getRequiredRights().getRights());
         XWikiRCSNodeContent newContent = makePatch(newNode, doc, context);
 
         updateNode(newNode);

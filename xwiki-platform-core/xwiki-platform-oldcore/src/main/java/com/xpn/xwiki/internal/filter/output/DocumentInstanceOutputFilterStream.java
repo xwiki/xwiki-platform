@@ -38,6 +38,7 @@ import org.xwiki.filter.instance.output.DocumentInstanceOutputProperties;
 import org.xwiki.filter.output.AbstractBeanOutputFilterStream;
 import org.xwiki.logging.marker.TranslationMarker;
 import org.xwiki.model.document.DocumentAuthors;
+import org.xwiki.model.internal.document.DefaultRequiredRights;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
@@ -218,6 +219,9 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
                 if (this.properties.isAuthorPreserved()) {
                     setAuthors(document, inputDocument);
                 }
+
+                document.setRequiredRights(
+                    new DefaultRequiredRights(document, inputDocument.getRequiredRights().getRights()));
             }
 
             // Authors

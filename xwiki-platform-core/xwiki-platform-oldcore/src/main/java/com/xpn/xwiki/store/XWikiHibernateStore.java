@@ -1884,7 +1884,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     {
         executeRead(context, session -> {
             try {
-                Set<Right> rights = session.createQuery("from XWikiDocumentRequiredRights where rr.id = :docId",
+                Set<Right> rights = session.createQuery("from XWikiDocumentRequiredRights rr where rr.docId = :docId",
                         XWikiDocumentRequiredRights.class)
                     .setParameter("docId", doc.getId())
                     .list()

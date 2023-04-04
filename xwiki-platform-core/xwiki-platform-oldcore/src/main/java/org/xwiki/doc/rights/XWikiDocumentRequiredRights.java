@@ -76,6 +76,19 @@ public class XWikiDocumentRequiredRights
         this.right = right;
     }
 
+    private String getRightName()
+    {
+        if (this.right == null) {
+            return null;
+        }
+        return this.right.getName();
+    }
+
+    private void setRightName(String rightName)
+    {
+        this.right = Right.toRight(rightName);
+    }
+
     @Override
     public boolean equals(Object o)
     {

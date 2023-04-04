@@ -727,7 +727,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     private final DefaultDocumentAuthors authors = new DefaultDocumentAuthors(this);
 
-    private RequiredRights requiredRights;
+    private RequiredRights requiredRights = new DefaultRequiredRights(this, null);
 
     /**
      * Create a document for the given reference, with the {@link Locale#ROOT} even if the reference contains a locale.
@@ -4616,6 +4616,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             doc.elements = this.elements;
 
             doc.originalDocument = this.originalDocument;
+
+            doc.requiredRights = new DefaultRequiredRights(doc, this.requiredRights.getRights());
         } catch (Exception e) {
             // This should not happen
             LOGGER.error("Exception while cloning document", e);
@@ -9423,9 +9425,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Override
     public RequiredRights getRequiredRights()
     {
-        if (this.requiredRights == null) {
-            return new DefaultRequiredRights(this, Set.of());
-        }
         return this.requiredRights;
     }
     

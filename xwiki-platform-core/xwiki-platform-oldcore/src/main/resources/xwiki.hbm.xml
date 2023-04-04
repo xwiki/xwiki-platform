@@ -469,6 +469,6 @@
             <generator class="native"/>
         </id>
         <property name="docId" column="XRR_DOC_ID" type="long"/>
-        <property name="right" column="XRR_RIGHT" type="long"/>
+        <property name="rightName" column="XRR_RIGHT" type="string" length="100"/>
     </class>
 </hibernate-mapping>

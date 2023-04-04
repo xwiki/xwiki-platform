@@ -20,6 +20,7 @@
 package org.xwiki.model.internal.document;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.xwiki.model.document.RequiredRights;
@@ -46,7 +47,11 @@ public class DefaultRequiredRights implements RequiredRights
     public DefaultRequiredRights(XWikiDocument document, Set<Right> requiredRights)
     {
         this.document = document;
-        this.requiredRights = requiredRights;
+        if (requiredRights != null) {
+            this.requiredRights = new HashSet<>(requiredRights);
+        } else {
+            this.requiredRights = new HashSet<>();
+        }
     }
 
     @Override

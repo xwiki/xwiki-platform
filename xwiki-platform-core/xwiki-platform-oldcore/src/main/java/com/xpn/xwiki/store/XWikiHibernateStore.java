@@ -42,6 +42,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -70,8 +71,10 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.doc.rights.XWikiDocumentRequiredRights;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.document.DocumentAuthors;
+import org.xwiki.model.internal.document.DefaultRequiredRights;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -86,6 +89,7 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.store.UnexpectedException;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
@@ -612,6 +616,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     if (doc.hasElement(XWikiDocument.HAS_ATTACHMENTS)) {
                         saveAttachmentList(doc, context);
                     }
+
+                    saveRequiredRights(doc, context);
+
                     // Reset the list of attachments to remove
                     doc.clearAttachmentsToRemove();
 
@@ -1056,6 +1063,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     if (doc.hasElement(XWikiDocument.HAS_ATTACHMENTS)) {
                         loadAttachmentList(doc, context, false);
                     }
+
+                    loadRequiredRights(doc, context);
 
                     // TODO: handle the case where there are no xWikiClass and xWikiObject in the Database
                     BaseClass bclass = new BaseClass();
@@ -1871,6 +1880,29 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         });
     }
 
+    private void loadRequiredRights(XWikiDocument doc, XWikiContext context) throws XWikiException
+    {
+        executeRead(context, session -> {
+            try {
+                Set<Right> rights = session.createQuery("from XWikiDocumentRequiredRights where rr.id = :docId",
+                        XWikiDocumentRequiredRights.class)
+                    .setParameter("docId", doc.getId())
+                    .list()
+                    .stream()
+                    .map(XWikiDocumentRequiredRights::getRight)
+                    .collect(Collectors.toSet());
+                doc.setRequiredRights(new DefaultRequiredRights(doc, rights));
+                return null;
+            } catch (Exception e) {
+                this.logger.error("Failed to load the required rights of document [{}]", doc.getDocumentReference(), e);
+                Object[] args = { doc.getDocumentReference() };
+                // TODO: improve exception code.
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_MISC,
+                    "Exception while loading the required rights for document {0}", e, args);
+            }
+        });
+    }
+
     private boolean isDeleted(XWikiAttachment attachment, XWikiDocument doc)
     {
         for (XWikiAttachmentToRemove attachmentToRemove : doc.getAttachmentsToRemove()) {
@@ -1896,6 +1928,33 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT_LIST,
                 "Exception while saving attachments attachment list of document {0}", e, args);
         }
+    }
+
+    private void saveRequiredRights(XWikiDocument doc, XWikiContext inputxcontext) throws XWikiException
+    {
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
+
+        // Extract the links
+        Set<Right> rights = doc.getRequiredRights().getRights();
+
+        // Save the links
+        executeWrite(context, session -> {
+            // We delete the existing links before saving the newly analyzed ones. Unless non exists yet.
+            if (countRequiredRights(doc.getId(), context) > 0) {
+                deleteRequiredRights(doc.getId(), context);
+            }
+
+            if (!rights.isEmpty()) {
+                for (Right right : rights) {
+                    XWikiDocumentRequiredRights xWikiDocumentRequiredRights = new XWikiDocumentRequiredRights();
+                    xWikiDocumentRequiredRights.setDocId(doc.getId());
+                    xWikiDocumentRequiredRights.setRight(right);
+                    session.save(xWikiDocumentRequiredRights);
+                }
+            }
+
+            return null;
+        });
     }
 
     private void saveAttachment(XWikiAttachment attachment, boolean deleted, XWikiContext context) throws XWikiException
@@ -2344,6 +2403,24 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             } catch (Exception e) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                     XWikiException.ERROR_XWIKI_STORE_HIBERNATE_DELETING_LINKS, "Exception while deleting links", e);
+            }
+
+            return null;
+        });
+    }
+
+    private void deleteRequiredRights(long docId, XWikiContext inputxcontext) throws XWikiException
+    {
+        executeWrite(inputxcontext, session -> {
+            try {
+                Query<?> query =
+                    session.createQuery("delete from XWikiDocumentRequiredRights as link where link.id.docId = :docId");
+                query.setParameter("docId", docId);
+                query.executeUpdate();
+            } catch (Exception e) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    // TODO: improve cause error code + error message (add doc ref)
+                    XWikiException.ERROR_XWIKI_STORE_MISC, "Exception while deleting required rights", e);
             }
 
             return null;
@@ -3312,6 +3389,22 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             } catch (Exception e) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                     XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_BACKLINKS, "Exception while count backlinks", e);
+            }
+        });
+    }
+
+    private long countRequiredRights(long docId, XWikiContext inputxcontext) throws XWikiException
+    {
+        return executeRead(inputxcontext, session -> {
+            try {
+                Query<Long> query =
+                    session.createQuery("select count(*) from XWikiDocumentRequiredRights as rr where rr.id = :docId")
+                        .setParameter("docId", docId);
+                return query.getSingleResult();
+            } catch (Exception e) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    // TODO: improve code id and error message (include doc ref)o
+                    XWikiException.ERROR_XWIKI_STORE_MISC, "Exception while counting required rights for {}", e);
             }
         });
     }

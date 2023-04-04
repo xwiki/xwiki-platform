@@ -19,19 +19,40 @@
  */
 package org.xwiki.model.internal.document;
 
+import java.util.Set;
+
 import org.xwiki.model.document.RequiredRights;
+import org.xwiki.security.authorization.Right;
+
+import static org.xwiki.script.internal.safe.AbstractSafeObject.FORBIDDEN;
 
 /**
+ * A safe version of the required rights, where update operations are disabled.
+ *
  * @version $Id$
  * @since x.y.z
  */
 public class SafeRequiredRights implements RequiredRights
 {
-    private RequiredRights requiredRights;
+    private final RequiredRights requiredRights;
 
+    /**
+     * @param requiredRights the wrapped required rights
+     */
     public SafeRequiredRights(RequiredRights requiredRights)
     {
-
         this.requiredRights = requiredRights;
+    }
+
+    @Override
+    public Set<Right> getRights()
+    {
+        return this.requiredRights.getRights();
+    }
+
+    @Override
+    public void setRights(Set<Right> newRights)
+    {
+        throw new UnsupportedOperationException(FORBIDDEN);
     }
 }

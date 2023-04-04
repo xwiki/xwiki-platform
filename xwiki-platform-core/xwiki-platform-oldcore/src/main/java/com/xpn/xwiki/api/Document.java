@@ -3348,6 +3348,9 @@ public class Document extends Api
         }
     }
 
+    /**
+     * @return the required rights of the current document.
+     */
     @Unstable
     public RequiredRights getRequiredRights()
     {

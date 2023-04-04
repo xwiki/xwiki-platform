@@ -150,6 +150,9 @@ public interface DocumentModelBridge
         return null;
     }
 
+    /**
+     * @return the required rights of the document
+     */
     @Unstable
     default RequiredRights getRequiredRights()
     {

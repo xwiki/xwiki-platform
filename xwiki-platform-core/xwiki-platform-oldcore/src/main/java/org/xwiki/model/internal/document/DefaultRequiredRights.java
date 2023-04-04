@@ -19,7 +19,11 @@
  */
 package org.xwiki.model.internal.document;
 
+import java.util.Collections;
+import java.util.Set;
+
 import org.xwiki.model.document.RequiredRights;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -29,13 +33,33 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 public class DefaultRequiredRights implements RequiredRights
 {
-    private XWikiDocument document;
-    
-    // TODO: when adding setters, don't forget to add a dirty flag.
+    private final Set<Right> requiredRights;
 
-    public DefaultRequiredRights(XWikiDocument document)
+    private final XWikiDocument document;
+
+    /**
+     * Default constructor.
+     *
+     * @param document the document containing the required rights
+     * @param requiredRights the set of required rights of the document (e.g., {@link Right#SCRIPT})
+     */
+    public DefaultRequiredRights(XWikiDocument document, Set<Right> requiredRights)
     {
-
         this.document = document;
+        this.requiredRights = requiredRights;
+    }
+
+    @Override
+    public Set<Right> getRights()
+    {
+        return Collections.unmodifiableSet(this.requiredRights);
+    }
+
+    @Override
+    public void setRights(Set<Right> newRights)
+    {
+        this.requiredRights.clear();
+        this.requiredRights.addAll(newRights);
+        this.document.setMetaDataDirty(true);
     }
 }

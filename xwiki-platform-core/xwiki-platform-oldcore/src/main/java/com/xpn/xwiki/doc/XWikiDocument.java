@@ -727,7 +727,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     private final DefaultDocumentAuthors authors = new DefaultDocumentAuthors(this);
 
-    private final DefaultRequiredRights requiredRights = new DefaultRequiredRights(this);
+    private RequiredRights requiredRights;
 
     /**
      * Create a document for the given reference, with the {@link Locale#ROOT} even if the reference contains a locale.
@@ -9423,7 +9423,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Override
     public RequiredRights getRequiredRights()
     {
+        if (this.requiredRights == null) {
+            return new DefaultRequiredRights(this, Set.of());
+        }
         return this.requiredRights;
+    }
+    
+    public void setRequiredRights(RequiredRights requiredRights) {
+        this.requiredRights = requiredRights;
     }
 
     /**

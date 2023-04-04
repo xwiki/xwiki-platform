@@ -19,6 +19,9 @@
  */
 package org.xwiki.model.document;
 
+import java.util.Set;
+
+import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -28,4 +31,13 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public interface RequiredRights
 {
+    /**
+     * @return an immutable set of required rights
+     */
+    Set<Right> getRights();
+
+    /**
+     * @param newRights the new rights to set
+     */
+    void setRights(Set<Right> newRights);
 }

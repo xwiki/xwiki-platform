@@ -655,7 +655,7 @@ class DefaultWikiMacroTest
     }
 
     @Test
-    void wkimacroparameterWhenTypeWiki() throws Exception
+    void wikimacroparameterWhenTypeWiki() throws Exception
     {
         List<WikiMacroParameterDescriptor> parameterDescriptors = Arrays
             .asList(new WikiMacroParameterDescriptor("param1", "This is param1", false, null, Block.LIST_BLOCK_TYPE));

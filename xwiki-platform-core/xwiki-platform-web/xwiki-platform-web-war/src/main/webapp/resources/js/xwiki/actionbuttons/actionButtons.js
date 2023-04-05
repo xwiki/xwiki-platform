@@ -127,9 +127,9 @@ var XWiki = (function(XWiki) {
       }
 
       var commentField = form?.comment || $('commentinput');
-      const commentIsSuggested = commentField.getAttribute('data-xwiki-edit-comment-suggested') === 'true';
-      const commentIsMandatory = commentField.getAttribute('data-xwiki-edit-comment-mandatory') === 'true';
-      if (commentField && (commentIsSuggested || commentIsMandatory)) {
+      const commentIsSuggested = commentField?.getAttribute('data-xwiki-edit-comment-suggested') === 'true';
+      const commentIsMandatory = commentField?.getAttribute('data-xwiki-edit-comment-mandatory') === 'true';
+      if (commentIsSuggested || commentIsMandatory) {
         while (commentField.value === '') {
           var response = prompt(commentField.getAttribute('data-xwiki-edit-comment-prompt'), '');
           if (response === null) {

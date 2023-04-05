@@ -626,8 +626,8 @@ var XWiki = (function(XWiki){
     if (withEnableButton && !this.container.down('.hide-button')) {
       var positions = this.options.hideButton.positions;
       for (var i=0; i< positions.length; i++) {
-        var hideButton = new Element('span', {'class' : 'hide-button'}).update(this.options.hideButton.text),
-            toInsert = {};
+        var hideButton = new Element('button', {'class' : 'hide-button', 'type' : 'button'})
+          .update(this.options.hideButton.text), toInsert = {};
         toInsert[positions[i]] = new Element('div', {'class' : 'hide-button-wrapper'}).update(hideButton);
         hideButton.observe('click', this.clearSuggestions.bindAsEventListener(this));
         this.container.insert(toInsert);
@@ -727,9 +727,9 @@ var XWiki = (function(XWiki){
       var item = new XWiki.widgets.XListItem( this.createItemDisplay(arr[i], source) , {
         containerClasses: 'suggestItem ' + (arr[i].type || ''),
         value: valueNode,
-        noHighlight: true // we do the highlighting ourselves
+        noHighlight: true, // we do the highlighting ourselves
+        nature: 'button'
       });
-
       list.addItem(item);
     }
 

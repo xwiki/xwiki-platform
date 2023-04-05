@@ -135,15 +135,13 @@ var XWiki = (function (XWiki) {
           'classes': 'showAllResults',
           'eventCallbackScope' : this,
           'noHighlight' : true,
-          'value' : valueNode
+          'value' : valueNode,
+          'nature': 'button' //main behaviour is to submit the form, so we make it a button with default type.
         } ),
       ],
       {
         'classes' : 'suggestList',
         'eventListeners' : {
-          'click': function(event){
-            this.searchInput.up('form').submit();
-          },
           'mouseover':function(event){
             this.suggest.clearHighlight();
             this.suggest.iHighlighted = event.element();
@@ -153,7 +151,7 @@ var XWiki = (function (XWiki) {
       });
       var allResults = allResultsNode.getElement();
       this.suggest = new XWiki.widgets.Suggest( this.searchInput, {
-        parentContainer: $('searchSuggest'),
+        parentContainer: $('globalsearch'),
         className: 'searchSuggest horizontalLayout',
         fadeOnClear: false,
         align: "auto",

@@ -77,7 +77,7 @@
   #if ($authServices.size() &gt; 1)
     {{html}}
       &lt;form action="$xwiki.relativeRequestURL" method="post"&gt;
-        &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;;
+        &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
         $escapetool.xml($services.localization.render("security.authservice.admin.component.label"))
         &lt;select name="authServiceId" id="authServiceId"&gt;
         #foreach ($availableAuthService in $authServices)

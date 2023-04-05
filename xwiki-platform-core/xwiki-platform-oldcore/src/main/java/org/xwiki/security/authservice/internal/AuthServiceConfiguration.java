@@ -72,6 +72,16 @@ public class AuthServiceConfiguration
     public static final String CONFIGURATION_INSTANCE_PROPERTY =
         "security.authentication." + AuthServiceConfigurationClassInitializer.FIELD_SERVICE;
 
+    /**
+     * Used to store the configured name in the cache. The reason why we don't directly store the name is that we need
+     * to differentiate between two use cases:
+     * <ul>
+     * <li>A given wiki does not have any configured auth service: the cache contains an entry associated with the wiki
+     * identifier with a null name in it</li>
+     * <li>The configuration of a given wiki hasn't been cache yet: the cache does not contain any entry associated with
+     * the wiki identifier</li>
+     * </ul>
+     */
     private class ServiceCacheEntry
     {
         private final String name;

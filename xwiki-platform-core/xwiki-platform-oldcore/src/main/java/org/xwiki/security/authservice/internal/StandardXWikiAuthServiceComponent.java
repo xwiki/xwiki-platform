@@ -25,8 +25,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.security.authservice.XWikiAuthServiceComponent;
 
 import com.xpn.xwiki.XWikiContext;
@@ -43,25 +41,19 @@ import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
 @Component
 @Singleton
 @Named(StandardXWikiAuthServiceComponent.ID)
-public class StandardXWikiAuthServiceComponent implements XWikiAuthServiceComponent, Initializable
+public class StandardXWikiAuthServiceComponent implements XWikiAuthServiceComponent
 {
     /**
      * The identifier of the authentication service.
      */
     public static final String ID = "standard";
 
-    private XWikiAuthServiceImpl service;
+    private final XWikiAuthServiceImpl service = new XWikiAuthServiceImpl();
 
     @Override
     public String getId()
     {
         return ID;
-    }
-
-    @Override
-    public void initialize() throws InitializationException
-    {
-        this.service = new XWikiAuthServiceImpl();
     }
 
     @Override

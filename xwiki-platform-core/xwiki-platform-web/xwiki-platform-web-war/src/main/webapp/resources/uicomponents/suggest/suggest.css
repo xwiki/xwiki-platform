@@ -14,16 +14,24 @@ body {
 }
 
 div.suggestItems {
-  position:absolute;
+  position: absolute;
   border: 1px solid $theme.borderColor;
   border-top: none;
   background: $theme.pageContentBackgroundColor;
   z-index: 100013;
   text-align:left;
 }
+
+div.suggestItems button {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+}
+
 div.suggestItems .hide-button-wrapper {
   line-height: 1em;
-  text-align: right;
 }
 div.suggestItems .hide-button {
   cursor: pointer;
@@ -32,6 +40,7 @@ div.suggestItems .hide-button {
   margin: 0 4px;
   opacity: .4;
   padding: 0 0.5em;
+  text-align: right;
 }
 
 div.suggestItems ul {
@@ -91,7 +100,7 @@ div.suggestItemName {
   text-indent: 0;
 }
 
-div.suggestItem, li.noSuggestion div {
+button.suggestItem, li.noSuggestion div {
   color: $theme.textColor;
   font-size: 0.875em;
 }
@@ -126,7 +135,7 @@ div.resultContainer div.sourceName {
   background-position:right 3px center;
 }
 
-.horizontalLayout div.resultContainer div.xitemcontainer {
+.horizontalLayout div.resultContainer button.xitemcontainer {
   margin-left:10px;
 }
 

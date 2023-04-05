@@ -264,6 +264,5 @@
 @xwiki-icon-link-external:            "$xwiki.getSkinFile('icons/xwiki/external-link.png')";
 
 ## Standard pointer target sizes from WCAG recommendations
-
 @target-size-minimum:                 24px;
 @target-size-recommended:             44px;

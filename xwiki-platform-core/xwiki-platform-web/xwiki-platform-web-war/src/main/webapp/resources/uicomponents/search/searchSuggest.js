@@ -131,12 +131,12 @@ var XWiki = (function (XWiki) {
         .insert(new Element('div', {'class': 'clearfloats'}));
       var allResultsNode = new XWiki.widgets.XList([
         new XWiki.widgets.XListItem( content, {
-          'containerClasses': 'suggestItem',
-          'classes': 'showAllResults',
-          'eventCallbackScope' : this,
-          'noHighlight' : true,
-          'value' : valueNode,
-          'nature': 'button' //main behaviour is to submit the form, so we make it a button with default type.
+          containerClasses: 'suggestItem',
+          classes: 'showAllResults',
+          eventCallbackScope : this,
+          noHighlight : true,
+          value : valueNode,
+          containerNature: 'button'
         } ),
       ],
       {

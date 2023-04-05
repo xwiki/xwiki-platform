@@ -728,7 +728,7 @@ var XWiki = (function(XWiki){
         containerClasses: 'suggestItem ' + (arr[i].type || ''),
         value: valueNode,
         noHighlight: true, // we do the highlighting ourselves
-        nature: 'button'
+        containerNature: 'button'
       });
       list.addItem(item);
     }

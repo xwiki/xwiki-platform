@@ -38,7 +38,7 @@ div.suggestItems .hide-button {
   font-size: 0.8em;
   font-style: italic;
   margin: 0 4px;
-  opacity: .4;
+  opacity: .8; /* Should eventually use a full color defined in the color theme like .text-muted */
   padding: 0 0.5em;
   text-align: right;
 }

@@ -312,6 +312,46 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
     </dl>
   #end
 
+#if ("$!request.section" == '' || $request.section == 'PageRights')
+  <h2>Required Rights</h2>
+  aa $services.model.serialize($doc.documentReference, 'default')
+  aa $services.model.serialize($targetDocument.documentReference, 'default')
+##  $request.getRequestURI()
+  <form action="$escapetool.xml($xwiki.getURL($targetDocument, 'saveandcontinue'))" class="xform" method="post" name="form_name1">
+    <dl>
+      <dt>
+        <label for="input_id1">Script</label>
+      </dt>
+      <dd>
+##        $doc.requiredRights.class
+        <input id="input_id1" name="requiredRights" type="checkbox" value="script"
+          #if($targetDocument.requiredRights.has('script'))checked#end
+        />
+      </dd>
+    </dl>
+    <dl>
+      <dt>
+        <label for="input_id2">Programming</label>
+      </dt>
+      <dd>
+        <input id="input_id2" name="requiredRights" type="checkbox" value="programming"
+         #if($targetDocument.requiredRights.has('programming'))checked#end 
+        />
+      </dd>
+    </dl>
+    <p>
+      <span class="buttonwrapper">
+        <input class="button" type="submit" value="Button"/>
+      </span>
+    </p>
+    <div class="hidden">
+      <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
+      <input type="hidden" name="xcontinue" value="$escapetool.xml($xwiki.getURL($doc, $xcontext.action, $escapetool.url($request.parameterMap)))" />;
+      <input type="hidden" name="xredirect" value="$escapetool.xml($xwiki.getURL($doc, $xcontext.action, $escapetool.url($request.parameterMap)))" />;
+    </div>
+  </form>
+#end
+  
     <script>
     //<![CDATA[
 (function() {

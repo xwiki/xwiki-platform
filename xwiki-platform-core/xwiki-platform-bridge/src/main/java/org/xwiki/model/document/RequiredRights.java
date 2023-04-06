@@ -42,4 +42,6 @@ public interface RequiredRights
      * @param newRights the new rights to set
      */
     void setRights(Set<Right> newRights);
+
+    boolean has(Right right);
 }

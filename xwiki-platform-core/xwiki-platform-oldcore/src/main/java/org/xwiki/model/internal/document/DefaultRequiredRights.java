@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.xwiki.model.document.RequiredRights;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.text.XWikiToStringBuilder;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -64,10 +65,25 @@ public class DefaultRequiredRights implements RequiredRights
     }
 
     @Override
+    public boolean has(Right right)
+    {
+        return getRights().contains(right);
+    }
+
+    @Override
     public void setRights(Set<Right> newRights)
     {
         this.requiredRights.clear();
         this.requiredRights.addAll(newRights);
         this.document.setMetaDataDirty(true);
+    }
+
+    @Override
+    public String toString()
+    {
+        return new XWikiToStringBuilder(this)
+            .append("requiredRights", this.requiredRights)
+            .append("document", this.document.getDocumentReference())
+            .toString();
     }
 }

@@ -2414,7 +2414,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         executeWrite(inputxcontext, session -> {
             try {
                 Query<?> query =
-                    session.createQuery("delete from XWikiDocumentRequiredRight as link where link.id.docId = :docId");
+                    session.createQuery("delete from XWikiDocumentRequiredRight as rr where rr.docId = :docId");
                 query.setParameter("docId", docId);
                 query.executeUpdate();
             } catch (Exception e) {
@@ -3398,7 +3398,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         return executeRead(inputxcontext, session -> {
             try {
                 Query<Long> query =
-                    session.createQuery("select count(*) from XWikiDocumentRequiredRight as rr where rr.id = :docId")
+                    session.createQuery("select count(*) from XWikiDocumentRequiredRight as rr where rr.docId = :docId")
                         .setParameter("docId", docId);
                 return query.getSingleResult();
             } catch (Exception e) {

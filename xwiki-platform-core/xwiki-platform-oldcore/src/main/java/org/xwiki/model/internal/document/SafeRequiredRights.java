@@ -56,4 +56,10 @@ public class SafeRequiredRights implements RequiredRights
     {
         throw new UnsupportedOperationException(FORBIDDEN);
     }
+
+    @Override
+    public boolean has(Right right)
+    {
+        return this.requiredRights.has(right);
+    }
 }

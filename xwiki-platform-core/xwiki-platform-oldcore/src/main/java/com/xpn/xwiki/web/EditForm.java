@@ -25,14 +25,17 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
 
@@ -49,16 +52,14 @@ public class EditForm extends XWikiForm
 
     /**
      * Format for passing xproperties references in URLs. General format:
-     * {@code &lt;space&gt;.&lt;pageClass&gt;_&lt;number&gt;_<propertyName>} (e.g.
-     * {@code XWiki.XWikiRights_0_member}).
+     * {@code &lt;space&gt;.&lt;pageClass&gt;_&lt;number&gt;_<propertyName>} (e.g. {@code XWiki.XWikiRights_0_member}).
      */
     private static final Pattern XPROPERTY_REFERENCE_PATTERN =
         Pattern.compile("^((?:[\\S ]+\\.)+[\\S ]+?)_([0-9]+)_(.+)$");
 
     /**
-     * Format for passing xobjects references in URLs. General format:
-     * {@code &lt;space&gt;.&lt;pageClass&gt;_<number>} (e.g.
-     * {@code XWiki.XWikiRights_0}).
+     * Format for passing xobjects references in URLs. General format: {@code &lt;space&gt;.&lt;pageClass&gt;_<number>}
+     * (e.g. {@code XWiki.XWikiRights_0}).
      */
     private static final Pattern XOBJECTS_REFERENCE_PATTERN = Pattern.compile("^((?:[\\S ]+\\.)+[\\S ]+?)_([0-9]+)$");
 
@@ -98,7 +99,7 @@ public class EditForm extends XWikiForm
     private boolean convertSyntax;
 
     private String hidden;
-    
+
     private ObjectPolicyType objectPolicy;
 
     private Map<String, List<Integer>> objectsToRemove;
@@ -108,6 +109,8 @@ public class EditForm extends XWikiForm
     private Map<String, SortedMap<Integer, Map<String, String[]>>> updateOrCreateMap;
 
     private List<String> temporaryUploadedFiles;
+
+    private Set<Right> requiredRights;
 
     @Override
     public void readRequest()
@@ -135,13 +138,16 @@ public class EditForm extends XWikiForm
         setObjectsToRemove(request.getParameterValues("deletedObjects"));
         setObjectsToAdd(request.getParameterValues("addedObjects"));
         setTemporaryUploadedFiles(request.getParameterValues("uploadedFiles"));
+        if (request.getParameterMap().containsKey("requiredRights")) {
+            setRequiredRights(request.getParameterValues("requiredRights"));
+        }
     }
 
     public void setTags(String[] parameter)
     {
         if (parameter == null) {
             this.tags = null;
-            return;
+            return; 
         }
         StringBuilder tags = new StringBuilder();
         boolean first = true;
@@ -325,7 +331,7 @@ public class EditForm extends XWikiForm
 
     /**
      * @return {@code true} if the document content and meta data should be converted to the new syntax specified on the
-     *         edit form, {@code false} otherwise
+     *     edit form, {@code false} otherwise
      * @see #syntaxId
      * @since 12.6.3
      * @since 12.9RC1
@@ -337,9 +343,9 @@ public class EditForm extends XWikiForm
 
     /**
      * Sets whether to convert the document content and meta data to the new syntax specified on the edit form.
-     * 
-     * @param convertSyntax {@code true} to convert the document content and meta data to the new syntax, {@code false}
-     *            to only change the syntax identifier
+     *
+     * @param convertSyntax {@code true} to convert the document content and meta data to the new syntax,
+     *     {@code false} to only change the syntax identifier
      * @since 12.6.3
      * @since 12.9RC1
      */
@@ -359,20 +365,20 @@ public class EditForm extends XWikiForm
     }
 
     /**
-     * Return the object policy given in the HTTP request. See {@link com.xpn.xwiki.web.ObjectPolicyType
-     * ObjectPolicyType} for more information about what is an object policy.
+     * Return the object policy given in the HTTP request. See
+     * {@link com.xpn.xwiki.web.ObjectPolicyType ObjectPolicyType} for more information about what is an object policy.
      *
      * @return the Object Policy type
      * @since 7.0RC1
      */
-    public ObjectPolicyType getObjectPolicy() {
+    public ObjectPolicyType getObjectPolicy()
+    {
         return this.objectPolicy;
     }
 
     /**
      * see {@link #getObjectPolicy}
-     * 
-
+     *
      * @since 7.0RC1
      */
     private void setObjectPolicy(ObjectPolicyType objectPolicy)
@@ -461,17 +467,32 @@ public class EditForm extends XWikiForm
         }
     }
 
-    /**
+    private void setRequiredRights(String[] requiredRights)
+    {
+        if (requiredRights != null) {
+            this.requiredRights = Arrays.stream(requiredRights).map(Right::toRight).collect(Collectors.toSet());
+        } else {
+            this.requiredRights = Set.of();
+        }
+    }
+
+    /** 
      * Retrieve the list of temporary uploaded files to add as attachment.
      *
-     * @see TemporaryAttachmentSessionsManager
      * @return a list of filenames that should be attached.
+     * @see TemporaryAttachmentSessionsManager
      * @since 14.3RC1
      */
     @Unstable
     public List<String> getTemporaryUploadedFiles()
     {
         return temporaryUploadedFiles;
+    }
+
+    @Unstable
+    public Set<Right> getRequiredRights()
+    {
+        return this.requiredRights;
     }
 
     public Map<String, List<Integer>> getObjectsToAdd()
@@ -527,12 +548,11 @@ public class EditForm extends XWikiForm
 
     /**
      * If current objectPolicyType is {@link ObjectPolicyType#UPDATE_OR_CREATE}, retrieve a map from the request
-     * parameters of the form {@code &lt;spacename&gt;.&lt;classname&gt;_&lt;number&gt;_<propertyname>'}
-     * Keys of this map will be the reference {@code &lt;spacename&gt;.<classname>} to the Class
-     * (for example, 'XWiki.XWikiRights'), the content is a list where each element describe property for the
-     * object {@code &lt;number&gt;}. Element of the list is a map where key is {@code <propertyname>} and
-     * content is the array of corresponding values.
-     *
+     * parameters of the form {@code &lt;spacename&gt;.&lt;classname&gt;_&lt;number&gt;_<propertyname>'} Keys of this
+     * map will be the reference {@code &lt;spacename&gt;.<classname>} to the Class (for example, 'XWiki.XWikiRights'),
+     * the content is a list where each element describe property for the object {@code &lt;number&gt;}. Element of the
+     * list is a map where key is {@code <propertyname>} and content is the array of corresponding values.
+     * <p>
      * Example with a list of HTTP parameters:
      * <ul>
      * <li>XWiki.XWikiRights_0_users=XWiki.Admin</li>
@@ -563,7 +583,7 @@ public class EditForm extends XWikiForm
      * definition of the XClass. For example, the request could contain {@code XWiki.XWikiRights_0_foobar=value}: the
      * resulting map will always return a parameter "foobar" for XWiki.XWikiRights
      * even if the xclass does not define it or even if the xclass does not exist.
-     *
+     * <p>
      * If the current objectPolicyType is not {@link ObjectPolicyType#UPDATE_OR_CREATE}
      * it will return an empty map.
      *

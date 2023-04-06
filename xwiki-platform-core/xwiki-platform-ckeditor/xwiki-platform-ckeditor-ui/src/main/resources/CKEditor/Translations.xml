@@ -134,7 +134,7 @@ ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.start=Start
 ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.center=Center
 ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.end=End
 ckeditor.plugin.image.imageEditor.advancedTab.textWrap.label=Text Wrap
-ckeditor.plugin.image.imageEditor.advancedTab.textWrap.hint=When checked, the image is wrapped around the surrounding text.
+ckeditor.plugin.image.imageEditor.advancedTab.textWrap.hint=When checked, the text is wrapped around the image.
 
 ckeditor.plugin.image.imageSelector.treeTab.title=Tree
 ckeditor.plugin.image.imageSelector.uploadTab.title=Upload

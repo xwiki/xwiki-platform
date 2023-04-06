@@ -27,10 +27,10 @@ import com.xpn.xwiki.user.api.XWikiAuthService;
 /**
  * Expose {@link XWikiAuthService} instances as components.
  * <p>
- * A name and a description should also be exposed through translations using key of the followin form:
+ * A name and a description should also be exposed through translations using key of the following form:
  * <ul>
- * <li>security.authservice.<id>.name for the name</li>
- * <li>security.authservice.<id>.description for the description</li>
+ * <li>{@code security.authservice.<id>.name for the name}</li>
+ * <li>{@code security.authservice.<id>.description for the description}</li>
  * </ul>
  * 
  * @version $Id$

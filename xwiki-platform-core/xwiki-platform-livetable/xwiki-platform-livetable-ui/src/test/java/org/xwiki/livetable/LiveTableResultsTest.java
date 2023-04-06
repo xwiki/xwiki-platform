@@ -643,6 +643,88 @@ class LiveTableResultsTest extends PageTest
         verify(this.query).bindValues(expectedBindValues);
     }
 
+    public static Stream<Arguments> provideObfuscateEmailsSort()
+    {
+        return Stream.of(
+            Arguments.of(
+                true,
+                ", BaseObject as obj   "
+                    + "where obj.name=doc.fullName "
+                    + "and obj.className = :className "
+                    + "and doc.fullName not in (:classTemplate1, :classTemplate2)  ",
+                Map.of(
+                    "className", "Space.MyClass",
+                    "classTemplate1", "Space.MyClassTemplate",
+                    "classTemplate2", "Space.MyTemplate"
+                ),
+                "t...@mail.com",
+                "t...@mail.com"
+            ),
+            Arguments.of(
+                false,
+                ", BaseObject as obj , StringProperty prop_email  "
+                    + "where obj.name=doc.fullName "
+                    + "and obj.className = :className "
+                    + "and doc.fullName not in (:classTemplate1, :classTemplate2)  "
+                    + "and obj.id=prop_email.id.id "
+                    + "and prop_email.name = :prop_email_name   "
+                    + "order by lower(prop_email.value) asc, prop_email.value asc",
+                Map.of(
+                    "className", "Space.MyClass",
+                    "classTemplate1", "Space.MyClassTemplate",
+                    "classTemplate2", "Space.MyTemplate",
+                    "prop_email_name", "email"
+                ),
+                "<a href=\"mailto:test@mail.com\">test@mail.com</a>",
+                "test@mail.com"
+            )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideObfuscateEmailsSort")
+    void obfuscateEmailsSort(boolean obfuscate, String expectedHql, Map<String, Object> expectedBindValues,
+        String expectedMail, String expectedMailValue) throws Exception
+    {
+        // TODO: We mock the mail configuration as it relies on document that are loaded through xar files from external
+        //  modules, which is currently not possible (would it be loaded using a mandatory document initializer, it 
+        //  would work though).
+        when(this.generalMailConfiguration.shouldObfuscate()).thenReturn(obfuscate);
+
+        DocumentReference myClassReference = new DocumentReference("xwiki", "Space", "MyClass");
+        XWikiDocument xClassDocument = new XWikiDocument(myClassReference);
+        xClassDocument.getXClass().addEmailField("mail", "Email", 100);
+        xClassDocument.getXClass().addTextField("name", "Name", 100);
+        this.xwiki.saveDocument(xClassDocument, this.context);
+
+        XWikiDocument xObjectDocument = new XWikiDocument(new DocumentReference("xwiki", "Space", "MyObject"));
+        xObjectDocument.setSyntax(XWIKI_2_1);
+        BaseObject baseObject = xObjectDocument.newXObject(myClassReference, this.context);
+        baseObject.set("mail", "test@mail.com", this.context);
+        baseObject.set("name", "testName", this.context);
+        this.xwiki.saveDocument(xObjectDocument, this.context);
+
+        setColumns("mail,name");
+        setClassName("Space.MyClass");
+        setSort("email", true);
+
+        when(this.queryService.hql(anyString())).thenReturn(this.query);
+        when(this.query.setLimit(anyInt())).thenReturn(this.query);
+        when(this.query.setOffset(anyInt())).thenReturn(this.query);
+        when(this.query.bindValues(any(Map.class))).thenReturn(this.query);
+        when(this.query.count()).thenReturn(1L);
+        when(this.query.execute()).thenReturn(singletonList("Space.MyObject"));
+
+        renderPage();
+
+        List<Map<String, Object>> rows = getRows();
+        assertEquals(expectedMail, StringUtils.trim((String) rows.get(0).get("mail")));
+        assertEquals(expectedMailValue, rows.get(0).get("mail_value"));
+
+        verify(this.queryService).hql(expectedHql);
+        verify(this.query).bindValues(expectedBindValues);
+    }
+
     //
     // Helper methods
     //

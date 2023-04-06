@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.LiveTableResultsMacros" locale="">
+<xwikidoc version="1.5" reference="XWiki.LiveTableResultsMacros" locale="">
   <web>XWiki</web>
   <name>LiveTableResultsMacros</name>
   <language/>
@@ -138,6 +138,8 @@
   #set($order = "$!request.sort")
   #if ($order == 'doc.location')
     #set ($order = 'doc.fullName')
+  #elseif ($order == 'email' &amp;&amp; $services.mail.general.shouldObfuscate())
+    #set ($order = '')
   #end
   #set ($orderSql = '')
   #if($order != '')

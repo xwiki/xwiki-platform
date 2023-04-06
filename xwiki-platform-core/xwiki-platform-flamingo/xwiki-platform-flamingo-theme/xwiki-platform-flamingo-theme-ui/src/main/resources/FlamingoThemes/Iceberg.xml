@@ -968,8 +968,10 @@
       <lessCode>/* Administration: Vertical Menus */
 @list-group-active-border: @list-group-border;
 
-/* Accessibility */
+/* Increasing default contrast for accessibility. */
+/* Slight change on @gray-light to make it pass the 4.5 contrast threshold on a white background. */
 @gray-light: #727272;
+/* Gray-light is too light on a light backgrounds. @gray for muted text is easier to read. */
 @text-muted: @gray;
 
 /* Drawer */

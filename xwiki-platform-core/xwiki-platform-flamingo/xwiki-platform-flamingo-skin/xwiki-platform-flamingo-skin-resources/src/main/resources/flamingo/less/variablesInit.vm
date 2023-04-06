@@ -262,7 +262,3 @@
 @xwiki-icon-spinner:                  "$xwiki.getSkinFile('icons/xwiki/spinner.gif')";
 @xwiki-icon-spinner-height:           16px;
 @xwiki-icon-link-external:            "$xwiki.getSkinFile('icons/xwiki/external-link.png')";
-
-## Standard pointer target sizes from WCAG recommendations
-@target-size-minimum:                 24px;
-@target-size-recommended:             44px;

@@ -178,4 +178,19 @@ public interface WikiMacroConstants
      * @since 10.10RC1
      */
     String PARAMETER_TYPE_PROPERTY = "type";
+
+    /**
+     * Constant for the "Wiki" choice for Macro Content Type.
+     *
+     * @since 15.3RC1
+     */
+    String PARAMETER_TYPE_WIKI = MACRO_CONTENT_TYPE_WIKI;
+
+    /**
+     * Constant for the "Unkown" choice for Macro Content Type.
+     *
+     * @since 15.3RC1
+     */
+    String PARAMETER_TYPE_UNKNOWN = MACRO_CONTENT_TYPE_UNKNOWN;
+
 }

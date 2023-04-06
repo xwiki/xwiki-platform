@@ -171,6 +171,7 @@ import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.security.authservice.internal.AuthServiceManager;
 import org.xwiki.skin.Resource;
 import org.xwiki.skin.Skin;
 import org.xwiki.skin.SkinManager;
@@ -339,6 +340,8 @@ public class XWiki implements EventListener
     private XWikiPluginManager pluginManager;
 
     private XWikiAuthService authService;
+
+    private AuthServiceManager authServices;
 
     private XWikiRightService rightService;
 
@@ -847,6 +850,15 @@ public class XWiki implements EventListener
         }
 
         return this.referenceUpdater;
+    }
+
+    private AuthServiceManager getAuthServiceManager()
+    {
+        if (this.authServices == null) {
+            this.authServices = Utils.getComponent(AuthServiceManager.class);
+        }
+
+        return this.authServices;
     }
 
     private String localizePlainOrKey(String key, Object... parameters)
@@ -5969,7 +5981,7 @@ public class XWiki implements EventListener
             if (isLDAP()) {
                 authClass = "com.xpn.xwiki.user.impl.LDAP.XWikiLDAPAuthServiceImpl";
             } else {
-                authClass = "com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl";
+                return null;
             }
         }
 
@@ -5997,10 +6009,15 @@ public class XWiki implements EventListener
                 try {
                     Class<? extends XWikiAuthService> authClass = getAuthServiceClass();
 
-                    setAuthService(authClass);
+                    if (authClass != null) {
+                        // Remember the authenticator instance corresponding to the configured class
+                        setAuthService(authClass);
+                    } else {
+                        // Search for the configured component based auth service
+                        return getAuthServiceManager().getAuthService();
+                    }
                 } catch (Exception e) {
-                    LOGGER.warn("Failed to get the configured AuthService class, fallbacking on standard authenticator",
-                        e);
+                    LOGGER.error("Failed to get the configured AuthService, fallbacking on standard authenticator", e);
 
                     this.authService = new XWikiAuthServiceImpl();
 
@@ -6012,6 +6029,16 @@ public class XWiki implements EventListener
 
             return this.authService;
         }
+    }
+
+    /**
+     * @return true if the auth service is a component, false when it's based on the old xwiki.cfg's authclass property
+     *         or if it's directly injected through {@link #setAuthService(Class)}
+     * @since 15.3RC1
+     */
+    public boolean isAuthServiceComponent()
+    {
+        return this.authService == null;
     }
 
     private void setAuthService(Class<? extends XWikiAuthService> authClass)

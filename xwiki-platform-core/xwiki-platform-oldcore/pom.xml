@@ -37,7 +37,11 @@
       com.xpn.xwiki.platform:xwiki-core,
 
       <!-- The old org.xwiki.platform:xwiki-platform-filter-instance-oldcore has been merged with oldcore -->
-      org.xwiki.platform:xwiki-platform-filter-instance-oldcore
+      org.xwiki.platform:xwiki-platform-filter-instance-oldcore,
+
+      <!-- A contrib extension to use with versions of oldcore which does not support authservice API -->
+      org.xwiki.contrib:authservice-backport-api,
+      org.xwiki.contrib:authservice-backport-default
     </xwiki.extension.features>
     <!-- Skipping revapi since xwiki-platform-legacy-oldcore wraps this module and runs checks on it -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>

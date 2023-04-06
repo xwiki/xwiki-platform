@@ -22,6 +22,9 @@ package com.xpn.xwiki.api;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.document.DocumentAuthors;
@@ -29,8 +32,11 @@ import org.xwiki.model.internal.document.SafeDocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.user.CurrentUserReference;
@@ -39,6 +45,7 @@ import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -56,6 +63,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -73,6 +81,9 @@ class DocumentTest
 
     @MockComponent
     private ObservationManager observationManager;
+
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     @Test
     void toStringReturnsFullName()
@@ -389,5 +400,33 @@ class DocumentTest
         assertSame(documentAuthors, obtainedAuthors);
         verify(mockAuthorizationManager, times(2)).hasAccess(Right.PROGRAM, userReference, currentDocReference);
         verify(currentDoc).clone();
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = { false, true })
+    void getDocumentRevision(boolean allowAccess, MockitoComponentManager componentManager) throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("Wiki", "Space", "Page");
+        XWikiDocument xWikiDocument = new XWikiDocument(documentReference);
+        Document document = new Document(xWikiDocument, this.oldcore.getXWikiContext());
+        DocumentRevisionProvider revisionProvider =
+            componentManager.registerMockComponent(DocumentRevisionProvider.class);
+        String revision = "42.1";
+        XWikiDocument revisionDocument = mock(XWikiDocument.class);
+        when(revisionProvider.getRevision(xWikiDocument, revision)).thenReturn(revisionDocument);
+        String deniedMessage = "Denied";
+        if (!allowAccess) {
+            doThrow(new AuthorizationException(deniedMessage)).when(revisionProvider)
+                .checkAccess(Right.VIEW, CurrentUserReference.INSTANCE, documentReference, revision);
+            assertNull(document.getDocumentRevision(revision));
+            assertEquals(1, this.logCapture.size());
+            assertEquals(String.format("Access denied for loading revision [%s] of document [%s()]: "
+                    + "[AuthorizationException: %s]", revision,
+                documentReference, deniedMessage), this.logCapture.getMessage(0));
+        } else {
+            assertEquals(new Document(revisionDocument, this.oldcore.getXWikiContext()),
+                document.getDocumentRevision(revision));
+        }
+        verify(revisionProvider).checkAccess(Right.VIEW, CurrentUserReference.INSTANCE, documentReference, revision);
     }
 }

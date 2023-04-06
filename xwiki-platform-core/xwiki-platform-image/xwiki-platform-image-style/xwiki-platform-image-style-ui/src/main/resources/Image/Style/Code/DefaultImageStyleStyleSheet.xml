@@ -166,6 +166,7 @@ img[data-xwiki-image-style-text-wrap="true"],
 div[data-xwiki-image-style-text-wrap="true"],
 span[data-xwiki-image-style-text-wrap="true"] {
   float: left;
+  margin-right: 0.5em;
 }
 
 figure[data-xwiki-image-style-alignment="start"] img[data-xwiki-image-style-alignment="start"],
@@ -194,6 +195,7 @@ img[data-xwiki-image-style-alignment="end"],
 div[data-xwiki-image-style-alignment="end"],
 span[data-xwiki-image-style-alignment="end"] {
   float: right;
+  margin-left: 0.5em;
 }
 
 div[data-xwiki-image-style-alignment="end"] figure[data-xwiki-image-style-alignment="end"],

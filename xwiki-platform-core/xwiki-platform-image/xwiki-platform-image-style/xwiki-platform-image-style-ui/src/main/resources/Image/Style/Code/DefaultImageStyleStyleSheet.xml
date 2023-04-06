@@ -160,9 +160,11 @@ figure[data-xwiki-image-style-border="true"] img[data-xwiki-image-style-border="
 figure[data-xwiki-image-style-alignment="start"],
 img[data-xwiki-image-style-alignment="start"],
 div[data-xwiki-image-style-alignment="start"],
+span[data-xwiki-image-style-alignment="start"],
 figure[data-xwiki-image-style-text-wrap="true"],
 img[data-xwiki-image-style-text-wrap="true"],
-div[data-xwiki-image-style-text-wrap="true"] {
+div[data-xwiki-image-style-text-wrap="true"],
+span[data-xwiki-image-style-text-wrap="true"] {
   float: left;
 }
 
@@ -175,7 +177,8 @@ div[data-xwiki-image-style-text-wrap="true"] figure[data-xwiki-image-style-text-
 
 figure[data-xwiki-image-style-alignment="center"],
 img[data-xwiki-image-style-alignment="center"],
-div[data-xwiki-image-style-alignment="center"] {
+div[data-xwiki-image-style-alignment="center"],
+span[data-xwiki-image-style-alignment="center"] {
   display: block;
   margin-left: auto;
   margin-right: auto;
@@ -188,7 +191,8 @@ span[data-xwiki-image-style-alignment="center"] {
 
 figure[data-xwiki-image-style-alignment="end"],
 img[data-xwiki-image-style-alignment="end"],
-div[data-xwiki-image-style-alignment="end"] {
+div[data-xwiki-image-style-alignment="end"],
+span[data-xwiki-image-style-alignment="end"] {
   float: right;
 }
 

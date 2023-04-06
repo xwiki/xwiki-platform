@@ -42,6 +42,7 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
+import org.xwiki.rendering.macro.descriptor.DefaultParameterDescriptor;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroDescriptor;
@@ -286,13 +287,20 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
                     (macroParameter.getIntValue(PARAMETER_MANDATORY_PROPERTY) == 0) ? false : true;
                 String parameterDefaultValue = macroParameter.getStringValue(PARAMETER_DEFAULT_VALUE_PROPERTY);
                 String type = macroParameter.getStringValue(PARAMETER_TYPE_PROPERTY);
-                Type parameterType = null;
-                if (!StringUtils.isEmpty(type)) {
+                Type parameterType;
+                if (StringUtils.isEmpty(type) || PARAMETER_TYPE_UNKNOWN.equals(type)) {
+                    parameterType = DefaultParameterDescriptor.DEFAULT_PARAMETER_TYPE;
+                } else if (PARAMETER_TYPE_WIKI.equals(type)) {
+                    parameterType = Block.LIST_BLOCK_TYPE;
+                } else {
                     try {
                         parameterType =
                             ReflectionUtils.unserializeType(type, Thread.currentThread().getContextClassLoader());
                     } catch (ClassNotFoundException e) {
-                        throw new WikiMacroException("Couldn't unserialize the given type.", e);
+                        this.logger.error(
+                            "Error while unserializing macro parameter type [{}]. The default type will be used.",
+                            type, e);
+                        parameterType = DefaultParameterDescriptor.DEFAULT_PARAMETER_TYPE;
                     }
                 }
 

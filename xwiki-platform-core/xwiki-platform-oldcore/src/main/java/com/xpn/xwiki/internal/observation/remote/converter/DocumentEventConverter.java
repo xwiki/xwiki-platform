@@ -38,8 +38,6 @@ import org.xwiki.observation.remote.RemoteEventData;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.store.XWikiCacheStore;
-import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 
 /**
  * Convert all document event to remote events and back to local events.

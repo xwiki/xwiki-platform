@@ -43,6 +43,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.store.XWikiCacheStore;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 import com.xpn.xwiki.util.XWikiStubContextProvider;
 
@@ -160,18 +161,13 @@ public class DefaultDocumentRemoteEventConverter implements DocumentRemoteEventC
         return xcontext;
     }
 
-    private XWikiDocument getDocument(DocumentReference documentReference, String language, String version)
+    private XWikiDocument getDocument(XWikiDocument document, String version, XWikiContext xcontext)
         throws RemoteEventConverterException
     {
-        XWikiContext xcontext = getXWikiStubContext();
-
-        XWikiDocument document = new XWikiDocument(documentReference);
-        document.setLanguage(language);
-
         // Force bypassing the cache to make extra sure we get the last version of the document.
         XWikiDocument targetDocument = null;
         try {
-            targetDocument = xcontext.getWiki().getNotCacheStore().loadXWikiDoc(document, xcontext);
+            targetDocument = xcontext.getWiki().getDocument(document, xcontext);
         } catch (XWikiException e) {
             throw new RemoteEventConverterException(String.format("Error when loading document [%s]",
                 document.getDocumentReferenceWithLocale()), e);
@@ -196,28 +192,33 @@ public class DefaultDocumentRemoteEventConverter implements DocumentRemoteEventC
         Map<String, Serializable> remoteDataMap = (Map<String, Serializable>) remoteData;
 
         DocumentReference docReference = (DocumentReference) remoteDataMap.get(DOC_NAME);
+        Locale locale = LocaleUtils.toLocale((String) remoteDataMap.get(DOC_LANGUAGE));
+        Locale origLocale = LocaleUtils.toLocale((String) remoteDataMap.get(ORIGDOC_LANGUAGE));
 
-        XWikiDocument doc;
-        if (remoteDataMap.get(DOC_VERSION) == null) {
-            doc = new XWikiDocument(docReference);
-        } else {
-            doc =
-                getDocument(docReference, (String) remoteDataMap.get(DOC_LANGUAGE),
-                    (String) remoteDataMap.get(DOC_VERSION));
+        XWikiContext xcontext = getXWikiStubContext();
+
+        XWikiDocument document = new XWikiDocument(docReference, locale);
+        XWikiDocument origDoc = new XWikiDocument(docReference, origLocale);
+
+        // Force invalidating the cache to be sure it return (and keep) the right document
+        if (xcontext.getWiki().getStore() instanceof XWikiCacheStore) {
+            ((XWikiCacheStore) xcontext.getWiki().getStore()).invalidate(document);
+            ((XWikiCacheStore) xcontext.getWiki().getStore()).invalidate(origDoc);
         }
 
-        XWikiDocument origDoc;
-        if (remoteDataMap.get(ORIGDOC_VERSION) == null) {
-            origDoc = new XWikiDocument(docReference);
-        } else {
-            origDoc =
-                getDocument(docReference, (String) remoteDataMap.get(ORIGDOC_LANGUAGE),
-                    (String) remoteDataMap.get(ORIGDOC_VERSION));
+        String version = (String) remoteDataMap.get(DOC_VERSION);
+        if (version != null) {
+            document = getDocument(document, version, xcontext);
         }
 
-        doc.setOriginalDocument(origDoc);
+        String origVersion = (String) remoteDataMap.get(ORIGDOC_VERSION);
+        if (origVersion != null) {
+            origDoc = getDocument(origDoc, origVersion, xcontext);
+        }
 
-        return doc;
+        document.setOriginalDocument(origDoc);
+
+        return document;
     }
 
     @Override
@@ -257,6 +258,11 @@ public class DefaultDocumentRemoteEventConverter implements DocumentRemoteEventC
             }
 
             doc.setOriginalDocument(origDoc);
+
+            // Force invalidating the cache to be sure it return (and keep) the right document
+            if (xcontext.getWiki().getStore() instanceof XWikiCacheStore) {
+                ((XWikiCacheStore) xcontext.getWiki().getStore()).invalidate(doc);
+            }
 
             return doc;
         } else {

@@ -20,17 +20,10 @@
 package com.xpn.xwiki.internal.observation.remote.converter;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
 
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
-import org.xwiki.localization.LocaleUtils;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.remote.converter.AbstractEventConverter;
 import org.xwiki.observation.remote.converter.DocumentRemoteEventConverter;
 import org.xwiki.observation.remote.converter.RemoteEventConverterException;
@@ -38,8 +31,6 @@ import org.xwiki.observation.remote.converter.RemoteEventConverterException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.store.XWikiCacheStore;
-import com.xpn.xwiki.util.XWikiStubContextProvider;
 
 /**
  * Provide some serialization tools for old apis like {@link XWikiDocument} and {@link XWikiContext}.

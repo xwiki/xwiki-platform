@@ -30,7 +30,7 @@ import org.xwiki.stability.Unstable;
  * Component helper for serializing standard XWiki elements such as {@code XWikiDocument} or {@code XWikiContext}.
  *
  * @version $Id$
- * @since 15.2RC1
+ * @since 15.3RC1
  */
 @Unstable
 @Role

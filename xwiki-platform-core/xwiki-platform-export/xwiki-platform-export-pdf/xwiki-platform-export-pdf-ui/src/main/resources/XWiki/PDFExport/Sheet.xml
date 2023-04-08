@@ -391,6 +391,27 @@ define('paged-polyfill-patched', ['paged-polyfill'], function(PagedPolyfill) {
     }
   };
 
+  /**
+   * This is a workaround for the Chrome / Paged.js bug that makes table rows hidden when they are split between print
+   * pages. See https://github.com/pagedjs/pagedjs/issues/114 . See also https://jira.xwiki.org/browse/XWIKI-20741 .
+   * TODO: Remove this hack once we upgrade to Paged.js 0.5.0 (as it seems the beta version is fixing the problem).
+   */
+  class ShowInvisibleRowsOnPageBreaks extends Paged.Handler {
+    constructor(chunker, polisher, caller) {
+      super(chunker, polisher, caller);
+    }
+
+    afterPageLayout(pageFragment) {
+      // We don't need the column display once the print page layout is done, but we need to make sure the page content
+      // doesn't overflow the page footer.
+      const pageContentWrapper = pageFragment.querySelector('.pagedjs_page_content');
+      pageContentWrapper.style.columnWidth = 'unset';
+      pageContentWrapper.style.overflow = 'hidden';
+    }
+  }
+
+  Paged.registerHandlers(ShowInvisibleRowsOnPageBreaks);
+
   return PagedPolyfill;
 });
 

@@ -194,4 +194,10 @@ public class AllITs
     class NestedFormTokenInjectionIT extends FormTokenInjectionIT
     {
     }
+
+    @Nested
+    @DisplayName("Page Picker Tests")
+    class NestedPagePickerIT extends PagePickerIT
+    {
+    }
 }

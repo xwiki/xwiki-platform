@@ -130,7 +130,7 @@ export default {
 <style>
 
 .livedata-dropdown-menu {
-  // Similar to .flat-buttons(), but there's no access
+  // Similar to .flat-buttons()
   .btn-default {
     background-color: @breadcrumb-bg;
     background-image: none;

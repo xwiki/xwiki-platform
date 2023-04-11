@@ -74,7 +74,7 @@
 
         input.next('.daterangepicker').attr('id', input.attr('id')+'-picker');
         input.next('.daterangepicker').attr('tabindex', '0');
-        input.attr('aria-controls', input.attr('id')+'-picker');
+        input.parentElement.attr('aria-controls', input.attr('id')+'-picker');
 
         var updateInput = function(element, event, picker) {
           if (event.type == 'cancel') {

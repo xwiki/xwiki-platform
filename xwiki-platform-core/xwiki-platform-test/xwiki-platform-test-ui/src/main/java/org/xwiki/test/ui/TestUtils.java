@@ -211,10 +211,17 @@ public class TestUtils
 
     private static String urlPrefix = XWikiExecutor.URL;
 
-    /** Cached secret token. TODO cache for each user. */
+    /**
+     * Cached secret token. TODO cache for each user.
+     */
     private String secretToken = null;
 
     private HttpClient httpClient;
+
+    /**
+     * @since 15.2RC1
+     */
+    private WCAGUtils wcagUtils = new WCAGUtils();
 
     /**
      * @since 8.0M1
@@ -289,6 +296,14 @@ public class TestUtils
         return TestUtils.context.getDriver();
     }
 
+    /**
+     * @since 15.2RC1
+     * @return the utils concerning wcag.
+     */
+    public WCAGUtils getWCAGUtils()
+    {
+        return this.wcagUtils;
+    }
     public Session getSession()
     {
         return this.new Session(getDriver().manage().getCookies(), getSecretToken());
@@ -1428,7 +1443,7 @@ public class TestUtils
     }
 
     /**
-     * This class represents all cookies stored in the browser. Use with getSession() and setSession()
+     *This class represents all cookies stored in the browser. Use with getSession() and setSession()
      */
     public class Session
     {

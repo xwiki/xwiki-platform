@@ -24,9 +24,7 @@ import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -74,9 +72,11 @@ class XWikiBlogNewsSourceTest
         assertEquals(Syntax.HTML_5_0, items.get(0).getDescription().get().getSyntax());
         assertEquals("Michael Hamann", items.get(0).getAuthor().get());
         assertEquals(NewsCategory.ADMIN_USER, items.get(0).getCategories().iterator().next());
-        assertEquals("2023-01-23T05:34:15+01:00", items.get(0).getPublishedDate().get());
+        assertEquals(1674448455000L, items.get(0).getPublishedDate().get().getTime());
         assertEquals("https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki%2015.0%20Release%20Candidate%201%20Released"
             + "?language=en", items.get(0).getOriginURL().get());
+        assertEquals("http://localhost:8080/xwiki/bin/download/Blog/BlogIntroduction/blog-post-thumbnail.jpg?rev=1.1",
+            items.get(0).getImageURL().get());
     }
 
     @Test

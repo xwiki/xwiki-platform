@@ -120,6 +120,11 @@ public @interface UITest
     boolean vnc() default true;
 
     /**
+     * @return true if WCAG tests should be executed, false otherwise
+     */
+    boolean wcag() default false;
+
+    /**
      * @return the list of configuration properties to use when generating the XWiki configuration files such as
      *         {@code xwiki.properties} with Velocity (check {@code xwiki.properties.vm} to find the list of supported
      *         properties)

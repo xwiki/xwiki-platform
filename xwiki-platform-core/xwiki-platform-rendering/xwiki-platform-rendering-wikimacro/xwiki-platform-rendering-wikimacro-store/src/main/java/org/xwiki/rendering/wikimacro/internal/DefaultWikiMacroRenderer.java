@@ -711,7 +711,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
 
     private Block resolveMacroContent(MacroMarkerBlock macroBlock)
     {
-        if (this.wikimacro.getDescriptor().getContentDescriptor() != null) {
+        if (this.wikimacro.getDescriptor().getContentDescriptor() != null && this.macroContent != null) {
             MetaData nonGeneratedContentMetaData = getNonGeneratedContentMetaData();
             nonGeneratedContentMetaData.addMetaData("wikimacrocontent", "true");
 

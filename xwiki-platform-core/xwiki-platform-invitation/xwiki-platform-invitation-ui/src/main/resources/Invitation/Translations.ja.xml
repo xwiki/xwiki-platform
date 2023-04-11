@@ -46,4 +46,4 @@ Invitation.WebHome_smtp_port.hint=SMTPサーバーで使用するポート。
 Invitation.WebHome_smtp_server.hint=送信するSMTPサーバー。
 Invitation.WebHome_javamail_extra_props.hint=使用するJavaMailの追加のプロパティー一覧。
 </content>
-  </xwikidoc>
+</xwikidoc>

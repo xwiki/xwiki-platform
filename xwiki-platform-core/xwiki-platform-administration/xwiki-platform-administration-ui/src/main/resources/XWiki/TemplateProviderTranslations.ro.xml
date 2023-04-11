@@ -46,4 +46,4 @@ administration.templateProvider.creationRestrictions.none=Acest șablon poate cr
 administration.templateProvider.creationRestrictionsAreSuggestions=Restricții de creare ca sugestii
 administration.templateProvider.creationRestrictionsAreSuggestions.hint=Permite utilizatorului să selecteze orice locație pentru a crea pagina cu acest șablon, folosind prima restricție de creare ca locație implicită completată în prealabil atunci când șablonul este selectat din listă.
 </content>
-  </xwikidoc>
+</xwikidoc>

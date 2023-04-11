@@ -154,28 +154,81 @@ $menuTemplateDoc.content.replace('{', '')
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery'], function($) {
+      <code>define('menu-ui-translation-keys', {
+  prefix: 'menu.ui.',
+  keys: [
+    "openSubMenu",
+    "closeSubMenu"
+  ]
+});
+require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
   // It's not possible to write a CSS selector that targets list items containing lists so we rely on JavaScript.
   // The 'dropdown' CSS class is used only to display the down/left arrow.
-  $('.menu-horizontal li ul').parent().addClass('xDropdown');
-
+  // All nodes on the tree.
+  $('.menu-horizontal ul , .menu-vertical ul')
+    .attr('role', 'menu');
+  // All leaves on the tree.
+  $('.menu-horizontal li, .menu-vertical li')
+    .attr('role', 'menuitem');
+  $('.menu-horizontal li ul, .menu-vertical li ul')
+    .parent()
+    .addClass('xDropdown');
   // Make sure the menu separators are really empty.
-  $('.menu-horizontal, .menu-vertical').find('li &gt; br:first-child').remove();
+  var menus = $('.menu-horizontal, .menu-vertical');
+  menus.find('li &gt; br:first-child').remove();
 
-  // Collapsible menu bahavior.
-  $('.menu-vertical.collapsible').each(function(){
+  // Add aria attributes to the menu separators.
+  menus.find('li')
+    .filter(function() {return this.textContent.trim() === ""; })
+    .attr('role', 'separator')
+    .attr('aria-hidden', 'true');
+
+  // Vertical menus are initially expanded
+  $('.menu-vertical.collapsible').each(function() {
     var open = $(this).hasClass('open');
     $(this).find('li ul').each(function() {
       $(this).addClass('xDropdown-menu').parent().addClass('xDropdown' + (open ? ' open' : ''));
-      // Wrap everything (including text nodes) before the sub-menu in a DIV that will toggle its state.
-      var toggle = this.ownerDocument.createElement('div');
-      $(this).parent().prepend(toggle);
-      for(var next = toggle.nextSibling; next != this; next = toggle.nextSibling) {
-        toggle.appendChild(next);
-      }
-      $(toggle).addClass('xDropdown-toggle').on('click', function() {
-        $(this).parent().toggleClass('open');
-      });
+    });
+  });
+
+  function setDropdownButtonTitle(dropDownButton) {
+    var xDropdown = $(dropDownButton).parent().parent();
+    if($(xDropdown).hasClass('open')) {
+      $(dropDownButton).attr('title', l10n['closeSubMenu']);
+      $(xDropdown).attr('aria-expanded', "true");
+    } else {
+      $(dropDownButton).attr('title', l10n['openSubMenu']);
+      $(xDropdown).attr('aria-expanded', "false");
+    }
+  }
+
+  $('.xDropdown').each(function() {
+    var dropDownHeader = this.ownerDocument.createElement("div");
+    $(dropDownHeader).addClass("xDropdown-header");
+    var dropDownButton = this.ownerDocument.createElement("button");
+    $(dropDownButton).addClass("xDropdown-header-toggle");
+    setDropdownButtonTitle(dropDownButton);
+    dropDownButton.addEventListener('click',function() {
+      //Swaps the state of the submenu.
+      var xDropdown = $(this).parent().parent();
+      xDropdown.toggleClass('open');
+      setDropdownButtonTitle(dropDownButton);
+    });
+    dropDownHeader.append($(this).contents()[0]);
+    dropDownHeader.append(dropDownButton);
+    $(this).prepend(dropDownHeader);
+    $(dropDownHeader).next().addClass('xDropdown-menu');
+  });
+
+  $('.menu-horizontal .xDropdown').each(function() {
+    // In case of horizontal menus, make it so that a class is added on hover, instead of using the :hover pseudo-class
+    this.addEventListener("mouseover", function() {
+      $(this).addClass('open');
+      setDropdownButtonTitle(this.firstChild.lastChild);
+    });
+    this.addEventListener("mouseout", function() {
+      $(this).removeClass('open');
+      setDropdownButtonTitle(this.firstChild.lastChild);
     });
   });
 
@@ -598,6 +651,32 @@ $menuTemplateDoc.content.replace('{', '')
   }
 }
 .menu {
+  /* Rotate the carets when the menu is opened. */
+  .xDropdown{
+    &gt; .xDropdown-header &gt; .xDropdown-header-toggle:before {
+        transform: rotate(90deg);
+      }
+    &amp;.open &gt; .xDropdown-header &gt; .xDropdown-header-toggle:before {
+      transform: rotate(0);
+    }
+  }
+  .xDropdown-header-toggle {
+    background: transparent;
+    border:none;
+    border-radius: @border-radius-base;
+    margin: 0 .3em;
+    line-height: (@line-height-computed / 2);
+    min-width: 24px;
+    min-height: 24px;
+    &amp;:hover, &amp;:focus-within {
+      background-color: @dropdown-bg;
+    }
+    &amp;:before {
+      .caret;
+      margin-left: 0;
+      content: '';
+    }
+  }
   &amp;.menu-vertical {
     ul {
       list-style-type: none;
@@ -619,32 +698,8 @@ $menuTemplateDoc.content.replace('{', '')
     .xDropdown-menu {
       display: none;
     }
-    .xDropdown-toggle {
-      cursor: pointer;
-      position: relative;
-      &amp;:hover {
-        background-color: @nav-link-hover-bg;
-      }
-      &amp;:after {
-        .caret;
-        content: '';
-        /* Positioning */
-        position: absolute;
-        margin-top: @line-height-computed / 3;
-        right: 1em;
-        /* Collapsed arrow style */
-        border-bottom: 4px solid transparent;
-        border-right: 4px solid;
-        border-top: 4px solid transparent;
-      }
-    }
     .xDropdown.open {
-      &gt; .xDropdown-toggle:after {
-        /* Expanded arrow style */
-        .caret;
-        margin-top: @line-height-computed / 2;
-      }
-      &gt; .xDropdown-menu {
+      &gt; ul {
         display: block;
       }
     }
@@ -658,22 +713,35 @@ $menuTemplateDoc.content.replace('{', '')
     .box-shadow(0 2px 8px rgba(0,0,0,0.4) inset);
     min-height: @navbar-height;
     padding-left: 25px;
+    .xDropdown.open {
+      &gt; .xDropdown-header &gt; .xDropdown-header-toggle:before {
+        transform: rotate(0);
+      }
+      &gt; ul {
+        display: block;
+      }
+    }
     &amp; &gt; ul {
       padding-left: 0;
       list-style-type: none;
       margin: 0;
+      min-height: 50px;
+      display: flex;
+      align-items: stretch;
       &amp; &gt; li {
         position: relative;
-        display: block;
+        min-height: 50px;
+        display: flex;
+        align-items: center;
         padding: @nav-link-padding;
-        padding-top: @navbar-padding-vertical;
-        padding-bottom: @navbar-padding-vertical;
+        padding-top: 0;
+        padding-bottom: 0;
         @media (min-width: @grid-float-breakpoint) {
           float: left;
         }
         line-height: @line-height-computed;
         color: @navbar-default-link-color;
-        &amp;:hover {
+        &amp;:hover, &amp;:focus-within {
           color: @navbar-default-link-hover-color;
           background-color: @navbar-default-link-hover-bg;
           background-color: @navbar-default-link-active-bg;
@@ -687,7 +755,7 @@ $menuTemplateDoc.content.replace('{', '')
         /* Links inside menu */
         a {
           color: @navbar-default-link-color;
-          &amp;:hover {
+          &amp;:hover, &amp;:focus-within {
             text-decoration: none;
           }
         }
@@ -696,6 +764,17 @@ $menuTemplateDoc.content.replace('{', '')
           /* Limit the height to the nav height minus the padding and minus border */
           max-height: @navbar-height - (2 * @navbar-padding-vertical) - 2px;
           overflow: hidden;
+          &amp;.xDropdown-header{
+            /* No border on the dropdown header */
+            max-height: unset;
+          }
+        }
+        /* Horizontal menu top-level headers. */
+        &amp; &gt; .xDropdown-header &gt; .xDropdown-header-toggle {
+          &amp;:hover, &amp;:focus-within {
+            /* Change background color of the caret when hovering on the navbar. */
+            background-color: @navbar-default-bg;
+          }
         }
         /* Separator vertical inside menu */
         &amp;:empty {
@@ -740,7 +819,7 @@ $menuTemplateDoc.content.replace('{', '')
             color: @dropdown-link-color;
             overflow: hidden;
             text-overflow: ellipsis; // Displaying ... if the text is too long
-            &amp;:hover {
+            &amp;:hover, &amp;:focus-within {
               /* &amp;:extend(.dropdown-menu&gt;li&gt;a:hover); */
               text-decoration: none;
               color: @dropdown-link-hover-color;
@@ -758,7 +837,7 @@ $menuTemplateDoc.content.replace('{', '')
             color: @dropdown-link-color;
             /* Empty dropdowns should have height in order to display the arrow */
             min-height: 2 * @font-size-base;
-            &amp;:hover {
+            &amp;:hover, &amp;:focus-within {
               text-decoration: none;
               color: @dropdown-link-hover-color;
               background-color: @dropdown-link-hover-bg;
@@ -790,16 +869,8 @@ $menuTemplateDoc.content.replace('{', '')
     /* Stylization: Generic */
     li {
       /* Display submenus on hover */
-      &amp;:hover &gt; ul {
+      &amp;.open &gt; ul {
         display: block;
-      }
-      /* Display an arrow for expandable items */
-      &amp;.xDropdown {
-        &amp;:after {
-          .caret;
-          content: '';
-          margin-left: .5em;
-        }
       }
     }
     /* The only way to have a menu with more than 2 levels without JavaScript is to use a fixed width. */
@@ -822,7 +893,7 @@ $menuTemplateDoc.content.replace('{', '')
     }
     /* Resetting rules for mobile view */
     @media (max-width: @screen-xs-max) {
-      &gt; ul { 
+      &gt; ul {
         margin: 0 0 0 -25px; /* Remove padding added in normal view */
         &gt; li {
           &amp;:empty {
@@ -844,19 +915,16 @@ $menuTemplateDoc.content.replace('{', '')
             /* Links inside menu */
             a {
               color: @navbar-default-link-color;
-              &amp;:hover {
-                /* Preserve the styling from dropdown */
-              }
             }
             /* Submenus inside menu */
             &amp;.xDropdown {
               color: @navbar-default-link-color;
-              &amp;:hover {
+              &amp;.open {
                 background-color: transparent;
                 color: inherit;
               }
               /* When in dropdown we also have a link */
-              &gt; span &gt; a { 
+              &gt; span &gt; a {
                 color: @navbar-default-link-color;
               }
             }
@@ -1188,7 +1256,7 @@ $menuTemplateDoc.content.replace('{', '')
         &lt;/button&gt;
       {{/html}}
     )))
-    (% id="$!{services.rendering.escape($id, 'xwiki/2.1')}" class="menu menu-${services.rendering.escape($!type, 'xwiki/2.1')} collapse navbar-collapse" %)(((
+    (% id="$!{services.rendering.escape($id, 'xwiki/2.1')}" class="menu menu-${services.rendering.escape($!type, 'xwiki/2.1')} collapse navbar-collapse" role="navigation" %)(((
       {{wikimacrocontent/}}
     )))
   )))

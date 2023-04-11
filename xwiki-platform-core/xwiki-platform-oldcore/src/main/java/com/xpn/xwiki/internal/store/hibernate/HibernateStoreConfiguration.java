@@ -23,13 +23,11 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
 import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.jaxb.spi.Binding;
 import org.hibernate.cfg.Configuration;
 
 /**
@@ -41,52 +39,26 @@ import org.hibernate.cfg.Configuration;
  */
 public class HibernateStoreConfiguration extends Configuration
 {
-    private List<URL> configureURLs = new ArrayList<>();
-
-    private List<URL> addURLs = new ArrayList<>();
-
-    private List<String> addResources = new ArrayList<>();
-
-    private List<byte[]> addBytes = new ArrayList<>();
+    private final MetadataSources metadataSources = new MetadataSources();
 
     /**
-     * @param metadataSources the custom {@link MetadataSources} instance
-     * @param previousConfiguration the configuration to recreate
+     * @param url the URL of the Hibernate configuration file
+     * @since 15.3RC1
      */
-    public HibernateStoreConfiguration(MetadataSources metadataSources,
-        HibernateStoreConfiguration previousConfiguration)
+    public HibernateStoreConfiguration(URL url)
     {
-        super(metadataSources);
-
-        // Copy previous configuration
-        if (previousConfiguration != null) {
-            this.configureURLs = previousConfiguration.configureURLs;
-            this.addURLs = previousConfiguration.addURLs;
-            this.addBytes.addAll(previousConfiguration.addBytes);
-
-            // Reload previous configuration
-            for (URL url : this.configureURLs) {
-                super.configure(url);
-            }
-            for (URL url : this.addURLs) {
-                super.addURL(url);
-            }
-            for (String resource : this.addResources) {
-                super.addResource(resource);
-            }
-            for (byte[] bytes : this.addBytes) {
-                addBytes(bytes);
-            }
+        if (url != null) {
+            configure(url);
         }
     }
 
     @Override
-    public Configuration configure(URL url) throws HibernateException
+    public Configuration addURL(URL url) throws MappingException
     {
         // Remember the configuration
-        this.configureURLs.add(url);
+        this.metadataSources.addURL(url);
 
-        return super.configure(url);
+        return super.addURL(url);
     }
 
     @Override
@@ -99,7 +71,6 @@ public class HibernateStoreConfiguration extends Configuration
         } catch (IOException e) {
             throw new MappingException("Failed to read the configuration file", e);
         }
-        this.addBytes.add(bytes);
 
         // Load the configuration
         return addBytes(bytes);
@@ -109,13 +80,27 @@ public class HibernateStoreConfiguration extends Configuration
     public Configuration addResource(String resourceName) throws MappingException
     {
         // Remember the configuration
-        this.addResources.add(resourceName);
+        this.metadataSources.addResource(resourceName);
 
         return super.addResource(resourceName);
     }
 
     private Configuration addBytes(byte[] bytes)
     {
+        // Remember the configuration
+        this.metadataSources.addInputStream(new ByteArrayInputStream(bytes));
+
         return super.addInputStream(new ByteArrayInputStream(bytes));
+    }
+
+    /**
+     * @param metadataSource the source to inject with the current source content
+     * @since 15.3RC1
+     */
+    public void copy(MetadataSources metadataSource)
+    {
+        for (Binding<?> binding : this.metadataSources.getXmlBindings()) {
+            metadataSource.addXmlBinding(binding);
+        }
     }
 }

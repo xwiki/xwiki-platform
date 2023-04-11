@@ -1500,4 +1500,33 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 # tag.rightCheckStrategy.hint=exhaustive
 # tag.rightCheckStrategy.hint=unsafe
 
+#-------------------------------------------------------------------------------------
+# What's New
+#-------------------------------------------------------------------------------------
+
+#-# [Since 15.2RC1]
+#-# Defines the list of News sources from which to get news items displayed by the What's New UI
+#-# Source format:
+#-#   whatsnew.sources = <a unique id> = <a valid source hint>
+#-# Where:
+#-#   - <a unique id>: a user-chosen id that represents the source. It's used to define the parameters for the source,
+#-#     see below
+#-#   - <a valid source hint>: for example use "xwikiblog" for using the XWiki Blog Application as a news source.
+#-# Source parameters format:
+#-#   whatsnew.source.<source id>.<key> = <value>
+#-# Where:
+#-#   - <source id>: this is the unique id mentioned above
+#-#   - <key>: a source-dependent parameter name (e.g for the "xwikiblog" source, the "rssURL" key is used to point to
+#-#     the URL that generates the RSS feed)
+#-#   - <value>: a source-dependent parameter value for the specified key
+#-#
+#-# To disable the feature, use an empty source list, as in:
+# whatsnew.sources =
+#-#
+#-# When not defined, the default list of sources and their configuration is:
+# whatsnew.sources = xwikiorg = xwikiblog
+# whatsnew.source.xwikiorg.rssURL = https://extensions.xwiki.org/news
+# whatsnew.sources = xwikisas = xwikiblog
+# whatsnew.sources.xwikisas.rssURL = https://xwiki.com/news
+
 $!xwikiPropertiesAdditionalProperties

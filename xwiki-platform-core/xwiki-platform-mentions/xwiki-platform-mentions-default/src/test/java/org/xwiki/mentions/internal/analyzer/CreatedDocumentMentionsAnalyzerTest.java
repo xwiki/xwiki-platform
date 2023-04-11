@@ -173,7 +173,7 @@ class CreatedDocumentMentionsAnalyzerTest
 
         assertEquals(asList(
             new MentionNotificationParameters(AUTHOR, new ObjectPropertyReference("comment", baseObjectReference),
-                MentionLocation.AWM_FIELD, "1.0")
+                MentionLocation.TEXT_FIELD, "1.0")
                 .addNewMention("user", new MentionNotificationParameter(USER_U1, "anchor2", FIRST_NAME))
                 .addNewMention("user", new MentionNotificationParameter(USER_U1, "anchor1", FIRST_NAME))
                 .addMention("user", new MentionNotificationParameter(USER_U1, "anchor2", FIRST_NAME))

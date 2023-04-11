@@ -319,6 +319,8 @@ public class AttachmentsResourceIT extends AbstractHttpIT
         PostMethod postMethod = new PostMethod(attachmentsUri);
         MultipartRequestEntity mpre = new MultipartRequestEntity(parts, postMethod.getParams());
         postMethod.setRequestEntity(mpre);
+        postMethod.setRequestHeader("XWiki-Form-Token", getFormToken(TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
+            TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword()));
         httpClient.executeMethod(postMethod);
         Assert.assertEquals(getHttpMethodInfo(postMethod), HttpStatus.SC_CREATED, postMethod.getStatusCode());
 

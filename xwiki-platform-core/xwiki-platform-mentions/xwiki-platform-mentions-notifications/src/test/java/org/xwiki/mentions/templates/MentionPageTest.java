@@ -30,6 +30,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.icon.IconManagerScriptServiceComponentList;
+import org.xwiki.localization.Translation;
+import org.xwiki.localization.script.LocalizationScriptService;
 import org.xwiki.mentions.internal.MentionView;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.CompositeEvent;
@@ -49,6 +51,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalToCompressingWhiteSpace;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -114,6 +119,10 @@ class MentionPageTest extends PageTest
         // Mocking of the date script service.
         when(this.dateScriptService.displayTimeAgo(eventDate)).thenReturn("one hundred years ago");
 
+        LocalizationScriptService localizationScriptService =
+            this.componentManager.getInstance(ScriptService.class, "localization");
+        when(localizationScriptService.get(any())).thenReturn(mock(Translation.class));
+
         // Initialization of the velocity context.
         DefaultEvent event1 = new DefaultEvent();
         event1.setDate(eventDate);
@@ -129,10 +138,12 @@ class MentionPageTest extends PageTest
 
         Map<Object, Object> compositeEventParams = new HashMap<>();
         compositeEventParams.put(event1, new MentionView()
+            .setLocation("DOCUMENT")
             .setAuthorURL("/U1")
             .setDocumentURL("/page1")
             .setDocument(xWikiDocument1));
         compositeEventParams.put(event2, new MentionView()
+            .setLocation("COMMENT")
             .setAuthorURL("/U2")
             .setDocument(xWikiDocument2)
             .setDocumentURL("/page2"));
@@ -144,5 +155,7 @@ class MentionPageTest extends PageTest
             UTF_8);
 
         assertThat(actual, equalToCompressingWhiteSpace(expected));
+        verify(localizationScriptService).get("mentions.event.mention.description.DOCUMENT");
+        verify(localizationScriptService).get("mentions.event.mention.description.COMMENT");
     }
 }

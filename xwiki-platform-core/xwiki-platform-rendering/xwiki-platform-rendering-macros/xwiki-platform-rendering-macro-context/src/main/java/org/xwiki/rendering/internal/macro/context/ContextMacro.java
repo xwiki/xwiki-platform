@@ -199,7 +199,8 @@ public class ContextMacro extends AbstractExecutedContentMacro<ContextMacroParam
                     // IMPORTANT: This can be dangerous since it means executing macros, and thus also script macros
                     // defined in the referenced document. To be used with caution.
                     TransformationContext referencedTxContext =
-                        new TransformationContext(referencedXDOM, referencedDoc.getSyntax());
+                        new TransformationContext(referencedXDOM, referencedDoc.getSyntax(),
+                            referencedDoc.isRestricted());
                     this.transformationManager.performTransformations(referencedXDOM, referencedTxContext);
                 }
 

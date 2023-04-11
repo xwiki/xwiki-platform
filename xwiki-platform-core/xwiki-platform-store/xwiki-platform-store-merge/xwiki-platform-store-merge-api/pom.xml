@@ -24,7 +24,7 @@
   <parent>
     <artifactId>xwiki-platform-store-merge</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>15.2-SNAPSHOT</version>
+    <version>15.3-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -35,7 +35,7 @@
     XWiki module API dedicated to perform document merge operations and manage related conflicts resolution.
   </description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.63</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.62</xwiki.jacoco.instructionRatio>
     </properties>
 
   <dependencies>

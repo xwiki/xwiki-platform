@@ -77,6 +77,11 @@ public class DocumentContentAsyncRenderer extends AbstractBlockAsyncRenderer
     {
         this.parameters = parameters;
 
+        // Make sure the restricted property of the document is properly taken into account.
+        if (document.isRestricted()) {
+            parameters.setTransformationContextRestricted(true);
+        }
+
         this.asyncProperties = this.asyncParser.getAsyncProperties(document);
 
         String transformationId = this.defaultEntityReferenceSerializer

@@ -19,11 +19,14 @@
  */
 package com.xpn.xwiki.web;
 
+import java.util.Map;
+
 import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.xwiki.csrf.CSRFToken;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -39,8 +42,11 @@ import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -75,6 +81,9 @@ public class EditActionTest
     @Named("document")
     private UserReferenceSerializer<DocumentReference> documentReferenceUserReferenceSerializer;
 
+    @MockComponent
+    private CSRFToken csrf;
+
     @Mock
     private XWikiRequest request;
 
@@ -85,6 +94,9 @@ public class EditActionTest
         when(this.documentReferenceUserReferenceSerializer.serialize(USER_REFERENCE)).thenReturn(USER_DOCUMENT_REFERENCE);
 
         this.oldcore.getXWikiContext().setUserReference(USER_DOCUMENT_REFERENCE);
+
+        this.oldcore.getXWikiContext().setRequest(new XWikiServletRequestStub.Builder().
+            setRequestParameters(Map.of("form_token", new String[] {"tokenvalue"})).build());
     }
 
     private String initAndRenderAction() throws XWikiException
@@ -141,7 +153,18 @@ public class EditActionTest
     }
 
     @Test
-    void documentAuthorsWhenDocumentExistAndContentIsModified() throws XWikiException
+    void documentAuthorsWhenDocumentExistAndContentIsModifiedAndInvalidCSRF() throws XWikiException
+    {
+        documentAuthorsWhenDocumentExistAndContentIsModified(false);
+    }
+
+    @Test
+    void documentAuthorsWhenDocumentExistAndContentIsModifiedAndValidCSRF() throws XWikiException
+    {
+        documentAuthorsWhenDocumentExistAndContentIsModified(true);
+    }
+
+    void documentAuthorsWhenDocumentExistAndContentIsModified(boolean validToken) throws XWikiException
     {
         XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
             this.oldcore.getXWikiContext());
@@ -158,6 +181,8 @@ public class EditActionTest
 
         when(this.request.getParameter("content")).thenReturn("modified content");
 
+        when(this.csrf.isTokenValid("tokenvalue")).thenReturn(validToken);
+
         initAndRenderAction();
 
         document = this.oldcore.getXWikiContext().getDoc();
@@ -166,5 +191,24 @@ public class EditActionTest
         assertSame(OTHERUSER_REFERENCE, document.getAuthors().getCreator());
         assertSame(OTHERUSER_REFERENCE, document.getAuthors().getEffectiveMetadataAuthor());
         assertSame(OTHERUSER_REFERENCE, document.getAuthors().getOriginalMetadataAuthor());
+        assertEquals(!validToken, document.isRestricted());
+    }
+
+    @Test
+    void restrictedWhenDocumentModifiedBeforeInput() throws XWikiException
+    {
+        XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getXWikiContext());
+        this.oldcore.getXWikiContext().setDoc(document);
+        this.oldcore.getXWikiContext().put("tdoc", document);
+
+        document.setMetaDataDirty(true);
+
+        initAndRenderAction();
+
+        document = this.oldcore.getXWikiContext().getDoc();
+
+        assertFalse(document.isRestricted());
+        verifyNoInteractions(this.csrf);
     }
 }

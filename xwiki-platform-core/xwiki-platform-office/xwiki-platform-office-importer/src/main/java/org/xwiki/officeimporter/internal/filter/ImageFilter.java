@@ -112,11 +112,15 @@ public class ImageFilter extends AbstractHTMLFilter
             htmlDocument.setUserData(EMBEDDED_IMAGES, new HashMap<String, byte[]>(), null);
         }
 
+        String replaceAttachmentPrefix = cleaningParams.get("replaceImagePrefix");
+        String replacementAttachmentPrefix = cleaningParams.get("replacementImagePrefix");
+
         List<Element> images = filterDescendants(htmlDocument.getDocumentElement(), new String[] {TAG_IMG});
         for (Element image : images) {
             Attr source = image.getAttributeNode(ATTRIBUTE_SRC);
             if (source != null && targetDocumentReference != null) {
-                filterImageSource(source, targetDocumentReference);
+                filterImageSource(source, targetDocumentReference, replaceAttachmentPrefix,
+                    replacementAttachmentPrefix);
             }
 
             // The 'align' attribute of images creates a lot of problems. First,the office server has a problem with
@@ -127,11 +131,12 @@ public class ImageFilter extends AbstractHTMLFilter
         }
     }
 
-    private void filterImageSource(Attr source, DocumentReference targetDocumentReference)
+    private void filterImageSource(Attr source, DocumentReference targetDocumentReference, String replacePrefix,
+        String replacementPrefix)
     {
         String fileName = null;
         try {
-            fileName = getFileName(source);
+            fileName = getFileName(source, replacePrefix, replacementPrefix);
         } catch (Exception e) {
             this.logger.warn("Failed to extract the image file name. Root cause is [{}]",
                 ExceptionUtils.getRootCauseMessage(e));
@@ -155,7 +160,7 @@ public class ImageFilter extends AbstractHTMLFilter
         image.getParentNode().insertBefore(afterComment, image.getNextSibling());
     }
 
-    private String getFileName(Attr source) throws MimeTypeException
+    private String getFileName(Attr source, String replacePrefix, String replacementPrefix) throws MimeTypeException
     {
         String value = source.getValue();
         String fileName = null;
@@ -194,13 +199,25 @@ public class ImageFilter extends AbstractHTMLFilter
                 fileName = fileName.replaceAll("\\+", "%2B");
                 // We have to decode the image file name in case it contains URL special characters.
                 fileName = URLDecoder.decode(fileName, UTF_8);
-
-                // '@' must also be escaped in order to resolve properly the path in XWiki
-                fileName = fileName.replaceAll("@", "\\\\@");
             } catch (Exception e) {
                 // This shouldn't happen. Use the encoded image file name.
             }
+
+            fileName = replacePrefix(replacePrefix, replacementPrefix, fileName);
+            // '@' must also be escaped in order to resolve properly the path in XWiki
+            fileName = fileName.replace("@", "\\@");
         }
         return fileName;
+    }
+
+    private static String replacePrefix(String replacePrefix, String replacementPrefix, String fileName)
+    {
+        String result = fileName;
+
+        if (StringUtils.startsWith(fileName, replacePrefix) && replacementPrefix != null) {
+            result = replacementPrefix + StringUtils.removeStart(fileName, replacePrefix);
+        }
+
+        return result;
     }
 }

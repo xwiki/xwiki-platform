@@ -77,4 +77,4 @@ Mail.SendMailStatus_livetable.resend=再送
 mailSender.admin.resendSuccess=メールは正常に再送されました
 mailSender.admin.resendFailure=再送できませんでした。クリックすると詳細を表示します。
 </content>
-  </xwikidoc>
+</xwikidoc>

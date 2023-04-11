@@ -270,3 +270,9 @@ org.xwiki.internal.template.ActionTemplateRequirement
 org.xwiki.internal.migration.R150000000XWIKI20285DataMigration
 org.xwiki.internal.migration.InvitationInternalDocumentParameterEscapingFixer
 org.xwiki.internal.migration.InvitationInternalDocumentParameterEscapingTaskConsumer
+org.xwiki.security.authservice.internal.AuthServiceConfiguration
+org.xwiki.security.authservice.internal.AuthServiceConfigurationClassInitializer
+org.xwiki.security.authservice.internal.AuthServiceConfigurationInvalidator
+org.xwiki.security.authservice.internal.AuthServiceManager
+org.xwiki.security.authservice.internal.StandardXWikiAuthServiceComponent
+org.xwiki.security.authservice.script.AuthServiceScriptService

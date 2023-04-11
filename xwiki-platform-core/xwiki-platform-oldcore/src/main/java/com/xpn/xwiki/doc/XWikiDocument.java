@@ -6704,16 +6704,18 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public void setLocale(Locale locale)
     {
-        this.locale = locale;
+        if (!Objects.equals(this.locale, locale)) {
+            this.locale = locale;
 
-        setMetaDataDirty(true);
+            setMetaDataDirty(true);
 
-        // Clean various caches
+            // Clean various caches
 
-        this.keyCache = null;
-        this.localKeyCache = null;
-        this.documentReferenceWithLocaleCache = null;
-        this.pageReferenceWithLocaleCache = null;
+            this.keyCache = null;
+            this.localKeyCache = null;
+            this.documentReferenceWithLocaleCache = null;
+            this.pageReferenceWithLocaleCache = null;
+        }
     }
 
     /**
@@ -6745,9 +6747,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public void setDefaultLocale(Locale defaultLocale)
     {
-        this.defaultLocale = defaultLocale;
+        if (!Objects.equals(this.defaultLocale, defaultLocale)) {
+            this.defaultLocale = defaultLocale;
 
-        setMetaDataDirty(true);
+            setMetaDataDirty(true);
+        }
     }
 
     public int getTranslation()
@@ -7677,9 +7681,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public void setDefaultTemplate(String defaultTemplate)
     {
-        this.defaultTemplate = defaultTemplate;
+        if (!Objects.equals(this.defaultTemplate, defaultTemplate)) {
+            this.defaultTemplate = defaultTemplate;
 
-        setMetaDataDirty(true);
+            setMetaDataDirty(true);
+        }
     }
 
     public Vector<BaseObject> getComments()
@@ -8685,15 +8691,19 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public void setCustomClass(String customClass)
     {
-        this.customClass = customClass;
-        setMetaDataDirty(true);
+        if (!Objects.equals(this.customClass, customClass)) {
+            this.customClass = customClass;
+            setMetaDataDirty(true);
+        }
     }
 
     public void setValidationScript(String validationScript)
     {
-        this.validationScript = validationScript;
+        if (!Objects.equals(this.validationScript, validationScript)) {
+            this.validationScript = validationScript;
 
-        setMetaDataDirty(true);
+            setMetaDataDirty(true);
+        }
     }
 
     public String getValidationScript()

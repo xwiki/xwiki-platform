@@ -60,9 +60,23 @@ define('imageStyleClient', ['jquery'], function($) {
     }
   }
 
+  function getImageStyle(styleId) {
+    return loadImageStyles().then(function (results) {
+      var filteredResults = results.imageStyles.filter(function (imageStyle) {
+        return imageStyle.type === styleId;
+      });
+      if (filteredResults.length === 0) {
+        return Promise.reject("Unable to find an image style with id [" + styleId + "]");
+      } else {
+        return Promise.resolve(filteredResults[0]);
+      }
+    });
+  }
+
   return {
     loadImageStyles: loadImageStyles,
-    loadImageStylesDefault: loadImageStylesDefault
+    loadImageStylesDefault: loadImageStylesDefault,
+    getImageStyle: getImageStyle
   };
 });
 

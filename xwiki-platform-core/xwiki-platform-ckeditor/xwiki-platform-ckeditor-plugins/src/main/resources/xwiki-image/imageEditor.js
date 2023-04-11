@@ -23,6 +23,7 @@ define('imageEditorTranslationKeys', [], [
   'modal.loadFail.message',
   'modal.title',
   'modal.insertButton',
+  'modal.updateButton',
   'modal.initialization.fail',
   'modal.outscaleWarning'
 ]);
@@ -121,10 +122,14 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
         .prependTo(insertButton.parent());
       selectImageButton.on('click', function() {
         var imageData = getFormData(modal);
+        var modalInput = modal.data('input');
+        // New image is set to true only of it is already explicitly set as such.
+        var newImage = modalInput.newImage === true;
         modal.data('output', {
           action: 'selectImage',
-          editor: modal.data('input').editor,
-          imageData: imageData
+          editor: modalInput.editor,
+          imageData: imageData,
+          newImage: newImage
         }).modal('hide');
       });
     }
@@ -313,6 +318,14 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
     // Fetch modal content from a remote template the first time the image dialog editor is opened.
     function initialize(modal) {
       var params = modal.data('input');
+
+      // Update the button label according to the image state (new or updated image).
+      if (params.newImage) {
+        modal.find('.modal-footer .btn-primary').text(translations.get('modal.insertButton'));
+      } else {
+        modal.find('.modal-footer .btn-primary').text(translations.get('modal.updateButton'));
+      }
+      
       if (!modal.data('initialized')) {
         var url = new XWiki.Document(XWiki.Model.resolve('CKEditor.ImageEditorService', XWiki.EntityType.DOCUMENT))
           .getURL('get');

@@ -39,6 +39,8 @@ public class XWikiBlogRSSReader
 {
     private static final String XWIKI_ITEM_IMAGE_TAG = "xwiki:image";
 
+    private static final String USER_AGENT = "XWikiWhatsNew";
+
     /**
      * @param rssURL the rss URL to get the RSS feed
      * @return the stream of items
@@ -65,6 +67,8 @@ public class XWikiBlogRSSReader
         RssReader rssReader = new RssReader();
         // Add support for Dublin Core (dc) that XWiki's RSS feeds uses.
         addXWikiDublinCoreSupport(rssReader);
+        // Set the user agent to simply mark that it's coming from an XWiki instance and be a good citizen
+        rssReader.setUserAgent(USER_AGENT);
         return rssReader;
     }
 

@@ -223,7 +223,7 @@ public class XWikiRepositoryModel
     // Solr
 
     public static final String SOLRPROP_EXTENSION_VALIDEXTENSION =
-        toExtensionClassSolrPropertyName(PROP_EXTENSION_VALIDEXTENSION, "boolean");
+        toExtensionClassSolrPropertyName(PROP_EXTENSION_VALIDEXTENSION, SOLR_BOOLEAN);
 
     public static final String SOLR_STRING = "string";
 
@@ -414,13 +414,13 @@ public class XWikiRepositoryModel
     public static ExtensionRepositoryDescriptor toRepositoryDescriptor(String repository, ExtensionFactory factory)
         throws URISyntaxException
     {
-        int index;
-
         // Id
-        String id = repository.substring(0, index = repository.indexOf(':'));
+        int index = repository.indexOf(':')
+        String id = repository.substring(0, index);
 
         // Type
-        String type = repository.substring(index + 1, index = repository.indexOf(':', index + 1));
+        index = repository.indexOf(':', index + 1);
+        String type = repository.substring(index + 1, index);
 
         // URI
         URI uri = new URI(repository.substring(index + 1, repository.length()));

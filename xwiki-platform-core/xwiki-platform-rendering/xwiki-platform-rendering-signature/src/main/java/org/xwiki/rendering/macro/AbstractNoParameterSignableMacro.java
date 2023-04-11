@@ -34,7 +34,7 @@ public abstract class AbstractNoParameterSignableMacro extends AbstractSignableM
      *
      * @param name the name of the macro (eg "Table Of Contents" for the TOC macro)
      */
-    public AbstractNoParameterSignableMacro(String name)
+    protected AbstractNoParameterSignableMacro(String name)
     {
         super(name);
     }
@@ -45,7 +45,7 @@ public abstract class AbstractNoParameterSignableMacro extends AbstractSignableM
      * @param name the name of the macro (eg "Table Of Contents" for the TOC macro)
      * @param description the description of the macro
      */
-    public AbstractNoParameterSignableMacro(String name, String description)
+    protected AbstractNoParameterSignableMacro(String name, String description)
     {
         super(name, description);
     }
@@ -57,7 +57,7 @@ public abstract class AbstractNoParameterSignableMacro extends AbstractSignableM
      * @param description the description of the macro
      * @param contentDescriptor the {@link org.xwiki.rendering.macro.descriptor.ContentDescriptor} describing the content of this macro.
      */
-    public AbstractNoParameterSignableMacro(String name, String description, ContentDescriptor contentDescriptor)
+    protected AbstractNoParameterSignableMacro(String name, String description, ContentDescriptor contentDescriptor)
     {
         super(name, description, contentDescriptor);
     }

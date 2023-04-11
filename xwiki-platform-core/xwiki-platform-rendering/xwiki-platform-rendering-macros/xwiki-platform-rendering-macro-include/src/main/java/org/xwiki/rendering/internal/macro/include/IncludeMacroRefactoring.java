@@ -85,22 +85,22 @@ public class IncludeMacroRefactoring implements MacroRefactoring
 
     @Override
     public Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
-        DocumentReference sourceReference, DocumentReference targetReference, boolean relative)
+        DocumentReference sourceReference, DocumentReference targetReference)
         throws MacroRefactoringException
     {
-        return getMacroBlock(macroBlock, currentDocumentReference, sourceReference, targetReference, relative);
+        return getMacroBlock(macroBlock, currentDocumentReference, sourceReference, targetReference);
     }
 
     @Override
     public Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
-        AttachmentReference sourceReference, AttachmentReference targetReference, boolean relative)
+        AttachmentReference sourceReference, AttachmentReference targetReference)
         throws MacroRefactoringException
     {
-        return getMacroBlock(macroBlock, currentDocumentReference, sourceReference, targetReference, relative);
+        return getMacroBlock(macroBlock, currentDocumentReference, sourceReference, targetReference);
     }
 
     private <T extends EntityReference> Optional<MacroBlock> getMacroBlock(MacroBlock macroBlock,
-        DocumentReference currentDocumentReference, T sourceReference, T targetReference, boolean relative)
+        DocumentReference currentDocumentReference, T sourceReference, T targetReference)
         throws MacroRefactoringException
     {
         Optional<MacroBlock> result;
@@ -216,7 +216,7 @@ public class IncludeMacroRefactoring implements MacroRefactoring
     private <T extends EntityReference> boolean serializeTargetReference(EntityReference originalReference,
         MacroBlock newMacroBlock, T targetReference, EntityReference currentReference, boolean relative)
     {
-        boolean result;
+        boolean result = false;
 
         // TODO: the relative parameter has no impact ATM since the passed reference to serialize
         // (i.e. targetReference) is an absolute reference (either a DocumentReference or an AttachmentReference)

@@ -71,7 +71,7 @@ export default {
   height: 100%;
   min-height: 1rem;
   animation: waiting 2s linear infinite;
-  background: linear-gradient(135deg, transparent 25%, #ccc4 50%, transparent 75%);
+  background: linear-gradient(135deg, transparent 25%, @panel-default-heading-bg 50%, transparent 75%);
   background-repeat: repeat;
   background-size: 200% 100%;
 }

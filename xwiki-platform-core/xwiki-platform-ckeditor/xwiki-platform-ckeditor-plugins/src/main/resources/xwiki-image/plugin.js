@@ -20,6 +20,23 @@
 (function() {
   'use strict';
 
+  function disableResizer(widget) {
+    require(['imageStyleClient'], function (imageStyleClient) {
+      widget.resizer.removeClass('hidden');
+      var styleId = widget.data.imageStyle;
+      if (styleId) {
+        imageStyleClient.getImageStyle(styleId)
+          .then(function (imageStyle) {
+            if (imageStyle.adjustableSize === false) {
+              widget.resizer.addClass('hidden');
+            }
+          }, function () {
+            console.debug("Failed to resolve image style [" + styleId + "]");
+          });
+      }
+    });
+  }
+
   function showImageWizard(editor, widget, isInsert) {
 
     /**
@@ -42,6 +59,8 @@
       }).done(function(data) {
         if (widget && widget.element) {
           widget.setData(data);
+
+          disableResizer(widget);
 
           // With the old image dialog, image were wrapped in a p to be centered. We need to unwrap them to make them
           // compliant with the new image dialog.
@@ -165,6 +184,7 @@
         this.setData('textWrap', image.getAttribute('data-xwiki-image-style-text-wrap'));
 
         moveResizer(this);
+        disableResizer(this);
       };
 
       var originalData = imageWidget.data;

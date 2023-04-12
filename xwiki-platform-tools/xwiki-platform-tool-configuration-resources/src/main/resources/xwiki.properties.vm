@@ -421,7 +421,7 @@ rendering.transformations = $xwikiRenderingTransformations
 #-#   velocity.properties = context.scope_control.template = true
 #-#   velocity.properties = context.scope_control.macro = true
 #-#   velocity.properties = event_handler.include.class = org.xwiki.velocity.internal.util.RestrictParseLocationEventHandler
-#-#   velocity.properties = runtime.introspection.uberspect = org.xwiki.velocity.introspection.SecureUberspector\,org.apache.velocity.util.introspection.DeprecatedCheckUberspector\,org.xwiki.velocity.introspection.MethodArgumentsUberspector
+#-#   velocity.properties = runtime.introspection.uberspect = org.xwiki.velocity.introspection.SecureUberspector\,org.apache.velocity.util.introspection.DeprecatedCheckUberspector\,org.xwiki.velocity.introspection.MethodArgumentsUberspector\,org.xwiki.velocity.introspection.MethodOverrideUberspector
 
 #-------------------------------------------------------------------------------------
 # Groovy

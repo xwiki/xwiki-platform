@@ -74,7 +74,7 @@
 
         input.next('.daterangepicker').attr('id', input.attr('id')+'-picker');
         input.next('.daterangepicker').attr('tabindex', '0');
-        input.parentElement.attr('aria-controls', input.attr('id')+'-picker');
+        input.parent().attr('aria-controls', input.attr('id')+'-picker');
 
         var updateInput = function(element, event, picker) {
           if (event.type == 'cancel') {
@@ -97,6 +97,7 @@
 
         input.on('keypress', function (e) {
           if(e.which === 13) {
+            // when the enter key is pressed.
             var txt = input.val().trim();
             var range = txt.split(' - ');
             if (range.length === 2) {
@@ -115,8 +116,8 @@
         });
 
         input.on('show.daterangepicker', function(event) {
-          this.setAttribute('aria-expanded', true);
-          this.next('.daterangepicker').setAttribute('style',
+          event.target.parentElement.setAttribute('aria-expanded', true);
+          event.target.next('.daterangepicker').setAttribute('style',
             'display:block; width: max-content;');
         });
 
@@ -124,7 +125,7 @@
           // Overwrite at instance level the 'hide' function added by Prototype.js to the Element prototype.
           // This removes the 'hide' function only for the event target.
           event.target.hide = undefined;
-          event.target.setAttribute('aria-expanded', false);
+          event.target.parentElement.setAttribute('aria-expanded', false);
           // Restore the 'hide' function after the event is handled (i.e. after all the listeners have been called).
           setTimeout(function () {
             // This deletes the local 'hide' key from the instance, making the 'hide' inherited from the prototype

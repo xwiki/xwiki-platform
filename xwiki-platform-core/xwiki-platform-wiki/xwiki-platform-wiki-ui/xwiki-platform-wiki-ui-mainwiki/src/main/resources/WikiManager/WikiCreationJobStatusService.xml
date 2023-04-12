@@ -54,12 +54,23 @@
   #template('logging_macros.vm')
   #template('extension.vm')
   ## Hack to be able to use macros from extension.vm that are supposed to be used inside Extension Manager
-  #set($olddoc = $doc)
-  #set($doc = $xwiki.getDocument('XWiki.AddExtensions'))
-  #set($loading = $status.state != 'FINISHED')
-  #set($logs = "#printLogs($status.logTail, $loading)")
-  #set($doc = $olddoc)
-  #set($map = {'wikiId':$wikiId, 'progress':$status.progress.offset, 'status':$status.state, 'error':$errorMessage, 'hasErrorLog':$hasErrorLog, 'logs':$logs})
+  #set ($olddoc = $doc)
+  #set ($doc = $xwiki.getDocument('XWiki.AddExtensions'))
+  ## Note: it's important for the state to be the same when calling `printLogs` and for the `status` field of $map,
+  ## otherwise if the state is changed to FINISHED while `printLogs` is called, a spinner will be displayed on the last
+  ## item, even tough the job is finished.
+  #set ($state = $status.state)
+  #set ($loading = $state != 'FINISHED')
+  #set ($logs = "#printLogs($status.logTail $loading)")
+  #set ($doc = $olddoc)
+  #set ($map = {
+    'wikiId': $wikiId,
+    'progress': $status.progress.offset,
+    'status': $state,
+    'error': $errorMessage, 
+    'hasErrorLog': $hasErrorLog,
+    'logs': $logs
+  })
   #jsonResponse($map)
 #end
 {{/velocity}}</content>

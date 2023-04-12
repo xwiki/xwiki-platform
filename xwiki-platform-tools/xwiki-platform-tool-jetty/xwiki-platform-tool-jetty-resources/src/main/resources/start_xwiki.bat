@@ -36,7 +36,7 @@ setlocal EnableDelayedExpansion
 
 if not defined XWIKI_OPTS set XWIKI_OPTS=-Xmx1024m
 
-REM The port on which to start Jetty can be defined in an enviroment variable called JETTY_PORT
+REM The port on which to start Jetty can be defined in an environment variable called JETTY_PORT
 if not defined JETTY_PORT (
   REM Alternatively, it can be passed to this script as the first argument
   set JETTY_PORT=%1
@@ -45,7 +45,7 @@ if not defined JETTY_PORT (
   )
 )
 
-REM The port on which Jetty listens for a Stop command can be defined in an enviroment variable called JETTY_STOP_PORT
+REM The port on which Jetty listens for a Stop command can be defined in an environment variable called JETTY_STOP_PORT
 if not defined JETTY_STOP_PORT (
   REM Alternatively, it can be passed to this script as the second argument
   set JETTY_STOP_PORT=%2

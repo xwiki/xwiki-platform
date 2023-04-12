@@ -220,8 +220,7 @@ fi
 if [ "$JAVA_VERSION" -gt 11 ]; then
   XWIKI_OPENS_LANG="--add-opens java.base/java.lang=ALL-UNNAMED"
   XWIKI_OPENS_UTIL="--add-opens java.base/java.util=ALL-UNNAMED"
-  XWIKI_OPENS_CONCURRENT="--add-opens java.base/java.concurrent=ALL-UNNAMED"
-  XWIKI_OPTS="$XWIKI_OPENS_LANG $XWIKI_OPENS_UTIL $XWIKI_OPENS_CONCURRENT $XWIKI_OPTS"
+  XWIKI_OPTS="$XWIKI_OPENS_LANG $XWIKI_OPENS_UTIL $XWIKI_OPTS"
 fi
 
 # We save the shell PID here because we do an exec below and exec will replace the shell with the executed command

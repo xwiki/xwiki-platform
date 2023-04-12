@@ -237,11 +237,11 @@ if [ ! "$XWIKI_NONINTERACTIVE" = true ] ; then
     echo "No Java found. You need Java installed for XWiki to work."
     exit 0
   fi
-  if [ "$JAVA_VERSION" -lt 8 ]; then
-    echo This version of XWiki requires Java 8 or greater.
+  if [ "$JAVA_VERSION" -lt 11 ]; then
+    echo This version of XWiki requires Java 11 or greater.
     exit 0
   fi
-  if [ "$JAVA_VERSION" -gt 11 ]; then
+  if [ "$JAVA_VERSION" -gt 17 ]; then
     read -p "You're using Java $JAVA_VERSION which XWiki doesn't fully support yet. Continue (y/N)? " -n 1 -r
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
       exit 0

@@ -58,7 +58,7 @@
   #set ($authServiceType = 'other')
 #end
 
-{{box}}
+{{box title="{{translation key=~"security.authservice.admin.currentAuthService~"/}}"}}
   #set ($authService = $services.security.authService.getAuthService())
   #set ($authServiceName = $services.localization.get("security.authservice.service.${authService.id}.name"))
   #if ($authServiceName)

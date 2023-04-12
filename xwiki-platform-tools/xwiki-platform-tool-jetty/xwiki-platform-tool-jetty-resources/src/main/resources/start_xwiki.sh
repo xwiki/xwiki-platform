@@ -214,9 +214,9 @@ if [ ! "$XWIKI_NONINTERACTIVE" = true ] ; then
   fi
 fi
 
-# TODO: Remove once https://jira.xwiki.org/browse/XRENDERING-616 and https://jira.xwiki.org/browse/XWIKI-19034 are
-# fixed. In summary we need this to allow the XWiki code or 3rd party code to use reflection to access private
-# variables (setAccessible() calls). See https://tinyurl.com/tdhkn6mp
+# TODO: Remove once https://jira.xwiki.org/browse/XWIKI-19034 is fixed. In summary we need this to allow the XWiki code
+# or 3rd party code to use reflection to access private variables (setAccessible() calls).
+# See https://tinyurl.com/tdhkn6mp
 if [ "$JAVA_VERSION" -gt 11 ]; then
   XWIKI_OPENS_LANG="--add-opens java.base/java.lang=ALL-UNNAMED"
   XWIKI_OPENS_UTIL="--add-opens java.base/java.util=ALL-UNNAMED"

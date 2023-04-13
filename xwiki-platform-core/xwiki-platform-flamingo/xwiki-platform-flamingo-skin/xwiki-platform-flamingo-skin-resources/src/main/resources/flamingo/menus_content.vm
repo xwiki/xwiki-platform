@@ -75,7 +75,7 @@
   ## EDIT menu
   ##
   #define ($editMenu)
-    #if($displayEditMenu && $services.security.authorization.hasAccessWithRequiredRight('edit') && !$isReadOnly)
+    #if($displayEditMenu && $services.security.authorization.hasAccessWithRequiredRights('edit') && !$isReadOnly)
       #displayEditMenu()
     #elseif ($displayEditMenu && $hasEdit && !$isReadOnly)
       #warning("TODO: blabla")

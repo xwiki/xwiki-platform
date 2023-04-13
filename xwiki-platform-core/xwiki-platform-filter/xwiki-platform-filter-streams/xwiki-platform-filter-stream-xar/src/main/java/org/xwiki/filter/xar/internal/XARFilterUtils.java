@@ -81,7 +81,6 @@ public final class XARFilterUtils
      */
     public static final String ROLEHINT_16 = ROLEHINT_PREFIX + XarDocumentModel.VERSION_16;
 
-
     /**
      * @since 7.2M1
      */

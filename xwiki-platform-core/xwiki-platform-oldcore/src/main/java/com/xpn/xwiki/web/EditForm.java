@@ -52,14 +52,16 @@ public class EditForm extends XWikiForm
 
     /**
      * Format for passing xproperties references in URLs. General format:
-     * {@code &lt;space&gt;.&lt;pageClass&gt;_&lt;number&gt;_<propertyName>} (e.g. {@code XWiki.XWikiRights_0_member}).
+     * {@code &lt;space&gt;.&lt;pageClass&gt;_&lt;number&gt;_<propertyName>} (e.g.
+     * {@code XWiki.XWikiRights_0_member}).
      */
     private static final Pattern XPROPERTY_REFERENCE_PATTERN =
         Pattern.compile("^((?:[\\S ]+\\.)+[\\S ]+?)_([0-9]+)_(.+)$");
 
     /**
-     * Format for passing xobjects references in URLs. General format: {@code &lt;space&gt;.&lt;pageClass&gt;_<number>}
-     * (e.g. {@code XWiki.XWikiRights_0}).
+     * Format for passing xobjects references in URLs. General format:
+     * {@code &lt;space&gt;.&lt;pageClass&gt;_<number>} (e.g.
+     * {@code XWiki.XWikiRights_0}).
      */
     private static final Pattern XOBJECTS_REFERENCE_PATTERN = Pattern.compile("^((?:[\\S ]+\\.)+[\\S ]+?)_([0-9]+)$");
 
@@ -99,7 +101,7 @@ public class EditForm extends XWikiForm
     private boolean convertSyntax;
 
     private String hidden;
-
+    
     private ObjectPolicyType objectPolicy;
 
     private Map<String, List<Integer>> objectsToRemove;
@@ -147,7 +149,7 @@ public class EditForm extends XWikiForm
     {
         if (parameter == null) {
             this.tags = null;
-            return; 
+            return;
         }
         StringBuilder tags = new StringBuilder();
         boolean first = true;
@@ -331,7 +333,7 @@ public class EditForm extends XWikiForm
 
     /**
      * @return {@code true} if the document content and meta data should be converted to the new syntax specified on the
-     *     edit form, {@code false} otherwise
+     *         edit form, {@code false} otherwise
      * @see #syntaxId
      * @since 12.6.3
      * @since 12.9RC1
@@ -343,9 +345,9 @@ public class EditForm extends XWikiForm
 
     /**
      * Sets whether to convert the document content and meta data to the new syntax specified on the edit form.
-     *
-     * @param convertSyntax {@code true} to convert the document content and meta data to the new syntax,
-     *     {@code false} to only change the syntax identifier
+     * 
+     * @param convertSyntax {@code true} to convert the document content and meta data to the new syntax, {@code false}
+     *            to only change the syntax identifier
      * @since 12.6.3
      * @since 12.9RC1
      */
@@ -365,20 +367,20 @@ public class EditForm extends XWikiForm
     }
 
     /**
-     * Return the object policy given in the HTTP request. See
-     * {@link com.xpn.xwiki.web.ObjectPolicyType ObjectPolicyType} for more information about what is an object policy.
+     * Return the object policy given in the HTTP request. See {@link com.xpn.xwiki.web.ObjectPolicyType
+     * ObjectPolicyType} for more information about what is an object policy.
      *
      * @return the Object Policy type
      * @since 7.0RC1
      */
-    public ObjectPolicyType getObjectPolicy()
-    {
+    public ObjectPolicyType getObjectPolicy() {
         return this.objectPolicy;
     }
 
     /**
      * see {@link #getObjectPolicy}
-     *
+     * 
+
      * @since 7.0RC1
      */
     private void setObjectPolicy(ObjectPolicyType objectPolicy)
@@ -469,6 +471,8 @@ public class EditForm extends XWikiForm
 
     private void setRequiredRights(String[] requiredRights)
     {
+        // TODO: add more control on who can add/remove the rights? e.g. should I have script right to add script?
+        // should have I script right to remove script right?
         if (requiredRights != null) {
             this.requiredRights = Arrays.stream(requiredRights).map(Right::toRight).collect(Collectors.toSet());
         } else {
@@ -476,11 +480,11 @@ public class EditForm extends XWikiForm
         }
     }
 
-    /** 
+    /**
      * Retrieve the list of temporary uploaded files to add as attachment.
      *
-     * @return a list of filenames that should be attached.
      * @see TemporaryAttachmentSessionsManager
+     * @return a list of filenames that should be attached.
      * @since 14.3RC1
      */
     @Unstable
@@ -548,11 +552,12 @@ public class EditForm extends XWikiForm
 
     /**
      * If current objectPolicyType is {@link ObjectPolicyType#UPDATE_OR_CREATE}, retrieve a map from the request
-     * parameters of the form {@code &lt;spacename&gt;.&lt;classname&gt;_&lt;number&gt;_<propertyname>'} Keys of this
-     * map will be the reference {@code &lt;spacename&gt;.<classname>} to the Class (for example, 'XWiki.XWikiRights'),
-     * the content is a list where each element describe property for the object {@code &lt;number&gt;}. Element of the
-     * list is a map where key is {@code <propertyname>} and content is the array of corresponding values.
-     * <p>
+     * parameters of the form {@code &lt;spacename&gt;.&lt;classname&gt;_&lt;number&gt;_<propertyname>'}
+     * Keys of this map will be the reference {@code &lt;spacename&gt;.<classname>} to the Class
+     * (for example, 'XWiki.XWikiRights'), the content is a list where each element describe property for the
+     * object {@code &lt;number&gt;}. Element of the list is a map where key is {@code <propertyname>} and
+     * content is the array of corresponding values.
+     *
      * Example with a list of HTTP parameters:
      * <ul>
      * <li>XWiki.XWikiRights_0_users=XWiki.Admin</li>
@@ -583,7 +588,7 @@ public class EditForm extends XWikiForm
      * definition of the XClass. For example, the request could contain {@code XWiki.XWikiRights_0_foobar=value}: the
      * resulting map will always return a parameter "foobar" for XWiki.XWikiRights
      * even if the xclass does not define it or even if the xclass does not exist.
-     * <p>
+     *
      * If the current objectPolicyType is not {@link ObjectPolicyType#UPDATE_OR_CREATE}
      * it will return an empty map.
      *

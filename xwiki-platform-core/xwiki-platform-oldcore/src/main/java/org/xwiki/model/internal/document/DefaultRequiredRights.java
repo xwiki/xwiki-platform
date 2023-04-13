@@ -23,6 +23,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.document.RequiredRights;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.text.XWikiToStringBuilder;
@@ -76,6 +78,31 @@ public class DefaultRequiredRights implements RequiredRights
         this.requiredRights.clear();
         this.requiredRights.addAll(newRights);
         this.document.setMetaDataDirty(true);
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        DefaultRequiredRights that = (DefaultRequiredRights) o;
+
+        return new EqualsBuilder()
+            .append(this.requiredRights, that.requiredRights)
+            .append(this.document, that.document)
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37).append(this.requiredRights).append(this.document).toHashCode();
     }
 
     @Override

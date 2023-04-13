@@ -313,19 +313,16 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
   #end
 
 #if ("$!request.section" == '' || $request.section == 'PageRights')
-  <h2>Required Rights</h2>
-  aa $services.model.serialize($doc.documentReference, 'default')
-  aa $services.model.serialize($targetDocument.documentReference, 'default')
-##  $request.getRequestURI()
+  <h2>TODO: Required Rights</h2>
   <form action="$escapetool.xml($xwiki.getURL($targetDocument, 'saveandcontinue'))" class="xform" method="post" name="form_name1">
     <dl>
       <dt>
         <label for="input_id1">Script</label>
       </dt>
       <dd>
-##        $doc.requiredRights.class
         <input id="input_id1" name="requiredRights" type="checkbox" value="script"
           #if($targetDocument.requiredRights.has('script'))checked#end
+          #if(!$services.security.authorization.hasAccess('script'))disabled#end
         />
       </dd>
     </dl>
@@ -335,7 +332,8 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
       </dt>
       <dd>
         <input id="input_id2" name="requiredRights" type="checkbox" value="programming"
-         #if($targetDocument.requiredRights.has('programming'))checked#end 
+           #if($targetDocument.requiredRights.has('programming'))checked#end
+           #if(!$services.security.authorization.hasAccess('programming'))disabled#end
         />
       </dd>
     </dl>

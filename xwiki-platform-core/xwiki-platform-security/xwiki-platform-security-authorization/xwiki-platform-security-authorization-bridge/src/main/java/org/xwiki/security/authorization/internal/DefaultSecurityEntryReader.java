@@ -202,6 +202,9 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
         }
 
         // Get standard rules
+        
+        
+        // TODO: check if I can add the required rights around here??
         Collection<SecurityRule> rules = getSecurityRules(documentReference, classReference, wikiReference);
 
         // Add extras rules

@@ -19,11 +19,15 @@
  */
 package org.xwiki.security.authorization.internal;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.xwiki.security.authorization.RightSet;
-import org.xwiki.security.authorization.SecurityAccess;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.security.authorization.RightSet;
 import org.xwiki.security.authorization.RuleState;
+import org.xwiki.security.authorization.SecurityAccess;
 
 /**
  * Default implementation for an {@link org.xwiki.security.authorization.SecurityAccess}.
@@ -45,6 +49,8 @@ public class XWikiSecurityAccess implements SecurityAccess
     /** Denied rights. */
     protected RightSet denied = new RightSet();
 
+    private Set<Right> requiredRights = new HashSet<>();
+
     /**
      * @return the default access, using the default value of all rights.
      */
@@ -58,6 +64,15 @@ public class XWikiSecurityAccess implements SecurityAccess
             }
         }
         return defaultAccess;
+    }
+
+    public void setRequiredRights(Set<Right> requiredRights)
+    {
+        if (requiredRights == null) {
+            this.requiredRights = Set.of();
+        } else {
+            this.requiredRights = requiredRights;
+        }
     }
 
     /**
@@ -118,8 +133,31 @@ public class XWikiSecurityAccess implements SecurityAccess
         if (denied.contains(right)) {
             return RuleState.DENY;
         }
-        if (allowed.contains(right)) {
-            return RuleState.ALLOW;
+        
+        // TODO: find a way to activate the required right (e.g., set a flag on the doc the first time a required 
+        //  rights is saved?)
+        if(!requiredRights.isEmpty()) {
+            if (allowed.contains(right)) {
+                if (right.equals(Right.EDIT)) {
+                    if (this.allowed.containsAll(this.requiredRights)) {
+                        return RuleState.ALLOW;
+                    } else {
+                        return RuleState.DENY;
+                    }
+                } else if (right.equals(Right.SCRIPT) || right.equals(Right.PROGRAM)) {
+                    if (this.requiredRights.contains(right)) {
+                        return RuleState.ALLOW;
+                    } else {
+                        return RuleState.DENY;
+                    }
+                } else {
+                    return RuleState.ALLOW;
+                }
+            }
+        } else {
+            if (allowed.contains(right)) {
+                return RuleState.ALLOW;
+            }
         }
         return RuleState.UNDETERMINED;
     }
@@ -130,29 +168,37 @@ public class XWikiSecurityAccess implements SecurityAccess
         XWikiSecurityAccess clone = (XWikiSecurityAccess) super.clone();
         clone.allowed = allowed.clone();
         clone.denied = denied.clone();
+        clone.requiredRights = new HashSet<>(clone.requiredRights);
         return clone;
     }
 
     @Override
-    public boolean equals(Object object)
+    public boolean equals(Object o)
     {
-        if (object == this) {
+        if (this == o) {
             return true;
         }
-        if (!(object instanceof XWikiSecurityAccess)) {
+
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        XWikiSecurityAccess other = (XWikiSecurityAccess) object;
 
-        return other.allowed.equals(allowed) && other.denied.equals(denied);
+        XWikiSecurityAccess that = (XWikiSecurityAccess) o;
+
+        return new EqualsBuilder()
+            .append(this.allowed, that.allowed)
+            .append(this.denied, that.denied)
+            .append(this.requiredRights, that.requiredRights)
+            .isEquals();
     }
 
     @Override
     public int hashCode()
     {
-        return new HashCodeBuilder()
-            .append(allowed)
-            .append(denied)
+        return new HashCodeBuilder(17, 37)
+            .append(this.allowed)
+            .append(this.denied)
+            .append(this.requiredRights)
             .toHashCode();
     }
 
@@ -169,6 +215,9 @@ public class XWikiSecurityAccess implements SecurityAccess
             }
             b.append(r).append(": ").append(get(r));
         }
+        
+        // TODO: add the required rights
+        
         return b.toString();
     }
 }

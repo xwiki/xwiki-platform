@@ -176,7 +176,7 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
         if (entity == null) {
             return authorizationSettlerProvider.get()
                 .settle(user, loadGroupsOfUserOrGroup(user, user.getWikiReference(), null, new ArrayDeque<>()),
-                    null);
+                    null, this.securityEntryReader.requiredRights(entity));
         }
 
         // Retrieve rules for the entity from the cache
@@ -219,7 +219,8 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
         }
 
         // Settle the access
-        SecurityAccessEntry accessEntry = authorizationSettlerProvider.get().settle(user, groups, ruleEntries);
+        SecurityAccessEntry accessEntry = authorizationSettlerProvider.get().settle(user, groups, ruleEntries,
+            securityEntryReader.requiredRights(entity));
 
         // Store the result into the cache
         try {

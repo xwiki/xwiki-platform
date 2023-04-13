@@ -25,9 +25,13 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.filter.input.AbstractBeanInputFilterStreamFactory;
 import org.xwiki.filter.type.FilterStreamType;
 import org.xwiki.filter.xar.input.XARInputProperties;
-import org.xwiki.filter.xar.internal.XARFilterUtils;
 
-import static org.xwiki.filter.xar.internal.XARFilterUtils.*;
+import static org.xwiki.filter.xar.internal.XARFilterUtils.ROLEHINT_11;
+import static org.xwiki.filter.xar.internal.XARFilterUtils.ROLEHINT_12;
+import static org.xwiki.filter.xar.internal.XARFilterUtils.ROLEHINT_13;
+import static org.xwiki.filter.xar.internal.XARFilterUtils.ROLEHINT_14;
+import static org.xwiki.filter.xar.internal.XARFilterUtils.ROLEHINT_15;
+import static org.xwiki.filter.xar.internal.XARFilterUtils.ROLEHINT_16;
 
 /**
  * Generate events from XAR FilterStream package.

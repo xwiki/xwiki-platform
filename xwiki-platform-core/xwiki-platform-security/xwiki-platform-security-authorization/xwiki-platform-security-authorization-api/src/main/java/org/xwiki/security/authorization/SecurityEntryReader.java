@@ -19,6 +19,8 @@
  */
 package org.xwiki.security.authorization;
 
+import java.util.Set;
+
 import org.xwiki.component.annotation.Role;
 import org.xwiki.security.SecurityReference;
 
@@ -41,4 +43,6 @@ public interface SecurityEntryReader
      * @throws AuthorizationException on error.
      */
     SecurityRuleEntry read(SecurityReference entityReference) throws AuthorizationException;
+
+    Set<Right> requiredRights(SecurityReference entity) throws AuthorizationException;
 }

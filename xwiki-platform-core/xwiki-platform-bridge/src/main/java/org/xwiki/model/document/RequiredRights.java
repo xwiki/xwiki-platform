@@ -43,5 +43,9 @@ public interface RequiredRights
      */
     void setRights(Set<Right> newRights);
 
+    /**
+     * @param right the right to check
+     * @return {@code true} of the right is part of the required rights, {@code false} otherwise
+     */
     boolean has(Right right);
 }

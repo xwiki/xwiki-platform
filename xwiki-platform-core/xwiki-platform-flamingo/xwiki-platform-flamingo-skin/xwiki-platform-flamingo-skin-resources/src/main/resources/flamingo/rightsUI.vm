@@ -312,6 +312,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
     </dl>
   #end
 
+## TODO: extract to a UIX?
 #if ("$!request.section" == '' || $request.section == 'PageRights')
   <h2>TODO: Required Rights</h2>
   <form action="$escapetool.xml($xwiki.getURL($targetDocument, 'saveandcontinue'))" class="xform" method="post" name="form_name1">

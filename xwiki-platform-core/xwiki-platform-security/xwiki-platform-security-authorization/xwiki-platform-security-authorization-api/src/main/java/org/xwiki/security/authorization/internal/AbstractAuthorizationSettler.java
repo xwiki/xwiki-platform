@@ -192,9 +192,10 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
 
     @Override
     public SecurityAccessEntry settle(UserSecurityReference user,
-        Collection<GroupSecurityReference> groups, Deque<SecurityRuleEntry> ruleEntries)
+        Collection<GroupSecurityReference> groups, Deque<SecurityRuleEntry> ruleEntries, Set<Right> requiredRights)
     {
         XWikiSecurityAccess access = new XWikiSecurityAccess();
+        access.setRequiredRights(requiredRights);
         SecurityReference reference = null;
 
         Policies policies = new Policies();

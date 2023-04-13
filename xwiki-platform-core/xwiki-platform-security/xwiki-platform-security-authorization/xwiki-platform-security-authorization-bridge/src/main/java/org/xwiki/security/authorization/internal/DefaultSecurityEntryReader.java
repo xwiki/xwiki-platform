@@ -36,6 +36,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.document.RequiredRights;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
@@ -229,6 +230,25 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
         }
 
         return new InternalSecurityRuleEntry(entity, rules);
+    }
+
+    @Override
+    public Set<Right> requiredRights(SecurityReference entity) throws AuthorizationException
+    {
+        switch (entity.getType()) {
+            case WIKI:
+            case SPACE:
+                return Set.of();
+            case DOCUMENT:
+                XWikiDocument document = getDocument(new DocumentReference(entity));
+                if (document == null) {
+                    return Set.of();
+                }
+                RequiredRights requiredRights = document.getRequiredRights();
+                return requiredRights.getRights();
+            default:
+                throw new EntityTypeNotSupportedException(entity.getType(), this);
+        }
     }
 
     /**

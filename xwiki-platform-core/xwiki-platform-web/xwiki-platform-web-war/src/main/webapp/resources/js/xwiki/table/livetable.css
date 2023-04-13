@@ -152,7 +152,6 @@ thead.xwiki-livetable-display-header th.selected {
   background-color: $theme.highlightColor;
 }
 html>body thead.xwiki-livetable-display-header  td.xwiki-livetable-display-header-filter {
-  position: relative;
   padding: 2px 5px 2px 0px;
   border-color: transparent;
 }

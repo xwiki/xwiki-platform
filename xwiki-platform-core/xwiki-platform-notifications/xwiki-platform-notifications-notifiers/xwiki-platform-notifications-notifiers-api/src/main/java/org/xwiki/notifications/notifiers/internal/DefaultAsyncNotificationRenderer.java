@@ -28,12 +28,14 @@ import javax.inject.Named;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.eventstream.Event;
 import org.xwiki.job.GroupedJobInitializer;
 import org.xwiki.job.JobGroupPath;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.CompositeEventStatus;
 import org.xwiki.notifications.CompositeEventStatusManager;
+import org.xwiki.notifications.GroupingEventManager;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.notifications.sources.ParametrizedNotificationManager;
@@ -67,6 +69,9 @@ public class DefaultAsyncNotificationRenderer implements AsyncRenderer
 
     @Inject
     private EntityReferenceSerializer<String> documentReferenceSerializer;
+
+    @Inject
+    private GroupingEventManager groupingEventManager;
 
     @Inject
     @Named("AsyncNotificationRenderer")
@@ -108,11 +113,11 @@ public class DefaultAsyncNotificationRenderer implements AsyncRenderer
             this.notificationCacheManager.getFromCache(this.cacheKey, this.configuration.isCount());
 
         NotificationParameters notificationParameters = this.configuration.getNotificationParameters();
-        List<CompositeEvent> events = null;
+        List<Event> events = null;
         Integer count = null;
         if (fromCache == null) {
             try {
-                events = this.notificationManager.getEvents(notificationParameters);
+                events = this.notificationManager.getRawEvents(notificationParameters);
                 count = events.size();
                 this.notificationCacheManager.setInCache(this.cacheKey, events, this.configuration.isCount());
             } catch (NotificationException e) {
@@ -122,7 +127,7 @@ public class DefaultAsyncNotificationRenderer implements AsyncRenderer
             if (this.configuration.isCount()) {
                 count = (Integer) fromCache;
             } else {
-                events = (List<CompositeEvent>) fromCache;
+                events = (List<Event>) fromCache;
             }
         }
         String stringResult;
@@ -133,12 +138,18 @@ public class DefaultAsyncNotificationRenderer implements AsyncRenderer
                 boolean loadMore = events.size() == notificationParameters.expectedCount;
                 List<CompositeEventStatus> compositeEventStatuses = null;
                 // We cannot compute the read status if the user is not available.
+                String userId = null;
                 if (notificationParameters.user != null) {
-                    compositeEventStatuses =
-                        this.compositeEventStatusManager.getCompositeEventStatuses(events,
-                            documentReferenceSerializer.serialize(notificationParameters.user));
+                    userId = documentReferenceSerializer.serialize(notificationParameters.user);
                 }
-                stringResult = this.htmlNotificationRenderer.render(events, compositeEventStatuses, loadMore);
+                List<CompositeEvent> compositeEvents = this.groupingEventManager.getCompositeEvents(events, userId,
+                    notificationParameters.groupingEventTarget);
+
+                if (userId != null) {
+                    compositeEventStatuses =
+                        this.compositeEventStatusManager.getCompositeEventStatuses(compositeEvents, userId);
+                }
+                stringResult = this.htmlNotificationRenderer.render(compositeEvents, compositeEventStatuses, loadMore);
             } catch (Exception e) {
                 throw new RenderingException("Error while retrieving the event status", e);
             }

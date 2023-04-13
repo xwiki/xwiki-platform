@@ -23,15 +23,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.CompositeEventStatus;
 import org.xwiki.notifications.CompositeEventStatusManager;
+import org.xwiki.notifications.GroupingEventManager;
 import org.xwiki.notifications.notifiers.NotificationRenderer;
 import org.xwiki.notifications.rest.model.Notification;
 import org.xwiki.rendering.renderer.BlockRenderer;
@@ -53,6 +56,7 @@ public class InternalNotificationsRenderer
     private CompositeEventStatusManager compositeEventStatusManager;
 
     @Inject
+    @Named("context")
     private ComponentManager componentManager;
 
     @Inject
@@ -62,22 +66,26 @@ public class InternalNotificationsRenderer
     private NotificationRenderer notificationRenderer;
 
     @Inject
+    private GroupingEventManager groupingEventManager;
+
+    @Inject
     private Logger logger;
 
     /**
      * Render the notifications.
      *
-     * @param compositeEvents list of composite events to render
+     * @param events list of events to render
      * @param userId id of the current user
      * @param showReadStatus either or not include the "read" status of the events
+     * @param target the output target for notifications (e.g. rss, alert, email)
      * @return the list of notifications
      * @throws Exception if an error occurs
      */
-    public List<Notification> renderNotifications(List<CompositeEvent> compositeEvents, String userId,
+    public List<Notification> renderNotifications(List<Event> events, String userId, String target,
         boolean showReadStatus) throws Exception
     {
         List<Notification> notifications = new ArrayList<>();
-
+        List<CompositeEvent> compositeEvents = this.groupingEventManager.getCompositeEvents(events, userId, target);
         if (showReadStatus && StringUtils.isNotBlank(userId)) {
             for (CompositeEventStatus status
                     : compositeEventStatusManager.getCompositeEventStatuses(compositeEvents, userId)) {

@@ -55,7 +55,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-class CachedModelBridgeTest
+class CachedNotificationPreferenceModelBridgeTest
 {
     private final static DocumentReference USER = new DocumentReference("wiki", "XWiki", "User");
 

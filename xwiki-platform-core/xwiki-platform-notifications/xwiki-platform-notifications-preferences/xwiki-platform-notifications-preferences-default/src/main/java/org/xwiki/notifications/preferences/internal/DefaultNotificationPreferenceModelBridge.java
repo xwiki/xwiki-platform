@@ -51,13 +51,13 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
- * Default implementation for {@link ModelBridge}.
+ * Default implementation for {@link NotificationPreferenceModelBridge}.
  *
  * @version $Id$
  */
 @Component
 @Singleton
-public class DefaultModelBridge implements ModelBridge
+public class DefaultNotificationPreferenceModelBridge implements NotificationPreferenceModelBridge
 {
     private static final String EVENT_TYPE_FIELD = "eventType";
 
@@ -97,10 +97,6 @@ public class DefaultModelBridge implements ModelBridge
      */
     public static final LocalDocumentReference GLOBAL_PREFERENCES =
         new LocalDocumentReference(Arrays.asList(WIKI_SPACE, NOTIFICATIONS, CODE), "NotificationAdministration");
-
-    private static final String NOTIFICATION_START_DATE_UPDATE_COMMENT = "Update start date for the notifications.";
-
-    private static final String SET_USER_START_DATE_ERROR_MESSAGE = "Failed to set the user start date for [%s].";
 
     private static final String WIKI_PROVIDER = "wiki";
 
@@ -331,5 +327,32 @@ public class DefaultModelBridge implements ModelBridge
             throw new NotificationException(
                 String.format("Failed to save the notification preference into [%s]", targetDocument), e);
         }
+    }
+
+    @Override
+    public String getEventGroupingStrategyHint(DocumentReference userDocReference, String target)
+        throws NotificationException
+    {
+        String result = "default";
+        XWikiContext context = contextProvider.get();
+        try {
+            XWikiDocument document = context.getWiki().getDocument(userDocReference, context);
+            List<BaseObject> objects =
+                document.getXObjects(NotificationEventGroupingStrategyPreferenceDocumentInitializer.REFERENCE);
+            for (BaseObject object : objects) {
+                if (StringUtils.equalsIgnoreCase(target,
+                    object.getStringValue(NotificationEventGroupingStrategyPreferenceDocumentInitializer.FIELD_TARGET)))
+                {
+                    result = object.getStringValue(
+                        NotificationEventGroupingStrategyPreferenceDocumentInitializer.FIELD_STRATEGY);
+                    break;
+                }
+            }
+        } catch (XWikiException e) {
+            throw new NotificationException(
+                String.format("Error when trying to load the event grouping strategy preference for "
+                + "user [%s]", userDocReference), e);
+        }
+        return result;
     }
 }

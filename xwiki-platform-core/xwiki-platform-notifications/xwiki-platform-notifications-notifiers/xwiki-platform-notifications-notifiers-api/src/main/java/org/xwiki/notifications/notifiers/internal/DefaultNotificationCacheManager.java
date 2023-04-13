@@ -33,6 +33,7 @@ import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationConfiguration;
@@ -68,7 +69,7 @@ public class DefaultNotificationCacheManager implements Initializable, Disposabl
      * Cache used to store events result until the result might change (for example when a new notification is
      * created).
      */
-    private Cache<List<CompositeEvent>> longEventCache;
+    private Cache<List<Event>> longEventCache;
 
     /**
      * Cache used to store task count result until the result might change (for example when a new notification is
@@ -163,10 +164,11 @@ public class DefaultNotificationCacheManager implements Initializable, Disposabl
      * @param count if {@code true} only store the number of events; else store the objects.
      * @param events the events to store in cache. Their size will be stored too.
      */
-    public void setInCache(String cacheKey, List<CompositeEvent> events, boolean count)
+    public void setInCache(String cacheKey, List<Event> events, boolean count)
     {
         if (this.configuration.isRestCacheEnabled()) {
             if (count) {
+                // FIXME: events use to be the composite, and is now the individual events...
                 this.longCountCache.set(cacheKey, events.size());
             } else {
                 this.longEventCache.set(cacheKey, events);

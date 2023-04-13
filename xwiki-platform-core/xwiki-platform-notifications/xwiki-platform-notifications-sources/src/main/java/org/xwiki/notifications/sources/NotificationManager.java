@@ -19,14 +19,17 @@
  */
 package org.xwiki.notifications.sources;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.eventstream.Event;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.preferences.NotificationPreference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Get notifications for users.
@@ -45,7 +48,10 @@ public interface NotificationManager
      * @return the matching events for the user, could be less than expectedCount but not more
      * @throws NotificationException if error happens
      * @since 10.1RC1
+     * @deprecated Prefer using {@link #getRawEvents(String, NotificationFormat, int, Date, boolean, Date, List)} and
+     *             rely on {@link org.xwiki.notifications.GroupingEventStrategy} to get the composite events.
      */
+    @Deprecated(since = "15.4RC1")
     List<CompositeEvent> getEvents(String userId, int expectedCount) throws NotificationException;
 
     /**
@@ -58,7 +64,10 @@ public interface NotificationManager
      * @return the matching events for the user, could be less than expectedCount but not more
      * @throws NotificationException if error happens
      * @since 10.1RC1
+     * @deprecated Prefer using {@link #getRawEvents(String, NotificationFormat, int, Date, boolean, Date, List)} and
+     *             rely on {@link org.xwiki.notifications.GroupingEventStrategy} to get the composite events.
      */
+    @Deprecated(since = "15.4RC1")
     List<CompositeEvent> getEvents(String userId, int expectedCount, Date untilDate, List<String> blackList)
             throws NotificationException;
 
@@ -73,7 +82,10 @@ public interface NotificationManager
      * @return the matching events for the user, could be less than expectedCount but not more
      * @throws NotificationException if error happens
      * @since 10.1RC1
+     * @deprecated Prefer using {@link #getRawEvents(String, NotificationFormat, int, Date, boolean, Date, List)} and
+     *             rely on {@link org.xwiki.notifications.GroupingEventStrategy} to get the composite events.
      */
+    @Deprecated(since = "15.4RC1")
     List<CompositeEvent> getEvents(String userId, int expectedCount, Date untilDate, Date fromDate,
             List<String> blackList) throws NotificationException;
 
@@ -90,7 +102,10 @@ public interface NotificationManager
      * @throws NotificationException if error happens
      *
      * @since 10.1RC1
+     * @deprecated Prefer using {@link #getRawEvents(String, NotificationFormat, int, Date, boolean, Date, List)} and
+     *             rely on {@link org.xwiki.notifications.GroupingEventStrategy} to get the composite events.
      */
+    @Deprecated(since = "15.4RC1")
     List<CompositeEvent> getEvents(String userId, NotificationFormat format, int expectedCount, Date untilDate,
             Date fromDate, List<String> blackList) throws NotificationException;
 
@@ -108,11 +123,35 @@ public interface NotificationManager
      * @throws NotificationException if error happens
      * @since 12.6.1
      * @since 12.7RC1
+     * @deprecated Prefer using {@link #getRawEvents(String, NotificationFormat, int, Date, boolean, Date, List)} and
+     *             rely on {@link org.xwiki.notifications.GroupingEventStrategy} to get the composite events.
      */
+    @Deprecated(since = "15.4RC1")
     default List<CompositeEvent> getEvents(String userId, NotificationFormat format, int expectedCount, Date untilDate,
         boolean untilDateIncluded, Date fromDate, List<String> blackList) throws NotificationException
     {
         return getEvents(userId, format, expectedCount, untilDate, fromDate, blackList);
+    }
+
+    /**
+     * Return events to display as notifications concerning the specified user.
+     *
+     * @param userId id of the user
+     * @param format format of the notifications
+     * @param expectedCount the maximum events to return
+     * @param untilDate do not return events happened after this date
+     * @param untilDateIncluded true if the passed {@code untilDate} should be included
+     * @param fromDate do not return events happened before this date
+     * @param blackList list of ids of blacklisted events to not return (to not get already known events again)
+     * @return the matching events for the user, could be less than expectedCount but not more
+     * @throws NotificationException if error happens
+     * @since 15.4RC1
+     */
+    @Unstable
+    default List<Event> getRawEvents(String userId, NotificationFormat format, int expectedCount, Date untilDate,
+        boolean untilDateIncluded, Date fromDate, List<String> blackList) throws NotificationException
+    {
+        return Collections.emptyList();
     }
 
     /**

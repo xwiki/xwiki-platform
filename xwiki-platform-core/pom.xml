@@ -125,7 +125,34 @@
 
                  Single justification example:
             -->
-            
+            <revapi.differences>
+              <justification>Young API</justification>
+              <criticality>documented</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.addedToInterface</code>
+                  <new>method int java.lang.Comparable&lt;T&gt;::compareTo(T) @ org.xwiki.whatsnew.NewsSourceItem</new>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.addedToInterface</code>
+                  <new>method java.util.Optional&lt;java.lang.String&gt; org.xwiki.whatsnew.NewsSourceItem::getImageURL()</new>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <justification>Not breaking as a default value is provided</justification>
+              <criticality>documented</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.numberOfParametersChanged</code>
+                  <old>method javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, boolean, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</old>
+                  <new>method javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, boolean, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</new>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

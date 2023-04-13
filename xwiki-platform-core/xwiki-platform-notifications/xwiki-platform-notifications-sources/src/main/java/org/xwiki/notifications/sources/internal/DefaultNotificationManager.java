@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.sources.internal;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -27,8 +28,10 @@ import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.notifications.CompositeEvent;
+import org.xwiki.notifications.GroupingEventManager;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.preferences.NotificationPreference;
@@ -62,27 +65,20 @@ public class DefaultNotificationManager implements NotificationManager
     @Inject
     private DefaultNotificationParametersFactory parametersFactory;
 
+    @Inject
+    private GroupingEventManager groupingEventManager;
+
     @Override
     public List<CompositeEvent> getEvents(String userId, int expectedCount) throws NotificationException
     {
-        NotificationParameters parameters = new NotificationParameters();
-        parameters.user = documentReferenceResolver.resolve(userId);
-        parameters.format = NotificationFormat.ALERT;
-        parameters.expectedCount = expectedCount;
-        return getEvents(parameters);
+        return getEvents(userId, expectedCount, null, Collections.emptyList());
     }
 
     @Override
     public List<CompositeEvent> getEvents(String userId, int count, Date untilDate, List<String> blackList)
         throws NotificationException
     {
-        NotificationParameters parameters = new NotificationParameters();
-        parameters.user = documentReferenceResolver.resolve(userId);
-        parameters.format = NotificationFormat.ALERT;
-        parameters.expectedCount = count;
-        parameters.endDate = untilDate;
-        parameters.blackList = blackList;
-        return getEvents(parameters);
+        return getEvents(userId, NotificationFormat.ALERT, count, untilDate, true, null, blackList);
     }
 
     @Override
@@ -103,16 +99,10 @@ public class DefaultNotificationManager implements NotificationManager
     public List<CompositeEvent> getEvents(String userId, NotificationFormat format, int expectedCount, Date untilDate,
         boolean untilDateIncluded, Date fromDate, List<String> blackList) throws NotificationException
     {
-        NotificationParameters parameters = new NotificationParameters();
-        parameters.user = documentReferenceResolver.resolve(userId);
-        parameters.format = format;
-        parameters.expectedCount = expectedCount;
-        parameters.endDate = untilDate;
-        parameters.endDateIncluded = untilDateIncluded;
-        parameters.fromDate = fromDate;
-        parameters.blackList = blackList;
-
-        return getEvents(parameters);
+        NotificationParameters parameters =
+            getParameters(userId, format, expectedCount, untilDate, untilDateIncluded, fromDate, blackList);
+        List<Event> rawEvents = this.parametrizedNotificationManager.getRawEvents(parameters);
+        return this.groupingEventManager.getCompositeEvents(rawEvents, userId, parameters.groupingEventTarget);
     }
 
     @Override
@@ -123,14 +113,34 @@ public class DefaultNotificationManager implements NotificationManager
         parameters.format = NotificationFormat.ALERT;
         parameters.expectedCount = maxCount;
         parameters.onlyUnread = true;
-        return getEvents(parameters).size();
+        List<Event> rawEvents = this.parametrizedNotificationManager.getRawEvents(parameters);
+        // FIXME: not consistent with the cache count
+        return this.groupingEventManager.getCompositeEvents(rawEvents, userId, parameters.groupingEventTarget).size();
     }
 
-    private List<CompositeEvent> getEvents(NotificationParameters parameters) throws NotificationException
+    @Override
+    public List<Event> getRawEvents(String userId, NotificationFormat format, int expectedCount, Date untilDate,
+        boolean untilDateIncluded, Date fromDate, List<String> blackList) throws NotificationException
     {
-        this.parametersFactory.useUserPreferences(parameters);
+        NotificationParameters parameters =
+            getParameters(userId, format, expectedCount, untilDate, untilDateIncluded, fromDate, blackList);
+        return this.parametrizedNotificationManager.getRawEvents(parameters);
+    }
 
-        return parametrizedNotificationManager.getEvents(parameters);
+    private NotificationParameters getParameters(String userId, NotificationFormat format, int expectedCount,
+        Date untilDate, boolean untilDateIncluded, Date fromDate, List<String> blackList) throws NotificationException
+    {
+        NotificationParameters parameters = new NotificationParameters();
+        parameters.user = documentReferenceResolver.resolve(userId);
+        parameters.format = format;
+        parameters.expectedCount = expectedCount;
+        parameters.endDate = untilDate;
+        parameters.endDateIncluded = untilDateIncluded;
+        parameters.fromDate = fromDate;
+        parameters.blackList = blackList;
+
+        this.parametersFactory.useUserPreferences(parameters);
+        return parameters;
     }
 
     @Override

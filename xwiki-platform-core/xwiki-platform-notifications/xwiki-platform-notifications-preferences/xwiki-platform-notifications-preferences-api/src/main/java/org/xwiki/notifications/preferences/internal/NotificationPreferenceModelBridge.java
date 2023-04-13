@@ -35,7 +35,7 @@ import org.xwiki.notifications.preferences.NotificationPreference;
  * @since 9.2RC1
  */
 @Role
-public interface ModelBridge
+public interface NotificationPreferenceModelBridge
 {
     /**
      * Return the notifications preferences that are stored as XObjects in the user profile.
@@ -80,4 +80,19 @@ public interface ModelBridge
      */
     void saveNotificationsPreferences(DocumentReference userReference,
             List<NotificationPreference> notificationPreferences) throws NotificationException;
+
+    /**
+     * Retrieve the defined grouping strategy in user preferences for the given target.
+     *
+     * @param userDocReference the user for which to retrieve the preference
+     * @param target the target output for which the grouping strategy will be used (e.g. mail or alert)
+     * @return the hint of the {@link org.xwiki.notifications.GroupingEventStrategy} component to use
+     * @throws NotificationException in case of problem for loading the preferences
+     * @since 15.4RC1
+     */
+    default String getEventGroupingStrategyHint(DocumentReference userDocReference, String target)
+        throws NotificationException
+    {
+        return "default";
+    }
 }

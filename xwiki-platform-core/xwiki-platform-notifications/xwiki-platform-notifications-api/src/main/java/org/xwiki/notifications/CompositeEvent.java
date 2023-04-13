@@ -84,13 +84,26 @@ public class CompositeEvent
      * @param event the event to add
      * @param similarity the similarity between the event to add and the events of the composite events
      * @throws NotificationException if the addition is illegal (lower similarity for example)
+     * @deprecated now that we have a {@link GroupingEventStrategy} this method has no real reason to be used,
+     * {@link #add(Event)} should be used instead.
      */
+    @Deprecated(since = "15.4RC1")
     public void add(Event event, int similarity) throws NotificationException
     {
         if (similarity < similarityBetweenEvents) {
             throw new NotificationException("Invalid addition of an event inside a CompositeEvent");
         }
         similarityBetweenEvents = similarity;
+        this.add(event);
+    }
+
+    /**
+     * Add an event to the composite event and order it based on the dates.
+     *
+     * @param event the event to add
+     */
+    public void add(Event event)
+    {
         events.add(event);
         // Ensure the events are always sorted by date (more recent firsts)
         Collections.sort(events, (e1, e2) -> e2.getDate().compareTo(e1.getDate()));
@@ -98,7 +111,9 @@ public class CompositeEvent
 
     /**
      * @return the greatest similarity between events of the composite event
+     * @deprecated this method shouldn't be used anymore now we have a {@link GroupingEventStrategy}
      */
+    @Deprecated(since = "15.4RC1")
     public int getSimilarityBetweenEvents()
     {
         return similarityBetweenEvents;
@@ -122,6 +137,7 @@ public class CompositeEvent
         for (Event event : events) {
             // We are most interested in "advanced" event that we are in "core" events such as "create" or "update",
             // which often are the technical consequences of the real event (ex: a comment has been added).
+            // FIXME: this sounds really like a hack: we should probably instead allow to set the type.
             if (StringUtils.isNotBlank(event.getType()) && !"create".equals(event.getType())
                 && !"update".equals(event.getType())) {
                 type = event.getType();
@@ -133,6 +149,7 @@ public class CompositeEvent
     /**
      * @return the groupId of the first event of the current object
      */
+    // FIXME: To deprecate? Not so sure what it's used for...
     public String getGroupId()
     {
         return events.get(0).getGroupId();
@@ -141,6 +158,7 @@ public class CompositeEvent
     /**
      * @return the document of the first event of the current object
      */
+    // FIXME: We probably need a getDocuments
     public DocumentReference getDocument()
     {
         return events.get(0).getDocument();

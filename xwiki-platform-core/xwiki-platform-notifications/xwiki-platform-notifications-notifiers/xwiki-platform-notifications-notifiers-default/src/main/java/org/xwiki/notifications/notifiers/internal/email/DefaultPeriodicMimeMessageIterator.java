@@ -29,8 +29,10 @@ import javax.inject.Inject;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.CompositeEvent;
+import org.xwiki.notifications.GroupingEventManager;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.sources.NotificationManager;
@@ -49,6 +51,9 @@ public class DefaultPeriodicMimeMessageIterator extends AbstractMimeMessageItera
     @Inject
     private NotificationManager notificationManager;
 
+    @Inject
+    private GroupingEventManager groupingEventManager;
+
     private Date lastTrigger;
 
     @Override
@@ -63,7 +68,11 @@ public class DefaultPeriodicMimeMessageIterator extends AbstractMimeMessageItera
     @Override
     protected List<CompositeEvent> retrieveCompositeEventList(DocumentReference user) throws NotificationException
     {
-        return this.notificationManager.getEvents(this.serializer.serialize(user), NotificationFormat.EMAIL,
-            Integer.MAX_VALUE / 4, null, this.lastTrigger, Collections.emptyList());
+        String serializedUser = this.serializer.serialize(user);
+        List<Event> rawEvents =
+            this.notificationManager.getRawEvents(serializedUser, NotificationFormat.EMAIL,
+                Integer.MAX_VALUE / 4, null, false, this.lastTrigger, Collections.emptyList());
+
+        return this.groupingEventManager.getCompositeEvents(rawEvents, serializedUser, NotificationFormat.EMAIL.name());
     }
 }

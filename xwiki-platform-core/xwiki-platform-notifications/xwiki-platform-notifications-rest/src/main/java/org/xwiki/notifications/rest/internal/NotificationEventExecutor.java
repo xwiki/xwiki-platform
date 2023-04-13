@@ -49,8 +49,8 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.notifiers.internal.DefaultNotificationCacheManager;
@@ -104,7 +104,7 @@ public class NotificationEventExecutor implements Initializable, Disposable
     {
         private final String cacheKey;
 
-        private final Callable<List<CompositeEvent>> callable;
+        private final Callable<List<Event>> callable;
 
         private final Set<String> asyncIds = ConcurrentHashMap.newKeySet();
 
@@ -114,13 +114,13 @@ public class NotificationEventExecutor implements Initializable, Disposable
 
         private final DocumentReference currentUserReference;
 
-        CallableEntry(String longCacheKey, Callable<List<CompositeEvent>> callable, boolean count,
+        CallableEntry(String longCacheKey, Callable<List<Event>> callable, boolean count,
             DocumentReference currentUserReference)
         {
             this(longCacheKey, callable, count, currentUserReference, null);
         }
 
-        CallableEntry(String longCacheKey, Callable<List<CompositeEvent>> callable, boolean count,
+        CallableEntry(String longCacheKey, Callable<List<Event>> callable, boolean count,
             DocumentReference currentUserReference, String asyncId)
         {
             this.cacheKey = longCacheKey;
@@ -191,7 +191,7 @@ public class NotificationEventExecutor implements Initializable, Disposable
                 xcontextProvider.get().setUserReference(this.currentUserReference);
 
                 // Execute the callable
-                List<CompositeEvent> events = this.callable.call();
+                List<Event> events = this.callable.call();
                 notificationCacheManager.setInCache(this.cacheKey, events, this.count);
 
                 if (this.count) {
@@ -301,7 +301,7 @@ public class NotificationEventExecutor implements Initializable, Disposable
      *         </ul>
      * @throws Exception when failing to execute the passed {@link Callable}
      */
-    public Object submit(String cacheKey, Callable<List<CompositeEvent>> callable, boolean async, boolean count)
+    public Object submit(String cacheKey, Callable<List<Event>> callable, boolean async, boolean count)
         throws Exception
     {
         Object cached = this.notificationCacheManager.getFromCache(cacheKey, count);
@@ -331,7 +331,7 @@ public class NotificationEventExecutor implements Initializable, Disposable
         }
     }
 
-    private void submit(String longCacheKey, Callable<List<CompositeEvent>> callable, boolean count, String asyncId)
+    private void submit(String longCacheKey, Callable<List<Event>> callable, boolean count, String asyncId)
     {
         synchronized (this.queue) {
             CallableEntry entry = this.queue.get(longCacheKey);

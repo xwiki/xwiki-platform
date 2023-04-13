@@ -21,6 +21,7 @@ package org.xwiki.notifications.preferences.internal;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +29,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -40,8 +42,8 @@ import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.internal.cache.UnboundedEntityCacheManager;
 
 /**
- * Wrap the default {@link ModelBridge} to store in the execution context the notification preferences to avoid fetching
- * them several time during the same HTTP request.
+ * Wrap the default {@link NotificationPreferenceModelBridge} to store in the execution context the notification
+ * preferences to avoid fetching them several time during the same HTTP request.
  *
  * @version $Id$
  * @since 9.5RC1
@@ -49,12 +51,13 @@ import org.xwiki.notifications.preferences.internal.cache.UnboundedEntityCacheMa
 @Component
 @Named("cached")
 @Singleton
-public class CachedModelBridge implements ModelBridge, Initializable
+public class CachedNotificationPreferenceModelBridge implements NotificationPreferenceModelBridge, Initializable
 {
     private static final String CACHE_NAME = "NotificationsPreferences";
+    private static final String EVENT_GROUPING_CACHE_NAME = "EventGroupingNotificationsPreferences";
 
     @Inject
-    private ModelBridge modelBridge;
+    private NotificationPreferenceModelBridge notificationPreferenceModelBridge;
 
     @Inject
     private UnboundedEntityCacheManager cacheManager;
@@ -63,12 +66,16 @@ public class CachedModelBridge implements ModelBridge, Initializable
     private EntityReferenceFactory referenceFactory;
 
     private Map<EntityReference, List<NotificationPreference>> preferenceCache;
+    private Map<Pair<EntityReference, String>, String> eventGroupingStrategyCache;
 
     @Override
     public void initialize() throws InitializationException
     {
         // TODO: optimize the invalidation not not be on every user document modification
         this.preferenceCache = this.cacheManager.createCache(CACHE_NAME, true);
+
+        // FIXME: should probably be a cache, but it cannot be created with UnboundedEntityCacheManager
+        this.eventGroupingStrategyCache = new HashMap<>();
     }
 
     @Override
@@ -84,7 +91,7 @@ public class CachedModelBridge implements ModelBridge, Initializable
             return preferences;
         }
 
-        preferences = this.modelBridge.getNotificationsPreferences(userReference);
+        preferences = this.notificationPreferenceModelBridge.getNotificationsPreferences(userReference);
 
         this.preferenceCache.put(this.referenceFactory.getReference(userReference), preferences);
 
@@ -104,7 +111,7 @@ public class CachedModelBridge implements ModelBridge, Initializable
             return preferences;
         }
 
-        preferences = this.modelBridge.getNotificationsPreferences(wikiReference);
+        preferences = this.notificationPreferenceModelBridge.getNotificationsPreferences(wikiReference);
 
         this.preferenceCache.put(this.referenceFactory.getReference(wikiReference), preferences);
 
@@ -114,14 +121,14 @@ public class CachedModelBridge implements ModelBridge, Initializable
     @Override
     public void setStartDateForUser(DocumentReference userReference, Date startDate) throws NotificationException
     {
-        this.modelBridge.setStartDateForUser(userReference, startDate);
+        this.notificationPreferenceModelBridge.setStartDateForUser(userReference, startDate);
     }
 
     @Override
     public void saveNotificationsPreferences(DocumentReference userReference,
         List<NotificationPreference> notificationPreferences) throws NotificationException
     {
-        this.modelBridge.saveNotificationsPreferences(userReference, notificationPreferences);
+        this.notificationPreferenceModelBridge.saveNotificationsPreferences(userReference, notificationPreferences);
     }
 
     /**
@@ -133,5 +140,19 @@ public class CachedModelBridge implements ModelBridge, Initializable
     public void invalidatePreference(EntityReference reference)
     {
         this.preferenceCache.remove(reference);
+        this.eventGroupingStrategyCache.remove(reference);
+    }
+
+    @Override
+    public String getEventGroupingStrategyHint(DocumentReference userDocReference, String target)
+        throws NotificationException
+    {
+        String strategyHint = this.eventGroupingStrategyCache.get(Pair.of(userDocReference, target));
+        if (strategyHint == null) {
+            strategyHint =
+                this.notificationPreferenceModelBridge.getEventGroupingStrategyHint(userDocReference, target);
+            this.eventGroupingStrategyCache.put(Pair.of(userDocReference, target), strategyHint);
+        }
+        return strategyHint;
     }
 }

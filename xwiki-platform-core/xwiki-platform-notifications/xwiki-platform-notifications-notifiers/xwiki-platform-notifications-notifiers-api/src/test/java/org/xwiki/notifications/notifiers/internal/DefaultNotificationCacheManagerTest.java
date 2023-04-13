@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.LRUCacheConfiguration;
+import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
@@ -107,8 +108,8 @@ public class DefaultNotificationCacheManagerTest
     @Test
     public void setInCache()
     {
-        List<CompositeEvent> events = Arrays.asList(mock(CompositeEvent.class), mock(CompositeEvent.class),
-            mock(CompositeEvent.class));
+        List<Event> events = Arrays.asList(mock(Event.class), mock(Event.class),
+            mock(Event.class));
         this.defaultNotificationCacheManager.setInCache("mykey", events, false);
         verify(this.longEventCache).set("mykey", events);
         verify(this.longCountCache, never()).set("mykey", events);

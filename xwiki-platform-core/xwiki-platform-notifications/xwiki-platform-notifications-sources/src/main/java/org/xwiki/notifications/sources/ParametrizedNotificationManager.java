@@ -19,11 +19,14 @@
  */
 package org.xwiki.notifications.sources;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.eventstream.Event;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.stability.Unstable;
 
 /**
  * A notification manager that work only with the parameters given to it (it will not look at the current user
@@ -40,6 +43,23 @@ public interface ParametrizedNotificationManager
      * @param parameters parameters to take care of
      * @return a list of the corresponding composite events
      * @throws NotificationException if an error occurs
+     * @deprecated Prefer using {@link #getRawEvents(NotificationParameters)} and rely on
+     *             {@link org.xwiki.notifications.GroupingEventManager} to obtain the composite events.
      */
+    @Deprecated(since = "15.4RC1")
     List<CompositeEvent> getEvents(NotificationParameters parameters) throws NotificationException;
+
+    /**
+     * Get the events matching the given parameters.
+     *
+     * @param parameters parameters to take care of
+     * @return a list of the corresponding events
+     * @throws NotificationException if an error occurs
+     * @since 15.4RC1
+     */
+    @Unstable
+    default List<Event> getRawEvents(NotificationParameters parameters) throws NotificationException
+    {
+        return Collections.emptyList();
+    }
 }

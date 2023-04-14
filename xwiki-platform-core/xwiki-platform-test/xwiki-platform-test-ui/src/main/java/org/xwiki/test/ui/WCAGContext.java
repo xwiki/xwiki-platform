@@ -66,7 +66,8 @@ public class WCAGContext
 
             // WCAG 2.0 Level A & AA Rules
             entry("area-alt", true),
-            entry("aria-allowed-attr", false), // Set to true once the build doesn't fail this rule anymore
+            // Set to true once the build doesn't fail this rule anymore
+            entry("aria-allowed-attr", false),
             entry("aria-command-name", true),
             entry("aria-hidden-body", true),
             entry("aria-hidden-focus", true),
@@ -74,7 +75,8 @@ public class WCAGContext
             entry("aria-meter-name", true),
             entry("aria-progressbar-name", true),
             entry("aria-required-attr", true),
-            entry("aria-required-children", false), // Set to true once the build doesn't fail this rule anymore
+            // Set to true once the build doesn't fail this rule anymore
+            entry("aria-required-children", false),
             entry("aria-required-parent", true),
             entry("aria-roledescription", true),
             entry("aria-roles", true),
@@ -86,27 +88,38 @@ public class WCAGContext
             entry("blink", true),
             entry("button-name", true),
             entry("bypass", true),
-            entry("color-contrast", false), // Set to true once the build doesn't fail this rule anymore
+            // Set to true once the build doesn't fail this rule anymore
+            entry("color-contrast", false),
             entry("definition-list", true),
-            entry("dlitem", false), // Set to true once the build doesn't fail this rule anymore
+            // Set to true once the build doesn't fail this rule anymore
+            entry("dlitem", false),
             entry("document-title", true),
-            entry("duplicate-id-active", false), // Set to true once the build doesn't fail this rule anymore
-            entry("duplicate-id-aria", false), // Set to true once the build doesn't fail this rule anymore
-            entry("duplicate-id", false), // Set to true once the build doesn't fail this rule anymore
+            // Set to true once the build doesn't fail this rule anymore
+            entry("duplicate-id-active", false),
+            // Set to true once the build doesn't fail this rule anymore
+            entry("duplicate-id-aria", false),
+            // Set to true once the build doesn't fail this rule anymore
+            entry("duplicate-id", false),
             entry("form-field-multiple-labels", true),
             entry("frame-focusable-content", true),
             entry("frame-title-unique", true),
-            entry("frame-title", false), // Set to true once the build doesn't fail this rule anymore
+            // Set to true once the build doesn't fail this rule anymore
+            entry("frame-title", false),
             entry("html-has-lang", true),
             entry("html-lang-valid", true),
             entry("html-xml-lang-mismatch", true),
-            entry("image-alt", false), // Set to true once the build doesn't fail this rule anymore
+            // Set to true once the build doesn't fail this rule anymore
+            entry("image-alt", false),
             entry("input-button-name", true),
             entry("input-image-alt", true),
-            entry("label", false), // Set to true once the build doesn't fail this rule anymore
-            entry("link-in-text-block", false), // Set to true once the build doesn't fail this rule anymore
-            entry("link-name", false), // Set to true once the build doesn't fail this rule anymore
-            entry("list", false), // Set to true once the build doesn't fail this rule anymore
+            // Set to true once the build doesn't fail this rule anymore
+            entry("label", false),
+            // Set to true once the build doesn't fail this rule anymore
+            entry("link-in-text-block", false),
+            // Set to true once the build doesn't fail this rule anymore
+            entry("link-name", false),
+            // Set to true once the build doesn't fail this rule anymore
+            entry("list", false),
             entry("listitem", true),
             entry("marquee", true),
             entry("meta-refresh", true),
@@ -116,7 +129,8 @@ public class WCAGContext
             entry("object-alt", true),
             entry("role-img-alt", true),
             entry("scrollable-region-focusable", true),
-            entry("select-name", false), // Set to true once the build doesn't fail this rule anymore
+            // Set to true once the build doesn't fail this rule anymore
+            entry("select-name", false),
             entry("server-side-image-map", true),
             entry("svg-img-alt", true),
             entry("td-headers-attr", true),

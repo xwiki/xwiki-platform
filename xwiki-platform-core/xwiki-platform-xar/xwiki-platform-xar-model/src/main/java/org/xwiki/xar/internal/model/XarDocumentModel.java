@@ -176,6 +176,12 @@ public class XarDocumentModel
      */
     public static final String ELEMENT_REVISION_REQUIRED_RIGHTS = "requiredRights";
 
+    /**
+     * @since 15.3RC1
+     */
+    public static final String ELEMENT_REVISION_REQUIRED_RIGHTS_ACTIVATED = "requiredRightsActivated";
+
+
     public static final String ELEMENT_REVISION_COMMENT = "comment";
 
     public static final String ELEMENT_REVISION_MINOR = "minorEdit";

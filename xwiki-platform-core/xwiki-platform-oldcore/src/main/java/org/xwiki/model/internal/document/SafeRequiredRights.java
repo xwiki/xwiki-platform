@@ -62,4 +62,10 @@ public class SafeRequiredRights implements RequiredRights
     {
         return this.requiredRights.has(right);
     }
+
+    @Override
+    public boolean activated()
+    {
+        return this.requiredRights.activated();
+    }
 }

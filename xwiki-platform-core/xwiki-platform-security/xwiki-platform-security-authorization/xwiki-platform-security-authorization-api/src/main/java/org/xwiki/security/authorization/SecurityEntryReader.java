@@ -19,6 +19,7 @@
  */
 package org.xwiki.security.authorization;
 
+import java.util.Optional;
 import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
@@ -44,5 +45,11 @@ public interface SecurityEntryReader
      */
     SecurityRuleEntry read(SecurityReference entityReference) throws AuthorizationException;
 
-    Set<Right> requiredRights(SecurityReference entity) throws AuthorizationException;
+    /**
+     * @param entity the entity to get required rights from
+     * @return {@link Optional#empty()} if required rights are not applicable for the entity (i.e., it is not a
+     *     document, or the required rights are not activated on the document), the set of required rights otherwise
+     * @throws AuthorizationException in case of right issue when access the required rights
+     */
+    Optional<Set<Right>> requiredRights(SecurityReference entity) throws AuthorizationException;
 }

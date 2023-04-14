@@ -79,7 +79,6 @@ public class DefaultAuthorizationSettler extends AbstractAuthorizationSettler
         // The same behavior as the old implementation. I.e., an allow means implicit deny for everyone else.
         for (Right right : allowed) {
             if (access.get(right) == UNDETERMINED) {
-                // TODO: understand why this rights are denied now that the required rights are set! 
                 access.deny(right);
             }
         }

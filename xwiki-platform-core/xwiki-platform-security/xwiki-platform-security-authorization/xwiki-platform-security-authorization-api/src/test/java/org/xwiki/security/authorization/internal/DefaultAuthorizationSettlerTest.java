@@ -169,7 +169,7 @@ class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTestCase
 
         assertAccess("When no rules are defined, return default access for main wiki user on main wiki doc",
             xuserRef, xdocRef.getParentSecurityReference().getParentSecurityReference(), defaultAccess,
-            authorizationSettler.settle(xuserRef, Collections.<GroupSecurityReference>emptyList(), emptyXdocRules));
+            authorizationSettler.settle(xuserRef, Collections.<GroupSecurityReference>emptyList(), emptyXdocRules, null));
 
         assertAccess("When no rules are defined, deny all access for local wiki user on main wiki doc",
             userRef, xdocRef.getParentSecurityReference().getParentSecurityReference(), denyAllAccess,

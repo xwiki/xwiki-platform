@@ -349,6 +349,10 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
                 this.writer.writeElement(XarDocumentModel.ELEMENT_REVISION_ORIGINALMEDATAAUTHOR,
                     (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_REVISION_ORIGINALMETADATA_AUTHOR));
             }
+            if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_REVISION_REQUIRED_RIGHTS_ACTIVATED)) {
+                this.writer.writeElement(XarDocumentModel.ELEMENT_REVISION_REQUIRED_RIGHTS_ACTIVATED,
+                    toString(parameters.get(XWikiWikiDocumentFilter.PARAMETER_REVISION_REQUIRED_RIGHTS_ACTIVATED)));
+            }
             if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_REVISION_REQUIRED_RIGHTS)) {
                 this.writer.writeElement(XarDocumentModel.ELEMENT_REVISION_REQUIRED_RIGHTS,
                     (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_REVISION_REQUIRED_RIGHTS));

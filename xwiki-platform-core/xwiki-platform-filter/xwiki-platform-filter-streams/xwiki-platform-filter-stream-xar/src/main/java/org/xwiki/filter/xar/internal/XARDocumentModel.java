@@ -72,6 +72,8 @@ public class XARDocumentModel extends XarDocumentModel
                 new EventParameter(XWikiWikiDocumentFilter.PARAMETER_REVISION_EFFECTIVEMETADATA_AUTHOR));
             put(ELEMENT_REVISION_ORIGINALMEDATAAUTHOR,
                 new EventParameter(XWikiWikiDocumentFilter.PARAMETER_REVISION_ORIGINALMETADATA_AUTHOR));
+            put(ELEMENT_REVISION_REQUIRED_RIGHTS_ACTIVATED,
+                new EventParameter(XWikiWikiDocumentFilter.PARAMETER_REVISION_REQUIRED_RIGHTS_ACTIVATED));
             put(ELEMENT_REVISION_REQUIRED_RIGHTS,
                 new EventParameter(XWikiWikiDocumentFilter.PARAMETER_REVISION_REQUIRED_RIGHTS));
             put(ELEMENT_REVISION_COMMENT, new EventParameter(XWikiWikiDocumentFilter.PARAMETER_REVISION_COMMENT));

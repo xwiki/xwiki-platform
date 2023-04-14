@@ -37,24 +37,16 @@ import org.xwiki.security.authorization.SecurityAccess;
  */
 public class XWikiSecurityAccess implements SecurityAccess
 {
-    /**
-     * The default access.
-     */
+    /** The default access. */
     private static XWikiSecurityAccess defaultAccess;
 
-    /**
-     * The default access size. Check to update defaultAccess if a new Right is added.
-     */
+    /** The default access size. Check to update defaultAccess if a new Right is added. */
     private static int defaultAccessSize;
 
-    /**
-     * Allowed rights.
-     */
+    /** Allowed rights. */
     protected RightSet allowed = new RightSet();
 
-    /**
-     * Denied rights.
-     */
+    /** Denied rights. */
     protected RightSet denied = new RightSet();
 
     private Set<Right> requiredRights = new HashSet<>();
@@ -85,7 +77,6 @@ public class XWikiSecurityAccess implements SecurityAccess
 
     /**
      * Set the state of a right in this access.
-     *
      * @param right the right to set.
      * @param state the state to set the right to.
      */
@@ -108,7 +99,6 @@ public class XWikiSecurityAccess implements SecurityAccess
 
     /**
      * Allow this right.
-     *
      * @param right the right to allow.
      */
     void allow(Right right)
@@ -119,7 +109,6 @@ public class XWikiSecurityAccess implements SecurityAccess
 
     /**
      * Deny this right.
-     *
      * @param right the right to deny.
      */
     void deny(Right right)
@@ -130,7 +119,6 @@ public class XWikiSecurityAccess implements SecurityAccess
 
     /**
      * Clear this right, it will return to the undetermined state.
-     *
      * @param right the right to clear.
      */
     void clear(Right right)
@@ -147,10 +135,8 @@ public class XWikiSecurityAccess implements SecurityAccess
             return RuleState.DENY;
         }
 
-        // TODO: find a way to activate the required right (e.g., set a flag on the doc the first time a required 
-        //  rights is saved?)
         if (this.allowed.contains(resolvedRight)) {
-            if (right.isWithRequiredRights()) {
+            if (this.requiredRights != null && right.isWithRequiredRights()) {
                 return getWithRequiredRights(resolvedRight);
             } else {
                 return RuleState.ALLOW;

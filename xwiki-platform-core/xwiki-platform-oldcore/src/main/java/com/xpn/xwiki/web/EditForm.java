@@ -102,6 +102,8 @@ public class EditForm extends XWikiForm
 
     private String hidden;
     
+    private String activateRequiredRights;
+    
     private ObjectPolicyType objectPolicy;
 
     private Map<String, List<Integer>> objectsToRemove;
@@ -140,6 +142,8 @@ public class EditForm extends XWikiForm
         setObjectsToRemove(request.getParameterValues("deletedObjects"));
         setObjectsToAdd(request.getParameterValues("addedObjects"));
         setTemporaryUploadedFiles(request.getParameterValues("uploadedFiles"));
+        
+        setActivateRequiredRights(request.getParameter("activateRequiredRights"));
         if (request.getParameterMap().containsKey("updateRequiredRights")) {
             setRequiredRights(request.getParameterValues("requiredRights"));
         }
@@ -469,6 +473,11 @@ public class EditForm extends XWikiForm
         }
     }
 
+    private void setActivateRequiredRights(String activateRequiredRights)
+    {
+        this.activateRequiredRights = activateRequiredRights;
+    }
+
     private void setRequiredRights(String[] requiredRights)
     {
         // TODO: add more control on who can add/remove the rights? e.g. should I have script right to add script?
@@ -491,6 +500,12 @@ public class EditForm extends XWikiForm
     public List<String> getTemporaryUploadedFiles()
     {
         return temporaryUploadedFiles;
+    }
+
+    @Unstable
+    public String getActivateRequiredRights()
+    {
+        return this.activateRequiredRights;
     }
 
     @Unstable

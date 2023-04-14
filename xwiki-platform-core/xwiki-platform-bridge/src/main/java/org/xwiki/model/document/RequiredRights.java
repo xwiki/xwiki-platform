@@ -48,4 +48,9 @@ public interface RequiredRights
      * @return {@code true} of the right is part of the required rights, {@code false} otherwise
      */
     boolean has(Right right);
+
+    /**
+     * @return {@code true} when the required rights are activated for the document
+     */
+    boolean activated();
 }

@@ -188,6 +188,12 @@ public interface WikiDocumentFilter
 
     /**
      * @type {@link String}
+     * @since 15.3RC1
+     */
+    String PARAMETER_REVISION_REQUIRED_RIGHTS_ACTIVATED = "revision_required_rights_activated";
+
+    /**
+     * @type {@link String}
      * @deprecated since 14.0RC1, use {@link #PARAMETER_REVISION_EFFECTIVEMETADATA_AUTHOR} instead
      */
     @Deprecated

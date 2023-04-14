@@ -221,6 +221,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     private static final String CLOSE_HTML_MACRO = "{{/html}}";
 
+    private boolean requiredRightsActivated;
+
     /**
      * An attachment waiting to be deleted at next document save.
      *
@@ -4163,6 +4165,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             setHidden("1".equals(eform.getHidden()));
         }
 
+        if (Objects.equals(eform.getActivateRequiredRights(), "1")) {
+            this.requiredRightsActivated = true;
+        }
+        
         if (eform.getRequiredRights() != null) {
             ContextualAuthorizationManager authorizationManager =
                 Utils.getComponent(ContextualAuthorizationManager.class);
@@ -4174,7 +4180,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                     newRights.add(right);
                 }
             }
-            // TODO: should not be possible to update without enough rights
             setRequiredRights(new DefaultRequiredRights(this, newRights));
         }
     }
@@ -9486,6 +9491,29 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             UserReference userReference = userStringToUserReference(serializedUserReference);
             this.authors.setOriginalMetadataAuthor(userReference);
         }
+    }
+
+    /**
+     * 
+     * @return
+     * @since 15.3RC1
+     */
+    @Unstable
+    public boolean getRequiredRightsActivated()
+    {
+        return this.requiredRightsActivated;
+    }
+
+    /**
+     * 
+     * @param requiredRightsActivated
+     * @return
+     * @since 15.3RC1
+     */
+    @Unstable
+    public void setRequiredRightsActicated(boolean requiredRightsActivated)
+    {
+        this.requiredRightsActivated = requiredRightsActivated;
     }
 
     /**

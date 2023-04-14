@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -36,7 +37,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.document.RequiredRights;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
@@ -203,9 +203,6 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
         }
 
         // Get standard rules
-        
-        
-        // TODO: check if I can add the required rights around here??
         Collection<SecurityRule> rules = getSecurityRules(documentReference, classReference, wikiReference);
 
         // Add extras rules
@@ -233,19 +230,18 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
     }
 
     @Override
-    public Set<Right> requiredRights(SecurityReference entity) throws AuthorizationException
+    public Optional<Set<Right>> requiredRights(SecurityReference entity) throws AuthorizationException
     {
         switch (entity.getType()) {
             case WIKI:
             case SPACE:
-                return Set.of();
+                return Optional.empty();
             case DOCUMENT:
                 XWikiDocument document = getDocument(new DocumentReference(entity));
-                if (document == null) {
-                    return Set.of();
+                if (document == null || !document.getRequiredRightsActivated()) {
+                    return Optional.empty();
                 }
-                RequiredRights requiredRights = document.getRequiredRights();
-                return requiredRights.getRights();
+                return Optional.ofNullable(document.getRequiredRights().getRights());
             default:
                 throw new EntityTypeNotSupportedException(entity.getType(), this);
         }

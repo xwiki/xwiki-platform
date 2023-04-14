@@ -70,6 +70,8 @@ public class XWikiRCSNodeInfo extends AbstractSimpleClass implements Comparable<
      */
     private SoftReference<XWikiRCSNodeContent> contentRef;
 
+    private boolean requiredRightsActivated;
+    
     private Set<Right> requiredRights;
 
     /**
@@ -156,6 +158,28 @@ public class XWikiRCSNodeInfo extends AbstractSimpleClass implements Comparable<
     public Set<Right> getRequiredRights()
     {
         return this.requiredRights;
+    }
+
+    /**
+     * 
+     * @return
+     * @since 15.3RC1
+     */
+    @Unstable
+    public boolean isRequiredRightsActivated()
+    {
+        return this.requiredRightsActivated;
+    }
+
+    /**
+     * 
+     * @param requiredRightsActivated
+     * @since 15.3RC1
+     */
+    @Unstable
+    public void setRequiredRightsActivated(boolean requiredRightsActivated)
+    {
+        this.requiredRightsActivated = requiredRightsActivated;
     }
 
     /**

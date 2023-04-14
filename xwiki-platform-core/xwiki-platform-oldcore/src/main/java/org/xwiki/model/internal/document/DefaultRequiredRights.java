@@ -73,6 +73,12 @@ public class DefaultRequiredRights implements RequiredRights
     }
 
     @Override
+    public boolean activated()
+    {
+        return this.document.getRequiredRightsActivated();
+    }
+
+    @Override
     public void setRights(Set<Right> newRights)
     {
         this.requiredRights.clear();

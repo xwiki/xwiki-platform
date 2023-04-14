@@ -62,7 +62,7 @@ public class PrioritizingAuthorizationSettler extends AbstractAuthorizationSettl
 
     @Override
     protected XWikiSecurityAccess settle(UserSecurityReference user, Collection<GroupSecurityReference> groups,
-        SecurityRuleEntry entry, Policies policies)
+        SecurityRuleEntry entry, Policies policies, Set<Right> requiredRights)
     {
         XWikiSecurityAccess access = new XWikiSecurityAccess();
         Map<Right, Integer> priorities = new RightMap<Integer>();

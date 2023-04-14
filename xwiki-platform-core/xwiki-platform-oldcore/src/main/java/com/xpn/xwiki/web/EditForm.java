@@ -140,7 +140,7 @@ public class EditForm extends XWikiForm
         setObjectsToRemove(request.getParameterValues("deletedObjects"));
         setObjectsToAdd(request.getParameterValues("addedObjects"));
         setTemporaryUploadedFiles(request.getParameterValues("uploadedFiles"));
-        if (request.getParameterMap().containsKey("requiredRights")) {
+        if (request.getParameterMap().containsKey("updateRequiredRights")) {
             setRequiredRights(request.getParameterValues("requiredRights"));
         }
     }

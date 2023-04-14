@@ -312,34 +312,39 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
     </dl>
   #end
 
-## TODO: extract to a UIX?
 #if ("$!request.section" == '' || $request.section == 'PageRights')
+  #set ($discard = $xwiki.jsfx.use('rightsUI.js'))
   <h2>TODO: Required Rights</h2>
   <form action="$escapetool.xml($xwiki.getURL($targetDocument, 'saveandcontinue'))" class="xform" method="post" name="form_name1">
     <dl>
       <dt>
-        <label for="input_id1">Script</label>
+        <label for="scriptRequiredRight">Script</label>
       </dt>
       <dd>
-        <input id="input_id1" name="requiredRights" type="checkbox" value="script"
+        <input name="initialValueScriptRequiredRight" value="$targetDocument.requiredRights.has('script')" type="hidden" disabled/>
+        <input id="scriptRequiredRight" name="requiredRights" type="checkbox" value="script"
           #if($targetDocument.requiredRights.has('script'))checked#end
-          #if(!$services.security.authorization.hasAccess('script'))disabled#end
+          #if(!$services.security.authorization.hasAccess($services.security.authorization.optOutRequiredRights('script'), $xcontext.userReference, $targetDocument))disabled#end
         />
+        <span class="box warningmessage hidden">Removing this mandatory right may result in breakage. Please make sure you understand the consequences, before saving.</span>
       </dd>
     </dl>
     <dl>
       <dt>
-        <label for="input_id2">Programming</label>
+        <label for="programmingRequiredRight">Programming</label>
       </dt>
       <dd>
-        <input id="input_id2" name="requiredRights" type="checkbox" value="programming"
+        <input name="initialValueProgrammingRequiredRight" value="$targetDocument.requiredRights.has('programming')" type="hidden" disabled/>
+        <input id="programmingRequiredRight" name="requiredRights" type="checkbox" value="programming"
            #if($targetDocument.requiredRights.has('programming'))checked#end
-           #if(!$services.security.authorization.hasAccess('programming'))disabled#end
+           #if(!$services.security.authorization.hasAccess($services.security.authorization.optOutRequiredRights('programming'), $xcontext.userReference, $targetDocument))disabled#end
         />
+        <span class="box warningmessage hidden">Removing this mandatory right may result in breakage. Please make sure you understand the consequences, before saving.</span>
       </dd>
     </dl>
     <p>
       <span class="buttonwrapper">
+        <input type="hidden" name="updateRequiredRights" value="1">
         <input class="button" type="submit" value="Button"/>
       </span>
     </p>

@@ -37,16 +37,24 @@ import org.xwiki.security.authorization.SecurityAccess;
  */
 public class XWikiSecurityAccess implements SecurityAccess
 {
-    /** The default access. */
+    /**
+     * The default access.
+     */
     private static XWikiSecurityAccess defaultAccess;
 
-    /** The default access size. Check to update defaultAccess if a new Right is added. */
+    /**
+     * The default access size. Check to update defaultAccess if a new Right is added.
+     */
     private static int defaultAccessSize;
 
-    /** Allowed rights. */
+    /**
+     * Allowed rights.
+     */
     protected RightSet allowed = new RightSet();
 
-    /** Denied rights. */
+    /**
+     * Denied rights.
+     */
     protected RightSet denied = new RightSet();
 
     private Set<Right> requiredRights = new HashSet<>();
@@ -77,6 +85,7 @@ public class XWikiSecurityAccess implements SecurityAccess
 
     /**
      * Set the state of a right in this access.
+     *
      * @param right the right to set.
      * @param state the state to set the right to.
      */
@@ -99,6 +108,7 @@ public class XWikiSecurityAccess implements SecurityAccess
 
     /**
      * Allow this right.
+     *
      * @param right the right to allow.
      */
     void allow(Right right)
@@ -109,6 +119,7 @@ public class XWikiSecurityAccess implements SecurityAccess
 
     /**
      * Deny this right.
+     *
      * @param right the right to deny.
      */
     void deny(Right right)
@@ -119,6 +130,7 @@ public class XWikiSecurityAccess implements SecurityAccess
 
     /**
      * Clear this right, it will return to the undetermined state.
+     *
      * @param right the right to clear.
      */
     void clear(Right right)
@@ -130,36 +142,32 @@ public class XWikiSecurityAccess implements SecurityAccess
     @Override
     public RuleState get(Right right)
     {
-        if (denied.contains(right)) {
+        Right resolvedRight = Right.toRight(right.getName());
+        if (this.denied.contains(resolvedRight)) {
             return RuleState.DENY;
         }
-        
+
         // TODO: find a way to activate the required right (e.g., set a flag on the doc the first time a required 
         //  rights is saved?)
-        if(!requiredRights.isEmpty()) {
-            if (allowed.contains(right)) {
-                if (right.equals(Right.EDIT)) {
-                    if (this.allowed.containsAll(this.requiredRights)) {
-                        return RuleState.ALLOW;
-                    } else {
-                        return RuleState.DENY;
-                    }
-                } else if (right.equals(Right.SCRIPT) || right.equals(Right.PROGRAM)) {
-                    if (this.requiredRights.contains(right)) {
-                        return RuleState.ALLOW;
-                    } else {
-                        return RuleState.DENY;
-                    }
-                } else {
-                    return RuleState.ALLOW;
-                }
-            }
-        } else {
-            if (allowed.contains(right)) {
+        if (this.allowed.contains(resolvedRight)) {
+            if (right.isWithRequiredRights()) {
+                return getWithRequiredRights(resolvedRight);
+            } else {
                 return RuleState.ALLOW;
             }
         }
         return RuleState.UNDETERMINED;
+    }
+
+    private RuleState getWithRequiredRights(Right right)
+    {
+        if (right.equals(Right.EDIT)) {
+            return this.allowed.containsAll(this.requiredRights) ? RuleState.ALLOW : RuleState.DENY;
+        } else if (right.equals(Right.SCRIPT) || right.equals(Right.PROGRAM)) {
+            return this.requiredRights.contains(right) ? RuleState.ALLOW : RuleState.DENY;
+        } else {
+            return RuleState.ALLOW;
+        }
     }
 
     @Override
@@ -215,9 +223,9 @@ public class XWikiSecurityAccess implements SecurityAccess
             }
             b.append(r).append(": ").append(get(r));
         }
-        
+
         // TODO: add the required rights
-        
+
         return b.toString();
     }
 }

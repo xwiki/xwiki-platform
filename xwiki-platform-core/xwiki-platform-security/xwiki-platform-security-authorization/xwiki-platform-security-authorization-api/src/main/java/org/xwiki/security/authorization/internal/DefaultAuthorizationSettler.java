@@ -20,7 +20,9 @@
 package org.xwiki.security.authorization.internal;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Singleton;
 
@@ -49,16 +51,18 @@ public class DefaultAuthorizationSettler extends AbstractAuthorizationSettler
 {
     @Override
     protected XWikiSecurityAccess settle(UserSecurityReference user, Collection<GroupSecurityReference> groups,
-        SecurityRuleEntry entry, Policies policies)
+        SecurityRuleEntry entry, Policies policies, Set<Right> requiredRights)
     {
         Set<Right> enabledRights = Right.getEnabledRights(entry.getReference().getSecurityType());
         Set<Right> fromUser = new RightSet();
         Set<Right> allowed = new RightSet();
 
         XWikiSecurityAccess access = new XWikiSecurityAccess();
+        access.setRequiredRights(requiredRights);
 
         // Evaluate rules from current entity
-        for (Right right : enabledRights) {
+        List<Right> collect = enabledRights.stream().map(Right::optOutRequiredRights).collect(Collectors.toList());
+        for (Right right : collect) {
             for (SecurityRule rule : entry.getRules()) {
                 if (rule.match(right)) {
                     if (rule.getState() == ALLOW) {
@@ -75,6 +79,7 @@ public class DefaultAuthorizationSettler extends AbstractAuthorizationSettler
         // The same behavior as the old implementation. I.e., an allow means implicit deny for everyone else.
         for (Right right : allowed) {
             if (access.get(right) == UNDETERMINED) {
+                // TODO: understand why this rights are denied now that the required rights are set! 
                 access.deny(right);
             }
         }

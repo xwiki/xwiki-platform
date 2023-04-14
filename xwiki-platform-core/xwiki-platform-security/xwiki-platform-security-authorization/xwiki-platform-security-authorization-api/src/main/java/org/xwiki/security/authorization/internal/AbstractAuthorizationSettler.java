@@ -207,7 +207,7 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
                     reference = entry.getReference();
                 }
                 // Compute access of this level and merge it with previous access result
-                merge(settle(user, groups, entry, policies), access, entry.getReference(), policies);
+                merge(settle(user, groups, entry, policies, requiredRights), access, entry.getReference(), policies);
             }
             if (reference == null && entry.getReference().getType() == EntityType.WIKI) {
                 reference = entry.getReference();
@@ -248,14 +248,16 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
 
     /**
      * Compute the access of a particular document hierarchy level.
+     *
      * @param user The user.
      * @param groups The groups where the user is a member.
      * @param entry The security entry to settle.
      * @param policies the current security policies.
+     * @param requiredRights
      * @return the resulting access for the user/group based on the given rules.
      */
     protected abstract XWikiSecurityAccess settle(UserSecurityReference user, Collection<GroupSecurityReference> groups,
-        SecurityRuleEntry entry, Policies policies);
+        SecurityRuleEntry entry, Policies policies, Set<Right> requiredRights);
 
     /**
      * Merge the current access with the result from previous ones.

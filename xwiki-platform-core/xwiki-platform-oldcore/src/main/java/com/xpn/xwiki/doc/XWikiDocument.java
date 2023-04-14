@@ -4164,8 +4164,18 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         if (eform.getRequiredRights() != null) {
+            ContextualAuthorizationManager authorizationManager =
+                Utils.getComponent(ContextualAuthorizationManager.class);
+            // For each existing required right, check if it is missing from the new required rights.
+            // In this case check if the user has enough rights to remove it (i.e., does he have the corresponding right).
+            Set<Right> newRights = new HashSet<>(eform.getRequiredRights());
+            for (Right right : new ArrayList<>(this.requiredRights.getRights())) {
+                if (!eform.getRequiredRights().contains(right) && !authorizationManager.hasAccess(right)) {
+                    newRights.add(right);
+                }
+            }
             // TODO: should not be possible to update without enough rights
-            setRequiredRights(new DefaultRequiredRights(this, eform.getRequiredRights()));
+            setRequiredRights(new DefaultRequiredRights(this, newRights));
         }
     }
 

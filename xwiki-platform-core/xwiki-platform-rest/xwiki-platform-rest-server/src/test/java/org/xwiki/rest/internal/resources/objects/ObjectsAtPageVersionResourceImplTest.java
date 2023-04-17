@@ -136,10 +136,8 @@ class ObjectsAtPageVersionResourceImplTest
         List<ObjectSummary> objectSummaries = objects.getObjectSummaries();
         assertEquals(1, objectSummaries.size());
 
-        // TODO: the following demonstrates https://jira.xwiki.org/browse/XWIKI-20815, the passed object needs to be
-        // baseObject, not this.document.getXObject(TAG_CLASS)
         verify(this.modelFactory).toRestObjectSummary(this.uriInfo.getBaseUri(), new Document(deletedVersion,
-            this.mockitoOldcore.getXWikiContext()), this.document.getXObject(TAG_CLASS), true, false);
+            this.mockitoOldcore.getXWikiContext()), baseObject, true, false);
 
         doThrow(new AuthorizationException("Access denied")).when(this.deletedDocumentRevisionProvider)
             .checkAccess(Right.VIEW, CurrentUserReference.INSTANCE, DOCUMENT_REFERENCE, "1");

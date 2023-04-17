@@ -26,8 +26,7 @@
 <aside id="xwikidata" aria-label="$escapetool.xml($services.localization.render('docextra.label'))">
 ##
 ## Build the list of documents extras to display, if it does not exist (default).
-## List format : ['ExtraAnchor', 'ExtraName', 'ExtraTabText',
-## 'ExtraNumberOfItems', 'extratemplate.vm', 'keyboardShortcut']
+## List format : ['ExtraAnchor', 'ExtraName', 'ExtraTabText', 'ExtraNumberOfItems', 'extratemplate.vm', 'keyboardShortcut']
 ##
 #if (!$docextras)
   #set ($docextras = [])
@@ -52,7 +51,7 @@
       ## Prepend request parameter
       #set ($sortAttachmentsBy = "&sortAttachmentsBy=$escapetool.url(${sortAttachmentsBy})")
     #end
-    #set ($discard = $docextras.add(['Attachments', 'attachments', $services.localization.render('docextra.attachments'), $doc.getAttachmentList().size(), "attachmentsinline .vm$!{sortAttachmentsBy}", $services.localization.render('core.shortcuts.view.attachments')]))
+    #set ($discard = $docextras.add(['Attachments', 'attachments', $services.localization.render('docextra.attachments'), $doc.getAttachmentList().size(), "attachmentsinline.vm$!{sortAttachmentsBy}", $services.localization.render('core.shortcuts.view.attachments')]))
   #end
   #if ($showhistory)
     ## Pagination style

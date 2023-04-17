@@ -171,7 +171,7 @@ public class DefaultAuthorizationManager implements AuthorizationManager
             securityReferenceFactory.newEntityReference(entityReference)
         );
 
-        RuleState access = securityAccess.get(entityReference == null ? right.optOutRequiredRights() : right);
+        RuleState access = securityAccess.get(right);
         String info = check ? "security checkpoint" : "access inquiry";
         if (check && access != RuleState.ALLOW) {
             logDeny(userReference, entityReference, right, info);

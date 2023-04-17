@@ -20,9 +20,7 @@
 package org.xwiki.security.authorization.internal;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.inject.Singleton;
 
@@ -58,11 +56,11 @@ public class DefaultAuthorizationSettler extends AbstractAuthorizationSettler
         Set<Right> allowed = new RightSet();
 
         XWikiSecurityAccess access = new XWikiSecurityAccess();
+        access.setRequiredRightsActivated(this.execution.getContext().hasProperty("skipRequiredRight") && this.execution.getContext().getProperty("skipRequiredRight").equals("true"));
         access.setRequiredRights(requiredRights);
 
         // Evaluate rules from current entity
-        List<Right> collect = enabledRights.stream().map(Right::optOutRequiredRights).collect(Collectors.toList());
-        for (Right right : collect) {
+        for (Right right : enabledRights) {
             for (SecurityRule rule : entry.getRules()) {
                 if (rule.match(right)) {
                     if (rule.getState() == ALLOW) {

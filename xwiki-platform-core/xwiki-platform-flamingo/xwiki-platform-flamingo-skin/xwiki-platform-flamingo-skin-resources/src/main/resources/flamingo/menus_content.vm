@@ -77,8 +77,12 @@
   #define ($editMenu)
     #if($displayEditMenu && $hasEdit && !$isReadOnly)
       #displayEditMenu()
-    #elseif ($displayEditMenu && $services.security.authorization.hasAccess($services.security.authorization.optOutRequiredRights('edit')) && !$isReadOnly)
+    #else
+      #set ($discard = $services.security.authorization.optOutRequiredRights())
+      #if ($displayEditMenu && $services.security.authorization.hasAccess('edit') && !$isReadOnly)
       #warning("TODO: blabla")
+      #end
+      #set ($discard = $services.security.authorization.optInRequiredRights())
     #end
   #end
   #set ($discard = $topStaticExtensions.add( { 'content': "$!editMenu", 'order': 10000}))

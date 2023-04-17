@@ -32,9 +32,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.EntityType;
-import org.xwiki.stability.Unstable;
 
 import static org.xwiki.security.SecurityReference.FARM;
 import static org.xwiki.security.authorization.RuleState.ALLOW;
@@ -186,11 +184,6 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     private final boolean isReadOnly;
 
     /**
-     * When {@code true} the required rights of the current document are taken into account during rights resolution.
-     */
-    private boolean withRequiredRights;
-
-    /**
      * Construct a new Right from its description.
      * This is a package private constructor, the registration of a new right should be done using
      * the {@link AuthorizationManager}
@@ -256,17 +249,7 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
         boolean inheritanceOverridePolicy, Set<Right> impliedRights, Set<EntityType> validEntityTypes,
         boolean isReadOnly, Set<Right> impliedByRights)
     {
-        this(name, defaultState, tieResolutionPolicy, inheritanceOverridePolicy, impliedRights, validEntityTypes,
-            isReadOnly, impliedByRights, null);
-    }
-
-    private Right(String name, RuleState defaultState, RuleState tieResolutionPolicy,
-        boolean inheritanceOverridePolicy, Set<Right> impliedRights, Set<EntityType> validEntityTypes,
-        boolean isReadOnly, Set<Right> impliedByRights, Right cloned)
-    {
-        if (cloned == null) {
-            checkIllegalArguments(name, defaultState, tieResolutionPolicy);
-        }
+        checkIllegalArguments(name, defaultState, tieResolutionPolicy);
 
         this.name = name;
         this.defaultState = defaultState;
@@ -274,52 +257,33 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
         this.inheritanceOverridePolicy = inheritanceOverridePolicy;
         this.impliedRights = cloneImpliedRights(impliedRights);
         this.isReadOnly = isReadOnly;
-        this.withRequiredRights = true;
 
-        if (cloned == null) {
-            synchronized (VALUES) {
-                this.value = VALUES.size();
-                if (this.value >= 64) {
-                    throw new IndexOutOfBoundsException();
-                }
-                VALUES.add(this);
-                if (!name.equals(ILLEGAL_RIGHT_NAME)) {
-                    ALL_RIGHTS.add(name);
-                }
-                if (validEntityTypes != null) {
-                    for (EntityType type : validEntityTypes) {
-                        if (type == EntityType.WIKI) {
-                            // If enabled on a wiki, enable also on main wiki.
-                            enableFor(FARM);
-                        }
-                        enableFor(type);
-                    }
-                } else {
-                    // If enabled on a wiki, enable also on main wiki.
-                    enableFor(FARM);
-                }
-
-                for (Right impliedByRight : impliedByRights) {
-                    impliedByRight.impliedRights.add(this);
-                }
+        synchronized (VALUES) {
+            this.value = VALUES.size();
+            if (this.value >= 64) {
+                throw new IndexOutOfBoundsException();
             }
-        } else {
-            this.value = cloned.value;
-        }
-    }
+            VALUES.add(this);
+            if (!name.equals(ILLEGAL_RIGHT_NAME)) {
+                ALL_RIGHTS.add(name);
+            }
+            if (validEntityTypes != null) {
+                for (EntityType type : validEntityTypes) {
+                    if (type == EntityType.WIKI) {
+                        // If enabled on a wiki, enable also on main wiki.
+                        enableFor(FARM);
+                    }
+                    enableFor(type);
+                }
+            } else {
+                // If enabled on a wiki, enable also on main wiki.
+                enableFor(FARM);
+            }
 
-    /**
-     * @return the same right, but with required rights deactivated
-     */
-    @Unstable
-    public Right optOutRequiredRights()
-    {
-        Right rightWithoutRequiredRights =
-            new Right(this.name, this.defaultState, this.tieResolutionPolicy, this.inheritanceOverridePolicy,
-                this.impliedRights, this.getTargetedEntityType(),
-                this.isReadOnly, this.impliedRights, this);
-        rightWithoutRequiredRights.withRequiredRights = false;
-        return rightWithoutRequiredRights;
+            for (Right impliedByRight : impliedByRights) {
+                impliedByRight.impliedRights.add(this);
+            }
+        }
     }
 
     /**
@@ -562,16 +526,6 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
         return this.isReadOnly;
     }
 
-    /**
-     * @return {@code true} when the required rights needs to be taken into account
-     * @since 15.3RC1
-     */
-    @Unstable
-    public boolean isWithRequiredRights()
-    {
-        return this.withRequiredRights;
-    }
-
     @Override
     public int compareTo(Right other)
     {
@@ -619,35 +573,5 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
                 || (otherImpliedRights == null && localImpliedRights.isEmpty());
         }
         return result;
-    }
-
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o) {
-            return true;
-        }
-
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        Right right = (Right) o;
-
-        return new EqualsBuilder().append(this.value, right.value)
-            .append(this.inheritanceOverridePolicy, right.inheritanceOverridePolicy).append(this.isReadOnly, right.isReadOnly)
-            .append(this.name, right.name).append(this.defaultState, right.defaultState)
-            .append(this.tieResolutionPolicy, right.tieResolutionPolicy).append(this.impliedRights, right.impliedRights)
-            .append(this.immutableImpliedRights, right.immutableImpliedRights).isEquals();
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return new HashCodeBuilder(17, 37).append(this.value).append(this.name).append(this.defaultState).append(
-                this.tieResolutionPolicy)
-            .append(this.inheritanceOverridePolicy).append(this.impliedRights).append(this.immutableImpliedRights).append(
-                this.isReadOnly)
-            .toHashCode();
     }
 }

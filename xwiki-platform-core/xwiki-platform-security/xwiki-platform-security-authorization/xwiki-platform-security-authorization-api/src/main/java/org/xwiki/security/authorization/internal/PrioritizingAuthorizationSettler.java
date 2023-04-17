@@ -65,6 +65,9 @@ public class PrioritizingAuthorizationSettler extends AbstractAuthorizationSettl
         SecurityRuleEntry entry, Policies policies, Set<Right> requiredRights)
     {
         XWikiSecurityAccess access = new XWikiSecurityAccess();
+        // TODO: make "skipRequiredRight" a reusable constant
+        access.setRequiredRightsActivated(this.execution.getContext().hasProperty("skipRequiredRight") && this.execution.getContext().getProperty("skipRequiredRight").equals("true"));
+        access.setRequiredRights(requiredRights);
         Map<Right, Integer> priorities = new RightMap<Integer>();
         SecurityReference reference = entry.getReference();
         Set<Right> enabledRights = Right.getEnabledRights(reference.getSecurityType());

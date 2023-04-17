@@ -322,10 +322,12 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
       </dt>
       <dd>
         <input name="initialValueScriptRequiredRight" value="$targetDocument.requiredRights.has('script')" type="hidden" disabled/>
+        #set ($discard = $services.security.authorization.optOutRequiredRights())
         <input id="scriptRequiredRight" name="requiredRights" type="checkbox" value="script"
           #if($targetDocument.requiredRights.has('script'))checked#end
-          #if(!$services.security.authorization.hasAccess($services.security.authorization.optOutRequiredRights('script'), $xcontext.userReference, $targetDocument))disabled#end
+          #if(!$services.security.authorization.hasAccess('script', $xcontext.userReference, $targetDocument))disabled#end
         />
+        #set ($discard = $services.security.authorization.optInRequiredRights())
         <span class="box warningmessage hidden">Removing this mandatory right may result in breakage. Please make sure you understand the consequences, before saving.</span>
       </dd>
     </dl>
@@ -335,10 +337,12 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
       </dt>
       <dd>
         <input name="initialValueProgrammingRequiredRight" value="$targetDocument.requiredRights.has('programming')" type="hidden" disabled/>
+        #set ($discard = $services.security.authorization.optOutRequiredRights())
         <input id="programmingRequiredRight" name="requiredRights" type="checkbox" value="programming"
            #if($targetDocument.requiredRights.has('programming'))checked#end
-           #if(!$services.security.authorization.hasAccess($services.security.authorization.optOutRequiredRights('programming'), $xcontext.userReference, $targetDocument))disabled#end
+           #if(!$services.security.authorization.hasAccess('programming', $xcontext.userReference, $targetDocument))disabled#end
         />
+        #set ($discard = $services.security.authorization.optInRequiredRights())
         <span class="box warningmessage hidden">Removing this mandatory right may result in breakage. Please make sure you understand the consequences, before saving.</span>
       </dd>
     </dl>

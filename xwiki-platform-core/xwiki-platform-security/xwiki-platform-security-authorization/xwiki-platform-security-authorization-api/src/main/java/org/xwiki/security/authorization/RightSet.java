@@ -111,7 +111,7 @@ public class RightSet extends AbstractSet<Right> implements Cloneable, java.io.S
             }
             lastIndex = index & -index;
             index -= lastIndex;
-            return Right.get(Long.numberOfTrailingZeros(lastIndex)).optOutRequiredRights();
+            return Right.get(Long.numberOfTrailingZeros(lastIndex));
         }
 
         @Override
@@ -270,7 +270,7 @@ public class RightSet extends AbstractSet<Right> implements Cloneable, java.io.S
         int j = 0;
         for (int i = 0; i < Right.size(); i++) {
             if ((rights & (1 << i)) > 0) {
-                ts[j++] = Right.get(i).optOutRequiredRights();
+                ts[j++] = Right.get(i);
             }
         }
         return ts;

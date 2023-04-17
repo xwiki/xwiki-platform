@@ -49,7 +49,9 @@ public class XWikiSecurityAccess implements SecurityAccess
     /** Denied rights. */
     protected RightSet denied = new RightSet();
 
-    private Set<Right> requiredRights = new HashSet<>();
+    private Set<Right> requiredRights;
+    
+    private boolean requiredRightsActivated;
 
     /**
      * @return the default access, using the default value of all rights.
@@ -59,6 +61,8 @@ public class XWikiSecurityAccess implements SecurityAccess
         if (defaultAccess == null || Right.size() != defaultAccessSize) {
             defaultAccessSize = Right.size();
             defaultAccess = new XWikiSecurityAccess();
+            // TODO: maybed set to false?
+            defaultAccess.setRequiredRightsActivated(false);
             for (Right right : Right.values()) {
                 defaultAccess.set(right, right.getDefaultState());
             }
@@ -68,11 +72,7 @@ public class XWikiSecurityAccess implements SecurityAccess
 
     public void setRequiredRights(Set<Right> requiredRights)
     {
-        if (requiredRights == null) {
-            this.requiredRights = Set.of();
-        } else {
-            this.requiredRights = requiredRights;
-        }
+        this.requiredRights = requiredRights;
     }
 
     /**
@@ -130,14 +130,13 @@ public class XWikiSecurityAccess implements SecurityAccess
     @Override
     public RuleState get(Right right)
     {
-        Right resolvedRight = Right.toRight(right.getName());
-        if (this.denied.contains(resolvedRight)) {
+        if (this.denied.contains(right)) {
             return RuleState.DENY;
         }
 
-        if (this.allowed.contains(resolvedRight)) {
-            if (this.requiredRights != null && right.isWithRequiredRights()) {
-                return getWithRequiredRights(resolvedRight);
+        if (this.allowed.contains(right)) {
+            if (this.requiredRights != null && this.requiredRightsActivated) {
+                return getWithRequiredRights(right);
             } else {
                 return RuleState.ALLOW;
             }
@@ -156,15 +155,31 @@ public class XWikiSecurityAccess implements SecurityAccess
         }
     }
 
+    public boolean isRequiredRightsActivated()
+    {
+        return this.requiredRightsActivated;
+    }
+
+    public void setRequiredRightsActivated(boolean requiredRightsActivated)
+    {
+        this.requiredRightsActivated = requiredRightsActivated;
+    }
+
     @Override
     public XWikiSecurityAccess clone() throws CloneNotSupportedException
     {
         XWikiSecurityAccess clone = (XWikiSecurityAccess) super.clone();
-        clone.allowed = allowed.clone();
-        clone.denied = denied.clone();
-        clone.requiredRights = new HashSet<>(clone.requiredRights);
+        clone.allowed = this.allowed.clone();
+        clone.denied = this.denied.clone();
+        if (this.requiredRights != null) {
+            clone.requiredRights = new HashSet<>(this.requiredRights);
+        } else {
+            clone.requiredRights = null;
+        }
         return clone;
     }
+    
+    
 
     @Override
     public boolean equals(Object o)

@@ -23,7 +23,10 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.SecurityReference;
@@ -54,6 +57,9 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
     /** The initial policy size. Check to update initial policies if a new Right is added. */
     private static int initialPolicySize;
 
+    @Inject
+    protected Execution execution;
+    
     /**
      * Private implementation of the {@link SecurityAccessEntry}.
      */
@@ -196,6 +202,7 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
     {
         XWikiSecurityAccess access = new XWikiSecurityAccess();
         access.setRequiredRights(requiredRights);
+        access.setRequiredRightsActivated(this.execution.getContext().hasProperty("skipRequiredRight") && this.execution.getContext().getProperty("skipRequiredRight").equals("true"));
         SecurityReference reference = null;
 
         Policies policies = new Policies();

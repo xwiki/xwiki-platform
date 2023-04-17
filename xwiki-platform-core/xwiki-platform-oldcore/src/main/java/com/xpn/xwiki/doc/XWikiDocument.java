@@ -9511,7 +9511,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @since 15.3RC1
      */
     @Unstable
-    public void setRequiredRightsActicated(boolean requiredRightsActivated)
+    public void setRequiredRightsActivated(boolean requiredRightsActivated)
     {
         this.requiredRightsActivated = requiredRightsActivated;
     }

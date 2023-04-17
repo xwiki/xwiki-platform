@@ -305,7 +305,7 @@ public class XWikiDocumentOutputFilterStream extends AbstractEntityOutputFilterS
         this.entity.getAuthors().setContentAuthor(
             getUserReference(WikiDocumentFilter.PARAMETER_CONTENT_AUTHOR, parameters, defaultAuthorReference));
 
-        this.entity.setRequiredRightsActicated(
+        this.entity.setRequiredRightsActivated(
             getBoolean(WikiDocumentFilter.PARAMETER_REVISION_REQUIRED_RIGHTS_ACTIVATED, parameters, false));
         this.entity.setRequiredRights(new DefaultRequiredRights(this.entity, getRequiredRights(WikiDocumentFilter.PARAMETER_REVISION_REQUIRED_RIGHTS, parameters)));
         String revisions =

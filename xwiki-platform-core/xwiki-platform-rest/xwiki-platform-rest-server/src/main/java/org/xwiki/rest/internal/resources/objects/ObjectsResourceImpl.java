@@ -61,7 +61,7 @@ public class ObjectsResourceImpl extends BaseObjectsResource implements ObjectsR
 
             Objects objects = objectFactory.createObjects();
 
-            List<BaseObject> objectList = getBaseObjects(doc);
+            List<BaseObject> objectList = getBaseObjects(doc.getDocumentReference());
 
             RangeIterable<BaseObject> ri = new RangeIterable<BaseObject>(objectList, start, number);
 

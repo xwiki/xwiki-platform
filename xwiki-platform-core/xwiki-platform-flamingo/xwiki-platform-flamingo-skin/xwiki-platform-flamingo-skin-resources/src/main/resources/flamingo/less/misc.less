@@ -201,14 +201,17 @@
     text-align: left;
   }
   .xAdditional {
+    &.recoverPassword {
+      text-align: right;
+    }
+    flex-grow: 1;
     font-size: .8em;
     font-weight: normal;
     margin-top: .3em;
   }
   .submitSection {
-    align-items: flex-end;
     display: flex;
-    flex-direction: column;
+    flex-flow: row wrap;
   }
 }
 

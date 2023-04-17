@@ -92,7 +92,7 @@
     #end
     #set ($resetPasswordUrl = $services.security.authentication.getAuthenticationURL('resetpassword', $NULL))
     #if("$!resetPasswordUrl" != '')
-      <span class="xAdditional"><a href="$resetPasswordUrl" >$services.localization.render('xe.admin.passwordReset.loginMessage')</a></span>
+      <span class="xAdditional recoverPassword"><a href="$resetPasswordUrl" >$services.localization.render('xe.admin.passwordReset.loginMessage')</a></span>
     #end
   </dt>
 </dl>

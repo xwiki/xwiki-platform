@@ -946,8 +946,6 @@ class CreateActionTest
         when(document.isNew()).thenReturn(false);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
         context.setDoc(document);
-        String csrfTokenValue = "token42557783";
-        when(this.csrfToken.getToken()).thenReturn(csrfTokenValue);
 
         // Submit from the UI spaceReference=X&name=Y&templateProvider=XWiki.MyTemplateProvider
         String templateProviderFullName = "XWiki.MyTemplateProvider";
@@ -971,7 +969,7 @@ class CreateActionTest
         // Note1: We are allowed to create anything under space X, be it a terminal or a non-terminal document.
         // Note2: We are creating X.Y and using the template extracted from the template provider.
         verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
-            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + csrfTokenValue,
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + CSRF_TOKEN_VALUE,
             null, "xwiki", context);
     }
 

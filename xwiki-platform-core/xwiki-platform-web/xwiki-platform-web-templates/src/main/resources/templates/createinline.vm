@@ -276,6 +276,7 @@
   ## By the past, it was "xwiki/create.js" which created this field, but it was causing problems when the user sent the
   ## form before the JavaScript code was executed.
   <input type="hidden" name="templateprovider" id="templateprovider" value="" />
+  <input type="hidden" name="form_token" value="$!{escapetool.xml($services.csrf.getToken())}"/>
 
   <div class='row'>
     ## Hide the first column when displayed in an AJAX call by clicking on a Wanted Link (because we know the target

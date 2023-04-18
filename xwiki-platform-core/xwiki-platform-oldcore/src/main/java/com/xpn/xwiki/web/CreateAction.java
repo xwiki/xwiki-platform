@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
@@ -95,6 +96,9 @@ public class CreateAction extends XWikiAction
      * Local entity reference serializer hint.
      */
     private static final String LOCAL_SERIALIZER_HINT = "local";
+
+    @Inject
+    private CSRFToken csrf;
 
     /**
      * The action to perform when creating a new page from a template.
@@ -185,9 +189,12 @@ public class CreateAction extends XWikiAction
         checkRights(newDocumentReference.getLastSpaceReference(), context);
 
         // Check if the document to create already exists and if it respects the name strategy
+        // Also check the CSRF token.
         XWikiDocument newDocument = context.getWiki().getDocument(newDocumentReference, context);
         if (handler.isDocumentAlreadyExisting(newDocument) || handler.isDocumentPathTooLong(newDocumentReference)
-            || !this.isEntityReferenceNameValid(newDocumentReference)) {
+            || !this.isEntityReferenceNameValid(newDocumentReference)
+            || !this.csrf.isTokenValid(context.getRequest().getParameter("form_token")))
+        {
             return CREATE_TEMPLATE;
         }
 
@@ -334,8 +341,7 @@ public class CreateAction extends XWikiAction
             redirectParams += "&title=" + Util.encodeURI(title, null);
         }
         // Both the save and the edit action might require a CSRF token
-        CSRFToken csrf = Utils.getComponent(CSRFToken.class);
-        redirectParams += "&form_token=" + Util.encodeURI(csrf.getToken(), null);
+        redirectParams += "&form_token=" + Util.encodeURI(this.csrf.getToken(), null);
 
         return redirectParams;
     }

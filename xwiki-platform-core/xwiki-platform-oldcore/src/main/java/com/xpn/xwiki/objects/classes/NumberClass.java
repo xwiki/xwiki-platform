@@ -35,6 +35,34 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public class NumberClass extends PropertyClass
 {
+    /**
+     * The type of the number is integer.
+     * 
+     * @since 15.4RC1
+     */
+    public static final String TYPE_INTEGER = "integer";
+
+    /**
+     * The type of the number is float.
+     * 
+     * @since 15.4RC1
+     */
+    public static final String TYPE_FLOAT = "float";
+
+    /**
+     * The type of the number is double.
+     * 
+     * @since 15.4RC1
+     */
+    public static final String TYPE_DOUBLE = "double";
+
+    /**
+     * The type of the number is long.
+     * 
+     * @since 15.4RC1
+     */
+    public static final String TYPE_LONG = "long";
+
     private static final long serialVersionUID = 1L;
 
     private static final String XCLASSNAME = "number";
@@ -46,7 +74,7 @@ public class NumberClass extends PropertyClass
     {
         super(XCLASSNAME, "Number", wclass);
         setSize(30);
-        setNumberType("long");
+        setNumberType(TYPE_LONG);
     }
 
     public NumberClass()
@@ -79,11 +107,11 @@ public class NumberClass extends PropertyClass
     {
         String ntype = getNumberType();
         BaseProperty property;
-        if (ntype.equals("integer")) {
+        if (ntype.equals(TYPE_INTEGER)) {
             property = new IntegerProperty();
-        } else if (ntype.equals("float")) {
+        } else if (ntype.equals(TYPE_FLOAT)) {
             property = new FloatProperty();
-        } else if (ntype.equals("double")) {
+        } else if (ntype.equals(TYPE_DOUBLE)) {
             property = new DoubleProperty();
         } else {
             property = new LongProperty();
@@ -100,15 +128,15 @@ public class NumberClass extends PropertyClass
         Number nvalue = null;
 
         try {
-            if (ntype.equals("integer")) {
+            if (ntype.equals(TYPE_INTEGER)) {
                 if ((value != null) && (!value.equals(""))) {
                     nvalue = Integer.valueOf(value);
                 }
-            } else if (ntype.equals("float")) {
+            } else if (ntype.equals(TYPE_FLOAT)) {
                 if ((value != null) && (!value.equals(""))) {
                     nvalue = Float.valueOf(value);
                 }
-            } else if (ntype.equals("double")) {
+            } else if (ntype.equals(TYPE_DOUBLE)) {
                 if ((value != null) && (!value.equals(""))) {
                     nvalue = Double.valueOf(value);
                 }

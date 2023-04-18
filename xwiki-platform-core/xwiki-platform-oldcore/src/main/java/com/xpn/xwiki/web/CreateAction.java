@@ -444,7 +444,6 @@ public class CreateAction extends XWikiAction
 
     /**
      * @param template the template to create document from
-     * @param resolver the resolver to use to resolve the template document reference
      * @param context the context of the current request
      * @return the default edit mode for a document created from the passed template
      * @throws XWikiException in case something goes wrong accessing template document

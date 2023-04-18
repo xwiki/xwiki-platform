@@ -31,7 +31,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * Database level object to store a required {@link Right} of a {@link XWikiDocument}.
  *
  * @version $Id$
- * @since 15.3RC1
+ * @since 15.4RC1
  */
 @Unstable
 public class XWikiDocumentRequiredRight

@@ -4165,8 +4165,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             setHidden("1".equals(eform.getHidden()));
         }
 
-        if (Objects.equals(eform.getActivateRequiredRights(), "1")) {
-            this.requiredRightsActivated = true;
+        if (eform.getActivateRequiredRights() != null) {
+            if (Objects.equals(eform.getActivateRequiredRights(), "1")) {
+                this.requiredRightsActivated = true;
+                setMetaDataDirty(true);
+            }
         }
         
         if (eform.getRequiredRights() != null) {
@@ -9496,10 +9499,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * 
      * @return
-     * @since 15.3RC1
+     * @since 15.4RC1
      */
     @Unstable
-    public boolean getRequiredRightsActivated()
+    public Boolean getRequiredRightsActivated()
     {
         return this.requiredRightsActivated;
     }
@@ -9508,12 +9511,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * 
      * @param requiredRightsActivated
      * @return
-     * @since 15.3RC1
+     * @since 15.4RC1
      */
     @Unstable
-    public void setRequiredRightsActivated(boolean requiredRightsActivated)
+    public void setRequiredRightsActivated(Boolean requiredRightsActivated)
     {
-        this.requiredRightsActivated = requiredRightsActivated;
+        this.requiredRightsActivated = requiredRightsActivated != null && requiredRightsActivated;
     }
 
     /**

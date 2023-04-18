@@ -28,8 +28,8 @@ import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.UserSecurityReference;
 
 /**
- * An AuthorizationSettler compute the resulting access for a given user, a list of groups, and a hierarchy of rights
- * objects defining rights on a given entity.
+ * An AuthorizationSettler compute the resulting access for a given user,
+ * a list of groups, and a hierarchy of rights objects defining rights on a given entity.
  *
  * @version $Id$
  * @since 4.0M2
@@ -38,15 +38,18 @@ import org.xwiki.security.UserSecurityReference;
 public interface AuthorizationSettler
 {
     /**
-     * Compute the current access for the user that is a member of the given groups and on an entity which is protected
-     * by the given hierarchy of rights objects.
+     * Compute the current access for the user that is a member
+     * of the given groups and on an entity which is protected by the
+     * given hierarchy of rights objects.
      *
      * @param user a user identifier.
      * @param groups a collection of groups.
-     * @param securityRuleEntries a hierarchy of security rules.  The list is arranged such that the rules belonging
-     *     to the main wiki is put in the last collection, preceded by subwiki if any, preceded by space and subspaces
-     *     if any, preceded by the document rules.  The levels of this hierarchy match the structure of the entity
-     *     reference reported by the first SecurityRuleEntry.
+     * @param securityRuleEntries a hierarchy of security rules.  The list
+     * is arranged such that the rules belonging to the main
+     * wiki is put in the last collection, preceded by subwiki if
+     * any, preceded by space and subspaces if any, preceded by the
+     * document rules.  The levels of this hierarchy
+     * match the structure of the entity reference reported by the first SecurityRuleEntry.
      * @return the computed access for the given user.
      */
     default SecurityAccessEntry settle(UserSecurityReference user,

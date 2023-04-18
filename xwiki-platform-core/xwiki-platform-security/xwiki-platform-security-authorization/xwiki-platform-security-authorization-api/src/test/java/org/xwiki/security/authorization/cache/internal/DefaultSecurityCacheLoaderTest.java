@@ -31,8 +31,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -101,12 +99,6 @@ public class DefaultSecurityCacheLoaderTest
         mocker.registerMockComponent(UserBridge.class);
         mocker.registerMockComponent(AuthorizationSettler.class);
         securityCacheLoader = mocker.getInstance(SecurityCacheLoader.class);
-
-        Execution execution = this.mocker.registerMockComponent(Execution.class);
-        ExecutionContext executionContext = mock(ExecutionContext.class);
-        when(execution.getContext()).thenReturn(executionContext);
-        when(executionContext.hasProperty("skipRequiredRight")).thenReturn(true);
-        when(executionContext.getProperty("skipRequiredRight")).thenReturn("true");
     }
 
     /**
@@ -150,7 +142,7 @@ public class DefaultSecurityCacheLoaderTest
         AuthorizationSettler authorizationSettler = mocker.getInstance(AuthorizationSettler.class);
         Deque<SecurityRuleEntry> securityRuleEntries =
             new LinkedList<SecurityRuleEntry>(Arrays.asList(documentEntry, spaceEntry, wikiEntry));
-        when(authorizationSettler.settle(user, groups, securityRuleEntries)).thenReturn(securityAccessEntry);
+        when(authorizationSettler.settle(user, groups, securityRuleEntries, null)).thenReturn(securityAccessEntry);
 
         doThrow(ConflictingInsertionException.class).when(securityCache).add(securityAccessEntry);
         doThrow(ConflictingInsertionException.class).when(securityCache).add(securityAccessEntry, null);

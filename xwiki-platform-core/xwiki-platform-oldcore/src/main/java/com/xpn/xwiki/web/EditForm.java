@@ -102,8 +102,6 @@ public class EditForm extends XWikiForm
 
     private String hidden;
     
-    private String activateRequiredRights;
-    
     private ObjectPolicyType objectPolicy;
 
     private Map<String, List<Integer>> objectsToRemove;
@@ -113,6 +111,8 @@ public class EditForm extends XWikiForm
     private Map<String, SortedMap<Integer, Map<String, String[]>>> updateOrCreateMap;
 
     private List<String> temporaryUploadedFiles;
+
+    private String activateRequiredRights;
 
     private Set<Right> requiredRights;
 

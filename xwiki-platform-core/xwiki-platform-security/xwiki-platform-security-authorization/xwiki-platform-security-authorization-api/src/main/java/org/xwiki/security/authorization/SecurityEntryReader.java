@@ -51,5 +51,8 @@ public interface SecurityEntryReader
      *     document, or the required rights are not activated on the document), the set of required rights otherwise
      * @throws AuthorizationException in case of right issue when access the required rights
      */
-    Optional<Set<Right>> requiredRights(SecurityReference entity) throws AuthorizationException;
+    default Optional<Set<Right>> requiredRights(SecurityReference entity) throws AuthorizationException
+    {
+        return Optional.empty();
+    }
 }

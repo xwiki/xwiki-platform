@@ -316,6 +316,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
   #set ($discard = $xwiki.jsfx.use('rightsUI.js'))
   <h2>TODO: Required Rights</h2>
   <form action="$escapetool.xml($xwiki.getURL($targetDocument, 'saveandcontinue'))" class="xform" method="post" name="form_name1">
+    #if ($targetDocument.requiredRights.activated())
     <dl>
       <dt>
         <label for="scriptRequiredRight">Script</label>
@@ -349,9 +350,15 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
     <p>
       <span class="buttonwrapper">
         <input type="hidden" name="updateRequiredRights" value="1">
-        <input class="button" type="submit" value="Button"/>
+        <input class="button" type="submit" value="Save"/>
       </span>
     </p>
+    #else
+      <span class="buttonwrapper">
+        <input type="hidden" name="activateRequiredRights" value="1">
+        <input class="button" type="submit" value="Activate"/>
+      </span>
+    #end
     <div class="hidden">
       <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
       <input type="hidden" name="xcontinue" value="$escapetool.xml($xwiki.getURL($doc, $xcontext.action, $escapetool.url($request.parameterMap)))" />;

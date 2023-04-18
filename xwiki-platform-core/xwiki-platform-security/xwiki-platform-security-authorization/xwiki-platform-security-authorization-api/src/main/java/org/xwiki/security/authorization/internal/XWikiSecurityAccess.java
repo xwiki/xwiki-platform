@@ -70,6 +70,9 @@ public class XWikiSecurityAccess implements SecurityAccess
         return defaultAccess;
     }
 
+    /**
+     * @param requiredRights the set of required rights to use for the security access computation
+     */
     public void setRequiredRights(Set<Right> requiredRights)
     {
         this.requiredRights = requiredRights;
@@ -155,11 +158,10 @@ public class XWikiSecurityAccess implements SecurityAccess
         }
     }
 
-    public boolean isRequiredRightsActivated()
-    {
-        return this.requiredRightsActivated;
-    }
-
+    /**
+     * @param requiredRightsActivated when {@code true} the required rights are activated, when {@code false} the
+     *     required rights are not activated and are not taken into account during rights computation
+     */
     public void setRequiredRightsActivated(boolean requiredRightsActivated)
     {
         this.requiredRightsActivated = requiredRightsActivated;

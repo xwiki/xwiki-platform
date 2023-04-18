@@ -263,6 +263,7 @@ public class XWikiRCSArchive extends Archive
                     UserReferenceSerializer<String> userReferenceSerializer = Utils.getComponent(
                         new DefaultParameterizedType(null, UserReferenceSerializer.class, String.class));
                     nodeInfo.setAuthor(userReferenceSerializer.serialize(doc.getAuthors().getOriginalMetadataAuthor()));
+                    nodeInfo.setRequiredRightsActivated(doc.getRequiredRightsActivated());
                     nodeInfo.setRequiredRights(doc.getRequiredRights().getRights());
                     nodeInfo.setComment(doc.getComment());
                     nodeInfo.setDate(doc.getDate());

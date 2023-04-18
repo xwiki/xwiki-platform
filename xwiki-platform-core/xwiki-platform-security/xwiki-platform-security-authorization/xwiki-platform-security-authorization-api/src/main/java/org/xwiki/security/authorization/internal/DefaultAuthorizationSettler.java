@@ -25,6 +25,7 @@ import java.util.Set;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.UserSecurityReference;
 import org.xwiki.security.authorization.Right;
@@ -47,6 +48,7 @@ import static org.xwiki.security.authorization.RuleState.UNDETERMINED;
 @Singleton
 public class DefaultAuthorizationSettler extends AbstractAuthorizationSettler
 {
+
     @Override
     protected XWikiSecurityAccess settle(UserSecurityReference user, Collection<GroupSecurityReference> groups,
         SecurityRuleEntry entry, Policies policies, Set<Right> requiredRights)
@@ -56,7 +58,10 @@ public class DefaultAuthorizationSettler extends AbstractAuthorizationSettler
         Set<Right> allowed = new RightSet();
 
         XWikiSecurityAccess access = new XWikiSecurityAccess();
-        access.setRequiredRightsActivated(this.execution.getContext().hasProperty("skipRequiredRight") && this.execution.getContext().getProperty("skipRequiredRight").equals("true"));
+        ExecutionContext context = this.execution.getContext();
+        access.setRequiredRightsActivated(
+            context != null && context.hasProperty(SKIP_REQUIRED_RIGHT) && context.getProperty(SKIP_REQUIRED_RIGHT)
+                .equals("true"));
         access.setRequiredRights(requiredRights);
 
         // Evaluate rules from current entity

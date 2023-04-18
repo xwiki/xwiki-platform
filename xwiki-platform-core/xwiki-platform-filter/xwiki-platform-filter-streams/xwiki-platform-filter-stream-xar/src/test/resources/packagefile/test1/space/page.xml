@@ -9,7 +9,7 @@
   <creationDate>1297952360000</creationDate>
   <author>XWiki.author</author>
   <originalMetadataAuthor>XWiki.originalMetadataAuthor</originalMetadataAuthor>
-  <requiredRightsActivated>0</requiredRightsActivated>
+  <requiredRightsActivated>false</requiredRightsActivated>
   <requiredRights/>
   <customClass/>
   <contentAuthor>XWiki.contentAuthor</contentAuthor>
@@ -22,7 +22,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <content>content</content>
   <class>
     <name>space.page</name>

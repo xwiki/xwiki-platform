@@ -142,14 +142,14 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>define('like-button-title-keys', {
+      <code>define('xwiki-like-messages', {
   prefix: 'like.button.title.',
   keys: [
     "unlike",
     "like"
   ]
 });
-require(['jquery', 'xwiki-meta', 'xwiki-l10n!like-button-title-keys'], function ($, xm, l10n) {
+require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($, xm, l10n) {
   var likeUIXReference = XWiki.Model.resolve('XWiki.Like.LikeUIX', XWiki.EntityType.DOCUMENT);
   var likeUIXurl = new XWiki.Document(likeUIXReference).getURL('get');
   

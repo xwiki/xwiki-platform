@@ -17,115 +17,107 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-class TabsManual {
-  constructor(tabListNode) {
-    this.tabListNode = tabListNode;
-    this.tabs = Array.from(this.tabListNode.querySelectorAll('[role=tab]'));
-    this.firstTab = null;
-    this.lastTab = null;
-    var selectedTab;
-    this.tabpanels = [];
-    for (var i = 0; i < this.tabs.length; i += 1) {
-      var tab = this.tabs[i];
-      var tabpanel = document.getElementById(tab.getAttribute('aria-controls'));
-      this.tabpanels.push(tabpanel);
-      tab.observe('keydown', this.onKeydown.bind(this));
-      tab.observe('click', this.onClick.bind(this));
-      if (!selectedTab && tab.getAttribute('aria-selected')=='true') {
-        selectedTab = tab;
+var XWiki = (function(XWiki) {
+  // Start XWiki augmentation.
+  var widgets = XWiki.widgets = XWiki.widgets || {};
+  /**
+   * KeyboardAccessibleTabList class.
+   * Provides keyboard support for horizontal tab lists.
+   */
+  widgets.KeyboardAccessibleTabList = Class.create({
+    initialize: function (tabListNode) {
+      this.tabListNode = tabListNode;
+      this.tabs = Array.from(this.tabListNode.querySelectorAll('[role=tab]'));
+      this.firstTab = null;
+      this.lastTab = null;
+      var selectedTab;
+      this.tabpanels = [];
+      for (var i = 0; i < this.tabs.length; i += 1) {
+        var tab = this.tabs[i];
+        var tabpanel = document.getElementById(tab.getAttribute('aria-controls'));
+        this.tabpanels.push(tabpanel);
+        tab.observe('keyup', this.onKeyUp.bindAsEventListener(this));
+        tab.observe('click', this.onClick.bindAsEventListener(this));
+        if (!selectedTab && tab.getAttribute('aria-selected') == 'true') {
+          selectedTab = tab;
+        }
       }
-    }
-    this.setSelectedTab(selectedTab);
-    if (this.tabs.length>0) {
-      this.firstTab = this.tabs[0];
-      this.lastTab = this.tabs[this.tabs.length-1];
-    }
-  }
-  setSelectedTab(currentTab)
-  {
-    this.tabs.forEach((tab, index) => {
-      if (currentTab === tab) {
-        tab.removeAttribute('tabindex');
-      } else {
-        tab.tabIndex = -1;
+      this.setSelectedTab(selectedTab);
+      if (this.tabs.length != 0) {
+        this.firstTab = this.tabs[0];
+        this.lastTab = this.tabs[this.tabs.length - 1];
       }
-    })
-  }
-  moveFocusToTab(currentTab)
-  {
-    currentTab.focus();
-  }
+    },
 
-  moveFocusToPreviousTab(currentTab)
-  {
-    if (currentTab === this.firstTab) {
-      this.moveFocusToTab(this.lastTab);
-    } else {
-      this.moveFocusToTab(this.tabs[this.tabs.indexOf(currentTab) - 1]);
-    }
-  }
+    setSelectedTab: function (currentTab) {
+      this.tabs.forEach((tab, index) => {
+        if (currentTab === tab) {
+          tab.removeAttribute('tabindex');
+        } else {
+          tab.tabIndex = -1;
+        }
+      })
+    },
 
-  moveFocusToTab(currentTab, )
-  {
-    if (currentTab === this.lastTab) {
-      this.moveFocusToTab(this.firstTab);
-    } else {
-      this.moveFocusToTab(this.tabs[this.tabs.indexOf(currentTab) + 1]);
-    }
-  }
+    moveFocusToTab: function (currentTab) {
+      currentTab.focus();
+    },
 
-  /* EVENT HANDLERS */
+    moveFocusToTabShifted: function (currentTab, deltaIndex) {
+      this.moveFocusToTab(this.tabs[this.tabs.indexOf(currentTab) + deltaIndex]);
+    },
 
-  onKeydown(event)
-  {
-    var target = event.currentTarget,
-        flag = false;
-
-    switch (event.key) {
-      case 'ArrowLeft':
-        this.moveFocusToPreviousTab(target);
-        flag = true;
-        break;
-
-      case 'ArrowRight':
-        this.moveFocusToNextTab(target);
-        flag = true;
-        break;
-
-      case 'Home':
-        this.moveFocusToTab(this.firstTab);
-        flag = true;
-        break;
-
-      case 'End':
+    moveFocusToPreviousTab: function (currentTab) {
+      if (currentTab === this.firstTab) {
         this.moveFocusToTab(this.lastTab);
-        flag = true;
-        break;
+      } else {
+        this.moveFocusToTabShifted(currentTab, -1);
+      }
+    },
 
-      case ' ':
-        target.click();
-        flag = true;
-        break;
+    moveFocusToNextTab: function (currentTab) {
+      if (currentTab === this.lastTab) {
+        this.moveFocusToTab(this.firstTab);
+      } else {
+        this.moveFocusToTabShifted(currentTab, +1);
+      }
+    },
 
-      default:
-        break;
+    /* EVENT HANDLERS */
+    onKeyUp: function(event) {
+      let target = event.currentTarget;
+      let controlOfTab = true;
+      let key = even.keyCode;
+      const KEY_SPACE = 32;
+      switch (key) {
+        case Event.KEY_LEFT:
+          this.moveFocusToPreviousTab(target);
+          break;
+        case Event.KEY_RIGHT:
+          this.moveFocusToNextTab(target);
+          break;
+        case Event.KEY_HOME:
+          this.moveFocusToTab(this.firstTab);
+          break;
+        case Event.KEY_END:
+          this.moveFocusToTab(this.lastTab);
+          break;
+        case KEY_SPACE:
+          target.click();
+          break;
+        default:
+          controlOfTab = false;
+          break;
+      }
+      if (controlOfTab) {
+        event.stopPropagation();
+      }
+    },
+
+    onClick: function(event) {
+      this.setSelectedTab(event.currentTarget);
     }
-
-    if (flag) {
-      event.stopPropagation();
-      event.preventDefault();
-    }
-  }
-
-  // Since this example uses buttons for the tabs, the click onr also is activated
-  // with the space and enter keys
-  onClick(event)
-  {
-    this.setSelectedTab(event.currentTarget);
-  }
-}
-
-var tablists = document.querySelectorAll('[role="tablist"]');
-for (var i = 0; i < tablists.length; i++) {
-  new TabsManual(tablists[i]);
-}
+  });
+  // End XWiki augmentation.
+  return XWiki;
+}(XWiki || {}));

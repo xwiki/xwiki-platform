@@ -320,6 +320,44 @@ class ImagePluginIT
             savedPage.editWiki().getContent());
     }
 
+    @Test
+    @Order(7)
+    void imageWrappedInLink(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Upload an attachment to test with.
+        String attachmentName = "image.gif";
+        ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
+
+        WikiEditPage wikiEditPage = newPage.editWiki();
+        wikiEditPage.setContent("[[[[image:image.gif]]>>doc:]]\n"
+            + "\n"
+            + "(% a='b' %)[[[[image:image.gif]]>>doc:]]\n"
+            + "\n"
+            + "(% a=\"b\" %)\n"
+            + "[[aaaa>>image:image.gif]]");
+        ViewPage savedPage = wikiEditPage.clickSaveAndView();
+
+        assertEquals("[[[[image:image.gif]]>>doc:]]\n"
+            + "\n"
+            + "(% a='b' %)[[[[image:image.gif]]>>doc:]]\n"
+            + "\n"
+            + "(% a=\"b\" %)\n"
+            + "[[aaaa>>image:image.gif]]", savedPage.editWiki().getContent());
+
+        // Re-edit the page.
+        WYSIWYGEditPage wysiwygEditPage = savedPage.editWYSIWYG();
+        new CKEditor("content").waitToLoad();
+        savedPage = wysiwygEditPage.clickSaveAndView();
+
+        // Verify that the content is not altered when edited with CKEditor (expect for the additional escaping)
+        assertEquals("[[~[~[image:image.gif~]~]>>doc:]]\n"
+            + "\n"
+            + "(% a=\"b\" %)[[~[~[image:image.gif~]~]>>doc:]]\n"
+            + "\n"
+            + "(% a=\"b\" %)\n"
+            + "[[aaaa>>image:image.gif]]", savedPage.editWiki().getContent());
+    }
+
     private static void createAndLoginStandardUser(TestUtils setup)
     {
         setup.createUserAndLogin("alice", "pa$$word", "editor", "Wysiwyg", "usertype", "Advanced");

@@ -18,733 +18,733 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 var XWiki = (function(XWiki) {
-  XWiki.widgets = XWiki.widgets || {};
-  /**
-   * XWiki namespace.
-   * TODO: move everything in it.
-   */
-  Object.extend(XWiki, {
+XWiki.widgets = XWiki.widgets || {};
+/**
+ * XWiki namespace.
+ * TODO: move everything in it.
+ */
+Object.extend(XWiki, {
 
-    constants: {
-      /** URL Anchor separator. */
-      anchorSeparator: "#",
+  constants: {
+    /** URL Anchor separator. */
+    anchorSeparator: "#",
 
-      /** URL Anchor for page comments. */
-      docextraCommentsAnchor: "Comments",
+    /** URL Anchor for page comments. */
+    docextraCommentsAnchor: "Comments",
 
-      /** URL Anchor for page attachments. */
-      docextraAttachmentsAnchor: "Attachments",
+    /** URL Anchor for page attachments. */
+    docextraAttachmentsAnchor: "Attachments",
 
-      /** URL Anchor for page history. */
-      docextraHistoryAnchor: "History",
+    /** URL Anchor for page history. */
+    docextraHistoryAnchor: "History",
 
-      /** URL Anchor for page information. */
-      docextraInformationAnchor: "Information"
+    /** URL Anchor for page information. */
+    docextraInformationAnchor: "Information"
+  },
+
+  resource: {
+    /**
+     * Build a resource object from a wiki resource name (aka fullName). Example with "Main.WebHome":
+     * {
+     *   wiki: "xwiki",
+     *   space: "Main",
+     *   prefixedSpace: "xwiki:Main",
+     *   fullName: "Main.WebHome",
+     *   prefixedFullName: "xwiki:Main.WebHome",
+     *   name: "WebHome",
+     *   attachment: ""
+     *  }
+     *
+     * @param name name of the resource to create (examples: xwiki:Main.WebHome, xwiki:Main.WebHome@Archive.tgz).
+     * @param entityType the type of entity specified by the given name; this parameter is optional but very useful when
+     *                   the passed string is a relative entity reference; e.g. XWiki.EntityType.SPACE for 'xwiki:Main'
+     *                   and XWiki.EntityType.ATTACHMENT for 'Page@file.txt'
+     * @return the newly created resource object.
+     */
+    get: function(name, entityType) {
+      // First, extract the anchor if it is specified, because entity references don't support anchors. We use a list
+      // of known anchors to reduce the possibility of a conflict with an entity whose name contains the anchor
+      // separator. Of couse this meas we don't support entity names that end with known anchors.
+      var anchor = '', knownAnchors = ['Attachments'];
+      // In case the entity type is not specified determine it from the known anchor.
+      var entityTypeForAnchor = [XWiki.EntityType.DOCUMENT];
+      for (var i = 0; i < knownAnchors.length; i++) {
+        if (name.endsWith(XWiki.constants.anchorSeparator + knownAnchors[i])) {
+          anchor = knownAnchors[i];
+          name = name.substr(0, name.length - (anchor.length + 1));
+          entityType = entityType || entityTypeForAnchor[i];
+          break;
+        }
+      }
+
+      var reference;
+      if (entityType) {
+        reference = XWiki.Model.resolve(name, entityType);
+      } else {
+        // NOTE: The given name can be an attachment reference, a document reference, a space reference or a wiki
+        // reference. Since we don't know the entity type we try to deduce it. This can fail if the given name is a
+        // relative reference.
+        reference = XWiki.Model.resolve(name, XWiki.EntityType.ATTACHMENT);
+        if (!reference.parent) {
+          // Attachment references must be prefixed with at least the document name.
+          reference = XWiki.Model.resolve(name, XWiki.EntityType.DOCUMENT);
+          if (!reference.parent) {
+            // Check if it's not a space reference.
+            var spaceReference = XWiki.Model.resolve(name, XWiki.EntityType.SPACE);
+            if (spaceReference.parent) {
+              // The wiki is specified so we assume it is a space reference.
+              reference = spaceReference;
+            } else {
+              // The given name is either a wiki name, a space name or a document name. We can't really
+              // distinguish between them so we assume it's the name of a document from the current space.
+            }
+          }
+        }
+      }
+
+      return this.fromEntityReference(reference, anchor);
     },
 
-    resource: {
-      /**
-       * Build a resource object from a wiki resource name (aka fullName). Example with "Main.WebHome":
-       * {
-       *   wiki: "xwiki",
-       *   space: "Main",
-       *   prefixedSpace: "xwiki:Main",
-       *   fullName: "Main.WebHome",
-       *   prefixedFullName: "xwiki:Main.WebHome",
-       *   name: "WebHome",
-       *   attachment: ""
-       *  }
-       *
-       * @param name name of the resource to create (examples: xwiki:Main.WebHome, xwiki:Main.WebHome@Archive.tgz).
-       * @param entityType the type of entity specified by the given name; this parameter is optional but very useful when
-       *                   the passed string is a relative entity reference; e.g. XWiki.EntityType.SPACE for 'xwiki:Main'
-       *                   and XWiki.EntityType.ATTACHMENT for 'Page@file.txt'
-       * @return the newly created resource object.
-       */
-      get: function(name, entityType) {
-        // First, extract the anchor if it is specified, because entity references don't support anchors. We use a list
-        // of known anchors to reduce the possibility of a conflict with an entity whose name contains the anchor
-        // separator. Of couse this meas we don't support entity names that end with known anchors.
-        var anchor = '', knownAnchors = ['Attachments'];
-        // In case the entity type is not specified determine it from the known anchor.
-        var entityTypeForAnchor = [XWiki.EntityType.DOCUMENT];
-        for (var i = 0; i < knownAnchors.length; i++) {
-          if (name.endsWith(XWiki.constants.anchorSeparator + knownAnchors[i])) {
-            anchor = knownAnchors[i];
-            name = name.substr(0, name.length - (anchor.length + 1));
-            entityType = entityType || entityTypeForAnchor[i];
+    fromEntityReference : function(reference, anchor) {
+      var wiki = reference.extractReference(XWiki.EntityType.WIKI);
+      wiki = (wiki && wiki.name) || XWiki.currentWiki;
+
+      var space = reference.extractReference(XWiki.EntityType.SPACE);
+      space = (space && space.name) || XWiki.currentSpace;
+
+      var page = reference.extractReference(XWiki.EntityType.DOCUMENT);
+      page = (page && page.name) || XWiki.currentPage;
+
+      var attachment = reference.extractReference(XWiki.EntityType.ATTACHMENT);
+      attachment = (attachment && attachment.name) || '';
+
+      var documentReference = new XWiki.DocumentReference(wiki, space, page);
+      var fullName = XWiki.Model.serialize(documentReference.relativeTo(new XWiki.WikiReference(wiki)));
+      var prefixedSpace = XWiki.Model.serialize(documentReference.parent);
+      var prefixedFullName = XWiki.Model.serialize(documentReference);
+
+      return {
+        wiki: wiki,
+        space: space,
+        prefixedSpace: prefixedSpace,
+        fullName: fullName,
+        prefixedFullName: prefixedFullName,
+        name: page,
+        attachment: attachment,
+        anchor: anchor
+      };
+    },
+
+    asEntityReference : function(resource) {
+      var reference;
+      var components = [resource.wiki, resource.space, resource.name, resource.attachment];
+      for (var i = 0; i < components.length; i++) {
+        if (components[i]) {
+          reference = new XWiki.EntityReference(components[i], i, reference);
+        }
+      }
+      return reference;
+    },
+
+    /**
+     * Serializes the given resource.
+     *
+     * @param resource the resource to be serialized
+     * @return a string that can be passed to the #get(String) method to reconstruct the resource
+     */
+    serialize: function(resource) {
+      var name = XWiki.Model.serialize(this.asEntityReference(resource));
+      if (resource.anchor) {
+        if (name.length > 0) {
+          name += XWiki.constants.anchorSeparator;
+        }
+        name += resource.anchor;
+      }
+      return name;
+    }
+  },
+
+  /**
+   * Deprecated. See XWiki.resource.get(String).
+   */
+  getResource : function(fullName) {
+    return this.resource.get(fullName);
+  },
+
+  /**
+   * Method used by docextra.vm to emulate tabbed panes.
+   *
+   * @param extraID Id of the pane to show.
+   * @param extraTemplate Velocity template to retrieve and display in the pane.
+   * @param scrollToAnchor Jump to the pane anchor.
+   * @return
+   */
+  displayDocExtra: function (extraID, extraTemplate, scrollToAnchor) {
+    // Nested function: hides the previously displayed extra pane (window.activeDocExtraPane)
+    // and display the one that is passed as an argument (extraID).
+    // Fires an event to notify that the pane has changed.
+    var dhtmlSwitch = function(extraID) {
+      var tab = document.getElementById(extraID + "tab");
+      var pane = document.getElementById(extraID + "pane");
+      if (window.activeDocExtraTab != null) {
+        window.activeDocExtraTab.removeAttribute('class');
+        window.activeDocExtraTab.setAttribute("aria-selected", "false");
+        window.activeDocExtraTab.setAttribute("tabindex", "-1");
+        window.activeDocExtraPane.className="hidden";
+      }
+      window.activeDocExtraTab = tab;
+      window.activeDocExtraPane = pane;
+      window.activeDocExtraTab.className="active";
+      window.activeDocExtraTab.setAttribute("aria-selected", "true");
+      window.activeDocExtraTab.removeAttribute("tabindex");
+      window.activeDocExtraPane.className="";
+
+      document.fire("xwiki:docextra:activated", {"id": extraID});
+    };
+
+    // Use Ajax.Request to display the requested pane (extraID) : comments, attachments, etc.
+    // On complete :
+    //   1. Call dhtmlSwitch()
+    //   2. If the function call has been triggered by an event : reset location.href to #extraID
+    //      (because when the link has been first clicked the anchor was not loaded)
+    if ($(extraID + "pane").className.indexOf("empty") != -1) {
+      if (window.activeDocExtraPane != null) {
+        window.activeDocExtraPane.className="invisible";
+      }
+      $("docextrapanes").className="loading";
+
+      // Determine if JS minification is disabled in the URL. Needed to pass it to the AJAX call to get the right resources on the reply.
+      var maybeMinifyRequestParameter = '';
+      var requestMinify = window.location.search.toQueryParams().minify;
+      if (requestMinify && requestMinify == 'false') {
+        maybeMinifyRequestParameter = '&minify=false';
+      }
+
+      new Ajax.Request(
+          window.docgeturl + '?xpage=xpart&vm=' + extraTemplate + maybeMinifyRequestParameter,
+          {
+            method: 'get',
+            onSuccess: function(response) {
+              // Do the work that Ajax.Updater is supposed to do, but we can't use it because it strips the <script>s
+              // from the output and we need to inject the external scripts from the reply (in the DOM's dead), to execute them.
+
+              var head = document.body.previous('head');
+              var html = response.responseText;
+
+              // Use a temporary "container" to parse and process the HTML response.
+              var container = new Element('div');
+              container.innerHTML = html;
+
+              // Insert link elements in head, if not already there.
+              container.select('link').each(function(link) {
+                var existingElements = head.select('link[href="' + link.readAttribute('href') + '"][type="' + link.readAttribute('type') + '"]');
+                if (existingElements.length == 0) {
+                  head.insert(new Element('link', {rel: "stylesheet", type: link.type, href: link.readAttribute('href')}));
+                }
+                // Strip links from the result, since they are now in head.
+                link.remove();
+              });
+
+              container.select('script').each(function(script) {
+                // Insert external scripts in head, if not already there.
+                if (script.src) {
+                  var existingElements = head.select('script[src="' + script.readAttribute('src') + '"][type="' + script.readAttribute('type') + '"]');
+                  if (existingElements.length == 0) {
+                    head.insert(new Element('script', {type: script.type, src: script.readAttribute('src')}));
+                  }
+                }
+              });
+
+              // Replaces the element's content with the temporary container's content, while also evaluating
+              // any inline scripts.
+              // The replacement is done by inserting the child elements of the temporary container into the
+              // element's content.
+              var pane = $(extraID + "pane");
+              container.childElements().forEach(function(e) {
+                pane.insert(e);
+              });
+
+              // Notify the others that the DOM has been updated.
+              document.fire('xwiki:dom:updated', {elements: [$(extraID + 'pane')]});
+            },
+            onComplete: function(response){
+              if (response.status == 401) {
+                document.location.reload();
+              }
+
+              $("docextrapanes").className="";
+
+              // Let other know new content has been loaded
+              document.fire("xwiki:docextra:loaded", {
+                "id" : extraID,
+                "element": $(extraID + "pane")
+              });
+
+              // switch tab
+              dhtmlSwitch(extraID);
+
+              if (scrollToAnchor) {
+                // Yes, this is a POJW (Plain Old JavaScript Ha^Wworkaround) which
+                // prevents the anchor 'jump' after a click event but enable it
+                // when the user is arriving from a direct /Space/Page#Section URL
+                $(extraID + 'anchor').id = extraID;
+                location.href='#' + extraID;
+                $(extraID).id = extraID + 'anchor';
+              }
+            }
+          });
+    } else {
+      dhtmlSwitch(extraID);
+      if (scrollToAnchor) {
+        $(extraID + 'anchor').id = extraID;
+        location.href='#' + extraID;
+        $(extraID).id = extraID + 'anchor';
+      }
+    }
+  },
+
+  /**
+   * Add click listeners on all rendereing error messages to let the user read the detailed error description.
+   * If a content is passed, add click listener for errors reported in this content (usefull for AJAX requests response)
+   * Otherwise make all the document's body errors expandable.
+   */
+  makeRenderingErrorsExpandable: function(content) {
+    $(content || 'body').select(".xwikirenderingerror").each(function(error) {
+      var description = error.next(".xwikirenderingerrordescription");
+      if(description.innerHTML !== "" && description.hasClassName("xwikirenderingerrordescription")) {
+        error.style.cursor="pointer";
+        error.title = "$escapetool.javascript($services.localization.render('platform.core.rendering.error.readTechnicalInformation'))";
+        Event.observe(error, "click", function(event){
+          event.element().closest(".xwikirenderingerror").next(".xwikirenderingerrordescription").toggleClassName("hidden");
+        });
+      }
+    });
+  },
+
+  /**
+   * Make links marked with rel="external" in an external window and sets the target attribute to any
+   * rel attribute starting with "_". Note that We need to do this in Javascript
+   * as opposed to using target="_blank" since the target attribute is not valid XHTML.
+   * Apply this on links found in the passed content if any, or on the document's all body otherwise.
+   */
+  fixLinksTargetAttribute: function(content) {
+    var anchors = $(content || 'body').select("a[rel]");
+    for (var i = 0; i < anchors.length; i++) {
+      var anchor = anchors[i];
+      if (anchor.up('.xRichTextEditor')) {
+        // Do not touch links inside a WYSIWYG editor since, if the content is saved, our modification would be saved
+        // with it and we do not want to alter the content.
+        // Note: The WYSIWYG editor is currently in a frame, so this code would not reach it anyway. This is more of
+        // a precaution for the future, in case that changes.
+        continue;
+      }
+      if (anchor.getAttribute("href") && anchor.getAttribute("rel")) {
+        // Since the rel attribute can have other values we need to only take into account the ones
+        // starting with "_"
+        var values = anchor.getAttribute("rel").split(" ");
+        for (var j = 0; j < values.length; j++) {
+          if (values[j].charAt(0) == "_") {
+            anchor.target = values[j].substring(1);
+            break;
+          } else if (values[j] == "external") {
+            anchor.target = "_blank";
             break;
           }
         }
-
-        var reference;
-        if (entityType) {
-          reference = XWiki.Model.resolve(name, entityType);
-        } else {
-          // NOTE: The given name can be an attachment reference, a document reference, a space reference or a wiki
-          // reference. Since we don't know the entity type we try to deduce it. This can fail if the given name is a
-          // relative reference.
-          reference = XWiki.Model.resolve(name, XWiki.EntityType.ATTACHMENT);
-          if (!reference.parent) {
-            // Attachment references must be prefixed with at least the document name.
-            reference = XWiki.Model.resolve(name, XWiki.EntityType.DOCUMENT);
-            if (!reference.parent) {
-              // Check if it's not a space reference.
-              var spaceReference = XWiki.Model.resolve(name, XWiki.EntityType.SPACE);
-              if (spaceReference.parent) {
-                // The wiki is specified so we assume it is a space reference.
-                reference = spaceReference;
-              } else {
-                // The given name is either a wiki name, a space name or a document name. We can't really
-                // distinguish between them so we assume it's the name of a document from the current space.
+        // If the link is opened in a new window, we are vulnerable to a phishing attack
+        // see https://mathiasbynens.github.io/rel-noopener/ or https://dev.to/phishing
+        // To avoid that, we just need to add "noopener" and "noreferrer" in the "rel" attribute of the link.
+        // (_self, _parent and _top are the only values that are not concerned by this security issue)
+        if (anchor.target && anchor.target != "_self" && anchor.target != "_parent" && anchor.target != "_top") {
+          var contains = function (array, value) {
+            for (var i = 0; i < array.length; ++i) {
+              if (array[i] == value) {
+                return true;
               }
             }
+            return false;
+          };
+          if (!contains(values, "noopener")) {
+            values.push("noopener");
           }
-        }
-
-        return this.fromEntityReference(reference, anchor);
-      },
-
-      fromEntityReference : function(reference, anchor) {
-        var wiki = reference.extractReference(XWiki.EntityType.WIKI);
-        wiki = (wiki && wiki.name) || XWiki.currentWiki;
-
-        var space = reference.extractReference(XWiki.EntityType.SPACE);
-        space = (space && space.name) || XWiki.currentSpace;
-
-        var page = reference.extractReference(XWiki.EntityType.DOCUMENT);
-        page = (page && page.name) || XWiki.currentPage;
-
-        var attachment = reference.extractReference(XWiki.EntityType.ATTACHMENT);
-        attachment = (attachment && attachment.name) || '';
-
-        var documentReference = new XWiki.DocumentReference(wiki, space, page);
-        var fullName = XWiki.Model.serialize(documentReference.relativeTo(new XWiki.WikiReference(wiki)));
-        var prefixedSpace = XWiki.Model.serialize(documentReference.parent);
-        var prefixedFullName = XWiki.Model.serialize(documentReference);
-
-        return {
-          wiki: wiki,
-          space: space,
-          prefixedSpace: prefixedSpace,
-          fullName: fullName,
-          prefixedFullName: prefixedFullName,
-          name: page,
-          attachment: attachment,
-          anchor: anchor
-        };
-      },
-
-      asEntityReference : function(resource) {
-        var reference;
-        var components = [resource.wiki, resource.space, resource.name, resource.attachment];
-        for (var i = 0; i < components.length; i++) {
-          if (components[i]) {
-            reference = new XWiki.EntityReference(components[i], i, reference);
+          if (!contains(values, "noreferrer")) {
+            values.push("noreferrer");
           }
+          anchor.setAttribute("rel", values.join(" "));
         }
-        return reference;
-      },
-
-      /**
-       * Serializes the given resource.
-       *
-       * @param resource the resource to be serialized
-       * @return a string that can be passed to the #get(String) method to reconstruct the resource
-       */
-      serialize: function(resource) {
-        var name = XWiki.Model.serialize(this.asEntityReference(resource));
-        if (resource.anchor) {
-          if (name.length > 0) {
-            name += XWiki.constants.anchorSeparator;
-          }
-          name += resource.anchor;
-        }
-        return name;
       }
-    },
+    }
+  },
 
-    /**
-     * Deprecated. See XWiki.resource.get(String).
-     */
-    getResource : function(fullName) {
-      return this.resource.get(fullName);
-    },
+  /**
+   * Insert a link for editing sections.
+   */
+  insertSectionEditLinks: function(container) {
+    // Insert links only if enabled, in view mode and for documents not in xwiki/1.0 syntax
+    if ( $xwiki.hasSectionEdit() && XWiki.docsyntax != "xwiki/1.0" && XWiki.contextaction == "view" && XWiki.hasEdit) {
 
-    /**
-     * Method used by docextra.vm to emulate tabbed panes.
-     *
-     * @param extraID Id of the pane to show.
-     * @param extraTemplate Velocity template to retrieve and display in the pane.
-     * @param scrollToAnchor Jump to the pane anchor.
-     * @return
-     */
-    displayDocExtra: function (extraID, extraTemplate, scrollToAnchor) {
-      // Nested function: hides the previously displayed extra pane (window.activeDocExtraPane)
-      // and display the one that is passed as an argument (extraID).
-      // Fires an event to notify that the pane has changed.
-      var dhtmlSwitch = function(extraID) {
-        var tab = document.getElementById(extraID + "tab");
-        var pane = document.getElementById(extraID + "pane");
-        if (window.activeDocExtraTab != null) {
-          window.activeDocExtraTab.removeAttribute('class');
-          window.activeDocExtraTab.setAttribute("aria-selected", "false");
-          window.activeDocExtraTab.setAttribute("tabindex", "-1");
-          window.activeDocExtraPane.className="hidden";
+      // Section count starts at one, not zero.
+      var sectionCount = 1;
+
+      container = $(container || 'body');
+      container = container.id == 'xwikicontent' ? container : container.down('#xwikicontent');
+      if (!container) {
+        return;
+      }
+      // We can't use element.select() since it does not keep the order of the elements in the flow.
+      var nodes = container.childNodes;
+
+      // Only allow section editing for the specified depth level (2 by default)
+      var headerPattern = new RegExp("H[1-" + $xwiki.getSectionEditingDepth() + "]");
+
+      // For all non-generated headers insert a link in order to be able to edit the section.
+      for (var i = 0; i < nodes.length; i++) {
+
+        var node = $(nodes[i]);
+
+        if (headerPattern.test(node.nodeName) && !node.classList.contains('wikigeneratedheader') &&
+            !node.down('a.edit_section')) {
+          var editSectionLink = document.createElement('a');
+          editSectionLink.className = 'edit_section';
+          // Show the section editing link only if the section heading is visible.
+          editSectionLink.toggle(node.visible() && !node.hasClassName('hidden'));
+          editSectionLink.setAttribute('role', 'button');
+          editSectionLink.title = $jsontool.serialize($services.localization.render('edit'));
+          editSectionLink.innerHTML = $jsontool.serialize($services.icon.renderHTML('pencil'));
+
+          var editSectionLinkLabel = document.createElement('span');
+          editSectionLinkLabel.className = 'sr-only';
+          editSectionLinkLabel.textContent = $jsontool.serialize($services.localization.render('edit'));
+          editSectionLink.appendChild(editSectionLinkLabel);
+
+          // Disable the section editing link if there's no Syntax Renderer for the current document's syntax
+          // because editing a section requires a Syntax Renderer.
+          if (!XWiki.hasRenderer) {
+            editSectionLink.className = editSectionLink.className + ' disabled';
+            editSectionLink.setAttribute('aria-disabled', 'true');
+            editSectionLink.setAttribute('tabindex', '-1');
+            editSectionLink.title = $jsontool.serialize($services.localization.render(
+                'platform.core.rendering.noRendererForSectionEdit'));
+            editSectionLink.href = '#' + (node.id || '');
+          } else {
+            editSectionLink.href = window.docediturl + "?section=" + sectionCount;
+          }
+
+          node.appendChild(editSectionLink);
+          sectionCount++;
         }
-        window.activeDocExtraTab = tab;
-        window.activeDocExtraPane = pane;
-        window.activeDocExtraTab.className="active";
-        window.activeDocExtraTab.setAttribute("aria-selected", "true");
-        window.activeDocExtraTab.removeAttribute("tabindex");
-        window.activeDocExtraPane.className="";
+      }
+    }
+  },
 
-        document.fire("xwiki:docextra:activated", {"id": extraID});
-      };
-
-      // Use Ajax.Request to display the requested pane (extraID) : comments, attachments, etc.
-      // On complete :
-      //   1. Call dhtmlSwitch()
-      //   2. If the function call has been triggered by an event : reset location.href to #extraID
-      //      (because when the link has been first clicked the anchor was not loaded)
-      if ($(extraID + "pane").className.indexOf("empty") != -1) {
-        if (window.activeDocExtraPane != null) {
-          window.activeDocExtraPane.className="invisible";
-        }
-        $("docextrapanes").className="loading";
-
-        // Determine if JS minification is disabled in the URL. Needed to pass it to the AJAX call to get the right resources on the reply.
-        var maybeMinifyRequestParameter = '';
-        var requestMinify = window.location.search.toQueryParams().minify;
-        if (requestMinify && requestMinify == 'false') {
-          maybeMinifyRequestParameter = '&minify=false';
-        }
-
-        new Ajax.Request(
-            window.docgeturl + '?xpage=xpart&vm=' + extraTemplate + maybeMinifyRequestParameter,
-            {
-              method: 'get',
-              onSuccess: function(response) {
-                // Do the work that Ajax.Updater is supposed to do, but we can't use it because it strips the <script>s
-                // from the output and we need to inject the external scripts from the reply (in the DOM's dead), to execute them.
-
-                var head = document.body.previous('head');
-                var html = response.responseText;
-
-                // Use a temporary "container" to parse and process the HTML response.
-                var container = new Element('div');
-                container.innerHTML = html;
-
-                // Insert link elements in head, if not already there.
-                container.select('link').each(function(link) {
-                  var existingElements = head.select('link[href="' + link.readAttribute('href') + '"][type="' + link.readAttribute('type') + '"]');
-                  if (existingElements.length == 0) {
-                    head.insert(new Element('link', {rel: "stylesheet", type: link.type, href: link.readAttribute('href')}));
-                  }
-                  // Strip links from the result, since they are now in head.
-                  link.remove();
-                });
-
-                container.select('script').each(function(script) {
-                  // Insert external scripts in head, if not already there.
-                  if (script.src) {
-                    var existingElements = head.select('script[src="' + script.readAttribute('src') + '"][type="' + script.readAttribute('type') + '"]');
-                    if (existingElements.length == 0) {
-                      head.insert(new Element('script', {type: script.type, src: script.readAttribute('src')}));
-                    }
-                  }
-                });
-
-                // Replaces the element's content with the temporary container's content, while also evaluating
-                // any inline scripts.
-                // The replacement is done by inserting the child elements of the temporary container into the
-                // element's content.
-                var pane = $(extraID + "pane");
-                container.childElements().forEach(function(e) {
-                  pane.insert(e);
-                });
-
-                // Notify the others that the DOM has been updated.
-                document.fire('xwiki:dom:updated', {elements: [$(extraID + 'pane')]});
+  /**
+   * Display a modal box allowing to create the new document from a template when clicking on broken links.
+   *
+   * @param container where to look for broken links
+   */
+  insertCreatePageFromTemplateModalBoxes: function(container) {
+    // Insert links only in view mode and for documents not in xwiki/1.0 syntax
+    if (XWiki.docsyntax != "xwiki/1.0" && XWiki.contextaction == "view" && XWiki.hasEdit && XWiki.widgets.ModalPopup) {
+      XWiki.widgets.CreatePagePopup = Class.create(XWiki.widgets.ModalPopup, {
+        initialize : function($super, interactionParameters) {
+          var content =  new Element('div', {'class': 'modal-popup'});
+          content.insert(interactionParameters.content);
+          $super(
+              content,
+              {
+                "show"  : { method : this.showDialog,  keys : [] },
+                "close" : { method : this.closeDialog, keys : ['Esc'] }
               },
-              onComplete: function(response){
-                if (response.status == 401) {
-                  document.location.reload();
-                }
-
-                $("docextrapanes").className="";
-
-                // Let other know new content has been loaded
-                document.fire("xwiki:docextra:loaded", {
-                  "id" : extraID,
-                  "element": $(extraID + "pane")
-                });
-
-                // switch tab
-                dhtmlSwitch(extraID);
-
-                if (scrollToAnchor) {
-                  // Yes, this is a POJW (Plain Old JavaScript Ha^Wworkaround) which
-                  // prevents the anchor 'jump' after a click event but enable it
-                  // when the user is arriving from a direct /Space/Page#Section URL
-                  $(extraID + 'anchor').id = extraID;
-                  location.href='#' + extraID;
-                  $(extraID).id = extraID + 'anchor';
-                }
+              {
+                displayCloseButton : true,
+                verticalPosition : "center",
+                backgroundColor : "#FFF"
               }
-            });
-      } else {
-        dhtmlSwitch(extraID);
-        if (scrollToAnchor) {
-          $(extraID + 'anchor').id = extraID;
-          location.href='#' + extraID;
-          $(extraID).id = extraID + 'anchor';
-        }
-      }
-    },
-
-    /**
-     * Add click listeners on all rendereing error messages to let the user read the detailed error description.
-     * If a content is passed, add click listener for errors reported in this content (usefull for AJAX requests response)
-     * Otherwise make all the document's body errors expandable.
-     */
-    makeRenderingErrorsExpandable: function(content) {
-      $(content || 'body').select(".xwikirenderingerror").each(function(error) {
-        var description = error.next(".xwikirenderingerrordescription");
-        if(description.innerHTML !== "" && description.hasClassName("xwikirenderingerrordescription")) {
-          error.style.cursor="pointer";
-          error.title = "$escapetool.javascript($services.localization.render('platform.core.rendering.error.readTechnicalInformation'))";
-          Event.observe(error, "click", function(event){
-            event.element().closest(".xwikirenderingerror").next(".xwikirenderingerrordescription").toggleClassName("hidden");
-          });
+          );
+          this.showDialog();
+          this.setClass("createpage-modal-popup");
         }
       });
-    },
 
-    /**
-     * Make links marked with rel="external" in an external window and sets the target attribute to any
-     * rel attribute starting with "_". Note that We need to do this in Javascript
-     * as opposed to using target="_blank" since the target attribute is not valid XHTML.
-     * Apply this on links found in the passed content if any, or on the document's all body otherwise.
-     */
-    fixLinksTargetAttribute: function(content) {
-      var anchors = $(content || 'body').select("a[rel]");
-      for (var i = 0; i < anchors.length; i++) {
-        var anchor = anchors[i];
-        if (anchor.up('.xRichTextEditor')) {
-          // Do not touch links inside a WYSIWYG editor since, if the content is saved, our modification would be saved
-          // with it and we do not want to alter the content.
-          // Note: The WYSIWYG editor is currently in a frame, so this code would not reach it anyway. This is more of
-          // a precaution for the future, in case that changes.
-          continue;
-        }
-        if (anchor.getAttribute("href") && anchor.getAttribute("rel")) {
-          // Since the rel attribute can have other values we need to only take into account the ones
-          // starting with "_"
-          var values = anchor.getAttribute("rel").split(" ");
-          for (var j = 0; j < values.length; j++) {
-            if (values[j].charAt(0) == "_") {
-              anchor.target = values[j].substring(1);
-              break;
-            } else if (values[j] == "external") {
-              anchor.target = "_blank";
-              break;
-            }
-          }
-          // If the link is opened in a new window, we are vulnerable to a phishing attack
-          // see https://mathiasbynens.github.io/rel-noopener/ or https://dev.to/phishing
-          // To avoid that, we just need to add "noopener" and "noreferrer" in the "rel" attribute of the link.
-          // (_self, _parent and _top are the only values that are not concerned by this security issue)
-          if (anchor.target && anchor.target != "_self" && anchor.target != "_parent" && anchor.target != "_top") {
-            var contains = function (array, value) {
-              for (var i = 0; i < array.length; ++i) {
-                if (array[i] == value) {
-                  return true;
-                }
+      var spans = $(container || 'body').select("span.wikicreatelink:not(.skipCreatePagePopup)");
+      for (var i = 0; i < spans.length; i++) {
+        spans[i].down('a').observe('click', function(event) {
+          // Remove the fragment identifier from the link URL.
+          new Ajax.Request(event.findElement('a').href.replace(/#.*$/, ''), {
+            method:'get',
+            parameters: {
+              xpage: 'createinline',
+              ajax: 1
+            },
+            onSuccess: function(transport) {
+              var redirect = transport.getHeader('redirect');
+              if (redirect) {
+                window.location = redirect;
+              } else {
+                // The create action actually loads some JS and CSS. This modal box needs them too, but we
+                // load them on demand.
+                // We display an notification while the browser fetch the resources/
+                var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.create.popup.loading'))", 'inprogress');
+                // Add the CSS
+                var newStyle = new Element('link', {'rel': 'stylesheet', 'type':'text/css',
+                  'href': '$xwiki.getSkinFile("uicomponents/widgets/select/select.css", true)'});
+                $(document.head).insert(newStyle);
+                // Add the JS
+                require(["$xwiki.getSkinFile('js/xwiki/create.js', true)",
+                      "$xwiki.getSkinFile('uicomponents/widgets/select/select.js', true)"],
+                    function($) {
+                      // We are sure that the JS have been loaded, so we finally display
+                      // the create popup
+                      new XWiki.widgets.CreatePagePopup({content: transport.responseText});
+                      notification.hide();
+                    });
               }
-              return false;
-            };
-            if (!contains(values, "noopener")) {
-              values.push("noopener");
+            },
+            onFailure: function() {
+              new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.create.ajax.error'))", 'error', {inactive: true}).show();
             }
-            if (!contains(values, "noreferrer")) {
-              values.push("noreferrer");
-            }
-            anchor.setAttribute("rel", values.join(" "));
-          }
-        }
-      }
-    },
-
-    /**
-     * Insert a link for editing sections.
-     */
-    insertSectionEditLinks: function(container) {
-      // Insert links only if enabled, in view mode and for documents not in xwiki/1.0 syntax
-      if ( $xwiki.hasSectionEdit() && XWiki.docsyntax != "xwiki/1.0" && XWiki.contextaction == "view" && XWiki.hasEdit) {
-
-        // Section count starts at one, not zero.
-        var sectionCount = 1;
-
-        container = $(container || 'body');
-        container = container.id == 'xwikicontent' ? container : container.down('#xwikicontent');
-        if (!container) {
-          return;
-        }
-        // We can't use element.select() since it does not keep the order of the elements in the flow.
-        var nodes = container.childNodes;
-
-        // Only allow section editing for the specified depth level (2 by default)
-        var headerPattern = new RegExp("H[1-" + $xwiki.getSectionEditingDepth() + "]");
-
-        // For all non-generated headers insert a link in order to be able to edit the section.
-        for (var i = 0; i < nodes.length; i++) {
-
-          var node = $(nodes[i]);
-
-          if (headerPattern.test(node.nodeName) && !node.classList.contains('wikigeneratedheader') &&
-              !node.down('a.edit_section')) {
-            var editSectionLink = document.createElement('a');
-            editSectionLink.className = 'edit_section';
-            // Show the section editing link only if the section heading is visible.
-            editSectionLink.toggle(node.visible() && !node.hasClassName('hidden'));
-            editSectionLink.setAttribute('role', 'button');
-            editSectionLink.title = $jsontool.serialize($services.localization.render('edit'));
-            editSectionLink.innerHTML = $jsontool.serialize($services.icon.renderHTML('pencil'));
-
-            var editSectionLinkLabel = document.createElement('span');
-            editSectionLinkLabel.className = 'sr-only';
-            editSectionLinkLabel.textContent = $jsontool.serialize($services.localization.render('edit'));
-            editSectionLink.appendChild(editSectionLinkLabel);
-
-            // Disable the section editing link if there's no Syntax Renderer for the current document's syntax
-            // because editing a section requires a Syntax Renderer.
-            if (!XWiki.hasRenderer) {
-              editSectionLink.className = editSectionLink.className + ' disabled';
-              editSectionLink.setAttribute('aria-disabled', 'true');
-              editSectionLink.setAttribute('tabindex', '-1');
-              editSectionLink.title = $jsontool.serialize($services.localization.render(
-                  'platform.core.rendering.noRendererForSectionEdit'));
-              editSectionLink.href = '#' + (node.id || '');
-            } else {
-              editSectionLink.href = window.docediturl + "?section=" + sectionCount;
-            }
-
-            node.appendChild(editSectionLink);
-            sectionCount++;
-          }
-        }
-      }
-    },
-
-    /**
-     * Display a modal box allowing to create the new document from a template when clicking on broken links.
-     *
-     * @param container where to look for broken links
-     */
-    insertCreatePageFromTemplateModalBoxes: function(container) {
-      // Insert links only in view mode and for documents not in xwiki/1.0 syntax
-      if (XWiki.docsyntax != "xwiki/1.0" && XWiki.contextaction == "view" && XWiki.hasEdit && XWiki.widgets.ModalPopup) {
-        XWiki.widgets.CreatePagePopup = Class.create(XWiki.widgets.ModalPopup, {
-          initialize : function($super, interactionParameters) {
-            var content =  new Element('div', {'class': 'modal-popup'});
-            content.insert(interactionParameters.content);
-            $super(
-                content,
-                {
-                  "show"  : { method : this.showDialog,  keys : [] },
-                  "close" : { method : this.closeDialog, keys : ['Esc'] }
-                },
-                {
-                  displayCloseButton : true,
-                  verticalPosition : "center",
-                  backgroundColor : "#FFF"
-                }
-            );
-            this.showDialog();
-            this.setClass("createpage-modal-popup");
-          }
+          });
+          event.stop();
         });
+      }
+    }
+  },
 
-        var spans = $(container || 'body').select("span.wikicreatelink:not(.skipCreatePagePopup)");
-        for (var i = 0; i < spans.length; i++) {
-          spans[i].down('a').observe('click', function(event) {
-            // Remove the fragment identifier from the link URL.
-            new Ajax.Request(event.findElement('a').href.replace(/#.*$/, ''), {
-              method:'get',
-              parameters: {
-                xpage: 'createinline',
-                ajax: 1
-              },
-              onSuccess: function(transport) {
-                var redirect = transport.getHeader('redirect');
-                if (redirect) {
-                  window.location = redirect;
-                } else {
-                  // The create action actually loads some JS and CSS. This modal box needs them too, but we
-                  // load them on demand.
-                  // We display an notification while the browser fetch the resources/
-                  var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.create.popup.loading'))", 'inprogress');
-                  // Add the CSS
-                  var newStyle = new Element('link', {'rel': 'stylesheet', 'type':'text/css',
-                    'href': '$xwiki.getSkinFile("uicomponents/widgets/select/select.css", true)'});
-                  $(document.head).insert(newStyle);
-                  // Add the JS
-                  require(["$xwiki.getSkinFile('js/xwiki/create.js', true)",
-                        "$xwiki.getSkinFile('uicomponents/widgets/select/select.js', true)"],
-                      function($) {
-                        // We are sure that the JS have been loaded, so we finally display
-                        // the create popup
-                        new XWiki.widgets.CreatePagePopup({content: transport.responseText});
-                        notification.hide();
-                      });
-                }
-              },
-              onFailure: function() {
-                new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.create.ajax.error'))", 'error', {inactive: true}).show();
+  /**
+   * Watchlist methods.
+   *
+   * @deprecated Since XWiki 7.4, the watchlist UI is implemented in a UI extension. This code is still there to not
+   * break the retro-compatibility but we can consider removing it.
+   */
+  watchlist : {
+
+    /**
+     * Mapping between link IDs and associated actions.
+     */
+    actionsMap : {
+      'tmWatchDocument' : 'adddocument',
+      'tmUnwatchDocument' : 'removedocument',
+      'tmWatchSpace' : 'addspace',
+      'tmUnwatchSpace' : 'removespace',
+      'tmWatchWiki' : 'addwiki',
+      'tmUnwatchWiki' : 'removewiki'
+    },
+
+    /**
+     * Mapping allowing to know which action to display when a previous action has been executed.
+     */
+    flowMap : {
+      'tmWatchDocument' : 'tmUnwatchDocument',
+      'tmUnwatchDocument' : 'tmWatchDocument',
+      'tmWatchSpace' : 'tmUnwatchSpace',
+      'tmUnwatchSpace' : 'tmWatchSpace',
+      'tmWatchWiki' : 'tmUnwatchWiki',
+      'tmUnwatchWiki' : 'tmWatchWiki'
+    },
+
+    /**
+     * Execute a watchlist action (add or remove the given document/space/wiki from watchlist).
+     *
+     * @param element the element that fired the action.
+     */
+    executeAction : function(element) {
+      var surl = window.docgeturl + "?xpage=watch&do=" + this.actionsMap[element.id];
+      new Ajax.Request(
+          surl,
+          {
+            method: 'get',
+            onComplete: function() {
+              if (element.nodeName == 'A') {
+                element.up().toggleClassName('hidden');
+                $(XWiki.watchlist.flowMap[element.id]).up().toggleClassName('hidden');
+              } else {
+                element.toggleClassName('hidden');
+                $(XWiki.watchlist.flowMap[element.id]).toggleClassName('hidden');
               }
-            });
-            event.stop();
+            }
+          });
+    },
+
+    /**
+     * Initialize watchlist UI.
+     */
+    initialize: function(container) {
+      container = $(container || 'body');
+      for (var button in XWiki.watchlist.actionsMap) {
+        var element = container.down('#' + button);
+        if (element) {
+          if (element.nodeName != 'A') {
+            element = $(button).down('A');
+          }
+
+          if (!element) {
+            // This is supposed to happen every time since the watchlist icons are implemented in the notifications
+            // menu. The watchlist icons are now implemented as a UI extension, and the inputs are handled with a
+            // custom solution (bootstrap-switch).
+            // For these reasons, we stop the initialization here.
+            // We keep this function for old skins (like Colibri), that still have the old-fashioned watchlist icons.
+            return;
+          }
+
+          // unregister previously registered handler if any
+          element.stopObserving('click');
+          element.observe('click', function(event) {
+            Event.stop(event);
+            var element = event.element();
+            while (element.id == '') {
+              element = element.up();
+            }
+            XWiki.watchlist.executeAction(element);
           });
         }
       }
-    },
-
-    /**
-     * Watchlist methods.
-     *
-     * @deprecated Since XWiki 7.4, the watchlist UI is implemented in a UI extension. This code is still there to not
-     * break the retro-compatibility but we can consider removing it.
-     */
-    watchlist : {
-
-      /**
-       * Mapping between link IDs and associated actions.
-       */
-      actionsMap : {
-        'tmWatchDocument' : 'adddocument',
-        'tmUnwatchDocument' : 'removedocument',
-        'tmWatchSpace' : 'addspace',
-        'tmUnwatchSpace' : 'removespace',
-        'tmWatchWiki' : 'addwiki',
-        'tmUnwatchWiki' : 'removewiki'
-      },
-
-      /**
-       * Mapping allowing to know which action to display when a previous action has been executed.
-       */
-      flowMap : {
-        'tmWatchDocument' : 'tmUnwatchDocument',
-        'tmUnwatchDocument' : 'tmWatchDocument',
-        'tmWatchSpace' : 'tmUnwatchSpace',
-        'tmUnwatchSpace' : 'tmWatchSpace',
-        'tmWatchWiki' : 'tmUnwatchWiki',
-        'tmUnwatchWiki' : 'tmWatchWiki'
-      },
-
-      /**
-       * Execute a watchlist action (add or remove the given document/space/wiki from watchlist).
-       *
-       * @param element the element that fired the action.
-       */
-      executeAction : function(element) {
-        var surl = window.docgeturl + "?xpage=watch&do=" + this.actionsMap[element.id];
-        new Ajax.Request(
-            surl,
-            {
-              method: 'get',
-              onComplete: function() {
-                if (element.nodeName == 'A') {
-                  element.up().toggleClassName('hidden');
-                  $(XWiki.watchlist.flowMap[element.id]).up().toggleClassName('hidden');
-                } else {
-                  element.toggleClassName('hidden');
-                  $(XWiki.watchlist.flowMap[element.id]).toggleClassName('hidden');
-                }
-              }
-            });
-      },
-
-      /**
-       * Initialize watchlist UI.
-       */
-      initialize: function(container) {
-        container = $(container || 'body');
-        for (var button in XWiki.watchlist.actionsMap) {
-          var element = container.down('#' + button);
-          if (element) {
-            if (element.nodeName != 'A') {
-              element = $(button).down('A');
-            }
-
-            if (!element) {
-              // This is supposed to happen every time since the watchlist icons are implemented in the notifications
-              // menu. The watchlist icons are now implemented as a UI extension, and the inputs are handled with a 
-              // custom solution (bootstrap-switch).
-              // For these reasons, we stop the initialization here.
-              // We keep this function for old skins (like Colibri), that still have the old-fashioned watchlist icons.
-              return;
-            }
-
-            // unregister previously registered handler if any
-            element.stopObserving('click');
-            element.observe('click', function(event) {
-              Event.stop(event);
-              var element = event.element();
-              while (element.id == '') {
-                element = element.up();
-              }
-              XWiki.watchlist.executeAction(element);
-            });
-          }
-        }
-      }
-    },
-
-    cookies: {
-      /**
-       * Create a cookie, with or without expiration date.
-       *
-       * @param name Name of the cookie.
-       * @param value Value of the cookie.
-       * @param days Days to keep the cookie (can be null).
-       * @return
-       */
-      create: function(name,value,days) {
-        if (days) {
-          var date = new Date();
-          date.setTime(date.getTime()+(days*24*60*60*1000));
-          var expires = "; expires="+date.toGMTString();
-        }
-        else var expires = "";
-        document.cookie = name+"="+encodeURIComponent(value)+expires+"; path=/";
-      },
-
-      /**
-       * Read a cookie.
-       *
-       * @param name Name of the cookie.
-       * @return Value for the given cookie.
-       */
-      read:function(name) {
-        var nameEQ = name + "=";
-        var ca = document.cookie.split(';');
-        for(var i=0;i < ca.length;i++) {
-          var c = ca[i];
-          while (c.charAt(0)==' ') {
-            c = c.substring(1,c.length);
-          }
-          if (c.indexOf(nameEQ) == 0) {
-            return decodeURIComponent(c.substring(nameEQ.length,c.length));
-          }
-        }
-        return null;
-      },
-
-      /**
-       * Erase a cookie.
-       *
-       * @param name Name of the cookie to erase.
-       * @return
-       */
-      erase:function(name) {
-        XWiki.cookies.create(name,"",-1);
-      }
-
-    },
-
-    /**
-     * Expand the given panel if collapsed, collapse if visible.
-     *
-     * @param form  {element} The panel element.
-     */
-    togglePanelVisibility: function(element){
-      element = $(element);
-      element.toggleClassName("collapsed");
-    },
-
-    registerPanelToggle: function(container) {
-      $(container || 'body').select('.panel .xwikipaneltitle').each(function(item) {
-        item.observe('click', this.togglePanelVisibility.bind(this, item.up('.panel')));
-      }.bind(this));
-    },
-
-    /**
-     * Extracts the file name from the value of the specified file input.
-     */
-    extractFileName: function(fileInput) {
-      fileInput = $(fileInput);
-      if (fileInput.files && fileInput.files.length > 0) {
-        // Modern browsers provide additional information about the selected file(s).
-        return fileInput.files[0].name;
-      } else if (fileInput.value.substr(0, 12) == 'C:\\fakepath\\') {
-        // Most browsers hide the real path for security reasons.
-        return fileInput.value.substr(12);
-      } else {
-        var lastPathSeparatorIndex = fileInput.value.lastIndexOf('/');
-        if (lastPathSeparatorIndex >= 0) {
-          // Unix-based path.
-          return fileInput.value.substr(lastPathSeparatorIndex + 1);
-        }
-        lastPathSeparatorIndex = fileInput.value.lastIndexOf('\\');
-        if (lastPathSeparatorIndex >= 0) {
-          // Windows-based path.
-          return fileInput.value.substr(lastPathSeparatorIndex + 1);
-        }
-        // The file input value is just the file name.
-        return fileInput.value;
-      }
-    },
-
-    /**
-     * Initialize method for the XWiki object. This is to be called only once upon dom loading.
-     * It makes rendering errors expandable and fixes external links on the body content.
-     * Then it fires an custom event to signify the (modified) DOM is now loaded.
-     */
-    initialize: function() {
-      // Extra security to make sure we do not get initalized twice.
-      // It would fire the custom xwiki:dom:loaded event twice, which could make their observers misbehave.
-      if (typeof this.isInitialized == "undefined" || this.isInitialized == false) {
-        // This variable is set when the marker script is executed, which should always be the last script to execute.
-        // In case the dom:loaded event was fired prematurely, delay the execution and ask instead the marker script to
-        // re-invoke the initialization process.
-        if (typeof XWiki.lastScriptLoaded == "undefined") {
-          XWiki.failedInit = true;
-          return;
-        }
-
-        // All ready, continue with the initialization.
-        this.isInitialized = true;
-        document.fire("xwiki:dom:loading");
-
-        // Make sure we re-add the behaviour whenever a part of the DOM is updated.
-        document.observe('xwiki:dom:updated', function(event) {
-          event.memo.elements.each(this._addBehaviour.bind(this));
-        }.bindAsEventListener(this));
-        // Add behaviour to the entire DOM.
-        this._addBehaviour();
-
-        this.domIsLoaded = true;
-        document.fire("xwiki:dom:loaded");
-      }
-    },
-
-    /**
-     * Enhances some of the common page elements with JavaScript behaviour.
-     */
-    _addBehaviour: function(container) {
-      container = container || $('body');
-
-      this.makeRenderingErrorsExpandable(container);
-      this.fixLinksTargetAttribute(container);
-      this.insertSectionEditLinks(container);
-      this.insertCreatePageFromTemplateModalBoxes(container);
-      this.watchlist.initialize(container);
-      this.registerPanelToggle(container);
     }
-  });
+  },
 
-  return XWiki;
+  cookies: {
+    /**
+     * Create a cookie, with or without expiration date.
+     *
+     * @param name Name of the cookie.
+     * @param value Value of the cookie.
+     * @param days Days to keep the cookie (can be null).
+     * @return
+     */
+    create: function(name,value,days) {
+      if (days) {
+        var date = new Date();
+        date.setTime(date.getTime()+(days*24*60*60*1000));
+        var expires = "; expires="+date.toGMTString();
+      }
+      else var expires = "";
+      document.cookie = name+"="+encodeURIComponent(value)+expires+"; path=/";
+    },
+
+    /**
+     * Read a cookie.
+     *
+     * @param name Name of the cookie.
+     * @return Value for the given cookie.
+     */
+    read:function(name) {
+      var nameEQ = name + "=";
+      var ca = document.cookie.split(';');
+      for(var i=0;i < ca.length;i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') {
+          c = c.substring(1,c.length);
+        }
+        if (c.indexOf(nameEQ) == 0) {
+          return decodeURIComponent(c.substring(nameEQ.length,c.length));
+        }
+      }
+      return null;
+    },
+
+    /**
+     * Erase a cookie.
+     *
+     * @param name Name of the cookie to erase.
+     * @return
+     */
+    erase:function(name) {
+      XWiki.cookies.create(name,"",-1);
+    }
+
+  },
+
+  /**
+   * Expand the given panel if collapsed, collapse if visible.
+   *
+   * @param form  {element} The panel element.
+   */
+  togglePanelVisibility: function(element){
+    element = $(element);
+    element.toggleClassName("collapsed");
+  },
+
+  registerPanelToggle: function(container) {
+    $(container || 'body').select('.panel .xwikipaneltitle').each(function(item) {
+      item.observe('click', this.togglePanelVisibility.bind(this, item.up('.panel')));
+    }.bind(this));
+  },
+
+  /**
+   * Extracts the file name from the value of the specified file input.
+   */
+  extractFileName: function(fileInput) {
+    fileInput = $(fileInput);
+    if (fileInput.files && fileInput.files.length > 0) {
+      // Modern browsers provide additional information about the selected file(s).
+      return fileInput.files[0].name;
+    } else if (fileInput.value.substr(0, 12) == 'C:\\fakepath\\') {
+      // Most browsers hide the real path for security reasons.
+      return fileInput.value.substr(12);
+    } else {
+      var lastPathSeparatorIndex = fileInput.value.lastIndexOf('/');
+      if (lastPathSeparatorIndex >= 0) {
+        // Unix-based path.
+        return fileInput.value.substr(lastPathSeparatorIndex + 1);
+      }
+      lastPathSeparatorIndex = fileInput.value.lastIndexOf('\\');
+      if (lastPathSeparatorIndex >= 0) {
+        // Windows-based path.
+        return fileInput.value.substr(lastPathSeparatorIndex + 1);
+      }
+      // The file input value is just the file name.
+      return fileInput.value;
+    }
+  },
+
+  /**
+   * Initialize method for the XWiki object. This is to be called only once upon dom loading.
+   * It makes rendering errors expandable and fixes external links on the body content.
+   * Then it fires an custom event to signify the (modified) DOM is now loaded.
+   */
+  initialize: function() {
+    // Extra security to make sure we do not get initalized twice.
+    // It would fire the custom xwiki:dom:loaded event twice, which could make their observers misbehave.
+    if (typeof this.isInitialized == "undefined" || this.isInitialized == false) {
+      // This variable is set when the marker script is executed, which should always be the last script to execute.
+      // In case the dom:loaded event was fired prematurely, delay the execution and ask instead the marker script to
+      // re-invoke the initialization process.
+      if (typeof XWiki.lastScriptLoaded == "undefined") {
+        XWiki.failedInit = true;
+        return;
+      }
+
+      // All ready, continue with the initialization.
+      this.isInitialized = true;
+      document.fire("xwiki:dom:loading");
+
+      // Make sure we re-add the behaviour whenever a part of the DOM is updated.
+      document.observe('xwiki:dom:updated', function(event) {
+        event.memo.elements.each(this._addBehaviour.bind(this));
+      }.bindAsEventListener(this));
+      // Add behaviour to the entire DOM.
+      this._addBehaviour();
+
+      this.domIsLoaded = true;
+      document.fire("xwiki:dom:loaded");
+    }
+  },
+
+  /**
+   * Enhances some of the common page elements with JavaScript behaviour.
+   */
+  _addBehaviour: function(container) {
+    container = container || $('body');
+
+    this.makeRenderingErrorsExpandable(container);
+    this.fixLinksTargetAttribute(container);
+    this.insertSectionEditLinks(container);
+    this.insertCreatePageFromTemplateModalBoxes(container);
+    this.watchlist.initialize(container);
+    this.registerPanelToggle(container);
+  }
+});
+
+return XWiki;
 
 })(XWiki || {});
 
@@ -803,10 +803,10 @@ function hidesubmenu(element){
  * @return
  */
 function doHide(){
-  window.hideelement.className = window.hideelement.className.replace("visible", "hidden");
-  clearTimeout(window.hidetimer);
-  window.hidetimer = null;
-  window.hideelement = null;
+    window.hideelement.className = window.hideelement.className.replace("visible", "hidden");
+    clearTimeout(window.hidetimer);
+    window.hidetimer = null;
+    window.hideelement = null;
 }
 
 /**
@@ -817,12 +817,12 @@ function doHide(){
  * @return
  */
 function toggleClass(o, className){
-  if(!eltHasClass(o,className)) {
-    o.className += ' ' + className
-  }
-  else {
-    rmClass(o, className);
-  }
+    if(!eltHasClass(o,className)) {
+        o.className += ' ' + className
+    }
+    else {
+        rmClass(o, className);
+    }
 }
 
 /**
@@ -833,8 +833,8 @@ function toggleClass(o, className){
  * @return
  */
 function addClass(o, className){
-  if(!eltHasClass(o,className))
-    o.className += ' ' + className
+    if(!eltHasClass(o,className))
+        o.className += ' ' + className
 }
 
 /**
@@ -845,9 +845,9 @@ function addClass(o, className){
  * @return True if the element has the class.
  */
 function eltHasClass(o,className){
-  if(!o.className)
-    return false;
-  return new RegExp('\\b' + className + '\\b').test(o.className)
+    if(!o.className)
+        return false;
+    return new RegExp('\\b' + className + '\\b').test(o.className)
 }
 
 /**
@@ -858,7 +858,7 @@ function eltHasClass(o,className){
  * @return
  */
 function rmClass(o, className){
-  o.className = o.className.replace(new RegExp('\\s*\\b' + className + '\\b'),'')
+    o.className = o.className.replace(new RegExp('\\s*\\b' + className + '\\b'),'')
 }
 
 /**
@@ -868,10 +868,10 @@ function rmClass(o, className){
  * @return
  */
 function openURL(url) {
-  var win = open( url, "win", "titlebar=0,width=990,height=500,resizable,scrollbars");
-  if( win ) {
-    win.focus();
-  }
+    var win = open( url, "win", "titlebar=0,width=990,height=500,resizable,scrollbars");
+    if( win ) {
+        win.focus();
+    }
 }
 
 /**
@@ -881,10 +881,10 @@ function openURL(url) {
  * @return
  */
 function openHelp() {
-  var win = open( "http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/XWikiSyntax/WebHome?xpage=print", "XWikiSyntax", "titlebar=0,width=750,height=480,resizable,scrollbars");
-  if( win ) {
-    win.focus();
-  }
+    var win = open( "http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/XWikiSyntax/WebHome?xpage=print", "XWikiSyntax", "titlebar=0,width=750,height=480,resizable,scrollbars");
+    if( win ) {
+        win.focus();
+    }
 }
 
 /**
@@ -896,20 +896,20 @@ function openHelp() {
  * @return true if the text empty after the operation.
  */
 function updateName(field1, field2, removeclass) {
-  var name = field1.value;
-  name = noaccent(name);
-  if (removeclass!=false) {
-    name = name.replace(/class$/gi,"");
-  }
-  if (field2 == null) {
-    field1.value = name;
-  } else {
-    field2.value = name;
-  }
-  if (name=="") {
-    return false;
-  }
-  return true;
+    var name = field1.value;
+    name = noaccent(name);
+    if (removeclass!=false) {
+        name = name.replace(/class$/gi,"");
+    }
+    if (field2 == null) {
+        field1.value = name;
+    } else {
+        field2.value = name;
+    }
+    if (name=="") {
+        return false;
+    }
+    return true;
 }
 
 /**

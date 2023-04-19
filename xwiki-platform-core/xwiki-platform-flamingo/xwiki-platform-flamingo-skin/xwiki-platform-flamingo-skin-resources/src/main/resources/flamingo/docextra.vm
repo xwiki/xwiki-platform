@@ -82,7 +82,7 @@
 ##
 #if ($docextras.size() > 0)
   <div id="docextraanchors">
-    #foreach ($docextra in $docextras)<span id="${docextra.get(0)}anchor">&nbsp;</span>#end
+  #foreach ($docextra in $docextras)<span id="${docextra.get(0)}anchor">&nbsp;</span>#end
   </div>
 #end
 ##

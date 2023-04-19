@@ -259,6 +259,7 @@ $xwiki.jsfx.use('uicomponents/model/entityReference.js', {'defer': false})##
   $xwiki.jsfx.use('uicomponents/widgets/confirmedAjaxRequest.js', true)##
   $xwiki.jsfx.use('uicomponents/widgets/notification.js', true)##
   $xwiki.ssfx.use('uicomponents/widgets/notification.css', true)##
+  $xwiki.jsfx.use('uicomponents/widgets/tabList.js', true)
   $xwiki.jsfx.use('uicomponents/widgets/list/xlist.js')##
   $xwiki.jsfx.use('uicomponents/suggest/suggest.js', {'forceSkinAction' : true, 'language' : $xcontext.locale})##
   $xwiki.ssfx.use('uicomponents/suggest/suggest.css', true)##

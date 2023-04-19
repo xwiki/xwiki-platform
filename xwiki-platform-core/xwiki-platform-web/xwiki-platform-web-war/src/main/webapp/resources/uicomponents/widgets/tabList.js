@@ -27,7 +27,7 @@ class TabsManual {
     this.tabpanels = [];
     for (var i = 0; i < this.tabs.length; i += 1) {
       var tab = this.tabs[i];
-      var tabpanel = $('#'+tab.getAttribute('aria-controls'));
+      var tabpanel = document.getElementById(tab.getAttribute('aria-controls'));
       this.tabpanels.push(tabpanel);
       tab.observe('keydown', this.onKeydown.bind(this));
       tab.observe('click', this.onClick.bind(this));
@@ -40,21 +40,16 @@ class TabsManual {
       this.firstTab = this.tabs[0];
       this.lastTab = this.tabs[this.tabs.length-1];
     }
-
-
   }
   setSelectedTab(currentTab)
   {
-    for (var i = 0; i < this.tabs.length; i += 1) {
-      var tab = this.tabs[i];
+    this.tabs.forEach((tab, index) => {
       if (currentTab === tab) {
         tab.removeAttribute('tabindex');
-        this.tabpanels[i].classList.remove('hidden');
       } else {
         tab.tabIndex = -1;
-        this.tabpanels[i].classList.add('hidden');
       }
-    }
+    })
   }
   moveFocusToTab(currentTab)
   {
@@ -63,25 +58,19 @@ class TabsManual {
 
   moveFocusToPreviousTab(currentTab)
   {
-    var index;
-
     if (currentTab === this.firstTab) {
       this.moveFocusToTab(this.lastTab);
     } else {
-      index = this.tabs.indexOf(currentTab);
-      this.moveFocusToTab(this.tabs[index - 1]);
+      this.moveFocusToTab(this.tabs[this.tabs.indexOf(currentTab) - 1]);
     }
   }
 
-  moveFocusToNextTab(currentTab)
+  moveFocusToTab(currentTab, )
   {
-    var index;
-
     if (currentTab === this.lastTab) {
       this.moveFocusToTab(this.firstTab);
     } else {
-      index = this.tabs.indexOf(currentTab);
-      this.moveFocusToTab(this.tabs[index + 1]);
+      this.moveFocusToTab(this.tabs[this.tabs.indexOf(currentTab) + 1]);
     }
   }
 

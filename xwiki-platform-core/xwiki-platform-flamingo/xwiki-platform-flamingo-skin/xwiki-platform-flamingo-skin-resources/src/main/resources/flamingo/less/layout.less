@@ -324,17 +324,45 @@
 // Tabbar =====================================================================
 
 .xwikitabbar { // Used by: AllDocs, DocExtra
-  .nav;
-  .nav-tabs;
+  display: flex;
+  border-bottom: 1px solid @nav-tabs-border-color;
   margin: 0;
+  > a {
+    // Make the list-items overlay the bottom border
+    margin-bottom: -1px;
+    margin-right: 2px;
+    line-height: @line-height-base;
+    border: 1px solid transparent;
+    border-radius: @border-radius-base @border-radius-base 0 0;
+
+    position: relative;
+    display: block;
+    padding: @nav-link-padding;
+    &:hover,
+    &:focus {
+      text-decoration: none;
+      background-color: @nav-link-hover-bg;
+      border-color: @nav-tabs-link-hover-border-color @nav-tabs-link-hover-border-color @nav-tabs-border-color;
+    }
+  }
+
+  // Active state, and its :hover to override normal :hover
+  & > a.active {
+    border-top-color: fade((@xwiki-border-color), 80%);
+    border-left-color: fade((@xwiki-border-color), 80%);
+    border-right-color: fade((@xwiki-border-color), 80%);
+    &,
+    &:hover,
+    &:focus {
+      color: @nav-tabs-active-link-hover-color;
+      cursor: default;
+      background-color: @nav-tabs-active-link-hover-bg;
+      border: 1px solid @nav-tabs-active-link-hover-border-color;
+      border-bottom-color: transparent;
+    }
+  }
 }
 
 #docExtrasTabsUl {
   margin-left: -(floor((@grid-gutter-width / 2)));
-}
-
-.xwikitabbar > li.active > a {
-  border-top-color: fade((@xwiki-border-color), 80%);
-  border-left-color: fade((@xwiki-border-color), 80%);
-  border-right-color: fade((@xwiki-border-color), 80%);
 }

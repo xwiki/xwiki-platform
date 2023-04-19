@@ -197,7 +197,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!like-button-title-keys'], function 
       new XWiki.widgets.Notification("$escapetool.xml($services.localization.render('like.unlike.error'))", 'error');
     });
   };
-  $('.like-button:not([disabled])').on('click', likeClick);
+  $('.like-button').on('click', likeClick);
 });</code>
     </property>
     <property>

@@ -65,71 +65,85 @@ public class WCAGContext
     private static final Map<String, Boolean> FAILS_ON_RULE = Map.ofEntries(
 
             // WCAG 2.0 Level A & AA Rules
-            entry("area-alt", false),
+            entry("area-alt", true),
+            // Set to true once the build doesn't fail this rule anymore
             entry("aria-allowed-attr", false),
-            entry("aria-command-name", false),
-            entry("aria-hidden-body", false),
-            entry("aria-hidden-focus", false),
-            entry("aria-input-field-name", false),
-            entry("aria-meter-name", false),
-            entry("aria-progressbar-name", false),
-            entry("aria-required-attr", false),
+            entry("aria-command-name", true),
+            entry("aria-hidden-body", true),
+            entry("aria-hidden-focus", true),
+            entry("aria-input-field-name", true),
+            entry("aria-meter-name", true),
+            entry("aria-progressbar-name", true),
+            entry("aria-required-attr", true),
+            // Set to true once the build doesn't fail this rule anymore
             entry("aria-required-children", false),
-            entry("aria-required-parent", false),
-            entry("aria-roledescription", false),
-            entry("aria-roles", false),
-            entry("aria-toggle-field-name", false),
-            entry("aria-tooltip-name", false),
-            entry("aria-valid-attr-value", false),
-            entry("aria-valid-attr", false),
-            entry("audio-caption", false),
-            entry("blink", false),
-            entry("button-name", false),
-            entry("bypass", false),
+            entry("aria-required-parent", true),
+            entry("aria-roledescription", true),
+            entry("aria-roles", true),
+            entry("aria-toggle-field-name", true),
+            entry("aria-tooltip-name", true),
+            entry("aria-valid-attr-value", true),
+            entry("aria-valid-attr", true),
+            entry("audio-caption", true),
+            entry("blink", true),
+            entry("button-name", true),
+            entry("bypass", true),
+            // Set to true once the build doesn't fail this rule anymore
             entry("color-contrast", false),
-            entry("definition-list", false),
+            entry("definition-list", true),
+            // Set to true once the build doesn't fail this rule anymore
             entry("dlitem", false),
-            entry("document-title", false),
+            entry("document-title", true),
+            // Set to true once the build doesn't fail this rule anymore
             entry("duplicate-id-active", false),
+            // Set to true once the build doesn't fail this rule anymore
             entry("duplicate-id-aria", false),
+            // Set to true once the build doesn't fail this rule anymore
             entry("duplicate-id", false),
-            entry("form-field-multiple-labels", false),
-            entry("frame-focusable-content", false),
-            entry("frame-title-unique", false),
+            entry("form-field-multiple-labels", true),
+            entry("frame-focusable-content", true),
+            entry("frame-title-unique", true),
+            // Set to true once the build doesn't fail this rule anymore
             entry("frame-title", false),
-            entry("html-has-lang", false),
-            entry("html-lang-valid", false),
-            entry("html-xml-lang-mismatch", false),
+            entry("html-has-lang", true),
+            entry("html-lang-valid", true),
+            entry("html-xml-lang-mismatch", true),
+            // Set to true once the build doesn't fail this rule anymore
             entry("image-alt", false),
-            entry("input-button-name", false),
-            entry("input-image-alt", false),
+            entry("input-button-name", true),
+            entry("input-image-alt", true),
+            // Set to true once the build doesn't fail this rule anymore
             entry("label", false),
+            // Set to true once the build doesn't fail this rule anymore
             entry("link-in-text-block", false),
+            // Set to true once the build doesn't fail this rule anymore
             entry("link-name", false),
+            // Set to true once the build doesn't fail this rule anymore
             entry("list", false),
-            entry("listitem", false),
-            entry("marquee", false),
-            entry("meta-refresh", false),
-            entry("meta-viewport", false),
-            entry("nested-interactive", false),
-            entry("no-autoplay-audio", false),
-            entry("object-alt", false),
-            entry("role-img-alt", false),
-            entry("scrollable-region-focusable", false),
+            entry("listitem", true),
+            entry("marquee", true),
+            entry("meta-refresh", true),
+            entry("meta-viewport", true),
+            entry("nested-interactive", true),
+            entry("no-autoplay-audio", true),
+            entry("object-alt", true),
+            entry("role-img-alt", true),
+            entry("scrollable-region-focusable", true),
+            // Set to true once the build doesn't fail this rule anymore
             entry("select-name", false),
-            entry("server-side-image-map", false),
-            entry("svg-img-alt", false),
-            entry("td-headers-attr", false),
-            entry("th-has-data-cells", false),
-            entry("valid-lang", false),
-            entry("video-caption", false),
+            entry("server-side-image-map", true),
+            entry("svg-img-alt", true),
+            entry("td-headers-attr", true),
+            entry("th-has-data-cells", true),
+            entry("valid-lang", true),
+            entry("video-caption", true),
 
             // WCAG 2.1 Level A & AA Rules
-            entry("autocomplete-valid", false),
-            entry("avoid-inline-spacing", false),
+            entry("autocomplete-valid", true),
+            entry("avoid-inline-spacing", true),
 
             // WCAG 2.2 Level A & AA Rules
-            entry("target-size", false)
+            entry("target-size", true)
     );
 
     /**

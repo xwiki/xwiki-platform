@@ -956,16 +956,20 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 
 #-# [Since 14.10]
 #-# Define the list of allowed attachment mimetypes. By default, this list is empty, but you can specify a 
-#-# comma-separated list of allowed mimetypes. Note that a joker (*) can be used to accept any media type. Once this
-#-# list is not empty, any attachment with an unlisted mimetype will be rejected.
+#-# comma-separated list of allowed mimetypes. Note that a single star character (*) can be used in the defined allowed
+#-# mimetype and in this case the allowed mimetype value will need to start with the text before the star and end with
+#-# the text after it.
+#-# Once this list is not empty, any attachment with an unlisted mimetype will be rejected.
 #-# For instance, if you want to only accept plain text and any kind of images, you can set the list to:
 #-# text/plain,image/*
 # attachment.upload.allowList=
 
 #-# [Since 14.10]
 #-# Define the list of blocked attachment mimetypes. By default, this list is empty, but you can specify a 
-#-# comma-separated list of blocked mimetypes. Note that a joker (*) can be used to accept any media type. Once this 
-#-# list is not empty, any attachment matching one of the listed mimetype will be rejected.
+#-# comma-separated list of blocked mimetypes. Note that a single star character (*) can be used in the defined blocked
+#-# mimetype and in this case the blocked mimetype value will need to start with the text before the star and end with
+#-# the text after it.
+#-# Once this list is not empty, any attachment matching one of the listed mimetype will be rejected.
 #-# For instance, if you want to reject plain text and any kind of images, you can set the list to:
 #-# text/plain,image/*
 #-#

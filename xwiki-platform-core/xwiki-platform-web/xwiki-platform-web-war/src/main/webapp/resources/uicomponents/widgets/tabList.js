@@ -17,17 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-var XWiki = (function(XWiki) {
-  // Start XWiki augmentation.
-  var widgets = XWiki.widgets = XWiki.widgets || {};
-  /**
-   * KeyboardAccessibleTabList class.
-   * Provides keyboard support for horizontal tab lists.
-   */
-  widgets.KeyboardAccessibleTabList = Class.create({
-    initialize: function (tabListNode) {
+define('xwiki-tabList', ['jquery'], function($) {
+  class KeyboardAccessibleTabList {
+    constructor(tabListNode) {
       this.tabListNode = tabListNode;
-      this.tabs = Array.from(this.tabListNode.querySelectorAll('[role=tab]'));
+      this.tabs = Array.from(this.tabListNode.find('[role=tab]'));
       this.firstTab = null;
       this.lastTab = null;
       var selectedTab;
@@ -36,9 +30,9 @@ var XWiki = (function(XWiki) {
         var tab = this.tabs[i];
         var tabpanel = document.getElementById(tab.getAttribute('aria-controls'));
         this.tabpanels.push(tabpanel);
-        tab.observe('keyup', this.onKeyUp.bindAsEventListener(this));
+        tab.observe('keydown', this.onKeyDown.bindAsEventListener(this));
         tab.observe('click', this.onClick.bindAsEventListener(this));
-        if (!selectedTab && tab.getAttribute('aria-selected') == 'true') {
+        if (!selectedTab && $(tab).hasClass('active')) {
           selectedTab = tab;
         }
       }
@@ -47,47 +41,49 @@ var XWiki = (function(XWiki) {
         this.firstTab = this.tabs[0];
         this.lastTab = this.tabs[this.tabs.length - 1];
       }
-    },
+    }
 
-    setSelectedTab: function (currentTab) {
+    setSelectedTab(currentTab) {
       this.tabs.forEach((tab, index) => {
         if (currentTab === tab) {
           tab.removeAttribute('tabindex');
+          tab.setAttribute('aria-selected', 'true');
         } else {
           tab.tabIndex = -1;
+          tab.setAttribute('aria-selected', 'false');
         }
       })
-    },
+    }
 
-    moveFocusToTab: function (currentTab) {
+    moveFocusToTab(currentTab) {
       currentTab.focus();
-    },
+    }
 
-    moveFocusToTabShifted: function (currentTab, deltaIndex) {
+    moveFocusToTabShifted(currentTab, deltaIndex) {
       this.moveFocusToTab(this.tabs[this.tabs.indexOf(currentTab) + deltaIndex]);
-    },
+    }
 
-    moveFocusToPreviousTab: function (currentTab) {
+    moveFocusToPreviousTab(currentTab) {
       if (currentTab === this.firstTab) {
         this.moveFocusToTab(this.lastTab);
       } else {
         this.moveFocusToTabShifted(currentTab, -1);
       }
-    },
+    }
 
-    moveFocusToNextTab: function (currentTab) {
+    moveFocusToNextTab(currentTab) {
       if (currentTab === this.lastTab) {
         this.moveFocusToTab(this.firstTab);
       } else {
         this.moveFocusToTabShifted(currentTab, +1);
       }
-    },
+    }
 
     /* EVENT HANDLERS */
-    onKeyUp: function(event) {
+    onKeyDown(event) {
       let target = event.currentTarget;
       let controlOfTab = true;
-      let key = even.keyCode;
+      let key = event.keyCode;
       const KEY_SPACE = 32;
       switch (key) {
         case Event.KEY_LEFT:
@@ -111,13 +107,13 @@ var XWiki = (function(XWiki) {
       }
       if (controlOfTab) {
         event.stopPropagation();
+        event.preventDefault();
       }
-    },
+    }
 
-    onClick: function(event) {
+    onClick(event) {
       this.setSelectedTab(event.currentTarget);
     }
-  });
-  // End XWiki augmentation.
-  return XWiki;
-}(XWiki || {}));
+  };
+  return KeyboardAccessibleTabList;
+});

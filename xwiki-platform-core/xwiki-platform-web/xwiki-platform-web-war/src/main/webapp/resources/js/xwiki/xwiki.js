@@ -188,17 +188,13 @@ Object.extend(XWiki, {
         var pane = document.getElementById(extraID + "pane");
         if (window.activeDocExtraTab != null) {
           window.activeDocExtraTab.removeAttribute('class');
-          window.activeDocExtraTab.setAttribute("aria-selected", "false");
-          window.activeDocExtraTab.setAttribute("tabindex", "-1");
-            window.activeDocExtraPane.className="hidden";
+          window.activeDocExtraPane.className="hidden";
         }
         window.activeDocExtraTab = tab;
         window.activeDocExtraPane = pane;
         window.activeDocExtraTab.className="active";
-        window.activeDocExtraTab.setAttribute("aria-selected", "true");
-        window.activeDocExtraTab.removeAttribute("tabindex");
+
         window.activeDocExtraPane.className="";
-        tab.blur();
 
         document.fire("xwiki:docextra:activated", {"id": extraID});
      };

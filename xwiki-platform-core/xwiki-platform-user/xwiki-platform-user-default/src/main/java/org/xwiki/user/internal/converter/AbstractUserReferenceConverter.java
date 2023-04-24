@@ -24,6 +24,8 @@ import java.lang.reflect.Type;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.xwiki.component.util.ReflectionUtils;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.properties.converter.AbstractConverter;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
@@ -45,6 +47,10 @@ public abstract class AbstractUserReferenceConverter<U extends UserReference> ex
     @Inject
     private UserReferenceSerializer<String> userReferenceSerializer;
 
+    @Inject
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> userReferenceDocumentReferenceSerializer;
+
     @Override
     protected UserReference convertToType(Type targetType, Object value)
     {
@@ -53,6 +59,24 @@ public abstract class AbstractUserReferenceConverter<U extends UserReference> ex
         }
 
         return this.userReferenceResolver.resolve(value.toString());
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <G> G convert(Type targetType, Object sourceValue)
+    {
+        G result;
+
+        // Special handling for target type DocumentReference to support converting UserReference to DocumentReference.
+        if (targetType != null && ReflectionUtils.getTypeClass(targetType).equals(DocumentReference.class)
+            && sourceValue instanceof UserReference)
+        {
+            result = (G) this.userReferenceDocumentReferenceSerializer.serialize((UserReference) sourceValue);
+        } else {
+            result = super.convert(targetType, sourceValue);
+        }
+
+        return result;
     }
 
     @Override

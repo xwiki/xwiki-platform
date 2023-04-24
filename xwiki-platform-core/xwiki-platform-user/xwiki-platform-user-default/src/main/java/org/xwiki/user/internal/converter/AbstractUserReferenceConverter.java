@@ -24,7 +24,6 @@ import java.lang.reflect.Type;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.properties.converter.AbstractConverter;
 import org.xwiki.user.UserReference;
@@ -68,9 +67,7 @@ public abstract class AbstractUserReferenceConverter<U extends UserReference> ex
         G result;
 
         // Special handling for target type DocumentReference to support converting UserReference to DocumentReference.
-        if (targetType != null && ReflectionUtils.getTypeClass(targetType).equals(DocumentReference.class)
-            && sourceValue instanceof UserReference)
-        {
+        if (targetType == DocumentReference.class && sourceValue instanceof UserReference) {
             result = (G) this.userReferenceDocumentReferenceSerializer.serialize((UserReference) sourceValue);
         } else {
             result = super.convert(targetType, sourceValue);

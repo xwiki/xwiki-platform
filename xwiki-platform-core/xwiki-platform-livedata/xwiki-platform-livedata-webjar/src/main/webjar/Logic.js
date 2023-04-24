@@ -213,6 +213,7 @@ define('xwiki-livedata', [
         "selection.infoBar.allSelectedBut",
         "pagination.currentEntries",
         "pagination.pageSize",
+        "pagination.selectPageSize",
         "pagination.page",
         "pagination.first",
         "pagination.previous",

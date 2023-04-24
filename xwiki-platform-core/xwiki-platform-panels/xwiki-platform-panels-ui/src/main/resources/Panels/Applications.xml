@@ -240,12 +240,13 @@
 &lt;/ul&gt;
 &lt;ul class="applicationsPanel applicationsPanelMoreList nav nav-pills nav-stacked"&gt;
   &lt;li&gt;
-    &lt;button class="applicationPanelMoreButton btn btn-default"
+    #set ($panelId = $doc.getXDOM().getIdGenerator().generateUniqueId('applicationPanelMoreContainer',''))
+    &lt;button class='applicationPanelMoreButton btn btn-default' aria-controls="$panelId"
       title="$services.localization.render('panels.applications.more')" aria-expanded='false' &gt;
       &lt;span class="application-img"&gt;$services.icon.renderHTML('add')&lt;/span&gt;
       &lt;span class="application-label"&gt;$services.localization.render('panels.applications.more')&lt;/span&gt;
     &lt;/button&gt;
-    &lt;div class="applicationPanelMoreContainer hidden"&gt;
+    &lt;div id="$panelId" class="applicationPanelMoreContainer hidden"&gt;
       &lt;ul class="nav nav-pills nav-stacked"&gt;
         #displayAppPanelEntries('org.xwiki.platform.panels.Applications.more')
       &lt;/ul&gt;
@@ -365,8 +366,6 @@ panels.MoreApplicationsButtonListener = Class.create({
 
     var moreAppsCount = this.container.select('.application-label').length;
     if (moreAppsCount &gt; 0) {
-      this.container.id = 'applicationPanelMoreContainer' + Math.floor(Math.random()*101);
-      this.button.setAttribute('aria-controls',this.container.id);
       this.isToggling = false;
       this.button.observe('click', function(e) {
         e.stop();

@@ -240,11 +240,11 @@
 &lt;/ul&gt;
 &lt;ul class="applicationsPanel applicationsPanelMoreList nav nav-pills nav-stacked"&gt;
   &lt;li&gt;
-    &lt;a href="$xwiki.getURL($services.model.createDocumentReference('', 'XWiki', 'XWikiPreferences'), 'admin',
-        'editor=globaladmin&amp;section=XWiki.AddExtensions')" class="applicationPanelMoreButton" title="$services.localization.render('panels.applications.more')"&gt;
+    &lt;button class="applicationPanelMoreButton btn btn-default"
+      title="$services.localization.render('panels.applications.more')" aria-expanded='false' &gt;
       &lt;span class="application-img"&gt;$services.icon.renderHTML('add')&lt;/span&gt;
       &lt;span class="application-label"&gt;$services.localization.render('panels.applications.more')&lt;/span&gt;
-    &lt;/a&gt;
+    &lt;/button&gt;
     &lt;div class="applicationPanelMoreContainer hidden"&gt;
       &lt;ul class="nav nav-pills nav-stacked"&gt;
         #displayAppPanelEntries('org.xwiki.platform.panels.Applications.more')
@@ -366,6 +366,7 @@ panels.MoreApplicationsButtonListener = Class.create({
     var moreAppsCount = this.container.select('.application-label').length;
     if (moreAppsCount &gt; 0) {
       this.container.id = 'applicationPanelMoreContainer' + Math.floor(Math.random()*101);
+      this.button.setAttribute('aria-controls',this.container.id);
       this.isToggling = false;
       this.button.observe('click', function(e) {
         e.stop();
@@ -389,6 +390,7 @@ panels.MoreApplicationsButtonListener = Class.create({
         duration: 0.1,
         afterFinish: function() {
           this.isToggling = false;
+          this.button.setAttribute('aria-expanded','true');
         }.bind(this)
       });
     } else {
@@ -399,6 +401,7 @@ panels.MoreApplicationsButtonListener = Class.create({
         afterFinish: function() {
           this.container.addClassName('hidden');
           this.isToggling = false;
+          this.button.setAttribute('aria-expanded','false');
         }.bind(this)
       });
     }
@@ -613,20 +616,6 @@ require(['scriptaculous/effects'], function() {
   padding: 0;
 }
 
-.panel-width-Small .applicationPanelMoreContainer ul {
-  padding: 0;
-  margin: 0;
-  background-color: $theme.pageContentBackgroundColor;
-}
-
-.panel-width-Small .applicationPanelMoreContainer ul li:hover {
-  background-color: $theme.highlightColor;
-}
-
-.panel-width-Small .applicationPanelMoreContainer ul li:hover a {
-  color: $theme.textPrimaryColor;
-}
-
 .panel-width-Small .applicationPanelMoreContainer > ul > li > a {
   justify-content: center;
 }
@@ -693,15 +682,6 @@ require(['scriptaculous/effects'], function() {
 }
 
 /* for colibri */
-
-.skin-colibri .applicationPanelMoreContainer ul {
-  margin-left: 0;
-}
-
-.skin-colibri .panel-width-Medium .applicationPanelMoreContainer ul,
-.skin-colibri .panel-width-Large .applicationPanelMoreContainer ul {
-  margin-left: 20px;
-}
 
 .skin-colibri .panel-width-Small .applicationsPanel {
   margin: 0;

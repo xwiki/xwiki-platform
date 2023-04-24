@@ -36,8 +36,11 @@ define('xwiki-tabList', ['jquery'], function($) {
           selectedTab = tab;
         }
       }
-      this.setSelectedTab(selectedTab);
       if (this.tabs.length != 0) {
+        if (!selectedTab) {
+          selectedTab=this.tabs[0];
+        }
+        this.setSelectedTab(selectedTab);
         this.firstTab = this.tabs[0];
         this.lastTab = this.tabs[this.tabs.length - 1];
       }

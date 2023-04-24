@@ -171,7 +171,6 @@
                 <include>**/confirmationBox.js</include>
                 <include>**/confirmedAjaxRequest.js</include>
                 <include>**/notification.js</include>
-                <include>**/tabList.js</include>
                 <include>**/xlist.js</include>
                 <include>**/suggest.js</include>
               </includes>

@@ -193,7 +193,6 @@ Object.extend(XWiki, {
         window.activeDocExtraTab = tab;
         window.activeDocExtraPane = pane;
         window.activeDocExtraTab.className="active";
-
         window.activeDocExtraPane.className="";
 
         document.fire("xwiki:docextra:activated", {"id": extraID});

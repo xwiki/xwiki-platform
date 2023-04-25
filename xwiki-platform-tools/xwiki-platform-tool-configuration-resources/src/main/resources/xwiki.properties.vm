@@ -132,7 +132,7 @@ environment.permanentDirectory = $xwikiPropertiesEnvironmentPermanentDirectory
 #-# Override the default hidden macro categories.
 #-# Note: the categories are case sensitive.
 #-#
-#-# For instance, to make the "Development" category hidden by default, in addition to the default "Internal" and 
+#-# For instance, to make the "Development" category hidden by default, in addition to the default "Internal" and
 #-# "Deprecated" categories, you'd use:
 # rendering.transformation.macro.hiddenCategories = Development,Internal,Deprecated
 
@@ -961,7 +961,7 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 
 #-# [Since 14.10]
 #-# Define the list of blocked attachment mimetypes. By default, this list is empty, but you can specify a 
-#-# comma-separated list of blocked mimetypes. Note that a joker (*) can be used to accept any media type. Once this 
+#-# comma-separated list of blocked mimetypes. Note that a joker (*) can be used to accept any media type. Once this
 #-# list is not empty, any attachment matching one of the listed mimetype will be rejected.
 #-# For instance, if you want to reject plain text and any kind of images, you can set the list to:
 #-# text/plain,image/*
@@ -1502,5 +1502,28 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# not considered as critical information.
 # tag.rightCheckStrategy.hint=exhaustive
 # tag.rightCheckStrategy.hint=unsafe
+
+#-------------------------------------------------------------------------------------
+# XML Diff
+#-------------------------------------------------------------------------------------
+
+#-# [Since 14.10.15, 15.5.1, 15.6]
+#-# If the compared documents contain images, they can be embedded as data URI to compare the images themselves
+#-# instead of their URLs. For this, images are downloaded via HTTP and embedded as data URI. Images are only
+#-# downloaded from trusted domains when enabled above. Still, this can be a security and stability risk as
+#-# downloading images can easily increase the server load. If this option is set to "false", no images are
+#-# downloaded by the diff and images are compared by URL instead.
+#-# Default is "true".
+# diff.xml.dataURI.enabled = true
+
+#-# [Since 14.10.15, 15.5.1, 15.6]
+#-# Configure the maximum size in bytes of an image to be embedded into the XML diff output as data URI.
+#-# Default is 1MB.
+# diff.xml.dataURI.maximumContentSize = 1048576
+
+#-# [Since 14.10.15, 15.5.1, 15.6]
+#-# Configure the timeout in seconds for downloading an image via HTTP to embed it into the XML diff output as data URI.
+#-# Default is 10 seconds.
+# diff.xml.dataURI.httpTimeout = 10
 
 $!xwikiPropertiesAdditionalProperties

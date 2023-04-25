@@ -383,7 +383,6 @@ panels.MoreApplicationsButtonListener = Class.create({
   toggle: function() {
     this.isToggling = true;
     if (this.container.hasClassName('hidden')) {
-      this.container.style.display = "none";
       this.container.removeClassName('hidden');
       Effect.BlindDown(this.container.id, {
         duration: 0.1,
@@ -553,6 +552,18 @@ require(['scriptaculous/effects'], function() {
 
 .applicationsPanel li .application-label {
   margin-left: 0.1em;
+}
+
+.applicationPanelMoreButton {
+  padding-left: 0px;
+  padding-right: 6px;
+}
+
+.applicationPanelMoreButton .application-label{
+  white-space: normal;
+  text-align: left;
+  display: block;
+  margin-left: 20px;
 }
 
 .applicationPanelMoreContainer ul {

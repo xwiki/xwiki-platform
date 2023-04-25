@@ -54,13 +54,13 @@ $services.progress.endStep()
   $services.progress.startStep('Compute title to display and modify rendered content accordingly')
   #template("titlevars.vm")
   $services.progress.endStep()
-  <div class="xcontent">
+  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with inclusive techs.
+  <main class="xcontent">
     $xcontext.dropPermissions()
     <div class="document-info">
       <div id="document-title"><h1>$titleToDisplay</h1></div>
     </div>
-    ## Set as an HTML main for better DOM tree semantics to facilitate navigation with inclusive techs.
-    <main id="xwikicontent">
+    <div id="xwikicontent">
 #end
 #if ("$!exception" != '')
   $exceptiontool.getStackTrace($exception)
@@ -68,7 +68,7 @@ $services.progress.endStep()
   $renderedContent
 #end
 #if ($request.outputTitle == 'true')
-    </main>
-  </div>
+    </div>
+  </main>
 #end
 $services.progress.popLevel()

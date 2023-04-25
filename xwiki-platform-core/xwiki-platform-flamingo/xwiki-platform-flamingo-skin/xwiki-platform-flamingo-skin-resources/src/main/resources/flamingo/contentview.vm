@@ -40,7 +40,8 @@ $services.progress.endStep()
 ## Display the title
 ## ----------------------------
 $services.progress.startStep('Display the title and content')
-<div class="xcontent">
+## Set as an HTML main for better DOM tree semantics to facilitate navigation with inclusive techs.
+<main class="xcontent">
   #template('contentheader.vm')
   #foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.template.content.header.after'))
     $services.rendering.render($uix.execute(), 'xhtml/1.0')
@@ -54,16 +55,15 @@ $services.progress.startStep('Display the title and content')
   ## Display the rendered content
   ## ----------------------------
   <div class="row">
-    ## Set as an HTML main for better DOM tree semantics to facilitate navigation with inclusive techs.
-    <main id="xwikicontent" class="col-xs-12">
+    <div id="xwikicontent" class="col-xs-12">
       #if ("$!contentvmexception" != '')
         #displayUnhandledException($contentvmexception)
       #else
         $renderedContent
       #end
-    </main>
+    </div>
   </div>
-</div>
+</main>
 $services.progress.endStep()
 
 ## -----------------------------------------------------------------------------------

@@ -36,8 +36,7 @@
 #else
   #set ($pages = ["$doc.documentReference"])
 #end
-## Set as an HTML main for better DOM tree semantics to facilitate navigation with inclusive techs.
-<main id="xwikicontent">
+<div id="xwikicontent">
   #foreach ($page in $pages)
     #set ($pageDoc = $xwiki.getDocument($page))
     $pageDoc.getRenderedContent()
@@ -58,7 +57,7 @@
       #pagebreak()
     #end
   #end
-</main>
+</div>
 ## TODO: move that in a place common to old and new rendering footnotes
 #if ($doc.syntax.toIdString() == 'xwiki/1.0')
 #set($footnotes = "#putFootnotes()")

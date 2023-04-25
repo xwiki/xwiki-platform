@@ -37,8 +37,7 @@
   #end
 
   <div class="main">
-  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with inclusive techs.
-  <main id="mainContentArea">
+  <div id="mainContentArea">
   #template("hierarchy.vm")
   #if($viewer == 'content')
     #template("contentview.vm")
@@ -46,7 +45,7 @@
     #template("${viewer}.vm")
   #end
   <div class="clearfloats"></div>
-  </main>## mainContentArea
+  </div>## mainContentArea
   #if($viewer == 'content')
     #if ($displayContentFooter)
       <div id="xdocFooter">

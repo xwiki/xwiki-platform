@@ -19,12 +19,11 @@
 ## ---------------------------------------------------------------------------
 #template("startpage.vm")
 <div class="main layoutsubsection">
-## Set as an HTML main for better DOM tree semantics to facilitate navigation with inclusive techs.
-<main id="mainContentArea">
+<div id="mainContentArea">
 #template("hierarchy.vm")
 #template("contentview.vm")
 <hr />
 <div class="bottombuttons sticky-buttons">#template("previewactions.vm")</div>
-</main> ## mainContentArea
+</div> ## mainContentArea
 </div> ## main
 #template("endpage.vm")

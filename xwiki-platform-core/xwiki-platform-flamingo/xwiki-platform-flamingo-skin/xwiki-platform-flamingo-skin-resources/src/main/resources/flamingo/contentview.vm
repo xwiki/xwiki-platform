@@ -54,13 +54,14 @@ $services.progress.startStep('Display the title and content')
   ## Display the rendered content
   ## ----------------------------
   <div class="row">
-    <div id="xwikicontent" class="col-xs-12">
+    ## Set as an HTML main for better DOM tree semantics to facilitate navigation with inclusive techs.
+    <main id="xwikicontent" class="col-xs-12">
       #if ("$!contentvmexception" != '')
         #displayUnhandledException($contentvmexception)
       #else
         $renderedContent
       #end
-    </div>
+    </main>
   </div>
 </div>
 $services.progress.endStep()

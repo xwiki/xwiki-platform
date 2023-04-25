@@ -59,7 +59,8 @@ $services.progress.endStep()
     <div class="document-info">
       <div id="document-title"><h1>$titleToDisplay</h1></div>
     </div>
-    <div id="xwikicontent">
+    ## Set as an HTML main for better DOM tree semantics to facilitate navigation with inclusive techs.
+    <main id="xwikicontent">
 #end
 #if ("$!exception" != '')
   $exceptiontool.getStackTrace($exception)
@@ -67,7 +68,7 @@ $services.progress.endStep()
   $renderedContent
 #end
 #if ($request.outputTitle == 'true')
-    </div>
+    </main>
   </div>
 #end
 $services.progress.popLevel()

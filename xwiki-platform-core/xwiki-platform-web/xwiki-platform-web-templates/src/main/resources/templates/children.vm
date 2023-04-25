@@ -31,8 +31,7 @@
 #if($request.xpage == 'children')
   #template('startpage.vm')
     <div class="main layoutsubsection">
-      ## Set as an HTML main for better DOM tree semantics to facilitate navigation with inclusive techs.
-      <main id="mainContentArea">
+      <div id="mainContentArea">
         <div class="xcontent">
 #end
 #######################################################
@@ -85,13 +84,16 @@
       'childrenOf': $doc.space,
       '$doc': $doc.documentReference
     }))
-    {{liveData
-      id='childrenIndex'
-      source='liveTable'
-      sourceParameters="$sourceParameters"
-      properties='doc.title,doc.location,doc.date,doc.author,_actions'
-      sort='doc.location:asc'
-      }}$jsontool.serialize($liveDataConfig){{/liveData}}
+    ## Set as an HTML main for better DOM tree semantics to facilitate navigation with inclusive techs.
+    <main>
+      {{liveData
+        id='childrenIndex'
+        source='liveTable'
+        sourceParameters="$sourceParameters"
+        properties='doc.title,doc.location,doc.date,doc.author,_actions'
+        sort='doc.location:asc'
+        }}$jsontool.serialize($liveDataConfig){{/liveData}}
+    </main>
   #end
 #end
 #######################################################
@@ -119,7 +121,7 @@
 #######################################################
 #if($request.xpage == 'children')
         </div> ## xcontent
-      </main> ## mainContentArea
+      </div> ## mainContentArea
     </div> ## main
   #template("endpage.vm")
 #end

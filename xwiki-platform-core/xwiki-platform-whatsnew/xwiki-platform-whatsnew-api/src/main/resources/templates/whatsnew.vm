@@ -24,8 +24,7 @@
 #set ($discard = $response.setHeader('X-Robots-Tag', 'noindex'))
 #template("startpage.vm")
 <div class="main layoutsubsection">
-  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with inclusive techs.
-  <main id="mainContentArea">
+  <div id="mainContentArea">
     #template("hierarchy.vm")
     #set($titleToDisplay = $services.localization.render('platform.whatsnew.title'))
     ## Do not display the content menu or the "last modified by" since the page is not about the current document and
@@ -40,7 +39,8 @@
         </div>
       </div>
       #try()
-      <div class="xwiki-whatsnew-container">
+      ## Set as an HTML main for better DOM tree semantics to facilitate navigation with inclusive techs.
+      <main class="xwiki-whatsnew-container">
         #set ($newsSource = $services.whatsnew.configuredNewsSource)
         ## TODO: For now, show all categories until we implement support for either Admin UI selection of categories
         ## or we decide to automatically show categories based on whether the current user is a simple or advanced user,
@@ -77,13 +77,13 @@
         #else
           No news!
         #end
-      </div>
+      </main>
       #end
       #if ("$!exception" != '')
         #displayException('Error displaying XWiki News', $exception)
       #end
       <div class="clearfloats"></div>
     </div> ## xcontent
-  </main>## mainContentArea
+  </div>## mainContentArea
 </div>## main
 #template("endpage.vm")

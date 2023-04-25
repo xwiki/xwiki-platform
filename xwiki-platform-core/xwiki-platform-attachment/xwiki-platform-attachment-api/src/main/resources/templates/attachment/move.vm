@@ -43,7 +43,7 @@
     #end
   #end
   <div class="main layoutsubsection">
-  <div id="mainContentArea">
+  <main id="mainContentArea">
     #if ("$!request.moveId" != '')
       ## Display the move status
       #template("attachment/moveStatus.vm")
@@ -95,7 +95,7 @@
       #end
     #end
     <div class="clearfloats"></div>
-  </div>## mainContentArea
+  </main>## mainContentArea
   </div>## main
   #template("endpage.vm")
 #end

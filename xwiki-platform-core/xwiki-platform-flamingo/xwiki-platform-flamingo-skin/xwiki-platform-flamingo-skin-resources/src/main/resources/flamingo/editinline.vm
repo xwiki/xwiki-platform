@@ -31,7 +31,8 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
 #set($allowDocEdit = !(($doc.getLocked()==true)&&(!$force)) )
 ##
 <div class="main">
-<div id="mainContentArea">
+## Set as an HTML main for better DOM tree semantics to facilitate navigation with inclusive techs.
+<main id="mainContentArea">
 ## ----------------------------------------------------------------------------
 ## Start FORM at start of content area IF editing is allowed.
 ## ----------------------------------------------------------------------------
@@ -142,5 +143,5 @@ $renderedContent
 </div> ## form
 </form>
 #end ## can edit
-</div> ## mainContentArea
+</main> ## mainContentArea
 </div> ## main

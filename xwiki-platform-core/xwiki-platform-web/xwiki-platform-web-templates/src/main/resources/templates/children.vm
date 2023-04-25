@@ -31,7 +31,8 @@
 #if($request.xpage == 'children')
   #template('startpage.vm')
     <div class="main layoutsubsection">
-      <div id="mainContentArea">
+      ## Set as an HTML main for better DOM tree semantics to facilitate navigation with inclusive techs.
+      <main id="mainContentArea">
         <div class="xcontent">
 #end
 #######################################################
@@ -118,7 +119,7 @@
 #######################################################
 #if($request.xpage == 'children')
         </div> ## xcontent
-      </div> ## mainContentArea
+      </main> ## mainContentArea
     </div> ## main
   #template("endpage.vm")
 #end

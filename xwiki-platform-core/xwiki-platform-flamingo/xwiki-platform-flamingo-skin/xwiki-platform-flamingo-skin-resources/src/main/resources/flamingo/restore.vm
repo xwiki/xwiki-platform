@@ -37,7 +37,8 @@
 #else
   #template("startpage.vm")
   <div class="main">
-    <div id="mainContentArea">
+    ## Set as an HTML main for better DOM tree semantics to facilitate navigation with inclusive techs.
+    <main id="mainContentArea">
       #define($title)<a href="$doc.getURL('view')">$!escapetool.xml($doc.plainTitle)</a>#end
       #set($titleToDisplay = $services.localization.render('core.restore.title', [$title]))
       <div class="xcontent">
@@ -45,7 +46,7 @@
         #controller()
         <div class="clearfloats"></div>
       </div> ## xcontent
-    </div>## mainContentArea
+    </main>## mainContentArea
   </div>## main
   #template("endpage.vm")
 #end

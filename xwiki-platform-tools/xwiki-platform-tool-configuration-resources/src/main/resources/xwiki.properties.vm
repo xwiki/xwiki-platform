@@ -1556,4 +1556,27 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 # whatsnew.sources = xwikisas = xwikiblog
 # whatsnew.sources.xwikisas.rssURL = https://xwiki.com/news
 
+#-------------------------------------------------------------------------------------
+# XML Diff
+#-------------------------------------------------------------------------------------
+
+#-# [Since 14.10.15, 15.5.1, 15.6]
+#-# If the compared documents contain images, they can be embedded as data URI to compare the images themselves
+#-# instead of their URLs. For this, images are downloaded via HTTP and embedded as data URI. Images are only
+#-# downloaded from trusted domains when enabled above. Still, this can be a security and stability risk as
+#-# downloading images can easily increase the server load. If this option is set to "false", no images are
+#-# downloaded by the diff and images are compared by URL instead.
+#-# Default is "true".
+# diff.xml.dataURI.enabled = true
+
+#-# [Since 14.10.15, 15.5.1, 15.6]
+#-# Configure the maximum size in bytes of an image to be embedded into the XML diff output as data URI.
+#-# Default is 1MB.
+# diff.xml.dataURI.maximumContentSize = 1048576
+
+#-# [Since 14.10.15, 15.5.1, 15.6]
+#-# Configure the timeout in seconds for downloading an image via HTTP to embed it into the XML diff output as data URI.
+#-# Default is 10 seconds.
+# diff.xml.dataURI.httpTimeout = 10
+
 $!xwikiPropertiesAdditionalProperties

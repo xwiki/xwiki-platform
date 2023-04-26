@@ -58,7 +58,7 @@
 #set ($supplementaryForm = $services.security.authentication.getForm($request.j_username))
 <dl>
   <dt>
-    <label for="j_username">$services.localization.render('username')</label>
+    <label for="j_username">$escapetool.xml($services.localization.render('username'))</label>
   </dt>
   <dd class="input-group">
     <span class="input-group-addon">$services.icon.renderHTML('user')</span>
@@ -66,7 +66,7 @@
     <input class="form-control" type="text" id="j_username" size="60" name="j_username" value="" autofocus />
   </dd>
   <dt>
-    <label for="j_password">$services.localization.render('password')</label>
+    <label for="j_password">$escapetool.xml($services.localization.render('password'))</label>
   </dt>
   <dd class="input-group">
     <span class="input-group-addon">$services.icon.renderHTML('lock')</span>
@@ -75,7 +75,7 @@
   <dt></dt>
   <dd>
     <label class="xHint" for="rememberme">
-      <input id="rememberme" type="checkbox" name="j_rememberme" value="true" /> $services.localization.render('remembermeonthiscomp')
+      <input id="rememberme" type="checkbox" name="j_rememberme" value="true" /> $escapetool.xml($services.localization.render('remembermeonthiscomp'))
     </label>
   </dd>
   #if ("$!supplementaryForm" != "")
@@ -84,15 +84,15 @@
     </div>
   #end
   <dt class="submitSection">
-    <input type="submit" class="btn btn-primary col-xs-12" value="$services.localization.render('login')"/>
+    <input type="submit" class="btn btn-primary col-xs-12" value="$escapetool.xml($services.localization.render('login'))"/>
 
     #set ($forgotUsernameURL = $services.security.authentication.getAuthenticationURL('retrieveusername', $NULL))
     #if("$!forgotUsernameURL" != "")
-      <span class="xAdditional"><a href="$forgotUsernameURL">$services.localization.render('xe.admin.forgotUsername.loginMessage')</a></span>
+      <span class="xAdditional"><a href="$forgotUsernameURL">$escapetool.xml($services.localization.render('xe.admin.forgotUsername.loginMessage'))</a></span>
     #end
     #set ($resetPasswordUrl = $services.security.authentication.getAuthenticationURL('resetpassword', $NULL))
     #if("$!resetPasswordUrl" != '')
-      <span class="xAdditional recoverPassword"><a href="$resetPasswordUrl" >$services.localization.render('xe.admin.passwordReset.loginMessage')</a></span>
+      <span class="xAdditional recoverPassword"><a href="$resetPasswordUrl" >$escapetool.xml($services.localization.render('xe.admin.passwordReset.loginMessage'))</a></span>
     #end
   </dt>
 </dl>

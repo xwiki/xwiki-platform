@@ -137,6 +137,9 @@
     </div>
   #end
   #template("hierarchy.vm")
+  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with inclusive techs.
+  ## We keep the hierarchy outside because it's not unique/specific to this page.
+  <main>
   ## Display a warning in case the document is restricted to explain explain the reason for potential errors.
   ## Also, only display it to users with script right as it's very unlikely that others are impacted.
   #if ($doc.isRestricted() && $services.security.authorization.hasAccess('script'))
@@ -204,6 +207,7 @@
     }
     //]]>
   </script>
+  </main>
   </div> ## mainEditArea
   </div> ## alleditcontent
   </div> ## editcolumn

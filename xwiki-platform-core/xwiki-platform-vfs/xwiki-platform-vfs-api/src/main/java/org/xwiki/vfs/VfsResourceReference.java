@@ -82,7 +82,7 @@ public class VfsResourceReference extends EntityResourceReference
     public VfsResourceReference(URI uri, List<String> pathSegments)
     {
         // FIXME: we don't know the wiki of the resource yet, putting main one
-        super(XWIKI_REFERENCE, EntityResourceAction.fromString(""));
+        super(XWIKI_REFERENCE, EntityResourceAction.fromString(""), uri.getFragment());
 
         setType(TYPE);
         this.uri = uri;

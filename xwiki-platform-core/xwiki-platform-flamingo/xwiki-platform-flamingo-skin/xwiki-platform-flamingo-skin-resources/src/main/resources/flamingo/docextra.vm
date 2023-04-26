@@ -93,11 +93,10 @@
     <div class="floatcontainer" id="docExtraTabs">
       <div class="xwikitabbar" id="docExtrasTabsUl" role="tablist">
         #foreach($docextra in $docextras)
-          ## Note: Add rel='nofollow' to prevent search crawler from navigating the links and indexing them in search results
-          <a id="${docextra.get(0)}tab" href="$doc.getURL('view', "viewer=${docextra.get(1)}")" rel="nofollow"
+          <button id="${docextra.get(0)}tab" rel="nofollow"
             role="tab" aria-controls="${docextra.get(0)}pane" aria-selected="false" tabindex="-1">
             $docextra.get(2) #if($docextra.get(3) >= 0) <span class="itemCount">$services.localization.render('docextra.extranb', [$docextra.get(3)])</span> #end
-          </a>
+          </button>
         #end
       </div>
     </div>
@@ -138,22 +137,21 @@
         ## Replace tab link
         ##
         if ($("${extraAnchor}tab") != null) {
-          $("${extraAnchor}tab").href="#${extraAnchor}";
-          Event.observe($("${extraAnchor}tab"), "click", function(){ XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", false); }, false);
+          $("${extraAnchor}tab").addEventListener("click", function(){ XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", false); }, false);
         }
         ##
         ## Replace top menu link (if any)
         ##
         if ($("tmShow${extraAnchor}") != null) {
           $("tmShow${extraAnchor}").href="#${extraAnchor}";
-          Event.observe($("tmShow${extraAnchor}"), "click", function(){ XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", true); }, false);
+          $("tmShow${extraAnchor}").addEventListener("click", function(){ XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", true); }, false);
         }
         ##
         ## Replace shortcut link (if any)
         ##
         if ($("${extraName}shortcut") != null) {
           $("${extraName}shortcut").down('a').href="#${extraName}";
-          Event.observe($("${extraName}shortcut"), "click", function(){ XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", true); }, false);
+          $("${extraName}shortcut").addEventListener("click", function(){ XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", true); }, false);
         }
         ##
         ## Override keyboard shortcut (if any)

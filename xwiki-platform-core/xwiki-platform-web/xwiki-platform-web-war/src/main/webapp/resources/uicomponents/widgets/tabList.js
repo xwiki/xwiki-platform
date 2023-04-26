@@ -19,26 +19,35 @@
  */
 define('xwiki-tabList', ['jquery'], function($) {
   class KeyboardAccessibleTabList {
+    /**
+     * Instantiates a keyboard navigable tabList.
+     * @param tabListNode is the root of the list, with role = "tablist"
+     * All of its children should be tab elements whose "aria-controls" attribute is properly set.
+     * The state of the tabList can be initialized with one element already open. This element's tab should have the
+     * class "active" on it.
+     */
     constructor(tabListNode) {
       this.tabListNode = tabListNode;
+      // Only the elements that are properly annotated are considered as tabs.
+      // The correct use of this class is with children that are all properly annotated.
       this.tabs = Array.from(this.tabListNode.find('[role=tab]'));
       this.firstTab = null;
       this.lastTab = null;
-      var selectedTab;
+      let selectedTab;
       this.tabpanels = [];
       for (var i = 0; i < this.tabs.length; i += 1) {
         var tab = this.tabs[i];
         var tabpanel = document.getElementById(tab.getAttribute('aria-controls'));
         this.tabpanels.push(tabpanel);
-        tab.observe('keydown', this.onKeyDown.bindAsEventListener(this));
-        tab.observe('click', this.onClick.bindAsEventListener(this));
+        tab.addEventListener('keydown', this.onKeyDown.bindAsEventListener(this));
+        tab.addEventListener('click', this.onClick.bindAsEventListener(this));
         if (!selectedTab && $(tab).hasClass('active')) {
           selectedTab = tab;
         }
       }
       if (this.tabs.length != 0) {
         if (!selectedTab) {
-          selectedTab=this.tabs[0];
+          selectedTab = this.tabs[0];
         }
         this.setSelectedTab(selectedTab);
         this.firstTab = this.tabs[0];
@@ -46,9 +55,13 @@ define('xwiki-tabList', ['jquery'], function($) {
       }
     }
 
-    setSelectedTab(currentTab) {
+    /**
+     * Updates the attributes of the tab-list to reflect a change in the opened tab.
+     * @param newlyOpenedTab
+     */
+    setSelectedTab(newlyOpenedTab) {
       this.tabs.forEach((tab, index) => {
-        if (currentTab === tab) {
+        if (newlyOpenedTab === tab) {
           tab.removeAttribute('tabindex');
           tab.setAttribute('aria-selected', 'true');
         } else {
@@ -58,16 +71,26 @@ define('xwiki-tabList', ['jquery'], function($) {
       })
     }
 
-    moveFocusToTab(currentTab) {
-      currentTab.focus();
+    /**
+     * Move user focus to a new tab in the list.
+     * @param newlyFocusedTab is the new tab to focus.
+     */
+    moveFocusToTab(newlyFocusedTab) {
+      newlyFocusedTab.focus();
     }
 
+    /**
+     * Move user focus to a new tab in the list.
+     * @param currentTab is the current tab.
+     * @param deltaIndex is the difference in index from the current tab to the new tab to focus
+     */
     moveFocusToTabShifted(currentTab, deltaIndex) {
       this.moveFocusToTab(this.tabs[this.tabs.indexOf(currentTab) + deltaIndex]);
     }
 
     moveFocusToPreviousTab(currentTab) {
       if (currentTab === this.firstTab) {
+        // Loop around when the start of the list is reached.
         this.moveFocusToTab(this.lastTab);
       } else {
         this.moveFocusToTabShifted(currentTab, -1);
@@ -76,18 +99,22 @@ define('xwiki-tabList', ['jquery'], function($) {
 
     moveFocusToNextTab(currentTab) {
       if (currentTab === this.lastTab) {
+        // Loop around when the end of the list is reached.
         this.moveFocusToTab(this.firstTab);
       } else {
         this.moveFocusToTabShifted(currentTab, +1);
       }
     }
 
-    /* EVENT HANDLERS */
+    /**
+     * Event handler for keydown.
+     * This switch contains the
+     * @param event
+     */
     onKeyDown(event) {
       let target = event.currentTarget;
       let controlOfTab = true;
       let key = event.keyCode;
-      const KEY_SPACE = 32;
       switch (key) {
         case Event.KEY_LEFT:
           this.moveFocusToPreviousTab(target);
@@ -101,19 +128,23 @@ define('xwiki-tabList', ['jquery'], function($) {
         case Event.KEY_END:
           this.moveFocusToTab(this.lastTab);
           break;
-        case KEY_SPACE:
-          target.click();
-          break;
         default:
           controlOfTab = false;
           break;
       }
       if (controlOfTab) {
+        // When a tab focus event is observed, we stop propagation of this event to avoid
+        // multiple interactions through one input. E.g. This prevents the screen from scrolling right and left when
+        // navigating through the tabs with right/left arrows
         event.stopPropagation();
         event.preventDefault();
       }
     }
 
+    /**
+     * Event handler for the click event.
+     * @param event
+     */
     onClick(event) {
       this.setSelectedTab(event.currentTarget);
     }

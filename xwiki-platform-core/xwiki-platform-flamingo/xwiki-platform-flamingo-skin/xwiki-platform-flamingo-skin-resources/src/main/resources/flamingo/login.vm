@@ -35,7 +35,7 @@
 ###
 ###
 #template("startpage.vm")
-<main class="main layoutsubsection">
+<div class="main layoutsubsection">
 <div id="mainContentArea">
 <form id="loginForm" action="$doc.getURL('loginsubmit')" method="post" class="xform">
 <div class="hidden"><input type="hidden" name="xredirect" value="$!{escapetool.xml($request.xredirect)}"/>
@@ -99,7 +99,7 @@
 #xwikimessageboxend()
 </form>
 </div>## mainContentArea
-</main>## main
+</div>## main
 
 #template("endpage.vm")
 #end

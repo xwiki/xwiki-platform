@@ -69,7 +69,8 @@
       'name': "$name",
       'rows': 25,
       'cols': 80,
-      'full': true
+      'full': true,
+      'restricted': $editedDocument.isRestricted()
     })
   #else
     &lt;/div&gt;

@@ -19,25 +19,18 @@
  */
 package org.xwiki.export.pdf.internal.chrome;
 
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Disposable;
-import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.browser.BrowserManager;
-import org.xwiki.export.pdf.internal.docker.ContainerManager;
-
-import com.github.dockerjava.api.model.HostConfig;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * Default provider of {@link ChromeManager}.
@@ -50,155 +43,25 @@ import com.github.dockerjava.api.model.HostConfig;
 @Named("chrome")
 public class ChromeManagerProvider implements Provider<BrowserManager>, Disposable
 {
-    private static final String BRIDGE_NETWORK = "bridge";
+    @Inject
+    private Provider<ChromeManagerManager> chromeManagerManagerProvider;
 
     @Inject
-    private Logger logger;
+    private WikiDescriptorManager wikiDescriptorManager;
 
-    @Inject
-    private PDFExportConfiguration configuration;
-
-    @Inject
-    @Named("chrome")
-    private BrowserManager chromeManager;
-
-    /**
-     * We use a provider (i.e. lazy initialization) because we don't always need this component (e.g. when the Chrome
-     * web browser is remote and thus not managed by XWiki).
-     */
-    @Inject
-    private Provider<ContainerManager> containerManagerProvider;
-
-    private String containerId;
-
-    /**
-     * Flag indicating if the Docker container used for PDF export was created by this component instance or not. This
-     * is needed in order to know whether to stop the Docker container or not when the component is disposed. We
-     * shouldn't stop a Docker container that we didn't create (i.e. that is being reused).
-     */
-    private boolean isContainerCreator;
-
-    /**
-     * We store the previous configuration values in order to detect when the configuration changes.
-     */
-    private Map<String, Object> previousConfig;
+    private Map<String, ChromeManagerManager> instances = new ConcurrentHashMap<>();
 
     @Override
     public void dispose()
     {
-        disconnect();
+        this.instances.values().forEach(ChromeManagerManager::dispose);
     }
 
     @Override
     public BrowserManager get()
     {
-        if (configurationChanged()) {
-            disconnect();
-            connect();
-        }
-
-        return this.chromeManager;
-    }
-
-    private synchronized boolean configurationChanged()
-    {
-        Map<String, Object> nextConfig = copyConfiguration();
-        boolean changed = !Objects.equals(this.previousConfig, nextConfig);
-        this.previousConfig = nextConfig;
-        return changed;
-    }
-
-    /**
-     * @return a copy of the configuration properties that influence the connection with the Chrome web browser
-     */
-    private Map<String, Object> copyConfiguration()
-    {
-        Map<String, Object> config = new HashMap<>();
-        config.put("chromeHost", this.configuration.getChromeHost());
-        config.put("chromeRemoteDebuggingPort", this.configuration.getChromeRemoteDebuggingPort());
-        config.put("chromeDockerImage", this.configuration.getChromeDockerImage());
-        config.put("chromeDockerContainerName", this.configuration.getChromeDockerContainerName());
-        config.put("dockerNetwork", this.configuration.getDockerNetwork());
-        return config;
-    }
-
-    private void disconnect()
-    {
-        this.chromeManager.close();
-
-        if (this.containerId != null && this.isContainerCreator) {
-            this.containerManagerProvider.get().stopContainer(this.containerId);
-            this.containerId = null;
-            this.isContainerCreator = false;
-        }
-    }
-
-    private void connect()
-    {
-        String chromeHost = this.configuration.getChromeHost();
-        if (StringUtils.isBlank(chromeHost)) {
-            chromeHost = prepareChromeDockerContainer(this.configuration.getChromeDockerImage(),
-                this.configuration.getChromeDockerContainerName(), this.configuration.getDockerNetwork(),
-                this.configuration.getChromeRemoteDebuggingPort());
-        }
-        connectChromeService(chromeHost, this.configuration.getChromeRemoteDebuggingPort());
-    }
-
-    private String prepareChromeDockerContainer(String imageName, String containerName, String network,
-        int remoteDebuggingPort)
-    {
-        this.logger.debug("Preparing the Docker container running the headless Chrome web browser.");
-        ContainerManager containerManager = this.containerManagerProvider.get();
-        try {
-            this.containerId = containerManager.maybeReuseContainerByName(containerName);
-            if (this.containerId == null) {
-                // The container doesn't exist so we have to create it.
-                // But first we need to pull the image used to create the container, if we don't have it already.
-                if (!containerManager.isLocalImagePresent(imageName)) {
-                    containerManager.pullImage(imageName);
-                }
-
-                HostConfig hostConfig = containerManager.getHostConfig(network, remoteDebuggingPort);
-                if (BRIDGE_NETWORK.equals(network)) {
-                    // The extra host is needed in order for the created container to be able to access the XWiki
-                    // instance running on the same machine as the Docker daemon.
-                    hostConfig = hostConfig.withExtraHosts(this.configuration.getXWikiHost() + ":host-gateway");
-                }
-
-                this.containerId = containerManager.createContainer(imageName, containerName,
-                    Arrays.asList("--no-sandbox", "--remote-debugging-address=0.0.0.0",
-                        "--remote-debugging-port=" + remoteDebuggingPort),
-                    hostConfig);
-                this.isContainerCreator = true;
-                containerManager.startContainer(this.containerId);
-            }
-
-            // By default we assume XWiki is not running inside a Docker container (i.e. it runs on the same host as the
-            // Docker daemon) so it can access the Chrome browser (that runs inside a Docker container) using localhost
-            // because the Chrome container is supposed to export the remote debugging port on the Docker daemon host.
-            // Note that on Linux we could have also used the Chrome container's IP address but unfortunately that
-            // doesn't work on MacOS and Windows. The recommendation is to either use localhost plus port forwarding
-            // when you are on the Docker daemon host, or use the container IP/alias when you are inside a container.
-            String chromeHost = "localhost";
-            if (!BRIDGE_NETWORK.equals(network)) {
-                // Using a dedicated (user-defined) Docker network (instead of the default bridge) normally signals the
-                // fact that XWiki is also running inside a Docker container and so both the XWiki container and the
-                // Chrome container are in the specified network. In this case the Chrome browser must be accessed using
-                // the IP address of its Docker container.
-                chromeHost = containerManager.getIpAddress(this.containerId, network);
-            }
-            return chromeHost;
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to prepare the Docker container for the PDF export.", e);
-        }
-    }
-
-    private void connectChromeService(String host, int remoteDebuggingPort)
-    {
-        try {
-            this.chromeManager.connect(host, remoteDebuggingPort);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to connect to the Chrome remote debugging service.", e);
-        }
+        return this.instances.computeIfAbsent(this.wikiDescriptorManager.getCurrentWikiId(), (wikiId) -> {
+            return this.chromeManagerManagerProvider.get();
+        }).get();
     }
 }

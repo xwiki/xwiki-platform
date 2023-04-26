@@ -21,6 +21,7 @@ package com.xpn.xwiki.internal.observation.remote.converter;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -28,12 +29,14 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.remote.converter.AbstractEventConverter;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.store.XWikiCacheStore;
 import com.xpn.xwiki.util.XWikiStubContextProvider;
 
 /**
@@ -137,7 +140,7 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
      */
     protected Serializable serializeXWikiDocument(XWikiDocument document)
     {
-        HashMap<String, Serializable> remoteDataMap = new HashMap<String, Serializable>();
+        HashMap<String, Serializable> remoteDataMap = new HashMap<>();
 
         remoteDataMap.put(DOC_NAME, document.getDocumentReference());
 
@@ -156,16 +159,11 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
         return remoteDataMap;
     }
 
-    protected XWikiDocument getDocument(DocumentReference documentReference, String language, String version)
+    protected XWikiDocument getDocument(XWikiDocument document, String version, XWikiContext xcontext)
         throws XWikiException
     {
-        XWikiContext xcontext = getXWikiStubContext();
-
-        XWikiDocument document = new XWikiDocument(documentReference);
-        document.setLanguage(language);
-
         // Force bypassing the cache to make extra sure we get the last version of the document.
-        XWikiDocument targetDocument = xcontext.getWiki().getNotCacheStore().loadXWikiDoc(document, xcontext);
+        XWikiDocument targetDocument = xcontext.getWiki().getDocument(document, xcontext);
 
         if (!targetDocument.getVersion().equals(version)) {
             // It's not the last version of the document, ask versioning store.
@@ -185,27 +183,32 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
         Map<String, Serializable> remoteDataMap = (Map<String, Serializable>) remoteData;
 
         DocumentReference docReference = (DocumentReference) remoteDataMap.get(DOC_NAME);
+        Locale locale = LocaleUtils.toLocale((String) remoteDataMap.get(DOC_LANGUAGE));
+        Locale origLocale = LocaleUtils.toLocale((String) remoteDataMap.get(ORIGDOC_LANGUAGE));
 
-        XWikiDocument doc;
-        if (remoteDataMap.get(DOC_VERSION) == null) {
-            doc = new XWikiDocument(docReference);
-        } else {
-            doc =
-                getDocument(docReference, (String) remoteDataMap.get(DOC_LANGUAGE),
-                    (String) remoteDataMap.get(DOC_VERSION));
+        XWikiContext xcontext = getXWikiStubContext();
+
+        XWikiDocument document = new XWikiDocument(docReference, locale);
+        XWikiDocument origDoc = new XWikiDocument(docReference, origLocale);
+
+        // Force invalidating the cache to be sure it return (and keep) the right document
+        if (xcontext.getWiki().getStore() instanceof XWikiCacheStore) {
+            ((XWikiCacheStore) xcontext.getWiki().getStore()).invalidate(document);
+            ((XWikiCacheStore) xcontext.getWiki().getStore()).invalidate(origDoc);
         }
 
-        XWikiDocument origDoc;
-        if (remoteDataMap.get(ORIGDOC_VERSION) == null) {
-            origDoc = new XWikiDocument(docReference);
-        } else {
-            origDoc =
-                getDocument(docReference, (String) remoteDataMap.get(ORIGDOC_LANGUAGE),
-                    (String) remoteDataMap.get(ORIGDOC_VERSION));
+        String version = (String) remoteDataMap.get(DOC_VERSION);
+        if (version != null) {
+            document = getDocument(document, version, xcontext);
         }
 
-        doc.setOriginalDocument(origDoc);
+        String origVersion = (String) remoteDataMap.get(ORIGDOC_VERSION);
+        if (origVersion != null) {
+            origDoc = getDocument(origDoc, origVersion, xcontext);
+        }
 
-        return doc;
+        document.setOriginalDocument(origDoc);
+
+        return document;
     }
 }

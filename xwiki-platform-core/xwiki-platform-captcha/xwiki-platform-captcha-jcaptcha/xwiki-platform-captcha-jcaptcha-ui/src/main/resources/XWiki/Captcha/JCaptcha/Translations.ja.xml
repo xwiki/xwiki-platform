@@ -62,4 +62,4 @@ captcha.jcaptcha.engine.com.octo.captcha.engine.sound.gimpy.SimpleListSoundCaptc
 captcha.jcaptcha.engine.org.xwiki.captcha.internal.SimpleMathCaptchaEngine=シンプルな算数
 captcha.jcaptcha.engine.custom=カスタム：
 </content>
-  </xwikidoc>
+</xwikidoc>

@@ -108,4 +108,4 @@ export.pdf.options.template.hint=Le template PDF contrôle les informations affi
 ### Missing: XWiki.PDFExport.ConfigurationClass_replaceFOP=Replace FOP
 ### Missing: XWiki.PDFExport.ConfigurationClass_replaceFOP.hint=Replace the old PDF export based on Apache Formatting Objects Processor (FOP).
 </content>
-  </xwikidoc>
+</xwikidoc>

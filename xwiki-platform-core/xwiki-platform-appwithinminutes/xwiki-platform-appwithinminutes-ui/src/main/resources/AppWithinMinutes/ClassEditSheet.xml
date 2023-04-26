@@ -135,6 +135,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
             #set ($fieldURL = $doc.getURL('edit', $escapetool.url({
               'xpage': 'plain',
               'sheet': 'AppWithinMinutes.ClassEditSheet',
+              'form_token': $services.csrf.getToken(),
               'template': 'AppWithinMinutes.ClassTemplate',
               'field': $formFieldDoc.fullName,
               'xeditmode': 'text'
@@ -715,6 +716,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
       })
       #if (!$xwiki.exists($templateProviderReference))
         #set ($discard = $queryString.putAll({
+          'form_token': $services.csrf.getToken(),
           'template': 'XWiki.TemplateProviderTemplate',
           'parent': $doc.fullName
         }))

@@ -237,11 +237,11 @@ if [ ! "$XWIKI_NONINTERACTIVE" = true ] ; then
     echo "No Java found. You need Java installed for XWiki to work."
     exit 0
   fi
-  if [ "$JAVA_VERSION" -lt 8 ]; then
-    echo This version of XWiki requires Java 8 or greater.
+  if [ "$JAVA_VERSION" -lt 11 ]; then
+    echo This version of XWiki requires Java 11 or greater.
     exit 0
   fi
-  if [ "$JAVA_VERSION" -gt 11 ]; then
+  if [ "$JAVA_VERSION" -gt 17 ]; then
     read -p "You're using Java $JAVA_VERSION which XWiki doesn't fully support yet. Continue (y/N)? " -n 1 -r
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
       exit 0
@@ -249,14 +249,13 @@ if [ ! "$XWIKI_NONINTERACTIVE" = true ] ; then
   fi
 fi
 
-# TODO: Remove once https://jira.xwiki.org/browse/XRENDERING-616 and https://jira.xwiki.org/browse/XWIKI-19034 are
-# fixed. In summary we need this to allow the XWiki code or 3rd party code to use reflection to access private
-# variables (setAccessible() calls). See https://tinyurl.com/tdhkn6mp
+# TODO: Remove once https://jira.xwiki.org/browse/XWIKI-19034 is fixed. In summary we need this to allow the XWiki code
+# or 3rd party code to use reflection to access private variables (setAccessible() calls).
+# See https://tinyurl.com/tdhkn6mp
 if [ "$JAVA_VERSION" -gt 11 ]; then
   XWIKI_OPENS_LANG="--add-opens java.base/java.lang=ALL-UNNAMED"
   XWIKI_OPENS_UTIL="--add-opens java.base/java.util=ALL-UNNAMED"
-  XWIKI_OPENS_CONCURRENT="--add-opens java.base/java.concurrent=ALL-UNNAMED"
-  XWIKI_OPTS="$XWIKI_OPENS_LANG $XWIKI_OPENS_UTIL $XWIKI_OPENS_CONCURRENT $XWIKI_OPTS"
+  XWIKI_OPTS="$XWIKI_OPENS_LANG $XWIKI_OPENS_UTIL $XWIKI_OPTS"
 fi
 
 # We save the shell PID here because we do an exec below and exec will replace the shell with the executed command

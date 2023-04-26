@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -30,6 +31,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.extension.version.Version;
@@ -187,8 +191,10 @@ public class XWikiBlogNewsSource implements NewsSource
 
             newsItem.setAuthor(item.getAuthor());
             newsItem.setCategories(this.categoriesConverter.convertFromRSS(item.getCategories()));
-            newsItem.setPublishedDate(item.getPubDate());
+            newsItem.setPublishedDate(parseDateTime(item.getPubDate()));
             newsItem.setOriginURL(item.getLink());
+            newsItem.setImageURL(item.getEnclosure().isPresent() ? Optional.of(item.getEnclosure().get().getUrl())
+                : Optional.empty());
             newsItems.add(newsItem);
         }
 
@@ -212,6 +218,30 @@ public class XWikiBlogNewsSource implements NewsSource
             result = String.format("%s%s%s", this.rssURL,
                 this.rssURL.contains(QUESTION_MARK) ? "&" : QUESTION_MARK,
                 this.categoriesConverter.convertToQueryString(this.wantedCategories));
+        }
+        return result;
+    }
+
+    @Override
+    public String toString()
+    {
+        return String.format("XWiki Blog news source for URL [%s]", this.rssURL);
+    }
+
+    private Optional<Date> parseDateTime(Optional<String> dateAsString)
+    {
+        Optional<Date> result;
+        if (!dateAsString.isPresent()) {
+            result = Optional.empty();
+        } else {
+            // Example of expected date: "2023-01-23T05:34:15+01:00"
+            // TODO: find how to pare the blog rss dates using ZonedDateTime:
+            // DateTimeFormatter formatter = DateTimeFormatter.ofPattern("format here");
+            // ZonedDateTime zonedDateTime = ZonedDateTime.parse(dateAsString, formatter);
+            // I could not find a format that works.
+            DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'hh:mm:ssZ");
+            DateTime dt = formatter.parseDateTime(dateAsString.get());
+            result = Optional.of(dt.toDate());
         }
         return result;
     }

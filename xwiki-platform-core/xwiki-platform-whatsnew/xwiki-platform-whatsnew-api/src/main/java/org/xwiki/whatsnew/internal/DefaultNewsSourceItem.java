@@ -20,6 +20,7 @@
 package org.xwiki.whatsnew.internal;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -42,11 +43,13 @@ public class DefaultNewsSourceItem implements NewsSourceItem
 
     private Set<NewsCategory> categories = new HashSet<>();
 
-    private Optional<String> publishedDate;
+    private Optional<Date> publishedDate;
 
     private Optional<String> author;
 
     private Optional<String> originURL;
+
+    private Optional<String> imageURL;
 
     @Override
     public Optional<String> getTitle()
@@ -91,7 +94,7 @@ public class DefaultNewsSourceItem implements NewsSourceItem
     }
 
     @Override
-    public Optional<String> getPublishedDate()
+    public Optional<Date> getPublishedDate()
     {
         return this.publishedDate;
     }
@@ -99,7 +102,7 @@ public class DefaultNewsSourceItem implements NewsSourceItem
     /**
      * @param publishedDate see {@link #getPublishedDate()}
      */
-    public void setPublishedDate(Optional<String> publishedDate)
+    public void setPublishedDate(Optional<Date> publishedDate)
     {
         this.publishedDate = publishedDate;
     }
@@ -130,5 +133,26 @@ public class DefaultNewsSourceItem implements NewsSourceItem
     public void setOriginURL(Optional<String> originURL)
     {
         this.originURL = originURL;
+    }
+
+    @Override
+    public Optional<String> getImageURL()
+    {
+        return this.imageURL;
+    }
+
+    /**
+     * @param imageURL see {@link #getImageURL()} ()}
+     */
+    public void setImageURL(Optional<String> imageURL)
+    {
+        this.imageURL = imageURL;
+    }
+
+    @Override
+    public int compareTo(NewsSourceItem other)
+    {
+        // We sort descending, i.e. the first item is the newest of the two.
+        return other.getPublishedDate().orElse(new Date()).compareTo(getPublishedDate().orElse(new Date()));
     }
 }

@@ -116,6 +116,8 @@ public class DefaultWikiComponentBuilder implements WikiComponentBuilder, WikiCo
             new DefaultWikiComponent(reference, componentBridge.getAuthorReference(reference),
                 componentBridge.getRoleType(reference), componentBridge.getRoleHint(reference),
                 componentBridge.getScope(reference));
+        rawComponent.setRoleTypePriority(componentBridge.getRoleTypePriority(reference));
+        rawComponent.setRoleHintPriority(componentBridge.getRoleHintPriority(reference));
         rawComponent.setHandledMethods(componentBridge.getHandledMethods(reference));
         rawComponent.setImplementedInterfaces(componentBridge.getDeclaredInterfaces(reference));
         rawComponent.setDependencies(componentBridge.getDependencies(reference));

@@ -25,6 +25,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.extension.version.Version;
 import org.xwiki.user.UserReference;
 import org.xwiki.whatsnew.NewsCategory;
@@ -39,6 +42,8 @@ import org.xwiki.whatsnew.NewsSourceItem;
  */
 public class CompositeNewsSource implements NewsSource
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CompositeNewsSource.class);
+
     private List<NewsSource> wrappedSources;
 
     /**
@@ -95,13 +100,20 @@ public class CompositeNewsSource implements NewsSource
     }
 
     @Override
-    public List<NewsSourceItem> build() throws NewsException
+    public List<NewsSourceItem> build()
     {
-        // TODO: Sort the items by date
         List<NewsSourceItem> items = new ArrayList<>();
         for (NewsSource source : getWrappedSources()) {
-            items.addAll(source.build());
+            try {
+                items.addAll(source.build());
+            } catch (NewsException e) {
+                // If an error happens for a given source, just ignore the source, but log the problem as a warning
+                LOGGER.warn("Failed to get news items for source [{}]. Root cause: [{}]", source,
+                    ExceptionUtils.getRootCauseMessage(e));
+            }
         }
+        // Sort by having the latest published date items come first in the list so that they're rendered first.
+        Collections.sort(items);
         return items;
     }
 

@@ -323,6 +323,13 @@ public class MockitoOldcore
                 this.spaceConfigurationSource);
         }
 
+        // Expose a XWikiStubContextProvider if none is exist
+        if (!getMocker().hasComponent(XWikiStubContextProvider.class)) {
+            XWikiStubContextProvider conetxtProvider =
+                getMocker().registerMockComponent(XWikiStubContextProvider.class);
+            when(conetxtProvider.createStubContext()).thenReturn(getXWikiContext());
+        }
+
         // Since the oldcore module draws the Servlet Environment in its dependencies we need to ensure it's set up
         // correctly with a Servlet Context.
         if (getMocker().hasComponent(Environment.class)) {
@@ -628,6 +635,9 @@ public class MockitoOldcore
                 document.setNew(false);
                 document.setStore(getMockStore());
 
+                // Make sure the document is not restricted.
+                document.setRestricted(false);
+
                 XWikiDocument savedDocument = document.clone();
 
                 documents.put(document.getDocumentReferenceWithLocale(), savedDocument);
@@ -831,7 +841,11 @@ public class MockitoOldcore
                         document.setOriginalDocument(originalDocument);
                     }
 
+                    // Make sure the document is not restricted.
+                    document.setRestricted(false);
+
                     XWikiDocument savedDocument = document.clone();
+
                     documents.put(document.getDocumentReferenceWithLocale(), savedDocument);
 
                     if (isNew) {

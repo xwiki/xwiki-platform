@@ -424,7 +424,7 @@ rendering.transformations = $xwikiRenderingTransformations
 #-#   velocity.properties = context.scope_control.template = true
 #-#   velocity.properties = context.scope_control.macro = true
 #-#   velocity.properties = event_handler.include.class = org.xwiki.velocity.internal.util.RestrictParseLocationEventHandler
-#-#   velocity.properties = runtime.introspection.uberspect = org.xwiki.velocity.introspection.SecureUberspector\,org.apache.velocity.util.introspection.DeprecatedCheckUberspector\,org.xwiki.velocity.introspection.MethodArgumentsUberspector
+#-#   velocity.properties = runtime.introspection.uberspect = org.xwiki.velocity.introspection.SecureUberspector\,org.apache.velocity.util.introspection.DeprecatedCheckUberspector\,org.xwiki.velocity.introspection.MethodArgumentsUberspector\,org.xwiki.velocity.introspection.MethodOverrideUberspector
 
 #-------------------------------------------------------------------------------------
 # Groovy
@@ -956,16 +956,20 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 
 #-# [Since 14.10]
 #-# Define the list of allowed attachment mimetypes. By default, this list is empty, but you can specify a 
-#-# comma-separated list of allowed mimetypes. Note that a joker (*) can be used to accept any media type. Once this
-#-# list is not empty, any attachment with an unlisted mimetype will be rejected.
+#-# comma-separated list of allowed mimetypes. Note that a single star character (*) can be used in the defined allowed
+#-# mimetype and in this case the allowed mimetype value will need to start with the text before the star and end with
+#-# the text after it.
+#-# Once this list is not empty, any attachment with an unlisted mimetype will be rejected.
 #-# For instance, if you want to only accept plain text and any kind of images, you can set the list to:
 #-# text/plain,image/*
 # attachment.upload.allowList=
 
 #-# [Since 14.10]
 #-# Define the list of blocked attachment mimetypes. By default, this list is empty, but you can specify a 
-#-# comma-separated list of blocked mimetypes. Note that a joker (*) can be used to accept any media type. Once this 
-#-# list is not empty, any attachment matching one of the listed mimetype will be rejected.
+#-# comma-separated list of blocked mimetypes. Note that a single star character (*) can be used in the defined blocked
+#-# mimetype and in this case the blocked mimetype value will need to start with the text before the star and end with
+#-# the text after it.
+#-# Once this list is not empty, any attachment matching one of the listed mimetype will be rejected.
 #-# For instance, if you want to reject plain text and any kind of images, you can set the list to:
 #-# text/plain,image/*
 #-#
@@ -1499,5 +1503,34 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# not considered as critical information.
 # tag.rightCheckStrategy.hint=exhaustive
 # tag.rightCheckStrategy.hint=unsafe
+
+#-------------------------------------------------------------------------------------
+# What's New
+#-------------------------------------------------------------------------------------
+
+#-# [Since 15.2RC1]
+#-# Defines the list of News sources from which to get news items displayed by the What's New UI
+#-# Source format:
+#-#   whatsnew.sources = <a unique id> = <a valid source hint>
+#-# Where:
+#-#   - <a unique id>: a user-chosen id that represents the source. It's used to define the parameters for the source,
+#-#     see below
+#-#   - <a valid source hint>: for example use "xwikiblog" for using the XWiki Blog Application as a news source.
+#-# Source parameters format:
+#-#   whatsnew.source.<source id>.<key> = <value>
+#-# Where:
+#-#   - <source id>: this is the unique id mentioned above
+#-#   - <key>: a source-dependent parameter name (e.g for the "xwikiblog" source, the "rssURL" key is used to point to
+#-#     the URL that generates the RSS feed)
+#-#   - <value>: a source-dependent parameter value for the specified key
+#-#
+#-# To disable the feature, use an empty source list, as in:
+# whatsnew.sources =
+#-#
+#-# When not defined, the default list of sources and their configuration is:
+# whatsnew.sources = xwikiorg = xwikiblog
+# whatsnew.source.xwikiorg.rssURL = https://extensions.xwiki.org/news
+# whatsnew.sources = xwikisas = xwikiblog
+# whatsnew.sources.xwikisas.rssURL = https://xwiki.com/news
 
 $!xwikiPropertiesAdditionalProperties

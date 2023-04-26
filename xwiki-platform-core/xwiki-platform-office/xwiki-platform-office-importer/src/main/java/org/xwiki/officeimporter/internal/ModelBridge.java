@@ -19,20 +19,20 @@
  */
 package org.xwiki.officeimporter.internal;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.Set;
+import java.io.InputStream;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.OfficeImporterException;
+import org.xwiki.officeimporter.document.OfficeDocumentArtifact;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -117,7 +117,7 @@ public class ModelBridge
         }
 
         // Finally attach all the artifacts into target document.
-        attachArtifacts(doc.getArtifactsFiles(), documentReference);
+        attachArtifacts(doc.getArtifactsMap(), documentReference);
     }
 
     /**
@@ -126,17 +126,17 @@ public class ModelBridge
      * @param artifactFiles set of artifact files.
      * @param targetDocumentReference target wiki page into which artifacts are to be attached
      */
-    private void attachArtifacts(Set<File> artifactFiles, DocumentReference targetDocumentReference)
+    private void attachArtifacts(Map<String, OfficeDocumentArtifact> artifactFiles,
+        DocumentReference targetDocumentReference)
     {
-        for (File artifact : artifactFiles) {
-            AttachmentReference attachmentReference =
-                new AttachmentReference(artifact.getName(), targetDocumentReference);
-            try (FileInputStream fis = new FileInputStream(artifact)) {
-                this.docBridge.setAttachmentContent(attachmentReference, IOUtils.toByteArray(fis));
+        artifactFiles.forEach((filename, artifact) -> {
+            AttachmentReference attachmentReference = new AttachmentReference(filename, targetDocumentReference);
+            try (InputStream is = artifact.getContentInputStream()) {
+                this.docBridge.setAttachmentContent(attachmentReference, is);
             } catch (Exception ex) {
-                // Log the error and skip the artifact.
-                this.logger.error("Error while attaching artifact.", ex);
+                // Log the error as warning and skip the artifact.
+                this.logger.warn("Error while attaching artifact: [{}].", ExceptionUtils.getRootCauseMessage(ex));
             }
-        }
+        });
     }
 }

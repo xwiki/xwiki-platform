@@ -386,6 +386,7 @@ public class TextAreaClass extends StringClass
         String editorType = getEditorType(context);
         EditorManager editorManager = Utils.getComponent(EditorManager.class);
         Editor<SyntaxContent> editor = editorManager.getDefaultEditor(SyntaxContent.class, editorType);
+        XWikiDocument ownerDocument = getObjectDocument(object, context);
         Map<String, Object> parameters = new HashMap<>();
         String fieldName = prefix + name;
         parameters.put("id", fieldName);
@@ -393,7 +394,7 @@ public class TextAreaClass extends StringClass
         parameters.put("cols", getSize());
         parameters.put("rows", getRows());
         parameters.put("disabled", isDisabled());
-        parameters.put("restricted", isRestricted());
+        parameters.put("restricted", isRestricted() || (ownerDocument != null && ownerDocument.isRestricted()));
         parameters.put("sourceDocumentReference", object.getDocumentReference());
         Syntax syntax = null;
         String contentType = getContentType();

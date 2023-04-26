@@ -101,7 +101,7 @@ export default {
 <style>
 
 .displayer-actions .action {
-  color: #777;
+  color: @text-muted;
   white-space: nowrap;
 }
 

@@ -188,7 +188,7 @@ export default {
 
 .noentries-table {
   text-align: center;
-  color: #777777;
+  color: @text-muted;
   width: 100%;
   padding-bottom: 1em;
 }

@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.EntityType;
@@ -538,6 +539,23 @@ public interface DocumentAccessBridge
      * @since 2.2.1
      */
     void setAttachmentContent(AttachmentReference attachmentReference, byte[] attachmentData) throws Exception;
+
+    /**
+     * Sets the content of a document attachment. If the document or the attachment does not exist, both will be created
+     * newly.
+     *
+     * @param attachmentReference the name of the attachment to access
+     * @param attachmentData Attachment content.
+     * @throws Exception If the storage cannot be accessed.
+     * @since 14.10.8
+     * @since 15.3RC1
+     */
+    @Unstable
+    default void setAttachmentContent(AttachmentReference attachmentReference, InputStream attachmentData)
+        throws Exception
+    {
+        setAttachmentContent(attachmentReference, IOUtils.toByteArray(attachmentData));
+    }
 
     /**
      * Sets the content of a document attachment. If the document or the attachment does not exist, both will be created

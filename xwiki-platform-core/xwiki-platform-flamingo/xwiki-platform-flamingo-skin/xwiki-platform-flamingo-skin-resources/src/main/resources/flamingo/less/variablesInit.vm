@@ -232,6 +232,28 @@
   @xwiki-page-header-bg-color:          $theme.pageHeaderBackgroundColor;
   @xwiki-page-header-bg-image:          $stringtool.defaultString($theme.headerBackgroundImage, '""');
   @xwiki-page-header-bg-position:       $stringtool.defaultString($theme.headerBackgroundPosition, '""');
+
+  ## Some values are changed from the bootstrap default in order to make sure there's no accessibility contrast issue
+  ## Make sure the links are dark enough in the tmDrawer
+  @navbar-default-link-color:           #727272;
+  @navbar-default-color:                #727272;
+  ## Make sure the breadcrumb links are dark enough
+  @breadcrumb-active-color:             #707070;
+  @breadcrumb-color:                    #707070;
+  ## Make sure that all text-muted based components have sufficient contrast on white
+  @text-muted:                          @gray;
+  ## Make the links a bit darker than the default from bootstrap. Default #337ab7 has sufficient contrast on white
+  ## but this updated value allows light grey background to keep enough contrast.
+  @brand-primary:                       #2f70a7;
+  ## Make sure button white text has enough contrast on the whole gradient
+  @btn-primary-bg:                      #386da7;
+  ## Make sure all kinds of buttons have proper contrast
+  @btn-succes-bg:                       #31754f;
+  @btn-danger-bg:                       #ca302c;
+  @btn-success-bg:                      #31754f;
+  ## For the warning buttons, since the saturation is very high, we'd need to make the background way darker, going
+  ## from an orangish yellow to complete brown. Instead, we change the text color to black.
+  @btn-warning-color:                   #000;
 #end
 
 ##############################################

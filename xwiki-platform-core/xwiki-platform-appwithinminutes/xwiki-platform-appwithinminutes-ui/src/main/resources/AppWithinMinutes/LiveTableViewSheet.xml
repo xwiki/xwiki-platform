@@ -98,6 +98,7 @@
           #end
           ## We need to set the title if we want to be able to sort or filter the doc.title live table column.
           #set ($params = {
+            'form_token': $services.csrf.token,
             'template': "${className}Template",
             'title': '__entryName__',
             'parent': $services.model.serialize($doc.documentReference, 'local')

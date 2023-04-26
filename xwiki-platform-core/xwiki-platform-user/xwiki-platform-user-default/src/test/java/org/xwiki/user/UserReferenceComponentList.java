@@ -27,8 +27,10 @@ import java.lang.annotation.Target;
 import org.xwiki.configuration.internal.XWikiPropertiesConfigurationSource;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.user.internal.ConfiguredStringUserReferenceSerializer;
+import org.xwiki.user.internal.CurrentConfiguredStringUserReferenceResolver;
 import org.xwiki.user.internal.DefaultConfiguredStringUserReferenceResolver;
 import org.xwiki.user.internal.DefaultUserConfiguration;
+import org.xwiki.user.internal.document.CurrentDocumentStringUserReferenceResolver;
 import org.xwiki.user.internal.document.CurrentUserReferenceResolver;
 import org.xwiki.user.internal.document.DocumentDocumentReferenceUserReferenceResolver;
 import org.xwiki.user.internal.document.DocumentDocumentReferenceUserReferenceSerializer;
@@ -62,6 +64,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     DefaultConfiguredStringUserReferenceResolver.class,
     XWikiUserUserReferenceResolver.class,
     DocumentStringUserReferenceSerializer.class,
+    CurrentConfiguredStringUserReferenceResolver.class,
+    CurrentDocumentStringUserReferenceResolver.class,
 
     // Needed for the ConfiguredXXX component
     DefaultUserConfiguration.class,

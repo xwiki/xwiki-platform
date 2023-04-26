@@ -100,6 +100,7 @@
       #set ($wikiHomePageRef = $services.model.resolveDocument('', 'default'))
       #set ($wikiHomePage = $services.model.serialize($wikiHomePageRef, 'local'))
       #set ($discard = $queryString.putAll({
+        'form_token': $services.csrf.getToken(),
         'template': 'AppWithinMinutes.LiveTableTemplate',
         "${appDescriptorClassName}_0_class": $classReference,
         'title': $appReference.name,

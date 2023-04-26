@@ -22,19 +22,23 @@ package com.xpn.xwiki.objects;
 import org.xwiki.store.merge.MergeManagerResult;
 
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
-import com.xpn.xwiki.doc.merge.MergeResult;
 
 public class LargeStringProperty extends BaseStringProperty
 {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
+    protected MergeManagerResult<Object, Object> mergeValue(Object previousValue, Object newValue,
+        MergeConfiguration configuration)
     {
         MergeManagerResult<String, String> valueMergeManagerResult = getMergeManager()
-            .mergeLines((String) previousValue, (String) newValue, getValue(), new MergeConfiguration());
-        mergeResult.getLog().addAll(valueMergeManagerResult.getLog());
-        mergeResult.setModified(mergeResult.isModified() || valueMergeManagerResult.isModified());
-        setValue(valueMergeManagerResult.getMergeResult());
+            .mergeLines((String) previousValue, (String) newValue, getValue(), configuration);
+
+        MergeManagerResult<Object, Object> result = new MergeManagerResult<>();
+        result.setLog(valueMergeManagerResult.getLog());
+        result.setMergeResult(valueMergeManagerResult.getMergeResult());
+        // We cannot convert a Conflict<String> to Conflict<Object> right now, so we're loosing conflicts info here...
+        result.setModified(valueMergeManagerResult.isModified());
+        return result;
     }
 }

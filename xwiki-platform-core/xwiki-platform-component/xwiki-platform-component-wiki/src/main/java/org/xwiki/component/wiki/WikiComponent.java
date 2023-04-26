@@ -21,8 +21,10 @@ package org.xwiki.component.wiki;
 
 import java.lang.reflect.Type;
 
+import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Represents the definition of a wiki component implementation. A java component can extend this interface if it needs
@@ -68,6 +70,34 @@ public interface WikiComponent
      * @return the hint of the role implemented by this component implementation.
      */
     String getRoleHint();
+
+    /**
+     * The role type priority represents the priority for ordering components sharing the same type: it can be used to
+     * order the components when retrieving a list of components of the same type. The lower the value, the higher the
+     * priority.
+     *
+     * @return the role type priority of the component.
+     * @since 15.4RC1
+     */
+    @Unstable
+    default int getRoleTypePriority()
+    {
+        return ComponentDescriptor.DEFAULT_PRIORITY;
+    }
+
+    /**
+     * The role hint priority represents the priority for ordering components sharing the same type and hint: it can be
+     * used to decide which component should be overridden when loading them. The lower the value, the higher the
+     * priority.
+     *
+     * @return the role hint priority of the component.
+     * @since 15.4RC1
+     */
+    @Unstable
+    default int getRoleHintPriority()
+    {
+        return ComponentDescriptor.DEFAULT_PRIORITY;
+    }
 
     /**
      * @return the {@link WikiComponentScope} of the component.

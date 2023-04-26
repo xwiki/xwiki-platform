@@ -46,7 +46,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
-import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -1521,62 +1520,67 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     }
 
     @Override
-    public void merge(ElementInterface previousElement, ElementInterface newElement, MergeConfiguration configuration,
-        XWikiContext context, MergeResult mergeResult)
+    public MergeManagerResult<ElementInterface, Object> merge(ElementInterface previousElement,
+        ElementInterface newElement, MergeConfiguration configuration, XWikiContext context)
     {
+        MergeManagerResult<ElementInterface, Object> mergeResult =
+            super.merge(previousElement, newElement, configuration, context);
+
         BaseClass previousClass = (BaseClass) previousElement;
         BaseClass newClass = (BaseClass) newElement;
+
+        BaseClass modifiableResult = (BaseClass) mergeResult.getMergeResult();
 
         MergeManagerResult<String, String> customClassMergeResult =
             getMergeManager().mergeObject(previousClass.getCustomClass(),
                 newClass.getCustomClass(), getCustomClass(), configuration);
         mergeResult.getLog().addAll(customClassMergeResult.getLog());
         mergeResult.setModified(mergeResult.isModified() || customClassMergeResult.isModified());
-        setCustomClass(customClassMergeResult.getMergeResult());
+        modifiableResult.setCustomClass(customClassMergeResult.getMergeResult());
 
-        MergeManagerResult<String, String> customMappingMergeResult = getMergeManager().mergeObject(previousClass.getCustomMapping(),
+        MergeManagerResult<String, String> customMappingMergeResult = getMergeManager().mergeObject(
+            previousClass.getCustomMapping(),
             newClass.getCustomMapping(), getCustomMapping(), configuration);
         mergeResult.getLog().addAll(customMappingMergeResult.getLog());
         mergeResult.setModified(mergeResult.isModified() || customMappingMergeResult.isModified());
-        setCustomMapping(customMappingMergeResult.getMergeResult());
+        modifiableResult.setCustomMapping(customMappingMergeResult.getMergeResult());
 
-        MergeManagerResult<String, String> defaultWebMergeResult = getMergeManager().mergeObject(previousClass.getDefaultWeb(),
+        MergeManagerResult<String, String> defaultWebMergeResult = getMergeManager().mergeObject(
+            previousClass.getDefaultWeb(),
             newClass.getDefaultWeb(), getDefaultWeb(), configuration);
         mergeResult.getLog().addAll(defaultWebMergeResult.getLog());
         mergeResult.setModified(mergeResult.isModified() || defaultWebMergeResult.isModified());
-        setDefaultWeb(defaultWebMergeResult.getMergeResult());
+        modifiableResult.setDefaultWeb(defaultWebMergeResult.getMergeResult());
 
         MergeManagerResult<String, String> defaultViewSheetMergeResult =
             getMergeManager().mergeObject(previousClass.getDefaultViewSheet(), newClass.getDefaultViewSheet(),
                 getDefaultViewSheet(), configuration);
         mergeResult.getLog().addAll(defaultViewSheetMergeResult.getLog());
         mergeResult.setModified(mergeResult.isModified() || defaultViewSheetMergeResult.isModified());
-        setDefaultViewSheet(defaultViewSheetMergeResult.getMergeResult());
+        modifiableResult.setDefaultViewSheet(defaultViewSheetMergeResult.getMergeResult());
 
         MergeManagerResult<String, String> defaultEditSheetMergeResult =
             getMergeManager().mergeObject(previousClass.getDefaultEditSheet(), newClass.getDefaultEditSheet(),
                 getDefaultEditSheet(), configuration);
         mergeResult.getLog().addAll(defaultEditSheetMergeResult.getLog());
         mergeResult.setModified(mergeResult.isModified() || defaultEditSheetMergeResult.isModified());
-        setDefaultEditSheet(defaultEditSheetMergeResult.getMergeResult());
+        modifiableResult.setDefaultEditSheet(defaultEditSheetMergeResult.getMergeResult());
 
         MergeManagerResult<String, String> validationScriptMergeResult =
             getMergeManager().mergeObject(previousClass.getValidationScript(), newClass.getValidationScript(),
                 getValidationScript(), configuration);
         mergeResult.getLog().addAll(validationScriptMergeResult.getLog());
         mergeResult.setModified(mergeResult.isModified() || validationScriptMergeResult.isModified());
-        setValidationScript(validationScriptMergeResult.getMergeResult());
+        modifiableResult.setValidationScript(validationScriptMergeResult.getMergeResult());
 
         MergeManagerResult<String, String> nameFieldMergeResult =
             getMergeManager().mergeObject(previousClass.getNameField(), newClass.getNameField(), getNameField(),
                 configuration);
         mergeResult.getLog().addAll(nameFieldMergeResult.getLog());
         mergeResult.setModified(mergeResult.isModified() || nameFieldMergeResult.isModified());
-        setNameField(nameFieldMergeResult.getMergeResult());
+        modifiableResult.setNameField(nameFieldMergeResult.getMergeResult());
 
-        // Properties
-
-        super.merge(previousElement, newElement, configuration, context, mergeResult);
+        return mergeResult;
     }
 
     @Override

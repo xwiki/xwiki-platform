@@ -30,31 +30,42 @@ public enum Database
     /**
      * Represents the MySQL database.
      */
-    MYSQL,
+    MYSQL("mysql"),
 
     /**
      * Represents the MariaDB database.
      */
-    MARIADB,
+    MARIADB("mariadb"),
 
     /**
      * Represents the HyperSQL database, running outside of a Docker contaier.
      */
-    HSQLDB_EMBEDDED,
+    HSQLDB_EMBEDDED("hsqldb"),
 
     /**
      * Represents the PostgreSQL database.
      */
-    POSTGRESQL,
+    POSTGRESQL("pgsql"),
 
     /**
      * Represents the Oracle database.
      */
-    ORACLE;
+    ORACLE("oracle");
 
     private String ip;
 
     private int port;
+
+    private String pomPropertyPrefix;
+
+    /**
+     * @param pomPropertyPrefix see {@link #getPomPropertyPrefix()}
+     * @since 15.2RC1
+     */
+    Database(String pomPropertyPrefix)
+    {
+        this.pomPropertyPrefix = pomPropertyPrefix;
+    }
 
     /**
      * @param ip see {@link #getIP()}
@@ -88,5 +99,15 @@ public enum Database
     public int getPort()
     {
         return this.port;
+    }
+
+    /**
+     * @return the prefix for defining the JDBC artifact properties in XWiki's {@code pom.xml}
+     *         (e.g {@code mariadb} for {@code mariadb.groupId}, {@code mariadb.artifactId} and {@code mariadb.version})
+     * @since 15.2RC1
+     */
+    public String getPomPropertyPrefix()
+    {
+        return this.pomPropertyPrefix;
     }
 }

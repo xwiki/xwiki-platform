@@ -25,13 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-whatsnew</artifactId>
-    <version>15.2-SNAPSHOT</version>
+    <version>15.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-whatsnew-api</artifactId>
   <name>XWiki Platform - What's New - API</name>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.74</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.77</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>What's New API</xwiki.extension.name>
     <!-- Category to display in the Extension Manager. -->
@@ -68,6 +68,17 @@
       <artifactId>xwiki-commons-xml</artifactId>
       <version>${commons.version}</version>
     </dependency>
+    <!-- Needed for $xwiki.formatDate() in whatsnew.vm -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+    </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -81,6 +92,13 @@
       <artifactId>xwiki-commons-xml</artifactId>
       <version>${commons.version}</version>
       <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <!-- For Page Test -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-page</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collections;
@@ -42,6 +43,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.converter.OfficeConverter;
 import org.xwiki.officeimporter.converter.OfficeConverterResult;
+import org.xwiki.officeimporter.document.OfficeDocumentArtifact;
 import org.xwiki.officeimporter.document.XHTMLOfficeDocument;
 import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.test.junit5.XWikiTempDir;
@@ -51,9 +53,14 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Test case for {@link DefaultXHTMLOfficeDocumentBuilder}.
@@ -62,7 +69,7 @@ import static org.mockito.Mockito.*;
  * @since 2.1M1
  */
 @ComponentTest
-public class DefaultXHTMLOfficeDocumentBuilderTest
+class DefaultXHTMLOfficeDocumentBuilderTest
 {
     @InjectMockComponents
     private DefaultXHTMLOfficeDocumentBuilder officeDocumentBuilder;
@@ -90,7 +97,7 @@ public class DefaultXHTMLOfficeDocumentBuilderTest
     }
 
     @Test
-    public void xhtmlOfficeDocumentBuilding() throws Exception
+    void xhtmlOfficeDocumentBuilding() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
         when(this.entityReferenceSerializer.serialize(documentReference)).thenReturn("wiki:Path.To.Page");
@@ -112,12 +119,18 @@ public class DefaultXHTMLOfficeDocumentBuilderTest
         try (FileOutputStream fos = new FileOutputStream(outputFile)) {
             IOUtils.write("HTML content".getBytes(), fos);
         }
+        String otherArtifactContent = "Other content";
+        try (FileOutputStream fos = new FileOutputStream(otherArtifact)) {
+            IOUtils.write(otherArtifactContent.getBytes(), fos);
+        }
+
         when(converterResult.getAllFiles()).thenReturn(allFiles);
 
-        when(this.officeConverter.convertDocument(Collections.singletonMap("file.odt", officeFileStream), "file.odt",
-            "file.html")).thenReturn(converterResult);
+        when(this.officeConverter.convertDocument(Collections.singletonMap("input.odt", officeFileStream), "input.odt",
+            "output.html")).thenReturn(converterResult);
 
-        Map<String, byte[]> embeddedImages = Collections.singletonMap("image.png", "Image content".getBytes());
+        byte[] imageContent = "Image content".getBytes();
+        Map<String, byte[]> embeddedImages = Collections.singletonMap("image.png", imageContent);
         Document xhtmlDoc = mock(Document.class);
         when(xhtmlDoc.getUserData("embeddedImages")).thenReturn(embeddedImages);
 
@@ -132,13 +145,18 @@ public class DefaultXHTMLOfficeDocumentBuilderTest
         params.put("targetDocument", "wiki:Path.To.Page");
         params.put("attachEmbeddedImages", "true");
         params.put("filterStyles", "strict");
+        params.put("replaceImagePrefix", "output_html_");
+        params.put("replacementImagePrefix", "file_");
         verify(config).setParameters(params);
 
         assertEquals(xhtmlDoc, result.getContentDocument());
 
-        Set<File> expectedFileArtifacts = new HashSet<>();
-        expectedFileArtifacts.add(otherArtifact);
-        expectedFileArtifacts.add(new File(this.outputDirectory, "image.png"));
-        assertEquals(expectedFileArtifacts, result.getArtifactsFiles());
+        Map<String, OfficeDocumentArtifact> actualArtifacts = result.getArtifactsMap();
+        OfficeDocumentArtifact actualOtherArtifact = actualArtifacts.get("file.txt");
+        assertEquals(otherArtifactContent,
+            IOUtils.toString(actualOtherArtifact.getContentInputStream(), StandardCharsets.UTF_8));
+        assertTrue(actualArtifacts.containsKey("image.png"));
+        OfficeDocumentArtifact imageArtifact = actualArtifacts.get("image.png");
+        assertArrayEquals(imageContent, IOUtils.toByteArray(imageArtifact.getContentInputStream()));
     }
 }

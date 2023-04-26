@@ -61,7 +61,7 @@ public class WhatsNewPage extends ViewPage
      */
     public String getNewsItemTitle(int index)
     {
-        return this.items.get(index).findElement(By.className("xwiki-whatsnew-title")).getText();
+        return this.items.get(index).findElement(By.className("xwiki-whatsnew-item-title")).getText();
     }
 
     /**
@@ -70,7 +70,7 @@ public class WhatsNewPage extends ViewPage
      */
     public String getNewsItemDescription(int index)
     {
-        return this.items.get(index).findElement(By.className("xwiki-whatsnew-description")).getText();
+        return this.items.get(index).findElement(By.className("xwiki-whatsnew-item-description")).getText();
     }
 
     /**
@@ -79,6 +79,6 @@ public class WhatsNewPage extends ViewPage
      */
     public String getNewsItemDate(int index)
     {
-        return this.items.get(index).findElement(By.className("xwiki-whatsnew-date")).getText();
+        return this.items.get(index).findElement(By.className("xwiki-whatsnew-item-date")).getText();
     }
 }

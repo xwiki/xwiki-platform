@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-user-profile-test</artifactId>
-    <version>15.2-SNAPSHOT</version>
+    <version>15.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-user-profile-test-docker</artifactId>
   <name>XWiki Platform - User - Profile - Tests - Functional Docker Tests</name>
@@ -56,6 +56,14 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-administration-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Needed in order to test email obfuscation in the User profile page -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-mail-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
       <scope>runtime</scope>

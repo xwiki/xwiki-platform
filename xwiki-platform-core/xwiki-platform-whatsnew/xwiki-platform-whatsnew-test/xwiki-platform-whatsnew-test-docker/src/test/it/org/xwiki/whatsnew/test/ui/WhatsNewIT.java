@@ -66,7 +66,7 @@ class WhatsNewIT
         assertEquals("The XWiki development team is proud to announce the availability of the first release candidate "
             + "of XWiki 15.0. This release consists mostly of dependency upgrades and bug fixes including security "
             + "fixes with some small new features for admins and developers. ...", page.getNewsItemDescription(0));
-        // TODO: Fix the displayed date to use the date format defined in XWiki
-        assertEquals("2023-01-23T05:34:15+01:00", page.getNewsItemDate(0));
+        // Note: we don't check the time as it depends on the timezone of the machine executing this test
+        assertTrue(page.getNewsItemDate(0).startsWith("2023/01/23"));
     }
 }

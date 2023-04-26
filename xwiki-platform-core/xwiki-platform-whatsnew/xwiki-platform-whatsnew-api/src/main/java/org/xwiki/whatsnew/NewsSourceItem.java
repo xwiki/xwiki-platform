@@ -19,6 +19,7 @@
  */
 package org.xwiki.whatsnew;
 
+import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
 
@@ -31,7 +32,7 @@ import org.xwiki.stability.Unstable;
  * @since 15.1RC1
  */
 @Unstable
-public interface NewsSourceItem
+public interface NewsSourceItem extends Comparable<NewsSourceItem>
 {
     /**
      * @return the news item title
@@ -51,7 +52,7 @@ public interface NewsSourceItem
     /**
      * @return the news item publication date
      */
-    Optional<String> getPublishedDate();
+    Optional<Date> getPublishedDate();
 
     /**
      * @return the news item author
@@ -62,4 +63,10 @@ public interface NewsSourceItem
      * @return the news item origin URL
      */
     Optional<String> getOriginURL();
+
+    /**
+     * @return the URL to an image associated with the news item
+     * @since 15.3RC1
+     */
+    Optional<String> getImageURL();
 }

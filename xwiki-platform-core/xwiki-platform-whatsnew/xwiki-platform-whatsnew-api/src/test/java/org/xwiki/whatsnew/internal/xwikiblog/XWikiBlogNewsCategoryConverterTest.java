@@ -66,9 +66,14 @@ class XWikiBlogNewsCategoryConverterTest
         categories.add(NewsCategory.UNKNOWN);
         String result = new XWikiBlogNewsCategoryConverter().convertToQueryString(categories);
 
-        assertEquals("category=Blog.What%27s+New+for+XWiki%3A+Simple+User&"
-            + "category=Blog.What%27s+New+for+XWiki%3A+Admin+User&"
-            + "category=Blog.What%27s+New+for+XWiki%3A+Advanced+User&"
-            + "category=Blog.What%27s+New+for+XWiki%3A+Extension", result);
+        // TODO: Until https://jira.xwiki.org/browse/BLOG-198 is implemented, the XWiki Blog app only supports
+        // a single category. Thus FTM, we use the "Blog.What's New for XWiki" one to get all news under that
+        // category.
+        // Once it's fixed, uncomment the following line:
+        //   assertEquals("category=Blog.What%27s+New+for+XWiki%3A+Simple+User&"
+        //       + "category=Blog.What%27s+New+for+XWiki%3A+Admin+User&"
+        //       + "category=Blog.What%27s+New+for+XWiki%3A+Advanced+User&"
+        //       + "category=Blog.What%27s+New+for+XWiki%3A+Extension", result);
+        assertEquals("category=Blog.What%27s+New+for+XWiki", result);
     }
 }

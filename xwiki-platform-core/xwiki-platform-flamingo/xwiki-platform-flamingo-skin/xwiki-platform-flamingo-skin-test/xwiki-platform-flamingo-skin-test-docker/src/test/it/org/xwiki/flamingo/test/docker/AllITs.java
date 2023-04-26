@@ -158,12 +158,6 @@ public class AllITs
     class NestedRecycleBinIT extends RecycleBinIT
     {
     }
-    
-    @Nested
-    @DisplayName("Invitation tests")
-    class NestedInvitationIT extends InvitationIT
-    {
-    }
 
     @Nested
     @DisplayName("PDF Export Tests")
@@ -180,6 +174,30 @@ public class AllITs
     @Nested
     @DisplayName("TextArea property Tests")
     class NestedTextAreaIT extends TextAreaIT
+    {
+    }
+
+    @Nested
+    @DisplayName("Sheet system Tests")
+    class NestedSheetIT extends SheetIT
+    {
+    }
+
+    @Nested
+    @DisplayName("Script author Tests")
+    class NestedScriptAuthorIT extends ScriptAuthorIT
+    {
+    }
+
+    @Nested
+    @DisplayName("Form Token injection Tests")
+    class NestedFormTokenInjectionIT extends FormTokenInjectionIT
+    {
+    }
+
+    @Nested
+    @DisplayName("Page Picker Tests")
+    class NestedPagePickerIT extends PagePickerIT
     {
     }
 }

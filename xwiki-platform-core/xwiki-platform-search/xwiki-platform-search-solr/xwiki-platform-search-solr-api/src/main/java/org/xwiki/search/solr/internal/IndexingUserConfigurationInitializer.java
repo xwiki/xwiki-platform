@@ -27,11 +27,11 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.descriptor.ComponentDescriptor;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.AbstractMandatoryDocumentInitializer;
-import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -44,7 +44,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Named("XWiki.SolrSearchAdminIndexingUser")
 @Singleton
 // initalize after the corresponding class
-@Priority(MandatoryDocumentInitializer.DEFAULT_PRIORITY + 100)
+@Priority(ComponentDescriptor.DEFAULT_PRIORITY + 100)
 public class IndexingUserConfigurationInitializer extends AbstractMandatoryDocumentInitializer
 {
     @Inject

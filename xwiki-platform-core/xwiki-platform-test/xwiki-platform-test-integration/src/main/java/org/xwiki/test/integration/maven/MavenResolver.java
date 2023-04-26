@@ -105,11 +105,21 @@ public class MavenResolver
      */
     public String getPropertyFromCurrentPOM(String propertyName) throws Exception
     {
-        String propertyValue = getModelFromCurrentPOM().getProperties().getProperty(propertyName);
+        String propertyValue = getPropertiesFromCurrentPOM().getProperty(propertyName);
         if (propertyValue == null) {
             throw new Exception(String.format("Missing property [%s] in the current pom.xml", propertyName));
         }
         return propertyValue;
+    }
+
+    /**
+     * @return the resolved POM properties
+     * @throws Exception if the properties cannot be resolved
+     * @since 15.2RC1
+     */
+    public Properties getPropertiesFromCurrentPOM() throws Exception
+    {
+        return getModelFromCurrentPOM().getProperties();
     }
 
     /**

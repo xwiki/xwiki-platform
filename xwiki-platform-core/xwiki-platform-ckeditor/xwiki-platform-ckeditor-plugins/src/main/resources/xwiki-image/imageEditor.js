@@ -446,7 +446,7 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
         modal.data('input').imageData.imageStyle = imageStyle;
 
         var config = (imageStylesConfig.imageStyles || []).find(function(imageStyleConfig) {
-          return imageStyleConfig.type === imageStyle;
+          return imageStyleConfig.type !== '' && imageStyleConfig.type === imageStyle;
         });
         var noStyle = false;
         if (config === undefined) {

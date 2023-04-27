@@ -1073,6 +1073,8 @@ public class LegacyTestWiki extends AbstractTestWiki
                     allowing(mockedDocument)
                         .getXObjects(XWikiGroupsDocumentInitializer.XWIKI_GROUPS_DOCUMENT_REFERENCE);
                     will(returnValue(Collections.emptyList()));
+                    allowing(mockedDocument).isRequiredRightsActivated();
+                    will(returnValue(false));
                 }
             });
 

@@ -31,7 +31,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -41,7 +40,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.SecurityReference;
 import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.EntityTypeNotSupportedException;
@@ -52,9 +50,7 @@ import org.xwiki.security.authorization.SecurityEntryReader;
 import org.xwiki.security.authorization.SecurityEntryReaderExtra;
 import org.xwiki.security.authorization.SecurityRule;
 import org.xwiki.security.authorization.SecurityRuleEntry;
-import org.xwiki.security.internal.GroupSecurityEntry;
 import org.xwiki.security.internal.XWikiConstants;
-import org.xwiki.text.XWikiToStringBuilder;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -97,62 +93,6 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
 
     @Inject
     private Logger logger;
-
-    /**
-     * Internal implementation of the SecurityRuleEntry.
-     */
-    private final class InternalSecurityRuleEntry extends AbstractSecurityRuleEntry implements GroupSecurityEntry
-    {
-        /** Reference of the related entity. */
-        private SecurityReference reference;
-
-        /** The list of objects. */
-        private final Collection<SecurityRule> rules;
-
-        /**
-         * @param reference reference of the related entity
-         * @param rules collection of security rules applied on the entity.
-         */
-        private InternalSecurityRuleEntry(SecurityReference reference, Collection<SecurityRule> rules)
-        {
-            this.reference = reference;
-            this.rules = Collections.unmodifiableCollection(rules);
-        }
-
-        /**
-         * @return the reference of the related entity
-         */
-        @Override
-        public SecurityReference getReference()
-        {
-            return reference;
-        }
-
-        @Override
-        public void setGroupReference(GroupSecurityReference reference)
-        {
-            this.reference = reference;
-        }
-
-        /**
-         * @return all rules available for this entity
-         */
-        @Override
-        public Collection<SecurityRule> getRules()
-        {
-            return rules;
-        }
-
-        @Override
-        public String toString()
-        {
-            ToStringBuilder builder = new XWikiToStringBuilder(this);
-            builder.append("entity", this.reference);
-            builder.append("rules", this.rules);
-
-            return builder.toString();
-        }
-    }
 
     /**
      * Load the rules from wiki documents.

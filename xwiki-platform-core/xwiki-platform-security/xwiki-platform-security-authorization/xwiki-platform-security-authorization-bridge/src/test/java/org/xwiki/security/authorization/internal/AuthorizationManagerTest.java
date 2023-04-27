@@ -228,7 +228,6 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
         DocumentReference userA = new DocumentReference("wiki", "XWiki", "userA");
         DocumentReference userB = new DocumentReference("wiki", "XWiki", "userB");
         DocumentReference userA2 = new DocumentReference("wiki2", "XWiki", "userA");
-        DocumentReference userB2 = new DocumentReference("wiki2", "XWiki", "userB");
 
         assertAccessTrue("Admin should have edit access to XWikiPreferences when allowed by the wiki",
             Right.EDIT, userA, new DocumentReference("wiki", "XWiki", "XWikiPreferences"), ctx);

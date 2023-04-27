@@ -162,6 +162,7 @@ public class SecurityAuthorizationScriptService implements ScriptService
         this.execution.getContext().setProperty("skipRequiredRight", "true");
     }
 
+    @Unstable
     public void optInRequiredRights()
     {
         this.execution.getContext().setProperty("skipRequiredRight", "false");

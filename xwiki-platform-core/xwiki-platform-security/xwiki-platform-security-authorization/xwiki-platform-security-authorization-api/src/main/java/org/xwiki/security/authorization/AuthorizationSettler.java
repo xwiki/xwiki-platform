@@ -73,7 +73,10 @@ public interface AuthorizationSettler
      *     given document
      * @return the computed access for the given user.
      */
-    SecurityAccessEntry settle(UserSecurityReference user,
+    default SecurityAccessEntry settle(UserSecurityReference user,
         Collection<GroupSecurityReference> groups,
-        Deque<SecurityRuleEntry> securityRuleEntries, Set<Right> requiredRights);
+        Deque<SecurityRuleEntry> securityRuleEntries, Set<Right> requiredRights)
+    {
+        return settle(user, groups, securityRuleEntries);
+    }
 }

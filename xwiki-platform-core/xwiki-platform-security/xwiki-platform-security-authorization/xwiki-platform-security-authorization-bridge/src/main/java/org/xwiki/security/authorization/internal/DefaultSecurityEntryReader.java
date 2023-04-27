@@ -238,7 +238,7 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
                 return Optional.empty();
             case DOCUMENT:
                 XWikiDocument document = getDocument(new DocumentReference(entity));
-                if (document == null || !document.getRequiredRightsActivated()) {
+                if (document == null || !document.isRequiredRightsActivated()) {
                     return Optional.empty();
                 }
                 return Optional.ofNullable(document.getRequiredRights().getRights());

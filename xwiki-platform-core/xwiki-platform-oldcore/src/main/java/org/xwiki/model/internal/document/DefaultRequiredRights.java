@@ -21,6 +21,7 @@ package org.xwiki.model.internal.document;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -75,15 +76,18 @@ public class DefaultRequiredRights implements RequiredRights
     @Override
     public boolean activated()
     {
-        return this.document.getRequiredRightsActivated();
+        return this.document.isRequiredRightsActivated();
     }
 
     @Override
     public void setRights(Set<Right> newRights)
     {
-        this.requiredRights.clear();
-        this.requiredRights.addAll(newRights);
-        this.document.setMetaDataDirty(true);
+        boolean hasChanged = !Objects.equals(newRights, this.requiredRights);
+        if (hasChanged) {
+            this.requiredRights.clear();
+            this.requiredRights.addAll(newRights);
+            this.document.setMetaDataDirty(true);
+        }
     }
 
     @Override

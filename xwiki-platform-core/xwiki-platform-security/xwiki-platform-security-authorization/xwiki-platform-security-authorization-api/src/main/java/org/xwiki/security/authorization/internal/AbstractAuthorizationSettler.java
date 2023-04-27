@@ -320,7 +320,7 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
     protected boolean isRequiredRightsActivated()
     {
         ExecutionContext context = this.execution.getContext();
-        return context != null && context.hasProperty(SKIP_REQUIRED_RIGHT) && context.getProperty(SKIP_REQUIRED_RIGHT)
+        return context == null || !context.hasProperty(SKIP_REQUIRED_RIGHT) || !context.getProperty(SKIP_REQUIRED_RIGHT)
             .equals("true");
     }
 }

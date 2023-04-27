@@ -25,7 +25,6 @@ import java.util.Set;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.UserSecurityReference;
 import org.xwiki.security.authorization.Right;
@@ -58,10 +57,7 @@ public class DefaultAuthorizationSettler extends AbstractAuthorizationSettler
         Set<Right> allowed = new RightSet();
 
         XWikiSecurityAccess access = new XWikiSecurityAccess();
-        ExecutionContext context = this.execution.getContext();
-        access.setRequiredRightsActivated(
-            context != null && context.hasProperty(SKIP_REQUIRED_RIGHT) && context.getProperty(SKIP_REQUIRED_RIGHT)
-                .equals("true"));
+        access.setRequiredRightsActivated(isRequiredRightsActivated());
         access.setRequiredRights(requiredRights);
 
         // Evaluate rules from current entity

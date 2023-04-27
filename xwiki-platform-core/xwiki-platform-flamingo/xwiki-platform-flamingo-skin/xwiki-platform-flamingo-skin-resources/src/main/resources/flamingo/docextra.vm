@@ -93,7 +93,7 @@
     <div class="floatcontainer" id="docExtraTabs">
       <div class="xwikitabbar" id="docExtrasTabsUl" role="tablist">
         #foreach($docextra in $docextras)
-          <button id="${docextra.get(0)}tab" rel="nofollow"
+          <button id="${docextra.get(0)}tab"
             role="tab" aria-controls="${docextra.get(0)}pane" aria-selected="false" tabindex="-1">
             $docextra.get(2) #if($docextra.get(3) >= 0) <span class="itemCount">$services.localization.render('docextra.extranb', [$docextra.get(3)])</span> #end
           </button>
@@ -129,7 +129,7 @@
         #end
         if (hashviewer == "${extraAnchor}") {
           var extraInit = function(){
-            XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", true)
+            XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", false)
             require(['jquery', 'xwiki-tabList'], function($, TabList) { new TabList($("#docExtrasTabsUl")); });
           };
         }

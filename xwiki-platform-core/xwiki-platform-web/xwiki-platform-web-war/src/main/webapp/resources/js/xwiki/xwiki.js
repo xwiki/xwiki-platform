@@ -284,7 +284,11 @@ Object.extend(XWiki, {
                         // prevents the anchor 'jump' after a click event but enable it
                         // when the user is arriving from a direct /Space/Page#Section URL
                         $(extraID + 'anchor').id = extraID;
-                        location.href='#' + extraID;
+                        location.href = '#' + extraID;
+                        $(extraID).id = extraID + 'anchor';
+                      } else {
+                        $(extraID + 'anchor').id = extraID;
+                        location.href= '#' + extraID;
                         $(extraID).id = extraID + 'anchor';
                       }
                     }
@@ -293,7 +297,11 @@ Object.extend(XWiki, {
         dhtmlSwitch(extraID);
         if (scrollToAnchor) {
             $(extraID + 'anchor').id = extraID;
-            location.href='#' + extraID;
+            location.href = '#' + extraID;
+            $(extraID).id = extraID + 'anchor';
+        } else {
+            $(extraID + 'anchor').id = extraID;
+            location.href= '#' + extraID;
             $(extraID).id = extraID + 'anchor';
         }
      }

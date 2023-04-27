@@ -80,7 +80,10 @@
     #else
       #set ($discard = $services.security.authorization.optOutRequiredRights())
       #if ($displayEditMenu && $services.security.authorization.hasAccess('edit') && !$isReadOnly)
-        #warning("TODO: blabla")
+        <button class="btn btn-default" type="submit" disabled 
+                title="$escapetool.xml("Your are missing one of the following required rights: $doc.requiredRights.rights.")">
+          $services.icon.renderHTML('pencil') $escapetool.xml($services.localization.render('core.menu.edit'))
+        </button>
       #end
       #set ($discard = $services.security.authorization.optInRequiredRights())
     #end

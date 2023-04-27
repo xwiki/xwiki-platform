@@ -34,6 +34,5 @@
     <module>xwiki-platform-security-api</module>
     <module>xwiki-platform-security-authentication</module>
     <module>xwiki-platform-security-authorization</module>
-    <module>xwiki-platform-security-requiredrights</module>
   </modules>
 </project>

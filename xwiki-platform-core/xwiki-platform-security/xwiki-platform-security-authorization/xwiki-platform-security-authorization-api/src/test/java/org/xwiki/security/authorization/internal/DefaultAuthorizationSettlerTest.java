@@ -170,7 +170,7 @@ class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTestCase
 
         assertAccess("When no rules are defined, return default access for main wiki user on main wiki doc",
             xuserRef, xdocRef.getParentSecurityReference().getParentSecurityReference(), defaultAccess,
-            authorizationSettler.settle(xuserRef, Collections.<GroupSecurityReference>emptyList(), emptyXdocRules, null));
+            authorizationSettler.settle(xuserRef, Collections.<GroupSecurityReference>emptyList(), emptyXdocRules, null, false));
 
         assertAccess("When no rules are defined, deny all access for local wiki user on main wiki doc",
             userRef, xdocRef.getParentSecurityReference().getParentSecurityReference(), denyAllAccess,
@@ -475,87 +475,87 @@ class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTestCase
     void testSettleOneAllowImpliesDenyForAllOthers() throws Exception
     {
         XWikiSecurityAccess defaultAllowRight0 = defaultAccess.clone();
-        XWikiSecurityAccess defaultDenyRight0 = defaultAccess.clone();
-        XWikiSecurityAccess defaultAllowRight6 = defaultAccess.clone();
+        XWikiSecurityAccess defaultDenyRight0 = this.defaultAccess.clone();
+        XWikiSecurityAccess defaultAllowRight6 = this.defaultAccess.clone();
         defaultAllowRight0.allow(allTestRights.get(0));
         defaultDenyRight0.deny(allTestRights.get(0));
         defaultAllowRight6.allow(allTestRights.get(6));
 
         assertAccess("When an allow rules is found, deny any not matching user",
-            anotherUserRef, docRef, defaultDenyRight0,
-            authorizationSettler.settle(anotherUserRef, Arrays.asList(anotherGroupRef),
+            this.anotherUserRef, this.docRef, defaultDenyRight0,
+            this.authorizationSettler.settle(this.anotherUserRef, Collections.singletonList(this.anotherGroupRef),
                 getMockedSecurityRuleEntries("onlyRight0",
-                    docRef,
-                    Arrays.asList(Arrays.asList(getMockedSecurityRule(
+                    this.docRef,
+                    List.of(List.of(getMockedSecurityRule(
                         "onlyRight0",
-                        Arrays.asList(userRef),
-                        Collections.<GroupSecurityReference>emptyList(),
-                        Arrays.asList(allTestRights.get(0)),
-                        RuleState.ALLOW))))));
+                        Collections.singletonList(this.userRef),
+                        Collections.emptyList(),
+                        Collections.singletonList(allTestRights.get(0)),
+                        ALLOW))))));
 
 
         assertAccess("When an allow rules is found, do not deny a user matching in another rule",
-            anotherUserRef, docRef, defaultAllowRight6,
-            authorizationSettler.settle(anotherUserRef, Arrays.asList(anotherGroupRef),
+            this.anotherUserRef, this.docRef, defaultAllowRight6,
+            this.authorizationSettler.settle(this.anotherUserRef, Collections.singletonList(this.anotherGroupRef),
                 getMockedSecurityRuleEntries("allowRight6ToAnotherUser",
-                    docRef,
-                    Arrays.asList(Arrays.asList(
+                    this.docRef,
+                    List.of(Arrays.asList(
                         getMockedSecurityRule(
                             "allowRight6ToUser",
-                            Arrays.asList(userRef),
-                            Collections.<GroupSecurityReference>emptyList(),
-                            Arrays.asList(allTestRights.get(6)),
-                            RuleState.ALLOW),
+                            Collections.singletonList(this.userRef),
+                            Collections.emptyList(),
+                            Collections.singletonList(allTestRights.get(6)),
+                            ALLOW),
                         getMockedSecurityRule(
                             "allowRight6ToAnotherUser",
-                            Arrays.asList(anotherUserRef),
-                            Collections.<GroupSecurityReference>emptyList(),
-                            Arrays.asList(allTestRights.get(6)),
-                            RuleState.ALLOW))))));
+                            Collections.singletonList(this.anotherUserRef),
+                            Collections.emptyList(),
+                            Collections.singletonList(allTestRights.get(6)),
+                            ALLOW))))));
 
         assertAccess("When an allow rules is found, do not deny a user matching in another rule",
-            anotherUserRef, docRef, defaultAllowRight6,
-            authorizationSettler.settle(anotherUserRef, Arrays.asList(anotherGroupRef),
+            this.anotherUserRef, this.docRef, defaultAllowRight6,
+            this.authorizationSettler.settle(this.anotherUserRef, Collections.singletonList(this.anotherGroupRef),
                 getMockedSecurityRuleEntries("allowRight6ToAnotherGroup",
-                    docRef,
-                    Arrays.asList(Arrays.asList(
+                    this.docRef,
+                    List.of(Arrays.asList(
                         getMockedSecurityRule(
                             "allowRight6ToUserAndGroup",
-                            Arrays.asList(userRef),
-                            Arrays.asList(groupRef),
-                            Arrays.asList(allTestRights.get(6)),
-                            RuleState.ALLOW),
+                            Collections.singletonList(this.userRef),
+                            Collections.singletonList(this.groupRef),
+                            Collections.singletonList(allTestRights.get(6)),
+                            ALLOW),
                         getMockedSecurityRule(
                             "allowRight6ToAnotherGroup",
-                            Collections.<UserSecurityReference>emptyList(),
-                            Arrays.asList(anotherGroupRef),
-                            Arrays.asList(allTestRights.get(6)),
-                            RuleState.ALLOW))))));
+                            Collections.emptyList(),
+                            Collections.singletonList(this.anotherGroupRef),
+                            Collections.singletonList(allTestRights.get(6)),
+                            ALLOW))))));
 
         assertAccess("When an allow rules is found, do not deny a user matching the rule",
-            userRef, docRef, defaultAllowRight6,
-            authorizationSettler.settle(userRef, Arrays.asList(groupRef),
+            this.userRef, this.docRef, defaultAllowRight6,
+            this.authorizationSettler.settle(this.userRef, Collections.singletonList(this.groupRef),
                 getMockedSecurityRuleEntries("onlyRight6",
-                    docRef,
-                    Arrays.asList(Arrays.asList(getMockedSecurityRule(
+                    this.docRef,
+                    List.of(List.of(getMockedSecurityRule(
                         "onlyRight6",
-                        Arrays.asList(userRef),
-                        Collections.<GroupSecurityReference>emptyList(),
-                        Arrays.asList(allTestRights.get(6)),
-                        RuleState.ALLOW))))));
+                        Collections.singletonList(this.userRef),
+                        Collections.emptyList(),
+                        Collections.singletonList(allTestRights.get(6)),
+                        ALLOW))))));
 
         assertAccess("When an allow rules is found, do not deny a user matching a group in the rule",
-            anotherUserRef, docRef, defaultAllowRight6,
-            authorizationSettler.settle(anotherUserRef, Arrays.asList(anotherGroupRef),
+            this.anotherUserRef, this.docRef, defaultAllowRight6,
+            this.authorizationSettler.settle(this.anotherUserRef, Collections.singletonList(this.anotherGroupRef),
                 getMockedSecurityRuleEntries("allowRight6",
-                    docRef,
-                    Arrays.asList(Arrays.asList(
+                    this.docRef,
+                    List.of(List.of(
                         getMockedSecurityRule(
                             "allowRight6ToUserAndAnotherGroup",
-                            Arrays.asList(userRef),
-                            Arrays.asList(anotherGroupRef),
-                            Arrays.asList(allTestRights.get(6)),
-                            RuleState.ALLOW))))));
+                            Collections.singletonList(this.userRef),
+                            Collections.singletonList(this.anotherGroupRef),
+                            Collections.singletonList(allTestRights.get(6)),
+                            ALLOW))))));
 
     }
 
@@ -563,42 +563,42 @@ class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTestCase
     void testSettleRightWithImpliedRights() throws Exception
     {
         SecurityRule allowImpliedADT = getMockedSecurityRule("allowImpliedADT",
-            Arrays.asList(userRef), Arrays.asList(anotherGroupRef), Arrays.asList(impliedTestRightsADT), ALLOW);
+            Collections.singletonList(this.userRef), Collections.singletonList(this.anotherGroupRef), Collections.singletonList(impliedTestRightsADT), ALLOW);
         SecurityRule denyImpliedADT = getMockedSecurityRule("denyImpliedADT",
-            Arrays.asList(userRef), Arrays.asList(anotherGroupRef), Arrays.asList(impliedTestRightsADT), DENY);
+            Collections.singletonList(this.userRef), Collections.singletonList(this.anotherGroupRef), Collections.singletonList(impliedTestRightsADT), DENY);
 
         SecurityRule allowImpliedDAF = getMockedSecurityRule("allowImpliedDAF",
-            Arrays.asList(userRef), Arrays.asList(anotherGroupRef), Arrays.asList(impliedTestRightsDAF), ALLOW);
+            Collections.singletonList(this.userRef), Collections.singletonList(this.anotherGroupRef), Collections.singletonList(impliedTestRightsDAF), ALLOW);
         SecurityRule denyImpliedDAF = getMockedSecurityRule("denyImpliedDAF",
-            Arrays.asList(userRef), Arrays.asList(anotherGroupRef), Arrays.asList(impliedTestRightsDAF), DENY);
+            Collections.singletonList(this.userRef), Collections.singletonList(this.anotherGroupRef), Collections.singletonList(impliedTestRightsDAF), DENY);
 
 
-        XWikiSecurityAccess allowAccessADT = defaultAccess.clone();
+        XWikiSecurityAccess allowAccessADT = this.defaultAccess.clone();
         allowAccessADT.set(impliedTestRightsADT, ALLOW);
         for (Right right : allTestRights) {
             allowAccessADT.allow(right);
         }
-        XWikiSecurityAccess tieADT = defaultAccess.clone();
+        XWikiSecurityAccess tieADT = this.defaultAccess.clone();
         tieADT.set(impliedTestRightsADT, ALLOW);
         for (Right right : allTestRights) {
             tieADT.set(right, right.getTieResolutionPolicy());
         }
-        XWikiSecurityAccess allowAccessDAF = defaultAccess.clone();
+        XWikiSecurityAccess allowAccessDAF = this.defaultAccess.clone();
         allowAccessDAF.set(impliedTestRightsDAF, ALLOW);
         for (Right right : allTestRights) {
             allowAccessDAF.allow(right);
         }
-        XWikiSecurityAccess denyADTAccess = defaultAccess.clone();
+        XWikiSecurityAccess denyADTAccess = this.defaultAccess.clone();
         denyADTAccess.deny(impliedTestRightsADT);
-        XWikiSecurityAccess denyDAFAccess = defaultAccess.clone();
+        XWikiSecurityAccess denyDAFAccess = this.defaultAccess.clone();
         denyDAFAccess.deny(impliedTestRightsDAF);
 
-        XWikiSecurityAccess denyAccessADT = defaultAccess.clone();
+        XWikiSecurityAccess denyAccessADT = this.defaultAccess.clone();
         denyAccessADT.set(impliedTestRightsADT, ALLOW);
         for (Right right : allTestRights) {
             denyAccessADT.deny(right);
         }
-        XWikiSecurityAccess denyAccessDAF = defaultAccess.clone();
+        XWikiSecurityAccess denyAccessDAF = this.defaultAccess.clone();
         denyAccessDAF.set(impliedTestRightsDAF, ALLOW);
         for (Right right : allTestRights) {
             denyAccessDAF.deny(right);
@@ -607,102 +607,102 @@ class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTestCase
 
 
         assertAccess("When a right implying others rights is allowed, imply those rights (ADT)",
-            userRef, docRef, allowAccessADT,
-            authorizationSettler.settle(userRef, Arrays.asList(groupRef),
-                getMockedSecurityRuleEntries("allowAccessADT", docRef,
-                    Arrays.asList(Arrays.asList(allowImpliedADT)))));
+            this.userRef, this.docRef, allowAccessADT,
+            this.authorizationSettler.settle(this.userRef, Collections.singletonList(this.groupRef),
+                getMockedSecurityRuleEntries("allowAccessADT", this.docRef,
+                    List.of(List.of(allowImpliedADT)))));
 
         assertAccess("When a right implying others rights is allowed, imply those rights (DAF)",
-            userRef, docRef, allowAccessDAF,
-            authorizationSettler.settle(userRef, Arrays.asList(groupRef),
-                getMockedSecurityRuleEntries("allowAccessDAF", docRef,
-                    Arrays.asList(Arrays.asList(allowImpliedDAF)))));
+            this.userRef, this.docRef, allowAccessDAF,
+            this.authorizationSettler.settle(this.userRef, Collections.singletonList(this.groupRef),
+                getMockedSecurityRuleEntries("allowAccessDAF", this.docRef,
+                    List.of(List.of(allowImpliedDAF)))));
 
         assertAccess("When a right implying others rights is denied, do not denied implied rights (ADT)",
-            userRef, docRef, denyADTAccess,
-            authorizationSettler.settle(userRef, Arrays.asList(groupRef),
-                getMockedSecurityRuleEntries("denyAccessADT", docRef,
-                    Arrays.asList(Arrays.asList(denyImpliedADT)))));
+            this.userRef, this.docRef, denyADTAccess,
+            this.authorizationSettler.settle(this.userRef, Collections.singletonList(this.groupRef),
+                getMockedSecurityRuleEntries("denyAccessADT", this.docRef,
+                    List.of(List.of(denyImpliedADT)))));
 
         assertAccess("When a right implying others rights is denied, do not denied implied rights (DAF)",
-            userRef, docRef, denyDAFAccess,
-            authorizationSettler.settle(userRef, Arrays.asList(groupRef),
-                getMockedSecurityRuleEntries("denyAccessDAF", docRef,
-                    Arrays.asList(Arrays.asList(denyImpliedDAF)))));
+            this.userRef, this.docRef, denyDAFAccess,
+            this.authorizationSettler.settle(this.userRef, Collections.singletonList(this.groupRef),
+                getMockedSecurityRuleEntries("denyAccessDAF", this.docRef,
+                    List.of(List.of(denyImpliedDAF)))));
 
         SecurityRule allowAllTestRightsUserAndAnotherGroup = getMockedSecurityRule("allowAllTestRightsUserAndAnotherGroup",
-            Arrays.asList(userRef), Arrays.asList(anotherGroupRef), allTestRights, ALLOW);
+            Collections.singletonList(this.userRef), Collections.singletonList(this.anotherGroupRef), allTestRights, ALLOW);
         SecurityRule denyAllTestRightsUserAndAnotherGroup = getMockedSecurityRule("denyAllTestRightsUserAndAnotherGroup",
-            Arrays.asList(userRef), Arrays.asList(anotherGroupRef), allTestRights, DENY);
+            Collections.singletonList(this.userRef), Collections.singletonList(this.anotherGroupRef), allTestRights, DENY);
         SecurityRule denyAllTestRightsAnotherUserAndGroup = getMockedSecurityRule("denyAllTestRightsAnotherUserAndGroup",
-            Arrays.asList(anotherUserRef), Arrays.asList(groupRef), allTestRights, DENY);
+            Collections.singletonList(this.anotherUserRef), Collections.singletonList(this.groupRef), allTestRights, DENY);
 
 
         Deque<SecurityRuleEntry> conflictAllowDenySameTargetADT
-            = getMockedSecurityRuleEntries("conflictAllowDenySameTargetADT", docRef, Arrays.asList(
+            = getMockedSecurityRuleEntries("conflictAllowDenySameTargetADT", this.docRef, List.of(
             Arrays.asList(allowImpliedADT, denyAllTestRightsUserAndAnotherGroup)));
         Deque<SecurityRuleEntry> conflictAllowDenySameTargetDAF
-            = getMockedSecurityRuleEntries("conflictAllowDenySameTargetDAF", docRef, Arrays.asList(
+            = getMockedSecurityRuleEntries("conflictAllowDenySameTargetDAF", this.docRef, List.of(
             Arrays.asList(allowImpliedDAF, denyAllTestRightsUserAndAnotherGroup)));
 
         Deque<SecurityRuleEntry> conflictAllowDenyUserGroupADT
-            = getMockedSecurityRuleEntries("conflictAllowDenyUserGroupADT", docRef, Arrays.asList(
+            = getMockedSecurityRuleEntries("conflictAllowDenyUserGroupADT", this.docRef, List.of(
             Arrays.asList(allowImpliedADT, denyAllTestRightsAnotherUserAndGroup)));
         Deque<SecurityRuleEntry> conflictAllowDenyUserGroupDAF
-            = getMockedSecurityRuleEntries("conflictAllowDenyUserGroupDAF", docRef, Arrays.asList(
+            = getMockedSecurityRuleEntries("conflictAllowDenyUserGroupDAF", this.docRef, List.of(
             Arrays.asList(allowImpliedDAF, denyAllTestRightsAnotherUserAndGroup)));
 
         assertAccess("When allowed implied right for user is denied for same user in another rule, use most favorable tie resolution policy (ADT)",
-            userRef, docRef, tieADT,
-            authorizationSettler.settle(userRef, Arrays.asList(groupRef), conflictAllowDenySameTargetADT));
+            this.userRef, this.docRef, tieADT,
+            this.authorizationSettler.settle(this.userRef, Collections.singletonList(this.groupRef), conflictAllowDenySameTargetADT));
 
         assertAccess("When allowed implied right for user is denied for same user in another rule, use most favorable tie resolution policy (DAF)",
-            userRef, docRef, allowAccessDAF,
-            authorizationSettler.settle(userRef, Arrays.asList(groupRef), conflictAllowDenySameTargetDAF));
+            this.userRef, this.docRef, allowAccessDAF,
+            this.authorizationSettler.settle(this.userRef, Collections.singletonList(this.groupRef), conflictAllowDenySameTargetDAF));
 
         assertAccess("When allowed implied right for group is denied for same group in another rule, use most favorable tie resolution policy (ADT)",
-            anotherUserRef, docRef, tieADT,
-            authorizationSettler.settle(anotherUserRef, Arrays.asList(anotherGroupRef), conflictAllowDenySameTargetADT));
+            this.anotherUserRef, this.docRef, tieADT,
+            this.authorizationSettler.settle(this.anotherUserRef, Collections.singletonList(this.anotherGroupRef), conflictAllowDenySameTargetADT));
 
         assertAccess("When allowed implied right for group is denied for same group in another rule, use most favorable tie resolution policy (DAF)",
-            anotherUserRef, docRef, allowAccessDAF,
-            authorizationSettler.settle(anotherUserRef, Arrays.asList(anotherGroupRef), conflictAllowDenySameTargetDAF));
+            this.anotherUserRef, this.docRef, allowAccessDAF,
+            this.authorizationSettler.settle(this.anotherUserRef, Collections.singletonList(this.anotherGroupRef), conflictAllowDenySameTargetDAF));
 
         assertAccess("When allowed implied right for user is denied for its group in another rule, allow it. (ADT)",
-            userRef, docRef, allowAccessADT,
-            authorizationSettler.settle(userRef, Arrays.asList(groupRef), conflictAllowDenyUserGroupADT));
+            this.userRef, this.docRef, allowAccessADT,
+            this.authorizationSettler.settle(this.userRef, Collections.singletonList(this.groupRef), conflictAllowDenyUserGroupADT));
 
         assertAccess("When allowed implied right for user is denied for its group in another rule, allow it. (DAF)",
-            userRef, docRef, allowAccessDAF,
-            authorizationSettler.settle(userRef, Arrays.asList(groupRef), conflictAllowDenyUserGroupDAF));
+            this.userRef, this.docRef, allowAccessDAF,
+            this.authorizationSettler.settle(this.userRef, Collections.singletonList(this.groupRef), conflictAllowDenyUserGroupDAF));
 
         assertAccess("When allowed implied right for group is denied for one of its user in another rule, deny it. (ADT)",
-            anotherUserRef, docRef, denyAccessADT,
-            authorizationSettler.settle(anotherUserRef, Arrays.asList(anotherGroupRef), conflictAllowDenyUserGroupADT));
+            this.anotherUserRef, this.docRef, denyAccessADT,
+            this.authorizationSettler.settle(this.anotherUserRef, Collections.singletonList(this.anotherGroupRef), conflictAllowDenyUserGroupADT));
 
         assertAccess("When allowed implied right for group is denied for one of its user in another rule, deny it. (DAF)",
-            anotherUserRef, docRef, denyAccessDAF,
-            authorizationSettler.settle(anotherUserRef, Arrays.asList(anotherGroupRef), conflictAllowDenyUserGroupDAF));
+            this.anotherUserRef, this.docRef, denyAccessDAF,
+            this.authorizationSettler.settle(this.anotherUserRef, Collections.singletonList(this.anotherGroupRef), conflictAllowDenyUserGroupDAF));
     }
 
     @Test
     void testSettleNewRightJustAdded() throws Exception
     {
         Right newRight = getNewTestRight("RightAddedLater",DENY,DENY,true);
-        XWikiSecurityAccess defaultNewRight = defaultAccess.clone();
+        XWikiSecurityAccess defaultNewRight = this.defaultAccess.clone();
         defaultNewRight.allow(newRight);
 
         assertAccess("Allow a new right just added now",
-            userRef, docRef, defaultNewRight,
-            authorizationSettler.settle(userRef, Arrays.asList(groupRef),
+            this.userRef, this.docRef, defaultNewRight,
+            this.authorizationSettler.settle(this.userRef, Collections.singletonList(this.groupRef),
                 getMockedSecurityRuleEntries("onlyNewRight",
-                    docRef,
-                    Arrays.asList(Arrays.asList(getMockedSecurityRule(
+                    this.docRef,
+                    List.of(List.of(getMockedSecurityRule(
                         "onlyNewRight",
-                        Arrays.asList(userRef),
-                        Collections.<GroupSecurityReference>emptyList(),
-                        Arrays.asList(newRight),
-                        RuleState.ALLOW))))));
+                        Collections.singletonList(this.userRef),
+                        Collections.emptyList(),
+                        List.of(newRight),
+                        ALLOW))))));
 
         this.authorizationManager.unregister(newRight);
     }
@@ -711,13 +711,13 @@ class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTestCase
     void testSettleEntityTypeWithoutAnyEnabledRight() throws Exception
     {
         SecurityRule allowAllTestRightsRulesToXuser = getMockedSecurityRule("allowAllTestRightsRulesToXuser",
-            Collections.singletonList(xuserRef), Collections.<GroupSecurityReference>emptyList(), allTestRights, ALLOW);
+            Collections.singletonList(this.xuserRef), Collections.emptyList(), allTestRights, ALLOW);
 
         assertAccess("Allow rights to entity without any acceptable right on itself but having some (XWIKI-12552)",
-            xuserRef, xattachmentRef, defaultAccess,
-            authorizationSettler.settle(xuserRef, Collections.<GroupSecurityReference>emptyList(),
+            this.xuserRef, this.xattachmentRef, this.defaultAccess,
+            this.authorizationSettler.settle(this.xuserRef, Collections.emptyList(),
                 getMockedSecurityRuleEntries("allrights",
-                    xattachmentRef,
+                    this.xattachmentRef,
                     Collections.singletonList(Collections.singletonList(allowAllTestRightsRulesToXuser)))));
     }
 }

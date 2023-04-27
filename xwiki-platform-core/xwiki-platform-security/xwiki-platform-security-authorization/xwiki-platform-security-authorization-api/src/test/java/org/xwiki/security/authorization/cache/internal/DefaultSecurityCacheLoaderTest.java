@@ -142,7 +142,7 @@ public class DefaultSecurityCacheLoaderTest
         AuthorizationSettler authorizationSettler = mocker.getInstance(AuthorizationSettler.class);
         Deque<SecurityRuleEntry> securityRuleEntries =
             new LinkedList<SecurityRuleEntry>(Arrays.asList(documentEntry, spaceEntry, wikiEntry));
-        when(authorizationSettler.settle(user, groups, securityRuleEntries, null)).thenReturn(securityAccessEntry);
+        when(authorizationSettler.settle(user, groups, securityRuleEntries, null, false)).thenReturn(securityAccessEntry);
 
         doThrow(ConflictingInsertionException.class).when(securityCache).add(securityAccessEntry);
         doThrow(ConflictingInsertionException.class).when(securityCache).add(securityAccessEntry, null);

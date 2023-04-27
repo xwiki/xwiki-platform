@@ -38,6 +38,7 @@ import org.xwiki.security.SecurityReferenceFactory;
 import org.xwiki.security.UserSecurityReference;
 import org.xwiki.security.authorization.cache.SecurityCache;
 import org.xwiki.security.authorization.cache.SecurityCacheLoader;
+import org.xwiki.security.authorization.internal.RequiredRightsSkipContext;
 import org.xwiki.security.internal.XWikiBridge;
 
 /**
@@ -55,10 +56,13 @@ public class DefaultAuthorizationManager implements AuthorizationManager
      */
     private static final List<Right> DEFAULT_IMPLIED_BY_RIGHTS = Arrays.asList(Right.ADMIN, Right.PROGRAM);
 
+    @Inject
+    private RequiredRightsSkipContext requiredRightsSkipContext;
+
     /** Logger. **/
     @Inject
     private Logger logger;
-    
+
     /** The cached rights. */
     @Inject
     private SecurityCache securityCache;
@@ -171,7 +175,7 @@ public class DefaultAuthorizationManager implements AuthorizationManager
             securityReferenceFactory.newEntityReference(entityReference)
         );
 
-        RuleState access = securityAccess.get(right);
+        RuleState access = securityAccess.get(right, this.requiredRightsSkipContext.isRequiredRightsSkipped());
         String info = check ? "security checkpoint" : "access inquiry";
         if (check && access != RuleState.ALLOW) {
             logDeny(userReference, entityReference, right, info);

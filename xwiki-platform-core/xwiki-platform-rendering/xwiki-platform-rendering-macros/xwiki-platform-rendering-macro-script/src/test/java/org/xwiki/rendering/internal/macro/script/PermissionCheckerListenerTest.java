@@ -84,8 +84,9 @@ class PermissionCheckerListenerTest
 
         this.listener.check(event, context, parameters);
 
-        verify(event).cancel("The execution of the [macro] script macro is not allowed. Check the rights of its last "
-            + "author or the parameters if it's rendered from another script.");
+        verify(event).cancel("The execution of the [macro] script macro is not allowed. "
+            + "Check the rights of its last author, the required rights of the document, or the parameters if it's "
+            + "rendered from another script.");
     }
 
     @Test
@@ -104,6 +105,7 @@ class PermissionCheckerListenerTest
         this.listener.check(event, context, parameters);
 
         verify(event).cancel("The execution of the [macro] script macro is not allowed in [location]. "
-            + "Check the rights of its last author or the parameters if it's rendered from another script.");
+            + "Check the rights of its last author, the required rights of the document, or the parameters if it's "
+            + "rendered from another script.");
     }
 }

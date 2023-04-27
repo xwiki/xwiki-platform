@@ -193,7 +193,6 @@ public class XWikiDocumentLocaleEventGenerator
         revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_MINOR, document.isMinorEdit());
         revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_REQUIRED_RIGHTS_ACTIVATED,
             document.isRequiredRightsActivated());
-        // TODO: might be better to represent the set as an actual list of elements, in particular in XML.
         revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_REQUIRED_RIGHTS,
             document.getRequiredRights().getRights().stream()
                 .map(Right::getName).collect(Collectors.joining(",")));

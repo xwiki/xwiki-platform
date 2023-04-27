@@ -56,7 +56,7 @@ public interface AuthorizationSettler
         Collection<GroupSecurityReference> groups,
         Deque<SecurityRuleEntry> securityRuleEntries)
     {
-        return settle(user, groups, securityRuleEntries, null);
+        return settle(user, groups, securityRuleEntries, null, false);
     }
 
     /**
@@ -71,11 +71,12 @@ public interface AuthorizationSettler
      *     reference reported by the first SecurityRuleEntry.
      * @param requiredRights the set of required rights, {@code null} if the required rights are not activated for a
      *     given document
+     * @param requiredRightsActivated when {@code true}, the required rights are activated on the entity
      * @return the computed access for the given user.
      */
     default SecurityAccessEntry settle(UserSecurityReference user,
         Collection<GroupSecurityReference> groups,
-        Deque<SecurityRuleEntry> securityRuleEntries, Set<Right> requiredRights)
+        Deque<SecurityRuleEntry> securityRuleEntries, Set<Right> requiredRights, boolean requiredRightsActivated)
     {
         return settle(user, groups, securityRuleEntries);
     }

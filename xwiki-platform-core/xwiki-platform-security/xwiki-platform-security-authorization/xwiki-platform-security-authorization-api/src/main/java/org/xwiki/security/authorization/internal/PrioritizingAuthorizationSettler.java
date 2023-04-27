@@ -62,11 +62,10 @@ public class PrioritizingAuthorizationSettler extends AbstractAuthorizationSettl
 
     @Override
     protected XWikiSecurityAccess settle(UserSecurityReference user, Collection<GroupSecurityReference> groups,
-        SecurityRuleEntry entry, Policies policies, Set<Right> requiredRights)
+        SecurityRuleEntry entry, Policies policies, Set<Right> requiredRights, boolean requiredRightsActivated)
     {
         XWikiSecurityAccess access = new XWikiSecurityAccess();
-        access.setRequiredRightsActivated(isRequiredRightsActivated());
-        access.setRequiredRights(requiredRights);
+        access.configureRequiredRights(requiredRights, requiredRightsActivated);
         Map<Right, Integer> priorities = new RightMap<Integer>();
         SecurityReference reference = entry.getReference();
         Set<Right> enabledRights = Right.getEnabledRights(reference.getSecurityType());

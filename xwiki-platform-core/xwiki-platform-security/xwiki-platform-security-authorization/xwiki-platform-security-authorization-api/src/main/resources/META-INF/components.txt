@@ -6,3 +6,4 @@ org.xwiki.security.authorization.DefaultAuthorizationManager
 org.xwiki.security.authorization.internal.DefaultAuthorizationManagerConfiguration
 org.xwiki.security.authorization.internal.DefaultAuthorizationSettler
 org.xwiki.security.authorization.internal.PrioritizingAuthorizationSettler
+org.xwiki.security.authorization.internal.RequiredRightsSkipContext

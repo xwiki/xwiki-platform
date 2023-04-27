@@ -23,11 +23,7 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.SecurityReference;
@@ -44,56 +40,32 @@ import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * Abstract super class for right resolvers.
- *
  * @version $Id$
  * @since 4.0M2
  */
 abstract class AbstractAuthorizationSettler implements AuthorizationSettler
 {
-    /**
-     * Identifier of the context key for the required rights skipping value. When {@code "true"}, the required rights
-     * are not taken into account when computing the rigths.
-     *
-     * @since 15.4RC1
-     */
-    public static final String SKIP_REQUIRED_RIGHT = "skipRequiredRight";
-    
-    /**
-     * Cache the initial tie resolution.
-     */
+    /** Cache the initial tie resolution. */
     private static RightSet initialAllowTie;
 
-    /**
-     * Cache the initial no override inheritance policy.
-     */
+    /** Cache the initial no override inheritance policy. */
     private static RightSet initialNoOverride;
 
-    /**
-     * The initial policy size. Check to update initial policies if a new Right is added.
-     */
+    /** The initial policy size. Check to update initial policies if a new Right is added. */
     private static int initialPolicySize;
-
-    @Inject
-    protected Execution execution;
 
     /**
      * Private implementation of the {@link SecurityAccessEntry}.
      */
     private final class InternalSecurityAccessEntry extends AbstractSecurityAccessEntry implements GroupSecurityEntry
     {
-        /**
-         * User reference.
-         */
+        /** User reference. */
         private UserSecurityReference userReference;
 
-        /**
-         * Entity reference.
-         */
+        /** Entity reference. */
         private final SecurityReference reference;
 
-        /**
-         * Security access.
-         */
+        /** Security access. */
         private final SecurityAccess access;
 
         /**
@@ -120,7 +92,7 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
         {
             this.userReference = reference;
         }
-
+        
         @Override
         public SecurityAccess getAccess()
         {
@@ -150,14 +122,10 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
      */
     protected final class Policies
     {
-        /**
-         * Current right which has an allow tie.
-         */
+        /** Current right which has an allow tie. */
         private Set<Right> allowTie;
 
-        /**
-         * Current right which has an no override inheritance policy.
-         */
+        /** Current right which has an no override inheritance policy. */
         private Set<Right> noOverride;
 
         /**
@@ -185,8 +153,10 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
         }
 
         /**
-         * Set the current tie and inheritance policy of an implied right to the policies of the original right. Once
-         * allowed, the resolution policy could not be denied. Once a no override policy set, it could not be revoked.
+         * Set the current tie and inheritance policy of an implied right
+         * to the policies of the original right.
+         * Once allowed, the resolution policy could not be denied.
+         * Once a no override policy set, it could not be revoked.
          *
          * @param impliedRight the implied right to set
          * @param originalRight the original right to get
@@ -221,12 +191,11 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
     }
 
     @Override
-    public SecurityAccessEntry settle(UserSecurityReference user,
-        Collection<GroupSecurityReference> groups, Deque<SecurityRuleEntry> ruleEntries, Set<Right> requiredRights)
+    public SecurityAccessEntry settle(UserSecurityReference user, Collection<GroupSecurityReference> groups,
+        Deque<SecurityRuleEntry> ruleEntries, Set<Right> requiredRights, boolean requiredRightsActivated)
     {
         XWikiSecurityAccess access = new XWikiSecurityAccess();
-        access.setRequiredRights(requiredRights);
-        access.setRequiredRightsActivated(isRequiredRightsActivated());
+        access.configureRequiredRights(requiredRights, requiredRightsActivated);
         SecurityReference reference = null;
 
         Policies policies = new Policies();
@@ -238,7 +207,8 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
                     reference = entry.getReference();
                 }
                 // Compute access of this level and merge it with previous access result
-                merge(settle(user, groups, entry, policies, requiredRights), access, entry.getReference(), policies);
+                merge(settle(user, groups, entry, policies, requiredRights, requiredRightsActivated), access,
+                    entry.getReference(), policies);
             }
             if (reference == null && entry.getReference().getType() == EntityType.WIKI) {
                 reference = entry.getReference();
@@ -263,8 +233,7 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
         for (Right right : Right.values()) {
             if (access.get(right) == RuleState.UNDETERMINED) {
                 if (!user.isGlobal() && !user.getOriginalReference().getWikiReference()
-                    .equals(reference.extractReference(EntityType.WIKI)))
-                {
+                        .equals(reference.extractReference(EntityType.WIKI))) {
                     /*
                      * Deny all by default for users from another wiki.
                      */
@@ -280,20 +249,19 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
 
     /**
      * Compute the access of a particular document hierarchy level.
-     *
      * @param user The user.
      * @param groups The groups where the user is a member.
      * @param entry The security entry to settle.
      * @param policies the current security policies.
-     * @param requiredRights
+     * @param requiredRights the required rights of  the current entity
+     * @param requiredRightsActivated when {@code true} the required rights are activated on the current entity
      * @return the resulting access for the user/group based on the given rules.
      */
     protected abstract XWikiSecurityAccess settle(UserSecurityReference user, Collection<GroupSecurityReference> groups,
-        SecurityRuleEntry entry, Policies policies, Set<Right> requiredRights);
+        SecurityRuleEntry entry, Policies policies, Set<Right> requiredRights, boolean requiredRightsActivated);
 
     /**
      * Merge the current access with the result from previous ones.
-     *
      * @param currentAccess The access computed at the current entity in the document hierarchy.
      * @param access The resulting access previously computed (modified and returned).
      * @param reference the current entity in the document hierarchy.
@@ -315,12 +283,5 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
                 access.allow(right);
             }
         }
-    }
-
-    protected boolean isRequiredRightsActivated()
-    {
-        ExecutionContext context = this.execution.getContext();
-        return context == null || !context.hasProperty(SKIP_REQUIRED_RIGHT) || !context.getProperty(SKIP_REQUIRED_RIGHT)
-            .equals("true");
     }
 }

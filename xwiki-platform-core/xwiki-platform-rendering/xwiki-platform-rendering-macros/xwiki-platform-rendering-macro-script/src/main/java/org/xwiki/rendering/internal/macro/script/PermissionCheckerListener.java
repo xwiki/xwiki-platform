@@ -92,7 +92,8 @@ public class PermissionCheckerListener extends AbstractScriptCheckerListener
                     sourceText = "";
                 }
                 event.cancel(String.format("The execution of the [%s] script macro is not allowed%s."
-                    + " Check the rights of its last author or the parameters if it's rendered from another script.",
+                        + " Check the rights of its last author, the required rights of the document, "
+                        + "or the parameters if it's rendered from another script.",
                     currentMacroId, sourceText));
             }
         } catch (ComponentLookupException e) {

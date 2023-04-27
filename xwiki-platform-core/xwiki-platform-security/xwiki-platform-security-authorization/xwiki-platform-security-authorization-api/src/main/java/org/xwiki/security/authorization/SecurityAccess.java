@@ -23,14 +23,31 @@ package org.xwiki.security.authorization;
  * Provide the allow/deny/undetermined state of a full set of rights.
  *
  * @version $Id$
- * @since 4.0M2 
+ * @since 4.0M2
  */
 public interface SecurityAccess extends Cloneable
 {
     /**
      * Return the rule state of a given {@link Right}.
+     *
      * @param right the right to retrieve.
-     * @return the state of this right.
+     * @return the state of this right
      */
-    RuleState get(Right right);
+    default RuleState get(Right right)
+    {
+        return get(right, true);
+    }
+
+    /**
+     * Return the rule state of a given {@link Right}.
+     *
+     * @param right the right to retrieve.
+     * @param skipRequiredRights when {@code true}, the required rights are not considered when computing the
+     *     rule state
+     * @return the state of this right
+     */
+    default RuleState get(Right right, boolean skipRequiredRights)
+    {
+        return get(right);
+    }
 }

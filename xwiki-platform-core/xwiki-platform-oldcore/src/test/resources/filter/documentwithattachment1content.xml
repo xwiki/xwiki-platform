@@ -63,6 +63,10 @@
                   <boolean>false</boolean>
                 </entry>
                 <entry>
+                  <string>revision_required_rights_activated</string>
+                  <boolean>false</boolean>
+                </entry>
+                <entry>
                   <string>revision_required_rights</string>
                   <string></string>
                 </entry>

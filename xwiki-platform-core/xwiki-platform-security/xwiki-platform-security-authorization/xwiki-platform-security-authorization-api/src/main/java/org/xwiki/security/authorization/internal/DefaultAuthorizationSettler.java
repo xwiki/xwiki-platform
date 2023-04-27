@@ -47,18 +47,16 @@ import static org.xwiki.security.authorization.RuleState.UNDETERMINED;
 @Singleton
 public class DefaultAuthorizationSettler extends AbstractAuthorizationSettler
 {
-
     @Override
     protected XWikiSecurityAccess settle(UserSecurityReference user, Collection<GroupSecurityReference> groups,
-        SecurityRuleEntry entry, Policies policies, Set<Right> requiredRights)
+        SecurityRuleEntry entry, Policies policies, Set<Right> requiredRights, boolean requiredRightsActivated)
     {
         Set<Right> enabledRights = Right.getEnabledRights(entry.getReference().getSecurityType());
         Set<Right> fromUser = new RightSet();
         Set<Right> allowed = new RightSet();
 
         XWikiSecurityAccess access = new XWikiSecurityAccess();
-        access.setRequiredRightsActivated(isRequiredRightsActivated());
-        access.setRequiredRights(requiredRights);
+        access.configureRequiredRights(requiredRights, requiredRightsActivated);
 
         // Evaluate rules from current entity
         for (Right right : enabledRights) {

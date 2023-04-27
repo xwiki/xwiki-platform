@@ -50,7 +50,7 @@ public class XWikiSecurityAccess implements SecurityAccess
     protected RightSet denied = new RightSet();
 
     private Set<Right> requiredRights;
-    
+
     private boolean requiredRightsActivated;
 
     /**
@@ -61,8 +61,6 @@ public class XWikiSecurityAccess implements SecurityAccess
         if (defaultAccess == null || Right.size() != defaultAccessSize) {
             defaultAccessSize = Right.size();
             defaultAccess = new XWikiSecurityAccess();
-            // TODO: maybed set to false?
-            defaultAccess.setRequiredRightsActivated(false);
             for (Right right : Right.values()) {
                 defaultAccess.set(right, right.getDefaultState());
             }
@@ -71,11 +69,16 @@ public class XWikiSecurityAccess implements SecurityAccess
     }
 
     /**
+     * Configure the required rights.
+     *
      * @param requiredRights the set of required rights to use for the security access computation
+     * @param requiredRightsActivated {@code true} when the required rights are activated on the entity,
+     *     {@code false} otherwise
      */
-    public void setRequiredRights(Set<Right> requiredRights)
+    public void configureRequiredRights(Set<Right> requiredRights, boolean requiredRightsActivated)
     {
         this.requiredRights = requiredRights;
+        this.requiredRightsActivated = requiredRightsActivated;
     }
 
     /**
@@ -131,14 +134,14 @@ public class XWikiSecurityAccess implements SecurityAccess
     }
 
     @Override
-    public RuleState get(Right right)
+    public RuleState get(Right right, boolean skipRequiredRights)
     {
         if (this.denied.contains(right)) {
             return RuleState.DENY;
         }
 
         if (this.allowed.contains(right)) {
-            if (this.requiredRights != null && this.requiredRightsActivated) {
+            if (this.requiredRights != null && this.requiredRightsActivated && !skipRequiredRights) {
                 return getWithRequiredRights(right);
             } else {
                 return RuleState.ALLOW;
@@ -158,14 +161,6 @@ public class XWikiSecurityAccess implements SecurityAccess
         }
     }
 
-    /**
-     * @param requiredRightsActivated when {@code true} the required rights are activated, when {@code false} the
-     *     required rights are not activated and are not taken into account during rights computation
-     */
-    public void setRequiredRightsActivated(boolean requiredRightsActivated)
-    {
-        this.requiredRightsActivated = requiredRightsActivated;
-    }
 
     @Override
     public XWikiSecurityAccess clone() throws CloneNotSupportedException

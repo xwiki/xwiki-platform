@@ -334,7 +334,7 @@
     line-height: @line-height-base;
     border: 1px solid transparent;
     border-radius: @border-radius-base @border-radius-base 0 0;
-
+    background-color: transparent;
     position: relative;
     display: block;
     padding: @nav-link-padding;
@@ -348,9 +348,9 @@
 
   // Active state, and its :hover to override normal :hover
   & > button.active {
-    border-top-color: fade((@xwiki-border-color), 80%);
-    border-left-color: fade((@xwiki-border-color), 80%);
-    border-right-color: fade((@xwiki-border-color), 80%);
+    border-top-color: @xwiki-border-color;
+    border-left-color: @xwiki-border-color;
+    border-right-color: @xwiki-border-color;
     &,
     &:hover,
     &:focus {

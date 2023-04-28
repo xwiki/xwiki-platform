@@ -187,13 +187,15 @@ Object.extend(XWiki, {
       var tab = document.getElementById(extraID + "tab");
       var pane = document.getElementById(extraID + "pane");
       if (window.activeDocExtraTab != null) {
-        window.activeDocExtraTab.removeAttribute('class');
-        window.activeDocExtraPane.className="hidden";
+        window.activeDocExtraTab.className = "";
+        window.activeDocExtraPane.className = "hidden";
+      } else {
+
       }
       window.activeDocExtraTab = tab;
       window.activeDocExtraPane = pane;
-      window.activeDocExtraTab.className="active";
-      window.activeDocExtraPane.className="";
+      window.activeDocExtraTab.className = "active";
+      window.activeDocExtraPane.className = "";
 
       document.fire("xwiki:docextra:activated", {"id": extraID});
     };
@@ -284,11 +286,7 @@ Object.extend(XWiki, {
               // prevents the anchor 'jump' after a click event but enable it
               // when the user is arriving from a direct /Space/Page#Section URL
               $(extraID + 'anchor').id = extraID;
-              location.href = '#' + extraID;
-              $(extraID).id = extraID + 'anchor';
-            } else {
-              $(extraID + 'anchor').id = extraID;
-              location.href = '#' + extraID;
+              location.replace('#' + extraID);
               $(extraID).id = extraID + 'anchor';
             }
           }
@@ -296,13 +294,9 @@ Object.extend(XWiki, {
     } else {
       dhtmlSwitch(extraID);
       if (scrollToAnchor) {
-          $(extraID + 'anchor').id = extraID;
-          location.href = '#' + extraID;
-          $(extraID).id = extraID + 'anchor';
-      } else {
-          $(extraID + 'anchor').id = extraID;
-          location.href = '#' + extraID;
-          $(extraID).id = extraID + 'anchor';
+        $(extraID + 'anchor').id = extraID;
+        location.replace('#' + extraID);
+        $(extraID).id = extraID + 'anchor';
       }
     }
   },

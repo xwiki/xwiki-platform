@@ -64,6 +64,7 @@ define('xwiki-tabList', ['jquery'], function($) {
         if (newlyOpenedTab === tab) {
           tab.removeAttribute('tabindex');
           tab.setAttribute('aria-selected', 'true');
+          this.moveFocusToTab(tab);
         } else {
           tab.tabIndex = -1;
           tab.setAttribute('aria-selected', 'false');

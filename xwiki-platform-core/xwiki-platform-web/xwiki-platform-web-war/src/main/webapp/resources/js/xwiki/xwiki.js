@@ -179,132 +179,132 @@ Object.extend(XWiki, {
    * @param scrollToAnchor Jump to the pane anchor.
    * @return
    */
-   displayDocExtra: function (extraID, extraTemplate, scrollToAnchor) {
-     // Nested function: hides the previously displayed extra pane (window.activeDocExtraPane)
-     // and display the one that is passed as an argument (extraID).
-     // Fires an event to notify that the pane has changed.
-     var dhtmlSwitch = function(extraID) {
-        var tab = document.getElementById(extraID + "tab");
-        var pane = document.getElementById(extraID + "pane");
-        if (window.activeDocExtraTab != null) {
-          window.activeDocExtraTab.removeAttribute('class');
-          window.activeDocExtraPane.className="hidden";
-        }
-        window.activeDocExtraTab = tab;
-        window.activeDocExtraPane = pane;
-        window.activeDocExtraTab.className="active";
-        window.activeDocExtraPane.className="";
+  displayDocExtra: function (extraID, extraTemplate, scrollToAnchor) {
+  // Nested function: hides the previously displayed extra pane (window.activeDocExtraPane)
+  // and display the one that is passed as an argument (extraID).
+  // Fires an event to notify that the pane has changed.
+    var dhtmlSwitch = function(extraID) {
+      var tab = document.getElementById(extraID + "tab");
+      var pane = document.getElementById(extraID + "pane");
+      if (window.activeDocExtraTab != null) {
+        window.activeDocExtraTab.removeAttribute('class');
+        window.activeDocExtraPane.className="hidden";
+      }
+      window.activeDocExtraTab = tab;
+      window.activeDocExtraPane = pane;
+      window.activeDocExtraTab.className="active";
+      window.activeDocExtraPane.className="";
 
-        document.fire("xwiki:docextra:activated", {"id": extraID});
-     };
+      document.fire("xwiki:docextra:activated", {"id": extraID});
+    };
 
-     // Use Ajax.Request to display the requested pane (extraID) : comments, attachments, etc.
-     // On complete :
-     //   1. Call dhtmlSwitch()
-     //   2. If the function call has been triggered by an event : reset location.href to #extraID
-     //      (because when the link has been first clicked the anchor was not loaded)
-     if ($(extraID + "pane").className.indexOf("empty") != -1) {
-        if (window.activeDocExtraPane != null) {
-            window.activeDocExtraPane.className="invisible";
-        }
-        $("docextrapanes").className="loading";
+    // Use Ajax.Request to display the requested pane (extraID) : comments, attachments, etc.
+    // On complete :
+    //   1. Call dhtmlSwitch()
+    //   2. If the function call has been triggered by an event : reset location.href to #extraID
+    //      (because when the link has been first clicked the anchor was not loaded)
+    if ($(extraID + "pane").className.indexOf("empty") != -1) {
+      if (window.activeDocExtraPane != null) {
+          window.activeDocExtraPane.className="invisible";
+      }
+      $("docextrapanes").className="loading";
 
-        // Determine if JS minification is disabled in the URL. Needed to pass it to the AJAX call to get the right resources on the reply.
-        var maybeMinifyRequestParameter = '';
-        var requestMinify = window.location.search.toQueryParams().minify;
-        if (requestMinify && requestMinify == 'false') {
-          maybeMinifyRequestParameter = '&minify=false';
-        }
+      // Determine if JS minification is disabled in the URL. Needed to pass it to the AJAX call to get the right resources on the reply.
+      var maybeMinifyRequestParameter = '';
+      var requestMinify = window.location.search.toQueryParams().minify;
+      if (requestMinify && requestMinify == 'false') {
+        maybeMinifyRequestParameter = '&minify=false';
+      }
 
-        new Ajax.Request(
-          window.docgeturl + '?xpage=xpart&vm=' + extraTemplate + maybeMinifyRequestParameter,
-                {
-                    method: 'get',
-                    onSuccess: function(response) {
-                      // Do the work that Ajax.Updater is supposed to do, but we can't use it because it strips the <script>s
-                      // from the output and we need to inject the external scripts from the reply (in the DOM's dead), to execute them.
+      new Ajax.Request(
+        window.docgeturl + '?xpage=xpart&vm=' + extraTemplate + maybeMinifyRequestParameter,
+          {
+          method: 'get',
+          onSuccess: function(response) {
+            // Do the work that Ajax.Updater is supposed to do, but we can't use it because it strips the <script>s
+            // from the output and we need to inject the external scripts from the reply (in the DOM's dead), to execute them.
 
-                      var head = document.body.previous('head');
-                      var html = response.responseText;
+            var head = document.body.previous('head');
+            var html = response.responseText;
 
-                      // Use a temporary "container" to parse and process the HTML response.
-                      var container = new Element('div');
-                      container.innerHTML = html;
+            // Use a temporary "container" to parse and process the HTML response.
+            var container = new Element('div');
+            container.innerHTML = html;
 
-                      // Insert link elements in head, if not already there.
-                      container.select('link').each(function(link) {
-                        var existingElements = head.select('link[href="' + link.readAttribute('href') + '"][type="' + link.readAttribute('type') + '"]');
-                        if (existingElements.length == 0) {
-                          head.insert(new Element('link', {rel: "stylesheet", type: link.type, href: link.readAttribute('href')}));
-                        }
-                        // Strip links from the result, since they are now in head.
-                        link.remove();
-                      });
+            // Insert link elements in head, if not already there.
+            container.select('link').each(function(link) {
+              var existingElements = head.select('link[href="' + link.readAttribute('href') + '"][type="' + link.readAttribute('type') + '"]');
+              if (existingElements.length == 0) {
+                head.insert(new Element('link', {rel: "stylesheet", type: link.type, href: link.readAttribute('href')}));
+              }
+              // Strip links from the result, since they are now in head.
+              link.remove();
+            });
 
-                      container.select('script').each(function(script) {
-                        // Insert external scripts in head, if not already there.
-                        if (script.src) {
-                          var existingElements = head.select('script[src="' + script.readAttribute('src') + '"][type="' + script.readAttribute('type') + '"]');
-                          if (existingElements.length == 0) {
-                            head.insert(new Element('script', {type: script.type, src: script.readAttribute('src')}));
-                          }
-                        }
-                      });
+            container.select('script').each(function(script) {
+              // Insert external scripts in head, if not already there.
+              if (script.src) {
+                var existingElements = head.select('script[src="' + script.readAttribute('src') + '"][type="' + script.readAttribute('type') + '"]');
+                if (existingElements.length == 0) {
+                  head.insert(new Element('script', {type: script.type, src: script.readAttribute('src')}));
+                }
+              }
+            });
 
-                      // Replaces the element's content with the temporary container's content, while also evaluating
-                      // any inline scripts.
-                      // The replacement is done by inserting the child elements of the temporary container into the
-                      // element's content.
-                      var pane = $(extraID + "pane");
-                      container.childElements().forEach(function(e) {
-                        pane.insert(e);
-                      });
+            // Replaces the element's content with the temporary container's content, while also evaluating
+            // any inline scripts.
+            // The replacement is done by inserting the child elements of the temporary container into the
+            // element's content.
+            var pane = $(extraID + "pane");
+            container.childElements().forEach(function(e) {
+              pane.insert(e);
+            });
 
-                      // Notify the others that the DOM has been updated.
-                      document.fire('xwiki:dom:updated', {elements: [$(extraID + 'pane')]});
-                    },
-                    onComplete: function(response){
-                      if (response.status == 401) {
-                        document.location.reload();
-                      }
+            // Notify the others that the DOM has been updated.
+            document.fire('xwiki:dom:updated', {elements: [$(extraID + 'pane')]});
+          },
+          onComplete: function(response){
+            if (response.status == 401) {
+              document.location.reload();
+            }
 
-                      $("docextrapanes").className="";
+            $("docextrapanes").className="";
 
-                      // Let other know new content has been loaded
-                      document.fire("xwiki:docextra:loaded", {
-                        "id" : extraID,
-                        "element": $(extraID + "pane")
-                      });
+            // Let other know new content has been loaded
+            document.fire("xwiki:docextra:loaded", {
+              "id" : extraID,
+              "element": $(extraID + "pane")
+            });
 
-                      // switch tab
-                      dhtmlSwitch(extraID);
+            // switch tab
+            dhtmlSwitch(extraID);
 
-                      if (scrollToAnchor) {
-                        // Yes, this is a POJW (Plain Old JavaScript Ha^Wworkaround) which
-                        // prevents the anchor 'jump' after a click event but enable it
-                        // when the user is arriving from a direct /Space/Page#Section URL
-                        $(extraID + 'anchor').id = extraID;
-                        location.href = '#' + extraID;
-                        $(extraID).id = extraID + 'anchor';
-                      } else {
-                        $(extraID + 'anchor').id = extraID;
-                        location.href= '#' + extraID;
-                        $(extraID).id = extraID + 'anchor';
-                      }
-                    }
-                });
-     } else {
-        dhtmlSwitch(extraID);
-        if (scrollToAnchor) {
-            $(extraID + 'anchor').id = extraID;
-            location.href = '#' + extraID;
-            $(extraID).id = extraID + 'anchor';
-        } else {
-            $(extraID + 'anchor').id = extraID;
-            location.href= '#' + extraID;
-            $(extraID).id = extraID + 'anchor';
-        }
-     }
+            if (scrollToAnchor) {
+              // Yes, this is a POJW (Plain Old JavaScript Ha^Wworkaround) which
+              // prevents the anchor 'jump' after a click event but enable it
+              // when the user is arriving from a direct /Space/Page#Section URL
+              $(extraID + 'anchor').id = extraID;
+              location.href = '#' + extraID;
+              $(extraID).id = extraID + 'anchor';
+            } else {
+              $(extraID + 'anchor').id = extraID;
+              location.href = '#' + extraID;
+              $(extraID).id = extraID + 'anchor';
+            }
+          }
+      });
+    } else {
+      dhtmlSwitch(extraID);
+      if (scrollToAnchor) {
+          $(extraID + 'anchor').id = extraID;
+          location.href = '#' + extraID;
+          $(extraID).id = extraID + 'anchor';
+      } else {
+          $(extraID + 'anchor').id = extraID;
+          location.href = '#' + extraID;
+          $(extraID).id = extraID + 'anchor';
+      }
+    }
   },
 
   /**

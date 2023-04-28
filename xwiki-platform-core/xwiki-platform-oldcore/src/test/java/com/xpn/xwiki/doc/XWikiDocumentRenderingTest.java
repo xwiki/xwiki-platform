@@ -213,8 +213,8 @@ public class XWikiDocumentRenderingTest
 
         this.document.setContent(
             "content not in section\n" + "= [[Space.Page]]=\nheader 1 content\n" + "== header 2==\nheader 2 content");
-        assertEquals("<span class=\"wikiexternallink\"><a href=\"Space.Page\">"
-                + "<span class=\"wikigeneratedlinkcontent\">Space.Page</span></a></span>",
+        assertEquals("<span class=\"wikiinternallink\"><a href=\"Space.Page\">"
+                + "<span class=\"wikigeneratedlinkcontent\">Page</span></a></span>",
             this.document.getRenderedTitle(Syntax.XHTML_1_0, this.oldcore.getXWikiContext()));
 
         this.document.setContent("content not in section\n" + "= #set($var ~= \"value\")=\nheader 1 content\n"

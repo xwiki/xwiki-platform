@@ -135,9 +135,10 @@
     function hideSearchInput() {
       globalSearch.addClass('globalsearch-close');
       globalSearchButton.attr('aria-expanded', 'false');
-      /* We need to use the aria-hidden attribute (and not just hidden)
-      because we use a transition on width, that is incompatible with 'hidden'. */
-      setTimeout(function() {globalSearchInput.attr('type','hidden')}, 300);
+      /* We use the input type='hidden' instead of the attribute 'hidden'
+      because we use a transition on width, that is incompatible with 'hidden'.
+      Input type hidden also hides from the tab order and removes possibilities of adding text*/
+      globalSearchInput.attr('type','hidden');
     }
 
     // Open the global search when the user click on the global search button

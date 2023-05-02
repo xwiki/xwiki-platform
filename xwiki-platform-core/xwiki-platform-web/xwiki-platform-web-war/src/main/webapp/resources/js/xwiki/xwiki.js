@@ -1391,7 +1391,7 @@ XWiki.Document = Class.create({
       return encodeURIComponent(spaceSegment);
     }).join('/');
     url = url.replace("__space__", spaceSegments);
-    url = url.replace("__page__", (this.page == 'WebHome') ? '' : encodeURIComponent(this.page));
+    url = url.replace("__page__", encodeURIComponent(this.page));
     url = url.replace("__action__/", encodeURIComponent(action) + "/");
     if (queryString) {
       url += '?' + queryString;

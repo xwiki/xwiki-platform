@@ -34,9 +34,9 @@
     #end
   #end
   <div class="main layoutsubsection">
-  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with inclusive techs.
-  <main id="mainContentArea">
+  <div id="mainContentArea">
     #template("hierarchy.vm")
+    <main>
     #if ("$!request.renameId" != '')
       ## Display the rename status
       #template("renameStatus.vm")
@@ -103,7 +103,8 @@
       #end
     #end
     <div class="clearfloats"></div>
-  </main>## mainContentArea
+  </main>
+  </div>## mainContentArea
   </div>## main
   #template("endpage.vm")
 #end

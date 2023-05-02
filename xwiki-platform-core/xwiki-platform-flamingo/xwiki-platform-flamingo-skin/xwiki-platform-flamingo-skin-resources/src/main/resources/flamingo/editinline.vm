@@ -32,7 +32,7 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
 ##
 <div class="main">
 ## Set as an HTML main for better DOM tree semantics to facilitate navigation with inclusive techs.
-<main id="mainContentArea">
+<div id="mainContentArea">
 ## ----------------------------------------------------------------------------
 ## Start FORM at start of content area IF editing is allowed.
 ## ----------------------------------------------------------------------------
@@ -50,6 +50,9 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
   </div>
 #end
 #template("hierarchy.vm")
+#if ($allowDocEdit)
+<main>
+#end
 ## Display a warning in case the document is restricted to explain explain the reason for potential errors.
 ## Also, only display it to users with script right as it's very unlikely that others are impacted.
 #if ($doc.isRestricted() && $services.security.authorization.hasAccess('script'))
@@ -141,7 +144,10 @@ $renderedContent
 #set($editactions = "bottom")
 <div class="bottombuttons sticky-buttons">#template("editactions.vm")</div>
 </div> ## form
+#if ($allowDocEdit)
+</main>
+#end
 </form>
 #end ## can edit
-</main> ## mainContentArea
+</div> ## mainContentArea
 </div> ## main

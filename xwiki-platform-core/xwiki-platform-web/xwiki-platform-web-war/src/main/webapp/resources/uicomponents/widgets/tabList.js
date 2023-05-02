@@ -60,12 +60,10 @@ define('xwiki-tabList', ['jquery'], function($) {
      * @param newlyOpenedTab
      */
     setSelectedTab(newlyOpenedTab) {
+      newlyOpenedTab.removeAttribute('tabindex');
+      newlyOpenedTab.setAttribute('aria-selected', 'true');
       this.tabs.forEach((tab, index) => {
-        if (newlyOpenedTab === tab) {
-          tab.removeAttribute('tabindex');
-          tab.setAttribute('aria-selected', 'true');
-          this.moveFocusToTab(tab);
-        } else {
+        if (newlyOpenedTab !== tab) {
           tab.tabIndex = -1;
           tab.setAttribute('aria-selected', 'false');
         }
@@ -148,6 +146,7 @@ define('xwiki-tabList', ['jquery'], function($) {
      */
     onClick(event) {
       this.setSelectedTab(event.currentTarget);
+      this.moveFocusToTab(event.currentTarget);
     }
   };
   return KeyboardAccessibleTabList;

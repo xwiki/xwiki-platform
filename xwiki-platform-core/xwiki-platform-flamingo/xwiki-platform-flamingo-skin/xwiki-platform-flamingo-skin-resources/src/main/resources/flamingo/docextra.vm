@@ -142,8 +142,8 @@
           $("${extraAnchor}tab").addEventListener("click", function(){
             XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", false);
             location.replace("#${extraAnchor}");
-            }, false);
             this.focus();
+            }, false);
         }
         ##
         ## Replace top menu link (if any)

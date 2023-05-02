@@ -189,8 +189,6 @@ Object.extend(XWiki, {
       if (window.activeDocExtraTab != null) {
         window.activeDocExtraTab.className = "";
         window.activeDocExtraPane.className = "hidden";
-      } else {
-
       }
       window.activeDocExtraTab = tab;
       window.activeDocExtraPane = pane;

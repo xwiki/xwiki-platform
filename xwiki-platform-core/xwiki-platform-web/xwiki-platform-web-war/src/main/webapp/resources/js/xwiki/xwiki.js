@@ -1425,6 +1425,49 @@ XWiki.Document = Class.create({
     return this.documentReference;
   }
 });
+XWiki.Attachment = Class.create({
+  /**
+   * Constructor.
+   *
+   * Example: new XWiki.Attachment('filename',
+   *            new XWiki.Document(new XWiki.DocumentReference('xwiki', ['Space1', 'Space2'], 'Page'))
+   */
+  initialize : function(filenameOrAttachmentReference, document) {
+    if (typeof filenameOrAttachmentReference === 'string') {
+      // The first argument is a filename.
+      this.filename = filenameOrAttachmentReference;
+      this.document = document;
+    } else {
+      // The first argument is an attachment reference (or it is null).
+      // We ignore the other argument since all the needed information is on the reference
+      this.initializeFromReference(filenameOrAttachmentReference);
+    }
+  },
+  /**
+   * Constructor.
+   *
+   * Example: new XWiki.Attachment(new XWiki.AttachmentReference('filename',
+   *            new XWiki.DocumentReference('xwiki', ['Space1', 'Space2'], 'Page')))
+   */
+  initializeFromReference : function(attachmentReference) {
+    this.filename = attachmentReference.name;
+    this.document = new XWiki.Document(attachmentReference.parent);
+  },
+  /**
+   * Gets a URL pointing to this attachment.
+   */
+  getURL : function(queryString, fragment) {
+    var attachmentURL = this.document.getURL('download') +
+      (this.document.page.name == 'WebHome' ? this.document.page.name : '') + '/' + encodeURIComponent(this.filename);
+    if (queryString) {
+      attachmentURL += '?' + queryString;
+    }
+    if (fragment) {
+      attachmentURL += '#' + fragment;
+    }
+    return attachmentURL;
+  }
+});
 /* Initialize the document URL factory, and create XWiki.currentDocument.
 TODO: use the new API to get the document meta data (see: http://jira.xwiki.org/browse/XWIKI-11225).
 Currently not done because the new API is asynchronous meanwhile this script must be loaded first/ */

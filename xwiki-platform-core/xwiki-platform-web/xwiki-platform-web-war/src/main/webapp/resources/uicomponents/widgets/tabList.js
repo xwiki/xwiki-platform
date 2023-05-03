@@ -62,7 +62,7 @@ define('xwiki-tabList', ['jquery'], function($) {
     setSelectedTab(newlyOpenedTab) {
       newlyOpenedTab.removeAttribute('tabindex');
       newlyOpenedTab.setAttribute('aria-selected', 'true');
-      this.tabs.forEach((tab, index) => {
+      this.tabs.forEach((tab) => {
         if (newlyOpenedTab !== tab) {
           tab.tabIndex = -1;
           tab.setAttribute('aria-selected', 'false');

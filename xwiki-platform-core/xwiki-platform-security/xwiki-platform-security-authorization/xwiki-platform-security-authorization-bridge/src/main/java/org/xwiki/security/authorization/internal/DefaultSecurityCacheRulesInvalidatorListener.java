@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -42,6 +43,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.AbstractEventListener;
+import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.security.SecurityReferenceFactory;
@@ -66,6 +68,7 @@ import com.xpn.xwiki.user.api.XWikiGroupService;
 @Component
 @Named(DefaultSecurityCacheRulesInvalidatorListener.NAME)
 @Singleton
+@Priority(EventListener.CACHE_INVALIDATION_DEFAULT_PRIORITY)
 public class DefaultSecurityCacheRulesInvalidatorListener extends AbstractEventListener
 {
     /**

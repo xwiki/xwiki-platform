@@ -128,7 +128,7 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
                 this.documentReference), new DocumentDeletedEvent(this.documentReference), new WikiDeletedEvent(
                 this.documentReference.getWikiReference().getName()));
 
-        this.observation.addListener(this);
+        this.observation.addListener(this, EventListener.CACHE_INVALIDATION_DEFAULT_PRIORITY);
     }
 
     protected void setReference(DocumentReference reference)

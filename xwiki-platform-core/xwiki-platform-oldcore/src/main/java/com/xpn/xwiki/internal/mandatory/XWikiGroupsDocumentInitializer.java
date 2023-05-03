@@ -45,6 +45,12 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 public class XWikiGroupsDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
+     * Local reference of the XWikiUsers class document.
+     */
+    public static final LocalDocumentReference XWIKI_GROUPS_DOCUMENT_REFERENCE =
+        new LocalDocumentReference(XWiki.SYSTEM_SPACE, "XWikiGroups");
+
+    /**
      * Used to bind a class to a document sheet.
      */
     @Inject
@@ -56,7 +62,7 @@ public class XWikiGroupsDocumentInitializer extends AbstractMandatoryClassInitia
      */
     public XWikiGroupsDocumentInitializer()
     {
-        super(new LocalDocumentReference(XWiki.SYSTEM_SPACE, "XWikiGroups"));
+        super(XWIKI_GROUPS_DOCUMENT_REFERENCE);
     }
 
     @Override

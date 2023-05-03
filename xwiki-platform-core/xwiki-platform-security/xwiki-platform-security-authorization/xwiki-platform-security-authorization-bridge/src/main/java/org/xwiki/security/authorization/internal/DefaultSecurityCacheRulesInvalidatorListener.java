@@ -43,7 +43,6 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.AbstractEventListener;
-import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.security.SecurityReferenceFactory;
@@ -68,7 +67,7 @@ import com.xpn.xwiki.user.api.XWikiGroupService;
 @Component
 @Named(DefaultSecurityCacheRulesInvalidatorListener.NAME)
 @Singleton
-@Priority(EventListener.CACHE_INVALIDATION_DEFAULT_PRIORITY)
+@Priority(SecurityCache.CACHE_INVALIDATION_PRIORITY)
 public class DefaultSecurityCacheRulesInvalidatorListener extends AbstractEventListener
 {
     /**

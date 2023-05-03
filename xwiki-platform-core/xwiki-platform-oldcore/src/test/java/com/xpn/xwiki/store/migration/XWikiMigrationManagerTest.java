@@ -117,7 +117,7 @@ public class XWikiMigrationManagerTest extends AbstractBridgedXWikiComponentTest
     private void registerComponent(Class<?> klass) throws Exception
     {
         ComponentAnnotationLoader loader = new ComponentAnnotationLoader();
-        List<ComponentDescriptor<?>> descriptors = loader.getComponentsDescriptors(klass);
+        List<ComponentDescriptor<?>> descriptors = loader.getComponentsDescriptors(klass, 0);
 
         for (ComponentDescriptor<?> descriptor : descriptors) {
             getComponentManager().registerComponent(descriptor);

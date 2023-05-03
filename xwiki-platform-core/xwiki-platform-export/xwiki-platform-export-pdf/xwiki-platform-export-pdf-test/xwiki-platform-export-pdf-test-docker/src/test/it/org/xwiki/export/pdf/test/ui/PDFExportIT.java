@@ -607,9 +607,10 @@ class PDFExportIT
             assertEquals(2, pdf.getNumberOfPages());
 
             String content = pdf.getTextFromPage(1);
-            assertEquals("FormFields\n2 / 2\n" + "Title\nTitle modified\n" + " Enabled\n"
-                + "Color\n Blue  Yellow  Red\n" + "City\nParis\n" + "Genre\nComedy\nDrama\nRomance\n"
-                + "Description\ndescription modified\n" + "Submit\n", content);
+            assertEquals("FormFields\n2 / 2\n" + "Title modified\n"
+                + " Blue  Yellow  Red\n" + "Paris\n" + "Comedy\nDrama\nRomance\n"
+                + "description modified\n" + "Submit\n"
+                + "TITLE\n" + " ENABLED\n" + "COLOR\n" + "CITY\n" + "GENRE\n" + "DESCRIPTION\n", content);
         }
     }
 

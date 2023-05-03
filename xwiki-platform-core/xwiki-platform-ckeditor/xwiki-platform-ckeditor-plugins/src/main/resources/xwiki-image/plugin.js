@@ -287,11 +287,17 @@
             newStyles = newStyles + ';';
           }
 
+          if (newStyles === ';') {
+            newStyles = '';
+          }
+
           if (widget.data.hasCaption && widget.data.width) {
             newStyles = newStyles + "width: " + widget.data.width + "px;";
           }
 
-          widget.element.setAttribute('style', newStyles);
+          if(newStyles !== '') {
+            widget.element.setAttribute('style', newStyles);
+          }
         }
 
         // Caption
@@ -321,10 +327,14 @@
       var originalDowncast = imageWidget.downcast;
       imageWidget.downcast = function (element) {
         var el = originalDowncast.apply(this, arguments);
-        if (this.parts.caption === null && el.children[0] && el.children[0].children[0]) {
-          el = el.children[0].children[0];
-          delete el.attributes['data-widget'];
+        var isNotCaptioned = this.parts.caption === null;
+        if (isNotCaptioned) {
+          var img = el.findOne('img', true);
+          // Cleanup and remove the wrapping span used for the resize caret.
+          delete img.attributes['data-widget'];
+          img.parent.replaceWith(img);
         }
+
         return el;
       };
     }

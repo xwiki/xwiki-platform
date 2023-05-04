@@ -133,9 +133,9 @@ var XWiki = (function (XWiki) {
         new XWiki.widgets.XListItem( content, {
           containerClasses: 'suggestItem',
           classes: 'showAllResults',
-          eventCallbackScope : this,
-          noHighlight : true,
-          value : valueNode,
+          eventCallbackScope: this,
+          noHighlight: true,
+          value: valueNode,
           containerNature: 'button'
         } ),
       ],

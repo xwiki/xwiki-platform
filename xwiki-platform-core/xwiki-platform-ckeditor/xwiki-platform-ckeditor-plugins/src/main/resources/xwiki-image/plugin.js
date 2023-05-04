@@ -118,6 +118,24 @@
       CKEDITOR.plugins.registered['xwiki-image-old'].overrideImageWidget(editor, imageWidget);
 
       /**
+       * Initializes the resize wrapper for the widget.
+       *
+       * @param widget the widget to initialize
+       * @returns {HTMLSpanElement} returns undefined of the resize wrapper was already initialized, otherwise returns
+       *   the wrapper span element
+       */
+      function initResizeWrapper(widget) {
+        var resizeWrapper;
+        if (widget.element.find('.cke_image_resizer_wrapper', true).count() === 0) {
+          resizeWrapper = editor.document.createElement('span');
+          resizeWrapper.addClass('cke_image_resizer_wrapper');
+          resizeWrapper.append(widget.parts.image);
+          resizeWrapper.append(widget.resizer);
+        }
+        return resizeWrapper;
+      }
+
+      /**
        * Update the dom of the widget to place the resize span inside the previously created wrapping span.
        *
        * @param widget the image widget to update
@@ -126,10 +144,7 @@
         if(widget.data.hasCaption) {
           return;
         } 
-        var resizeWrapper = editor.document.createElement('span');
-        resizeWrapper.addClass('cke_image_resizer_wrapper');
-        resizeWrapper.append(widget.parts.image);
-        resizeWrapper.append(widget.resizer);
+        var resizeWrapper = initResizeWrapper(widget);
 
         // Set the data.align to right when it's right so that the mousedown event is tricked into believing the
         // alignment is right.
@@ -151,12 +166,16 @@
           // This happens when removing the caption of an image. 
           var widgetElement = editor.document.createElement('span');
           widgetElement.addClass('cke_widget_element');
-          widgetElement.append(resizeWrapper);
+          if (resizeWrapper) {
+            widgetElement.append(resizeWrapper);
+          }
           widget.wrapper.append(widgetElement, true);
           widget.element = widgetElement;
           widget.element.setAttribute('data-widget', widget.name);
         } else {
-          widget.element.append(resizeWrapper, true);
+          if (resizeWrapper) {
+            widget.element.append(resizeWrapper, true);
+          }
         }
       }
 
@@ -332,8 +351,13 @@
           var img = el.findOne('img', true);
           // Cleanup and remove the wrapping span used for the resize caret.
           delete img.attributes['data-widget'];
-          img.parent.replaceWith(img);
+          var firstChild = el.children[0];
+          firstChild.replaceWith(firstChild.children[0]);
         }
+
+        // Safety data-widget removal as I noticed an additional data-widget being persisted. I did not identify the
+        // exact reproduction steps though. 
+        delete el.attributes['data-widget'];
 
         return el;
       };

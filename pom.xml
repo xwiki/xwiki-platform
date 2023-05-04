@@ -1041,14 +1041,11 @@
               <include>**/*IntegrationTests.java</include>
             </includes>
             <!-- Verify that unit tests don't output anything to stdout/stderr -->
-            <systemProperties combine.children="append">
+            <systemPropertyVariables>
               <!-- This property makes it simple for some module to exclude the check (for example for functional
                    tests) -->
-              <property>
-                <name>xwiki.surefire.captureconsole.skip</name>
-                <value>${xwiki.surefire.captureconsole.skip}</value>
-              </property>
-            </systemProperties>
+              <xwiki.surefire.captureconsole.skip>${xwiki.surefire.captureconsole.skip}</xwiki.surefire.captureconsole.skip>
+            </systemPropertyVariables>
           </configuration>
           <dependencies>
             <!-- Used to automatically register our custom JUnit5 Extensions using the service loader mechanism.

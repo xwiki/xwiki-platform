@@ -43,8 +43,8 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
  *   <li>Look in {@code Mail.MailConfig} in the current wiki</li>
  *   <li>Look in {@code Mail.MailConfig} in the main wiki</li>
  *   <li>[Backward compatibility] Look in {@code (current space).XWikiPreferences} in the current wiki</li>
- *   <li>[Backward compatibility] Look in {@code }XWiki.XWikiPreferences} in the current wiki</li>
- *   <li>Look in the xwiki properties file</li>
+ *   <li>[Backward compatibility] Look in {@code XWiki.XWikiPreferences} in the current wiki</li>
+ *   <li>Look in the {@code xwiki.properties} file</li>
  * </ul>
  *
  * @version $Id$
@@ -166,11 +166,17 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     public String getUsername()
     {
         String username = this.currentWikiMailConfigSource.getProperty(USERNAME_PROPERTY, String.class);
-        if (username == null && !isMainWiki()) {
+
+        // If the current wiki has overridden the SMTP host then don't fall back on the main wiki for credentials
+        // since that would forbid the ability to have anonymous credentials in subwikis. In other words, if the
+        // host is set for a subwiki, you need to explicitly set the username/password too.
+        String currentHost = this.currentWikiMailConfigSource.getProperty(HOST_PROPERTY, String.class);
+
+        if (username == null && !isMainWiki() && currentHost == null) {
             username = this.mainWikiMailConfigSource.getProperty(USERNAME_PROPERTY, String.class);
         }
 
-        if (username == null) {
+        if (username == null && ((!isMainWiki() && currentHost == null) || isMainWiki())) {
             username = this.xwikiPropertiesSource.getProperty(PREFIX + USERNAME_PROPERTY, String.class);
         }
 
@@ -181,11 +187,17 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     public String getPassword()
     {
         String password = this.currentWikiMailConfigSource.getProperty(PASSWORD_PROPERTY, String.class);
-        if (password == null && !isMainWiki()) {
+
+        // If the current wiki has overridden the SMTP host then don't fall back on the main wiki for credentials
+        // since that would forbid the ability to have anonymous credentials in subwikis. In other words, if the
+        // host is set for a subwiki, you need to explicitly set the username/password too.
+        String currentHost = this.currentWikiMailConfigSource.getProperty(HOST_PROPERTY, String.class);
+
+        if (password == null && !isMainWiki() && currentHost == null) {
             password = this.mainWikiMailConfigSource.getProperty(PASSWORD_PROPERTY, String.class);
         }
 
-        if (password == null) {
+        if (password == null && ((!isMainWiki() && currentHost == null) || isMainWiki())) {
             password = this.xwikiPropertiesSource.getProperty(PREFIX + PASSWORD_PROPERTY, String.class);
         }
 

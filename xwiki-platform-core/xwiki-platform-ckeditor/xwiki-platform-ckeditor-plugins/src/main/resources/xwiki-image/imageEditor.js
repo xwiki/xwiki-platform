@@ -329,6 +329,29 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
       });
     }
 
+    /**
+     * Keeps alignment and text-wrap consistent on the given modal.
+     *
+     * @param modal the modal to keep consistent
+     */
+    function addToggleAlignmentTextWrap(modal) {
+      var alignmentRadios = modal.find('[name="alignment"]');
+      var textWrapCheckbox = modal.find('[name="textWrap"]');
+      var noneAlignment = modal.find('[name="alignment"][value="none"]');
+
+      alignmentRadios.change(function () {
+        if (this.value !== 'none') {
+          textWrapCheckbox.prop("checked", false);
+        }
+      });
+
+      textWrapCheckbox.change(function () {
+        if (this.checked) {
+          noneAlignment.prop("checked", true);
+        }
+      });
+    }
+
     // Fetch modal content from a remote template the first time the image dialog editor is opened.
     function initialize(modal) {
       var params = modal.data('input');
@@ -361,6 +384,7 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
             });
 
             addToggleImageWidthLock(modal);
+            addToggleAlignmentTextWrap(modal);
           }).fail(function(error) {
             new XWiki.widgets.Notification(translations.get('modal.initialization.fail'), 'error');
             console.log('Failed to retrieve the image edition form.', error);
@@ -501,6 +525,10 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
       $('#advanced [name="alignment"]').val([imageData.alignment || 'none']);
 
       // Text Wrap
+      // Uncheck text wrap in case of inconsistency (i.e., alignment takes precedence over text-wrap). 
+      if (imageData.alignment && imageData.alignment !== 'none') {
+        imageData.textWrap = false;
+      }
       $('#advanced [name="textWrap"]').prop('checked', imageData.textWrap);
 
       //  Override with the style values only if it's a new image.

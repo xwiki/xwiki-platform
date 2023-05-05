@@ -32,7 +32,7 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>Синтаксис екранування XWiki</title>
+  <title>XWikiSyntaxEscapes</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -43,14 +43,14 @@
 
 == Уникання ==
 
-=== 1.0 Уникання ===
+=== Уникання 1.0 ===
 
 Дозволяє уникнути синтаксису XWiki.
 
 |=Функція|=Синтаксис XWiki 1.0|=Результат
 |Екранування символу|{{{Це не [посилання]}}}|{{{Це не [посилання]}}}
 
-=== 2.0 Уникання ===
+=== Уникання 2.0 ===
 
 Дозволяє уникнути синтаксису XWiki.
 

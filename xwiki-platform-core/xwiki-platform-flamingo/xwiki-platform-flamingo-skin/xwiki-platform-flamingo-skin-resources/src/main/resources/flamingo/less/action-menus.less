@@ -80,6 +80,37 @@
   }
 }
 
+ul {
+  @media (max-width: @screen-sm-max) {
+    // On mobile, do not show the avatar nor the notification buttons when the search input is open
+    &.globalsearch-open {
+      .navbar-avatar {
+        position: absolute;
+        left: -10000px;
+      }
+      #tmNotifications {
+        position: absolute;
+        left: -10000px;
+      }
+    }
+
+    .navbar-avatar {
+      position: relative;
+    }
+
+    #tmNotifications {
+      position: relative;
+    }
+
+    // Deactivate animation on mobile, otherwise the toolbar flickers when the search input gets closed, since
+    // the hidden buttons are made immediately visible (no transition possible on "position" or "display" properties).
+    #globalsearch #headerglobalsearchinput {
+      transition: none;
+    }
+  }
+}
+
+
 #globalsearch {
 
   margin: 0;
@@ -120,7 +151,10 @@
     border: 0;
     min-width: 0;
     transition: width 0.3s, padding 0.3s;
-    width: 200px; // we need to set a width in pixels otherwise the transition is not applied nicely
+    width: 115px; // we need to set a width in pixels otherwise the transition is not applied nicely
+    @media (min-width: @screen-sm-min) {
+      width: 200px;
+    }
   }
 
   // When the global search is close

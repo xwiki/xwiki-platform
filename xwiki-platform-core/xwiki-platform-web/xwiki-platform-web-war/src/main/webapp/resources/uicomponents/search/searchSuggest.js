@@ -43,6 +43,7 @@ var XWiki = (function (XWiki) {
       document.observe("xwiki:suggest:containerPrepared", this.onSuggestContainerPrepared.bindAsEventListener(this));
       document.observe("xwiki:suggest:updated", this.onSuggestUpdated.bindAsEventListener(this));
       document.observe("xwiki:suggest:selected", this.onSuggestionSelected.bindAsEventListener(this));
+      document.observe("xwiki:suggest:collapsed", this.onSuggestionCollapsed.bindAsEventListener(this));
 
       this.createSuggest();
     },
@@ -85,10 +86,11 @@ var XWiki = (function (XWiki) {
     onSuggestUpdated: function(event) {
       // Check if there are any suggestions, taking into account that there is at least one suggestion used to link the
       // search page.
-      if (event.memo.container.select('.suggestItem').length == 1) {
+      if (event.memo.container.select('.suggestItem').length === 1) {
         // Show the "No results!" message.
         this.noResultsMessage.removeClassName('hidden').setStyle({'float': 'left'});
       }
+      event.memo.container.select('.suggestItem')[0].href=event.memo.url||"";
     },
 
     /**
@@ -102,7 +104,7 @@ var XWiki = (function (XWiki) {
         if (event.memo.originalEvent) {
           Event.stop(event.memo.originalEvent);
         }
-        if (!event.memo.url) {
+        if (!event.memo.url || event.memo.url==="") {
           // Submit form
           this.searchInput.up('form').submit();
         }
@@ -111,6 +113,10 @@ var XWiki = (function (XWiki) {
           window.location = event.memo.url;
         }
       }
+    },
+
+    onSuggestionCollapsed: function(event) {
+      this.suggest.clearSuggestions();
     },
 
     /**
@@ -150,6 +156,7 @@ var XWiki = (function (XWiki) {
         }
       });
       var allResults = allResultsNode.getElement();
+      allResults.addEventListener('focusin', () => pointer.setHighlight(allResults));
       this.suggest = new XWiki.widgets.Suggest( this.searchInput, {
         parentContainer: $('globalsearch'),
         className: 'searchSuggest horizontalLayout',

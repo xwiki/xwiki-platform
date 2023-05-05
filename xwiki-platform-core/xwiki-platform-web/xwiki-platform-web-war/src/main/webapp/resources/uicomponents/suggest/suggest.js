@@ -156,6 +156,8 @@ var XWiki = (function(XWiki){
       this.seps = "";
     }
 
+    this.searchPageUrl = encodeURIComponent(this.fld.value.strip());
+
     // Initialize a request number that will keep track of the latest request being fired.
     // This will help to discard potential non-last requests callbacks ; this in order to have better performance
     // (less unneccessary DOM manipulation, and less unneccessary highlighting computation).
@@ -526,12 +528,12 @@ var XWiki = (function(XWiki){
       // Don't enforce the width if it wasn't specified to let the container adjust its width to fit the suggest items.
       div.style[this.options.width ? 'width' : 'minWidth'] = containerWidth + "px";
 
-      // set mouseover functions for div
-      // when mouse pointer leaves div, set a timeout to remove the list after an interval
-      // when mouse enters div, kill the timeout so the list won't be removed
+      // set focus functions for div
+      // when focus leaves div, set a timeout to remove the list after an interval
+      // when focus enters div, kill the timeout so the list won't be removed
       var pointer = this;
-      div.onmouseover = function(){ pointer.killTimeout(); };
-      div.onmouseout = function(){ pointer.resetTimeout(); };
+      div.addEventListener("focusin", () => pointer.killTimeout());
+      div.addEventListener("focusout", () => pointer.resetTimeout());
 
       this.resultContainer = new Element("div", {'class':'resultContainer'});
       div.appendChild(this.resultContainer);
@@ -651,7 +653,7 @@ var XWiki = (function(XWiki){
   createList: function(arr, source)
   {
     this._createList(arr, source);
-
+    this.searchPageurl = encodeURIComponent(this.fld.value.strip());
     if (!this.isInMultiSourceMode || !this.resultContainer.down('.results.loading')) {
       document.fire('xwiki:suggest:updated', {
         'container' : this.container,
@@ -728,8 +730,10 @@ var XWiki = (function(XWiki){
         containerClasses: 'suggestItem ' + (arr[i].type || ''),
         value: valueNode,
         noHighlight: true, // we do the highlighting ourselves
-        containerNature: 'button'
+        containerNature: 'a'
       });
+      item.containerElement.setAttribute('href',arr[i].url);
+      item.containerElement.addEventListener('focus', () => pointer.setHighlight(item.containerElement));
       list.addItem(item);
     }
 

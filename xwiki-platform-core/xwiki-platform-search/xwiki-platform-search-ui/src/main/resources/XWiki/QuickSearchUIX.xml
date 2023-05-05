@@ -143,8 +143,9 @@
         // We close the global search only if the focus is not on the search input or the search button.
         // Without this, the global search would be close each time the user click on the button (even when it's for
         // actually performing the search).
-        if (document.activeElement !== globalSearchButton[0] &amp;&amp; document.activeElement !== globalSearchInput[0]) {
+        if (!document.getElementById('globalsearch').contains(document.activeElement)) {
           globalSearch.addClass('globalsearch-close');
+          document.fire("xwiki:suggest:collapsed",globalSearchInput);
         }
       }, 1);
     });

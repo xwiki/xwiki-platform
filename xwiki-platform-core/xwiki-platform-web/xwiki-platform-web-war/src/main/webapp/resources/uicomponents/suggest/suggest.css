@@ -22,7 +22,9 @@ div.suggestItems {
   text-align:left;
 }
 
+div.suggestItems a,
 div.suggestItems button {
+  display: block;
   width: 100%;
   background: none;
   border: none;
@@ -99,7 +101,7 @@ div.suggestItemName {
   text-indent: 0;
 }
 
-button.suggestItem, li.noSuggestion div {
+a.suggestItem, li.noSuggestion div {
   color: $theme.textColor;
   font-size: 0.875em;
 }
@@ -134,7 +136,7 @@ div.resultContainer div.sourceName {
   background-position:right 3px center;
 }
 
-.horizontalLayout div.resultContainer button.xitemcontainer {
+.horizontalLayout div.resultContainer a.xitemcontainer {
   margin-left:10px;
 }
 

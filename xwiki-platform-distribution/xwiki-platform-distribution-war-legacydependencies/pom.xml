@@ -125,6 +125,10 @@
           <groupId>org.xwiki.platform</groupId>
           <artifactId>xwiki-platform-extension-handler-xar</artifactId>
         </exclusion>
+        <exclusion>
+          <artifactId>xwiki-rendering-macro-toc</artifactId>
+          <groupId>org.xwiki.rendering</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
 
@@ -362,6 +366,17 @@
         <exclusion>
           <groupId>org.xwiki.rendering</groupId>
           <artifactId>xwiki-rendering-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-legacy-macro-toc</artifactId>
+      <version>${rendering.version}</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>xwiki-rendering-macro-toc</artifactId>
+          <groupId>org.xwiki.rendering</groupId>
         </exclusion>
       </exclusions>
     </dependency>

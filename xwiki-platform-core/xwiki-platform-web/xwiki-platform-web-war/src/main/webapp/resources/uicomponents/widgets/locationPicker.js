@@ -145,13 +145,18 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge', 'xwiki-form-validation-a
      * Compute a page name from a given title.
      **/
     var getPageName = function(title) {
-      var url = XWiki.currentDocument.getURL("get");
-      return Promise.resolve($.get(url, {
-        'xpage': 'entitynamevalidation_json',
-        'outputSyntax': 'plain',
-        'name': title,
-        'form_token': xm.form_token
-      }));
+      if (nameInput.prop('readonly')) {
+        // The page name is read-only so we shouldn't update it based on the title.
+        return Promise.resolve({transformedName: nameInput.val()});
+      } else {
+        var url = XWiki.currentDocument.getURL("get");
+        return Promise.resolve($.get(url, {
+          'xpage': 'entitynamevalidation_json',
+          'outputSyntax': 'plain',
+          'name': title,
+          'form_token': xm.form_token
+        }));
+      }
     };
 
     /**

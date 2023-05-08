@@ -133,7 +133,7 @@ class TextAreaClassTest
         });
 
         String renderingResult = "1 &#38; 1";
-        OldRendering oldRendering = mock();
+        OldRendering oldRendering = mock(OldRendering.class);
         String renderingInput = velocityCode.replace("&", "&#38;");
         when(oldRendering.parseContent(renderingInput, this.oldcore.getXWikiContext()))
             .thenReturn(renderingResult);

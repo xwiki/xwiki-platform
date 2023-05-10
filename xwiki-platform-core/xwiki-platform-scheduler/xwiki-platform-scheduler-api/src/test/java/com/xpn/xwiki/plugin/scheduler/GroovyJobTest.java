@@ -52,7 +52,9 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
@@ -121,7 +123,7 @@ class GroovyJobTest
         xObject.setLargeStringValue("script",
             "xcontext.get('feedbackFunction')"
                 + ".accept(xcontext.get(com.xpn.xwiki.doc.XWikiDocument.CKEY_SDOC).getAuthors().getContentAuthor())");
-        mockitoOldcore.getSpyXWiki().saveDocument(jobDocument, mockitoOldcore.getXWikiContext());
+        // Don't save the document as this would override the content author with the effective metadata author.
         jobDataMap.put("xjob", xObject);
 
         doAnswer(invocationOnMock -> {
@@ -131,6 +133,7 @@ class GroovyJobTest
             XWikiDocument sDocument = (XWikiDocument) xWikiContext.get(XWikiDocument.CKEY_SDOC);
             assertEquals(jobAuthor, sDocument.getAuthors().getContentAuthor());
             assertNotEquals(contentAuthor, sDocument.getAuthors().getContentAuthor());
+            assertNotSame(jobDocument, sDocument);
 
             if (!allowExecution) {
                 throw new AccessDeniedException(Right.PROGRAM, new DocumentReference(WIKI_NAME, "XWiki", "JobAuthor"),
@@ -150,6 +153,8 @@ class GroovyJobTest
                 jobExecutionException.getMessage());
             assertEquals("Access denied when checking [programming] access to [xwiki:Scheduler.Job] "
                 + "for user [xwiki:XWiki.JobAuthor]", jobExecutionException.getCause().getMessage());
+            // Make sure the job is not re-executed immediately.
+            assertFalse(jobExecutionException.refireImmediately());
         }
 
         verify(mockitoOldcore.getMockContextualAuthorizationManager()).checkAccess(Right.PROGRAM);

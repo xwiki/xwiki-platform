@@ -480,8 +480,6 @@ public class EditForm extends XWikiForm
 
     private void setRequiredRights(String[] requiredRights)
     {
-        // TODO: add more control on who can add/remove the rights? e.g. should I have script right to add script?
-        // should have I script right to remove script right?
         if (requiredRights != null) {
             this.requiredRights = Arrays.stream(requiredRights).map(Right::toRight).collect(Collectors.toSet());
         } else {
@@ -502,12 +500,20 @@ public class EditForm extends XWikiForm
         return temporaryUploadedFiles;
     }
 
+    /**
+     * @return the value of the {@code activateRequiredRights} request parameter
+     * @since 15.4RC1
+     */
     @Unstable
     public String getActivateRequiredRights()
     {
         return this.activateRequiredRights;
     }
 
+    /**
+     * @return the set of required rights defined in the request parameters
+     * @since 15.4RC1
+     */
     @Unstable
     public Set<Right> getRequiredRights()
     {

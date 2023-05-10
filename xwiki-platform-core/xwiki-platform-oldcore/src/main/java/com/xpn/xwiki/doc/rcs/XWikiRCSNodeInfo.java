@@ -161,8 +161,7 @@ public class XWikiRCSNodeInfo extends AbstractSimpleClass implements Comparable<
     }
 
     /**
-     * 
-     * @return
+     * @return {@code true} when the required rights are activated
      * @since 15.4RC1
      */
     @Unstable
@@ -172,8 +171,7 @@ public class XWikiRCSNodeInfo extends AbstractSimpleClass implements Comparable<
     }
 
     /**
-     * 
-     * @param requiredRightsActivated
+     * @param requiredRightsActivated {@code true} when the required rights are activated, {@code false} otherwise
      * @since 15.4RC1
      */
     @Unstable

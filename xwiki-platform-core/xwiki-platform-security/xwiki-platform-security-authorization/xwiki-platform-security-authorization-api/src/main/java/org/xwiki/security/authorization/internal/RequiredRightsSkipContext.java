@@ -44,7 +44,7 @@ public class RequiredRightsSkipContext
      *
      * @since 15.4RC1
      */
-    private static final String SKIP_REQUIRED_RIGHT = "skipRequiredRight";
+    public static final String SKIP_REQUIRED_RIGHT = "skipRequiredRight";
 
     @Inject
     private Execution execution;

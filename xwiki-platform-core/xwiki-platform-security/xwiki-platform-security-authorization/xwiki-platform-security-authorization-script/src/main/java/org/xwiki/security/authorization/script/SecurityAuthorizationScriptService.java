@@ -37,6 +37,8 @@ import org.xwiki.security.authorization.Right;
 import org.xwiki.security.script.SecurityScriptService;
 import org.xwiki.stability.Unstable;
 
+import static org.xwiki.security.authorization.internal.RequiredRightsSkipContext.SKIP_REQUIRED_RIGHT;
+
 /**
  * Security Authorization Script Service.
  *
@@ -152,20 +154,28 @@ public class SecurityAuthorizationScriptService implements ScriptService
     }
 
     /**
-     * @param right
-     * @return
+     * Update the execution context to ignore the required rights.
+     *
+     * @see #optInRequiredRights()
      * @since 15.3RC1
      */
     @Unstable
     public void optOutRequiredRights()
     {
-        this.execution.getContext().setProperty("skipRequiredRight", "true");
+        this.execution.getContext().setProperty(SKIP_REQUIRED_RIGHT, "true");
     }
-
+    
+    /**
+     * Update the execution context to explicitly take into account the required rights. Can be used to revert back
+     * {@link #optOutRequiredRights()}
+     *
+     * @see #optOutRequiredRights()
+     * @since 15.3RC1
+     */
     @Unstable
     public void optInRequiredRights()
     {
-        this.execution.getContext().setProperty("skipRequiredRight", "false");
+        this.execution.getContext().setProperty(SKIP_REQUIRED_RIGHT, "false");
     }
 
     /**

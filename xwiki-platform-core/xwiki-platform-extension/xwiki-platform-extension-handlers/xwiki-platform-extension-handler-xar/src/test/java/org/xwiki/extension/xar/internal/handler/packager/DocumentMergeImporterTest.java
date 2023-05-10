@@ -20,6 +20,7 @@
 package org.xwiki.extension.xar.internal.handler.packager;
 
 import java.util.Locale;
+import java.util.Set;
 
 import javax.inject.Provider;
 
@@ -39,6 +40,7 @@ import org.xwiki.job.JobContext;
 import org.xwiki.job.Request;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.internal.document.DefaultDocumentAuthors;
+import org.xwiki.model.internal.document.DefaultRequiredRights;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.store.merge.MergeConflictDecisionsManager;
 import org.xwiki.store.merge.MergeDocumentResult;
@@ -162,8 +164,12 @@ public class DocumentMergeImporterTest
         when(this.mergedDocument.getAuthors()).thenReturn(new DefaultDocumentAuthors(this.mergedDocument));
         when(this.mergedDocument.isNew()).thenReturn(false);
         when(this.mergedDocument.getDocumentReferenceWithLocale()).thenReturn(this.documentReference);
+        when(this.mergedDocument.getRequiredRights())
+            .thenReturn(new DefaultRequiredRights(this.mergedDocument, Set.of()));
 
         when(this.currentDocument.clone()).thenReturn(this.mergedDocument);
+        when(this.currentDocument.getRequiredRights())
+            .thenReturn(new DefaultRequiredRights(this.currentDocument, Set.of()));
 
         // merge
 

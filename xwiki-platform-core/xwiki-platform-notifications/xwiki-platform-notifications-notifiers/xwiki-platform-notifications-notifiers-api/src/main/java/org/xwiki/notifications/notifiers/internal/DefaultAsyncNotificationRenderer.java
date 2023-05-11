@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.notifiers.internal;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,7 +29,6 @@ import javax.inject.Named;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.eventstream.Event;
 import org.xwiki.job.GroupedJobInitializer;
 import org.xwiki.job.JobGroupPath;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -110,16 +110,18 @@ public class DefaultAsyncNotificationRenderer implements AsyncRenderer
     public AsyncRendererResult render(boolean async, boolean cached) throws RenderingException
     {
         Object fromCache =
-            this.notificationCacheManager.getFromCache(this.cacheKey, this.configuration.isCount());
+            this.notificationCacheManager.getFromCache(this.cacheKey, this.configuration.isCount(), true);
 
         NotificationParameters notificationParameters = this.configuration.getNotificationParameters();
-        List<Event> events = null;
+        List<CompositeEvent> events = null;
         Integer count = null;
         if (fromCache == null) {
             try {
-                events = this.notificationManager.getRawEvents(notificationParameters);
+                events = this.notificationManager.getEvents(notificationParameters);
                 count = events.size();
-                this.notificationCacheManager.setInCache(this.cacheKey, events, this.configuration.isCount());
+                this.notificationCacheManager.setInCache(this.cacheKey, new ArrayList<>(events),
+                    this.configuration.isCount(),
+                    true);
             } catch (NotificationException e) {
                 throw new RenderingException("Error while retrieving the notification", e);
             }
@@ -127,7 +129,7 @@ public class DefaultAsyncNotificationRenderer implements AsyncRenderer
             if (this.configuration.isCount()) {
                 count = (Integer) fromCache;
             } else {
-                events = (List<Event>) fromCache;
+                events = (List<CompositeEvent>) fromCache;
             }
         }
         String stringResult;
@@ -142,14 +144,12 @@ public class DefaultAsyncNotificationRenderer implements AsyncRenderer
                 if (notificationParameters.user != null) {
                     userId = documentReferenceSerializer.serialize(notificationParameters.user);
                 }
-                List<CompositeEvent> compositeEvents = this.groupingEventManager.getCompositeEvents(events, userId,
-                    notificationParameters.groupingEventTarget);
 
                 if (userId != null) {
                     compositeEventStatuses =
-                        this.compositeEventStatusManager.getCompositeEventStatuses(compositeEvents, userId);
+                        this.compositeEventStatusManager.getCompositeEventStatuses(events, userId);
                 }
-                stringResult = this.htmlNotificationRenderer.render(compositeEvents, compositeEventStatuses, loadMore);
+                stringResult = this.htmlNotificationRenderer.render(events, compositeEventStatuses, loadMore);
             } catch (Exception e) {
                 throw new RenderingException("Error while retrieving the event status", e);
             }

@@ -35,7 +35,7 @@ import org.xwiki.notifications.NotificationException;
  * Default strategy for grouping event, that reuse the {@link SimilarityCalculator}.
  *
  * @version $Id$
- * @since 15.4RC1
+ * @since 15.5RC1
  */
 @Component
 @Singleton
@@ -163,5 +163,13 @@ public class DefaultGroupingEventStrategy implements GroupingEventStrategy
         }
 
         return result;
+    }
+
+    @Override
+    public void group(List<CompositeEvent> compositeEvents, List<Event> newEvents) throws NotificationException
+    {
+        for (Event newEvent : newEvents) {
+            recordEvent(compositeEvents, newEvent);
+        }
     }
 }

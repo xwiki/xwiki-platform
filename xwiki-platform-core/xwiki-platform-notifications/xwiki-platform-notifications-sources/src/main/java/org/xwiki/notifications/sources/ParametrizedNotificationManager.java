@@ -43,10 +43,7 @@ public interface ParametrizedNotificationManager
      * @param parameters parameters to take care of
      * @return a list of the corresponding composite events
      * @throws NotificationException if an error occurs
-     * @deprecated Prefer using {@link #getRawEvents(NotificationParameters)} and rely on
-     *             {@link org.xwiki.notifications.GroupingEventManager} to obtain the composite events.
      */
-    @Deprecated(since = "15.4RC1")
     List<CompositeEvent> getEvents(NotificationParameters parameters) throws NotificationException;
 
     /**
@@ -55,7 +52,7 @@ public interface ParametrizedNotificationManager
      * @param parameters parameters to take care of
      * @return a list of the corresponding events
      * @throws NotificationException if an error occurs
-     * @since 15.4RC1
+     * @since 15.5RC1
      */
     @Unstable
     default List<Event> getRawEvents(NotificationParameters parameters) throws NotificationException

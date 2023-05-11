@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.notifiers.internal;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,7 +27,6 @@ import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.xwiki.eventstream.Event;
 import org.xwiki.job.GroupedJobInitializer;
 import org.xwiki.job.JobGroupPath;
 import org.xwiki.model.reference.DocumentReference;
@@ -34,7 +34,6 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.CompositeEventStatus;
 import org.xwiki.notifications.CompositeEventStatusManager;
-import org.xwiki.notifications.GroupingEventManager;
 import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.notifications.sources.ParametrizedNotificationManager;
 import org.xwiki.rendering.async.internal.AsyncRendererResult;
@@ -81,9 +80,6 @@ class DefaultAsyncNotificationRendererTest
     @Named("AsyncNotificationRenderer")
     private GroupedJobInitializer jobInitializer;
 
-    @MockComponent
-    private GroupingEventManager groupingEventManager;
-
     private NotificationParameters notificationParameters;
 
     @BeforeEach
@@ -118,22 +114,11 @@ class DefaultAsyncNotificationRendererTest
     @Test
     void render() throws Exception
     {
-        List<Event> eventList = Arrays.asList(
-            mock(Event.class),
-            mock(Event.class),
-            mock(Event.class),
-            mock(Event.class)
-        );
-
-        when(this.notificationManager.getRawEvents(notificationParameters)).thenReturn(eventList);
-
         List<CompositeEvent> compositeEventList = List.of(
             mock(CompositeEvent.class),
             mock(CompositeEvent.class)
         );
-
-        when(this.groupingEventManager.getCompositeEvents(eventList, USER_SERIALIZED_REFERENCE, "alert"))
-            .thenReturn(compositeEventList);
+        when(this.notificationManager.getEvents(notificationParameters)).thenReturn(compositeEventList);
 
         List<CompositeEventStatus> compositeEventStatusList = Arrays.asList(
             mock(CompositeEventStatus.class),
@@ -141,7 +126,7 @@ class DefaultAsyncNotificationRendererTest
         );
         when(this.compositeEventStatusManager.getCompositeEventStatuses(compositeEventList, USER_SERIALIZED_REFERENCE))
             .thenReturn(compositeEventStatusList);
-        notificationParameters.expectedCount = 4;
+        notificationParameters.expectedCount = 2;
         when(this.htmlNotificationRenderer.render(compositeEventList, compositeEventStatusList, true))
             .thenReturn("Expected result!");
 
@@ -149,34 +134,29 @@ class DefaultAsyncNotificationRendererTest
         this.asyncNotificationRenderer.initialize(
             new NotificationAsyncRendererConfiguration(notificationParameters, false));
         assertEquals(new AsyncRendererResult("Expected result!"), this.asyncNotificationRenderer.render(false, false));
-        verify(this.notificationCacheManager).getFromCache(CACHE_KEY, false);
-        verify(this.notificationCacheManager).setInCache(CACHE_KEY, eventList, false);
+        verify(this.notificationCacheManager).getFromCache(CACHE_KEY, false, true);
+        verify(this.notificationCacheManager).setInCache(CACHE_KEY, new ArrayList<>(compositeEventList), false, true);
 
         // Test2: get count of 2 events, without cache
-        when(this.htmlNotificationRenderer.render(4)).thenReturn("Expected count result!");
+        when(this.htmlNotificationRenderer.render(2)).thenReturn("Expected count result!");
         this.asyncNotificationRenderer.initialize(
             new NotificationAsyncRendererConfiguration(notificationParameters, true));
         assertEquals(new AsyncRendererResult("Expected count result!"),
             this.asyncNotificationRenderer.render(true, true));
-        verify(this.notificationCacheManager).getFromCache(CACHE_KEY, true);
-        verify(this.notificationCacheManager).setInCache(CACHE_KEY, eventList, true);
+        verify(this.notificationCacheManager).getFromCache(CACHE_KEY, true, true);
+        verify(this.notificationCacheManager).setInCache(CACHE_KEY, new ArrayList<>(compositeEventList), true, true);
 
         // Test3: get 1 event with cache
-        eventList = Arrays.asList(
-            mock(Event.class)
-        );
         compositeEventList = List.of(
             mock(CompositeEvent.class)
         );
 
-        when(this.groupingEventManager.getCompositeEvents(eventList, USER_SERIALIZED_REFERENCE, "alert"))
-            .thenReturn(compositeEventList);
         compositeEventStatusList = Arrays.asList(
             mock(CompositeEventStatus.class)
         );
         when(this.compositeEventStatusManager.getCompositeEventStatuses(compositeEventList, USER_SERIALIZED_REFERENCE))
             .thenReturn(compositeEventStatusList);
-        when(this.notificationCacheManager.getFromCache(CACHE_KEY, false)).thenReturn(eventList);
+        when(this.notificationCacheManager.getFromCache(CACHE_KEY, false, true)).thenReturn(compositeEventList);
 
         when(this.htmlNotificationRenderer.render(compositeEventList, compositeEventStatusList, false))
             .thenReturn("Expected cache result!");
@@ -184,46 +164,38 @@ class DefaultAsyncNotificationRendererTest
             new NotificationAsyncRendererConfiguration(notificationParameters, false));
         assertEquals(new AsyncRendererResult("Expected cache result!"),
             this.asyncNotificationRenderer.render(true, false));
-        verify(this.notificationCacheManager, never()).setInCache(CACHE_KEY, eventList, false);
+        verify(this.notificationCacheManager, never()).setInCache(CACHE_KEY,
+            new ArrayList<>(compositeEventList), false, true);
 
-        when(this.notificationCacheManager.getFromCache(CACHE_KEY, true)).thenReturn(1);
+        when(this.notificationCacheManager.getFromCache(CACHE_KEY, true, true)).thenReturn(1);
         when(this.htmlNotificationRenderer.render(1))
             .thenReturn("Expected count cache result!");
         this.asyncNotificationRenderer.initialize(
             new NotificationAsyncRendererConfiguration(notificationParameters, true));
         assertEquals(new AsyncRendererResult("Expected count cache result!"),
             this.asyncNotificationRenderer.render(false, true));
-        verify(this.notificationCacheManager, never()).setInCache(CACHE_KEY, eventList, false);
+        verify(this.notificationCacheManager, never()).setInCache(CACHE_KEY,
+            new ArrayList<>(compositeEventList), false, true);
     }
 
     @Test
     void renderUserNull() throws Exception
     {
         notificationParameters.user = null;
-        List<Event> eventList = Arrays.asList(
-            mock(Event.class),
-            mock(Event.class),
-            mock(Event.class),
-            mock(Event.class)
-        );
-
-        when(this.notificationManager.getRawEvents(notificationParameters)).thenReturn(eventList);
-
         List<CompositeEvent> compositeEventList = List.of(
             mock(CompositeEvent.class),
             mock(CompositeEvent.class)
         );
 
-        when(this.groupingEventManager.getCompositeEvents(eventList, null, "alert"))
-            .thenReturn(compositeEventList);
-        notificationParameters.expectedCount = 4;
+        when(this.notificationManager.getEvents(notificationParameters)).thenReturn(compositeEventList);
+        notificationParameters.expectedCount = 2;
         when(this.htmlNotificationRenderer.render(compositeEventList, null, true))
             .thenReturn("Expected result!");
         this.asyncNotificationRenderer.initialize(
             new NotificationAsyncRendererConfiguration(notificationParameters, false));
         assertEquals(new AsyncRendererResult("Expected result!"), this.asyncNotificationRenderer.render(false, false));
-        verify(this.notificationCacheManager).getFromCache(CACHE_KEY, false);
-        verify(this.notificationCacheManager).setInCache(CACHE_KEY, eventList, false);
+        verify(this.notificationCacheManager).getFromCache(CACHE_KEY, false, true);
+        verify(this.notificationCacheManager).setInCache(CACHE_KEY, new ArrayList<>(compositeEventList), false, true);
         verify(this.compositeEventStatusManager, never()).getCompositeEventStatuses(any(), any());
     }
 

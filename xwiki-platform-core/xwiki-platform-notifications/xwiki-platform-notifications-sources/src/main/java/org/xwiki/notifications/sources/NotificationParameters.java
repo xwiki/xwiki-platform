@@ -102,7 +102,7 @@ public class NotificationParameters
     /**
      * The output target of the notification for composite events computation with the
      * {@link org.xwiki.notifications.GroupingEventManager}.
-     * @since 15.4RC1
+     * @since 15.5RC1
      */
     @Unstable
     public String groupingEventTarget = "alert";

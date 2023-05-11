@@ -30,7 +30,7 @@ import org.xwiki.stability.Unstable;
  * output, and on the preference of the users.
  *
  * @version $Id$
- * @since 15.4RC1
+ * @since 15.5RC1
  */
 @Role
 @Unstable
@@ -48,4 +48,18 @@ public interface GroupingEventManager
      */
     List<CompositeEvent> getCompositeEvents(List<Event> events, String userId, String target) throws
         NotificationException;
+
+    /**
+     * Add new events to an already existing list of composite events, using the {@link GroupingEventStrategy}
+     * retrieved from the given information.
+     * This method does not return anything but update the given list of composite events.
+     *
+     * @param compositeEvents a list of composite events (might be empty)
+     * @param newEvents the new events to group along with the given list of composite events
+     * @param userId the identifier of the user for whom the grouping is performed
+     * @param target the output target (e.g. email or alert)
+     * @throws NotificationException in case of problem when performing the grouping
+     */
+    void augmentCompositeEvents(List<CompositeEvent> compositeEvents, List<Event> newEvents, String userId,
+        String target) throws NotificationException;
 }

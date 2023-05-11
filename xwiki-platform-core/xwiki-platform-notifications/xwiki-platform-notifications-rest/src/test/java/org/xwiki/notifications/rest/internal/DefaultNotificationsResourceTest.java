@@ -176,11 +176,11 @@ class DefaultNotificationsResourceTest
         String expectedCacheKey = "cacheKey";
         when(this.cacheManager.createCacheKey(notificationParameters)).thenReturn(expectedCacheKey);
 
-        List<Event> eventList = Collections.singletonList(mock(Event.class));
-        when(this.executor.submit(eq(expectedCacheKey), any(), eq(false), eq(false))).thenReturn(eventList);
+        List<CompositeEvent> eventList = Collections.singletonList(mock(CompositeEvent.class));
+        when(this.executor.submit(eq(expectedCacheKey), any(), eq(false), eq(false), eq(true))).thenReturn(eventList);
 
         String expectedResult = "some results";
-        when(this.rssFeedRenderer.render(eventList, userId)).thenReturn(expectedResult);
+        when(this.rssFeedRenderer.render(eventList)).thenReturn(expectedResult);
 
         assertEquals(expectedResult, this.notificationsResource
             .getNotificationsRSS(useUserPreferences, userId, untilDate, blackList, pages, spaces, wikis, users, "",

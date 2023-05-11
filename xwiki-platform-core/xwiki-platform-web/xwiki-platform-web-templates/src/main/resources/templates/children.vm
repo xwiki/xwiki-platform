@@ -86,7 +86,6 @@
     }))
     {{/html}}
 
-    {{html wiki='true'}}
     {{liveData
       id='childrenIndex'
       source='liveTable'
@@ -94,8 +93,7 @@
       properties='doc.title,doc.location,doc.date,doc.author,_actions'
       sort='doc.location:asc'
       }}$jsontool.serialize($liveDataConfig){{/liveData}}
-    {{/html}}
-
+    
     {{html clean='false'}}
   #end
 #end

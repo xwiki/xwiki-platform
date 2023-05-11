@@ -654,7 +654,6 @@ var XWiki = (function(XWiki){
   createList: function(arr, source)
   {
     this._createList(arr, source);
-    this.searchPageurl = encodeURIComponent(this.fld.value.strip());
     if (!this.isInMultiSourceMode || !this.resultContainer.down('.results.loading')) {
       document.fire('xwiki:suggest:updated', {
         'container' : this.container,

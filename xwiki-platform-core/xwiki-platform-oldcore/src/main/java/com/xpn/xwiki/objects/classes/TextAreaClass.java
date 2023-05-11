@@ -54,6 +54,8 @@ public class TextAreaClass extends StringClass
     private static final String FAILED_VELOCITY_EXECUTION_WARNING =
         "Failed to execute velocity code in text area property [{}]: [{}]";
 
+    private static final String RESTRICTED = "restricted";
+
     /**
      * Possible values for the editor meta property.
      * <p>
@@ -228,7 +230,7 @@ public class TextAreaClass extends StringClass
     @Override
     public BaseProperty newProperty()
     {
-        BaseProperty property = new LargeStringProperty();
+        BaseProperty<?> property = new LargeStringProperty();
         property.setName(getName());
 
         return property;
@@ -348,11 +350,7 @@ public class TextAreaClass extends StringClass
     {
         String contentType = getContentType();
 
-        if (contentType != null && !contentType.equals("puretext") && !contentType.equals("velocitycode")) {
-            return true;
-        } else {
-            return false;
-        }
+        return contentType != null && !contentType.equals("puretext") && !contentType.equals("velocitycode");
     }
 
     /**
@@ -367,7 +365,7 @@ public class TextAreaClass extends StringClass
     @Unstable
     public boolean isRestricted()
     {
-        return getIntValue("restricted", 0) == 1;
+        return getIntValue(RESTRICTED, 0) == 1;
     }
 
     /**
@@ -383,7 +381,7 @@ public class TextAreaClass extends StringClass
     @Unstable
     public void setRestricted(boolean restricted)
     {
-        setIntValue("restricted", restricted ? 1 : 0);
+        setIntValue(RESTRICTED, restricted ? 1 : 0);
     }
 
     @Override
@@ -401,7 +399,7 @@ public class TextAreaClass extends StringClass
         parameters.put("cols", getSize());
         parameters.put("rows", getRows());
         parameters.put("disabled", isDisabled());
-        parameters.put("restricted", isRestricted() || (ownerDocument != null && ownerDocument.isRestricted()));
+        parameters.put(RESTRICTED, isRestricted() || (ownerDocument != null && ownerDocument.isRestricted()));
         parameters.put("sourceDocumentReference", object.getDocumentReference());
         Syntax syntax = null;
         String contentType = getContentType();
@@ -513,7 +511,7 @@ public class TextAreaClass extends StringClass
         return content;
     }
 
-    private void displayVelocityCode(StringBuffer buffer, String name, String prefix, BaseCollection object,
+    private void displayVelocityCode(StringBuffer buffer, String name, String prefix, BaseCollection<?> object,
         XWikiContext context)
     {
         StringBuffer result = new StringBuffer();
@@ -553,7 +551,7 @@ public class TextAreaClass extends StringClass
         return isAllowed;
     }
 
-    private XWikiDocument getObjectDocument(BaseCollection object, XWikiContext context)
+    private XWikiDocument getObjectDocument(BaseCollection<?> object, XWikiContext context)
     {
         try {
             XWikiDocument doc = object.getOwnerDocument();
@@ -574,7 +572,7 @@ public class TextAreaClass extends StringClass
         return null;
     }
 
-    private Syntax getObjectDocumentSyntax(BaseCollection object, XWikiContext context)
+    private Syntax getObjectDocumentSyntax(BaseCollection<?> object, XWikiContext context)
     {
         XWikiDocument doc = getObjectDocument(object, context);
 

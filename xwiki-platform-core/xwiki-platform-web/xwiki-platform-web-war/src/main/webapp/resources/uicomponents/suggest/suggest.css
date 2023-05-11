@@ -36,10 +36,7 @@ div.suggestItems .hide-button-wrapper {
   line-height: 1em;
 }
 div.suggestItems .hide-button {
-  cursor: pointer;
-  font-size: 0.8em;
   font-style: italic;
-  opacity: .8; /* Should eventually use a full color defined in the color theme like .text-muted */
   padding: 0 0.8em;
   text-align: right;
 }

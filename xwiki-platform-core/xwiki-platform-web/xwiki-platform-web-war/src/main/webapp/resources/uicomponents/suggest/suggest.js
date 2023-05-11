@@ -534,6 +534,7 @@ var XWiki = (function(XWiki){
       var pointer = this;
       div.addEventListener("focusin", () => pointer.killTimeout());
       div.addEventListener("focusout", () => pointer.resetTimeout());
+      div.addEventListener("mouseout", () => pointer.clearHighlight())
 
       this.resultContainer = new Element("div", {'class':'resultContainer'});
       div.appendChild(this.resultContainer);
@@ -733,7 +734,7 @@ var XWiki = (function(XWiki){
         containerNature: 'a'
       });
       item.containerElement.setAttribute('href',arr[i].url);
-      item.containerElement.addEventListener('focus', () => pointer.setHighlight(item.containerElement));
+      item.listItemElement.addEventListener('focusin', (event) => pointer.setHighlight(event.currentTarget));
       list.addItem(item);
     }
 

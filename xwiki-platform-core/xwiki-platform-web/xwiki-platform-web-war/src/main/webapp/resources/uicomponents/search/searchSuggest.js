@@ -149,14 +149,12 @@ var XWiki = (function (XWiki) {
         'classes' : 'suggestList',
         'eventListeners' : {
           'mouseover':function(event){
-            this.suggest.clearHighlight();
-            this.suggest.iHighlighted = event.element();
-            event.element().addClassName('xhighlight');
+            this.suggest.setHighlight(event.currentTarget)
           }
         }
       });
       var allResults = allResultsNode.getElement();
-      allResults.addEventListener('focusin', () => pointer.setHighlight(allResults));
+      allResultsNode.items[0].getElement().addEventListener('focusin', (event) => this.suggest.setHighlight($(event.currentTarget)));
       this.suggest = new XWiki.widgets.Suggest( this.searchInput, {
         parentContainer: $('globalsearch'),
         className: 'searchSuggest horizontalLayout',

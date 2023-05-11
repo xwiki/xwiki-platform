@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -112,7 +113,7 @@ public class EditForm extends XWikiForm
 
     private List<String> temporaryUploadedFiles;
 
-    private String activateRequiredRights;
+    private Boolean activateRequiredRights;
 
     private Set<Right> requiredRights;
 
@@ -475,7 +476,11 @@ public class EditForm extends XWikiForm
 
     private void setActivateRequiredRights(String activateRequiredRights)
     {
-        this.activateRequiredRights = activateRequiredRights;
+        if (activateRequiredRights != null) {
+            this.activateRequiredRights = Objects.equals(activateRequiredRights, "1");
+        } else {
+            this.activateRequiredRights = null;
+        }
     }
 
     private void setRequiredRights(String[] requiredRights)
@@ -505,7 +510,7 @@ public class EditForm extends XWikiForm
      * @since 15.4RC1
      */
     @Unstable
-    public String getActivateRequiredRights()
+    public Boolean getActivateRequiredRights()
     {
         return this.activateRequiredRights;
     }

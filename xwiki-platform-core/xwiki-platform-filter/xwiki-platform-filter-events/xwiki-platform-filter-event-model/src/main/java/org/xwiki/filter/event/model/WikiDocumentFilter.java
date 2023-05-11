@@ -26,6 +26,7 @@ import org.slf4j.MarkerFactory;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.annotation.Default;
+import org.xwiki.stability.Unstable;
 
 /**
  * Document related events.
@@ -184,12 +185,14 @@ public interface WikiDocumentFilter
      * @type {@link String}
      * @since 15.4RC1
      */
+    @Unstable
     String PARAMETER_REVISION_REQUIRED_RIGHTS = "revision_required_rights";
 
     /**
      * @type {@link String}
      * @since 15.4RC1
      */
+    @Unstable
     String PARAMETER_REVISION_REQUIRED_RIGHTS_ACTIVATED = "revision_required_rights_activated";
 
     /**

@@ -37,7 +37,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * exposed to users with restricted rights, see {@link SafeRequiredRights}.
  *
  * @version $Id$
- * @since 15.3RC1
+ * @since 15.4RC1
  */
 public class DefaultRequiredRights implements RequiredRights
 {

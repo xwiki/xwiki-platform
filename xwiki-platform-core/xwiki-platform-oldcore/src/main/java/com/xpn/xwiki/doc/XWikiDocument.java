@@ -4165,11 +4165,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             setHidden("1".equals(eform.getHidden()));
         }
 
-        if (eform.getActivateRequiredRights() != null) {
-            if (Objects.equals(eform.getActivateRequiredRights(), "1")) {
-                this.requiredRightsActivated = true;
-                setMetaDataDirty(true);
-            }
+        if (eform.getActivateRequiredRights() != null && eform.getActivateRequiredRights()) {
+            boolean oldValue = this.requiredRightsActivated;
+            this.requiredRightsActivated = true;
+            setMetaDataDirty(!oldValue);
         }
         
         if (eform.getRequiredRights() != null) {
@@ -9498,8 +9497,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * 
-     * @return
+     * @return {@code true} when the required rigths are activated for a given document, {@code false} otherwise
      * @since 15.4RC1
      */
     @Unstable
@@ -9509,9 +9507,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * 
-     * @param requiredRightsActivated
-     * @return
+     * @param requiredRightsActivated set the required rights activation status of the current document. When
+     *     {@code null}, the activation status is set to {@code false}
      * @since 15.4RC1
      */
     @Unstable

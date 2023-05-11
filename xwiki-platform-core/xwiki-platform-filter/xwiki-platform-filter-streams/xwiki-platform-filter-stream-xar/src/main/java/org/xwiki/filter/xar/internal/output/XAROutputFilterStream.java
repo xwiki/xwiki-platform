@@ -51,6 +51,7 @@ import org.xwiki.filter.xar.internal.XARAttachmentModel;
 import org.xwiki.filter.xar.internal.XARClassModel;
 import org.xwiki.filter.xar.internal.XARClassPropertyModel;
 import org.xwiki.filter.xar.internal.XARFilter;
+import org.xwiki.filter.xar.internal.XARFilterUtils;
 import org.xwiki.filter.xar.internal.XARObjectModel;
 import org.xwiki.filter.xar.internal.XARObjectPropertyModel;
 import org.xwiki.filter.xar.output.XAROutputProperties;
@@ -64,24 +65,17 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.xar.internal.XarObjectPropertySerializerManager;
 import org.xwiki.xar.internal.model.XarDocumentModel;
 
-import static org.xwiki.filter.xar.internal.XARFilterUtils.ROLEHINT_11;
-import static org.xwiki.filter.xar.internal.XARFilterUtils.ROLEHINT_12;
-import static org.xwiki.filter.xar.internal.XARFilterUtils.ROLEHINT_13;
-import static org.xwiki.filter.xar.internal.XARFilterUtils.ROLEHINT_14;
-import static org.xwiki.filter.xar.internal.XARFilterUtils.ROLEHINT_15;
-import static org.xwiki.filter.xar.internal.XARFilterUtils.ROLEHINT_16;
-
 /**
  * @version $Id$
  * @since 6.2M1
  */
 @Component(hints = {
-    ROLEHINT_16,
-    ROLEHINT_15,
-    ROLEHINT_14,
-    ROLEHINT_13,
-    ROLEHINT_12,
-    ROLEHINT_11
+    XARFilterUtils.ROLEHINT_16,
+    XARFilterUtils.ROLEHINT_15,
+    XARFilterUtils.ROLEHINT_14,
+    XARFilterUtils.ROLEHINT_13,
+    XARFilterUtils.ROLEHINT_12,
+    XARFilterUtils.ROLEHINT_11
 })
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROutputProperties> implements XARFilter

@@ -24,7 +24,6 @@ ul.xlist li.showAllResults.loading {
 ul.xlist li.showAllResults button.xitemcontainer {
   margin-left: 0;
   padding-left: 10px;
-  border: 1px solid #EEEEEE;
   font-size: 1em;
   height: 100%;
   padding-right: 10px;

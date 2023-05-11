@@ -19,9 +19,7 @@
  */
 package org.xwiki.extension.xar.internal.handler.packager;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -43,7 +41,6 @@ import org.xwiki.job.JobContext;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.security.authorization.Right;
 import org.xwiki.store.merge.MergeConflictDecisionsManager;
 import org.xwiki.store.merge.MergeDocumentResult;
 import org.xwiki.store.merge.MergeManager;
@@ -312,15 +309,6 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
             }
         }
 
-        if (mergedDocument != null) {
-            Set<Right> rights = new HashSet<>(mergedDocument.getRequiredRights().getRights());
-            if (currentDocument != null) {
-                rights.addAll(currentDocument.getRequiredRights().getRights());
-            }
-            mergedDocument.getRequiredRights().setRights(rights);
-        }
-        
-        
         // Calculate the conflict type
         ConflictQuestion.ConflictType type;
         List<Conflict<?>> documentContentConflicts = null;

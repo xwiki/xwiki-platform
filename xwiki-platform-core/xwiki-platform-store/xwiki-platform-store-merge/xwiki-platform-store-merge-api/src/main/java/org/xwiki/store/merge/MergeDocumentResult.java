@@ -28,6 +28,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.diff.Conflict;
+import org.xwiki.stability.Unstable;
 
 /**
  * Store information about a merge operation of documents.
@@ -117,7 +118,14 @@ public class MergeDocumentResult extends MergeManagerResult<DocumentModelBridge,
         /**
          * Merge of the attachments.
          */
-        ATTACHMENTS
+        ATTACHMENTS,
+
+        /**
+         * Merge of required rights.
+         * @since 15.4RC1
+         */
+        @Unstable
+        REQUIRED_RIGHTS
     }
 
     /**

@@ -145,18 +145,18 @@
  *#
 #macro(displayMenu $id $icon $menuContent $titleKey $titleAsLabel $actionUrl $extraAttribute)
   <div class="btn-group" id="$id">
-    <a class="btn btn-default#if ("$!actionUrl" == '') dropdown-toggle#end" title="$services.localization.render($titleKey)"##
+    <#if ("$!actionUrl" == '')button#{else}a#end class="btn btn-default#if ("$!actionUrl" == '') dropdown-toggle#end" title="$services.localization.render($titleKey)"##
     #if ("$!actionUrl" != '')
       href="$actionUrl"
     #else
       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
     #end
-    role="button"#if ("$!extraAttribute" != '') ${extraAttribute}#end>
+    #if ("$!extraAttribute" != '') ${extraAttribute}#end>
       $services.icon.renderHTML($icon)
       #if ($titleAsLabel)
         <span class="btn-label">$services.localization.render($titleKey)</span>
       #end
-    </a>
+    </#if ("$!actionUrl" == '')button#{else}a#end>
     #if ($stringtool.isNotBlank("$!menuContent"))
       #if ("$!actionUrl" != '')
         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

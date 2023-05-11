@@ -19,7 +19,6 @@
  */
 package org.xwiki.notifications.notifiers.internal.email;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +34,9 @@ import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.GroupingEventManager;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.sources.NotificationManager;
+import org.xwiki.notifications.sources.NotificationParameters;
+import org.xwiki.notifications.sources.ParametrizedNotificationManager;
+import org.xwiki.notifications.sources.internal.DefaultNotificationParametersFactory;
 
 /**
  * Default implementation of {@link PeriodicMimeMessageIterator}.
@@ -49,7 +50,10 @@ public class DefaultPeriodicMimeMessageIterator extends AbstractMimeMessageItera
     implements PeriodicMimeMessageIterator
 {
     @Inject
-    private NotificationManager notificationManager;
+    private ParametrizedNotificationManager notificationManager;
+
+    @Inject
+    private DefaultNotificationParametersFactory notificationParametersFactory;
 
     @Inject
     private GroupingEventManager groupingEventManager;
@@ -69,10 +73,15 @@ public class DefaultPeriodicMimeMessageIterator extends AbstractMimeMessageItera
     protected List<CompositeEvent> retrieveCompositeEventList(DocumentReference user) throws NotificationException
     {
         String serializedUser = this.serializer.serialize(user);
-        List<Event> rawEvents =
-            this.notificationManager.getRawEvents(serializedUser, NotificationFormat.EMAIL,
-                Integer.MAX_VALUE / 4, null, false, this.lastTrigger, Collections.emptyList());
+        NotificationParameters notificationParameters = new NotificationParameters();
+        notificationParameters.user = user;
+        notificationParameters.format = NotificationFormat.EMAIL;
+        notificationParameters.expectedCount = Integer.MAX_VALUE / 4;
+        notificationParameters.fromDate = this.lastTrigger;
+        notificationParameters.endDateIncluded = false;
+        notificationParametersFactory.useUserPreferences(notificationParameters);
 
+        List<Event> rawEvents = this.notificationManager.getRawEvents(notificationParameters);
         return this.groupingEventManager.getCompositeEvents(rawEvents, serializedUser, NotificationFormat.EMAIL.name());
     }
 }

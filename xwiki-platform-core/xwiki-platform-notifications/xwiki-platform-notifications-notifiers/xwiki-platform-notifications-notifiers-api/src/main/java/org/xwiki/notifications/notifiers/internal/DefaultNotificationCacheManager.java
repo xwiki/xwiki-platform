@@ -33,7 +33,6 @@ import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationConfiguration;
@@ -69,13 +68,25 @@ public class DefaultNotificationCacheManager implements Initializable, Disposabl
      * Cache used to store events result until the result might change (for example when a new notification is
      * created).
      */
-    private Cache<List<Event>> longEventCache;
+    private Cache<List<Object>> longEventCache;
 
     /**
-     * Cache used to store task count result until the result might change (for example when a new notification is
+     * Cache used to store composite events result until the result might change (for example when a new notification is
      * created).
      */
-    private Cache<Integer> longCountCache;
+    private Cache<List<Object>> longCompositeEventCache;
+
+    /**
+     * Cache used to store individual events count result until the result might change (for example when a new
+     * notification is created).
+     */
+    private Cache<Integer> longIndividualEventCountCache;
+
+    /**
+     * Cache used to store composite events count result until the result might change (for example when a new
+     * notification is created).
+     */
+    private Cache<Integer> longCompositeEventCountCache;
 
     @Override
     public void initialize() throws InitializationException
@@ -84,15 +95,17 @@ public class DefaultNotificationCacheManager implements Initializable, Disposabl
             try {
                 this.longEventCache = this.cacheManager
                     .createNewCache(new LRUCacheConfiguration("notification.rest.longCache.events", 100, 86400));
-            } catch (CacheException e) {
-                throw new InitializationException("Failed to create long event cache", e);
-            }
-
-            try {
-                this.longCountCache = this.cacheManager
+                this.longIndividualEventCountCache = this.cacheManager
                     .createNewCache(new LRUCacheConfiguration("notification.rest.longCache.count", 10000, 86400));
+
+                this.longCompositeEventCache = this.cacheManager
+                    .createNewCache(new LRUCacheConfiguration("notification.rest.longCache.events.composite", 100,
+                        86400));
+                this.longCompositeEventCountCache = this.cacheManager
+                    .createNewCache(new LRUCacheConfiguration("notification.rest.longCache.count.composite", 10000,
+                        86400));
             } catch (CacheException e) {
-                throw new InitializationException("Failed to create long count cache", e);
+                throw new InitializationException("Failed to create one of the notification cache.", e);
             }
         }
     }
@@ -141,15 +154,20 @@ public class DefaultNotificationCacheManager implements Initializable, Disposabl
 
     /**
      * @param cacheKey the key where the event are stored.
-     * @param count true if the value to return is a count instead of a list of events
+     * @param count {@code true} if the value to return is a count instead of a list of events
+     * @param composite {@code true} if the value to return is about composite events or individual events
      * @return the value associated with the passed parameters
      */
-    public Object getFromCache(String cacheKey, boolean count)
+    public Object getFromCache(String cacheKey, boolean count, boolean composite)
     {
         Object result = null;
         if (this.configuration.isRestCacheEnabled()) {
-            if (count) {
-                result = this.longCountCache.get(cacheKey);
+            if (count && composite) {
+                result = this.longCompositeEventCountCache.get(cacheKey);
+            } else if (count && !composite) {
+                result = this.longIndividualEventCountCache.get(cacheKey);
+            } else if (!count && composite) {
+                result = this.longCompositeEventCache.get(cacheKey);
             } else {
                 result = this.longEventCache.get(cacheKey);
             }
@@ -163,13 +181,17 @@ public class DefaultNotificationCacheManager implements Initializable, Disposabl
      * @param cacheKey the key to store the given events.
      * @param count if {@code true} only store the number of events; else store the objects.
      * @param events the events to store in cache. Their size will be stored too.
+     * @param composite {@code true} if the value to store is about composite events or individual events
      */
-    public void setInCache(String cacheKey, List<Event> events, boolean count)
+    public void setInCache(String cacheKey, List<Object> events, boolean count, boolean composite)
     {
         if (this.configuration.isRestCacheEnabled()) {
-            if (count) {
-                // FIXME: events use to be the composite, and is now the individual events...
-                this.longCountCache.set(cacheKey, events.size());
+            if (count && composite) {
+                this.longCompositeEventCountCache.set(cacheKey, events.size());
+            } else if (count && !composite) {
+                this.longIndividualEventCountCache.set(cacheKey, events.size());
+            } else if (!count && composite) {
+                this.longCompositeEventCache.set(cacheKey, events);
             } else {
                 this.longEventCache.set(cacheKey, events);
             }
@@ -181,24 +203,18 @@ public class DefaultNotificationCacheManager implements Initializable, Disposabl
      */
     public void flushLongCache()
     {
-        if (this.longEventCache != null) {
-            this.longEventCache.removeAll();
-        }
-
-        if (this.longCountCache != null) {
-            this.longCountCache.removeAll();
-        }
+        this.longEventCache.removeAll();
+        this.longIndividualEventCountCache.removeAll();
+        this.longCompositeEventCache.removeAll();
+        this.longCompositeEventCountCache.removeAll();
     }
 
     @Override
     public void dispose() throws ComponentLifecycleException
     {
-        if (this.longCountCache != null) {
-            this.longCountCache.dispose();
-        }
-
-        if (this.longEventCache != null) {
-            this.longEventCache.dispose();
-        }
+        this.longIndividualEventCountCache.dispose();
+        this.longEventCache.dispose();
+        this.longCompositeEventCache.dispose();
+        this.longCompositeEventCountCache.dispose();
     }
 }

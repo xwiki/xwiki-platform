@@ -31,6 +31,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.stability.Unstable;
 import org.xwiki.text.StringUtils;
 
 /**
@@ -87,7 +88,7 @@ public class CompositeEvent
      * @deprecated now that we have a {@link GroupingEventStrategy} this method has no real reason to be used,
      * {@link #add(Event)} should be used instead.
      */
-    @Deprecated(since = "15.4RC1")
+    @Deprecated(since = "15.5RC1")
     public void add(Event event, int similarity) throws NotificationException
     {
         if (similarity < similarityBetweenEvents) {
@@ -101,7 +102,9 @@ public class CompositeEvent
      * Add an event to the composite event and order it based on the dates.
      *
      * @param event the event to add
+     * @since 15.5RC1
      */
+    @Unstable
     public void add(Event event)
     {
         events.add(event);
@@ -113,7 +116,7 @@ public class CompositeEvent
      * @return the greatest similarity between events of the composite event
      * @deprecated this method shouldn't be used anymore now we have a {@link GroupingEventStrategy}
      */
-    @Deprecated(since = "15.4RC1")
+    @Deprecated(since = "15.5RC1")
     public int getSimilarityBetweenEvents()
     {
         return similarityBetweenEvents;

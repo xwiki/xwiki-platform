@@ -101,16 +101,18 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
     @Override
     public List<CompositeEvent> getEvents(NotificationParameters parameters) throws NotificationException
     {
-        List<Event> rawEvents = getRawEvents(parameters);
-        String userId = null;
-        if (parameters.user != null) {
-            userId = this.serializer.serialize(parameters.user);
-        }
-        return this.groupingEventManager.getCompositeEvents(rawEvents, userId, parameters.groupingEventTarget);
+        List<CompositeEvent> compositeEvents = new ArrayList<>();
+        getRawEvents(parameters, compositeEvents);
+        return compositeEvents;
     }
 
     @Override
-    public List<Event> getRawEvents(NotificationParameters parameters)
+    public List<Event> getRawEvents(NotificationParameters parameters) throws NotificationException
+    {
+        return getRawEvents(parameters, null);
+    }
+
+    private List<Event> getRawEvents(NotificationParameters parameters, List<CompositeEvent> compositeEvents)
         throws NotificationException
     {
         if (Boolean.TRUE.equals(parameters.onlyUnread) && !parameters.filters.contains(eventReadAlertFilter)) {
@@ -126,13 +128,12 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
         int batchSize = parameters.expectedCount * 2;
         int offset = 0;
         try {
-
             boolean done = false;
             while (!done) {
                 // Get a batch of events
                 List<Event> batch = this.eventSearcher.searchEvents(offset, batchSize, parameters);
 
-                done = addMatchingEventsToResults(batch, parameters, results);
+                done = addMatchingEventsToResults(batch, parameters, results, compositeEvents);
                 if (!done) {
                     if (batch.size() < batchSize) {
                         // there are no more results to expect. stop.
@@ -154,10 +155,11 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
     }
 
     private boolean addMatchingEventsToResults(List<Event> batch, NotificationParameters parameters,
-        List<Event> results) throws EventStreamException, NotificationException
+        List<Event> results, List<CompositeEvent> compositeEvents) throws EventStreamException, NotificationException
     {
         boolean done = false;
         // Add to the results the events the user has the right to see
+        List<Event> newEvents = new ArrayList<>();
         for (Event event : batch) {
             DocumentReference document = event.getDocument();
             // 1) Don't include events concerning a doc the passed user cannot see
@@ -173,8 +175,23 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
 
             // Record this event
             results.add(event);
+            newEvents.add(event);
+
+            int reachedSize = results.size();
+
+            // if what's requested is the composite events, then we only stop when the number of composite events
+            // is reached
+            if (compositeEvents != null) {
+                String userId = null;
+                if (parameters.user != null) {
+                    userId = this.serializer.serialize(parameters.user);
+                }
+                this.groupingEventManager.augmentCompositeEvents(compositeEvents, newEvents, userId,
+                    parameters.groupingEventTarget);
+                reachedSize = compositeEvents.size();
+            }
             // If the expected count is reached, stop now
-            if (results.size() >= parameters.expectedCount) {
+            if (reachedSize >= parameters.expectedCount) {
                 done = true;
                 break;
             }

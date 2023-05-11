@@ -25,9 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.eventstream.Event;
 import org.xwiki.notifications.CompositeEvent;
-import org.xwiki.notifications.GroupingEventManager;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.notifiers.rss.NotificationRSSManager;
 
@@ -49,24 +47,19 @@ public class RSSFeedRenderer
     @Inject
     private NotificationRSSManager notificationRSSManager;
 
-    @Inject
-    private GroupingEventManager groupingEventManager;
-
     /**
      * Convert an event list to an RSS feed object using {@link NotificationRSSManager} and then render it using
      * {@link SyndFeedOutput}.
      *
      * @param eventList the list of events to be displayed in RSS feed.
-     * @param userId the user for which to retrieve the notification to know how to group them.
      * @return a String ready to be sent.
      * @throws NotificationException in case of problem to render the events.
      */
-    public String render(List<Event> eventList, String userId) throws NotificationException
+    public String render(List<CompositeEvent> eventList) throws NotificationException
     {
         SyndFeedOutput output = new SyndFeedOutput();
-        List<CompositeEvent> compositeEvents = this.groupingEventManager.getCompositeEvents(eventList, userId, "rss");
         try {
-            return output.outputString(notificationRSSManager.renderFeed(compositeEvents));
+            return output.outputString(notificationRSSManager.renderFeed(eventList));
         } catch (FeedException e) {
             throw new NotificationException("Error while rendering the RSS feed of events", e);
         }

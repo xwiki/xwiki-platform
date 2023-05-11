@@ -88,7 +88,7 @@ public interface NotificationPreferenceModelBridge
      * @param target the target output for which the grouping strategy will be used (e.g. mail or alert)
      * @return the hint of the {@link org.xwiki.notifications.GroupingEventStrategy} component to use
      * @throws NotificationException in case of problem for loading the preferences
-     * @since 15.4RC1
+     * @since 15.5RC1
      */
     default String getEventGroupingStrategyHint(DocumentReference userDocReference, String target)
         throws NotificationException

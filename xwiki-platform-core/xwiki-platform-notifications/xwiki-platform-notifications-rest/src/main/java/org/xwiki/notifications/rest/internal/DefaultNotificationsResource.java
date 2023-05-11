@@ -35,9 +35,9 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.notifiers.internal.DefaultNotificationCacheManager;
 import org.xwiki.notifications.rest.NotificationsResource;
@@ -95,7 +95,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     {
         // Build the response
         Response.ResponseBuilder response;
-        Object result = getRawEvents(useUserPreferences, userId, untilDate, untilDateIncluded, blackList, pages,
+        Object result = getCompositeEvents(useUserPreferences, userId, untilDate, untilDateIncluded, blackList, pages,
             spaces, wikis, users, toMaxCount(maxCount, 21), displayOwnEvents, displayMinorEvents, displaySystemEvents,
             displayReadEvents, tags, currentWiki, async, asyncId, false, false);
 
@@ -116,7 +116,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
                 }
 
                 Notifications notifications = new Notifications(this.notificationsRenderer
-                    .renderNotifications((List<Event>) result, userId, target, TRUE.equals(displayReadStatus)));
+                    .renderNotifications((List<CompositeEvent>) result, userId, TRUE.equals(displayReadStatus)));
 
                 response = Response.ok(notifications);
             } finally {
@@ -137,7 +137,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         return NumberUtils.toInt(maxCount, defaultMaxCount);
     }
 
-    private Object getRawEvents(String useUserPreferences, String userId, String untilDate,
+    private Object getCompositeEvents(String useUserPreferences, String userId, String untilDate,
         boolean untilDateIncluded, String blackList, String pages, String spaces, String wikis, String users,
         int maxCount, String displayOwnEvents, String displayMinorEvents, String displaySystemEvents,
         String displayReadEvents, String tags, String currentWiki, String async, String asyncId, boolean onlyUnread,
@@ -164,17 +164,17 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
 
             // 3. Search events
             result = this.executor.submit(cacheKey,
-                () -> getEvents(notificationParameters),
-                Boolean.parseBoolean(async), count);
+                () -> getCompositeEvents(notificationParameters),
+                Boolean.parseBoolean(async), count, true);
         }
 
         return result;
     }
 
-    private List<Event> getEvents(NotificationParameters notificationParameters)
+    private List<CompositeEvent> getCompositeEvents(NotificationParameters notificationParameters)
         throws NotificationException
     {
-        return this.newNotificationManager.getRawEvents(notificationParameters);
+        return this.newNotificationManager.getEvents(notificationParameters);
     }
 
     @Override
@@ -189,7 +189,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         if (!StringUtils.isEmpty(userId) && xWikiUser == null) {
             response = Response.status(Status.UNAUTHORIZED);
         } else {
-            Object result = getRawEvents(useUserPreferences, userId, null, true, null, pages, spaces, wikis,
+            Object result = getCompositeEvents(useUserPreferences, userId, null, true, null, pages, spaces, wikis,
                 users, toMaxCount(maxCount, 21), displayOwnEvents, displayMinorEvents, displaySystemEvents,
                 displayReadEvents, tags, currentWiki, async, asyncId, true, true);
 
@@ -222,12 +222,12 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             getXWikiContext().getResponse().sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return null;
         } else {
-            List<Event> events =
-                (List<Event>) getRawEvents(useUserPreferences, userId, untilDate, true, blackList, pages,
+            List<CompositeEvent> events =
+                (List<CompositeEvent>) getCompositeEvents(useUserPreferences, userId, untilDate, true, blackList, pages,
                     spaces, wikis, users, toMaxCount(maxCount, 10), displayOwnEvents, displayMinorEvents,
                     displaySystemEvents, displayReadEvents, tags, currentWiki, null, null, false, false);
 
-            return this.rssFeedRenderer.render(events, userId);
+            return this.rssFeedRenderer.render(events);
         }
     }
 

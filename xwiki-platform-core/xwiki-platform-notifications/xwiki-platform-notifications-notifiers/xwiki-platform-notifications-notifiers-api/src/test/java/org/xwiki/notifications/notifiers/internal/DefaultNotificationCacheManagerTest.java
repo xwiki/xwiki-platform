@@ -70,12 +70,17 @@ public class DefaultNotificationCacheManagerTest
 
     private Cache longEventCache;
     private Cache longCountCache;
+    private Cache longCompositeEventCountCache;
+    private Cache longCompositeEventCache;
 
     @BeforeComponent
     public void setupComponents(MockitoComponentManager componentManager) throws Exception
     {
         this.longEventCache = mock(Cache.class);
         this.longCountCache = mock(Cache.class);
+        this.longCompositeEventCountCache = mock(Cache.class);
+        this.longCompositeEventCache = mock(Cache.class);
+
         when(this.configuration.isRestCacheEnabled()).thenReturn(true);
         CacheManager cacheManager = componentManager.registerMockComponent(CacheManager.class);
 
@@ -85,6 +90,12 @@ public class DefaultNotificationCacheManagerTest
                 return longEventCache;
             } else if ("notification.rest.longCache.count".equals(lruCacheConfiguration.getConfigurationId())) {
                 return longCountCache;
+            } else if ("notification.rest.longCache.events.composite"
+                .equals(lruCacheConfiguration.getConfigurationId())) {
+                return longCompositeEventCache;
+            } else if ("notification.rest.longCache.count.composite"
+                .equals(lruCacheConfiguration.getConfigurationId())) {
+                return longCompositeEventCountCache;
             }
             return null;
         });
@@ -93,11 +104,11 @@ public class DefaultNotificationCacheManagerTest
     @Test
     public void getFromCache()
     {
-        this.defaultNotificationCacheManager.getFromCache("anykey", true);
+        this.defaultNotificationCacheManager.getFromCache("anykey", true, false);
         verify(this.longCountCache).get("anykey");
         verify(this.longEventCache, never()).get("anykey");
 
-        this.defaultNotificationCacheManager.getFromCache("anotherkey", false);
+        this.defaultNotificationCacheManager.getFromCache("anotherkey", false, false);
         verify(this.longEventCache).get("anotherkey");
         verify(this.longCountCache, never()).get("anotherkey");
 
@@ -108,13 +119,13 @@ public class DefaultNotificationCacheManagerTest
     @Test
     public void setInCache()
     {
-        List<Event> events = Arrays.asList(mock(Event.class), mock(Event.class),
+        List<Object> events = Arrays.asList(mock(Event.class), mock(Event.class),
             mock(Event.class));
-        this.defaultNotificationCacheManager.setInCache("mykey", events, false);
+        this.defaultNotificationCacheManager.setInCache("mykey", events, false, false);
         verify(this.longEventCache).set("mykey", events);
         verify(this.longCountCache, never()).set("mykey", events);
 
-        this.defaultNotificationCacheManager.setInCache("anotherkey", events, true);
+        this.defaultNotificationCacheManager.setInCache("anotherkey", events, true, false);
         verify(this.longEventCache, never()).set("anotherkey", 3);
         verify(this.longCountCache).set("anotherkey", 3);
 

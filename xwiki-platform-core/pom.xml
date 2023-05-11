@@ -143,7 +143,7 @@
             </revapi.differences>
             <revapi.differences>
               <justification>Not breaking as a default value is provided</justification>
-              <criticality>documented</criticality>
+              <criticality>allowed</criticality>
               <differences>
                 <item>
                   <ignore>true</ignore>

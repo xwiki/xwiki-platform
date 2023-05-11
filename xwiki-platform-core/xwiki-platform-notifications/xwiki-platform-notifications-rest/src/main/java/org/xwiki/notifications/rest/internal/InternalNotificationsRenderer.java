@@ -29,7 +29,6 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.CompositeEventStatus;
@@ -74,18 +73,16 @@ public class InternalNotificationsRenderer
     /**
      * Render the notifications.
      *
-     * @param events list of events to render
+     * @param compositeEvents list of events to render
      * @param userId id of the current user
      * @param showReadStatus either or not include the "read" status of the events
-     * @param target the output target for notifications (e.g. rss, alert, email)
      * @return the list of notifications
      * @throws Exception if an error occurs
      */
-    public List<Notification> renderNotifications(List<Event> events, String userId, String target,
+    public List<Notification> renderNotifications(List<CompositeEvent> compositeEvents, String userId,
         boolean showReadStatus) throws Exception
     {
         List<Notification> notifications = new ArrayList<>();
-        List<CompositeEvent> compositeEvents = this.groupingEventManager.getCompositeEvents(events, userId, target);
         if (showReadStatus && StringUtils.isNotBlank(userId)) {
             for (CompositeEventStatus status
                     : compositeEventStatusManager.getCompositeEventStatuses(compositeEvents, userId)) {

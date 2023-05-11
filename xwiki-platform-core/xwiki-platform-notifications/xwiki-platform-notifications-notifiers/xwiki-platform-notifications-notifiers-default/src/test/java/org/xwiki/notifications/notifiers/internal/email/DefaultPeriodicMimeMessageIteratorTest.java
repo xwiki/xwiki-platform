@@ -46,6 +46,8 @@ import org.xwiki.notifications.GroupingEventManager;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.notifiers.email.NotificationEmailRenderer;
 import org.xwiki.notifications.sources.NotificationManager;
+import org.xwiki.notifications.sources.NotificationParameters;
+import org.xwiki.notifications.sources.ParametrizedNotificationManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -80,7 +82,7 @@ class DefaultPeriodicMimeMessageIteratorTest
     private DefaultPeriodicMimeMessageIterator iterator;
 
     @MockComponent
-    private NotificationManager notificationManager;
+    private ParametrizedNotificationManager notificationManager;
 
     @MockComponent
     @Named("template")
@@ -144,10 +146,25 @@ class DefaultPeriodicMimeMessageIteratorTest
         Event event1 = mock(Event.class);
         Event event2 = mock(Event.class);
 
-        when(this.notificationManager.getRawEvents("xwiki:XWiki.UserA", NotificationFormat.EMAIL, Integer.MAX_VALUE / 4,
-            null, false, new Date(0L), Collections.emptyList())).thenReturn(Collections.singletonList(event1));
-        when(this.notificationManager.getRawEvents("xwiki:XWiki.UserC", NotificationFormat.EMAIL, Integer.MAX_VALUE / 4,
-            null, false, new Date(0L), Collections.emptyList())).thenReturn(Collections.singletonList(event2));
+        NotificationParameters notificationParameters = new NotificationParameters();
+        notificationParameters.user = userA;
+        notificationParameters.format = NotificationFormat.EMAIL;
+        notificationParameters.expectedCount = Integer.MAX_VALUE / 4;
+        notificationParameters.fromDate = new Date(0L);
+        notificationParameters.endDateIncluded = false;
+
+        when(this.notificationManager.getRawEvents(notificationParameters))
+            .thenReturn(Collections.singletonList(event1));
+
+        NotificationParameters notificationParameters2 = new NotificationParameters();
+        notificationParameters2.user = userC;
+        notificationParameters2.format = NotificationFormat.EMAIL;
+        notificationParameters2.expectedCount = Integer.MAX_VALUE / 4;
+        notificationParameters2.fromDate = new Date(0L);
+        notificationParameters2.endDateIncluded = false;
+
+        when(this.notificationManager.getRawEvents(notificationParameters2))
+            .thenReturn(Collections.singletonList(event2));
 
         when(this.groupingEventManager.getCompositeEvents(Collections.singletonList(event1), "xwiki:XWiki.UserA",
             "EMAIL")).thenReturn(Collections.singletonList(compositeEvent1));

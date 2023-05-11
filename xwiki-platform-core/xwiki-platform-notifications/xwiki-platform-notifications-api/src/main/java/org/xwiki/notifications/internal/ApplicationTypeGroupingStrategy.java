@@ -38,7 +38,7 @@ import org.xwiki.notifications.NotificationException;
  * other information.
  *
  * @version $Id$
- * @since 15.4RC1
+ * @since 15.5RC1
  */
 @Component
 @Named("applicationtype")
@@ -62,5 +62,25 @@ public class ApplicationTypeGroupingStrategy implements GroupingEventStrategy
         }
 
         return new ArrayList<>(compositeEventMap.values());
+    }
+
+    @Override
+    public void group(List<CompositeEvent> compositeEvents, List<Event> newEvents) throws NotificationException
+    {
+        Map<String, CompositeEvent> compositeEventMap = new HashMap<>();
+        for (CompositeEvent compositeEvent : compositeEvents) {
+            compositeEventMap.put(compositeEvent.getType(), compositeEvent);
+        }
+        for (Event event : newEvents) {
+            String eventType = event.getType();
+            if (compositeEventMap.containsKey(eventType)) {
+                CompositeEvent compositeEvent = compositeEventMap.get(eventType);
+                compositeEvent.add(event);
+            } else {
+                CompositeEvent compositeEvent = new CompositeEvent(event);
+                compositeEventMap.put(eventType, compositeEvent);
+                compositeEvents.add(compositeEvent);
+            }
+        }
     }
 }

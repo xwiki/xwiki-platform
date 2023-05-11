@@ -22,6 +22,7 @@ package org.xwiki.bridge;
 import java.util.Date;
 
 import org.xwiki.model.document.DocumentAuthors;
+import org.xwiki.model.document.NullRequiredRights;
 import org.xwiki.model.document.RequiredRights;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
@@ -157,7 +158,7 @@ public interface DocumentModelBridge
     @Unstable
     default RequiredRights getRequiredRights()
     {
-        return null;
+        return new NullRequiredRights();
     }
 
     /**

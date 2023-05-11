@@ -308,8 +308,9 @@ public class XWikiDocumentOutputFilterStream extends AbstractEntityOutputFilterS
         if (parameters.containsKey(PARAMETER_REVISION_REQUIRED_RIGHTS_ACTIVATED)) {
             this.entity.setRequiredRightsActivated(
                 getBoolean(WikiDocumentFilter.PARAMETER_REVISION_REQUIRED_RIGHTS_ACTIVATED, parameters, false));
-        } 
-        this.entity.setRequiredRights(new DefaultRequiredRights(this.entity, getRequiredRights(WikiDocumentFilter.PARAMETER_REVISION_REQUIRED_RIGHTS, parameters)));
+        }
+        this.entity.getRequiredRights()
+            .setRights(getRequiredRights(WikiDocumentFilter.PARAMETER_REVISION_REQUIRED_RIGHTS, parameters));
         String revisions =
             getString(XWikiWikiDocumentFilter.PARAMETER_JRCSREVISIONS, this.currentLocaleParameters, null);
         if (revisions != null) {

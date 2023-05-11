@@ -1891,7 +1891,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     .stream()
                     .map(XWikiDocumentRequiredRight::getRight)
                     .collect(Collectors.toSet());
-                doc.setRequiredRights(new DefaultRequiredRights(doc, rights));
+                doc.getRequiredRights().setRights(rights);
                 return null;
             } catch (Exception e) {
                 this.logger.error("Failed to load the required rights of document [{}]", doc.getDocumentReference(), e);

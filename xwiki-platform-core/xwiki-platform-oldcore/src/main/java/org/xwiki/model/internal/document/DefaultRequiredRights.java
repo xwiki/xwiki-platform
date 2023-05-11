@@ -41,7 +41,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 public class DefaultRequiredRights implements RequiredRights
 {
-    private final Set<Right> requiredRights;
+    private Set<Right> requiredRights;
 
     private final XWikiDocument document;
 
@@ -84,8 +84,9 @@ public class DefaultRequiredRights implements RequiredRights
     {
         boolean hasChanged = !Objects.equals(newRights, this.requiredRights);
         if (hasChanged) {
-            this.requiredRights.clear();
-            this.requiredRights.addAll(newRights);
+            // Instantiate a new set as clearing the content of the set to replace with the new rights wouldn't work 
+            // well in case of concurrency. 
+            this.requiredRights = new HashSet<>(newRights);
             this.document.setMetaDataDirty(true);
         }
     }

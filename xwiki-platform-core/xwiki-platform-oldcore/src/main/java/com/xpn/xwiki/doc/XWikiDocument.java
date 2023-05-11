@@ -729,7 +729,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     private final DefaultDocumentAuthors authors = new DefaultDocumentAuthors(this);
 
-    private RequiredRights requiredRights = new DefaultRequiredRights(this, null);
+    private final RequiredRights requiredRights = new DefaultRequiredRights(this, null);
 
     /**
      * Create a document for the given reference, with the {@link Locale#ROOT} even if the reference contains a locale.
@@ -4182,7 +4182,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                     newRights.add(right);
                 }
             }
-            setRequiredRights(new DefaultRequiredRights(this, newRights));
+            this.requiredRights.setRights(newRights);
         }
     }
 
@@ -4639,7 +4639,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
             doc.originalDocument = this.originalDocument;
 
-            doc.requiredRights = new DefaultRequiredRights(doc, this.requiredRights.getRights());
+            doc.requiredRights.setRights(this.requiredRights.getRights());
             doc.requiredRightsActivated = this.requiredRightsActivated;
         } catch (Exception e) {
             // This should not happen
@@ -9449,21 +9449,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public RequiredRights getRequiredRights()
     {
         return this.requiredRights;
-    }
-
-    /**
-     * Set {@link #isMetaDataDirty} if the required rights are changed.
-     *
-     * @param requiredRights the required rights to set
-     * @since 15.3RC1
-     */
-    @Unstable
-    public void setRequiredRights(RequiredRights requiredRights)
-    {
-        if (!Objects.equals(this.requiredRights, requiredRights)) {
-            setMetaDataDirty(true);
-        }
-        this.requiredRights = requiredRights;
     }
 
     /**

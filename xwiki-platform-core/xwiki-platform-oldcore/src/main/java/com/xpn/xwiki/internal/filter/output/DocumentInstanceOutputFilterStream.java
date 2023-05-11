@@ -221,8 +221,7 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
                 }
 
                 document.setRequiredRightsActivated(inputDocument.isRequiredRightsActivated());
-                document.setRequiredRights(
-                    new DefaultRequiredRights(document, inputDocument.getRequiredRights().getRights()));
+                document.getRequiredRights().setRights(inputDocument.getRequiredRights().getRights());
             }
 
             // Authors

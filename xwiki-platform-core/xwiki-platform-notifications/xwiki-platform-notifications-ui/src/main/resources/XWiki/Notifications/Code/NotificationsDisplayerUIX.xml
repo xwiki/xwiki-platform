@@ -780,7 +780,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-bootstrap-switch'], function ($, xm) {
  * Notifications Header
  ***********************************************/
 #tmNotifications {
-  & > button {
+  &amp; > button {
     background-color: @navbar-default-bg;
     color: @navbar-default-link-color;
     border: 0;
@@ -789,12 +789,12 @@ require(['jquery', 'xwiki-meta', 'xwiki-bootstrap-switch'], function ($, xm) {
     @media (min-width: @grid-float-breakpoint) {
       padding: @navbar-padding-vertical @navbar-padding-horizontal;
     }
-    &:hover,
-    &:focus {
+    &amp;:hover,
+    &amp;:focus {
       background-color: @navbar-default-link-hover-bg;
       color: @navbar-default-link-hover-color;
     }
-    &:active {
+    &amp;:active {
       background-color: @navbar-default-link-active-bg;
       color: @navbar-default-link-active-color;
     }

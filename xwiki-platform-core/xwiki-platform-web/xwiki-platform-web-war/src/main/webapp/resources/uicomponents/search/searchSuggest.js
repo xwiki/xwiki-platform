@@ -43,7 +43,7 @@ var XWiki = (function (XWiki) {
       document.observe("xwiki:suggest:containerPrepared", this.onSuggestContainerPrepared.bindAsEventListener(this));
       document.observe("xwiki:suggest:updated", this.onSuggestUpdated.bindAsEventListener(this));
       document.observe("xwiki:suggest:selected", this.onSuggestionSelected.bindAsEventListener(this));
-      document.observe("xwiki:suggest:collapsed", this.onSuggestionCollapsed.bindAsEventListener(this));
+      document.observe("xwiki:suggest:collapsed", this.onSuggestCollapsed.bindAsEventListener(this));
 
       this.createSuggest();
     },
@@ -90,7 +90,6 @@ var XWiki = (function (XWiki) {
         // Show the "No results!" message.
         this.noResultsMessage.removeClassName('hidden').setStyle({'float': 'left'});
       }
-      event.memo.container.select('.suggestItem')[0].href=event.memo.url||"";
     },
 
     /**
@@ -104,7 +103,7 @@ var XWiki = (function (XWiki) {
         if (event.memo.originalEvent) {
           Event.stop(event.memo.originalEvent);
         }
-        if (!event.memo.url || event.memo.url==="") {
+        if (!event.memo.url) {
           // Submit form
           this.searchInput.up('form').submit();
         }
@@ -115,7 +114,10 @@ var XWiki = (function (XWiki) {
       }
     },
 
-    onSuggestionCollapsed: function(event) {
+    /**
+     * Callback triggered when the suggest element is collapsed, because of a focusout event for example.
+     */
+    onSuggestCollapsed: function(event) {
       this.suggest.clearSuggestions();
     },
 
@@ -142,7 +144,7 @@ var XWiki = (function (XWiki) {
           eventCallbackScope: this,
           noHighlight: true,
           value: valueNode,
-          containerNature: 'button'
+          containerTagName: 'button'
         } ),
       ],
       {
@@ -154,7 +156,8 @@ var XWiki = (function (XWiki) {
         }
       });
       var allResults = allResultsNode.getElement();
-      allResultsNode.items[0].getElement().addEventListener('focusin', (event) => this.suggest.setHighlight($(event.currentTarget)));
+      allResultsNode.items[0].getElement().addEventListener('focusin',
+        (event) => this.suggest.setHighlight($(event.currentTarget)));
       this.suggest = new XWiki.widgets.Suggest( this.searchInput, {
         parentContainer: $('globalsearch'),
         className: 'searchSuggest horizontalLayout',

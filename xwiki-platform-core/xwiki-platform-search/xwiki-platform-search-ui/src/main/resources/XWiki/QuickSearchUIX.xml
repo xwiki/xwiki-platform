@@ -145,7 +145,7 @@
         // actually performing the search).
         if (!document.getElementById('globalsearch').contains(document.activeElement)) {
           globalSearch.addClass('globalsearch-close');
-          document.fire("xwiki:suggest:collapsed",globalSearchInput);
+          globalSearchInput.trigger("xwiki:suggest:collapsed");
         }
       }, 1);
     });

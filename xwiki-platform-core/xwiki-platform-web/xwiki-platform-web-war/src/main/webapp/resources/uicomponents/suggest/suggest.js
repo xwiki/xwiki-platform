@@ -156,8 +156,6 @@ var XWiki = (function(XWiki){
       this.seps = "";
     }
 
-    this.searchPageUrl = encodeURIComponent(this.fld.value.strip());
-
     // Initialize a request number that will keep track of the latest request being fired.
     // This will help to discard potential non-last requests callbacks ; this in order to have better performance
     // (less unneccessary DOM manipulation, and less unneccessary highlighting computation).
@@ -730,7 +728,7 @@ var XWiki = (function(XWiki){
         containerClasses: 'suggestItem ' + (arr[i].type || ''),
         value: valueNode,
         noHighlight: true, // we do the highlighting ourselves
-        containerNature: 'a'
+        containerTagName: 'a'
       });
       item.containerElement.setAttribute('href', arr[i].url);
       item.listItemElement.addEventListener('focusin', (event) => pointer.setHighlight(event.currentTarget));

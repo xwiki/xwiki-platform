@@ -40,18 +40,18 @@ import org.xwiki.model.reference.LocalDocumentReference;
 @Singleton
 public class RenderingConfigClassDocumentConfigurationSource extends AbstractDocumentConfigurationSource
 {
-    private static final String RENDERING_SPACE = "Rendering";
+    static final String RENDERING_SPACE = "Rendering";
 
     /**
      * The local reference of the {@code Rendering.RenderingConfigClass} xclass.
      */
-    private static final LocalDocumentReference CLASS_REFERENCE =
+    static final LocalDocumentReference CLASS_REFERENCE =
         new LocalDocumentReference(RENDERING_SPACE, "RenderingConfigClass");
 
     /**
      * The local reference of the {@code Rendering.RenderingConfig} document.
      */
-    private static final LocalDocumentReference DOC_REFERENCE =
+    static final LocalDocumentReference DOC_REFERENCE =
         new LocalDocumentReference(RENDERING_SPACE, "RenderingConfig");
 
     @Override

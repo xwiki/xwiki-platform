@@ -126,32 +126,6 @@ class NotificationsSettingsIT
             notificationsUserProfilePage.getEventType(SYSTEM, UPDATE).getEventTypeDescription());
 
         // Check default
-        assertEquals(OFF, notificationsUserProfilePage.getApplicationState(SYSTEM, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getApplicationState(SYSTEM, EMAIL_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, ADD_COMMENT, EMAIL_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, CREATE, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, CREATE, EMAIL_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, DELETE, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, DELETE, EMAIL_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, UPDATE, EMAIL_FORMAT));
-
-        // Enable alert on system
-        notificationsUserProfilePage.setApplicationState(SYSTEM, ALERT_FORMAT, ON);
-        assertEquals(ON, notificationsUserProfilePage.getApplicationState(SYSTEM, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getApplicationState(SYSTEM, EMAIL_FORMAT));
-        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, ADD_COMMENT, EMAIL_FORMAT));
-        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, CREATE, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, CREATE, EMAIL_FORMAT));
-        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, DELETE, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, DELETE, EMAIL_FORMAT));
-        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, UPDATE, EMAIL_FORMAT));
-
-        // Enable email on system
-        notificationsUserProfilePage.setApplicationState(SYSTEM, EMAIL_FORMAT, ON);
         assertEquals(ON, notificationsUserProfilePage.getApplicationState(SYSTEM, ALERT_FORMAT));
         assertEquals(ON, notificationsUserProfilePage.getApplicationState(SYSTEM, EMAIL_FORMAT));
         assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT));
@@ -268,9 +242,6 @@ class NotificationsSettingsIT
             NotificationsUserProfilePage notificationsUserProfilePage =
                 NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
 
-            // Enable the notifications
-            notificationsUserProfilePage.setApplicationState(SYSTEM, "alert", ON);
-
             // Create a page
             testUtils.createPage(testReference.getLastSpaceReference().getName(), testReference.getName(), "", "");
             NotificationsTrayPage trayPage = new NotificationsTrayPage();
@@ -278,8 +249,8 @@ class NotificationsSettingsIT
 
             // Check if the page is watched
             assertTrue(trayPage.isPageOnlyWatched());
-            assertTrue(trayPage.arePageAndChildrenWatched());
-            assertTrue(trayPage.isWikiWatched());
+            assertFalse(trayPage.arePageAndChildrenWatched());
+            assertFalse(trayPage.isWikiWatched());
 
             // Unwatch the wiki
             trayPage.setWikiWatchedState(false);
@@ -410,23 +381,23 @@ class NotificationsSettingsIT
         system.setCollapsed(false);
 
         // Check default values
-        assertEquals(OFF, notificationsUserProfilePage.getApplicationState(SYSTEM, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getApplicationState(SYSTEM, EMAIL_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, ADD_COMMENT, EMAIL_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, CREATE, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, CREATE, EMAIL_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, DELETE, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, DELETE, EMAIL_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, UPDATE, EMAIL_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getApplicationState(SYSTEM, ALERT_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getApplicationState(SYSTEM, EMAIL_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, ADD_COMMENT, EMAIL_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, CREATE, ALERT_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, CREATE, EMAIL_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, DELETE, ALERT_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, DELETE, EMAIL_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, UPDATE, EMAIL_FORMAT));
 
         assertEquals(NotificationsUserProfilePage.EmailDiffType.STANDARD,
             notificationsUserProfilePage.getNotificationEmailDiffType());
         assertEquals(NotificationsUserProfilePage.AutowatchMode.MAJOR,
             notificationsUserProfilePage.getAutoWatchModeValue());
 
-        notificationsUserProfilePage.setEventTypeState(SYSTEM, CREATE, ALERT_FORMAT, ON);
+        notificationsUserProfilePage.setEventTypeState(SYSTEM, CREATE, ALERT_FORMAT, OFF);
         notificationsUserProfilePage.setAutoWatchMode(NotificationsUserProfilePage.AutowatchMode.NONE);
 
         // Second step: login with superadmin and set global notification settings.
@@ -438,23 +409,23 @@ class NotificationsSettingsIT
         system.setCollapsed(false);
 
         // Check default values
-        assertEquals(OFF, notificationsUserProfilePage.getApplicationState(SYSTEM, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getApplicationState(SYSTEM, EMAIL_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, ADD_COMMENT, EMAIL_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, CREATE, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, CREATE, EMAIL_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, DELETE, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, DELETE, EMAIL_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, UPDATE, EMAIL_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getApplicationState(SYSTEM, ALERT_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getApplicationState(SYSTEM, EMAIL_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, ADD_COMMENT, EMAIL_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, CREATE, ALERT_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, CREATE, EMAIL_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, DELETE, ALERT_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, DELETE, EMAIL_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, UPDATE, EMAIL_FORMAT));
 
         assertEquals(NotificationsUserProfilePage.EmailDiffType.STANDARD,
             notificationsUserProfilePage.getNotificationEmailDiffType());
         assertEquals(NotificationsUserProfilePage.AutowatchMode.MAJOR,
             notificationsUserProfilePage.getAutoWatchModeValue());
 
-        notificationsUserProfilePage.setEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT, ON);
+        notificationsUserProfilePage.setEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT, OFF);
         notificationsUserProfilePage.setAutoWatchMode(NotificationsUserProfilePage.AutowatchMode.ALL);
         notificationsUserProfilePage.setNotificationEmailDiffType(NotificationsUserProfilePage.EmailDiffType.NOTHING);
 
@@ -472,17 +443,17 @@ class NotificationsSettingsIT
         assertTrue(system.isCollapsed());
         system.setCollapsed(false);
 
-        // All should be false except update alert
+        // All should be true except update alert
         assertEquals(UNDETERMINED, notificationsUserProfilePage.getApplicationState(SYSTEM, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getApplicationState(SYSTEM, EMAIL_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, ADD_COMMENT, EMAIL_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, CREATE, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, CREATE, EMAIL_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, DELETE, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, DELETE, EMAIL_FORMAT));
-        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, UPDATE, EMAIL_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getApplicationState(SYSTEM, EMAIL_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, ADD_COMMENT, EMAIL_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, CREATE, ALERT_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, CREATE, EMAIL_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, DELETE, ALERT_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, DELETE, EMAIL_FORMAT));
+        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, UPDATE, EMAIL_FORMAT));
 
         assertEquals(NotificationsUserProfilePage.EmailDiffType.NOTHING,
             notificationsUserProfilePage.getNotificationEmailDiffType());
@@ -490,7 +461,7 @@ class NotificationsSettingsIT
             notificationsUserProfilePage.getAutoWatchModeValue());
 
         // perform some changes with superadmin
-        notificationsUserProfilePage.setEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT, ON);
+        notificationsUserProfilePage.setEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT, OFF);
         notificationsUserProfilePage.setAutoWatchMode(NotificationsUserProfilePage.AutowatchMode.NEW);
 
         // Fourth step: still with superadmin, go to first user notification settings, check them and perform changes.
@@ -503,17 +474,17 @@ class NotificationsSettingsIT
         assertTrue(system.isCollapsed());
         system.setCollapsed(false);
 
-        // All should be false except for the create alert, specified in first step.
+        // All should be true except for the create alert, specified in first step.
         assertEquals(UNDETERMINED, notificationsUserProfilePage.getApplicationState(SYSTEM, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getApplicationState(SYSTEM, EMAIL_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, ADD_COMMENT, EMAIL_FORMAT));
-        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, CREATE, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, CREATE, EMAIL_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, DELETE, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, DELETE, EMAIL_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, UPDATE, EMAIL_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getApplicationState(SYSTEM, EMAIL_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, ADD_COMMENT, EMAIL_FORMAT));
+        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, CREATE, ALERT_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, CREATE, EMAIL_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, DELETE, ALERT_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, DELETE, EMAIL_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, UPDATE, EMAIL_FORMAT));
 
         // We didn't change the email settings value in first step, so we obtain here the global settings until
         // the user decide which settings she'd want for herself.
@@ -523,7 +494,7 @@ class NotificationsSettingsIT
             notificationsUserProfilePage.getAutoWatchModeValue());
 
         // perform some changes with superadmin
-        notificationsUserProfilePage.setEventTypeState(SYSTEM, ADD_COMMENT, EMAIL_FORMAT, ON);
+        notificationsUserProfilePage.setEventTypeState(SYSTEM, ADD_COMMENT, EMAIL_FORMAT, OFF);
         notificationsUserProfilePage.setNotificationEmailDiffType(NotificationsUserProfilePage.EmailDiffType.STANDARD);
 
         // Fifth step: login with first user and check notification settings
@@ -536,14 +507,14 @@ class NotificationsSettingsIT
 
         assertEquals(UNDETERMINED, notificationsUserProfilePage.getApplicationState(SYSTEM, ALERT_FORMAT));
         assertEquals(UNDETERMINED, notificationsUserProfilePage.getApplicationState(SYSTEM, EMAIL_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT));
-        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, ADD_COMMENT, EMAIL_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT));
+        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, ADD_COMMENT, EMAIL_FORMAT));
         assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, CREATE, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, CREATE, EMAIL_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, DELETE, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, DELETE, EMAIL_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT));
-        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, UPDATE, EMAIL_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, CREATE, EMAIL_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, DELETE, ALERT_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, DELETE, EMAIL_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT));
+        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, UPDATE, EMAIL_FORMAT));
 
         assertEquals(NotificationsUserProfilePage.EmailDiffType.STANDARD,
             notificationsUserProfilePage.getNotificationEmailDiffType());

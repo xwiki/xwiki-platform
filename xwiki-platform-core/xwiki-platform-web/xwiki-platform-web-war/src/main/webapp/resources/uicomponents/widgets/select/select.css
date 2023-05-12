@@ -96,12 +96,6 @@
   background-color: $theme.highlightColor;
 }
 
-.xwiki-select ul {
-  list-style-type: none;
-  margin: 0;
-  padding-left: 0;
-}
-
 .skin-colibri .xwiki-select-option {
   width: 47%;
 }

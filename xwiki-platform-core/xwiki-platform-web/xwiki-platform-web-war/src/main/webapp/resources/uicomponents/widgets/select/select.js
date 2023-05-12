@@ -35,7 +35,7 @@ require(['jquery'], function($) {
      * Send an event to say that the selection have changed
      */
     self.triggerSelectionChange = function () {
-      self.selectWidget.trigger('xwiki:select:updated', {'elements': self.selectWidget[0]});
+      self.selectWidget.trigger('xwiki:select:updated', {'elements': self.selectWidget});
     };
 
     /**
@@ -52,6 +52,7 @@ require(['jquery'], function($) {
       }
       input.prop('checked', true);
       self.selectWidget.find('.xwiki-select-option-selected').removeClass('xwiki-select-option-selected');
+      self.selectWidget.attr('aria-activedescendant', option.attr('id'));
       option.addClass('xwiki-select-option-selected');
       self.triggerSelectionChange();
     };

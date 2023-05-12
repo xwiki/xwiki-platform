@@ -98,7 +98,7 @@ var XWiki = function(XWiki){
           this.options = options || {};
           var classes = 'xitem ' + (this.options.noHighlight ? '' : 'xhighlight ');
           classes += this.options.classes ? this.options.classes: '';
-          var containerTagName = this.options.containerTagName ? this.options.containerTagName: 'div';
+          const containerTagName = this.options.containerTagName || 'div';
           this.containerElement = new Element(containerTagName, {'class': 'xitemcontainer'}).insert(content || '');
           this.containerElement.addClassName(this.options.containerClasses || '');
           this.containerElement.setStyle({textIndent: '0px'});

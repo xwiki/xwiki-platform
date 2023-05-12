@@ -84,6 +84,8 @@ class CreatePanelTest extends PageTest
         this.request.put("create", "1");
         this.request.put("panelTitle", PAGE_TITLE);
         this.request.put("parent", "Panels.WebHome");
+        String formToken = "csrfToken45";
+        this.request.put("form_token", formToken);
 
         renderPage(new DocumentReference("xwiki", "Panels", "CreatePanel"));
 
@@ -94,7 +96,7 @@ class CreatePanelTest extends PageTest
             + "&Panels.PanelClass_0_name=" + tool.url(PAGE_TITLE)
             + "&Panels.PanelClass_0_content=" + tool
             .url("{{velocity}}\n#panelheader('" + PAGE_TITLE + "')\n\n#panelfooter()\n{{/velocity}}")
-            + "&parent=Panels.WebHome");
+            + "&parent=Panels.WebHome&form_token=" + formToken);
     }
 
     @Test

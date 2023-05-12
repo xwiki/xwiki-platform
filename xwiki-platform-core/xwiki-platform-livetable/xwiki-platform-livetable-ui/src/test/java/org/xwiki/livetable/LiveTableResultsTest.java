@@ -49,10 +49,19 @@ import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax20ComponentList;
+import org.xwiki.user.GuestUserReference;
+import org.xwiki.user.SuperAdminUserReference;
+import org.xwiki.user.UserReferenceComponentList;
+import org.xwiki.user.internal.converter.CurrentUserReferenceConverter;
+import org.xwiki.user.internal.converter.DocumentUserReferenceConverter;
+import org.xwiki.user.internal.converter.GuestUserReferenceConverter;
+import org.xwiki.user.internal.converter.SuperAdminUserReferenceConverter;
+import org.xwiki.user.script.UserScriptService;
 import org.xwiki.velocity.tools.JSONTool;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.model.reference.DocumentReferenceConverter;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
@@ -83,8 +92,14 @@ import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_1;
 @XWikiSyntax20ComponentList
 @SecurityScriptServiceComponentList
 @MailScriptServiceComponentList
+@UserReferenceComponentList
 @ComponentList({
-    ModelScriptService.class
+    ModelScriptService.class,
+    SuperAdminUserReferenceConverter.class,
+    GuestUserReferenceConverter.class,
+    DocumentUserReferenceConverter.class,
+    CurrentUserReferenceConverter.class,
+    DocumentReferenceConverter.class
 })
 class LiveTableResultsTest extends PageTest
 {
@@ -641,6 +656,127 @@ class LiveTableResultsTest extends PageTest
 
         verify(this.queryService).hql(expectedHql);
         verify(this.query).bindValues(expectedBindValues);
+    }
+
+    public static Stream<Arguments> provideObfuscateEmailsSort()
+    {
+        return Stream.of(
+            Arguments.of(
+                true,
+                ", BaseObject as obj   "
+                    + "where obj.name=doc.fullName "
+                    + "and obj.className = :className "
+                    + "and doc.fullName not in (:classTemplate1, :classTemplate2)  ",
+                Map.of(
+                    "className", "Space.MyClass",
+                    "classTemplate1", "Space.MyClassTemplate",
+                    "classTemplate2", "Space.MyTemplate"
+                ),
+                "t...@mail.com",
+                "t...@mail.com"
+            ),
+            Arguments.of(
+                false,
+                ", BaseObject as obj , StringProperty prop_email  "
+                    + "where obj.name=doc.fullName "
+                    + "and obj.className = :className "
+                    + "and doc.fullName not in (:classTemplate1, :classTemplate2)  "
+                    + "and obj.id=prop_email.id.id "
+                    + "and prop_email.name = :prop_email_name   "
+                    + "order by lower(prop_email.value) asc, prop_email.value asc",
+                Map.of(
+                    "className", "Space.MyClass",
+                    "classTemplate1", "Space.MyClassTemplate",
+                    "classTemplate2", "Space.MyTemplate",
+                    "prop_email_name", "email"
+                ),
+                "<a href=\"mailto:test@mail.com\">test@mail.com</a>",
+                "test@mail.com"
+            )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideObfuscateEmailsSort")
+    void obfuscateEmailsSort(boolean obfuscate, String expectedHql, Map<String, Object> expectedBindValues,
+        String expectedMail, String expectedMailValue) throws Exception
+    {
+        // TODO: We mock the mail configuration as it relies on document that are loaded through xar files from external
+        //  modules, which is currently not possible (would it be loaded using a mandatory document initializer, it 
+        //  would work though).
+        when(this.generalMailConfiguration.shouldObfuscate()).thenReturn(obfuscate);
+
+        DocumentReference myClassReference = new DocumentReference("xwiki", "Space", "MyClass");
+        XWikiDocument xClassDocument = new XWikiDocument(myClassReference);
+        xClassDocument.getXClass().addEmailField("mail", "Email", 100);
+        xClassDocument.getXClass().addTextField("name", "Name", 100);
+        this.xwiki.saveDocument(xClassDocument, this.context);
+
+        XWikiDocument xObjectDocument = new XWikiDocument(new DocumentReference("xwiki", "Space", "MyObject"));
+        xObjectDocument.setSyntax(XWIKI_2_1);
+        BaseObject baseObject = xObjectDocument.newXObject(myClassReference, this.context);
+        baseObject.set("mail", "test@mail.com", this.context);
+        baseObject.set("name", "testName", this.context);
+        this.xwiki.saveDocument(xObjectDocument, this.context);
+
+        setColumns("mail,name");
+        setClassName("Space.MyClass");
+        setSort("email", true);
+
+        when(this.queryService.hql(anyString())).thenReturn(this.query);
+        when(this.query.setLimit(anyInt())).thenReturn(this.query);
+        when(this.query.setOffset(anyInt())).thenReturn(this.query);
+        when(this.query.bindValues(any(Map.class))).thenReturn(this.query);
+        when(this.query.count()).thenReturn(1L);
+        when(this.query.execute()).thenReturn(singletonList("Space.MyObject"));
+
+        renderPage();
+
+        List<Map<String, Object>> rows = getRows();
+        assertEquals(expectedMail, StringUtils.trim((String) rows.get(0).get("mail")));
+        assertEquals(expectedMailValue, rows.get(0).get("mail_value"));
+
+        verify(this.queryService).hql(expectedHql);
+        verify(this.query).bindValues(expectedBindValues);
+    }
+
+    /**
+     * Verify that the author is correctly displayed when the last author is superadmin.
+     */
+    @Test
+    void authorSuperAdmin() throws Exception
+    {
+        UserScriptService userScriptService =
+            this.componentManager.registerMockComponent(ScriptService.class, "user", UserScriptService.class, false);
+        when(userScriptService.getGuestUserReference()).thenReturn(GuestUserReference.INSTANCE);
+
+        DocumentReference myClassReference = new DocumentReference("xwiki", "Space", "MyClass");
+        XWikiDocument xClassDocument = new XWikiDocument(myClassReference);
+        this.xwiki.saveDocument(xClassDocument, this.context);
+
+        XWikiDocument xObjectDocument = new XWikiDocument(new DocumentReference("xwiki", "Space", "MyObject"));
+        xObjectDocument.newXObject(myClassReference, this.context);
+        xObjectDocument.getAuthors().setOriginalMetadataAuthor(SuperAdminUserReference.INSTANCE);
+        this.xwiki.saveDocument(xObjectDocument, this.context);
+
+        setColumns("doc.name");
+        setClassName("Space.MyClass");
+
+        DocumentReference superAdminReference = new DocumentReference("xwiki", "XWiki", "superadmin");
+        when(this.xwiki.getPlainUserName(superAdminReference, this.context)).thenReturn("SuperAdmin");
+
+        when(this.queryService.hql(anyString())).thenReturn(this.query);
+        when(this.query.setLimit(anyInt())).thenReturn(this.query);
+        when(this.query.setOffset(anyInt())).thenReturn(this.query);
+        when(this.query.bindValues(any(Map.class))).thenReturn(this.query);
+        when(this.query.count()).thenReturn(1L);
+        when(this.query.execute()).thenReturn(singletonList("Space.MyObject"));
+
+        renderPage();
+
+        List<Map<String, Object>> rows = getRows();
+        assertEquals("SuperAdmin", rows.get(0).get("doc_author"));
+        assertEquals("/xwiki/bin/view/XWiki/superadmin", rows.get(0).get("doc_author_url"));
     }
 
     //

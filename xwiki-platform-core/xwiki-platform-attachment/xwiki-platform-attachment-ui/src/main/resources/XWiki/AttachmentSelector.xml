@@ -590,7 +590,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
             hasErrors = true;
           }
           const beforeUploadEvent = Event.fire(document, 'xwiki:actions:beforeUpload', {
-            file: fileInput
+            file: fileInput.files[0]
           });
 
           if (beforeUploadEvent.defaultPrevented) {

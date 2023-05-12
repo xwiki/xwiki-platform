@@ -68,6 +68,7 @@ public abstract class AbstractTagsSelector implements TagsSelector
     protected ContextualAuthorizationManager contextualAuthorizationManager;
 
     @Inject
+    @Named("current")
     protected DocumentReferenceResolver<String> stringDocumentReferenceResolver;
 
     @Override

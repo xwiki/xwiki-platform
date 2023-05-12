@@ -32,9 +32,10 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.text.StringUtils;
 import org.xwiki.whatsnew.NewsConfiguration;
 import org.xwiki.whatsnew.NewsSourceDescriptor;
+
+import static org.apache.commons.lang3.StringUtils.substringAfter;
 
 /**
  * Implementation for configuration data for the What's New extension, looking in the {@code xwiki.properties} file.
@@ -113,7 +114,7 @@ public class DefaultNewsConfiguration implements NewsConfiguration
     public boolean isActive()
     {
         Properties sources = getConfiguredSources();
-        return sources == null || (sources != null && !sources.isEmpty());
+        return sources == null || !sources.isEmpty();
     }
 
     private Properties getConfiguredSources()
@@ -144,7 +145,7 @@ public class DefaultNewsConfiguration implements NewsConfiguration
             String prefix = String.format("%s%s.", sourceKeyNamePrefix, entry.getKey());
             for (String key : keys) {
                 if (key.startsWith(prefix)) {
-                    String parameterKey = StringUtils.substringAfter(key, prefix);
+                    String parameterKey = substringAfter(key, prefix);
                     parameters.put(parameterKey, this.configurationSource.getProperty(key, String.class));
                 }
             }

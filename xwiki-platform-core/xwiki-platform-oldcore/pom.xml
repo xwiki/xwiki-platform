@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>15.2-SNAPSHOT</version>
+    <version>15.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -37,7 +37,11 @@
       com.xpn.xwiki.platform:xwiki-core,
 
       <!-- The old org.xwiki.platform:xwiki-platform-filter-instance-oldcore has been merged with oldcore -->
-      org.xwiki.platform:xwiki-platform-filter-instance-oldcore
+      org.xwiki.platform:xwiki-platform-filter-instance-oldcore,
+
+      <!-- A contrib extension to use with versions of oldcore which does not support authservice API -->
+      org.xwiki.contrib:authservice-backport-api,
+      org.xwiki.contrib:authservice-backport-default
     </xwiki.extension.features>
     <!-- Skipping revapi since xwiki-platform-legacy-oldcore wraps this module and runs checks on it -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
@@ -971,10 +975,14 @@
         <groupId>com.mycila</groupId>
         <artifactId>license-maven-plugin</artifactId>
         <configuration>
-          <excludes>
-            <!-- Exclude a test vm file since the tests don't execute velocity on it -->
-            <exclude>src/test/**/classloader_template.vm</exclude>
-          </excludes>
+          <licenseSets>
+            <licenseSet>
+              <excludes>
+                <!-- Exclude a test vm file since the tests don't execute velocity on it -->
+                <exclude>src/test/**/classloader_template.vm</exclude>
+              </excludes>
+            </licenseSet>
+          </licenseSets>
         </configuration>
       </plugin>
     </plugins>

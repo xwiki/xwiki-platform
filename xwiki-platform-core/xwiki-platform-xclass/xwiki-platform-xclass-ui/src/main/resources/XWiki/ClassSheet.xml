@@ -68,6 +68,7 @@
     ## inline action.
     #set ($editAction = $xwiki.getDocument($request.template).getDefaultEditMode())
     $response.sendRedirect($xwiki.getURL($targetDocRef, $editAction, $escapetool.url({
+      'form_token': $request.form_token,
       'template': $request.template,
       'parent': $request.parent,
       'title': $request.docName

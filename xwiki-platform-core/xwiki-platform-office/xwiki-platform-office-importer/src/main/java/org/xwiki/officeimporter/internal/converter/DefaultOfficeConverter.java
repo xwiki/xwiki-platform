@@ -92,6 +92,9 @@ public class DefaultOfficeConverter implements OfficeConverter
             OfficeConverterFileStorage storage = new OfficeConverterFileStorage(this.workDir, inputFileName,
                 outputFileName);
 
+            // Check that the potentially cleaned filename is actually in the input streams.
+            this.checkInputStream(inputStreams, storage.getInputFile().getName());
+
             // Write out all the input streams.
             for (Map.Entry<String, InputStream> entry : inputStreams.entrySet()) {
                 File temp = new File(storage.getInputDir(), entry.getKey());

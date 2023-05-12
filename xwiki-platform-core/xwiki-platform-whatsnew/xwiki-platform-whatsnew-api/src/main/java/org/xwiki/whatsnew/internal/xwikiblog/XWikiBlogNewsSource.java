@@ -47,6 +47,7 @@ import org.xwiki.whatsnew.NewsSourceItem;
 import org.xwiki.whatsnew.internal.DefaultNewsContent;
 import org.xwiki.whatsnew.internal.DefaultNewsSourceItem;
 
+import com.apptasticsoftware.rssreader.Enclosure;
 import com.apptasticsoftware.rssreader.Item;
 
 /**
@@ -168,12 +169,9 @@ public class XWikiBlogNewsSource implements NewsSource
             } else {
                 itemStream = rssReader.read(this.rssStream);
             }
-            // Note:
-            articles = itemStream
-                .collect(Collectors.toList());
+            articles = itemStream.collect(Collectors.toList());
         } catch (IOException e) {
-            String message = computedRSSURL != null ? String.format("Failed to read RSS for [%s]", computedRSSURL)
-                : "Failed to read RSS";
+            String message = String.format("Failed to read RSS for [%s]", computedRSSURL);
             throw new NewsException(message, e);
         }
 
@@ -181,22 +179,43 @@ public class XWikiBlogNewsSource implements NewsSource
         for (Item item : articles) {
             DefaultNewsSourceItem newsItem = new DefaultNewsSourceItem();
             newsItem.setTitle(item.getTitle());
-
-            // Clean the HTML content from the description so that it's safe to be rendered.
-            Optional<NewsContent> content = item.getDescription().isPresent()
-                ? Optional.of(new DefaultNewsContent(this.rssContentCleaner.clean(item.getDescription().get()),
-                    getContentSyntax()))
-                : Optional.empty();
-            newsItem.setDescription(content);
-
+            newsItem.setDescription(getCleanedContent(item));
             newsItem.setAuthor(item.getAuthor());
             newsItem.setCategories(this.categoriesConverter.convertFromRSS(item.getCategories()));
-            newsItem.setPublishedDate(parsetDateTime(item.getPubDate()));
+            newsItem.setPublishedDate(parseDateTime(item.getPubDate()));
             newsItem.setOriginURL(item.getLink());
+            newsItem.setImageURL(getURL(item));
             newsItems.add(newsItem);
         }
 
         return newsItems;
+    }
+
+    private Optional<String> getURL(Item item)
+    {
+        Optional<String> optionalURL;
+        Optional<Enclosure> optionalEnclosure = item.getEnclosure();
+        if (optionalEnclosure.isEmpty()) {
+            optionalURL = Optional.empty();
+        } else {
+            optionalURL = Optional.of(optionalEnclosure.get().getUrl());
+        }
+        return optionalURL;
+    }
+
+    private Optional<NewsContent> getCleanedContent(Item item)
+    {
+        // Clean the HTML content from the description so that it's safe to be rendered.
+        Optional<NewsContent> optionalContent;
+        Optional<String> optionalDescription = item.getDescription();
+        if (optionalDescription.isPresent()) {
+            optionalContent = Optional.of(
+                new DefaultNewsContent(this.rssContentCleaner.clean(optionalDescription.get()),
+                    getContentSyntax()));
+        } else {
+            optionalContent = Optional.empty();
+        }
+        return optionalContent;
     }
 
     private Syntax getContentSyntax()
@@ -226,7 +245,7 @@ public class XWikiBlogNewsSource implements NewsSource
         return String.format("XWiki Blog news source for URL [%s]", this.rssURL);
     }
 
-    private Optional<Date> parsetDateTime(Optional<String> dateAsString)
+    private Optional<Date> parseDateTime(Optional<String> dateAsString)
     {
         Optional<Date> result;
         if (!dateAsString.isPresent()) {

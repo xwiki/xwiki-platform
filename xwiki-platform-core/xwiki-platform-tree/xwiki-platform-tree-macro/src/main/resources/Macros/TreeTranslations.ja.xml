@@ -67,4 +67,4 @@ rendering.macro.tree.parameter.limit.description=初めに親ノードを展開�
 rendering.macro.tree.content.description=入れ子式の順序なしHTMLリストを使ってツリー構造を記述できます。詳細はhttp://www.jstree.com/docs/html/を参照してください。
 tree.macro.editModeWarning=このツリーは編集モードで表示できません。
 </content>
-  </xwikidoc>
+</xwikidoc>

@@ -175,16 +175,17 @@ class BaseClassTest
         newClass.setPrettyName("new");
         newClass.setValidationScript("my new validation script");
         newClass.setDefaultEditSheet("A previous edit sheet");
-
         when(mergeManager.mergeObject(any(), any(), any(), any())).thenReturn(new MergeManagerResult<>());
 
-        MergeManagerResult<String, String> mergeManagerResult = new MergeManagerResult<>();
-        mergeManagerResult.setMergeResult("current");
-        mergeManagerResult.setModified(false);
-        mergeManagerResult.getLog().error("Failed to merge objects: previous=[previous] new=[new] current=[current]");
-        when(mergeManager.mergeObject(eq("previous"), eq("new"), eq("current"), any())).thenReturn(mergeManagerResult);
+        MergeManagerResult<String, Character> prettyNameManagerResult = new MergeManagerResult<>();
+        prettyNameManagerResult.setMergeResult("current");
+        prettyNameManagerResult.setModified(false);
+        prettyNameManagerResult.getLog()
+            .error("Failed to merge objects: previous=[previous] new=[new] current=[current]");
+        when(mergeManager.mergeCharacters(eq("previous"), eq("new"), eq("current"), any()))
+            .thenReturn(prettyNameManagerResult);
 
-        mergeManagerResult = new MergeManagerResult<>();
+        MergeManagerResult<String,  String> mergeManagerResult = new MergeManagerResult<>();
         mergeManagerResult.setMergeResult("my new validation script");
         mergeManagerResult.setModified(true);
         when(mergeManager

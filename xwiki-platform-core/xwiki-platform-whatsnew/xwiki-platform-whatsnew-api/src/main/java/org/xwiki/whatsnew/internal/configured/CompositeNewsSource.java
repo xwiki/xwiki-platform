@@ -100,9 +100,8 @@ public class CompositeNewsSource implements NewsSource
     }
 
     @Override
-    public List<NewsSourceItem> build() throws NewsException
+    public List<NewsSourceItem> build()
     {
-        // TODO: Sort the items by date
         List<NewsSourceItem> items = new ArrayList<>();
         for (NewsSource source : getWrappedSources()) {
             try {
@@ -113,6 +112,8 @@ public class CompositeNewsSource implements NewsSource
                     ExceptionUtils.getRootCauseMessage(e));
             }
         }
+        // Sort by having the latest published date items come first in the list so that they're rendered first.
+        Collections.sort(items);
         return items;
     }
 

@@ -1425,6 +1425,49 @@ XWiki.Document = Class.create({
     return this.documentReference;
   }
 });
+XWiki.Attachment = Class.create({
+  /**
+   * Constructor.
+   *
+   * Example: new XWiki.Attachment('filename',
+   *            new XWiki.Document(new XWiki.DocumentReference('xwiki', ['Space1', 'Space2'], 'Page'))
+   */
+  initialize : function(filenameOrAttachmentReference, document) {
+    if (typeof filenameOrAttachmentReference === 'string') {
+      // The first argument is a filename.
+      this.filename = filenameOrAttachmentReference;
+      this.document = document;
+    } else {
+      // The first argument is an attachment reference (or it is null).
+      // We ignore the other argument since all the needed information is on the reference
+      this.initializeFromReference(filenameOrAttachmentReference);
+    }
+  },
+  /**
+   * Constructor.
+   *
+   * Example: new XWiki.Attachment(new XWiki.AttachmentReference('filename',
+   *            new XWiki.DocumentReference('xwiki', ['Space1', 'Space2'], 'Page')))
+   */
+  initializeFromReference : function(attachmentReference) {
+    this.filename = attachmentReference.name;
+    this.document = new XWiki.Document(attachmentReference.parent);
+  },
+  /**
+   * Gets a URL pointing to this attachment.
+   */
+  getURL : function(queryString, fragment) {
+    var attachmentURL = this.document.getURL('download') +
+      (this.document.page.name == 'WebHome' ? this.document.page.name : '') + '/' + encodeURIComponent(this.filename);
+    if (queryString) {
+      attachmentURL += '?' + queryString;
+    }
+    if (fragment) {
+      attachmentURL += '#' + fragment;
+    }
+    return attachmentURL;
+  }
+});
 /* Initialize the document URL factory, and create XWiki.currentDocument.
 TODO: use the new API to get the document meta data (see: http://jira.xwiki.org/browse/XWIKI-11225).
 Currently not done because the new API is asynchronous meanwhile this script must be loaded first/ */
@@ -1882,7 +1925,8 @@ document.observe("xwiki:dom:loaded", function() {
   };
 
   /**
-   * Overwrite the XMLHttpRequest#open() method in order to add our load listener on all requests made from this page.
+   * Overwrite the XMLHttpRequest#open() method in order to inject the form token and to add our load listener on all
+   * requests made from this page.
    */
   var interceptXMLHttpRequest = function() {
     var originalOpen = window.XMLHttpRequest.prototype.open;
@@ -1890,18 +1934,48 @@ document.observe("xwiki:dom:loaded", function() {
       this.addEventListener('load', function() {
         handleResponseHeaders(this.getResponseHeader.bind(this));
       });
-      return originalOpen.apply(this, arguments);
+      const result = originalOpen.apply(this, arguments);
+      // Send the form token on same-origin requests only to prevent leaking the token to third-parties.
+      if (arguments.length >= 2 && window.location.origin === (new URL(arguments[1], window.location.href)).origin) {
+        // Make sure this is really safe in case this should be called in some unexpected situation.
+        const formToken = document?.documentElement?.dataset?.xwikiFormToken;
+        if (formToken) {
+          this.setRequestHeader("XWiki-Form-Token", formToken);
+        }
+      }
+      return result;
     };
   };
 
   /**
-   * Overwrite the fetch function in order to add our own response callback on all fetch requests made from this page.
+   * Overwrite the fetch function in order to inject the form token and add our own response callback on all fetch
+   * requests made from this page.
    */
   var interceptFetch = function() {
     var originalFetch = window.fetch;
     if (originalFetch) {
       window.fetch = function() {
-        return originalFetch.apply(this, arguments).then(function(response) {
+        // Inject the form token.
+        let modifiedArguments = arguments;
+        // Make sure this is really safe in case this should be called in some unexpected situation.
+        const formToken = document?.documentElement?.dataset?.xwikiFormToken;
+        if (formToken) {
+          let request = null;
+          // Convert the arguments to a request, as Request expects the same arguments as fetch() but provides
+          // convenient ways to modify the headers (and fetch accepts a request as parameter).
+          if (arguments.length === 1 && arguments[0] instanceof Request) {
+            request = arguments[0];
+          } else if (arguments.length) {
+            request = new Request(...arguments);
+          }
+          // Only handle expected cases and same-origin requests to prevent leaking the token to third-parties,
+          // leave the arguments alone otherwise.
+          if (request !== null && window.location.origin === (new URL(request.url, window.location.href).origin)) {
+            request.headers.append("XWiki-Form-Token", formToken);
+            modifiedArguments = [request];
+          }
+        }
+        return originalFetch.apply(this, modifiedArguments).then(function(response) {
           handleResponseHeaders(response.headers.get.bind(response.headers));
           return response;
         });

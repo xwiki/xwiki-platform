@@ -44,4 +44,4 @@ dashboard.gadgetEditor.gadgetTitle.label=ガジェットのタイトル
 dashboard.gadgetEditor.gadgetTitle.hint=このガジェットのタイトルは、ダッシュボードのガジェットパネルの上に表示されます（velocityのコードを含めることができます）。
 dashboard.initialization.saveMessage=既定のダッシュボードのユーザーのセットアップを初期化
 </content>
-  </xwikidoc>
+</xwikidoc>

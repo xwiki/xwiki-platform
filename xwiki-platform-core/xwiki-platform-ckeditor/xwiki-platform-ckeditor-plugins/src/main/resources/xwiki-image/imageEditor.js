@@ -23,6 +23,7 @@ define('imageEditorTranslationKeys', [], [
   'modal.loadFail.message',
   'modal.title',
   'modal.insertButton',
+  'modal.updateButton',
   'modal.initialization.fail',
   'modal.outscaleWarning'
 ]);
@@ -59,9 +60,23 @@ define('imageStyleClient', ['jquery'], function($) {
     }
   }
 
+  function getImageStyle(styleId) {
+    return loadImageStyles().then(function (results) {
+      var filteredResults = results.imageStyles.filter(function (imageStyle) {
+        return imageStyle.type === styleId;
+      });
+      if (filteredResults.length === 0) {
+        return Promise.reject("Unable to find an image style with id [" + styleId + "]");
+      } else {
+        return Promise.resolve(filteredResults[0]);
+      }
+    });
+  }
+
   return {
     loadImageStyles: loadImageStyles,
-    loadImageStylesDefault: loadImageStylesDefault
+    loadImageStylesDefault: loadImageStylesDefault,
+    getImageStyle: getImageStyle
   };
 });
 
@@ -121,10 +136,14 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
         .prependTo(insertButton.parent());
       selectImageButton.on('click', function() {
         var imageData = getFormData(modal);
+        var modalInput = modal.data('input');
+        // New image is set to true only of it is already explicitly set as such.
+        var newImage = modalInput.newImage === true;
         modal.data('output', {
           action: 'selectImage',
-          editor: modal.data('input').editor,
-          imageData: imageData
+          editor: modalInput.editor,
+          imageData: imageData,
+          newImage: newImage
         }).modal('hide');
       });
     }
@@ -189,18 +208,38 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
         }
       });
     }
-    
-    function addToggleImageWidthLock(modal) {
+
+    function updateLockStatus(modal) {
+      // When loading an image for the first time in an edit session, it is locked by default.
+      if (modal.data('input').imageData.isLocked === undefined || modal.data('input').newImage) {
+        modal.data('input').imageData.isLocked = true;
+      }
+      updateLockAccordingToStatus(modal);
+    }
+
+    function updateLockAccordingToStatus(modal) {
       var imageSizeLocked = modal.find('.image-size-locked');
       var imageSizeUnlocked = modal.find('.image-size-unlocked');
+      var hiddenClass = 'hidden';
+      var isLocked = modal.data('input').imageData.isLocked;
+      if (isLocked) {
+        imageSizeLocked.removeClass(hiddenClass);
+        imageSizeUnlocked.addClass(hiddenClass);
+      } else {
+        imageSizeLocked.addClass(hiddenClass);
+        imageSizeUnlocked.removeClass(hiddenClass);
+      }
+      return isLocked;
+    }
+
+    function addToggleImageWidthLock(modal) {
       var imageWidthField = modal.find('[name="imageWidth"]');
       var imageHeightField = modal.find('[name="imageHeight"]');
-      var hiddenClass = 'hidden';
-      var locked = !imageSizeLocked.hasClass(hiddenClass);
+
       modal.find('.image-size-lock').on('click', function () {
-        imageSizeLocked.toggleClass(hiddenClass);
-        imageSizeUnlocked.toggleClass(hiddenClass);
-        locked = !locked;
+        // Toggle the lock status and refresh the display.
+        modal.data('input').imageData.isLocked = !modal.data('input').imageData.isLocked;
+        updateLockAccordingToStatus(modal);
       });
 
       /**
@@ -261,7 +300,7 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
        */
       function updateSize(field, inputField, targetField) {
         var inputValue = inputField.val();
-        if (locked) {
+        if (modal.data('input').imageData.isLocked) {
           imageWidthField.prop('disabled', true);
           imageHeightField.prop('disabled', true);
           return $.when(updateRatio(field, inputValue)).then(function (value) {
@@ -290,9 +329,40 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
       });
     }
 
+    /**
+     * Keeps alignment and text-wrap consistent on the given modal.
+     *
+     * @param modal the modal to keep consistent
+     */
+    function addToggleAlignmentTextWrap(modal) {
+      var alignmentRadios = modal.find('[name="alignment"]');
+      var textWrapCheckbox = modal.find('[name="textWrap"]');
+      var noneAlignment = modal.find('[name="alignment"][value="none"]');
+
+      alignmentRadios.change(function () {
+        if (this.value !== 'none') {
+          textWrapCheckbox.prop("checked", false);
+        }
+      });
+
+      textWrapCheckbox.change(function () {
+        if (this.checked) {
+          noneAlignment.prop("checked", true);
+        }
+      });
+    }
+
     // Fetch modal content from a remote template the first time the image dialog editor is opened.
     function initialize(modal) {
       var params = modal.data('input');
+
+      // Update the button label according to the image state (new or updated image).
+      if (params.newImage) {
+        modal.find('.modal-footer .btn-primary').text(translations.get('modal.insertButton'));
+      } else {
+        modal.find('.modal-footer .btn-primary').text(translations.get('modal.updateButton'));
+      }
+      
       if (!modal.data('initialized')) {
         var url = new XWiki.Document(XWiki.Model.resolve('CKEditor.ImageEditorService', XWiki.EntityType.DOCUMENT))
           .getURL('get');
@@ -314,6 +384,7 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
             });
 
             addToggleImageWidthLock(modal);
+            addToggleAlignmentTextWrap(modal);
           }).fail(function(error) {
             new XWiki.widgets.Notification(translations.get('modal.initialization.fail'), 'error');
             console.log('Failed to retrieve the image edition form.', error);
@@ -343,7 +414,9 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
             width: width,
             height: height
           })
-        })
+        }),
+        // Pass the data back to the widget so that it is re-loaded in the same state during the editing session.
+        isLocked: modal.data('input').imageData.isLocked
       };
     }
 
@@ -397,7 +470,7 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
         modal.data('input').imageData.imageStyle = imageStyle;
 
         var config = (imageStylesConfig.imageStyles || []).find(function(imageStyleConfig) {
-          return imageStyleConfig.type === imageStyle;
+          return imageStyleConfig.type !== '' && imageStyleConfig.type === imageStyle;
         });
         var noStyle = false;
         if (config === undefined) {
@@ -452,12 +525,17 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
       $('#advanced [name="alignment"]').val([imageData.alignment || 'none']);
 
       // Text Wrap
+      // Uncheck text wrap in case of inconsistency (i.e., alignment takes precedence over text-wrap). 
+      if (imageData.alignment && imageData.alignment !== 'none') {
+        imageData.textWrap = false;
+      }
       $('#advanced [name="textWrap"]').prop('checked', imageData.textWrap);
 
       //  Override with the style values only if it's a new image.
       updateAdvancedFromStyle($('#imageStyles')[0].selectize.getValue(), modal);
       // Initial check of the image dimensions on load.
       checkDimensions(modal);
+      updateLockStatus(modal);
     }
 
     return $modal.createModalStep({

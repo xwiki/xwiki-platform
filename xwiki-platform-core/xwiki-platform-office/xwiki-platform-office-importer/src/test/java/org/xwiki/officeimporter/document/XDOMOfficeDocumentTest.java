@@ -79,6 +79,6 @@ class XDOMOfficeDocumentTest extends AbstractOfficeImporterTest
     {
         Parser parser = this.componentManager.getInstance(Parser.class, syntax);
         XDOM xdom = parser.parse(new StringReader(content));
-        return new XDOMOfficeDocument(xdom, Collections.emptySet(), this.componentManager, null);
+        return new XDOMOfficeDocument(xdom, Collections.emptyMap(), this.componentManager, null);
     }
 }

@@ -51,4 +51,11 @@
     </div>
   #end
 </div>
+## Display a warning regarding restricted mode for advanced users or when there is an actual error to not to confuse
+## simple users. Also, only display the warning for the content viewer as other viewers shouldn't display
+## rendered content of old revisions and this would thus only confuse users.
+#if ($viewer == 'content' && $doc.isRestricted()
+  && ($isAdvancedUser || $stringtool.contains($renderedContent, 'xwikirenderingerror')))
+  #warning($escapetool.xml($services.localization.render('core.document.restrictedInfo')))
+#end
 <hr/>

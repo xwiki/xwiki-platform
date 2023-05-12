@@ -279,8 +279,7 @@ viewers.Comments = Class.create({
           this.addPreview(this.form);
           // Set the replyto field to the replied comment's number
           this.form["XWiki.XWikiComments_replyto"].value = item.up(this.xcommentSelector)._x_number;
-          // Clear the contents and focus the textarea
-          this.form["XWiki.XWikiComments_comment"].value = "";
+          // Focus on the textarea.
           this.form["XWiki.XWikiComments_comment"].focus();
           // Hide the reply button
           item.hide();

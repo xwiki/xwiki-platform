@@ -233,6 +233,10 @@ public class XWikiDocumentOutputFilterStream extends AbstractEntityOutputFilterS
             this.entity.setLocale(this.currentLocale);
         }
 
+        // Mark the document as restricted to avoid that any scripts are executed as scripts should only be executed
+        // on the current, saved version, see https://jira.xwiki.org/browse/XWIKI-20594
+        this.entity.setRestricted(true);
+
         // Find default author
         DocumentReference defaultAuthorDocumentReference;
         // TODO: move to UserReference based APIs in DocumentInstanceOutputProperties

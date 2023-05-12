@@ -39,6 +39,8 @@ import org.xwiki.test.ui.po.DeletingPage;
 import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -283,5 +285,35 @@ class RecycleBinIT
 
         assertTrue(deletedPagesEntries.get(0).canBeRestored());
         assertTrue(deletedTerminalPagesEntries.get(0).canBeRestored());
+    }
+
+    @Test
+    @Order(3)
+    void deletedDocumentIsRestricted(TestUtils testUtils, TestReference testReference)
+    {
+        testUtils.loginAsSuperAdmin();
+
+        ViewPage viewPage = testUtils.createPage(testReference, "{{velocity}}Velocity content{{/velocity}}", "Title");
+        // Make sure the Velocity macro is executed normally.
+        assertEquals("Velocity content", viewPage.getContent());
+
+        viewPage.deletePage().confirmDeletePage().waitUntilFinished();
+
+        testUtils.gotoPage(testReference);
+        DeletePageOutcomePage recycleBinPage = new DeletePageOutcomePage();
+
+        List<DeletedPageEntry> deletedPageEntries = recycleBinPage.getDeletedPagesEntries();
+        assertFalse(deletedPageEntries.isEmpty());
+        viewPage = deletedPageEntries.get(0).clickView();
+
+        assertEquals("Title", viewPage.getDocumentTitle());
+        // In the preview the Velocity macro should be forbidden.
+        assertThat(viewPage.getContent(), startsWith("Failed to execute the [velocity] macro."));
+
+        testUtils.gotoPage(testReference);
+        recycleBinPage = new DeletePageOutcomePage();
+        viewPage = recycleBinPage.getDeletedPagesEntries().get(0).clickRestore();
+        // Assert that in the restored document, scripts are allowed again.
+        assertEquals("Velocity content", viewPage.getContent());
     }
 }

@@ -80,19 +80,31 @@
 #imageToolbarTemplate {
   display: none;
 }
-.imageToolbar {
-  > * {
-    margin: .5em;
-  }
 
-  .tooltip-inner {
-    white-space:nowrap;
-  }
-}
 #imagePopoverContainer {
   position: absolute;
 
   .popover {
     white-space: nowrap;
+  }
+
+  .popover-content {
+    padding: 0;
+  }
+
+  .imageToolbar {
+    display: flex;
+
+    & > *, & a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: @target-size-recommended;
+      min-height: @target-size-recommended;
+    }
+
+    .tooltip-inner {
+      white-space: nowrap;
+    }
   }
 }

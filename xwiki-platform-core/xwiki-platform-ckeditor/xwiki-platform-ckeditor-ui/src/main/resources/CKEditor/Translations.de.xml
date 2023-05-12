@@ -195,6 +195,7 @@ imageEditor.modal.changeImage.button=Bild ändern
 imageEditor.modal.loadFail.message=Fehler beim Abrufen des Bildbearbeitungsformulars.
 imageEditor.modal.title=Bild bearbeiten
 imageEditor.modal.insertButton=Einfügen
+imageEditor.modal.updateButton=Aktualisieren
 imageEditor.modal.initialization.fail=Fehler beim Abrufen des Bildauswahlformulars.
 imageEditor.modal.outscaleWarning=Eine der Dimensionen ist größer als das Originalbild ({0}). Dies kann zu einer Verringerung der Qualität des angezeigten Bildes führen.
 imageSelector.modal.title=Bild auswählen

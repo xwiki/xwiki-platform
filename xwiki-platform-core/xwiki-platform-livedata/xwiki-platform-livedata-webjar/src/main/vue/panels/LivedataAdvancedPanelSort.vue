@@ -217,7 +217,7 @@ export default {
   visibility: visible;
 }
 .livedata-advanced-panel-sort .delete-sort:hover {
-  background-color: #ccc4;
+  background-color: @panel-default-heading-bg;
 }
 .livedata-advanced-panel-sort .delete-sort:active {
   background-color: unset;

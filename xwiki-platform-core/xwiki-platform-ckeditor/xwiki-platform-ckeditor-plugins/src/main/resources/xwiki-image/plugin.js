@@ -20,6 +20,23 @@
 (function() {
   'use strict';
 
+  function disableResizer(widget) {
+    require(['imageStyleClient'], function (imageStyleClient) {
+      widget.resizer.removeClass('hidden');
+      var styleId = widget.data.imageStyle;
+      if (styleId) {
+        imageStyleClient.getImageStyle(styleId)
+          .then(function (imageStyle) {
+            if (imageStyle.adjustableSize === false) {
+              widget.resizer.addClass('hidden');
+            }
+          }, function () {
+            console.debug("Failed to resolve image style [" + styleId + "]");
+          });
+      }
+    });
+  }
+
   function showImageWizard(editor, widget, isInsert) {
 
     /**
@@ -43,6 +60,8 @@
         if (widget && widget.element) {
           widget.setData(data);
 
+          disableResizer(widget);
+
           // With the old image dialog, image were wrapped in a p to be centered. We need to unwrap them to make them
           // compliant with the new image dialog.
           if (widget.element.getName() === 'p') {
@@ -51,7 +70,9 @@
           }
 
         } else {
-          var element = CKEDITOR.dom.element.createFromHtml(widget.template.output(), editor.document);
+          // Wrap the image in a span to have somewhere to place the resize element.
+          var element = CKEDITOR.dom.element.createFromHtml('<span>' + widget.template.output() + '</span>',
+            editor.document);
           var wrapper = editor.widgets.wrapElement(element, widget.name);
           var temp = new CKEDITOR.dom.documentFragment(wrapper.getDocument());
 
@@ -70,12 +91,19 @@
 
   CKEDITOR.plugins.add('xwiki-image', {
     requires: 'xwiki-image-old,xwiki-dialog',
+    beforeInit: function(editor) {
+      editor.on('widgetDefinition', function(event) {
+        var widgetDefinition = event.data;
+        if (widgetDefinition.name === "image" && widgetDefinition.dialog === "image2") {
+          this.overrideImageWidget(editor, widgetDefinition);
+        }
+      }, this);
+    },
     init: function(editor) {
       this.initImageDialogWidget(editor);
     },
     initImageDialogWidget: function(editor) {
       var imageWidget = editor.widgets.registered.image;
-      this.overrideImageWidget(editor, imageWidget);
 
       imageWidget.insert = function() {
         showImageWizard(editor, this, true);
@@ -88,6 +116,68 @@
     },
     overrideImageWidget: function(editor, imageWidget) {
       CKEDITOR.plugins.registered['xwiki-image-old'].overrideImageWidget(editor, imageWidget);
+
+      /**
+       * Initializes the resize wrapper for the widget.
+       *
+       * @param widget the widget to initialize
+       * @returns {HTMLSpanElement} returns undefined of the resize wrapper was already initialized, otherwise returns
+       *   the wrapper span element
+       */
+      function initResizeWrapper(widget) {
+        var resizeWrapper;
+        if (widget.element.find('.cke_image_resizer_wrapper', true).count() === 0) {
+          resizeWrapper = editor.document.createElement('span');
+          resizeWrapper.addClass('cke_image_resizer_wrapper');
+          resizeWrapper.append(widget.parts.image);
+          resizeWrapper.append(widget.resizer);
+        }
+        return resizeWrapper;
+      }
+
+      /**
+       * Update the dom of the widget to place the resize span inside the previously created wrapping span.
+       *
+       * @param widget the image widget to update
+       */
+      function moveResizer(widget) {
+        if(widget.data.hasCaption) {
+          return;
+        } 
+        var resizeWrapper = initResizeWrapper(widget);
+
+        // Set the data.align to right when it's right so that the mousedown event is tricked into believing the
+        // alignment is right.
+        // The 'align' value is reset to 'none' on mouseout to prevent it to be persisted.
+        widget.resizer.on('mouseover', function () {
+          if(widget.data.alignment === 'end') {
+            widget.data.align = 'right';
+          }
+        });
+        widget.resizer.on('mouseout', function () {
+          widget.data.align = 'none';
+        });
+        widget.on('data', function () {
+          widget.resizer[widget.data.alignment === 'end' ? 'addClass' : 'removeClass']('cke_image_resizer_left');
+        });
+        
+        if(!widget.wrapper.getChild(0).hasClass('cke_widget_element')) {
+          // Re-wrap the element in a widget element.
+          // This happens when removing the caption of an image. 
+          var widgetElement = editor.document.createElement('span');
+          widgetElement.addClass('cke_widget_element');
+          if (resizeWrapper) {
+            widgetElement.append(resizeWrapper);
+          }
+          widget.wrapper.append(widgetElement, true);
+          widget.element = widgetElement;
+          widget.element.setAttribute('data-widget', widget.name);
+        } else {
+          if (resizeWrapper) {
+            widget.element.append(resizeWrapper, true);
+          }
+        }
+      }
 
       var originalInit = imageWidget.init;
       imageWidget.init = function() {
@@ -102,16 +192,67 @@
         }
 
         // Style
-        this.setData('imageStyle', this.parts.image.getAttribute('data-xwiki-image-style') || '');
+        var image = this.parts.image;
+        if (this.data.hasCaption) {
+          image = this.element;
+        }
+        this.setData('imageStyle', image.getAttribute('data-xwiki-image-style') || '');
 
-        this.setData('border', this.parts.image.getAttribute('data-xwiki-image-style-border'));
-        this.setData('alignment', this.parts.image.getAttribute('data-xwiki-image-style-alignment'));
-        this.setData('textWrap', this.parts.image.getAttribute('data-xwiki-image-style-text-wrap'));
+        this.setData('border', image.getAttribute('data-xwiki-image-style-border'));
+        this.setData('alignment', image.getAttribute('data-xwiki-image-style-alignment'));
+        this.setData('textWrap', image.getAttribute('data-xwiki-image-style-text-wrap'));
+
+        moveResizer(this);
+        disableResizer(this);
       };
 
       var originalData = imageWidget.data;
-      imageWidget.data = function() {
 
+      /**
+       * Update the attributes of the widget according to the data.
+       *
+       * @param widget the widget to update
+       * @param setAttribute a set attribute method, it is a function with 3 arguments, the widget, the id of the data
+       *   to update, and its value
+       * @param removeAttribute a remove attribute method, it is a function with 2 arguments, the widget and the id of
+       *   the data to remove
+       */
+      function computeStyleData(widget, setAttribute, removeAttribute) {
+        // Style
+        if (widget.data.imageStyle) {
+          setAttribute(widget, 'data-xwiki-image-style', widget.data.imageStyle);
+        } else {
+          removeAttribute(widget, 'data-xwiki-image-style');
+        }
+
+        if (widget.data.border) {
+          setAttribute(widget, 'data-xwiki-image-style-border', widget.data.border);
+        } else {
+          removeAttribute(widget, 'data-xwiki-image-style-border');
+        }
+
+        // If alignment is undefined, try to convert from the legacy align data property.
+        var mapping = {left: 'start', right: 'end', center: 'center'};
+        widget.data.alignment = widget.data.alignment || mapping[widget.data.align] || 'none';
+
+        // The old align needs to be undefined otherwise it's not removed when re-inserting the image after the edition,
+        // add deprecated attributes to the image.
+        widget.data.align = 'none';
+
+        if (widget.data.alignment && widget.data.alignment !== 'none') {
+          setAttribute(widget, 'data-xwiki-image-style-alignment', widget.data.alignment);
+        } else {
+          removeAttribute(widget, 'data-xwiki-image-style-alignment');
+        }
+
+        if (widget.data.textWrap) {
+          setAttribute(widget, 'data-xwiki-image-style-text-wrap', widget.data.textWrap);
+        } else {
+          removeAttribute(widget, 'data-xwiki-image-style-text-wrap');
+        }
+      }
+
+      imageWidget.data = function() {
         /**
          * Update the given attribute at two locations in the widget, the image tag and the widget itself.
          *
@@ -120,6 +261,11 @@
          * @param value the attribute value
          */
         function setAttribute(widget, key, value) {
+          widget.parts.image.removeAttribute(key);
+          widget.element.removeAttribute(key);
+          if(widget.data.hasCaption) {
+            widget.element.setAttribute(key, value);
+          }
           widget.parts.image.setAttribute(key, value);
           widget.wrapper.setAttribute(key, value);
         }
@@ -131,47 +277,89 @@
          * @param key the property key to removew
          */
         function removeAttribute(widget, key) {
+          widget.element.removeAttribute(key);
           widget.parts.image.removeAttribute(key);
           widget.wrapper.removeAttribute(key);
+        }
+
+        function updateFigureWidth(widget) {
+          var figureStyles;
+          if (widget.element.hasAttribute('style')) {
+            figureStyles = widget.element.getAttribute('style');
+          } else {
+            figureStyles = "";
+          }
+          var newStyles;
+          if (widget.oldData && widget.oldData.width) {
+            newStyles = figureStyles.split(';').filter(function (item) {
+              return item.indexOf("width: " + widget.oldData.width + "px") === -1;
+            }).join(';');
+          } else if (widget.data.width) {
+            newStyles = figureStyles.split(';').filter(function (item) {
+              return item.indexOf("width: ") === -1;
+            }).join(';');
+          } else {
+            newStyles = figureStyles;
+          }
+
+          if (!newStyles.endsWith(';')) {
+            newStyles = newStyles + ';';
+          }
+
+          if (newStyles === ';') {
+            newStyles = '';
+          }
+
+          if (widget.data.hasCaption && widget.data.width) {
+            newStyles = newStyles + "width: " + widget.data.width + "px;";
+          }
+
+          if(newStyles !== '') {
+            widget.element.setAttribute('style', newStyles);
+          }
         }
 
         // Caption
         // TODO: Add support for editing the caption directly from the dialog (see CKEDITOR-435)
 
-        // Style
-        if (this.data.imageStyle) {
-          setAttribute(this, 'data-xwiki-image-style', this.data.imageStyle);
-        } else {
-          removeAttribute(this, 'data-xwiki-image-style');
-        }
-
-        if (this.data.border) {
-          setAttribute(this, 'data-xwiki-image-style-border', this.data.border);
-        } else {
-          removeAttribute(this, 'data-xwiki-image-style-border');
-        }
-
-        // If alignment is undefined, try to convert from the legacy align data property.
-        var mapping = {left: 'start', right: 'end', center: 'center'};
-        this.data.alignment = this.data.alignment || mapping[this.data.align] || 'none';
-
-        // The old align needs to be undefined otherwise it's not removed when re-inserting the image after the edition,
-        // add deprecated attributes to the image.
-        this.data.align = 'none';
-        
-        if (this.data.alignment && this.data.alignment !== 'none') {
-          setAttribute(this, 'data-xwiki-image-style-alignment', this.data.alignment);
-        } else {
-          removeAttribute(this, 'data-xwiki-image-style-alignment');
-        }
-
-        if (this.data.textWrap) {
-          setAttribute(this, 'data-xwiki-image-style-text-wrap', this.data.textWrap);
-        } else {
-          removeAttribute(this, 'data-xwiki-image-style-text-wrap');
-        }
+        computeStyleData(this, setAttribute, removeAttribute);
+        updateFigureWidth(this);
 
         originalData.call(this);
+      };
+
+      var originalUpcast = imageWidget.upcast;
+      // @param {CKEDITOR.htmlParser.element} element
+      // @param {Object} data
+      imageWidget.upcast = function (element, data) {
+        var el = originalUpcast.apply(this, arguments);
+        if (el && element.name === 'img') {
+          // Wrap the image with a span. This span will be used to place the resize span during the init of the image
+          // widget.
+          var span = new CKEDITOR.htmlParser.element( 'span' );
+          el.wrapWith(span);
+          el = span;
+        }
+        return el;
+      };
+
+      var originalDowncast = imageWidget.downcast;
+      imageWidget.downcast = function (element) {
+        var el = originalDowncast.apply(this, arguments);
+        var isNotCaptioned = this.parts.caption === null;
+        if (isNotCaptioned) {
+          var img = el.findOne('img', true);
+          // Cleanup and remove the wrapping span used for the resize caret.
+          delete img.attributes['data-widget'];
+          var firstChild = el.children[0];
+          firstChild.replaceWith(firstChild.children[0]);
+        }
+
+        // Safety data-widget removal as I noticed an additional data-widget being persisted. I did not identify the
+        // exact reproduction steps though. 
+        delete el.attributes['data-widget'];
+
+        return el;
       };
     }
   });

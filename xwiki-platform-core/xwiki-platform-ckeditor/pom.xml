@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>15.2-SNAPSHOT</version>
+    <version>15.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-ckeditor</artifactId>
   <packaging>pom</packaging>
@@ -38,7 +38,7 @@
     <module>xwiki-platform-ckeditor-webjar</module>
   </modules>
   <properties>
-    <ckeditor.version>4.20.1</ckeditor.version>
+    <ckeditor.version>4.21.0</ckeditor.version>
 
     <!-- The path to the folder where we clone the CKEditor sources. -->
     <ckeditor.path>${project.build.directory}/ckeditor4-${ckeditor.version}</ckeditor.path>
@@ -154,6 +154,15 @@
                 <arguments>
                   <!-- Exclude from release all plugins/skins that are not specified in build-config. -->
                   <argument>--skip-omitted-in-build-config</argument>
+                  <!-- Turn off warnings about syntax errors on Internet Explorer, like trailing commas. -->
+                  <argument>--no-ie-checks</argument>
+                  <!-- We don't use the generated archives. -->
+                  <argument>--no-zip</argument>
+                  <argument>--no-tar</argument>
+                  <!-- Uncomment to leave the JavaScript code as is (merge but not minify). -->
+                  <!--<argument>-&#45;leave-js-unminified</argument>-->
+                  <!-- Uncomment to see all the available configuration options. -->
+                  <!--<argument>-&#45;help</argument>-->
                 </arguments>
               </configuration>
             </execution>

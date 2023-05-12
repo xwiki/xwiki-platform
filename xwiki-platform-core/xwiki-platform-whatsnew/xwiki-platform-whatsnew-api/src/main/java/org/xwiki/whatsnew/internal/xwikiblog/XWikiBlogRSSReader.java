@@ -21,10 +21,12 @@ package org.xwiki.whatsnew.internal.xwikiblog;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.apptasticsoftware.rssreader.Enclosure;
 import com.apptasticsoftware.rssreader.Item;
 import com.apptasticsoftware.rssreader.RssReader;
 
@@ -36,6 +38,10 @@ import com.apptasticsoftware.rssreader.RssReader;
  */
 public class XWikiBlogRSSReader
 {
+    private static final String XWIKI_ITEM_IMAGE_TAG = "xwiki:image";
+
+    private static final String USER_AGENT = "XWikiWhatsNew";
+
     /**
      * @param rssURL the rss URL to get the RSS feed
      * @return the stream of items
@@ -62,6 +68,8 @@ public class XWikiBlogRSSReader
         RssReader rssReader = new RssReader();
         // Add support for Dublin Core (dc) that XWiki's RSS feeds uses.
         addXWikiDublinCoreSupport(rssReader);
+        // Set the user agent to simply mark that it's coming from an XWiki instance and be a good citizen
+        rssReader.setUserAgent(USER_AGENT);
         return rssReader;
     }
 
@@ -77,5 +85,30 @@ public class XWikiBlogRSSReader
         });
         rssReader.addItemExtension("dc:creator", Item::setAuthor);
         rssReader.addItemExtension("dc:date", Item::setPubDate);
+        rssReader.addItemExtension(XWIKI_ITEM_IMAGE_TAG, (item, image) ->
+            // Map the image URL to a RSS 2.0 Enclosure
+            getEnclosure(item).setUrl(image)
+        );
+        rssReader.addItemExtension(XWIKI_ITEM_IMAGE_TAG, "type", (item, type) ->
+            // Set the mimetype of the Enclosure
+            getEnclosure(item).setType(type)
+        );
+        rssReader.addItemExtension(XWIKI_ITEM_IMAGE_TAG, "length", (item, length) ->
+            // Set the image content length of the Enclosure
+            getEnclosure(item).setLength(Long.valueOf(length))
+        );
+    }
+
+    private Enclosure getEnclosure(Item item)
+    {
+        Enclosure result;
+        Optional<Enclosure> optionalEnclosure = item.getEnclosure();
+        if (!optionalEnclosure.isPresent()) {
+            result = new Enclosure();
+            item.setEnclosure(result);
+        } else {
+            result = optionalEnclosure.get();
+        }
+        return result;
     }
 }

@@ -20,22 +20,30 @@
 package org.xwiki.officeimporter.document;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.converter.OfficeConverterResult;
+import org.xwiki.officeimporter.internal.document.ByteArrayOfficeDocumentArtifact;
+import org.xwiki.officeimporter.internal.document.FileOfficeDocumentArtifact;
 import org.xwiki.rendering.block.XDOM;
 
 public privileged aspect XDOMOfficeDocumentCompatibilityAspect
 {
     @Deprecated
     private Map<String, byte[]> XDOMOfficeDocument.artifacts;
+
+    @Deprecated
+    private Set<File> XDOMOfficeDocument.fileArtifacts;
 
     /**
      * Creates a new {@link XDOMOfficeDocument}.
@@ -48,8 +56,31 @@ public privileged aspect XDOMOfficeDocumentCompatibilityAspect
     @Deprecated
     public XDOMOfficeDocument.new(XDOM xdom, Map<String, byte[]> artifacts, ComponentManager componentManager)
     {
-        this(xdom, Collections.emptySet(), componentManager, null);
+        this(xdom, artifacts.entrySet().stream()
+                .map(entry -> new ByteArrayOfficeDocumentArtifact(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toMap(ByteArrayOfficeDocumentArtifact::getName, Function.identity())),
+            componentManager, null);
         this.artifacts = artifacts;
+    }
+
+    /**
+     * Creates a new {@link XDOMOfficeDocument}.
+     *
+     * @param xdom {@link XDOM} corresponding to office document content.
+     * @param artifactFiles artifacts for this office document.
+     * @param componentManager {@link ComponentManager} used to lookup for various renderers.
+     * @param converterResult the {@link OfficeConverterResult} used to build that object.
+     * @since 13.1RC1
+     * @deprecated Use {@link #XDOMOfficeDocument(XDOM, Map, ComponentManager, OfficeConverterResult)} instead.
+     */
+    @Deprecated(since = "14.10.8, 15.3RC1")
+    public XDOMOfficeDocument.new(XDOM xdom, Set<File> artifactFiles, ComponentManager componentManager,
+        OfficeConverterResult converterResult)
+    {
+        this(xdom, artifactFiles.stream().collect(Collectors.toMap(File::getName,
+                file -> new FileOfficeDocumentArtifact(file.getName(), file))),
+            componentManager, converterResult);
+        this.fileArtifacts = artifactFiles;
     }
 
     /**
@@ -60,20 +91,26 @@ public privileged aspect XDOMOfficeDocumentCompatibilityAspect
     {
         if (this.artifacts == null) {
             this.artifacts = new HashMap<>();
-            FileInputStream fis = null;
-
-            for (File file : this.artifactFiles) {
-                try {
-                    fis = new FileInputStream(file);
-                    this.artifacts.put(file.getName(), IOUtils.toByteArray(fis));
-                } catch (IOException e) {
+            for (Map.Entry<String, OfficeDocumentArtifact> mapItem : this.artifactsMap.entrySet()) {
+                OfficeDocumentArtifact artifact = mapItem.getValue();
+                String fileName = mapItem.getKey();
+                try (InputStream is = artifact.getContentInputStream()) {
+                    this.artifacts.put(fileName, IOUtils.toByteArray(is));
+                } catch (OfficeImporterException | IOException e) {
                     // FIXME
                     e.printStackTrace();
-                } finally {
-                    IOUtils.closeQuietly(fis);
                 }
             }
         }
         return this.artifacts;
+    }
+
+    /**
+     * Overrides {@link CompatibilityOfficeDocument#getArtifactsFiles()}.
+     */
+    @Deprecated
+    public Set<File> XDOMOfficeDocument.getArtifactsFiles()
+    {
+        return this.fileArtifacts != null ? this.fileArtifacts : Collections.emptySet();
     }
 }

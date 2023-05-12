@@ -603,6 +603,38 @@ class DefaultWikiMacroTest
     }
 
     @Test
+    void wikimacrocontentWhenOptionalContentWithNoContent() throws Exception
+    {
+        WikiMacroDescriptor descriptor = new WikiMacroDescriptor.Builder()
+            .id(new MacroId("wikimacro"))
+            .name("Wiki Macro")
+            .visibility(WikiMacroVisibility.GLOBAL)
+            .contentDescriptor(new DefaultContentDescriptor(false))
+            .parameterDescriptors(Collections.emptyList())
+            .build();
+        this.wikiMacroDocument.setSyntax(Syntax.XWIKI_2_0);
+        this.wikiMacroObject.setLargeStringValue(WikiMacroConstants.MACRO_CODE_PROPERTY, "{{wikimacrocontent/}}");
+        DefaultWikiMacro wikiMacro = new DefaultWikiMacro(this.wikiMacroObject, descriptor, this.componentManager);
+        this.wikiMacroManager.registerWikiMacro(wikiMacroDocumentReference, wikiMacro);
+
+        Converter converter = this.componentManager.getInstance(Converter.class);
+
+        DefaultWikiPrinter printer = new DefaultWikiPrinter();
+        converter.convert(new StringReader("{{wikimacro/}}"), Syntax.XWIKI_2_1, Syntax.EVENT_1_0, printer);
+
+        String expect = "beginDocument [[syntax]=[XWiki 2.1]]\n"
+            + "beginMacroMarkerStandalone [wikimacro] []\n"
+            + "beginMacroMarkerStandalone [wikimacrocontent] []\n"
+            + "beginGroup [[data-wikimacro-id]=[wikimacrocontent]]\n"
+            + "endGroup [[data-wikimacro-id]=[wikimacrocontent]]\n"
+            + "endMacroMarkerStandalone [wikimacrocontent] []\n"
+            + "endMacroMarkerStandalone [wikimacro] []\n"
+            + "endDocument [[syntax]=[XWiki 2.1]]";
+
+        assertEquals(expect, printer.toString());
+    }
+
+    @Test
     void wikimacrocontentWhenTypeWiki() throws Exception
     {
         registerWikiMacro("wikimacro",
@@ -655,7 +687,7 @@ class DefaultWikiMacroTest
     }
 
     @Test
-    void wkimacroparameterWhenTypeWiki() throws Exception
+    void wikimacroparameterWhenTypeWiki() throws Exception
     {
         List<WikiMacroParameterDescriptor> parameterDescriptors = Arrays
             .asList(new WikiMacroParameterDescriptor("param1", "This is param1", false, null, Block.LIST_BLOCK_TYPE));

@@ -207,6 +207,36 @@ ckeditor.plugin.slash.action.table_cell_delete.name=Delete Cell
 ckeditor.plugin.slash.action.table_cell_delete.hint=Remove the current table cell.
 ckeditor.plugin.slash.action.table_delete.hint=Remove the current table from the content.
 
+ckeditor.plugin.focusedplaceholder.placeholder.body=Body
+ckeditor.plugin.focusedplaceholder.placeholder.address=Address
+ckeditor.plugin.focusedplaceholder.placeholder.aside=Aside
+ckeditor.plugin.focusedplaceholder.placeholder.footer=Footer
+ckeditor.plugin.focusedplaceholder.placeholder.header=Header
+ckeditor.plugin.focusedplaceholder.placeholder.h1=Heading 1
+ckeditor.plugin.focusedplaceholder.placeholder.h2=Heading 2
+ckeditor.plugin.focusedplaceholder.placeholder.h3=Heading 3
+ckeditor.plugin.focusedplaceholder.placeholder.h4=Heading 4
+ckeditor.plugin.focusedplaceholder.placeholder.h5=Heading 5
+ckeditor.plugin.focusedplaceholder.placeholder.h6=Heading 6
+ckeditor.plugin.focusedplaceholder.placeholder.main=Main content
+ckeditor.plugin.focusedplaceholder.placeholder.nav=Navigation
+ckeditor.plugin.focusedplaceholder.placeholder.section=Section
+ckeditor.plugin.focusedplaceholder.placeholder.blockquote=Quote
+ckeditor.plugin.focusedplaceholder.placeholder.dl=Definition list
+ckeditor.plugin.focusedplaceholder.placeholder.dt=Definition entry
+ckeditor.plugin.focusedplaceholder.placeholder.dd=Description
+ckeditor.plugin.focusedplaceholder.placeholder.figcaption=Caption
+ckeditor.plugin.focusedplaceholder.placeholder.figure=Figure
+ckeditor.plugin.focusedplaceholder.placeholder.ol=Ordered list
+ckeditor.plugin.focusedplaceholder.placeholder.ul=Unordered list
+ckeditor.plugin.focusedplaceholder.placeholder.menu=Menu (unordered list)
+ckeditor.plugin.focusedplaceholder.placeholder.li=List item
+ckeditor.plugin.focusedplaceholder.placeholder.p=Paragraph
+ckeditor.plugin.focusedplaceholder.placeholder.pre=Preformated
+ckeditor.plugin.focusedplaceholder.placeholder.caption=Title
+ckeditor.plugin.focusedplaceholder.placeholder.th=Header
+ckeditor.plugin.focusedplaceholder.placeholder.td=Cell
+
 ckeditor.inline.failedToInit=Failed to initialize CKEditor.
 
 ckeditor.upload.error.csrf=The CSRF token is missing.

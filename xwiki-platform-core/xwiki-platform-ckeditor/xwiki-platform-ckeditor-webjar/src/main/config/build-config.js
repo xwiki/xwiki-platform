@@ -124,6 +124,7 @@ var CKBUILDER_CONFIG = {
     wysiwygarea: 1,
     'xwiki-config': 1,
     'xwiki-filter': 1,
+    'xwiki-focusedplaceholder': 1,
     'xwiki-image-old': 1,
     'xwiki-image': 1,
     'xwiki-link': 1,

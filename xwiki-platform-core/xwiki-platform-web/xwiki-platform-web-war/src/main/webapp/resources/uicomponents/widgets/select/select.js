@@ -51,9 +51,12 @@ require(['jquery'], function($) {
         return;
       }
       input.prop('checked', true);
-      self.selectWidget.find('.xwiki-select-option-selected').removeClass('xwiki-select-option-selected');
+      let previousOption = self.selectWidget.find('.xwiki-select-option-selected');
+      previousOption.removeClass('xwiki-select-option-selected');
+      previousOption.removeAttr('aria-selected');
       self.selectWidget.attr('aria-activedescendant', option.attr('id'));
       option.addClass('xwiki-select-option-selected');
+      option.attr('aria-selected', 'true');
       self.triggerSelectionChange();
     };
 
@@ -81,7 +84,7 @@ require(['jquery'], function($) {
           var label = option.find('label').text().toLowerCase();
           var hint  = option.find('.xHint').text().toLowerCase();
           var optionText = label + ' ' + hint;
-          // We look if the label match all the values of the filer.
+          // We look if the label match all the values of the filter.
           var optionShouldBeVisible = true;
           for (var k = 0; k < filterValues.length; ++k) {
             var filterValue = filterValues[k].toLowerCase();

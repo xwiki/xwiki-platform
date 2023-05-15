@@ -57,8 +57,19 @@
   vertical-align: middle;
 }
 
+.xwiki-select-options > ul {
+  display: flex;
+  flex-wrap: wrap;
+  padding-left: 0;
+}
+
+.xwiki-select-options > ul > label {
+  flex-basis: 100%;
+}
+
 .xwiki-select-options > ul > li {
   clear: both;
+  flex-basis: 50%;
 }
 
 /* Make sure we create a new line every 2 items (like a grid) */

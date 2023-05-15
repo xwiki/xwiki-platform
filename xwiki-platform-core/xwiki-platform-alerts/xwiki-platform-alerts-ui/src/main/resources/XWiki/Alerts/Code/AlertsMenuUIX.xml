@@ -137,13 +137,13 @@
   #set ($cachedMenuContent = $menuContent.toString())
   #if ($stringtool.isNotBlank($cachedMenuContent))
     &lt;li class="dropdown" id="tmNotifications"&gt;
-      &lt;a class="icon-navbar dropdown-toggle" data-toggle="dropdown" role="button"
+      &lt;button class="dropdown-toggle" data-toggle="dropdown"
       title="$services.localization.render('watchlist.notification.tooltip')"&gt;
         &lt;span class="sr-only"&gt;
           $services.localization.render('core.menu.toggleNavigation')
         &lt;/span&gt;
         $services.icon.renderHTML('bell')
-      &lt;/a&gt;
+      &lt;/button&gt;
       &lt;ul class="dropdown-menu"&gt;
         $cachedMenuContent
       &lt;/ul&gt;

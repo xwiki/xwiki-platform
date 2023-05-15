@@ -373,6 +373,99 @@ public class XWikiTest
             same(this.oldcore.getXWikiContext()));
     }
 
+    @Test
+    public void testSaveDocumentWithListenerSwitchDirtyFlagToTrue() throws Exception
+    {
+        EventListener mockListener = mock(EventListener.class);
+        when(mockListener.getName()).thenReturn("testlistener");
+        DocumentReference ref = new DocumentReference("xwikitest", "Some", "Document");
+        when(mockListener.getEvents())
+            .thenReturn(Arrays.asList(new DocumentCreatingEvent(ref)));
+        doAnswer(new Answer<Void>()
+        {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable
+            {
+                ((XWikiDocument) invocation.getArgument(1)).setContent("modified content");
+
+                return null;
+            }
+        }).when(mockListener).onEvent(any(), any(), any());
+
+        doAnswer(new Answer<Void>()
+        {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable
+            {
+                XWikiDocument document = (XWikiDocument) invocation.getArgument(0);
+                assertFalse(document.isMetaDataDirty());
+                assertFalse(document.isContentDirty());
+
+                return null;
+            }
+        }).when(this.oldcore.getMockStore()).saveXWikiDoc(any(), any());
+
+        ObservationManager om = this.oldcore.getMocker().getInstance(ObservationManager.class);
+        om.addListener(mockListener);
+
+        XWikiDocument document = new XWikiDocument(ref);
+        document.setContent("the content");
+        document.setMetaDataDirty(false);
+        document.setContentDirty(false);
+
+        this.xwiki.saveDocument(document, this.oldcore.getXWikiContext());
+
+        // Ensure that the onEvent method has been called
+        verify(mockListener).onEvent(any(DocumentCreatingEvent.class), any(XWikiDocument.class),
+            same(this.oldcore.getXWikiContext()));
+    }
+
+    @Test
+    public void testSaveDocumentWithListenerSwitchDirtyFlagToFalse() throws Exception
+    {
+        EventListener mockListener = mock(EventListener.class);
+        when(mockListener.getName()).thenReturn("testlistener");
+        DocumentReference ref = new DocumentReference("xwikitest", "Some", "Document");
+        when(mockListener.getEvents())
+            .thenReturn(Arrays.asList(new DocumentCreatingEvent(ref)));
+        doAnswer(new Answer<Void>()
+        {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable
+            {
+                ((XWikiDocument) invocation.getArgument(1)).setMetaDataDirty(false);
+                ((XWikiDocument) invocation.getArgument(1)).setContentDirty(false);
+
+                return null;
+            }
+        }).when(mockListener).onEvent(any(), any(), any());
+
+        doAnswer(new Answer<Void>()
+        {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable
+            {
+                XWikiDocument document = (XWikiDocument) invocation.getArgument(0);
+                assertFalse(document.isMetaDataDirty());
+                assertFalse(document.isContentDirty());
+
+                return null;
+            }
+        }).when(this.oldcore.getMockStore()).saveXWikiDoc(any(), any());
+
+        ObservationManager om = this.oldcore.getMocker().getInstance(ObservationManager.class);
+        om.addListener(mockListener);
+
+        XWikiDocument document = new XWikiDocument(ref);
+        document.setContent("the content");
+
+        this.xwiki.saveDocument(document, this.oldcore.getXWikiContext());
+
+        // Ensure that the onEvent method has been called
+        verify(mockListener).onEvent(any(DocumentCreatingEvent.class), any(XWikiDocument.class),
+            same(this.oldcore.getXWikiContext()));
+    }
+
     /**
      * We only verify here that the renameDocument API calls the Observation component.
      */

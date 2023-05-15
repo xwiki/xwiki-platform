@@ -2051,6 +2051,10 @@ public class XWiki implements EventListener
             // Switch to document wiki
             context.setWikiId(document.getDocumentReference().getWikiReference().getName());
 
+            // Remember the dirty flags statuses so that they can be restored if needed
+            boolean metadataDirty = document.isMetaDataDirty();
+            boolean contentDirty = document.isContentDirty();
+
             // Make sure the document is ready to be saved
             XWikiDocument originalDocument = prepareDocumentForSave(document, comment, isMinorEdit, context);
 
@@ -2081,6 +2085,12 @@ public class XWiki implements EventListener
                         }
                     }
                 }
+            }
+
+            // Restore dirty flags #saveDocument was called with metadata dirty flag to false
+            if (!metadataDirty) {
+                document.setMetaDataDirty(metadataDirty);
+                document.setContentDirty(contentDirty);
             }
 
             // Actually save the document.

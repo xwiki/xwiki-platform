@@ -2630,7 +2630,8 @@ Recursive title display detected!##
       $escapetool.xml($services.localization.render('web.widgets.select.listbox.description'))
     </span>
     <div id="${escapedId}-listbox" role='listbox' class='xwiki-select-options' tabindex='0'
-      aria-labelledby="${escapedId}-listbox-label" aria-describedby="${escapedId}-listbox-description">
+      aria-labelledby="${escapedId}-listbox-label" aria-describedby="${escapedId}-listbox-description"
+      aria-activedescendant="${fieldName}_0_option">
       #set ($count = 0)
       #foreach ($category in $options)
         <ul id="${escapedId}-group${count}" role='group' class="xwiki-select-category">
@@ -2640,7 +2641,7 @@ Recursive title display detected!##
           #foreach ($option in $category.options)
             #if ("$!defaultValue" == $$option.value || ($count == 0 && $firstIsDefaultIfDefaultNull && "$!defaultValue" == ''))
               #set ($checked = 'checked="checked"')
-              #set ($class = 'xwiki-select-option-selected')
+              #set ($class = 'xwiki-select-option-selected xwiki-select-option-highlighted')
             #else
               #set ($checked = '')
               #set ($class = '')

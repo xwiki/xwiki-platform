@@ -61,6 +61,7 @@
     >
       {{ $t('livedata.pagination.pageSize') }}
       <select
+        :title="$t('livedata.pagination.selectPageSize')"
         @change="changePageSize"
       >
         <!-- Page sizes (get from the `pagination.pageSizes` config -->

@@ -92,10 +92,7 @@
     init: function (editor) {
 
       // Create a TextWatcher instance to detect changes in the document
-      var placeholderTextWatcher = new CKEDITOR.plugins.textWatcher(editor,
-        function (range) {
-          updatePlaceholder(range);
-        });
+      var placeholderTextWatcher = new CKEDITOR.plugins.textWatcher(editor, updatePlaceholder);
 
       // The placeholder should update at every keystroke
       placeholderTextWatcher.ignoredKeys = [];
@@ -112,16 +109,16 @@
       });
 
 
-      /* Using contentDom event in case the DOM Tree gets recreated by CKEditor (e.g. mode change)*/
+      // Using contentDom event in case the DOM Tree gets recreated by CKEditor (e.g. mode change)
       editor.on("contentDom", function () {
 
-        /* The placeholder should update when the user clicks somewhere in the document. */
+        // The placeholder should update when the user clicks somewhere in the document.
         editor.document.$.addEventListener("click",
           function () {
             placeholderTextWatcher.check(false);
           });
 
-        /* The placeholder should update when the editor gains focus. */
+        // The placeholder should update when the editor gains focus.
         editor.document.$.addEventListener("focus",
           function () {
             placeholderTextWatcher.check(false);
@@ -148,21 +145,21 @@
       }
 
       /**
-       * Checks if an element should be considered empty
+       * Checks if a node should be considered empty
        *
-       * @param {Object} element - the DOM Element
-       * @return {bool}
+       * @param {Object} node - the DOM Node
+       * @return {bool} - True when the node is considered empty, false otherwise
        */
-      function isEmpty(element) {
+      function isEmpty(node) {
 
         // Consider the length of a text node as its number of children
-        if (element.nodeName === "#text") {
-          return !Boolean(element.length);
+        if (node.nodeName === "#text") {
+          return !Boolean(node.length);
         }
 
         var i;
-        for (i = 0; i < element.childNodes.length; i++) {
-          var child = element.childNodes[i];
+        for (i = 0; i < node.childNodes.length; i++) {
+          var child = node.childNodes[i];
 
           // Child is not considered empty if it is not ignored if empty
           if (!editor.config["xwiki-focusedplaceholder"].ignoreIfEmpty.includes(child.nodeName.toLowerCase())) {
@@ -179,28 +176,28 @@
       }
 
       /**
-       * Finds the first configured ancestor of a DOM element
+       * Finds the first configured ancestor of a DOM Node
        *
-       * @param {Object} element
-       * @return {Object} - The first configured ancestor
+       * @param {Object} node
+       * @return {Object} - The first configured ancestor, null if none were found
        */
-      function getFirstConfiguredAncestor(element) {
+      function getFirstConfiguredAncestor(node) {
 
         // No parents
-        if (element === null) {
-          return element;
+        if (node === null) {
+          return node;
         }
-        if (element.parentNode === null) {
-          return element.parentNode;
+        if (node.parentNode === null) {
+          return node.parentNode;
         }
 
         // Configured element
-        if (element.tagName !== undefined &&
-          editor.config["xwiki-focusedplaceholder"].placeholder[element.tagName.toLowerCase()] !== undefined) {
-          return element;
+        if (node.tagName !== undefined &&
+          editor.config["xwiki-focusedplaceholder"].placeholder[node.tagName.toLowerCase()] !== undefined) {
+          return node;
         }
 
-        return getFirstConfiguredAncestor(element.parentNode);
+        return getFirstConfiguredAncestor(node.parentNode);
 
       }
 
@@ -232,10 +229,10 @@
       }
 
       /**
-       * Returns the expected placeholder text for a given element
+       * Returns the expected placeholder text for a given tagName
        *
        * @param {string} tag - Lowercase tagName
-       * @return {string}
+       * @return {string} - Placeholder text
        */
       function getPlaceholderContent(tag) {
 

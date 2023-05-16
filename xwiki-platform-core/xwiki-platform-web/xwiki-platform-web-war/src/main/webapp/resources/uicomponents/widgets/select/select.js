@@ -35,7 +35,7 @@ require(['jquery'], function($) {
      * Send an event to say that the selection have changed
      */
     self.triggerSelectionChange = function () {
-      self.selectWidget.trigger('xwiki:select:updated', {'elements': self.selectWidget});
+      self.selectWidget.trigger('xwiki:select:updated', {'elements': self.selectWidget[0]});
     };
 
     /**

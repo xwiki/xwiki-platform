@@ -131,8 +131,12 @@ require(['jquery'], function($) {
      */
     self.onOptionUpKeyPressed = function() {
       let highlightedOption = self.selectWidget.find('.xwiki-select-option-highlighted');
-      // The selector hereafter supposes that the first element of a category is always its label.
-      let firstOptions = $('.xwiki-select-category .xwiki-select-option:nth-child(2)');
+      // The selector hereafter supposes that the first visible element of a category is always its label.
+      let firstOptions = $();
+      $('.xwiki-select-category').each(function( index ) {
+        firstOptions = firstOptions.add($(this).find(".xwiki-select-option:visible:eq(0)"));
+      });
+
       let previousGroupFirstElement = firstOptions.eq(firstOptions.index(highlightedOption) - 1);
       if (previousGroupFirstElement && $.contains(self.selectWidget.get(0), previousGroupFirstElement.get(0))) {
         self.changeHighlight(previousGroupFirstElement);
@@ -151,7 +155,11 @@ require(['jquery'], function($) {
     self.onOptionDownKeyPressed = function() {
       let highlightedOption = self.selectWidget.find('.xwiki-select-option-highlighted');
       // The selector hereafter supposes that the first element of a category is always its label.
-      let firstOptions = $('.xwiki-select-category .xwiki-select-option:nth-child(2)');
+      let firstOptions = $();
+      $('.xwiki-select-category').each(function( index ) {
+        firstOptions = firstOptions.add($(this).find(".xwiki-select-option:visible:eq(0)"));
+      });
+
       let nextGroupFirstElement = firstOptions.eq(firstOptions.index(highlightedOption) + 1);
       if (nextGroupFirstElement && $.contains(self.selectWidget.get(0), nextGroupFirstElement.get(0))) {
         self.changeHighlight(nextGroupFirstElement);

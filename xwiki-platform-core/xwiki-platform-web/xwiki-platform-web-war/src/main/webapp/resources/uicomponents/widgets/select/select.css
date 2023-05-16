@@ -77,11 +77,6 @@
   clear: both;
 }
 
-.xwiki-select-option-selected {
-  background-color: $theme.highlightColor;
-  border: 1px dotted #CCC;
-}
-
 .xwiki-select-option, .xwiki-select-option > label {
   cursor: pointer;
 }
@@ -101,10 +96,6 @@
 .xwiki-select-option-icon > img{
   height: 20px;
   width: 20px;
-}
-
-.xwiki-select-option:hover {
-  background-color: $theme.highlightColor;
 }
 
 .skin-colibri .xwiki-select-option {

@@ -2626,8 +2626,11 @@ Recursive title display detected!##
     <span id="${escapedId}-listbox-label" class="sr-only">
       $escapetool.xml($services.localization.render('web.widgets.select.listbox.label', [$fieldName]))
     </span>
-    <div id="${escapedId}-listbox" role='listbox' class="xwiki-select-options"
-      tabindex='0' aria-labelledby="${escapedId}-listbox-label">
+    <span id="${escapedId}-listbox-description" class="sr-only">
+      $escapetool.xml($services.localization.render('web.widgets.select.listbox.description'))
+    </span>
+    <div id="${escapedId}-listbox" role='listbox' class='xwiki-select-options' tabindex='0'
+      aria-labelledby="${escapedId}-listbox-label" aria-describedby="${escapedId}-listbox-description">
       #set ($count = 0)
       #foreach ($category in $options)
         <ul id="${escapedId}-group${count}" role='group' class="xwiki-select-category">

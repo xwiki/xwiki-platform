@@ -189,6 +189,7 @@ require(['jquery'], function($) {
      */
     self.onOptionKeyPressed = function (event) {
       var key = event.keyCode;
+      let preventDefault = true;
       switch (key) {
         case 37: {
           self.onOptionLeftKeyPressed();
@@ -200,12 +201,10 @@ require(['jquery'], function($) {
         }
         case 38: {
           self.onOptionUpKeyPressed();
-          event.preventDefault();
           break;
         }
         case 40: {
           self.onOptionDownKeyPressed();
-          event.preventDefault();
           break;
         }
         case 13:
@@ -222,8 +221,10 @@ require(['jquery'], function($) {
           break;
         }
         default:
+          preventDefault = false;
           break;
       }
+      if (preventDefault) event.preventDefault();
     };
 
     /**

@@ -29,12 +29,14 @@
   </parent>
   <artifactId>xwiki-platform-tag-api</artifactId>
   <name>XWiki Platform - Tag - API</name>
-  <description>XWiki Platform - Tag - API</description>
+  <description>API for manipulating tags (create, delete, rename, search)</description>
   <properties>
     <!-- code coverage: it is not much, but it is a start -->
     <xwiki.jacoco.instructionRatio>0.32</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Tag API</xwiki.extension.name>
+    <!-- Category to display in the Extension Manager. -->
+    <xwiki.extension.category>api</xwiki.extension.category>
     </properties>
   <dependencies>
     <dependency>

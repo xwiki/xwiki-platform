@@ -34,7 +34,7 @@
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Model Validation API</xwiki.extension.name>
     <!-- Category to display by the Extension Manager -->
-    <xwiki.extension.category>jar</xwiki.extension.category>
+    <xwiki.extension.category>api</xwiki.extension.category>
   </properties>
   <dependencies>
     <dependency>

@@ -30,11 +30,13 @@
   <artifactId>xwiki-platform-link</artifactId>
   <name>XWiki Platform - Link</name>
   <packaging>jar</packaging>
-  <description>Tools to manipulate links found in documents</description>
+  <description>API to manipulate links found in documents</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.0</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Link API</xwiki.extension.name>
+    <!-- Category to display by the Extension Manager -->
+    <xwiki.extension.category>api</xwiki.extension.category>
   </properties>
   <dependencies>
     <dependency>

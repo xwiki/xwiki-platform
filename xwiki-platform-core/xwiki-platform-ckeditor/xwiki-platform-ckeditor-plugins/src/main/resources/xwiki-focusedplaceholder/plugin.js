@@ -24,26 +24,6 @@
 
   CKEDITOR.plugins.add('xwiki-focusedplaceholder', {
 
-    /**
-     * Styles that would be applied to the editor by the placeholder text when visible.
-     *
-     * @property {String}
-     */
-    placeholderStyle: '[' + ATTRIBUTE_NAME + ']::before {' +
-      'position: absolute;' +
-      'opacity: .8;' +
-      'color: #aaa;' +
-      'content: attr( ' + ATTRIBUTE_NAME + ' );' +
-      '}' +
-      '.cke_wysiwyg_div[' + ATTRIBUTE_NAME + ']::before {' +
-      'margin-top: 1em;' +
-      '}',
-
-    onLoad: function () {
-      // Adding the style only when the editor is loaded prevents placeholders to appear in view mode
-      CKEDITOR.addCss(this.placeholderStyle);
-    },
-
     beforeInit: function (editor) {
       // Default plugin configuration, to be overriden by other plugins
       editor.config["xwiki-focusedplaceholder"] = {
@@ -118,6 +98,20 @@
     },
 
     init: function (editor) {
+
+      // Filter out placeholders when saving
+      var filterPlaceholders = {
+        elements: {
+          '^': function (element) {
+            if (element.attributes[ATTRIBUTE_NAME] !== undefined) {
+              delete element.attributes[ATTRIBUTE_NAME];
+            }
+          },
+        }
+      };
+      var htmlFilter = editor.dataProcessor && editor.dataProcessor.htmlFilter;
+      htmlFilter.addRules(filterPlaceholders);
+
 
       // Create a TextWatcher instance to detect changes in the document
       var placeholderTextWatcher = new CKEDITOR.plugins.textWatcher(editor, updatePlaceholder);

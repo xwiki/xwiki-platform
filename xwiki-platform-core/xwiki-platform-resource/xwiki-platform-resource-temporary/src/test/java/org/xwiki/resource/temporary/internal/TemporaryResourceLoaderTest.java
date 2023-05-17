@@ -86,6 +86,7 @@ class TemporaryResourceLoaderTest
         assertNull(this.resourceLoader.load(resourceReference));
 
         assertEquals("Failed to get the temporary resource's content for [type = [tmp], parameters = [], "
-            + "reference = [wiki:space.page], action = [], locale = [<null>]]", logCapture.getMessage(0));
+                + "reference = [wiki:space.page], action = [], locale = [<null>], anchor = [<null>]]",
+            this.logCapture.getMessage(0));
     }
 }

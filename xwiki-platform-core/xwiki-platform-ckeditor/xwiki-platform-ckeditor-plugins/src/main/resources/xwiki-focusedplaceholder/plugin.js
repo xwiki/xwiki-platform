@@ -24,41 +24,31 @@
 
   CKEDITOR.plugins.add('xwiki-focusedplaceholder', {
 
+    /**
+     * Styles that would be applied to the editor by the placeholder text when visible.
+     *
+     * @property {String}
+     */
+    placeholderStyle: '[' + ATTRIBUTE_NAME + ']::before {' +
+      'position: absolute;' +
+      'opacity: .8;' +
+      'color: #aaa;' +
+      'content: attr( ' + ATTRIBUTE_NAME + ' );' +
+      '}' +
+      '.cke_wysiwyg_div[' + ATTRIBUTE_NAME + ']::before {' +
+      'margin-top: 1em;' +
+      '}',
+
+    onLoad: function () {
+      // Adding the style only when the editor is loaded prevents placeholders to appear in view mode
+      CKEDITOR.addCss(this.placeholderStyle);
+    },
+
     beforeInit: function (editor) {
       // Default plugin configuration, to be overriden by other plugins
       editor.config["xwiki-focusedplaceholder"] = {
-        // Default placeholder for content sectioning, text and table HTML tags
-        placeholder: {
-          body: "xwiki-focusedplaceholder.placeholder.body", // Body
-          address: "xwiki-focusedplaceholder.placeholder.address", // Address
-          aside: "xwiki-focusedplaceholder.placeholder.aside", // Aside
-          footer: "xwiki-focusedplaceholder.placeholder.footer", // Footer
-          header: "xwiki-focusedplaceholder.placeholder.header", // Header
-          h1: "xwiki-focusedplaceholder.placeholder.h1", // Heading 1
-          h2: "xwiki-focusedplaceholder.placeholder.h2", // Heading 2
-          h3: "xwiki-focusedplaceholder.placeholder.h3", // Heading 3
-          h4: "xwiki-focusedplaceholder.placeholder.h4", // Heading 4
-          h5: "xwiki-focusedplaceholder.placeholder.h5", // Heading 5
-          h6: "xwiki-focusedplaceholder.placeholder.h6", // Heading 6
-          main: "xwiki-focusedplaceholder.placeholder.main", // Main content
-          nav: "xwiki-focusedplaceholder.placeholder.nav", // Navigation
-          section: "xwiki-focusedplaceholder.placeholder.section", // Section
-          blockquote: "xwiki-focusedplaceholder.placeholder.blockquote", // Quote
-          dl: "xwiki-focusedplaceholder.placeholder.dl", // Definition list
-          dt: "xwiki-focusedplaceholder.placeholder.dt", // Definition entry
-          dd: "xwiki-focusedplaceholder.placeholder.dd", // Description
-          figcaption: "xwiki-focusedplaceholder.placeholder.figcaption", // Caption
-          figure: "xwiki-focusedplaceholder.placeholder.figure", // Figure
-          ol: "xwiki-focusedplaceholder.placeholder.ol", // Ordered list
-          ul: "xwiki-focusedplaceholder.placeholder.ul", // Unordered list
-          menu: "xwiki-focusedplaceholder.placeholder.menu", // Menu (unordered list)
-          li: "xwiki-focusedplaceholder.placeholder.li", // List item
-          p: "xwiki-focusedplaceholder.placeholder.p", // Paragraph
-          pre: "xwiki-focusedplaceholder.placeholder.pre", // Preformated
-          caption: "xwiki-focusedplaceholder.placeholder.caption", // Title
-          th: "xwiki-focusedplaceholder.placeholder.th", // Header
-          td: "xwiki-focusedplaceholder.placeholder.td", // Cell
-        },
+        // Left empty to be configured in the next instruction
+        placeholder: {},
         /* Empty inline tags (or nodeNames) that usually do not appear on screen should be ignored by default
          * because they might get propagated to new lines by CKEditor*/
         ignoreIfEmpty: [
@@ -87,6 +77,44 @@
           "ins",
         ],
       };
+
+      // Add generic default placeholders for content sectioning, text and table HTML tags
+      [
+        "body",
+        "address",
+        "aside",
+        "footer",
+        "header",
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6",
+        "main",
+        "nav",
+        "section",
+        "blockquote",
+        "dl",
+        "dt",
+        "dd",
+        "figcaption",
+        "figure",
+        "ol",
+        "ul",
+        "menu",
+        "li",
+        "p",
+        "pre",
+        "caption",
+        "th",
+        "td",
+      ].forEach(function (tagName) {
+        editor
+          .config["xwiki-focusedplaceholder"]
+          .placeholder[tagName] = "xwiki-focusedplaceholder.placeholder." + tagName;
+      });
+
     },
 
     init: function (editor) {
@@ -101,34 +129,34 @@
         // Attach the textWatcher to the editor
         placeholderTextWatcher.attach();
 
-        /* The placeholder should update when the content is changed via menus.
-         * snapshots are created when that occurs*/
+        // The placeholder should update when the content is changed via menus.
+        // snapshots are created when that occurs
         editor.on("saveSnapshot", function () {
           placeholderTextWatcher.check(false);
         });
-      });
 
+      });
 
       // Using contentDom event in case the DOM Tree gets recreated by CKEditor (e.g. mode change)
       editor.on("contentDom", function () {
-
+        var editable = editor.editable();
         // The placeholder should update when the user clicks somewhere in the document.
-        editor.document.$.addEventListener("click",
+        editable.attachListener(editable, "click",
           function () {
             placeholderTextWatcher.check(false);
           });
 
         // The placeholder should update when the editor gains focus.
-        editor.document.$.addEventListener("focus",
+        editable.attachListener(editable, "focus",
           function () {
             placeholderTextWatcher.check(false);
           });
 
-        /* The placeholder should disappear when the editor loses focus.
-         * (The empty document placeholder might appear) */
-        editor.document.$.addEventListener("blur",
+        // The placeholder should disappear when the editor loses focus.
+        // (The empty document placeholder might appear)
+        editable.attachListener(editable, "blur",
           function () {
-            removeAllPlaceholders(editor.document.$);
+            removeAllPlaceholders(editor.editable().$);
           });
 
       });
@@ -208,7 +236,7 @@
        */
       function updatePlaceholder(range) {
         // Clear previous placeholders
-        removeAllPlaceholders(range.document.$);
+        removeAllPlaceholders(range.root.$);
 
         // No placeholder when a selection is occuring
         if (!range.collapsed) {

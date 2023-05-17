@@ -242,14 +242,6 @@ a[data-linktype="create"]::after {
   display: block;
 }
 
-[data-xwiki-focusedplaceholder]::before {
-  /* Show the value of the focused line placeholder attribute */
-  position: absolute;
-  opacity: .8;
-  color: #aaa;
-  content: attr(data-xwiki-focusedplaceholder);
-}
-
 /* Inline widgets (macros) have display:inline-block and thus don't inherit the text-decoration styles. We fix this by
   applying the styles directly for the text-decoration values that are commonly used.
   See CKEDITOR-282: Strikethrough not displayed for macros */

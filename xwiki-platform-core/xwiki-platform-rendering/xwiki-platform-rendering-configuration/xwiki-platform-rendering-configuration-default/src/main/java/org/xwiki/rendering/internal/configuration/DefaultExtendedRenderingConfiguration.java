@@ -103,7 +103,9 @@ public class DefaultExtendedRenderingConfiguration implements ExtendedRenderingC
         List<Syntax> disabledSyntaxes = new ArrayList<>();
         List<String> disabledSyntaxesAsStrings = this.renderingConfiguration.getProperty(DISABLED_SYNTAXES_PROPERTY);
         // Convert into a list of Syntax objects
-        disabledSyntaxes.addAll(convertList(disabledSyntaxesAsStrings));
+        if (disabledSyntaxesAsStrings != null) {
+            disabledSyntaxes.addAll(convertList(disabledSyntaxesAsStrings));
+        }
         return disabledSyntaxes;
     }
 

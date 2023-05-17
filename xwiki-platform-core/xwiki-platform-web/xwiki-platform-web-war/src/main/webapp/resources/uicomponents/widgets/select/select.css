@@ -68,13 +68,7 @@
 }
 
 .xwiki-select-options > ul > li {
-  clear: both;
   flex-basis: 50%;
-}
-
-/* Make sure we create a new line every 2 items (like a grid) */
-.xwiki-select-option:nth-child(2n+1) {
-  clear: both;
 }
 
 .xwiki-select-option, .xwiki-select-option > label {

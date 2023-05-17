@@ -58,16 +58,20 @@ require(['jquery'], function($) {
         return;
       }
       input.prop('checked', true);
+      // Clear the previous option selected
       let previousSelection = self.selectWidget.find('.xwiki-select-option-selected');
       previousSelection.removeClass('xwiki-select-option-selected');
-      let previousHighlight = self.selectWidget.find('.xwiki-select-option-highlighted');
       previousSelection.removeAttr('aria-selected');
+      // Clear the previous option highlighted
+      let previousHighlight = self.selectWidget.find('.xwiki-select-option-highlighted');
       if (previousHighlight) previousHighlight.removeClass('xwiki-select-option-highlighted');
-      // Set aria-activedescendant on the second level parent, which should be the lsitbox object.
+      // Set aria-activedescendant on the second level parent, which should be the listbox object.
       option.parent().parent().attr('aria-activedescendant', option.attr('id'));
+      // Update the new highlighted option
+      self.changeHighlight(option);
+      // Update the new selected option
       option.addClass('xwiki-select-option-selected');
       option.attr('aria-selected', 'true');
-      self.changeHighlight(option);
       self.triggerSelectionChange();
     };
 
@@ -85,7 +89,8 @@ require(['jquery'], function($) {
      };
 
     /**
-     *
+     * Callback when the enter or space key is pressed when focusing an option.
+     * Essential for keyboard support of select.
      */
      self.onOptionSelectHighlighted = function() {
        let highlightedOption = self.selectWidget.find('.xwiki-select-option-highlighted');
@@ -186,6 +191,7 @@ require(['jquery'], function($) {
 
     /**
      * Callback used when a key is pressed down when selecting the options.
+     * @since 15.4RC1
      */
     self.onOptionKeyPressed = function (event) {
       var key = event.keyCode;

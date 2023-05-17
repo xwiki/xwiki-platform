@@ -95,7 +95,7 @@
 
 #macro (displayProperty_syntax $parameters)
   #if ($parameters.mode == 'edit')
-    #set ($configuredSyntaxes = $services.rendering.configuredSyntaxes)
+    #set ($configuredSyntaxes = $collectiontool.sort($services.rendering.configuredSyntaxes))
     #set ($availableParserSyntaxes = $services.rendering.availableParserSyntaxes)
     #set ($availableRendererSyntaxes = $services.rendering.availableRendererSyntaxes)
     <select id="$!escapetool.xml($parameters.id)" name="$!escapetool.xml($parameters.name)" data-type="syntax">

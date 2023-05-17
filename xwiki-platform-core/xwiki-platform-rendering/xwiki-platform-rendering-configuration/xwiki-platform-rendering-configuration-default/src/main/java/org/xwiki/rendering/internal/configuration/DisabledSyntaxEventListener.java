@@ -104,7 +104,11 @@ public class DisabledSyntaxEventListener implements EventListener
         XWikiContext xcontext = (XWikiContext) data;
         try {
             XWikiDocument document = xwiki.getDocument(DOC_REFERENCE, xcontext);
-            if (document.getXObject(CLASS_REFERENCE) == null) {
+            // Don't create the document if it doesn't exist. The reason being that the goal of this listener is not
+            // to create that doc (which is supposed to be installed by the Rendering UI Extension).
+            // This means that if the document doesn't exist (as is the case in an empty wiki) there'll be no disabled
+            // syntaxes.
+            if (!document.isNew() && document.getXObject(CLASS_REFERENCE) == null) {
                 BaseObject xobject = document.newXObject(CLASS_REFERENCE, xcontext);
                 xobject.set("disabledSyntaxes", getDisabledSyntaxes(), xcontext);
                 xwiki.saveDocument(document,

@@ -221,4 +221,18 @@ class DisabledSyntaxEventListenerTest
         verify(this.xwiki).getDocument(any(EntityReference.class), any());
         verifyNoMoreInteractions(this.xwiki);
     }
+
+    @Test
+    void onEventWhenDocumentDoesntExist() throws Exception
+    {
+        when(this.document.isNew()).thenReturn(true);
+
+        this.listener.onEvent(new ApplicationReadyEvent(), this.xwiki, this.xContext);
+
+        // The tests are here below.
+
+        // No document save is done
+        verify(this.xwiki).getDocument(any(EntityReference.class), any());
+        verifyNoMoreInteractions(this.xwiki);
+    }
 }

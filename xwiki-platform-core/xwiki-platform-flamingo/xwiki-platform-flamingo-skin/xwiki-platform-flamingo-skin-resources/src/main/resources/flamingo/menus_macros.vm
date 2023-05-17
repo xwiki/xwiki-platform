@@ -57,7 +57,7 @@
 ###    Toplevel Left Menu
 ###
 #macro(xwikitopmenuleftstart)
-  <ul class="nav navbar-nav navbar-left">
+  <ul class='nav navbar-nav navbar-left'>
 #end
 
 ###

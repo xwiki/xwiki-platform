@@ -1160,6 +1160,7 @@
 #macro (searchAttachmentsSolr $text $limit $return)
   #set ($params = [
     'fq=type:ATTACHMENT',
+    'fq=locale:*',
     'qf=filename^4 attcontent',
     'fl=type wiki spaces name filename'
   ])

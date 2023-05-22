@@ -17,22 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-// The wrapping function is required to make sure that the dependencies are loaded before calling require.
-(function () {
-  require(['jquery'], function ($) {
-    function activateWarning(currentValueFieldName, checkboxId) {
-      if ($('[name="' + currentValueFieldName + '"]').val() === 'true') {
-        $('#' + checkboxId).change(function () {
-          if (!$(this).is(':checked')) {
-            $(this).next().removeClass("hidden");
-          } else {
-            $(this).next().addClass("hidden");
-          }
-        });
-      }
-    }
+package org.xwiki.security.test.ui;
 
-    activateWarning('initialValueScriptRequiredRight', 'scriptRequiredRight');
-    activateWarning('initialValueProgrammingRequiredRight', 'programmingRequiredRight');
-  });
-})();
+import org.xwiki.test.docker.junit5.UITest;
+
+/**
+ * @version $Id$
+ * @since 15.5RC1
+ */
+@UITest
+public class RequiredRightsIT
+{
+}

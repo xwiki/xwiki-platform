@@ -507,7 +507,7 @@ public class EditForm extends XWikiForm
 
     /**
      * @return the value of the {@code activateRequiredRights} request parameter
-     * @since 15.4RC1
+     * @since 15.5RC1
      */
     @Unstable
     public Boolean getActivateRequiredRights()
@@ -517,7 +517,7 @@ public class EditForm extends XWikiForm
 
     /**
      * @return the set of required rights defined in the request parameters
-     * @since 15.4RC1
+     * @since 15.5RC1
      */
     @Unstable
     public Set<Right> getRequiredRights()

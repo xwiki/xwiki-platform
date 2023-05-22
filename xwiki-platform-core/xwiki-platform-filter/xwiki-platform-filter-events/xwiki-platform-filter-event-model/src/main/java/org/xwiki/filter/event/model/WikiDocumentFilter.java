@@ -183,14 +183,14 @@ public interface WikiDocumentFilter
 
     /**
      * @type {@link String}
-     * @since 15.4RC1
+     * @since 15.5RC1
      */
     @Unstable
     String PARAMETER_REVISION_REQUIRED_RIGHTS = "revision_required_rights";
 
     /**
      * @type {@link String}
-     * @since 15.4RC1
+     * @since 15.5RC1
      */
     @Unstable
     String PARAMETER_REVISION_REQUIRED_RIGHTS_ACTIVATED = "revision_required_rights_activated";

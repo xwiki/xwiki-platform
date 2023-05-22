@@ -28,7 +28,7 @@ import org.xwiki.stability.Unstable;
  * Stores the required rights of a {@link org.xwiki.bridge.DocumentModelBridge}.
  *
  * @version $Id$
- * @since 15.4RC1
+ * @since 15.5RC1
  */
 @Unstable
 public interface RequiredRights

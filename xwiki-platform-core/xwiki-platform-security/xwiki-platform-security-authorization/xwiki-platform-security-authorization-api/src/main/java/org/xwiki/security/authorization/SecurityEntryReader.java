@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.security.SecurityReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * A security rules reader reads rules attached to a given entity.
@@ -50,7 +51,9 @@ public interface SecurityEntryReader
      * @return {@link Optional#empty()} if required rights are not applicable for the entity (i.e., it is not a
      *     document, or the required rights are not activated on the document), the set of required rights otherwise
      * @throws AuthorizationException in case of right issue when access the required rights
+     * @since 15.5RC1
      */
+    @Unstable
     default Optional<Set<Right>> requiredRights(SecurityReference entity) throws AuthorizationException
     {
         return Optional.empty();

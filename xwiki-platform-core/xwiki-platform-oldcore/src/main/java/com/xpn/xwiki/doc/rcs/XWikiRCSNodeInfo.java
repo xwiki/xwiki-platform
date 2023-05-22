@@ -142,7 +142,7 @@ public class XWikiRCSNodeInfo extends AbstractSimpleClass implements Comparable<
 
     /**
      * @param requiredRights the required rights of the revision
-     * @since 15.4RC1
+     * @since 15.5RC1
      */
     @Unstable
     public void setRequiredRights(Set<Right> requiredRights)
@@ -152,7 +152,7 @@ public class XWikiRCSNodeInfo extends AbstractSimpleClass implements Comparable<
 
     /**
      * @return the required rights of the revision
-     * @since 15.4RC1
+     * @since 15.5RC1
      */
     @Unstable
     public Set<Right> getRequiredRights()
@@ -162,7 +162,7 @@ public class XWikiRCSNodeInfo extends AbstractSimpleClass implements Comparable<
 
     /**
      * @return {@code true} when the required rights are activated
-     * @since 15.4RC1
+     * @since 15.5RC1
      */
     @Unstable
     public boolean isRequiredRightsActivated()
@@ -172,7 +172,7 @@ public class XWikiRCSNodeInfo extends AbstractSimpleClass implements Comparable<
 
     /**
      * @param requiredRightsActivated {@code true} when the required rights are activated, {@code false} otherwise
-     * @since 15.4RC1
+     * @since 15.5RC1
      */
     @Unstable
     public void setRequiredRightsActivated(boolean requiredRightsActivated)

@@ -32,7 +32,7 @@ import org.xwiki.context.ExecutionContext;
  * Check if the required rights have been deactivated through the execution context.
  *
  * @version $Id$
- * @since 15.4RC1
+ * @since 15.5RC1
  */
 @Component(roles = RequiredRightsSkipContext.class)
 @Singleton

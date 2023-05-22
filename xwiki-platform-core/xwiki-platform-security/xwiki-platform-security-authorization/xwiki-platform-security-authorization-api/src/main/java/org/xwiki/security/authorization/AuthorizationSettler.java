@@ -26,6 +26,7 @@ import java.util.Set;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.UserSecurityReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * An AuthorizationSettler compute the resulting access for a given user,
@@ -72,8 +73,10 @@ public interface AuthorizationSettler
      * @param requiredRights the set of required rights, {@code null} if the required rights are not activated for a
      *     given document
      * @param requiredRightsActivated when {@code true}, the required rights are activated on the entity
-     * @return the computed access for the given user.
+     * @return the computed access for the given user
+     * @since 15.5RC1
      */
+    @Unstable
     default SecurityAccessEntry settle(UserSecurityReference user,
         Collection<GroupSecurityReference> groups,
         Deque<SecurityRuleEntry> securityRuleEntries, Set<Right> requiredRights, boolean requiredRightsActivated)

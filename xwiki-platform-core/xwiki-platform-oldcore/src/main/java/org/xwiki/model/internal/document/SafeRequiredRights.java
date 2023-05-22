@@ -31,7 +31,7 @@ import static org.xwiki.script.internal.safe.AbstractSafeObject.FORBIDDEN;
  * version is {@link DefaultRequiredRights}.
  *
  * @version $Id$
- * @since 15.3RC1
+ * @since 15.5RC1
  */
 public class SafeRequiredRights implements RequiredRights
 {

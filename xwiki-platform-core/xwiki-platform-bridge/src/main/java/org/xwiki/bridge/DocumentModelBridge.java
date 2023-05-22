@@ -153,7 +153,7 @@ public interface DocumentModelBridge
 
     /**
      * @return the required rights of the document
-     * @since 15.4RC1
+     * @since 15.5RC1
      */
     @Unstable
     default RequiredRights getRequiredRights()

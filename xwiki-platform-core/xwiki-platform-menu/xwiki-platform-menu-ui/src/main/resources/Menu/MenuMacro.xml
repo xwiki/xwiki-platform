@@ -218,8 +218,8 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
       // We put all the content of the entry in the header,
       // except for the last one which is the content of the dropdown. This dropdown stays where it is.
       for (let index = 0; index &lt; dropDownContent.length - 1 ; index++) {
-      let item = dropDownContent[index];
-      dropDownHeader.append(item);
+        let item = dropDownContent[index];
+        dropDownHeader.append(item);
       }
       dropDownHeader.append(dropDownButton);
       $(this).prepend(dropDownHeader);

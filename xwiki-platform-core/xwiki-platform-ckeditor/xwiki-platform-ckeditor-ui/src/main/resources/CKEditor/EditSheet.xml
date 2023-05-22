@@ -1180,20 +1180,49 @@ ul.cke_autocomplete_panel {
   font: inherit;
   padding: 5px 0;
   width: auto;
-  max-width: 100%;
+  max-width: 324px;
   min-width: 200px;
 }
+.cke_autocomplete_panel &gt; li.ckeditor-autocomplete-group,
 .cke_autocomplete_panel &gt; li.ckeditor-autocomplete-item {
-  padding: 3px 12px;
+  padding: 5px 20px;
 }
-.cke_autocomplete_panel &gt; li.ckeditor-autocomplete-item &gt; div {
+.cke_autocomplete_panel &gt; li.ckeditor-autocomplete-group {
+  border-top: 1px solid $theme.borderColor;
+  color: $theme.textSecondaryColor;
+  font-size: smaller;
+  margin-top: 9px;
+  padding-top: 14px;
+}
+.cke_autocomplete_panel &gt; li.ckeditor-autocomplete-group h6 {
+  font-size: inherit;
+  margin: 0;
+}
+.cke_autocomplete_panel &gt; li.ckeditor-autocomplete-group:first-child {
+  border-top: 0 none;
+  margin-top: 0;
+  padding-top: 5px;
+}
+.cke_autocomplete_panel &gt; li.ckeditor-autocomplete-group:hover {
+  background-color: transparent;
+  cursor: inherit;
+}
+.ckeditor-autocomplete-group h6,
+.ckeditor-autocomplete-item-label,
+.ckeditor-autocomplete-item-shortcut {
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
+}
+.ckeditor-autocomplete-item-head {
+  display: flex;
+  align-items: center;
 }
 .ckeditor-autocomplete-item-icon-wrapper {
   display: inline-block;
   height: 14px;
   line-height: 14px;
-  margin-right: .3em;
+  margin-right: .5em;
   text-align: center;
   width: 14px;
 }
@@ -1208,9 +1237,29 @@ ul.cke_autocomplete_panel {
 .ckeditor-autocomplete-item-icon-wrapper img[src=""] {
   display: none;
 }
+.ckeditor-autocomplete-item-label {
+  /* Push the shortcut to the right edge of the item. */
+  flex-grow: 1;
+}
+.ckeditor-autocomplete-item-shortcut:not(:empty) {
+  background-color: $theme.borderColor;
+  border-radius: 4px;
+  padding: 2px 5px;
+  margin-left: .5em;
+}
+.ckeditor-autocomplete-item-shortcut,
 .ckeditor-autocomplete-item-hint {
   color: $theme.textSecondaryColor;
   font-size: smaller;
+}
+.ckeditor-autocomplete-item-hint {
+  /* Limit to 3 lines of text (based on line height). */
+  max-height: calc(3 * 20em / 14);
+  overflow: hidden;
+  /* Put the ellipsis at the end of the last line when the text is cut. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
 .ckeditor-autocomplete-item-hint:empty {
   margin-top: 0;
@@ -1583,6 +1632,148 @@ body[data-maximized="true"] {
     <property>
       <parameters>id=xwiki-ckeditor
 path=$xwiki.getURL('CKEditor.EditSheet', 'jsx', $escapetool.url({'v': $services.extension.installed.getInstalledExtension('org.xwiki.platform:xwiki-platform-ckeditor-ui', "wiki:$xcontext.database").version.value, 'xwiki-version': $services.extension.core.getCoreExtension('org.xwiki.platform:xwiki-platform-tree-webjar').version.value, 'fast-diff-version': $services.extension.installed.getInstalledExtension('org.webjars.npm:fast-diff', "wiki:$xcontext.database").version.value, 'bs3typeahead-version': $services.extension.installed.getInstalledExtension('org.webjars.npm:bootstrap-3-typeahead', "wiki:$xcontext.database").version.value}))</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
+  <object>
+    <name>CKEditor.EditSheet</name>
+    <number>1</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>e2cb2c4d-1b95-4e0a-ae87-04e436c75174</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>3</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>4</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>, </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>2</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>1</number>
+        <prettyName>Executed Content</prettyName>
+        <restricted>0</restricted>
+        <rows>25</rows>
+        <size>120</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>5</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>6</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>parameters</name>
+        <number>7</number>
+        <prettyName>Extension Parameters</prettyName>
+        <restricted>0</restricted>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>8</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
+      <content/>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.platform.requirejs.module</extensionPointId>
+    </property>
+    <property>
+      <name>org.xwiki.platform.requirejs.module.fusejs</name>
+    </property>
+    <property>
+      <parameters>id=fuse
+path=$services.webjars.url('org.webjars.npm:fuse.js', 'dist/fuse.basic.min.js')</parameters>
     </property>
     <property>
       <scope>wiki</scope>

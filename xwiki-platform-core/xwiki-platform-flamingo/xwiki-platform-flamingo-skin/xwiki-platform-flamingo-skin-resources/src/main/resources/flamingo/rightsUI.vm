@@ -315,7 +315,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
 #if ("$!request.section" == '' || $request.section == 'PageRights')
   #set ($discard = $xwiki.jsfx.use('rightsUI.js'))
   <h2>TODO: Required Rights</h2>
-  <form action="$escapetool.xml($xwiki.getURL($targetDocument, 'saveandcontinue'))" class="xform" method="post" name="form_name1">
+  <form action="$escapetool.xml($xwiki.getURL($targetDocument, 'saveandcontinue'))" class="xform" method="post" name="required_rights_form">
     #if ($targetDocument.requiredRights.activated())
     <dl>
       <dt>

@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-security-test</artifactId>
-    <version>15.4-SNAPSHOT</version>
+    <version>15.5-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-security-test-docker</artifactId>
   <name>XWiki Platform - Security - Tests - Functional Tests</name>
@@ -37,6 +37,15 @@
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
+    <!-- ================================
+         Runtime dependencies.
+         ================================ -->
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-macro-box</artifactId>
+      <version>${rendering.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- ================================
          Test only dependencies
          ================================ -->

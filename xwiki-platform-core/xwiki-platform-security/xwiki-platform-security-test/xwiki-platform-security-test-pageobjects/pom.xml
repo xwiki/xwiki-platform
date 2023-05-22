@@ -24,10 +24,17 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-security-test</artifactId>
-    <version>15.4-SNAPSHOT</version>
+    <version>15.5-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-security-test-pageobjects</artifactId>
-  <name>XWiki Platform - Share Page - Tests - Page Objects</name>
+  <name>XWiki Platform - Security - Tests - Page Objects</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Share Page - Tests - Page Objects</description>
+  <description>XWiki Platform - Security - Tests - Page Objects</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-docker</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

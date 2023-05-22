@@ -815,10 +815,12 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
         li {
           /* Text inside menu */
           color: @dropdown-link-color;
+          display: flex;
+          align-items: center;
+          padding: 3px 20px;
           /* Links inside menu */
           a {
-            display: block;
-            padding: 3px 20px;
+            display: inline;
             clear: both;
             font-weight: normal;
             line-height: @line-height-base;
@@ -836,7 +838,6 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
           &amp;.xDropdown &gt; .xDropdown-header {
             /* Even if we don't have links, display the content the same way */
             display: block;
-            padding: 3px 20px;
             clear: both;
             font-weight: normal;
             line-height: @line-height-base;

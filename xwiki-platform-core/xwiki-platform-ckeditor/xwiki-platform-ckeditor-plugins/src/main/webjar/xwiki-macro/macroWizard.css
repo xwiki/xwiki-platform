@@ -28,13 +28,16 @@ ul.macro-list > li.selected {
 }
 
 ul.macro-list .macro-name,
+li.auto-macro-list .macro-name,
 ul.macro-parameters .macro-parameter-name {
   color: #333;
   color: $theme.textColor;
 }
 
 ul.macro-list .macro-description,
+li.auto-macro-list .macro-description,
 ul.macro-list .macro-extension,
+li.auto-macro-list .macro-extension,
 .macro-editor .macro-description,
 ul.macro-parameters .macro-parameter-description,
 ul.macro-parameters > li.more,
@@ -45,8 +48,13 @@ ul.macro-parameter-group-members > li.more {
   font-size: smaller;
 }
 
+li.auto-macro-list .macro-description {
+  width: 0;
+  min-width: 100%;
+}
 
-ul.macro-list .macro-extension {
+ul.macro-list .macro-extension,
+li.auto-macro-list .macro-extension {
   margin-right: 1em;
 }
 

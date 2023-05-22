@@ -365,6 +365,133 @@
       ((editor.config['xwiki-macro'] || {}).insertButtons || []).forEach(function(definition) {
         macroPlugin.maybeRegisterDedicatedInsertMacroButton(editor, definition);
       });
+
+      // Autocompletion with {
+
+      // Badges template
+      var badgesTemplate = "";
+      for (var i = 0; i < 3; i++) {
+        badgesTemplate += '<span class="badge">{badge' + i + '}</span>';
+      }
+
+      // Register the macro autocomplete configuration
+      editor.config.mentions = editor.config.mentions || [];
+      editor.config.mentions.push({
+        marker: '{',
+        minChars: 0,
+        itemsLimit: 6,
+        itemTemplate: '<li class="auto-macro-list" data-id="{id}">' +
+          '<div class="auto-macro-title">' +
+          '<span class="macro-name">{label}</span>' +
+          '<span class="macro-extension">{extensionName}</span>' +
+          '<span class="macro-categories-badges">' +
+          badgesTemplate +
+          '<span class="badge">{recommended}</span>' +
+          '</span>' +
+          '</div>' +
+          '<div class="macro-description">{description}</div>' +
+          '</li>',
+        feed: function (opts, callback) {
+          require(['macroService', 'l10n!macroSelector'], function (macroService, translations) {
+            macroService.getMacros(XWiki.docsyntax).done(function (macros) {
+
+              var items = [];
+              macros.forEach(function (macro) {
+                // Search macros by name
+                if (macro.name.toLowerCase().includes(opts.query.toLowerCase())) {
+
+                  // Minimal item object
+                  var item = {
+                    id: macro.id.id,
+                    label: macro.name,
+                    description: macro.description,
+                    installed: true,
+                    extensionName: "",
+                    recommended: "",
+                  };
+
+                  // Set the badges attributes
+                  for (var i = 0; i < 3; i++) {
+                    item["badge" + i] = macro.categories[i] ? macro.categories[i].label : "";
+                  }
+
+                  // Not installed macros have extra attributes
+                  if (macro.categories.some(function (cat) {
+                      return cat.id === "_notinstalled";
+                    }) && macro.extensionInstallAllowed && macro.extensionVersion) {
+                    item.extensionId = macro.extensionId;
+                    item.extensionVersion = macro.extensionVersion;
+                    item.extensionName = " - " + macro.extensionName;
+                    if (macro.extensionRecommended) {
+                      item.recommended = translations.get('recommended');
+                    }
+                  }
+
+                  items.push(item);
+                }
+              });
+
+              // Show the found macros
+              callback(items);
+            });
+          });
+        },
+
+        outputTemplate: function (item) {
+
+          editor.once('afterInsertHtml', function () {
+            require(['macroService', 'l10n!macroSelector'], function (macroService, translations) {
+              var insertMacro = function () {
+
+                // Retrieve required parameters
+                macroService.getMacroDescriptor(item.id).done(function (descriptor) {
+
+                  for (var param in descriptor.parameterDescriptorMap) {
+                    // Show the insertion dialog if at least one of the parameters is mandatory
+                    if (descriptor.parameterDescriptorMap[param].mandatory) {
+                      editor.execCommand('xwiki-macro', {
+                        name: item.id
+                      });
+                      return;
+                    }
+                  }
+
+                  // Minimal insertion parameters
+                  var insertParam = {
+                    name: item.id,
+                    parameters: {},
+                  };
+
+                  // Set an empty default content when it is mandatory
+                  if (descriptor.contentDescriptor && descriptor.contentDescriptor.mandatory) {
+                    insertParam.content = " ";
+                  }
+
+                  // Insert the empty macro
+                  editor.execCommand('xwiki-macro-insert', insertParam);
+                });
+              };
+
+              // Show a confirmation dialog when the macro is not installed
+              if (item.extensionVersion) {
+                if (window.confirm(translations.get('install.confirm', item.extensionName, item.extensionVersion))) {
+                  macroService.installMacro(item.extensionId, item.extensionVersion).done(function () {
+                    // Force update the macro list to get the newly installed macro
+                    macroService.getMacros(XWiki.docsyntax, true);
+                    // Insert the macro once it has been installed
+                    insertMacro();
+                  });
+                }
+
+                return;
+              }
+              insertMacro();
+            });
+          });
+          return '';
+        },
+      });
+
     },
 
     // Setup the balloon tool bar for the nested editables, after the balloontoolbar plugin has been fully initialized.

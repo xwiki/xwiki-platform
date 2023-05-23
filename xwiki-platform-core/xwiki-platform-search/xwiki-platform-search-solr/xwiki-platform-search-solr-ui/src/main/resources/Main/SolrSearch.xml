@@ -198,14 +198,26 @@
     }
   };
 
-  var addFacetValueCheckbox = function() {
+  var addFacetValueCheckbox = function(index) {
+    var facetsContainer = $(this).parents('.search-facet').first();
     var checkBox = $(document.createElement('input')).attr('type', 'checkbox');
+    let checkBoxId = facetsContainer.attr('data-name') + '-' + index.toString() + '-checkbox';
+    checkBox.attr('id', checkBoxId);
+    var checkBoxLabel = $(document.createElement('label'));
+    checkBoxLabel.attr('for', checkBoxId);
+    checkBoxLabel.addClass('sr-only');
+    // We duplicate the content of the anchor instead of having it be a label
+    // because we want to keep the use case "Open in a new page" possible.
+    $(this).contents().clone().appendTo(checkBoxLabel);
     checkBox.prop('checked', $(this).hasClass('selected'));
     // Add the 'checked' attribute so that it can be easily located with CSS.
     checkBox.prop('checked') &amp;&amp; checkBox.attr('checked', 'checked');
     checkBox.on('click', this.click.bind(this));
     // Remove the 'selected' class because the selected state is marked using the check box.
-    $(this).removeClass('selected').before(checkBox);
+    $(this).removeClass('selected')
+    // Add the checkbox to the DOM
+    $(this).before(checkBox)
+    $(this).before(checkBoxLabel);
   };
 
   var enhanceSearchFacets = function() {
@@ -784,6 +796,7 @@ a.search-result-highlightAll:after {
 }
 
 .search-facet-body li {
+  display: flex;
   padding: .1em .2em;
 }
 
@@ -839,8 +852,8 @@ a.search-result-highlightAll:after {
 }
 
 .search-facet-body .itemCount {
-  float: right;
   padding: .1em 0;
+  margin-left: auto;
 }
 
 @media (max-width: 768px) {

@@ -51,3 +51,4 @@ set JETTY_OPTS=%JETTY_OPTS% STOP.KEY=xwiki STOP.PORT=%JETTY_STOP_PORT%
 REM Pause so that the command window used to run this script doesn't close automatically in case of problem
 REM (like when the JDK/JRE is not installed)
 PAUSE
+

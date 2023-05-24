@@ -804,6 +804,7 @@ a.search-result-highlightAll:after {
 
 .search-facet-body li {
   display: flex;
+  flex-wrap: wrap;
   padding: .1em .2em;
 }
 

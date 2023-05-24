@@ -524,7 +524,7 @@
     </property>
     <property>
       <code>.search-facet-body .customDateInterval label {
-  display: block;
+  display: flex;
 }
 .search-facet-body .customDateInterval .itemName {
   cursor: pointer;

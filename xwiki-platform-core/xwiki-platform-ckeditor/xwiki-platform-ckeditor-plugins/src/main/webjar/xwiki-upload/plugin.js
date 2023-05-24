@@ -59,16 +59,36 @@
         return startMarker + image + stopMarker;
       });
 
-      // Chrome uses 'image.png' as file name when pasting images, instead of leaving the file name empty, and this
-      // prevents us from using the configured default file name.
-      // See CKEDITOR-169: Image upload by copy & paste overwrites previous ones
+      // Chrome uses 'image.png', or a localized form (e.g., 'graphik.png' in German) as file name when pasting images,
+      // instead of leaving the file name empty, and this prevents us from using the configured default file name.
+      // Keeping the same name would override again and again the same attachment, which is problematic when more than
+      // one image is pasted to the same page.
+      // Instead, we integrate the timestamp and a random number between the filename and the file extension.
+      // For instance, 'image.png' becomes 'image-1684887709-691.png'
       // See https://github.com/ckeditor/ckeditor-dev/issues/664
       var oldCreate = editor.uploadRepository.create;
-      editor.uploadRepository.create = function(file, name) {
-        // jshint camelcase:false
-        var defaultFileName = editor.config.fileTools_defaultFileName;
-        if (!name && file && file.type === 'image/png' && file.name === 'image.png' && defaultFileName) {
-          name = defaultFileName + '.png';
+      
+      var duringPaste = false;
+
+      editor.on('beforePaste', function () {
+        duringPaste = true;
+      });
+
+      editor.on('afterPaste', function () {
+        duringPaste = false;
+      });
+
+      editor.uploadRepository.create = function (file, name) {
+        if (duringPaste) {
+          var splitName = file.name.split(".");
+          // Note: pop is stateful and needs to be executed before join.
+          var extension = splitName.pop();
+          var fileName = splitName.join(".");
+          var timestamp = Date.now();
+          var min = 100;
+          var max = 999;
+          var random = Math.floor(Math.random() * (max - min + 1)) + min;
+          name = fileName + '-' + timestamp + '-' + random + '.' + extension;
         }
         return oldCreate.call(this, file, name);
       };

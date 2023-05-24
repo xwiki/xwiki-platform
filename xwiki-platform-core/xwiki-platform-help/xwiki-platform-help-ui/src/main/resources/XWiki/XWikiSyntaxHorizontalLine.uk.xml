@@ -22,26 +22,49 @@
 
 <xwikidoc locale="uk">
   <web>XWiki</web>
-  <name>XWikiSyntaxTranslations</name>
+  <name>XWikiSyntaxHorizontalLine</name>
   <language>uk</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
-  <parent>Main.WebHome</parent>
+  <parent>XWiki.XWikiSyntax</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>XWikiSyntaxTranslations</title>
+  <title>XWikiSyntaxHorizontalLine</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>plain/1.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>help.syntaxpage.title=Посібник із синтаксису XWiki
-help.syntaxtitle=Синтаксис XWiki {0}
-help.syntaxall=Усе
-help.changesyntax=Змінити синтаксис
-help.choose_syntax=Вибрати синтаксис</content>
-</xwikidoc>
+  <content>= Редагування =
+
+== Горизонтальна лінія ==
+
+=== Горизонтальна лінія 1.0 ===
+
+{{info}}Має бути 4 або більше дефісів.{{/info}}
+
+|=Функція|=Синтаксис XWiki 1.0|=Результат
+|Проста горизонтальна лінія|{{{----}}}|(((----)))
+|Параметризована горизонтальна лінія|&lt;hr style="border-color:blue"/&gt;|(((
+(% style="border-color:blue" %)
+----
+)))
+
+=== Горизонтальна лінія 2.0 ===
+
+{{info}}Має бути 4 або більше дефісів.{{/info}}
+
+|=Функція|=Синтаксис XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Результат
+|Проста горизонтальна лінія|{{{----}}}|(((----)))
+|Параметризована горизонтальна лінія|((({{{
+(% style="border-color:blue" %)
+----
+}}})))|(((
+(% style="border-color:blue" %)
+----
+)))</content>
+  </xwikidoc>

@@ -20,28 +20,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc locale="uk">
-  <web>XWiki</web>
-  <name>XWikiSyntaxTranslations</name>
+<xwikidoc version="1.1" locale="uk">
+  <web>IconThemesCode</web>
+  <name>Translations</name>
   <language>uk</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
-  <parent>Main.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>XWikiSyntaxTranslations</title>
-  <defaultTemplate/>
-  <validationScript/>
+  <title/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>help.syntaxpage.title=Посібник із синтаксису XWiki
-help.syntaxtitle=Синтаксис XWiki {0}
-help.syntaxall=Усе
-help.changesyntax=Змінити синтаксис
-help.choose_syntax=Вибрати синтаксис</content>
-</xwikidoc>
+  <parent>IconThemes.WebHome</parent>
+  <content>platform.icon.picker.preview=Попередній перегляд за допомогою:
+platform.icon.picker.loading=Завантаження
+rendering.macro.iconPicker.name=Вибір піктограм
+rendering.macro.iconPicker.description=Виберіть піктограму із набору піктограм XWiki.
+rendering.macro.iconPicker.parameter.id.name=Id
+rendering.macro.iconPicker.parameter.id.description=Id DOM поля введення, до якого буде застосовано засіб вибору
+rendering.macro.iconPicker.parameter.class.name=Клас
+rendering.macro.iconPicker.parameter.class.description=Клас CSS вхідних даних, до якого буде застосовано засіб вибору
+rendering.macro.iconPicker.parameter.prefix.name=Префікс
+rendering.macro.iconPicker.parameter.prefix.description=Префікс, який потрібно додати перед назвою значка в полі введення (за умовчанням: "image:icon:")
+</content>
+  </xwikidoc>

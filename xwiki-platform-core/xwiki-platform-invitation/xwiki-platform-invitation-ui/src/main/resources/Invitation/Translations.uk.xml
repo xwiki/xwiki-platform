@@ -20,28 +20,30 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc locale="uk">
-  <web>XWiki</web>
-  <name>XWikiSyntaxTranslations</name>
+<xwikidoc version="1.2" reference="Invitation.Translations" locale="uk">
+  <web>Invitation</web>
+  <name>Translations</name>
   <language>uk</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
-  <parent>Main.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <parent>Invitation.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>XWikiSyntaxTranslations</title>
-  <defaultTemplate/>
-  <validationScript/>
+  <title>Translations</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>help.syntaxpage.title=Посібник із синтаксису XWiki
-help.syntaxtitle=Синтаксис XWiki {0}
-help.syntaxall=Усе
-help.changesyntax=Змінити синтаксис
-help.choose_syntax=Вибрати синтаксис</content>
-</xwikidoc>
+  <content>invitation.applicationsPanelEntryLabel=Запрошення
+
+# Invitation Administration Section
+Invitation.WebHome_from_address.hint=Адреса електронної пошти, з якої надсилаються електронні листи із запрошенням.
+Invitation.WebHome_smtp_server_password.hint=Пароль для підключення до SMTP-сервера, лише коли потрібна автентифікація.
+Invitation.WebHome_smtp_server_username.hint=Ім’я користувача для підключення до SMTP-сервера, лише коли потрібна автентифікація.
+Invitation.WebHome_smtp_port.hint=Порт сервера SMTP, який потрібно використовувати.
+Invitation.WebHome_smtp_server.hint=SMTP-сервер, на який потрібно надіслати.
+Invitation.WebHome_javamail_extra_props.hint=Список додаткових властивостей JavaMail, які потрібно використовувати.
+</content>
+  </xwikidoc>

@@ -20,28 +20,25 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc locale="uk">
-  <web>XWiki</web>
-  <name>XWikiSyntaxTranslations</name>
-  <language>uk</language>
+<xwikidoc version="1.2" reference="Rendering.Translations" locale="ro">
+  <web>Rendering</web>
+  <name>Translations</name>
+  <language>ro</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
-  <parent>Main.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <parent>Rendering.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>XWikiSyntaxTranslations</title>
-  <defaultTemplate/>
-  <validationScript/>
+  <title>Rendering Translations</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>help.syntaxpage.title=Посібник із синтаксису XWiki
-help.syntaxtitle=Синтаксис XWiki {0}
-help.syntaxall=Усе
-help.changesyntax=Змінити синтаксис
-help.choose_syntax=Вибрати синтаксис</content>
-</xwikidoc>
+  <content>admin.syntaxes=Sintaxe
+admin.syntaxes.description=Alege sintaxa implicită a paginii și configurează sintaxele markup disponibile.
+Rendering.RenderingConfigClass_disabledSyntaxes=Sintaxele dezactivate
+Rendering.RenderingConfigClass_disabledSyntaxes.hint=Lista cu sintaxe markup in care paginile nu pot fi scrise
+</content>
+  </xwikidoc>

@@ -20,28 +20,27 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc locale="uk">
-  <web>XWiki</web>
-  <name>XWikiSyntaxTranslations</name>
+<xwikidoc version="1.3" reference="XWiki.Captcha.Translations" locale="uk">
+  <web>XWiki.Captcha</web>
+  <name>Translations</name>
   <language>uk</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
-  <parent>Main.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Captcha.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>XWikiSyntaxTranslations</title>
-  <defaultTemplate/>
-  <validationScript/>
+  <title/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>help.syntaxpage.title=Посібник із синтаксису XWiki
-help.syntaxtitle=Синтаксис XWiki {0}
-help.syntaxall=Усе
-help.changesyntax=Змінити синтаксис
-help.choose_syntax=Вибрати синтаксис</content>
-</xwikidoc>
+  <content>admin.captcha=CAPTCHA
+captcha.admin.defaultCaptchaName.label=CAPTCHA за умовчанням
+captcha.admin.defaultCaptchaName.hint=Реалізація CAPTCHA за умовчанням для використання. Використовуйте менеджер розширень для пошуку інших реалізацій, які можна встановити та використовувати.
+captcha.admin.configure.title=Налаштувати {0}
+captcha.admin.sample.title=Зразок CAPTCHA
+captcha.admin.sample.description=Приклад, як виглядає налаштована CAPTCHA, коли вона буде відображатися у формі.
+</content>
+  </xwikidoc>

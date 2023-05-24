@@ -20,28 +20,27 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc locale="uk">
-  <web>XWiki</web>
-  <name>XWikiSyntaxTranslations</name>
-  <language>uk</language>
+<xwikidoc version="1.3" reference="XWiki.Captcha.Translations" locale="ro">
+  <web>XWiki.Captcha</web>
+  <name>Translations</name>
+  <language>ro</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
-  <parent>Main.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Captcha.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>XWikiSyntaxTranslations</title>
-  <defaultTemplate/>
-  <validationScript/>
+  <title/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>help.syntaxpage.title=Посібник із синтаксису XWiki
-help.syntaxtitle=Синтаксис XWiki {0}
-help.syntaxall=Усе
-help.changesyntax=Змінити синтаксис
-help.choose_syntax=Вибрати синтаксис</content>
-</xwikidoc>
+  <content>admin.captcha=CAPTCHA
+captcha.admin.defaultCaptchaName.label=CAPTCHA predefinit
+captcha.admin.defaultCaptchaName.hint=Folosirea implementării de CAPTCHA predefinit. Utilizați Managerul de extensii pentru a căuta alte implementări pe care le puteți instala și utiliza.
+captcha.admin.configure.title=Configurează {0}
+captcha.admin.sample.title=Exemplu de CAPTCHA
+captcha.admin.sample.description=Exemplu de cum arată CAPTCHA configurat atunci când va fi afișat într-un formular.
+</content>
+  </xwikidoc>

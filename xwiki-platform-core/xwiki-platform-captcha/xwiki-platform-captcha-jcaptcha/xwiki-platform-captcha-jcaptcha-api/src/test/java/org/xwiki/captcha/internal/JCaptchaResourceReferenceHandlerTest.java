@@ -50,6 +50,7 @@ import com.octo.captcha.service.sound.SoundCaptchaService;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -169,7 +170,7 @@ public class JCaptchaResourceReferenceHandlerTest
         verify(textCaptchService, times(1)).getChallengeForID(SESSION_ID, LOCALE);
         verify(response, times(1)).setContentType("text/plain");
         verify(response, times(1)).getOutputStream();
-        verify(outputStream, times(1)).write(any());
+        verify(outputStream, times(1)).write(any(), anyInt(), anyInt());
         verify(outputStream, times(1)).close();
         verify(resourceReferenceHandlerChain, times(1)).handleNext(jCaptchaResourceReference);
     }

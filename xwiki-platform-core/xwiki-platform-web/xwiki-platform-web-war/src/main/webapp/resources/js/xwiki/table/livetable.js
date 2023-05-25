@@ -1033,7 +1033,7 @@ var LiveTablePagination = Class.create({
       'aria-label': '$escapetool.javascript($services.localization.render("platform.livetable.selectPageSize.label"))'
     });
     for (var i=this.startValue; i<=this.maxValue; i += this.step) {
-      var attrs = {'value':i, 'text':i};
+      var attrs = {'value':i};
       if (i == this.currentValue) {
         attrs.selected = true;
       } else {

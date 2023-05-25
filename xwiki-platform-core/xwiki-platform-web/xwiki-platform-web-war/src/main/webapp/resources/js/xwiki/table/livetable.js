@@ -1041,7 +1041,6 @@ var LiveTablePagination = Class.create({
         if (this.currentValue > prevStep && this.currentValue < i) {
           select.appendChild(new Element('option', {
             value: this.currentValue,
-            text: this.currentValue,
             selected: true
           }).update(this.currentValue));
         }

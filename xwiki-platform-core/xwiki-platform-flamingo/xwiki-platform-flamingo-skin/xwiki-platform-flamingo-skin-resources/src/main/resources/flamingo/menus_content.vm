@@ -164,9 +164,17 @@
           <span class="sr-only">$services.localization.render('core.menu.toggleDropdown')</span>
         </button>
       #end
-      <ul class="dropdown-menu #if ("$!actionUrl" == '')dropdown-menu-right#end">
-        $menuContent
-      </ul>
+      #if ("$!actionUrl" == '')
+        ## We use another component for the more action menu, since it has
+        ## a more complex structure with submenus.
+        <dl class='dropdown-menu dropdown-menu-right'>
+          $menuContent
+        </dl>
+      #else
+        <ul class='dropdown-menu'>
+          $menuContent
+        </ul>
+      #end
     #end
   </div>
 #end
@@ -220,8 +228,8 @@
   #setVariable("$count", $count)
 #end
 
-#macro (submenuheader $titleKey)
-  <li class="dropdown-header">$services.localization.render($titleKey)</li>
+#macro (submenuheader $titleKey, $needsSeparator)
+  <dt class="dropdown-header#if($needsSeparator) separator-above#end">$services.localization.render($titleKey)</dt>
 #end
 
 #**
@@ -402,7 +410,9 @@
       #set ($adminActions = "#displayAdminActions()")
       #if ($stringtool.isNotBlank("$!adminActions"))
         #submenuheader('core.menu.actions.main')
-        $adminActions
+        <dd><ul>
+          $adminActions
+        </ul></dd>
         #set ($needsSeparator = true)
       #end
     #end
@@ -410,11 +420,10 @@
     #if ($displayMoreActionsMenu)
       #set ($moreActions = "#displayMoreActions()")
       #if ($stringtool.isNotBlank("$!moreActions"))
-        #if ($needsSeparator)
-          #submenuseparator()
-        #end
-        #submenuheader('core.menu.actions.others')
-        $moreActions
+        #submenuheader('core.menu.actions.others', $needsSeparator)
+        <dd><ul>
+          $moreActions
+        </ul></dd>
         #set ($needsSeparator = true)
       #end
       ## ----------------------------
@@ -423,20 +432,19 @@
       #if($xwiki.hasAccessLevel('view') && $displayShortcuts)
         #set ($viewersContent = "#template('shortcuts.vm')")
         ## Only display a separator if at least one menu entry has been displayed before
-        #if ($needsSeparator)
-          #submenuseparator()
-        #end
-        #submenuheader('core.menu.actions.viewers')
+        #submenuheader('core.menu.actions.viewers', $needsSeparator)
         ##
         ## VIEW SOURCE
         ##
         #if ("$!request.rev" != '')
           #set ($revisionParameter = "&rev=$request.rev")
         #end
-        #submenuitem($doc.getURL('view', "viewer=code$!{revisionParameter}") $services.localization.render('core.menu.view.source') 'tmViewSource', '', 'search', $extraAttributes)
-        $viewersContent
-        ## Display Viewers menu UIX..
-        #displaySecureUIX('org.xwiki.platform.template.menu.viewers', [])
+        <dd><ul>
+          #submenuitem($doc.getURL('view', "viewer=code$!{revisionParameter}") $services.localization.render('core.menu.view.source') 'tmViewSource', '', 'search', $extraAttributes)
+          $viewersContent
+          ## Display Viewers menu UIX..
+          #displaySecureUIX('org.xwiki.platform.template.menu.viewers', [])
+        </ul></dd>
         #set ($needsSeparator = true)
       #end
     #end

@@ -301,6 +301,7 @@
 
 #contentmenu {
   .text-right();
+  .flat-buttons();
 
   .dropdown {
     display: inline-block;
@@ -313,5 +314,31 @@
     }
   }
 
-  .flat-buttons();
+  #tmMoreActions > dl.dropdown-menu {
+    & > dt.dropdown-header {
+      // Use the bootstrap style for our semantic architecture
+      &:extend(li.dropdown-header);
+      font-weight: initial;
+
+      // Add a css separator above the header
+      &.separator-above {
+        padding-top: 10px;
+        border-top: 1px solid @dropdown-divider-bg ;
+      }
+    }
+
+    & > dd > ul {
+      // Remove default list style
+      list-style: none;
+      padding-left: 0;
+
+      & > li > a {
+        // Use the bootstrap style for our semantic architecture
+        &:extend(.dropdown-menu > li > a);
+        &:hover, &:focus-within {
+          &:extend(.dropdown-menu > li > a:hover);
+        }
+      }
+    }
+  }
 }

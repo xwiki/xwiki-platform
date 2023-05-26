@@ -20,18 +20,24 @@
 (function () {
   'use strict';
 
+  // Declare the configuration namespace.
+  CKEDITOR.config['xwiki-focusedplaceholder'] = CKEDITOR.config['xwiki-focusedplaceholder'] || {
+    __namespace: true,
+    placeholder: {
+      __namespace: true
+    }
+  };
+
   var ATTRIBUTE_NAME = 'data-xwiki-focusedplaceholder';
 
   CKEDITOR.plugins.add('xwiki-focusedplaceholder', {
 
-    beforeInit: function (editor) {
-      // Default plugin configuration, to be overriden by other plugins
-      editor.config["xwiki-focusedplaceholder"] = {
-        // Left empty to be configured in the next instruction
-        placeholder: {},
-        /* Empty inline tags (or nodeNames) that usually do not appear on screen should be ignored by default
-         * because they might get propagated to new lines by CKEditor*/
-        ignoreIfEmpty: [
+    init: function(editor) {
+      // Add default configuration values.
+      if (!editor.config["xwiki-focusedplaceholder"].ignoreIfEmpty) {
+        //Empty inline tags (or nodeNames) that usually do not appear on screen should be ignored by default because
+        // they might get propagated to new lines by CKEditor
+        editor.config["xwiki-focusedplaceholder"].ignoreIfEmpty = [
           "#text",
           "a",
           "abbr",
@@ -55,10 +61,9 @@
           "wbr",
           "del",
           "ins",
-        ],
-      };
-
-      // Add generic default placeholders for content sectioning, text and table HTML tags
+        ];
+      }
+      // Add generic default placeholders for content sectioning, text and table HTML tags.
       [
         "body",
         "address",
@@ -90,14 +95,11 @@
         "th",
         "td",
       ].forEach(function (tagName) {
-        editor
-          .config["xwiki-focusedplaceholder"]
-          .placeholder[tagName] = "xwiki-focusedplaceholder.placeholder." + tagName;
+        if (!editor.config["xwiki-focusedplaceholder"].placeholder[tagName]) {
+          editor.config["xwiki-focusedplaceholder"].placeholder[tagName] =
+            `xwiki-focusedplaceholder.placeholder.${tagName}`;
+        }
       });
-
-    },
-
-    init: function (editor) {
 
       // Filter out placeholders when saving
       var filterPlaceholders = {

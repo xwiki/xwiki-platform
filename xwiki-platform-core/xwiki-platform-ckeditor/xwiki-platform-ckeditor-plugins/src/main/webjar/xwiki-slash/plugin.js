@@ -371,10 +371,17 @@
    * The quick actions (slash) plugin.
    */
   CKEDITOR.plugins.add('xwiki-slash', {
-    requires: 'autocomplete',
+    requires: 'autocomplete,xwiki-focusedplaceholder',
 
     beforeInit: function(editor) {
       editor.quickActions = new QuickActions();
+
+      // Advertise the quick actions feature on empty lines, if the placeholder hasn't been customized already.
+      ['p', 'li', 'td'].forEach(tagName => {
+        if (!editor.config['xwiki-focusedplaceholder'].placeholder[tagName]) {
+          editor.config['xwiki-focusedplaceholder'].placeholder[tagName] = 'xwiki-slash.placeholder';
+        }
+      });
     },
 
     init: function(editor) {

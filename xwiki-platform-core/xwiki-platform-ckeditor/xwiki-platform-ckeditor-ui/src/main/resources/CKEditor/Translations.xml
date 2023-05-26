@@ -207,6 +207,8 @@ ckeditor.plugin.slash.action.table_cell_delete.name=Delete Cell
 ckeditor.plugin.slash.action.table_cell_delete.hint=Remove the current table cell.
 ckeditor.plugin.slash.action.table_delete.hint=Remove the current table from the content.
 
+ckeditor.plugin.slash.placeholder=Type / for quick actions...
+
 ckeditor.plugin.focusedplaceholder.placeholder.body=Body
 ckeditor.plugin.focusedplaceholder.placeholder.address=Address
 ckeditor.plugin.focusedplaceholder.placeholder.aside=Aside

@@ -151,7 +151,7 @@
     #else
       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
     #end
-    role="button"#if ("$!extraAttribute" != '') ${extraAttribute}#end>
+    #if ("$!extraAttribute" != '') ${extraAttribute}#end>
       $services.icon.renderHTML($icon)
       #if ($titleAsLabel)
         <span class="btn-label">$services.localization.render($titleKey)</span>

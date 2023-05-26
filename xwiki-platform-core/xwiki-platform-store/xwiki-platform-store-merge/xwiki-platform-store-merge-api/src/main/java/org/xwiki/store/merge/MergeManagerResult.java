@@ -89,11 +89,29 @@ public class MergeManagerResult<R, C>
     }
 
     /**
-     * @return all the conflicts occured during this merge
+     * This methods returns all the conflicts that occurred during the merge, and that have been properly recorded.
+     * Note that right now the merge mechanism doesn't record all the conflicts as a {@link Conflict} instance:
+     * some of the conflicts are only recorded as an error log.
+     * @return all the conflicts that occurred during this merge
      */
     public List<Conflict<C>> getConflicts()
     {
         return this.conflicts;
+    }
+
+    /**
+     * Retrieve the total number of conflicts: both the conflicts recorded as {@link Conflict} and the conflicts
+     * recorded only as error logs.
+     * @return the total number of conflicts
+     * @see #getConflicts()
+     * @since 14.10.12
+     * @since 15.5RC1
+     */
+    @Unstable
+    public int getConflictsNumber()
+    {
+        // Each conflicts recorded, is recorded with its own error log.
+        return (this.log.getLogs(LogLevel.ERROR).size() - this.conflicts.size()) + this.conflicts.size();
     }
 
     /**

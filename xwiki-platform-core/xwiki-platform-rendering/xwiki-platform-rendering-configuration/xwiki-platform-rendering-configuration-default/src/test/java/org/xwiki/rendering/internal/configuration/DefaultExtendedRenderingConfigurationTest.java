@@ -93,7 +93,7 @@ class DefaultExtendedRenderingConfigurationTest
     @Test
     void isImageDimensionsIncludedInImageURL() throws Exception
     {
-        ConfigurationSource source = this.componentManager.getInstance(ConfigurationSource.class);
+        ConfigurationSource source = componentManager.getInstance(ConfigurationSource.class);
         when(source.getProperty("rendering.imageDimensionsIncludedInImageURL", true)).thenReturn(false);
         assertFalse(this.defaultExtendedRenderingConfiguration.isImageDimensionsIncludedInImageURL());
 
@@ -102,10 +102,53 @@ class DefaultExtendedRenderingConfigurationTest
     }
 
     @Test
-    void getConfiguredAndDisabledSyntaxes() throws Exception
+    void getConfiguredAndDisabledSyntaxesWhenNoConfigXObjectAndExistingXWikiCfgProperty() throws Exception
     {
-        ConfigurationSource renderingSource = this.componentManager.getInstance(ConfigurationSource.class, "rendering");
-        when(renderingSource.getProperty("disabledSyntaxes")).thenReturn(Arrays.asList("syntax1/1.0", "syntax2/1.0"));
+        ConfigurationSource renderingSource = componentManager.getInstance(ConfigurationSource.class, "rendering");
+        when(renderingSource.getProperty("disabledSyntaxes")).thenReturn(null);
+
+        ConfigurationSource xwikiCfgSource = componentManager.getInstance(ConfigurationSource.class, "xwikicfg");
+        when(xwikiCfgSource.getProperty("xwiki.rendering.syntaxes", List.class))
+            .thenReturn(Arrays.asList("default1/1.0", "default2/1.0"));
+
+        // Register some Syntaxes for the test
+        Syntax default1Syntax = new Syntax(new SyntaxType("default1", "Default 1"), "1.0");
+        Parser default1Parser = componentManager.registerMockComponent(Parser.class, default1Syntax.toIdString());
+        when(default1Parser.getSyntax()).thenReturn(default1Syntax);
+        Syntax default2Syntax = new Syntax(new SyntaxType("default2", "Default 2"), "1.0");
+        Parser default2Parser = componentManager.registerMockComponent(Parser.class, default2Syntax.toIdString());
+        when(default2Parser.getSyntax()).thenReturn(default2Syntax);
+        Syntax syntax1 = new Syntax(new SyntaxType("syntax1", "Syntax 1"), "1.0");
+        Parser syntax1Parser = componentManager.registerMockComponent(Parser.class, syntax1.toIdString());
+        when(syntax1Parser.getSyntax()).thenReturn(syntax1);
+        Syntax syntax2 = new Syntax(new SyntaxType("syntax2", "Syntax 2"), "1.0");
+        Parser syntax2Parser = componentManager.registerMockComponent(Parser.class, syntax2.toIdString());
+        when(syntax2Parser.getSyntax()).thenReturn(syntax2);
+
+        when(this.syntaxRegistry.resolveSyntax("default1/1.0")).thenReturn(default1Syntax);
+        when(this.syntaxRegistry.resolveSyntax("default2/1.0")).thenReturn(default2Syntax);
+        when(this.syntaxRegistry.resolveSyntax("syntax1/1.0")).thenReturn(syntax1);
+        when(this.syntaxRegistry.resolveSyntax("syntax2/1.0")).thenReturn(syntax2);
+
+        List<Syntax> disabledSyntaxes = defaultExtendedRenderingConfiguration.getDisabledSyntaxes();
+        assertEquals(2, disabledSyntaxes.size());
+        assertTrue(disabledSyntaxes.contains(syntax1));
+        assertTrue(disabledSyntaxes.contains(syntax2));
+
+        List<Syntax> configuredSyntaxes = defaultExtendedRenderingConfiguration.getConfiguredSyntaxes();
+        assertEquals(2, configuredSyntaxes.size());
+        assertTrue(configuredSyntaxes.contains(default1Syntax));
+        assertTrue(configuredSyntaxes.contains(default2Syntax));
+    }
+
+    @Test
+    void getConfiguredAndDisabledSyntaxesWhenNoConfigXObjectAndNoXWikiCfgProperty() throws Exception
+    {
+        ConfigurationSource renderingSource = componentManager.getInstance(ConfigurationSource.class, "rendering");
+        when(renderingSource.getProperty("disabledSyntaxes")).thenReturn(null);
+
+        ConfigurationSource xwikiCfgSource = componentManager.getInstance(ConfigurationSource.class, "xwikicfg");
+        when(xwikiCfgSource.getProperty("xwiki.rendering.syntaxes", List.class)).thenReturn(null);
 
         CoreConfiguration coreConfiguration = componentManager.getInstance(CoreConfiguration.class);
         Syntax defaultSyntax = new Syntax(new SyntaxType("xwiki", "XWiki"), "2.1");
@@ -123,17 +166,46 @@ class DefaultExtendedRenderingConfigurationTest
         Syntax syntax2 = new Syntax(new SyntaxType("syntax2", "Syntax 2"), "1.0");
         when(syntax2Parser.getSyntax()).thenReturn(syntax2);
 
-        when(this.syntaxRegistry.resolveSyntax("syntax1/1.0")).thenReturn(syntax1);
-        when(this.syntaxRegistry.resolveSyntax("syntax2/1.0")).thenReturn(syntax2);
-
-        List<Syntax> disabledSyntaxes = this.defaultExtendedRenderingConfiguration.getDisabledSyntaxes();
+        List<Syntax> disabledSyntaxes = defaultExtendedRenderingConfiguration.getDisabledSyntaxes();
         assertEquals(2, disabledSyntaxes.size());
         assertTrue(disabledSyntaxes.contains(syntax1));
         assertTrue(disabledSyntaxes.contains(syntax2));
 
-        List<Syntax> configuredSyntaxes = this.defaultExtendedRenderingConfiguration.getConfiguredSyntaxes();
+        List<Syntax> configuredSyntaxes = defaultExtendedRenderingConfiguration.getConfiguredSyntaxes();
         assertEquals(1, configuredSyntaxes.size());
         assertTrue(configuredSyntaxes.contains(defaultSyntax));
+    }
+
+    @Test
+    void getConfiguredAndDisabledSyntaxesWhenConfigXObjectExists() throws Exception
+    {
+        ConfigurationSource renderingSource = componentManager.getInstance(ConfigurationSource.class, "rendering");
+        when(renderingSource.getProperty("disabledSyntaxes")).thenReturn(Arrays.asList("syntax1/1.0", "syntax2/1.0"));
+
+        // Register some Syntaxes for the test
+
+        Parser syntax1Parser = componentManager.registerMockComponent(Parser.class, "syntax1/1.0");
+        Syntax syntax1 = new Syntax(new SyntaxType("syntax1", "Syntax 1"), "1.0");
+        when(syntax1Parser.getSyntax()).thenReturn(syntax1);
+        Parser syntax2Parser = componentManager.registerMockComponent(Parser.class, "syntax2/1.0");
+        Syntax syntax2 = new Syntax(new SyntaxType("syntax2", "Syntax 2"), "1.0");
+        when(syntax2Parser.getSyntax()).thenReturn(syntax2);
+
+        Parser xwikiSyntax20Parser = componentManager.registerMockComponent(Parser.class, "xwiki/2.0");
+        Syntax xwikiSyntax20 = new Syntax(new SyntaxType("xwiki", "XWiki"), "2.0");
+        when(xwikiSyntax20Parser.getSyntax()).thenReturn(xwikiSyntax20);
+
+        when(this.syntaxRegistry.resolveSyntax("syntax1/1.0")).thenReturn(syntax1);
+        when(this.syntaxRegistry.resolveSyntax("syntax2/1.0")).thenReturn(syntax2);
+
+        List<Syntax> disabledSyntaxes = defaultExtendedRenderingConfiguration.getDisabledSyntaxes();
+        assertEquals(2, disabledSyntaxes.size());
+        assertTrue(disabledSyntaxes.contains(syntax1));
+        assertTrue(disabledSyntaxes.contains(syntax2));
+
+        List<Syntax> configuredSyntaxes = defaultExtendedRenderingConfiguration.getConfiguredSyntaxes();
+        assertEquals(1, configuredSyntaxes.size());
+        assertTrue(configuredSyntaxes.contains(xwikiSyntax20));
     }
 
     @Test

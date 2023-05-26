@@ -18,10 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 /*!
-#set ($paths = {
-  'treeRequireConfig': $services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js',
-    {'evaluate': true, 'minify': $services.debug.minify})
-})
 #set ($l10nKeys = [
   'entitynamevalidation.nametransformation.error',
   'core.validation.valid.message',
@@ -34,58 +30,56 @@
 #end
 #[[*/
 // Start JavaScript-only code.
-(function(paths, l10n) {
+(function(l10n) {
   "use strict";
 
 // Location Tree Picker
-require([paths.treeRequireConfig], function() {
-  require(['tree'], function($) {
-    $('.location-picker').each(function() {
-      var picker = $(this);
-      var trigger = picker.find('.location-action-pick');
-      var modal = picker.find('.modal');
-      var treeElement = modal.find('.location-tree');
-      var selectButton = modal.find('.modal-footer .btn-primary');
+require(['xwiki-tree'], function($) {
+  $('.location-picker').each(function() {
+    var picker = $(this);
+    var trigger = picker.find('.location-action-pick');
+    var modal = picker.find('.modal');
+    var treeElement = modal.find('.location-tree');
+    var selectButton = modal.find('.modal-footer .btn-primary');
 
-      trigger.on('click', function(event) {
-        event.preventDefault();
-        modal.modal();
-      });
+    trigger.on('click', function(event) {
+      event.preventDefault();
+      modal.modal();
+    });
 
-      modal.on('shown.bs.modal', function(event) {
-        // Open to the specified node only once. Preserve the tree state otherwise.
-        var openToNodeId = trigger.attr('data-openTo');
-        if (openToNodeId && openToNodeId !== modal.data('openTo')) {
-          modal.data('openTo', openToNodeId);
-        } else {
-          openToNodeId = false;
-        }
-        var tree = $.jstree.reference(treeElement);
-        if (!tree) {
-          // Initialize the tree and hook the event listeners.
-          treeElement.xtree({
-            core: {
-              multiple: treeElement.data('multiple') === 'true'
-            }
-          }).one('ready.jstree', function(event, data) {
-            openToNodeId && data.instance.openTo(openToNodeId);
-          }).on('changed.jstree', function(event, data) {
-            selectButton.prop('disabled', !data.selected.length);
-          }).on('dblclick', '.jstree-anchor', function() {
-            selectButton.click();
-          });
-        } else if (openToNodeId) {
-          tree.deselect_all();
-          tree.close_all();
-          tree.openTo(openToNodeId);
-        }
-      });
-
-      selectButton.on('click', function() {
-        modal.modal('hide');
-        modal.triggerHandler('xwiki:locationTreePicker:select', {
-          'tree': $.jstree.reference(treeElement)
+    modal.on('shown.bs.modal', function(event) {
+      // Open to the specified node only once. Preserve the tree state otherwise.
+      var openToNodeId = trigger.attr('data-openTo');
+      if (openToNodeId && openToNodeId !== modal.data('openTo')) {
+        modal.data('openTo', openToNodeId);
+      } else {
+        openToNodeId = false;
+      }
+      var tree = $.jstree.reference(treeElement);
+      if (!tree) {
+        // Initialize the tree and hook the event listeners.
+        treeElement.xtree({
+          core: {
+            multiple: treeElement.data('multiple') === 'true'
+          }
+        }).one('ready.jstree', function(event, data) {
+          openToNodeId && data.instance.openTo(openToNodeId);
+        }).on('changed.jstree', function(event, data) {
+          selectButton.prop('disabled', !data.selected.length);
+        }).on('dblclick', '.jstree-anchor', function() {
+          selectButton.click();
         });
+      } else if (openToNodeId) {
+        tree.deselect_all();
+        tree.close_all();
+        tree.openTo(openToNodeId);
+      }
+    });
+
+    selectButton.on('click', function() {
+      modal.modal('hide');
+      modal.triggerHandler('xwiki:locationTreePicker:select', {
+        'tree': $.jstree.reference(treeElement)
       });
     });
   });
@@ -580,4 +574,4 @@ require(['jquery'], function($) {
 });
 
 // End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$paths, $l10n]));
+}).apply(']]#', $jsontool.serialize([$l10n]));

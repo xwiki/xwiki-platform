@@ -30,7 +30,7 @@
     requires: 'notification,xwiki-cache,xwiki-localization',
     editors: [],
 
-    beforeInit: function(editor) {
+    init: function(editor) {
       // Make sure we restore the previous editing mode when the page is loaded from cache (back/forward/reload).
       var contentTypeField = this.getContentTypeField(editor);
       // Chrome doesn't cache the enabled/disabled state of form fields so we are caching it separately.
@@ -38,9 +38,7 @@
         contentTypeField.prop('disabled', true);
         editor.config.startupMode = 'source';
       }
-    },
 
-    init: function(editor) {
       this.editors.push(editor);
       editor.on('destroy', (function(event) {
         var index = this.editors.indexOf(editor);

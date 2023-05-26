@@ -7,13 +7,13 @@ paths: {
   // Tree
   jsTree: '/webjars/jstree',
   JobRunner: '/webjars/jobRunner',
-  'tree-finder': '/webjars/finder',
-  tree: '/webjars/tree',
+  'xwiki-tree-finder': '/webjars/finder',
+  'xwiki-tree': '/webjars/tree',
 
   'fast-diff': '/webjars/diff',
 
   // We need the full path here because ckeditor.js loads other resources using relative paths.
-  ckeditor: '/webjars/xwiki-platform-ckeditor-base/${project.version}/ckeditor',
+  ckeditor: '/webjars/xwiki-platform-ckeditor-webjar/${project.version}/ckeditor',
 
   testUtils: '/spec/testUtils',
 
@@ -27,7 +27,10 @@ paths: {
   'xwiki-table': 'xwiki-table/plugin',
 
   resource: 'xwiki-resource/resource',
-  resourcePicker: 'xwiki-resource/resourcePicker',
+  'resourcePicker.bundle': 'xwiki-resource/resourcePicker',
+  entityResourcePicker: 'xwiki-resource/entityResourcePicker',
+  entityResourceSuggester: 'xwiki-resource/entityResourceSuggester',
+  entityResourceDisplayer: 'xwiki-resource/entityResourceDisplayer',
   l10n: 'xwiki-localization/l10n',
 
   textSelection: 'xwiki-selection/plugin',
@@ -45,7 +48,7 @@ shim: {
   'xwiki-localization': ['ckeditor'],
   'xwiki-macro': ['ckeditor', 'xwiki-dialog', 'xwiki-loading', 'xwiki-localization', 'xwiki-marker', 'textSelection'],
   'xwiki-marker': ['ckeditor'],
-  'xwiki-resource': ['ckeditor', 'resource', 'resourcePicker', 'l10n', 'xwiki-marker'],
+  'xwiki-resource': ['ckeditor', 'resource', 'resourcePicker.bundle', 'l10n', 'xwiki-marker'],
   'xwiki-table': ['ckeditor'],
 
   textSelection: ['ckeditor'],

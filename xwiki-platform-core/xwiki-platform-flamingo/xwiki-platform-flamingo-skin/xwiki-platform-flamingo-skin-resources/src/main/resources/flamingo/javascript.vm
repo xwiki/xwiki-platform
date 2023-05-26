@@ -80,6 +80,7 @@
     'iscroll': "#removeJsSuffix($services.webjars.url('org.webjars.npm:iscroll', 'build/iscroll-lite.js'))",
     'jquery': "#removeJsSuffix($services.webjars.url('jquery', ""jquery${jsExtension}""))",
     'jquery-migrate': "#removeJsSuffix($services.webjars.url('jquery-migrate', ""jquery-migrate${jsExtension}""))",
+    'jsTree': "#removeJsSuffix($services.webjars.url('jstree', ""jstree${jsExtension}""))",
     'moment-jdateformatparser': $services.webjars.url('moment-jdateformatparser', 'moment-jdateformatparser.min'),
     'moment-timezone': $services.webjars.url('org.webjars.npm:moment-timezone', 'builds/moment-timezone-with-data.min'),
     'prototype': "#removeJsSuffix($services.webjars.url('prototype', 'prototype.js'))",
@@ -92,7 +93,9 @@
     'xwiki-l10n': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-localization-webjar', ""l10n${jsExtension}""))",
     'xwiki-locale-picker': $xwiki.getSkinFile('localePicker.js', true),
     'xwiki-meta': $xwiki.getSkinFile('js/xwiki/meta.js'),
-    'xwiki-selectize': $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js')
+    'xwiki-selectize': $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js'),
+    'xwiki-tree-finder': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', ""finder${jsExtension}""))",
+    'xwiki-tree': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', ""tree${jsExtension}""))"
   },
   'shim': {
     'bootstrap': ['jquery'],

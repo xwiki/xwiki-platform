@@ -201,12 +201,7 @@ var XWiki = (function(XWiki){
              })("$services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css', {'evaluate': true})");
 
             // Insert the package tree
-            require(["$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {'evaluate': true})"], this.requireTree.bind(this));
-        },
-
-        requireTree: function()
-        {
-            require(['tree'], this.initXTree.bind(this));
+            require(['xwiki-tree'], this.initXTree.bind(this));
         },
 
         initXTree: function($)

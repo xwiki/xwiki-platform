@@ -20,180 +20,184 @@
 (function() {
   'use strict';
 
-  /**
-   * Creates a new QuickActions instance with the provided search configuration.
-   *
-   * @param {Object} config - the quick actions configuration options
-   */
-  var QuickActions = function(config) {
-    this.config = Object.assign({
-      // Default values for quick action / group fields.
-      defaultAction: {group: '', id: '', name: '', description: '', iconClass: '', iconURL: '', shortcut: ''},
-      defaultGroup: {id: '', name: '', order: Infinity}
-    }, config);
+  class QuickActions {
 
-    // Configuration for the quick actions search.
-    this.config.search = Object.assign({
-      includeScore: true,
-      // Allow one character missmatch in 4 (i.e. match at least 3 characters when the input text is 4 characters).
-      // With the default distance parameter being 100 and location 0 this also means we're matching only the first 25
-      // characters which is fine considering that we split the indexed information into tokens (by whitespace).
-      threshold: 0.25,
-      keys: [
-        // We obviously give more weight to the action id and name, but we also match the action description and group.
-        {name: 'id', weight: 5},
-        {name: 'nameTokens', weight: 4},
-        {name: 'descriptionTokens', weight: 2},
-        {name: 'group.id', weight: 1},
-        {name: 'group.nameTokens', weight: 1}
-      ]
-    }, this.config.search);
+    /**
+     * Creates a new QuickActions instance with the provided search configuration.
+     *
+     * @param {Object} config - the quick actions configuration options
+     */
+    constructor(config) {
+      this.config = Object.assign({
+        // Default values for quick action / group fields.
+        defaultAction: {group: '', id: '', name: '', description: '', iconClass: '', iconURL: '', shortcut: ''},
+        defaultGroup: {id: '', name: '', order: Infinity}
+      }, config);
 
-    // Start with an empty list of quick actions and no groups;
-    this.actions = [];
-    this.groups = {};
+      // Configuration for the quick actions search.
+      this.config.search = Object.assign({
+        includeScore: true,
+        // Allow one character missmatch in 4 (i.e. match at least 3 characters when the input text is 4 characters).
+        // With the default distance parameter being 100 and location 0 this also means we're matching only the first 25
+        // characters which is fine considering that we split the indexed information into tokens (by whitespace).
+        threshold: 0.25,
+        keys: [
+          // We obviously give more weight to the action id and name, but we also match the action description and
+          // group.
+          {name: 'id', weight: 5},
+          {name: 'nameTokens', weight: 4},
+          {name: 'descriptionTokens', weight: 2},
+          {name: 'group.id', weight: 1},
+          {name: 'group.nameTokens', weight: 1}
+        ]
+      }, this.config.search);
 
-    // Initialize the quick action search asynchronously.
-    this.searchReady = new Promise(function(resolve, reject) {
-      require(['fuse'], function(Fuse) {
-        resolve(new Fuse(this.actions, this.config.search));
-      }.bind(this), reject);
-    }.bind(this));
-  };
+      // Start with an empty list of quick actions and no groups;
+      this.actions = [];
+      this.groups = {};
 
-  /**
-   * Adds one or more quick actions.
-   *
-   * @param {Object | Array} the quick actions to add
-   */
-  QuickActions.prototype.addActions = function() {
-    for (var i = 0; i < arguments.length; i++) {
-      if (Array.isArray(arguments[i])) {
-        this.addActions.apply(this, arguments[i]);
-      } else {
-        this.addAction(arguments[i]);
+      // Initialize the quick action search asynchronously.
+      this.searchReady = new Promise(function(resolve, reject) {
+        require(['fuse'], function(Fuse) {
+          resolve(new Fuse(this.actions, this.config.search));
+        }.bind(this), reject);
+      }.bind(this));
+    }
+
+    /**
+     * Adds one or more quick actions.
+     *
+     * @param {Object | Array} the quick actions to add
+     */
+    addActions() {
+      for (var i = 0; i < arguments.length; i++) {
+        if (Array.isArray(arguments[i])) {
+          this.addActions.apply(this, arguments[i]);
+        } else {
+          this.addAction(arguments[i]);
+        }
       }
     }
-  };
 
-  /**
-   * Adds a quick action.
-   *
-   * @param {Object} action - the action to add
-   */
-  QuickActions.prototype.addAction = function(action) {
-    action = Object.assign({}, this.config.defaultAction, action);
-    action.nameTokens = action.name.split(/\s+/);
-    action.descriptionTokens = action.description.split(/\s+/);
-    var group;
-    if (!Object.hasOwn(this.groups, action.group)) {
-      if (typeof action.group === 'string') {
-        group = this.addGroup({id: action.group, name: action.group});
+    /**
+     * Adds a quick action.
+     *
+     * @param {Object} action - the action to add
+     */
+    addAction(action) {
+      action = Object.assign({}, this.config.defaultAction, action);
+      action.nameTokens = action.name.split(/\s+/);
+      action.descriptionTokens = action.description.split(/\s+/);
+      var group;
+      if (!Object.hasOwn(this.groups, action.group)) {
+        if (typeof action.group === 'string') {
+          group = this.addGroup({id: action.group, name: action.group});
+        } else {
+          group = this.addGroup(action.group);
+        }
       } else {
-        group = this.addGroup(action.group);
+        group = this.groups[action.group];
       }
-    } else {
-      group = this.groups[action.group];
-    }
-    action.group = group;
-    return this.searchReady.then(function(fuse) {
-      fuse.add(action);
-    }).catch(function (error) {
-      console.error('Failed to initialize quick action search because: ' + error);
-      this.actions.push(action);
-    }.bind(this));
-  };
-
-  /**
-   * Defines one or more quick action groups.
-   *
-   * @param {Object | Array} the groups to add
-   */
-  QuickActions.prototype.addGroups = function() {
-    for (var i = 0; i < arguments.length; i++) {
-      if (Array.isArray(arguments[i])) {
-        this.addGroups.apply(this, arguments[i]);
-      } else {
-        this.addGroup(arguments[i]);
-      }
-    }
-  };
-
-  /**
-   * Defines a new quick action group.
-   *
-   * @param {Object} the group to add
-   */
-  QuickActions.prototype.addGroup = function(group) {
-    group = Object.assign({}, this.config.defaultGroup, group);
-    group.nameTokens = (group.name || '').split(/\s+/);
-    this.groups[group.id] = group;
-    return group;
-  };
-
-  /**
-   * Searches for quick actions that match the given text.
-   *
-   * @param {String} text - the text to match
-   * @return {Promise} a promise that resolves with the array of quick actions that match the given text
-   */
-  QuickActions.prototype.search = function(text) {
-    if (text.length) {
+      action.group = group;
       return this.searchReady.then(function(fuse) {
-        return fuse.search(text);
-      });
-    } else {
-      // Return a shallow copy of the actions array in order to be able to modify it safely (e.g. add groups).
-      return Promise.resolve(this.actions.slice());
+        fuse.add(action);
+      }).catch(function (error) {
+        console.error('Failed to initialize quick action search because: ' + error);
+        this.actions.push(action);
+      }.bind(this));
     }
-  };
 
-  /**
-   * Sort the given quick actions by group score and action score.
-   *
-   * @param {Array} the quick actions to sort
-   * @return {Array} the sorted array of quick actions
-   */
-  QuickActions.prototype.sort = function(actions) {
-    if (actions.length && actions[0].score) {
-      // Sort search results based on the group and action score.
-      var matchedGroups = actions.reduce(function(matchedGroups, action) {
-        matchedGroups[action.item.group.id] = matchedGroups[action.item.group.id] || [];
-        matchedGroups[action.item.group.id].push(action);
-        return matchedGroups;
-      }, {});
-      // The group score is given by the best action score within that group. But note that a lower score is better, 0
-      // meaning a perfect match.
-      var groupScores = {};
-      Object.entries(matchedGroups).forEach(function(entry) {
-        groupScores[entry[0]] = entry[1].reduce(function(min, action) {
-          return Math.min(min, action.score);
-        }, Infinity);
-      });
-      return actions.sort(function(alice, bob) {
-        if (alice.item.group.id === bob.item.group.id) {
-          // Order by action score inside each group (lower score means higher importance).
-          return alice.score - bob.score;
+    /**
+     * Defines one or more quick action groups.
+     *
+     * @param {Object | Array} the groups to add
+     */
+    addGroups() {
+      for (var i = 0; i < arguments.length; i++) {
+        if (Array.isArray(arguments[i])) {
+          this.addGroups.apply(this, arguments[i]);
         } else {
-          // Order by group score outside groups (lower score means higher importance).
-          return groupScores[alice.item.group.id] - groupScores[bob.item.group.id];
+          this.addGroup(arguments[i]);
         }
-      }).map(function(action) {
-        return action.item;
-      });
-    } else {
-      // Sort quick actions based on the group order.
-      return actions.sort(function(alice, bob) {
-        if (alice.group.id === bob.group.id) {
-          // Preserve the action order inside each group (the insertion order).
-          return 0;
-        } else {
-          // Lower order value means higher importance.
-          return alice.group.order - bob.group.order;
-        }
-      });
+      }
     }
-  };
+
+    /**
+     * Defines a new quick action group.
+     *
+     * @param {Object} the group to add
+     */
+    addGroup(group) {
+      group = Object.assign({}, this.config.defaultGroup, group);
+      group.nameTokens = (group.name || '').split(/\s+/);
+      this.groups[group.id] = group;
+      return group;
+    }
+
+    /**
+     * Searches for quick actions that match the given text.
+     *
+     * @param {String} text - the text to match
+     * @return {Promise} a promise that resolves with the array of quick actions that match the given text
+     */
+    search(text) {
+      if (text.length) {
+        return this.searchReady.then(function(fuse) {
+          return fuse.search(text);
+        });
+      } else {
+        // Return a shallow copy of the actions array in order to be able to modify it safely (e.g. add groups).
+        return Promise.resolve(this.actions.slice());
+      }
+    }
+
+    /**
+     * Sort the given quick actions by group score and action score.
+     *
+     * @param {Array} the quick actions to sort
+     * @return {Array} the sorted array of quick actions
+     */
+    sort(actions) {
+      if (actions.length && actions[0].score) {
+        // Sort search results based on the group and action score.
+        var matchedGroups = actions.reduce(function(matchedGroups, action) {
+          matchedGroups[action.item.group.id] = matchedGroups[action.item.group.id] || [];
+          matchedGroups[action.item.group.id].push(action);
+          return matchedGroups;
+        }, {});
+        // The group score is given by the best action score within that group. But note that a lower score is better, 0
+        // meaning a perfect match.
+        var groupScores = {};
+        Object.entries(matchedGroups).forEach(function(entry) {
+          groupScores[entry[0]] = entry[1].reduce(function(min, action) {
+            return Math.min(min, action.score);
+          }, Infinity);
+        });
+        return actions.sort(function(alice, bob) {
+          if (alice.item.group.id === bob.item.group.id) {
+            // Order by action score inside each group (lower score means higher importance).
+            return alice.score - bob.score;
+          } else {
+            // Order by group score outside groups (lower score means higher importance).
+            return groupScores[alice.item.group.id] - groupScores[bob.item.group.id];
+          }
+        }).map(function(action) {
+          return action.item;
+        });
+      } else {
+        // Sort quick actions based on the group order.
+        return actions.sort(function(alice, bob) {
+          if (alice.group.id === bob.group.id) {
+            // Preserve the action order inside each group (the insertion order).
+            return 0;
+          } else {
+            // Lower order value means higher importance.
+            return alice.group.order - bob.group.order;
+          }
+        });
+      }
+    }
+  }
 
   //----------------------------------
   // Extend the autocomplete feature with support for:
@@ -405,7 +409,7 @@
         {
           group: 'structure',
           id: 'h1',
-          name: editor.lang.format.tag_h1,
+          name: editor.lang.format.tag_h1, // jshint ignore:line
           iconClass: 'fa fa-header',
           description: editor.localization.get('xwiki-slash.action.h1.hint'),
           command: {
@@ -417,7 +421,7 @@
         }, {
           group: 'structure',
           id: 'h2',
-          name: editor.lang.format.tag_h2,
+          name: editor.lang.format.tag_h2, // jshint ignore:line
           iconClass: 'fa fa-header',
           description: editor.localization.get('xwiki-slash.action.h2.hint'),
           command: {
@@ -429,7 +433,7 @@
         }, {
           group: 'structure',
           id: 'h3',
-          name: editor.lang.format.tag_h3,
+          name: editor.lang.format.tag_h3, // jshint ignore:line
           iconClass: 'fa fa-header',
           description: editor.localization.get('xwiki-slash.action.h3.hint'),
           command: {

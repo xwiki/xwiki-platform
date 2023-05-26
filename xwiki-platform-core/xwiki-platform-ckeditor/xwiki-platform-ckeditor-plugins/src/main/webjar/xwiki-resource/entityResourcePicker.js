@@ -24,7 +24,7 @@ define('entityResourcePickerTranslationKeys', [], [
 ]);
 
 define('entityResourcePicker', [
-  'jquery', 'resource', 'modal', 'l10n!entityResourcePicker', 'tree'
+  'jquery', 'resource', 'modal', 'l10n!entityResourcePicker', 'xwiki-tree'
 ], function($, $resource, $modal, translations) {
   'use strict';
 

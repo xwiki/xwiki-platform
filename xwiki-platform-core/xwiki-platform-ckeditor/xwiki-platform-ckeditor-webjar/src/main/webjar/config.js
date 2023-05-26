@@ -63,8 +63,8 @@ CKEDITOR.editorConfig = function(config) {
   // This should be fixed by implementing https://jira.xwiki.org/browse/CKEDITOR-319
   allowedContentBySyntax['markdown/1.2'] = $.extend(true, {}, allowedContentBySyntax['xwiki/2.1']);
   // Markdown doesn't allow figures at the moment.
-  delete allowedContentBySyntax['markdown/1.2']['$1'].elements.figure;
-  delete allowedContentBySyntax['markdown/1.2']['$2'].elements.figcaption;
+  delete allowedContentBySyntax['markdown/1.2'].$1.elements.figure;
+  delete allowedContentBySyntax['markdown/1.2'].$2.elements.figcaption;
 
   CKEDITOR.tools.extend(config, {
     allowedContentBySyntax: allowedContentBySyntax,
@@ -73,11 +73,11 @@ CKEDITOR.editorConfig = function(config) {
     applyPasteFilterAfterPasteFromWord: true,
     // Modify the strike and underline core styles to match what the XWiki Rendering is generating and expecting.
     // See CKEDITOR-52: Unable to un-strike or un-underline saved content
-    coreStyles_strike: {
+    coreStyles_strike: { // jshint ignore:line
       element: 'del',
       overrides: ['s', 'strike']
     },
-    coreStyles_underline: {
+    coreStyles_underline: { // jshint ignore:line
       element: 'ins',
       overrides: 'u'
     },
@@ -88,14 +88,14 @@ CKEDITOR.editorConfig = function(config) {
     // checker plugins are relying on an external service which leads to security and privacy concerns.
     disableNativeSpellChecker: false,
     // This is used in CKEditor.FileUploader so we must keep them in sync.
-    fileTools_defaultFileName: '__fileCreatedFromDataURI__',
+    fileTools_defaultFileName: '__fileCreatedFromDataURI__', // jshint ignore:line
     // The editor input is a full HTML page because we need to include the XWiki skin (in order to achieve WYSIWYG).
     fullPage: true,
     // The maximum image width is limited from the skin to 100% of the available page width (responsive images).
     // Prefilling the image dimensions leads to a stretched image (horizontally) because the browser uses the prefilled
     // height but limits the width.
     // CKEDITOR-141: Image larger than the screen inserted with CKEditor gets distorted by default
-    image2_prefillDimensions: false,
+    image2_prefillDimensions: false, // jshint ignore:line
     // Simplify the link dialog.
     linkShowAdvancedTab: false,
     linkShowTargetTab: false,
@@ -149,6 +149,30 @@ CKEDITOR.editorConfig = function(config) {
         }
       }
     },
+    plugins: config.plugins + ',' + [
+      'xwiki-config',
+      'xwiki-filter',
+      'xwiki-focusedplaceholder',
+      'xwiki-image-old',
+      'xwiki-image',
+      'xwiki-link',
+      'xwiki-list',
+      'xwiki-loading',
+      'xwiki-localization',
+      'xwiki-macro',
+      'xwiki-maximize',
+      'xwiki-office',
+      'xwiki-save',
+      'xwiki-selection',
+      'xwiki-slash',
+      'xwiki-source',
+      'xwiki-sourcearea',
+      'xwiki-syntax',
+      'xwiki-table',
+      'xwiki-toolbar',
+      'xwiki-upload',
+      'xwiki-wysiwygarea'
+    ].join(','),
     // We simplify the tool bar by removing:
     // * the features that are not well integrated (e.g. bidi, save, Anchor, Find)
     // * the features that are focused more on the presentation than the content (e.g. colorbutton, font, justify,
@@ -164,11 +188,12 @@ CKEDITOR.editorConfig = function(config) {
     // * the List and Indent buttons because they are grouped in the Lists drop down menu
     // * the Unlink button because it is available on the context menu and on the balloon toolbar
     // * the XWiki Macro button because we have it in the Insert menu
-    removeButtons: 'Anchor,BulletedList,Copy,CopyFormatting,Cut,Find,HorizontalRule,Indent,Language,NumberedList,'
-      + 'Outdent,Paste,PasteFromWord,PasteText,RemoveFormat,SpecialChar,Strike,Subscript,Superscript,Underline,Unlink,'
-      + 'officeImporter,xwiki-macro',
-    // We remove the default sourcearea plugin because we use our own xwiki-sourcearea plugin which supports switching to
-    // Source while editing in-place. We still bundle the sourcearea plugin because we reuse its icons and translations.
+    removeButtons: 'Anchor,BulletedList,Copy,CopyFormatting,Cut,Find,HorizontalRule,Indent,Language,NumberedList,' +
+      'Outdent,Paste,PasteFromWord,PasteText,RemoveFormat,SpecialChar,Strike,Subscript,Superscript,Underline,Unlink,' +
+      'officeImporter,xwiki-macro',
+    // We remove the default sourcearea plugin because we use our own xwiki-sourcearea plugin which supports switching
+    // to Source while editing in-place. We still bundle the sourcearea plugin because we reuse its icons and
+    // translations.
     removePlugins: 'bidi,colorbutton,font,justify,save,sourcearea',
     toolbarGroups: [
       {name: 'format'},

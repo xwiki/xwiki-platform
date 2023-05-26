@@ -80,8 +80,13 @@ define('imageStyleClient', ['jquery'], function($) {
   };
 });
 
-define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'],
-  function($, $modal, imageStyleClient, translations) {
+define('imageEditor', [
+  'jquery',
+  'modal',
+  'imageStyleClient',
+  'l10n!imageEditor',
+  'xwiki-selectize'
+], function($, $modal, imageStyleClient, translations) {
     'use strict';
 
     function initImageStyleField(modal) {

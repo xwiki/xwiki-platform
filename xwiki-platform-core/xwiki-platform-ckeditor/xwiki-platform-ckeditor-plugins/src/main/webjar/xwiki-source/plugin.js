@@ -60,7 +60,7 @@
   CKEDITOR.plugins.add('xwiki-source', {
     requires: 'notification,xwiki-loading,xwiki-localization,xwiki-selection,xwiki-sourcearea',
 
-    init: function(editor) {
+    beforeInit: function(editor) {
       // Fill missing configuration with default values.
       editor.config['xwiki-source'] = $.extend({
         // We need the source document to be the current document when the HTML conversion is performed in order to make
@@ -72,7 +72,9 @@
           formToken: document.documentElement.dataset.xwikiFormToken || ''
         }))
       }, editor.config['xwiki-source']);
+    },
 
+    afterInit: function(editor) {
       // The source command is not registered if the editor is loaded in-line.
       var sourceCommand = editor.getCommand('source');
       if (sourceCommand) {

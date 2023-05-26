@@ -745,7 +745,7 @@ td.cke_dialog_contents_body {
    * tree finder = 48px
    * footer = 69px
    */
-  max-height: calc(100vh - 268px);
+  max-height: calc(~"100vh - 268px");
   overflow-y: auto;
 }
 

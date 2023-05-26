@@ -17,8 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-require(['jquery', 'resource', 'resourcePicker.bundle'], function ($, $resource) {
+(function() {
   'use strict';
+  const $ = jQuery;
+  let $resource;
 
   // Declare the configuration namespace.
   CKEDITOR.config['xwiki-resource'] = CKEDITOR.config['xwiki-resource'] || {
@@ -28,7 +30,16 @@ require(['jquery', 'resource', 'resourcePicker.bundle'], function ($, $resource)
   CKEDITOR.plugins.add('xwiki-resource', {
     requires: 'xwiki-marker,xwiki-dialog,xwiki-localization',
 
-    init : function(editor) {
+    onLoad: function() {
+      // Note that $resource may be initialized after its first use, but the chances are very low because $resource is
+      // used in a dialog (e.g. insert link) that is opened after the editor is ready, and the resource picker code is
+      // normally bundled with the code of this plugin so there no need for additional HTTP request to bring the code.
+      require(['resource', 'resourcePicker.bundle'], function () {
+        $resource = arguments[0];
+      });
+    },
+
+    init: function(editor) {
       // Fill missing configuration with default values.
       editor.config['xwiki-resource'] = $.extend({
         // We use the source document to compute the resource dispatcher URL because the resource reference can be
@@ -306,4 +317,4 @@ require(['jquery', 'resource', 'resourcePicker.bundle'], function ($, $resource)
     });
     return parameters;
   };
-});
+})();

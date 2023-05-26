@@ -71,6 +71,17 @@
   #displayProperty_locale($macro.parameters)
 #end
 
+
+#macro (displayDocumentProperty_requiredRights $displayMode)
+  #set ($macro.parameters = {
+    'id': 'xwikiRequiredRightsInput',
+    'name': 'requiredRights',
+    'requiredRights': $tdoc.requiredRights,
+    'mode': $displayMode
+  })
+  #displayProperty_requiredRights($macro.parameters)
+#end
+
 ##
 ## Generic displayers
 ##
@@ -139,6 +150,86 @@
       #set ($styleName = 'text-muted')
     #end
     <span data-value="$!escapetool.xml($parameters.value)" class="$styleName">$!escapetool.xml($localeName)</span>
+  #end
+#end
+
+#macro (displayProperty_requiredRights $parameters)
+  #set ($isRRActivated = $parameters.requiredRights.activated())
+  #set ($hasRRProgramming  = $parameters.requiredRights.has('programming'))
+  #set ($hasRRScript  = $parameters.requiredRights.has('script'))
+  #set ($discard = $services.security.authorization.optOutRequiredRights())
+  #set ($hasProgrammingRROptOut = $services.security.authorization.hasAccess('programming'))
+  #set ($discard = $services.security.authorization.optInRequiredRights())
+
+
+  #set ($initialPriority = '0')
+  #if ($isRRActivated && !$hasRRProgramming && !$hasRRScript)
+    #set ($initialPriority = '1')
+  #elseif ($isRRActivated && !$hasRRProgramming && $hasRRScript)
+    #set ($initialPriority = '2')
+  #elseif($isRRActivated && $hasRRProgramming)
+    #set ($initialPriority = '3')
+  #end
+  
+  #if ($parameters.mode == 'edit')
+    #set ($discard = $xwiki.jsfx.use('requiredRights.js'))
+    <div class="editRequiredRights">
+      #info("Be aware that the more rights you grant to the page, the fewer users will be able to edit it as only users with the granted rights are allowed to edit them.")
+      <br />
+      <select data-type="requiredRights" data-priority="$initialPriority">
+        #if(!$isRRActivated)
+          <option selected data-activated="false" data-priority="0">
+            Legacy mode, the rights of the last author applies
+          </option>
+        #end
+        <option #if($isRRActivated && !$hasRRProgramming && !$hasRRScript) selected#end
+            data-activated="true"
+            data-right=""
+            data-priority="1">
+          Disable Script and Programming
+        </option>
+        <option#if($isRRActivated && !$hasRRProgramming && $hasRRScript) selected#end
+            data-activated="true"
+            data-right="script"
+            data-priority="2">
+          Allow Script only
+        </option>
+        #if ($hasProgrammingRROptOut)
+        <option#if($isRRActivated && $hasRRProgramming) selected#end
+            data-activated="true"
+            data-right="programming"
+            data-priority="3">
+          Allow Script and Programming
+        </option>
+        #end
+      </select>
+      <div class="hidden lowerrights">
+        <br />
+        #warning("Lowering the rights is dangerous")
+      </div>
+      <div class="hidden parameters">
+        #set ($activateRequiredRights = '0')
+        #if ($isRRActivated)
+          #set ($activateRequiredRights = '1')
+        #end
+        <input type="hidden" name="activateRequiredRights" value="$activateRequiredRights">
+        #foreach($right in $parameters.requiredRights.rights)
+          <input type="hidden" name="requiredRights" value="$escapetool.xml($right.name)">        
+        #end
+      </div>
+    </div>
+  #else
+    #if ($isRRActivated)
+      #if ($hasRRProgramming) 
+        Script and Programming are allowed on this page.
+      #elseif ($hasRRScript)
+        Script allowed and Programming disabled on this page.
+      #else
+        Script and Programming are disabled on this page.
+      #end
+    #else
+      Legacy mode, the rights of the last author applies.  
+    #end
   #end
 #end
 

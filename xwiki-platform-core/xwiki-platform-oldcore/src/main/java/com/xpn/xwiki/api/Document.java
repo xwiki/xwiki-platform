@@ -3349,7 +3349,7 @@ public class Document extends Api
     }
 
     /**
-     * @return the required rights of the current document.
+     * @return the required rights of the current document
      * @since 15.5RC1
      */
     @Unstable

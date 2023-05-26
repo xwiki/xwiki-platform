@@ -4179,6 +4179,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             Set<Right> newRights = new HashSet<>(eform.getRequiredRights());
             for (Right right : new ArrayList<>(this.requiredRights.getRights())) {
                 if (!eform.getRequiredRights().contains(right) && !authorizationManager.hasAccess(right)) {
+                    // Add back the right which can't be removed by the current user.
                     newRights.add(right);
                 }
             }
@@ -9482,7 +9483,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @return {@code true} when the required rigths are activated for a given document, {@code false} otherwise
+     * @return {@code true} when the required rights are activated for a given document, {@code false} otherwise
      * @since 15.5RC1
      */
     @Unstable

@@ -33,6 +33,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -486,7 +487,9 @@ public class EditForm extends XWikiForm
     private void setRequiredRights(String[] requiredRights)
     {
         if (requiredRights != null) {
-            this.requiredRights = Arrays.stream(requiredRights).map(Right::toRight).collect(Collectors.toSet());
+            this.requiredRights = Arrays.stream(requiredRights)
+                .filter(StringUtils::isNotBlank)
+                .map(Right::toRight).collect(Collectors.toSet());
         } else {
             this.requiredRights = Set.of();
         }

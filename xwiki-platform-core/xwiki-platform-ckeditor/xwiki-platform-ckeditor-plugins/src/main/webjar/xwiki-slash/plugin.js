@@ -634,7 +634,8 @@
           name: editor.localization.get('xwiki-slash.action.macros.name'),
           iconClass: 'fa fa-th-list',
           description: editor.localization.get('xwiki-slash.action.macros.hint'),
-          command: 'xwiki-macro'
+          shortcut: '{',
+          outputHTML: '{'
         },
 
         //

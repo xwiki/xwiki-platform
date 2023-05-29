@@ -66,7 +66,7 @@
   CKEDITOR.plugins.add('xwiki-macro', {
     // CKEditor build fails if the requires string contains a concatenation. To match the line length limit, the string
     // is moved one line down.
-    requires: 
+    requires:
       'widget,balloontoolbar,notification,xwiki-marker,xwiki-loading,xwiki-localization,xwiki-selection,xwiki-dialog',
 
     init: function(editor) {
@@ -367,30 +367,23 @@
       });
 
       // Autocompletion with {
-
-      // Badges template
-      var badgesTemplate = "";
-      for (var i = 0; i < 3; i++) {
-        badgesTemplate += '<span class="badge">{badge' + i + '}</span>';
-      }
-
       // Register the macro autocomplete configuration
       editor.config.mentions = editor.config.mentions || [];
       editor.config.mentions.push({
         marker: '{',
         minChars: 0,
-        itemsLimit: 6,
-        itemTemplate: '<li class="auto-macro-list" data-id="{id}">' +
-          '<div class="auto-macro-title">' +
-          '<span class="macro-name">{label}</span>' +
-          '<span class="macro-extension">{extensionName}</span>' +
-          '<span class="macro-categories-badges">' +
-          badgesTemplate +
-          '<span class="badge">{recommended}</span>' +
-          '</span>' +
-          '</div>' +
-          '<div class="macro-description">{description}</div>' +
-          '</li>',
+        itemTemplate: `<li class="macro-suggestion" data-id="{id}">
+          <div>
+          <span class="macro-name">{label}</span>
+          <span class="macro-extension">{extensionName}</span>
+          <span class="macro-categories-badges">` +
+          // Badges template
+          Array(3).fill().map(function (element, i) {return '<span class="badge">{badge' + i + '}</span>';}).join('') +
+          `<span class="badge">{recommended}</span>
+          </span>
+          </div>
+          <div class="macro-description">{description}</div>
+          </li>`,
         feed: function (opts, callback) {
           require(['macroService', 'l10n!macroSelector'], function (macroService, translations) {
             macroService.getMacros(XWiki.docsyntax).done(function (macros) {
@@ -405,7 +398,6 @@
                     id: macro.id.id,
                     label: macro.name,
                     description: macro.description,
-                    installed: true,
                     extensionName: "",
                     recommended: "",
                   };
@@ -418,9 +410,13 @@
                   // Not installed macros have extra attributes
                   if (macro.categories.some(function (cat) {
                       return cat.id === "_notinstalled";
-                    }) && macro.extensionInstallAllowed && macro.extensionVersion) {
-                    item.extensionId = macro.extensionId;
-                    item.extensionVersion = macro.extensionVersion;
+                    }) && macro.extensionVersion) {
+
+                    // Do not display macros that can't be installed
+                    if (!macro.extensionInstallAllowed) {
+                      return;
+                    }
+
                     item.extensionName = " - " + macro.extensionName;
                     if (macro.extensionRecommended) {
                       item.recommended = translations.get('recommended');
@@ -440,56 +436,143 @@
         outputTemplate: function (item) {
 
           editor.once('afterInsertHtml', function () {
-            require(['macroService', 'l10n!macroSelector'], function (macroService, translations) {
-              var insertMacro = function () {
-
-                // Retrieve required parameters
-                macroService.getMacroDescriptor(item.id).done(function (descriptor) {
-
-                  for (var param in descriptor.parameterDescriptorMap) {
-                    // Show the insertion dialog if at least one of the parameters is mandatory
-                    if (descriptor.parameterDescriptorMap[param].mandatory) {
-                      editor.execCommand('xwiki-macro', {
-                        name: item.id
-                      });
-                      return;
-                    }
-                  }
-
-                  // Minimal insertion parameters
-                  var insertParam = {
-                    name: item.id,
-                    parameters: {},
-                  };
-
-                  // Set an empty default content when it is mandatory
-                  if (descriptor.contentDescriptor && descriptor.contentDescriptor.mandatory) {
-                    insertParam.content = " ";
-                  }
-
-                  // Insert the empty macro
-                  editor.execCommand('xwiki-macro-insert', insertParam);
-                });
-              };
-
-              // Show a confirmation dialog when the macro is not installed
-              if (item.extensionVersion) {
-                if (window.confirm(translations.get('install.confirm', item.extensionName, item.extensionVersion))) {
-                  macroService.installMacro(item.extensionId, item.extensionVersion).done(function () {
-                    // Force update the macro list to get the newly installed macro
-                    macroService.getMacros(XWiki.docsyntax, true);
-                    // Insert the macro once it has been installed
-                    insertMacro();
-                  });
-                }
-
-                return;
-              }
-              insertMacro();
+            editor.execCommand('xwiki-macro-maybe-install-insert', {
+              id: item.id
             });
           });
           return '';
         },
+      });
+
+
+      // Command to quickly insert/install macros
+      require(['macroService', 'l10n!macroSelector'], function (macroService, translations) {
+        editor.addCommand('xwiki-macro-maybe-install-insert', {
+          async: true,
+          exec: function (editor, macroCall) {
+
+            var command = this;
+
+
+            // Get latest data if the macro has been marked as installable during initialization
+            macroService.getMacros(XWiki.docsyntax, macroCall.update).done(function (macros) {
+
+              // Find the macro we are going to insert
+              macros.forEach(function (macro) {
+                if (macro.id.id === macroCall.id) {
+
+                  // Helper function
+                  var insertMacro = function () {
+
+                    // Retrieve required parameters
+                    macroService.getMacroDescriptor(macro.id.id).done(function (descriptor) {
+
+                      // Show the insertion dialog if at least one of the parameters is mandatory
+                      for (var param in descriptor.parameterDescriptorMap) {
+                        if (descriptor.parameterDescriptorMap[param].mandatory) {
+                          editor.execCommand('xwiki-macro', {
+                            name: macro.id.id
+                          });
+                          return;
+                        }
+                      }
+
+                      // Minimal insertion parameters
+                      var insertParam = {
+                        name: macro.id.id,
+                        parameters: {},
+                      };
+
+                      // Set an empty default content when it is mandatory
+                      if (descriptor.contentDescriptor && descriptor.contentDescriptor.mandatory) {
+                        insertParam.content = " ";
+                      }
+
+                      // Insert the empty macro
+                      editor.execCommand('xwiki-macro-insert', insertParam);
+
+                      editor.fire('afterCommandExec', {
+                        name: command.name,
+                        command: command
+                      });
+                    });
+                  };
+
+                  // Install the macro if it is installable.
+                  if (macro.extensionId &&
+                    macro.extensionName &&
+                    macro.extensionVersion &&
+                    macro.extensionInstallAllowed) {
+
+                    // Request user confirmation
+                    if (!window.confirm(translations.get('install.confirm',
+                        macro.extensionName,
+                        macro.extensionVersion))) {
+                      editor.fire('afterCommandExec', {
+                        name: command.name,
+                        command: command
+                      });
+                      return;
+                    }
+
+                    macroService.installMacro(macro.extensionId, macro.extensionVersion).done(function () {
+                      // Update the cache for future insertions
+                      macroService.getMacros(XWiki.docsyntax, true);
+                      insertMacro();
+                    });
+                    return;
+                  }
+                  insertMacro();
+                }
+              });
+            });
+          }
+        });
+
+        // Icons used for Quick Actions
+        var categoriesIcons = {
+          Notifications: 'fa fa-bell',
+          Content: 'fa fa-align-left',
+          Development: 'fa fa-code',
+          Formatting: 'fa fa-font',
+          Navigation: 'fa fa-compass',
+          Layout: 'fa fa-object-group',
+          Social: 'fa fa-users',
+          _fallback: 'fa fa-th-list'
+        };
+
+        // Register macros in Quick Actions plugin
+        macroService.getMacros(XWiki.docsyntax).done(function (macros) {
+          macros.forEach(function (macro) {
+
+            var item = {
+              group: 'macros',
+              id: 'macro-' + macro.id.id,
+              name: macro.name,
+              description: macro.description,
+              iconClass: categoriesIcons[macro.defaultCategory || (macro.categories[0] && macro.categories[0].id)] ||
+                categoriesIcons._fallback,
+              command: {
+                name: 'xwiki-macro-maybe-install-insert',
+                data: {
+                  id: macro.id.id,
+                  update: macro.categories.some(function (cat) {
+                    return cat.id === "_notinstalled";
+                  })
+                }
+              }
+            };
+
+            // Do not register macros that can't be installed
+            if (macro.categories.some(function (cat) {
+                return cat.id === "_notinstalled";
+              }) && macro.extensionVersion && !macro.extensionInstallAllowed) {
+              return;
+            }
+
+            editor.quickActions.addAction(item);
+          });
+        });
       });
 
     },

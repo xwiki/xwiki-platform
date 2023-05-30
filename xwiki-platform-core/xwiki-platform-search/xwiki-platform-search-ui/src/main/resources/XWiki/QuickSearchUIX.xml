@@ -127,7 +127,7 @@
 
     //Expand or retract the global search
     function showSearchInput() {
-      globalSearchInput.attr('type','text');
+      globalSearchInput.attr('type', 'text');
       globalSearch.removeClass('globalsearch-close');
       globalSearchButton.attr('aria-expanded', 'true');
       globalSearchInput.trigger('focus');
@@ -138,7 +138,7 @@
       /* We use the input type='hidden' instead of the attribute 'hidden'
       because we use a transition on width, that is incompatible with 'hidden'.
       Input type hidden also hides from the tab order and removes possibilities of adding text*/
-      globalSearchInput.attr('type','hidden');
+      globalSearchInput.attr('type', 'hidden');
     }
 
     // Open the global search when the user click on the global search button

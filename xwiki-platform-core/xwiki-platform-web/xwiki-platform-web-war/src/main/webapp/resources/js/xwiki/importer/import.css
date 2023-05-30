@@ -156,15 +156,15 @@
   padding: 3px !important;
 }
 
-#import ul.package li.xitem div.xitemcontainer span.checkbox,
-#import ul.package li.xitem div.xitemcontainer input.space {
+#import ul.package li.xitem a.xitemcontainer span.checkbox,
+#import ul.package li.xitem a.xitemcontainer input.space {
   float: right;
 }
 
-#import ul.package li.xitem div.xitemcontainer {
+#import ul.package li.xitem a.xitemcontainer {
   text-indent: 0;
 }
-#import ul.package li.xitem div.xitemcontainer .spacename:before {
+#import ul.package li.xitem a.xitemcontainer .spacename:before {
   content: '\229F';
   display: inline-block;
   font-size: 16px;
@@ -174,22 +174,22 @@
   text-align: center;
   width: 16px;
 }
-#import ul.package li.xitem.collapsed div.xitemcontainer .spacename:before {
+#import ul.package li.xitem.collapsed a.xitemcontainer .spacename:before {
   content: '\229E'
 }
 
-#import ul.package li.collapsed div.xitemcontainer .pages {
+#import ul.package li.collapsed a.xitemcontainer .pages {
   display: none;
 }
 
-#import ul.package li.xitem div.xitemcontainer div.spacename {
+#import ul.package li.xitem a.xitemcontainer div.spacename {
   background: transparent url("$xwiki.getSkinFile('icons/silk/folder.png')") no-repeat scroll 18px .1em;
   cursor: pointer;
   float: left;
   font-weight: bold;
 }
 
-#import ul.package li.xitem div.xitemcontainer div.selection {
+#import ul.package li.xitem a.xitemcontainer div.selection {
   color: $theme.textSecondaryColor;
   float: right;
   font-size: .8em;

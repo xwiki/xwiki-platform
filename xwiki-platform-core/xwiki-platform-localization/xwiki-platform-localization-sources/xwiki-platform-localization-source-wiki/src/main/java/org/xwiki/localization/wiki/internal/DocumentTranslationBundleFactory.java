@@ -210,7 +210,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
         loadTranslations(this.wikiManager.getMainWikiId());
 
         // Listeners
-        this.observation.addListener(this.listener);
+        this.observation.addListener(this.listener, EventListener.CACHE_INVALIDATION_DEFAULT_PRIORITY);
         this.observation.addListener(this.wikilistener);
     }
 

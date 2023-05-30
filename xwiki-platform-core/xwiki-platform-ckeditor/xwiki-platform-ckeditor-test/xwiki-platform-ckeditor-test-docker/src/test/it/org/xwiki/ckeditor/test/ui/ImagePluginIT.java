@@ -358,6 +358,33 @@ class ImagePluginIT
             + "[[aaaa>>image:image.gif]]", savedPage.editWiki().getContent());
     }
 
+    @Test
+    @Order(8)
+    void imageWrappedInLinkUI(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Upload an attachment to test with.
+        String attachmentName = "image.gif";
+        AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
+        ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
+
+        // Move to the WYSIWYG edition page.
+        WYSIWYGEditPage wysiwygEditPage = newPage.editWYSIWYG();
+        CKEditor editor = new CKEditor("content").waitToLoad();
+
+        // Insert a with caption and alignment to center.
+        ImageDialogSelectModal imageDialogSelectModal = editor.clickImageButton();
+        imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);
+        imageDialogSelectModal.clickSelect().clickInsert();
+
+        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+
+        editor.clickLinkButton().setResourceValue("doc:", false).clickOK();
+
+        ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
+
+        assertEquals("[[~[~[image:image.gif~]~]>>doc:]]", savedPage.editWiki().getContent());
+    }
+
     private static void createAndLoginStandardUser(TestUtils setup)
     {
         setup.createUserAndLogin("alice", "pa$$word", "editor", "Wysiwyg", "usertype", "Advanced");

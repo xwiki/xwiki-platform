@@ -20,8 +20,8 @@
 package org.xwiki.flamingo.test.docker;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Order;
@@ -59,18 +59,24 @@ class FormTokenInjectionIT
             + "</script>"
             + "{{/html}}";
         ViewPage viewPage = setup.createPage(reference, content);
+
+        List<String> expectedMessages = List.of(
+            "Simple POST: 201",
+            "Only Request: 201",
+            "Request with init: 201",
+            "Simple with array headers: 201",
+            "Request with init body",
+            "Request Body",
+            "Simple with array headers body"
+        );
+
+        // Wait until the page content contains the last message to ensure the script has been fully executed.
+        setup.getDriver().waitUntilCondition(
+            driver -> viewPage.getContent().contains(expectedMessages.get(expectedMessages.size() - 1))
+        );
+
         String pageContent = viewPage.getContent();
 
-        assertAll(
-            Stream.of(
-                "Simple POST: 201",
-                "Only Request: 201",
-                "Request with init: 201",
-                "Simple with array headers: 201",
-                "Request with init body",
-                "Request Body",
-                "Simple with array headers body"
-            ).map(expected -> (() -> assertThat(pageContent, containsString(expected))))
-        );
+        assertAll(expectedMessages.stream().map(expected -> (() -> assertThat(pageContent, containsString(expected)))));
     }
 }

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor-test</artifactId>
-    <version>15.4-SNAPSHOT</version>
+    <version>15.5-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test-upgrade</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Upgrade</name>
@@ -169,36 +169,15 @@
             <includes>
               <include>**/Upgrade*Test.java</include>
             </includes>
-            <systemProperties combine.children="append">
-              <property>
-                <name>previousFlavorName</name>
-                <value>${upgradetest.previousflavor.name}</value>
-              </property>
-              <property>
-                <name>previousFlavorId</name>
-                <value>${upgradetest.previousflavor.id}</value>
-              </property>
-              <property>
-                <name>flavorName</name>
-                <value>${xwiki.extension.distribution.ui.name}</value>
-              </property>
-              <property>
-                <name>flavorSummary</name>
-                <value>${xwiki.extension.distribution.ui.summary}</value>
-              </property>
-              <property>
-                <name>flavorId</name>
-                <value>${xwiki.extension.distribution.ui.id}</value>
-              </property>
-              <property>
-                <name>knowValidFlavors</name>
-                <value>${xwiki.extension.knownFlavors}</value>
-              </property>
-              <property>
-                <name>knowInvalidFlavors</name>
-                <value>${xwiki.extension.knownInvalidFlavors}</value>
-              </property>
-            </systemProperties>
+            <systemPropertyVariables>
+              <previousFlavorName>${upgradetest.previousflavor.name}</previousFlavorName>
+              <previousFlavorId>${upgradetest.previousflavor.id}</previousFlavorId>
+              <flavorName>${xwiki.extension.distribution.ui.name}</flavorName>
+              <flavorSummary>${xwiki.extension.distribution.ui.summary}</flavorSummary>
+              <flavorId>${xwiki.extension.distribution.ui.id}</flavorId>
+              <knowValidFlavors>${xwiki.extension.knownFlavors}</knowValidFlavors>
+              <knowInvalidFlavors>${xwiki.extension.knownInvalidFlavors}</knowInvalidFlavors>
+            </systemPropertyVariables>
           </configuration>
         </plugin>
       </plugins>

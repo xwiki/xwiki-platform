@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>15.4-SNAPSHOT</version>
+    <version>15.5-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -125,7 +125,19 @@
 
                  Single justification example:
             -->
-            
+            <revapi.differences>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.added</code>
+                  <old>method void org.xwiki.rendering.macro.toc.TocMacroParameters::setNumbered(boolean) @ org.xwiki.rendering.macro.toc.XWikiTocMacroParameters</old>
+                  <new>method void org.xwiki.rendering.macro.toc.TocMacroParameters::setNumbered(boolean) @ org.xwiki.rendering.macro.toc.XWikiTocMacroParameters</new>
+                  <annotation>@org.xwiki.properties.annotation.PropertyAdvanced</annotation>
+                  <criticality>allowed</criticality>
+                  <justification>Binary compatible</justification>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>
@@ -252,19 +264,16 @@
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-failsafe-plugin</artifactId>
               <configuration>
-                <systemProperties combine.children="append">
+                <systemPropertyVariables>
                   <!-- This is required by the Oracle JDBC driver when running configuration tests on Oracle, as
                        otherwise it fails with:
                          SQLException: ORA-00604: error occurred at recursive SQL level 1
                          ORA-01882: timezone region not found
-                       It's required at this level since TestContainers used JDBC to verify that the Oracle database is
+                       It's required at this level since TestContainers uses JDBC to verify that the Oracle database is
                        started.
                   -->
-                  <property>
-                    <name>oracle.jdbc.timezoneAsRegion</name>
-                    <value>false</value>
-                  </property>
-                </systemProperties>
+                  <oracle.jdbc.timezoneAsRegion>false</oracle.jdbc.timezoneAsRegion>
+                </systemPropertyVariables>
               </configuration>
             </plugin>
           </plugins>
@@ -287,30 +296,24 @@
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-surefire-plugin</artifactId>
               <configuration>
-                <systemProperties combine.children="append">
+                <systemPropertyVariables>
                   <!-- Tells XWiki Platform Test module to generate screenshots in the target dir when a test is
                        failing.
                        TODO: Remove this property once all functional tests have been moved to use the failsafe plugin
                   -->
-                  <property>
-                    <name>screenshotDirectory</name>
-                    <value>${project.build.directory}/screenshots</value>
-                  </property>
-                </systemProperties>
+                  <screenshotDirectory>${project.build.directory}/screenshots</screenshotDirectory>
+                </systemPropertyVariables>
               </configuration>
             </plugin>
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-failsafe-plugin</artifactId>
               <configuration>
-                <systemProperties combine.children="append">
+                <systemPropertyVariables>
                   <!-- Tells XWiki Platform Test module to generate screenshots in the target dir when a test is
                        failing (only used by non-docker UI tests) -->
-                  <property>
-                    <name>screenshotDirectory</name>
-                    <value>${project.build.directory}/screenshots</value>
-                  </property>
-                </systemProperties>
+                  <screenshotDirectory>${project.build.directory}/screenshots</screenshotDirectory>
+                </systemPropertyVariables>
               </configuration>
             </plugin>
           </plugins>

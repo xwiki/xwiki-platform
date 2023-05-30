@@ -295,7 +295,7 @@ Get the actual notifications.
     // Create the counter if it is not present
     if (counter.length == 0) {
       counter = $('&lt;span&gt;').addClass('notifications-count badge');
-      $('#tmNotifications &gt; a.icon-navbar').after(counter);
+      $('#tmNotifications &gt; button.dropdown-toggle').append(counter);
     }
     // Update the counter
     counter.text(count);
@@ -779,17 +779,39 @@ require(['jquery', 'xwiki-meta', 'xwiki-bootstrap-switch'], function ($, xm) {
 /***********************************************
  * Notifications Header
  ***********************************************/
+#tmNotifications {
+  &amp; > button {
+    background-color: @navbar-default-bg;
+    color: @navbar-default-link-color;
+    border: 0;
+    padding: 10px @navbar-padding-horizontal;
+
+    @media (min-width: @grid-float-breakpoint) {
+      padding: @navbar-padding-vertical @navbar-padding-horizontal;
+    }
+    &amp;:hover,
+    &amp;:focus {
+      background-color: @navbar-default-link-hover-bg;
+      color: @navbar-default-link-hover-color;
+    }
+    &amp;:active {
+      background-color: @navbar-default-link-active-bg;
+      color: @navbar-default-link-active-color;
+    }
+  }
+}
+
 .notifications-count {
   color: @btn-danger-color;
   background-color: @btn-danger-bg;
   position: absolute;
-  margin-left: 1.6em;
   top: 0;
 }
 
 @media (min-width: 768px) {
   .notifications-count {
     top: 3px;
+    right: 3px;
   }
 }
 

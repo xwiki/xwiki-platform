@@ -28,11 +28,15 @@
 -->
 <template>
   <!-- Pagination -->
-  <nav class="livedata-pagination">
+  <nav class="livedata-pagination"
+       :aria-label="this.data.id
+        ? $t('livedata.pagination.label', [this.data.id])
+        : $t('livedata.pagination.label.empty')
+      ">
 
     <!--
       Display the pagination current entry range
-      Can be shown / hiden by the `pagination.showEntryRange` property
+      Can be shown / hidden by the `pagination.showEntryRange` property
       in the Livedata meta config
     -->
     <span
@@ -57,6 +61,7 @@
     >
       {{ $t('livedata.pagination.pageSize') }}
       <select
+        :title="$t('livedata.pagination.selectPageSize')"
         @change="changePageSize"
       >
         <!-- Page sizes (get from the `pagination.pageSizes` config -->
@@ -71,12 +76,12 @@
 
     <!--
       The actual pagination widget
-      It dislays the the available pages numbers, and change to them on click.
-      Not all page numbers are show depending of the `pagination.maxShownPages`
+      It displays the the available pages numbers, and change to them on click.
+      Not all page numbers are shown depending of the `pagination.maxShownPages`
       property in the Livedata meta config.
       Arrows can be shown to go to first, last, previous, next page.
     -->
-    <nav class="pagination-indexes">
+    <span class="pagination-indexes">
       {{ $t('livedata.pagination.page') }}
       <!--
         Go to First Page button
@@ -180,7 +185,7 @@
         <XWikiIcon :icon-descriptor="{name: 'fast-forward'}"/>
       </a>
 
-    </nav>
+    </span>
 
   </nav>
 </template>

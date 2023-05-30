@@ -25,17 +25,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-ckeditor</artifactId>
-    <version>15.4-SNAPSHOT</version>
+    <version>15.5-SNAPSHOT</version>
   </parent>
-  <packaging>jar</packaging>
+  <packaging>webjar</packaging>
   <artifactId>xwiki-platform-ckeditor-plugins</artifactId>
   <name>XWiki Platform - CKEditor - Plugins</name>
   <description>Custom plugins that help the integration of the CKEditor in XWiki.</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>CKEditor Plugins for XWiki</xwiki.extension.name>
-    <!-- Explicitly indicate it's a webjar -->
-    <xwiki.extension.jar.type>webjar</xwiki.extension.jar.type>
     <!-- Old name of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>org.xwiki.contrib:application-ckeditor-plugins</xwiki.extension.features>
   </properties>
@@ -72,111 +70,52 @@
       <artifactId>fast-diff</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <!-- Fuzzy quick action (slash) search. -->
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>fuse.js</artifactId>
+      <version>6.6.2</version>
+      <scope>runtime</scope>
+    </dependency>
 
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-ckeditor-base</artifactId>
+      <artifactId>xwiki-platform-ckeditor-webjar</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
   <build>
     <plugins>
-      <!-- Verify the JavaScript code. -->
       <plugin>
-        <groupId>org.xwiki.contrib</groupId>
-        <artifactId>jshint-maven-plugin</artifactId>
+        <groupId>com.github.blutorange</groupId>
+        <artifactId>closure-compiler-maven-plugin</artifactId>
         <executions>
           <execution>
+            <id>generate-bundles</id>
             <goals>
-              <goal>lint</goal>
+              <!-- This is the only goal available, so we have to use it, even if we only want to merge some files. -->
+              <goal>minify</goal>
             </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <artifactId>maven-resources-plugin</artifactId>
-        <executions>
-          <execution>
-            <!-- Copy the WebJar resources to the right path before packing the jar. -->
-            <id>copy-webjar-resources</id>
-            <phase>validate</phase>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>net.alchim31.maven</groupId>
-        <artifactId>yuicompressor-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <!-- Minify the WebJar resources before packing the jar. -->
-            <id>minify-webjar-resources</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>compress</goal>
-            </goals>
+            <phase>compile</phase>
             <configuration>
-              <sourceDirectory>${webjar.outputDirectory}</sourceDirectory>
-              <outputDirectory>${webjar.outputDirectory}</outputDirectory>
+              <baseSourceDir>
+                ${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}
+              </baseSourceDir>
+              <sourceDir>${project.version}</sourceDir>
+              <baseTargetDir>
+                ${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}
+              </baseTargetDir>
+              <targetDir>${project.version}</targetDir>
+              <skipMerge>false</skipMerge>
+              <bundleConfiguration>src/main/config/bundleConfiguration.json</bundleConfiguration>
+              <!-- There's no configuration option to keep the unminified aggregated file so we include its source
+                in the generated source map file.  -->
+              <closureIncludeSourcesContent>true</closureIncludeSourcesContent>
             </configuration>
           </execution>
         </executions>
-        <configuration>
-          <!-- We use it also for JavaScript for now. -->
-          <!-- TODO: move to a more standard webjar packaging -->
-          <includes>
-            <include>**/*.js</include>
-            <include>**/*.css</include>
-          </includes>
-          <nosuffix>false</nosuffix>
-          <preProcessAggregates>true</preProcessAggregates>
-          <aggregations>
-            <!-- Aggregate the Resource Picker modules. -->
-            <aggregation>
-              <insertNewLine>true</insertNewLine>
-              <output>${webjar.outputDirectory}/xwiki-resource/resourcePicker.bundle.js</output>
-              <includes>
-                <include>*.js</include>
-              </includes>
-              <excludes>
-                <exclude>plugin.js</exclude>
-              </excludes>
-            </aggregation>
-            <!-- Aggregate the Macro Wizard modules. -->
-            <aggregation>
-              <insertNewLine>true</insertNewLine>
-              <output>${webjar.outputDirectory}/xwiki-macro/macroWizard.bundle.js</output>
-              <includes>
-                <include>*.js</include>
-              </includes>
-              <excludes>
-                <exclude>plugin.js</exclude>
-              </excludes>
-            </aggregation>
-            <!-- Aggregate the Image Dialog modules. -->
-            <aggregation>
-              <insertNewLine>true</insertNewLine>
-              <output>${webjar.outputDirectory}/xwiki-image/imageWizard.bundle.js</output>
-              <includes>
-                <include>*.js</include>
-              </includes>
-              <excludes>
-                <exclude>plugin.js</exclude>
-              </excludes>
-            </aggregation>
-          </aggregations>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <configuration>
-          <includes>
-            <!-- Include only the WebJar content -->
-            <include>META-INF/**</include>
-          </includes>
-        </configuration>
       </plugin>
     </plugins>
   </build>
@@ -207,7 +146,7 @@
                       <!-- Force a slightly older version of the Chrome Driver in case we don't have the latest Chrome
                         installed locally. -->
                       <name>wdm.chromeDriverVersion</name>
-                      <value>108.0.5359.71</value>
+                      <value>113.0.5672.63</value>
                     </property>
                     <property>
                       <!-- Try to work around error: "[SEVERE]: bind() failed: Cannot assign requested address (99)" -->
@@ -243,7 +182,7 @@
               <customRunnerConfiguration>
                 ${project.build.testOutputDirectory}/jasmine-require-config.txt
               </customRunnerConfiguration>
-              <jsSrcDir>${project.basedir}/src/main/resources</jsSrcDir>
+              <jsSrcDir>${project.basedir}/src/main/webjar</jsSrcDir>
             </configuration>
           </plugin>
         </plugins>

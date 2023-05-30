@@ -214,10 +214,16 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
       xDropdown.toggleClass('open');
       setDropdownButtonTitle(dropDownButton);
     });
-    dropDownHeader.append($(this).contents()[0]);
-    dropDownHeader.append(dropDownButton);
-    $(this).prepend(dropDownHeader);
-    $(dropDownHeader).next().addClass('xDropdown-menu');
+      let dropDownContent = $(this).contents();
+      // We put all the content of the entry in the header,
+      // except for the last one which is the content of the dropdown. This dropdown stays where it is.
+      for (let index = 0; index &lt; dropDownContent.length - 1 ; index++) {
+        let item = dropDownContent[index];
+        dropDownHeader.append(item);
+      }
+      dropDownHeader.append(dropDownButton);
+      $(this).prepend(dropDownHeader);
+      $(dropDownHeader).next().addClass('xDropdown-menu');
   });
 
   $('.menu-horizontal .xDropdown').each(function() {
@@ -851,12 +857,6 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
               padding: 0;
               display: inherit;
             }
-            /* Place the arrow on the right */
-            &amp;:after {
-              position: absolute;
-              margin-top: @line-height-computed / 2;
-              right: 8px;
-            }
           }
           /* Separator horizontal inside menu */
           &amp;:empty {
@@ -1227,6 +1227,7 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
       <code>{{velocity}}
 #set ($id = $xcontext.macro.params.id)
 #set ($type = $xcontext.macro.params.type)
+#set ($label = $xcontext.macro.params.label)
 #set ($colorTheme = $xwiki.getUserPreference('colorTheme'))
 #if ("$!colorTheme" != '')
   ## Make sure we use an absolute reference (see XWIKI-9672)
@@ -1234,12 +1235,17 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
 #end
 #set ($discard = $xwiki.ssx.use("$xcontext.macro.doc.prefixedFullName", {'colorTheme': $colorTheme}))
 #set ($discard = $xwiki.jsx.use("$xcontext.macro.doc.prefixedFullName"))
+## Make sure the label is non-empty as otherwise the aria-label doesn't work.
+#if ("$!label" != '')
+  #set ($label = $wikimacro.context.getXDOM().getIdGenerator().generateUniqueId('Menu',''))
+#end
 #if($type.contains('horizontal'))
   ## Make sure the id is non-empty for horizontal menus as otherwise the toggle doesn't work.
-  #if ($stringtool.isBlank("$!id"))
+  #if ("$!id" == '')
     #set ($id = $wikimacro.context.getXDOM().getIdGenerator().generateUniqueId("M", "GeneratedMenuId"))
   #end
-  (% role="navigation" class="menu-horizontal-toggle" %)(((
+  (% role='navigation' class='menu-horizontal-toggle'
+  aria-label="${services.rendering.escape($label, 'xwiki/2.1')}" %)(((
     (% class="navbar-header" %)(((
       {{html}}
         &lt;button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#$!{escapetool.xml($id)}" aria-expanded="false"&gt;
@@ -1250,12 +1256,13 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
         &lt;/button&gt;
       {{/html}}
     )))
-    (% id="$!{services.rendering.escape($id, 'xwiki/2.1')}" class="menu menu-${services.rendering.escape($!type, 'xwiki/2.1')} collapse navbar-collapse" role="menubar" %)(((
+    (% id="$!{services.rendering.escape($id, 'xwiki/2.1')}" class="menu menu-${services.rendering.escape($!type, 'xwiki/2.1')} collapse navbar-collapse" role="navigation" %)(((
       {{wikimacrocontent/}}
     )))
   )))
 #else
-  (% #if ("$!id" != '') id="${services.rendering.escape($id, 'xwiki/2.1')}"#end class="menu menu-${services.rendering.escape($!type, 'xwiki/2.1')}" role="menu" %)(((
+  (% role="navigation" #if ("$!id" != '') id="${services.rendering.escape($id, 'xwiki/2.1')}"#end class="menu menu-${services.rendering.escape($!type, 'xwiki/2.1')}"
+        aria-label="${services.rendering.escape($label, 'xwiki/2.1')}" %)(((
     {{wikimacrocontent/}}
   )))
 #end
@@ -1445,6 +1452,85 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
     </property>
     <property>
       <name>id</name>
+    </property>
+    <property>
+      <type/>
+    </property>
+  </object>
+  <object>
+    <name>Menu.MenuMacro</name>
+    <number>3</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>7101f71c-870b-4d80-8cbc-0ca11389151a</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <restricted>0</restricted>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
+    </class>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>Optional menu label used to describe the content of the menu.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>label</name>
     </property>
     <property>
       <type/>

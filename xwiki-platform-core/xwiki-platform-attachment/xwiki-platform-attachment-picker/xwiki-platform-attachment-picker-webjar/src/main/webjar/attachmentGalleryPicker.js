@@ -311,9 +311,8 @@ define('xwiki-attachment-picker',
 
       addAttachment(result, index) {
         const attachmentReference = XWiki.Model.resolve(result.id, XWiki.EntityType.ATTACHMENT);
-        const downloadDocumentURL = new XWiki.Document(attachmentReference.parent).getURL('download');
+        const downloadURL = new XWiki.Attachment(attachmentReference).getURL();
         const filename = result.filename[0];
-        const downloadURL = `${downloadDocumentURL}/${encodeURIComponent(attachmentReference.name)}`;
         const preview = this.initPreviewElement(result, downloadURL, filename);
 
         const textSpan = $('<span>').text(filename).prop('title', filename).addClass('attachmentTitle');

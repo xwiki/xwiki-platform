@@ -22,6 +22,7 @@ package org.xwiki.lesscss.internal.listeners;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -50,6 +51,7 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component
 @Named("lessSkin")
 @Singleton
+@Priority(EventListener.CACHE_INVALIDATION_DEFAULT_PRIORITY)
 public class SkinListener implements EventListener
 {
     private static final LocalDocumentReference SKIN_CLASS =

@@ -31,7 +31,8 @@
 ###    Toplevel Menu
 ###
 #macro(xwikitopmenustart)
-  <nav class="navbar navbar-default actionmenu">
+  <nav class="navbar navbar-default actionmenu"
+  aria-label="$escapetool.xml($services.localization.render('core.menu.navbar.label'))">
     <div class="container-fluid">
       ## Brand and toggle get grouped for better mobile display
       <div class="navbar-header">
@@ -56,8 +57,7 @@
 ###    Toplevel Left Menu
 ###
 #macro(xwikitopmenuleftstart)
-  <ul class="nav navbar-nav navbar-left"
-    aria-label="$escapetool.xml($services.localization.render('core.menu.navbar.left.label'))">
+  <ul class='nav navbar-nav navbar-left'>
 #end
 
 ###

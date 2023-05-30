@@ -97,6 +97,8 @@ class DefaultRatingsManagerFactoryTest
         expectedComponentDescriptor.setImplementation(SolrRatingsManager.class);
         expectedComponentDescriptor.setRoleHint(hint);
         expectedComponentDescriptor.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON);
+        expectedComponentDescriptor.setRoleHintPriority(0);
+        expectedComponentDescriptor.setRoleTypePriority(0);
 
         assertSame(this.ratingsManager, this.factory.getRatingsManager(hint));
         verify(this.currentComponentManager).registerComponent(expectedComponentDescriptor, this.ratingsManager);
@@ -121,6 +123,8 @@ class DefaultRatingsManagerFactoryTest
         expectedComponentDescriptor.setImplementation(SolrRatingsManager.class);
         expectedComponentDescriptor.setRoleHint(hint);
         expectedComponentDescriptor.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON);
+        expectedComponentDescriptor.setRoleHintPriority(0);
+        expectedComponentDescriptor.setRoleTypePriority(0);
 
         assertSame(this.ratingsManager, this.factory.getRatingsManager(hint));
         verify(this.currentComponentManager).registerComponent(expectedComponentDescriptor, this.ratingsManager);

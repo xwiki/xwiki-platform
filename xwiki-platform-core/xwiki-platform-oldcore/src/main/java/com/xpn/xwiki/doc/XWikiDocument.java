@@ -213,6 +213,8 @@ import com.xpn.xwiki.web.ObjectPolicyType;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
+import static org.xwiki.security.authorization.internal.RequiredRightsSkipContext.SKIP_REQUIRED_RIGHT;
+
 public class XWikiDocument implements DocumentModelBridge, Cloneable
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiDocument.class);
@@ -4174,16 +4176,23 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         if (eform.getRequiredRights() != null) {
             ContextualAuthorizationManager authorizationManager =
                 Utils.getComponent(ContextualAuthorizationManager.class);
+            Execution execution = Utils.getComponent(Execution.class);
             // For each existing required right, check if it is missing from the new required rights.
             // In this case check if the user has enough rights to remove it (i.e., does he have the corresponding right).
-            Set<Right> newRights = new HashSet<>(eform.getRequiredRights());
-            for (Right right : new ArrayList<>(this.requiredRights.getRights())) {
-                if (!eform.getRequiredRights().contains(right) && !authorizationManager.hasAccess(right)) {
-                    // Add back the right which can't be removed by the current user.
-                    newRights.add(right);
+            Object old = execution.getContext().getProperty(SKIP_REQUIRED_RIGHT);
+            try {
+                execution.getContext().setProperty(SKIP_REQUIRED_RIGHT, "true");
+                Set<Right> newRights = new HashSet<>(eform.getRequiredRights());
+                for (Right right : new ArrayList<>(this.requiredRights.getRights())) {
+                    if (!eform.getRequiredRights().contains(right) && !authorizationManager.hasAccess(right)) {
+                        // Add back the right which can't be removed by the current user.
+                        newRights.add(right);
+                    }
                 }
+                this.requiredRights.setRights(newRights);
+            } finally {
+                execution.getContext().setProperty(SKIP_REQUIRED_RIGHT, old);
             }
-            this.requiredRights.setRights(newRights);
         }
     }
 

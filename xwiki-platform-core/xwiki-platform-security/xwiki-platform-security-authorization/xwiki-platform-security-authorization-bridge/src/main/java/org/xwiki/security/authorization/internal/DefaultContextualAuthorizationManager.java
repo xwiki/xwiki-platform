@@ -19,8 +19,10 @@
  */
 package org.xwiki.security.authorization.internal;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -29,6 +31,8 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -42,6 +46,10 @@ import org.xwiki.security.internal.XWikiConstants;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.EditForm;
+import com.xpn.xwiki.web.Utils;
+
+import static org.xwiki.security.authorization.internal.RequiredRightsSkipContext.SKIP_REQUIRED_RIGHT;
 
 /**
  * Default implementation of the {@link ContextualAuthorizationManager}.
@@ -71,6 +79,9 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
+
+    @Inject
+    private Execution execution;
 
     @Override
     public void checkAccess(Right right) throws AccessDeniedException
@@ -119,7 +130,62 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
 
     private boolean hasAccess(Right right, DocumentReference user, EntityReference entity)
     {
-        return checkPreAccess(right) && this.authorizationManager.hasAccess(right, user, getFullReference(entity));
+        boolean preAccess = checkPreAccess(right);
+        if (!preAccess) {
+            return false;
+        }
+        ExecutionContext context = this.execution.getContext();
+        Object previousValue = context.getProperty(SKIP_REQUIRED_RIGHT);
+        context.setProperty(SKIP_REQUIRED_RIGHT, "true");
+        try {
+            boolean hasAccess = this.authorizationManager.hasAccess(right, user, getFullReference(entity));
+            if (!hasAccess) {
+                return false;
+            }
+            XWikiDocument doc = getProgrammingDocument();
+            EditForm eform = new EditForm();
+            eform.setRequest(this.xcontextProvider.get().getRequest());
+            if (eform.getRequest() != null && doc != null) {
+                eform.readRequest();
+
+                Boolean activateRequiredRights = eform.getActivateRequiredRights();
+                if (activateRequiredRights != null) {
+                    doc.setRequiredRightsActivated(activateRequiredRights);
+                }
+                if (eform.getRequiredRights() != null) {
+
+                    // For each existing required right, check if it is missing from the new required rights.
+                    // In this case check if the user has enough rights to remove it (i.e., does he have the corresponding
+                    // right).
+
+                    Set<Right> newRights = new HashSet<>(eform.getRequiredRights());
+                    for (Right right2 : new ArrayList<>(doc.getRequiredRights().getRights())) {
+                        if (!eform.getRequiredRights().contains(right) && !this.authorizationManager.hasAccess(right2,
+                            user,
+                            getFullReference(entity)))
+                        {
+                            // Add back the right which can't be removed by the current user.
+                            newRights.add(right);
+                        }
+                    }
+                    doc.getRequiredRights().setRights(newRights);
+                }
+            }
+
+            if (doc != null && doc.getRequiredRights().activated()) {
+                if (Objects.equals(previousValue, "true")) {
+                    return true;
+                } else if (right.equals(Right.EDIT)) {
+                    return doc.getRequiredRights().getRights().stream()
+                        .allMatch(r -> this.authorizationManager.hasAccess(r, user, getFullReference(entity)));
+                } else if (right.equals(Right.SCRIPT) || right.equals(Right.PROGRAM)) {
+                    return doc.getRequiredRights().has(right);
+                }
+            }
+            return true;
+        } finally {
+            context.setProperty(SKIP_REQUIRED_RIGHT, previousValue);
+        }
     }
 
     private EntityReference getFullReference(EntityReference reference)

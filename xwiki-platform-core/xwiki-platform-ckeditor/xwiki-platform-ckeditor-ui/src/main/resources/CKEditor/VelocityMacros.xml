@@ -78,7 +78,7 @@
       #set ($output = $services.rendering.render($xdom, $sourceSyntax.toIdString()))
     #end
   #end
-  #if ("$!output" != '' || $output == '')
+  #if ("$!output" != '' || $output == '')f
     $output##
   #else
     ## The output is null so an exception must have been thrown.

@@ -146,7 +146,7 @@ public class EditForm extends XWikiForm
         setTemporaryUploadedFiles(request.getParameterValues("uploadedFiles"));
         
         setActivateRequiredRights(request.getParameter("activateRequiredRights"));
-        if (request.getParameterMap().containsKey("updateRequiredRights")) {
+        if (request.getParameterMap() != null && request.getParameterMap().containsKey("updateRequiredRights")) {
             setRequiredRights(request.getParameterValues("requiredRights"));
         }
     }

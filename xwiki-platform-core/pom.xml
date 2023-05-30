@@ -125,19 +125,7 @@
 
                  Single justification example:
             -->
-            <revapi.differences>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.annotation.added</code>
-                  <old>method void org.xwiki.rendering.macro.toc.TocMacroParameters::setNumbered(boolean) @ org.xwiki.rendering.macro.toc.XWikiTocMacroParameters</old>
-                  <new>method void org.xwiki.rendering.macro.toc.TocMacroParameters::setNumbered(boolean) @ org.xwiki.rendering.macro.toc.XWikiTocMacroParameters</new>
-                  <annotation>@org.xwiki.properties.annotation.PropertyAdvanced</annotation>
-                  <criticality>allowed</criticality>
-                  <justification>Binary compatible</justification>
-                </item>
-              </differences>
-            </revapi.differences>
+            
           </analysisConfiguration>
         </configuration>
       </plugin>

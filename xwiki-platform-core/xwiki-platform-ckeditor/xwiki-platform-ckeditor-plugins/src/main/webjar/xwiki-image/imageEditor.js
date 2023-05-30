@@ -357,6 +357,23 @@ define('imageEditor', [
       });
     }
 
+    function initializeCaption(modal) {
+      const params = modal.data('input');
+      const editor = params.editor;
+      const feature = editor.widgets.registered.image.features.caption;
+      const captionsAllowed = editor.filter.checkFeature(feature);
+      const captionDd = $('#imageCaptionActivation').parents('dd');
+      const captionDt = captionDd.prev();
+      if(captionsAllowed) {
+        captionDd.removeClass('hidden');
+        captionDt.removeClass('hidden');
+      } else {
+        captionDd.addClass('hidden');
+        captionDt.addClass('hidden');
+        modal.data('input').imageData.hasCaption = false;
+      }
+    } 
+
     // Fetch modal content from a remote template the first time the image dialog editor is opened.
     function initialize(modal) {
       var params = modal.data('input');
@@ -502,6 +519,10 @@ define('imageEditor', [
     // 
     function updateForm(modal) {
       var imageData = modal.data('input').imageData || {};
+
+      // Placed early as the value of imageData.hasCaption can be forced to false if the current syntax does not
+      // support captions.
+      initializeCaption(modal);
 
       // Switch back to the default tab
       $('.image-editor a[href="#standard"]').tab('show');

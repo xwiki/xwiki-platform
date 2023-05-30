@@ -22,6 +22,7 @@ package com.xpn.xwiki.internal.filter.output;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -293,8 +294,9 @@ public abstract class AbstractEntityOutputFilterStream<E> implements EntityOutpu
 
     protected Set<Right> getRequiredRights(String parameterRevisionRequiredRights, FilterEventParameters parameters)
     {
-        return this.<List<String>>get(List.class, parameterRevisionRequiredRights, parameters, List.of(), false, true)
-            .stream()
+        String[] converted =
+            get(String[].class, parameterRevisionRequiredRights, parameters, new String[] {}, false, true);
+        return Arrays.stream(converted)
             .map(Right::toRight)
             .collect(Collectors.toSet());
     }

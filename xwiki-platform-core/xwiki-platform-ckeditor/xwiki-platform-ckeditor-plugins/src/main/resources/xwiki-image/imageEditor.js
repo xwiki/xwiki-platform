@@ -353,12 +353,12 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
     }
 
     function initializeCaption(modal) {
-      const params = modal.data('input');
-      const editor = params.editor;
-      const feature = editor.widgets.registered.image.features.caption;
-      const captionsAllowed = editor.filter.checkFeature(feature);
-      const captionDd = $('#imageCaptionActivation').parents('dd');
-      const captionDt = captionDd.prev();
+      var params = modal.data('input');
+      var editor = params.editor;
+      var feature = editor.widgets.registered.image.features.caption;
+      var captionsAllowed = editor.filter.checkFeature(feature);
+      var captionDd = $('#imageCaptionActivation').parents('dd');
+      var captionDt = captionDd.prev();
       if(captionsAllowed) {
         captionDd.removeClass('hidden');
         captionDt.removeClass('hidden');

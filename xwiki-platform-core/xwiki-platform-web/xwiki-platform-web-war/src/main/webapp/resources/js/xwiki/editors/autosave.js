@@ -114,8 +114,9 @@ editors.AutoSave = Class.create({
     frequencyLabel.appendChild(this.timeUnit);
     // A paragraph containing the whole thing
     var container = new Element('div', {"id": "autosaveControl"});
+    this.classNameAutosaveDisabled = 'autosaveDisabled';
     if (!this.options.enabled) {
-      container.addClassName('disabled');
+      container.addClassName(this.classNameAutosaveDisabled);
     }
     container.appendChild(autosaveLabel);
     container.appendChild(document.createTextNode(" "));
@@ -207,12 +208,12 @@ editors.AutoSave = Class.create({
     if (this.options.enabled) {
       this.startTimer();
       if (this.autosaveInput) {
-        this.autosaveInput.up(1).removeClassName('disabled');
+        this.autosaveInput.up(1).removeClassName(this.classNameAutosaveDisabled);
       }
     } else {
       this.stopTimer();
       if (this.autosaveInput) {
-        this.autosaveInput.up(1).addClassName('disabled');
+        this.autosaveInput.up(1).addClassName(this.classNameAutosaveDisabled);
       }
     }
   },

@@ -138,9 +138,13 @@
  * @param $content the content of the menu
  * @param $titleKey translation key of the link title to use
  * @param $titleAsLabel if the link title should also be used as link label
- * @param $actionUrl the link of the top menu entry. If not provided, the top menu entry will act as an activator for the dropdown
- * @param $extraAttribute (optional) additional A element attributes to add (such as ref="nofollow" for example)
- *
+ * @param $actionUrl (optional) the link of the top menu entry.
+ *   If not provided, the top menu entry will act as an activator for the dropdown
+ * @param $extraAttribute (optional) additional attributes to add (such as ref="nofollow" for example)
+ *   By default those attribute should fit an anchor.
+ *   Do take care that if the $actionUrl provided is empty,
+ *   the $extraAttributes are going to be used for a `button` instead of an `anchor`
+ *   and should have values fit to a `button`.
  * @since 7.3M2
  *#
 #macro(displayMenu $id $icon $menuContent $titleKey $titleAsLabel $actionUrl $extraAttribute)

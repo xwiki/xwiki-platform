@@ -18,21 +18,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>15.7-SNAPSHOT</version>
+    <artifactId>xwiki-platform-requiredrights</artifactId>
+    <version>15.5-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-security</artifactId>
-  <name>XWiki Platform - Security - Parent POM</name>
-  <description>Security APIs (Authentication, Authorization, and more)</description>
-  <packaging>pom</packaging>
-  <!-- Sorted Alphabetically -->
-  <modules>
-    <module>xwiki-platform-security-api</module>
-    <module>xwiki-platform-security-authentication</module>
-    <module>xwiki-platform-security-authorization</module>
-  </modules>
+  <artifactId>xwiki-platform-requiredrights-api</artifactId>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-script</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+    </dependency>
+  </dependencies>
 </project>

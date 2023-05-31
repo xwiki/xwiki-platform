@@ -162,7 +162,7 @@ public class SecurityAuthorizationScriptService implements ScriptService
     @Unstable
     public void optOutRequiredRights()
     {
-        this.execution.getContext().setProperty(SKIP_REQUIRED_RIGHT, "true");
+        this.execution.getContext().setProperty(SKIP_REQUIRED_RIGHT, String.valueOf(Boolean.TRUE));
     }
     
     /**
@@ -175,7 +175,7 @@ public class SecurityAuthorizationScriptService implements ScriptService
     @Unstable
     public void optInRequiredRights()
     {
-        this.execution.getContext().setProperty(SKIP_REQUIRED_RIGHT, "false");
+        this.execution.getContext().setProperty(SKIP_REQUIRED_RIGHT, String.valueOf(Boolean.FALSE));
     }
 
     /**

@@ -32,6 +32,7 @@
   <description>Provide the UIs specific to required rights</description>
   <modules>
     <!-- Sorted Alphabetically -->
+    <module>xwiki-platform-requiredrights-api</module>
     <module>xwiki-platform-requiredrights-ui</module>
   </modules>
   <profiles>

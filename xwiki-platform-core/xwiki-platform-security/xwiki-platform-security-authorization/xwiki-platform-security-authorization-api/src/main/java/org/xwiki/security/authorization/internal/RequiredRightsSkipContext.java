@@ -57,6 +57,6 @@ public class RequiredRightsSkipContext
         ExecutionContext context = this.execution.getContext();
         return context != null
             && context.hasProperty(SKIP_REQUIRED_RIGHT)
-            && Objects.equals(context.getProperty(SKIP_REQUIRED_RIGHT), "true");
+            && Objects.equals(context.getProperty(SKIP_REQUIRED_RIGHT), String.valueOf(Boolean.TRUE));
     }
 }

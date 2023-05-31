@@ -38,6 +38,8 @@
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
 #macro (ckeditor_convert $text $toHTML $fromHTML $stripHTMLEnvelope)
+  ## Update the required rights of the document based on the request parameters.
+  #set($discard = $services.requiredrights.loadFromRequest($tdoc))
   #set ($sourceSyntax = $request.sourceSyntax)
   #if ("$!sourceSyntax" != '')
     #set ($sourceSyntax = $services.rendering.resolveSyntax($sourceSyntax))
@@ -78,7 +80,7 @@
       #set ($output = $services.rendering.render($xdom, $sourceSyntax.toIdString()))
     #end
   #end
-  #if ("$!output" != '' || $output == '')f
+  #if ("$!output" != '' || $output == '')
     $output##
   #else
     ## The output is null so an exception must have been thrown.

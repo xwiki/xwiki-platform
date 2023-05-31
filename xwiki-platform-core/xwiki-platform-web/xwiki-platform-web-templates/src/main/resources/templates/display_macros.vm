@@ -212,10 +212,11 @@
         #if ($isRRActivated)
           #set ($activateRequiredRights = '1')
         #end
-        <input type="hidden" name="activateRequiredRights" value="$activateRequiredRights">
+        <input type="hidden" name="activateRequiredRights" value="$activateRequiredRights"/>
         #foreach($right in $parameters.requiredRights.rights)
-          <input type="hidden" name="requiredRights" value="$escapetool.xml($right.name)">        
+          <input type="hidden" name="requiredRights" value="$escapetool.xml($right.name)"/>        
         #end
+        <input type="hidden" name="updateRequiredRights" value="1"/>
       </div>
     </div>
   #else

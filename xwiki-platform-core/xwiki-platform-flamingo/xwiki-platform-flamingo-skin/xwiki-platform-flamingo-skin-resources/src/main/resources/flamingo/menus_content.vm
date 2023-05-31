@@ -78,10 +78,13 @@
     #if ($displayEditMenu && $hasEdit && !$isReadOnly)
       #displayEditMenu()
     #else
+      ## Display an explanation message in the case where the user has the edit right, but is missing one of the 
+      ## required rights.
       #set ($discard = $services.security.authorization.optOutRequiredRights())
       #if ($displayEditMenu && $services.security.authorization.hasAccess('edit') && !$isReadOnly)
-        <button class="btn btn-default" type="submit" disabled 
-                title="$escapetool.xml("Your are missing one of the following required rights: $doc.requiredRights.rights.")">
+        #set ($titleMessage = $services.localization.render("core.requiredrights.menu.edit.disabled",
+          [$doc.requiredRights.rights]))
+        <button class="btn btn-default" type="submit" disabled title="$escapetool.xml($titleMessage)">
           $services.icon.renderHTML('pencil') $escapetool.xml($services.localization.render('core.menu.edit'))
         </button>
       #end

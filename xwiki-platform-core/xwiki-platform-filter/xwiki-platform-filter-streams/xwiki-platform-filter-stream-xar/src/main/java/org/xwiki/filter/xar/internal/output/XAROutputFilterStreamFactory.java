@@ -30,7 +30,7 @@ import org.xwiki.filter.xar.output.XAROutputProperties;
 
 /**
  * Generate XAR package from FilterStream events.
- *
+ * 
  * @version $Id$
  * @since 6.2M1
  */

@@ -141,7 +141,7 @@ public class XWikiRCSNodeInfo extends AbstractSimpleClass implements Comparable<
     }
 
     /**
-     * @param requiredRights the required rights of the revision
+     * @param requiredRights the required rights for the revision
      * @since 15.5RC1
      */
     @Unstable

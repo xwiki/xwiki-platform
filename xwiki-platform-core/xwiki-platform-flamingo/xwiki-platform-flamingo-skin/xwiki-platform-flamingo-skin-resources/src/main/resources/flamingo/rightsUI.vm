@@ -312,61 +312,6 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
     </dl>
   #end
 
-#if ("$!request.section" == '' || $request.section == 'PageRights')
-  #set ($discard = $xwiki.jsfx.use('rightsUI.js'))
-  <h2>TODO: Required Rights</h2>
-  <form action="$escapetool.xml($xwiki.getURL($targetDocument, 'saveandcontinue'))" class="xform" method="post" name="required_rights_form">
-    #if ($targetDocument.requiredRights.activated())
-    <dl>
-      <dt>
-        <label for="scriptRequiredRight">Script</label>
-      </dt>
-      <dd>
-        <input name="initialValueScriptRequiredRight" value="$targetDocument.requiredRights.has('script')" type="hidden" disabled/>
-        #set ($discard = $services.security.authorization.optOutRequiredRights())
-        <input id="scriptRequiredRight" name="requiredRights" type="checkbox" value="script"
-          #if($targetDocument.requiredRights.has('script'))checked#end
-          #if(!$services.security.authorization.hasAccess('script', $xcontext.userReference, $targetDocument))disabled#end
-        />
-        #set ($discard = $services.security.authorization.optInRequiredRights())
-        <span class="box warningmessage hidden">Removing this mandatory right may result in breakage. Please make sure you understand the consequences, before saving.</span>
-      </dd>
-    </dl>
-    <dl>
-      <dt>
-        <label for="programmingRequiredRight">Programming</label>
-      </dt>
-      <dd>
-        <input name="initialValueProgrammingRequiredRight" value="$targetDocument.requiredRights.has('programming')" type="hidden" disabled/>
-        #set ($discard = $services.security.authorization.optOutRequiredRights())
-        <input id="programmingRequiredRight" name="requiredRights" type="checkbox" value="programming"
-           #if($targetDocument.requiredRights.has('programming'))checked#end
-           #if(!$services.security.authorization.hasAccess('programming', $xcontext.userReference, $targetDocument))disabled#end
-        />
-        #set ($discard = $services.security.authorization.optInRequiredRights())
-        <span class="box warningmessage hidden">Removing this mandatory right may result in breakage. Please make sure you understand the consequences, before saving.</span>
-      </dd>
-    </dl>
-    <p>
-      <span class="buttonwrapper">
-        <input type="hidden" name="updateRequiredRights" value="1">
-        <input class="button" type="submit" value="Save"/>
-      </span>
-    </p>
-    #else
-      <span class="buttonwrapper">
-        <input type="hidden" name="activateRequiredRights" value="1">
-        <input class="button" type="submit" value="Activate"/>
-      </span>
-    #end
-    <div class="hidden">
-      <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
-      <input type="hidden" name="xcontinue" value="$escapetool.xml($xwiki.getURL($doc, $xcontext.action, $escapetool.url($request.parameterMap)))" />;
-      <input type="hidden" name="xredirect" value="$escapetool.xml($xwiki.getURL($doc, $xcontext.action, $escapetool.url($request.parameterMap)))" />;
-    </div>
-  </form>
-#end
-  
     <script>
     //<![CDATA[
 (function() {

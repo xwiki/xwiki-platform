@@ -62,7 +62,7 @@ require(['jquery', 'xwiki-l10n!requiredRightsSelectorTranslationKeys'], function
           .val('script')
         );
       }
-      $(select).trigger('requiredRightsPickerUpdated');
+      $(select).trigger('xwiki:requiredRights:propertyUpdated');
     });
   }
 

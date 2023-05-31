@@ -80,6 +80,7 @@ import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.display.internal.DocumentDisplayer;
@@ -4174,25 +4175,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
         
         if (eform.getRequiredRights() != null) {
-            ContextualAuthorizationManager authorizationManager =
-                Utils.getComponent(ContextualAuthorizationManager.class);
-            Execution execution = Utils.getComponent(Execution.class);
-            // For each existing required right, check if it is missing from the new required rights.
-            // In this case check if the user has enough rights to remove it (i.e., does he have the corresponding right).
-            Object old = execution.getContext().getProperty(SKIP_REQUIRED_RIGHT);
-            try {
-                execution.getContext().setProperty(SKIP_REQUIRED_RIGHT, "true");
-                Set<Right> newRights = new HashSet<>(eform.getRequiredRights());
-                for (Right right : new ArrayList<>(this.requiredRights.getRights())) {
-                    if (!eform.getRequiredRights().contains(right) && !authorizationManager.hasAccess(right)) {
-                        // Add back the right which can't be removed by the current user.
-                        newRights.add(right);
-                    }
-                }
-                this.requiredRights.setRights(newRights);
-            } finally {
-                execution.getContext().setProperty(SKIP_REQUIRED_RIGHT, old);
-            }
+            initRequiredRightsFromForm(eform);
         }
     }
 
@@ -9491,6 +9474,29 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
     }
 
+    private void initRequiredRightsFromForm(EditForm eform)
+    {
+        ContextualAuthorizationManager authorizationManager = Utils.getComponent(ContextualAuthorizationManager.class);
+        Execution execution = Utils.getComponent(Execution.class);
+        // For each existing required right, check if it is missing from the new required rights.
+        // In this case check if the user has enough rights to remove it (i.e., does he have the corresponding right).
+        ExecutionContext newContext = new ExecutionContext();
+        execution.pushContext(newContext, true);
+        try {
+            newContext.setProperty(SKIP_REQUIRED_RIGHT, "true");
+            Set<Right> newRights = new HashSet<>(eform.getRequiredRights());
+            for (Right right : new ArrayList<>(this.requiredRights.getRights())) {
+                if (!eform.getRequiredRights().contains(right) && !authorizationManager.hasAccess(right)) {
+                    // Add back the right which can't be removed by the current user.
+                    newRights.add(right);
+                }
+            }
+            this.requiredRights.setRights(newRights);
+        } finally {
+            execution.popContext();
+        }
+    }
+
     /**
      * @return {@code true} when the required rights are activated for a given document, {@code false} otherwise
      * @since 15.5RC1
@@ -9509,7 +9515,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Unstable
     public void setRequiredRightsActivated(Boolean requiredRightsActivated)
     {
-        this.requiredRightsActivated = requiredRightsActivated != null && requiredRightsActivated;
+        boolean newValue = requiredRightsActivated != null && requiredRightsActivated;
+        if (!Objects.equals(newValue, this.requiredRightsActivated)) {
+            setMetaDataDirty(true);
+        }
+        this.requiredRightsActivated = newValue;
     }
 
     /**

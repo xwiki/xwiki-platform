@@ -19,12 +19,14 @@
  */
 package org.xwiki.security.authorization.internal;
 
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.xwiki.model.internal.document.DefaultRequiredRights;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
@@ -117,6 +119,7 @@ class DefaultContextualAuthorizationManagerTest
         assertFalse(this.contextualAuthorizationManager.hasAccess(right));
 
         XWikiDocument contextDocument = mock(XWikiDocument.class);
+        when(contextDocument.getRequiredRights()).thenReturn(new DefaultRequiredRights(contextDocument, Set.of()));
         this.oldcore.getXWikiContext().setDoc(contextDocument);
         assertTrue(this.contextualAuthorizationManager.hasAccess(right));
         verify(contextDocument).isRestricted();

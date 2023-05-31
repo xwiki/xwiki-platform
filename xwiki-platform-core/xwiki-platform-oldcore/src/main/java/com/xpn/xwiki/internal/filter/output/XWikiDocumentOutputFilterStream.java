@@ -296,7 +296,7 @@ public class XWikiDocumentOutputFilterStream extends AbstractEntityOutputFilterS
 
         this.entity.getAuthors().setEffectiveMetadataAuthor(getUserReference(
             WikiDocumentFilter.PARAMETER_REVISION_EFFECTIVEMETADATA_AUTHOR, parameters, defaultAuthorReference));
-        // Use effectuve metadata author as default as this value used to be used both both original and effective
+        // Use effectove metadata author as default as this value used to be used both both original and effective
         // metadata authors
         this.entity.getAuthors()
             .setOriginalMetadataAuthor(getUserReference(WikiDocumentFilter.PARAMETER_REVISION_ORIGINALMETADATA_AUTHOR,

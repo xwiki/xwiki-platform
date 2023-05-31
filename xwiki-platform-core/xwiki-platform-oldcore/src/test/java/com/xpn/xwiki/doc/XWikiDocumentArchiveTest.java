@@ -19,7 +19,9 @@
  */
 package com.xpn.xwiki.doc;
 
+import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +31,7 @@ import org.xwiki.test.annotation.AllComponents;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.user.api.XWikiRightService;
@@ -252,6 +255,86 @@ class XWikiDocumentArchiveTest
         assertEquals(doc11.getDate(), actual.getDate());
         assertEquals(doc11.getAuthor(), actual.getAuthor());
         assertEquals(doc11.getComment(), actual.getComment());
+    }
+
+    @Test
+    void getNodes() throws XWikiException
+    {
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("Test", "Test", "Test"));
+        XWikiDocumentArchive archive = new XWikiDocumentArchive(doc.getId());
+        doc.setDocumentArchive(archive);
+        String author = "XWiki.some author";
+
+        addRevisionToHistory(archive, doc, "content 1.1", author, "initial 1.1");
+
+        doc.setContent("content 2.1\nqwe @ ");
+        archive.updateArchive(doc, author, new Date(), "2.1", new Version(2,1), context);
+
+        doc.setContent("content 2.2\nqweq@ ");
+        archive.updateArchive(doc, author, new Date(), "2.2", new Version(2,2), context);
+
+        doc.setContent("content 2.3\nqweqe @@");
+        archive.updateArchive(doc, author, new Date(), "2.3", new Version(2,3), context);
+        assertEquals(new Version(2,3), archive.getLatestVersion());
+
+        Collection<XWikiRCSNodeInfo> nodes = archive.getNodes(new Version("3.0"), new Version("2.2"));
+        assertEquals(2, nodes.size());
+        Iterator<XWikiRCSNodeInfo> iterator = nodes.iterator();
+        assertEquals(new Version("2.3"), iterator.next().getVersion());
+        assertEquals(new Version("2.2"), iterator.next().getVersion());
+
+        nodes = archive.getNodes(new Version("2.2"), new Version("2.2"));
+        assertEquals(1, nodes.size());
+        iterator = nodes.iterator();
+        assertEquals(new Version("2.2"), iterator.next().getVersion());
+    }
+
+    @Test
+    void getNextFullVersions() throws XWikiException
+    {
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("Test", "Test", "Test"));
+        XWikiDocumentArchive archive = new XWikiDocumentArchive(doc.getId());
+        doc.setDocumentArchive(archive);
+        String author = "XWiki.some author";
+
+        // We have a full version every 5 nodes, so we're injecting 15 versions
+        addRevisionToHistory(archive, doc, "content 1.1", author, "initial 1.1");
+
+        doc.setContent("content 2.1\nqwe @ ");
+        archive.updateArchive(doc, author, new Date(), "2.1", new Version(2,1), context);
+
+        doc.setContent("content 2.2\nqweq@ ");
+        archive.updateArchive(doc, author, new Date(), "2.2", new Version(2,2), context);
+
+        doc.setContent("content 2.3\nqweqe @@");
+        archive.updateArchive(doc, author, new Date(), "2.3", new Version(2,3), context);
+
+        doc.setContent("content 2.4\nqweqe @@");
+        archive.updateArchive(doc, author, new Date(), "2.4", new Version(2,4), context);
+
+        // 5 nodes so far,
+        // let's add 5
+
+        for (int i = 1; i <= 5; i++) {
+            String version = String.format("3.%s", i);
+            doc.setContent(version + "\nqweqe @@");
+            archive.updateArchive(doc, author, new Date(), version, new Version(version), context);
+        }
+
+        // let's add 7
+        for (int i = 1; i <= 7; i++) {
+            String version = String.format("4.%s", i);
+            doc.setContent(version + "\nqweqe @@");
+            archive.updateArchive(doc, author, new Date(), version, new Version(version), context);
+        }
+        assertEquals(new Version(4,7), archive.getLatestVersion());
+
+        assertEquals(new Version("2.4"), archive.getNextFullVersion(new Version("2.3")));
+        assertEquals(new Version("2.4"), archive.getNextFullVersion(new Version("1.1")));
+        assertEquals(new Version("2.4"), archive.getNextFullVersion(new Version("2.1")));
+        assertEquals(new Version("3.5"), archive.getNextFullVersion(new Version("3.1")));
+        assertEquals(new Version("4.7"), archive.getNextFullVersion(new Version("4.6")));
+        assertEquals(new Version("4.5"), archive.getNextFullVersion(new Version("4.4")));
     }
 
     /**

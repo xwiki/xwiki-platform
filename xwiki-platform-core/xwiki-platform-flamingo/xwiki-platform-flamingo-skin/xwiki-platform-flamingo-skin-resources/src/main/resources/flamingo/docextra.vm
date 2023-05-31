@@ -125,7 +125,7 @@
         ##
         #if ($foreach.count == 1)
           var extraInit = function(){
-            XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", false)
+            XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", false);
             require(['jquery', 'xwiki-tabList'], function($, TabList) { new TabList($("#docExtrasTabsUl")); });
           };
         #end

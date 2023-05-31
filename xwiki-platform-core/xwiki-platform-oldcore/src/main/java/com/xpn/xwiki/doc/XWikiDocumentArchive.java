@@ -478,12 +478,11 @@ public class XWikiDocumentArchive
     }
 
     /**
+     * @param ver - for what version find next full one
+     * @return next version which contain full information (not patch)
      * @deprecated This method has been deprecated as its name is error-prone, and it has never done what's documented:
      * it always returned the next full version, and never the nearest one. So we renamed it to
      * {@link #getNextFullVersion(Version)}.
-     *
-     * @param ver - for what version find next full one
-     * @return next version which contain full information (not patch)
      */
     @Deprecated(since = "14.10.12,15.5RC1")
     public Version getNearestFullVersion(Version ver)

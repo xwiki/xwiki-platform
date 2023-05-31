@@ -107,7 +107,7 @@
     ##
     <div id="docextrapanes">
       #foreach($docextra in $docextras)
-        <div id="${docextra.get(0)}pane" class="hidden empty" role ="tabpanel" aria-labelledby="${docextra.get(0)}tab"></div>
+        <div id="${docextra.get(0)}pane" class="hidden empty" role="tabpanel" aria-labelledby="${docextra.get(0)}tab"></div>
       #end
     </div>
     ##

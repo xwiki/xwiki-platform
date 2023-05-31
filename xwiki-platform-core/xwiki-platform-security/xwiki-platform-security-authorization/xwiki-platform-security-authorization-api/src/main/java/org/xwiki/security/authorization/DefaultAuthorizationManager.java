@@ -62,7 +62,7 @@ public class DefaultAuthorizationManager implements AuthorizationManager
     /** Logger. **/
     @Inject
     private Logger logger;
-
+    
     /** The cached rights. */
     @Inject
     private SecurityCache securityCache;
@@ -174,10 +174,6 @@ public class DefaultAuthorizationManager implements AuthorizationManager
             securityReferenceFactory.newUserReference(userReference),
             securityReferenceFactory.newEntityReference(entityReference)
         );
-        
-        // TODO: find a way to retrive the required rights from the http request
-        // otherwise we are unable to simulate what changes when the required are changed
-        // without saving the document first...
 
         RuleState access = securityAccess.get(right, this.requiredRightsSkipContext.isRequiredRightsSkipped());
         String info = check ? "security checkpoint" : "access inquiry";

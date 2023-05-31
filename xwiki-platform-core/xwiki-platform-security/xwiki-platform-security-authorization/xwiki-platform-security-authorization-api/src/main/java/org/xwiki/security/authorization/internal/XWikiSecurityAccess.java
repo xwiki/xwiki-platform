@@ -175,8 +175,6 @@ public class XWikiSecurityAccess implements SecurityAccess
         }
         return clone;
     }
-    
-    
 
     @Override
     public boolean equals(Object o)
@@ -221,9 +219,6 @@ public class XWikiSecurityAccess implements SecurityAccess
             }
             b.append(r).append(": ").append(get(r));
         }
-
-        // TODO: add the required rights
-
         return b.toString();
     }
 }

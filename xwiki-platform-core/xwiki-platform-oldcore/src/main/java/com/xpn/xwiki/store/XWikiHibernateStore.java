@@ -1896,7 +1896,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             } catch (Exception e) {
                 this.logger.error("Failed to load the required rights of document [{}]", doc.getDocumentReference(), e);
                 Object[] args = { doc.getDocumentReference() };
-                // TODO: improve exception code.
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_MISC,
                     "Exception while loading the required rights for document {0}", e, args);
             }
@@ -2419,7 +2418,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 query.executeUpdate();
             } catch (Exception e) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                    // TODO: improve cause error code + error message (add doc ref)
                     XWikiException.ERROR_XWIKI_STORE_MISC, "Exception while deleting required rights", e);
             }
 
@@ -3403,7 +3401,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 return query.getSingleResult();
             } catch (Exception e) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                    // TODO: improve code id and error message (include doc ref)o
                     XWikiException.ERROR_XWIKI_STORE_MISC, "Exception while counting required rights for {}", e);
             }
         });

@@ -44,7 +44,6 @@ import org.xwiki.filter.event.model.WikiDocumentFilter;
 import org.xwiki.filter.event.xwiki.XWikiWikiDocumentFilter;
 import org.xwiki.filter.input.InputSource;
 import org.xwiki.localization.LocalizationContext;
-import org.xwiki.model.internal.document.DefaultRequiredRights;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
@@ -294,21 +293,11 @@ public class XWikiDocumentOutputFilterStream extends AbstractEntityOutputFilterS
 
         this.entity.setMinorEdit(getBoolean(WikiDocumentFilter.PARAMETER_REVISION_MINOR, parameters, false));
 
-        this.entity.getAuthors().setEffectiveMetadataAuthor(getUserReference(
-            WikiDocumentFilter.PARAMETER_REVISION_EFFECTIVEMETADATA_AUTHOR, parameters, defaultAuthorReference));
-        // Use effectove metadata author as default as this value used to be used both both original and effective
-        // metadata authors
-        this.entity.getAuthors()
-            .setOriginalMetadataAuthor(getUserReference(WikiDocumentFilter.PARAMETER_REVISION_ORIGINALMETADATA_AUTHOR,
-                parameters, this.entity.getAuthors().getEffectiveMetadataAuthor()));
-
-        this.entity.getAuthors().setContentAuthor(
-            getUserReference(WikiDocumentFilter.PARAMETER_CONTENT_AUTHOR, parameters, defaultAuthorReference));
-
         if (parameters.containsKey(PARAMETER_REVISION_REQUIRED_RIGHTS_ACTIVATED)) {
             this.entity.setRequiredRightsActivated(
                 getBoolean(WikiDocumentFilter.PARAMETER_REVISION_REQUIRED_RIGHTS_ACTIVATED, parameters, false));
         }
+
         this.entity.getRequiredRights()
             .setRights(getRequiredRights(WikiDocumentFilter.PARAMETER_REVISION_REQUIRED_RIGHTS, parameters));
         String revisions =

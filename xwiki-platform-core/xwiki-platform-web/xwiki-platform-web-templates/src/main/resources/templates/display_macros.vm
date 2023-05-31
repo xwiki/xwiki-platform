@@ -71,7 +71,11 @@
   #displayProperty_locale($macro.parameters)
 #end
 
-
+##
+## Display the required rights document property.
+## 
+## @since 15.5RC1
+##
 #macro (displayDocumentProperty_requiredRights $displayMode)
   #set ($macro.parameters = {
     'id': 'xwikiRequiredRightsInput',
@@ -153,6 +157,12 @@
   #end
 #end
 
+##
+## Dynamic part of the required rights property display. Displays either the current required rights configuration or a
+## drop-down of the required rights available options.
+## The text is written in terms understandable by end-users with not technical knowledge of our right system.
+## @since 15.5R1
+## 
 #macro (displayProperty_requiredRights $parameters)
   #set ($isRRActivated = $parameters.requiredRights.activated())
   #set ($hasRRProgramming  = $parameters.requiredRights.has('programming'))
@@ -160,7 +170,6 @@
   #set ($discard = $services.security.authorization.optOutRequiredRights())
   #set ($hasProgrammingRROptOut = $services.security.authorization.hasAccess('programming'))
   #set ($discard = $services.security.authorization.optInRequiredRights())
-
 
   #set ($initialPriority = '0')
   #if ($isRRActivated && !$hasRRProgramming && !$hasRRScript)
@@ -174,38 +183,38 @@
   #if ($parameters.mode == 'edit')
     #set ($discard = $xwiki.jsfx.use('requiredRights.js'))
     <div class="editRequiredRights">
-      #info("Be aware that the more rights you grant to the page, the fewer users will be able to edit it as only users with the granted rights are allowed to edit them.")
+      #info($services.localization.render('core.requiredrights.widgets.explanations'))
       <br />
       <select data-type="requiredRights" data-priority="$initialPriority">
         #if(!$isRRActivated)
           <option selected data-activated="false" data-priority="0">
-            Legacy mode, the rights of the last author applies
+            $escapetool.xml($services.localization.render('core.requiredrights.widgets.option.deactivated'))
           </option>
         #end
         <option #if($isRRActivated && !$hasRRProgramming && !$hasRRScript) selected#end
             data-activated="true"
             data-right=""
             data-priority="1">
-          Disable Script and Programming
+          $escapetool.xml($services.localization.render('core.requiredrights.widgets.option.activatedNoRights'))
         </option>
         <option#if($isRRActivated && !$hasRRProgramming && $hasRRScript) selected#end
             data-activated="true"
             data-right="script"
             data-priority="2">
-          Allow Script only
+          $escapetool.xml($services.localization.render('core.requiredrights.widgets.option.activatedScriptOnly'))
         </option>
         #if ($hasProgrammingRROptOut)
         <option#if($isRRActivated && $hasRRProgramming) selected#end
             data-activated="true"
             data-right="programming"
             data-priority="3">
-          Allow Script and Programming
+          $escapetool.xml($services.localization.render('core.requiredrights.widgets.option.activatedProgramming'))
         </option>
         #end
       </select>
       <div class="hidden lowerrights">
         <br />
-        #warning("Lowering the rights is dangerous")
+        #warning($services.localization.render('core.requiredrights.widgets.rightsLoweredWarning'))
       </div>
       <div class="hidden parameters">
         #set ($activateRequiredRights = '0')
@@ -221,15 +230,15 @@
     </div>
   #else
     #if ($isRRActivated)
-      #if ($hasRRProgramming) 
-        Script and Programming are allowed on this page.
+      #if ($hasRRProgramming)
+        $escapetool.xml($services.localization.render('core.requiredrights.widgets.view.hasProgramming'))
       #elseif ($hasRRScript)
-        Script allowed and Programming disabled on this page.
+        $escapetool.xml($services.localization.render('core.requiredrights.widgets.view.hasScript'))
       #else
-        Script and Programming are disabled on this page.
+        $escapetool.xml($services.localization.render('core.requiredrights.widgets.view.hasNone'))
       #end
     #else
-      Legacy mode, the rights of the last author applies.  
+      $escapetool.xml($services.localization.render('core.requiredrights.widgets.view.deactivated'))
     #end
   #end
 #end

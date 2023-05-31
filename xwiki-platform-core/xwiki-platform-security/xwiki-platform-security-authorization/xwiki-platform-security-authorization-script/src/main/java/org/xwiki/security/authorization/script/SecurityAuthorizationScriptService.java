@@ -65,9 +65,10 @@ public class SecurityAuthorizationScriptService implements ScriptService
     private Execution execution;
 
     /**
-     * Check if access identified by {@code right} on the current entity is allowed in the current context. The context
-     * includes information like the authenticated user, the current macro being executed, the rendering context
-     * restriction, the dropping of rights by macro, etc... This function should be used at security checkpoint.
+     * Check if access identified by {@code right} on the current entity is allowed in the current context.
+     * The context includes information like the authenticated user, the current macro being executed, the rendering
+     * context restriction, the dropping of rights by macro, etc...
+     * This function should be used at security checkpoint.
      *
      * @param right the right needed for execution of the action
      * @throws AccessDeniedException if the action should be denied, which may also happen when an error occurs
@@ -78,10 +79,10 @@ public class SecurityAuthorizationScriptService implements ScriptService
     }
 
     /**
-     * Verifies if access identified by {@code right} on the current entity would be allowed in the current context. The
-     * context includes information like the authenticated user, the current macro being executed, the rendering context
-     * restriction, the dropping of rights by macro, etc... This function should be used for interface matters, use
-     * {@link #checkAccess} at security checkpoints.
+     * Verifies if access identified by {@code right} on the current entity would be allowed in the current context.
+     * The context includes information like the authenticated user, the current macro being executed, the rendering
+     * context restriction, the dropping of rights by macro, etc...
+     * This function should be used for interface matters, use {@link #checkAccess} at security checkpoints.
      *
      * @param right the right to check .
      * @return {@code true} if the user has the specified right on the entity, {@code false} otherwise
@@ -92,9 +93,10 @@ public class SecurityAuthorizationScriptService implements ScriptService
     }
 
     /**
-     * Check if access identified by {@code right} on the given entity is allowed in the current context. The context
-     * includes information like the authenticated user, the current macro being executed, the rendering context
-     * restriction, the dropping of rights by macro, etc... This function should be used at security checkpoint.
+     * Check if access identified by {@code right} on the given entity is allowed in the current context.
+     * The context includes information like the authenticated user, the current macro being executed, the rendering
+     * context restriction, the dropping of rights by macro, etc...
+     * This function should be used at security checkpoint.
      *
      * @param right the right needed for execution of the action
      * @param entityReference the entity on which to check the right
@@ -106,10 +108,10 @@ public class SecurityAuthorizationScriptService implements ScriptService
     }
 
     /**
-     * Verifies if access identified by {@code right} on the given entity would be allowed in the current context. The
-     * context includes information like the authenticated user, the current macro being executed, the rendering context
-     * restriction, the dropping of rights by macro, etc... This function should be used for interface matters, use
-     * {@link #checkAccess} at security checkpoints.
+     * Verifies if access identified by {@code right} on the given entity would be allowed in the current context.
+     * The context includes information like the authenticated user, the current macro being executed, the rendering
+     * context restriction, the dropping of rights by macro, etc...
+     * This function should be used for interface matters, use {@link #checkAccess} at security checkpoints.
      *
      * @param right the right to check.
      * @param entityReference the entity on which to check the right
@@ -121,10 +123,10 @@ public class SecurityAuthorizationScriptService implements ScriptService
     }
 
     /**
-     * Check if the user identified by {@code userReference} has the access identified by {@code right} on the entity
-     * identified by {@code entityReference}. Note that some rights may be checked higher in hierarchy of the provided
-     * entity if such right is not enabled at lowest hierarchy level provided. This function should be used at security
-     * checkpoint.
+     * Check if the user identified by {@code userReference} has the access identified by {@code right} on the
+     * entity identified by {@code entityReference}. Note that some rights may be checked higher in hierarchy of the
+     * provided entity if such right is not enabled at lowest hierarchy level provided.
+     * This function should be used at security checkpoint.
      *
      * @param right the right needed for execution of the action
      * @param userReference the user to check the right for
@@ -138,10 +140,10 @@ public class SecurityAuthorizationScriptService implements ScriptService
     }
 
     /**
-     * Verifies if the user identified by {@code userReference} has the access identified by {@code right} on the entity
-     * identified by {@code entityReference}. Note that some rights may be checked higher in hierarchy of the provided
-     * entity if such right is not enabled at lowest hierarchy level provided. This function should be used for
-     * interface matters, use {@link #checkAccess} at security checkpoints.
+     * Verifies if the user identified by {@code userReference} has the access identified by {@code right} on the
+     * entity identified by {@code entityReference}. Note that some rights may be checked higher in hierarchy of the
+     * provided entity if such right is not enabled at lowest hierarchy level provided.
+     * This function should be used for interface matters, use {@link #checkAccess} at security checkpoints.
      *
      * @param right the right to check .
      * @param userReference the user to check the right for

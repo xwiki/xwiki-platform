@@ -41,8 +41,6 @@ public class RequiredRightsSkipContext
     /**
      * Identifier of the context key for the required rights skipping value. When {@code "true"}, the required rights
      * are not taken into account when computing the rights.
-     *
-     * @since 15.4RC1
      */
     public static final String SKIP_REQUIRED_RIGHT = "skipRequiredRight";
 

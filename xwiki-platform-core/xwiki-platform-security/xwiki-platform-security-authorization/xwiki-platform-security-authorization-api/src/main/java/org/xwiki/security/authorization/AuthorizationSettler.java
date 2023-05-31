@@ -39,9 +39,9 @@ import org.xwiki.stability.Unstable;
 public interface AuthorizationSettler
 {
     /**
-     * Compute the current access for the user that is a member
-     * of the given groups and on an entity which is protected by the
-     * given hierarchy of rights objects.
+     * Compute the current access for the user that is a member of the given groups and on an entity which is protected
+     * by the given hierarchy of rights objects. By default, called
+     * {@link #settle(UserSecurityReference, Collection, Deque, Set, boolean)} with required rights deactivated.
      *
      * @param user a user identifier.
      * @param groups a collection of groups.
@@ -62,14 +62,14 @@ public interface AuthorizationSettler
 
     /**
      * Compute the current access for the user that is a member of the given groups and on an entity which is protected
-     * by the given hierarchy of rights objects.
+     * by the given hierarchy of rights objects and set of required rights.
      *
-     * @param user a user identifier.
-     * @param groups a collection of groups.
+     * @param user a user identifier
+     * @param groups a collection of groups
      * @param securityRuleEntries a hierarchy of security rules.  The list is arranged such that the rules belonging
      *     to the main wiki is put in the last collection, preceded by subwiki if any, preceded by space and subspaces
      *     if any, preceded by the document rules.  The levels of this hierarchy match the structure of the entity
-     *     reference reported by the first SecurityRuleEntry.
+     *     reference reported by the first SecurityRuleEntry
      * @param requiredRights the set of required rights, {@code null} if the required rights are not activated for a
      *     given document
      * @param requiredRightsActivated when {@code true}, the required rights are activated on the entity

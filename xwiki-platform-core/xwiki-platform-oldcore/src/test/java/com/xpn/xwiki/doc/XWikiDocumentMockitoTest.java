@@ -49,13 +49,11 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.properties.internal.converter.ListConverter;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.user.UserConfiguration;
@@ -105,9 +103,6 @@ import static org.mockito.Mockito.when;
 @OldcoreTest
 @ReferenceComponentList
 @XWikiDocumentFilterUtilsComponentList
-@ComponentList({
-    ListConverter.class
-})
 public class XWikiDocumentMockitoTest
 {
     private static final String DOCWIKI = "wiki";

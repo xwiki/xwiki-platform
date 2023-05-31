@@ -35,7 +35,6 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.security.authorization.internal.RequiredRightsSkipContext;
 import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;

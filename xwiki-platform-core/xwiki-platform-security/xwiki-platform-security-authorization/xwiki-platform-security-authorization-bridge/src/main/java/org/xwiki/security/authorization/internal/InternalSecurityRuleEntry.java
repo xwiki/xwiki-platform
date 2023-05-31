@@ -49,7 +49,7 @@ final class InternalSecurityRuleEntry extends AbstractSecurityRuleEntry implemen
 
     /**
      * @param reference reference of the related entity
-     * @param rules collection of security rules applied on the entity.
+     * @param rules collection of security rules applied on the entity
      */
     InternalSecurityRuleEntry(SecurityReference reference, Collection<SecurityRule> rules)
     {

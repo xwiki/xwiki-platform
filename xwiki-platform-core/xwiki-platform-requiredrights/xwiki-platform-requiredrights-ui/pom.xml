@@ -32,6 +32,8 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Required Rights Application</xwiki.extension.name>
+    <!-- Category to display in the Extension Manager. -->
+    <xwiki.extension.category>application</xwiki.extension.category>
   </properties>
   <dependencies>
     <dependency>

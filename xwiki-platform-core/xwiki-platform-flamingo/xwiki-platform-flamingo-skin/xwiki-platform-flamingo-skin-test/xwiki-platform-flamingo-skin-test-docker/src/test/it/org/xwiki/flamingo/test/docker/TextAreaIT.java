@@ -113,7 +113,7 @@ class TextAreaIT
         assertEquals("Failed to execute the [velocity] macro. "
             + "Cause: [The execution of the [velocity] script macro is not allowed in ["
             + testUtils.serializeReference(testReference) + "]. "
-            + "Check the rights of its last author or the parameters if it's rendered from another script.]. "
-            + "Click on this message for details.", viewPage.getContent());
+            + "Check the rights of its last author, the required rights of the document, or the parameters if it's "
+            + "rendered from another script.]. Click on this message for details.", viewPage.getContent());
     }
 }

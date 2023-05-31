@@ -504,7 +504,7 @@ public class XWikiDocumentArchive
             return ver;
         }
         SortedSet<Version> headSet = this.fullVersions.headSet(ver);
-        return (headSet.isEmpty()) ? null : headSet.last();
+        return headSet.isEmpty() ? null : headSet.last();
     }
 
     /**

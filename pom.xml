@@ -59,7 +59,7 @@
     <jetty.version>9.4.49.v20220914</jetty.version>
     <netty.version>4.1.93.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
-    <dockerJava.version>3.3.0</dockerJava.version>
+    <dockerJava.version>3.3.1</dockerJava.version>
 
     <!-- Versions of other software we need in our functional tests -->
     <testcontainers.version>1.18.1</testcontainers.version>

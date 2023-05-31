@@ -138,25 +138,29 @@
  * @param $content the content of the menu
  * @param $titleKey translation key of the link title to use
  * @param $titleAsLabel if the link title should also be used as link label
- * @param $actionUrl the link of the top menu entry. If not provided, the top menu entry will act as an activator for the dropdown
- * @param $extraAttribute (optional) additional A element attributes to add (such as ref="nofollow" for example)
- *
+ * @param $actionUrl (optional) the link of the top menu entry.
+ *   If not provided, the top menu entry will act as an activator for the dropdown
+ * @param $extraAttribute (optional) additional attributes to add (such as ref="nofollow" for example)
+ *   By default those attribute should fit an anchor.
+ *   Do take care that if the $actionUrl provided is empty,
+ *   the $extraAttributes are going to be used for a `button` instead of an `anchor`
+ *   and should have values fit to a `button`.
  * @since 7.3M2
  *#
 #macro(displayMenu $id $icon $menuContent $titleKey $titleAsLabel $actionUrl $extraAttribute)
   <div class="btn-group" id="$id">
-    <a class="btn btn-default#if ("$!actionUrl" == '') dropdown-toggle#end" title="$services.localization.render($titleKey)"##
+    <#if ("$!actionUrl" == '')button#{else}a#end class="btn btn-default#if ("$!actionUrl" == '') dropdown-toggle#end" title="$services.localization.render($titleKey)"##
     #if ("$!actionUrl" != '')
       href="$actionUrl"
     #else
       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
     #end
-    role="button"#if ("$!extraAttribute" != '') ${extraAttribute}#end>
+    #if ("$!extraAttribute" != '') ${extraAttribute}#end>
       $services.icon.renderHTML($icon)
       #if ($titleAsLabel)
         <span class="btn-label">$services.localization.render($titleKey)</span>
       #end
-    </a>
+    </#if ("$!actionUrl" == '')button#{else}a#end>
     #if ($stringtool.isNotBlank("$!menuContent"))
       #if ("$!actionUrl" != '')
         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

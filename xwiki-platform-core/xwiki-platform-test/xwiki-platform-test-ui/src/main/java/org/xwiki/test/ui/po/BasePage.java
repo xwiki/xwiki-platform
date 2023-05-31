@@ -70,7 +70,7 @@ public class BasePage extends BaseElement
     @FindBy(xpath = "//div[@id='tmCreate']/a[contains(@role, 'button')]")
     private WebElement tmCreate;
 
-    @FindBy(xpath = "//div[@id='tmMoreActions']/a[contains(@role, 'button')]")
+    @FindBy(xpath = "//div[@id='tmMoreActions']/button")
     private WebElement moreActionsMenu;
 
     @FindBy(xpath = "//input[@id='tmWatchDocument']/../span[contains(@class, 'bootstrap-switch-label')]")
@@ -317,7 +317,7 @@ public class BasePage extends BaseElement
      */
     public void clickMoreActionsSubMenuEntry(String id)
     {
-        clickSubMenuEntryFromMenu(By.xpath("//div[@id='tmMoreActions']/a[contains(@role, 'button')]"), id);
+        clickSubMenuEntryFromMenu(By.xpath("//div[@id='tmMoreActions']/button"), id);
     }
 
     /**

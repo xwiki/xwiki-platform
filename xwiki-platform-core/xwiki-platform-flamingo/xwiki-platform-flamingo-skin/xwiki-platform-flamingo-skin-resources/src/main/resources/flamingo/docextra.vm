@@ -131,7 +131,7 @@
         #end
         if (hashviewer == "${extraAnchor}") {
           var extraInit = function(){
-            XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", true)
+            XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", true);
             require(['jquery', 'xwiki-tabList'], function($, TabList) { new TabList($("#docExtrasTabsUl")); });
           };
         }

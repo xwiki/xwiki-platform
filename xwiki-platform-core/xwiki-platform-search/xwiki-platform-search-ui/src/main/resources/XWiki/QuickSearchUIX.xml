@@ -127,7 +127,7 @@
 
     //Expand or retract the global search
     function showSearchInput() {
-      globalSearchInput.attr('type', 'text');
+      globalSearchInput.removeAttr('disabled');
       globalSearch.removeClass('globalsearch-close');
       globalSearchButton.attr('aria-expanded', 'true');
       globalSearchInput.trigger('focus');
@@ -135,10 +135,7 @@
     function hideSearchInput() {
       globalSearch.addClass('globalsearch-close');
       globalSearchButton.attr('aria-expanded', 'false');
-      /* We use the input type='hidden' instead of the attribute 'hidden'
-      because we use a transition on width, that is incompatible with 'hidden'.
-      Input type hidden also hides from the tab order and removes possibilities of adding text*/
-      globalSearchInput.attr('type', 'hidden');
+      globalSearchInput.attr('disabled','');
     }
 
     // Open the global search when the user click on the global search button
@@ -270,7 +267,7 @@
         &lt;label class='hidden' for='headerglobalsearchinput'&gt;$services.localization.render('search')&lt;/label&gt;
         &lt;button type='submit' class='btn' title="$services.localization.render('search')"
         aria-expanded='false' aria-controls='headerglobalsearchinput'&gt;$services.icon.renderHTML('search')&lt;/button&gt;
-        &lt;input type='hidden' name='text' placeholder="$services.localization.render('panels.search.inputText')" id='headerglobalsearchinput' /&gt;
+        &lt;input type='text' name='text' placeholder="$services.localization.render('panels.search.inputText')" id='headerglobalsearchinput' disabled /&gt;
         &lt;/form&gt;
     &lt;/li&gt;
   #end

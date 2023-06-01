@@ -20,16 +20,15 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.6" reference="XWiki.RequiredRights.Code.ConfigurationUI" locale="">
+<xwikidoc version="1.5" reference="XWiki.RequiredRights.Code.ConfigurationUI" locale="">
   <web>XWiki.RequiredRights.Code</web>
   <name>ConfigurationUI</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.RequiredRights.Code</parent>
   <author>xwiki:XWiki.Admin</author>
-  <requiredRightsActivated>false</requiredRightsActivated>
-  <requiredRights/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
   <title/>

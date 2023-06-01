@@ -56,7 +56,7 @@ public interface MandatoryDocumentInitializer
     /**
      * Update the provided document according to the need.
      *
-     * @param document the existing document to update
+     * @param document the document to update (can be existing or not)
      * @return true if the document has been modified, false otherwise
      */
     boolean updateDocument(XWikiDocument document);

@@ -72,10 +72,7 @@
       <div class="breadcrumb-container">
         ## Note: We display only the parent reference here. The new document part will be added from JavaScript.
         #hierarchy($options.parent.reference $options)
-        #if ($isDocumentTreeAvailable)
-          #documentPickerModal($options)
-          #locationPickerActions()
-        #end
+        #locationPickerActions($options)
       </div>
       ##
       ## ---------------------------------------------------------------------------------------------------------
@@ -87,15 +84,19 @@
   </dl>
 #end
 
-#macro (locationPickerActions)
+#macro (locationPickerActions $options)
   <div class="location-actions">
     ## Tree picker toggle
-    <a href="#" class="location-action location-action-pick"
-       title="$escapetool.xml($services.localization.render('core.create.locationPreview.actions.pick'))">
-      $services.icon.renderHTML('chart-organisation')
-    </a>
+    #if ($isDocumentTreeAvailable && $options.parent.label && !$options.parent.readOnly)
+      #documentPickerModal($options)
+      <a href="#" class="location-action location-action-pick"
+         title="$escapetool.xml($services.localization.render('core.create.locationPreview.actions.pick'))">
+        $services.icon.renderHTML('chart-organisation')
+      </a>
+    #end
     ## Location advanced edit button.
-    #if ($isAdvancedUser)
+    #if ($isAdvancedUser && ($options.name.label || $options.parent.label ||
+        ($options.wiki.label && $displayWikiFields)))
       <a href="#" class="location-action location-action-edit"
          title="$escapetool.xml($services.localization.render('core.create.locationPreview.actions.edit'))">
         $services.icon.renderHTML('pencil')
@@ -139,9 +140,9 @@
         </dd>
       #elseif ($wikiField)
         <dt class="hidden"></dt>
-        <dt class="hidden">
+        <dd class="hidden">
           <input type="hidden" name="$wikiField.name" class="location-wiki-field" value="$!escapedValue" />
-        </dt>
+        </dd>
       #end
       ## ---------------------------------------------------------------------------------------------------------
       ## Parent Reference field
@@ -162,17 +163,26 @@
         #set ($value = $defaultParentReferenceString)
       #end
       #set ($escapedValue = $escapetool.xml($value))
-      <dt>
-        <label for="$escapetool.xml($!{options.id})ParentReference">##
-          $escapetool.xml($services.localization.render($parentField.label))##
-        </label>
-        <span class="xHint">$!escapetool.xml($services.localization.render($parentField.hint))</span>
-      </dt>
-      <dd>
-        <input type="text" id="$escapetool.xml($!{options.id})ParentReference" class="location-parent-field suggestSpaces"
-          name="$escapetool.xml($parentField.name)" value="$!escapedValue"
-          placeholder="$!escapetool.xml($services.localization.render($parentField.placeholder))" />
-      </dd>
+      #if ($parentField.label)
+        <dt>
+          <label for="$escapetool.xml($!{options.id})ParentReference">##
+            $escapetool.xml($services.localization.render($parentField.label))##
+          </label>
+          <span class="xHint">$!escapetool.xml($services.localization.render($parentField.hint))</span>
+        </dt>
+        <dd>
+          <input type="text" id="$escapetool.xml($!{options.id})ParentReference" class="location-parent-field suggestSpaces"
+            name="$escapetool.xml($parentField.name)" value="$!escapedValue"
+            placeholder="$!escapetool.xml($services.localization.render($parentField.placeholder))"
+            #if ($parentField.readOnly)readonly#end />
+        </dd>
+      #else
+        <dt class="hidden"></dt>
+        <dd class="hidden">
+          <input type="hidden" name="$escapetool.xml($parentField.name)" value="$!escapedValue"
+                 class="location-parent-field" />
+        </dd>
+      #end
       ##
       ## ---------------------------------------------------------------------------------------------------------
       ## Name field
@@ -194,7 +204,8 @@
         <dd>
           <input type="text" id="$escapetool.xml($!{options.id})Name" name="$escapetool.xml($nameField.name)" class="location-name-field"
             value="$!escapedValue"
-            placeholder="$!escapetool.xml($services.localization.render($nameField.placeholder))" />
+            placeholder="$!escapetool.xml($services.localization.render($nameField.placeholder))"
+            #if ($nameField.readOnly)readonly#end />
         </dd>
       #elseif ($nameField)
         <dt class="hidden"></dt>

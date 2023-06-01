@@ -67,7 +67,6 @@ public class BasePage extends BaseElement
     @FindBy(id = "contentmenu")
     private WebElement contentMenuBar;
 
-
     @FindBy(xpath = "//div[@id='tmCreate']/a[contains(@class, 'btn')]")
     private WebElement tmCreate;
 

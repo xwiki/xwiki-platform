@@ -59,15 +59,15 @@
         return startMarker + image + stopMarker;
       });
 
-      // Chrome uses 'image.png', or a localized form (e.g., 'graphik.png' in German) as file name when pasting images,
-      // instead of leaving the file name empty, and this prevents us from using the configured default file name.
-      // Keeping the same name would override again and again the same attachment, which is problematic when more than
-      // one image is pasted to the same page.
-      // Instead, we integrate the timestamp and a random number between the filename and the file extension.
-      // For instance, 'image.png' becomes 'image-1684887709-691.png'
-      // See https://github.com/ckeditor/ckeditor-dev/issues/664
+      // Browses uses 'image.png', or a localized form (e.g., 'graphik.png' in German Firefox) as file name when pasting
+      // images, instead of leaving the file name empty, and this prevents us from using the configured default file
+      // name. Keeping the same name would override again and again the same attachment, which is problematic when more
+      // than one image is pasted to the same page. Instead, we replace the filename by a timestamp and a random number.
+      // For instance, 'image.png' becomes '1684887709-691.png'. See https://github.com/ckeditor/ckeditor-dev/issues/664
       var oldCreate = editor.uploadRepository.create;
       
+      // duringPaste is set to true on beforePaste and to false on afterPaste.
+      // That way, duringPaste is true when editor.uploadRepository.create is called only when a file is pasted.
       var duringPaste = false;
 
       editor.on('beforePaste', function () {
@@ -79,16 +79,15 @@
       });
 
       editor.uploadRepository.create = function (file, name) {
+        // Update the filename only when the file is pasted, otherwise use the provided filename.
         if (duringPaste) {
-          var splitName = file.name.split(".");
-          // Note: pop is stateful and needs to be executed before join.
-          var extension = splitName.pop();
-          var fileName = splitName.join(".");
-          var timestamp = Date.now();
-          var min = 100;
-          var max = 999;
-          var random = Math.floor(Math.random() * (max - min + 1)) + min;
-          name = fileName + '-' + timestamp + '-' + random + '.' + extension;
+          // The extension is everything after the first '.'.
+          const extension = file.name.split('.').slice(1).join('.');
+          const timestamp = Date.now();
+          const min = 100;
+          const max = 999;
+          const random = Math.floor(Math.random() * (max - min + 1)) + min;
+          name = `${timestamp}-${random}.${extension}`;
         }
         return oldCreate.call(this, file, name);
       };

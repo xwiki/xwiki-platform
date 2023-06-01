@@ -114,7 +114,7 @@ public class ViewPage extends BasePage
      */
     public WebElement getTranslateButton()
     {
-        return getDriver().findElement(By.cssSelector("#tmTranslate > a[role='button']"));
+        return getDriver().findElement(By.cssSelector("#tmTranslate > a.btn"));
     }
 
     /**

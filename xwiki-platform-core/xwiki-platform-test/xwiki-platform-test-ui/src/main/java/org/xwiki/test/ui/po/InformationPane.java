@@ -30,8 +30,8 @@ import org.openqa.selenium.support.FindBy;
 /**
  * PO for Page Information pane.
  *
- * @since 11.10
  * @version $Id$
+ * @since 11.10
  */
 public class InformationPane extends BaseElement
 {
@@ -57,7 +57,7 @@ public class InformationPane extends BaseElement
 
     /**
      * @return {@code true} if the Information tab says that the original locale of the current page is currently being
-     *         viewed, {@code false} otherwise
+     *     viewed, {@code false} otherwise
      * @since 12.10.6
      * @since 13.2RC1
      */
@@ -101,7 +101,7 @@ public class InformationPane extends BaseElement
 
     /**
      * Clicks on the translation link that corresponds to the given locale.
-     * 
+     *
      * @param locale the locale to click on
      * @since 12.10.6
      * @since 13.2RC1
@@ -113,7 +113,7 @@ public class InformationPane extends BaseElement
 
     /**
      * Clicks on the translation link with the specified label (locale pretty name).
-     * 
+     *
      * @param label the locale pretty name
      * @since 12.10.6
      * @since 13.2RC1
@@ -131,5 +131,14 @@ public class InformationPane extends BaseElement
     public DocumentSyntaxPropertyPane editSyntax()
     {
         return new DocumentSyntaxPropertyPane().clickEdit();
+    }
+
+    /**
+     * @return the page object to edit the required rights in the information pane
+     * @since 15.5RC1
+     */
+    public DocumentRequiredRightsPropertyPane editRequiredRights()
+    {
+        return new DocumentRequiredRightsPropertyPane().clickEdit();
     }
 }

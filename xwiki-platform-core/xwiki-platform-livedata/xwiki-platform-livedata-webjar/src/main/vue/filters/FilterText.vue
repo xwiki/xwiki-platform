@@ -29,7 +29,7 @@
     class="filter-text"
     type="text"
     size="1"
-    :aria-label="$t('livedata.filter.number.label')"
+    :aria-label="$t('livedata.filter.text.label')"
     :value="filterEntry.value"
     @input="applyFilterWithDelay($event.target.value)"
   />

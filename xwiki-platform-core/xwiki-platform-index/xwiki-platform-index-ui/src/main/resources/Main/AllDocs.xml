@@ -75,11 +75,17 @@
 ##===========
 {{html}}
 &lt;div class="floatcontainer"&gt;
-  &lt;ul class="xwikitabbar"&gt;
+  &lt;div id='tablistlabel' class='hidden'&gt;$escapetool.xml($services.localization.render('platform.index.tablist.label'))&lt;/div&gt;
+  &lt;div id='tablistdescription' class='hidden'&gt;$escapetool.xml($services.localization.render('platform.index.tablist.description'))&lt;/div&gt;
+  &lt;div id='allPagesTabs' class='xwikitabbar' role='tablist' aria-labelledby='tablistlabel' aria-describedby='tablistdescription'&gt;
 #foreach ($tab in $tabs)
-  &lt;li id="xwiki$tab['idSuffix']"#if($view == $tab['tabName']) class="active"#end&gt;&lt;a href="$doc.getURL('view', "view=$tab['tabName']&amp;amp;$!param")"&gt;$services.localization.render($tab['translationKey'])&lt;/a&gt;&lt;/li&gt;
+  &lt;a id="xwiki$tab['idSuffix']tab" href="$doc.getURL('view', "view=$tab['tabName']&amp;amp;$!param")"
+    #if($view == $tab['tabName']) class="active" aria-selected="true"
+    #else aria-selected="false" tabindex="-1" #end role="tab" aria-controls="xwiki$tab['idSuffix']pane"&gt;
+    $services.localization.render($tab['translationKey'])
+  &lt;/a&gt;
 #end
-  &lt;/ul&gt;
+  &lt;/div&gt;
 &lt;/div&gt;
 {{/html}}
 
@@ -90,11 +96,16 @@
 &lt;div class='xwikitabpanescontainer'&gt;
 #foreach ($tab in $tabs)
   #if ($tab['tabName'] == $view)
+    &lt;div id="xwiki$tab['idSuffix']pane" role='tabpanel' aria-labelledby="xwiki$tab['idSuffix']tab"&gt;
     {{include reference="$tab['document']"/}}
     #break
+    &lt;/div&gt;
   #end
 #end
 &lt;/div&gt;
+&lt;script&gt;
+require(['jquery', 'xwiki-tabList'], function($, TabList) { new TabList($("#allPagesTabs")); });
+&lt;/script&gt;
 {{/html}}
 #set($docextras=[])
 {{/velocity}}</content>

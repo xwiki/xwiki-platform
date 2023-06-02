@@ -93,7 +93,8 @@
     <div class="floatcontainer" id="docExtraTabs">
       <div id='tablistlabel' class='hidden'>$escapetool.xml($services.localization.render('docextra.tablist.label'))</div>
       <div id='tablistdescription' class='hidden'>$escapetool.xml($services.localization.render('docextra.tablist.description'))</div>
-      <div class='xwikitabbar' id='docExtrasTabsUl' role='tablist' aria-describedby='tablistdescription'>
+      <div class='xwikitabbar' id='docExtrasTabsUl' role='tablist'
+        aria-labelledby='tablistlabel' aria-describedby='tablistdescription'>
         #foreach($docextra in $docextras)
           <button id="${docextra.get(0)}tab"
             role="tab" aria-controls="${docextra.get(0)}pane" aria-selected="false" tabindex="-1">

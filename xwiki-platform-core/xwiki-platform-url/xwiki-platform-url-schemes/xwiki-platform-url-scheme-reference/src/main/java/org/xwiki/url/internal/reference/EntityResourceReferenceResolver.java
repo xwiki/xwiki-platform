@@ -102,7 +102,7 @@ public class EntityResourceReferenceResolver extends AbstractResourceReferenceRe
         // Convert the string representation of the Entity reference into a proper EntityResourceReference.
         entityURL = new EntityResourceReference(
             this.defaultEntityReferenceResolver.resolve(entityReferenceAsString, entityType),
-            EntityResourceAction.fromString(action));
+            EntityResourceAction.fromString(action), extendedURL.getURI().getFragment());
 
         return entityURL;
     }

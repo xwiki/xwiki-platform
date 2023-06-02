@@ -140,7 +140,7 @@ public class InstalledExtensionIndexIT extends AbstractClusterHttpIT
 
         // Make sure extension utils is initialized and set.
         if (AbstractClusterHttpIT.getExtensionTestUtils() == null) {
-            AllITs.initExtensionTestUtils(AbstractTest.context);
+            AllIT.initExtensionTestUtils(AbstractTest.context);
         }
     }
 

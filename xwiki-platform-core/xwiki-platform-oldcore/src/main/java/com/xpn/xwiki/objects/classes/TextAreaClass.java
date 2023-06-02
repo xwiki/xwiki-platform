@@ -34,7 +34,11 @@ import org.xwiki.edit.Editor;
 import org.xwiki.edit.EditorManager;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxContent;
+import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
+import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -47,6 +51,11 @@ import com.xpn.xwiki.web.Utils;
 
 public class TextAreaClass extends StringClass
 {
+    private static final String FAILED_VELOCITY_EXECUTION_WARNING =
+        "Failed to execute velocity code in text area property [{}]: [{}]";
+
+    private static final String RESTRICTED = "restricted";
+
     /**
      * Possible values for the editor meta property.
      * <p>
@@ -221,7 +230,7 @@ public class TextAreaClass extends StringClass
     @Override
     public BaseProperty newProperty()
     {
-        BaseProperty property = new LargeStringProperty();
+        BaseProperty<?> property = new LargeStringProperty();
         property.setName(getName());
 
         return property;
@@ -341,11 +350,7 @@ public class TextAreaClass extends StringClass
     {
         String contentType = getContentType();
 
-        if (contentType != null && !contentType.equals("puretext") && !contentType.equals("velocitycode")) {
-            return true;
-        } else {
-            return false;
-        }
+        return contentType != null && !contentType.equals("puretext") && !contentType.equals("velocitycode");
     }
 
     /**
@@ -360,7 +365,7 @@ public class TextAreaClass extends StringClass
     @Unstable
     public boolean isRestricted()
     {
-        return getIntValue("restricted", 0) == 1;
+        return getIntValue(RESTRICTED, 0) == 1;
     }
 
     /**
@@ -376,7 +381,7 @@ public class TextAreaClass extends StringClass
     @Unstable
     public void setRestricted(boolean restricted)
     {
-        setIntValue("restricted", restricted ? 1 : 0);
+        setIntValue(RESTRICTED, restricted ? 1 : 0);
     }
 
     @Override
@@ -394,7 +399,7 @@ public class TextAreaClass extends StringClass
         parameters.put("cols", getSize());
         parameters.put("rows", getRows());
         parameters.put("disabled", isDisabled());
-        parameters.put("restricted", isRestricted() || (ownerDocument != null && ownerDocument.isRestricted()));
+        parameters.put(RESTRICTED, isRestricted() || (ownerDocument != null && ownerDocument.isRestricted()));
         parameters.put("sourceDocumentReference", object.getDocumentReference());
         Syntax syntax = null;
         String contentType = getContentType();
@@ -437,48 +442,116 @@ public class TextAreaClass extends StringClass
         if (contentType == ContentType.PURE_TEXT) {
             super.displayView(buffer, name, prefix, object, context);
         } else if (contentType == ContentType.VELOCITY_CODE) {
-            StringBuffer result = new StringBuffer();
-            super.displayView(result, name, prefix, object, context);
-            if (getObjectDocumentSyntax(object, context).equals(Syntax.XWIKI_1_0)) {
-                buffer.append(context.getWiki().parseContent(result.toString(), context));
-            } else {
-                // Don't do anything since this mode is deprecated and not supported in the new rendering.
-                buffer.append(result);
-            }
+            displayVelocityCode(buffer, name, prefix, object, context);
         } else {
-            BaseProperty property = (BaseProperty) object.safeget(name);
+            BaseProperty<?> property = (BaseProperty<?>) object.safeget(name);
             if (property != null) {
                 String content = property.toText();
                 XWikiDocument sdoc = getObjectDocument(object, context);
 
+                if (contentType == ContentType.VELOCITYWIKI) {
+                    content = maybeEvaluateContent(name, isolated, content, sdoc);
+                }
+
                 if (sdoc != null) {
-                    if (contentType == ContentType.VELOCITYWIKI) {
-                        // Start with a pass of Velocity
-                        // TODO: maybe make velocity+wiki a syntax so that getRenderedContent can directly take care
-                        // of that
-                        VelocityEvaluator velocityEvaluator = Utils.getComponent(VelocityEvaluator.class);
-                        content = velocityEvaluator.evaluateVelocityNoException(content,
-                            isolated ? sdoc.getDocumentReference() : null);
-                    }
+                    sdoc = ensureContentAuthorIsMetadataAuthor(sdoc);
 
-                    // Make sure the right author is used to execute the textarea
-                    // Clone the document to void messaging with the cache
-                    if (!Objects.equals(sdoc.getAuthors().getEffectiveMetadataAuthor(),
-                        sdoc.getAuthors().getContentAuthor())) {
-                        sdoc = sdoc.clone();
-                        sdoc.getAuthors().setContentAuthor(sdoc.getAuthors().getEffectiveMetadataAuthor());
-                    }
-
-                    buffer.append(context.getDoc().getRenderedContent(content, sdoc.getSyntax(), isRestricted(), sdoc,
-                        isolated, context));
+                    buffer.append(
+                        context.getDoc().getRenderedContent(content, sdoc.getSyntax(), isRestricted(), sdoc,
+                            isolated, context));
                 } else {
-                    buffer.append(content);
+                    buffer.append(XMLUtils.escapeElementText(content));
                 }
             }
         }
     }
 
-    private XWikiDocument getObjectDocument(BaseCollection object, XWikiContext context)
+    private static XWikiDocument ensureContentAuthorIsMetadataAuthor(XWikiDocument sdoc)
+    {
+        XWikiDocument result;
+
+        // Make sure the right author is used to execute the textarea
+        // Clone the document to avoid changing the cached document instance
+        if (!Objects.equals(sdoc.getAuthors().getEffectiveMetadataAuthor(), sdoc.getAuthors().getContentAuthor())) {
+            result = sdoc.clone();
+            result.getAuthors().setContentAuthor(sdoc.getAuthors().getEffectiveMetadataAuthor());
+        } else {
+            result = sdoc;
+        }
+
+        return result;
+    }
+
+    private String maybeEvaluateContent(String name, boolean isolated, String content, XWikiDocument sdoc)
+    {
+        if (sdoc != null) {
+            // Start with a pass of Velocity
+            // TODO: maybe make velocity+wiki a syntax so that getRenderedContent can directly take care
+            // of that
+            AuthorExecutor authorExecutor = Utils.getComponent(AuthorExecutor.class);
+            VelocityEvaluator velocityEvaluator = Utils.getComponent(VelocityEvaluator.class);
+            try {
+                return authorExecutor.call(() -> {
+                    String result;
+                    // Check script right inside the author executor as otherwise the context author might not be
+                    // correct.
+                    if (isDocumentAuthorAllowedToEvaluateScript(sdoc)) {
+                        result = velocityEvaluator.evaluateVelocityNoException(content,
+                            isolated ? sdoc.getDocumentReference() : null);
+                    } else {
+                        result = content;
+                    }
+                    return result;
+                }, sdoc.getAuthorReference(), sdoc.getDocumentReference());
+            } catch (Exception e) {
+                LOGGER.warn(FAILED_VELOCITY_EXECUTION_WARNING, name, ExceptionUtils.getRootCauseMessage(e));
+            }
+        }
+
+        return content;
+    }
+
+    private void displayVelocityCode(StringBuffer buffer, String name, String prefix, BaseCollection<?> object,
+        XWikiContext context)
+    {
+        StringBuffer result = new StringBuffer();
+        super.displayView(result, name, prefix, object, context);
+        XWikiDocument sdoc = getObjectDocument(object, context);
+        if (getObjectDocumentSyntax(object, context).equals(Syntax.XWIKI_1_0) && sdoc != null) {
+            try {
+                Utils.getComponent(AuthorExecutor.class).call(() -> {
+                    // Check script right inside the author executor as otherwise the context author might not be
+                    // correct.
+                    if (isDocumentAuthorAllowedToEvaluateScript(sdoc)) {
+                        buffer.append(context.getWiki().parseContent(result.toString(), context));
+                    } else {
+                        buffer.append(result);
+                    }
+                    return null;
+                }, sdoc.getAuthorReference(), sdoc.getDocumentReference());
+            } catch (Exception e) {
+                LOGGER.warn(FAILED_VELOCITY_EXECUTION_WARNING, name, ExceptionUtils.getRootCauseMessage(e));
+                buffer.append(result);
+            }
+        } else {
+            // Don't do anything since this mode is deprecated and not supported in the new rendering.
+            buffer.append(result);
+        }
+    }
+
+    private boolean isDocumentAuthorAllowedToEvaluateScript(XWikiDocument document)
+    {
+        boolean isAllowed = !isRestricted() && !document.isRestricted();
+
+        if (isAllowed) {
+            ContextualAuthorizationManager authorization = Utils.getComponent(ContextualAuthorizationManager.class);
+            isAllowed = authorization.hasAccess(Right.SCRIPT);
+        }
+
+        return isAllowed;
+    }
+
+    private XWikiDocument getObjectDocument(BaseCollection<?> object, XWikiContext context)
     {
         try {
             XWikiDocument doc = object.getOwnerDocument();
@@ -499,7 +572,7 @@ public class TextAreaClass extends StringClass
         return null;
     }
 
-    private Syntax getObjectDocumentSyntax(BaseCollection object, XWikiContext context)
+    private Syntax getObjectDocumentSyntax(BaseCollection<?> object, XWikiContext context)
     {
         XWikiDocument doc = getObjectDocument(object, context);
 

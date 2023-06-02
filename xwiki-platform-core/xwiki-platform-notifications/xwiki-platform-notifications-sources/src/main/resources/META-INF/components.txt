@@ -1,3 +1,4 @@
+org.xwiki.notifications.sources.internal.DefaultGroupingEventManager
 org.xwiki.notifications.sources.internal.DefaultNotificationManager
 org.xwiki.notifications.sources.internal.DefaultParametrizedNotificationManager
 org.xwiki.notifications.sources.internal.EventQueryGenerator

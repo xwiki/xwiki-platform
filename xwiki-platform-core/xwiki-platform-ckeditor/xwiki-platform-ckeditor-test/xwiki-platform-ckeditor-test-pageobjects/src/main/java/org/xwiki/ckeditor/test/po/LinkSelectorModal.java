@@ -47,11 +47,27 @@ public class LinkSelectorModal extends BaseElement
      */
     public LinkSelectorModal setResourceValue(String value)
     {
+        return setResourceValue(value, true);
+    }
+    
+    /**
+     * Set the given value on the resource value search field.
+     *
+     * @param value the value to use to search for a resource (i.e., page or attachment)
+     * @param wait when {@code true}, wait for the dropdown to be shown before continuing
+     * @return the current page object
+     * @since 15.4RC1
+     * @since 14.10.10
+     */
+    public LinkSelectorModal setResourceValue(String value, boolean wait)
+    {
         WebElement resourcePicker = getResourcePicker();
         WebElement element = resourcePicker.findElement(cssSelector(" input.resourceReference"));
         element.clear();
         element.sendKeys(value);
-        getDriver().waitUntilElementsAreVisible(resourcePicker, new By[] { DROPDOWN_ITEM_SELECTOR }, true);
+        if (wait) {
+            getDriver().waitUntilElementsAreVisible(resourcePicker, new By[] { DROPDOWN_ITEM_SELECTOR }, true);
+        }
         return this;
     }
 

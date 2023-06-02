@@ -106,13 +106,13 @@ public class GroovyJob extends AbstractJob
             shell.evaluate(object.getLargeStringValue("script"));
         } catch (CompilationFailedException e) {
             throw new JobExecutionException(
-                "Failed to execute script for job [" + jobContext.getJobDetail().getKey() + "]", e, true);
+                "Failed to execute script for job [" + jobContext.getJobDetail().getKey() + "]", e);
         } catch (XWikiException e) {
             throw new JobExecutionException("Failed to load the document containing the job ["
-                + jobContext.getJobDetail().getKey() + "]", e, true);
+                + jobContext.getJobDetail().getKey() + "]", e);
         } catch (AccessDeniedException e) {
             throw new JobExecutionException("Executing the job [" + jobContext.getJobDetail().getKey() + "] failed "
-                + "due to insufficient rights.", e, true);
+                + "due to insufficient rights.", e);
         }
     }
 }

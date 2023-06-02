@@ -21,10 +21,12 @@
 package org.xwiki.security.authorization.cache;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.observation.EventListener;
 import org.xwiki.security.SecurityReference;
 import org.xwiki.security.UserSecurityReference;
 import org.xwiki.security.authorization.SecurityAccessEntry;
 import org.xwiki.security.authorization.SecurityRuleEntry;
+import org.xwiki.stability.Unstable;
 
 /**
  * A cache for fast access right rules checking.
@@ -35,6 +37,14 @@ import org.xwiki.security.authorization.SecurityRuleEntry;
 @Role
 public interface SecurityCache
 {
+    /**
+     * The priority used by the listener in charge of invalidating this cache.
+     * 
+     * @since 15.4RC1
+     */
+    @Unstable
+    int CACHE_INVALIDATION_PRIORITY = EventListener.CACHE_INVALIDATION_DEFAULT_PRIORITY;
+
     /**
      * Get a cached entry.
      * @param user Entity representing the user.

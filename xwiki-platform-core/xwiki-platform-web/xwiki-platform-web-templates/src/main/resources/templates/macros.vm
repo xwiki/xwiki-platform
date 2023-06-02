@@ -2934,7 +2934,7 @@ Recursive title display detected!##
   <div class="user" data-reference="$escapetool.xml($docReference)">
     <span class="user-avatar-wrapper">
       #getUserAvatarURL($docReference $avatarURL 120)
-      <img class="user-avatar" src="$escapetool.xml($avatarURL.url)" />
+      <img class="user-avatar" src="$escapetool.xml($avatarURL.url)" alt="" />
     </span>
     <a href="$xwiki.getURL($docReference)">$escapetool.xml($docReference.name)</a>
   </div>

@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.notifications.CompositeEvent;
@@ -175,9 +176,8 @@ class DefaultNotificationsResourceTest
         String expectedCacheKey = "cacheKey";
         when(this.cacheManager.createCacheKey(notificationParameters)).thenReturn(expectedCacheKey);
 
-        CompositeEvent compositeEvent = mock(CompositeEvent.class, "My Event");
-        List<CompositeEvent> eventList = Collections.singletonList(compositeEvent);
-        when(this.executor.submit(eq(expectedCacheKey), any(), eq(false), eq(false))).thenReturn(eventList);
+        List<CompositeEvent> eventList = Collections.singletonList(mock(CompositeEvent.class));
+        when(this.executor.submit(eq(expectedCacheKey), any(), eq(false), eq(false), eq(true))).thenReturn(eventList);
 
         String expectedResult = "some results";
         when(this.rssFeedRenderer.render(eventList)).thenReturn(expectedResult);

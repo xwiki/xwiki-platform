@@ -22,11 +22,13 @@ package org.xwiki.resource.entity;
 import java.util.Collections;
 import java.util.Locale;
 
-import org.junit.*;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Unit tests for {@link org.xwiki.resource.entity.EntityResourceReference}.
@@ -34,17 +36,18 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @since 6.1M2
  */
-public class EntityResourceReferenceTest
+class EntityResourceReferenceTest
 {
     @Test
-    public void creation()
+    void creation()
     {
         EntityReference reference = new DocumentReference("wiki", "space", "page");
-        EntityResourceReference resource = new EntityResourceReference(reference, EntityResourceAction.VIEW);
+        EntityResourceReference resource = new EntityResourceReference(reference, EntityResourceAction.VIEW, "anchor");
         assertEquals(EntityResourceAction.VIEW, resource.getAction());
         assertEquals(reference, resource.getEntityReference());
         assertEquals(Collections.EMPTY_MAP, resource.getParameters());
         assertNull(resource.getLocale());
+        assertEquals("anchor", resource.getAnchor());
 
         resource.addParameter("param1", "value1");
         assertEquals("value1", resource.getParameterValue("param1"));
@@ -57,7 +60,7 @@ public class EntityResourceReferenceTest
     }
 
     @Test
-    public void identity()
+    void identity()
     {
         EntityReference entityReference = new DocumentReference("wiki", "space", "page");
         EntityResourceReference reference1 = new EntityResourceReference(entityReference, EntityResourceAction.VIEW);
@@ -71,12 +74,13 @@ public class EntityResourceReferenceTest
     }
 
     @Test
-    public void toStringTest()
+    void toStringTest()
     {
         EntityReference entityReference = new DocumentReference("wiki", "space", "page");
         EntityResourceReference reference = new EntityResourceReference(entityReference, EntityResourceAction.VIEW);
         assertEquals(
-            "type = [entity], parameters = [], reference = [wiki:space.page], action = [view], locale = [<null>]",
+            "type = [entity], parameters = [], reference = [wiki:space.page], action = [view], locale = [<null>]"
+                + ", anchor = [<null>]",
             reference.toString());
     }
 }

@@ -158,7 +158,7 @@ class NotificationPreferenceScriptServiceTest
         DocumentUserReference documentUserReference = new DocumentUserReference(user, true);
 
         when(notificationPreferenceManager.getAllPreferences(user)).thenReturn(Collections.emptyList());
-        assertFalse(this.scriptService
+        assertTrue(this.scriptService
             .isEventTypeEnabledForUser("update", NotificationFormat.ALERT, documentUserReference));
 
         NotificationPreference pref1 = mock(NotificationPreference.class);
@@ -211,7 +211,7 @@ class NotificationPreferenceScriptServiceTest
         WikiReference wiki = new WikiReference("whatever");
 
         when(notificationPreferenceManager.getAllPreferences(wiki)).thenReturn(Collections.emptyList());
-        assertFalse(this.scriptService.isEventTypeEnabled("update", NotificationFormat.ALERT,
+        assertTrue(this.scriptService.isEventTypeEnabled("update", NotificationFormat.ALERT,
                 wiki.getName()));
 
         NotificationPreference pref1 = mock(NotificationPreference.class);

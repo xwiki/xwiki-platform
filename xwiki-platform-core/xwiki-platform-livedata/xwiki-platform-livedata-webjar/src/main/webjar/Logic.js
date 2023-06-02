@@ -96,6 +96,12 @@ define('xwiki-livedata', [
     }
   }
 
+  // Initializes a promise to be resolved once the translations loading is done.
+  var translationsLoadedResolve;
+  const translationsLoaded = new Promise((resolve) => {
+    translationsLoadedResolve = resolve;
+  });
+
   /**
    * Class for a logic element
    * Contains the Livedata data object and methods to mutate it
@@ -211,8 +217,11 @@ define('xwiki-livedata', [
         "selection.infoBar.selectedCount",
         "selection.infoBar.allSelected",
         "selection.infoBar.allSelectedBut",
+        "pagination.label",
+        "pagination.label.empty",
         "pagination.currentEntries",
         "pagination.pageSize",
+        "pagination.selectPageSize",
         "pagination.page",
         "pagination.first",
         "pagination.previous",
@@ -249,6 +258,8 @@ define('xwiki-livedata', [
         "bottombar.noEntries",
         "error.updateEntriesFailed"
       ],
+    }).then(() => {
+      translationsLoadedResolve(true);
     });
 
     // Return a translation only once the translations have been loaded from the server.
@@ -1487,6 +1498,17 @@ define('xwiki-livedata', [
         });
         this.updateEntries().then(resolve, reject);
       });
+    },
+    
+    //
+    // Translations
+    //
+
+    /**
+     * @returns {Promise<boolean>} the promise is resolved to true once the translations are loaded
+     */
+    translationsLoaded() {
+      return translationsLoaded;
     },
     
     //

@@ -21,6 +21,7 @@
 <div class="main layoutsubsection">
   ## Set as an HTML main for better DOM tree semantics to facilitate navigation with inclusive techs.
   <main id="mainContentArea">
+    #template('hierarchy.vm')
     ## ---------------------------------------------------------------------------------------------------------
     ## Since this template can be used for creating a Page or a Space, compute its title based on the passed
     ## "tocreate" parameter which can be either "page" or "space". If no "tocreate" parameter is passed then we

@@ -71,6 +71,9 @@ function initWrapper(mountConfiguration = {}) {
           return Promise.resolve(true);
         }
       }
+    },
+    mocks: {
+      $t: (key) => key
     }
   }, mountConfiguration));
 }
@@ -81,7 +84,8 @@ describe('FilterList.vue', () => {
     // The loader is displayed until the translations are loaded.
     expect(wrapper.classes()).toStrictEqual(['xwiki-loader']);
     await flushPromises()
-    expect(wrapper.html()).toBe("<span><input class=\"filter-list livedata-filter\"></span>")
+    expect(wrapper.html()).toBe("<span><input aria-label=\"livedata.filter.list.label\" " +
+     "class=\"filter-list livedata-filter\"></span>")
   })
 
   it('Render the filter list when Empty filter and advanced', async () => {
@@ -100,6 +104,7 @@ describe('FilterList.vue', () => {
     // The loader is displayed until the translations are loaded.
     expect(wrapper.classes()).toStrictEqual(['xwiki-loader']);
     await flushPromises()
-    expect(wrapper.html()).toBe('<span style="display: none;"><input class="filter-list livedata-filter"></span>')
+    expect(wrapper.html()).toBe('<span style="display: none;"><input aria-label="livedata.filter.list.label" ' +
+     'class="filter-list livedata-filter"></span>')
   })
 })

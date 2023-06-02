@@ -49,7 +49,28 @@
 #set ($configDocName = 'Rendering.RenderingConfig')
 #set ($configDoc = $xwiki.getDocument($configDocName))
 #set ($configClassName = 'Rendering.RenderingConfigClass')
-## Display form
+#set ($configObj = $configDoc.getObject($configClassName))
+## =======================================================
+## Step 1: Migrate Rendering config data
+## =======================================================
+## We bundle Rendering.RenderingConfig without a Rendering.RenderingConfigClass xobject, allowing us to migrate Rendering configuration
+## that were previously stored in the xwiki.rendering.syntaxes property in xwiki.cfg.
+#if ($xcontext.action == 'admin' &amp;&amp; "$!configObj" == '')
+  ## Create the xobject
+  #set ($configObj = $configDoc.newObject($configClassName))
+  ## Get the disabled syntaxes value from the old location and set them as the current disabled syntaxes
+  ## Also convert from Syntax to String
+  #set ($disabledSyntaxes = [])
+  #foreach ($disabledSyntax in $services.rendering.disabledSyntaxes)
+    #set ($discard = $disabledSyntaxes.add($disabledSyntax.toIdString())) 
+  #end
+  #set ($discard = $configObj.set('disabledSyntaxes', $disabledSyntaxes))
+  ## Save the new xobject!
+  #set ($discard = $configDoc.save('Migrated Rendering configuration found in xwiki.cfg (xwiki.rendering.syntaxes)', true))
+#end
+## =======================================================
+## Step 2: Display form
+## =======================================================
 #set ($params = {
   'general': ['disabledSyntaxes']
 })

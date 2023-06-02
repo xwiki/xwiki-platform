@@ -21,7 +21,7 @@
   <div class="user#if ($disabled) disabled#end" data-reference="$escapetool.xml($userReference)">
     <span class="user-avatar-wrapper">
       #getUserAvatarURL($userReference $avatarURL 120)
-      <img class="user-avatar" src="$escapetool.xml($avatarURL.url)" />
+      <img class="user-avatar" src="$escapetool.xml($avatarURL.url)" alt="" />
     </span>
     <a href="$xwiki.getURL($userReference)">$escapetool.xml($userReference.name)</a>
   </div>

@@ -44,7 +44,7 @@ public class DefaultGroupingEventStrategy implements GroupingEventStrategy
     @Inject
     private SimilarityCalculator similarityCalculator;
 
-    private final class BestSimilarity
+    private static final class BestSimilarity
     {
         public int value;
 

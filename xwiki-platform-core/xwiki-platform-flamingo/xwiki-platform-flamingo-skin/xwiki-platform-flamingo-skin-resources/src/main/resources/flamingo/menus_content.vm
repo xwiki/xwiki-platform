@@ -232,8 +232,8 @@
   #setVariable("$count", $count)
 #end
 
-#macro (submenuheader $titleKey $needsSeparator)
-  <dt class="dropdown-header#if($needsSeparator) separator-above#end">$services.localization.render($titleKey)</dt>
+#macro (submenuheader $titleKey)
+  <dt class="dropdown-header">$services.localization.render($titleKey)</dt>
 #end
 
 #**
@@ -408,7 +408,6 @@
   ## Display all the extensions points, including the static ones
   ##
   #define ($menuContent)
-    #set ($needsSeparator = false)
     ## Admin actions UIXP
     #if ($displayAdminMenu)
       #set ($adminActions = "#displayAdminActions()")
@@ -419,18 +418,18 @@
             $adminActions
           </ul>
         </dd>
-        #set ($needsSeparator = true)
       #end
     #end
     ## More actions UIXP
     #if ($displayMoreActionsMenu)
       #set ($moreActions = "#displayMoreActions()")
       #if ($stringtool.isNotBlank("$!moreActions"))
-        #submenuheader('core.menu.actions.others', $needsSeparator)
-        <dd><ul>
-          $moreActions
-        </ul></dd>
-        #set ($needsSeparator = true)
+        #submenuheader('core.menu.actions.others')
+        <dd>
+          <ul>
+            $moreActions
+          </ul>
+        </dd>
       #end
       ## ----------------------------
       ## Display the shortcuts
@@ -438,20 +437,21 @@
       #if($xwiki.hasAccessLevel('view') && $displayShortcuts)
         #set ($viewersContent = "#template('shortcuts.vm')")
         ## Only display a separator if at least one menu entry has been displayed before
-        #submenuheader('core.menu.actions.viewers', $needsSeparator)
+        #submenuheader('core.menu.actions.viewers')
         ##
         ## VIEW SOURCE
         ##
         #if ("$!request.rev" != '')
           #set ($revisionParameter = "&rev=$request.rev")
         #end
-        <dd><ul>
-          #submenuitem($doc.getURL('view', "viewer=code$!{revisionParameter}") $services.localization.render('core.menu.view.source') 'tmViewSource', '', 'search', $extraAttributes)
-          $viewersContent
-          ## Display Viewers menu UIX..
-          #displaySecureUIX('org.xwiki.platform.template.menu.viewers', [])
-        </ul></dd>
-        #set ($needsSeparator = true)
+        <dd>
+          <ul>
+            #submenuitem($doc.getURL('view', "viewer=code$!{revisionParameter}") $services.localization.render('core.menu.view.source') 'tmViewSource', '', 'search', $extraAttributes)
+            $viewersContent
+            ## Display Viewers menu UIX..
+            #displaySecureUIX('org.xwiki.platform.template.menu.viewers', [])
+          </ul>
+        </dd>
       #end
     #end
   #end

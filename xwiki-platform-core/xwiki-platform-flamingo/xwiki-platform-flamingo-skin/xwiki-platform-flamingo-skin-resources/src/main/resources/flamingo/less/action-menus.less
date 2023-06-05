@@ -323,8 +323,8 @@
       &:extend(li.dropdown-header);
       font-weight: initial;
 
-      // Add a css separator above the header
-      &.separator-above {
+      &:not(:first-child) {
+        // Add a css separator above the header
         padding-top: 10px;
         border-top: 1px solid @dropdown-divider-bg ;
       }

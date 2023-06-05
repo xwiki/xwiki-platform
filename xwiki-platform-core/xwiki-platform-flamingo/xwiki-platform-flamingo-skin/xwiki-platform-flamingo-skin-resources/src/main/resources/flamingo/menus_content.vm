@@ -228,7 +228,7 @@
   #setVariable("$count", $count)
 #end
 
-#macro (submenuheader $titleKey, $needsSeparator)
+#macro (submenuheader $titleKey $needsSeparator)
   <dt class="dropdown-header#if($needsSeparator) separator-above#end">$services.localization.render($titleKey)</dt>
 #end
 

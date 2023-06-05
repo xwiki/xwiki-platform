@@ -123,12 +123,8 @@ public class DefaultLocalizationManager implements LocalizationManager
             Block block = translation.render(parameters);
             DefaultWikiPrinter wikiPrinter = new DefaultWikiPrinter();
             BlockRenderer renderer = getSyntaxRenderer(targetSyntax);
-            if (renderer == null) {
-                result = null;
-            } else {
-                renderer.render(block, wikiPrinter);
-                result = wikiPrinter.toString();
-            }
+            renderer.render(block, wikiPrinter);
+            result = wikiPrinter.toString();
         }
 
         return result;

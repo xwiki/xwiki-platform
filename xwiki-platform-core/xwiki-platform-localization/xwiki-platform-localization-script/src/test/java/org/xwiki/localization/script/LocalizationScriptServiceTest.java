@@ -29,7 +29,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
@@ -56,10 +55,9 @@ import static org.mockito.Mockito.when;
 
 public class LocalizationScriptServiceTest
 {
-
     @Rule
     public MockitoComponentMockingRule<ScriptService> mocker =
-        new MockitoComponentMockingRule<ScriptService>(LocalizationScriptService.class);
+        new MockitoComponentMockingRule<>(LocalizationScriptService.class);
 
     private BlockRenderer renderer;
 
@@ -91,15 +89,10 @@ public class LocalizationScriptServiceTest
         localizationScriptService = (LocalizationScriptService) mocker.getComponentUnderTest();
         translation = mock(Translation.class);
 
-        doAnswer(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
-            {
-                WikiPrinter printer = (WikiPrinter) invocation.getArguments()[1];
-                printer.print("print result");
-                return null;
-            }
+        doAnswer((Answer<Object>) invocation -> {
+            WikiPrinter printer = (WikiPrinter) invocation.getArguments()[1];
+            printer.print("print result");
+            return null;
         }).when(renderer).render(eq(new WordBlock("message")), any(WikiPrinter.class));
         when(translation.render(Locale.ROOT, ArrayUtils.EMPTY_OBJECT_ARRAY)).thenReturn(new WordBlock("message"));
         when(localizationManager.getTranslation("key", Locale.ROOT)).thenReturn(translation);
@@ -117,7 +110,7 @@ public class LocalizationScriptServiceTest
     }
 
     @Test
-    public void renderWithSyntax() throws Exception
+    public void renderWithSyntax()
     {
         assertEquals("print result", localizationScriptService.render("key", Syntax.PLAIN_1_0));
         assertEquals("print result", localizationScriptService
@@ -125,7 +118,7 @@ public class LocalizationScriptServiceTest
     }
 
     @Test
-    public void renderWithSyntaxAndParameters() throws Exception
+    public void renderWithSyntaxAndParameters()
     {
         assertEquals("print result", localizationScriptService.render("key", Syntax.PLAIN_1_0, Arrays.asList()));
         assertEquals("print result", localizationScriptService
@@ -133,7 +126,7 @@ public class LocalizationScriptServiceTest
     }
 
     @Test
-    public void renderWithParameters() throws Exception
+    public void renderWithParameters()
     {
         assertEquals("print result", localizationScriptService.render("key", Arrays.asList()));
         assertEquals("print result", localizationScriptService
@@ -141,14 +134,14 @@ public class LocalizationScriptServiceTest
     }
 
     @Test
-    public void getCurrentLocale() throws Exception
+    public void getCurrentLocale()
     {
         when(localizationContext.getCurrentLocale()).thenReturn(Locale.ENGLISH);
         assertEquals(Locale.ENGLISH, localizationScriptService.getCurrentLocale());
     }
 
     @Test
-    public void getAvailableLocales() throws Exception
+    public void getAvailableLocales()
     {
         when(environment.getResourceAsStream(eq("/WEB-INF/xwiki-locales.txt")))
             .thenReturn(getClass().getResourceAsStream("/xwiki-locales.txt"));

@@ -410,9 +410,11 @@
       #set ($adminActions = "#displayAdminActions()")
       #if ($stringtool.isNotBlank("$!adminActions"))
         #submenuheader('core.menu.actions.main')
-        <dd><ul>
-          $adminActions
-        </ul></dd>
+        <dd>
+          <ul>
+            $adminActions
+          </ul>
+        </dd>
         #set ($needsSeparator = true)
       #end
     #end

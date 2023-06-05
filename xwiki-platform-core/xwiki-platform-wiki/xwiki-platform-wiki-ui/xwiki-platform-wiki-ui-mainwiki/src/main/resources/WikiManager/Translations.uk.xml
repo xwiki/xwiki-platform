@@ -84,7 +84,7 @@ platform.wiki.dependencies.user.missing=Java-компонент "Wiki User" не
 platform.wiki.create.button=Створити Вікі
 platform.wiki.create.title=Створити нову вікі
 platform.wiki.create.members=УЧАСНИКИ
-### Missing: platform.wiki.create.prettyname.empty=Pretty name must not be empty
+platform.wiki.create.prettyname.empty=Читабельна назва не повинна бути порожнім
 platform.wiki.create.error=Не вдалося створити Вікі "{0}": {1}.
 platform.wiki.create.error.wikiname.databasealreadyexists=База даних із цим ідентифікатором уже існує
 platform.wiki.create.error.wikiname.wikialreadyexists=Цей ідентифікатор уже використовується
@@ -95,7 +95,7 @@ platform.wiki.error.wikidoesnotexist=Вікі [{0}] не існує
 platform.wiki.error.oneParameterNotSpecified=Параметр ''{0}'' не було вказано.
 platform.wiki.error.parameterAcceptsMultipleValues=Дозволено кілька значень.
 platform.wiki.error.exceptionWithMessage=Виключення: {0}
-### Missing: platform.wiki.form.requiredField=Required
+platform.wiki.form.requiredField=Обов'язковий
 platform.wiki.csrf.error=Недійсний маркер безпеки. Будь ласка, повторіть свою операцію.
 
 ## Users
@@ -166,7 +166,7 @@ rendering.macro.workspaces.description=Застарілий макрос, яки
 
 ## Browse
 platform.wiki.browse=Переглянути Вікі
-### Missing: platform.wiki.browse.emptyvalue=N/A
+platform.wiki.browse.emptyvalue=Відсутнє
 platform.wiki.browse.wikiprettyname=Назва
 platform.wiki.browse.description=Опис
 platform.wiki.browse.owner=Власник
@@ -188,7 +188,7 @@ WikiManager.WikiUserClass_userScope_local_only=Лише локальні кор�
 WikiManager.WikiUserClass_userScope_global_only=Лише глобальні користувачі доступні у вікі
 WikiManager.WikiUserClass_userScope_local_and_global=Глобальні та локальні користувачі доступні у вікі
 platform.wiki.prop.wikiname=Вікі ідентифікатор
-### Missing: platform.wiki.prop.wikiprettyname=Pretty Name
+platform.wiki.prop.wikiprettyname=Читабельна назва
 platform.wiki.prop.wikialias=Псевдонім
 platform.wiki.prop.description=Опис
 platform.wiki.prop.owner=Власник
@@ -197,7 +197,7 @@ platform.wiki.prop.membershipType.hint=Спосіб, у який користу�
 
 ## Wizard
 platform.wiki.create.wizard.desc.wikiname=Унікальний ідентифікатор нової вікі.
-### Missing: platform.wiki.create.wizard.desc.wikiprettyname=The display name of the wiki.
+platform.wiki.create.wizard.desc.wikiprettyname=Коротка назва вікі.
 platform.wiki.create.wizard.desc.wikialias=Доменне ім'я, яке вказуватиме на вікі.
 platform.wiki.create.wizard.desc.newTemplateHint=Шаблон для використання в цій новій вікі (усі сторінки будуть клоновані).
 platform.wiki.create.wizard.desc.description=Короткий опис вікі та її призначення.
@@ -247,7 +247,7 @@ platform.wiki.sheet.erroraliasdoesnotexists=Псевдонім вікі "{0}" н
 platform.wiki.sheet.title.settings=Властивості вікі
 platform.wiki.sheet.title.createnewalias=Створити новий псевдонім
 platform.wiki.sheet.title.viewaliases=Переглянути псевдоніми
-### Missing: platform.wiki.sheet.desc.wikiprettyname=The display name of the wiki.
+platform.wiki.sheet.desc.wikiprettyname=Коротка назва вікі.
 platform.wiki.sheet.desc.owner=Користувач, який матиме всі права на цю вікі.
 platform.wiki.sheet.desc.secure=Якщо ввімкнути, усі URL-адреси, створені цією вікі, починатимуться з "https".
 platform.wiki.sheet.desc.port=Порт для використання для всіх зовнішніх URL-адрес, створених цією вікі. Якщо не встановлено, воно успадковується від конфігурації та основної вікі. Враховується лише для URL-адрес на основі домену.
@@ -255,9 +255,9 @@ platform.wiki.sheet.desc.iswikitemplate=Вказує, чи можна цю ві�
 platform.wiki.sheet.desc.server=Псевдонім, використовуваний для доступу до вікі.
 platform.wiki.sheet.desc.description=Короткий опис вікі.
 platform.wiki.sheet.desc.homepage=Домашня сторінка вікі.
-### Missing: platform.wiki.sheet.prop.wikiprettyname=Pretty name
+platform.wiki.sheet.prop.wikiprettyname=Читабельна назва
 platform.wiki.sheet.prop.owner=Власник
-### Missing: platform.wiki.sheet.prop.secure=Secure (SSL)
+platform.wiki.sheet.prop.secure=Захищено (SSL)
 platform.wiki.sheet.prop.port=Порт
 platform.wiki.sheet.prop.description=Опис
 platform.wiki.sheet.prop.server=Псевдонім
@@ -278,7 +278,7 @@ platform.wiki.sheet.aliases=Псевдонім — інша назва вікі.
 #######################################
 ## until 6.1
 #######################################
-### Missing: platform.wiki.dependencies.applicationmanager.missing=The {0}Application Manager Plugin{1} is not installed. Please install it and try again.
+platform.wiki.dependencies.applicationmanager.missing={0}Application Manager Plugin{1} не інстальовано. Будь ласка, встановіть його та спробуйте ще раз.
 
 #######################################
 ## until 6.4RC1

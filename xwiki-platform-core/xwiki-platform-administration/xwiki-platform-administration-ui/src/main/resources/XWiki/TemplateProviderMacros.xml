@@ -199,7 +199,7 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery', "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {'evaluate': true})"], function($) {
+      <code>require(['jquery', 'xwiki-tree'], function($) {
   $('.paths').on('click', '.path-delete', function(event) {
     event.preventDefault();
     $(this).closest('.path').remove();
@@ -242,32 +242,30 @@
   });
 
   // Location Tree Picker
-  require(['tree'], function($) {
-    $('.location-picker.modal').each(function() {
-      var modal = $(this);
-      var treeElement = modal.find('.location-tree');
-      var selectButton = modal.find('.modal-footer .btn-primary');
+  $('.location-picker.modal').each(function() {
+    var modal = $(this);
+    var treeElement = modal.find('.location-tree');
+    var selectButton = modal.find('.modal-footer .btn-primary');
 
-      modal.on('shown.bs.modal', function(event) {
-        if (!$.jstree.reference(treeElement)) {
-          // Initialize the tree and hook the event listeners.
-          treeElement.xtree({
-            core: {
-              multiple: true
-            }
-          }).on('changed.jstree', function(event, data) {
-            selectButton.prop('disabled', !data.selected.length);
-          }).on('dblclick', '.jstree-anchor', function() {
-            selectButton.click();
-          });
-        }
-      });
-
-      selectButton.on('click', function() {
-        modal.modal('hide');
-        modal.triggerHandler('xwiki:locationTreePicker:select', {
-          'tree': $.jstree.reference(treeElement)
+    modal.on('shown.bs.modal', function(event) {
+      if (!$.jstree.reference(treeElement)) {
+        // Initialize the tree and hook the event listeners.
+        treeElement.xtree({
+          core: {
+            multiple: true
+          }
+        }).on('changed.jstree', function(event, data) {
+          selectButton.prop('disabled', !data.selected.length);
+        }).on('dblclick', '.jstree-anchor', function() {
+          selectButton.click();
         });
+      }
+    });
+
+    selectButton.on('click', function() {
+      modal.modal('hide');
+      modal.triggerHandler('xwiki:locationTreePicker:select', {
+        'tree': $.jstree.reference(treeElement)
       });
     });
   });

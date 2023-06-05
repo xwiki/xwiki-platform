@@ -58,7 +58,7 @@ public class NotificationPreferenceEventGeneratorListener extends AbstractEventL
     public static final String NAME = "NotificationPreferenceEventGeneratorListener";
 
     private static final RegexEntityReference REFERENCE =
-        BaseObjectReference.any(DefaultModelBridge.NOTIFICATION_PREFERENCE_CLASS_STRING);
+        BaseObjectReference.any(DefaultNotificationPreferenceModelBridge.NOTIFICATION_PREFERENCE_CLASS_STRING);
 
     @Inject
     private ObservationManager observation;
@@ -89,7 +89,7 @@ public class NotificationPreferenceEventGeneratorListener extends AbstractEventL
 
     private EntityReference getEntityReference(DocumentReference source)
     {
-        if (source.getLocalDocumentReference().equals(DefaultModelBridge.GLOBAL_PREFERENCES)) {
+        if (source.getLocalDocumentReference().equals(DefaultNotificationPreferenceModelBridge.GLOBAL_PREFERENCES)) {
             return source.getWikiReference();
         } else {
             return source;

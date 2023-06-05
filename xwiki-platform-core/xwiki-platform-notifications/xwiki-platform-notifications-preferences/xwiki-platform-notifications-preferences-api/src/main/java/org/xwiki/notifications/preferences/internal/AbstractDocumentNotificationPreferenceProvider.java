@@ -47,7 +47,7 @@ public abstract class AbstractDocumentNotificationPreferenceProvider implements 
 {
     @Inject
     @Named("cached")
-    protected ModelBridge cachedModelBridge;
+    protected NotificationPreferenceModelBridge cachedNotificationPreferenceModelBridge;
 
     @Inject
     protected Logger logger;
@@ -84,7 +84,8 @@ public abstract class AbstractDocumentNotificationPreferenceProvider implements 
             throws NotificationException
     {
         if (target instanceof DocumentReference) {
-            cachedModelBridge.saveNotificationsPreferences((DocumentReference) target, preferences);
+            cachedNotificationPreferenceModelBridge
+                .saveNotificationsPreferences((DocumentReference) target, preferences);
         } else {
             logger.warn("Preference's target [{}] is not a document reference. The corresponding preference will not"
                     + " be saved.");

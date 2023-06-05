@@ -20,6 +20,7 @@
 package org.xwiki.rendering.internal.configuration;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -67,6 +68,10 @@ public class DefaultExtendedRenderingConfiguration implements ExtendedRenderingC
     private ConfigurationSource renderingConfiguration;
 
     @Inject
+    @Named("xwikicfg")
+    private ConfigurationSource xwikiCfgConfiguration;
+
+    @Inject
     private CoreConfiguration coreConfiguration;
 
     /**
@@ -101,9 +106,29 @@ public class DefaultExtendedRenderingConfiguration implements ExtendedRenderingC
     public List<Syntax> getDisabledSyntaxes()
     {
         List<Syntax> disabledSyntaxes = new ArrayList<>();
+
+        // First, look in the document sources
         List<String> disabledSyntaxesAsStrings = this.renderingConfiguration.getProperty(DISABLED_SYNTAXES_PROPERTY);
-        // Convert into a list of Syntax objects
-        if (disabledSyntaxesAsStrings != null) {
+
+        // Second, if there's no RenderingConfigClass xobject (i.e. when disabledSyntaxesAsStrings is null), then
+        // convert the config values from "xwiki.rendering.syntaxes" in xwiki.cfg into disabled syntaxes.
+        // Note: if disabledSyntaxesAsStrings is an empty list, it means that the user has not disabled any syntax and
+        // we'll show all of them.
+        if (disabledSyntaxesAsStrings == null) {
+            List<Syntax> configuredSyntaxes =
+                convertList(this.xwikiCfgConfiguration.getProperty("xwiki.rendering.syntaxes", List.class));
+            // If there's no such property, then only allow the default syntax. We do this since we don't want users to
+            // see bundled syntaxes by default. We only want them to see automatically syntaxes installed thereafter by
+            // the Extension Manager.
+            if (configuredSyntaxes == null || configuredSyntaxes.isEmpty()) {
+                disabledSyntaxes.addAll(computeDisabledSyntaxes(
+                    Collections.singletonList(getDefaultContentSyntax())));
+            } else {
+                // Disable all syntaxes except those in xwiki.rendering.syntaxes
+                disabledSyntaxes.addAll(computeDisabledSyntaxes(configuredSyntaxes));
+            }
+        } else {
+            // Convert into a list of Syntax objects
             disabledSyntaxes.addAll(convertList(disabledSyntaxesAsStrings));
         }
         return disabledSyntaxes;
@@ -147,6 +172,17 @@ public class DefaultExtendedRenderingConfiguration implements ExtendedRenderingC
             }
         }
         return syntaxes;
+    }
+
+    private List<Syntax> computeDisabledSyntaxes(List<Syntax> configuredSyntaxes)
+    {
+        List<Syntax> disabledSyntaxes = new ArrayList<>();
+        for (Syntax availableSyntax : getAvailableParserSyntaxes()) {
+            if (!configuredSyntaxes.contains(availableSyntax)) {
+                disabledSyntaxes.add(availableSyntax);
+            }
+        }
+        return disabledSyntaxes;
     }
 
     /**

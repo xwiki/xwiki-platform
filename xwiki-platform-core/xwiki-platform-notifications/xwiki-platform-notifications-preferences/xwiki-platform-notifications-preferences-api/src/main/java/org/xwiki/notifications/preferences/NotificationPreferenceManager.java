@@ -27,6 +27,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.stability.Unstable;
+import org.xwiki.user.UserReference;
 
 /**
  * Provide an interface for interacting with user notification preferences.
@@ -90,4 +92,20 @@ public interface NotificationPreferenceManager
      */
     void savePreferences(List<NotificationPreference> preferences)
             throws NotificationException;
+
+    /**
+     * Retrieve the defined grouping strategy in user preferences for the given target.
+     *
+     * @param userReference the user for which to retrieve the preference
+     * @param target the target output for which the grouping strategy will be used (e.g. mail or alert)
+     * @return the hint of the {@link org.xwiki.notifications.GroupingEventStrategy} component to use
+     * @throws NotificationException in case of problem for loading the preferences
+     * @since 15.5RC1
+     */
+    @Unstable
+    default String getNotificationGroupingStrategy(UserReference userReference, String target)
+        throws NotificationException
+    {
+        return "default";
+    }
 }

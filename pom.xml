@@ -57,9 +57,9 @@
     <pdfbox.version>2.0.28</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
     <jetty.version>9.4.49.v20220914</jetty.version>
-    <netty.version>4.1.92.Final</netty.version>
+    <netty.version>4.1.93.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
-    <dockerJava.version>3.3.0</dockerJava.version>
+    <dockerJava.version>3.3.1</dockerJava.version>
 
     <!-- Versions of other software we need in our functional tests -->
     <testcontainers.version>1.18.1</testcontainers.version>
@@ -110,7 +110,7 @@
     <pgsql.artifactId>postgresql</pgsql.artifactId>
     <pgsql.version>42.6.0</pgsql.version>
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
-    <oracle.artifactId>ojdbc8</oracle.artifactId>
+    <oracle.artifactId>ojdbc11</oracle.artifactId>
     <oracle.version>23.2.0.0</oracle.version>
   </properties>
   <scm>

@@ -60,7 +60,8 @@ public interface NotificationsResource
             @QueryParam("tags") String tags,
             @QueryParam("currentWiki") String currentWiki,
             @QueryParam("async") String async,
-            @QueryParam("asyncId") String asyncId
+            @QueryParam("asyncId") String asyncId,
+            @QueryParam("target") @DefaultValue("alert") String target
             ) throws Exception;
 
     /**

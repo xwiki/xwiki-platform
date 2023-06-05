@@ -233,9 +233,37 @@ public abstract class XWikiAction implements LegacyAction
         return this.autorization;
     }
 
+    /**
+     * @deprecated use {@link #localizePlainOrReturnKey(String, Object...)} instead. The new API doesn't XML-escape
+     *             the translation as it's supposed to be used in a context where the target syntax is plain text.
+     */
+    @Deprecated(since = "14.10.12,15.5RC1")
     protected String localizePlainOrKey(String key, Object... parameters)
     {
+        // TODO: Review all calls to localizePlainOrKey() and once this is done change this method implementation to
+        // use:
+        //   return localizeOrKey(key, Syntax.PLAIN_1_0, parameters)
         return XMLUtils.escape(StringUtils.defaultString(getLocalization().getTranslationPlain(key, parameters), key));
+    }
+
+    /**
+     * @since 14.10.12
+     * @since 15.5RC1
+     */
+    @Unstable
+    protected String localizeOrReturnKey(String key, Syntax syntax, Object... parameters)
+    {
+        return StringUtils.defaultString(getLocalization().getTranslation(key, syntax, parameters), key);
+    }
+
+    /**
+     * @since 14.10.12
+     * @since 15.5RC1
+     */
+    @Unstable
+    protected String localizePlainOrReturnKey(String key, Object... parameters)
+    {
+        return localizeOrReturnKey(key, Syntax.PLAIN_1_0, parameters);
     }
 
     protected JobProgressManager getProgress()

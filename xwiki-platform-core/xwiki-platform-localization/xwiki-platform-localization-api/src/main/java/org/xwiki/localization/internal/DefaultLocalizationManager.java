@@ -41,6 +41,7 @@ import org.xwiki.localization.TranslationBundleFactoryDoesNotExistsException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Default implementation of the {@link LocalizationManager} component.
@@ -53,7 +54,8 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 public class DefaultLocalizationManager implements LocalizationManager
 {
     /**
-     * Provides access to different bundles based on their hint. Needed in {@link #use(String, String)}.
+     * Provides access to different bundles based on their hint (needed in {@link #use(String, String)} and access to
+     * the various syntax renderers (needed in {@link #getTranslation(String, Locale, Syntax, Object...)}.
      */
     @Inject
     @Named("context")
@@ -64,13 +66,6 @@ public class DefaultLocalizationManager implements LocalizationManager
      */
     @Inject
     private TranslationBundleContext bundleContext;
-
-    /**
-     * The plain text renderer.
-     */
-    @Inject
-    @Named("plain/1.0")
-    private BlockRenderer plainRenderer;
 
     /**
      * The logger to log.
@@ -104,18 +99,30 @@ public class DefaultLocalizationManager implements LocalizationManager
     @Override
     public String getTranslationPlain(String key, Locale locale, Object... parameters)
     {
-        Translation translation = getTranslation(key, locale);
+        return getTranslation(key, locale, Syntax.PLAIN_1_0, parameters);
+    }
 
+    @Override
+    public String getTranslation(String key, Locale locale, Syntax targetSyntax, Object... parameters)
+    {
+        String result;
+
+        Translation translation = getTranslation(key, locale);
         if (translation == null) {
-            return null;
+            result = null;
+        } else {
+            Block block = translation.render(parameters);
+            DefaultWikiPrinter wikiPrinter = new DefaultWikiPrinter();
+            BlockRenderer renderer = getSyntaxRenderer(targetSyntax);
+            if (renderer == null) {
+                result = null;
+            } else {
+                renderer.render(block, wikiPrinter);
+                result = wikiPrinter.toString();
+            }
         }
 
-        Block block = translation.render(parameters);
-
-        DefaultWikiPrinter wikiPrinter = new DefaultWikiPrinter();
-        this.plainRenderer.render(block, wikiPrinter);
-
-        return wikiPrinter.toString();
+        return result;
     }
 
     @Override
@@ -155,5 +162,17 @@ public class DefaultLocalizationManager implements LocalizationManager
     public Locale getDefaultLocale()
     {
         return Locale.getDefault();
+    }
+
+    private BlockRenderer getSyntaxRenderer(Syntax syntax)
+    {
+        BlockRenderer result;
+        try {
+            result = this.componentManagerProvider.get().getInstance(BlockRenderer.class, syntax.toIdString());
+        } catch (ComponentLookupException e) {
+            this.logger.error("Failure to find Block Renderer for syntax [{}]. Returning a null translation", e);
+            result = null;
+        }
+        return result;
     }
 }

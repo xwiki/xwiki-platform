@@ -90,7 +90,7 @@
 #if("$!exception" != '' && $exception.code == 11018)
 <div class='box errormessage'>
   ## Use the 'invalidNameReference' context binding set by the create action for this case.
-  $services.localization.render('entitynamevalidation.create.invalidname', [$invalidNameReference])
+  $escapetool.xml($services.localization.render('entitynamevalidation.create.invalidname', [$invalidNameReference]))
 </div>
 #end
 

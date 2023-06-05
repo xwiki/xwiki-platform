@@ -235,7 +235,9 @@ public class DefaultNotificationParametersFactory
          * Accepted values are identifier of the current wiki. This is used in case of multiple wikis.
          */
         // TODO: not sure we should keep it, I put it since it was already in the REST API.
-        CURRENT_WIKI(false);
+        CURRENT_WIKI(false),
+
+        NOTIFICATION_GROUPING_EVENT_TARGET(true);
 
         private boolean isDirectlyUsed;
 
@@ -353,6 +355,10 @@ public class DefaultNotificationParametersFactory
 
                     case ONLY_UNREAD:
                         this.handleOnlyUnread(notificationParameters, parameterValue);
+                        break;
+
+                    case NOTIFICATION_GROUPING_EVENT_TARGET:
+                        notificationParameters.groupingEventTarget = parameterValue;
                         break;
 
                     default:

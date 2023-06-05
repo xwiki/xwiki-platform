@@ -4712,6 +4712,12 @@ public class XWiki implements EventListener
 
         XWikiDocumentArchive archive = document.getDocumentArchive(context);
 
+        if (archive.getNodes(upperBound, lowerBound).isEmpty()) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI,
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_UNEXISTANT_VERSION,
+                String.format("Cannot find any revision to delete matching the range defined by [%s] and [%s]",
+                    lowerBound, upperBound));
+        }
         // Remove the versions
         archive.removeVersions(upperBound, lowerBound, context);
 

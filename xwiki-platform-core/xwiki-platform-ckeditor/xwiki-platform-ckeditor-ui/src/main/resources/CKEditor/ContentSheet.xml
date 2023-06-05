@@ -229,6 +229,14 @@ a[data-linktype="create"]::after {
   text-decoration: none;
 }
 
+[contenteditable="true"] [data-xwiki-focusedplaceholder]::before {
+  /* Show the value of the focused line placeholder attribute */
+  position: absolute;
+  opacity: .8;
+  color: #aaa;
+  content: attr(data-xwiki-focusedplaceholder);
+}
+
 .macro-placeholder {
   /* Hide the placeholder by default and show it only if the macro is editable. */
   display: none;

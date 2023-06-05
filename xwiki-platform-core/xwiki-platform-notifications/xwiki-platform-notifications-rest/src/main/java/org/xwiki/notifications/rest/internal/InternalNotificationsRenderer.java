@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -32,6 +33,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.CompositeEventStatus;
 import org.xwiki.notifications.CompositeEventStatusManager;
+import org.xwiki.notifications.GroupingEventManager;
 import org.xwiki.notifications.notifiers.NotificationRenderer;
 import org.xwiki.notifications.rest.model.Notification;
 import org.xwiki.rendering.renderer.BlockRenderer;
@@ -53,6 +55,7 @@ public class InternalNotificationsRenderer
     private CompositeEventStatusManager compositeEventStatusManager;
 
     @Inject
+    @Named("context")
     private ComponentManager componentManager;
 
     @Inject
@@ -62,12 +65,15 @@ public class InternalNotificationsRenderer
     private NotificationRenderer notificationRenderer;
 
     @Inject
+    private GroupingEventManager groupingEventManager;
+
+    @Inject
     private Logger logger;
 
     /**
      * Render the notifications.
      *
-     * @param compositeEvents list of composite events to render
+     * @param compositeEvents list of events to render
      * @param userId id of the current user
      * @param showReadStatus either or not include the "read" status of the events
      * @return the list of notifications
@@ -77,7 +83,6 @@ public class InternalNotificationsRenderer
         boolean showReadStatus) throws Exception
     {
         List<Notification> notifications = new ArrayList<>();
-
         if (showReadStatus && StringUtils.isNotBlank(userId)) {
             for (CompositeEventStatus status
                     : compositeEventStatusManager.getCompositeEventStatuses(compositeEvents, userId)) {

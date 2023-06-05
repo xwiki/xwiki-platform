@@ -92,6 +92,7 @@ public class NotificationsIT
     @BeforeEach
     public void setup(TestUtils setup) throws Exception
     {
+        setup.loginAsSuperAdmin();
         // Create the two users we will be using
         setup.createUser(FIRST_USER_NAME, FIRST_USER_PASSWORD, "", "");
         setup.createUser(SECOND_USER_NAME, SECOND_USER_PASSWORD, "", "");
@@ -122,6 +123,7 @@ public class NotificationsIT
     {
         setup.deletePage("XWiki", FIRST_USER_NAME);
         setup.deletePage("XWiki", SECOND_USER_NAME);
+        setup.forceGuestUser();
     }
 
     @Test
@@ -146,6 +148,13 @@ public class NotificationsIT
         p = NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);
         p.getApplication(SYSTEM).setCollapsed(false);
         p.setEventTypeState(SYSTEM, CREATE, ALERT_FORMAT, BootstrapSwitch.State.ON);
+
+        tray.showNotificationTray();
+        assertFalse(tray.isPageOnlyWatched());
+        assertFalse(tray.arePageAndChildrenWatched());
+        assertFalse(tray.isWikiWatched());
+        // And he will watch the entire wiki.
+        tray.setWikiWatchedState(true);
 
         // We create a lot of pages in order to test the notification badge
         setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
@@ -228,7 +237,10 @@ public class NotificationsIT
         p.setEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT, BootstrapSwitch.State.ON);
         setup.gotoPage("Main", "WebHome");
         tray = new NotificationsTrayPage();
+        tray.showNotificationTray();
         tray.clearAllNotifications();
+        // Watch the entire wiki so that we receive notifications
+        tray.setWikiWatchedState(true);
 
         // Create a page, edit it twice, and finally add a comment
         setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
@@ -320,6 +332,11 @@ public class NotificationsIT
             p.getApplication(SYSTEM).setCollapsed(false);
             p.setEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT, BootstrapSwitch.State.ON);
 
+            // Watch the entire wiki so that we receive notifications
+            NotificationsTrayPage tray = new NotificationsTrayPage();
+            tray.showNotificationTray();
+            tray.setWikiWatchedState(true);
+
             // Login as second user and modify ARandomPageThatShouldBeModified
             setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
 
@@ -336,7 +353,7 @@ public class NotificationsIT
 
             // Ensure the notification has been received.
             NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + FIRST_USER_NAME, "xwiki", 1);
-            NotificationsTrayPage tray = new NotificationsTrayPage();
+            tray = new NotificationsTrayPage();
             assertEquals("This is a test template", tray.getNotificationRawContent(0));
         } finally {
             setup.loginAsSuperAdmin();
@@ -361,6 +378,12 @@ public class NotificationsIT
             p.setApplicationState(SYSTEM, "alert", BootstrapSwitch.State.ON);
             assertEquals("Own Events Filter", preferences.get(2).getFilterName());
             preferences.get(2).setEnabled(false);
+
+            // Watch the entire wiki so that we receive notifications
+            NotificationsTrayPage tray = new NotificationsTrayPage();
+            tray.showNotificationTray();
+            tray.setWikiWatchedState(true);
+
             setup.createPage(testReference, "", "");
             // Ensure the notification has been received.
             NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + FIRST_USER_NAME, "xwiki", 1);

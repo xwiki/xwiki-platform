@@ -22,6 +22,7 @@ package org.xwiki.test.ui;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,14 +98,15 @@ public class WCAGUtils
     public void writeWCAGResults() throws IOException
     {
         float totalTime = (float) this.wcagContext.getWCAGTime() / 1000;
-        LOGGER.debug("Time spent on WCAG validation for [{}]: [{}] (in s)",
+        LOGGER.info("Time spent on WCAG validation for [{}]: [{}] (in s)",
             getWCAGContext().getTestClassName(), totalTime);
 
         File wcagDir = new File(getWCAGReportPathOnHost());
         if (this.wcagContext.hasWCAGWarnings()) {
             String outputName = "wcagWarnings.txt";
             LOGGER.warn("There are [{}] accessibility warnings in the test suite. See [{}/{}] for more details.",
-                this.wcagContext.getWCAGWarnAmount(), getWCAGReportPathOnHost(), outputName);
+                this.wcagContext.getWCAGWarnCount(), getWCAGReportPathOnHost(), outputName);
+            logViolationCount(false);
             if (!wcagDir.exists()) {
                 Files.createDirectory(wcagDir.toPath());
             }
@@ -116,9 +118,24 @@ public class WCAGUtils
                 Files.createDirectory(wcagDir.toPath());
             }
             String outputName = "wcagFails.txt";
-            LOGGER.error("There are [{}] accessibility fails in the test suite.", this.wcagContext.getWCAGFailAmount());
+            LOGGER.error("There are [{}] accessibility fails in the test suite.", this.wcagContext.getWCAGFailCount());
+            logViolationCount(true);
             File failsFile = new File(wcagDir, outputName);
             WCAGContext.writeWCAGReportToFile(failsFile, this.wcagContext.buildFailsReport());
+        }
+    }
+
+    private void logViolationCount(boolean isFailingViolations)
+    {
+        Map<String, Integer> violationCounts = wcagContext.getViolationCountPerRule();
+        for (String ruleID : violationCounts.keySet()) {
+            if (isFailingViolations
+                && wcagContext.isFailing(ruleID)) {
+                LOGGER.error("    [{}] : [{}] failures", ruleID, violationCounts.get(ruleID));
+            } else if (!isFailingViolations
+                && !wcagContext.isFailing(ruleID)) {
+                LOGGER.warn("    [{}] : [{}] warnings", ruleID, violationCounts.get(ruleID));
+            }
         }
     }
 

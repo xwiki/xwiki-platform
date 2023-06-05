@@ -33,8 +33,10 @@ import org.xwiki.notifications.preferences.NotificationPreference;
  *
  * @version $Id$
  * @since 9.2RC1
+ * @deprecated {@link ParametrizedNotificationManager} APIs should be used instead.
  */
 @Role
+@Deprecated(since = "15.5RC1")
 public interface NotificationManager
 {
     /**
@@ -46,6 +48,7 @@ public interface NotificationManager
      * @throws NotificationException if error happens
      * @since 10.1RC1
      */
+    @Deprecated(since = "15.5RC1")
     List<CompositeEvent> getEvents(String userId, int expectedCount) throws NotificationException;
 
     /**

@@ -50,7 +50,6 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.notifiers.internal.DefaultNotificationCacheManager;
@@ -104,28 +103,31 @@ public class NotificationEventExecutor implements Initializable, Disposable
     {
         private final String cacheKey;
 
-        private final Callable<List<CompositeEvent>> callable;
+        private final Callable<List> callable;
 
         private final Set<String> asyncIds = ConcurrentHashMap.newKeySet();
 
         private final boolean count;
 
+        private final boolean composite;
+
         private final String initialAsyncId;
 
         private final DocumentReference currentUserReference;
 
-        CallableEntry(String longCacheKey, Callable<List<CompositeEvent>> callable, boolean count,
-            DocumentReference currentUserReference)
+        CallableEntry(String longCacheKey, Callable<List> callable, boolean count,
+            DocumentReference currentUserReference, boolean composite)
         {
-            this(longCacheKey, callable, count, currentUserReference, null);
+            this(longCacheKey, callable, count, currentUserReference, null, composite);
         }
 
-        CallableEntry(String longCacheKey, Callable<List<CompositeEvent>> callable, boolean count,
-            DocumentReference currentUserReference, String asyncId)
+        CallableEntry(String longCacheKey, Callable<List> callable, boolean count,
+            DocumentReference currentUserReference, String asyncId, boolean composite)
         {
             this.cacheKey = longCacheKey;
             this.callable = callable;
             this.count = count;
+            this.composite = composite;
             this.currentUserReference = currentUserReference;
             this.initialAsyncId = asyncId;
 
@@ -177,7 +179,7 @@ public class NotificationEventExecutor implements Initializable, Disposable
         private Object execute() throws Exception
         {
             // Check if the result is already in the event cache
-            Object result = notificationCacheManager.getFromCache(this.cacheKey, this.count);
+            Object result = notificationCacheManager.getFromCache(this.cacheKey, this.count, this.composite);
             if (result != null) {
                 return result;
             }
@@ -191,8 +193,8 @@ public class NotificationEventExecutor implements Initializable, Disposable
                 xcontextProvider.get().setUserReference(this.currentUserReference);
 
                 // Execute the callable
-                List<CompositeEvent> events = this.callable.call();
-                notificationCacheManager.setInCache(this.cacheKey, events, this.count);
+                List events = this.callable.call();
+                notificationCacheManager.setInCache(this.cacheKey, events, this.count, this.composite);
 
                 if (this.count) {
                     result = events.size();
@@ -292,8 +294,9 @@ public class NotificationEventExecutor implements Initializable, Disposable
     /**
      * @param cacheKey the cache key
      * @param callable the callable to execute
-     * @param async true if the method should return immediately with the task id (or the cached value)
-     * @param count true if if the size of the list should be returned/cache instead of the list
+     * @param async {@code true} if the method should return immediately with the task id (or the cached value)
+     * @param count {@code true} if the size of the list should be returned/cache instead of the list
+     * @param composite {@code true} if the request is about composite events
      * @return one of the following:
      *         <ul>
      *         <li>a {@link String} when an asynchronous execution has been started</li>
@@ -301,10 +304,10 @@ public class NotificationEventExecutor implements Initializable, Disposable
      *         </ul>
      * @throws Exception when failing to execute the passed {@link Callable}
      */
-    public Object submit(String cacheKey, Callable<List<CompositeEvent>> callable, boolean async, boolean count)
-        throws Exception
+    public Object submit(String cacheKey, Callable<List> callable, boolean async, boolean count,
+        boolean composite) throws Exception
     {
-        Object cached = this.notificationCacheManager.getFromCache(cacheKey, count);
+        Object cached = this.notificationCacheManager.getFromCache(cacheKey, count, composite);
 
         if (cached != null) {
             return cached;
@@ -314,14 +317,14 @@ public class NotificationEventExecutor implements Initializable, Disposable
             if (async) {
                 String asyncId = String.valueOf(this.counter.incrementAndGet());
 
-                submit(cacheKey, callable, count, asyncId);
+                submit(cacheKey, callable, count, asyncId, composite);
 
                 return asyncId;
             } else {
                 // Even when not asynchronous we want to make sure only a configured number of threads is allowed to
                 // search for notifications
                 Future<?> future = this.executor.submit(new CallableEntry(cacheKey, callable, count,
-                    this.xcontextProvider.get().getUserReference()));
+                    this.xcontextProvider.get().getUserReference(), composite));
 
                 // Wait for the result
                 return future.get();
@@ -331,7 +334,8 @@ public class NotificationEventExecutor implements Initializable, Disposable
         }
     }
 
-    private void submit(String longCacheKey, Callable<List<CompositeEvent>> callable, boolean count, String asyncId)
+    private void submit(String longCacheKey, Callable<List> callable, boolean count, String asyncId,
+        boolean composite)
     {
         synchronized (this.queue) {
             CallableEntry entry = this.queue.get(longCacheKey);
@@ -339,7 +343,7 @@ public class NotificationEventExecutor implements Initializable, Disposable
             // If not already in the queue, start a new one
             if (entry == null) {
                 entry = new CallableEntry(longCacheKey, callable, count, this.xcontextProvider.get().getUserReference(),
-                    asyncId);
+                    asyncId, composite);
                 this.queue.put(longCacheKey, entry);
 
                 this.logger.debug("Added [{}] in the queue", entry);

@@ -40,6 +40,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.environment.Environment;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.localization.LocalizationContext;
+import org.xwiki.localization.LocalizationException;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.localization.Translation;
 import org.xwiki.rendering.syntax.Syntax;
@@ -357,11 +358,7 @@ public class LocalizationScriptService implements ScriptService
         String translation = null;
         for (String key : keys) {
             if (key != null) {
-                if (parameters == null) {
-                    translation = this.localization.getTranslation(key, locale, syntax);
-                } else {
-                    translation = this.localization.getTranslation(key, locale, syntax, parameters.toArray());
-                }
+                translation = getTranslation(key, syntax, parameters, locale);
                 if (translation != null) {
                     break;
                 }
@@ -410,5 +407,21 @@ public class LocalizationScriptService implements ScriptService
         }
 
         return locales;
+    }
+
+    private String getTranslation(String key, Syntax syntax, Collection<?> parameters, Locale locale)
+    {
+        String result;
+        try {
+            if (parameters == null) {
+                result = this.localization.getTranslation(key, locale, syntax);
+            } else {
+                result = this.localization.getTranslation(key, locale, syntax, parameters.toArray());
+            }
+        } catch (LocalizationException e) {
+            // TODO set current error
+            result = null;
+        }
+        return result;
     }
 }

@@ -79,7 +79,7 @@
   <div class='box errormessage'>
       ## Use the 'existingDocumentReference' context binding set by the create action for this case.
       $services.localization.render('core.create.page.error.docalreadyexists',
-        ["${existingDocumentReference}",
+        [$escapetool.xml("${existingDocumentReference}"),
          $xwiki.getURL($existingDocumentReference, 'view', ''),
          $xwiki.getURL($existingDocumentReference, 'edit', '')
         ]

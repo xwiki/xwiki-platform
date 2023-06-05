@@ -50,6 +50,10 @@ public interface RequiredRights
     boolean has(Right right);
 
     /**
+     * Before 15.5RC1, the notion of required rights did not exist. Consequently, any page created before  does not have
+     * required rights activated by default, unless a migration effort was done to activate them. When the required
+     * rights are not activated, the rights of the last content author are used to compute the rights.
+     *
      * @return {@code true} when the required rights are activated for the document
      */
     boolean activated();

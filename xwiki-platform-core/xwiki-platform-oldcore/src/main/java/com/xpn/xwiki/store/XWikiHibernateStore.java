@@ -1933,8 +1933,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     {
         XWikiContext context = getExecutionXContext(inputxcontext, true);
 
-        // Extract the links
-        Set<Right> rights = doc.getRequiredRights().getRights();
 
         // Save the links
         executeWrite(context, session -> {
@@ -1943,6 +1941,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 deleteRequiredRights(doc.getId(), context);
             }
 
+            Set<Right> rights = doc.getRequiredRights().getRights();
             if (!rights.isEmpty()) {
                 for (Right right : rights) {
                     XWikiDocumentRequiredRight xWikiDocumentRequiredRight = new XWikiDocumentRequiredRight();

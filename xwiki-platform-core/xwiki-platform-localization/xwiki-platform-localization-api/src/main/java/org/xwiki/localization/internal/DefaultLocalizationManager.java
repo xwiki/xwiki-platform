@@ -31,6 +31,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.localization.LocaleUtils;
+import org.xwiki.localization.LocalizationException;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.localization.Translation;
 import org.xwiki.localization.TranslationBundle;
@@ -99,11 +100,19 @@ public class DefaultLocalizationManager implements LocalizationManager
     @Override
     public String getTranslationPlain(String key, Locale locale, Object... parameters)
     {
-        return getTranslation(key, locale, Syntax.PLAIN_1_0, parameters);
+        String result;
+        try {
+            result = getTranslation(key, locale, Syntax.PLAIN_1_0, parameters);
+        } catch (LocalizationException e) {
+            // This shouldn't happen since a Plain Text Renderer should always be present in XWiki
+            result = null;
+        }
+        return result;
     }
 
     @Override
     public String getTranslation(String key, Locale locale, Syntax targetSyntax, Object... parameters)
+        throws LocalizationException
     {
         String result;
 
@@ -164,14 +173,14 @@ public class DefaultLocalizationManager implements LocalizationManager
         return Locale.getDefault();
     }
 
-    private BlockRenderer getSyntaxRenderer(Syntax syntax)
+    private BlockRenderer getSyntaxRenderer(Syntax syntax) throws LocalizationException
     {
         BlockRenderer result;
         try {
             result = this.componentManagerProvider.get().getInstance(BlockRenderer.class, syntax.toIdString());
         } catch (ComponentLookupException e) {
-            this.logger.error("Failure to find Block Renderer for syntax [{}]. Returning a null translation", e);
-            result = null;
+            throw new LocalizationException(String.format("Failed to render the translation using the [%s] syntax",
+                syntax), e);
         }
         return result;
     }

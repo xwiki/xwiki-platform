@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.LocalizationContext;
+import org.xwiki.localization.LocalizationException;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.localization.Translation;
 import org.xwiki.rendering.syntax.Syntax;
@@ -60,11 +61,18 @@ public class DefaultContextualLocalizationManager implements ContextualLocalizat
     @Override
     public String getTranslationPlain(String key, Object... parameters)
     {
-        return getTranslation(key, Syntax.PLAIN_1_0, parameters);
+        String result;
+        try {
+            result = getTranslation(key, Syntax.PLAIN_1_0, parameters);
+        } catch (LocalizationException e) {
+            // This shouldn't happen since a Plain Text Renderer should always be present in XWiki
+            result = null;
+        }
+        return result;
     }
 
     @Override
-    public String getTranslation(String key, Syntax targetSyntax, Object... parameters)
+    public String getTranslation(String key, Syntax targetSyntax, Object... parameters) throws LocalizationException
     {
         return this.localizationManager.getTranslation(key, this.localizationContext.getCurrentLocale(), targetSyntax,
             parameters);

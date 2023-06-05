@@ -62,12 +62,13 @@ public interface ContextualLocalizationManager
      * @param parameters the parameters
      * @return the translation in the current language, rendered in the target syntax, null if no translation could be
      *         found or it couldn't be rendered
+     * @throws LocalizationException if there's an error while getting the Renderer for the passed syntax
      * @see #getTranslation(String)
      * @since 15.5RC1
      * @since 14.10.12
      */
     @Unstable
-    default String getTranslation(String key, Syntax targetSyntax, Object... parameters)
+    default String getTranslation(String key, Syntax targetSyntax, Object... parameters) throws LocalizationException
     {
         return null;
     }

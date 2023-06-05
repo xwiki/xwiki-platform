@@ -44,7 +44,71 @@
 ## The workaround is to make sure the submitted content (the macro markers) don't match the preview HTML.
 ## See XWIKI-14818: Preview triggers ERR_BLOCKED_BY_XSS_AUDITOR in Chrome
 #set ($iframe = 'iframe')
-&lt;$iframe src="https://www.youtube.com/embed/9QTWrZ7OfzI" title="YouTube video of XWiki" role="presentation" allowfullscreen&gt;&lt;/$iframe&gt;
+&lt;$iframe src="https://www.youtube.com/embed/9QTWrZ7OfzI" title="YouTube video of XWiki" allowfullscreen
+  aria-labelledby='xwikipresentationvideolabel' aria-describedby='xwikipresentationvideodescription'&gt;&lt;/$iframe&gt;
+&lt;div id='xwikipresentationvideolabel' class='sr-only'&gt;Video presentation of XWiki&lt;/div&gt;
+&lt;dl id='xwikipresentationvideodescription' class='sr-only'&gt;
+  &lt;dt&gt;
+    Summary:
+  &lt;/dt&gt;
+  &lt;dd&gt;
+    XWiki is a flexible and reliable Enterprise Wiki, allowing organizations of all sizes to better collaborate and exchange information in a timely and cost-effective manner.
+    XWiki makes use of all the features you would expect from an Enterprise Wiki. Ergonomic WYSIWYG Editing, Page linking, History and rollback, User and rights management, File attachments,  Macros, and advanced search using the Apache SOLR engine, just to name a few.
+    XWiki's solution can be used to share information inside a team, and to build Knowledge Bases for support, sales, or HR teams. If projects become complex, XWiki can comply with the requirements and turn into a real, collaborative solution, be it as a full Intranet, extranet, or information-sharing website.
+  &lt;/dd&gt;
+  &lt;dt&gt;
+    Transcript:
+  &lt;/dt&gt;
+  &lt;dd&gt;
+    XWiki
+    We are the information organization experts.
+    &lt;hr&gt;
+    Are you fed up with:
+    &lt;ul&gt;
+    &lt;li&gt;Using email to share attachments&lt;/li&gt;
+    &lt;li&gt;Hunting for a document at the office, in the cloud and on the server...&lt;/li&gt;
+    &lt;li&gt;New employees spending their time asking where they should look for information&lt;/li&gt;
+    &lt;li&gt;Doubting the validity of the information you find&lt;/li&gt;
+    &lt;/ul&gt;
+    Thanks to XWiki, our easy to use collaborative platform, you are now able to:
+    &lt;ul&gt;
+      &lt;li&gt;
+        Capture, centralize and structure your company's knowledge.
+        #forms #templates #reference documents/procedures #FAQ #database #sales and product documents #rich text editor
+      &lt;/li&gt;
+      &lt;li&gt;
+        Search and access your data wherever you are
+        #extensibles and customizable #secure space #configurable user interface #apache solr search engine
+      &lt;/li&gt;
+      &lt;li&gt;
+        Share your ideas and knowledge, promote collective intelligence
+        #forum #annotations #comments #blog #activity stream
+      &lt;/li&gt;
+      &lt;li&gt;
+        Increase the value and relevance of information within your company
+        #better circulation of information #talent recognition #emergence of experts #knowledge sharing #knowledge repositories #easier sharing #idea catalyst #creating synergies
+      &lt;/li&gt;
+      &lt;li&gt;Gain in productivity in your company&lt;/li&gt;
+    &lt;/ul&gt;
+    XWiki is already used as a knowledge base, a resource center, a documentation and support platform, business applications, intranets, websites, a competitive intelligence tool
+    XWiki SAS is ready to meet your needs. We are a skilled team that can:
+    &lt;ul&gt;
+      &lt;li&gt;Work with you on your project from start to finish&lt;/li&gt;
+      &lt;li&gt;Train both your technical and business users&lt;/li&gt;
+      &lt;li&gt;Provide you with hosting and technical support services&lt;/li&gt;
+    &lt;/ul&gt;
+    Benefit from the expertise of a pioneer editor in professional collaborative solutions:
+    &lt;ul&gt;
+      &lt;li&gt;10 years of experience&lt;/li&gt;
+      &lt;li&gt;30 000 downloads per year&lt;/li&gt;
+      &lt;li&gt;100% open source&lt;/li&gt;
+      &lt;li&gt;More than 500 projects worldwide&lt;/li&gt;
+    &lt;/ul&gt;
+    &lt;hr&gt;
+    XWiki, the best way to organize your information
+    www.xwiki.com
+  &lt;/dd&gt;
+&lt;/dl&gt;
 {{/html}}
 {{/velocity}}
 {{/box}}

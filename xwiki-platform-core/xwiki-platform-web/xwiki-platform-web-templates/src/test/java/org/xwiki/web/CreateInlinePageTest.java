@@ -20,6 +20,7 @@
 package org.xwiki.web;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
@@ -28,6 +29,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.velocity.VelocityManager;
@@ -117,5 +120,50 @@ class CreateInlinePageTest extends PageTest
         String expectedMessage = String.format("core.create.page.error.docalreadyexists [%s, %s, %s]",
             DOCUMENT_REFERENCE, viewURL, editURL);
         assertEquals(expectedMessage, errormessage.text());
+    }
+
+    /**
+     * Test that when there is an exception about the template provider not allowing the chosen space, the allowed
+     * spaces are correctly escaped.
+     */
+    @ParameterizedTest
+    @MethodSource("allowedSpacesProvider")
+    void templateProviderRestrictionErrorEscaping(List<String> allowedSpaces) throws Exception
+    {
+        String provider = "\"provider</div>";
+        this.request.put("templateprovider", provider);
+        String template = "template</div>";
+
+        // Set "createException" to an XWikiException to simulate a template provider restriction error.
+        Object[] args = { template, DOCUMENT_REFERENCE, DOCUMENT_REFERENCE };
+        XWikiException exception = new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+            XWikiException.ERROR_XWIKI_APP_TEMPLATE_NOT_AVAILABLE,
+            "Template {0} cannot be used in space {1} when creating page {2}", null, args);
+        this.velocityManager.getVelocityContext().put(CREATE_EXCEPTION_VELOCITY_KEY, exception);
+        // Set the allowed spaces to a list containing some HTML.
+        this.velocityManager.getVelocityContext().put("createAllowedSpaces", allowedSpaces);
+
+        // Render the template.
+        Document document = Jsoup.parse(this.templateManager.render(CREATE_INLINE_VM));
+        Element errormessage = document.getElementsByClass(ERROR_MESSAGE_CLASS).first();
+        assertNotNull(errormessage);
+
+        String expectedMessage;
+        if (allowedSpaces.size() == 1) {
+            expectedMessage = String.format("core.create.template.allowedspace.inline [%s, %s]",
+                provider, allowedSpaces.get(0));
+        } else {
+            expectedMessage = String.format("core.create.template.allowedspaces.inline [%s, %s]",
+                provider, allowedSpaces);
+        }
+        assertEquals(expectedMessage, errormessage.text());
+    }
+
+    static Stream<List<String>> allowedSpacesProvider()
+    {
+        return Stream.of(
+            List.of("allowedSpace</div>"),
+            List.of("allowedSpace1</div>", "allowedSpace2</div>")
+        );
     }
 }

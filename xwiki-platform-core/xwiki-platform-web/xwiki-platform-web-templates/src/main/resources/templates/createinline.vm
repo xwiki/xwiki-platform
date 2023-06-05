@@ -68,9 +68,11 @@
   <div class="box errormessage">
     #set($allowedSpaces = $createAllowedSpaces)
     #if ($allowedSpaces.size() == 1)
-      $services.localization.render('core.create.template.allowedspace.inline', [$templateProvider, $allowedSpaces.get(0)])
+      $escapetool.xml($services.localization.render('core.create.template.allowedspace.inline', [$templateProvider,
+        $allowedSpaces.get(0)]))
     #else
-      $services.localization.render('core.create.template.allowedspaces.inline', [$templateProvider, $allowedSpaces.toString()])
+      $escapetool.xml($services.localization.render('core.create.template.allowedspaces.inline', [$templateProvider,
+        $allowedSpaces.toString()]))
     #end
   </div>
 #end

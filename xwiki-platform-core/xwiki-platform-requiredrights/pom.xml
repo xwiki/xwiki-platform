@@ -29,7 +29,7 @@
   <artifactId>xwiki-platform-requiredrights</artifactId>
   <name>XWiki Platform - Required Rights - Parent POM</name>
   <packaging>pom</packaging>
-  <description>Provide the UIs specific to required rights</description>
+  <description>XWiki Platform - Required Rights - Parent POM</description>
   <modules>
     <!-- Sorted Alphabetically -->
     <module>xwiki-platform-requiredrights-api</module>

@@ -20,8 +20,6 @@
 
 package org.xwiki.security.authorization.testwikis.internal.entities;
 
-import java.util.StringJoiner;
-
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -108,16 +106,5 @@ public class DefaultTestAccessRule extends AbstractTestEntity implements TestAcc
     public boolean isUser()
     {
         return isUser;
-    }
-
-    @Override
-    public String toString()
-    {
-        return new StringJoiner(", ", DefaultTestAccessRule.class.getSimpleName() + "[", "]")
-            .add("userReference=" + userReference)
-            .add("right=" + right)
-            .add("state=" + state)
-            .add("isUser=" + isUser)
-            .toString();
     }
 }

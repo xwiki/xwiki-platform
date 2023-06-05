@@ -92,6 +92,7 @@ public class NotificationsIT
     @BeforeEach
     public void setup(TestUtils setup) throws Exception
     {
+        setup.loginAsSuperAdmin();
         // Create the two users we will be using
         setup.createUser(FIRST_USER_NAME, FIRST_USER_PASSWORD, "", "");
         setup.createUser(SECOND_USER_NAME, SECOND_USER_PASSWORD, "", "");
@@ -122,6 +123,7 @@ public class NotificationsIT
     {
         setup.deletePage("XWiki", FIRST_USER_NAME);
         setup.deletePage("XWiki", SECOND_USER_NAME);
+        setup.forceGuestUser();
     }
 
     @Test

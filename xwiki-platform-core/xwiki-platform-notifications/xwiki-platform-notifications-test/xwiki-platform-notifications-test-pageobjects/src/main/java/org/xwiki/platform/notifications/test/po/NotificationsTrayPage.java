@@ -227,6 +227,7 @@ public class NotificationsTrayPage extends ViewPage
      */
     public void showNotificationTray()
     {
+        getDriver().scrollTo(this.watchListButton);
         if (!isMenuOpen()) {
             this.watchListButton.click();
             getDriver().waitUntilCondition(webDriver -> isMenuOpen());

@@ -114,8 +114,8 @@ public class ScopeNotificationFilterLocationStateComputer
 
         Iterator<ScopeNotificationFilterPreference> it = preferences.getInclusiveFiltersThatHasNoParents();
         if (!checkInclusiveFilters || !it.hasNext()) {
-            // No inclusive filters ==  we get everything, so the location is watched
-            return new WatchedLocationState(true);
+            // No inclusive filters == we get nothing, so it's not watched.
+            return new WatchedLocationState(false);
         }
 
         boolean match = false;
@@ -155,6 +155,7 @@ public class ScopeNotificationFilterLocationStateComputer
             // If the exclusive filter match the event location...
             if (match(pref, location) && deepLevel > deepestLevel) {
                 state = WatchedState.NOT_WATCHED;
+                startingDate = pref.getStartingDate();
                 deepestLevel = deepLevel;
 
                 // then we watch the location if there is at least an inclusive filter child matching it

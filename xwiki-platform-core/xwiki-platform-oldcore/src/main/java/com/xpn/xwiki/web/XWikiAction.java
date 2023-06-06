@@ -256,7 +256,6 @@ public abstract class XWikiAction implements LegacyAction
     protected String localizeOrReturnKey(String key, Syntax syntax, Object... parameters)
     {
         String result;
-
         try {
             result = StringUtils.defaultString(getLocalization().getTranslation(key, syntax, parameters), key);
         } catch (LocalizationException e) {
@@ -265,7 +264,7 @@ public abstract class XWikiAction implements LegacyAction
                 + "instead. Root cause: [{}]", key, syntax.toIdString(), ExceptionUtils.getRootCauseMessage(e));
             result = key;
         }
-        return key;
+        return result;
     }
 
     /**

@@ -39,7 +39,7 @@ public class AttachmentsViewPage extends ViewPage
      */
     public AttachmentsPane openAttachmentsDocExtraPane()
     {
-        getDriver().findElement(By.id("Attachmentslink")).click();
+        getDriver().findElement(By.id("Attachmentstab")).click();
         waitForDocExtraPaneActive(ATTACHMENTS);
         return new AttachmentsPane();
     }

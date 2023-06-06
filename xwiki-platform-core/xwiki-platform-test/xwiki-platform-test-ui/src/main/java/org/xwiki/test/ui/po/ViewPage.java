@@ -55,21 +55,21 @@ public class ViewPage extends BasePage
      */
     public CommentsTab openCommentsDocExtraPane()
     {
-        getDriver().findElement(By.id("Commentslink")).click();
+        getDriver().findElement(By.id("Commentstab")).click();
         waitForDocExtraPaneActive("comments");
         return new CommentsTab();
     }
 
     public HistoryPane openHistoryDocExtraPane()
     {
-        getDriver().findElement(By.id("Historylink")).click();
+        getDriver().findElement(By.id("Historytab")).click();
         waitForDocExtraPaneActive("history");
         return new HistoryPane();
     }
 
     public InformationPane openInformationDocExtraPane()
     {
-        getDriver().findElement(By.id("Informationlink")).click();
+        getDriver().findElement(By.id("Informationtab")).click();
         waitForDocExtraPaneActive("information");
         return new InformationPane();
     }

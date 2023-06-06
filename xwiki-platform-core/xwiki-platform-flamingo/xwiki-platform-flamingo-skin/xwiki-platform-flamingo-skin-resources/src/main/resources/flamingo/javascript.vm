@@ -96,7 +96,7 @@
     'xwiki-selectize': $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js'),
     'xwiki-tree-finder': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', ""finder${jsExtension}""))",
     'xwiki-tree': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', ""tree${jsExtension}""))",
-  'xwiki-tabList': $xwiki.getSkinFile('uicomponents/widgets/tabList.js')
+    'xwiki-tabList': $xwiki.getSkinFile('uicomponents/widgets/tabList.js')
   },
   'shim': {
     'bootstrap': ['jquery'],

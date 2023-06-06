@@ -26,11 +26,9 @@ import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.environment.Environment;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.localization.LocalizationManager;
-import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -44,15 +42,16 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.when;
 
+/**
+ * Unit tests for {@link LocalizationScriptService}.
+ *
+ * @version $Id$
+ */
 @ComponentTest
 class LocalizationScriptServiceTest
 {
     @InjectMockComponents
     private LocalizationScriptService localizationScriptService;
-
-    private BlockRenderer renderer;
-
-    private ComponentManager componentManager;
 
     @MockComponent
     private LocalizationContext localizationContext;

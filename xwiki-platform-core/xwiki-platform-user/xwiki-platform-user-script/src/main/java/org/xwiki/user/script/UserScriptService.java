@@ -26,9 +26,11 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
+import org.xwiki.stability.Unstable;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.SuperAdminUserReference;
+import org.xwiki.user.UserConfiguration;
 import org.xwiki.user.UserException;
 import org.xwiki.user.UserManager;
 import org.xwiki.user.UserProperties;
@@ -72,6 +74,9 @@ public class UserScriptService implements ScriptService
 
     @Inject
     private UserReferenceSerializer<String> userReferenceSerializer;
+
+    @Inject
+    private UserConfiguration userConfiguration;
 
     /**
      * @param <S> the type of the {@link ScriptService}
@@ -245,5 +250,16 @@ public class UserScriptService implements ScriptService
     public String serialize(UserReference userReference)
     {
         return this.userReferenceSerializer.serialize(userReference);
+    }
+
+    /**
+     * @return the user configuration
+     * @since 14.10.12
+     * @since 15.5RC1
+     */
+    @Unstable
+    public UserConfiguration getConfiguration()
+    {
+        return this.userConfiguration;
     }
 }

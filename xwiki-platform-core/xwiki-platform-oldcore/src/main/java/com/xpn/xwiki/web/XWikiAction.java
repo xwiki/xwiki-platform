@@ -59,6 +59,7 @@ import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.job.internal.DefaultJobProgress;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.LocaleUtils;
+import org.xwiki.localization.LocalizationException;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -254,7 +255,17 @@ public abstract class XWikiAction implements LegacyAction
     @Unstable
     protected String localizeOrReturnKey(String key, Syntax syntax, Object... parameters)
     {
-        return StringUtils.defaultString(getLocalization().getTranslation(key, syntax, parameters), key);
+        String result;
+
+        try {
+            result = StringUtils.defaultString(getLocalization().getTranslation(key, syntax, parameters), key);
+        } catch (LocalizationException e) {
+            // Return the key in case of error but log a warning
+            LOGGER.warn("Error rendering the translation for key [{}] in syntax [{}]. Using the translation key "
+                + "instead. Root cause: [{}]", key, syntax.toIdString(), ExceptionUtils.getRootCauseMessage(e));
+            result = key;
+        }
+        return key;
     }
 
     /**

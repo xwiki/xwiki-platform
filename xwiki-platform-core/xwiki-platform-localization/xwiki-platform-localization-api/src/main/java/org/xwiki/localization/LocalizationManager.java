@@ -22,6 +22,8 @@ package org.xwiki.localization;
 import java.util.Locale;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.stability.Unstable;
 
 /**
  * Internationalization service based on key/property values. The key is the id of the message being looked for, and the
@@ -50,19 +52,49 @@ public interface LocalizationManager
     Translation getTranslation(String key, Locale locale);
 
     /**
-     * Find a translation in the current language.
+     * Find a translation in the specified locale.
      * 
      * @param key the key identifying the message to look for
-     * @param locale the {@link Locale} for which this translation is searched. The result might me associated to a
+     * @param locale the {@link Locale} for which this translation is searched. The result might be associated to a
      *            different {@link Locale} (for example getting the {@code fr} translation when asking for the
      *            {@code fr_FR} one).
      * @param parameters the parameters
-     * @return the translation in the current language rendered as plain text, null if no translation could be found
+     * @return the translation in the defined language, rendered as plain text, null if no translation could be found
      * @see #getTranslation(String, Locale)
      * @since 14.1RC1
      * @since 13.10.3
      */
     default String getTranslationPlain(String key, Locale locale, Object... parameters)
+    {
+        String result;
+        try {
+            result = getTranslation(key, locale, Syntax.PLAIN_1_0, parameters);
+        } catch (LocalizationException e) {
+            // This shouldn't happen since a Plain Text Renderer should always be present in XWiki
+            result = null;
+        }
+        return result;
+    }
+
+    /**
+     * Find a translation in the specified locale.
+     *
+     * @param key the key identifying the message to look for
+     * @param locale the {@link Locale} for which this translation is searched. The result might be associated to a
+     *            different {@link Locale} (for example getting the {@code fr} translation when asking for the
+     *            {@code fr_FR} one).
+     * @param targetSyntax the syntax in which to render the translation
+     * @param parameters the parameters
+     * @return the translation in the defined language, rendered in the target syntax, null if no translation could be
+     *         found or it couldn't be rendered
+     * @throws LocalizationException if there's an error while getting the Renderer for the passed syntax
+     * @see #getTranslation(String, Locale)
+     * @since 15.5RC1
+     * @since 14.10.12
+     */
+    @Unstable
+    default String getTranslation(String key, Locale locale, Syntax targetSyntax, Object... parameters)
+        throws LocalizationException
     {
         return null;
     }

@@ -38,7 +38,7 @@
   <hidden>true</hidden>
   <content>admin.ratings=Рейтинги
 rating.rate=Оцінити!
-### Missing: rating.saveexception=Error when saving the rating.
+rating.saveexception=Помилка під час збереження рейтингу.
 rating.votenotvalid=Ви не можете проголосувати зі значенням 0.
 rating.voteoutofbounds=Голосування вийшло за ліміт.
 rating.setvote.inprogress=Ваш голос зберігається...

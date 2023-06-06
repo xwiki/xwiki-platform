@@ -509,7 +509,7 @@ class NotificationsSettingsIT
         assertEquals(UNDETERMINED, notificationsUserProfilePage.getApplicationState(SYSTEM, EMAIL_FORMAT));
         assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT));
         assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, ADD_COMMENT, EMAIL_FORMAT));
-        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, CREATE, ALERT_FORMAT));
+        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, CREATE, ALERT_FORMAT));
         assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, CREATE, EMAIL_FORMAT));
         assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, DELETE, ALERT_FORMAT));
         assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, DELETE, EMAIL_FORMAT));

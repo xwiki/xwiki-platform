@@ -8,7 +8,8 @@
       "iconSetType": "IMAGE",
       "url": "/xwiki/skins/flamingo/icons/silk/user.png"
     },
-    "url": "/xwiki/bin/view/XWiki/U1"
+    "url": "/xwiki/bin/view/XWiki/U1",
+    "hint": null
   },
   {
     "value": "XWiki.U3",
@@ -19,7 +20,8 @@
       "iconSetType": "IMAGE",
       "url": "/xwiki/skins/flamingo/icons/silk/user.png"
     },
-    "url": "/xwiki/bin/view/XWiki/U3"
+    "url": "/xwiki/bin/view/XWiki/U3",
+    "hint": "Paris, France"
   },
   {
     "value": "XWiki.U4",
@@ -30,7 +32,8 @@
       "iconSetType": "IMAGE",
       "url": "/xwiki/skins/flamingo/icons/silk/user.png"
     },
-    "url": "/xwiki/bin/view/XWiki/U4"
+    "url": "/xwiki/bin/view/XWiki/U4",
+    "hint": null
   },
   {
     "value": "XWiki.U5",
@@ -41,7 +44,8 @@
       "iconSetType": "IMAGE",
       "url": "/xwiki/skins/flamingo/icons/silk/user.png"
     },
-    "url": "/xwiki/bin/view/XWiki/U5"
+    "url": "/xwiki/bin/view/XWiki/U5",
+    "hint": null
   },
   {
     "value": "XWiki.U6",
@@ -52,7 +56,8 @@
       "iconSetType": "IMAGE",
       "url": "/xwiki/skins/flamingo/icons/silk/user.png"
     },
-    "url": "/xwiki/bin/view/XWiki/U6"
+    "url": "/xwiki/bin/view/XWiki/U6",
+    "hint": null
   },
   {
     "value": "XWiki.U7",
@@ -63,7 +68,8 @@
       "iconSetType": "IMAGE",
       "url": "/xwiki/skins/flamingo/icons/silk/user.png"
     },
-    "url": "/xwiki/bin/view/XWiki/U7"
+    "url": "/xwiki/bin/view/XWiki/U7",
+    "hint": null
   },
   {
     "value": "XWiki.U8",
@@ -74,7 +80,8 @@
       "iconSetType": "IMAGE",
       "url": "/xwiki/skins/flamingo/icons/silk/user.png"
     },
-    "url": "/xwiki/bin/view/XWiki/U8"
+    "url": "/xwiki/bin/view/XWiki/U8",
+    "hint": null
   },
   {
     "value": "XWiki.U9",
@@ -85,7 +92,8 @@
       "iconSetType": "IMAGE",
       "url": "/xwiki/skins/flamingo/icons/silk/user.png"
     },
-    "url": "/xwiki/bin/view/XWiki/U9"
+    "url": "/xwiki/bin/view/XWiki/U9",
+    "hint": null
   },
   {
     "value": "XWiki.U10",
@@ -96,7 +104,8 @@
       "iconSetType": "IMAGE",
       "url": "/xwiki/skins/flamingo/icons/silk/user.png"
     },
-    "url": "/xwiki/bin/view/XWiki/U10"
+    "url": "/xwiki/bin/view/XWiki/U10",
+    "hint": null
   },
   {
     "value": "XWiki.U11",
@@ -107,6 +116,7 @@
       "iconSetType": "IMAGE",
       "url": "/xwiki/skins/flamingo/icons/silk/user.png"
     },
-    "url": "/xwiki/bin/view/XWiki/U11"
+    "url": "/xwiki/bin/view/XWiki/U11",
+    "hint": null
   }
 ]

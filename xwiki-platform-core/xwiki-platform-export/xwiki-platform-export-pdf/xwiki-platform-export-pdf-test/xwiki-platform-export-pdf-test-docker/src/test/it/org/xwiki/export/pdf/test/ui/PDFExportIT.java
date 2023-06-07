@@ -700,6 +700,65 @@ class PDFExportIT
         }
     }
 
+    @Test
+    @Order(14)
+    void pageRevision(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration) throws Exception
+    {
+        setup.createPage(testReference, "Parent initial content.", "Parent Initial Title");
+        setup.rest().savePage(testReference, "Parent modified content.", "Parent Modified Title");
+
+        EntityReference childReference =
+            new EntityReference("Child", EntityType.DOCUMENT, testReference.getLastSpaceReference());
+        setup.createPage(childReference, "Child initial content.", "Child Initial Title");
+        setup.rest().savePage(childReference, "Child modified content.", "Child Modified Title");
+
+        ViewPage viewPage = setup.gotoPage(testReference);
+        assertEquals("Parent modified content.", viewPage.getContent());
+
+        viewPage = viewPage.openHistoryDocExtraPane().viewVersion("1.1");
+        assertEquals("Parent initial content.", viewPage.getContent());
+
+        ExportTreeModal exportTreeModal = ExportTreeModal.open(viewPage, "PDF");
+        // Include the child page in the export because we want to check that the revision specified in the query string
+        // applies only to the current page.
+        exportTreeModal.getPageTree().getNode("document:" + setup.serializeReference(childReference)).select();
+        exportTreeModal.export();
+
+        try (PDFDocument pdf = export(new PDFExportOptionsModal(), testConfiguration)) {
+            // We should have 4 pages: cover page, table of contents, one page for the parent document and one page for
+            // the child document.
+            assertEquals(4, pdf.getNumberOfPages());
+
+            //
+            // Verify the cover page.
+            //
+
+            String coverPageText = pdf.getTextFromPage(0);
+            assertTrue(coverPageText.startsWith("Parent Initial Title\nVersion 1.1 authored by John"),
+                "Unexpected cover page text: " + coverPageText);
+
+            //
+            // Verify the page corresponding to the parent document.
+            //
+
+            String contentPageText = pdf.getTextFromPage(2);
+            assertTrue(contentPageText.startsWith("Parent Initial Title\n3 / 4\n"),
+                "Unexpected header and footer on the content page: " + contentPageText);
+            assertTrue(contentPageText.contains("Parent Initial Title\nParent initial content.\n"),
+                "Unexpected parent page content: " + contentPageText);
+
+            //
+            // Verify the page corresponding to the child document.
+            //
+
+            contentPageText = pdf.getTextFromPage(3);
+            assertTrue(contentPageText.startsWith("Child Modified Title\n4 / 4\n"),
+                "Unexpected header and footer on the content page: " + contentPageText);
+            assertTrue(contentPageText.contains("Child Modified Title\nChild modified content.\n"),
+                "Unexpected child page content: " + contentPageText);
+        }
+    }
+
     private URL getHostURL(TestConfiguration testConfiguration) throws Exception
     {
         return new URL(String.format("http://%s:%d", testConfiguration.getServletEngine().getIP(),

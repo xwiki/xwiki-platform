@@ -35,6 +35,7 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -86,5 +87,17 @@ class DefaultDocumentAccessBridgeTest
         assertEquals(fileName, attachment.getFilename());
         assertArrayEquals(attachmentContent,
             IOUtils.toByteArray(attachment.getAttachmentContent(oldcore.getXWikiContext()).getContentInputStream()));
+    }
+
+    @Test
+    void getCurrentDocumentReference(MockitoOldcore oldcore)
+    {
+        assertNull(this.documentAccessBridge.getCurrentDocumentReference());
+
+        DocumentReference documentReference = new DocumentReference("test", "Some", "Page");
+        XWikiDocument document = new XWikiDocument(documentReference);
+        oldcore.getXWikiContext().setDoc(document);
+
+        assertEquals(documentReference, this.documentAccessBridge.getCurrentDocumentReference());
     }
 }

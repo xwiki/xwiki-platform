@@ -357,11 +357,12 @@
     #end
     <div role="combobox" id="xwiki-livetable-${htmlLiveTableId}-filter-date-combobox-${foreach.count}"
       class="xwiki-livetable-display-header-filter-date-combobox" aria-expanded="false">
+      #set($dateRangeFormat = $escapetool.xml($dateFormat) + " - " + $escapetool.xml($dateFormat))
       <input id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" type="text"
         data-type="date" data-dateformat="$escapetool.xml($dateFormat)"
         #if ("$!columnProperties.size" != '')size="$!escapetool.xml($columnProperties.size)"#end
         title="$!selectTitle"
-        aria-description="$!escapetool.xml($services.localization.render('platform.livetable.filter.date.format.description',[$escapetool.xml($dateFormat)]))"/>
+        aria-description="$!escapetool.xml($services.localization.render('platform.livetable.filter.date.format.description',[$dateRangeFormat]))"/>
     </div>
   #elseif ($filterType == 'suggest' && $xproperty)
     #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'),

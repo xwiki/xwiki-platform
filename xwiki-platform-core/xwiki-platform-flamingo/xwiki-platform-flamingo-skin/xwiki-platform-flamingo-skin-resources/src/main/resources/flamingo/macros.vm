@@ -309,11 +309,11 @@
       #set ($filterType = 'text')
     #end
   #end
-  #set ($selectTitle = $escapetool.xml($services.localization.render('platform.livetable.filtersTitle',
+  #set ($filterTitle = $escapetool.xml($services.localization.render('platform.livetable.filtersTitle',
     [$services.localization.render("${transprefix}$column")])))
   #if ($filterType == 'list' || $filterType == 'multilist')
     <select id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$!escapetool.xml($column)"
-      title="$!selectTitle"
+      title="$!filterTitle"
       #if ($filterType == 'multilist')
         #set ($discard = $xwiki.jsfx.use('js/xwiki/table/livetablemulti.js', true))
         #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-select', 'css/bootstrap-select.css'),
@@ -336,7 +336,7 @@
     </select>
   #elseif ($filterType == 'boolean')
     <select id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$!escapetool.xml($column)"
-      title="$!selectTitle">
+      title="$!filterTitle">
       <option value="">$services.localization.render('platform.livetable.selectAll')</option>
       <option value="0">$services.localization.render('no')</option>
       <option value="1">$services.localization.render('yes')</option>
@@ -344,7 +344,7 @@
   #elseif ($filterType == 'text' || $filterType == 'number')
     <input id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$!escapetool.xml($column)" type="text"
       #if ("$!columnProperties.size" != '')size="$!escapetool.xml($columnProperties.size)"#end
-      title="$!selectTitle" />
+      title="$!filterTitle" />
   #elseif ($filterType == 'date')
     #set ($discard = $xwiki.jsfx.use('js/xwiki/table/livetabledate.js', true))
     #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-daterangepicker',
@@ -361,7 +361,7 @@
       <input id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" type="text"
         data-type="date" data-dateformat="$escapetool.xml($dateFormat)"
         #if ("$!columnProperties.size" != '')size="$!escapetool.xml($columnProperties.size)"#end
-        title="$!selectTitle"
+        title="$!filterTitle"
         aria-description="$!escapetool.xml($services.localization.render('platform.livetable.filter.date.format.description',[$dateRangeFormat]))"/>
     </div>
   #elseif ($filterType == 'suggest' && $xproperty)
@@ -372,7 +372,7 @@
     <select id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$!escapetool.xml($column)"
       class="suggest-propertyValues" multiple="multiple" size="1"
       data-className="$!escapetool.xml($xproperty.className)" data-propertyName="$!escapetool.xml($xproperty.name)"
-      title="$!selectTitle">
+      title="$!filterTitle">
     </select>
   #end
 #end

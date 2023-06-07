@@ -112,10 +112,11 @@
     <div class="col-xs-9 notification-content">
       $content
       #if ($stringtool.isNotBlank($details))
-      <button class="btn btn-xs toggle-notification-event-details" type="submit">
-        <span class="fa fa-ellipsis-h"></span>
-        <span class="sr-only">$services.localization.render('notifications.macro.showEventDetails')</span>
-      </button>
+        <button class="btn btn-xs toggle-notification-event-details" type="submit"
+                aria-label="$services.localization.render('notifications.macro.showEventDetails')"
+                title="$services.localization.render('notifications.macro.showEventDetails')">
+          <span class="fa fa-ellipsis-h"></span>
+        </button>
       #end
     </div>
     #if ($stringtool.isNotBlank($details))

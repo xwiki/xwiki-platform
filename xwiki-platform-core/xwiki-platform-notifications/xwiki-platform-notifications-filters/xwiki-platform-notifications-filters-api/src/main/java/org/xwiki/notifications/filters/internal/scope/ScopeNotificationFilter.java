@@ -98,7 +98,7 @@ public class ScopeNotificationFilter implements NotificationFilter
         } else {
             if (state.isWatched() && state.getStartingDate().after(event.getDate())) {
                 return FilterPolicy.FILTER;
-            } else if (!state.isWatched() && event.getDate().before(event.getDate())) {
+            } else if (!state.isWatched() && state.getStartingDate().before(event.getDate())) {
                 return FilterPolicy.FILTER;
             }
         }

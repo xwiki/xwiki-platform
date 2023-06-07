@@ -44,9 +44,11 @@ import org.xwiki.notifications.notifiers.internal.email.NotificationUserIterator
  *
  * @since 9.10RC1
  * @version $Id$
+ * @deprecated This component is only used in case of post-filtering events. We stopped supporting those.
  */
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+@Deprecated(since = "15.5RC1")
 public class DefaultLiveMimeMessageIterator extends AbstractMimeMessageIterator
     implements LiveMimeMessageIterator
 {

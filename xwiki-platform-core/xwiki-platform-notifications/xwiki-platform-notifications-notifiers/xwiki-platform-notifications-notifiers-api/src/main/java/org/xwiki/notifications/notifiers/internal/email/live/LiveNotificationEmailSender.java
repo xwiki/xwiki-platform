@@ -46,9 +46,11 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
  *
  * @since 9.6RC1
  * @version $Id$
+ * @deprecated This component is only used in case of post-filtering events. We stopped supporting those.
  */
 @Component(roles = LiveNotificationEmailSender.class)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+@Deprecated(since = "15.5RC1")
 public class LiveNotificationEmailSender
 {
     @Inject

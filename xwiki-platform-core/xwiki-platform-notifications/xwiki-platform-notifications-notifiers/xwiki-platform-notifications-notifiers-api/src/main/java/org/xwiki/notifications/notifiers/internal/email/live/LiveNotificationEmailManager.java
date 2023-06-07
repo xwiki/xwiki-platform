@@ -42,9 +42,11 @@ import org.xwiki.notifications.internal.SimilarityCalculator;
  *
  * @since 9.6RC1
  * @version $Id$
+ * @deprecated This component is only used in case of post-filtering events. We stopped supporting those.
  */
 @Component(roles = LiveNotificationEmailManager.class)
 @Singleton
+@Deprecated(since = "15.5RC1")
 public class LiveNotificationEmailManager implements Initializable
 {
     @Inject
@@ -91,7 +93,6 @@ public class LiveNotificationEmailManager implements Initializable
         Iterator<QueueElement> it = queue.iterator();
         while (it.hasNext()) {
             QueueElement element = it.next();
-
             // Compute the similarity between the event and the composite event in the map
             int similarity = similarityCalculator.computeSimilarity(event, element.event.getEvents().get(0));
 

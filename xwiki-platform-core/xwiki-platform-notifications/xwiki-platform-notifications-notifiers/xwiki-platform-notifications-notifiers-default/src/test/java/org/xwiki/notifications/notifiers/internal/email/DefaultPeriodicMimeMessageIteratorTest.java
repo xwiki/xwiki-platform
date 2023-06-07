@@ -50,6 +50,8 @@ import org.xwiki.notifications.sources.ParametrizedNotificationManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.api.Attachment;
@@ -111,6 +113,9 @@ class DefaultPeriodicMimeMessageIteratorTest
     @MockComponent
     private UserAvatarAttachmentExtractor userAvatarAttachmentExtractor;
 
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> userReferenceResolver;
+
     @BeforeEach
     void beforeEach()
     {
@@ -165,9 +170,15 @@ class DefaultPeriodicMimeMessageIteratorTest
         when(this.notificationManager.getRawEvents(notificationParameters2))
             .thenReturn(Collections.singletonList(event2));
 
-        when(this.groupingEventManager.getCompositeEvents(Collections.singletonList(event1), "xwiki:XWiki.UserA",
+        UserReference userRefA = mock(UserReference.class, "userA");
+        UserReference userRefC = mock(UserReference.class, "userC");
+
+        when(this.userReferenceResolver.resolve(userA)).thenReturn(userRefA);
+        when(this.userReferenceResolver.resolve(userC)).thenReturn(userRefC);
+
+        when(this.groupingEventManager.getCompositeEvents(Collections.singletonList(event1), userRefA,
             "EMAIL")).thenReturn(Collections.singletonList(compositeEvent1));
-        when(this.groupingEventManager.getCompositeEvents(Collections.singletonList(event2), "xwiki:XWiki.UserC",
+        when(this.groupingEventManager.getCompositeEvents(Collections.singletonList(event2), userRefC,
             "EMAIL")).thenReturn(Collections.singletonList(compositeEvent2));
 
         when(compositeEvent1.getUsers()).thenReturn(Sets.newSet(userB));

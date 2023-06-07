@@ -84,4 +84,10 @@ public class DefaultNotificationConfiguration implements NotificationConfigurati
     {
         return configurationSource.getProperty(CONFIGURATION_PREFIX + "async.poolSize", 2);
     }
+
+    @Override
+    public String getEmailGroupingStrategyHint()
+    {
+        return configurationSource.getProperty(CONFIGURATION_PREFIX + "emailGroupingStrategyHint", "default");
+    }
 }

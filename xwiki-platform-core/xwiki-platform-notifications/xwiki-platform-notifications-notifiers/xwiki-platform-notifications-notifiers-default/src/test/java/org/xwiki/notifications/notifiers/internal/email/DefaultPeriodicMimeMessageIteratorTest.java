@@ -45,7 +45,6 @@ import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.GroupingEventManager;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.notifiers.email.NotificationEmailRenderer;
-import org.xwiki.notifications.sources.NotificationManager;
 import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.notifications.sources.ParametrizedNotificationManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;

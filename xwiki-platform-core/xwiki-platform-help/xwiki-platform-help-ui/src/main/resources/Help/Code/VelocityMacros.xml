@@ -402,6 +402,43 @@
   }
 }
 
+.card-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 1em;
+  padding-left: 0;
+}
+
+li.card {
+  list-style: none;
+  flex-shrink: 1;
+  width: calc(25% - 1em);
+}
+
+@media (max-width: 1200px) {
+  li.card {
+    width: calc(33% - 1em);
+  }
+}
+
+@media (max-width: 992px) {
+  li.card {
+    width: calc(50% - 1em);
+  }
+}
+
+@media (max-width: 768px) {
+  li.card {
+    width: 100%;
+  }
+}
+
+li.card > .well {
+  height: 100%;
+  margin-bottom: 0px;
+}
+
 .video-modal .modal-body {
   text-align: center;
 }

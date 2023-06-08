@@ -99,7 +99,7 @@ public class ScopeNotificationFilterPreferencesGetterTest
         ));
         assertEquals(expected, this.getter.getScopeFilterPreferences(Arrays.asList(
             pref1, pref2, pref3, pref4, pref5, pref6
-        ), requestedEventType, requestedFormat, onlyGivenType));
+        ), requestedEventType, requestedFormat, onlyGivenType, false));
     }
 
     @Test
@@ -153,7 +153,7 @@ public class ScopeNotificationFilterPreferencesGetterTest
             ));
         assertEquals(expected, this.getter.getScopeFilterPreferences(Arrays.asList(
             pref1, pref2, pref3, pref4, pref5, pref6
-        ), requestedEventType, requestedFormat, onlyGivenType));
+        ), requestedEventType, requestedFormat, onlyGivenType, false));
     }
 
     @Test
@@ -207,7 +207,7 @@ public class ScopeNotificationFilterPreferencesGetterTest
             ));
         assertEquals(expected, this.getter.getScopeFilterPreferences(Arrays.asList(
             pref1, pref2, pref3, pref4, pref5, pref6
-        ), requestedEventType, requestedFormat, onlyGivenType));
+        ), requestedEventType, requestedFormat, onlyGivenType, false));
     }
 
     @Test
@@ -260,7 +260,7 @@ public class ScopeNotificationFilterPreferencesGetterTest
             ));
         assertEquals(expected, this.getter.getScopeFilterPreferences(Arrays.asList(
             pref1, pref2, pref3, pref4, pref5, pref6
-        ), requestedEventType, requestedFormat, onlyGivenType));
+        ), requestedEventType, requestedFormat, onlyGivenType, false));
     }
 
     @Test
@@ -311,6 +311,6 @@ public class ScopeNotificationFilterPreferencesGetterTest
             ));
         assertEquals(expected, this.getter.getScopeFilterPreferences(Arrays.asList(
             pref1, pref2, pref3, pref4, pref5, pref6
-        ), requestedEventType, requestedFormat, onlyGivenType));
+        ), requestedEventType, requestedFormat, onlyGivenType, false));
     }
 }

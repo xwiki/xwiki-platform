@@ -65,7 +65,7 @@ public class WatchedUserReference implements WatchedEntityReference
     @Override
     public boolean isWatched(DocumentReference userReference) throws NotificationException
     {
-        return preferencesGetter.isUsedFollowed(userId,
+        return preferencesGetter.isUserFollowed(userId,
                 notificationFilterPreferenceManager.getFilterPreferences(userReference),
                 null);
     }
@@ -76,7 +76,15 @@ public class WatchedUserReference implements WatchedEntityReference
         return EventUserFilter.FILTER_NAME.equals(notificationFilterPreference.getFilterName())
                 && userId.equals(notificationFilterPreference.getUser())
                 && notificationFilterPreference.getNotificationFormats().containsAll(
-                        Sets.newHashSet(NotificationFormat.values()));
+                        Sets.newHashSet(NotificationFormat.values()))
+                && notificationFilterPreference.getEventTypes().isEmpty();
+    }
+
+    @Override
+    public boolean match(NotificationFilterPreference notificationFilterPreference)
+    {
+        return EventUserFilter.FILTER_NAME.equals(notificationFilterPreference.getFilterName())
+                && userId.equals(notificationFilterPreference.getUser());
     }
 
     @Override

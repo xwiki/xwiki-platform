@@ -19,7 +19,9 @@
  */
 package org.xwiki.annotation.test.ui;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,6 +32,8 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CommentsTab;
+import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
+import org.xwiki.test.ui.po.RenamePage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -73,6 +77,12 @@ class AnnotationsIT
         setup.deletePage(testReference);
 
         setup.createUser(USER_NAME, USER_PASS, "", "");
+
+        // The user is advanced to simplify the move operations.
+        Map<String, Object> userProperties = new HashMap<>();
+        userProperties.put("usertype", "Advanced");
+        setup.updateObject("XWiki", "UserAnnotation", "XWiki.XWikiUsers", 0, userProperties);
+
         setup.login(USER_NAME, USER_PASS);
     }
 
@@ -143,9 +153,19 @@ class AnnotationsIT
         assertTrue(commentsTab.hasDeleteButtonForCommentByID(commentId));
         assertEquals(ANNOTATION_TEXT_4, annotatableViewPage.getAnnotationContentByText(ANNOTATED_TEXT_4));
 
+        // Move the page to check if the annotations are still displayed afterward.
+        RenamePage renamePage = annotatableViewPage.getWrappedViewPage().rename();
+        renamePage.getDocumentPicker().setName("NewName");
+        CopyOrRenameOrDeleteStatusPage renameStatusPage = renamePage.clickRenameButton();
+        assertEquals("Done.", renameStatusPage.getInfoMessage());
+        renameStatusPage.gotoNewPage();
+
         // It seems that there are some issues refreshing content while this tab is not open. This might be a bug in the
         // Annotations Application
         annotatableViewPage.showAnnotationsPane();
+        annotatableViewPage.clickShowAnnotations();
+        assertEquals(4, annotatableViewPage.getAnnotationCount());
+
         annotatableViewPage.deleteAnnotationByText(ANNOTATED_TEXT_1);
         annotatableViewPage.deleteAnnotationByText(ANNOTATED_TEXT_2);
         annotatableViewPage.deleteAnnotationByText(ANNOTATED_TEXT_3);

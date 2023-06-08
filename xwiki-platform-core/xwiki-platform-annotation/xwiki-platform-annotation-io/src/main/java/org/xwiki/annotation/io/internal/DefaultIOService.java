@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -130,8 +131,7 @@ public class DefaultIOService implements IOService
             EntityReference annotationClassReference = this.configuration.getAnnotationClassReference();
             annotationClassReference =
                 annotationClassReference.removeParent(annotationClassReference.extractReference(EntityType.WIKI));
-            int id = document.createXObject(annotationClassReference, deprecatedContext);
-            BaseObject object = document.getXObject(this.configuration.getAnnotationClassReference(), id);
+            BaseObject object = document.newXObject(annotationClassReference, deprecatedContext);
             updateObject(object, annotation, deprecatedContext);
             // and set additional data: author to annotation author, date to now and the annotation target
             object.set(Annotation.DATE_FIELD, new Date(), deprecatedContext);
@@ -149,7 +149,12 @@ public class DefaultIOService implements IOService
             if (targetReference.getType() == EntityType.OBJECT_PROPERTY
                 || targetReference.getType() == EntityType.DOCUMENT)
             {
-                object.set(Annotation.TARGET_FIELD, this.localSerializer.serialize(targetReference), deprecatedContext);
+                // We only store the target if it is not pointing to the document containing the object.
+                // This makes it easier to have a valid annotation reference in case of page move/copy.
+                if (!Objects.equals(targetReference, object.getDocumentReference())) {
+                    object.set(Annotation.TARGET_FIELD, this.localSerializer.serialize(targetReference),
+                        deprecatedContext);
+                }
             } else {
                 object.set(Annotation.TARGET_FIELD, target, deprecatedContext);
             }
@@ -200,12 +205,12 @@ public class DefaultIOService implements IOService
                 return Collections.emptySet();
             }
             for (BaseObject object : objects) {
-                // if it's not on the required target, ignore it
-                if (object == null || !localTargetId.equals(object.getStringValue(Annotation.TARGET_FIELD))) {
-                    continue;
-                }
                 // use the object number as annotation id
-                result.add(loadAnnotationFromObject(object, deprecatedContext));
+                if (object != null && List.of(localTargetId, "")
+                    .contains(object.getStringValue(Annotation.TARGET_FIELD)))
+                {
+                    result.add(loadAnnotationFromObject(object, localTargetId));
+                }
             }
             return result;
         } catch (XWikiException e) {
@@ -240,11 +245,13 @@ public class DefaultIOService implements IOService
             BaseObject object =
                 document.getXObject(this.configuration.getAnnotationClassReference(),
                     Integer.valueOf(annotationID));
-            if (object == null || !localTargetId.equals(object.getStringValue(Annotation.TARGET_FIELD))) {
+            if (object == null || !List.of(localTargetId, "")
+                .contains(object.getStringValue(Annotation.TARGET_FIELD)))
+            {
                 return null;
             }
             // use the object number as annotation id
-            return loadAnnotationFromObject(object, deprecatedContext);
+            return loadAnnotationFromObject(object, target);
         } catch (NumberFormatException e) {
             throw new IOServiceException("Could not parse annotation id " + annotationID, e);
         } catch (XWikiException e) {
@@ -364,10 +371,10 @@ public class DefaultIOService implements IOService
      * Helper function to load an annotation object from an xwiki object.
      *
      * @param object the xwiki object to load an annotation from
-     * @param deprecatedContext XWikiContext to make operations on xwiki data
+     * @param target the local document reference of the current document
      * @return the Annotation instance for the annotation stored in BaseObject
      */
-    protected Annotation loadAnnotationFromObject(BaseObject object, XWikiContext deprecatedContext)
+    protected Annotation loadAnnotationFromObject(BaseObject object, String target)
     {
         // load the annotation with its ID, special handling of the state since it needs deserialization, special
         // handling of the original selection which shouldn't be set if it's empty
@@ -385,10 +392,15 @@ public class DefaultIOService implements IOService
         for (String propName : object.getPropertyNames()) {
             if (!skippedFields.contains(propName)) {
                 try {
-                    annotation.set(propName, ((BaseProperty) object.get(propName)).getValue());
+                    Object value = ((BaseProperty) object.get(propName)).getValue();
+                    if (Objects.equals(propName, "target") && StringUtils.isEmpty(String.valueOf(value))) {
+                        value = target;
+                    }
+                    annotation.set(propName, value);
                 } catch (XWikiException e) {
-                    this.logger.warn("Unable to get property " + propName + " from object " + object.getClassName()
-                        + "[" + object.getNumber() + "]. Will not be saved in the annotation.", e);
+                    this.logger.warn(String.format(
+                        "Unable to get property %s from object %s[%d]. Will not be saved in the annotation.", propName,
+                        object.getXClassReference(), object.getNumber()), e);
                 }
             }
         }

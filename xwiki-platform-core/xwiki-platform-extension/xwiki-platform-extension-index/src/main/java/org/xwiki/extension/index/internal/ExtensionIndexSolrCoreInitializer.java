@@ -153,6 +153,16 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
         setStringField(SOLR_FIELD_INCOMPATIBLE_NAMESPACES, true, false);
 
         migrateSchema(SCHEMA_VERSION_12_9);
+        
+        // TODO: add security related fields here, something to do with schema version?
+        
+        setPDoubleField("security_maxCCSV", false, false);
+        setStringField("security_cveID", true, false);
+        setStringField("security_cveLink", true, false);
+        setPDoubleField("security_cveCCSV", true, false);
+        setPIntField("security_cveCount", false, false);
+        setStringField("security_fixVersion", false, false);
+        setStringField("security_advice", false, false);
     }
 
     @Override

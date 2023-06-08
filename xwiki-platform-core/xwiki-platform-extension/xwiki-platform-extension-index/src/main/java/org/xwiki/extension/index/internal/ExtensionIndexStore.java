@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -56,6 +57,8 @@ import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.RemoteExtension;
 import org.xwiki.extension.index.IndexedExtensionQuery;
+import org.xwiki.extension.index.internal.security.ExtensionAnalysisResult;
+import org.xwiki.extension.index.internal.security.SecurityIssueDescriptor;
 import org.xwiki.extension.internal.ExtensionFactory;
 import org.xwiki.extension.internal.converter.ExtensionIdConverter;
 import org.xwiki.extension.rating.RatingExtension;
@@ -82,7 +85,7 @@ import org.xwiki.search.solr.SolrUtils;
 
 /**
  * An helper to manipulate the store of indexed extensions.
- * 
+ *
  * @version $Id$
  * @since 12.10
  */
@@ -265,7 +268,7 @@ public class ExtensionIndexStore implements Initializable
 
     /**
      * Update variable informations (recommended tag, ratings, etc.).
-     * 
+     *
      * @param extensionId the identifier of the extension to update
      * @param remoteExtension the remote extension from which to extract variable information
      * @throws IOException If there is a low-level I/O error.
@@ -292,9 +295,28 @@ public class ExtensionIndexStore implements Initializable
         add(document);
     }
 
+    public void update(ExtensionId extensionId, ExtensionAnalysisResult result) throws SolrServerException, IOException
+    {
+        SolrInputDocument document = new SolrInputDocument();
+
+        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID, toSolrId(extensionId), document);
+
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, "security_maxCCSV", result.getMaxCCSV(), document);
+        Stream<String> cveIds = result.getSecurityIssues().stream().map(SecurityIssueDescriptor::getId);
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, "security_cveID",
+            cveIds.collect(Collectors.toList()), document);
+//        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, "security_cveLink", null, document);
+//        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, "security_cveCCSV", null, document);
+//        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, "security_cveCount", null, document);
+//        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, "security_fixVersion", null, document);
+//        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, "security_advice", null, document);
+
+        add(document);
+    }
+
     /**
      * Update variable informations (recommended tag, ratings, etc.) by copying it from another version.
-     * 
+     *
      * @param extensionId the identifier of the extension to update
      * @param copyVersion the version of the extension to copy
      * @throws IOException If there is a low-level I/O error.
@@ -572,6 +594,12 @@ public class ExtensionIndexStore implements Initializable
         return toSolrExtension(this.client.getById(toSolrId(extensionId)), extensionId);
     }
 
+    public List<String> getCVEID(ExtensionId extensionId) throws SolrServerException, IOException
+    {
+        SolrDocument byId = this.client.getById(toSolrId(extensionId));
+        return (List<String>) byId.get("security_cveID");
+    }
+
     private ExtensionRepository getRepository(SolrDocument document)
     {
         String repositoryId = this.utils.get(Extension.FIELD_REPOSITORY, document);
@@ -655,7 +683,7 @@ public class ExtensionIndexStore implements Initializable
 
     /**
      * Search extension based of the provided query.
-     * 
+     *
      * @param query the query
      * @return the found extensions descriptors, empty list if nothing could be found
      * @throws SearchException error when trying to search provided query

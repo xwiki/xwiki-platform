@@ -58,6 +58,12 @@
       <artifactId>xwiki-platform-flavor-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>us.springett</groupId>
+      <artifactId>cvss-calculator</artifactId>
+      <version>1.4.1</version>
+    </dependency>
+
 
     <!-- Test dependencies -->
     <dependency>

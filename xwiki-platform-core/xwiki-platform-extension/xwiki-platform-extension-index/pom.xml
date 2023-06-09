@@ -64,7 +64,6 @@
       <version>1.4.1</version>
     </dependency>
 
-
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>

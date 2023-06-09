@@ -1,0 +1,86 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.xwiki.extension.security.internal;
+
+import java.util.List;
+
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.livedata.LiveDataConfiguration;
+import org.xwiki.livedata.LiveDataEntryDescriptor;
+import org.xwiki.livedata.LiveDataMeta;
+import org.xwiki.livedata.LiveDataPropertyDescriptor;
+
+/**
+ * @version $Id$
+ * @since x.y.z
+ */
+@Component
+@Singleton
+@Named(ExtensionSecurityLiveDataSource.ID)
+public class ExtensionSecurityLiveDataConfigurationProvider implements Provider<LiveDataConfiguration>
+{
+    @Override
+    public LiveDataConfiguration get()
+    {
+        LiveDataConfiguration input = new LiveDataConfiguration();
+        LiveDataMeta meta = new LiveDataMeta();
+        LiveDataEntryDescriptor entryDescriptor = new LiveDataEntryDescriptor();
+        entryDescriptor.setIdProperty(ExtensionSecurityLiveDataSource.ID);
+        input.setMeta(meta);
+        meta.setEntryDescriptor(entryDescriptor);
+        meta.setPropertyDescriptors(List.of(
+            initExtensionIdDescriptor(),
+            initMaxCVSSDescriptor()
+        ));
+        return input;
+    }
+
+    private LiveDataPropertyDescriptor initMaxCVSSDescriptor()
+    {
+        LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
+        // TODO: translate?
+        descriptor.setName("Max CVSS");
+        descriptor.setId("maxCVSS");
+        descriptor.setType("Double");
+        descriptor.setVisible(true);
+        descriptor.setEditable(false);
+        descriptor.setSortable(true);
+        descriptor.setFilterable(true);
+        return descriptor;
+    }
+
+    private static LiveDataPropertyDescriptor initExtensionIdDescriptor()
+    {
+        LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
+        // TODO: translate?
+        descriptor.setName("Extension Id");
+        descriptor.setId("extensionId");
+        descriptor.setType("String");
+        descriptor.setVisible(true);
+        descriptor.setEditable(false);
+        descriptor.setSortable(true);
+        descriptor.setFilterable(true);
+        return descriptor;
+    }
+}

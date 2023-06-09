@@ -1,0 +1,5 @@
+org.xwiki.extension.security.internal.ExtensionSecurityLiveDataSource
+org.xwiki.extension.security.internal.ExtensionSecurityLiveDataEntryStore
+org.xwiki.extension.security.internal.ExtensionSecurityLiveDataPropertyDescriptorStore
+org.xwiki.extension.security.internal.ExtensionSecurityLiveDataConfigurationResolver
+org.xwiki.extension.security.internal.ExtensionSecurityLiveDataConfigurationProvider

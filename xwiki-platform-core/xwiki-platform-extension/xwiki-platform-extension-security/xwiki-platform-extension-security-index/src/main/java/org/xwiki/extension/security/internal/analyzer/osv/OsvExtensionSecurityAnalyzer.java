@@ -41,8 +41,8 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.index.internal.security.ExtensionAnalysisResult;
-import org.xwiki.extension.security.analyzer.ExtensionSecurityAnalyzer;
 import org.xwiki.extension.index.internal.security.SecurityIssueDescriptor;
+import org.xwiki.extension.security.analyzer.ExtensionSecurityAnalyzer;
 import org.xwiki.extension.security.internal.ExtensionSecurityException;
 import org.xwiki.extension.security.internal.analyzer.osv.model.PackageObject;
 import org.xwiki.extension.security.internal.analyzer.osv.model.QueryObject;
@@ -55,10 +55,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static java.net.http.HttpResponse.BodyHandlers.ofString;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
+ * Extension security analyzed based on <a href="https://osv.dev/">osv.dev</a> Rest API.
+ *
  * @version $Id$
  * @since 15.5RC1
  */
@@ -88,18 +91,16 @@ public class OsvExtensionSecurityAnalyzer implements ExtensionSecurityAnalyzer
             .setPackage(new PackageObject()
                 .setEcosystem("Maven")
                 .setName(extensionId));
-        if (!extensionId.startsWith(PLATFORM_PREFIX)) {
+        boolean isPlatform = extensionId.startsWith(PLATFORM_PREFIX);
+        if (!isPlatform) {
             // We currently have an issue regarding versions resolution of packages from xwiki-platform, because they 
             // are not published on maven central. Hence, we only filter explicitly by version for other group ids.
             queryObject.setVersion(version);
-        } else {
-            System.out.println("skip version ");
-        }
-
+        } 
         try {
             String body = objectMapper
                 .setSerializationInclusion(NON_NULL)
-                .writerWithDefaultPrettyPrinter()
+                .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
                 .writeValueAsString(queryObject);
 
             // TODO: allow to configure the actual url? 
@@ -110,15 +111,16 @@ public class OsvExtensionSecurityAnalyzer implements ExtensionSecurityAnalyzer
 
             HttpClient client = HttpClient.newHttpClient();
             
-            // TODO: find out why the response is always {}, for instance 'xwiki-platform-flamingo-theme-ui' is supposed
-            // to return a response.
-
             HttpResponse<String> response = client.send(request, ofString());
+            
+            // TODO: handle responses with error.
             OsvResponse osvResponse = objectMapper.readValue(response.body(), OsvResponse.class);
             List<VulnObject> matchingVulns = new ArrayList<>();
             if (osvResponse.getVulns() != null && !osvResponse.getVulns().isEmpty()) {
                 osvResponse.getVulns()
-                    .forEach(vuln -> analyzeVuln(extensionId, version, vuln).ifPresent(matchingVulns::add));
+                    // TODO: remove: the 13.10 hack is to simulate having issues on the current version.
+                    .forEach(vuln -> analyzeVuln(extensionId, isPlatform ? "13.10" : version, vuln).ifPresent(
+                        matchingVulns::add));
             }
             return new ExtensionAnalysisResult().setResults(
                 matchingVulns.stream().map(this::convert).collect(Collectors.toList()));

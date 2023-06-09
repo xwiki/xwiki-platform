@@ -85,7 +85,7 @@ import org.xwiki.search.solr.SolrUtils;
 
 /**
  * An helper to manipulate the store of indexed extensions.
- *
+ * 
  * @version $Id$
  * @since 12.10
  */
@@ -268,7 +268,7 @@ public class ExtensionIndexStore implements Initializable
 
     /**
      * Update variable informations (recommended tag, ratings, etc.).
-     *
+     * 
      * @param extensionId the identifier of the extension to update
      * @param remoteExtension the remote extension from which to extract variable information
      * @throws IOException If there is a low-level I/O error.
@@ -317,7 +317,7 @@ public class ExtensionIndexStore implements Initializable
 
     /**
      * Update variable informations (recommended tag, ratings, etc.) by copying it from another version.
-     *
+     * 
      * @param extensionId the identifier of the extension to update
      * @param copyVersion the version of the extension to copy
      * @throws IOException If there is a low-level I/O error.
@@ -598,7 +598,14 @@ public class ExtensionIndexStore implements Initializable
     public List<String> getCVEID(ExtensionId extensionId) throws SolrServerException, IOException
     {
         SolrDocument byId = this.client.getById(toSolrId(extensionId));
-        return (List<String>) byId.get("security_cveID");
+        if (byId == null) {
+            return List.of();
+        }
+        List<String> securityCveID = (List<String>) byId.get("security_cveID");
+        if (securityCveID == null) {
+            return List.of();
+        }
+        return securityCveID;
     }
 
     private ExtensionRepository getRepository(SolrDocument document)
@@ -684,7 +691,7 @@ public class ExtensionIndexStore implements Initializable
 
     /**
      * Search extension based of the provided query.
-     *
+     * 
      * @param query the query
      * @return the found extensions descriptors, empty list if nothing could be found
      * @throws SearchException error when trying to search provided query

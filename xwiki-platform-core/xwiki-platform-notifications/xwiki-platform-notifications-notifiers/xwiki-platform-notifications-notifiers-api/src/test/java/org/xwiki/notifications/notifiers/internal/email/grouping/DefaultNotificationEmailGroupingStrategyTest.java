@@ -19,35 +19,38 @@
  */
 package org.xwiki.notifications.notifiers.internal.email.grouping;
 
-import org.xwiki.component.annotation.Component;
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.notifiers.email.NotificationEmailGroupingStrategy;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.List;
-import java.util.stream.Collectors;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 
 /**
- * This component offers a strategy for sending one email per composite event to notify to the user.
- * This strategy can be used in combination with
- * {@link org.xwiki.notifications.internal.ApplicationTypeGroupingStrategy} to send as many emails as there is type of
- * events to notify the users. It could also be used with the default event grouping strategy so that users received as
- * many emails as there is group of events.
+ * Tests for {@link DefaultNotificationEmailGroupingStrategy}.
  *
  * @version $Id$
  * @since 15.5RC1
  */
-@Component
-@Singleton
-@Named("emailperevent")
-public class OneMailPerCompositeEmailGroupingStrategy implements NotificationEmailGroupingStrategy
+@ComponentTest
+class DefaultNotificationEmailGroupingStrategyTest
 {
-    @Override
-    public List<List<CompositeEvent>> groupEventsPerMail(List<CompositeEvent> compositeEvents)
-            throws NotificationException
+    @InjectMockComponents
+    private DefaultNotificationEmailGroupingStrategy groupingStrategy;
+
+    @Test
+    void groupEventsPerMail() throws NotificationException
     {
-        return compositeEvents.stream().map(List::of).collect(Collectors.toList());
+        CompositeEvent event1 = mock(CompositeEvent.class, "event1");
+        CompositeEvent event2 = mock(CompositeEvent.class, "event2");
+        CompositeEvent event3 = mock(CompositeEvent.class, "event3");
+        CompositeEvent event4 = mock(CompositeEvent.class, "event4");
+
+        List<CompositeEvent> input = List.of(event1, event2, event3, event4);
+        assertEquals(List.of(input), this.groupingStrategy.groupEventsPerMail(input));
     }
 }

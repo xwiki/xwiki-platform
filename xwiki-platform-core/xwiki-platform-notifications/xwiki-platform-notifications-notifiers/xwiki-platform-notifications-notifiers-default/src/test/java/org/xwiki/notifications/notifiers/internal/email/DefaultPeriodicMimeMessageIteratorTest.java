@@ -167,8 +167,9 @@ class DefaultPeriodicMimeMessageIteratorTest
         when(this.serializer.serialize(userB)).thenReturn("xwiki:XWiki.UserA");
         when(this.serializer.serialize(userC)).thenReturn("xwiki:XWiki.UserC");
 
-        CompositeEvent compositeEvent1 = mock(CompositeEvent.class);
-        CompositeEvent compositeEvent2 = mock(CompositeEvent.class);
+        CompositeEvent compositeEvent1UserA = mock(CompositeEvent.class);
+        CompositeEvent compositeEvent2UserA = mock(CompositeEvent.class);
+        CompositeEvent compositeEvent1UserC = mock(CompositeEvent.class);
 
         Event event1 = mock(Event.class);
         Event event2 = mock(Event.class);
@@ -200,29 +201,33 @@ class DefaultPeriodicMimeMessageIteratorTest
         when(this.userReferenceResolver.resolve(userC)).thenReturn(userRefC);
 
         when(this.groupingEventManager.getCompositeEvents(Collections.singletonList(event1), userRefA,
-            "EMAIL")).thenReturn(Collections.singletonList(compositeEvent1));
+            "EMAIL")).thenReturn(List.of(compositeEvent1UserA, compositeEvent2UserA));
         when(this.groupingEventManager.getCompositeEvents(Collections.singletonList(event2), userRefC,
-            "EMAIL")).thenReturn(Collections.singletonList(compositeEvent2));
+            "EMAIL")).thenReturn(Collections.singletonList(compositeEvent1UserC));
 
         when(this.notificationEmailGroupingStrategy.groupEventsPerMail(any())).then(invocationOnMock -> {
             List<CompositeEvent> compositeEvents = invocationOnMock.getArgument(0);
             return compositeEvents.stream().map(List::of).collect(Collectors.toList());
         });
 
-        when(compositeEvent1.getUsers()).thenReturn(Sets.newSet(userB));
-        when(compositeEvent2.getUsers()).thenReturn(Sets.newSet(userB));
+        when(compositeEvent1UserA.getUsers()).thenReturn(Sets.newSet(userB));
+        when(compositeEvent1UserC.getUsers()).thenReturn(Sets.newSet(userB));
 
         MimeMessage message = mock(MimeMessage.class);
         when(this.factory.createMessage(TEMPLATE_REFERENCE, factoryParameters)).thenReturn(message, message);
 
-        when(this.defaultNotificationEmailRenderer.renderHTML(eq(compositeEvent1), anyString()))
-            .thenReturn("eventHTML1");
-        when(this.defaultNotificationEmailRenderer.renderPlainText(eq(compositeEvent1), anyString()))
-            .thenReturn("compositeEvent1");
-        when(this.defaultNotificationEmailRenderer.renderHTML(eq(compositeEvent2), anyString()))
-            .thenReturn("eventHTML2");
-        when(this.defaultNotificationEmailRenderer.renderPlainText(eq(compositeEvent2), anyString()))
-            .thenReturn("compositeEvent2");
+        when(this.defaultNotificationEmailRenderer.renderHTML(eq(compositeEvent1UserA), anyString()))
+            .thenReturn("eventHTML1UserA");
+        when(this.defaultNotificationEmailRenderer.renderPlainText(eq(compositeEvent1UserA), anyString()))
+            .thenReturn("compositeEvent1UserA");
+        when(this.defaultNotificationEmailRenderer.renderHTML(eq(compositeEvent2UserA), anyString()))
+            .thenReturn("eventHTML2UserA");
+        when(this.defaultNotificationEmailRenderer.renderPlainText(eq(compositeEvent2UserA), anyString()))
+            .thenReturn("compositeEvent2UserA");
+        when(this.defaultNotificationEmailRenderer.renderHTML(eq(compositeEvent1UserC), anyString()))
+            .thenReturn("eventHTML1UserC");
+        when(this.defaultNotificationEmailRenderer.renderPlainText(eq(compositeEvent1UserC), anyString()))
+            .thenReturn("compositeEvent1UserC");
 
         Attachment userBAvatar = mock(Attachment.class);
         when(this.userAvatarAttachmentExtractor.getUserAvatar(eq(userB), anyInt())).thenReturn(userBAvatar);
@@ -237,9 +242,9 @@ class DefaultPeriodicMimeMessageIteratorTest
         assertEquals(new InternetAddress("userA@xwiki.org"), factoryParameters.get("to"));
         Map<String, Object> velocityVariables = (Map<String, Object>) factoryParameters.get("velocityVariables");
         assertNotNull(velocityVariables);
-        assertEquals(Arrays.asList(compositeEvent1), velocityVariables.get("events"));
-        assertEquals(Arrays.asList("eventHTML1"), velocityVariables.get("htmlEvents"));
-        assertEquals(Arrays.asList("compositeEvent1"), velocityVariables.get("plainTextEvents"));
+        assertEquals(Arrays.asList(compositeEvent1UserA), velocityVariables.get("events"));
+        assertEquals(Arrays.asList("eventHTML1UserA"), velocityVariables.get("htmlEvents"));
+        assertEquals(Arrays.asList("compositeEvent1UserA"), velocityVariables.get("plainTextEvents"));
         assertEquals("xwiki:XWiki.UserA", velocityVariables.get("emailUser"));
 
         // Count the number of attachments
@@ -250,12 +255,28 @@ class DefaultPeriodicMimeMessageIteratorTest
         assertTrue(this.iterator.hasNext());
         assertEquals(message, this.iterator.next());
         assertEquals(new InternetAddress("xwiki@xwiki.org"), factoryParameters.get("from"));
+        assertEquals(new InternetAddress("userA@xwiki.org"), factoryParameters.get("to"));
+        velocityVariables = (Map<String, Object>) factoryParameters.get("velocityVariables");
+        assertNotNull(velocityVariables);
+        assertEquals(Arrays.asList(compositeEvent2UserA), velocityVariables.get("events"));
+        assertEquals(Arrays.asList("eventHTML2UserA"), velocityVariables.get("htmlEvents"));
+        assertEquals(Arrays.asList("compositeEvent2UserA"), velocityVariables.get("plainTextEvents"));
+        assertEquals("xwiki:XWiki.UserA", velocityVariables.get("emailUser"));
+
+        // Count the number of attachments
+        assertEquals(1, ((List) factoryParameters.get("attachments")).size());
+        assertFalse(((List) factoryParameters.get("attachments")).contains(userBAvatar));
+
+        // Third iteration
+        assertTrue(this.iterator.hasNext());
+        assertEquals(message, this.iterator.next());
+        assertEquals(new InternetAddress("xwiki@xwiki.org"), factoryParameters.get("from"));
         assertEquals(new InternetAddress("userC@xwiki.org"), factoryParameters.get("to"));
         velocityVariables = (Map<String, Object>) factoryParameters.get("velocityVariables");
         assertNotNull(velocityVariables);
-        assertEquals(Arrays.asList(compositeEvent2), velocityVariables.get("events"));
-        assertEquals(Arrays.asList("eventHTML2"), velocityVariables.get("htmlEvents"));
-        assertEquals(Arrays.asList("compositeEvent2"), velocityVariables.get("plainTextEvents"));
+        assertEquals(Arrays.asList(compositeEvent1UserC), velocityVariables.get("events"));
+        assertEquals(Arrays.asList("eventHTML1UserC"), velocityVariables.get("htmlEvents"));
+        assertEquals(Arrays.asList("compositeEvent1UserC"), velocityVariables.get("plainTextEvents"));
         assertEquals("xwiki:XWiki.UserC", velocityVariables.get("emailUser"));
 
         // Make sure there is no duplicated attachments

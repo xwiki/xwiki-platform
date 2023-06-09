@@ -44,6 +44,11 @@ import org.xwiki.livedata.LiveDataQuery.Filter;
 import org.xwiki.livedata.LiveDataQuery.SortEntry;
 import org.xwiki.search.solr.SolrUtils;
 
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_MAX_CVSS;
+import static org.xwiki.extension.security.internal.ExtensionSecurityLiveDataConfigurationProvider.EXTENSION_ID;
+import static org.xwiki.extension.security.internal.ExtensionSecurityLiveDataConfigurationProvider.MAX_CVSS;
+import static org.xwiki.search.solr.AbstractSolrCoreInitializer.SOLR_FIELD_ID;
+
 /**
  * @version $Id$
  * @since 15.5RC1
@@ -53,17 +58,9 @@ import org.xwiki.search.solr.SolrUtils;
 @Named(ExtensionSecurityLiveDataSource.ID)
 public class ExtensionSecurityLiveDataEntryStore implements LiveDataEntryStore
 {
-    private static final String EXTENSION_ID_LD_PROPERTY = "extensionId";
-
-    private static final String MAX_CVSS_LD_PROPERTY = "maxCVSS";
-
-    private static final String ID_SOLR_FIELD = "id";
-
-    private static final String SECURITY_MAX_CCSV_SOLR_FIELD = "security_maxCCSV";
-
     private static final Map<String, String> LD_TO_SOLR = Map.of(
-        EXTENSION_ID_LD_PROPERTY, ID_SOLR_FIELD,
-        MAX_CVSS_LD_PROPERTY, SECURITY_MAX_CCSV_SOLR_FIELD
+        EXTENSION_ID, SOLR_FIELD_ID,
+        MAX_CVSS, SECURITY_MAX_CVSS
     );
 
     @Inject
@@ -87,31 +84,9 @@ public class ExtensionSecurityLiveDataEntryStore implements LiveDataEntryStore
             solrQuery.setRows(liveDataQuery.getLimit());
             solrQuery.setStart(Math.toIntExact(liveDataQuery.getOffset()));
 
-            solrQuery.clearSorts();
-            for (SortEntry sortEntry : liveDataQuery.getSort()) {
-                String property = sortEntry.getProperty();
-                String field = mapPropertyToField(property);
-                solrQuery.addSort(field, sortEntry.isDescending() ? SolrQuery.ORDER.desc : SolrQuery.ORDER.asc);
-            }
+            initSort(liveDataQuery, solrQuery);
 
-            for (String filterQuery : solrQuery.getFilterQueries()) {
-                solrQuery.removeFilterQuery(filterQuery);
-            }
-            solrQuery.addFilterQuery("security_maxCCSV:[0 TO 10]");
-            for (Filter filter : liveDataQuery.getFilters()) {
-                String field = mapPropertyToField(filter.getProperty());
-                for (Constraint constraint : filter.getConstraints()) {
-                    if (Objects.equals(field, SECURITY_MAX_CCSV_SOLR_FIELD)
-                        && Objects.equals(constraint.getOperator(), "match"))
-                    {
-                        // TODO: refine the filters.
-                        solrQuery.addFilterQuery(field + ":[" + constraint.getValue() + " TO 10]");
-                    } else {
-                        solrQuery.addFilterQuery(
-                            field + ":" + this.solrUtils.toFilterQueryString(constraint.getValue()));
-                    }
-                }
-            }
+            initFilter(liveDataQuery, solrQuery);
 
             QueryResponse searchResults = this.extensionIndexStore.search(solrQuery);
 
@@ -121,8 +96,8 @@ public class ExtensionSecurityLiveDataEntryStore implements LiveDataEntryStore
 
                 liveData.getEntries().add(Map.of(
                     // TODO: extract to constant.
-                    EXTENSION_ID_LD_PROPERTY, solrDoc.get(ID_SOLR_FIELD),
-                    MAX_CVSS_LD_PROPERTY, solrDoc.get(SECURITY_MAX_CCSV_SOLR_FIELD)
+                    EXTENSION_ID, solrDoc.get(SOLR_FIELD_ID),
+                    MAX_CVSS, solrDoc.get(SECURITY_MAX_CVSS)
                 ));
             }
             return liveData;
@@ -135,13 +110,35 @@ public class ExtensionSecurityLiveDataEntryStore implements LiveDataEntryStore
         }
     }
 
-    private static ExtensionQuery.COMPARISON mapOperatorToComparison(String operator)
+    private void initFilter(LiveDataQuery liveDataQuery, SolrQuery solrQuery)
     {
-        if (operator.equals("match")) {
-            return ExtensionQuery.COMPARISON.MATCH;
-        } else {
-            // TODO: should throw an exception or return an optional + a log...
-            return ExtensionQuery.COMPARISON.EQUAL;
+        for (String filterQuery : solrQuery.getFilterQueries()) {
+            solrQuery.removeFilterQuery(filterQuery);
+        }
+        solrQuery.addFilterQuery("security_maxCVSS:[0 TO 10]");
+        for (Filter filter : liveDataQuery.getFilters()) {
+            String field = mapPropertyToField(filter.getProperty());
+            for (Constraint constraint : filter.getConstraints()) {
+                if (Objects.equals(field, SECURITY_MAX_CVSS)
+                    && Objects.equals(constraint.getOperator(), "contains"))
+                {
+                    // TODO: refine the filters.
+                    solrQuery.addFilterQuery(field + ":[" + constraint.getValue() + " TO 10]");
+                } else {
+                    solrQuery.addFilterQuery(
+                        String.format("%s:*%s*", field, this.solrUtils.toFilterQueryString(constraint.getValue())));
+                }
+            }
+        }
+    }
+
+    private static void initSort(LiveDataQuery liveDataQuery, SolrQuery solrQuery)
+    {
+        solrQuery.clearSorts();
+        for (SortEntry sortEntry : liveDataQuery.getSort()) {
+            String property = sortEntry.getProperty();
+            String field = mapPropertyToField(property);
+            solrQuery.addSort(field, sortEntry.isDescending() ? SolrQuery.ORDER.desc : SolrQuery.ORDER.asc);
         }
     }
 

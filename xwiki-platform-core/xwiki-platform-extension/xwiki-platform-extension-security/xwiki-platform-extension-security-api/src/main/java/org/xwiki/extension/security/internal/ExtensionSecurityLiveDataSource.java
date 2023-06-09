@@ -30,7 +30,8 @@ import org.xwiki.livedata.LiveDataSource;
 
 /**
  * @version $Id$
- * @since x.y.z
+ * @link LiveDataSource} implementation for the extension security dashboard.
+ * @since 15.5RC1
  */
 @Component
 @Singleton
@@ -61,6 +62,4 @@ public class ExtensionSecurityLiveDataSource implements LiveDataSource
     {
         return this.propertyStore;
     }
-    
-    
 }

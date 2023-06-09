@@ -19,25 +19,22 @@
  */
 package org.xwiki.extension.security.internal;
 
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.checkerframework.checker.units.qual.N;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
-import org.xwiki.livedata.LiveDataEntryDescriptor;
 import org.xwiki.livedata.LiveDataException;
-import org.xwiki.livedata.LiveDataMeta;
 import org.xwiki.livedata.internal.JSONMerge;
 
 /**
+ * Adds missing live data configuration values specific to the extension security source.
+ *
  * @version $Id$
- * @since x.y.z
+ * @since 15.5RC1
  */
 @Component
 @Singleton
@@ -48,7 +45,7 @@ public class ExtensionSecurityLiveDataConfigurationResolver
     @Inject
     @Named(ExtensionSecurityLiveDataSource.ID)
     private Provider<LiveDataConfiguration> extensionSecurityLiveDataProvider;
-    
+
     @Override
     public LiveDataConfiguration resolve(LiveDataConfiguration input) throws LiveDataException
     {

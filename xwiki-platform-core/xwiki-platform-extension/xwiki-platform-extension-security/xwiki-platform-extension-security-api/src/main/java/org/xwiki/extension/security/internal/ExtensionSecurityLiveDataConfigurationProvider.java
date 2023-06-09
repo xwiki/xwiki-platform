@@ -33,13 +33,23 @@ import org.xwiki.livedata.LiveDataPropertyDescriptor;
 
 /**
  * @version $Id$
- * @since x.y.z
+ * @since 15.5RC1
  */
 @Component
 @Singleton
 @Named(ExtensionSecurityLiveDataSource.ID)
 public class ExtensionSecurityLiveDataConfigurationProvider implements Provider<LiveDataConfiguration>
 {
+    /**
+     * Max CVSS LD field.
+     */
+    public static final String MAX_CVSS = "maxCVSS";
+
+    /**
+     * Extension ID LD field.
+     */
+    public static final String EXTENSION_ID = "extensionId";
+
     @Override
     public LiveDataConfiguration get()
     {
@@ -61,7 +71,7 @@ public class ExtensionSecurityLiveDataConfigurationProvider implements Provider<
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
         // TODO: translate?
         descriptor.setName("Max CVSS");
-        descriptor.setId("maxCVSS");
+        descriptor.setId(MAX_CVSS);
         descriptor.setType("Double");
         descriptor.setVisible(true);
         descriptor.setEditable(false);
@@ -75,7 +85,7 @@ public class ExtensionSecurityLiveDataConfigurationProvider implements Provider<
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
         // TODO: translate?
         descriptor.setName("Extension Id");
-        descriptor.setId("extensionId");
+        descriptor.setId(EXTENSION_ID);
         descriptor.setType("String");
         descriptor.setVisible(true);
         descriptor.setEditable(false);

@@ -96,6 +96,50 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
      */
     public static final String SOLR_FIELD_INDEX_DATE = "s_indexDate";
 
+    /**
+     * The name of the field storing the score of the most critical CVE know for an extension.
+     *
+     * @see #SECURITY_CVE_CVSS for the list of individual CVSS values of the CVEs known for the extension
+     * @since 15.5RC1
+     */
+    public static final String SECURITY_MAX_CVSS = "security_maxCVSS";
+
+    /**
+     * The name of the field storing the IDs of the known CVEs for an extension.
+     *
+     * @since 15.5RC1
+     */
+    public static final String SECURITY_CVE_ID = "security_cveID";
+
+    /**
+     * The link of the CVEs known for an extension.
+     *
+     * @since 15.5RC1
+     */
+    public static final String SECURITY_CVE_LINK = "security_cveLink";
+
+    /**
+     * The values of the individual CVEs known for an extension.
+     *
+     * @see #SECURITY_MAX_CVSS stores the maxium value of this collection
+     */
+    public static final String SECURITY_CVE_CVSS = "security_cveCVSS";
+
+    /**
+     * The number of CVEs know for an extension.
+     */
+    public static final String SECURITY_CVE_COUNT = "security_cveCount";
+
+    /**
+     * The computed version where all the issues are fixed.
+     */
+    public static final String SECURITY_FIX_VERSION = "security_fixVersion";
+
+    /**
+     * A textual explanation of how to upgrade this extension to fix the security issues.
+     */
+    public static final String SECURITY_ADVICE = "security_advice";
+
     private static final Pattern COMPONENT_SPECIAL_CHARS = Pattern.compile("[<>,]+");
 
     private static final long SCHEMA_VERSION_12_9 = 120900000;
@@ -153,16 +197,16 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
         setStringField(SOLR_FIELD_INCOMPATIBLE_NAMESPACES, true, false);
 
         migrateSchema(SCHEMA_VERSION_12_9);
-        
+
         // TODO: add a field to list all the wikis where the extension is installed (with a option to say all of them)
-        
-        setPDoubleField("security_maxCCSV", false, false);
-        setStringField("security_cveID", true, false);
-        setStringField("security_cveLink", true, false);
-        setPDoubleField("security_cveCCSV", true, false);
-        setPIntField("security_cveCount", false, false);
-        setStringField("security_fixVersion", false, false);
-        setStringField("security_advice", false, false);
+
+        setPDoubleField(SECURITY_MAX_CVSS, false, false);
+        setStringField(SECURITY_CVE_ID, true, false);
+        setStringField(SECURITY_CVE_LINK, true, false);
+        setPDoubleField(SECURITY_CVE_CVSS, true, false);
+        setPIntField(SECURITY_CVE_COUNT, false, false);
+        setStringField(SECURITY_FIX_VERSION, false, false);
+        setStringField(SECURITY_ADVICE, false, false);
     }
 
     @Override

@@ -79,6 +79,7 @@ import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.search.solr.AbstractSolrCoreInitializer;
 import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.SolrUtils;
@@ -93,6 +94,7 @@ import org.xwiki.search.solr.SolrUtils;
 @Singleton
 public class ExtensionIndexStore implements Initializable
 {
+
     private static final String ROOT_NAMESPACE = "{root}";
 
     private static final int COMMIT_BATCH_SIZE = 100;
@@ -299,11 +301,11 @@ public class ExtensionIndexStore implements Initializable
     {
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID, toSolrId(extensionId), document);
+        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID, toSolrId(extensionId), document);
 
-        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, "security_maxCCSV", result.getMaxCCSV(), document);
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, ExtensionIndexSolrCoreInitializer.SECURITY_MAX_CVSS, result.getMaxCCSV(), document);
         Stream<String> cveIds = result.getSecurityIssues().stream().map(SecurityIssueDescriptor::getId);
-        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, "security_cveID",
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, ExtensionIndexSolrCoreInitializer.SECURITY_CVE_ID,
             cveIds.collect(Collectors.toList()), document);
 //        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, "security_cveLink", null, document);
 //        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, "security_cveCCSV", null, document);
@@ -601,7 +603,7 @@ public class ExtensionIndexStore implements Initializable
         if (byId == null) {
             return List.of();
         }
-        List<String> securityCveID = (List<String>) byId.get("security_cveID");
+        List<String> securityCveID = (List<String>) byId.get(ExtensionIndexSolrCoreInitializer.SECURITY_CVE_ID);
         if (securityCveID == null) {
             return List.of();
         }

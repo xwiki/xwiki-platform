@@ -20,7 +20,6 @@
 package org.xwiki.extension.security.internal;
 
 import java.util.Collection;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -29,30 +28,28 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.LiveDataConfiguration;
-import org.xwiki.livedata.LiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
 
 /**
+ * {@link LiveDataPropertyDescriptorStore} implementation that exposes the extension security dashboard columns as live
+ * data properties.
+ *
  * @version $Id$
- * @since x.y.z
+ * @since 15.5RC1
  */
 @Component
 @Singleton
 @Named(ExtensionSecurityLiveDataSource.ID)
 public class ExtensionSecurityLiveDataPropertyDescriptorStore implements LiveDataPropertyDescriptorStore
 {
-
     @Inject
     @Named(ExtensionSecurityLiveDataSource.ID)
     private Provider<LiveDataConfiguration> configurationResolver;
-
 
     @Override
     public Collection<LiveDataPropertyDescriptor> get()
     {
         return this.configurationResolver.get().getMeta().getPropertyDescriptors();
     }
-
-    
 }

@@ -224,7 +224,7 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
                 strategy = this.componentManager
                         .getInstance(NotificationEmailGroupingStrategy.class, emailGroupingStrategyHint);
             } catch (ComponentLookupException e) {
-                this.logger.error("Error while loading NotificationEmailGroupingStrategy with hint [{}]. " +
+                this.logger.warn("Error while loading NotificationEmailGroupingStrategy with hint [{}]. " +
                                 "Fallback on default strategy. Root cause: [{}]",
                         emailGroupingStrategyHint, ExceptionUtils.getRootCauseMessage(e));
                 this.logger.debug("Root cause of the error was: ", e);

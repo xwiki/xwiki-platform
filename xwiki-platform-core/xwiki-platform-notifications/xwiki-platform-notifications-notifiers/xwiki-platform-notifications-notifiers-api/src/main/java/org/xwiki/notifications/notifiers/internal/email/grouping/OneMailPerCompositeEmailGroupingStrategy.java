@@ -29,6 +29,7 @@ import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This component offers a strategy for sending one email per composite event to notify to the user.
@@ -49,8 +50,6 @@ public class OneMailPerCompositeEmailGroupingStrategy implements NotificationEma
     public List<List<CompositeEvent>> groupEventsPerMail(List<CompositeEvent> compositeEvents)
             throws NotificationException
     {
-        List<List<CompositeEvent>> result = new ArrayList<>();
-        compositeEvents.forEach(ce -> result.add(Collections.singletonList(ce)));
-        return result;
+        return compositeEvents.stream().map(List::of).collect(Collectors.toList());
     }
 }

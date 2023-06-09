@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.inject.Named;
 import javax.mail.internet.InternetAddress;
@@ -34,6 +35,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.internal.util.collections.Sets;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.eventstream.Event;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeMessageFactory;
@@ -43,13 +45,17 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.GroupingEventManager;
+import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.notifiers.email.NotificationEmailGroupingStrategy;
 import org.xwiki.notifications.notifiers.email.NotificationEmailRenderer;
 import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.notifications.sources.ParametrizedNotificationManager;
+import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -113,8 +119,25 @@ class DefaultPeriodicMimeMessageIteratorTest
     @MockComponent
     private UserAvatarAttachmentExtractor userAvatarAttachmentExtractor;
 
+    @MockComponent
     @Named("document")
     private UserReferenceResolver<DocumentReference> userReferenceResolver;
+
+    @MockComponent
+    private NotificationEmailGroupingStrategy notificationEmailGroupingStrategy;
+
+    @MockComponent
+    private NotificationConfiguration notificationConfiguration;
+
+    @BeforeComponent
+    void beforeComponent(MockitoComponentManager componentManager) throws Exception
+    {
+        String groupingStrategyHint = "testStrategy";
+        when(this.notificationConfiguration.getEmailGroupingStrategyHint()).thenReturn(groupingStrategyHint);
+        componentManager.registerComponent(NotificationEmailGroupingStrategy.class, groupingStrategyHint,
+            this.notificationEmailGroupingStrategy);
+        componentManager.registerComponent(ComponentManager.class, "context", componentManager);
+    }
 
     @BeforeEach
     void beforeEach()
@@ -181,16 +204,25 @@ class DefaultPeriodicMimeMessageIteratorTest
         when(this.groupingEventManager.getCompositeEvents(Collections.singletonList(event2), userRefC,
             "EMAIL")).thenReturn(Collections.singletonList(compositeEvent2));
 
+        when(this.notificationEmailGroupingStrategy.groupEventsPerMail(any())).then(invocationOnMock -> {
+            List<CompositeEvent> compositeEvents = invocationOnMock.getArgument(0);
+            return compositeEvents.stream().map(List::of).collect(Collectors.toList());
+        });
+
         when(compositeEvent1.getUsers()).thenReturn(Sets.newSet(userB));
         when(compositeEvent2.getUsers()).thenReturn(Sets.newSet(userB));
 
         MimeMessage message = mock(MimeMessage.class);
         when(this.factory.createMessage(TEMPLATE_REFERENCE, factoryParameters)).thenReturn(message, message);
 
-        when(this.defaultNotificationEmailRenderer.renderHTML(eq(compositeEvent1), anyString())).thenReturn("eventHTML1");
-        when(this.defaultNotificationEmailRenderer.renderPlainText(eq(compositeEvent1), anyString())).thenReturn("compositeEvent1");
-        when(this.defaultNotificationEmailRenderer.renderHTML(eq(compositeEvent2), anyString())).thenReturn("eventHTML2");
-        when(this.defaultNotificationEmailRenderer.renderPlainText(eq(compositeEvent2), anyString())).thenReturn("compositeEvent2");
+        when(this.defaultNotificationEmailRenderer.renderHTML(eq(compositeEvent1), anyString()))
+            .thenReturn("eventHTML1");
+        when(this.defaultNotificationEmailRenderer.renderPlainText(eq(compositeEvent1), anyString()))
+            .thenReturn("compositeEvent1");
+        when(this.defaultNotificationEmailRenderer.renderHTML(eq(compositeEvent2), anyString()))
+            .thenReturn("eventHTML2");
+        when(this.defaultNotificationEmailRenderer.renderPlainText(eq(compositeEvent2), anyString()))
+            .thenReturn("compositeEvent2");
 
         Attachment userBAvatar = mock(Attachment.class);
         when(this.userAvatarAttachmentExtractor.getUserAvatar(eq(userB), anyInt())).thenReturn(userBAvatar);

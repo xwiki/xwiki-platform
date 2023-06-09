@@ -25,7 +25,6 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.notifiers.email.NotificationEmailGroupingStrategy;
 
 import javax.inject.Singleton;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -44,6 +43,6 @@ public class DefaultNotificationEmailGroupingStrategy implements NotificationEma
             throws NotificationException
     {
         // TODO: Maybe the default component should systematically paginate?
-        return Collections.singletonList(compositeEvents);
+        return List.of(compositeEvents);
     }
 }

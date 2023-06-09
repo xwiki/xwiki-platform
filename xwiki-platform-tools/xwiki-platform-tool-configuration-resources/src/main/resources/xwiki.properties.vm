@@ -1275,6 +1275,14 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The default is :
 # notifications.async.poolSize = 2
 
+#-# [Since 15.5RC1]
+#-# The hint of the strategy component to use for email grouping notifications. Default strategy is to group all
+#-# notifications in a single email, but other strategies can be provided, e.g. to send as many emails as there was
+#-# type of notifications. Check online documentation related to notification to see the list of available strategies.
+#-#
+#-# The default is :
+# notifications.emailGroupingStrategyHint = "default"
+
 #-------------------------------------------------------------------------------------
 # Mentions
 #-------------------------------------------------------------------------------------

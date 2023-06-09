@@ -154,7 +154,7 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
 
         migrateSchema(SCHEMA_VERSION_12_9);
         
-        // TODO: add security related fields here, something to do with schema version?
+        // TODO: add a field to list all the wikis where the extension is installed (with a option to say all of them)
         
         setPDoubleField("security_maxCCSV", false, false);
         setStringField("security_cveID", true, false);

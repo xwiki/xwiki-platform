@@ -312,6 +312,7 @@ public class ExtensionIndexStore implements Initializable
 //        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, "security_advice", null, document);
 
         add(document);
+        commit();
     }
 
     /**

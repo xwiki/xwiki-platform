@@ -92,6 +92,8 @@ public class OsvExtensionSecurityAnalyzer implements ExtensionSecurityAnalyzer
             // We currently have an issue regarding versions resolution of packages from xwiki-platform, because they 
             // are not published on maven central. Hence, we only filter explicitly by version for other group ids.
             queryObject.setVersion(version);
+        } else {
+            System.out.println("skip version ");
         }
 
         try {
@@ -107,11 +109,14 @@ public class OsvExtensionSecurityAnalyzer implements ExtensionSecurityAnalyzer
                 .build();
 
             HttpClient client = HttpClient.newHttpClient();
+            
+            // TODO: find out why the response is always {}, for instance 'xwiki-platform-flamingo-theme-ui' is supposed
+            // to return a response.
 
             HttpResponse<String> response = client.send(request, ofString());
             OsvResponse osvResponse = objectMapper.readValue(response.body(), OsvResponse.class);
             List<VulnObject> matchingVulns = new ArrayList<>();
-            if (!osvResponse.getVulns().isEmpty()) {
+            if (osvResponse.getVulns() != null && !osvResponse.getVulns().isEmpty()) {
                 osvResponse.getVulns()
                     .forEach(vuln -> analyzeVuln(extensionId, version, vuln).ifPresent(matchingVulns::add));
             }

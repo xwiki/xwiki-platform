@@ -26,6 +26,8 @@ import org.xwiki.extension.security.internal.ExtensionSecurityException;
 import org.xwiki.stability.Unstable;
 
 /**
+ * Generic interface to call for the security analysis of an extension.
+ *
  * @version $Id$
  * @since 15.5RC1
  */

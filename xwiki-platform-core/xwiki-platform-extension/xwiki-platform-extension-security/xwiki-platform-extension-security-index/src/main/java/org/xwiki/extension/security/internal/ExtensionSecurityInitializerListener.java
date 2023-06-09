@@ -60,6 +60,6 @@ public class ExtensionSecurityInitializerListener extends AbstractEventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        this.schedulerProvider.get().initialize();
+        this.schedulerProvider.get().start();
     }
 }

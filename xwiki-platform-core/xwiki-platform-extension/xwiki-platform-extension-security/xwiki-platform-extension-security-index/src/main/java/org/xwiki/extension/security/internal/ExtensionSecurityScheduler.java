@@ -19,8 +19,9 @@
  */
 package org.xwiki.extension.security.internal;
 
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -48,14 +49,16 @@ public class ExtensionSecurityScheduler implements Runnable, Disposable
     @Inject
     private Logger logger;
 
-    private ExecutorService executor;
+    private ScheduledExecutorService executor;
 
     /**
      * Initialize and start the scheduler.
      */
-    public void initialize()
+    public void start()
     {
-        this.executor = Executors.newSingleThreadExecutor(r -> {
+
+        // Start the scheduling
+        this.executor = Executors.newSingleThreadScheduledExecutor(r -> {
             Thread thread = new Thread(r);
             thread.setName("Extension Security scanner");
             thread.setPriority(Thread.NORM_PRIORITY - 1);
@@ -63,14 +66,14 @@ public class ExtensionSecurityScheduler implements Runnable, Disposable
 
             return thread;
         });
+
+        // TODO: make configurable!
+        this.executor.scheduleWithFixedDelay(this, 0, 24, TimeUnit.HOURS);
     }
 
     @Override
     public void run()
     {
-        // TODO:
-        // - check is recurring execution is implemented (and working)
-        // - see how to test with a fake source as the current version will not CVE issues (and we don't want to depend on the existence of a given cve..)
         try {
             // Execute job
             Job job = this.jobExecutor.execute(ExtensionSecurityJob.JOBTYPE, new ExtensionSecurityRequest());

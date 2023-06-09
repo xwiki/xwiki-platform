@@ -33,6 +33,11 @@
   <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-platform-extension-security-notifications</artifactId>
   <version>15.5-SNAPSHOT</version>
+  <properties>
+    <!-- It does not make sense to have this extension installed on several wikis, as it perform the security
+      scan for all wikis. -->
+    <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

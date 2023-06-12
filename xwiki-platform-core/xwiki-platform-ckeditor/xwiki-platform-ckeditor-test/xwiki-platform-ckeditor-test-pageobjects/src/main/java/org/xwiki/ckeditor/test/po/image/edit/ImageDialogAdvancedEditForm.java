@@ -41,4 +41,14 @@ public class ImageDialogAdvancedEditForm extends BaseElement
         getDriver().findElement(By.cssSelector("#advanced [name='alignment'][value='center']")).click();
         return this;
     }
+
+    /**
+     * @return the currently selected alignment value
+     * @since 14.10.13
+     * @since 15.5RC1
+     */
+    public String getAlignment()
+    {
+        return getDriver().findElement(By.cssSelector("#advanced [name='alignment']:checked")).getAttribute("value");
+    }
 }

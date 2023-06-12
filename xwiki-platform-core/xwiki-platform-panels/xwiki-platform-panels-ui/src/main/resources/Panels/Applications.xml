@@ -558,7 +558,7 @@ require(['scriptaculous/effects'], function() {
   padding-left: 0px;
   padding-right: 6px;
   border: 0;
-  color: #2f6faf;
+  color: $theme.linkColor;
   box-shadow: none;
   background: transparent;
 }

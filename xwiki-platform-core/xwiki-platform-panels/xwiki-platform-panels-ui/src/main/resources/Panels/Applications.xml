@@ -554,7 +554,8 @@ require(['scriptaculous/effects'], function() {
   margin-left: 0.1em;
 }
 
-.applicationPanelMoreButton, .applicationPanelMoreButton:hover, .applicationPanelMoreButton:focus {
+.applicationPanelMoreButton, .applicationPanelMoreButton:hover,
+.applicationPanelMoreButton:focus, .applicationPanelMoreButton:active {
   padding-left: 0px;
   padding-right: 6px;
   border: 0;

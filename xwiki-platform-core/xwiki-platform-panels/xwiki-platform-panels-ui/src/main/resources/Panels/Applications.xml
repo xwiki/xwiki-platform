@@ -554,9 +554,13 @@ require(['scriptaculous/effects'], function() {
   margin-left: 0.1em;
 }
 
-.applicationPanelMoreButton {
+.applicationPanelMoreButton, .applicationPanelMoreButton:hover, .applicationPanelMoreButton:focus {
   padding-left: 0px;
   padding-right: 6px;
+  border: 0;
+  color: #2f6faf;
+  box-shadow: none;
+  background: transparent;
 }
 
 .applicationPanelMoreButton .application-label{

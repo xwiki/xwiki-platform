@@ -43,9 +43,9 @@ import static org.xwiki.livedata.LiveDataPropertyDescriptor.DisplayerDescriptor;
 public class ExtensionSecurityLiveDataConfigurationProvider implements Provider<LiveDataConfiguration>
 {
     /**
-     * Max CVSS LD field.
+     * The name LD field.
      */
-    public static final String MAX_CVSS = "maxCVSS";
+    public static final String NAME = "name";
 
     /**
      * Extension ID LD field.
@@ -53,9 +53,28 @@ public class ExtensionSecurityLiveDataConfigurationProvider implements Provider<
     public static final String EXTENSION_ID = "extensionId";
 
     /**
+     * Max CVSS LD field.
+     */
+    public static final String MAX_CVSS = "maxCVSS";
+
+    /**
+     * The fix version field.
+     */
+    public static final String FIX_VERSION = "fixVersion";
+
+    /**
+     * The advice field.
+     */
+    public static final String ADVICE = "advice";
+
+    /**
      * Extension ID LD field.
      */
     public static final String CVE_ID = "cveID";
+
+    private static final String STRING_TYPE = "String";
+
+    private static final String HTML_DISPLAYER_ID = "html";
 
     @Override
     public LiveDataConfiguration get()
@@ -67,11 +86,43 @@ public class ExtensionSecurityLiveDataConfigurationProvider implements Provider<
         input.setMeta(meta);
         meta.setEntryDescriptor(entryDescriptor);
         meta.setPropertyDescriptors(List.of(
+            initExtensionNameDescriptor(),
             initExtensionIdDescriptor(),
             initMaxCVSSDescriptor(),
-            initCVEIDDescriptor()
+            initCVEIDDescriptor(),
+            initFixVersionDescriptor(),
+            initAdviceDescriptor()
         ));
         return input;
+    }
+
+    private LiveDataPropertyDescriptor initExtensionNameDescriptor()
+    {
+        LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
+        // TODO: translate?
+        descriptor.setName("Name");
+        descriptor.setId(NAME);
+        descriptor.setType(STRING_TYPE);
+        descriptor.setVisible(true);
+        descriptor.setEditable(false);
+        descriptor.setSortable(true);
+        descriptor.setFilterable(true);
+        descriptor.setDisplayer(new DisplayerDescriptor(HTML_DISPLAYER_ID));
+        return descriptor;
+    }
+
+    private static LiveDataPropertyDescriptor initExtensionIdDescriptor()
+    {
+        LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
+        // TODO: translate?
+        descriptor.setName("Extension Id");
+        descriptor.setId(EXTENSION_ID);
+        descriptor.setType(STRING_TYPE);
+        descriptor.setVisible(true);
+        descriptor.setEditable(false);
+        descriptor.setSortable(true);
+        descriptor.setFilterable(true);
+        return descriptor;
     }
 
     private LiveDataPropertyDescriptor initMaxCVSSDescriptor()
@@ -88,13 +139,28 @@ public class ExtensionSecurityLiveDataConfigurationProvider implements Provider<
         return descriptor;
     }
 
-    private static LiveDataPropertyDescriptor initExtensionIdDescriptor()
+    private static LiveDataPropertyDescriptor initCVEIDDescriptor()
     {
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
         // TODO: translate?
-        descriptor.setName("Extension Id");
-        descriptor.setId(EXTENSION_ID);
-        descriptor.setType("String");
+        descriptor.setName("CVE ID");
+        descriptor.setId(CVE_ID);
+        descriptor.setType(STRING_TYPE);
+        descriptor.setDisplayer(new DisplayerDescriptor(HTML_DISPLAYER_ID));
+        descriptor.setVisible(true);
+        descriptor.setEditable(false);
+        descriptor.setSortable(false);
+        descriptor.setFilterable(true);
+        return descriptor;
+    }
+
+    private LiveDataPropertyDescriptor initFixVersionDescriptor()
+    {
+        LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
+        // TODO: translate?
+        descriptor.setName("Fix Version");
+        descriptor.setId(FIX_VERSION);
+        descriptor.setType(STRING_TYPE);
         descriptor.setVisible(true);
         descriptor.setEditable(false);
         descriptor.setSortable(true);
@@ -102,20 +168,17 @@ public class ExtensionSecurityLiveDataConfigurationProvider implements Provider<
         return descriptor;
     }
 
-    private static LiveDataPropertyDescriptor initCVEIDDescriptor()
+    private LiveDataPropertyDescriptor initAdviceDescriptor()
     {
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
         // TODO: translate?
-        descriptor.setName("CVE ID");
-        descriptor.setId(CVE_ID);
-        descriptor.setType("String");
-        DisplayerDescriptor displayer = new DisplayerDescriptor();
-        displayer.setId("html");
-        descriptor.setDisplayer(displayer);
+        descriptor.setName("Advice");
+        descriptor.setId(ADVICE);
+        descriptor.setType(STRING_TYPE);
         descriptor.setVisible(true);
         descriptor.setEditable(false);
         descriptor.setSortable(false);
-        descriptor.setFilterable(true);
+        descriptor.setFilterable(false);
         return descriptor;
     }
 }

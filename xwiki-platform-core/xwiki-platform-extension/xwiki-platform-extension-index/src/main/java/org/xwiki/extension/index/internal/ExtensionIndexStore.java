@@ -304,6 +304,11 @@ public class ExtensionIndexStore implements Initializable
 
         this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID, toSolrId(extensionId), document);
 
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SOLR_FIELD_EXTENSIONID, extensionId.getId(),
+            document);
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, Extension.FIELD_VERSION,
+            extensionId.getVersion().getValue(), document);
+
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_MAX_CVSS,
             result.getMaxCCSV(), document);
         Stream<String> cveIds = result.getSecurityIssues().stream().map(SecurityIssueDescriptor::getId);

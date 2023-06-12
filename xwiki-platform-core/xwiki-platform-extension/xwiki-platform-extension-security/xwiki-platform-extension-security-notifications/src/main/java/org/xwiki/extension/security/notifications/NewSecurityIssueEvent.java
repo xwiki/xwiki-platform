@@ -38,6 +38,6 @@ public class NewSecurityIssueEvent implements TargetableEvent
     @Override
     public Set<String> getTarget()
     {
-        return Set.of("XWiki.XWikiAdminGroup");
+        return Set.of("xwiki:XWiki.XWikiAdminGroup");
     }
 }

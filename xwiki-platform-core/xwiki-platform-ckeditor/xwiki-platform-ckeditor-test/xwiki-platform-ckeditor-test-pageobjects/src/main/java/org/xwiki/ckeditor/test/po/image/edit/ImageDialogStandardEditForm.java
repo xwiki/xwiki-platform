@@ -51,7 +51,7 @@ public class ImageDialogStandardEditForm extends BaseElement
 
     /**
      * @return true if the caption checkbox is checked
-     * @since 14.10.12
+     * @since 14.10.13
      * @since 15.5RC1
      */
     public boolean isCaptionCheckboxChecked()

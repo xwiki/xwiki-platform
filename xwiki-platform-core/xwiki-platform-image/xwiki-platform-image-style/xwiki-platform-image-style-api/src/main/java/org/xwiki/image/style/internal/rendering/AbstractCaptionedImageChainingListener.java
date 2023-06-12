@@ -33,7 +33,7 @@ import org.xwiki.rendering.listener.reference.ResourceReference;
  * Base class for chaining listeners that handle captioned images.
  *
  * @version $Id$
- * @since 14.10.12
+ * @since 14.10.13
  * @since 15.5RC1
  */
 abstract class AbstractCaptionedImageChainingListener extends LookaheadChainingListener

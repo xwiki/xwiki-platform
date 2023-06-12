@@ -44,7 +44,7 @@ public class ImageDialogAdvancedEditForm extends BaseElement
 
     /**
      * @return the currently selected alignment value
-     * @since 14.10.12
+     * @since 14.10.13
      * @since 15.5RC1
      */
     public String getAlignment()

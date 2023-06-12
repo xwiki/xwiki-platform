@@ -32,7 +32,7 @@ import static org.apache.commons.lang3.StringUtils.SPACE;
  * A listener that puts the image parameters in the figure parameters when the image is wrapped in a figure.
  *
  * @version $Id$
- * @since 14.10.12
+ * @since 14.10.13
  * @since 15.5RC1
  */
 class CaptionedImageParseChainingListener extends AbstractCaptionedImageChainingListener

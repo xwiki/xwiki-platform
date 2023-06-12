@@ -56,7 +56,7 @@ public class ImageDialogEditModal extends BaseElement
 
     /**
      * Click on the cancel button to close the modal.
-     * @since 14.10.12
+     * @since 14.10.13
      * @since 15.5RC1
      */
     public void clickCancel()

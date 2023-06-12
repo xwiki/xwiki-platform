@@ -73,7 +73,7 @@ public class LinkSelectorModal extends BaseElement
 
     /**
      * @return the resource type currently selected in the resource picker (e.g., {@code "doc"})
-     * @since 14.10.12
+     * @since 14.10.13
      * @since 15.5RC1
      */
     public String getSelectedResourceType()
@@ -83,7 +83,7 @@ public class LinkSelectorModal extends BaseElement
 
     /**
      * @return the resource reference currently selected in the resource picker (e.g., {@code "Sandbox.WebHome"})
-     * @since 14.10.12
+     * @since 14.10.13
      * @since 15.5RC1
      */
     public String getSelectedResourceReference()
@@ -127,6 +127,8 @@ public class LinkSelectorModal extends BaseElement
 
     /**
      * Click on the {@code "Cancel"} button of the modal.
+     * @since 14.10.13
+     * @since 15.5RC1
      */
     public void clickCancel()
     {

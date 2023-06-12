@@ -30,6 +30,13 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 
+/**
+ * A listener that cleans the image parameters from the figure when rendering to XWiki syntax.
+ *
+ * @version $Id$
+ * @since 14.10.13
+ * @since 15.5RC1
+ */
 class CaptionedImageRenderChainingListener extends AbstractCaptionedImageChainingListener
 {
     static final Set<String> KNOWN_PARAMETERS = Set.of(

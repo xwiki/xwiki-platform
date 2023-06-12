@@ -42,12 +42,14 @@ import org.xwiki.observation.remote.RemoteObservationManagerContext;
 /**
  * This listener is responsible of starting triggers when specific events occurs in the wiki.
  *
- * @since 9.6-RC1
+ * @since 9.6RC1
  * @version $Id$
+ * @deprecated This component is only used in case of post-filtering events. We stopped supporting those.
  */
 @Component
 @Singleton
 @Named(LiveNotificationEmailListener.NAME)
+@Deprecated(since = "15.5RC1")
 public class LiveNotificationEmailListener extends AbstractEventListener
 {
     /**

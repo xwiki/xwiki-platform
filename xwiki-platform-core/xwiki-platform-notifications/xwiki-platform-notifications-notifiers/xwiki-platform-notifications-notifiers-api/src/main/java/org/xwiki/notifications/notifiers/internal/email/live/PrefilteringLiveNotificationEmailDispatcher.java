@@ -164,6 +164,7 @@ public class PrefilteringLiveNotificationEmailDispatcher implements Initializabl
         entry.entities.forEach(entity -> {
             CompositeEvent composite = eventsToSend.get(entity);
 
+            // FIXME: This should use the grouping strategy
             if (composite != null) {
                 // Compute the similarity between the event and the composite event in the map
                 int similarity = similarityCalculator.computeSimilarity(composite.getEvents().get(0), entry.event);

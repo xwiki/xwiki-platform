@@ -42,13 +42,14 @@ public interface GroupingEventManager
      * it to group the given events.
      *
      * @param events the list of events to group
-     * @param userId the user for whom the grouping is performed (or {@code null} if it's not for a specific user)
+     * @param userReference the user for whom the grouping is performed (or {@code null} if it's not for a specific
+     *                      user)
      * @param target the output target (e.g. email or alert)
      * @return a list of composite events as computed by {@link GroupingEventStrategy#group(List)}
      * @throws NotificationException in case of problem when performing the grouping
      */
-    List<CompositeEvent> getCompositeEvents(List<Event> events, UserReference userId, String target) throws
-        NotificationException;
+    List<CompositeEvent> getCompositeEvents(List<Event> events, UserReference userReference, String target)
+        throws NotificationException;
 
     /**
      * Add new events to an already existing list of composite events, using the {@link GroupingEventStrategy}
@@ -57,10 +58,11 @@ public interface GroupingEventManager
      *
      * @param compositeEvents a list of composite events (might be empty)
      * @param newEvents the new events to group along with the given list of composite events
-     * @param userId the user for whom the grouping is performed (or {@code null} if it's not for a specific user)
+     * @param userReference the user for whom the grouping is performed (or {@code null} if it's not for a specific
+     *                      user)
      * @param target the output target (e.g. email or alert)
      * @throws NotificationException in case of problem when performing the grouping
      */
-    void augmentCompositeEvents(List<CompositeEvent> compositeEvents, List<Event> newEvents, UserReference userId,
-        String target) throws NotificationException;
+    void augmentCompositeEvents(List<CompositeEvent> compositeEvents, List<Event> newEvents,
+        UserReference userReference, String target) throws NotificationException;
 }

@@ -94,6 +94,6 @@ public interface NotificationConfiguration
     @Unstable
     default String getEmailGroupingStrategyHint()
     {
-        return "";
+        return "default";
     }
 }

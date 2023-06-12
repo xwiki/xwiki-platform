@@ -31,6 +31,8 @@ import org.xwiki.livedata.LiveDataEntryDescriptor;
 import org.xwiki.livedata.LiveDataMeta;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
 
+import static org.xwiki.livedata.LiveDataPropertyDescriptor.DisplayerDescriptor;
+
 /**
  * @version $Id$
  * @since 15.5RC1
@@ -50,6 +52,11 @@ public class ExtensionSecurityLiveDataConfigurationProvider implements Provider<
      */
     public static final String EXTENSION_ID = "extensionId";
 
+    /**
+     * Extension ID LD field.
+     */
+    public static final String CVE_ID = "cveID";
+
     @Override
     public LiveDataConfiguration get()
     {
@@ -61,7 +68,8 @@ public class ExtensionSecurityLiveDataConfigurationProvider implements Provider<
         meta.setEntryDescriptor(entryDescriptor);
         meta.setPropertyDescriptors(List.of(
             initExtensionIdDescriptor(),
-            initMaxCVSSDescriptor()
+            initMaxCVSSDescriptor(),
+            initCVEIDDescriptor()
         ));
         return input;
     }
@@ -90,6 +98,23 @@ public class ExtensionSecurityLiveDataConfigurationProvider implements Provider<
         descriptor.setVisible(true);
         descriptor.setEditable(false);
         descriptor.setSortable(true);
+        descriptor.setFilterable(true);
+        return descriptor;
+    }
+
+    private static LiveDataPropertyDescriptor initCVEIDDescriptor()
+    {
+        LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
+        // TODO: translate?
+        descriptor.setName("CVE ID");
+        descriptor.setId(CVE_ID);
+        descriptor.setType("String");
+        DisplayerDescriptor displayer = new DisplayerDescriptor();
+        displayer.setId("html");
+        descriptor.setDisplayer(displayer);
+        descriptor.setVisible(true);
+        descriptor.setEditable(false);
+        descriptor.setSortable(false);
         descriptor.setFilterable(true);
         return descriptor;
     }

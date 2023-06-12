@@ -20,9 +20,14 @@
 package org.xwiki.extension.security.internal;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -43,8 +48,13 @@ import org.xwiki.livedata.LiveDataQuery.Constraint;
 import org.xwiki.livedata.LiveDataQuery.Filter;
 import org.xwiki.livedata.LiveDataQuery.SortEntry;
 import org.xwiki.search.solr.SolrUtils;
+import org.xwiki.velocity.tools.EscapeTool;
 
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_CVE_CVSS;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_CVE_ID;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_CVE_LINK;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_MAX_CVSS;
+import static org.xwiki.extension.security.internal.ExtensionSecurityLiveDataConfigurationProvider.CVE_ID;
 import static org.xwiki.extension.security.internal.ExtensionSecurityLiveDataConfigurationProvider.EXTENSION_ID;
 import static org.xwiki.extension.security.internal.ExtensionSecurityLiveDataConfigurationProvider.MAX_CVSS;
 import static org.xwiki.search.solr.AbstractSolrCoreInitializer.SOLR_FIELD_ID;
@@ -94,10 +104,18 @@ public class ExtensionSecurityLiveDataEntryStore implements LiveDataEntryStore
             liveData.setCount(searchResults.getResults().getNumFound());
             for (SolrDocument solrDoc : searchResults.getResults()) {
 
+                List<Object> cveIds = new ArrayList<>(solrDoc.getFieldValues(SECURITY_CVE_ID));
+                List<Object> cveLinks = new ArrayList<>(solrDoc.getFieldValues(SECURITY_CVE_LINK));
+                List<Object> cveCvss = new ArrayList<>(solrDoc.getFieldValues(SECURITY_CVE_CVSS));
+                EscapeTool escapeTool = new EscapeTool();
+                Stream<String> objectStream = IntStream.range(0, cveIds.size())
+                    .mapToObj(value -> String.format("<a href='%s'>%s</a> (%s)", escapeTool.xml(cveLinks.get(value)),
+                        escapeTool.xml(cveIds.get(value)), escapeTool.xml(cveCvss.get(value))));
+
                 liveData.getEntries().add(Map.of(
-                    // TODO: extract to constant.
                     EXTENSION_ID, solrDoc.get(SOLR_FIELD_ID),
-                    MAX_CVSS, solrDoc.get(SECURITY_MAX_CVSS)
+                    MAX_CVSS, solrDoc.get(SECURITY_MAX_CVSS),
+                    CVE_ID, objectStream.collect(Collectors.joining("<br/>"))
                 ));
             }
             return liveData;

@@ -1,0 +1,3 @@
+org.xwiki.notifications.notifiers.internal.email.live.LiveNotificationEmailListener
+org.xwiki.notifications.notifiers.internal.email.live.LiveNotificationEmailManager
+org.xwiki.notifications.notifiers.internal.email.live.LiveNotificationEmailSender

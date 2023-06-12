@@ -24,15 +24,15 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-legacy</artifactId>
+    <artifactId>xwiki-platform-legacy-notifications</artifactId>
     <version>15.5-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-legacy-notifications</artifactId>
-  <name>XWiki Platform - Legacy - Notifications</name>
+  <artifactId>xwiki-platform-legacy-notifications-notifiers</artifactId>
+  <name>XWiki Platform - Legacy - Notifications - Notifiers</name>
   <packaging>pom</packaging>
   <modules>
-    <module>xwiki-platform-legacy-notification-activitymacro</module>
-    <module>xwiki-platform-legacy-notifications-notifiers</module>
+    <module>xwiki-platform-legacy-notifications-notifiers-api</module>
+    <module>xwiki-platform-legacy-notifications-notifiers-default</module>
   </modules>
 </project>
 

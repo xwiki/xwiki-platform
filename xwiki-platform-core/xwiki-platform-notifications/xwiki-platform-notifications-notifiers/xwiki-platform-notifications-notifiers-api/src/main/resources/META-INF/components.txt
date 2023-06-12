@@ -9,9 +9,6 @@ org.xwiki.notifications.notifiers.internal.email.grouping.OneMailPerCompositeEma
 org.xwiki.notifications.notifiers.internal.email.grouping.SeparatedMentionEmailGroupingStrategy
 org.xwiki.notifications.notifiers.internal.email.IntervalUsersManager
 org.xwiki.notifications.notifiers.internal.email.IntervalUsersManagerInvalidator
-org.xwiki.notifications.notifiers.internal.email.live.LiveNotificationEmailListener
-org.xwiki.notifications.notifiers.internal.email.live.LiveNotificationEmailManager
-org.xwiki.notifications.notifiers.internal.email.live.LiveNotificationEmailSender
 org.xwiki.notifications.notifiers.internal.email.live.MissingLiveNotificationMailsJob
 org.xwiki.notifications.notifiers.internal.email.live.PrefilteringLiveNotificationEmailDispatcher
 org.xwiki.notifications.notifiers.internal.email.live.PrefilteringLiveNotificationEmailListener

@@ -54,10 +54,13 @@ public interface NotificationConfiguration
     /**
      * @return true if pre filtering should be used for ALERT user notifications
      * @since 12.6
+     * @deprecated The pre-filtering is now the standard way of using notifications and post-filtering is not
+     * supported anymore (i.e. new code might not work with post-filtering).
      */
+    @Deprecated(since = "15.5RC1")
     default boolean isEventPrefilteringEnabled()
     {
-        return false;
+        return true;
     }
 
     /**

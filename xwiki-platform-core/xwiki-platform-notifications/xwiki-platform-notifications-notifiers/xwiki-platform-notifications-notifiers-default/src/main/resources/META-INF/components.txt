@@ -13,6 +13,5 @@ org.xwiki.notifications.notifiers.internal.email.UserAvatarAttachmentExtractor
 org.xwiki.notifications.notifiers.internal.email.WatchlistLeftoversCleaner
 org.xwiki.notifications.notifiers.internal.email.WikiEmailNotificationRendererComponentBuilder
 org.xwiki.notifications.notifiers.internal.email.WikiEmailNotificationRendererDocumentInitializer
-org.xwiki.notifications.notifiers.internal.email.live.DefaultLiveMimeMessageIterator
 org.xwiki.notifications.notifiers.internal.email.live.DefaultPrefilteringLiveMimeMessageIterator
 org.xwiki.notifications.notifiers.internal.email.live.LiveNotificationEmailEventFilter

@@ -31,6 +31,9 @@
   <name>XWiki Platform - Notifications - Notifiers - API</name>
   <description>Handle how notifications are transmitted to a user</description>
   <properties>
+    <!-- Skipping revapi since xwiki-platform-legacy-notifications-notifiers-api wraps this module and runs checks on it
+     -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
     <xwiki.jacoco.instructionRatio>0.75</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>

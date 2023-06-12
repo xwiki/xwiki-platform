@@ -24,15 +24,29 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-legacy</artifactId>
+    <artifactId>xwiki-platform-legacy-notifications-notifiers</artifactId>
     <version>15.5-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-legacy-notifications</artifactId>
-  <name>XWiki Platform - Legacy - Notifications</name>
-  <packaging>pom</packaging>
-  <modules>
-    <module>xwiki-platform-legacy-notification-activitymacro</module>
-    <module>xwiki-platform-legacy-notifications-notifiers</module>
-  </modules>
+  <artifactId>xwiki-platform-legacy-notifications-notifiers-default</artifactId>
+  <name>XWiki Platform - Legacy - Notifications - Notifiers - Default</name>
+  <packaging>jar</packaging>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Legacy Notifications Notifiers Default</xwiki.extension.name>
+    <xwiki.extension.features>org.xwiki.platform:xwiki-platform-notifications-notifiers-default</xwiki.extension.features>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-notifications-notifiers-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 </project>
-

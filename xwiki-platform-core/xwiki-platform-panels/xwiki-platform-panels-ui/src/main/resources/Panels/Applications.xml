@@ -555,7 +555,13 @@ require(['scriptaculous/effects'], function() {
   border: 0;
   color: $theme.linkColor;
   box-shadow: none;
-  background: transparent;
+  background-color: transparent;
+  width: 100%;
+  display: flex;
+}
+
+.applicationPanelMoreButton:hover {
+  background-color: $theme.highlightColor;
 }
 
 .applicationPanelMoreButton .application-label{

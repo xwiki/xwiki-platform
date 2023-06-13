@@ -31,29 +31,11 @@ import static java.util.Comparator.comparingDouble;
  */
 public class ExtensionAnalysisResult
 {
-    private Exception exception;
-
     private List<SecurityIssueDescriptor> securityIssues;
 
     private String advice;
 
-    /**
-     * @param e the exception encountered during the analysis of the extension
-     * @return the current object
-     */
-    public ExtensionAnalysisResult setException(Exception e)
-    {
-        this.exception = e;
-        return this;
-    }
-
-    /**
-     * @return the exception encountered during the analysis of the extension
-     */
-    public Exception getException()
-    {
-        return this.exception;
-    }
+    private List<String> wikis;
 
     /**
      * @param securityIssues the security issues associated with the analyzed extension
@@ -91,6 +73,26 @@ public class ExtensionAnalysisResult
     {
 
         this.advice = advice;
+        return this;
+    }
+
+    /**
+     * 
+     * @return the list of wikis where the security result applies
+     */
+    public List<String> getWikis()
+    {
+        return this.wikis;
+    }
+
+    /**
+     * 
+     * @param wikis the list of wikis where the security result applies
+     * @return the current object
+     */
+    public ExtensionAnalysisResult setWikis(List<String> wikis)
+    {
+        this.wikis = wikis;
         return this;
     }
 

@@ -19,27 +19,29 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-extension</artifactId>
     <version>15.5-SNAPSHOT</version>
   </parent>
-
   <artifactId>xwiki-platform-extension-security</artifactId>
-  <version>15.5-SNAPSHOT</version>
+  <name>XWiki Platform - Extension - Security - Parent POM</name>
   <packaging>pom</packaging>
-    
-    <modules>
-        <module>xwiki-platform-extension-security-ui</module>
-        <module>xwiki-platform-extension-security-api</module>
-        <module>xwiki-platform-extension-security-index</module>
-        <module>xwiki-platform-extension-security-notifications</module>
+  <description>XWiki Platform - Extension - Security - Parent POM</description>
+  <modules>
+    <module>xwiki-platform-extension-security-api</module>
+    <module>xwiki-platform-extension-security-index</module>
+    <module>xwiki-platform-extension-security-notifications</module>
+    <module>xwiki-platform-extension-security-ui</module>
+  </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
         <module>xwiki-platform-extension-security-test</module>
-    </modules>
-
+      </modules>
+    </profile>
+  </profiles>
 </project>

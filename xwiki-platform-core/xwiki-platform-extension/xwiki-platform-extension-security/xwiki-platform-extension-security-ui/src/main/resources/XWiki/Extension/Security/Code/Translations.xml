@@ -42,7 +42,13 @@ extension.security.indexed.on=Indexed on {0}. Any extension installed after this
 extension.security.indexed.nojob=Could not find any previous indexation processing.
 extension.security.admin.generalWarning=Please note that this security scan does not include all installed extensions. Extensions that can't be updated through the Extension Manager are currently not included.
 extension.security.admin.configuration.title=Configuration
-extension.security.notification.message=We have identified {0} extensions with known security issues, see the detail in the {1}</content>
+extension.security.notification.message=We have identified {0} extensions with known security issues, see the detail in the {1}
+XWiki.Extension.Security.Code.ConfigClass_scanEnabled=Scan Enabled
+XWiki.Extension.Security.Code.ConfigClass_scanEnabled.hint=When unchecked, the security scan won't be executed anymore
+XWiki.Extension.Security.Code.ConfigClass_scanDelay=Scan Delay
+XWiki.Extension.Security.Code.ConfigClass_scanDelay.hint=The number of hours to wait between two security scan (default: 24h)
+XWiki.Extension.Security.Code.ConfigClass_scanURL=Scan URL
+XWiki.Extension.Security.Code.ConfigClass_scanURL.hint=The url to use as the remote source for the security scan (default value: https://api.osv.dev/v1/query)</content>
   <object>
     <name>XWiki.Extension.Security.Code.Translations</name>
     <number>0</number>

@@ -40,8 +40,10 @@ import org.apache.maven.artifact.versioning.VersionRange;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.index.internal.security.ExtensionAnalysisResult;
 import org.xwiki.extension.index.internal.security.SecurityIssueDescriptor;
+import org.xwiki.extension.security.ExtensionSecurityConfiguration;
 import org.xwiki.extension.security.analyzer.ExtensionSecurityAnalyzer;
 import org.xwiki.extension.security.internal.ExtensionSecurityException;
 import org.xwiki.extension.security.internal.analyzer.osv.model.PackageObject;
@@ -85,6 +87,9 @@ public class OsvExtensionSecurityAnalyzer implements ExtensionSecurityAnalyzer
     @Inject
     private Logger logger;
 
+    @Inject
+    private ExtensionSecurityConfiguration extensionSecurityConfiguration;
+
     @Override
     public ExtensionAnalysisResult analyze(Extension extension) throws ExtensionSecurityException
     {
@@ -108,9 +113,8 @@ public class OsvExtensionSecurityAnalyzer implements ExtensionSecurityAnalyzer
                 .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
                 .writeValueAsString(queryObject);
 
-            // TODO: allow to configure the actual url? 
             HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://api.osv.dev/v1/query"))
+                .uri(URI.create(this.extensionSecurityConfiguration.getScanURL()))
                 .POST(HttpRequest.BodyPublishers.ofString(body))
                 .build();
 
@@ -118,31 +122,37 @@ public class OsvExtensionSecurityAnalyzer implements ExtensionSecurityAnalyzer
 
             HttpResponse<String> response = client.send(request, ofString());
 
-            // TODO: handle responses with error.
             OsvResponse osvResponse = objectMapper.readValue(response.body(), OsvResponse.class);
             List<VulnObject> matchingVulns = new ArrayList<>();
             if (osvResponse.getVulns() != null && !osvResponse.getVulns().isEmpty()) {
                 osvResponse.getVulns()
-                    // TODO: remove: the 13.10 hack is to simulate having issues on the current version.
-                    .forEach(vuln -> analyzeVuln(extensionId, isPlatform ? "13.10" : version, vuln).ifPresent(
-                        matchingVulns::add));
+                    .forEach(vulnerability -> analyzeVulnerability(extensionId, version, vulnerability)
+                        .ifPresent(matchingVulns::add));
             }
             return new ExtensionAnalysisResult()
                 .setResults(matchingVulns.stream().map(this::convert).collect(Collectors.toList()))
-                .setAdvice(UPGRADE_FROM_EM_ADVICE);
+                .setAdvice(UPGRADE_FROM_EM_ADVICE)
+                .setWikis(computeWikis(extension));
         } catch (JsonProcessingException e) {
             throw new ExtensionSecurityException(
-                String.format("Failed to build the json for [%s/+%s]", extensionId, version),
-                e);
+                String.format("Failed to build the json for [%s/+%s]", extensionId, version), e);
         } catch (IOException e) {
-            // TODO: throw exception instead?
-            this.logger.warn("Failed to send a request for [{}/{}]. Cause: [{}]", extension, version,
-                getRootCauseMessage(e));
-            return new ExtensionAnalysisResult().setException(e);
+            throw new ExtensionSecurityException(
+                String.format("Failed then the query for [%s/+%s]", extensionId, version), e);
         } catch (InterruptedException e) {
-            // TODO
-            throw new RuntimeException(e);
+            this.logger.warn("Can't finish the analysis as the thread was interrupted. Cause: [{}]",
+                getRootCauseMessage(e));
+            Thread.currentThread().interrupt();
+            return null;
         }
+    }
+
+    private List<String> computeWikis(Extension extension)
+    {
+        if (extension instanceof InstalledExtension) {
+            return new ArrayList<>(((InstalledExtension) extension).getNamespaces());
+        }
+        return List.of();
     }
 
     private SecurityIssueDescriptor convert(VulnObject vulnObject)
@@ -154,7 +164,7 @@ public class OsvExtensionSecurityAnalyzer implements ExtensionSecurityAnalyzer
             .setFixVersion(vulnObject.getMaxFixVersion().orElse(null));
     }
 
-    private Optional<VulnObject> analyzeVuln(String mavenId, String version, VulnObject vuln)
+    private Optional<VulnObject> analyzeVulnerability(String mavenId, String version, VulnObject vuln)
     {
         Optional<VulnObject> rvuln = Optional.empty();
         boolean isPlatform = mavenId.startsWith(PLATFORM_PREFIX);

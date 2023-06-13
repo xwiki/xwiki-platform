@@ -29,6 +29,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 
 import static org.xwiki.extension.security.internal.configuration.DefaultExtensionSecurityConfiguration.SCAN_DELAY;
 import static org.xwiki.extension.security.internal.configuration.DefaultExtensionSecurityConfiguration.SCAN_ENABLED;
+import static org.xwiki.extension.security.internal.configuration.DefaultExtensionSecurityConfiguration.SCAN_URL;
 
 /**
  * Initialize the XClass used to configure the extension security.
@@ -57,5 +58,6 @@ public class ConfigClassMandatoryInitializer extends AbstractMandatoryClassIniti
         // TODO: localization
         xclass.addBooleanField(SCAN_ENABLED, "Scan Enabled", "checkbox", true);
         xclass.addNumberField(SCAN_DELAY, "Scan Delay", 30, "integer");
+        xclass.addTextField(SCAN_URL, "Scan URL", 30);
     }
 }

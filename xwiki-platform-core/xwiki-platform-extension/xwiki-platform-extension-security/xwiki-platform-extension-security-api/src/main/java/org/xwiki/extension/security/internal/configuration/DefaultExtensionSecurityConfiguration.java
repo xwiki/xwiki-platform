@@ -39,7 +39,7 @@ import org.xwiki.extension.security.ExtensionSecurityConfiguration;
 public class DefaultExtensionSecurityConfiguration implements ExtensionSecurityConfiguration
 {
     /**
-     * Scan enabled configuration key.
+     * Scan enabled/disabled configuration key.
      */
     public static final String SCAN_ENABLED = "scanEnabled";
 
@@ -47,6 +47,11 @@ public class DefaultExtensionSecurityConfiguration implements ExtensionSecurityC
      * Scan delay configuration key.
      */
     public static final String SCAN_DELAY = "scanDelay";
+
+    /**
+     * Scan URL configuration key.
+     */
+    public static final String SCAN_URL = "scanURL";
 
     @Inject
     @Named("xwikiproperties")
@@ -66,6 +71,12 @@ public class DefaultExtensionSecurityConfiguration implements ExtensionSecurityC
     public int getScanDelay()
     {
         return getWithFallback(SCAN_DELAY, "extension.security.scan.delay", 24);
+    }
+
+    @Override
+    public String getScanURL()
+    {
+        return getWithFallback(SCAN_URL, "extension.security.scan.url", "https://api.osv.dev/v1/query");
     }
 
     private <T> T getWithFallback(String classKey, String propertiesKey, T fallbackValue)

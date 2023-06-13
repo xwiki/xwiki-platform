@@ -85,27 +85,18 @@ import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.SolrUtils;
 
-import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.NAME;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_ADVICE;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_CVE_COUNT;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_CVE_CVSS;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_CVE_ID;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_CVE_LINK;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_FIX_VERSION;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_MAX_CVSS;
-import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SOLR_FIELD_AUTHORS_INDEX;
-import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SOLR_FIELD_COMPATIBLE_NAMESPACES;
-import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SOLR_FIELD_COMPONENTS_INDEX;
-import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONFEATURES_INDEX;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID;
-import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID;
-import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SOLR_FIELD_INCOMPATIBLE_NAMESPACES;
-import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SOLR_FIELD_INDEX_DATE;
-import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST;
-import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.toComponentFieldName;
 
 /**
  * An helper to manipulate the store of indexed extensions.
- *
+ * 
  * @version $Id$
  * @since 12.10
  */
@@ -153,24 +144,24 @@ public class ExtensionIndexStore implements Initializable
 
     static {
         SEARCH_FIELD_MAPPING.put(Extension.FIELD_ID,
-            new SearchFieldMapping(SOLR_FIELD_EXTENSIONID));
+            new SearchFieldMapping(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID));
 
         SEARCH_FIELD_MAPPING.put(Extension.FIELD_AUTHOR,
-            new SearchFieldMapping(SOLR_FIELD_AUTHORS_INDEX));
+            new SearchFieldMapping(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_AUTHORS_INDEX));
         SEARCH_FIELD_MAPPING.put(Extension.FIELD_AUTHORS,
-            new SearchFieldMapping(SOLR_FIELD_AUTHORS_INDEX));
+            new SearchFieldMapping(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_AUTHORS_INDEX));
 
         SEARCH_FIELD_MAPPING.put(Extension.FIELD_EXTENSIONFEATURES,
-            new SearchFieldMapping(SOLR_FIELD_EXTENSIONFEATURES_INDEX));
+            new SearchFieldMapping(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONFEATURES_INDEX));
         SEARCH_FIELD_MAPPING.put(Extension.FIELD_EXTENSIONFEATURE,
             SEARCH_FIELD_MAPPING.get(Extension.FIELD_EXTENSIONFEATURES));
         SEARCH_FIELD_MAPPING.put(Extension.FIELD_FEATURE, SEARCH_FIELD_MAPPING.get(Extension.FIELD_EXTENSIONFEATURES));
         SEARCH_FIELD_MAPPING.put(Extension.FIELD_FEATURES, SEARCH_FIELD_MAPPING.get(Extension.FIELD_EXTENSIONFEATURES));
     }
 
-    private static final String BOOST = SOLR_FIELD_EXTENSIONID + "^10.0 "
-        + Extension.FIELD_NAME + "^9.0 " + SOLR_FIELD_EXTENSIONFEATURES_INDEX
-        + "^8.0 " + Extension.FIELD_SUMMARY + "^7.0 " + SOLR_FIELD_COMPONENTS_INDEX
+    private static final String BOOST = ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID + "^10.0 "
+        + Extension.FIELD_NAME + "^9.0 " + ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONFEATURES_INDEX
+        + "^8.0 " + Extension.FIELD_SUMMARY + "^7.0 " + ExtensionIndexSolrCoreInitializer.SOLR_FIELD_COMPONENTS_INDEX
         + "^7.0 " + Extension.FIELD_CATEGORY + "^6.0 " + Extension.FIELD_TYPE + "^5.0 ";
 
     @Inject
@@ -196,7 +187,7 @@ public class ExtensionIndexStore implements Initializable
     public void initialize() throws InitializationException
     {
         try {
-            this.client = this.solr.getClient(NAME);
+            this.client = this.solr.getClient(ExtensionIndexSolrCoreInitializer.NAME);
         } catch (SolrException e) {
             throw new InitializationException("Failed to get the extension index Solr core", e);
         }
@@ -255,7 +246,7 @@ public class ExtensionIndexStore implements Initializable
     {
         SolrQuery solrQuery = new SolrQuery();
 
-        solrQuery.addFilterQuery(SOLR_FIELD_ID + ':'
+        solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID + ':'
             + this.utils.toCompleteFilterQueryString(toSolrId(extensionId)));
 
         if (local != null) {
@@ -278,9 +269,9 @@ public class ExtensionIndexStore implements Initializable
     {
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(SOLR_FIELD_ID, toSolrId(extensionId), document);
+        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID, toSolrId(extensionId), document);
 
-        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SOLR_FIELD_LAST,
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST,
             last, document);
 
         add(document);
@@ -288,7 +279,7 @@ public class ExtensionIndexStore implements Initializable
 
     /**
      * Update variable informations (recommended tag, ratings, etc.).
-     *
+     * 
      * @param extensionId the identifier of the extension to update
      * @param remoteExtension the remote extension from which to extract variable information
      * @throws IOException If there is a low-level I/O error.
@@ -298,7 +289,7 @@ public class ExtensionIndexStore implements Initializable
     {
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(SOLR_FIELD_ID, toSolrId(extensionId), document);
+        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID, toSolrId(extensionId), document);
 
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, RemoteExtension.FIELD_RECOMMENDED,
             remoteExtension.isRecommended(), document);
@@ -315,43 +306,54 @@ public class ExtensionIndexStore implements Initializable
         add(document);
     }
 
+    /**
+     * Update a given extension with the provided  security analysis results.
+     * @param extensionId the extension id of the extension to update
+     * @param result the security analysis results
+     * @throws IOException If there is a low-level I/O error 
+     * @throws SolrServerException if there is an error on the server
+     */
     public void update(ExtensionId extensionId, ExtensionAnalysisResult result) throws SolrServerException, IOException
     {
-        SolrInputDocument document = new SolrInputDocument();
+        SolrInputDocument doc = new SolrInputDocument();
 
-        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID, toSolrId(extensionId), document);
+        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID, toSolrId(extensionId), doc);
 
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SOLR_FIELD_EXTENSIONID, extensionId.getId(),
-            document);
+            doc);
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, Extension.FIELD_VERSION,
-            extensionId.getVersion().getValue(), document);
+            extensionId.getVersion().getValue(), doc);
 
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_MAX_CVSS,
-            result.getMaxCVSS(), document);
+            result.getMaxCVSS(), doc);
         Stream<String> cveIds = result.getSecurityIssues().stream().map(SecurityIssueDescriptor::getId);
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_CVE_ID,
-            cveIds.collect(Collectors.toList()), document);
+            cveIds.collect(Collectors.toList()), doc);
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_CVE_LINK,
             result.getSecurityIssues().stream()
-                .map(SecurityIssueDescriptor::getURL).collect(Collectors.toList()), document);
+                .map(SecurityIssueDescriptor::getURL).collect(Collectors.toList()), doc);
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_CVE_CVSS,
             result.getSecurityIssues().stream()
-                .map(SecurityIssueDescriptor::getScore).collect(Collectors.toList()), document);
+                .map(SecurityIssueDescriptor::getScore).collect(Collectors.toList()), doc);
         String fixVersion = result.getSecurityIssues().stream()
             .map(SecurityIssueDescriptor::getFixVersion)
             .max(Comparator.naturalOrder())
             .map(Version::getValue)
             .orElse(null);
-        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_FIX_VERSION, fixVersion, document);
-        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_ADVICE, result.getAdvice(), document);
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_FIX_VERSION, fixVersion, doc);
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_ADVICE, result.getAdvice(), doc);
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_CVE_COUNT,
+            result.getSecurityIssues().size(), doc);
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET,
+            ExtensionIndexSolrCoreInitializer.SECURITY_INSTALLED_WIKIS, result.getWikis(), doc);
 
-        add(document);
+        add(doc);
         commit();
     }
 
     /**
      * Update variable informations (recommended tag, ratings, etc.) by copying it from another version.
-     *
+     * 
      * @param extensionId the identifier of the extension to update
      * @param copyVersion the version of the extension to copy
      * @throws IOException If there is a low-level I/O error.
@@ -361,7 +363,7 @@ public class ExtensionIndexStore implements Initializable
     {
         // Get the version to copy
         SolrQuery solrQuery = new SolrQuery();
-        solrQuery.addFilterQuery(SOLR_FIELD_ID + ':'
+        solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID + ':'
             + this.utils.toCompleteFilterQueryString(toSolrId(new ExtensionId(extensionId.getId(), copyVersion))));
         solrQuery.setFields(RemoteExtension.FIELD_RECOMMENDED, RatingExtension.FIELD_TOTAL_VOTES,
             RatingExtension.FIELD_AVERAGE_VOTE);
@@ -378,7 +380,7 @@ public class ExtensionIndexStore implements Initializable
 
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(SOLR_FIELD_ID, toSolrId(extensionId), document);
+        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID, toSolrId(extensionId), document);
 
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, RemoteExtension.FIELD_RECOMMENDED,
             copyDocument.get(RemoteExtension.FIELD_RECOMMENDED), document);
@@ -405,7 +407,7 @@ public class ExtensionIndexStore implements Initializable
     {
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(SOLR_FIELD_ID, toSolrId(extensionId), document);
+        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID, toSolrId(extensionId), document);
 
         // Update installed
         this.utils.setAtomic(
@@ -439,7 +441,7 @@ public class ExtensionIndexStore implements Initializable
     {
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(SOLR_FIELD_ID, toSolrId(extensionId), document);
+        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID, toSolrId(extensionId), document);
 
         updateCompatible(document, namespace, compatible, incompatible);
 
@@ -453,7 +455,7 @@ public class ExtensionIndexStore implements Initializable
             this.utils.setAtomic(
                 compatible.booleanValue() ? SolrUtils.ATOMIC_UPDATE_MODIFIER_ADD_DISTINCT
                     : SolrUtils.ATOMIC_UPDATE_MODIFIER_REMOVE,
-                SOLR_FIELD_COMPATIBLE_NAMESPACES, toStoredNamespace(namespace),
+                ExtensionIndexSolrCoreInitializer.SOLR_FIELD_COMPATIBLE_NAMESPACES, toStoredNamespace(namespace),
                 document);
         }
 
@@ -461,7 +463,7 @@ public class ExtensionIndexStore implements Initializable
             this.utils.setAtomic(
                 incompatible.booleanValue() ? SolrUtils.ATOMIC_UPDATE_MODIFIER_ADD_DISTINCT
                     : SolrUtils.ATOMIC_UPDATE_MODIFIER_REMOVE,
-                SOLR_FIELD_INCOMPATIBLE_NAMESPACES, toStoredNamespace(namespace),
+                ExtensionIndexSolrCoreInitializer.SOLR_FIELD_INCOMPATIBLE_NAMESPACES, toStoredNamespace(namespace),
                 document);
         }
     }
@@ -470,11 +472,11 @@ public class ExtensionIndexStore implements Initializable
     {
         SolrQuery solrQuery = new SolrQuery();
 
-        solrQuery.addFilterQuery(SOLR_FIELD_ID + ':'
+        solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID + ':'
             + this.utils.toCompleteFilterQueryString(toSolrId(extensionId)));
 
-        solrQuery.setFields(SOLR_FIELD_COMPATIBLE_NAMESPACES,
-            SOLR_FIELD_INCOMPATIBLE_NAMESPACES);
+        solrQuery.setFields(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_COMPATIBLE_NAMESPACES,
+            ExtensionIndexSolrCoreInitializer.SOLR_FIELD_INCOMPATIBLE_NAMESPACES);
 
         solrQuery.setRows(1);
 
@@ -487,14 +489,14 @@ public class ExtensionIndexStore implements Initializable
             String solrNamespace = toStoredNamespace(namespace);
 
             List<String> compatibleNamespaces = this.utils
-                .<List<String>>get(SOLR_FIELD_COMPATIBLE_NAMESPACES, document);
+                .<List<String>>get(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_COMPATIBLE_NAMESPACES, document);
 
             if (compatibleNamespaces != null && compatibleNamespaces.contains(solrNamespace)) {
                 return true;
             }
 
             List<String> incompatibleNamespaces = this.utils
-                .<List<String>>get(SOLR_FIELD_INCOMPATIBLE_NAMESPACES, document);
+                .<List<String>>get(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_INCOMPATIBLE_NAMESPACES, document);
 
             if (incompatibleNamespaces != null && incompatibleNamespaces.contains(solrNamespace)) {
                 return false;
@@ -537,9 +539,9 @@ public class ExtensionIndexStore implements Initializable
     {
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(SOLR_FIELD_ID, toSolrId(extension.getId()), document);
+        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID, toSolrId(extension.getId()), document);
 
-        this.utils.set(SOLR_FIELD_EXTENSIONID, extension.getId().getId(), document);
+        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID, extension.getId().getId(), document);
         this.utils.set(Extension.FIELD_VERSION, extension.getId().getVersion().getValue(), document);
 
         this.utils.set(Extension.FIELD_TYPE, extension.getType(), document);
@@ -556,29 +558,29 @@ public class ExtensionIndexStore implements Initializable
         this.utils.set(Extension.FIELD_CATEGORY, extension.getCategory(), document);
 
         this.utils.setString(Extension.FIELD_AUTHORS, extension.getAuthors(), ExtensionAuthor.class, document);
-        this.utils.set(SOLR_FIELD_AUTHORS_INDEX,
+        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_AUTHORS_INDEX,
             extension.getAuthors().stream().map(ExtensionAuthor::getName).collect(Collectors.toList()), document);
 
         this.utils.setString(Extension.FIELD_COMPONENTS, extension.getComponents(), ExtensionComponent.class, document);
         for (ExtensionComponent component : extension.getComponents()) {
-            document.addField(toComponentFieldName(component.getRoleType()),
+            document.addField(ExtensionIndexSolrCoreInitializer.toComponentFieldName(component.getRoleType()),
                 component.getRoleHint());
         }
 
         this.utils.setString(Extension.FIELD_EXTENSIONFEATURES, extension.getExtensionFeatures(), ExtensionId.class,
             document);
         for (ExtensionId feature : extension.getExtensionFeatures()) {
-            document.addField(SOLR_FIELD_EXTENSIONFEATURES_INDEX, feature.getId());
-            document.addField(SOLR_FIELD_EXTENSIONFEATURES_INDEX,
+            document.addField(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONFEATURES_INDEX, feature.getId());
+            document.addField(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONFEATURES_INDEX,
                 ExtensionIdConverter.toString(feature));
         }
 
         // TODO: add dependencies
         // TODO: add managed dependencies
 
-        this.utils.set(SOLR_FIELD_INDEX_DATE, new Date(), document);
+        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_INDEX_DATE, new Date(), document);
 
-        this.utils.set(SOLR_FIELD_LAST, last, document);
+        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST, last, document);
 
         // Set installed state
         InstalledExtension installedExtension = this.installedExtensions.getInstalledExtension(extension.getId());
@@ -593,7 +595,7 @@ public class ExtensionIndexStore implements Initializable
             this.utils.set(InstalledExtension.FIELD_INSTALLED_NAMESPACES, installedNamespaces, document);
 
             // We can already set those extensions as "incompatible" with those namespaces
-            this.utils.set(SOLR_FIELD_INCOMPATIBLE_NAMESPACES, installedNamespaces,
+            this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_INCOMPATIBLE_NAMESPACES, installedNamespaces,
                 document);
         }
 
@@ -629,7 +631,13 @@ public class ExtensionIndexStore implements Initializable
         return toSolrExtension(this.client.getById(toSolrId(extensionId)), extensionId);
     }
 
-    public List<String> getCVEID(ExtensionId extensionId) throws SolrServerException, IOException
+    /**
+     * @param extensionId the extension id
+     * @return the list of CVEs attached to a given extension id
+     * @throws IOException If there is a low-level I/O error.
+     * @throws SolrServerException if there is an error on the server
+     */
+    public List<String> getCVEIDs(ExtensionId extensionId) throws SolrServerException, IOException
     {
         SolrDocument byId = this.client.getById(toSolrId(extensionId));
         if (byId == null) {
@@ -652,7 +660,7 @@ public class ExtensionIndexStore implements Initializable
     public ExtensionId getExtensionId(SolrDocument document)
     {
         return new ExtensionId(
-            this.utils.<String>get(SOLR_FIELD_EXTENSIONID, document),
+            this.utils.<String>get(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID, document),
             this.factory.getVersion(this.utils.<String>get(Extension.FIELD_VERSION, document)));
     }
 
@@ -701,12 +709,12 @@ public class ExtensionIndexStore implements Initializable
         extension.setExtensionFeatures(
             this.utils.getCollection(Extension.FIELD_EXTENSIONFEATURES, document, ExtensionId.class));
 
-        extension.setLast(this.utils.get(SOLR_FIELD_LAST, document, false));
+        extension.setLast(this.utils.get(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST, document, false));
 
         extension.setCompatibleNamespaces(
-            getNamespaces(SOLR_FIELD_COMPATIBLE_NAMESPACES, document));
+            getNamespaces(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_COMPATIBLE_NAMESPACES, document));
         extension.setIncompatibleNamespaces(
-            getNamespaces(SOLR_FIELD_INCOMPATIBLE_NAMESPACES, document));
+            getNamespaces(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_INCOMPATIBLE_NAMESPACES, document));
 
         // TODO: add dependencies
         // TODO: add managed dependencies
@@ -725,7 +733,7 @@ public class ExtensionIndexStore implements Initializable
 
     /**
      * Search extension based of the provided query.
-     *
+     * 
      * @param query the query
      * @return the found extensions descriptors, empty list if nothing could be found
      * @throws SearchException error when trying to search provided query
@@ -764,19 +772,19 @@ public class ExtensionIndexStore implements Initializable
             // Add aliases for well known components roles
             // TODO: make it extensible
             solrQuery.set("f.component_macro.qf",
-                toComponentFieldName(Macro.class.getName()));
+                ExtensionIndexSolrCoreInitializer.toComponentFieldName(Macro.class.getName()));
             solrQuery.set("f.component_scriptservice.qf",
-                toComponentFieldName(ScriptService.class.getName()));
+                ExtensionIndexSolrCoreInitializer.toComponentFieldName(ScriptService.class.getName()));
             solrQuery.set("f.component_parser.qf",
-                toComponentFieldName(Parser.class.getName()));
+                ExtensionIndexSolrCoreInitializer.toComponentFieldName(Parser.class.getName()));
             solrQuery.set("f.component_renderer.qf",
-                toComponentFieldName(PrintRendererFactory.class.getName()));
+                ExtensionIndexSolrCoreInitializer.toComponentFieldName(PrintRendererFactory.class.getName()));
             solrQuery.set("f.component_blockrenderer.qf",
-                toComponentFieldName(BlockRenderer.class.getName()));
+                ExtensionIndexSolrCoreInitializer.toComponentFieldName(BlockRenderer.class.getName()));
             solrQuery.set("f.component_inputFilter.qf",
-                toComponentFieldName(InputFilterStreamFactory.class.getName()));
+                ExtensionIndexSolrCoreInitializer.toComponentFieldName(InputFilterStreamFactory.class.getName()));
             solrQuery.set("f.component_outputFilter.qf",
-                toComponentFieldName(OutputFilterStreamFactory.class.getName()));
+                ExtensionIndexSolrCoreInitializer.toComponentFieldName(OutputFilterStreamFactory.class.getName()));
         }
 
         // Pagination
@@ -822,7 +830,7 @@ public class ExtensionIndexStore implements Initializable
                 if (!indexedQuery.getCompatible()) {
                     builder.append('-');
                 }
-                builder.append(SOLR_FIELD_COMPATIBLE_NAMESPACES);
+                builder.append(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_COMPATIBLE_NAMESPACES);
                 builder.append(':');
 
                 builder.append('(');
@@ -853,11 +861,11 @@ public class ExtensionIndexStore implements Initializable
 
             // If no specific compatible or installed criteria only search for latest versions
             if (indexedQuery.getCompatible() == null && indexedQuery.getInstalled() == null) {
-                solrQuery.addFilterQuery(SOLR_FIELD_LAST + ':' + true);
+                solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST + ':' + true);
             }
         } else {
             // Only search for latest versions
-            solrQuery.addFilterQuery(SOLR_FIELD_LAST + ':' + true);
+            solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST + ':' + true);
         }
     }
 
@@ -929,7 +937,7 @@ public class ExtensionIndexStore implements Initializable
         if (solrQuery.getRows() == null) {
             solrQuery.setRows(Integer.MAX_VALUE);
         }
-        solrQuery.setFields(SOLR_FIELD_ID);
+        solrQuery.setFields(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID);
 
         QueryResponse response = search(solrQuery);
 
@@ -968,7 +976,7 @@ public class ExtensionIndexStore implements Initializable
 
         solrQuery.setFields(Extension.FIELD_VERSION);
 
-        solrQuery.addFilterQuery(SOLR_FIELD_EXTENSIONID + ':'
+        solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID + ':'
             + this.utils.toCompleteFilterQueryString(extensionId));
 
         QueryResponse response = search(solrQuery);
@@ -1020,14 +1028,14 @@ public class ExtensionIndexStore implements Initializable
 
         solrQuery.setFields(Extension.FIELD_VERSION);
 
-        solrQuery.addFilterQuery(SOLR_FIELD_EXTENSIONID + ':'
+        solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID + ':'
             + this.utils.toCompleteFilterQueryString(extensionId));
 
         if (withNamespace) {
-            solrQuery.addFilterQuery(SOLR_FIELD_COMPATIBLE_NAMESPACES + ":"
+            solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_COMPATIBLE_NAMESPACES + ":"
                 + this.utils.toCompleteFilterQueryString(toStoredNamespace(namespace)));
         } else {
-            solrQuery.addFilterQuery(SOLR_FIELD_COMPATIBLE_NAMESPACES + ":[* TO *]");
+            solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_COMPATIBLE_NAMESPACES + ":[* TO *]");
         }
 
         solrQuery.setRows(1);

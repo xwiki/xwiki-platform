@@ -86,9 +86,11 @@ public class ExtensionSecurityJob
                 this.progressManager.startStep(this);
                 try {
                     ExtensionAnalysisResult analysis = this.extensionSecurityAnalyzer.analyze(extension);
-                    boolean update = this.vulnerabilityIndexer.update(extension, analysis);
-                    if (update) {
-                        newVulnerabilityCount++;
+                    if (analysis != null) {
+                        boolean update = this.vulnerabilityIndexer.update(extension, analysis);
+                        if (update) {
+                            newVulnerabilityCount++;
+                        }
                     }
                 } catch (ExtensionSecurityException e) {
                     this.logger.warn("Failed to analyse [{}]. Cause: [{}]", extension, getRootCauseMessage(e));

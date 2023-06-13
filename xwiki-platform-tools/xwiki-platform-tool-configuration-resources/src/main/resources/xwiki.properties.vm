@@ -672,6 +672,13 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 #-#
 # extension.security.scan.delay = 24
 
+#-# [Since 15.5RC1]
+#-# Specifies the url to use as the endpoint for the security scan rest queries.
+#-# The url must conform to the API documented here: https://google.github.io/osv.dev/post-v1-query/
+#-# The default value is https://api.osv.dev/v1/query.
+#-#
+# extension.security.scan.url = https://api.osv.dev/v1/query
+
 #-------------------------------------------------------------------------------------
 # Distribution Wizard
 #-------------------------------------------------------------------------------------

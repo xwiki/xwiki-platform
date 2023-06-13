@@ -35,7 +35,7 @@ import org.xwiki.search.solr.SolrException;
 
 /**
  * Initialize the Solr core dedicated to events storage.
- * 
+ *
  * @version $Id$
  * @since 12.10
  */
@@ -140,6 +140,11 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
      */
     public static final String SECURITY_ADVICE = "security_advice";
 
+    /**
+     * The list the wikis in wich the extension is installed and vulnerable.
+     */
+    public static final String SECURITY_INSTALLED_WIKIS = "security_installedWikis";
+
     private static final Pattern COMPONENT_SPECIAL_CHARS = Pattern.compile("[<>,]+");
 
     private static final long SCHEMA_VERSION_12_9 = 120900000;
@@ -148,10 +153,12 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
 
     private static final long SCHEMA_VERSION_14_0 = 140000000;
 
+    private static final long SCHEMA_VERSION_15_5 = 150500000;
+
     @Override
     protected long getVersion()
     {
-        return SCHEMA_VERSION_14_0;
+        return SCHEMA_VERSION_15_5;
     }
 
     @Override
@@ -197,16 +204,6 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
         setStringField(SOLR_FIELD_INCOMPATIBLE_NAMESPACES, true, false);
 
         migrateSchema(SCHEMA_VERSION_12_9);
-
-        // TODO: add a field to list all the wikis where the extension is installed (with a option to say all of them)
-
-        setPDoubleField(SECURITY_MAX_CVSS, false, false);
-        setStringField(SECURITY_CVE_ID, true, false);
-        setStringField(SECURITY_CVE_LINK, true, false);
-        setPDoubleField(SECURITY_CVE_CVSS, true, false);
-        setPIntField(SECURITY_CVE_COUNT, false, false);
-        setStringField(SECURITY_FIX_VERSION, false, false);
-        setStringField(SECURITY_ADVICE, false, false);
     }
 
     @Override
@@ -224,6 +221,17 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
 
         if (cversion < SCHEMA_VERSION_14_0) {
             setStringField(InstalledExtension.FIELD_INSTALLED_NAMESPACES, true, false);
+        }
+
+        if (cversion < SCHEMA_VERSION_15_5) {
+            setPDoubleField(SECURITY_MAX_CVSS, false, false);
+            setStringField(SECURITY_CVE_ID, true, false);
+            setStringField(SECURITY_CVE_LINK, true, false);
+            setPDoubleField(SECURITY_CVE_CVSS, true, false);
+            setPIntField(SECURITY_CVE_COUNT, false, false);
+            setStringField(SECURITY_FIX_VERSION, false, false);
+            setStringField(SECURITY_ADVICE, false, false);
+            setStringField(SECURITY_INSTALLED_WIKIS, true, false);
         }
     }
 

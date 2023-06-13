@@ -44,4 +44,10 @@ public interface ExtensionSecurityConfiguration
      *     hours.
      */
     int getScanDelay();
+
+    /**
+     * @return the url to use for the rest api endpoint. The default value is <a
+     *     href="https://api.osv.dev/v1/query">https://api.osv.dev/v1/query</a>
+     */
+    String getScanURL();
 }

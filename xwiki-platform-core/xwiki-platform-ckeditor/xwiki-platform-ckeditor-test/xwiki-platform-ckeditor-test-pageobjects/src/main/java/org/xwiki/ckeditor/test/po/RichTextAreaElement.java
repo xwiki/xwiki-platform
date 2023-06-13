@@ -150,7 +150,7 @@ public class RichTextAreaElement extends BaseElement
     /**
      * @return the HTML element that has the focus in the Rich editor
      */
-    private WebElement getActiveElement()
+    public WebElement getActiveElement()
     {
         getDriver().switchTo().frame(this.iframe);
         return getDriver().switchTo().activeElement();

@@ -55,4 +55,10 @@ public class AllIT
     class NestedLinkPluginIT extends LinkPluginIT
     {
     }
+    
+    @Nested
+    @DisplayName("Quick Action")
+    class NestedQuickActionIT extends QuickActionIT
+    {
+    }
 }

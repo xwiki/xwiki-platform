@@ -374,7 +374,7 @@
             var command = this;
 
             // Find the macro we are going to insert
-            macroService.getMacros(XWiki.docsyntax, false, 'macro-slash').done(function (macros) {
+            macroService.getMacros(XWiki.docsyntax).done(function (macros) {
               macros.forEach(function (macro) {
                 if (macro.id.id === macroCall.id) {
 
@@ -467,7 +467,7 @@
                                                 'success',
                                                 5000);
                         // Update the cache for future insertions
-                        macroService.getMacros(XWiki.docsyntax, true, 'macro-slash');
+                        macroService.getMacros(XWiki.docsyntax, true);
 
                         // Update the pre-inserted widget
                         insertMacro(evt.data);
@@ -563,7 +563,7 @@
         };
 
         // Register macros in Quick Actions plugin
-        macroService.getMacros(XWiki.docsyntax, false, 'macro-slash').done(function (macros) {
+        macroService.getMacros(XWiki.docsyntax).done(function (macros) {
 
           // Keep track of how many groups we created
           var macroGroupsCount = 0;

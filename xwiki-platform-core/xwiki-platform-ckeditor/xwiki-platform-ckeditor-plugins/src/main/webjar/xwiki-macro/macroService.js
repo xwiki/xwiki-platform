@@ -55,11 +55,10 @@ define('macroService', ['jquery', 'xwiki-meta'], function ($, xcontext) {
     return deferred.promise();
   };
 
-  var macrosCache = {};
+  var macrosBySyntax = {};
 
-  var getMacros = function (syntaxId, force, cacheId) {
+  var getMacros = function (syntaxId, force) {
     var deferred = $.Deferred();
-    var macrosBySyntax = macrosCache[cacheId || ''] || {};
     var macros = macrosBySyntax[syntaxId || ''];
     if (macros && !force) {
       deferred.resolve(macros);

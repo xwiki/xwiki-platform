@@ -52,18 +52,6 @@ public interface NotificationConfiguration
     int liveNotificationsGraceTime();
 
     /**
-     * @return true if pre-filtering should be used for notifications
-     * @since 12.6
-     * @deprecated The pre-filtering is now the standard way of using notifications and post-filtering is not
-     * supported anymore (i.e. new code might not work with post-filtering).
-     */
-    @Deprecated(since = "15.5RC1")
-    default boolean isEventPrefilteringEnabled()
-    {
-        return true;
-    }
-
-    /**
      * @return true if the REST/async cache is enabled.
      * @since 12.2
      */

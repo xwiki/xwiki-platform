@@ -24,31 +24,14 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-notifications</artifactId>
+    <artifactId>xwiki-platform-legacy-notifications</artifactId>
     <version>15.5-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-notifications-api</artifactId>
-  <name>XWiki Platform - Notifications - API</name>
-  <description>Handle notifications</description>
-  <properties>
-    <xwiki.jacoco.instructionRatio>0.41</xwiki.jacoco.instructionRatio>
-    <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Notifications API</xwiki.extension.name>
-    <!-- Skipping revapi since xwiki-platform-legacy-notifications-api wraps this module and runs checks on it -->
-    <xwiki.revapi.skip>true</xwiki.revapi.skip>
-  </properties>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-eventstream-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <!-- Test dependencies -->
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-tool-test-component</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+  <artifactId>xwiki-platform-legacy-notifications-filters</artifactId>
+  <name>XWiki Platform - Legacy - Notifications - Filters</name>
+  <packaging>pom</packaging>
+  <modules>
+    <module>xwiki-platform-legacy-notifications-filters-api</module>
+  </modules>
 </project>
+

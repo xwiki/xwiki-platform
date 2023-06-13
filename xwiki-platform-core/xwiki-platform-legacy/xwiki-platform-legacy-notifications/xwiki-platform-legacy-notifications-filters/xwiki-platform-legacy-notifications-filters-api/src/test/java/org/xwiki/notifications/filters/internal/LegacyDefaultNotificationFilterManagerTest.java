@@ -35,6 +35,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -49,16 +50,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link DefaultNotificationFilterManager}
+ * Unit tests for {@link LegacyDefaultNotificationFilterManager}
  *
  * @version $Id$
- * @since 9.7RC1
+ * @since 15.5RC1
  */
 @ComponentTest
-public class DefaultNotificationFilterManagerTest
+public class LegacyDefaultNotificationFilterManagerTest
 {
     @InjectMockComponents
-    private DefaultNotificationFilterManager filterManager;
+    private LegacyDefaultNotificationFilterManager filterManager;
 
     @MockComponent
     private ComponentManager componentManager;
@@ -75,6 +76,9 @@ public class DefaultNotificationFilterManagerTest
 
     @MockComponent
     private ModelContext modelContext;
+
+    @MockComponent
+    private NotificationConfiguration configuration;
 
     @BeforeEach
     void setUp() throws Exception
@@ -241,35 +245,36 @@ public class DefaultNotificationFilterManagerTest
         when(componentManager.getInstanceList(NotificationFilter.class))
             .thenReturn(Arrays.asList(filter1, filter2, filter3, filter4, filter5, filter6, filter7));
 
-        // we request prefiltering filters that are enabled:
+        // prefiltering enabled: we request prefiltering filters that are enabled:
         // we should not return filter2/4/6 since they are not enabled,
         // nor filter3 because it's only for post-filtering
+        when(this.configuration.isEventPrefilteringEnabled()).thenReturn(true);
         Collection<NotificationFilter> allFilters = this.filterManager.getAllFilters(testUser, true,
             NotificationFilter.FilteringPhase.PRE_FILTERING);
         assertEquals(3, allFilters.size());
         assertEquals(new HashSet<>(Arrays.asList(filter1, filter5, filter7)), allFilters);
 
-        // we request postfiltering filters that are enabled:
+        // prefiltering still enabled: we request postfiltering filters that are enabled:
         // we should not return filter2/4/6 since they are not enabled,
         // nor filter1 because it's only for pre-filtering, nor filter5 because it's for both pre and post filtering
         allFilters = this.filterManager.getAllFilters(testUser, true, NotificationFilter.FilteringPhase.POST_FILTERING);
         assertEquals(1, allFilters.size());
         assertEquals(Collections.singleton(filter3), allFilters);
 
-        // we request all filters that are enabled:
+        // prefiltering still enabled: we request all filters that are enabled:
         // we should not return filter2/4/6 since they are not enabled.
         allFilters = this.filterManager.getAllFilters(testUser, true, null);
         assertEquals(4, allFilters.size());
         assertEquals(new HashSet<>(Arrays.asList(filter1, filter3, filter5, filter7)), allFilters);
 
-        // we request prefiltering filters whatever if they are enabled or not
+        // prefiltering still enabled: we request prefiltering filters whatever if they are enabled or not
         // we should not return filter3 and 4 because they are only for post-filtering
         allFilters = this.filterManager.getAllFilters(testUser, false,
             NotificationFilter.FilteringPhase.PRE_FILTERING);
         assertEquals(5, allFilters.size());
         assertEquals(new HashSet<>(Arrays.asList(filter1, filter2, filter5, filter6, filter7)), allFilters);
 
-        // we request postfiltering filters whatever if they are enabled or not
+        // prefiltering still enabled: we request postfiltering filters whatever if they are enabled or not
         // we should not return filter1/2 because they are only for pre-filtering,
         // nor filter5/6/7 because they are for both pre and post filtering
         allFilters = this.filterManager.getAllFilters(testUser, false,
@@ -277,7 +282,47 @@ public class DefaultNotificationFilterManagerTest
         assertEquals(2, allFilters.size());
         assertEquals(new HashSet<>(Arrays.asList(filter3, filter4)), allFilters);
 
-        // we request all filters  whatever if they are enabled or not:
+        // prefiltering still enabled: we request all filters  whatever if they are enabled or not:
+        // we return all filters
+        allFilters = this.filterManager.getAllFilters(testUser, false, null);
+        assertEquals(7, allFilters.size());
+        assertEquals(new HashSet<>(Arrays.asList(filter1, filter2, filter3, filter4, filter5, filter6, filter7)),
+            allFilters);
+
+        // prefiltering not enabled: we request prefiltering filters that are enabled:
+        // we return nothing: this does not make sense to have prefiltering filters in that case.
+        when(this.configuration.isEventPrefilteringEnabled()).thenReturn(false);
+        allFilters = this.filterManager.getAllFilters(testUser, true,
+            NotificationFilter.FilteringPhase.PRE_FILTERING);
+        assertTrue(allFilters.isEmpty());
+
+        // prefiltering still not enabled: we request postfiltering filters that are enabled:
+        // we should not return filter2/4/6 since they are not enabled,
+        // nor filter1 because it's only for pre-filtering
+        allFilters = this.filterManager.getAllFilters(testUser, true, NotificationFilter.FilteringPhase.POST_FILTERING);
+        assertEquals(3, allFilters.size());
+        assertEquals(new HashSet<>(Arrays.asList(filter3, filter5, filter7)), allFilters);
+
+        // prefiltering still not enabled: we request all filters that are enabled:
+        // we should not return filter2/4/6 since they are not enabled.
+        allFilters = this.filterManager.getAllFilters(testUser, true, null);
+        assertEquals(4, allFilters.size());
+        assertEquals(new HashSet<>(Arrays.asList(filter1, filter3, filter5, filter7)), allFilters);
+
+        // prefiltering still not enabled: we request prefiltering filters whatever if they are enabled or not
+        // we return nothing: this does not make sense to have prefiltering filters in that case.
+        allFilters = this.filterManager.getAllFilters(testUser, false,
+            NotificationFilter.FilteringPhase.PRE_FILTERING);
+        assertTrue(allFilters.isEmpty());
+
+        // prefiltering still not enabled: we request postfiltering filters whatever if they are enabled or not
+        // we should not return filter1/2 because they are only for pre-filtering,
+        allFilters = this.filterManager.getAllFilters(testUser, false,
+            NotificationFilter.FilteringPhase.POST_FILTERING);
+        assertEquals(5, allFilters.size());
+        assertEquals(new HashSet<>(Arrays.asList(filter3, filter4, filter5, filter6, filter7)), allFilters);
+
+        // prefiltering still not enabled: we request all filters  whatever if they are enabled or not:
         // we return all filters
         allFilters = this.filterManager.getAllFilters(testUser, false, null);
         assertEquals(7, allFilters.size());

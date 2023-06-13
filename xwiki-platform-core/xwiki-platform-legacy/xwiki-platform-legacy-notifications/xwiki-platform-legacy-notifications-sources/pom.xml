@@ -24,25 +24,21 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-legacy-notifications-notifiers</artifactId>
+    <artifactId>xwiki-platform-legacy-notifications</artifactId>
     <version>15.5-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-legacy-notifications-notifiers-api</artifactId>
-  <name>XWiki Platform - Legacy - Notifications - Notifiers - API</name>
+  <artifactId>xwiki-platform-legacy-notifications-sources</artifactId>
+  <name>XWiki Platform - Legacy - Notifications - Sources</name>
   <packaging>jar</packaging>
   <properties>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Legacy Notifications Notifiers API</xwiki.extension.name>
-    <!-- This application replaces the old Activity Stream Application and provide backward compatibility for it.
-         By setting this property, we make sure this application would be automatically uninstalled if the administrator
-         installs the old Activity Stream Application. -->
-    <xwiki.extension.features>org.xwiki.platform:xwiki-platform-notifications-notifiers-api</xwiki.extension.features>
-    <xwiki.jacoco.instructionRatio>0.63</xwiki.jacoco.instructionRatio>
+    <xwiki.extension.name>Legacy Notifications Sources</xwiki.extension.name>
+    <xwiki.extension.features>org.xwiki.platform:xwiki-platform-notifications-sources</xwiki.extension.features>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-notifications-notifiers-api</artifactId>
+      <artifactId>xwiki-platform-notifications-sources</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- Test dependencies -->

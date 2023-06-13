@@ -63,7 +63,6 @@ class PrefilteringLiveNotificationEmailListenerTest
         when(this.remoteState.isRemoteState()).thenReturn(false);
         when(this.notificationConfiguration.isEnabled()).thenReturn(true);
         when(this.notificationConfiguration.areEmailsEnabled()).thenReturn(true);
-        when(this.notificationConfiguration.isEventPrefilteringEnabled()).thenReturn(true);
 
         this.listener.onEvent(EVENT, event, null);
         verify(this.manager, times(1)).addEvent(event);
@@ -71,7 +70,6 @@ class PrefilteringLiveNotificationEmailListenerTest
         when(this.remoteState.isRemoteState()).thenReturn(true);
         when(this.notificationConfiguration.isEnabled()).thenReturn(true);
         when(this.notificationConfiguration.areEmailsEnabled()).thenReturn(true);
-        when(this.notificationConfiguration.isEventPrefilteringEnabled()).thenReturn(true);
 
         this.listener.onEvent(EVENT, event, null);
         verify(this.manager, times(1)).addEvent(event);
@@ -79,7 +77,6 @@ class PrefilteringLiveNotificationEmailListenerTest
         when(this.remoteState.isRemoteState()).thenReturn(false);
         when(this.notificationConfiguration.isEnabled()).thenReturn(false);
         when(this.notificationConfiguration.areEmailsEnabled()).thenReturn(true);
-        when(this.notificationConfiguration.isEventPrefilteringEnabled()).thenReturn(true);
 
         this.listener.onEvent(EVENT, event, null);
         verify(this.manager, times(1)).addEvent(event);
@@ -87,14 +84,8 @@ class PrefilteringLiveNotificationEmailListenerTest
         when(this.remoteState.isRemoteState()).thenReturn(false);
         when(this.notificationConfiguration.isEnabled()).thenReturn(true);
         when(this.notificationConfiguration.areEmailsEnabled()).thenReturn(false);
-        when(this.notificationConfiguration.isEventPrefilteringEnabled()).thenReturn(true);
 
         this.listener.onEvent(EVENT, event, null);
         verify(this.manager, times(1)).addEvent(event);
-
-        when(this.remoteState.isRemoteState()).thenReturn(false);
-        when(this.notificationConfiguration.isEnabled()).thenReturn(true);
-        when(this.notificationConfiguration.areEmailsEnabled()).thenReturn(true);
-        when(this.notificationConfiguration.isEventPrefilteringEnabled()).thenReturn(false);
     }
 }

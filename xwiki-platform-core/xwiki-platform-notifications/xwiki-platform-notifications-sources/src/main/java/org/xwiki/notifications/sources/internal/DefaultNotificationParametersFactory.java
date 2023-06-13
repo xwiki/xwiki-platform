@@ -46,7 +46,6 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
@@ -94,19 +93,7 @@ public class DefaultNotificationParametersFactory
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Inject
-    private NotificationConfiguration configuration;
-
-    @Inject
     private RecordableEventDescriptorManager recordableEventDescriptorManager;
-
-    @Inject
-    private NotificationPreferenceManager notificationPreferenceManager;
-
-    @Inject
-    private NotificationFilterManager notificationFilterManager;
-
-    @Inject
-    private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
@@ -116,6 +103,15 @@ public class DefaultNotificationParametersFactory
 
     @Inject
     private Logger logger;
+
+    @Inject
+    protected NotificationPreferenceManager notificationPreferenceManager;
+
+    @Inject
+    protected NotificationFilterManager notificationFilterManager;
+
+    @Inject
+    protected NotificationFilterPreferenceManager notificationFilterPreferenceManager;
 
     /**
      * Define the parameters that will be taken into account when creating a {@link NotificationParameters} in
@@ -399,20 +395,10 @@ public class DefaultNotificationParametersFactory
             parameters.filters = new HashSet<>(notificationFilterManager.getAllFilters(parameters.user, true,
                 NotificationFilter.FilteringPhase.POST_FILTERING));
 
-            // Check if we should pre or post filter events
-            if (this.configuration.isEventPrefilteringEnabled()) {
-                enableAllEventTypes(parameters);
-
-                // TODO: Could be added in the NotificationFilterManager#getAllFilters since we actually know
-                // in it if prefiltering is enabled. Now we are missing the format in this method for now.
-                parameters.filters.add(new ForUserEventFilter(parameters.format, null));
-            } else {
-                parameters.preferences =
-                    notificationPreferenceManager.getPreferences(parameters.user, true, parameters.format);
-
-                parameters.filterPreferences =
-                    notificationFilterPreferenceManager.getFilterPreferences(parameters.user);
-            }
+            enableAllEventTypes(parameters);
+            // TODO: Could be added in the NotificationFilterManager#getAllFilters since we actually know
+            // in it if prefiltering is enabled. Now we are missing the format in this method for now.
+            parameters.filters.add(new ForUserEventFilter(parameters.format, null));
         }
     }
 
@@ -559,7 +545,7 @@ public class DefaultNotificationParametersFactory
         return entityReferenceSerializer.serialize(entityRef);
     }
 
-    private void enableAllEventTypes(NotificationParameters parameters) throws NotificationException
+    protected void enableAllEventTypes(NotificationParameters parameters) throws NotificationException
     {
         parameters.preferences.clear();
 

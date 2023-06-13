@@ -586,6 +586,15 @@ require(['scriptaculous/effects'], function() {
   gap: 1em;
 }
 
+.panel-width-Small .applicationPanelMoreButton {
+  flex-direction: column;
+  padding: 0;
+}
+
+.panel-width-Small .applicationPanelMoreButton .application-label{
+  text-align: center;
+}
+
 .panel-width-Small .panel.Applications {
   background-color: transparent;
   border: 0;
@@ -635,8 +644,7 @@ require(['scriptaculous/effects'], function() {
   justify-content: center;
 }
 
-.panel-width-Small .applicationPanelMoreContainer ul,
-.panel-width-Medium .applicationPanelMoreContainer ul {
+.panel .applicationPanelMoreContainer ul {
   padding: 0;
   margin: 0;
 }

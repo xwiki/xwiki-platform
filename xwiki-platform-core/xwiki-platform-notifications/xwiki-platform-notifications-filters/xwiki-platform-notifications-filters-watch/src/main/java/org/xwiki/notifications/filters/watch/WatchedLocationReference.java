@@ -19,10 +19,7 @@
  */
 package org.xwiki.notifications.filters.watch;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.xwiki.model.reference.DocumentReference;
@@ -47,8 +44,7 @@ import org.xwiki.notifications.preferences.internal.UserProfileNotificationPrefe
  */
 public class WatchedLocationReference implements WatchedEntityReference
 {
-    private static final Set<NotificationFormat> ALL_NOTIFICATION_FORMATS
-            = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(NotificationFormat.values())));
+    private static final Set<NotificationFormat> ALL_NOTIFICATION_FORMATS = Set.of(NotificationFormat.values());
 
     private EntityReference entityReference;
 
@@ -100,7 +96,21 @@ public class WatchedLocationReference implements WatchedEntityReference
     public boolean matchExactly(NotificationFilterPreference notificationFilterPreference)
     {
         if (ScopeNotificationFilter.FILTER_NAME.equals(notificationFilterPreference.getFilterName())
-            && notificationFilterPreference.getEventTypes().isEmpty()) {
+            && notificationFilterPreference.getEventTypes().isEmpty()
+            && notificationFilterPreference.getNotificationFormats().containsAll(
+                Set.of(NotificationFormat.values()))) {
+            ScopeNotificationFilterPreference scope
+                    = new ScopeNotificationFilterPreference(notificationFilterPreference, resolver);
+            return entityReference.equals(scope.getScopeReference());
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean match(NotificationFilterPreference notificationFilterPreference)
+    {
+        if (ScopeNotificationFilter.FILTER_NAME.equals(notificationFilterPreference.getFilterName())) {
             ScopeNotificationFilterPreference scope
                     = new ScopeNotificationFilterPreference(notificationFilterPreference, resolver);
             return entityReference.equals(scope.getScopeReference());

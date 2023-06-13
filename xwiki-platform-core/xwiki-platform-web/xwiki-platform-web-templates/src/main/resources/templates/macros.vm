@@ -2634,10 +2634,10 @@ Recursive title display detected!##
       aria-activedescendant="${fieldName}_0_option">
       #set ($count = 0)
       #foreach ($category in $options)
+        <label for="${escapedId}-group${count}">
+          $category.name (<span class="xwiki-select-category-count">$category.options.size()</span>)
+        </label>
         <ul id="${escapedId}-group${count}" role='group' class="xwiki-select-category">
-          <label for="${escapedId}-group${count}">
-            $category.name (<span class="xwiki-select-category-count">$category.options.size()</span>)
-          </label>
           #foreach ($option in $category.options)
             #if ("$!defaultValue" == $$option.value || ($count == 0 && $firstIsDefaultIfDefaultNull && "$!defaultValue" == ''))
               #set ($checked = 'checked="checked"')

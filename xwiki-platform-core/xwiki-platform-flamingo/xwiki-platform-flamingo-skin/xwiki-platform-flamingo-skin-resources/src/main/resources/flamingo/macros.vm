@@ -357,7 +357,7 @@
     #end
     <div role="combobox" id="xwiki-livetable-${htmlLiveTableId}-filter-date-combobox-${foreach.count}"
       class="xwiki-livetable-display-header-filter-date-combobox" aria-expanded="false">
-      #set($dateRangeFormat = $escapetool.xml($dateFormat) + " - " + $escapetool.xml($dateFormat))
+      #set($dateRangeFormat = $dateFormat + " - " + $dateFormat)
       <input id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" type="text"
         data-type="date" data-dateformat="$escapetool.xml($dateFormat)"
         #if ("$!columnProperties.size" != '')size="$!escapetool.xml($columnProperties.size)"#end

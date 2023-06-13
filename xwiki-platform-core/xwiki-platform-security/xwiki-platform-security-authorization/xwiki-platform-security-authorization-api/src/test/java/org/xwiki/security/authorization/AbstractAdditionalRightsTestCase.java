@@ -23,7 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.xwiki.model.EntityType;
 import org.xwiki.security.AbstractSecurityTestCase;
 
@@ -109,7 +110,7 @@ public abstract class AbstractAdditionalRightsTestCase extends AbstractSecurityT
     protected static Right impliedTestRightsADT;
     protected static Right impliedTestRightsDAF;
 
-    @BeforeClass
+    @BeforeAll
     public static void oneTimeSetUp()
     {
         allTestRights.add(getNewTestRight("AllowAllowTrue", ALLOW, ALLOW, true));
@@ -125,6 +126,18 @@ public abstract class AbstractAdditionalRightsTestCase extends AbstractSecurityT
 
         impliedTestRightsADT = new Right(new TestRightDescription("impliedTestRightsADT", ALLOW, DENY, true, allTestRightSet));
         impliedTestRightsDAF = new Right(new TestRightDescription("impliedTestRightsDAF", DENY, ALLOW, false, allTestRightSet));
+    }
+
+    /**
+     * Unregister test rights, so they don't interfere with other test classes.
+     */
+    @AfterAll
+    public static void unregisterRights()
+    {
+        allTestRights.forEach(Right::unregister);
+        allTestRights.clear();
+        impliedTestRightsADT.unregister();
+        impliedTestRightsDAF.unregister();
     }
 
     public static Right getNewTestRight(String name, RuleState defaultValue, RuleState tieResolution, boolean overridePolicy) {

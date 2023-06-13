@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -125,7 +125,7 @@ public abstract class AbstractSecurityTestCase
         return new GroupSecurityReference(reference, getMainWikiReference());
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception
     {
         xwikiRef = newEntityReference(new WikiReference("xwiki"));

@@ -27,27 +27,27 @@ import java.util.Deque;
 import java.util.List;
 
 import org.hamcrest.Matcher;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.SecurityReference;
 import org.xwiki.security.UserSecurityReference;
 import org.xwiki.security.authorization.AbstractAdditionalRightsTestCase;
-import org.xwiki.security.authorization.AuthorizationSettler;
+import org.xwiki.security.authorization.DefaultAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authorization.RuleState;
 import org.xwiki.security.authorization.SecurityAccess;
 import org.xwiki.security.authorization.SecurityAccessEntry;
 import org.xwiki.security.authorization.SecurityRule;
 import org.xwiki.security.authorization.SecurityRuleEntry;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
@@ -61,18 +61,19 @@ import static org.xwiki.security.authorization.RuleState.UNDETERMINED;
  * @version $Id$
  * @since 4.0M2
  */
-public class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTestCase
+@ComponentTest
+class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTestCase
 {
-    @Rule
-    public final MockitoComponentMockingRule<AuthorizationSettler> authorizationSettlerMocker =
-        new MockitoComponentMockingRule<AuthorizationSettler>(DefaultAuthorizationSettler.class);
+    @InjectMockComponents
+    private DefaultAuthorizationSettler authorizationSettler;
 
-    private AuthorizationSettler authorizationSettler;
+    @InjectMockComponents
+    private DefaultAuthorizationManager authorizationManager;
 
     private XWikiSecurityAccess defaultAccess;
     private XWikiSecurityAccess denyAllAccess;
 
-    @Before
+    @BeforeEach
     public void configure() throws Exception
     {
         defaultAccess = XWikiSecurityAccess.getDefaultAccess();
@@ -80,8 +81,6 @@ public class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTes
         for (Right right : Right.values()) {
             denyAllAccess.deny(right);
         }
-
-        this.authorizationSettler = authorizationSettlerMocker.getComponentUnderTest();
     }
 
     private Deque<SecurityRuleEntry> getMockedSecurityRuleEntries(String name, final SecurityReference reference,
@@ -117,7 +116,8 @@ public class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTes
     }
 
     private SecurityRule getMockedSecurityRule(String name, Iterable<UserSecurityReference> users,
-        Iterable<GroupSecurityReference> groups, Iterable<Right> rights, final RuleState state) {
+        Iterable<GroupSecurityReference> groups, Iterable<Right> rights, final RuleState state)
+    {
         final SecurityRule rule = mock(SecurityRule.class, name);
 
         final List<Matcher<? super UserSecurityReference>> userMatchers
@@ -162,7 +162,7 @@ public class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTes
     }
 
     @Test
-    public void testSettleNoRulesOnMainWiki() throws Exception
+    void testSettleNoRulesOnMainWiki() throws Exception
     {
         Deque<SecurityRuleEntry> emptyXdocRules
             = getMockedSecurityRuleEntries("emptyXdocRules", xdocRef, Collections.<List<SecurityRule>>emptyList());
@@ -183,7 +183,7 @@ public class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTes
     }
 
     @Test
-    public void testSettleNoRulesOnLocalWiki() throws Exception
+    void testSettleNoRulesOnLocalWiki() throws Exception
     {
         Deque<SecurityRuleEntry> emptydocRules
             = getMockedSecurityRuleEntries("emptydocRules", docRef, Collections.<List<SecurityRule>>emptyList());
@@ -203,7 +203,7 @@ public class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTes
     }
 
     @Test
-    public void testSettleInheritancePolicy() throws Exception
+    void testSettleInheritancePolicy() throws Exception
     {
         SecurityRule allowAllTestRightsRulesToXuser = getMockedSecurityRule("allowAllTestRightsRulesToXuser",
             Arrays.asList(xuserRef), Collections.<GroupSecurityReference>emptyList(), allTestRights, ALLOW);
@@ -398,7 +398,7 @@ public class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTes
     }
 
     @Test
-    public void testSettleTieResolutionPolicy() throws Exception
+    void testSettleTieResolutionPolicy() throws Exception
     {
         SecurityRule allowAllTestRightsUserAndAnotherGroup = getMockedSecurityRule("allowAllTestRightsUserAndAnotherGroup",
             Arrays.asList(userRef), Arrays.asList(anotherGroupRef), allTestRights, ALLOW);
@@ -471,7 +471,7 @@ public class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTes
     }
 
     @Test
-    public void testSettleOneAllowImpliesDenyForAllOthers() throws Exception
+    void testSettleOneAllowImpliesDenyForAllOthers() throws Exception
     {
         XWikiSecurityAccess defaultAllowRight0 = defaultAccess.clone();
         XWikiSecurityAccess defaultDenyRight0 = defaultAccess.clone();
@@ -559,7 +559,7 @@ public class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTes
     }
 
     @Test
-    public void testSettleRightWithImpliedRights() throws Exception
+    void testSettleRightWithImpliedRights() throws Exception
     {
         SecurityRule allowImpliedADT = getMockedSecurityRule("allowImpliedADT",
             Arrays.asList(userRef), Arrays.asList(anotherGroupRef), Arrays.asList(impliedTestRightsADT), ALLOW);
@@ -685,7 +685,7 @@ public class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTes
     }
 
     @Test
-    public void testSettleNewRightJustAdded() throws Exception
+    void testSettleNewRightJustAdded() throws Exception
     {
         Right newRight = getNewTestRight("RightAddedLater",DENY,DENY,true);
         XWikiSecurityAccess defaultNewRight = defaultAccess.clone();
@@ -702,10 +702,12 @@ public class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTes
                         Collections.<GroupSecurityReference>emptyList(),
                         Arrays.asList(newRight),
                         RuleState.ALLOW))))));
+
+        this.authorizationManager.unregister(newRight);
     }
 
     @Test
-    public void testSettleEntityTypeWithoutAnyEnabledRight() throws Exception
+    void testSettleEntityTypeWithoutAnyEnabledRight() throws Exception
     {
         SecurityRule allowAllTestRightsRulesToXuser = getMockedSecurityRule("allowAllTestRightsRulesToXuser",
             Collections.singletonList(xuserRef), Collections.<GroupSecurityReference>emptyList(), allTestRights, ALLOW);

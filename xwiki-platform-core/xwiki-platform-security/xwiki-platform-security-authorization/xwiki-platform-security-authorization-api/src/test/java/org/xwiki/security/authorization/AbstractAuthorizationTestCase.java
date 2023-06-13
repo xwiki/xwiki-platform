@@ -22,6 +22,7 @@ package org.xwiki.security.authorization;
 
 import java.io.File;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
@@ -91,8 +92,20 @@ public abstract class AbstractAuthorizationTestCase
     /** VIEW, EDIT, COMMENT, DELETE, SCRIPT. */
     protected static final RightSet ALL_DOCUMENT_RIGHTS = new RightSet();
 
-    static {
-        for(Right right : Right.values()) {
+    /**
+     * Reset and fill the static variables.
+     */
+    @BeforeAll
+    public static void initialize()
+    {
+        ALL_RIGHTS.clear();
+        ALL_RIGHTS_EXCEPT_PROGRAMING.clear();
+        ALL_RIGHTS_EXCEPT_PROGRAMING_AND_CREATE_WIKI.clear();
+        ALL_RIGHTS_EXCEPT_ADMIN_AND_CREATE_WIKI.clear();
+        ALL_SPACE_RIGHTS.clear();
+        DEFAULT_DOCUMENT_RIGHTS.clear();
+        ALL_DOCUMENT_RIGHTS.clear();
+        for (Right right : Right.values()) {
             if (right != ILLEGAL && right != CREATOR) {
                 ALL_RIGHTS.add(right);
                 if (right != PROGRAM) {
@@ -100,15 +113,13 @@ public abstract class AbstractAuthorizationTestCase
                     if (right != CREATE_WIKI) {
                         ALL_RIGHTS_EXCEPT_PROGRAMING_AND_CREATE_WIKI.add(right);
                     }
-                    if (right != ADMIN) {
-                        if (right != CREATE_WIKI){
-                            ALL_RIGHTS_EXCEPT_ADMIN_AND_CREATE_WIKI.add(right);
-                            if (right != LOGIN && right != REGISTER) {
-                                ALL_DOCUMENT_RIGHTS.add(right);
-                            }
-                            if (right != DELETE && right != SCRIPT) {
-                                DEFAULT_DOCUMENT_RIGHTS.add(right);
-                            }
+                    if (right != ADMIN && right != CREATE_WIKI) {
+                        ALL_RIGHTS_EXCEPT_ADMIN_AND_CREATE_WIKI.add(right);
+                        if (right != LOGIN && right != REGISTER) {
+                            ALL_DOCUMENT_RIGHTS.add(right);
+                        }
+                        if (right != DELETE && right != SCRIPT) {
+                            DEFAULT_DOCUMENT_RIGHTS.add(right);
                         }
                     }
                     if (right != LOGIN && right != REGISTER && right != CREATE_WIKI) {

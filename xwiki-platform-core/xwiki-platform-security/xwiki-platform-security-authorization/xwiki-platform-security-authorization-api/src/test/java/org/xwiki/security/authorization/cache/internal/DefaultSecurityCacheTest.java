@@ -27,11 +27,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.model.EntityType;
@@ -40,14 +38,12 @@ import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.AbstractSecurityTestCase;
 import org.xwiki.security.DefaultSecurityReferenceFactory;
 import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.SecurityReference;
-import org.xwiki.security.SecurityReferenceFactory;
 import org.xwiki.security.UserSecurityReference;
 import org.xwiki.security.authorization.SecurityAccessEntry;
 import org.xwiki.security.authorization.SecurityEntry;
@@ -56,17 +52,19 @@ import org.xwiki.security.authorization.cache.ConflictingInsertionException;
 import org.xwiki.security.authorization.cache.ParentEntryEvictedException;
 import org.xwiki.security.authorization.cache.SecurityShadowEntry;
 import org.xwiki.security.internal.XWikiBridge;
-import org.xwiki.test.LogRule;
+import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -76,24 +74,21 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
+@ComponentTest
 @ComponentList({DefaultStringEntityReferenceSerializer.class, DefaultSymbolScheme.class, EntityReferenceFactory.class})
-public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
+class DefaultSecurityCacheTest extends AbstractSecurityTestCase
 {
-    @Rule
-    public final MockitoComponentMockingRule<SecurityCache> securityCacheMocker =
-        new MockitoComponentMockingRule<SecurityCache>(DefaultSecurityCache.class,
-            Arrays.asList(EntityReferenceSerializer.class));
+    @MockComponent
+    private CacheManager cacheManager;
 
-    @Rule
-    public final MockitoComponentMockingRule<SecurityReferenceFactory> securityReferenceFactoryMocker =
-        new MockitoComponentMockingRule<SecurityReferenceFactory>(DefaultSecurityReferenceFactory.class);
+    @InjectMockComponents
+    private DefaultSecurityCache securityCache;
 
-    @Rule
-    public LogRule logCapture = new LogRule();
+    @MockComponent
+    private XWikiBridge xWikiBridge;
 
-    private SecurityCache securityCache;
-
-    private SecurityReferenceFactory factory;
+    @InjectMockComponents
+    private DefaultSecurityReferenceFactory factory;
 
     private TestCache<Object> cache;
 
@@ -107,30 +102,21 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
 
     private SecurityReference aMissingWikiRef;
 
-    @Before
+    @BeforeComponent
+    public void configureCacheManager() throws CacheException
+    {
+        if (this.cache == null) {
+            this.cache = new TestCache<>();
+            when(this.cacheManager.createNewCache(any(CacheConfiguration.class))).thenReturn(this.cache);
+        }
+    }
+
+    @BeforeEach
     public void configure() throws Exception
     {
-        if (cache == null) {
-            cache = new TestCache<Object>();
-
-            final CacheManager cacheManager = securityCacheMocker.getInstance(CacheManager.class);
-            when(cacheManager.createNewCache(any(CacheConfiguration.class))).thenReturn(cache);
-        }
-
-        XWikiBridge xwikiBridge = securityReferenceFactoryMocker.getInstance(XWikiBridge.class);
-        when(xwikiBridge.getMainWikiReference()).thenReturn(new WikiReference("xwiki"));
-        when(xwikiBridge.toCompatibleEntityReference(any(EntityReference.class)))
-            .thenAnswer(new Answer<EntityReference>()
-            {
-                @Override
-                public EntityReference answer(InvocationOnMock invocation) throws Throwable
-                {
-                    return invocation.getArgument(0);
-                }
-            });
-
-        this.factory = securityReferenceFactoryMocker.getComponentUnderTest();
-        this.securityCache = securityCacheMocker.getComponentUnderTest();
+        when(this.xWikiBridge.getMainWikiReference()).thenReturn(new WikiReference("xwiki"));
+        when(this.xWikiBridge.toCompatibleEntityReference(any(EntityReference.class)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
 
         aMissingParentRef = factory.newEntityReference(new SpaceReference("space", new WikiReference("missing")));
         aMissingEntityRef =
@@ -395,29 +381,26 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
             if (entry.getValue() instanceof SecurityRuleEntry) {
                 SecurityRuleEntry sentry = (SecurityRuleEntry) entry.getValue();
                 if (keeper.keepRule(sentry)) {
-                    assertThat(((DefaultSecurityCache) securityCache).get(entry.getKey()),
-                        sameInstance(entry.getValue()));
+                    assertThat(this.securityCache.get(entry.getKey()), sameInstance(entry.getValue()));
                 } else {
                     it.remove();
-                    assertThat(((DefaultSecurityCache) securityCache).get(entry.getKey()), nullValue());
+                    assertThat(this.securityCache.get(entry.getKey()), nullValue());
                 }
             } else if (entry.getValue() instanceof SecurityAccessEntry) {
                 SecurityAccessEntry sentry = (SecurityAccessEntry) entry.getValue();
                 if (keeper.keepAccess(sentry)) {
-                    assertThat(((DefaultSecurityCache) securityCache).get(entry.getKey()),
-                        sameInstance(entry.getValue()));
+                    assertThat(this.securityCache.get(entry.getKey()), sameInstance(entry.getValue()));
                 } else {
                     it.remove();
-                    assertThat(((DefaultSecurityCache) securityCache).get(entry.getKey()), nullValue());
+                    assertThat(this.securityCache.get(entry.getKey()), nullValue());
                 }
             } else {
                 SecurityShadowEntry sentry = (SecurityShadowEntry) entry.getValue();
                 if (keeper.keepShadow(sentry)) {
-                    assertThat(((DefaultSecurityCache) securityCache).get(entry.getKey()),
-                        sameInstance(entry.getValue()));
+                    assertThat(this.securityCache.get(entry.getKey()), sameInstance(entry.getValue()));
                 } else {
                     it.remove();
-                    assertThat(((DefaultSecurityCache) securityCache).get(entry.getKey()), nullValue());
+                    assertThat(this.securityCache.get(entry.getKey()), nullValue());
                 }
             }
         }
@@ -567,7 +550,7 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
     }
 
     @Test
-    public void testAddSecurityRuleEntry() throws Exception
+    void testAddSecurityRuleEntry() throws Exception
     {
         final List<SecurityRuleEntry> ruleEntries = new ArrayList<SecurityRuleEntry>();
 
@@ -656,7 +639,7 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
     }
 
     @Test
-    public void testAddSecurityShadowEntry() throws Exception
+    void testAddSecurityShadowEntry() throws Exception
     {
         InsertUsersWithouShadow();
 
@@ -804,7 +787,7 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
     }
 
     @Test
-    public void testRemoveSecurityRuleEntry() throws Exception
+    void testRemoveSecurityRuleEntry() throws Exception
     {
         // Fill the cache
         Map<String, SecurityEntry> entries = InsertUsers();
@@ -822,7 +805,7 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
     }
 
     @Test
-    public void testCacheEvictedEntries() throws Exception
+    void testCacheEvictedEntries() throws Exception
     {
         // Fill the cache
         Map<String, SecurityEntry> entries = InsertUsers();
@@ -848,7 +831,7 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
     }
 
     @Test
-    public void testRemoveSecurityAccessEntry() throws Exception
+    void testRemoveSecurityAccessEntry() throws Exception
     {
         // Fill the cache
         Map<String, SecurityEntry> entries = InsertUsers();
@@ -867,7 +850,7 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
     }
 
     @Test
-    public void testKeyCollisions() throws Exception
+    void testKeyCollisions() throws Exception
     {
         this.securityCache.add(mockSecurityRuleEntry(newEntityReference(null)));
         this.securityCache.add(mockSecurityRuleEntry(newEntityReference(new WikiReference("wiki"))));

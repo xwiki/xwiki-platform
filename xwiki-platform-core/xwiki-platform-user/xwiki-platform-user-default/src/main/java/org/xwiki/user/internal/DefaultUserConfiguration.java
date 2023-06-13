@@ -70,6 +70,12 @@ public class DefaultUserConfiguration implements UserConfiguration
         return getPreferencesFor("guest");
     }
 
+    @Override
+    public String getUserQualifierProperty()
+    {
+        return this.xwikiPropertiesSource.getProperty(PREFIX + "display.qualifierProperty");
+    }
+
     private Properties getPreferencesFor(String userName)
     {
         Properties properties = new Properties();

@@ -39,7 +39,6 @@
   </properties>
   <modules>
     <module>xwiki-platform-annotation-test-pageobjects</module>
-    <module>xwiki-platform-annotation-test-tests</module>
   </modules>
   <profiles>
     <profile>

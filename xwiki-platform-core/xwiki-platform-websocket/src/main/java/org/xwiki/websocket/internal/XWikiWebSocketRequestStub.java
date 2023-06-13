@@ -140,7 +140,7 @@ public class XWikiWebSocketRequestStub extends XWikiServletRequestStub
             String[] cookieStrings = cookieHeader.split("\\s*;\\s*");
             return Arrays.asList(cookieStrings).stream().map(HttpCookie::parse).flatMap(Collection::stream)
                 .map(cookie -> new Cookie(cookie.getName(), cookie.getValue()))
-                .collect(Collectors.toMap(Cookie::getName, Function.identity()));
+                .collect(Collectors.toMap(Cookie::getName, Function.identity(), (alice, bob) -> alice));
         }
     }
 

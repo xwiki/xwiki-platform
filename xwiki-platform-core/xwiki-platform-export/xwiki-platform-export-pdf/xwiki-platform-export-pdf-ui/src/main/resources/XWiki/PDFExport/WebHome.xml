@@ -370,11 +370,15 @@ require([
       resolvePDFExportJobStarted = resolve;
       rejectPDFExportJobStarted = reject;
     });
+    const locale = document.documentElement.getAttribute('lang') || '';
     data.push(
       {name: 'outputSyntax', value: 'plain'},
       {name: 'sheet', value: 'XWiki.PDFExport.WebHome'},
       {name: 'action', value: 'export'},
       {name: 'form_token', value: xwikiMeta.form_token},
+      // We pass the locale in order to make sure the document saved in the PDF export job context (when the job is
+      // scheduled) matches the current document translation.
+      {name: 'language', value: locale},
       // We add the current value of the query string because we want to export the current state of the page (the query
       // string can hold for instance the state of the live data component).
       {name: 'pdfQueryString', value: window.location.search.substring(1)},
@@ -382,6 +386,13 @@ require([
       // state of the live table component).
       {name: 'pdfHash', value: window.location.hash.substring(1)}
     );
+    // If the PDF export is triggered on a document revision then we need to make sure that document revision is saved
+    // in the PDF export job context when the job is scheduled.
+    const urlParams = new URLSearchParams(window.location.search);
+    const revision = urlParams.get('rev');
+    if (revision) {
+      data.push({name: 'rev', value: revision});
+    }
     return Promise.resolve(new JobRunner({
       createStatusRequest: function(jobId) {
         resolvePDFExportJobStarted(jobId);

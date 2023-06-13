@@ -22,6 +22,7 @@ package org.xwiki.notifications.filters.watch;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Reference to an entity (a location, a user, etc...) to watch.
@@ -31,6 +32,49 @@ import org.xwiki.notifications.filters.NotificationFilterPreference;
  */
 public interface WatchedEntityReference
 {
+    /**
+     * Define more precisely the watched status given the event types and the formats.
+     * @since 15.5RC1
+     */
+    @Unstable
+    enum WatchedStatus
+    {
+        /**
+         * The entity is watched for all events and all formats: the filter doesn't specify any event or format.
+         */
+        WATCHED_FOR_ALL_EVENTS_AND_FORMATS,
+
+        /**
+         * The entity is only watched for a subset of events and/or a subset of formats.
+         */
+        WATCHED_FOR_SOME_EVENTS_OR_FORMATS,
+
+        /**
+         * The entity is not watched.
+         */
+        NOT_WATCHED
+    }
+
+    /**
+     * Retrieve the specific watched status of an entity for the given user.
+     *
+     * @param userReference the user for whom to check if the entity is watched or not
+     * @return the specific watched status of the entity by the given user
+     * @throws NotificationException in case of errors
+     * @since 15.5RC1
+     */
+    @Unstable
+    default WatchedStatus getWatchedStatus(DocumentReference userReference) throws NotificationException
+    {
+        if (isWatchedWithAllEventTypes(userReference)) {
+            return WatchedStatus.WATCHED_FOR_ALL_EVENTS_AND_FORMATS;
+        } else if (isWatched(userReference)) {
+            return WatchedStatus.WATCHED_FOR_SOME_EVENTS_OR_FORMATS;
+        } else {
+            return WatchedStatus.NOT_WATCHED;
+        }
+    }
+
     /**
      * @param userReference a user
      * @return {@code true} if the given user watch the current entity reference for any event type or format.
@@ -51,10 +95,30 @@ public interface WatchedEntityReference
     }
 
     /**
+     * Check if the given filter preference is an exact match: by "exact" we mean here that the preference concerns
+     * this exact entity, for all event types, and all formats.
+     * For checking if a preference match this entity, for any event type and any format,
+     * use {@link #match(NotificationFilterPreference)}.
+     *
      * @param notificationFilterPreference a filter preference
-     * @return either or not the filter preference concerns this exact entity
+     * @return whether the filter preference concerns this exact entity for all event types and all formats
+     * @see #match(NotificationFilterPreference)
      */
     boolean matchExactly(NotificationFilterPreference notificationFilterPreference);
+
+    /**
+     * Check if the given filter preference concerns this entity, whatever the event types and formats.
+     * For a matching for all event types and all formats use {@link #matchExactly(NotificationFilterPreference)}.
+     *
+     * @param notificationFilterPreference a filter preference
+     * @return whether the filter preference concerns this exact entity
+     * @since 15.5RC1
+     */
+    @Unstable
+    default boolean match(NotificationFilterPreference notificationFilterPreference)
+    {
+        return matchExactly(notificationFilterPreference);
+    }
 
     /**
      * Create a notification filter preference to watch this entity.

@@ -32,6 +32,7 @@ import org.xwiki.annotation.Annotation;
 import org.xwiki.annotation.AnnotationConfiguration;
 import org.xwiki.annotation.event.AnnotationAddedEvent;
 import org.xwiki.annotation.event.AnnotationDeletedEvent;
+import org.xwiki.annotation.event.AnnotationEvent;
 import org.xwiki.annotation.event.AnnotationUpdatedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
@@ -53,7 +54,7 @@ import com.xpn.xwiki.objects.BaseObjectReference;
 
 /**
  * Listens to object events of the same class as the currently configured annotation class and launches corresponding
- * {@link org.xwiki.annotation.event.AnnotationEvent}s.
+ * {@link AnnotationEvent}s.
  *
  * @version $Id$
  * @since 4.0RC1
@@ -66,7 +67,7 @@ public class AnnotationEventGeneratorEventListener implements EventListener
     /**
      * The matched events.
      */
-    private static final List<Event> EVENTS = Arrays.<Event> asList(new XObjectAddedEvent(), new XObjectUpdatedEvent(),
+    private static final List<Event> EVENTS = Arrays.asList(new XObjectAddedEvent(), new XObjectUpdatedEvent(),
         new XObjectDeletedEvent());
 
     /**
@@ -115,7 +116,7 @@ public class AnnotationEventGeneratorEventListener implements EventListener
     public void onEvent(Event event, Object source, Object data)
     {
         // Don`t rely on the context from the data parameter.
-        XWikiContext context = (XWikiContext) execution.getContext().getProperty("xwikicontext");
+        XWikiContext context = (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
         String currentWiki = context.getWikiId();
 
         try {
@@ -128,7 +129,7 @@ public class AnnotationEventGeneratorEventListener implements EventListener
             context.setWikiId(wikiOfAffectedDocument);
 
             // Only work if the Annotations Application is installed on the wiki.
-            if (!annotationConfiguration.isInstalled()) {
+            if (!this.annotationConfiguration.isInstalled()) {
                 return;
             }
 
@@ -137,7 +138,7 @@ public class AnnotationEventGeneratorEventListener implements EventListener
             DocumentReference objectClassReference = objectReference.getXClassReference();
 
             // Only interested in objects that are of the same class as the currently configured annotation class.
-            if (!objectClassReference.equals(annotationConfiguration.getAnnotationClassReference())) {
+            if (!objectClassReference.equals(this.annotationConfiguration.getAnnotationClassReference())) {
                 return;
             }
 
@@ -146,7 +147,7 @@ public class AnnotationEventGeneratorEventListener implements EventListener
 
             // Build the new event to launch using the current document reference and object number.
             Event newEvent = null;
-            String documentReference = defaultEntityReferenceSerializer.serialize(document.getDocumentReference());
+            String documentReference = this.defaultEntityReferenceSerializer.serialize(document.getDocumentReference());
             String number = String.valueOf(objectReference.getObjectNumber());
             if (event instanceof XObjectAddedEvent) {
                 newEvent = new AnnotationAddedEvent(documentReference, number);
@@ -172,9 +173,9 @@ public class AnnotationEventGeneratorEventListener implements EventListener
             }
 
             // Launch the new event.
-            observationManager.get().notify(newEvent, source, context);
+            this.observationManager.get().notify(newEvent, source, context);
         } catch (Exception e) {
-            logger.error("Failed to handle event of type [{}]", event.getClass().getName(), e);
+            this.logger.error("Failed to handle event of type [{}]", event.getClass().getName(), e);
         } finally {
             // Restore the context database.
             context.setWikiId(currentWiki);

@@ -40,13 +40,16 @@ import org.xwiki.template.TemplateManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.IconSetup;
 import org.xwiki.test.page.PageTest;
+import org.xwiki.user.UserConfiguration;
+import org.xwiki.user.UserProperties;
+import org.xwiki.user.script.UserScriptService;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -78,6 +81,12 @@ class UorgsuggestPageTest extends PageTest
     @Mock
     private ScriptQuery query;
 
+    @Mock
+    private UserScriptService userScriptService;
+
+    @Mock
+    private UserConfiguration userConfiguration;
+
     @BeforeEach
     void setUp() throws Exception
     {
@@ -93,6 +102,9 @@ class UorgsuggestPageTest extends PageTest
         when(qp.anyChars()).thenReturn(qp);
         when(qp.literal(anyString())).thenReturn(qp);
         when(qp.query()).thenReturn(this.query);
+
+        this.componentManager.registerComponent(ScriptService.class, "user", this.userScriptService);
+        when(this.userScriptService.getConfiguration()).thenReturn(this.userConfiguration);
     }
 
     @Test
@@ -127,6 +139,11 @@ class UorgsuggestPageTest extends PageTest
     {
         when(this.xwiki.getPlainUserName(new DocumentReference("xwiki", "XWiki", "U1"), this.context))
             .thenReturn("User 1");
+
+        when(this.userConfiguration.getUserQualifierProperty()).thenReturn("address");
+        UserProperties u3Properties = mock(UserProperties.class, "U3");
+        when(u3Properties.getProperty("address")).thenReturn("Paris, France");
+        when(this.userScriptService.getProperties("xwiki:XWiki.U3")).thenReturn(u3Properties);
 
         // U2 is excluded from the results because the current user does not have read access to this user.
         // U12 is excluded from the results because after U11, the 10 maximum results are already aggregated.

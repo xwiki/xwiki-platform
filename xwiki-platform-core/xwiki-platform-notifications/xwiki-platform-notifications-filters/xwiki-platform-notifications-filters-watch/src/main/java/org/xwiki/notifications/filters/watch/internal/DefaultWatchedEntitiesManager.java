@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -32,7 +31,6 @@ import org.apache.commons.compress.utils.Sets;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
 import org.xwiki.notifications.filters.NotificationFilterType;
@@ -92,7 +90,8 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
             return;
         }
 
-        Iterator<NotificationFilterPreference> filterPreferences = getAllEventsFilterPreferences(user).iterator();
+        Iterator<NotificationFilterPreference> filterPreferences =
+                notificationFilterPreferenceManager.getFilterPreferences(user).iterator();
 
         boolean thereIsAMatch = false;
 
@@ -109,6 +108,11 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
                         && notificationFilterPreference.isEnabled() == shouldBeWatched) {
                     enableOrDeleteFilter(!shouldBeWatched, notificationFilterPreference, user);
                 }
+            } else if (shouldDisableFilter(entity, notificationFilterPreference, shouldBeWatched)) {
+                // Disable custom filters that might be contradictory.
+                notificationFilterPreferenceManager.setFilterPreferenceEnabled(user,
+                        notificationFilterPreference.getId(),
+                        false);
             }
         }
 
@@ -117,6 +121,19 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
             notificationFilterPreferenceManager.saveFilterPreferences(user,
                     Sets.newHashSet(createFilterPreference(entity, shouldBeWatched)));
         }
+    }
+
+    private boolean shouldDisableFilter(WatchedEntityReference entity, NotificationFilterPreference filterPreference,
+                                        boolean shouldBeWatched)
+    {
+        if (entity.match(filterPreference) && filterPreference.isEnabled()) {
+            if (shouldBeWatched) {
+                return filterPreference.getFilterType() == NotificationFilterType.EXCLUSIVE;
+            } else {
+                return filterPreference.getFilterType() == NotificationFilterType.INCLUSIVE;
+            }
+        }
+        return false;
     }
 
     private boolean entityIsAlreadyInDesiredState(WatchedEntityReference entity, DocumentReference user,
@@ -139,17 +156,6 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
             notificationFilterPreferenceManager.deleteFilterPreference(user,
                     notificationFilterPreference.getId());
         }
-    }
-
-    private Stream<NotificationFilterPreference> getAllEventsFilterPreferences(DocumentReference user)
-            throws NotificationException
-    {
-        // A filter preferences object concerning all event is a filter that has no even set and that concern
-        // concerns all notification formats.
-        return notificationFilterPreferenceManager.getFilterPreferences(user).stream().filter(
-            filterPreference -> filterPreference.getEventTypes().isEmpty()
-            && filterPreference.getNotificationFormats().size() == NotificationFormat.values().length
-        );
     }
 
     private NotificationFilterPreference createFilterPreference(WatchedEntityReference entity, boolean shouldBeWatched)

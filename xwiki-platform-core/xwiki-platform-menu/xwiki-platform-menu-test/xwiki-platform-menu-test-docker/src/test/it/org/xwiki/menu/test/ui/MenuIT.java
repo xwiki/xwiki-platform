@@ -31,7 +31,6 @@ import org.xwiki.menu.test.po.MenuEntryEditPage;
 import org.xwiki.menu.test.po.MenuHomePage;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 
@@ -54,7 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 //  servletEngineTag = "9", browser = Browser.CHROME, verbose = true)
 //@UITest(database = Database.HSQLDB_EMBEDDED, servletEngine = ServletEngine.JETTY_STANDALONE,
 //  browser = Browser.FIREFOX, verbose = true)
-@UITest(servletEngine = ServletEngine.TOMCAT, servletEngineTag = "9-jdk17")
+@UITest
 class MenuIT
 {
     @Test

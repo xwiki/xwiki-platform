@@ -542,7 +542,7 @@ public class TableLayoutElement extends BaseElement
      */
     public int countRows()
     {
-        return getRoot().findElements(By.cssSelector("tbody tr td:first-child")).size();
+        return getDriver().findElementsWithoutWaiting(getRoot(), By.cssSelector("tbody tr td:first-child")).size();
     }
 
     /**
@@ -569,10 +569,11 @@ public class TableLayoutElement extends BaseElement
      */
     public int getRowIndexForElement(By by)
     {
-        WebElement rowElement = getRoot().findElement(by);
+        WebElement rowElement = getDriver().findElementWithoutWaiting(getRoot(), by);
         if (rowElement.isDisplayed()) {
-            // Count the preceding rows.
-            return rowElement.findElements(By.xpath("./ancestor::tr[1]/preceding-sibling::tr")).size() + 1;
+            // Count the preceding rows without waiting.
+            return getDriver().findElementsWithoutWaiting(rowElement,
+                By.xpath("./ancestor::tr[1]/preceding-sibling::tr")).size() + 1;
         }
         return 0;
     }

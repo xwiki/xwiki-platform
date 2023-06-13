@@ -20,6 +20,7 @@
 package org.xwiki.notifications;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Get the configuration options concerning the Notification module.
@@ -84,5 +85,15 @@ public interface NotificationConfiguration
     default int getAsyncPoolSize()
     {
         return 2;
+    }
+
+    /**
+     * @return the hint of the component to be used for the email grouping strategy.
+     * @since 15.5RC1
+     */
+    @Unstable
+    default String getEmailGroupingStrategyHint()
+    {
+        return "default";
     }
 }

@@ -21,7 +21,9 @@ package org.xwiki.notifications.notifiers.internal.email.live;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
@@ -44,10 +46,7 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.concurrent.ExecutionContextRunnable;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationConfiguration;
-import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.internal.SimilarityCalculator;
 
 /**
  * Dispatch events to users with live email notifications enabled.
@@ -72,9 +71,6 @@ public class PrefilteringLiveNotificationEmailDispatcher implements Initializabl
             this.entities.add(userReference);
         }
     }
-
-    @Inject
-    private SimilarityCalculator similarityCalculator;
 
     @Inject
     private PrefilteringLiveNotificationEmailSender sender;
@@ -148,9 +144,9 @@ public class PrefilteringLiveNotificationEmailDispatcher implements Initializabl
         }
 
         // Prepare a map of events to send per entity
-        Map<DocumentReference, CompositeEvent> eventsToSend = new HashMap<>();
-        currentEntry.entities.forEach(entity -> eventsToSend.put(entity, new CompositeEvent(currentEntry.event)));
-        // Consume similar following events
+        Map<DocumentReference, List<Event>> eventsToSend = new HashMap<>();
+        currentEntry.entities.forEach(entity -> eventsToSend.put(entity, new ArrayList<>(List.of(currentEntry.event))));
+        // Consume following events targeting same users
         this.queue.forEach(entry -> prepare(entry, eventsToSend));
 
         // Send mails
@@ -159,25 +155,13 @@ public class PrefilteringLiveNotificationEmailDispatcher implements Initializabl
         }
     }
 
-    private void prepare(QueueEntry entry, Map<DocumentReference, CompositeEvent> eventsToSend)
+    private void prepare(QueueEntry entry, Map<DocumentReference, List<Event>> eventsToSend)
     {
         entry.entities.forEach(entity -> {
-            CompositeEvent composite = eventsToSend.get(entity);
-
-            if (composite != null) {
-                // Compute the similarity between the event and the composite event in the map
-                int similarity = similarityCalculator.computeSimilarity(composite.getEvents().get(0), entry.event);
-
-                // If we can merge the event in the composite event
-                if (similarity > SimilarityCalculator.NO_SIMILARITY
-                    && composite.getSimilarityBetweenEvents() <= similarity) {
-                    try {
-                        composite.add(entry.event, similarity);
-                        entry.entities.remove(entity);
-                    } catch (NotificationException e1) {
-                        // Cannot happen
-                    }
-                }
+            if (eventsToSend.containsKey(entity)) {
+                List<Event> events = eventsToSend.get(entity);
+                events.add(entry.event);
+                entry.entities.remove(entity);
             }
         });
     }

@@ -33,11 +33,15 @@ import org.xwiki.attachment.validation.AttachmentValidationConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+import static com.xpn.xwiki.plugin.fileupload.FileUploadPlugin.UPLOAD_DEFAULT_MAXSIZE;
+import static com.xpn.xwiki.plugin.fileupload.FileUploadPlugin.UPLOAD_MAXSIZE_PARAMETER;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static org.xwiki.attachment.validation.internal.AttachmentMimetypeRestrictionClassDocumentInitializer.ALLOWED_MIMETYPES_FIELD;
 import static org.xwiki.attachment.validation.internal.AttachmentMimetypeRestrictionClassDocumentInitializer.BLOCKED_MIMETYPES_FIELD;
@@ -101,6 +105,26 @@ public class DefaultAttachmentValidationConfiguration implements AttachmentValid
     public List<String> getBlockerMimetypes(DocumentReference documentReference)
     {
         return wrapWithScope(documentReference, this::getBlockerMimetypes);
+    }
+
+    @Override
+    public long getMaxUploadSize(EntityReference entityReference)
+    {
+        XWikiContext context = this.contextProvider.get();
+        XWikiDocument previous = context.getDoc();
+
+        try {
+            XWiki wiki = context.getWiki();
+            if (entityReference != null) {
+                context.setDoc(wiki.getDocument(entityReference, context));
+            }
+            return wiki.getSpacePreferenceAsLong(UPLOAD_MAXSIZE_PARAMETER, UPLOAD_DEFAULT_MAXSIZE, context);
+        } catch (XWikiException e) {
+            this.logger.warn("Failed to resolve the entity [{}]. Cause: [{}]", entityReference, getRootCauseMessage(e));
+            return UPLOAD_DEFAULT_MAXSIZE;
+        } finally {
+            context.setDoc(previous);
+        }
     }
 
     private List<String> getPropertyWithFallback(String attachmentXObjectProperty, String xWikiPropertiesProperty)

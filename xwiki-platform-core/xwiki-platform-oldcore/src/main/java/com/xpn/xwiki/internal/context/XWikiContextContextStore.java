@@ -38,6 +38,8 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.servlet.http.Cookie;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.container.servlet.HttpServletUtils;
@@ -51,6 +53,7 @@ import org.xwiki.wiki.manager.WikiManagerException;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.XWikiRequest;
@@ -217,9 +220,24 @@ public class XWikiContextContextStore extends AbstractContextStore
     public static final String SUFFIX_PROP_DOCUMENT_REFERENCE = "reference";
 
     /**
+     * The suffix of the entry containing the context document revision (version).
+     */
+    public static final String SUFFIX_PROP_DOCUMENT_REVISION = "revision";
+
+    /**
      * Name of the entry containing the document reference.
      */
     public static final String PROP_DOCUMENT_REFERENCE = PREFIX_PROP_DOCUMENT + SUFFIX_PROP_DOCUMENT_REFERENCE;
+
+    /**
+     * Name of the entry containing the document revision (version).
+     */
+    public static final String PROP_DOCUMENT_REVISION = PREFIX_PROP_DOCUMENT + SUFFIX_PROP_DOCUMENT_REVISION;
+
+    /**
+     * The XWiki context key used to store the requested document revision (version).
+     */
+    private static final String REV = "rev";
 
     /**
      * The reference of the superadmin user.
@@ -243,6 +261,9 @@ public class XWikiContextContextStore extends AbstractContextStore
     @Inject
     private Logger logger;
 
+    @Inject
+    private DocumentRevisionProvider documentRevisionProvider;
+
     /**
      * Default constructor.
      */
@@ -250,7 +271,7 @@ public class XWikiContextContextStore extends AbstractContextStore
     {
         super(PROP_WIKI, PROP_USER, PROP_LOCALE, PROP_ACTION, PROP_REQUEST_BASE, PROP_REQUEST_URL,
             PROP_REQUEST_PARAMETERS, PROP_REQUEST_HEADERS, PROP_REQUEST_COOKIES, PROP_REQUEST_REMOTE_ADDR,
-            PROP_REQUEST_WIKI, PROP_DOCUMENT_REFERENCE);
+            PROP_REQUEST_WIKI, PROP_DOCUMENT_REFERENCE, PROP_DOCUMENT_REVISION);
     }
 
     @Override
@@ -266,20 +287,27 @@ public class XWikiContextContextStore extends AbstractContextStore
             save(contextStore, PROP_LOCALE, xcontext.getLocale(), entries);
             save(contextStore, PROP_ACTION, xcontext.getAction(), entries);
 
-            save(contextStore, PREFIX_PROP_DOCUMENT, xcontext.getDoc(), entries);
+            saveDocument(contextStore, PREFIX_PROP_DOCUMENT, xcontext, entries);
 
             save(contextStore, PREFIX_PROP_REQUEST, xcontext.getRequest(), entries, xcontext);
         }
     }
 
-    private void save(Map<String, Serializable> contextStore, String prefix, XWikiDocument document,
+    private void saveDocument(Map<String, Serializable> contextStore, String prefix, XWikiContext xcontext,
         Collection<String> entries)
     {
+        XWikiDocument document = xcontext.getDoc();
         if (document != null) {
             save((key, subkey) -> {
                 switch (subkey) {
                     case SUFFIX_PROP_DOCUMENT_REFERENCE:
                         contextStore.put(key, document.getDocumentReferenceWithLocale());
+                        break;
+                    case SUFFIX_PROP_DOCUMENT_REVISION:
+                        // Save the document revision only if it matches the revision that was requested explicitly.
+                        if (Objects.equals(document.getVersion(), xcontext.get(REV))) {
+                            contextStore.put(key, document.getVersion());
+                        }
                         break;
 
                     // TODO: support other properties ?
@@ -525,6 +553,10 @@ public class XWikiContextContextStore extends AbstractContextStore
 
     private void restoreDocument(String storedWikiId, Map<String, Serializable> contextStore, XWikiContext xcontext)
     {
+        if (contextStore.containsKey(PROP_DOCUMENT_REVISION)) {
+            xcontext.put(REV, contextStore.get(PROP_DOCUMENT_REVISION));
+        }
+
         if (contextStore.containsKey(PROP_DOCUMENT_REFERENCE)) {
             DocumentReference document = (DocumentReference) contextStore.get(PROP_DOCUMENT_REFERENCE);
             restoreDocument(document, xcontext);
@@ -558,9 +590,18 @@ public class XWikiContextContextStore extends AbstractContextStore
             return;
         }
 
+        String revision = (String) xcontext.get(REV);
+        if (StringUtils.isNotEmpty(revision)) {
+            try {
+                document = this.documentRevisionProvider.getRevision(document, revision);
+            } catch (XWikiException e) {
+                this.logger.warn("Failed to load revision [{}] of document [{}]. Root cause is [{}].", revision,
+                    documentReference, ExceptionUtils.getRootCauseMessage(e));
+            }
+        }
+
         // TODO: customize the document with what's in the contextStore if any
 
         xcontext.setDoc(document);
     }
-
 }

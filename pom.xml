@@ -96,7 +96,7 @@
     <!-- Versions of JDBC connectors we want to use in our distribution, in our tests and when using build tools -->
     <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
     <hsqldb.artifactId>hsqldb</hsqldb.artifactId>
-    <hsqldb.version>2.7.1</hsqldb.version>
+    <hsqldb.version>2.7.2</hsqldb.version>
     <mysql.groupId>com.mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-j</mysql.artifactId>
     <mysql.version>8.0.33</mysql.version>
@@ -698,7 +698,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-ffi</artifactId>
-        <version>2.2.13</version>
+        <version>2.2.14</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -708,7 +708,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-posix</artifactId>
-        <version>3.1.16</version>
+        <version>3.1.17</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>

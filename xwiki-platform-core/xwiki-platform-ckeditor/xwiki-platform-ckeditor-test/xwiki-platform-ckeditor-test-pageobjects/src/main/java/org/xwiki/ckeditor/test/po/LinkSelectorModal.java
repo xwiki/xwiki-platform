@@ -72,6 +72,31 @@ public class LinkSelectorModal extends BaseElement
     }
 
     /**
+     * @return the resource type currently selected in the resource picker (e.g., {@code "doc"})
+     * @since 14.10.13
+     * @since 15.5RC1
+     */
+    public String getSelectedResourceType()
+    {
+        return getResourceDisplay().getAttribute("data-resourcetype");
+    }
+
+    /**
+     * @return the resource reference currently selected in the resource picker (e.g., {@code "Sandbox.WebHome"})
+     * @since 14.10.13
+     * @since 15.5RC1
+     */
+    public String getSelectedResourceReference()
+    {
+        return getResourceDisplay().getAttribute("data-resourcereference");
+    }
+
+    private WebElement getResourceDisplay()
+    {
+        return getResourcePicker().findElement(cssSelector(".resourceDisplay"));
+    }
+
+    /**
      * Click on one of the choices proposed in the dropdown after using {@link #setResourceValue(String)}, based on its
      * hint and label.
      *
@@ -98,6 +123,16 @@ public class LinkSelectorModal extends BaseElement
     public void clickOK()
     {
         getCKEditorDialog().findElement(By.cssSelector(".cke_dialog_ui_button_ok")).click();
+    }
+
+    /**
+     * Click on the {@code "Cancel"} button of the modal.
+     * @since 14.10.13
+     * @since 15.5RC1
+     */
+    public void clickCancel()
+    {
+        getCKEditorDialog().findElement(By.cssSelector(".cke_dialog_ui_button_cancel")).click();
     }
 
     /**

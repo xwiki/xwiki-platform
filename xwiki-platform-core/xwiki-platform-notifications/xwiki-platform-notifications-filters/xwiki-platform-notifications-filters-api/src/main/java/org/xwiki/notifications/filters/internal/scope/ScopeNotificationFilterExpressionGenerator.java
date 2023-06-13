@@ -82,7 +82,7 @@ public class ScopeNotificationFilterExpressionGenerator
         // Get the filters to handle
         ScopeNotificationFilterPreferencesHierarchy preferences
                 = scopeNotificationFilterPreferencesGetter.getScopeFilterPreferences(filterPreferences,
-                    eventType, format, false);
+                    eventType, format, false, false);
 
         // The aim is to generate a black list with exceptions (handleExclusiveFilters) and a white
         // list (handleTopLevelInclusiveFilters).

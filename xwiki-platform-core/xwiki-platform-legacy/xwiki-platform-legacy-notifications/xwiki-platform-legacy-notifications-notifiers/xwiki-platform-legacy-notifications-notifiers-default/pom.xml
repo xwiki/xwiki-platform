@@ -40,6 +40,17 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-notifications-notifiers-default</artifactId>
       <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-notifications-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-legacy-notifications-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <!-- Test dependencies -->
     <dependency>

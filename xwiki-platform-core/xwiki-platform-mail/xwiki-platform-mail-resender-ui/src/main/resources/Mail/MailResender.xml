@@ -144,7 +144,7 @@
       <contextLang/>
     </property>
     <property>
-      <contextUser/>
+      <contextUser>XWiki.superadmin</contextUser>
     </property>
     <property>
       <cron>0 0 12 * * ?</cron>
@@ -153,7 +153,7 @@
       <jobClass>com.xpn.xwiki.plugin.scheduler.GroovyJob</jobClass>
     </property>
     <property>
-      <jobDescription>Resend emails that were prepared but that were either not sent or that failed to be sent (i.e. all mails in the "prepare_*" states). The mails are resent synchronously one by one to avoid requiring a lot of memory in case a lot of emails need to be resent.</jobDescription>
+      <jobDescription>Resend emails that were prepared but that were either not sent or that failed to be sent (i.e. all mails in the "prepare_success" state). The mails are resent synchronously one by one to avoid requiring a lot of memory in case a lot of emails need to be resent.</jobDescription>
     </property>
     <property>
       <jobName>Mail Resender</jobName>
@@ -165,7 +165,7 @@ if (services.mail.sender.lastError) {
   // Send a mail to the administrator with the exception, using the default "from" for both
   // the sender and the recipient. If no default from is used then don't send anything.
   def from = services.mail.sender.configuration.fromAddress
-  if (!from) {
+  if (from) {
     def message = services.mail.sender.createMessage(from, from, 'Mail Resender Scheduler Job Failed')
     message.addPart('text/plain', """
       The following error happened when trying to resend emails:
@@ -177,7 +177,7 @@ if (services.mail.sender.lastError) {
 </script>
     </property>
     <property>
-      <status/>
+      <status>Normal</status>
     </property>
   </object>
 </xwikidoc>

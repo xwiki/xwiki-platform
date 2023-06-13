@@ -17,22 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail;
-
-import org.xwiki.component.annotation.Role;
+package org.xwiki.mail.internal;
 
 /**
- * Configuration for the storage part of the Mail Sender.
+ * Add a backward compatibility layer to the {@link org.xwiki.mail.internal.DefaultMailStorageConfiguration} class.
  *
  * @version $Id$
- * @since 6.4.1
  */
-@Role
-public interface MailStorageConfiguration
+public privileged aspect DefaultMailStorageConfigurationAspect
 {
     /**
-     * @return true if the mail statuses for mails that have been sent successfully must be discarded or false if
-     *         they should be kept (for tracability purpose for example)
+     * @deprecated replaced replaced by a Mail Resender Scheduler job in 15.5RC1
      */
-    boolean discardSuccessStatuses();
+    @Deprecated
+    public boolean DefaultMailStorageConfiguration.resendAutomaticallyAtStartup()
+    {
+        return this.xwikiPropertiesSource.getProperty(PREFIX + "resendAutomaticallyAtStartup", true);
+    }
 }

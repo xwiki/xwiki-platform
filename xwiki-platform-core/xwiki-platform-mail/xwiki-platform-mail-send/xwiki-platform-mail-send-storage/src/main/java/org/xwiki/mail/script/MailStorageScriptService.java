@@ -321,9 +321,9 @@ public class MailStorageScriptService extends AbstractMailScriptService
     {
         List<Pair<MailStatus, MailStatusResult>> results;
         try {
-            results = multipleMailResender.resendMessages(filterMap, offset, count);
+            results = multipleMailResender.resendMessages(normalizeFilterMap(filterMap), offset, count);
         } catch (MailStoreException e) {
-            // Save the exception for reporting through the script services's getLastError() API
+            // Save the exception for reporting through the script service's getLastError() API
             setError(e);
             return null;
         }

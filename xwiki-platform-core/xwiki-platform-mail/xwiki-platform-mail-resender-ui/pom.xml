@@ -27,59 +27,56 @@
     <artifactId>xwiki-platform-mail</artifactId>
     <version>15.5-SNAPSHOT</version>
   </parent>
-  <packaging>jar</packaging>
-  <artifactId>xwiki-platform-mail-script</artifactId>
-  <name>XWiki Platform - Mail - Mail Script API</name>
-  <description>Mail Script API</description>
+  <packaging>xar</packaging>
+  <artifactId>xwiki-platform-mail-resender-ui</artifactId>
+  <name>XWiki Platform - Mail - Resender UI</name>
+  <description>Provides a Mail Resending Scheduler job</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Mail Script API</xwiki.extension.name>
+    <xwiki.extension.name>Mail Resending Application</xwiki.extension.name>
+    <!-- Should only be installed on the main wiki -->
+    <xwiki.extension.namespaces>wiki:xwiki</xwiki.extension.namespaces>
     <!-- Category to display in the Extension Manager. -->
-    <xwiki.extension.category>api</xwiki.extension.category>
+    <xwiki.extension.category>application</xwiki.extension.category>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-mail-general</artifactId>
+      <artifactId>xwiki-platform-mail-script</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-scheduler-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+      <!-- Optional because if the Scheduler UI is not there, all the mail sender features will still work. It's
+           just the Resender scheduler job that won't be available. -->
+      <optional>true</optional>
+    </dependency>
+    <!-- We also need a default implementation of the Mail Sender API at runtime -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-mail-send-default</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-mail-send-storage</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <!-- Testing Dependencies -->
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-tool-test-component</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>test-jar</id>
-            <goals>
-              <goal>test-jar</goal>
-            </goals>
-            <configuration>
-              <includes>
-                <include>**/MailScriptServiceComponentList.class</include>
-              </includes>
-            </configuration>
-          </execution>
-        </executions>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
+        <configuration>
+          <entries>
+            <entry>
+              <document>Mail.MailResender</document>
+              <type>customizable</type>
+            </entry>
+          </entries>
+        </configuration>
       </plugin>
     </plugins>
   </build>

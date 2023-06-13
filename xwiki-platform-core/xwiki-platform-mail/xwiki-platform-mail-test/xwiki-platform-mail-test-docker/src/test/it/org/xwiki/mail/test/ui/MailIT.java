@@ -272,13 +272,12 @@ class MailIT
 
     private void verifyMailResenderSchedulerJob(TestUtils setup) throws Exception
     {
-        // Send a mail that we set in prepare_error state for the test below. This is achieved using a custom
+        // Send a mail that we set in prepare_success state for the test below. This is achieved using a custom
         // Test DatabaseMailListener component.
         sendMailWithPrepareSuccessState(setup);
 
-        // Navigate to the scheduler job UI, schedule and then trigger the mail resender job
+        // Navigate to the scheduler job UI, and trigger the mail resender job so that it executes now
         SchedulerHomePage shp = SchedulerHomePage.gotoPage();
-        shp.clickJobActionSchedule("Mail Resender");
         shp.clickJobActionTrigger("Mail Resender");
 
         // Wait and assert the received email due to the resend.

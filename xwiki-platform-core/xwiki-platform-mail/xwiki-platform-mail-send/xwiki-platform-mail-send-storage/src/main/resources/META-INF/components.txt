@@ -3,4 +3,3 @@ org.xwiki.mail.internal.DatabaseMailListener
 org.xwiki.mail.internal.DatabaseMailStatusStore
 org.xwiki.mail.internal.DatabaseMailResender
 org.xwiki.mail.internal.DefaultMailStorageConfiguration
-org.xwiki.mail.internal.MailResenderListener

@@ -64,20 +64,4 @@ class DefaultMailStorageConfigurationTest
         when(mailConfigSource.getProperty("discardSuccessStatuses")).thenReturn(0);
         assertFalse(this.configuration.discardSuccessStatuses());
     }
-
-    @Test
-    void resendAutomaticallyAtStartupWhenNotDefined()
-    {
-        when(xwikiPropertiesSource.getProperty(
-            "mail.sender.database.resendAutomaticallyAtStartup", true)).thenReturn(true);
-        assertTrue(this.configuration.resendAutomaticallyAtStartup());
-    }
-
-    @Test
-    void resendAutomaticallyAtStartupWhenFalse()
-    {
-        when(xwikiPropertiesSource.getProperty(
-            "mail.sender.database.resendAutomaticallyAtStartup", true)).thenReturn(false);
-        assertFalse(this.configuration.resendAutomaticallyAtStartup());
-    }
 }

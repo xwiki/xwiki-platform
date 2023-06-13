@@ -19,20 +19,13 @@
  */
 package org.xwiki.mail;
 
-import org.xwiki.component.annotation.Role;
-
 /**
- * Configuration for the storage part of the Mail Sender.
+ * Add a backward compatibility layer to the {@link org.xwiki.mail.MailStorageConfiguration} class.
  *
  * @version $Id$
- * @since 6.4.1
+ * @since 15.5RC1
  */
-@Role
-public interface MailStorageConfiguration
+public privileged aspect MailStorageConfigurationAspect
 {
-    /**
-     * @return true if the mail statuses for mails that have been sent successfully must be discarded or false if
-     *         they should be kept (for tracability purpose for example)
-     */
-    boolean discardSuccessStatuses();
+    declare parents : MailStorageConfiguration implements CompatibilityMailStorageConfiguration;
 }

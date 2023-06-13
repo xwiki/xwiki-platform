@@ -33,8 +33,12 @@
   <description>API to store mails and their statuses</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.57</xwiki.jacoco.instructionRatio>
+    <!-- Skipping revapi since xwiki-platform-legacy-mail-send-storage wraps this module and runs checks on it -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Mail Sender Storage API</xwiki.extension.name>
+    <!-- Category to display in the Extension Manager. -->
+    <xwiki.extension.category>api</xwiki.extension.category>
   </properties>
   <dependencies>
     <dependency>

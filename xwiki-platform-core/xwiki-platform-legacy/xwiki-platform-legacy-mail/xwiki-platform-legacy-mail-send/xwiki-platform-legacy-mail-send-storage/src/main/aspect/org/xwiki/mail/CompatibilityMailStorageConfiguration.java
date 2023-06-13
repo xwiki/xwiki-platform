@@ -19,20 +19,16 @@
  */
 package org.xwiki.mail;
 
-import org.xwiki.component.annotation.Role;
-
-/**
- * Configuration for the storage part of the Mail Sender.
- *
- * @version $Id$
- * @since 6.4.1
- */
-@Role
-public interface MailStorageConfiguration
+public interface CompatibilityMailStorageConfiguration
 {
     /**
-     * @return true if the mail statuses for mails that have been sent successfully must be discarded or false if
-     *         they should be kept (for tracability purpose for example)
+     * @return true if XWiki should resend automatically mails in the prepare + error states at restart
+     * @since 12.9RC1
+     * @deprecated replaced by a Mail Resender Scheduler job
      */
-    boolean discardSuccessStatuses();
+    @Deprecated
+    default boolean resendAutomaticallyAtStartup()
+    {
+        return true;
+    }
 }

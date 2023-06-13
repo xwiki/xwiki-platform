@@ -19,49 +19,47 @@
  */
 package org.xwiki.mail.internal;
 
-import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
-import org.xwiki.component.annotation.Component;
+import org.junit.jupiter.api.Test;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.mail.MailStorageConfiguration;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 /**
- * Look for storage configuration first in {@code Mail.MailConfig} and then in {@code xwiki.properties}.
+ * Unit tests for {@link DefaultMailStorageConfiguration}.
  *
  * @version $Id$
  * @since 6.4.1
  */
-@Component
-@Singleton
-public class DefaultMailStorageConfiguration implements MailStorageConfiguration
+@ComponentTest
+class DefaultMailStorageConfigurationTest
 {
-    /**
-     * Prefix for configuration keys for the Mail Sender Storage module.
-     */
-    private static final String PREFIX = "mail.sender.database.";
+    @InjectMockComponents
+    private DefaultMailStorageConfiguration configuration;
 
-    private static final String DISCARD_SUCCESS_STATUSES = "discardSuccessStatuses";
-
-    @Inject
-    @Named("mailsend")
-    private ConfigurationSource mailConfigSource;
-
-    @Inject
+    @MockComponent
     @Named("xwikiproperties")
     private ConfigurationSource xwikiPropertiesSource;
 
-    @Override
-    public boolean discardSuccessStatuses()
+    @Test
+    void resendAutomaticallyAtStartupWhenNotDefined()
     {
-        // XWiki treats boolean as integers
-        Integer discardSuccessStatuses = this.mailConfigSource.getProperty(DISCARD_SUCCESS_STATUSES);
+        when(xwikiPropertiesSource.getProperty(
+            "mail.sender.database.resendAutomaticallyAtStartup", true)).thenReturn(true);
+        assertTrue(this.configuration.resendAutomaticallyAtStartup());
+    }
 
-        if (discardSuccessStatuses == null) {
-            discardSuccessStatuses = this.xwikiPropertiesSource.getProperty(PREFIX + DISCARD_SUCCESS_STATUSES, 1);
-        }
-
-        return (discardSuccessStatuses == 1);
+    @Test
+    void resendAutomaticallyAtStartupWhenFalse()
+    {
+        when(xwikiPropertiesSource.getProperty(
+            "mail.sender.database.resendAutomaticallyAtStartup", true)).thenReturn(false);
+        assertFalse(this.configuration.resendAutomaticallyAtStartup());
     }
 }

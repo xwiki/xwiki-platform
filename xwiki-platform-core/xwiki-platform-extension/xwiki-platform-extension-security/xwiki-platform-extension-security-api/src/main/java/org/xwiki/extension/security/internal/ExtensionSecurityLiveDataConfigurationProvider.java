@@ -163,7 +163,7 @@ public class ExtensionSecurityLiveDataConfigurationProvider implements Provider<
         descriptor.setType(STRING_TYPE);
         descriptor.setVisible(true);
         descriptor.setEditable(false);
-        descriptor.setSortable(true);
+        descriptor.setSortable(false);
         descriptor.setFilterable(true);
         return descriptor;
     }

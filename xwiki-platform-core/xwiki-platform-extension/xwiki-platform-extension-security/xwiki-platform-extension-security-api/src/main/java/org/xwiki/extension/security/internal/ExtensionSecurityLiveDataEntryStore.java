@@ -32,12 +32,9 @@ import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -56,29 +53,25 @@ import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataQuery.Constraint;
 import org.xwiki.livedata.LiveDataQuery.Filter;
 import org.xwiki.livedata.LiveDataQuery.SortEntry;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.search.solr.AbstractSolrCoreInitializer;
 import org.xwiki.search.solr.SolrUtils;
-import org.xwiki.velocity.tools.EscapeTool;
+import org.xwiki.search.solr.internal.api.FieldUtils;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.ViewAction;
 
-import static org.apache.commons.lang.StringEscapeUtils.*;
+import static org.apache.commons.lang.StringEscapeUtils.escapeXml;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_CVE_CVSS;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_CVE_ID;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_CVE_LINK;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_FIX_VERSION;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_MAX_CVSS;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID;
 import static org.xwiki.extension.security.internal.ExtensionSecurityLiveDataConfigurationProvider.ADVICE;
 import static org.xwiki.extension.security.internal.ExtensionSecurityLiveDataConfigurationProvider.CVE_ID;
 import static org.xwiki.extension.security.internal.ExtensionSecurityLiveDataConfigurationProvider.EXTENSION_ID;
 import static org.xwiki.extension.security.internal.ExtensionSecurityLiveDataConfigurationProvider.FIX_VERSION;
-import static org.xwiki.extension.security.internal.ExtensionSecurityLiveDataConfigurationProvider.NAME;
 import static org.xwiki.extension.security.internal.ExtensionSecurityLiveDataConfigurationProvider.MAX_CVSS;
+import static org.xwiki.extension.security.internal.ExtensionSecurityLiveDataConfigurationProvider.NAME;
 import static org.xwiki.search.solr.AbstractSolrCoreInitializer.SOLR_FIELD_ID;
 
 /**
@@ -92,7 +85,8 @@ public class ExtensionSecurityLiveDataEntryStore implements LiveDataEntryStore
 {
     private static final Map<String, String> LD_TO_SOLR = Map.of(
         EXTENSION_ID, SOLR_FIELD_ID,
-        MAX_CVSS, SECURITY_MAX_CVSS
+        MAX_CVSS, SECURITY_MAX_CVSS,
+        FIX_VERSION, SECURITY_FIX_VERSION
     );
 
     @Inject
@@ -128,7 +122,6 @@ public class ExtensionSecurityLiveDataEntryStore implements LiveDataEntryStore
             LiveData liveData = new LiveData();
             liveData.setCount(searchResults.getResults().getNumFound());
             for (SolrDocument solrDoc : searchResults.getResults()) {
-
                 List<Object> cveIds = new ArrayList<>(solrDoc.getFieldValues(SECURITY_CVE_ID));
                 List<Object> cveLinks = new ArrayList<>(solrDoc.getFieldValues(SECURITY_CVE_LINK));
                 List<Object> cveCvss = new ArrayList<>(solrDoc.getFieldValues(SECURITY_CVE_CVSS));
@@ -142,7 +135,7 @@ public class ExtensionSecurityLiveDataEntryStore implements LiveDataEntryStore
                     EXTENSION_ID, solrDoc.get(SOLR_FIELD_ID),
                     MAX_CVSS, solrDoc.get(SECURITY_MAX_CVSS),
                     CVE_ID, objectStream.collect(Collectors.joining("<br/>")),
-                    FIX_VERSION, "",
+                    FIX_VERSION, this.solrUtils.get(SECURITY_FIX_VERSION, solrDoc),
                     ADVICE, ""
                 ));
             }
@@ -163,8 +156,8 @@ public class ExtensionSecurityLiveDataEntryStore implements LiveDataEntryStore
         // Note: this is not supposed to happen in practice.
         ExtensionId extensionId = this.extensionIndexStore.getExtensionId(solrDoc);
         List<BasicNameValuePair> parameters = buildParameter(extensionId.getId(), extensionId.getVersion().getValue());
-        if (solrDoc.get("name") != null) {
-            extensionName = this.solrUtils.get("name", solrDoc);
+        if (solrDoc.get(FieldUtils.NAME) != null) {
+            extensionName = this.solrUtils.get(FieldUtils.NAME, solrDoc);
         } else {
             String[] versionId = this.solrUtils.getId(solrDoc).split("/");
             extensionName = versionId[0];

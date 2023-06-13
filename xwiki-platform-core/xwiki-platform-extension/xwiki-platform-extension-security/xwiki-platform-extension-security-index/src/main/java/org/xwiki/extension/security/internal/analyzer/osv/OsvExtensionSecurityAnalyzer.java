@@ -145,7 +145,8 @@ public class OsvExtensionSecurityAnalyzer implements ExtensionSecurityAnalyzer
         return new SecurityIssueDescriptor()
             .setId(vulnObject.getId())
             .setURL(vulnObject.getMainURL())
-            .setSeverityScore(vulnObject.getSeverityCCSV3());
+            .setSeverityScore(vulnObject.getSeverityCCSV3())
+            .setFixVersion(vulnObject.getMaxFixVersion().orElse(null));
     }
 
     private Optional<VulnObject> analyzeVuln(String mavenId, String version, VulnObject vuln)

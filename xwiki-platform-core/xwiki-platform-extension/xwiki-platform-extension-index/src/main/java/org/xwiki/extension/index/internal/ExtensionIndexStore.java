@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -84,7 +85,23 @@ import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.SolrUtils;
 
-import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.*;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.NAME;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_ADVICE;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_CVE_CVSS;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_CVE_ID;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_CVE_LINK;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_FIX_VERSION;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_MAX_CVSS;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SOLR_FIELD_AUTHORS_INDEX;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SOLR_FIELD_COMPATIBLE_NAMESPACES;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SOLR_FIELD_COMPONENTS_INDEX;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONFEATURES_INDEX;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SOLR_FIELD_INCOMPATIBLE_NAMESPACES;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SOLR_FIELD_INDEX_DATE;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.toComponentFieldName;
 
 /**
  * An helper to manipulate the store of indexed extensions.
@@ -96,6 +113,11 @@ import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializ
 @Singleton
 public class ExtensionIndexStore implements Initializable
 {
+    /**
+     * Shared constant when the suggestion is to upgrade the extension from the Extension Manager.
+     */
+    public static final String UPGRADE_FROM_EM_ADVICE = "upgradeFromEM";
+
     private static final String ROOT_NAMESPACE = "{root}";
 
     private static final int COMMIT_BATCH_SIZE = 100;
@@ -320,9 +342,13 @@ public class ExtensionIndexStore implements Initializable
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_CVE_CVSS,
             result.getSecurityIssues().stream()
                 .map(SecurityIssueDescriptor::getScore).collect(Collectors.toList()), document);
-//        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, "security_cveCount", null, document);
-//        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, "security_fixVersion", null, document);
-//        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, "security_advice", null, document);
+        String fixVersion = result.getSecurityIssues().stream()
+            .map(SecurityIssueDescriptor::getFixVersion)
+            .max(Comparator.naturalOrder())
+            .map(Version::getValue)
+            .orElse(null);
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_FIX_VERSION, fixVersion, document);
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_ADVICE, UPGRADE_FROM_EM_ADVICE, document);
 
         add(document);
         commit();

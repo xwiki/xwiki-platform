@@ -19,6 +19,8 @@
  */
 package org.xwiki.extension.index.internal.security;
 
+import org.xwiki.extension.version.Version;
+
 import us.springett.cvss.Cvss;
 
 /**
@@ -34,6 +36,8 @@ public class SecurityIssueDescriptor
     private String url;
 
     private double score;
+
+    private Version fixVersion;
 
     /**
      * @param id the security issue id
@@ -99,6 +103,24 @@ public class SecurityIssueDescriptor
     public SecurityIssueDescriptor setScore(double score)
     {
         this.score = score;
+        return this;
+    }
+
+    /**
+     * @return the minimal version to which to upgrade to get the issue fixed automatically
+     */
+    public Version getFixVersion()
+    {
+        return this.fixVersion;
+    }
+
+    /**
+     * @param fixVersion the minimal version to which to upgrade to get the issue fixed automatically
+     * @return the current object
+     */
+    public SecurityIssueDescriptor setFixVersion(Version fixVersion)
+    {
+        this.fixVersion = fixVersion;
         return this;
     }
 }

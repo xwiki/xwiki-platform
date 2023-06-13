@@ -19,8 +19,13 @@
  */
 package org.xwiki.extension.security.internal.analyzer.osv.model.response;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+
+import org.xwiki.extension.version.Version;
+import org.xwiki.extension.version.internal.DefaultVersion;
 
 /**
  * See https://ossf.github.io/osv-schema/.
@@ -127,5 +132,19 @@ public class VulnObject
             .map(SeverityObject::getScore)
             .findFirst()
             .orElse(null);
+    }
+
+    /**
+     * @return the most recent fix version for the ranges related to this vulnerability
+     */
+    public Optional<Version> getMaxFixVersion()
+    {
+        return this.affected.stream()
+            .flatMap(affect -> affect.getRanges().stream())
+            .flatMap(range -> range.getEvents().stream())
+            .map(EventObject::getFixed)
+            .filter(Objects::nonNull)
+            .<Version>map(DefaultVersion::new)
+            .max(Comparator.naturalOrder());
     }
 }

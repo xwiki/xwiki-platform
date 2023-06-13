@@ -1,1 +1,2 @@
 org.xwiki.extension.security.notifications.NewSecurityIssueEventDescriptor
+org.xwiki.extension.security.notifications.ExtensionSecurityListener

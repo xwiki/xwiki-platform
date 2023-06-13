@@ -113,11 +113,6 @@ import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializ
 @Singleton
 public class ExtensionIndexStore implements Initializable
 {
-    /**
-     * Shared constant when the suggestion is to upgrade the extension from the Extension Manager.
-     */
-    public static final String UPGRADE_FROM_EM_ADVICE = "upgradeFromEM";
-
     private static final String ROOT_NAMESPACE = "{root}";
 
     private static final int COMMIT_BATCH_SIZE = 100;
@@ -332,7 +327,7 @@ public class ExtensionIndexStore implements Initializable
             extensionId.getVersion().getValue(), document);
 
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_MAX_CVSS,
-            result.getMaxCCSV(), document);
+            result.getMaxCVSS(), document);
         Stream<String> cveIds = result.getSecurityIssues().stream().map(SecurityIssueDescriptor::getId);
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_CVE_ID,
             cveIds.collect(Collectors.toList()), document);
@@ -348,7 +343,7 @@ public class ExtensionIndexStore implements Initializable
             .map(Version::getValue)
             .orElse(null);
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_FIX_VERSION, fixVersion, document);
-        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_ADVICE, UPGRADE_FROM_EM_ADVICE, document);
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_ADVICE, result.getAdvice(), document);
 
         add(document);
         commit();

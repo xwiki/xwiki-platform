@@ -77,6 +77,11 @@ public class OsvExtensionSecurityAnalyzer implements ExtensionSecurityAnalyzer
 
     private static final String PLATFORM_PREFIX = "org.xwiki.platform:";
 
+    /**
+     * Shared constant when the suggestion is to upgrade the extension from the Extension Manager.
+     */
+    private static final String UPGRADE_FROM_EM_ADVICE = "extension.security.analysis.advice.upgradeFromEM";
+
     @Inject
     private Logger logger;
 
@@ -96,7 +101,7 @@ public class OsvExtensionSecurityAnalyzer implements ExtensionSecurityAnalyzer
             // We currently have an issue regarding versions resolution of packages from xwiki-platform, because they 
             // are not published on maven central. Hence, we only filter explicitly by version for other group ids.
             queryObject.setVersion(version);
-        } 
+        }
         try {
             String body = objectMapper
                 .setSerializationInclusion(NON_NULL)
@@ -110,9 +115,9 @@ public class OsvExtensionSecurityAnalyzer implements ExtensionSecurityAnalyzer
                 .build();
 
             HttpClient client = HttpClient.newHttpClient();
-            
+
             HttpResponse<String> response = client.send(request, ofString());
-            
+
             // TODO: handle responses with error.
             OsvResponse osvResponse = objectMapper.readValue(response.body(), OsvResponse.class);
             List<VulnObject> matchingVulns = new ArrayList<>();
@@ -122,8 +127,9 @@ public class OsvExtensionSecurityAnalyzer implements ExtensionSecurityAnalyzer
                     .forEach(vuln -> analyzeVuln(extensionId, isPlatform ? "13.10" : version, vuln).ifPresent(
                         matchingVulns::add));
             }
-            return new ExtensionAnalysisResult().setResults(
-                matchingVulns.stream().map(this::convert).collect(Collectors.toList()));
+            return new ExtensionAnalysisResult()
+                .setResults(matchingVulns.stream().map(this::convert).collect(Collectors.toList()))
+                .setAdvice(UPGRADE_FROM_EM_ADVICE);
         } catch (JsonProcessingException e) {
             throw new ExtensionSecurityException(
                 String.format("Failed to build the json for [%s/+%s]", extensionId, version),
@@ -141,7 +147,6 @@ public class OsvExtensionSecurityAnalyzer implements ExtensionSecurityAnalyzer
 
     private SecurityIssueDescriptor convert(VulnObject vulnObject)
     {
-        // TODO: convert the osv specific vuln object to a generic security issue descriptor
         return new SecurityIssueDescriptor()
             .setId(vulnObject.getId())
             .setURL(vulnObject.getMainURL())

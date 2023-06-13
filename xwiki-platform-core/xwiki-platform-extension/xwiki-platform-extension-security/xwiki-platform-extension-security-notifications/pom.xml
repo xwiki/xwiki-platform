@@ -44,5 +44,10 @@
       <artifactId>xwiki-platform-eventstream-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-security-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 </project>

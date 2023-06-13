@@ -1,0 +1,47 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.xwiki.extension.security;
+
+import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
+
+/**
+ * Provide the configuration values for the extension security.
+ *
+ * @version $Id$
+ * @since 15.5RC1
+ */
+@Role
+@Unstable
+public interface ExtensionSecurityConfiguration
+{
+    /**
+     * @return {@code true} when the security scan is enabled, {@code false} otherwise. When the security scan is
+     *     disabled, no security scan is performed and the list of security issues is not displayed in the
+     *     administration. The default value is {@code true}
+     */
+    boolean isSecurityScanEnabled();
+
+    /**
+     * @return the delay before starting a new security scan after the last one has finished. The default value is 24
+     *     hours.
+     */
+    int getScanDelay();
+}

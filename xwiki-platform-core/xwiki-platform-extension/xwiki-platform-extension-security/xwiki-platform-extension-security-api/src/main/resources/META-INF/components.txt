@@ -3,3 +3,9 @@ org.xwiki.extension.security.internal.ExtensionSecurityLiveDataEntryStore
 org.xwiki.extension.security.internal.ExtensionSecurityLiveDataPropertyDescriptorStore
 org.xwiki.extension.security.internal.ExtensionSecurityLiveDataConfigurationResolver
 org.xwiki.extension.security.internal.ExtensionSecurityLiveDataConfigurationProvider
+org.xwiki.extension.security.internal.SolrToLiveDataEntryMapper
+org.xwiki.extension.security.internal.configuration.DefaultExtensionSecurityConfiguration
+org.xwiki.extension.security.internal.configuration.ConfigClassMandatoryInitializer
+org.xwiki.extension.security.ExtensionSecurityScriptService
+org.xwiki.extension.security.internal.configuration.DocConfigurationSource
+org.xwiki.extension.security.internal.ExtensionSecuritySolrClient

@@ -17,56 +17,52 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.security.internal;
+package org.xwiki.extension.security.notifications;
 
-import java.util.Objects;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.extension.index.internal.job.ExtensionIndexJob;
-import org.xwiki.job.event.JobFinishedEvent;
-import org.xwiki.observation.AbstractEventListener;
+import org.xwiki.extension.security.ExtensionSecurityEvent;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 
 /**
- * Starts the {@link ExtensionSecurityScheduler} in charge of fetching known security vulnerabilities for installed
- * extensions.
- *
  * @version $Id$
- * @since 15.5RC1
+ * @since x.y.z
  */
 @Component
-@Named(ExtensionSecurityInitializerListener.NAME)
 @Singleton
-public class ExtensionSecurityInitializerListener extends AbstractEventListener
+@Named(ExtensionSecurityListener.ID)
+public class ExtensionSecurityListener implements EventListener
 {
     /**
-     * The name of the event listener (and its component hint).
+     * The hint and name of this listener.
      */
-    public static final String NAME = "ExtensionSecurityInitializerListener";
+    public static final String ID = "ExtensionSecurityListener";
 
     @Inject
-    private Provider<ExtensionSecurityScheduler> schedulerProvider;
+    private ObservationManager observationManager;
 
-    /**
-     * Default constructor.
-     */
-    public ExtensionSecurityInitializerListener()
+    @Override
+    public String getName()
     {
-        super(NAME, new JobFinishedEvent());
+        return ID;
+    }
+
+    @Override
+    public List<Event> getEvents()
+    {
+        return List.of(new ExtensionSecurityEvent());
     }
 
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (event instanceof JobFinishedEvent
-            && Objects.equals(((JobFinishedEvent) event).getJobType(), ExtensionIndexJob.JOB_TYPE))
-        {
-            this.schedulerProvider.get().start();
-        }
+        this.observationManager.notify(new NewSecurityIssueEvent(), this, data);
     }
 }

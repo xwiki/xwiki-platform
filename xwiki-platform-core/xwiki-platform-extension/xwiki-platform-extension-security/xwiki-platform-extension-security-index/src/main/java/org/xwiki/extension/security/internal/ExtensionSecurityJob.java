@@ -27,20 +27,17 @@ import javax.inject.Named;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.extension.Extension;
 import org.xwiki.extension.InstalledExtension;
-import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.index.internal.security.ExtensionAnalysisResult;
+import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.extension.security.ExtensionSecurityEvent;
 import org.xwiki.extension.security.analyzer.ExtensionSecurityAnalyzer;
 import org.xwiki.extension.security.internal.analyzer.VulnerabilityIndexer;
 import org.xwiki.extension.security.internal.analyzer.osv.OsvExtensionSecurityAnalyzer;
-import org.xwiki.extension.security.notifications.NewSecurityIssueEvent;
 import org.xwiki.job.AbstractJob;
 import org.xwiki.job.DefaultJobStatus;
-import org.xwiki.job.event.status.JobProgressManager;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
-import static org.xwiki.extension.security.notifications.NewSecurityIssueEventDescriptor.TYPE;
 
 /**
  * Run a security analysis on the current instance's extensions.
@@ -60,10 +57,7 @@ public class ExtensionSecurityJob
     public static final String JOBTYPE = "extension_security";
 
     @Inject
-    private InstalledExtensionRepository installedExtensionsRepository;
-
-    @Inject
-    private JobProgressManager progress;
+    private InstalledExtensionRepository installedExtensionRepository;
 
     @Inject
     @Named(OsvExtensionSecurityAnalyzer.ID)
@@ -82,33 +76,32 @@ public class ExtensionSecurityJob
     protected void runInternal()
     {
         Collection<InstalledExtension> installedExtensions =
-            this.installedExtensionsRepository.getInstalledExtensions();
-        this.progress.pushLevelProgress(0, this);
+            this.installedExtensionRepository.getInstalledExtensions();
+        this.progressManager.pushLevelProgress(installedExtensions.size(), this);
 
         try {
-            // Note: for now this step is sequential and each extension is analyzed after the previous one.
-            boolean newVulnerability = false;
-            for (Extension extension : installedExtensions) {
+            // Note: for now, this step is sequential and each extension is analyzed after the previous one.
+            long newVulnerabilityCount = 0;
+            for (InstalledExtension extension : installedExtensions) {
+                this.progressManager.startStep(this);
                 try {
-                    // TODO: introduce a way to configure he executed analyzer...
                     ExtensionAnalysisResult analysis = this.extensionSecurityAnalyzer.analyze(extension);
                     boolean update = this.vulnerabilityIndexer.update(extension, analysis);
                     if (update) {
-                        newVulnerability = true;
+                        newVulnerabilityCount++;
                     }
                 } catch (ExtensionSecurityException e) {
                     this.logger.warn("Failed to analyse [{}]. Cause: [{}]", extension, getRootCauseMessage(e));
                 } catch (Exception e) {
                     this.logger.warn("Unexpected error [{}]", getRootCauseMessage(e));
                 }
+                this.progressManager.endStep(this);
             }
-
-            if (newVulnerability) {
-                this.observationManager.notify(new NewSecurityIssueEvent(),
-                    "org.xwiki.platform:xwiki-platform-extension-security-notifications", TYPE);
+            if (newVulnerabilityCount > 0) {
+                this.observationManager.notify(new ExtensionSecurityEvent(), this, newVulnerabilityCount);
             }
         } finally {
-            this.progress.popLevelProgress(this);
+            this.progressManager.popLevelProgress(this);
         }
     }
 }

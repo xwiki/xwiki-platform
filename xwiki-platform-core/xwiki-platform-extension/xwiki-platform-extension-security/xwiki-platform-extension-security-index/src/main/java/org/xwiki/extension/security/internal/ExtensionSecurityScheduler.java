@@ -21,7 +21,6 @@ package org.xwiki.extension.security.internal;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -29,8 +28,11 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Disposable;
+import org.xwiki.extension.security.ExtensionSecurityConfiguration;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobExecutor;
+
+import static java.util.concurrent.TimeUnit.HOURS;
 
 /**
  * Periodically check for new security vulnerabilities associated with components that are part of the current wiki
@@ -47,6 +49,9 @@ public class ExtensionSecurityScheduler implements Runnable, Disposable
     private JobExecutor jobExecutor;
 
     @Inject
+    private ExtensionSecurityConfiguration extensionSecurityConfiguration;
+
+    @Inject
     private Logger logger;
 
     private ScheduledExecutorService executor;
@@ -54,26 +59,31 @@ public class ExtensionSecurityScheduler implements Runnable, Disposable
     /**
      * Initialize and start the scheduler.
      */
-    public void start()
+    public synchronized void start()
     {
+        if (this.executor == null) {
+            // Start the scheduling
+            this.executor = Executors.newSingleThreadScheduledExecutor(r -> {
+                Thread thread = new Thread(r);
+                thread.setName("Extension Security scanner");
+                thread.setPriority(Thread.NORM_PRIORITY - 1);
+                thread.setDaemon(true);
 
-        // Start the scheduling
-        this.executor = Executors.newSingleThreadScheduledExecutor(r -> {
-            Thread thread = new Thread(r);
-            thread.setName("Extension Security scanner");
-            thread.setPriority(Thread.NORM_PRIORITY - 1);
-            thread.setDaemon(true);
+                return thread;
+            });
 
-            return thread;
-        });
-
-        // TODO: make configurable!
-        this.executor.scheduleWithFixedDelay(this, 0, 24, TimeUnit.HOURS);
+            this.executor.scheduleWithFixedDelay(this, 0, this.extensionSecurityConfiguration.getScanDelay(), HOURS);
+        }
     }
 
     @Override
     public void run()
     {
+        if (!this.extensionSecurityConfiguration.isSecurityScanEnabled()) {
+            this.logger.info("Extension security scan disabled.");
+            return;
+        }
+
         try {
             // Execute job
             Job job = this.jobExecutor.execute(ExtensionSecurityJob.JOBTYPE, new ExtensionSecurityRequest());

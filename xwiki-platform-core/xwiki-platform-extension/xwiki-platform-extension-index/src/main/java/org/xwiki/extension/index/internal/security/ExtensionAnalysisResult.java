@@ -19,8 +19,9 @@
  */
 package org.xwiki.extension.index.internal.security;
 
-import java.util.Comparator;
 import java.util.List;
+
+import static java.util.Comparator.comparingDouble;
 
 /**
  * Store the known security issues for a given extension.
@@ -33,6 +34,8 @@ public class ExtensionAnalysisResult
     private Exception exception;
 
     private List<SecurityIssueDescriptor> securityIssues;
+
+    private String advice;
 
     /**
      * @param e the exception encountered during the analysis of the extension
@@ -71,13 +74,34 @@ public class ExtensionAnalysisResult
     }
 
     /**
-     * @return the highest CCSV of a security issue of this object
+     * @return the translation key of the advice applicable on the security analysis (e.g., how to upgrade the extension
+     *     to fix the identified security issues)
      */
-    public Double getMaxCCSV()
+    public String getAdvice()
+    {
+        return this.advice;
+    }
+
+    /**
+     * @param advice the translation key of the advice applicable on the security analysis (e.g., how to upgrade the
+     *     extension to fix the identified security issues)
+     * @return the current object
+     */
+    public ExtensionAnalysisResult setAdvice(String advice)
+    {
+
+        this.advice = advice;
+        return this;
+    }
+
+    /**
+     * @return the highest CVSS of this security issue in this analysis
+     */
+    public Double getMaxCVSS()
     {
         if (this.securityIssues != null) {
             return this.securityIssues.stream()
-                .max(Comparator.comparingDouble(SecurityIssueDescriptor::getScore))
+                .max(comparingDouble(SecurityIssueDescriptor::getScore))
                 .map(SecurityIssueDescriptor::getScore)
                 .orElse(null);
         } else {

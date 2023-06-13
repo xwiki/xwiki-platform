@@ -658,6 +658,21 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 # extension.ignoredDependencies=xerces:xmlParserAPIs
 
 #-------------------------------------------------------------------------------------
+# Extension Manager - Security
+#-------------------------------------------------------------------------------------
+
+#-# [Since 15.5RC1]
+#-# When true, the security scan is enabled. This is the default; set to false to disable the scan.
+#-#
+# extension.security.scan.enabled = true
+
+#-# [Since 15.5RC1]
+#-# Specifies the delay before starting a new security scan after the last one has finished.
+#-# The default value is 24 hours.
+#-#
+# extension.security.scan.delay = 24
+
+#-------------------------------------------------------------------------------------
 # Distribution Wizard
 #-------------------------------------------------------------------------------------
 

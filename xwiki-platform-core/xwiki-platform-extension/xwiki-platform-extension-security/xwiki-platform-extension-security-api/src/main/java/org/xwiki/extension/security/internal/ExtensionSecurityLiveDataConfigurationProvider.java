@@ -21,6 +21,7 @@ package org.xwiki.extension.security.internal;
 
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
@@ -29,7 +30,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataEntryDescriptor;
 import org.xwiki.livedata.LiveDataMeta;
+import org.xwiki.livedata.LiveDataPaginationConfiguration;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
+import org.xwiki.localization.ContextualLocalizationManager;
 
 import static org.xwiki.livedata.LiveDataPropertyDescriptor.DisplayerDescriptor;
 
@@ -76,11 +79,17 @@ public class ExtensionSecurityLiveDataConfigurationProvider implements Provider<
 
     private static final String HTML_DISPLAYER_ID = "html";
 
+    @Inject
+    private ContextualLocalizationManager l10n;
+
     @Override
     public LiveDataConfiguration get()
     {
         LiveDataConfiguration input = new LiveDataConfiguration();
         LiveDataMeta meta = new LiveDataMeta();
+        LiveDataPaginationConfiguration pagination = new LiveDataPaginationConfiguration();
+        pagination.setShowPageSizeDropdown(true);
+        meta.setPagination(pagination);
         LiveDataEntryDescriptor entryDescriptor = new LiveDataEntryDescriptor();
         entryDescriptor.setIdProperty(ExtensionSecurityLiveDataSource.ID);
         input.setMeta(meta);
@@ -93,14 +102,14 @@ public class ExtensionSecurityLiveDataConfigurationProvider implements Provider<
             initFixVersionDescriptor(),
             initAdviceDescriptor()
         ));
+
         return input;
     }
 
     private LiveDataPropertyDescriptor initExtensionNameDescriptor()
     {
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
-        // TODO: translate?
-        descriptor.setName("Name");
+        descriptor.setName(this.l10n.getTranslationPlain("extension.security.liveData.name"));
         descriptor.setId(NAME);
         descriptor.setType(STRING_TYPE);
         descriptor.setVisible(true);
@@ -111,11 +120,10 @@ public class ExtensionSecurityLiveDataConfigurationProvider implements Provider<
         return descriptor;
     }
 
-    private static LiveDataPropertyDescriptor initExtensionIdDescriptor()
+    private LiveDataPropertyDescriptor initExtensionIdDescriptor()
     {
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
-        // TODO: translate?
-        descriptor.setName("Extension Id");
+        descriptor.setName(this.l10n.getTranslationPlain("extension.security.liveData.extensionId"));
         descriptor.setId(EXTENSION_ID);
         descriptor.setType(STRING_TYPE);
         descriptor.setVisible(true);
@@ -128,8 +136,7 @@ public class ExtensionSecurityLiveDataConfigurationProvider implements Provider<
     private LiveDataPropertyDescriptor initMaxCVSSDescriptor()
     {
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
-        // TODO: translate?
-        descriptor.setName("Max CVSS");
+        descriptor.setName(this.l10n.getTranslationPlain("extension.security.liveData.maxCVSS"));
         descriptor.setId(MAX_CVSS);
         descriptor.setType("Double");
         descriptor.setVisible(true);
@@ -139,11 +146,10 @@ public class ExtensionSecurityLiveDataConfigurationProvider implements Provider<
         return descriptor;
     }
 
-    private static LiveDataPropertyDescriptor initCVEIDDescriptor()
+    private LiveDataPropertyDescriptor initCVEIDDescriptor()
     {
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
-        // TODO: translate?
-        descriptor.setName("CVE ID");
+        descriptor.setName(this.l10n.getTranslationPlain("extension.security.liveData.cveID"));
         descriptor.setId(CVE_ID);
         descriptor.setType(STRING_TYPE);
         descriptor.setDisplayer(new DisplayerDescriptor(HTML_DISPLAYER_ID));
@@ -157,8 +163,7 @@ public class ExtensionSecurityLiveDataConfigurationProvider implements Provider<
     private LiveDataPropertyDescriptor initFixVersionDescriptor()
     {
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
-        // TODO: translate?
-        descriptor.setName("Fix Version");
+        descriptor.setName(this.l10n.getTranslationPlain("extension.security.liveData.fixVersion"));
         descriptor.setId(FIX_VERSION);
         descriptor.setType(STRING_TYPE);
         descriptor.setVisible(true);
@@ -171,8 +176,7 @@ public class ExtensionSecurityLiveDataConfigurationProvider implements Provider<
     private LiveDataPropertyDescriptor initAdviceDescriptor()
     {
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
-        // TODO: translate?
-        descriptor.setName("Advice");
+        descriptor.setName(this.l10n.getTranslationPlain("extension.security.liveData.advice"));
         descriptor.setId(ADVICE);
         descriptor.setType(STRING_TYPE);
         descriptor.setVisible(true);

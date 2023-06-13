@@ -241,7 +241,7 @@
 &lt;ul class="applicationsPanel applicationsPanelMoreList nav"&gt;
   &lt;li&gt;
     #set ($panelId = $doc.getXDOM().getIdGenerator().generateUniqueId('applicationPanelMoreContainer',''))
-    &lt;button class='applicationPanelMoreButton btn btn-default' aria-controls="$panelId"
+    &lt;button class='applicationPanelMoreButton' aria-controls="$panelId"
       title="$services.localization.render('panels.applications.more')" aria-expanded='false' &gt;
       &lt;span class="application-img"&gt;$services.icon.renderHTML('add')&lt;/span&gt;
       &lt;span class="application-label"&gt;$services.localization.render('panels.applications.more')&lt;/span&gt;
@@ -533,10 +533,6 @@ require(['scriptaculous/effects'], function() {
     <property>
       <code>#template('colorThemeInit.vm')
 
-.applicationsPanelMoreList {
-  margin-top: 1em;
-}
-
 .applicationsPanel li img {
   float: left;
   width: 16px;
@@ -554,10 +550,8 @@ require(['scriptaculous/effects'], function() {
   margin-left: 0.1em;
 }
 
-.applicationPanelMoreButton, .applicationPanelMoreButton:hover,
-.applicationPanelMoreButton:focus, .applicationPanelMoreButton:active {
-  padding-left: 0px;
-  padding-right: 6px;
+.applicationPanelMoreButton {
+  padding: 10px 15px 10px 0;
   border: 0;
   color: $theme.linkColor;
   box-shadow: none;
@@ -635,7 +629,8 @@ require(['scriptaculous/effects'], function() {
   justify-content: center;
 }
 
-.panel-width-Small .applicationPanelMoreContainer ul {
+.panel-width-Small .applicationPanelMoreContainer ul,
+.panel-width-Medium .applicationPanelMoreContainer ul {
   padding: 0;
   margin: 0;
 }

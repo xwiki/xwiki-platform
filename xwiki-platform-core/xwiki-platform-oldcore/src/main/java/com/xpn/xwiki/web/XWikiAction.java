@@ -59,6 +59,7 @@ import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.job.internal.DefaultJobProgress;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.LocaleUtils;
+import org.xwiki.localization.LocalizationException;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -233,9 +234,46 @@ public abstract class XWikiAction implements LegacyAction
         return this.autorization;
     }
 
+    /**
+     * @deprecated use {@link #localizePlainOrReturnKey(String, Object...)} instead. The new API doesn't XML-escape
+     *             the translation as it's supposed to be used in a context where the target syntax is plain text.
+     */
+    @Deprecated(since = "14.10.12,15.5RC1")
     protected String localizePlainOrKey(String key, Object... parameters)
     {
+        // TODO: Review all calls to localizePlainOrKey() and once this is done change this method implementation to
+        // use:
+        //   return localizeOrKey(key, Syntax.PLAIN_1_0, parameters)
         return XMLUtils.escape(StringUtils.defaultString(getLocalization().getTranslationPlain(key, parameters), key));
+    }
+
+    /**
+     * @since 14.10.12
+     * @since 15.5RC1
+     */
+    @Unstable
+    protected String localizeOrReturnKey(String key, Syntax syntax, Object... parameters)
+    {
+        String result;
+        try {
+            result = StringUtils.defaultString(getLocalization().getTranslation(key, syntax, parameters), key);
+        } catch (LocalizationException e) {
+            // Return the key in case of error but log a warning
+            LOGGER.warn("Error rendering the translation for key [{}] in syntax [{}]. Using the translation key "
+                + "instead. Root cause: [{}]", key, syntax.toIdString(), ExceptionUtils.getRootCauseMessage(e));
+            result = key;
+        }
+        return result;
+    }
+
+    /**
+     * @since 14.10.12
+     * @since 15.5RC1
+     */
+    @Unstable
+    protected String localizePlainOrReturnKey(String key, Object... parameters)
+    {
+        return localizeOrReturnKey(key, Syntax.PLAIN_1_0, parameters);
     }
 
     protected JobProgressManager getProgress()

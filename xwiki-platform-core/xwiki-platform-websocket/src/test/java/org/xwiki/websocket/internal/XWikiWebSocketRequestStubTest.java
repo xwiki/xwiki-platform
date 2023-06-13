@@ -51,8 +51,9 @@ class XWikiWebSocketRequestStubTest
     void verifyStub() throws Exception
     {
         Map<String, List<String>> headers = new LinkedHashMap<>();
-        headers.put("Cookie", Collections.singletonList(
-            "JSESSIONID=abc; username=\"foo\"; password=\"bar\"; rememberme=\"false\"; validation=\"xyz\""));
+        // Note that we duplicate the JSESSIONID in order to check that it doesn't fail the cookie parsing.
+        headers.put("Cookie", Collections.singletonList("JSESSIONID=abc; username=\"foo\";"
+            + " password=\"bar\"; rememberme=\"false\"; JSESSIONID=abc; validation=\"xyz\""));
         headers.put("Date", Collections.singletonList("Tue, 3 Jun 2008 11:05:30 GMT"));
         headers.put("Int", Arrays.asList("12", "31"));
 

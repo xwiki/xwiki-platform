@@ -93,7 +93,7 @@ public class XWikiAnnotationRightService implements AnnotationRightService
             }
 
             // check if it's the author of the annotation
-            Annotation ann = annotationsStorageService.getAnnotation(target, annotationId);
+            Annotation ann = this.annotationsStorageService.getAnnotation(target, annotationId);
             return ann != null && ann.getAuthor().equals(userName);
         } catch (Exception e) {
             logException(e, target, userName);

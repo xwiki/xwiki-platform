@@ -25,69 +25,41 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-ckeditor</artifactId>
-    <version>15.4-SNAPSHOT</version>
+    <version>15.5-SNAPSHOT</version>
   </parent>
-  <packaging>jar</packaging>
+  <packaging>webjar</packaging>
   <artifactId>xwiki-platform-ckeditor-webjar</artifactId>
   <name>XWiki Platform - CKEditor - Webjar</name>
-  <description>Packages CKEditor and our custom plugins in a single WebJar.</description>
+  <description>Packages CKEditor code in a WebJar.</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>CKEditor WebJar</xwiki.extension.name>
-    <!-- Explicitly indicate it's a webjar -->
-    <xwiki.extension.jar.type>webjar</xwiki.extension.jar.type>
-    <!-- Where to unpack the WebJars with the custom CKEditor plugins. -->
-    <webjars.unpack.directory>${project.build.directory}/webjars</webjars.unpack.directory>
-    <webjars.unpack.contentDirectory>
-      ${webjars.unpack.directory}/META-INF/resources/webjars/xwiki-platform-ckeditor-plugins/${project.version}
-    </webjars.unpack.contentDirectory>
     <!-- Old name of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>org.xwiki.contrib:application-ckeditor-webjar</xwiki.extension.features>
+
+    <!-- The path to the folder where we clone the CKEditor sources. -->
+    <ckeditor.path>${project.build.directory}/ckeditor4-${ckeditor.version}</ckeditor.path>
+    <ckeditor.builder.path>${ckeditor.path}/dev/builder</ckeditor.builder.path>
   </properties>
-  <dependencies>
-    <!-- Even though we bundle the custom plugins with the CKEditor code (the plugins WebJar is merged with the CKEditor
-      WebJar) we still need to declare this dependency in order to bring the transitive dependencies that our custom
-      plugins may have (the alternative is to duplicate the dependencies here, which is too fragile). -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-ckeditor-plugins</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-  </dependencies>
   <build>
     <plugins>
       <!-- Download the CKEditor sources for the version (tag) we want to use. -->
       <plugin>
         <groupId>com.googlecode.maven-download-plugin</groupId>
         <artifactId>download-maven-plugin</artifactId>
+        <version>1.4.1</version>
         <executions>
+          <!-- Download the CKEditor sources for the version (tag) we want to use. -->
           <execution>
             <id>download-ckeditor-sources</id>
-            <phase>generate-resources</phase>
-          </execution>
-        </executions>
-      </plugin>
-      <!-- Unpack the WebJar with the custom CKEditor plugins that we want to include in the build. -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>unpack-plugins-webjar</id>
+            <!-- Make sure this execution is not used by default (you need to call it explicitly in your pom). -->
             <phase>generate-resources</phase>
             <goals>
-              <goal>unpack</goal>
+              <goal>wget</goal>
             </goals>
             <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.xwiki.platform</groupId>
-                  <artifactId>xwiki-platform-ckeditor-plugins</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <outputDirectory>${webjars.unpack.directory}</outputDirectory>
-                </artifactItem>
-              </artifactItems>
+              <url>https://github.com/ckeditor/ckeditor4/archive/${ckeditor.version}.zip</url>
+              <unpack>true</unpack>
             </configuration>
           </execution>
         </executions>
@@ -96,27 +68,18 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
         <executions>
+          <!-- Copy the build configuration to the CKEditor sources. -->
           <execution>
-            <!-- Copy the build configuration to the CKEditor sources. -->
             <id>copy-ckeditor-build-config</id>
-            <phase>process-resources</phase>
-          </execution>
-          <execution>
-            <!-- Copy the custom plugins to the CKEditor sources so that they are included in the build. -->
-            <id>copy-custom-plugins</id>
             <phase>process-resources</phase>
             <goals>
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${ckeditor.plugins.path}</outputDirectory>
+              <outputDirectory>${ckeditor.builder.path}</outputDirectory>
               <resources>
                 <resource>
-                  <directory>${webjars.unpack.contentDirectory}</directory>
-                  <excludes>
-                    <!-- The plugins are bundled with the CKEditor code. -->
-                    <exclude>**/plugin.min.js</exclude>
-                  </excludes>
+                  <directory>src/main/config</directory>
                 </resource>
               </resources>
             </configuration>
@@ -125,59 +88,137 @@
           <execution>
             <id>copy-ckeditor-resources</id>
             <phase>prepare-package</phase>
-          </execution>
-          <!-- Copy the unminified code to the expected WebJar location because CKBuilder has minified everything. -->
-          <execution>
-            <id>copy-unminified-code</id>
-            <phase>prepare-package</phase>
             <goals>
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${webjar.outputDirectory}/plugins</outputDirectory>
+              <outputDirectory>${webjar.outputDirectory}</outputDirectory>
               <resources>
                 <resource>
-                  <directory>${webjars.unpack.contentDirectory}</directory>
+                  <directory>${ckeditor.builder.path}/release/ckeditor</directory>
                   <excludes>
-                    <!-- The plugins have been already bundled with the CKEditor code. -->
-                    <exclude>**/plugin.*</exclude>
-                    <!-- The minified version has already been copied. -->
-                    <exclude>**/*.min.*</exclude>
+                    <exclude>config.js</exclude>
+                    <exclude>styles.js</exclude>
                   </excludes>
                 </resource>
               </resources>
             </configuration>
           </execution>
-          <!-- Copy the WebJar resources (e.g. CKEditor overwrites) to the right path before packing the jar. -->
-          <execution>
-            <!-- We can't use the inherited 'copy-webjar-resources' execution because it is executed before
-              'copy-ckeditor-resources', which means we loose our custom CKEditor configuration. -->
-            <id>copy-webjar-resources-custom</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${webjar.outputDirectory}</outputDirectory>
-            </configuration>
-          </execution>
         </executions>
+        <configuration>
+          <overwrite>true</overwrite>
+        </configuration>
       </plugin>
       <!-- Build the CKEditor. -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <configuration>
-          <includes>
-            <!-- Include only the WebJar content -->
-            <include>META-INF/**</include>
-          </includes>
-        </configuration>
+        <executions>
+          <!-- Remove the Byte Order Mark from the start of build.sh -->
+          <execution>
+            <id>remove-bom</id>
+            <!-- Use a phase after compile because the Clirr Maven Plugin executes all the phases up to compile
+                 twice. -->
+            <phase>process-classes</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <executable>sed</executable>
+            </configuration>
+          </execution>
+          <!-- Build the CKEditor. -->
+          <execution>
+            <id>build-ckeditor</id>
+            <!-- Use a phase after compile because the Clirr Maven Plugin executes all the phases up to compile
+                 twice. -->
+            <phase>process-classes</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <executable>${ckeditor.builder.path}/build.sh</executable>
+              <arguments>
+                <!-- Exclude from release all plugins/skins that are not specified in build-config. -->
+                <argument>--skip-omitted-in-build-config</argument>
+                <!-- Turn off warnings about syntax errors on Internet Explorer, like trailing commas. -->
+                <argument>--no-ie-checks</argument>
+                <!-- We don't use the generated archives. -->
+                <argument>--no-zip</argument>
+                <argument>--no-tar</argument>
+                <!-- Uncomment to leave the JavaScript code as is (merge but not minify). -->
+                <!--<argument>-&#45;leave-js-unminified</argument>-->
+                <!-- Uncomment to see all the available configuration options. -->
+                <!--<argument>-&#45;help</argument>-->
+              </arguments>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
+  <profiles>
+    <profile>
+      <id>unix</id>
+      <activation>
+        <os>
+          <family>unix</family>
+        </os>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>exec-maven-plugin</artifactId>
+              <executions>
+                <execution>
+                  <id>remove-bom</id>
+                  <configuration>
+                    <arguments>
+                      <argument>-i</argument>
+                      <argument>1s/^\xEF\xBB\xBF//</argument>
+                      <argument>${ckeditor.builder.path}/build.sh</argument>
+                    </arguments>
+                  </configuration>
+                </execution>
+              </executions>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
+      <id>mac</id>
+      <activation>
+        <os>
+          <family>mac</family>
+        </os>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>exec-maven-plugin</artifactId>
+              <executions>
+                <execution>
+                  <id>remove-bom</id>
+                  <configuration>
+                    <arguments>
+                      <argument>-i</argument>
+                      <argument>''</argument>
+                      <argument>-e</argument>
+                      <argument>1s/^\xEF\xBB\xBF//</argument>
+                      <argument>${ckeditor.builder.path}/build.sh</argument>
+                    </arguments>
+                  </configuration>
+                </execution>
+              </executions>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+  </profiles>
 </project>

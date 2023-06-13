@@ -52,7 +52,7 @@ public class CachedModelBridgeInvalidatorListener extends AbstractEventListener
 
     @Inject
     @Named("cached")
-    private ModelBridge bridge;
+    private NotificationPreferenceModelBridge bridge;
 
     /**
      * The default constructor.
@@ -67,6 +67,6 @@ public class CachedModelBridgeInvalidatorListener extends AbstractEventListener
     public void onEvent(Event event, Object source, Object data)
     {
         // Assume it's a wiki reference
-        ((CachedModelBridge) this.bridge).invalidatePreference((EntityReference) source);
+        ((CachedNotificationPreferenceModelBridge) this.bridge).invalidatePreference((EntityReference) source);
     }
 }

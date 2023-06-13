@@ -244,10 +244,8 @@ $annotationsConfigDoc.display('annotationClass', 'edit')
     <property>
       <code>// FIXME: This code duplicates XWiki.TemplateProviderSheet's JSX except for the tree and data element locators.
 
-require(["$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {'evaluate': true})"], function() {
-
   // Reminder: 'tree' is a jQuery plugin and returns the jQuery instance itself when required.
-  require(['tree', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
+  require(['xwiki-tree', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
     /**
      * Initialization method.
      */
@@ -360,9 +358,7 @@ require(["$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar'
     }
 
     (XWiki.isInitialized ? initialize() : document.on('xwiki:dom:loaded', initialize));
-  });
-
-});</code>
+  });</code>
     </property>
     <property>
       <name>Javascript</name>

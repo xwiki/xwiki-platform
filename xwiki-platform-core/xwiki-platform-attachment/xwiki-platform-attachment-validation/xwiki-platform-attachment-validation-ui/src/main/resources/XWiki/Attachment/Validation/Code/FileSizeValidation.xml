@@ -37,9 +37,9 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity wiki='false'}}
-#set ($spaceReference = $services.model.resolveDocument($!request.documentReference).extractReference('SPACE'))
+#set ($documentReference = $services.model.resolveDocument($!request.documentReference))
 $jsontool.serialize({
-    "maxFileSize": $xwiki.getSpacePreferenceFor('upload_maxsize', $spaceReference)
+  "maxFileSize": $services.attachmentValidation.getUploadMaxSize($documentReference)
 })
 {{/velocity}}</content>
   <object>
@@ -323,7 +323,7 @@ require(['jquery', 'xwiki-l10n!attachment-validation-filesize-messages', 'xwiki-
       <content>{{velocity}}
 {{html clean='false'}}
 &lt;script type='application/json' id='attachment-validation-filesize-configuration'&gt;$jsontool.serialize({
-  "maxFileSize": $xwiki.getSpacePreference('upload_maxsize')
+  "maxFileSize": $services.attachmentValidation.getUploadMaxSize()
 }).replace('&lt;', '\u003C').replace('{{/', '\u007B\u007B\u002F')&lt;/script&gt;
 {{/html}}
 {{/velocity}}</content>

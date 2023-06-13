@@ -20,15 +20,16 @@
 package org.xwiki.notifications.notifiers.internal.email.live;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.eventstream.Event;
 import org.xwiki.mail.MailListener;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.notifications.CompositeEvent;
 
 /**
  * MimeMessageIterator for sending pre filtered live mail notifications.
@@ -46,7 +47,7 @@ public interface PrefilteringMimeMessageIterator extends Iterator<MimeMessage>, 
      * @param factoryParameters parameters for the email factory
      * @param templateReference reference to the mail template
      */
-    void initialize(Map<DocumentReference, CompositeEvent> events, Map<String, Object> factoryParameters,
+    void initialize(Map<DocumentReference, List<Event>> events, Map<String, Object> factoryParameters,
         EntityReference templateReference);
 
     /**

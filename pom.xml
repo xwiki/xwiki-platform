@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>15.4-SNAPSHOT</version>
+    <version>15.5-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>15.4-SNAPSHOT</version>
+  <version>15.5-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
@@ -53,22 +53,22 @@
     <bootstrap.version>3.4.1</bootstrap.version>
     <batik.version>1.16</batik.version>
     <restlet.version>2.3.12</restlet.version>
-    <tika.version>2.7.0</tika.version>
+    <tika.version>2.8.0</tika.version>
     <pdfbox.version>2.0.28</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
     <jetty.version>9.4.49.v20220914</jetty.version>
-    <netty.version>4.1.92.Final</netty.version>
+    <netty.version>4.1.93.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
-    <dockerJava.version>3.3.0</dockerJava.version>
+    <dockerJava.version>3.3.1</dockerJava.version>
 
     <!-- Versions of other software we need in our functional tests -->
-    <testcontainers.version>1.17.6</testcontainers.version>
+    <testcontainers.version>1.18.3</testcontainers.version>
     <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
          sure the new version is available from https://download.documentfoundation.org/libreoffice/stable/
          Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
          (e.g. 7.2.7).
     -->
-    <libreoffice.version>7.4.6</libreoffice.version>
+    <libreoffice.version>7.4.7</libreoffice.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
@@ -96,7 +96,7 @@
     <!-- Versions of JDBC connectors we want to use in our distribution, in our tests and when using build tools -->
     <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
     <hsqldb.artifactId>hsqldb</hsqldb.artifactId>
-    <hsqldb.version>2.7.1</hsqldb.version>
+    <hsqldb.version>2.7.2</hsqldb.version>
     <mysql.groupId>com.mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-j</mysql.artifactId>
     <mysql.version>8.0.33</mysql.version>
@@ -110,7 +110,7 @@
     <pgsql.artifactId>postgresql</pgsql.artifactId>
     <pgsql.version>42.6.0</pgsql.version>
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
-    <oracle.artifactId>ojdbc8</oracle.artifactId>
+    <oracle.artifactId>ojdbc11</oracle.artifactId>
     <oracle.version>23.2.0.0</oracle.version>
   </properties>
   <scm>
@@ -172,6 +172,11 @@
           <exclusion>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
+          </exclusion>
+          <!-- Not the right id -->
+          <exclusion>
+            <groupId>javax.activation</groupId>
+            <artifactId>javax.activation-api</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -693,7 +698,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-ffi</artifactId>
-        <version>2.2.13</version>
+        <version>2.2.14</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -703,7 +708,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-posix</artifactId>
-        <version>3.1.16</version>
+        <version>3.1.17</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>

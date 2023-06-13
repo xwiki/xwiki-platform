@@ -121,26 +121,6 @@ var CKBUILDER_CONFIG = {
     undo: 1,
     uploadfile: 1,
     uploadimage: 1,
-    wysiwygarea: 1,
-    'xwiki-config': 1,
-    'xwiki-filter': 1,
-    'xwiki-image-old': 1,
-    'xwiki-image': 1,
-    'xwiki-link': 1,
-    'xwiki-list': 1,
-    'xwiki-loading': 1,
-    'xwiki-localization': 1,
-    'xwiki-macro': 1,
-    'xwiki-maximize': 1,
-    'xwiki-office': 1,
-    'xwiki-save': 1,
-    'xwiki-selection': 1,
-    'xwiki-syntax': 1,
-    'xwiki-source': 1,
-    'xwiki-sourcearea': 1,
-    'xwiki-table': 1,
-    'xwiki-toolbar': 1,
-    'xwiki-upload': 1,
-    'xwiki-wysiwygarea': 1
+    wysiwygarea: 1
   }
 };

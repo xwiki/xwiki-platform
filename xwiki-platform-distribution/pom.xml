@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>15.4-SNAPSHOT</version>
+    <version>15.5-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution</artifactId>
   <name>XWiki Platform - Distribution - Parent POM</name>
@@ -167,18 +167,18 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-appwithinminutes-ui</artifactId>
-        <version>15.4-SNAPSHOT</version>
+        <version>15.5-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-security-authorization-script</artifactId>
-        <version>15.4-SNAPSHOT</version>
+        <version>15.5-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-webjars-api</artifactId>
-        <version>15.4-SNAPSHOT</version>
+        <version>15.5-SNAPSHOT</version>
       </dependency>
       <!-- application-ckeditor-ui -->
       <dependency>
@@ -189,7 +189,7 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-tree-webjar</artifactId>
-        <version>15.4-SNAPSHOT</version>
+        <version>15.5-SNAPSHOT</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -273,7 +273,7 @@
         <plugin>
           <groupId>org.basepom.maven</groupId>
           <artifactId>duplicate-finder-maven-plugin</artifactId>
-          <version>1.5.1</version>
+          <version>2.0.1</version>
           <executions>
             <execution>
               <id>war-check-duplicates</id>

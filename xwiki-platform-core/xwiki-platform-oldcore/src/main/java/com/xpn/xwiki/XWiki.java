@@ -2051,6 +2051,10 @@ public class XWiki implements EventListener
             // Switch to document wiki
             context.setWikiId(document.getDocumentReference().getWikiReference().getName());
 
+            // Remember the dirty flags statuses so that they can be restored if needed
+            boolean metadataDirty = document.isMetaDataDirty();
+            boolean contentDirty = document.isContentDirty();
+
             // Make sure the document is ready to be saved
             XWikiDocument originalDocument = prepareDocumentForSave(document, comment, isMinorEdit, context);
 
@@ -2081,6 +2085,12 @@ public class XWiki implements EventListener
                         }
                     }
                 }
+            }
+
+            // Restore dirty flags #saveDocument was called with metadata dirty flag to false
+            if (!metadataDirty) {
+                document.setMetaDataDirty(metadataDirty);
+                document.setContentDirty(contentDirty);
             }
 
             // Actually save the document.
@@ -4702,6 +4712,12 @@ public class XWiki implements EventListener
 
         XWikiDocumentArchive archive = document.getDocumentArchive(context);
 
+        if (archive.getNodes(upperBound, lowerBound).isEmpty()) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI,
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_UNEXISTANT_VERSION,
+                String.format("Cannot find any revision to delete matching the range defined by [%s] and [%s]",
+                    lowerBound, upperBound));
+        }
         // Remove the versions
         archive.removeVersions(upperBound, lowerBound, context);
 

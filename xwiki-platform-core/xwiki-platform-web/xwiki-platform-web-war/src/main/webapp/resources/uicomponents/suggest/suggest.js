@@ -526,12 +526,13 @@ var XWiki = (function(XWiki){
       // Don't enforce the width if it wasn't specified to let the container adjust its width to fit the suggest items.
       div.style[this.options.width ? 'width' : 'minWidth'] = containerWidth + "px";
 
-      // set mouseover functions for div
-      // when mouse pointer leaves div, set a timeout to remove the list after an interval
-      // when mouse enters div, kill the timeout so the list won't be removed
+      // set focus functions for div
+      // when focus leaves div, set a timeout to remove the list after an interval
+      // when focus enters div, kill the timeout so the list won't be removed
       var pointer = this;
-      div.onmouseover = function(){ pointer.killTimeout(); };
-      div.onmouseout = function(){ pointer.resetTimeout(); };
+      div.addEventListener("focusin", () => pointer.killTimeout());
+      div.addEventListener("focusout", () => pointer.resetTimeout());
+      div.addEventListener("mouseout", () => pointer.clearHighlight())
 
       this.resultContainer = new Element("div", {'class':'resultContainer'});
       div.appendChild(this.resultContainer);
@@ -626,8 +627,8 @@ var XWiki = (function(XWiki){
     if (withEnableButton && !this.container.down('.hide-button')) {
       var positions = this.options.hideButton.positions;
       for (var i=0; i< positions.length; i++) {
-        var hideButton = new Element('span', {'class' : 'hide-button'}).update(this.options.hideButton.text),
-            toInsert = {};
+        var hideButton = new Element('button', {'class' : 'hide-button', 'type' : 'button'})
+          .update(this.options.hideButton.text), toInsert = {};
         toInsert[positions[i]] = new Element('div', {'class' : 'hide-button-wrapper'}).update(hideButton);
         hideButton.observe('click', this.clearSuggestions.bindAsEventListener(this));
         this.container.insert(toInsert);
@@ -651,7 +652,6 @@ var XWiki = (function(XWiki){
   createList: function(arr, source)
   {
     this._createList(arr, source);
-
     if (!this.isInMultiSourceMode || !this.resultContainer.down('.results.loading')) {
       document.fire('xwiki:suggest:updated', {
         'container' : this.container,
@@ -727,9 +727,11 @@ var XWiki = (function(XWiki){
       var item = new XWiki.widgets.XListItem( this.createItemDisplay(arr[i], source) , {
         containerClasses: 'suggestItem ' + (arr[i].type || ''),
         value: valueNode,
-        noHighlight: true // we do the highlighting ourselves
+        noHighlight: true, // we do the highlighting ourselves
+        containerTagName: 'a'
       });
-
+      item.containerElement.setAttribute('href', arr[i].url);
+      item.listItemElement.addEventListener('focusin', (event) => pointer.setHighlight(event.currentTarget));
       list.addItem(item);
     }
 

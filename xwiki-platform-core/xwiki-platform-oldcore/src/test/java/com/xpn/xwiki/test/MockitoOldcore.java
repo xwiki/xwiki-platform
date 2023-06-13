@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Provider;
@@ -196,6 +197,48 @@ public class MockitoOldcore
     private DocumentAccessBridge documentAccessBridge;
 
     private boolean mockXWiki = true;
+
+    private UserReferenceSerializer<DocumentReference> documentReferenceUserReferenceSerializer;
+
+    /**
+     * @version $Id$
+     * @since 15.5RC1
+     * @since 14.10.12
+     */
+    private class TestDocumentUserReference implements UserReference
+    {
+        private final DocumentReference documentReference;
+
+        TestDocumentUserReference(DocumentReference documentReference)
+        {
+            this.documentReference = documentReference;
+        }
+
+        @Override
+        public boolean equals(Object obj)
+        {
+            if (obj instanceof TestDocumentUserReference) {
+                DocumentReference otherDocument =
+                    documentReferenceUserReferenceSerializer.serialize((UserReference) obj);
+
+                return Objects.equals(this.documentReference, otherDocument);
+            }
+
+            return super.equals(obj);
+        }
+
+        @Override
+        public String toString()
+        {
+            return "TestDocumentUserReference: " + Objects.toString(this.documentReference);
+        }
+
+        @Override
+        public boolean isGlobal()
+        {
+            return false;
+        }
+    }
 
     public MockitoOldcore(MockitoComponentManager componentManager)
     {
@@ -1085,23 +1128,20 @@ public class MockitoOldcore
 
             DefaultParameterizedType userReferenceDocumentReferenceSerializer =
                 new DefaultParameterizedType(null, UserReferenceSerializer.class, DocumentReference.class);
-            UserReferenceSerializer<DocumentReference> documentReferenceUserReferenceSerializer;
             if (!this.componentManager.hasComponent(userReferenceDocumentReferenceSerializer, "document")) {
-                documentReferenceUserReferenceSerializer =
+                this.documentReferenceUserReferenceSerializer =
                     getMocker().registerMockComponent(userReferenceDocumentReferenceSerializer, "document");
             } else {
-                documentReferenceUserReferenceSerializer =
+                this.documentReferenceUserReferenceSerializer =
                     getMocker().getInstance(userReferenceDocumentReferenceSerializer, "document");
             }
 
             // we ensure that when trying to resolve a DocumentReference to UserReference, then the returned mock
             // will return the original DocumentReference when resolved back to DocumentReference.
-            when(userReferenceResolver.resolve(any())).then(invocationOnMock -> {
-                UserReference userReference = mock(UserReference.class);
-                when(documentReferenceUserReferenceSerializer.serialize(userReference))
-                    .thenReturn(invocationOnMock.getArgument(0));
-                return userReference;
-            });
+            when(userReferenceResolver.resolve(any()))
+                .then(invocationOnMock -> new TestDocumentUserReference(invocationOnMock.getArgument(0)));
+            when(this.documentReferenceUserReferenceSerializer.serialize(any(TestDocumentUserReference.class)))
+                .then(invocationOnMock -> invocationOnMock.<TestDocumentUserReference>getArgument(0).documentReference);
         }
     }
 

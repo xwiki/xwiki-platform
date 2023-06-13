@@ -254,7 +254,12 @@ public class UserEventManagerTest
         when(this.documentAccessBridge.getDocumentInstance(userReference)).thenReturn(userDoc);
         when(userDoc.getCreationDate()).thenReturn(new Date(40));
 
-        when(this.notificationPreferenceManager.getAllPreferences(userReference)).thenReturn(Collections.emptyList());
+        // We want to only check if the event is triggered by a followed user, so we must ignore conditions when
+        // the event is triggered by a matching preference, which is the case if there's no preference.
+        // So we create a stub one.
+        NotificationPreference notificationPreference = mock(NotificationPreference.class);
+        when(this.notificationPreferenceManager.getAllPreferences(userReference))
+            .thenReturn(Collections.singletonList(notificationPreference));
 
         // 2 filters to verify it iterates
         NotificationFilterPreference filter1 = mock(NotificationFilterPreference.class);

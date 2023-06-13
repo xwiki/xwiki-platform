@@ -17,31 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-/*!
-#set ($jsExtension = '.min.js')
-#if (!$services.debug.minify)
-  #set ($jsExtension = '.js')
-#end
-#set ($paths = {
-  'jsTree': $services.webjars.url('jstree', "jstree$jsExtension"),
-  'tree-finder': $services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', "finder$jsExtension"),
-  'tree': $services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', "tree$jsExtension")
-})
-#[[*/
-// Start JavaScript-only code.
-(function(paths) {
-  "use strict";
-
-require.config({
-  paths,
-  shim: {
-    jsTree: {
-      deps: ['jquery']
-    }
-  }
-});
-
-require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
+require(['jquery', 'xwiki-meta', 'xwiki-tree'], function($, xm) {
   /**
    * Called when a question is being asked
    */
@@ -151,6 +127,3 @@ require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
     initQuestion.bind(uiQuestion)(null);
   });
 });
-
-// End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$paths]));

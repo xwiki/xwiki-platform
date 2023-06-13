@@ -226,9 +226,9 @@ public class UploadAction extends XWikiAction
             params.add(String.format("%s (%s)", nextRev, attachmentComment));
         }
         if (attachment.isImage(context)) {
-            documentComment = localizePlainOrKey("core.comment.uploadImageComment", params.toArray());
+            documentComment = localizePlainOrReturnKey("core.comment.uploadImageComment", params.toArray());
         } else {
-            documentComment = localizePlainOrKey("core.comment.uploadAttachmentComment", params.toArray());
+            documentComment = localizePlainOrReturnKey("core.comment.uploadAttachmentComment", params.toArray());
         }
 
         // Make sure the user is allowed to make this modification

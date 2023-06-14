@@ -69,7 +69,7 @@ Der Teil in ##( )## ist erforderlich, während die Teile in ##{ }## optional sin
 
 Das vollständige Format eines Bilder ist entweder **##image~: (Verweis)##** oder **##~[~[{caption&gt;&gt;}image~: (Verweis) {||Parameter}]]##**
 
-* **##caption##**: Eine optionale Beschriftung. Kann beliebige XWiki 2.0-Syntax enthalten, aber verschachtelte Link-Syntax muss mit ##~~## maskiert werden. Die Beschriftung wird nur unterstützt, wenn die Bildsyntax der einzige Inhalt eines Absatzes ist.
+* **##caption##**: Eine optionale Beschriftung. Kann beliebige XWiki 2.0-Syntax enthalten, aber verschachtelte Link-Syntax muss mit ##~~## maskiert werden. Die Beschriftung wird nur unterstützt, wenn die Bildsyntax der einzige Inhalt eines Absatzes ist. Das Bild mit der Beschriftung kann auch in einen Link eingebettet sein. In diesem Fall enthält der Link das Bild, aber nicht die Beschriftung.
 * **##image~:##** Ein erforderlicher Text, welches die folgenden Angaben als Bild kennzeichnet.
 * **##Verweis##**: Der Verweis auf das anzuzeigende Bild. Der Verweis kann in folgenden Formaten angegeben werden:
 ** **URL**: Eine URL zu einem externen Bild in dem Format **##http:~/~/pfad/BildName##**. Beispiel: ##http:~/~/example.org/pfad/bild.png##
@@ -107,7 +107,7 @@ Der Teil in ##( )## ist erforderlich, während die Teile in ##{ }## optional sin
 
 Das vollständige Format eines Bilder ist entweder **##image~: (Verweis)##** oder **##~[~[{caption&gt;&gt;}image~: (Verweis) {||Parameter}]]##**
 
-* **##caption##**: Eine optionale Beschriftung. Kann beliebige XWiki 2.1-Syntax enthalten, aber verschachtelte Link-Syntax muss mit ##~~## maskiert werden. Die Beschriftung wird nur unterstützt, wenn die Bildsyntax der einzige Inhalt eines Absatzes ist.
+* **##caption##**: Eine optionale Beschriftung. Kann beliebige XWiki 2.1-Syntax enthalten, aber verschachtelte Link-Syntax muss mit ##~~## maskiert werden. Die Beschriftung wird nur unterstützt, wenn die Bildsyntax der einzige Inhalt eines Absatzes ist. Das Bild mit der Beschriftung kann auch in einen Link eingebettet sein. In diesem Fall enthält der Link das Bild, aber nicht die Beschriftung.
 * **##image~:##** Ein erforderlicher Text, welches die folgenden Angaben als Bild kennzeichnet.
 * **##Verweis##**: Der Verweis auf das anzuzeigende Bild. Der Verweis kann in folgenden Formaten angegeben werden:
 ** **URL**: Eine URL zu einem externen Bild in dem Format **##http:~/~/pfad/BildName##**. Beispiel: ##http:~/~/example.org/pfad/bild.png##

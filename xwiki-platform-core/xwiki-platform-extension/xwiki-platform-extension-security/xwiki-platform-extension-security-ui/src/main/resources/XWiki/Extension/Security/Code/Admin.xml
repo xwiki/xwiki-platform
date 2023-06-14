@@ -47,7 +47,7 @@
 {{liveData
   id="dashboard"
   source="extensionSecurity"
-  properties="name,extensionId,maxCVSS,cveID,fixVersion,advice"
+  properties="name,extensionId,wikis,maxCVSS,cveID,fixVersion,advice"
   showPageSizeDropdown="false"}}
 {{/liveData}}
 

@@ -37,12 +37,14 @@ import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.search.solr.SolrUtils;
 
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_FIX_VERSION;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_INSTALLED_WIKIS;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_MAX_CVSS;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID;
 import static org.xwiki.extension.security.internal.ExtensionSecurityLiveDataConfigurationProvider.EXTENSION_ID;
 import static org.xwiki.extension.security.internal.ExtensionSecurityLiveDataConfigurationProvider.FIX_VERSION;
 import static org.xwiki.extension.security.internal.ExtensionSecurityLiveDataConfigurationProvider.MAX_CVSS;
 import static org.xwiki.extension.security.internal.ExtensionSecurityLiveDataConfigurationProvider.NAME;
+import static org.xwiki.extension.security.internal.ExtensionSecurityLiveDataConfigurationProvider.WIKIS;
 import static org.xwiki.search.solr.AbstractSolrCoreInitializer.SOLR_FIELD_ID;
 
 /**
@@ -58,7 +60,8 @@ public class ExtensionSecuritySolrClient
     private static final Map<String, String> LD_TO_SOLR = Map.of(
         EXTENSION_ID, SOLR_FIELD_ID,
         MAX_CVSS, SECURITY_MAX_CVSS,
-        FIX_VERSION, SECURITY_FIX_VERSION
+        FIX_VERSION, SECURITY_FIX_VERSION,
+        WIKIS, SECURITY_INSTALLED_WIKIS
     );
 
     @Inject
@@ -120,7 +123,7 @@ public class ExtensionSecuritySolrClient
                 if (Objects.equals(field, SECURITY_MAX_CVSS)
                     && Objects.equals(constraint.getOperator(), "contains"))
                 {
-                    solrQuery.addFilterQuery(field + ":[" + filterQueryString + " TO 10]");
+                    solrQuery.addFilterQuery(String.format("%s:[%s TO 10]", field, filterQueryString));
                 } else if (Objects.equals(field, NAME)) {
                     solrQuery.addFilterQuery(
                         String.format("(%s:*%s* OR %s:*%s*)", field, filterQueryString, SOLR_FIELD_EXTENSIONID,

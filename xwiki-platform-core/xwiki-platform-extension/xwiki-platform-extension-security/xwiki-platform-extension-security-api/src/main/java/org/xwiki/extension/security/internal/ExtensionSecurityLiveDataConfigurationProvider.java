@@ -75,6 +75,11 @@ public class ExtensionSecurityLiveDataConfigurationProvider implements Provider<
      */
     public static final String CVE_ID = "cveID";
 
+    /**
+     * The name of the Wikis field.
+     */
+    public static final String WIKIS = "wikis";
+
     private static final String STRING_TYPE = "String";
 
     private static final String HTML_DISPLAYER_ID = "html";
@@ -100,7 +105,8 @@ public class ExtensionSecurityLiveDataConfigurationProvider implements Provider<
             initMaxCVSSDescriptor(),
             initCVEIDDescriptor(),
             initFixVersionDescriptor(),
-            initAdviceDescriptor()
+            initAdviceDescriptor(),
+            initWikisDescriptor()
         ));
 
         return input;
@@ -183,6 +189,19 @@ public class ExtensionSecurityLiveDataConfigurationProvider implements Provider<
         descriptor.setEditable(false);
         descriptor.setSortable(false);
         descriptor.setFilterable(false);
+        return descriptor;
+    }
+
+    private LiveDataPropertyDescriptor initWikisDescriptor()
+    {
+        LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
+        descriptor.setName(this.l10n.getTranslationPlain("extension.security.liveData.wikis"));
+        descriptor.setId(WIKIS);
+        descriptor.setType(STRING_TYPE);
+        descriptor.setVisible(true);
+        descriptor.setEditable(false);
+        descriptor.setSortable(false);
+        descriptor.setFilterable(true);
         return descriptor;
     }
 }

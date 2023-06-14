@@ -42,7 +42,6 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
@@ -106,9 +105,6 @@ public class DefaultNotificationParametersFactoryTest
 
     @MockComponent
     private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
-
-    @MockComponent
-    private NotificationConfiguration configuration;
 
     @MockComponent
     private EntityReferenceResolver<String> entityReferenceResolver;
@@ -233,8 +229,6 @@ public class DefaultNotificationParametersFactoryTest
     @Test
     public void createNotificationParameters() throws Exception
     {
-        when(this.configuration.isEventPrefilteringEnabled()).thenReturn(false);
-
         NotificationParameters notificationParameters = new NotificationParameters();
         notificationParameters.format = NotificationFormat.ALERT;
         notificationParameters.filters = new HashSet<>(this.filterList);
@@ -274,29 +268,16 @@ public class DefaultNotificationParametersFactoryTest
         notificationParameters.blackList = Arrays.asList("foo", "bar", "baz");
         notificationParameters.preferences = this.mailPreferenceList;
         notificationParameters.filterPreferences = this.filterPreferenceList;
-        notificationParameters.filters = Collections.singleton(this.filterList.get(1));
-
-        assertEquals(notificationParameters, this.parametersFactory.createNotificationParameters(parametersMap));
-
-        parametersMap.put(ParametersKey.FORMAT, NotificationFormat.ALERT.name());
-        notificationParameters.format = NotificationFormat.ALERT;
-        notificationParameters.preferences = this.alertPreferenceList;
-        assertEquals(notificationParameters, this.parametersFactory.createNotificationParameters(parametersMap));
-
-        when(this.configuration.isEventPrefilteringEnabled()).thenReturn(true);
-        // Prefiltering status is taken into account when getting the filters.
         when(notificationFilterManager.getAllFilters(USER_REFERENCE, true,
             NotificationFilter.FilteringPhase.POST_FILTERING)).thenReturn(Collections.emptyList());
 
+        notificationParameters.filters =
+            Collections.singleton(new ForUserEventFilter(NotificationFormat.EMAIL, null));
         notificationParameters.preferences =
             Arrays.asList(new InternalNotificationPreference(this.recordableEventDescriptors.get(0)),
                 new InternalNotificationPreference(this.recordableEventDescriptors.get(1)));
         notificationParameters.filterPreferences = Collections.emptyList();
 
-        parametersMap.put(ParametersKey.FORMAT, NotificationFormat.EMAIL.name());
-        notificationParameters.format = NotificationFormat.EMAIL;
-        notificationParameters.filters =
-            Collections.singleton(new ForUserEventFilter(NotificationFormat.EMAIL, null));
         assertEquals(notificationParameters, this.parametersFactory.createNotificationParameters(parametersMap));
 
         parametersMap.put(ParametersKey.FORMAT, NotificationFormat.ALERT.name());

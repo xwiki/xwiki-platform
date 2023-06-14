@@ -52,15 +52,6 @@ public interface NotificationConfiguration
     int liveNotificationsGraceTime();
 
     /**
-     * @return true if pre filtering should be used for ALERT user notifications
-     * @since 12.6
-     */
-    default boolean isEventPrefilteringEnabled()
-    {
-        return false;
-    }
-
-    /**
      * @return true if the REST/async cache is enabled.
      * @since 12.2
      */

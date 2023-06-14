@@ -24,8 +24,6 @@ import javax.inject.Provider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
@@ -94,13 +92,13 @@ public class LiveNotificationEmailSenderTest
 
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("xwiki");
 
-        when(this.notificationUserIteratorProvider.get()).thenReturn(Mockito.mock(NotificationUserIterator.class));
+        when(this.notificationUserIteratorProvider.get()).thenReturn(mock(NotificationUserIterator.class));
 
-        when(this.liveMimeMessageIteratorProvider.get()).thenReturn(Mockito.mock(LiveMimeMessageIterator.class));
+        when(this.liveMimeMessageIteratorProvider.get()).thenReturn(mock(LiveMimeMessageIterator.class));
 
-        when(this.sessionFactory.create(ArgumentMatchers.any())).thenReturn(null);
+        when(this.sessionFactory.create(any())).thenReturn(null);
 
-        when(this.mailListenerProvider.get()).thenReturn(Mockito.mock(MailListener.class));
+        when(this.mailListenerProvider.get()).thenReturn(mock(MailListener.class));
 
         this.mocker.getComponentUnderTest().sendEmails(event1);
 

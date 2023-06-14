@@ -30,9 +30,12 @@
   <artifactId>xwiki-platform-legacy-notifications</artifactId>
   <name>XWiki Platform - Legacy - Notifications</name>
   <packaging>pom</packaging>
-  <description>Legacy package for xwiki-platform-eventstream</description>
   <modules>
     <module>xwiki-platform-legacy-notification-activitymacro</module>
+    <module>xwiki-platform-legacy-notifications-api</module>
+    <module>xwiki-platform-legacy-notifications-filters</module>
+    <module>xwiki-platform-legacy-notifications-notifiers</module>
+    <module>xwiki-platform-legacy-notifications-sources</module>
   </modules>
 </project>
 

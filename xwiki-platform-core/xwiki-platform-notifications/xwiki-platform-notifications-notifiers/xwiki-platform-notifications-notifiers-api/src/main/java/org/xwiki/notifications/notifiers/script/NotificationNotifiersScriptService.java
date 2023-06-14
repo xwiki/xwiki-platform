@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.notifiers.script;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -38,8 +39,9 @@ import org.xwiki.notifications.notifiers.NotificationRenderer;
 import org.xwiki.notifications.notifiers.internal.DefaultAsyncNotificationRenderer;
 import org.xwiki.notifications.notifiers.internal.NotificationAsyncRendererConfiguration;
 import org.xwiki.notifications.notifiers.rss.NotificationRSSManager;
-import org.xwiki.notifications.sources.NotificationManager;
 import org.xwiki.notifications.sources.NotificationParameters;
+import org.xwiki.notifications.sources.ParametrizedNotificationManager;
+import org.xwiki.notifications.sources.internal.DefaultNotificationParametersFactory;
 import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.async.internal.AsyncRendererExecutor;
 import org.xwiki.rendering.async.internal.AsyncRendererExecutorResponse;
@@ -67,7 +69,7 @@ public class NotificationNotifiersScriptService implements ScriptService
     private NotificationRSSManager notificationRSSManager;
 
     @Inject
-    private NotificationManager notificationManager;
+    private ParametrizedNotificationManager notificationManager;
 
     @Inject
     private DocumentAccessBridge documentAccessBridge;
@@ -81,6 +83,9 @@ public class NotificationNotifiersScriptService implements ScriptService
     @Inject
     @Named("context")
     private Provider<ComponentManager> componentManager;
+
+    @Inject
+    private DefaultNotificationParametersFactory parametersFactory;
 
     /**
      * Generate a rendering Block for a given event to display as notification.
@@ -122,9 +127,11 @@ public class NotificationNotifiersScriptService implements ScriptService
     public String getFeed(String userId, int entryNumber) throws NotificationException
     {
         SyndFeedOutput output = new SyndFeedOutput();
+        NotificationParameters parametersForUserAndCount =
+            this.parametersFactory.getParametersForUserAndCount(userId, entryNumber);
+        List<CompositeEvent> events = this.notificationManager.getEvents(parametersForUserAndCount);
         try {
-            return output.outputString(this.notificationRSSManager.renderFeed(
-                    this.notificationManager.getEvents(userId, entryNumber)));
+            return output.outputString(this.notificationRSSManager.renderFeed(events));
         } catch (Exception e) {
             throw new NotificationException("Unable to render RSS feed", e);
         }

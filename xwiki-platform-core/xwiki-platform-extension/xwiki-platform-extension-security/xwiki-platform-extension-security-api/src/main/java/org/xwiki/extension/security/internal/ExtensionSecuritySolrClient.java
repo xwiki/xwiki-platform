@@ -57,6 +57,9 @@ import static org.xwiki.search.solr.AbstractSolrCoreInitializer.SOLR_FIELD_ID;
 @Singleton
 public class ExtensionSecuritySolrClient
 {
+    /**
+     * Mapping between the Live Data properties and the Solr properties.
+     */
     private static final Map<String, String> LD_TO_SOLR = Map.of(
         EXTENSION_ID, SOLR_FIELD_ID,
         MAX_CVSS, SECURITY_MAX_CVSS,

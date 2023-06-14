@@ -65,7 +65,7 @@ public class ExtensionSecurityScheduler implements Runnable, Disposable
     {
         if (this.executor == null) {
             this.started = true;
-            // Start the scheduling
+            // Start the scheduling.
             this.executor = Executors.newSingleThreadScheduledExecutor(r -> {
                 Thread thread = new Thread(r);
                 thread.setName("Extension Security scanner");
@@ -104,7 +104,7 @@ public class ExtensionSecurityScheduler implements Runnable, Disposable
             // Execute job
             Job job = this.jobExecutor.execute(ExtensionSecurityJob.JOBTYPE, new ExtensionSecurityRequest());
 
-            // Wait for the job to finish
+            // Wait for the job to finish.
             job.join();
         } catch (InterruptedException e) {
             // Restore interrupted state...

@@ -25,7 +25,8 @@ import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * See https://ossf.github.io/osv-schema/#affectedranges-field.
+ * See the <a href="https://ossf.github.io/osv-schema/#affectedranges-field">Open Source Vulnerability format API
+ * documentation</a>.
  *
  * @version $Id$
  * @since 15.5RC1

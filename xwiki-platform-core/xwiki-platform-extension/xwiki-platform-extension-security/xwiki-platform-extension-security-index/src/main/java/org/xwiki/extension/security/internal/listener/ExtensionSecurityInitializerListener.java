@@ -36,7 +36,7 @@ import static org.xwiki.extension.index.internal.job.ExtensionIndexJob.JOB_TYPE;
 
 /**
  * Starts the {@link ExtensionSecurityScheduler} in charge of fetching known security vulnerabilities for installed
- * extensions.
+ * extensions once the extension indexing is done.
  *
  * @version $Id$
  * @since 15.5RC1

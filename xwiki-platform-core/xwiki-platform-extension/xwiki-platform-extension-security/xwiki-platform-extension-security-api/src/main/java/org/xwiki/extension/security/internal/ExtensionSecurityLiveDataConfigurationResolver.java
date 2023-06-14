@@ -27,7 +27,6 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
-import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.internal.JSONMerge;
 
 /**
@@ -47,7 +46,7 @@ public class ExtensionSecurityLiveDataConfigurationResolver
     private Provider<LiveDataConfiguration> extensionSecurityLiveDataProvider;
 
     @Override
-    public LiveDataConfiguration resolve(LiveDataConfiguration input) throws LiveDataException
+    public LiveDataConfiguration resolve(LiveDataConfiguration input)
     {
         return new JSONMerge().merge(input, this.extensionSecurityLiveDataProvider.get());
     }

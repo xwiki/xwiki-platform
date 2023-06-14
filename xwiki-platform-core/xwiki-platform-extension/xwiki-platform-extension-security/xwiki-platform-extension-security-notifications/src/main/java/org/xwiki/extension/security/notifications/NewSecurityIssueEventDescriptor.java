@@ -26,6 +26,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 
 /**
+ * Descriptor for the {@link NewSecurityIssueEvent}.
+ *
  * @version $Id$
  * @since 15.5RC1
  */

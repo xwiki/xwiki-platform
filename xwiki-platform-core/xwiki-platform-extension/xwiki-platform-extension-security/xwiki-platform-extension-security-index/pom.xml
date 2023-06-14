@@ -19,9 +19,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
@@ -29,6 +27,9 @@
     <version>15.5-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-extension-security-index</artifactId>
+  <name>XWiki Platform - Extension - Security - Index</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - Extension - Security - Index</description>
   <properties>
     <!-- It does not make sense to have this extension installed on several wikis, as it perform the security
       scan for all wikis. -->

@@ -55,7 +55,6 @@ public class ConfigClassMandatoryInitializer extends AbstractMandatoryClassIniti
     {
         super.createClass(xclass);
 
-        // TODO: localization
         xclass.addBooleanField(SCAN_ENABLED, "Scan Enabled", "checkbox", true);
         xclass.addNumberField(SCAN_DELAY, "Scan Delay", 30, "integer");
         xclass.addTextField(SCAN_URL, "Scan URL", 30);

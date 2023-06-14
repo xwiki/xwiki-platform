@@ -20,7 +20,8 @@
 package org.xwiki.extension.security.internal.analyzer.osv.model.response;
 
 /**
- * See https://ossf.github.io/osv-schema/#severity-field.
+ * See the <a href="https://ossf.github.io/osv-schema/#severity-field">Open Source Vulnerability format API
+ * documentation</a>.
  *
  * @version $Id$
  * @since 15.5RC1

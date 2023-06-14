@@ -32,8 +32,11 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 
 /**
+ * Listen for {@link ExtensionSecurityEvent} and forward them as {@link NewSecurityIssueEvent} to notify admins of the
+ * presence of new security issues.
+ *
  * @version $Id$
- * @since x.y.z
+ * @since 15.5RC1
  */
 @Component
 @Singleton

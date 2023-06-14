@@ -37,6 +37,8 @@ import org.xwiki.localization.ContextualLocalizationManager;
 import static org.xwiki.livedata.LiveDataPropertyDescriptor.DisplayerDescriptor;
 
 /**
+ * Provides the default configuration for the {@link ExtensionSecurityLiveDataSource#ID} Live Data source.
+ *
  * @version $Id$
  * @since 15.5RC1
  */
@@ -46,37 +48,37 @@ import static org.xwiki.livedata.LiveDataPropertyDescriptor.DisplayerDescriptor;
 public class ExtensionSecurityLiveDataConfigurationProvider implements Provider<LiveDataConfiguration>
 {
     /**
-     * The name LD field.
+     * The name LD property.
      */
     public static final String NAME = "name";
 
     /**
-     * Extension ID LD field.
+     * Extension ID LD property.
      */
     public static final String EXTENSION_ID = "extensionId";
 
     /**
-     * Max CVSS LD field.
+     * Max CVSS LD property.
      */
     public static final String MAX_CVSS = "maxCVSS";
 
     /**
-     * The fix version field.
+     * The fix version LD property.
      */
     public static final String FIX_VERSION = "fixVersion";
 
     /**
-     * The advice field.
+     * The advice LD property.
      */
     public static final String ADVICE = "advice";
 
     /**
-     * Extension ID LD field.
+     * The CVE ID LD property.
      */
     public static final String CVE_ID = "cveID";
 
     /**
-     * The name of the Wikis field.
+     * The wikis LD property.
      */
     public static final String WIKIS = "wikis";
 

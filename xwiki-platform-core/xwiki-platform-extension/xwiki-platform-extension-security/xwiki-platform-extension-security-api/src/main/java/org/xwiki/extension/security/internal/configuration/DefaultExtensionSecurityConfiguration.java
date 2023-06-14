@@ -28,7 +28,7 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.extension.security.ExtensionSecurityConfiguration;
 
 /**
- * Default implementation of {@link ExtensionSecurityConfiguration}. Fetched the configurations from
+ * Default implementation of {@link ExtensionSecurityConfiguration}. Fetches the configurations from
  * {@code xwiki.properties}.
  *
  * @version $Id$

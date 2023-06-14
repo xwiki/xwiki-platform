@@ -37,9 +37,12 @@ import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
+
+import static org.xwiki.security.authorization.Right.ADMIN;
 
 /**
+ * Entries source for the {@link ExtensionSecurityLiveDataSource#ID} Live Data.
+ *
  * @version $Id$
  * @since 15.5RC1
  */
@@ -67,7 +70,7 @@ public class ExtensionSecurityLiveDataEntryStore implements LiveDataEntryStore
     public LiveData get(LiveDataQuery liveDataQuery) throws LiveDataException
     {
         try {
-            this.authorization.checkAccess(Right.ADMIN);
+            this.authorization.checkAccess(ADMIN);
         } catch (AccessDeniedException e) {
             throw new LiveDataException("This source is restricted to admins", e);
         }

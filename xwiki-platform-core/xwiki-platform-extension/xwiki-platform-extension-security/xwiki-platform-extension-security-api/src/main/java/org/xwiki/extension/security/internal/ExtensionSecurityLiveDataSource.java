@@ -29,8 +29,9 @@ import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
 import org.xwiki.livedata.LiveDataSource;
 
 /**
+ * Live Data source for the {@code extensionSecurity}.
+ *
  * @version $Id$
- * @link LiveDataSource} implementation for the extension security dashboard.
  * @since 15.5RC1
  */
 @Component

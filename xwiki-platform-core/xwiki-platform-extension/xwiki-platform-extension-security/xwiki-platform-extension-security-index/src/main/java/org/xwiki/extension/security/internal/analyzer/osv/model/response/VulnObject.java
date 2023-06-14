@@ -28,7 +28,7 @@ import org.xwiki.extension.version.Version;
 import org.xwiki.extension.version.internal.DefaultVersion;
 
 /**
- * See https://ossf.github.io/osv-schema/.
+ * See the <a href="https://ossf.github.io/osv-schema/">Open Source Vulnerability format API documentation</a>.
  *
  * @version $Id$
  * @since 15.5RC1

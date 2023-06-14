@@ -22,7 +22,7 @@ package org.xwiki.extension.security.internal.analyzer.osv.model.response;
 import java.util.List;
 
 /**
- * POJO form of https://ossf.github.io/osv-schema/.
+ * POJO for the <a href="https://ossf.github.io/osv-schema/">Open Source Vulnerability format API response</a>.
  *
  * @version $Id$
  * @since 15.5RC1

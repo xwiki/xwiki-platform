@@ -32,8 +32,8 @@ import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
 
 /**
- * {@link LiveDataPropertyDescriptorStore} implementation that exposes the extension security dashboard columns as live
- * data properties.
+ * {@link LiveDataPropertyDescriptorStore} implementation that exposes the extension security list columns as live data
+ * properties.
  *
  * @version $Id$
  * @since 15.5RC1

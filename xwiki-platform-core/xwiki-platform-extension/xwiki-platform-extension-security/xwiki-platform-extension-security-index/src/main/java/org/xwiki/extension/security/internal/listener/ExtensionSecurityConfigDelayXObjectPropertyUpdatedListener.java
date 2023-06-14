@@ -47,6 +47,7 @@ import static org.xwiki.extension.security.internal.configuration.DocConfigurati
 /**
  * Listen for a change in the {@link DefaultExtensionSecurityConfiguration#SCAN_DELAY} property of the
  * {@link DocConfigurationSource#XCLASS_REFERENCE} XClass in the {DocConfigurationSource#XOBJECT_REFERENCE} XObject.
+ * Restarts the {@link ExtensionSecurityScheduler} when the delay is changed.
  *
  * @version $Id$
  * @since 15.5RC1

@@ -24,6 +24,9 @@ import java.util.List;
 import org.xwiki.extension.security.internal.analyzer.osv.model.PackageObject;
 
 /**
+ * See the <a href="https://ossf.github.io/osv-schema/#affectedpackage-field">Open Source Vulnerability format API
+ * documentation</a>.
+ *
  * @version $Id$
  * @since 15.5RC1
  */

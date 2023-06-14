@@ -307,10 +307,11 @@ public class ExtensionIndexStore implements Initializable
     }
 
     /**
-     * Update a given extension with the provided  security analysis results.
+     * Update a given extension with the provided security analysis results.
+     *
      * @param extensionId the extension id of the extension to update
      * @param result the security analysis results
-     * @throws IOException If there is a low-level I/O error 
+     * @throws IOException If there is a low-level I/O error
      * @throws SolrServerException if there is an error on the server
      */
     public void update(ExtensionId extensionId, ExtensionAnalysisResult result) throws SolrServerException, IOException
@@ -634,7 +635,7 @@ public class ExtensionIndexStore implements Initializable
     /**
      * @param extensionId the extension id
      * @return the list of CVEs attached to a given extension id
-     * @throws IOException If there is a low-level I/O error.
+     * @throws IOException If there is a low-level I/O error
      * @throws SolrServerException if there is an error on the server
      */
     public List<String> getCVEIDs(ExtensionId extensionId) throws SolrServerException, IOException

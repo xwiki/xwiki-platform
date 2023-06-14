@@ -24,6 +24,8 @@ import java.util.Set;
 import org.xwiki.eventstream.TargetableEvent;
 
 /**
+ * Targetable event aimed at admins, to inform them of the presence of new security issues.
+ *
  * @version $Id$
  * @since 15.5RC1
  */

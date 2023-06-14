@@ -20,7 +20,7 @@
 package org.xwiki.extension.security.internal.analyzer.osv.model;
 
 /**
- * See https://google.github.io/osv.dev/post-v1-query/#parameters.
+ * See the <a href="https://ossf.github.io/osv-schema/">Open Source Vulnerability format API documentation</a>.
  *
  * @version $Id$
  * @since 15.5RC1

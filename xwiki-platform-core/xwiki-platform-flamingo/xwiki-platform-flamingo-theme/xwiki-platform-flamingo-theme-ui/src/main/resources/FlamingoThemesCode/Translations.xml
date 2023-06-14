@@ -91,6 +91,7 @@ platform.flamingo.themes.title.preview=Preview
 platform.flamingo.themes.autorefresh=Auto refresh
 platform.flamingo.themes.refresh=Refresh
 platform.flamingo.themes.refreshwarning=The refresh can take several seconds.
+platform.flamingo.themes.preview.iframe.label=Preview of the color theme.
 platform.flamingo.themes.loading=Loading...
 platform.flamingo.themes.category.logos=Logos
 platform.flamingo.themes.category.base-colors=Base colors

@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpSession;
 import javax.websocket.HandshakeResponse;
 import javax.websocket.Session;
 import javax.websocket.server.HandshakeRequest;
@@ -58,9 +59,11 @@ import com.xpn.xwiki.util.XWikiStubContextProvider;
 import com.xpn.xwiki.web.Utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -116,6 +119,8 @@ class DefaultWebSocketContextTest
         when(this.endPointConfig.getUserProperties()).thenReturn(this.userProperties);
         when(this.session.getUserProperties()).thenReturn(this.userProperties);
 
+        when(this.request.getHttpSession()).thenReturn(mock(HttpSession.class));
+
         XWiki wiki = mock(XWiki.class);
         when(wiki.checkAuth(this.xcontext)).thenReturn(new XWikiUser(this.currentUserReference));
         this.xcontext.setWiki(wiki);
@@ -145,6 +150,26 @@ class DefaultWebSocketContextTest
         verify(this.container, times(2)).setRequest(any(ServletRequest.class));
         verify(this.container, times(2)).setResponse(any(ServletResponse.class));
         verify(this.container, times(2)).setSession(any(ServletSession.class));
+    }
+
+    @Test
+    void runBeforeXWikiIsReady() throws Exception
+    {
+        when(this.endPointConfig.getPath()).thenReturn("/one/{roleHint}/two/{wiki}/three");
+        when(this.request.getRequestURI()).thenReturn(new URI("ws://www.xwiki.org/xwiki/one/echo/two/dev/three"));
+
+        // XWiki is not ready yet.
+        when(this.xcontextProvider.createStubContext()).thenReturn(null);
+
+        this.webSocketContext.initialize(this.endPointConfig, this.request, this.response);
+        this.webSocketContext.run(this.session, () -> {
+            // XWiki context is not published on the execution context.
+            assertFalse(this.execution.getContext().hasProperty(XWikiContext.EXECUTIONCONTEXT_KEY));
+        });
+
+        verify(this.container, never()).setRequest(any(ServletRequest.class));
+        verify(this.container, never()).setResponse(any(ServletResponse.class));
+        verify(this.container, never()).setSession(any(ServletSession.class));
     }
 
     @Test

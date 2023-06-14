@@ -196,7 +196,7 @@ public class XWikiServletRequestStub implements XWikiRequest
     {
     }
 
-    private XWikiServletRequestStub(Builder builder)
+    protected XWikiServletRequestStub(Builder builder)
     {
         if (builder.requestURL != null) {
             this.protocol = builder.requestURL.getProtocol();

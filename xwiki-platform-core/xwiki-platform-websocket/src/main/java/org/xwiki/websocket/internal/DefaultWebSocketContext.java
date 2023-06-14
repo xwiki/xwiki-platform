@@ -78,6 +78,10 @@ public class DefaultWebSocketContext implements WebSocketContext
         ExecutionContext context = createExecutionContext(config, request, response);
         config.getUserProperties().put(ExecutionContext.class.getName(), context);
         initialize(context);
+
+        // We have to authenticate the user after initializing the execution context because AuthServiceConfiguration
+        // component uses the XWiki context through its provider which takes it from the execution context.
+        authenticateUser(request);
     }
 
     @Override
@@ -110,10 +114,17 @@ public class DefaultWebSocketContext implements WebSocketContext
 
         this.execution.pushContext(context, false);
 
-        XWikiContext xcontext = (XWikiContext) context.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
-        this.container.setRequest(new ServletRequest(xcontext.getRequest()));
-        this.container.setResponse(new ServletResponse(xcontext.getResponse()));
-        this.container.setSession(new ServletSession(xcontext.getRequest()));
+        XWikiContext xcontext = getXWikiContext();
+        if (xcontext != null) {
+            this.container.setRequest(new ServletRequest(xcontext.getRequest()));
+            this.container.setResponse(new ServletResponse(xcontext.getResponse()));
+            this.container.setSession(new ServletSession(xcontext.getRequest()));
+        }
+    }
+
+    private XWikiContext getXWikiContext()
+    {
+        return (XWikiContext) this.execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
     }
 
     private void cleanup(Session session)
@@ -135,27 +146,24 @@ public class DefaultWebSocketContext implements WebSocketContext
     private ExecutionContext createExecutionContext(ServerEndpointConfig config, HandshakeRequest request,
         HandshakeResponse response)
     {
-        XWikiContext xcontext = this.contextProvider.createStubContext();
-
-        String wiki = getWiki(config, request);
-        if (wiki != null) {
-            xcontext.setWikiId(wiki);
-        }
-
-        xcontext.setRequest(new XWikiWebSocketRequestStub(request));
-        xcontext.setResponse(new XWikiWebSocketResponseStub(response));
-
-        try {
-            XWikiUser xwikiUser = xcontext.getWiki().checkAuth(xcontext);
-            if (xwikiUser != null) {
-                xcontext.setUserReference(xwikiUser.getUserReference());
-            }
-        } catch (Exception e) {
-            this.logger.warn("Failed to authenticate the user for [{}]. Root cause is:", request.getRequestURI(), e);
-        }
-
         ExecutionContext context = new ExecutionContext();
-        xcontext.declareInExecutionContext(context);
+
+        XWikiContext xcontext = this.contextProvider.createStubContext();
+        // The XWiki context is null if XWiki is not ready yet. See XWikiInitializerJob which initializes the
+        // XWikiStubContextProvider after XWiki is ready to service requests. XWiki WebSocket end-points that rely on
+        // the XWiki context should refuse the connection as long as the XWiki context is not set on the execution
+        // context (i.e. as long as XWiki is not ready).
+        if (xcontext != null) {
+            String wiki = getWiki(config, request);
+            if (wiki != null) {
+                xcontext.setWikiId(wiki);
+            }
+
+            xcontext.setRequest(new XWikiWebSocketRequestStub(request));
+            xcontext.setResponse(new XWikiWebSocketResponseStub(response));
+
+            xcontext.declareInExecutionContext(context);
+        }
 
         return context;
     }
@@ -181,5 +189,25 @@ public class DefaultWebSocketContext implements WebSocketContext
         List<String> matchedElements =
             pathElements.subList(pathElements.size() - templateElements.size(), pathElements.size());
         return matchedElements.get(pathParamPos);
+    }
+
+    private void authenticateUser(HandshakeRequest request)
+    {
+        XWikiContext xcontext = getXWikiContext();
+        // We can authenticate the user only after XWiki is ready (there's an XWiki context available) and if the
+        // WebSocket handshake request (HTTP upgrade) has an associated session (this prevents null pointer exceptions
+        // when authenticating the user because a session is expected in some cases, such as
+        // SecurityRequestWrapper#getUserPrincipal).
+        if (xcontext != null && request.getHttpSession() != null) {
+            try {
+                XWikiUser xwikiUser = xcontext.getWiki().checkAuth(xcontext);
+                if (xwikiUser != null) {
+                    xcontext.setUserReference(xwikiUser.getUserReference());
+                }
+            } catch (Exception e) {
+                this.logger.warn("Failed to authenticate the user for [{}]. Root cause is:", request.getRequestURI(),
+                    e);
+            }
+        }
     }
 }

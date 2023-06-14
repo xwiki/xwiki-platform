@@ -59,11 +59,11 @@ XWiki peut être utilisé comme base de connaissance (pour le support, la docume
 
 Pour utiliser votre Wiki au maximum de son potentiel, identifiez-vous et :
 
-Utilisez le bouton {{velocity}}$services.icon.render('pencil'){{/velocity}} ci-dessus pour //éditer// cette page et commencer à adapter ce Wiki à vos besoins.
+Utilisez le bouton {{displayIcon name="pencil"/}} ci-dessus pour //éditer// cette page et commencer à adapter ce Wiki à vos besoins.
 
-Utilisez le bouton {{velocity}}$services.icon.render('add'){{/velocity}} ci-dessus pour //ajouter// de nouvelles pages à votre Wiki et créez la //hiérarchie// qui vous convient le mieux pour organiser votre contenu.
+Utilisez le bouton {{displayIcon name="add"/}} ci-dessus pour //ajouter// de nouvelles pages à votre Wiki et créez la //hiérarchie// qui vous convient le mieux pour organiser votre contenu.
 
-Utilisez le fil d'Ariane {{velocity}}$services.icon.render('home'){{/velocity}} localisé au dessus du titre pour //naviguer// parmi vos pages. Vous pouvez être facilement perdu dans un Wiki important sans ce fil d'Ariane.
+Utilisez le fil d'Ariane {{displayIcon name="home"/}} localisé au dessus du titre pour //naviguer// parmi vos pages. Vous pouvez être facilement perdu dans un Wiki important sans ce fil d'Ariane.
 
 Vous pouvez aussi utiliser le [[bac à sable&gt;&gt;Sandbox.WebHome]] pour plus de contenu exemple ainsi que comme endroit pour expérimenter les fonctionnalités de votre Wiki.
 

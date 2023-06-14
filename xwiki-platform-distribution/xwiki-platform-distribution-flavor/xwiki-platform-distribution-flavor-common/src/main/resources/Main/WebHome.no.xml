@@ -59,11 +59,11 @@ XWiki kan brukes som kunnskapsbase (support, dokumentasjon, salg, etc.), for sam
 
 For å få mest mulig ut av wikien din, logg inn og:
 
-Bruk {{velocity}}$services.icon.render('pencil'){{/velocity}} knappen over for å //redigere// denne siden og begynne å tilpasse wiki til dine behov.
+Bruk {{displayIcon name="pencil"/}} knappen over for å //redigere// denne siden og begynne å tilpasse wiki til dine behov.
 
-Bruk {{velocity}}$services.icon.render('add'){{/velocity}} knappen over for å //legge til// flere sider til wikien din og opprette //hierarkiet// som best organiserer innholdet ditt .
+Bruk {{displayIcon name="add"/}} knappen over for å //legge til// flere sider til wikien din og opprette //hierarkiet// som best organiserer innholdet ditt .
 
-Bruk {{velocity}}$services.icon.render('home'){{/velocity}} brødsmulene som ligger over tittelen for å //navigere// inne på sidene dine. Det er lett å gå seg vill i en stor wiki uten dem.
+Bruk {{displayIcon name="home"/}} brødsmulene som ligger over tittelen for å //navigere// inne på sidene dine. Det er lett å gå seg vill i en stor wiki uten dem.
 
 Du kan også bruke [[Sandbox &gt;&gt;Sandbox.WebHome]] for mer demoinnhold og generelt et sted å eksperimentere med wikifunksjonene.
 

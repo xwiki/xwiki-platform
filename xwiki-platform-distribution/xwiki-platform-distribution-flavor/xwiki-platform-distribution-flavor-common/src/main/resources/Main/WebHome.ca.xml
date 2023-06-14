@@ -59,11 +59,11 @@ XWiki pot ser utilitzat com una base de dades de coneixement (suport, documentac
 
 Per treure el màxim profit del vostre wiki, registreu-vos i:
 
-Utilitzeu el botó {{html clean="false"}}&lt;span class="glyphicon glyphicon-pencil"&gt;&lt;/span&gt;{{/html}} a dalt per //editar// aquesta pagina i començar a personalitzar el vostre wiki,adaptant-lo a les vostres necessitats.
+Utilitzeu el botó {{displayIcon name="pencil"/}} a dalt per //editar// aquesta pagina i començar a personalitzar el vostre wiki,adaptant-lo a les vostres necessitats.
 
-Utilitzeu el botó {{html clean="false"}}&lt;span class="glyphicon glyphicon-plus"&gt;&lt;/span&gt;{{/html}} a dalt per //afegir// mes pàgines al vostre wiki i crear la //jerarquia// que millor organitzi el vostre contingut.
+Utilitzeu el botó {{displayIcon name="add"/}} a dalt per //afegir// mes pàgines al vostre wiki i crear la //jerarquia// que millor organitzi el vostre contingut.
 
-Utilitzeu l'explorador {{html clean="false"}}&lt;span class="glyphicon glyphicon-home fa fa-home"&gt;&lt;/span&gt;&lt;span class="fa fa-caret-down"&gt;&lt;/span&gt;{{/html}} situat sobre el títol, per //navegar// dins les vostres pàgines. Es fàcil perdre's dins d'un wiki gran sense aquesta eina.
+Utilitzeu l'explorador {{displayIcon name="home"/}} situat sobre el títol, per //navegar// dins les vostres pàgines. Es fàcil perdre's dins d'un wiki gran sense aquesta eina.
 
 També podeu utilitzar el [[Sandbox&gt;&gt;Sandbox.WebHome]] per a mes exemples de contingut i en general com a lloc per experimentar amb les prestacions del vostres wiki. 
 

@@ -59,11 +59,11 @@ XWiki는 지식 기반(support, documentation, sales 등)의 협업 작업 공�
 
 Wiki를 최대한 활용하려면, 로그인하고 다음 작업을 수행합니다:
 
-{{velocity}}$services.icon.render('pencil'){{/velocity}} 버튼을 사용하여 이 페이지를 //편집// 하고 필요에 따라 Wiki를 커스터마이즈 하십시오.
+{{displayIcon name="pencil"/}} 버튼을 사용하여 이 페이지를 //편집// 하고 필요에 따라 Wiki를 커스터마이즈 하십시오.
 
-{{velocity}}$services.icon.render('add'){{/velocity}} 버튼을 사용하여 wiki 페이지를 //추가// 콘텐츠를 가장 잘 정리하는 //계층화//를 만듭니다.
+{{displayIcon name="add"/}} 버튼을 사용하여 wiki 페이지를 //추가// 콘텐츠를 가장 잘 정리하는 //계층화//를 만듭니다.
 
-제목 위에 있는{{velocity}}$services.icon.render('home'){{/velocity}} 유저 위치를 보여주는 //네비게이트// 를 사용하십시오. Wiki에서는 길을 잃기 쉽습니다.
+제목 위에 있는{{displayIcon name="home"/}} 유저 위치를 보여주는 //네비게이트// 를 사용하십시오. Wiki에서는 길을 잃기 쉽습니다.
 
 당신은 또한 [[Sandbox&gt;&gt;Sandbox.WebHome]] 사용하여 더 많은 데모 콘텐츠를 볼 수 있으며 일반적으로 Wiki의 기능을 실험할 수 있습니다.
 

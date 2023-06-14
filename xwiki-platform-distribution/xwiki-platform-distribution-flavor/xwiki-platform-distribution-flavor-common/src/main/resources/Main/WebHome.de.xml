@@ -59,11 +59,11 @@ XWiki kann als Wissensdatenbank (Support, Dokumentation, Vertrieb, etc.), für k
 
 Um das Meiste aus Ihrem Wiki herauszuholen, melden Sie sich an und:
 
-Verwenden Sie die {{velocity}}$services.icon.render('pencil'){{/velocity}} Schaltfläche oberhalb, um diese Seite zu //bearbeiten// und beginnen Sie damit, das Wiki Ihren Vorstellungen anzupassen.
+Verwenden Sie die {{displayIcon name="pencil"/}} Schaltfläche oberhalb, um diese Seite zu //bearbeiten// und beginnen Sie damit, das Wiki Ihren Vorstellungen anzupassen.
 
-Verwenden Sie die {{velocity}}$services.icon.render('add'){{/velocity}} Schaltfläche oberhalb, um neue Seiten zu //erstellen// und erzeugen Sie eine //Hierarchie//, die Ihre Informationen am besten organisiert. 
+Verwenden Sie die {{displayIcon name="add"/}} Schaltfläche oberhalb, um neue Seiten zu //erstellen// und erzeugen Sie eine //Hierarchie//, die Ihre Informationen am besten organisiert.
 
-Verwenden Sie die {{velocity}}$services.icon.render('home'){{/velocity}} Breadcrumbs über dem Titel, um innerhalb Ihrer Seiten zu navigieren. Ohne diese ist es leicht, sich in einem großen Wiki zu verirren.
+Verwenden Sie die {{displayIcon name="home"/}} Breadcrumbs über dem Titel, um innerhalb Ihrer Seiten zu navigieren. Ohne diese ist es leicht, sich in einem großen Wiki zu verirren.
 
 Außerdem können Sie den [[Sandkasten&gt;&gt;Sandbox.WebHome]] verwenden, um weitere Demo-Inhalte anzusehen und die einzelnen Funktionen des Wikis auszuprobieren und besser kennenzulernen. 
 

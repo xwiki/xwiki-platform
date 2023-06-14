@@ -59,11 +59,11 @@ XWiki pode ser usado como uma base de conhecimento (suporte, documentação, ven
 
 Para fazer a maioria de seus wikis, faça o login e:
 
-Use o botão {{html clean="false"}}&lt;span class="glyphicon glyphicon-pencil"&gt;&lt;/span&gt;{{/html}} para //editar// esta página e começar a customizar da maneira que você precisar.
+Use o botão {{displayIcon name="pencil"/}} para //editar// esta página e começar a customizar da maneira que você precisar.
 
-Use o botão {{html clean="false"}}&lt;span class="glyphicon glyphicon-plus"&gt;&lt;/span&gt;{{/html}} para //adicionar// mais páginas para seu wiki e criar a //hierarquia// que melhor organiza seus conteúdos.
+Use o botão {{displayIcon name="add"/}} para //adicionar// mais páginas para seu wiki e criar a //hierarquia// que melhor organiza seus conteúdos.
 
-Use o botão {{html clean="false"}}&lt;span class="glyphicon glyphicon-home fa fa-home"&gt;&lt;/span&gt;&lt;span class="fa fa-caret-down"&gt;&lt;/span&gt;{{/html}} localizado acima do título para //navegar// dentro de suas páginas. É fácil de perder em um gigante wiki sem essa navegação.
+Use o botão {{displayIcon name="home"/}} localizado acima do título para //navegar// dentro de suas páginas. É fácil de perder em um gigante wiki sem essa navegação.
 
 Você pode também utilizar a  [[Sandbox&gt;&gt;Sandbox.WebHome]] para mais demostração de conteúdos e geralmente será um lugar para experimentar as funcionalidades de seu wiki. 
 

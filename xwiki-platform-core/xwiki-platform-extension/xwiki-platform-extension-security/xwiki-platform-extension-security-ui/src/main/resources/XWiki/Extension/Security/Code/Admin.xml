@@ -39,7 +39,7 @@
   <content>{{template name="extension.vm" output="false"/}}
 
 {{velocity}}
-#if($services.security.authorization.hasAccess('admin') &amp;&amp; $services.extensionSecurity.isSecurityScanEnabled())
+#if($services.security.authorization.hasAccess('admin') &amp;&amp; $services.extension.index.security.isSecurityScanEnabled())
 {{warning}}
 {{translation key="extension.security.admin.generalWarning"/}}
 {{/warning}}

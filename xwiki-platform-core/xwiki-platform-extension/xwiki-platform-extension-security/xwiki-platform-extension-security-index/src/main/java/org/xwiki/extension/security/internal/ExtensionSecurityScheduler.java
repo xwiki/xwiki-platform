@@ -63,6 +63,7 @@ public class ExtensionSecurityScheduler implements Runnable, Disposable
      */
     public synchronized void start()
     {
+        
         if (this.executor == null) {
             this.started = true;
             // Start the scheduling.

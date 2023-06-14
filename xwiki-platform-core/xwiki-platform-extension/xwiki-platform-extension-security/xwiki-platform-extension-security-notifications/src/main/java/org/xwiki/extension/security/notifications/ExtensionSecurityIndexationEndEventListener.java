@@ -32,8 +32,9 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 
 /**
- * Listen for {@link ExtensionSecurityIndexationEndEvent} and forward them as {@link NewExtensionSecurityVulnerabilityTargetableEvent} to notify
- * admins of the presence of new security issues.
+ * Listen for {@link ExtensionSecurityIndexationEndEvent} and forward them as
+ * {@link NewExtensionSecurityVulnerabilityTargetableEvent} to notify admins of the presence of new security
+ * vulnerabilities.
  *
  * @version $Id$
  * @since 15.5RC1
@@ -67,8 +68,10 @@ public class ExtensionSecurityIndexationEndEventListener implements EventListene
     public void onEvent(Event event, Object source, Object data)
     {
         if ((long) data > 0) {
+            // Converted to string are otherwise the data is ignored during the conversion.
+            String strData = String.valueOf(data);
             this.observationManager.notify(new NewExtensionSecurityVulnerabilityTargetableEvent(),
-                "org.xwiki.platform:xwiki-platform-extension-security-notifications", data);
+                "org.xwiki.platform:xwiki-platform-extension-security-notifications", strData);
         }
     }
 }

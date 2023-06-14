@@ -296,7 +296,7 @@
     <property>
       <content>{{velocity}}
       #if ($hasAdmin)
-        #set ($count = $services.extensionSecurity.getExtensionsCount())
+        #set ($count = $services.extension.index.security.getExtensionsCount())
         #if ($count &gt; 0)
           #set ($discard = $xwiki.ssx.use('XWiki.Extension.Security.Code.NotificationAlert'))
         {{error}}

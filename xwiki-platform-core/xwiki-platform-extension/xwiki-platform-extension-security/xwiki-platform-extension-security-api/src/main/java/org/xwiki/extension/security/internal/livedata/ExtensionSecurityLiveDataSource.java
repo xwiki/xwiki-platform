@@ -17,20 +17,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.security.internal;
+package org.xwiki.extension.security.internal.livedata;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.livedata.LiveDataConfiguration;
-import org.xwiki.livedata.LiveDataConfigurationResolver;
-import org.xwiki.livedata.internal.JSONMerge;
+import org.xwiki.livedata.LiveDataEntryStore;
+import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
+import org.xwiki.livedata.LiveDataSource;
 
 /**
- * Adds missing live data configuration values specific to the extension security source.
+ * Live Data source for the {@code extensionSecurity}.
  *
  * @version $Id$
  * @since 15.5RC1
@@ -38,16 +37,30 @@ import org.xwiki.livedata.internal.JSONMerge;
 @Component
 @Singleton
 @Named(ExtensionSecurityLiveDataSource.ID)
-public class ExtensionSecurityLiveDataConfigurationResolver
-    implements LiveDataConfigurationResolver<LiveDataConfiguration>
+public class ExtensionSecurityLiveDataSource implements LiveDataSource
 {
+    /**
+     * The extension security live data source id.
+     */
+    public static final String ID = "extensionSecurity";
+
     @Inject
-    @Named(ExtensionSecurityLiveDataSource.ID)
-    private Provider<LiveDataConfiguration> extensionSecurityLiveDataProvider;
+    @Named(ID)
+    private LiveDataEntryStore entryStore;
+
+    @Inject
+    @Named(ID)
+    private LiveDataPropertyDescriptorStore propertyStore;
 
     @Override
-    public LiveDataConfiguration resolve(LiveDataConfiguration input)
+    public LiveDataEntryStore getEntries()
     {
-        return new JSONMerge().merge(input, this.extensionSecurityLiveDataProvider.get());
+        return this.entryStore;
+    }
+
+    @Override
+    public LiveDataPropertyDescriptorStore getProperties()
+    {
+        return this.propertyStore;
     }
 }

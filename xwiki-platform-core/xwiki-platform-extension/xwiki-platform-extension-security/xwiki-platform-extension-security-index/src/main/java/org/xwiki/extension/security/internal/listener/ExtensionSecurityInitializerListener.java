@@ -30,7 +30,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.security.internal.ExtensionSecurityScheduler;
 import org.xwiki.job.event.JobFinishedEvent;
 import org.xwiki.observation.AbstractEventListener;
+import org.xwiki.observation.event.AbstractLocalEventListener;
 import org.xwiki.observation.event.Event;
+import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 import static org.xwiki.extension.index.internal.job.ExtensionIndexJob.JOB_TYPE;
 
@@ -44,7 +46,7 @@ import static org.xwiki.extension.index.internal.job.ExtensionIndexJob.JOB_TYPE;
 @Component
 @Named(ExtensionSecurityInitializerListener.NAME)
 @Singleton
-public class ExtensionSecurityInitializerListener extends AbstractEventListener
+public class ExtensionSecurityInitializerListener extends AbstractLocalEventListener
 {
     /**
      * The name of the event listener (and its component hint).
@@ -63,8 +65,10 @@ public class ExtensionSecurityInitializerListener extends AbstractEventListener
     }
 
     @Override
-    public void onEvent(Event event, Object source, Object data)
+    public void processLocalEvent(Event event, Object source, Object data)
     {
+        // Clustering related note: since the JobFinishedEvent is only sent by node, the scheduler will also be stared 
+        // on a single node. Therefore 
         if (event instanceof JobFinishedEvent
             && Objects.equals(((JobFinishedEvent) event).getJobType(), JOB_TYPE))
         {

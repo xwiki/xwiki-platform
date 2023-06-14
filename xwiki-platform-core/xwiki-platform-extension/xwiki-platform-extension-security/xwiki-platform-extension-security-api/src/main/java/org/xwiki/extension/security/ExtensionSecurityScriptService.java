@@ -28,6 +28,8 @@ import javax.inject.Singleton;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.extension.script.ExtensionIndexScriptService;
+import org.xwiki.extension.script.ExtensionManagerScriptService;
 import org.xwiki.extension.security.internal.ExtensionSecuritySolrClient;
 import org.xwiki.script.service.ScriptService;
 
@@ -41,9 +43,15 @@ import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessa
  */
 @Component
 @Singleton
-@Named("extensionSecurity")
+@Named(ExtensionManagerScriptService.ROLEHINT + '.' + ExtensionIndexScriptService.ID + '.'
+    + ExtensionSecurityScriptService.ID)
 public class ExtensionSecurityScriptService implements ScriptService
 {
+    /**
+     * The id of the component, also used as the last segment of the component hint.
+     */
+    public static final String ID = "security";
+
     @Inject
     private ExtensionSecurityConfiguration extensionSecurityConfiguration;
 
@@ -55,7 +63,7 @@ public class ExtensionSecurityScriptService implements ScriptService
 
     /**
      * @return {@code true} when the security scan is enabled, {@code false} otherwise. When the security scan is
-     *     disabled, no security scan is performed and the list of security issues is not displayed in the
+     *     disabled, no security scan is performed and the list of security vulnerabilities is not displayed in the
      *     administration. The default value is {@code true}
      */
     public boolean isSecurityScanEnabled()
@@ -71,7 +79,7 @@ public class ExtensionSecurityScriptService implements ScriptService
         try {
             return this.solrClient.getExtensionsCount();
         } catch (SolrServerException | IOException e) {
-            this.logger.warn("Failed to retrieve the count of extensions with known vulnerabilties. Cause: [{}]",
+            this.logger.warn("Failed to retrieve the count of extensions with known vulnerabilities. Cause: [{}]",
                 getRootCauseMessage(e));
             return 0;
         }

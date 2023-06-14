@@ -36,7 +36,7 @@ import org.xwiki.stability.Unstable;
 public interface ExtensionSecurityAnalyzer
 {
     /**
-     * Analyze the security issues for the given extension.
+     * Analyze the security vulnerabilities for the given extension.
      *
      * @param extension the extension to analyze
      * @return {@code true} if at least one unknown security issue is found for the extension

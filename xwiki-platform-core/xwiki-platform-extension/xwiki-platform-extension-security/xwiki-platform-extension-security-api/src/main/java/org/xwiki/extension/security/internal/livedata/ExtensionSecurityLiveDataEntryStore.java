@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.security.internal;
+package org.xwiki.extension.security.internal.livedata;
 
 import java.io.IOException;
 import java.util.Map;
@@ -31,6 +31,8 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.extension.security.internal.ExtensionSecuritySolrClient;
+import org.xwiki.extension.security.internal.SolrToLiveDataEntryMapper;
 import org.xwiki.livedata.LiveData;
 import org.xwiki.livedata.LiveDataEntryStore;
 import org.xwiki.livedata.LiveDataException;

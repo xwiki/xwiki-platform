@@ -40,11 +40,11 @@ import static org.xwiki.extension.InstalledExtension.FIELD_INSTALLED_NAMESPACES;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_FIX_VERSION;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_MAX_CVSS;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID;
-import static org.xwiki.extension.security.internal.ExtensionSecurityLiveDataConfigurationProvider.EXTENSION_ID;
-import static org.xwiki.extension.security.internal.ExtensionSecurityLiveDataConfigurationProvider.FIX_VERSION;
-import static org.xwiki.extension.security.internal.ExtensionSecurityLiveDataConfigurationProvider.MAX_CVSS;
-import static org.xwiki.extension.security.internal.ExtensionSecurityLiveDataConfigurationProvider.NAME;
-import static org.xwiki.extension.security.internal.ExtensionSecurityLiveDataConfigurationProvider.WIKIS;
+import static org.xwiki.extension.security.internal.livedata.ExtensionSecurityLiveDataConfigurationProvider.EXTENSION_ID;
+import static org.xwiki.extension.security.internal.livedata.ExtensionSecurityLiveDataConfigurationProvider.FIX_VERSION;
+import static org.xwiki.extension.security.internal.livedata.ExtensionSecurityLiveDataConfigurationProvider.MAX_CVSS;
+import static org.xwiki.extension.security.internal.livedata.ExtensionSecurityLiveDataConfigurationProvider.NAME;
+import static org.xwiki.extension.security.internal.livedata.ExtensionSecurityLiveDataConfigurationProvider.WIKIS;
 import static org.xwiki.search.solr.AbstractSolrCoreInitializer.SOLR_FIELD_ID;
 
 /**
@@ -143,7 +143,8 @@ public class ExtensionSecuritySolrClient
         for (String filterQuery : solrQuery.getFilterQueries()) {
             solrQuery.removeFilterQuery(filterQuery);
         }
-        // Only include extensions with a computed CVSS score, meaning that they have at least one known security issue.
+        // Only include extensions with a computed CVSS score, meaning that they have at least one known security
+        // vulnerability.
         solrQuery.addFilterQuery(String.format("%s:[0 TO 10]", SECURITY_MAX_CVSS));
     }
 

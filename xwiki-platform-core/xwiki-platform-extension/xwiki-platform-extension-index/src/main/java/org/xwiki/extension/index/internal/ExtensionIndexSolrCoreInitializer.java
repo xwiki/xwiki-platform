@@ -35,7 +35,7 @@ import org.xwiki.search.solr.SolrException;
 
 /**
  * Initialize the Solr core dedicated to events storage.
- *
+ * 
  * @version $Id$
  * @since 12.10
  */
@@ -66,7 +66,7 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
 
     /**
      * Index the list of components in a full text search friendly manner.
-     *
+     * 
      * @since 13.3RC1
      */
     public static final String SOLR_FIELD_COMPONENTS_INDEX = Extension.FIELD_COMPONENTS + INDEX_SUFFIX;
@@ -131,12 +131,12 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
     public static final String SECURITY_CVE_COUNT = "security_cveCount";
 
     /**
-     * The computed version where all the issues are fixed.
+     * The computed version where all the vulnerabilities are fixed.
      */
     public static final String SECURITY_FIX_VERSION = "security_fixVersion";
 
     /**
-     * A textual explanation of how to upgrade this extension to fix the security issues.
+     * A textual explanation of how to upgrade this extension to fix the security vulnerabilities.
      */
     public static final String SECURITY_ADVICE = "security_advice";
 

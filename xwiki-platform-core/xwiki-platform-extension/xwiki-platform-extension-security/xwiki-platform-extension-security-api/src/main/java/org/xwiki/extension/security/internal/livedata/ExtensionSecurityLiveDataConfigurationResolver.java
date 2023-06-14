@@ -17,9 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.security.internal;
-
-import java.util.Collection;
+package org.xwiki.extension.security.internal.livedata;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -28,12 +26,11 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.LiveDataConfiguration;
-import org.xwiki.livedata.LiveDataPropertyDescriptor;
-import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
+import org.xwiki.livedata.LiveDataConfigurationResolver;
+import org.xwiki.livedata.internal.JSONMerge;
 
 /**
- * {@link LiveDataPropertyDescriptorStore} implementation that exposes the extension security list columns as live data
- * properties.
+ * Adds missing live data configuration values specific to the extension security source.
  *
  * @version $Id$
  * @since 15.5RC1
@@ -41,15 +38,16 @@ import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
 @Component
 @Singleton
 @Named(ExtensionSecurityLiveDataSource.ID)
-public class ExtensionSecurityLiveDataPropertyDescriptorStore implements LiveDataPropertyDescriptorStore
+public class ExtensionSecurityLiveDataConfigurationResolver
+    implements LiveDataConfigurationResolver<LiveDataConfiguration>
 {
     @Inject
     @Named(ExtensionSecurityLiveDataSource.ID)
-    private Provider<LiveDataConfiguration> configurationResolver;
+    private Provider<LiveDataConfiguration> extensionSecurityLiveDataProvider;
 
     @Override
-    public Collection<LiveDataPropertyDescriptor> get()
+    public LiveDataConfiguration resolve(LiveDataConfiguration input)
     {
-        return this.configurationResolver.get().getMeta().getPropertyDescriptors();
+        return new JSONMerge().merge(input, this.extensionSecurityLiveDataProvider.get());
     }
 }

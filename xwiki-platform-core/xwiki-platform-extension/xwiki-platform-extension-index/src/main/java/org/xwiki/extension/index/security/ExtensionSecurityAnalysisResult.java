@@ -26,7 +26,7 @@ import org.xwiki.stability.Unstable;
 import static java.util.Comparator.comparingDouble;
 
 /**
- * Store the known security issues for a given extension.
+ * Store the known security vulnerabilities for a given extension.
  *
  * @version $Id$
  * @since 15.5RC1
@@ -34,31 +34,31 @@ import static java.util.Comparator.comparingDouble;
 @Unstable
 public class ExtensionSecurityAnalysisResult
 {
-    private List<SecurityIssueDescriptor> securityIssues;
+    private List<SecurityVulnerabilityDescriptor> securityVulnerabilities;
 
     private String advice;
 
     /**
-     * @param securityIssues the security issues associated with the analyzed extension
+     * @param securityVulnerabilities the security vulnerabilities associated with the analyzed extension
      * @return the current object
      */
-    public ExtensionSecurityAnalysisResult setResults(List<SecurityIssueDescriptor> securityIssues)
+    public ExtensionSecurityAnalysisResult setResults(List<SecurityVulnerabilityDescriptor> securityVulnerabilities)
     {
-        this.securityIssues = securityIssues;
+        this.securityVulnerabilities = securityVulnerabilities;
         return this;
     }
 
     /**
-     * @return the security issues associated with the analyzed extension
+     * @return the security vulnerabilities associated with the analyzed extension
      */
-    public List<SecurityIssueDescriptor> getSecurityIssues()
+    public List<SecurityVulnerabilityDescriptor> getSecurityVulnerabilities()
     {
-        return this.securityIssues;
+        return this.securityVulnerabilities;
     }
 
     /**
      * @return the translation key of the advice applicable on the security analysis (e.g., how to upgrade the extension
-     *     to fix the identified security issues)
+     *     to fix the identified security vulnerabilities)
      */
     public String getAdvice()
     {
@@ -67,7 +67,7 @@ public class ExtensionSecurityAnalysisResult
 
     /**
      * @param advice the translation key of the advice applicable on the security analysis (e.g., how to upgrade the
-     *     extension to fix the identified security issues)
+     *     extension to fix the identified security vulnerabilities)
      * @return the current object
      */
     public ExtensionSecurityAnalysisResult setAdvice(String advice)
@@ -78,14 +78,14 @@ public class ExtensionSecurityAnalysisResult
     }
 
     /**
-     * @return the highest CVSS of this security issue in this analysis
+     * @return the highest CVSS of this security vulnerabilities in this analysis
      */
     public Double getMaxCVSS()
     {
-        if (this.securityIssues != null) {
-            return this.securityIssues.stream()
-                .max(comparingDouble(SecurityIssueDescriptor::getScore))
-                .map(SecurityIssueDescriptor::getScore)
+        if (this.securityVulnerabilities != null) {
+            return this.securityVulnerabilities.stream()
+                .max(comparingDouble(SecurityVulnerabilityDescriptor::getScore))
+                .map(SecurityVulnerabilityDescriptor::getScore)
                 .orElse(null);
         } else {
             return null;

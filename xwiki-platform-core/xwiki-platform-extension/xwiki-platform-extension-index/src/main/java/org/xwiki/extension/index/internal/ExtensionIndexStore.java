@@ -59,7 +59,7 @@ import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.RemoteExtension;
 import org.xwiki.extension.index.IndexedExtensionQuery;
 import org.xwiki.extension.index.security.ExtensionSecurityAnalysisResult;
-import org.xwiki.extension.index.security.SecurityIssueDescriptor;
+import org.xwiki.extension.index.security.SecurityVulnerabilityDescriptor;
 import org.xwiki.extension.internal.ExtensionFactory;
 import org.xwiki.extension.internal.converter.ExtensionIdConverter;
 import org.xwiki.extension.rating.RatingExtension;
@@ -96,7 +96,7 @@ import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializ
 
 /**
  * An helper to manipulate the store of indexed extensions.
- *
+ * 
  * @version $Id$
  * @since 12.10
  */
@@ -279,7 +279,7 @@ public class ExtensionIndexStore implements Initializable
 
     /**
      * Update variable informations (recommended tag, ratings, etc.).
-     *
+     * 
      * @param extensionId the identifier of the extension to update
      * @param remoteExtension the remote extension from which to extract variable information
      * @throws IOException If there is a low-level I/O error.
@@ -325,31 +325,31 @@ public class ExtensionIndexStore implements Initializable
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, Extension.FIELD_VERSION,
             extensionId.getVersion().getValue(), doc);
 
-        if (!result.getSecurityIssues().isEmpty()) {
+        if (!result.getSecurityVulnerabilities().isEmpty()) {
             this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_MAX_CVSS,
                 result.getMaxCVSS(), doc);
         } else {
-            // Remove the CVSS score if the new list of security issues becomes empty.
+            // Remove the CVSS score if the new list of security vulnerabilities becomes empty.
             this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_REMOVE, SECURITY_MAX_CVSS, 0.0, Double.class, doc);
         }
-        Stream<String> cveIds = result.getSecurityIssues().stream().map(SecurityIssueDescriptor::getId);
+        Stream<String> cveIds = result.getSecurityVulnerabilities().stream().map(SecurityVulnerabilityDescriptor::getId);
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_CVE_ID,
             cveIds.collect(Collectors.toList()), doc);
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_CVE_LINK,
-            result.getSecurityIssues().stream()
-                .map(SecurityIssueDescriptor::getURL).collect(Collectors.toList()), doc);
+            result.getSecurityVulnerabilities().stream()
+                .map(SecurityVulnerabilityDescriptor::getURL).collect(Collectors.toList()), doc);
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_CVE_CVSS,
-            result.getSecurityIssues().stream()
-                .map(SecurityIssueDescriptor::getScore).collect(Collectors.toList()), doc);
-        String fixVersion = result.getSecurityIssues().stream()
-            .map(SecurityIssueDescriptor::getFixVersion)
+            result.getSecurityVulnerabilities().stream()
+                .map(SecurityVulnerabilityDescriptor::getScore).collect(Collectors.toList()), doc);
+        String fixVersion = result.getSecurityVulnerabilities().stream()
+            .map(SecurityVulnerabilityDescriptor::getFixVersion)
             .max(Comparator.naturalOrder())
             .map(Version::getValue)
             .orElse(null);
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_FIX_VERSION, fixVersion, doc);
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_ADVICE, result.getAdvice(), doc);
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_CVE_COUNT,
-            result.getSecurityIssues().size(), doc);
+            result.getSecurityVulnerabilities().size(), doc);
 
         add(doc);
         commit();
@@ -357,7 +357,7 @@ public class ExtensionIndexStore implements Initializable
 
     /**
      * Update variable informations (recommended tag, ratings, etc.) by copying it from another version.
-     *
+     * 
      * @param extensionId the identifier of the extension to update
      * @param copyVersion the version of the extension to copy
      * @throws IOException If there is a low-level I/O error.
@@ -737,7 +737,7 @@ public class ExtensionIndexStore implements Initializable
 
     /**
      * Search extension based of the provided query.
-     *
+     * 
      * @param query the query
      * @return the found extensions descriptors, empty list if nothing could be found
      * @throws SearchException error when trying to search provided query

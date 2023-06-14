@@ -34,7 +34,7 @@ public interface ExtensionSecurityConfiguration
 {
     /**
      * @return {@code true} when the security scan is enabled, {@code false} otherwise. When the security scan is
-     *     disabled, no security scan is performed and the list of security issues is not displayed in the
+     *     disabled, no security scan is performed and the list of security vulnerabilities is not displayed in the
      *     administration. The default value is {@code true}
      */
     boolean isSecurityScanEnabled();
@@ -46,6 +46,7 @@ public interface ExtensionSecurityConfiguration
     int getScanDelay();
 
     /**
+     * 
      * @return the url to use for the rest api endpoint. The default value is <a
      *     href="https://api.osv.dev/v1/query">https://api.osv.dev/v1/query</a>
      */

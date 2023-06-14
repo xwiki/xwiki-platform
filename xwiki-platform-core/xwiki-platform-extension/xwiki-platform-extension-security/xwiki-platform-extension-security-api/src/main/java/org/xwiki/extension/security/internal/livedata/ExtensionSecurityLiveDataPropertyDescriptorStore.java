@@ -17,19 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.security.internal;
+package org.xwiki.extension.security.internal.livedata;
+
+import java.util.Collection;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.livedata.LiveDataEntryStore;
+import org.xwiki.livedata.LiveDataConfiguration;
+import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
-import org.xwiki.livedata.LiveDataSource;
 
 /**
- * Live Data source for the {@code extensionSecurity}.
+ * {@link LiveDataPropertyDescriptorStore} implementation that exposes the extension security list columns as live data
+ * properties.
  *
  * @version $Id$
  * @since 15.5RC1
@@ -37,30 +41,15 @@ import org.xwiki.livedata.LiveDataSource;
 @Component
 @Singleton
 @Named(ExtensionSecurityLiveDataSource.ID)
-public class ExtensionSecurityLiveDataSource implements LiveDataSource
+public class ExtensionSecurityLiveDataPropertyDescriptorStore implements LiveDataPropertyDescriptorStore
 {
-    /**
-     * The extension security live data source id.
-     */
-    public static final String ID = "extensionSecurity";
-
     @Inject
-    @Named(ID)
-    private LiveDataEntryStore entryStore;
-
-    @Inject
-    @Named(ID)
-    private LiveDataPropertyDescriptorStore propertyStore;
+    @Named(ExtensionSecurityLiveDataSource.ID)
+    private Provider<LiveDataConfiguration> configurationResolver;
 
     @Override
-    public LiveDataEntryStore getEntries()
+    public Collection<LiveDataPropertyDescriptor> get()
     {
-        return this.entryStore;
-    }
-
-    @Override
-    public LiveDataPropertyDescriptorStore getProperties()
-    {
-        return this.propertyStore;
+        return this.configurationResolver.get().getMeta().getPropertyDescriptors();
     }
 }

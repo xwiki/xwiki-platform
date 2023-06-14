@@ -41,7 +41,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.index.security.ExtensionSecurityAnalysisResult;
-import org.xwiki.extension.index.security.SecurityIssueDescriptor;
+import org.xwiki.extension.index.security.SecurityVulnerabilityDescriptor;
 import org.xwiki.extension.security.ExtensionSecurityConfiguration;
 import org.xwiki.extension.security.analyzer.ExtensionSecurityAnalyzer;
 import org.xwiki.extension.security.internal.ExtensionSecurityException;
@@ -146,9 +146,9 @@ public class OsvExtensionSecurityAnalyzer implements ExtensionSecurityAnalyzer
         }
     }
 
-    private SecurityIssueDescriptor convert(VulnObject vulnObject)
+    private SecurityVulnerabilityDescriptor convert(VulnObject vulnObject)
     {
-        return new SecurityIssueDescriptor()
+        return new SecurityVulnerabilityDescriptor()
             .setId(vulnObject.getId())
             .setURL(vulnObject.getMainURL())
             .setSeverityScore(vulnObject.getSeverityCCSV3())

@@ -25,7 +25,8 @@ import org.xwiki.observation.event.Event;
 import org.xwiki.stability.Unstable;
 
 /**
- * Notify that new security issues have been found.
+ * Notify that new security vulnerabilities have been found. The source is {@code null}, and the data is the number of
+ * new security vulnerabilities found during the scan (as a {@code long}).
  *
  * @version $Id$
  * @since 15.5RC1

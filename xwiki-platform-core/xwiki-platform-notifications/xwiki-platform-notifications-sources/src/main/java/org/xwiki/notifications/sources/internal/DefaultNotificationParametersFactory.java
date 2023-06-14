@@ -402,6 +402,29 @@ public class DefaultNotificationParametersFactory
         }
     }
 
+    /**
+     * Helper method to get a notification parameters for Alert format for the given user and count.
+     * This helper is provided as it used to be a standard call in old APIs of Notifications.
+     *
+     * @param userId a serialization of the user for whom to get notifications
+     * @param expectedCount the number of notifications to retrieve
+     * @return the parameters to use in notification APIs
+     * @throws NotificationException in case of problem
+     * @since 15.5RC1
+     */
+    public NotificationParameters getParametersForUserAndCount(String userId, int expectedCount)
+        throws NotificationException
+    {
+        NotificationParameters parameters = new NotificationParameters();
+        parameters.user = this.stringDocumentReferenceResolver.resolve(userId);
+        parameters.format = NotificationFormat.ALERT;
+        parameters.expectedCount = expectedCount;
+        parameters.endDateIncluded = true;
+
+        this.useUserPreferences(parameters);
+        return parameters;
+    }
+
     private void dontUseUserPreferences(NotificationParameters notificationParameters,
         Map<ParametersKey, String> parameters) throws NotificationException, EventStreamException
     {

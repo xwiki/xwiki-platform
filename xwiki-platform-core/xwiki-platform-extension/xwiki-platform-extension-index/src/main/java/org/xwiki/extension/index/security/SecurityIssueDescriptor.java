@@ -17,9 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.index.internal.security;
+package org.xwiki.extension.index.security;
 
 import org.xwiki.extension.version.Version;
+import org.xwiki.stability.Unstable;
 
 import us.springett.cvss.Cvss;
 
@@ -29,6 +30,7 @@ import us.springett.cvss.Cvss;
  * @version $Id$
  * @since 15.5RC1
  */
+@Unstable
 public class SecurityIssueDescriptor
 {
     private String id;

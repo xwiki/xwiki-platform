@@ -1,0 +1,3 @@
+#template('notification/macros.vm')
+
+#displayNotificationEventSkeleton('warning' 'warning' 'content' 'details')

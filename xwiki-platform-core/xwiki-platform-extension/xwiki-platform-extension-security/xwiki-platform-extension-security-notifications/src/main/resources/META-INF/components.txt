@@ -1,2 +1,2 @@
-org.xwiki.extension.security.notifications.NewSecurityIssueEventDescriptor
-org.xwiki.extension.security.notifications.ExtensionSecurityListener
+org.xwiki.extension.security.notifications.NewExtensionSecurityVulnerabilityTargetableEventDescriptor
+org.xwiki.extension.security.notifications.ExtensionSecurityIndexationEndEventListener

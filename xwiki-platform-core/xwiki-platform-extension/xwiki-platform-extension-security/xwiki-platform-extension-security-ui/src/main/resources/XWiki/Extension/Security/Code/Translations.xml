@@ -36,13 +36,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>extension.security.admin.title=Security List
+  <content>extension.security.admin.title=Security Vulnerabilities
 extension.security.indexed.started=Index started on {0}.
-extension.security.indexed.on=Indexed on {0}. Any extension installed after this date, or security issues released after this date won't appear. New security scans are performed periodically.
+extension.security.indexed.on=Indexed on {0}. Any extension installed after this date, or security vulnerabilities released after this date won't appear. New security scans are performed periodically.
 extension.security.indexed.nojob=Could not find any previous indexation processing.
 extension.security.admin.generalWarning=Please note that this security scan does not include all installed extensions. Extensions that can't be updated through the Extension Manager are currently not included.
 extension.security.admin.configuration.title=Configuration
-extension.security.notification.message=We have identified {0} extensions with known security issues, see the detail in the {1}
+extension.security.notification.message=We have identified {0} extensions with known security vulnerabilities, see the detail in the {1} report
 XWiki.Extension.Security.Code.ConfigClass_scanEnabled=Scan Enabled
 XWiki.Extension.Security.Code.ConfigClass_scanEnabled.hint=When unchecked, the security scan won't be executed anymore
 XWiki.Extension.Security.Code.ConfigClass_scanDelay=Scan Delay

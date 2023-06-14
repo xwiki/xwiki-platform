@@ -26,27 +26,27 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.extension.security.ExtensionSecurityEvent;
+import org.xwiki.extension.security.ExtensionSecurityIndexationEndEvent;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 
 /**
- * Listen for {@link ExtensionSecurityEvent} and forward them as {@link NewSecurityIssueEvent} to notify admins of the
- * presence of new security issues.
+ * Listen for {@link ExtensionSecurityIndexationEndEvent} and forward them as {@link NewExtensionSecurityVulnerabilityTargetableEvent} to notify
+ * admins of the presence of new security issues.
  *
  * @version $Id$
  * @since 15.5RC1
  */
 @Component
 @Singleton
-@Named(ExtensionSecurityListener.ID)
-public class ExtensionSecurityListener implements EventListener
+@Named(ExtensionSecurityIndexationEndEventListener.ID)
+public class ExtensionSecurityIndexationEndEventListener implements EventListener
 {
     /**
      * The hint and name of this listener.
      */
-    public static final String ID = "ExtensionSecurityListener";
+    public static final String ID = "ExtensionSecurityIndexationEndEvent";
 
     @Inject
     private ObservationManager observationManager;
@@ -60,12 +60,15 @@ public class ExtensionSecurityListener implements EventListener
     @Override
     public List<Event> getEvents()
     {
-        return List.of(new ExtensionSecurityEvent());
+        return List.of(new ExtensionSecurityIndexationEndEvent());
     }
 
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        this.observationManager.notify(new NewSecurityIssueEvent(), this, data);
+        if ((long) data > 0) {
+            this.observationManager.notify(new NewExtensionSecurityVulnerabilityTargetableEvent(),
+                "org.xwiki.platform:xwiki-platform-extension-security-notifications", data);
+        }
     }
 }

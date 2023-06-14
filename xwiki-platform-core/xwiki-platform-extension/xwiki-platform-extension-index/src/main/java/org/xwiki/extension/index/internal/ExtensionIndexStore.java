@@ -58,8 +58,8 @@ import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.RemoteExtension;
 import org.xwiki.extension.index.IndexedExtensionQuery;
-import org.xwiki.extension.index.internal.security.ExtensionAnalysisResult;
-import org.xwiki.extension.index.internal.security.SecurityIssueDescriptor;
+import org.xwiki.extension.index.security.ExtensionSecurityAnalysisResult;
+import org.xwiki.extension.index.security.SecurityIssueDescriptor;
 import org.xwiki.extension.internal.ExtensionFactory;
 import org.xwiki.extension.internal.converter.ExtensionIdConverter;
 import org.xwiki.extension.rating.RatingExtension;
@@ -96,7 +96,7 @@ import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializ
 
 /**
  * An helper to manipulate the store of indexed extensions.
- * 
+ *
  * @version $Id$
  * @since 12.10
  */
@@ -279,7 +279,7 @@ public class ExtensionIndexStore implements Initializable
 
     /**
      * Update variable informations (recommended tag, ratings, etc.).
-     * 
+     *
      * @param extensionId the identifier of the extension to update
      * @param remoteExtension the remote extension from which to extract variable information
      * @throws IOException If there is a low-level I/O error.
@@ -314,7 +314,7 @@ public class ExtensionIndexStore implements Initializable
      * @throws IOException If there is a low-level I/O error
      * @throws SolrServerException if there is an error on the server
      */
-    public void update(ExtensionId extensionId, ExtensionAnalysisResult result) throws SolrServerException, IOException
+    public void update(ExtensionId extensionId, ExtensionSecurityAnalysisResult result) throws SolrServerException, IOException
     {
         SolrInputDocument doc = new SolrInputDocument();
 
@@ -325,8 +325,13 @@ public class ExtensionIndexStore implements Initializable
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, Extension.FIELD_VERSION,
             extensionId.getVersion().getValue(), doc);
 
-        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_MAX_CVSS,
-            result.getMaxCVSS(), doc);
+        if (!result.getSecurityIssues().isEmpty()) {
+            this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_MAX_CVSS,
+                result.getMaxCVSS(), doc);
+        } else {
+            // Remove the CVSS score if the new list of security issues becomes empty.
+            this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_REMOVE, SECURITY_MAX_CVSS, 0.0, Double.class, doc);
+        }
         Stream<String> cveIds = result.getSecurityIssues().stream().map(SecurityIssueDescriptor::getId);
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_CVE_ID,
             cveIds.collect(Collectors.toList()), doc);
@@ -345,8 +350,6 @@ public class ExtensionIndexStore implements Initializable
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_ADVICE, result.getAdvice(), doc);
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_CVE_COUNT,
             result.getSecurityIssues().size(), doc);
-        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET,
-            ExtensionIndexSolrCoreInitializer.SECURITY_INSTALLED_WIKIS, result.getWikis(), doc);
 
         add(doc);
         commit();
@@ -354,7 +357,7 @@ public class ExtensionIndexStore implements Initializable
 
     /**
      * Update variable informations (recommended tag, ratings, etc.) by copying it from another version.
-     * 
+     *
      * @param extensionId the identifier of the extension to update
      * @param copyVersion the version of the extension to copy
      * @throws IOException If there is a low-level I/O error.
@@ -734,7 +737,7 @@ public class ExtensionIndexStore implements Initializable
 
     /**
      * Search extension based of the provided query.
-     * 
+     *
      * @param query the query
      * @return the found extensions descriptors, empty list if nothing could be found
      * @throws SearchException error when trying to search provided query

@@ -66,7 +66,7 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
 
     /**
      * Index the list of components in a full text search friendly manner.
-     * 
+     *
      * @since 13.3RC1
      */
     public static final String SOLR_FIELD_COMPONENTS_INDEX = Extension.FIELD_COMPONENTS + INDEX_SUFFIX;
@@ -139,11 +139,6 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
      * A textual explanation of how to upgrade this extension to fix the security issues.
      */
     public static final String SECURITY_ADVICE = "security_advice";
-
-    /**
-     * The list the wikis in wich the extension is installed and vulnerable.
-     */
-    public static final String SECURITY_INSTALLED_WIKIS = "security_installedWikis";
 
     private static final Pattern COMPONENT_SPECIAL_CHARS = Pattern.compile("[<>,]+");
 
@@ -231,7 +226,6 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
             setPIntField(SECURITY_CVE_COUNT, false, false);
             setStringField(SECURITY_FIX_VERSION, false, false);
             setStringField(SECURITY_ADVICE, false, false);
-            setStringField(SECURITY_INSTALLED_WIKIS, true, false);
         }
     }
 

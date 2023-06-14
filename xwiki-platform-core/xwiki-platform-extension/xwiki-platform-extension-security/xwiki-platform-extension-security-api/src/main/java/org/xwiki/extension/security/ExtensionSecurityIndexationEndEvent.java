@@ -19,6 +19,8 @@
  */
 package org.xwiki.extension.security;
 
+import java.io.Serializable;
+
 import org.xwiki.observation.event.Event;
 import org.xwiki.stability.Unstable;
 
@@ -29,11 +31,11 @@ import org.xwiki.stability.Unstable;
  * @since 15.5RC1
  */
 @Unstable
-public class ExtensionSecurityEvent implements Event
+public class ExtensionSecurityIndexationEndEvent implements Event, Serializable
 {
     @Override
     public boolean matches(Object otherEvent)
     {
-        return otherEvent instanceof ExtensionSecurityEvent;
+        return otherEvent instanceof ExtensionSecurityIndexationEndEvent;
     }
 }

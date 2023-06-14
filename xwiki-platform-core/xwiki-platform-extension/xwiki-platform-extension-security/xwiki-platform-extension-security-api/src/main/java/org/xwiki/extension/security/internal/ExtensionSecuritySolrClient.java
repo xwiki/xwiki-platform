@@ -36,8 +36,8 @@ import org.xwiki.extension.repository.search.ExtensionQuery;
 import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.search.solr.SolrUtils;
 
+import static org.xwiki.extension.InstalledExtension.FIELD_INSTALLED_NAMESPACES;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_FIX_VERSION;
-import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_INSTALLED_WIKIS;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_MAX_CVSS;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID;
 import static org.xwiki.extension.security.internal.ExtensionSecurityLiveDataConfigurationProvider.EXTENSION_ID;
@@ -64,7 +64,7 @@ public class ExtensionSecuritySolrClient
         EXTENSION_ID, SOLR_FIELD_ID,
         MAX_CVSS, SECURITY_MAX_CVSS,
         FIX_VERSION, SECURITY_FIX_VERSION,
-        WIKIS, SECURITY_INSTALLED_WIKIS
+        WIKIS, FIELD_INSTALLED_NAMESPACES
     );
 
     @Inject
@@ -143,7 +143,8 @@ public class ExtensionSecuritySolrClient
         for (String filterQuery : solrQuery.getFilterQueries()) {
             solrQuery.removeFilterQuery(filterQuery);
         }
-        solrQuery.addFilterQuery("security_maxCVSS:[0 TO 10]");
+        // Only include extensions with a computed CVSS score, meaning that they have at least one known security issue.
+        solrQuery.addFilterQuery(String.format("%s:[0 TO 10]", SECURITY_MAX_CVSS));
     }
 
     private static void initSort(LiveDataQuery liveDataQuery, SolrQuery solrQuery)

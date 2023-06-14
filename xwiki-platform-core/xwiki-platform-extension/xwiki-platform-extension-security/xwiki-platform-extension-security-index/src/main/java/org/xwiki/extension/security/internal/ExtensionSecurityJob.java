@@ -28,9 +28,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.extension.InstalledExtension;
-import org.xwiki.extension.index.internal.security.ExtensionAnalysisResult;
+import org.xwiki.extension.index.security.ExtensionSecurityAnalysisResult;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
-import org.xwiki.extension.security.ExtensionSecurityEvent;
+import org.xwiki.extension.security.ExtensionSecurityIndexationEndEvent;
 import org.xwiki.extension.security.analyzer.ExtensionSecurityAnalyzer;
 import org.xwiki.extension.security.internal.analyzer.VulnerabilityIndexer;
 import org.xwiki.extension.security.internal.analyzer.osv.OsvExtensionSecurityAnalyzer;
@@ -85,7 +85,7 @@ public class ExtensionSecurityJob
             for (InstalledExtension extension : installedExtensions) {
                 this.progressManager.startStep(this);
                 try {
-                    ExtensionAnalysisResult analysis = this.extensionSecurityAnalyzer.analyze(extension);
+                    ExtensionSecurityAnalysisResult analysis = this.extensionSecurityAnalyzer.analyze(extension);
                     if (analysis != null) {
                         boolean update = this.vulnerabilityIndexer.update(extension, analysis);
                         if (update) {
@@ -99,9 +99,9 @@ public class ExtensionSecurityJob
                 }
                 this.progressManager.endStep(this);
             }
-            if (newVulnerabilityCount > 0) {
-                this.observationManager.notify(new ExtensionSecurityEvent(), this, newVulnerabilityCount);
-            }
+            
+            this.observationManager.notify(new ExtensionSecurityIndexationEndEvent(), null, newVulnerabilityCount);
+            
         } finally {
             this.progressManager.popLevelProgress(this);
         }

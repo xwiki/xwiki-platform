@@ -34,6 +34,7 @@ import org.apache.solr.common.SolrDocument;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.index.internal.ExtensionIndexStore;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -50,7 +51,6 @@ import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializ
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_CVE_ID;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_CVE_LINK;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_FIX_VERSION;
-import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_INSTALLED_WIKIS;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_MAX_CVSS;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID;
 import static org.xwiki.extension.security.internal.ExtensionSecurityLiveDataConfigurationProvider.ADVICE;
@@ -166,7 +166,7 @@ public class SolrToLiveDataEntryMapper
 
     private String buildWikis(SolrDocument doc)
     {
-        return this.solrUtils.getList(SECURITY_INSTALLED_WIKIS, doc)
+        return this.solrUtils.getList(InstalledExtension.FIELD_INSTALLED_NAMESPACES, doc)
             .stream()
             .map(String::valueOf)
             .collect(joining(","));

@@ -21,7 +21,7 @@ package org.xwiki.extension.security.analyzer;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.extension.Extension;
-import org.xwiki.extension.index.internal.security.ExtensionAnalysisResult;
+import org.xwiki.extension.index.security.ExtensionSecurityAnalysisResult;
 import org.xwiki.extension.security.internal.ExtensionSecurityException;
 import org.xwiki.stability.Unstable;
 
@@ -42,5 +42,5 @@ public interface ExtensionSecurityAnalyzer
      * @return {@code true} if at least one unknown security issue is found for the extension
      * @throws ExtensionSecurityException in case of issue during the analysis
      */
-    ExtensionAnalysisResult analyze(Extension extension) throws ExtensionSecurityException;
+    ExtensionSecurityAnalysisResult analyze(Extension extension) throws ExtensionSecurityException;
 }

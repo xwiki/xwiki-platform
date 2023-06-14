@@ -40,9 +40,8 @@ import org.apache.maven.artifact.versioning.VersionRange;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.Extension;
-import org.xwiki.extension.InstalledExtension;
-import org.xwiki.extension.index.internal.security.ExtensionAnalysisResult;
-import org.xwiki.extension.index.internal.security.SecurityIssueDescriptor;
+import org.xwiki.extension.index.security.ExtensionSecurityAnalysisResult;
+import org.xwiki.extension.index.security.SecurityIssueDescriptor;
 import org.xwiki.extension.security.ExtensionSecurityConfiguration;
 import org.xwiki.extension.security.analyzer.ExtensionSecurityAnalyzer;
 import org.xwiki.extension.security.internal.ExtensionSecurityException;
@@ -91,7 +90,7 @@ public class OsvExtensionSecurityAnalyzer implements ExtensionSecurityAnalyzer
     private ExtensionSecurityConfiguration extensionSecurityConfiguration;
 
     @Override
-    public ExtensionAnalysisResult analyze(Extension extension) throws ExtensionSecurityException
+    public ExtensionSecurityAnalysisResult analyze(Extension extension) throws ExtensionSecurityException
     {
         String version = extension.getId().getVersion().getValue();
         String extensionId = extension.getId().getId();
@@ -130,10 +129,9 @@ public class OsvExtensionSecurityAnalyzer implements ExtensionSecurityAnalyzer
                         vulnerability)
                         .ifPresent(matchingVulns::add));
             }
-            return new ExtensionAnalysisResult()
+            return new ExtensionSecurityAnalysisResult()
                 .setResults(matchingVulns.stream().map(this::convert).collect(Collectors.toList()))
-                .setAdvice(UPGRADE_FROM_EM_ADVICE)
-                .setWikis(computeWikis(extension));
+                .setAdvice(UPGRADE_FROM_EM_ADVICE);
         } catch (JsonProcessingException e) {
             throw new ExtensionSecurityException(
                 String.format("Failed to build the json for [%s/+%s]", extensionId, version), e);
@@ -146,14 +144,6 @@ public class OsvExtensionSecurityAnalyzer implements ExtensionSecurityAnalyzer
             Thread.currentThread().interrupt();
             return null;
         }
-    }
-
-    private List<String> computeWikis(Extension extension)
-    {
-        if (extension instanceof InstalledExtension) {
-            return new ArrayList<>(((InstalledExtension) extension).getNamespaces());
-        }
-        return List.of();
     }
 
     private SecurityIssueDescriptor convert(VulnObject vulnObject)

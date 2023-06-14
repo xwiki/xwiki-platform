@@ -17,9 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.index.internal.security;
+package org.xwiki.extension.index.security;
 
 import java.util.List;
+
+import org.xwiki.stability.Unstable;
 
 import static java.util.Comparator.comparingDouble;
 
@@ -29,19 +31,18 @@ import static java.util.Comparator.comparingDouble;
  * @version $Id$
  * @since 15.5RC1
  */
-public class ExtensionAnalysisResult
+@Unstable
+public class ExtensionSecurityAnalysisResult
 {
     private List<SecurityIssueDescriptor> securityIssues;
 
     private String advice;
 
-    private List<String> wikis;
-
     /**
      * @param securityIssues the security issues associated with the analyzed extension
      * @return the current object
      */
-    public ExtensionAnalysisResult setResults(List<SecurityIssueDescriptor> securityIssues)
+    public ExtensionSecurityAnalysisResult setResults(List<SecurityIssueDescriptor> securityIssues)
     {
         this.securityIssues = securityIssues;
         return this;
@@ -69,30 +70,10 @@ public class ExtensionAnalysisResult
      *     extension to fix the identified security issues)
      * @return the current object
      */
-    public ExtensionAnalysisResult setAdvice(String advice)
+    public ExtensionSecurityAnalysisResult setAdvice(String advice)
     {
 
         this.advice = advice;
-        return this;
-    }
-
-    /**
-     * 
-     * @return the list of wikis where the security result applies
-     */
-    public List<String> getWikis()
-    {
-        return this.wikis;
-    }
-
-    /**
-     * 
-     * @param wikis the list of wikis where the security result applies
-     * @return the current object
-     */
-    public ExtensionAnalysisResult setWikis(List<String> wikis)
-    {
-        this.wikis = wikis;
         return this;
     }
 

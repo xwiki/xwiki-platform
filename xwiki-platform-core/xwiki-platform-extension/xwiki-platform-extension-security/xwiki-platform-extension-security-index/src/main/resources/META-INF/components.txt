@@ -1,5 +1,6 @@
-org.xwiki.extension.security.internal.ExtensionSecurityInitializerListener
 org.xwiki.extension.security.internal.ExtensionSecurityJob
 org.xwiki.extension.security.internal.ExtensionSecurityScheduler
 org.xwiki.extension.security.internal.analyzer.osv.OsvExtensionSecurityAnalyzer
 org.xwiki.extension.security.internal.analyzer.VulnerabilityIndexer
+org.xwiki.extension.security.internal.listener.ExtensionSecurityInitializerListener
+org.xwiki.extension.security.internal.listener.ExtensionSecurityConfigDelayXObjectPropertyUpdatedListener

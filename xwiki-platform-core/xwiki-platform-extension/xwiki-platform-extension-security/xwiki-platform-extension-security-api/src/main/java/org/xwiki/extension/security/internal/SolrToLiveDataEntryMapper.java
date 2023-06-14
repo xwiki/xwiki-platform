@@ -124,7 +124,7 @@ public class SolrToLiveDataEntryMapper
         return this.solrUtils.get(SECURITY_FIX_VERSION, doc);
     }
 
-    private String buildMaxCVSS(SolrDocument doc)
+    private Double buildMaxCVSS(SolrDocument doc)
     {
         return this.solrUtils.get(SECURITY_MAX_CVSS, doc);
     }

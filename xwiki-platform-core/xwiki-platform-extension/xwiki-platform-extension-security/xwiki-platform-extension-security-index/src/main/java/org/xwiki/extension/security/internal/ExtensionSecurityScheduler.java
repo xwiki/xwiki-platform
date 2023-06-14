@@ -56,12 +56,15 @@ public class ExtensionSecurityScheduler implements Runnable, Disposable
 
     private ScheduledExecutorService executor;
 
+    private boolean started;
+
     /**
      * Initialize and start the scheduler.
      */
     public synchronized void start()
     {
         if (this.executor == null) {
+            this.started = true;
             // Start the scheduling
             this.executor = Executors.newSingleThreadScheduledExecutor(r -> {
                 Thread thread = new Thread(r);
@@ -74,6 +77,19 @@ public class ExtensionSecurityScheduler implements Runnable, Disposable
 
             this.executor.scheduleWithFixedDelay(this, 0, this.extensionSecurityConfiguration.getScanDelay(), HOURS);
         }
+    }
+
+    /**
+     * Restart the executor. This is needed when the delay is updated from the administration.
+     */
+    public void restart()
+    {
+        if (!this.started) {
+            return;
+        }
+        
+        this.executor.shutdown();
+        this.start();
     }
 
     @Override

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.security.internal;
+package org.xwiki.extension.security.internal.listener;
 
 import java.util.Objects;
 
@@ -27,10 +27,12 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.extension.index.internal.job.ExtensionIndexJob;
+import org.xwiki.extension.security.internal.ExtensionSecurityScheduler;
 import org.xwiki.job.event.JobFinishedEvent;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
+
+import static org.xwiki.extension.index.internal.job.ExtensionIndexJob.JOB_TYPE;
 
 /**
  * Starts the {@link ExtensionSecurityScheduler} in charge of fetching known security vulnerabilities for installed
@@ -64,7 +66,7 @@ public class ExtensionSecurityInitializerListener extends AbstractEventListener
     public void onEvent(Event event, Object source, Object data)
     {
         if (event instanceof JobFinishedEvent
-            && Objects.equals(((JobFinishedEvent) event).getJobType(), ExtensionIndexJob.JOB_TYPE))
+            && Objects.equals(((JobFinishedEvent) event).getJobType(), JOB_TYPE))
         {
             this.schedulerProvider.get().start();
         }

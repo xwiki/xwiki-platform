@@ -45,9 +45,15 @@ public class DocConfigurationSource extends AbstractDocumentConfigurationSource
 
     private static final List<String> SPACE = List.of("XWiki", "Extension", "Security", "Code");
 
-    private static final LocalDocumentReference XOBJECT_REFERENCE = new LocalDocumentReference(SPACE, "Config");
+    /**
+     * The local reference of the configuration object.
+     */
+    public static final LocalDocumentReference XOBJECT_REFERENCE = new LocalDocumentReference(SPACE, "Config");
 
-    static final LocalDocumentReference XCLASS_REFERENCE = new LocalDocumentReference(SPACE, "ConfigClass");
+    /**
+     * The local reference of the configuration class.
+     */
+    public static final LocalDocumentReference XCLASS_REFERENCE = new LocalDocumentReference(SPACE, "ConfigClass");
 
     @Override
     protected LocalDocumentReference getClassReference()

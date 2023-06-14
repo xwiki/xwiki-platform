@@ -32,11 +32,9 @@
         // Default values for quick action / group fields.
         defaultAction: {group: '', id: '', name: '', description: '',
           iconClass: '', iconURL: '', shortcut: '',
-          //Default value for badges
-          ...Array(3).fill().map(function (_, i) {return i;}).reduce(function (acc, element)
-            {return ({...acc, ['badge' + (element+1)]: ''});}, {}),
         },
-        defaultGroup: {id: '', name: '', order: Infinity}
+        defaultGroup: {id: '', name: '', order: Infinity},
+        maxBadges: 3,
       }, config);
 
       // Configuration for the quick actions search.
@@ -56,6 +54,16 @@
           {name: 'group.nameTokens', weight: 1}
         ]
       }, this.config.search);
+
+      //Default value for badges
+      this.config.defaultAction = Object.assign(
+        Array(this.config.maxBadges)
+        .fill()
+        .map(function (_, i) {return i;})
+        .reduce(function (acc, element)
+            {return ({...acc, ['badge' + (element+1)]: ''});}, {}
+                ),
+        this.config.defaultAction);
 
       // Start with an empty list of quick actions and no groups;
       this.actions = [];
@@ -835,7 +843,7 @@
               '<span class="ckeditor-autocomplete-item-shortcut">{shortcut}</span>',
             '</div>',
             '<div class="ckeditor-autocomplete-item-badges">',
-            ...Array(3).fill().map(function (_, i)
+            ...Array(editor.quickActions.config.maxBadges).fill().map(function (_, i)
               {return '<span class="badge ckeditor-autocomplete-item-badge">{badge' + (i+1) + '}</span>';}),
             '</div>',
             '<div class="ckeditor-autocomplete-item-hint">{description}</div>',

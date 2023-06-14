@@ -373,7 +373,7 @@
           exec: function (editor, macroCall) {
             var command = this;
 
-            // Find the macro we are going to insert
+            // Find the macro we are going to insert.
             macroService.getMacros(XWiki.docsyntax).done(function (macros) {
               macros.forEach(function (macro) {
                 if (macro.id.id === macroCall.id) {
@@ -381,7 +381,7 @@
                   // Helper function
                   var insertMacro = function (widget) {
 
-                    // The insertion finishes after refresh
+                    // The insertion finishes after refresh.
                     var handler = editor.on('afterCommandExec', function (event) {
                       var command = event.data.name;
                       if (event.data.name === 'xwiki-refresh') {
@@ -393,17 +393,17 @@
                       }
                     });
 
-                    // Retrieve required parameters
+                    // Retrieve required parameters.
                     macroService.getMacroDescriptor(macro.id.id).done(function (descriptor) {
 
-                      // Show the insertion dialog if at least one of the parameters is mandatory
+                      // Show the insertion dialog if at least one of the parameters is mandatory.
                       for (var param in descriptor.parameterDescriptorMap) {
                         if (descriptor.parameterDescriptorMap[param].mandatory) {
                           if (widget) {
-                            // Edit existing pre-inserted macro
+                            // Edit existing pre-inserted macro.
                             widget.edit();
                           } else {
-                            // Insert and edit macro
+                            // Insert and edit macro.
                             editor.execCommand("xwiki-macro", {
                               name: macro.id.id
                             });
@@ -418,12 +418,12 @@
                         parameters: {},
                       };
 
-                      // Set an empty default content when it is mandatory
+                      // Set an empty default content when it is mandatory.
                       if (descriptor.contentDescriptor && descriptor.contentDescriptor.mandatory) {
                         insertParam.content = " ";
                       }
 
-                      // Insert the empty macro
+                      // Insert the empty macro.
                       macroPlugin.insertOrUpdateMacroWidget(editor, insertParam, widget);
                     });
                   };
@@ -434,15 +434,19 @@
                     macro.extensionVersion &&
                     macro.extensionInstallAllowed) {
 
-                    // Request user confirmation
+                    // Request user confirmation.
                     if (!window.confirm(translations.get('install.confirm',
                         macro.extensionName,
                         macro.extensionVersion))) {
-                      editor.showNotification(editor.localization.get('xwiki-macro.installFailed',
-                                                                      macro.extensionName,
-                                                                      macro.extensionVersion),
-                                              'warning',
-                                              5000);
+                      editor.showNotification(
+                        editor.localization.get(
+                          'xwiki-macro.installFailed',
+                          macro.extensionName,
+                          macro.extensionVersion
+                        ),
+                        'warning',
+                        5000
+                      );
                       editor.fire('afterCommandExec', {
                         name: command.name,
                         command: command
@@ -450,15 +454,17 @@
                       return;
                     }
 
-                    // Recover the macro widget that will be pre-inserted
+                    // Recover the macro widget that will be pre-inserted.
                     editor.widgets.once('instanceCreated', function (evt) {
 
-                      var notification = editor.showNotification(editor.localization.get('xwiki-macro.installPending',
-                                                                                         macro.extensionName,
-                                                                                         macro.extensionVersion),
-                                                                 'progress',
-                                                                 0);
-                      // Install the macro extension
+                      var notification = editor.showNotification(
+                        editor.localization.get('xwiki-macro.installPending',
+                        macro.extensionName,
+                        macro.extensionVersion
+                        ),
+                        'progress',
+                        0);
+                      // Install the macro extension.
                       macroService.installMacro(macro.extensionId, macro.extensionVersion).done(function () {
                         notification.hide();
                         editor.showNotification(editor.localization.get('xwiki-macro.installSuccessful',
@@ -466,7 +472,7 @@
                                                                         macro.extensionVersion),
                                                 'success',
                                                 5000);
-                        // Update the cache for future insertions
+                        // Update the cache for future insertions.
                         macroService.getMacros(XWiki.docsyntax, true);
 
                         // Update the pre-inserted widget
@@ -483,7 +489,7 @@
                       });
                     });
 
-                    // Pre-insert macro and do not refresh to be able to edit the macro later
+                    // Pre-insert macro and do not refresh to be able to edit the macro later.
                     macroPlugin.insertOrUpdateMacroWidget(editor, {
                       name: macro.id.id,
                       parameters: {},
@@ -572,20 +578,18 @@
           var getCategoryAttributes = function (macro) {
             var attributes = {};
 
-            // Same macro should always appear in the same group
-            var categories = macro.categories.sort();
-
-            // Default category should be first
-            if (macro.defaultCategory) {
-
-              var defaultCategory = categories.find(function (category) {
-                return [category.id, category.label].includes(macro.defaultCategory);
-              });
-
-              categories = [defaultCategory].concat(categories.filter(function (category) {
-                return category !== defaultCategory;
-              }));
-            }
+            // Same macro should always appear in the same group and default category should be first.
+            var categories = macro.categories.sort((left, right) => {
+              if (macro.defaultCategory && left.id !== right.id) {
+                // Check against id and label because any of the two might be used.
+                 if ([left.id, left.label].includes(macro.defaultCategory)) {
+                   return -1;
+                 } else if ([right.id, right.label].includes(macro.defaultCategory)) {
+                   return 1;
+                 }
+              }
+              return left.id.localeCompare(right.id);
+            });
 
             // Add relevant group
             attributes.group = (categories[0] && categories[0].id) || 'Macro';
@@ -604,14 +608,16 @@
             attributes.iconClass = categoriesIcons[(categories[0] && categories[0].id)] ||
                 categoriesIcons._fallback;
 
-            // Add badge for each category exceot the first one
-            categories.map(function (category, i) {
-              attributes["badge" + i] = category.label || category;
+            // Add badge for each category, the first one will not be rendered
+            // because the templating index starts at 1. All categories exceeding
+            // the maximum number of badges will not be rendered either.
+            categories.forEach(function (category, i) {
+              attributes["badge" + i] = category.label;
             });
 
             // Add recommended badge
             if (macro.extensionRecommended) {
-              attributes.badge3 = translations.get('recommended');
+              attributes["badge" + editor.quickActions.config.maxBadges] = translations.get('recommended');
             }
 
             return attributes;

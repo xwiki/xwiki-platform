@@ -322,9 +322,11 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector', 'macroService'
         if (!macroSelectorAPI) {
           // Create the macro selector.
           macroSelector.on('ready', function() {
+            macroSelectorAPI = macroSelector.data('macroSelectorAPI');
             macroSelectorAPI.select(input.macroId);
             macroSelector.find('.macro-textFilter').focus();
           }).on('change', function() {
+            macroSelectorAPI = macroSelector.data('macroSelectorAPI');
             var buttonText;
             var buttonTitle;
             var buttonDisabled = !macroSelectorAPI.getSelectedMacro();

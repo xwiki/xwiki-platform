@@ -74,13 +74,14 @@ public class ExtensionSecuritySolrClient
     private SolrUtils solrUtils;
 
     /**
-     * Perform a solr query returning the count of extensions with at least one known vulnerability.
+     * Perform a solr query returning the count of extensions with at least one known vulnerability. If the same
+     * extension is present several times with different versions, they are all counted individually.
      *
      * @return the query response of the query
      * @throws IOException If there is a low-level I/O error
      * @throws SolrServerException if there is an error on the server
      */
-    public long getExtensionsCount() throws SolrServerException, IOException
+    public long getVulnerableExtensionsCount() throws SolrServerException, IOException
     {
         SolrQuery solrQuery = new SolrQuery();
         this.extensionIndexStore.createSolrQuery(new ExtensionQuery(), solrQuery);

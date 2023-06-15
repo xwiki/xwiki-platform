@@ -75,7 +75,7 @@ class ExtensionSecuritySolrClientTest
         when(mock.getResults()).thenReturn(documentList);
         when(this.extensionIndexStore.search(any(SolrQuery.class))).thenReturn(mock);
 
-        assertEquals(42, this.solrClient.getExtensionsCount());
+        assertEquals(42, this.solrClient.getVulnerableExtensionsCount());
 
         SolrQuery params = new SolrQuery();
         params.addFilterQuery("security_maxCVSS:[0 TO 10]");

@@ -72,12 +72,13 @@ public class ExtensionSecurityScriptService implements ScriptService
     }
 
     /**
-     * @return the count of extensions with at least one known vulnerability
+     * @return the count of extensions with at least one known vulnerability, if an extension is available with
+     *     different (vulnerable) versions, they are all counted individually
      */
-    public long getExtensionsCount()
+    public long getVulnerableExtensionsCount()
     {
         try {
-            return this.solrClient.getExtensionsCount();
+            return this.solrClient.getVulnerableExtensionsCount();
         } catch (SolrServerException | IOException e) {
             this.logger.warn("Failed to retrieve the count of extensions with known vulnerabilities. Cause: [{}]",
                 getRootCauseMessage(e));

@@ -52,6 +52,7 @@
                 <bannedDependencies>
                   <excludes>
                     <exclude>org.xwiki.commons:xwiki-commons-component-default:*:jar:*</exclude>
+                    <exclude>org.xwiki.commons:xwiki-commons-component-api:*:jar:*</exclude>
                     <exclude>org.xwiki.commons:xwiki-platform-distribution-war-dependencies:*:jar:*</exclude>
                     <exclude>org.xwiki.rendering:xwiki-rendering-api:*:jar:*</exclude>
                     <exclude>org.xwiki.rendering:xwiki-rendering-transformation-macro:*:jar:*</exclude>
@@ -132,6 +133,11 @@
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-legacy-component-default</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-legacy-component-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
     <dependency>

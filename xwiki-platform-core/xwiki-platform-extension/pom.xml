@@ -39,6 +39,7 @@
     <module>xwiki-platform-extension-index</module>
     <module>xwiki-platform-extension-script</module>
     <module>xwiki-platform-extension-ui</module>
+    <module>xwiki-platform-extension-security</module>
     <module>xwiki-platform-extension-versioncheck</module>
   </modules>
   <profiles>

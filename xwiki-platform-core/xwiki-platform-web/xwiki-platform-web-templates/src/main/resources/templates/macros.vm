@@ -2425,6 +2425,8 @@ $string##
     #set ($discard = $parameters.put('multiple', 'multiple'))
   #end
   #set ($discard = $parameters.putIfAbsent('data-userScope', "$!services.wiki.user.userScope"))
+  #set ($discard = $parameters.putIfAbsent('title',
+    "$services.localization.render('core.widgets.suggest.userPicker.title')"))
   #suggestInput($parameters)
 #end
 
@@ -2456,6 +2458,8 @@ $string##
     #set ($parameters = {})
   #end
   #set ($discard = $parameters.put('class', "$!parameters.get('class') suggest-pages"))
+  #set ($discard = $parameters.putIfAbsent('title',
+    "$services.localization.render('core.widgets.suggest.pagePicker.title')"))
   #suggestInput($parameters)
 #end
 
@@ -2475,6 +2479,8 @@ $string##
     #set ($parameters = {})
   #end
   #set ($discard = $parameters.put('class', "$!parameters.get('class') suggest-attachments"))
+  #set ($discard = $parameters.putIfAbsent('title',
+    "$services.localization.render('core.widgets.suggest.attachmentPicker.title')"))
   #suggestInput($parameters)
 #end
 
@@ -2673,6 +2679,7 @@ Recursive title display detected!##
     'name': $id,
     'value': $value,
     'class': 'suggest-propertyValues',
+    'title': $services.localization.render('core.widgets.suggest.xpropertyPicker.title'),
     'data-className': $field.className,
     'data-propertyName': $name
   })
@@ -2775,6 +2782,8 @@ Recursive title display detected!##
     #set ($parameters = {})
   #end
   #set ($discard = $parameters.put('class', "$!parameters.get('class') xwiki-selectize suggest-classes"))
+  #set ($discard = $parameters.putIfAbsent('title',
+    "$services.localization.render('core.widgets.suggest.classPicker.title')"))
   #suggestInput($parameters 'classPicker_displayOptions')
 #end
 

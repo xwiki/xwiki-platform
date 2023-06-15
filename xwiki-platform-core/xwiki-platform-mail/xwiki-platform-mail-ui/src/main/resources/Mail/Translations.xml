@@ -74,8 +74,11 @@ Mail.SendMailStatus_livetable.wiki=Wiki
 Mail.SendMailStatus_livetable.error=Error
 Mail.SendMailStatus_livetable.actions=Actions
 Mail.SendMailStatus_livetable.resend=Resend
+Mail.SendMailStatus_livetable.delete=Delete
 mailSender.admin.resendSuccess=The mail has been resent successfully
-mailSender.admin.resendFailure=Failed to resend. Click for more details.</content>
+mailSender.admin.resendFailure=Failed to resend mail. Click for more details.
+mailSender.admin.deleteSuccess=The mail has been deleted successfully
+mailSender.admin.deleteFailure=Failed to delete mail. Click for more details.</content>
   <object>
     <name>Mail.Translations</name>
     <number>0</number>

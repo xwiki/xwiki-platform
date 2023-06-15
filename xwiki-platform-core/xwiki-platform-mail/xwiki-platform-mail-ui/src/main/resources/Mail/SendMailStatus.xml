@@ -56,7 +56,7 @@
     {{/html}}
 
   #end
-  #if ("$!services.mailstorage.lastError" != '')
+  #if ("$!services.mail.storage.lastError" != '')
     #set ($mailError = true)
     #displayError($exceptiontool.getStackTrace($services.mail.storage.lastError))
   #end
@@ -69,6 +69,31 @@
   #if(!$mailError)
 
     {{success}}$services.localization.render('mailSender.admin.resendSuccess'){{/success}}
+
+  #end
+#elseif ($request.mailsendingaction_delete &amp;&amp; $request.mail_id &amp;&amp; $request.batch_id)
+  ## Delete email
+  #set($discard = $services.mail.storage.delete($request.batch_id, $request.mail_id))
+  #set ($mailError = false)
+  #macro (displayError $description)
+
+    {{html}}
+      &lt;div class="xwikirenderingerror" title="Click to get more details about the error" style="cursor: pointer;"&gt;
+        $services.localization.render('mailSender.admin.deleteFailure')
+      &lt;/div&gt;
+      &lt;div class="xwikirenderingerrordescription hidden"&gt;
+        &lt;pre&gt;${description}&lt;/pre&gt;
+      &lt;/div&gt;
+    {{/html}}
+
+  #end
+  #if ("$!services.mail.storage.lastError" != '')
+    #set ($mailError = true)
+    #displayError($exceptiontool.getStackTrace($services.mail.storage.lastError))
+  #end
+  #if(!$mailError)
+
+    {{success}}$services.localization.render('mailSender.admin.deleteSuccess'){{/success}}
 
   #end
 #end

@@ -250,8 +250,28 @@ class MailIT
         // now that the mail server is set correctly.
         verifyIndividualResend();
 
-        // Step 9: Try to resend the failed email by scheduling and triggering the Resend Scheduler Job
+        // Step 9: Verify we can delete a mail in the UI
+        verifyMailDelete();
+
+        // Step 10: Try to resend the failed email by scheduling and triggering the Resend Scheduler Job
         verifyMailResenderSchedulerJob(setup);
+    }
+
+    private void verifyMailDelete()
+    {
+        // Delete the mail in send_success state from the verifyIndividualResend() test
+        MailStatusAdministrationSectionPage statusPage = MailStatusAdministrationSectionPage.gotoPage();
+        TableLayoutElement tableLayout = statusPage.getLiveData().getTableLayout();
+        tableLayout.filterColumn("Status", "send_success");
+        int count = tableLayout.countRows();
+        tableLayout.clickAction(1, "mailsendingaction_delete");
+
+        // Wait for the success message to be displayed
+        statusPage.waitUntilContent("The mail has been deleted successfully");
+
+        // Verify that the LT has one item less
+        tableLayout = statusPage.getLiveData().getTableLayout();
+        assertEquals(count - 1, tableLayout.countRows());
     }
 
     private void verifyIndividualResend()

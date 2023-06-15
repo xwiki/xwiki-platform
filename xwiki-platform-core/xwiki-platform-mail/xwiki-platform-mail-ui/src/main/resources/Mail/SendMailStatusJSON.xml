@@ -136,16 +136,21 @@
     #if ($xcontext.isMainWiki())
       #set($discard  = $row.put('wiki', $!item.wiki))
     #end
+    #set ($actionHTML = "&lt;form action='' method='post'&gt;
+      &lt;input name='mail_id' value='$!item.messageId' type='hidden'/&gt;
+      &lt;input name='batch_id' value='$!item.batchId' type='hidden'/&gt;")
     #if("$!item.state" != 'sent')
-      #set($discard  = $row.put('actions', "&lt;form action='' method='post'&gt;
-              &lt;input name='mail_id' value='$!item.messageId' type='hidden'/&gt;
-              &lt;input name='batch_id' value='$!item.batchId' type='hidden'/&gt;
-              &lt;span class='btn-group text-left'&gt;&lt;input name='mailsendingaction_resend' value='${escapetool.xml($services.localization.render('Mail.SendMailStatus_livetable.resend'))}' class='btn btn-primary btn-sm' type='submit'&gt;
-&lt;/span&gt;
-            &lt;/form&gt;" ))
-    #else
-      #set($discard  = $row.put('actions', ''))
+      ## Add the Resend action
+      #set ($actionHTML = "${actionHTML}
+        &lt;span class='btn-group text-left'&gt;&lt;input name='mailsendingaction_resend' value='${escapetool.xml($services.localization.render('Mail.SendMailStatus_livetable.resend'))}' class='btn btn-primary btn-sm' type='submit'&gt;
+        &lt;/span&gt;")
     #end
+    ## Add the Delete action
+    #set ($actionHTML = "${actionHTML}
+      &lt;span class='btn-group text-left'&gt;&lt;input name='mailsendingaction_delete' value='${escapetool.xml($services.localization.render('Mail.SendMailStatus_livetable.delete'))}' class='btn btn-default btn-sm' type='submit'&gt;
+      &lt;/span&gt;
+      &lt;/form&gt;")
+    #set($discard  = $row.put('actions', $actionHTML))
     #set($discard = $rows.add($row))
   #end
   $jsontool.serialize($resultmap)

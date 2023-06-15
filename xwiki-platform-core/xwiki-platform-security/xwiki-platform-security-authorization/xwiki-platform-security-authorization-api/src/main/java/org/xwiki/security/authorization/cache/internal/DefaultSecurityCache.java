@@ -228,7 +228,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                 throw new ParentEntryEvictedException(String.format(
                     "The first parent with reference [%s] for the entry [%s] with wiki [%s] is no longer "
                         + "available in the cache.",
-                    parent1, entry, wiki));
+                    entry.getReference(), entry, wiki));
             }
             SecurityCacheEntry parent2 = (isSelf) ? parent1
                 : (wiki != null) ? DefaultSecurityCache.this.getShadowEntry(entry.getUserReference(), wiki)
@@ -237,7 +237,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                 throw new ParentEntryEvictedException(String.format(
                     "The second parent with reference [%s] for the entry [%s] with wiki [%s] is no longer available "
                         + "in the cache.",
-                    parent2, entry, wiki));
+                    entry.getUserReference(), entry, wiki));
             }
             this.parents = (isSelf) ? Arrays.asList(parent1) : Arrays.asList(parent1, parent2);
             parent1.addChild(this);

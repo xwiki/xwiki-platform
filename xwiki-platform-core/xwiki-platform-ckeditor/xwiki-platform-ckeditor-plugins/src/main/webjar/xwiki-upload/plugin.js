@@ -70,8 +70,10 @@
       // That way, duringPaste is true when editor.uploadRepository.create is called only when a file is pasted.
       var duringPaste = false;
 
-      editor.on('beforePaste', function () {
-        duringPaste = true;
+      editor.on('beforePaste', function (event) {
+        // Switch to 'true' only if the method used to insert the file in the editor is a pasted (in opposition to a 
+        // drag-and-drop which also triggers this event, but with a 'drop' method).
+        duringPaste = event.data && event.data.method === 'paste';
       });
 
       editor.on('afterPaste', function () {

@@ -192,9 +192,9 @@ $services.localization.render('xe.scheduler.welcome')
   &lt;input type="hidden" name="template" value="XWiki.SchedulerJobTemplate" /&gt;
   &lt;input type="hidden" name="sheet" value="1" /&gt;
   &lt;input type="hidden" name="space" value="Scheduler"/&gt;
-  &lt;label class="hidden" for="page"&gt;$services.localization.render('xe.scheduler.jobs.create.nameTip')&lt;/label&gt;
+  &lt;label class="sr-only" for="page"&gt;$services.localization.render('xe.scheduler.jobs.create.nameTip')&lt;/label&gt;
   &lt;input id="page" name="page" size="30" type="text"
-      value="$escapetool.xml($services.localization.render('xe.scheduler.jobs.create.nameTip'))" /&gt;
+      placeholder="$escapetool.xml($services.localization.render('xe.scheduler.jobs.create.nameTip'))" /&gt;
   &lt;span class="buttonwrapper"&gt;
     &lt;input type="submit" class="btn btn-success"
         value="$escapetool.xml($services.localization.render('xe.scheduler.jobs.create.submit'))"/&gt;

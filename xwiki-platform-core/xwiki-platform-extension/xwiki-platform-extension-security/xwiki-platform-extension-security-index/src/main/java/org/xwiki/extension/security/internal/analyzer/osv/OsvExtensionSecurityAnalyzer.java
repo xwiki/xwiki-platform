@@ -125,8 +125,7 @@ public class OsvExtensionSecurityAnalyzer implements ExtensionSecurityAnalyzer
             List<VulnObject> matchingVulns = new ArrayList<>();
             if (osvResponse.getVulns() != null && !osvResponse.getVulns().isEmpty()) {
                 osvResponse.getVulns()
-                    .forEach(vulnerability -> analyzeVulnerability(extensionId, isPlatform ? "13.10.4" : version, // TODO: remove this hack
-                        vulnerability)
+                    .forEach(vulnerability -> analyzeVulnerability(extensionId, version, vulnerability)
                         .ifPresent(matchingVulns::add));
             }
             return new ExtensionSecurityAnalysisResult()

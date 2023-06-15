@@ -30,6 +30,9 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 
 /**
+ * Retrieve the extension security configuration from the {@link #XOBJECT_REFERENCE} document, using the
+ * {@link #XCLASS_REFERENCE} XClass.
+ *
  * @version $Id$
  * @since 15.5RC1
  */

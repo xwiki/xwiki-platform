@@ -33,7 +33,7 @@ import org.xwiki.stability.Unstable;
 
 /**
  * Various script APIs related to indexed extensions.
- *
+ * 
  * @version $Id$
  * @since 12.10
  */
@@ -66,7 +66,7 @@ public class ExtensionIndexScriptService extends AbstractExtensionScriptService
 
     /**
      * Create a new instance of a {@link IndexedExtensionQuery} to be used in other APIs.
-     *
+     * 
      * @param query the query to execute
      * @return a {@link ExtensionQuery} instance
      * @since 7.1RC1

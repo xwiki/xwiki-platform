@@ -449,6 +449,29 @@ class ImagePluginIT
             + ">>doc:Main.WebHome]]", savedPage.editWiki().getContent());
     }
 
+    @Test
+    @Order(10)
+    void editLegacyCenteredImage(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Upload an attachment to test with.
+        String attachmentName = "image.gif";
+        ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
+
+        WikiEditPage wikiEditPage = newPage.editWiki();
+        wikiEditPage.setContent("(% style='text-align: center' %)\n"
+            + "[[image:image.gif]]");
+        ViewPage viewPage = wikiEditPage.clickSaveAndView();
+
+        // Move to the WYSIWYG edition page.
+        WYSIWYGEditPage wysiwygEditPage = viewPage.editWYSIWYG();
+        new CKEditor("content").waitToLoad();
+
+        ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
+
+        assertEquals("[[image:image.gif||data-xwiki-image-style-alignment=\"center\"]]",
+            savedPage.editWiki().getContent());
+    }
+
     private static void createAndLoginStandardUser(TestUtils setup)
     {
         setup.createUserAndLogin("alice", "pa$$word", "editor", "Wysiwyg", "usertype", "Advanced");

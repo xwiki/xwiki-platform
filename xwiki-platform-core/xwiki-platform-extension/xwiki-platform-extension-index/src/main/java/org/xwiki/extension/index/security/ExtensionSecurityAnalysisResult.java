@@ -21,7 +21,10 @@ package org.xwiki.extension.index.security;
 
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.stability.Unstable;
+import org.xwiki.text.XWikiToStringBuilder;
 
 import static java.util.Comparator.comparingDouble;
 
@@ -90,5 +93,42 @@ public class ExtensionSecurityAnalysisResult
         } else {
             return null;
         }
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        ExtensionSecurityAnalysisResult that = (ExtensionSecurityAnalysisResult) o;
+
+        return new EqualsBuilder()
+            .append(this.securityVulnerabilities, that.securityVulnerabilities)
+            .append(this.advice, that.advice)
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37)
+            .append(this.securityVulnerabilities)
+            .append(this.advice)
+            .toHashCode();
+    }
+
+    @Override
+    public String toString()
+    {
+        return new XWikiToStringBuilder(this)
+            .append("securityVulnerabilities", this.securityVulnerabilities)
+            .append("advice", this.advice)
+            .toString();
     }
 }

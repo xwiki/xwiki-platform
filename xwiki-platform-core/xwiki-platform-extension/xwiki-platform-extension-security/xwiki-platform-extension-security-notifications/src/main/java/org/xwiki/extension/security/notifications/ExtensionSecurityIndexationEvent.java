@@ -19,7 +19,7 @@
  */
 package org.xwiki.extension.security.notifications;
 
-import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -27,8 +27,8 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.security.ExtensionSecurityIndexationEndEvent;
-import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.AbstractLocalEventListener;
 import org.xwiki.observation.event.Event;
 
 /**
@@ -41,16 +41,24 @@ import org.xwiki.observation.event.Event;
  */
 @Component
 @Singleton
-@Named(ExtensionSecurityIndexationEndEventListener.ID)
-public class ExtensionSecurityIndexationEndEventListener implements EventListener
+@Named(ExtensionSecurityIndexationEvent.ID)
+public class ExtensionSecurityIndexationEvent extends AbstractLocalEventListener
 {
     /**
      * The hint and name of this listener.
      */
-    public static final String ID = "ExtensionSecurityIndexationEndEvent";
+    public static final String ID = "ExtensionSecurityIndexationEvent";
 
     @Inject
     private ObservationManager observationManager;
+
+    /**
+     * Default constructor.
+     */
+    public ExtensionSecurityIndexationEvent()
+    {
+        super(ID, new ExtensionSecurityIndexationEndEvent());
+    }
 
     @Override
     public String getName()
@@ -59,18 +67,13 @@ public class ExtensionSecurityIndexationEndEventListener implements EventListene
     }
 
     @Override
-    public List<Event> getEvents()
-    {
-        return List.of(new ExtensionSecurityIndexationEndEvent());
-    }
-
-    @Override
-    public void onEvent(Event event, Object source, Object data)
+    public void processLocalEvent(Event event, Object source, Object data)
     {
         if ((long) data > 0) {
             // Converted to string are otherwise the data is ignored during the conversion.
             String strData = String.valueOf(data);
-            this.observationManager.notify(new NewExtensionSecurityVulnerabilityTargetableEvent(),
+            this.observationManager.notify(
+                new NewExtensionSecurityVulnerabilityTargetableEvent(Set.of("xwiki:XWiki.XWikiAdminGroup")),
                 "org.xwiki.platform:xwiki-platform-extension-security-notifications", strData);
         }
     }

@@ -24,33 +24,21 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.artifact.versioning.VersionRange;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.index.security.ExtensionSecurityAnalysisResult;
-import org.xwiki.extension.index.security.SecurityVulnerabilityDescriptor;
 import org.xwiki.extension.security.ExtensionSecurityConfiguration;
 import org.xwiki.extension.security.analyzer.ExtensionSecurityAnalyzer;
 import org.xwiki.extension.security.internal.ExtensionSecurityException;
 import org.xwiki.extension.security.internal.analyzer.osv.model.PackageObject;
 import org.xwiki.extension.security.internal.analyzer.osv.model.QueryObject;
-import org.xwiki.extension.security.internal.analyzer.osv.model.response.AffectObject;
 import org.xwiki.extension.security.internal.analyzer.osv.model.response.OsvResponse;
-import org.xwiki.extension.security.internal.analyzer.osv.model.response.RangeObject;
-import org.xwiki.extension.security.internal.analyzer.osv.model.response.VulnObject;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -76,18 +64,16 @@ public class OsvExtensionSecurityAnalyzer implements ExtensionSecurityAnalyzer
      */
     public static final String ID = "osv";
 
-    private static final String PLATFORM_PREFIX = "org.xwiki.platform:";
-
-    /**
-     * Shared constant when the suggestion is to upgrade the extension from the Extension Manager.
-     */
-    private static final String UPGRADE_FROM_EM_ADVICE = "extension.security.analysis.advice.upgradeFromEM";
+    static final String PLATFORM_PREFIX = "org.xwiki.platform:";
 
     @Inject
     private Logger logger;
 
     @Inject
     private ExtensionSecurityConfiguration extensionSecurityConfiguration;
+
+    @Inject
+    private OsvResponseAnalyzer osvResponseAnalyzer;
 
     @Override
     public ExtensionSecurityAnalysisResult analyze(Extension extension) throws ExtensionSecurityException
@@ -118,19 +104,9 @@ public class OsvExtensionSecurityAnalyzer implements ExtensionSecurityAnalyzer
                 .build();
 
             HttpClient client = HttpClient.newHttpClient();
-
             HttpResponse<String> response = client.send(request, ofString());
-
             OsvResponse osvResponse = objectMapper.readValue(response.body(), OsvResponse.class);
-            List<VulnObject> matchingVulns = new ArrayList<>();
-            if (osvResponse.getVulns() != null && !osvResponse.getVulns().isEmpty()) {
-                osvResponse.getVulns()
-                    .forEach(vulnerability -> analyzeVulnerability(extensionId, version, vulnerability)
-                        .ifPresent(matchingVulns::add));
-            }
-            return new ExtensionSecurityAnalysisResult()
-                .setResults(matchingVulns.stream().map(this::convert).collect(Collectors.toList()))
-                .setAdvice(UPGRADE_FROM_EM_ADVICE);
+            return this.osvResponseAnalyzer.analyzeOsvResponse(extensionId, version, osvResponse);
         } catch (JsonProcessingException e) {
             throw new ExtensionSecurityException(
                 String.format("Failed to build the json for [%s/+%s]", extensionId, version), e);
@@ -142,66 +118,6 @@ public class OsvExtensionSecurityAnalyzer implements ExtensionSecurityAnalyzer
                 getRootCauseMessage(e));
             Thread.currentThread().interrupt();
             return null;
-        }
-    }
-
-    private SecurityVulnerabilityDescriptor convert(VulnObject vulnObject)
-    {
-        return new SecurityVulnerabilityDescriptor()
-            .setId(vulnObject.getId())
-            .setURL(vulnObject.getMainURL())
-            .setSeverityScore(vulnObject.getSeverityCCSV3())
-            .setFixVersion(vulnObject.getMaxFixVersion().orElse(null));
-    }
-
-    private Optional<VulnObject> analyzeVulnerability(String mavenId, String version, VulnObject vuln)
-    {
-        Optional<VulnObject> rvuln = Optional.empty();
-        boolean isPlatform = mavenId.startsWith(PLATFORM_PREFIX);
-        if (!isPlatform || isMatchesOneRange(mavenId, version, vuln)) {
-            rvuln = Optional.of(vuln);
-        }
-        return rvuln;
-    }
-
-    private boolean isMatchesOneRange(String mavenId, String version, VulnObject vuln)
-    {
-        boolean matchesOneRange = false;
-        List<AffectObject> affectedList = vuln.getAffected();
-        for (AffectObject affected : affectedList) {
-            if (Objects.equals(affected.getPackage().getName(), mavenId)) {
-                matchesOneRange = checkRanges(version, affected);
-            }
-
-            if (matchesOneRange) {
-                break;
-            }
-        }
-        return matchesOneRange;
-    }
-
-    private boolean checkRanges(String version, AffectObject affected)
-    {
-        boolean matchesOneRange = false;
-        if (!affected.getRanges().isEmpty()) {
-            List<RangeObject> ranges = affected.getRanges();
-            matchesOneRange = ranges.stream().anyMatch(range -> {
-                String start = range.getStart();
-                String end = range.getEnd();
-                return isInRange(start, end, version);
-            });
-        }
-        return matchesOneRange;
-    }
-
-    private boolean isInRange(Object introduced, Object fixed, String version)
-    {
-        String range = String.format("[%s,%s]", introduced, fixed == null ? "" : fixed);
-        try {
-            return VersionRange.createFromVersionSpec(range).containsVersion(new DefaultArtifactVersion(version));
-        } catch (InvalidVersionSpecificationException e) {
-            this.logger.warn("Failed to analyze range [{}]. Cause: [{}]", range, getRootCauseMessage(e));
-            return false;
         }
     }
 }

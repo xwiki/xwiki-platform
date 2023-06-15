@@ -61,7 +61,7 @@
     <dependency>
       <groupId>us.springett</groupId>
       <artifactId>cvss-calculator</artifactId>
-      <version>1.4.1</version>
+      <version>${cvssCalculator.version}</version>
     </dependency>
 
     <!-- Test dependencies -->

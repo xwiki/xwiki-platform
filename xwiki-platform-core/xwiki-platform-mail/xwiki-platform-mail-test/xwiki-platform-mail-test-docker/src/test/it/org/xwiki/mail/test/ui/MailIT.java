@@ -71,8 +71,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         // Pages created in the tests need to have PR since we ask for PR to send mails so we need to exclude them from
         // the PR checker.
         // TODO: Mail.MailResender can be removed on XWIKI-20557 is closed
-        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:(MailIT\\..*|Mail\\.MailResender)\n"
-            + "mail.sender.database.resendAutomaticallyAtStartup=false",
+        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:(MailIT\\..*|Mail\\.MailResender)",
         // Add the Scheduler plugin used by Mail Resender Scheduler Job
         "xwikiCfgPlugins=com.xpn.xwiki.plugin.scheduler.SchedulerPlugin"
     },
@@ -272,6 +271,10 @@ class MailIT
 
     private void verifyMailResenderSchedulerJob(TestUtils setup) throws Exception
     {
+        // Note: we don't need to disable automatic resend for the Mail Scheduler job since by default it only resends
+        // once per day and since the XWiki is just created, the resend will ony happen in about 24 hours from now,
+        // leaving enough time for the test to finish...
+
         // Send a mail that we set in prepare_success state for the test below. This is achieved using a custom
         // Test DatabaseMailListener component.
         sendMailWithPrepareSuccessState(setup);

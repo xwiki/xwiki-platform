@@ -79,6 +79,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -698,6 +699,21 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
 
         assertAccess(new RightSet(List.of(LOGIN, REGISTER, VIEW, DELETE)), getXUser("userA") ,
             getXDoc("docDeleteAllowA", "any space"));
+
+        /* Test XWIKI-21013: ensure that access entries are removed when a local parent group is removed from the
+        cache. */
+        SecurityCache securityCache = this.componentManager.getInstance(SecurityCache.class);
+        UserSecurityReference subwikiGroupC =
+            this.securityReferenceFactory.newUserReference(getUser("groupC", "subwiki"));
+        UserSecurityReference userA = this.securityReferenceFactory.newUserReference(getXUser("userA"));
+        SecurityReference docC =
+            this.securityReferenceFactory.newEntityReference(getDoc("docAllowGroupC", "any space", "subwiki"));
+
+        assertNotNull(securityCache.get(subwikiGroupC));
+        assertNotNull(securityCache.get(userA, docC));
+        securityCache.remove(subwikiGroupC);
+        assertNull(securityCache.get(userA, docC));
+        assertNotNull(securityCache.get(userA));
     }
 
     @Test

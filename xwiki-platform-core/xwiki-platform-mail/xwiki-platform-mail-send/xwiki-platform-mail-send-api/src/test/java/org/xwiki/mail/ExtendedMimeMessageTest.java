@@ -149,13 +149,27 @@ public class ExtendedMimeMessageTest
         message.setMessageId(TEST_MESSAGE_ID);
         assertThat(message.getUniqueMessageId(), equalTo("wmK5jlxm4kPv2caEGeVtsDOT3zk="));
 
+        // Verify that the unique id is modified.
         message.setRecipients(Message.RecipientType.TO, "john.doe@example.com");
+        assertThat(message.getUniqueMessageId(), equalTo("g9tEjV2+qAGNIFaQ44+P+iZtZZw="));
+
+        // Verify that the unique id is the same since the Cc address is the same as the To one.
+        message.removeHeader("To");
+        message.setRecipients(Message.RecipientType.CC, "john.doe@example.com");
+        assertThat(message.getUniqueMessageId(), equalTo("g9tEjV2+qAGNIFaQ44+P+iZtZZw="));
+
+        // Verify that the unique id is the same since the Bcc address is the same as the Cc and To ones.
+        message.removeHeader("Cc");
+        message.setRecipients(Message.RecipientType.BCC, "john.doe@example.com");
         assertThat(message.getUniqueMessageId(), equalTo("g9tEjV2+qAGNIFaQ44+P+iZtZZw="));
 
         message.setMessageId("AnotherID");
         assertThat(message.getUniqueMessageId(), equalTo("hdr6yyK2Tq9fKpv5hr5eMOL8XYA="));
 
+        // Verify that the unique id is back to what it was above
         message.setMessageId(TEST_MESSAGE_ID);
+        message.removeHeader("Bcc");
+        message.setRecipients(Message.RecipientType.TO, "john.doe@example.com");
         assertThat(message.getUniqueMessageId(), equalTo("g9tEjV2+qAGNIFaQ44+P+iZtZZw="));
     }
 

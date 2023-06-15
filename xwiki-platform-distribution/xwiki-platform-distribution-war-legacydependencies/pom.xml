@@ -465,6 +465,12 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-legacy-notifications-notifiers-default</artifactId>
       <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-oldcore</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

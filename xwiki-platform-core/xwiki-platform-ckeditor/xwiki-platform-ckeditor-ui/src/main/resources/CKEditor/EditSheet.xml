@@ -887,9 +887,14 @@ ul.cke_autocomplete_panel {
   margin-left: .5em;
 }
 .ckeditor-autocomplete-item-shortcut,
+.ckeditor-autocomplete-item-badge,
 .ckeditor-autocomplete-item-hint {
   color: @text-muted;
   font-size: smaller;
+}
+.ckeditor-autocomplete-item-badge {
+  background-color: @xwiki-border-color;
+  font-weight: normal;
 }
 .ckeditor-autocomplete-item-hint {
   /* Limit to 3 lines of text (based on line height). */

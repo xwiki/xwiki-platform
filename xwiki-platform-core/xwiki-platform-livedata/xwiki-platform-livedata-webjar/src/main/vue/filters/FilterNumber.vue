@@ -31,6 +31,7 @@
     class="filter-number"
     type="text"
     size="1"
+    :aria-label="$t('livedata.filter.number.label')"
     :value="filterEntry.value"
     @input="applyFilterWithDelay($event.target.value)"
   />

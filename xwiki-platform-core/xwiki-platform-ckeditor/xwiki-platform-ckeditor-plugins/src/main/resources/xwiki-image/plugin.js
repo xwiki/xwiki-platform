@@ -179,6 +179,26 @@
         }
       }
 
+      /**
+       * Remove the old way to center an image when found.
+       *
+       * @param el the element to downcast
+       * @param alignment the current alignment of the widget
+       */
+      function downcastLegacyCenter(el, alignment) {
+        if (el.name === 'p' && alignment === 'center') {
+          const styles = CKEDITOR.tools.parseCssText(el.attributes.style || '');
+          if (styles['text-align'] === 'center') {
+            delete styles['text-align'];
+          }
+          if (CKEDITOR.tools.isEmpty(styles)) {
+            el.attributes.style = undefined;
+          } else {
+            el.attributes.style = CKEDITOR.tools.writeCssText(styles);
+          }
+        }
+      }
+
       var originalInit = imageWidget.init;
       imageWidget.init = function() {
         originalInit.call(this);
@@ -345,14 +365,25 @@
 
       var originalDowncast = imageWidget.downcast;
       imageWidget.downcast = function (element) {
+        const alignment = this.data.alignment;
         var el = originalDowncast.apply(this, arguments);
+        downcastLegacyCenter(el, alignment);
         var isNotCaptioned = this.parts.caption === null;
         if (isNotCaptioned) {
-          var img = el.findOne('img', true);
+          let img;
+          if(el.name === 'img') {
+            img = el;
+          } else {
+            img = el.findOne('img', true);
+          }
           // Cleanup and remove the wrapping span used for the resize caret.
           delete img.attributes['data-widget'];
-          var firstChild = el.children[0];
-          firstChild.replaceWith(firstChild.children[0]);
+          if(el.children[0]) {
+            var firstChild = el.children[0];
+            if (firstChild.children[0]) {
+              firstChild.replaceWith(firstChild.children[0]);
+            }
+          }
         }
 
         // Safety data-widget removal as I noticed an additional data-widget being persisted. I did not identify the

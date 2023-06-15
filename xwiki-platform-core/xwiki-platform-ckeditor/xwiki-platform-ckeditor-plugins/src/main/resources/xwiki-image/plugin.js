@@ -187,7 +187,7 @@
        */
       function downcastLegacyCenter(el, alignment) {
         if (el.name === 'p' && alignment === 'center') {
-          const styles = CKEDITOR.tools.parseCssText(el.attributes.style || '');
+          var styles = CKEDITOR.tools.parseCssText(el.attributes.style || '');
           if (styles['text-align'] === 'center') {
             delete styles['text-align'];
           }
@@ -370,7 +370,7 @@
         downcastLegacyCenter(el, alignment);
         var isNotCaptioned = this.parts.caption === null;
         if (isNotCaptioned) {
-          let img;
+          var img;
           if(el.name === 'img') {
             img = el;
           } else {

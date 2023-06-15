@@ -32,7 +32,7 @@
   <description>XWiki Platform - Extension - Security - UI</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Extensions Security List Application</xwiki.extension.name>
+    <xwiki.extension.name>Extensions Security Vulnerabilities Application</xwiki.extension.name>
     <!-- Category for the Extension Manager -->
     <xwiki.extension.category>application</xwiki.extension.category>
   </properties>

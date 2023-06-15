@@ -34,6 +34,10 @@
     <!-- It does not make sense to have this extension installed on several wikis, as it performs the security
       scan for all wikis. -->
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Notifications for the Extensions Security Vulnerabilities application</xwiki.extension.name>
+    <!-- Category for the Extension Manager -->
+    <xwiki.extension.category>api</xwiki.extension.category>
   </properties>
   <dependencies>
     <dependency>

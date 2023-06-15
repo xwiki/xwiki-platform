@@ -166,9 +166,13 @@ public class SolrToLiveDataEntryMapper
 
     private String buildWikis(SolrDocument doc)
     {
-        return this.solrUtils.getList(InstalledExtension.FIELD_INSTALLED_NAMESPACES, doc)
-            .stream()
+        List<Object> list = this.solrUtils.getList(InstalledExtension.FIELD_INSTALLED_NAMESPACES, doc);
+        if (list == null) {
+            return "";
+        }
+        return list.stream()
             .map(String::valueOf)
-            .collect(joining(","));
+            .map(it -> it.replaceFirst("wiki:", ""))
+            .collect(joining(", "));
     }
 }

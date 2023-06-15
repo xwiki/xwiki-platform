@@ -46,7 +46,9 @@ public interface ExtensionSecurityConfiguration
     int getScanDelay();
 
     /**
-     * 
+     * The returned url must match what's documented in <a href="https://google.github.io/osv.dev/api/">osv.dev API
+     * documentation</a>.
+     *
      * @return the url to use for the rest api endpoint. The default value is <a
      *     href="https://api.osv.dev/v1/query">https://api.osv.dev/v1/query</a>
      */

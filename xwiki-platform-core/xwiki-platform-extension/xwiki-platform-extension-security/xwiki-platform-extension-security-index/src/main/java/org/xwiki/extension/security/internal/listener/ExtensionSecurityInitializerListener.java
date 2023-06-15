@@ -29,10 +29,8 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.security.internal.ExtensionSecurityScheduler;
 import org.xwiki.job.event.JobFinishedEvent;
-import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.AbstractLocalEventListener;
 import org.xwiki.observation.event.Event;
-import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 import static org.xwiki.extension.index.internal.job.ExtensionIndexJob.JOB_TYPE;
 

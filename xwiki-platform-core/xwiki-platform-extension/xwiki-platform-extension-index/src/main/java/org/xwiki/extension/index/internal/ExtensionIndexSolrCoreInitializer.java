@@ -131,7 +131,7 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
     public static final String SECURITY_CVE_COUNT = "security_cveCount";
 
     /**
-     * The computed version where all the vulnerabilities are fixed.
+     * The computed minimal version where all the vulnerabilities are fixed.
      */
     public static final String SECURITY_FIX_VERSION = "security_fixVersion";
 

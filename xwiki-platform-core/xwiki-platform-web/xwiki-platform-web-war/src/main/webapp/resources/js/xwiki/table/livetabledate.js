@@ -47,7 +47,7 @@
         var hidden = input.prev('input[type="hidden"]');
         var dateFormat = moment().toMomentFormatString(input.attr('data-dateformat'));
         input.daterangepicker({
-          parentEl: "#"+this.parentElement.id,
+          parentEl: '#'+$.escapeSelector(this.parentElement.id),
           drops: 'down',
           opens: 'center',
           autoUpdateInput: false,

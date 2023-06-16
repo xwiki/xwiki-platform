@@ -51,3 +51,39 @@ require(['jquery', 'bootstrap'], function($) {
     translateButton.attr('title', translateButton.attr('data-title')).popover();
   });
 });
+
+require(['jquery', 'iscroll', 'drawer'], function($, IScroll) {
+  // Unfortunately drawer doesn't declare the dependency on iscroll and expects it to be defined as a global variable.
+  window.IScroll = IScroll;
+  $(function() {
+    // Note that the 'drawer-open' and 'drawer-close' CSS classes are added before the open and close animations end
+    // which prevents us from using them in automated tests. We need something more reliable so we listen to
+    // 'drawer.opened' and 'drawer.closed' events and add our own markers.
+    var tmDrawer = $('#tmDrawer');
+    $('.drawer-nav').closest('body').drawer().on('drawer.opened', function(event) {
+      $('#tmDrawerActivator').attr('aria-expanded', 'true');
+      //Focus the first focusable element in tmDrawer.
+      tmDrawer.find('button, a, input:not([type="hidden"]), select, textarea, [tabindex]:not([tabindex="-1"])')
+        .first()
+        .focus();
+      let closeDrawer = () => $('.drawer-nav').closest('body').drawer('close');
+      // Drawer can be closed by pressing the ESC key.
+      tmDrawer.on('keydown', function (event) {
+        if (event.key === 'Escape') {
+          closeDrawer();
+        }
+      });
+      // It can also be closed by getting the focus out of it.
+      document.getElementById('tmDrawer').addEventListener('focusout',
+        function (event) {
+        if(!this.contains(event.relatedTarget)) {
+          closeDrawer();
+        }
+      });
+    }).on('drawer.closed', function(event) {
+      $('#tmDrawerActivator').attr('aria-expanded', 'false');
+      // We remove the listeners
+      tmDrawer.off('keydown focusout');
+    });
+  });
+});

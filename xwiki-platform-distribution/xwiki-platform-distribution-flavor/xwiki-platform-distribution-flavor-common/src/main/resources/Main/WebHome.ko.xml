@@ -35,21 +35,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>{{box cssClass="floatinginfobox"}}
-{{velocity}}
-{{html clean="false"}}
-## Chrome의 XSS Auditor는 다음과 같은 경우 미리 보기 작업을 차단합니다:
-## * 제출하신 콘텐츠에는 외부 URL이 있는 iframe이 있습니다
-## * 미리보기 동작에 전송된 iframe이 표시됩니다
-## 이 문제를 해결하려면 제출된 내용(매크로 마커)이 미리보기 HTML과 일치하지 않도록 해야 합니다.
-## 참고 항목 XWIKI-14818: Preview triggers ERR_BLOCKED_BY_XSS_AUDITOR in Chrome
-#set ($iframe = 'iframe')
-&lt;$iframe src="https://www.youtube.com/embed/9QTWrZ7OfzI" title="YouTube video of XWiki" role="presentation" allowfullscreen&gt;&lt;/$iframe&gt;
-{{/html}}
-{{/velocity}}
-{{/box}}
-
-= Wiki에 오신 것을 환영합니다 =
+  <content>= Wiki에 오신 것을 환영합니다 =
 
 XWiki는 지식을 정리하는 최고의 도구입니다. //wiki//는 //pages//의 계층으로 구성됩니다. 각각 고유한 페이지 집합을 가진 여러 Wiki를 만들 수 있습니다.
 

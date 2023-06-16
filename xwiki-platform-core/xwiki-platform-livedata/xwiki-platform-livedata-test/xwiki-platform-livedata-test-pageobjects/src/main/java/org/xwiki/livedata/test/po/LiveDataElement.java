@@ -114,7 +114,7 @@ public class LiveDataElement extends BaseElement
     {
         // Once the Vue template is loaded, a div with the loading class is inserted until the rest of the data
         // and components required to display the Live Data are loaded too.
-        return getDriver().findElement(By.id(this.id)).findElements(By.cssSelector(".xwiki-livedata .loading"))
+        return getDriver().findElement(By.id(this.id)).findElements(By.cssSelector(".xwiki-livedata > .loading"))
             .isEmpty();
     }
 

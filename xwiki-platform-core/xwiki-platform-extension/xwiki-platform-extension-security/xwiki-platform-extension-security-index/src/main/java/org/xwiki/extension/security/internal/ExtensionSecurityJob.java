@@ -93,7 +93,8 @@ public class ExtensionSecurityJob
                         }
                     }
                 } catch (ExtensionSecurityException e) {
-                    this.logger.warn("Failed to analyse [{}]. Cause: [{}]", extension, getRootCauseMessage(e));
+                    this.logger.warn("Failed to analyse [{}]. Cause: [{}]", extension.getId().toString(),
+                        getRootCauseMessage(e));
                 } catch (Exception e) {
                     this.logger.warn("Unexpected error [{}]", getRootCauseMessage(e));
                 }

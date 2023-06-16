@@ -63,7 +63,6 @@ public class ExtensionSecurityScheduler implements Runnable, Disposable
      */
     public synchronized void start()
     {
-        
         if (this.executor == null) {
             this.started = true;
             // Start the scheduling.
@@ -90,7 +89,8 @@ public class ExtensionSecurityScheduler implements Runnable, Disposable
         }
         
         this.executor.shutdown();
-        this.start();
+        this.executor = null;
+        start();
     }
 
     @Override

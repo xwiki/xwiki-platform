@@ -267,7 +267,7 @@ class MailIT
         tableLayout.clickAction(1, "mailsendingaction_delete");
 
         // Wait for the success message to be displayed
-        statusPage.waitUntilContent("The mail has been deleted successfully");
+        statusPage.waitUntilContent("\\QThe mail has been deleted successfully\\E");
 
         // Verify that the LT has one item less
         tableLayout = statusPage.getLiveData().getTableLayout();

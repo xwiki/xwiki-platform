@@ -365,7 +365,7 @@
 
       var originalDowncast = imageWidget.downcast;
       imageWidget.downcast = function (element) {
-        const alignment = this.data.alignment;
+        var alignment = this.data.alignment;
         var el = originalDowncast.apply(this, arguments);
         downcastLegacyCenter(el, alignment);
         var isNotCaptioned = this.parts.caption === null;

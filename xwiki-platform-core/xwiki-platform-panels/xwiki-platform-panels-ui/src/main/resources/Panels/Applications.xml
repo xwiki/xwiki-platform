@@ -560,7 +560,8 @@ require(['scriptaculous/effects'], function() {
   display: flex;
 }
 
-.applicationPanelMoreButton:hover {
+.applicationPanelMoreButton:hover,
+.applicationPanelMoreButton:focus {
   background-color: $theme.highlightColor;
 }
 

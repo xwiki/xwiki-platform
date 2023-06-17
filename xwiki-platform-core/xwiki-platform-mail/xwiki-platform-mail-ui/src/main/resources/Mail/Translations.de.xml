@@ -74,6 +74,10 @@ Mail.SendMailStatus_livetable.wiki=Wiki
 Mail.SendMailStatus_livetable.error=Fehler
 Mail.SendMailStatus_livetable.actions=Aktionen
 Mail.SendMailStatus_livetable.resend=Erneut senden
+Mail.SendMailStatus_livetable.delete=Löschen
 mailSender.admin.resendSuccess=Die Mail wurde erfolgreich erneut gesendet
-mailSender.admin.resendFailure=Es konnte nicht erneut gesendet werden. Klicken Sie hier für weitere Informationen.</content>
+mailSender.admin.resendFailure=Mail kann nicht erneut gesendet werden. Für weitere Details klicken.
+mailSender.admin.deleteSuccess=Die E-Mail wurde erfolgreich gelöscht
+mailSender.admin.deleteFailure=Löschen der E-Mail ist fehlgeschlagen. Für weitere Details klicken.
+</content>
 </xwikidoc>

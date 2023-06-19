@@ -200,7 +200,7 @@ public interface WikiDocumentFilter
     // Events
 
     /**
-     * @param name the name of the document
+     * @param name the name part of the {@link org.xwiki.model.reference.DocumentReference}
      * @param parameters the properties of the document
      * @throws FilterException when failing to send event
      */
@@ -208,7 +208,7 @@ public interface WikiDocumentFilter
         throws FilterException;
 
     /**
-     * @param name the name of the document
+     * @param name the name part of the {@link org.xwiki.model.reference.DocumentReference}
      * @param parameters the properties of the document
      * @throws FilterException when failing to send event
      */

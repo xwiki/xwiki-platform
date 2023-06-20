@@ -35,21 +35,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>{{box cssClass="floatinginfobox"}}
-{{velocity}}
-{{html clean="false"}}
-## Chrome의 XSS Auditor는 다음과 같은 경우 미리 보기 작업을 차단합니다:
-## * 제출하신 콘텐츠에는 외부 URL이 있는 iframe이 있습니다
-## * 미리보기 동작에 전송된 iframe이 표시됩니다
-## 이 문제를 해결하려면 제출된 내용(매크로 마커)이 미리보기 HTML과 일치하지 않도록 해야 합니다.
-## 참고 항목 XWIKI-14818: Preview triggers ERR_BLOCKED_BY_XSS_AUDITOR in Chrome
-#set ($iframe = 'iframe')
-&lt;$iframe src="https://www.youtube.com/embed/9QTWrZ7OfzI" title="YouTube video of XWiki" role="presentation" allowfullscreen&gt;&lt;/$iframe&gt;
-{{/html}}
-{{/velocity}}
-{{/box}}
-
-= Wiki에 오신 것을 환영합니다 =
+  <content>= Wiki에 오신 것을 환영합니다 =
 
 XWiki는 지식을 정리하는 최고의 도구입니다. //wiki//는 //pages//의 계층으로 구성됩니다. 각각 고유한 페이지 집합을 가진 여러 Wiki를 만들 수 있습니다.
 
@@ -59,11 +45,11 @@ XWiki는 지식 기반(support, documentation, sales 등)의 협업 작업 공�
 
 Wiki를 최대한 활용하려면, 로그인하고 다음 작업을 수행합니다:
 
-{{velocity}}$services.icon.render('pencil'){{/velocity}} 버튼을 사용하여 이 페이지를 //편집// 하고 필요에 따라 Wiki를 커스터마이즈 하십시오.
+{{displayIcon name="pencil"/}} 버튼을 사용하여 이 페이지를 //편집// 하고 필요에 따라 Wiki를 커스터마이즈 하십시오.
 
-{{velocity}}$services.icon.render('add'){{/velocity}} 버튼을 사용하여 wiki 페이지를 //추가// 콘텐츠를 가장 잘 정리하는 //계층화//를 만듭니다.
+{{displayIcon name="add"/}} 버튼을 사용하여 wiki 페이지를 //추가// 콘텐츠를 가장 잘 정리하는 //계층화//를 만듭니다.
 
-제목 위에 있는{{velocity}}$services.icon.render('home'){{/velocity}} 유저 위치를 보여주는 //네비게이트// 를 사용하십시오. Wiki에서는 길을 잃기 쉽습니다.
+제목 위에 있는{{displayIcon name="home"/}} 유저 위치를 보여주는 //네비게이트// 를 사용하십시오. Wiki에서는 길을 잃기 쉽습니다.
 
 당신은 또한 [[Sandbox&gt;&gt;Sandbox.WebHome]] 사용하여 더 많은 데모 콘텐츠를 볼 수 있으며 일반적으로 Wiki의 기능을 실험할 수 있습니다.
 

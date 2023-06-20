@@ -35,21 +35,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>{{box cssClass="floatinginfobox"}}
-{{velocity}}
-{{html clean="false"}}
-## Chrome's XSS Auditor blocks the preview action if:
-## * the submitted content has an iframe with an external URL
-## * the preview action displays the submitted iframe
-## The workaround is to make sure the submitted content (the macro markers) don't match the preview HTML.
-## See XWIKI-14818: Preview triggers ERR_BLOCKED_BY_XSS_AUDITOR in Chrome
-#set ($iframe = 'iframe')
-&lt;$iframe src="https://www.youtube.com/embed/9QTWrZ7OfzI" allowfullscreen&gt;&lt;/$iframe&gt;
-{{/html}}
-{{/velocity}}
-{{/box}}
-
-= Bienvenue sur votre Wiki =
+  <content>= Bienvenue sur votre Wiki =
 
 XWiki est le meilleur outil pour organiser votre connaissance. Un //Wiki// est organisé suivant une hiérarchie de //pages//. Vous pouvez créer de multiples wikis, chacun avec son propre ensemble de pages.
 
@@ -59,11 +45,11 @@ XWiki peut être utilisé comme base de connaissance (pour le support, la docume
 
 Pour utiliser votre Wiki au maximum de son potentiel, identifiez-vous et :
 
-Utilisez le bouton {{velocity}}$services.icon.render('pencil'){{/velocity}} ci-dessus pour //éditer// cette page et commencer à adapter ce Wiki à vos besoins.
+Utilisez le bouton {{displayIcon name="pencil"/}} ci-dessus pour //éditer// cette page et commencer à adapter ce Wiki à vos besoins.
 
-Utilisez le bouton {{velocity}}$services.icon.render('add'){{/velocity}} ci-dessus pour //ajouter// de nouvelles pages à votre Wiki et créez la //hiérarchie// qui vous convient le mieux pour organiser votre contenu.
+Utilisez le bouton {{displayIcon name="add"/}} ci-dessus pour //ajouter// de nouvelles pages à votre Wiki et créez la //hiérarchie// qui vous convient le mieux pour organiser votre contenu.
 
-Utilisez le fil d'Ariane {{velocity}}$services.icon.render('home'){{/velocity}} localisé au dessus du titre pour //naviguer// parmi vos pages. Vous pouvez être facilement perdu dans un Wiki important sans ce fil d'Ariane.
+Utilisez le fil d'Ariane {{displayIcon name="home"/}} localisé au dessus du titre pour //naviguer// parmi vos pages. Vous pouvez être facilement perdu dans un Wiki important sans ce fil d'Ariane.
 
 Vous pouvez aussi utiliser le [[bac à sable&gt;&gt;Sandbox.WebHome]] pour plus de contenu exemple ainsi que comme endroit pour expérimenter les fonctionnalités de votre Wiki.
 

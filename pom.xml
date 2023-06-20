@@ -364,7 +364,7 @@
         <version>${tika.version}</version>
       </dependency>
 
-      <!-- Rome is used in rss macro and feed api modules and in Tika -->
+      <!-- Rome is used in the feed api module and in Tika -->
       <dependency>
         <groupId>rome</groupId>
         <artifactId>rome</artifactId>

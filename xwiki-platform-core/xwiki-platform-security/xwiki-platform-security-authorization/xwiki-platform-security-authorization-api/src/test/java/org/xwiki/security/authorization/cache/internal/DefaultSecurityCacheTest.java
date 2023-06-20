@@ -22,10 +22,12 @@ package org.xwiki.security.authorization.cache.internal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -62,8 +64,10 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -160,7 +164,7 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         WikiReference entityWiki =
             (WikiReference) entry.getReference().getOriginalReference().extractReference(EntityType.WIKI);
         WikiReference userWiki = entry.getUserReference().getOriginalReference().getWikiReference();
-        if (entityWiki != userWiki) {
+        if (!Objects.equals(entityWiki, userWiki)) {
             if (entry.getUserReference().isGlobal()) {
                 securityCache.add(entry, factory.newEntityReference(entityWiki));
                 return cache.getLastInsertedKey();
@@ -875,5 +879,54 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
 
         assertSame(page1Space, this.securityCache.get(spaceReference));
         assertSame(page1Document, this.securityCache.get(documentReference));
+    }
+
+    @Test
+    void testRejectAccessEntryWithNonUserParent() throws Exception
+    {
+        // Insert the hierarchy for the user into the cache, but not as user.
+        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(null)));
+        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(new WikiReference("wiki"))));
+        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(new SpaceReference("wiki", "XWiki"))));
+        DocumentReference userDocRef = new DocumentReference("wiki", "XWiki", "nonUserParent");
+        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(userDocRef)));
+        UserSecurityReference userSecurityReference = newUserReference(userDocRef);
+
+        DocumentReference documentReference = new DocumentReference("wiki", "XWiki", "page1");
+        SecurityReference documentSecurityReference = newEntityReference(documentReference);
+        this.securityCache.add(mockSecurityRuleEntry(documentSecurityReference));
+
+        // Create an access entry with the user with non-user parent
+        SecurityAccessEntry entry = mockSecurityAccessEntry(documentSecurityReference, userSecurityReference);
+
+        // Try to add the access entry to the cache
+        ParentEntryEvictedException exception = assertThrows(ParentEntryEvictedException.class,
+            () -> AddAccessEntry(entry));
+        assertEquals("The second parent [Rules for Document wiki:XWiki.nonUserParent] for the entry "
+                + "[Access for Document wiki:XWiki.nonUserParent on Document wiki:XWiki.page1] with wiki [null] "
+                + "is not a user entry.",
+            exception.getMessage());
+    }
+
+    @Test
+    void testRejectUserEntryWithNonGroupGroup() throws Exception
+    {
+        // Insert the hierarchy for the group and the user into the cache.
+        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(null)));
+        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(new WikiReference("wiki"))));
+        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(new SpaceReference("wiki", "XWiki"))));
+
+        // Insert the group entry but as regular document.
+        DocumentReference groupDocRef = new DocumentReference("wiki", "XWiki", "group");
+        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(groupDocRef)));
+        GroupSecurityReference groupSecurityReference = newGroupReference(groupDocRef);
+
+        // Insert the user as user entry.
+        DocumentReference userDocRef = new DocumentReference("wiki", "XWiki", "user");
+        ParentEntryEvictedException exception = assertThrows(ParentEntryEvictedException.class, () ->
+            this.securityCache.add(mockSecurityRuleEntry(newUserReference(userDocRef)),
+                Collections.singleton(groupSecurityReference)));
+        assertEquals("The parent [Rules for Document wiki:XWiki.group] is not a group entry.",
+            exception.getMessage());
     }
 }

@@ -163,6 +163,22 @@ thead.xwiki-livetable-display-header td.xwiki-livetable-display-header-filter se
   margin: 0;
   padding: 0 0 0 2px;
 }
+
+.xwiki-livetable-display-header-filter-date-combobox {
+  position: relative;
+}
+
+.xwiki-livetable-display-header-filter-date-combobox > .daterangepicker {
+  left: 50%;
+  top: 100%;
+  transform: translate(-50%, 0);
+  background: $theme.pageContentBackgroundColor;
+}
+
+.xwiki-livetable-display-header-filter-date-combobox > .daterangepicker .ranges li.active {
+  background: $theme.menuBackgroundColor;
+}
+
 .xwiki-livetable-filter-active {
   background-color: $theme.highlightColor !important;
   font-weight: bold;

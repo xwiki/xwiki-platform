@@ -29,10 +29,10 @@
   <artifactId>xwiki-platform-extension-security-ui</artifactId>
   <name>XWiki Platform - Extension - Security - UI</name>
   <packaging>xar</packaging>
-  <description>XWiki Platform - Extension - Security - UI</description>
+  <description>List Extensions Security Vulnerabilities of installed extensions</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Extensions Security Vulnerabilities Application</xwiki.extension.name>
+    <xwiki.extension.name>Security Vulnerabilities Application</xwiki.extension.name>
     <!-- Category for the Extension Manager -->
     <xwiki.extension.category>application</xwiki.extension.category>
   </properties>

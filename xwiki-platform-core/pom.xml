@@ -125,17 +125,7 @@
 
                  Single justification example:
             -->
-            <revapi.differences>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.addedToInterface</code>
-                  <new>method long org.xwiki.attachment.validation.AttachmentValidationConfiguration::getMaxUploadSize(org.xwiki.model.reference.EntityReference)</new>
-                  <justification>Young API</justification>
-                  <criticality>documented</criticality>
-                </item>
-              </differences>
-            </revapi.differences>
+            
           </analysisConfiguration>
         </configuration>
       </plugin>

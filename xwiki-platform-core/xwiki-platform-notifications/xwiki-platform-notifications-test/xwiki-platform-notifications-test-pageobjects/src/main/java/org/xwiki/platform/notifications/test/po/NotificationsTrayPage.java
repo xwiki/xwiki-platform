@@ -511,4 +511,13 @@ public class NotificationsTrayPage extends ViewPage
     {
         return this.notificationsButton;
     }
+
+    /**
+     * @return a new instance of {@link GroupedNotificationElementPage}.
+     * @since 15.5
+     */
+    public GroupedNotificationElementPage getGroupedNotificationsPage()
+    {
+        return new GroupedNotificationElementPage(this.getNotificationsButton());
+    }
 }

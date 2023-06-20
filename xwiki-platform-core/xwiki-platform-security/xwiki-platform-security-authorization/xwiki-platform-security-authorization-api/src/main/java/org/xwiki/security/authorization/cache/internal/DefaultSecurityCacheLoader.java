@@ -65,9 +65,6 @@ import org.xwiki.security.internal.UserBridge;
 @Singleton
 public class DefaultSecurityCacheLoader implements SecurityCacheLoader
 {
-    /** Maximum number of attempts at loading an entry. */
-    private static final int MAX_RETRIES = 5;
-
     /** Logger. **/
     @Inject
     private Logger logger;
@@ -147,34 +144,19 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
     @Override
     public SecurityAccessEntry load(UserSecurityReference user, SecurityReference entity) throws AuthorizationException
     {
-        int retries = 0;
-        Exception lastException;
+        // This lock is important to prevent that any cache invalidation is applied while we are creating new
+        // cache entries. Otherwise, this code might create new cache entries based on outdated information that
+        // won't be invalidated. Imagine, for example, that thread 1 is starting to load user groups for user A, then
+        // thread 2 removes a group of A and invalidates the cache of A and then thread 1 saves a new cache entry for
+        // user A with the outdated information. This lock prevents this by delaying the invalidation of the cache of A
+        // (that uses a write-lock that corresponds to the read lock we use here) after the store of the cache entry A
+        // such that the new cache entry is correctly invalidated.
+        this.rulesInvalidator.suspend();
 
-        while (true) {
-            rulesInvalidator.suspend();
-
-            try {
-                retries++;
-                return loadRequiredEntries(user, entity);
-            } catch (ParentEntryEvictedException e) {
-                lastException = e;
-                if (retries < MAX_RETRIES) {
-                    this.logger.debug("The parent entry was evicted. Have tried {} times.  Trying again...", retries);
-                    continue;
-                }
-            } catch (ConflictingInsertionException e) {
-                lastException = e;
-                if (retries < MAX_RETRIES) {
-                    this.logger.debug("There were conflicting insertions. Have tried {} times.  Retrying...", retries);
-                    continue;
-                }
-            } finally {
-                rulesInvalidator.resume();
-            }
-            String message = String.format("Failed to load the cache in %d attempts. Giving up.", retries);
-            this.logger.error(String.format("%s For user [%s] and entity [%s].", message, user, entity));
-            throw new AuthorizationException(user.getOriginalDocumentReference(), entity.getOriginalReference(),
-                message, lastException);
+        try {
+            return loadRequiredEntries(user, entity);
+        } finally {
+            this.rulesInvalidator.resume();
         }
     }
 
@@ -185,12 +167,10 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
      * @param user The user to check access for.
      * @param entity The entity to check access to.
      * @return The resulting access for the user on the entity.
-     * @throws ParentEntryEvictedException If one of the parent entries are evicted before the load is completed.
-     * @throws ConflictingInsertionException When different threads have inserted conflicting entries into the cache.
      * @throws org.xwiki.security.authorization.AuthorizationException On error.
      */
     private SecurityAccessEntry loadRequiredEntries(UserSecurityReference user, SecurityReference entity)
-        throws ParentEntryEvictedException, ConflictingInsertionException, AuthorizationException
+        throws AuthorizationException
     {
         // No entity, return default rights for user in its wiki
         if (entity == null) {
@@ -214,13 +194,11 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
      * @param entity The lowest entity providing security rules on the path of the entity to check access for.
      * @param ruleEntries The rule entries associated with the above entity.
      * @return The access for the user at the entity (equivalent to the one of the entity to check access for).
-     * @throws ParentEntryEvictedException If one of the parent entries are evicted before the load is completed.
-     * @throws ConflictingInsertionException When different threads have inserted conflicting entries into the cache.
      * @throws org.xwiki.security.authorization.AuthorizationException On error.
      */
     private SecurityAccessEntry loadAccessEntries(UserSecurityReference user, SecurityReference entity,
         Deque<SecurityRuleEntry> ruleEntries)
-        throws ParentEntryEvictedException, ConflictingInsertionException, AuthorizationException
+        throws AuthorizationException
     {
         // userWiki is the wiki of the user
         SecurityReference userWiki = user.getWikiReference();
@@ -244,7 +222,11 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
         SecurityAccessEntry accessEntry = authorizationSettlerProvider.get().settle(user, groups, ruleEntries);
 
         // Store the result into the cache
-        getSecurityCache().add(accessEntry, entityWiki);
+        try {
+            getSecurityCache().add(accessEntry, entityWiki);
+        } catch (ParentEntryEvictedException | ConflictingInsertionException e) {
+            logFailedInsertion(e);
+        }
 
         // Return the result
         return accessEntry;
@@ -262,14 +244,12 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
      *     and a shadow user will be made available in that wiki to support access entries.
      * @param branchGroups groups that were already seen by callers, to avoid infinite recursion
      * @return A collection of groups associated to the requested user/group (both user wiki and entity wiki)
-     * @throws ParentEntryEvictedException if any of the parent entries of the group were evicted.
-     * @throws ConflictingInsertionException When different threads have inserted conflicting entries into the
      *     cache.
      * @throws org.xwiki.security.authorization.AuthorizationException on error.
      */
     private Collection<GroupSecurityReference> loadGroupsOfUserOrGroup(UserSecurityReference user,
         SecurityReference userWiki, SecurityReference entityWiki, Deque<GroupSecurityReference> branchGroups)
-        throws ParentEntryEvictedException, ConflictingInsertionException, AuthorizationException
+        throws AuthorizationException
     {
         // First, we try to get the groups of the user from the cache
         Collection<GroupSecurityReference> groups = getSecurityCache().getGroupsFor(user, entityWiki);
@@ -324,7 +304,11 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
             // Store a shadow entry for a global user/group involved in a local wiki with both local and global
             // groups as parents to ensure that the entry is properly invalidated also when just the shadow parent is
             // invalidated due to a local parent being invalidated.
-            getSecurityCache().add(new DefaultSecurityShadowEntry(user, entityWiki), allImmediateGroups);
+            try {
+                getSecurityCache().add(new DefaultSecurityShadowEntry(user, entityWiki), allImmediateGroups);
+            } catch (ParentEntryEvictedException | ConflictingInsertionException e) {
+                logFailedInsertion(e);
+            }
         }
 
         // Returns all collected groups for access evaluation
@@ -344,15 +328,12 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
      * @param branchGroups groups that were already seen by callers, to avoid infinite recursion
      * @param groupsToIgnore the groups in the immediate groups that need to be ignored to prevent cycles
      * @return A collection of groups associated to the requested groups (both user wiki and entity wiki)
-     * @throws ParentEntryEvictedException if any of the parent entries of the group were evicted.
-     * @throws ConflictingInsertionException When different threads have inserted conflicting entries into the
-     *     cache.
      * @throws org.xwiki.security.authorization.AuthorizationException on error.
      */
     private Collection<GroupSecurityReference> loadImmediateGroupsRecursively(
         Set<GroupSecurityReference> allImmediateGroups, SecurityReference entityWiki,
         Deque<GroupSecurityReference> branchGroups, Set<GroupSecurityReference> groupsToIgnore)
-        throws ParentEntryEvictedException, ConflictingInsertionException, AuthorizationException
+        throws AuthorizationException
     {
         Collection<GroupSecurityReference> groups = new HashSet<>();
 
@@ -386,15 +367,21 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
 
     private Collection<GroupSecurityReference> loadGroupsOfPublicUser(UserSecurityReference user,
         SecurityReference entityWiki)
-        throws AuthorizationException, ParentEntryEvictedException, ConflictingInsertionException
+        throws AuthorizationException
     {
-        if (getSecurityCache().get(user) == null) {
+        // Ensure that the main wiki entry is actually a user entry as the security cache only accepts user entries
+        // as user parent.
+        if (getSecurityCache().getImmediateGroupsFor(user) == null) {
             // Main wiki entry should be loaded
-            getRules(user);
+            loadUserEntry(user, null);
         }
         if (entityWiki != null) {
             // Ensure there is a Public shadow in the subwiki of the checked entity
-            getSecurityCache().add(new DefaultSecurityShadowEntry(user, entityWiki), null);
+            try {
+                getSecurityCache().add(new DefaultSecurityShadowEntry(user, entityWiki), null);
+            } catch (ParentEntryEvictedException | ConflictingInsertionException e) {
+                logFailedInsertion(e);
+            }
         }
         return Collections.emptySet();
     }
@@ -405,12 +392,10 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
      *
      * @param user The user/group to load.
      * @param groups The collection of groups associated with the user/group
-     * @throws ParentEntryEvictedException if any of the parent entries of the group were evicted.
-     * @throws ConflictingInsertionException When different threads have inserted conflicting entries into the cache.
      * @throws org.xwiki.security.authorization.AuthorizationException on error.
      */
     private void loadUserEntry(UserSecurityReference user, Collection<GroupSecurityReference> groups)
-        throws ParentEntryEvictedException, ConflictingInsertionException, AuthorizationException
+        throws AuthorizationException
     {
         // Make sure the parent of the user document is loaded.
         Deque<SecurityReference> chain = user.getReversedSecurityReferenceChain();
@@ -419,12 +404,16 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
             SecurityRuleEntry entry = getSecurityCache().get(ref);
             if (entry == null) {
                 entry = securityEntryReader.read(ref);
-                getSecurityCache().add(entry);
+                addToCache(entry);
             }
         }
 
         SecurityRuleEntry entry = securityEntryReader.read(user);
-        getSecurityCache().add(entry, groups);
+        try {
+            getSecurityCache().add(entry, groups);
+        } catch (ParentEntryEvictedException | ConflictingInsertionException e) {
+            logFailedInsertion(e);
+        }
     }
 
     /**
@@ -434,11 +423,9 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
      * @param entity The entity for which rules should be loaded and retrieve.
      * @return A collection of security rule entry, once for each level of the hierarchy.
      * @exception org.xwiki.security.authorization.AuthorizationException if an error occurs
-     * @exception ParentEntryEvictedException if any parent entry is evicted before the operation completes.
-     * @throws ConflictingInsertionException When different threads have inserted conflicting entries into the cache.
      */
     private Deque<SecurityRuleEntry> getRules(SecurityReference entity)
-        throws AuthorizationException, ParentEntryEvictedException, ConflictingInsertionException
+        throws AuthorizationException
     {
         Deque<SecurityRuleEntry> rules = new LinkedList<SecurityRuleEntry>();
         List<SecurityRuleEntry> emptyRuleEntryTail = new ArrayList<SecurityRuleEntry>();
@@ -451,18 +438,36 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
                     emptyRuleEntryTail.add(entry);
                 } else {
                     entry = securityEntryReader.read(ref);
-                    if (!emptyRuleEntryTail.isEmpty()) {
-                        // Add intermediate empty rules sets to the cache to hold this significant one
-                        for (SecurityRuleEntry emptyRuleEntry : emptyRuleEntryTail) {
-                            getSecurityCache().add(emptyRuleEntry);
-                        }
-                        emptyRuleEntryTail.clear();
+                    // Add intermediate empty rules sets to the cache to hold this significant one
+                    for (SecurityRuleEntry emptyRuleEntry : emptyRuleEntryTail) {
+                        addToCache(emptyRuleEntry);
                     }
-                    getSecurityCache().add(entry);
+                    emptyRuleEntryTail.clear();
+                    addToCache(entry);
                 }
             }
             rules.push(entry);
         }
         return rules;
+    }
+
+    private void addToCache(SecurityRuleEntry entry)
+    {
+        try {
+            getSecurityCache().add(entry);
+        } catch (ParentEntryEvictedException | ConflictingInsertionException e) {
+            logFailedInsertion(e);
+        }
+    }
+
+    /**
+     * Log a failed insertion into the security cache to allow debugging problems with the security cache.
+     *
+     * @param e the exception from the security cache
+     */
+    private void logFailedInsertion(Exception e)
+    {
+        this.logger.debug("Insertion into the security cache failed. This may indicate that the security "
+            + "cache is too small or a bug.", e);
     }
 }

@@ -239,6 +239,11 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                         + "in the cache.",
                     entry.getUserReference(), entry, wiki));
             }
+            if (!parent2.isUser()) {
+                throw new ParentEntryEvictedException(String.format(
+                    "The second parent [%s] for the entry [%s] with wiki [%s] is not a user entry.",
+                    parent2, entry, wiki));
+            }
             this.parents = (isSelf) ? Arrays.asList(parent1) : Arrays.asList(parent1, parent2);
             parent1.addChild(this);
             if (!isSelf) {
@@ -287,8 +292,8 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
             this.entry = entry;
             int parentSize = groups.size() + ((parentReference == null) ? 0 : 1);
             if (parentSize > 0) {
-                this.parents = new ArrayList<>(parentSize);
                 if (parentReference != null) {
+                    this.parents = new ArrayList<>(parentSize);
                     SecurityCacheEntry parent = DefaultSecurityCache.this.getEntry(parentReference);
                     if (parent == null) {
                         throw new ParentEntryEvictedException(String.format(
@@ -297,36 +302,45 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                             parentReference, entry, groups));
                     }
                     this.parents.add(parent);
+                    this.parents.addAll(getParentGroups(groups, parentReference));
+                    // Wait until here to avoid that in case of an exception there is a reference to the new object
+                    // in the parent's children.
                     parent.addChild(this);
+                } else {
+                    this.parents = getParentGroups(groups, null);
                 }
-                addParentGroups(groups, parentReference);
-                logNewEntry();
             } else {
                 this.parents = null;
-                logNewEntry();
             }
+            logNewEntry();
         }
 
         /**
-         * Add provided groups as parent of this entry, excluding the main parent reference.
+         * Get group entries for the provided parents, excluding the main parent reference.
+         * <p>
+         * If loading all of them succeeds, this entry is added as child of all of them.
          *
          * @param groups the list of groups to add.
          * @param parentReference the main parent reference to exclude.
          * @throws ParentEntryEvictedException if the parents required are no more available in the cache.
          */
-        private void addParentGroups(Collection<GroupSecurityReference> groups, SecurityReference parentReference)
+        private Collection<SecurityCacheEntry> getParentGroups(Collection<GroupSecurityReference> groups,
+            SecurityReference parentReference)
             throws ParentEntryEvictedException
         {
+            Collection<SecurityCacheEntry> result = new ArrayList<>(groups.size());
             for (GroupSecurityReference group : groups) {
-                if (group.equals(parentReference)) {
-                    continue;
-                }
                 SecurityCacheEntry parent = (entry instanceof SecurityShadowEntry && group.isGlobal())
                     ? DefaultSecurityCache.this.getShadowEntry(group, ((SecurityShadowEntry) entry).getWikiReference())
                     : DefaultSecurityCache.this.getEntry(group);
                 if (parent == null) {
                     throw new ParentEntryEvictedException(String
                         .format("The parent with reference [%s] is no longer available in the cache", parentReference));
+                }
+
+                if (!parent.isUser()) {
+                    throw new ParentEntryEvictedException(
+                        String.format("The parent [%s] is not a group entry.", parent.getEntry()));
                 }
 
                 // Make sure the group really is stored as such (can happen if that the right of the group was checked
@@ -336,9 +350,17 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                     ((GroupSecurityEntry) parent.getEntry()).setGroupReference(group);
                 }
 
-                this.parents.add(parent);
-                parent.addChild(this);
+                // Do not add the main parent reference but still execute all checks to be sure that it is a group.
+                if (!group.equals(parentReference)) {
+                    result.add(parent);
+                }
             }
+
+            // Wait until here to be sure that no children are added if there is an exception while collecting the
+            // parents.
+            result.forEach(parent -> parent.addChild(this));
+
+            return result;
         }
 
         /**
@@ -355,13 +377,14 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
 
             if (groups != null && !groups.isEmpty()) {
                 if (this.parents == null) {
-                    this.parents = new ArrayList<>(groups.size());
-                    addParentGroups(groups, null);
+                    this.parents = getParentGroups(groups, null);
                 } else {
                     SecurityCacheEntry parent = this.parents.iterator().next();
-                    this.parents = new ArrayList<>(groups.size() + 1);
-                    this.parents.add(parent);
-                    addParentGroups(groups, parent.entry.getReference());
+                    // Ensure that parents aren't modified if an exception is thrown.
+                    Collection<SecurityCacheEntry> newParents = new ArrayList<>(groups.size() + 1);
+                    newParents.add(parent);
+                    newParents.addAll(getParentGroups(groups, parent.entry.getReference()));
+                    this.parents = newParents;
                 }
             }
 
@@ -932,11 +955,13 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
             return null;
         }
 
-        for (SecurityCacheEntry parent : userEntry.parents) {
-            // Add the parent group (if we have not already seen it)
-            SecurityReference parentRef = parent.getEntry().getReference();
-            if (parentRef instanceof GroupSecurityReference) {
-                groups.add((GroupSecurityReference) parentRef);
+        if (userEntry.parents != null) {
+            for (SecurityCacheEntry parent : userEntry.parents) {
+                // Add the parent group (if we have not already seen it)
+                SecurityReference parentRef = parent.getEntry().getReference();
+                if (parentRef instanceof GroupSecurityReference) {
+                    groups.add((GroupSecurityReference) parentRef);
+                }
             }
         }
         return groups;

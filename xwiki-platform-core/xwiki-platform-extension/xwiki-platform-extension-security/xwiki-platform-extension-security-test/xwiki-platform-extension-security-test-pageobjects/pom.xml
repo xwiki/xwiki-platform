@@ -18,27 +18,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-extension-security</artifactId>
+    <artifactId>xwiki-platform-extension-security-test</artifactId>
     <version>15.6-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-extension-security-test</artifactId>
-  <name>XWiki Platform - Extension - Security - Test - Root POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Extension - Security - Test - Root POM</description>
-  <modules>
-    <module>xwiki-platform-extension-security-test-pageobjects</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>docker</id>
-      <modules>
-        <module>xwiki-platform-extension-security-test-docker</module>
-      </modules>
-    </profile>
-  </profiles>
+  <artifactId>xwiki-platform-extension-security-test-pageobjects</artifactId>
+  <name>XWiki Platform - Extension - Security - Tests - Page Objects</name>
+  <packaging>jar</packaging>
+  <description>The page objects used in the functional tests of the Extension Vulnerabilities UI.</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-ui</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

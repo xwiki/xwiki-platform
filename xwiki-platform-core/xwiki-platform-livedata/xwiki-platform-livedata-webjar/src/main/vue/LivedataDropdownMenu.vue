@@ -51,7 +51,7 @@
 
       <li>
         <!-- Refresh -->
-        <a href="#" @click.prevent="logic.updateEntries()">
+        <a href="#" @click.prevent="logic.updateEntries()" class="livedata-action-refresh">
           <XWikiIcon :icon-descriptor="{name: 'repeat'}" /> 
           {{ $t('livedata.action.refresh') }}
         </a>

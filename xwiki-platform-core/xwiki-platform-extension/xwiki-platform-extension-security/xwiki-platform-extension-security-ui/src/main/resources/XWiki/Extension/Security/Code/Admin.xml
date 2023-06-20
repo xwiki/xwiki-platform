@@ -45,7 +45,7 @@
 {{/warning}}
 
 {{liveData
-  id="dashboard"
+  id="extension-vulnerabilities-list"
   source="extensionSecurity"
   properties="name,extensionId,wikis,maxCVSS,cveID,fixVersion,advice"
   showPageSizeDropdown="false"}}

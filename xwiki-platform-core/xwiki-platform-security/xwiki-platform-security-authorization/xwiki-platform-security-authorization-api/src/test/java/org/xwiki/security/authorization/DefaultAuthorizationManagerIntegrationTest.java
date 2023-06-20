@@ -700,8 +700,11 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
         assertAccess(new RightSet(List.of(LOGIN, REGISTER, VIEW, DELETE)), getXUser("userA") ,
             getXDoc("docDeleteAllowA", "any space"));
 
-        /* Test XWIKI-21013: ensure that access entries are removed when a local parent group is removed from the
-        cache. */
+        /* In the situation where a global user (userA) is in a global group (groupA) that is in another global group
+         (groupB) that is in a local group (groupC) that is in a subwiki (subwiki), ensure that removing the local
+         group (groupC) from the cache removes the access entries for the global user (userA) in the subwiki as
+         otherwise permissions based on groupC are not recalculated when a member of groupC is removed. This
+         verifies that memberships between groups are correctly mirrored in the shadow entries for the subwiki. */
         SecurityCache securityCache = this.componentManager.getInstance(SecurityCache.class);
         UserSecurityReference subwikiGroupC =
             this.securityReferenceFactory.newUserReference(getUser("groupC", "subwiki"));

@@ -171,7 +171,7 @@ public interface DocumentAccessBridge
 
     /**
      * @return the current document on the XWiki context or {@code null} if there's no document set on the XWiki context
-     * @since 14.10.2
+     * @since 14.10.12
      * @since 15.5RC1
      */
     @Unstable

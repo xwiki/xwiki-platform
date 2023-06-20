@@ -41,8 +41,8 @@ import org.xwiki.observation.event.Event;
  */
 @Component
 @Singleton
-@Named(ExtensionSecurityIndexationEvent.ID)
-public class ExtensionSecurityIndexationEvent extends AbstractLocalEventListener
+@Named(ExtensionSecurityIndexationEventListener.ID)
+public class ExtensionSecurityIndexationEventListener extends AbstractLocalEventListener
 {
     /**
      * The hint and name of this listener.
@@ -55,7 +55,7 @@ public class ExtensionSecurityIndexationEvent extends AbstractLocalEventListener
     /**
      * Default constructor.
      */
-    public ExtensionSecurityIndexationEvent()
+    public ExtensionSecurityIndexationEventListener()
     {
         super(ID, new ExtensionSecurityIndexationEndEvent());
     }

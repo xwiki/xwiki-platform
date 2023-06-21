@@ -356,7 +356,7 @@
       #set ($dateFormat = $xwiki.getXWikiPreference('dateformat', 'yyyy/MM/dd HH:mm'))
     #end
     #set($dateRangeFormat = $dateFormat + " - " + $dateFormat)
-    <div id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}-description" class='sr-only'>
+    <div id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}-description" hidden>
       $!escapetool.xml($services.localization.render('platform.livetable.filter.date.format.description',[$dateRangeFormat]))
     </div>
     <div role="combobox" id="xwiki-livetable-${htmlLiveTableId}-filter-date-combobox-${foreach.count}"

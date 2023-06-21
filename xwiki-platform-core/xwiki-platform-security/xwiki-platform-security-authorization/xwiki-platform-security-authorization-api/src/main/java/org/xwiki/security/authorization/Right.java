@@ -28,7 +28,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.xwiki.model.EntityType;
@@ -97,14 +99,17 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     public static final Set<EntityType> WIKI_SPACE_DOCUMENT
         = EnumSet.of(EntityType.WIKI, EntityType.SPACE, EntityType.DOCUMENT);
 
+    /**
+     * There is currently a maximum number of registered rights allowed, related to the way {@link RightSet}
+     * is implemented.
+     */
+    static final int MAX_SIZE = 64;
+
     /** Serialization identifier. */
     private static final long serialVersionUID = 1L;
 
     /** Internal list of existing instances. */
     private static final List<Right> VALUES = new ArrayList<Right>();
-
-    /** Unmodifiable list of existing instance for public dissemination. */
-    private static final List<Right> UNMODIFIABLE_VALUES = Collections.unmodifiableList(VALUES);
 
     /** List of all rights, as strings. */
     private static final List<String> ALL_RIGHTS = new LinkedList<String>();
@@ -257,11 +262,30 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
         this.isReadOnly = isReadOnly;
 
         synchronized (VALUES) {
-            this.value = VALUES.size();
-            if (this.value >= 64) {
-                throw new IndexOutOfBoundsException();
+            int index = 0;
+            int tempValue = VALUES.size();
+            for (; index < VALUES.size(); index++)
+            {
+                // Since we have a limitation of 64 rights max, we're reusing the places
+                // left empty by unregistered rights. We should probably fix that in the future
+                // as it might be error-prone if for any reason a code tries to access an unregistered based
+                // on its ordinal.
+                if (VALUES.get(index) == null) {
+                    tempValue = index;
+                    break;
+                }
             }
-            VALUES.add(this);
+            if (tempValue == VALUES.size()) {
+                if (tempValue >= MAX_SIZE) {
+                    throw new IndexOutOfBoundsException(String.format("You cannot register more than [%s] rights.",
+                        MAX_SIZE));
+                }
+                VALUES.add(this);
+            } else {
+                VALUES.set(tempValue, this);
+            }
+            this.value = tempValue;
+
             if (!name.equals(ILLEGAL_RIGHT_NAME)) {
                 ALL_RIGHTS.add(name);
             }
@@ -344,7 +368,9 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
      */
     public static List<Right> values()
     {
-        return UNMODIFIABLE_VALUES;
+        return VALUES.stream()
+            .filter(Objects::nonNull)
+            .collect(Collectors.toUnmodifiableList());
     }
 
     /**
@@ -355,7 +381,7 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     public static Right toRight(String string)
     {
         for (Right right : VALUES) {
-            if (right.name.equalsIgnoreCase(string)) {
+            if (right != null && right.name.equalsIgnoreCase(string)) {
                 return right;
             }
         }
@@ -380,7 +406,7 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     /**
      * Retrieve a right based on its ordinal.
      * @param ordinal the ordinal of the right
-     * @return the {@code Right}
+     * @return the {@code Right} or {@code null} if the right has been unregistered.
      */
     public static Right get(int ordinal)
     {
@@ -423,7 +449,7 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     {
         Set<EntityType> entityTypes = this.getTargetedEntityType();
         synchronized (VALUES) {
-            VALUES.remove(this);
+            VALUES.set(this.ordinal(), null);
             ALL_RIGHTS.remove(this.name);
             if (entityTypes != null) {
                 for (EntityType type : entityTypes) {
@@ -439,7 +465,9 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
             }
 
             for (Right impliedByRight : VALUES) {
-                impliedByRight.impliedRights.remove(this);
+                if (impliedByRight != null) {
+                    impliedByRight.impliedRights.remove(this);
+                }
             }
         }
     }

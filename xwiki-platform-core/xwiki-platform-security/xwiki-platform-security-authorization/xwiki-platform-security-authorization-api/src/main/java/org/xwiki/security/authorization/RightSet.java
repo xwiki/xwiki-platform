@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import static org.xwiki.security.authorization.Right.MAX_SIZE;
+
 /**
  * Optimized set of {@link Right}.
  *
@@ -42,9 +44,7 @@ public class RightSet extends AbstractSet<Right> implements Cloneable, java.io.S
     /** Default constructor. */
     public RightSet()
     {
-        if (Right.size() > 64) {
-            throw new IllegalStateException();
-        }
+        maxSizeCheck();
     }
 
     /**
@@ -54,9 +54,7 @@ public class RightSet extends AbstractSet<Right> implements Cloneable, java.io.S
      */
     public RightSet(Collection<? extends Right> rights)
     {
-        if (Right.size() > 64) {
-            throw new IllegalStateException();
-        }
+        maxSizeCheck();
         this.addAll(rights);
     }
 
@@ -66,11 +64,16 @@ public class RightSet extends AbstractSet<Right> implements Cloneable, java.io.S
      */
     public RightSet(Right... rights)
     {
-        if (Right.size() > 64) {
-            throw new IllegalStateException();
-        }
-
+        maxSizeCheck();
         Collections.addAll(this, rights);
+    }
+
+    private void maxSizeCheck()
+    {
+        if (Right.size() > MAX_SIZE) {
+            throw new IllegalStateException(String.format("You cannot register more than [%s] rights.",
+                MAX_SIZE));
+        }
     }
 
     @Override

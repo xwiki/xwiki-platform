@@ -172,21 +172,19 @@ public class XWikiTest
     }
 
     @Test
-    public void testUserNotAddedByDefaultToXWikiAllGroupWhenThisGroupImplicit() throws Exception
+    void userNotAddedByDefaultToXWikiAllGroupWhenThisGroupImplicit() throws Exception
     {
         // given
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.authentication.group.allgroupimplicit", "1");
 
         XWikiGroupServiceImpl xWikiGroupService = new XWikiGroupServiceImpl();
-        xwiki.setGroupService(xWikiGroupService);
-
-        XWiki spyXWiki = Mockito.spy(xwiki);
+        this.xwiki.setGroupService(xWikiGroupService);
 
         // when
-        spyXWiki.setUserDefaultGroup("XWiki.user1", this.oldcore.getXWikiContext());
+        this.xwiki.setUserDefaultGroup("XWiki.user1", this.oldcore.getXWikiContext());
 
         // then
-        Mockito.verify(spyXWiki, times(0)).addUserToGroup(anyString(), anyString(), any(XWikiContext.class));
+        Mockito.verify(this.xwiki, times(0)).addUserToGroup(anyString(), anyString(), any(XWikiContext.class));
     }
 
     @Test

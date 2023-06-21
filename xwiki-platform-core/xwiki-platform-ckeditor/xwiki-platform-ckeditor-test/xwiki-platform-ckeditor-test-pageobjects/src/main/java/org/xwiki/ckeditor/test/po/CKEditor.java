@@ -153,4 +153,15 @@ public class CKEditor extends BaseElement
     {
         getDriver().findElement(By.className("cke_button__image_icon")).click();
     }
+    
+    /**
+     * Open a Quick Actions drop-down.
+     * @return the new QuickActionsDropdown instance
+     * @since 15.5
+     */
+    public QuickActionsDropdown openQuickActionsDropdown()
+    {
+        this.getRichTextArea().sendKeys("/");
+        return new QuickActionsDropdown();
+    }
 }

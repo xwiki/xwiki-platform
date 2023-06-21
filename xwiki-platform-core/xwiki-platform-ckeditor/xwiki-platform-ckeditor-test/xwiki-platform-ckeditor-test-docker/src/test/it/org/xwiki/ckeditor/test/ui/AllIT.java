@@ -57,8 +57,8 @@ public class AllIT
     }
     
     @Nested
-    @DisplayName("Quick Action")
-    class NestedQuickActionIT extends QuickActionIT
+    @DisplayName("Quick Actions")
+    class NestedQuickActionsIT extends QuickActionsIT
     {
     }
 }

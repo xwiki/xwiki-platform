@@ -40,8 +40,8 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  * targeting the document holding the annotation XObject.
  *
  * @version $Id$
- * @since 15.5RC1
- * @since 14.10.13
+ * @since 15.5
+ * @since 14.10.14
  */
 @Component
 @Named("R150500000XWIKI20699")

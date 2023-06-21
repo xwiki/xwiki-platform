@@ -355,14 +355,17 @@
     #if ("$!dateFormat" == '')
       #set ($dateFormat = $xwiki.getXWikiPreference('dateformat', 'yyyy/MM/dd HH:mm'))
     #end
+    #set($dateRangeFormat = $dateFormat + " - " + $dateFormat)
+    <div id="xwiki-livetable-${htmlLiveTableId}-filter-date-combobox-${foreach.count}-description" class='sr-only'>
+      $!escapetool.xml($services.localization.render('platform.livetable.filter.date.format.description',[$dateRangeFormat]))
+    </div>
     <div role="combobox" id="xwiki-livetable-${htmlLiveTableId}-filter-date-combobox-${foreach.count}"
       class="xwiki-livetable-display-header-filter-date-combobox" aria-expanded="false">
-      #set($dateRangeFormat = $dateFormat + " - " + $dateFormat)
       <input id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" type="text"
         data-type="date" data-dateformat="$escapetool.xml($dateFormat)"
         #if ("$!columnProperties.size" != '')size="$!escapetool.xml($columnProperties.size)"#end
         title="$!filterTitle"
-        aria-description="$!escapetool.xml($services.localization.render('platform.livetable.filter.date.format.description',[$dateRangeFormat]))"/>
+        aria-describedby="xwiki-livetable-${htmlLiveTableId}-filter-date-combobox-${foreach.count}-description"/>
     </div>
   #elseif ($filterType == 'suggest' && $xproperty)
     #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'),

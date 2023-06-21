@@ -947,6 +947,8 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     {
         Collection<GroupSecurityReference> groups = new HashSet<>();
 
+        // Load the user entry. Then traverse its parents. Parents of user/group entries are never modified, even
+        // when the parent is removed from the cache. This makes this code safe despite not locking the cache.
         SecurityCacheEntry userEntry = (entityWiki != null) ? getShadowEntry(user, entityWiki) : getEntry(user);
 
         // If the user is not in the cache, or if it is, but not as a user, but as a regular document
@@ -959,29 +961,24 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         // (instead of using the execution stack which would be more costly).
         Deque<SecurityCacheEntry> entriesToExplore = new ArrayDeque<>();
 
-        // Special case if the user is a shadow.
-        if (entityWiki != null) {
-            // We start with the parents of the original entry, and the parent of this shadow (excluding the original)
-            addParentsWhenEntryIsShadow(userEntry, user, groups, entriesToExplore);
-        } else {
-            // We start with the current user
-            entriesToExplore.add(userEntry);
-        }
+        // We start with the current user
+        entriesToExplore.add(userEntry);
 
         // Let's go
         while (!entriesToExplore.isEmpty()) {
             SecurityCacheEntry entry = entriesToExplore.pop();
 
-            // We add the parents of the current entry
-            addParentsToTheListOfEntriesToExplore(entry.parents, groups, entriesToExplore);
-
-            // If the entry has a shadow (in the concerned subwiki), we also add the parents of the shadow
-            if (entityWiki != null) {
-                GroupSecurityReference entryRef = (GroupSecurityReference) entry.getEntry().getReference();
-                if (entryRef.isGlobal()) {
-                    SecurityCacheEntry shadow = getShadowEntry(entryRef, entityWiki);
-                    if (shadow != null) {
-                        addParentsToTheListOfEntriesToExplore(shadow.parents, groups, entriesToExplore, entry);
+            if (entry.parents != null) {
+                // We add the parents of the current entry
+                for (SecurityCacheEntry parent : entry.parents) {
+                    // When exploring the parents of a global user in a given wiki, only explore parents that are
+                    // either from the desired wiki or that are shadow entries. This avoids leaving that wiki and
+                    // ensures that for a group, all parents in the wanted wiki are explored (otherwise, e.g., the main
+                    // wiki's entry of a group could be explored that lacks the subwiki parents).
+                    if (isEntryGroupInWiki(parent, entityWiki)
+                        && (groups.add((GroupSecurityReference) parent.getEntry().getReference())))
+                    {
+                        entriesToExplore.add(parent);
                     }
                 }
             }
@@ -990,59 +987,13 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         return groups;
     }
 
-    private void addParentsWhenEntryIsShadow(SecurityCacheEntry shadow, UserSecurityReference user,
-        Collection<GroupSecurityReference> groups, Deque<SecurityCacheEntry> entriesToExplore)
+    private static boolean isEntryGroupInWiki(SecurityCacheEntry entry, SecurityReference entityWiki)
     {
-        SecurityCacheEntry originalEntry = getEntry(user);
-
-        // We add the parents of the original (but not the original, otherwise we could have the same group twice)
-        addParentsToTheListOfEntriesToExplore(originalEntry.parents, groups, entriesToExplore);
-        // And we add the parent groups of the shadow
-        addParentsToTheListOfEntriesToExplore(shadow.parents, groups, entriesToExplore, originalEntry);
-    }
-
-    /**
-     * Add the parents of an entry to the list of entries to explore.
-     *
-     * @param parents the parents of the entry
-     * @param groups the collection where we store the found groups
-     * @param entriesToExplore the collection holding the entries we still have to explore
-     */
-    private void addParentsToTheListOfEntriesToExplore(Collection<SecurityCacheEntry> parents,
-        Collection<GroupSecurityReference> groups, Deque<SecurityCacheEntry> entriesToExplore)
-    {
-        addParentsToTheListOfEntriesToExplore(parents, groups, entriesToExplore, null);
-    }
-
-    /**
-     * Add the parents of an entry to the list of entries to explore.
-     *
-     * @param parents the parents of the entry
-     * @param groups the collection where we store the found groups
-     * @param entriesToExplore the collection holding the entries we still have to explore
-     * @param originalEntry the original entry of the current entry (if the current entry is a shadow), null otherwise
-     */
-    private void addParentsToTheListOfEntriesToExplore(Collection<SecurityCacheEntry> parents,
-        Collection<GroupSecurityReference> groups, Deque<SecurityCacheEntry> entriesToExplore,
-        SecurityCacheEntry originalEntry)
-    {
-        if (parents == null) {
-            return;
-        }
-
-        for (SecurityCacheEntry parent : parents) {
-            // skip this parent if the entry is a shadow and the parent is the original entry
-            // (ie: don't explore the original entry)
-            if (originalEntry != null && parent == originalEntry) {
-                continue;
-            }
-
-            // Add the parent group (if we have not already seen it)
-            SecurityReference parentRef = parent.getEntry().getReference();
-            if (parentRef instanceof GroupSecurityReference && groups.add((GroupSecurityReference) parentRef)) {
-                entriesToExplore.add(parent);
-            }
-        }
+        SecurityReference reference = entry.getEntry().getReference();
+        return reference instanceof GroupSecurityReference
+            && (entityWiki == null
+            || (entry.getEntry() instanceof SecurityShadowEntry
+            || entityWiki.equals(reference.getWikiReference())));
     }
 
     @Override

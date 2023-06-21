@@ -57,7 +57,7 @@
     <pdfbox.version>2.0.28</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
     <jetty.version>9.4.49.v20220914</jetty.version>
-    <netty.version>4.1.93.Final</netty.version>
+    <netty.version>4.1.94.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <dockerJava.version>3.3.1</dockerJava.version>
     <cvssCalculator.version>1.4.1</cvssCalculator.version>

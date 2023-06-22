@@ -28,7 +28,8 @@ import org.openqa.selenium.WebElement;
  * Represents the actions possible on the date range picker widget.
  *
  * @version $Id$
- * @since 14.9RC1
+ * @since 15.5
+ * @since 14.10.14
  */
 public class DateRangePicker extends BaseElement
 {

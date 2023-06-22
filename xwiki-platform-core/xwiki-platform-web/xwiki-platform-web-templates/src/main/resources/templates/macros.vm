@@ -2424,10 +2424,10 @@ $string##
   #if ($multiSelect)
     #set ($discard = $parameters.put('multiple', 'multiple'))
     #set ($discard = $parameters.putIfAbsent('title',
-      "$services.localization.render('core.widgets.suggest.userPicker.multi.title')"))
+      $services.localization.render('core.widgets.suggest.userPicker.multi.title')))
   #else
     #set ($discard = $parameters.putIfAbsent('title',
-      "$services.localization.render('core.widgets.suggest.userPicker.single.title')"))
+      $services.localization.render('core.widgets.suggest.userPicker.single.title')))
   #end
   #set ($discard = $parameters.putIfAbsent('data-userScope', "$!services.wiki.user.userScope"))
   #suggestInput($parameters)
@@ -2463,10 +2463,10 @@ $string##
   #set ($discard = $parameters.put('class', "$!parameters.get('class') suggest-pages"))
   #if ($parameters.get('multiple') == 'multiple')
     #set ($discard = $parameters.putIfAbsent('title',
-      "$services.localization.render('core.widgets.suggest.pagePicker.multi.title')"))
+      $services.localization.render('core.widgets.suggest.pagePicker.multi.title')))
   #else
     #set ($discard = $parameters.putIfAbsent('title',
-      "$services.localization.render('core.widgets.suggest.pagePicker.single.title')"))
+      $services.localization.render('core.widgets.suggest.pagePicker.single.title')))
   #end
   #suggestInput($parameters)
 #end
@@ -2489,10 +2489,10 @@ $string##
   #set ($discard = $parameters.put('class', "$!parameters.get('class') suggest-attachments"))
   #if ($parameters.get('multiple') == 'multiple')
     #set ($discard = $parameters.putIfAbsent('title',
-      "$services.localization.render('core.widgets.suggest.attachmentPicker.multi.title')"))
+      $services.localization.render('core.widgets.suggest.attachmentPicker.multi.title')))
   #else
     #set ($discard = $parameters.putIfAbsent('title',
-      "$services.localization.render('core.widgets.suggest.attachmentPicker.single.title')"))
+      $services.localization.render('core.widgets.suggest.attachmentPicker.single.title')))
   #end
   #suggestInput($parameters)
 #end
@@ -2705,14 +2705,14 @@ Recursive title display detected!##
   #if ($field.getProperty('multiSelect').value == 1)
     #set ($parameters.multiple = 'multiple')
     #set ($discard = $parameters.putIfAbsent('title',
-      "$services.localization.render('core.widgets.suggest.xpropertyPicker.multi.title')"))
+      $services.localization.render('core.widgets.suggest.xpropertyPicker.multi.title')))
     #set ($separators = $field.getProperty('separators').value)
     #if ("$!separators" != '')
       #set ($parameters.separators = $separators)
     #end
   #else
     #set ($discard = $parameters.putIfAbsent('title',
-      "$services.localization.render('core.widgets.suggest.xpropertyPicker.single.title')"))
+      $services.localization.render('core.widgets.suggest.xpropertyPicker.single.title')))
   #end
   #suggestInput($parameters)
 #end
@@ -2801,10 +2801,10 @@ Recursive title display detected!##
   #set ($discard = $parameters.put('class', "$!parameters.get('class') xwiki-selectize suggest-classes"))
   #if ($parameters.get('multiple') == 'multiple')
     #set ($discard = $parameters.putIfAbsent('title',
-      "$services.localization.render('core.widgets.suggest.classPicker.multi.title')"))
+      $services.localization.render('core.widgets.suggest.classPicker.multi.title')))
   #else
     #set ($discard = $parameters.putIfAbsent('title',
-      "$services.localization.render('core.widgets.suggest.classPicker.single.title')"))
+      $services.localization.render('core.widgets.suggest.classPicker.single.title')))
   #end
   #suggestInput($parameters 'classPicker_displayOptions')
 #end

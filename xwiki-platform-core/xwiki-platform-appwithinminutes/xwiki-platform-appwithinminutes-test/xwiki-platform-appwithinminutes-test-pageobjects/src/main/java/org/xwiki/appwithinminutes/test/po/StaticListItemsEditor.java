@@ -141,7 +141,9 @@ public class StaticListItemsEditor extends BaseElement
 
         // We move the item from the center, so we need to ensure that we actually move it with an offset of half its
         // width to be sure it's before the other item element.
-        int offsetX = - (itemToMove.getSize().getWidth() / 2);
+        // Adding a few pixels more (10) to make sure to pass the threshold where the passed element is moved to 
+        // the next position in the list.
+        int offsetX = -(itemToMove.getSize().getWidth() / 2) - 10;
         int offsetY = 2;
         getDriver().moveToTopLeftCornerOfTargetWithOffset(itemBefore, offsetX, offsetY, actions).release().perform();
     }

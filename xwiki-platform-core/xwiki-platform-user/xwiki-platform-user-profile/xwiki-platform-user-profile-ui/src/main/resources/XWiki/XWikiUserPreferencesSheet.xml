@@ -253,7 +253,7 @@
   &lt;dt&gt;
     &lt;label for="$escapedSelectId"&gt;$!escapetool.xml($services.localization.render($label))&lt;/label&gt;
     #if ($services.localization.get($hintKey))
-    &lt;span id="$escapedDescriptionId" class='xHint'&gt;$!escapetool.xml($services.localization.render($hintKey))&lt;/span&gt;
+      &lt;span id="$escapedDescriptionId" class='xHint'&gt;$!escapetool.xml($services.localization.render($hintKey))&lt;/span&gt;
     #end
   &lt;/dt&gt;
   &lt;dd data-user-property="$!escapetool.xml($fieldName)"&gt;

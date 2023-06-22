@@ -411,7 +411,7 @@
   &lt;div class="xform"&gt;
     &lt;dl&gt;
       &lt;dt&gt;&lt;label for='preference_notification_autowatch'&gt;$escapetool.xml($services.localization.render('notifications.settings.watch.autowatchmode'))&lt;/label&gt;
-      &lt;p id='preference_notification_autowatch_description' class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.settings.watch.autowatchmode.hint'))&lt;/p&gt;
+        &lt;p id='preference_notification_autowatch_description' class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.settings.watch.autowatchmode.hint'))&lt;/p&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
         &lt;select id='preference_notification_autowatch' class="notificationAutoWatchMode" aria-describedby='preference_notification_autowatch_description' data-target="$escapetool.xml($wikimacro.parameters.target)" $dataUser&gt;

@@ -3067,9 +3067,13 @@ public class Document extends Api
      */
     public void rename(DocumentReference newReference) throws XWikiException
     {
-        if (hasAccessLevel("delete") && this.context.getWiki().checkAccess("edit",
-            this.context.getWiki().getDocument(newReference, this.context), this.context)) {
-            this.getDoc().rename(newReference, getXWikiContext());
+        XWiki xWiki = this.context.getWiki();
+        if (hasAccessLevel("delete") && xWiki.checkAccess("edit",
+            xWiki.getDocument(newReference, this.context), this.context)) {
+            List<DocumentReference> backLinkedReferences = getDocument().getBackLinkedReferences(this.context);
+            List<DocumentReference> childrenReferences = getDocument().getChildrenReferences(this.context);
+            xWiki.renameDocument(getDocumentReference(), newReference, true, backLinkedReferences, childrenReferences,
+                    this.context);
         }
     }
 
@@ -3140,8 +3144,9 @@ public class Document extends Api
     public void rename(DocumentReference newReference, List<DocumentReference> backlinkDocumentNames,
         List<DocumentReference> childDocumentNames) throws XWikiException
     {
-        if (hasAccessLevel("delete") && this.context.getWiki().checkAccess("edit",
-            this.context.getWiki().getDocument(newReference, this.context), this.context)) {
+        XWiki xWiki = this.context.getWiki();
+        if (hasAccessLevel("delete") && xWiki.checkAccess("edit",
+            xWiki.getDocument(newReference, this.context), this.context)) {
 
             // Every page given in childDocumentNames has it's parent changed whether it needs it or not.
             // Let's make sure the user has edit permission on any page given which is not actually a child.
@@ -3152,14 +3157,14 @@ public class Document extends Api
             while (counter > 0) {
                 counter--;
                 if (!actuallyChildren.contains(childDocumentNames.get(counter))
-                    && !this.context.getWiki().checkAccess("edit",
-                        this.context.getWiki().getDocument(childDocumentNames.get(counter), this.context),
+                    && !xWiki.checkAccess("edit",
+                        xWiki.getDocument(childDocumentNames.get(counter), this.context),
                         this.context)) {
                     return;
                 }
             }
-
-            this.getDoc().rename(newReference, backlinkDocumentNames, childDocumentNames, getXWikiContext());
+            xWiki.renameDocument(getDocumentReference(), newReference, true, backlinkDocumentNames, childDocumentNames,
+                    this.context);
         }
     }
 

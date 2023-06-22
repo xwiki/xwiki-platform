@@ -731,29 +731,6 @@ public class XWikiDocumentTest
     }
 
     /**
-     * Validate rename does not crash when the document has 1.0 syntax (it does not support everything but it does not
-     * crash).
-     */
-    @Test
-    public void rename10() throws XWikiException
-    {
-        this.document.setContent("[pageinsamespace]");
-        this.document.setSyntax(Syntax.XWIKI_1_0);
-        DocumentReference targetReference = new DocumentReference("newwikiname", "newspace", "newpage");
-        XWikiDocument targetDocument = this.document.duplicate(targetReference);
-
-        when(this.xWiki.copyDocument(any(), any(), any())).thenReturn(true);
-        when(this.xWiki.getDocument(eq(targetReference), any())).thenReturn(targetDocument);
-
-        this.document.rename(new DocumentReference("newwikiname", "newspace", "newpage"),
-            Collections.emptyList(), Collections.emptyList(),
-            this.oldcore.getXWikiContext());
-
-        // Test links
-        assertEquals("[pageinsamespace]", this.document.getContent());
-    }
-
-    /**
      * @see "XWIKI-7515: 'getIncludedPages' in class com.xpn.xwiki.api.Document threw java.lang.NullPointerException"
      */
     @Test

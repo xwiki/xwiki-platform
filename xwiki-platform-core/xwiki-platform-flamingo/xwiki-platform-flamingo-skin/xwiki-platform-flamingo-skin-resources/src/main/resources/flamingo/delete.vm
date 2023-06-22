@@ -164,7 +164,7 @@
         #set ($forceAffectChildren = " checked='checked'")
       #end
       #define($heading)
-        <input name="affectChildren" id="affectChildren" type="checkbox" $!{forceAffectChildren}/><label for="affectChildren">$escapetool.xml($services.localization.render('core.delete.affectChildren'))</label> ($childCount)
+        <input name="affectChildren" id="affectChildren" type="checkbox" $!{forceAffectChildren}/><label for="affectChildren">$escapetool.xml($services.localization.render('core.delete.affectChildren')) ($childCount)</label>
       #end
       #define($body)
         ##

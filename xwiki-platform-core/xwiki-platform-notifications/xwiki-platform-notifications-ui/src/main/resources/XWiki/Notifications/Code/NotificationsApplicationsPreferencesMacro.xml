@@ -1012,7 +1012,6 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'xwiki-bootstrap-switch', 
   ## Display all applications
   ##
   #set ($appClass = "appOdd")
-  #set ($appCount = 0)
   #foreach ($app in $apps)
     #displayApp($app)
   #end
@@ -1045,7 +1044,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'xwiki-bootstrap-switch', 
       #end
       ## Collapse button
       &lt;td class="notificationCollapseButtonCell"&gt;
-        &lt;button id="notifications-applications-preferences-macro-$appCount-button" type="button" class="btn btn-default btn-sm collapseButton"&gt;
+        &lt;button type="button" class="btn btn-default btn-sm collapseButton"&gt;
           $services.icon.renderHTML('caret-down')
           &lt;span class='sr-only'&gt;
             $escapetool.xml($services.localization.render('notifications.settings.applications.table.dropdown.toggle.label',[$type.applicationName]))
@@ -1072,7 +1071,6 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'xwiki-bootstrap-switch', 
   #else
     #set ($appClass = 'appOdd')
   #end
-  #set ($appCount = $appCount + 1)
 #end
 
 #**

@@ -98,7 +98,7 @@ public abstract class AbstractAnnotationRenderer extends AbstractChainingPrintRe
         // still not do much. crap!
         chain.addListener(new LinkLabelGeneratorChainingListener(getLinkLabelGenerator(), plainTextParser, chain));
         // annotations generator, chained to map the annotations and maintain the annotations state while rendering
-        chain.addListener((AnnotationGeneratorChainingListener) annotationsGenerator);
+        chain.addListener(annotationsGenerator);
         // Following listeners are needed by the XHTML renderer
         chain.addListener(new BlockStateChainingListener(chain));
         chain.addListener(new EmptyBlockChainingListener(chain));

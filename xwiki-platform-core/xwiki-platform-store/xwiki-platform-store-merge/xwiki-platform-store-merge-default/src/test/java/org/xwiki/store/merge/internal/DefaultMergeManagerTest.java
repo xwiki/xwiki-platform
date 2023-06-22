@@ -466,8 +466,8 @@ public class DefaultMergeManagerTest
             attachment.setFilename("file");
 
             this.previousDocument.addAttachment(attachment);
-            this.nextDocument.addAttachment((XWikiAttachment) attachment.clone());
-            this.currentDocument.addAttachment((XWikiAttachment) attachment.clone());
+            this.nextDocument.addAttachment(attachment.clone());
+            this.currentDocument.addAttachment(attachment.clone());
 
             MergeDocumentResult result = merge();
 
@@ -484,7 +484,7 @@ public class DefaultMergeManagerTest
             attachment.setFilename("file");
 
             this.previousDocument.addAttachment(attachment);
-            this.nextDocument.addAttachment((XWikiAttachment) attachment.clone());
+            this.nextDocument.addAttachment(attachment.clone());
 
             MergeDocumentResult result = merge();
 
@@ -517,9 +517,9 @@ public class DefaultMergeManagerTest
             attachment.setFilename("file");
 
             this.previousDocument.addAttachment(attachment);
-            this.nextDocument.addAttachment((XWikiAttachment) attachment.clone());
+            this.nextDocument.addAttachment(attachment.clone());
 
-            attachment = (XWikiAttachment) attachment.clone();
+            attachment = attachment.clone();
             attachment.setContent(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 });
             attachment.setLongSize(9);
 
@@ -586,7 +586,7 @@ public class DefaultMergeManagerTest
             attachment.setFilename("file");
 
             this.currentDocument.addAttachment(attachment);
-            this.previousDocument.addAttachment((XWikiAttachment) attachment.clone());
+            this.previousDocument.addAttachment(attachment.clone());
 
             MergeDocumentResult result = merge();
 
@@ -607,9 +607,9 @@ public class DefaultMergeManagerTest
             attachment.setFilename("file");
 
             this.currentDocument.addAttachment(attachment);
-            this.previousDocument.addAttachment((XWikiAttachment) attachment.clone());
+            this.previousDocument.addAttachment(attachment.clone());
 
-            attachment = (XWikiAttachment) attachment.clone();
+            attachment = attachment.clone();
             attachment.setContent(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 });
             attachment.setLongSize(9);
 

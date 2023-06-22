@@ -259,7 +259,7 @@ public class XWikiStats extends BaseCollection
         setName(oel.element(XMLNODE_NAME).getText());
         List<?> list = oel.elements(XMLNODE_PROPERTY);
         for (int i = 0; i < list.size(); i++) {
-            Element pcel = (Element) ((Element) list.get(i)).elements().get(0);
+            Element pcel = ((Element) list.get(i)).elements().get(0);
             String name = pcel.getName();
             PropertyClass pclass = (PropertyClass) bclass.get(name);
             if (pclass != null) {

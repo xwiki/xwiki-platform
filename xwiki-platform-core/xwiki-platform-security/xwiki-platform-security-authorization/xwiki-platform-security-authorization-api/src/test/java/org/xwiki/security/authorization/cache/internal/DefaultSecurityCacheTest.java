@@ -654,8 +654,7 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
             if (ref.isGlobal()) {
                 for (SecurityReference wiki : Arrays.asList(wikiRef, anotherWikiRef)) {
                     SecurityShadowEntry entry = mockSecurityShadowEntry(ref, wiki);
-                    assertThat(((DefaultSecurityCache) securityCache).get(AddUserEntry(entry)),
-                        sameInstance((SecurityEntry) entry));
+                    assertThat(securityCache.get(AddUserEntry(entry)), sameInstance((SecurityEntry) entry));
                     allEntries.add(entry);
                 }
             }
@@ -666,8 +665,7 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
             if (ref.isGlobal()) {
                 for (SecurityReference wiki : Arrays.asList(wikiRef, anotherWikiRef)) {
                     SecurityShadowEntry entry = mockSecurityShadowEntry(ref, wiki);
-                    assertThat(((DefaultSecurityCache) securityCache).get(AddUserEntry(entry)),
-                        sameInstance((SecurityEntry) entry));
+                    assertThat(securityCache.get(AddUserEntry(entry)), sameInstance((SecurityEntry) entry));
                     allEntries.add(entry);
                 }
             }
@@ -678,8 +676,7 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
             if (ref.isGlobal()) {
                 for (SecurityReference wiki : Arrays.asList(wikiRef, anotherWikiRef)) {
                     SecurityShadowEntry entry = mockSecurityShadowEntry(ref, wiki);
-                    assertThat(((DefaultSecurityCache) securityCache).get(AddUserEntry(entry)),
-                        sameInstance((SecurityEntry) entry));
+                    assertThat(securityCache.get(AddUserEntry(entry)), sameInstance((SecurityEntry) entry));
                     allEntries.add(entry);
                 }
             }

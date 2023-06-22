@@ -2757,7 +2757,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public Map<DocumentReference, List<BaseObject>> getXObjects()
     {
-        return (Map) this.publicXObjects;
+        return this.publicXObjects;
     }
 
     /**
@@ -4629,7 +4629,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         this.getAttachmentList().clear();
         for (XWikiAttachment attach : sourceDocument.getAttachmentList()) {
-            XWikiAttachment newAttach = (XWikiAttachment) attach.clone();
+            XWikiAttachment newAttach = attach.clone();
 
             setAttachment(newAttach);
         }

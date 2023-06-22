@@ -1404,15 +1404,6 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 # Refactoring
 #-------------------------------------------------------------------------------------
 
-#-# [Since 12.5RC1]
-#-# Indicate to use the old implementation based on copy and delete, or the new implementation using an atomic operation
-#-# on database (which is a lot more performant).
-#-# This property aims at being removed in the future once the atomic rename has been validated to work 100% fine.
-#-# Only use it if you are facing an issue with the move/rename features.
-#-#
-#-# The default value is:
-# refactoring.rename.useAtomicRename = true
-
 #-# [Since 12.9RC1]
 #-# Indicates whether skipping the recycle bin when deleting pages is allowed for Advanced users.
 #-# It is disabled by default.

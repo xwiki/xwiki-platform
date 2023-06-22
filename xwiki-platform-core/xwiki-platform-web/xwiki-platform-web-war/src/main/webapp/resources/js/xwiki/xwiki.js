@@ -424,7 +424,9 @@ Object.extend(XWiki, {
                         'platform.core.rendering.noRendererForSectionEdit'));
                       editSectionLink.href = '#' + (node.id || '');
                   } else {
-                      editSectionLink.href = window.docediturl + "?section=" + sectionCount;
+                      // FIXME: Use the xwiki-meta module to get the form token when we switch to jQuery/RequireJS.
+                      var formToken = document.documentElement.getAttribute('data-xwiki-form-token');
+                      editSectionLink.href = window.docediturl + "?section=" + sectionCount + '&form_token=' + formToken;
                   }
 
                   node.appendChild(editSectionLink);

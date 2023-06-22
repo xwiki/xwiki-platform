@@ -46,8 +46,8 @@
         var input = $(element);
         var hidden = input.prev('input[type="hidden"]');
         var dateFormat = moment().toMomentFormatString(input.attr('data-dateformat'));
-
         input.daterangepicker({
+          parentEl: '#'+$.escapeSelector(this.parentElement.id),
           drops: 'down',
           opens: 'center',
           autoUpdateInput: false,
@@ -72,6 +72,8 @@
           }
         });
 
+        input.parent().attr('aria-controls', input.attr('id')+'-picker');
+
         var updateInput = function(element, event, picker) {
           if (event.type == 'cancel') {
             input.val('');
@@ -93,6 +95,7 @@
 
         input.on('keypress', function (e) {
           if(e.which === 13) {
+            // when the enter key is pressed.
             var txt = input.val().trim();
             var range = txt.split(' - ');
             if (range.length === 2) {
@@ -105,10 +108,22 @@
           }
         });
 
+        input.on('showCalendar.daterangepicker', function(event) {
+          event.target.next('.daterangepicker').setAttribute('style',
+            'display:block; width: max-content;');
+        });
+
+        input.on('show.daterangepicker', function(event) {
+          event.target.parentElement.setAttribute('aria-expanded', true);
+          event.target.next('.daterangepicker').setAttribute('style',
+            'display:block; width: max-content;');
+        });
+
         input.on('hide.daterangepicker', function(event) {
           // Overwrite at instance level the 'hide' function added by Prototype.js to the Element prototype.
           // This removes the 'hide' function only for the event target.
-          this.hide = undefined;
+          event.target.hide = undefined;
+          event.target.parentElement.setAttribute('aria-expanded', false);
           // Restore the 'hide' function after the event is handled (i.e. after all the listeners have been called).
           setTimeout(function () {
             // This deletes the local 'hide' key from the instance, making the 'hide' inherited from the prototype

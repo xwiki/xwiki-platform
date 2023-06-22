@@ -35,21 +35,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>{{box cssClass="floatinginfobox"}}
-{{velocity}}
-{{html clean="false"}}
-## Chromeの XSS Auditorは以下の場合にプレビューをブロックします：
-## * 送信されたコンテンツが外部URLによるiframeを含む場合
-## * プレビューが送信されたiframeを表示する場合
-## この問題は、送信されたコンテンツ（マクロマーカー）とHTMLのプレビューを一致させないことで回避できます。
-## XWIKI-14818を確認：Preview triggers ERR_BLOCKED_BY_XSS_AUDITOR in Chrome
-#set ($iframe = 'iframe')
-&lt;$iframe src="https://www.youtube.com/embed/9QTWrZ7OfzI" title="XWikiのYouTubeの動画" role="presentation" allowfullscreen&gt;&lt;/$iframe&gt;
-{{/html}}
-{{/velocity}}
-{{/box}}
-
-= あなたのウィキへようこそ =
+  <content>= あなたのウィキへようこそ =
 
 XWikiは知識をまとめるのに最適なツールです。//ウィキ//は複数の//ページ//の階層からなります。それぞれページをもつ複数のウィキを作成することができます。
 
@@ -59,11 +45,11 @@ XWikiは（サポート、ドキュメンテーション、セールスなどに
 
 ウィキを活用するには、ログイン後、
 
-上にある{{velocity}}$services.icon.render('pencil'){{/velocity}}ボタンをクリックしてください。このページを//編集//してウィキを必要に応じた仕方でカスタマイズできます。
+上にある{{displayIcon name="pencil"/}}ボタンをクリックしてください。このページを//編集//してウィキを必要に応じた仕方でカスタマイズできます。
 
-上にある{{velocity}}$services.icon.render('add'){{/velocity}}ボタンをクリックしてください。ページをウィキに//追加//し、最もよくコンテンツを組織する//階層//を作成することができます。
+上にある{{displayIcon name="add"/}}ボタンをクリックしてください。ページをウィキに//追加//し、最もよくコンテンツを組織する//階層//を作成することができます。
 
-タイトルの上にある{{velocity}}$services.icon.render('home'){{/velocity}}パンくずリストより、各ページ間を//移動//することができます。パンくずリストがあれば大きなウィキの中で迷うこともありません。
+タイトルの上にある{{displayIcon name="home"/}}パンくずリストより、各ページ間を//移動//することができます。パンくずリストがあれば大きなウィキの中で迷うこともありません。
 
 [[サンドボックス&gt;&gt;Sandbox.WebHome]]には、より多くのデモコンテンツがあります。また、サンドボックスはウィキの機能を試す際にも使用できます。
 

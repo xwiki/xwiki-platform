@@ -28,8 +28,10 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.xwiki.ckeditor.test.po.CKEditor;
+import org.xwiki.ckeditor.test.po.LinkSelectorModal;
 import org.xwiki.ckeditor.test.po.image.ImageDialogEditModal;
 import org.xwiki.ckeditor.test.po.image.ImageDialogSelectModal;
+import org.xwiki.ckeditor.test.po.image.edit.ImageDialogAdvancedEditForm;
 import org.xwiki.ckeditor.test.po.image.edit.ImageDialogStandardEditForm;
 import org.xwiki.ckeditor.test.po.image.select.ImageDialogIconSelectForm;
 import org.xwiki.ckeditor.test.po.image.select.ImageDialogUrlSelectForm;
@@ -45,6 +47,7 @@ import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test of the CKEditor Image Plugin.
@@ -383,6 +386,90 @@ class ImagePluginIT
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
         assertEquals("[[~[~[image:image.gif~]~]>>doc:]]", savedPage.editWiki().getContent());
+    }
+
+    @Test
+    @Order(9)
+    void imageWithLinkAndCaptionUI(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Upload an attachment to test with.
+        String attachmentName = "image.gif";
+        AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
+        ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
+
+        // Move to the WYSIWYG edition page.
+        WYSIWYGEditPage wysiwygEditPage = newPage.editWYSIWYG();
+        CKEditor editor = new CKEditor("content").waitToLoad();
+
+        // Insert a with caption and alignment to center.
+        ImageDialogSelectModal imageDialogSelectModal = editor.clickImageButton();
+        imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);
+        ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
+        imageDialogEditModal.switchToStandardTab().clickCaptionCheckbox();
+        imageDialogEditModal.switchToAdvancedTab().selectCenterAlignment();
+        imageDialogEditModal.clickInsert();
+
+        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+
+        editor.clickLinkButton().setResourceValue("doc:Main.WebHome", false).clickOK();
+
+        ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
+
+        assertEquals("[[~[~[Caption~>~>image:image.gif~|~|data-xwiki-image-style-alignment=\"center\"~]~]"
+            + ">>doc:Main.WebHome]]", savedPage.editWiki().getContent());
+        // Test that when re-editing the image, the link, caption and alignment are still set.
+        wysiwygEditPage = savedPage.editWYSIWYG();
+        editor = new CKEditor("content").waitToLoad();
+
+        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+
+        imageDialogEditModal = editor.clickImageButtonWhenImageExists();
+        // Verify that the caption and alignment are still set.
+        ImageDialogStandardEditForm standardEditForm = imageDialogEditModal.switchToStandardTab();
+        assertTrue(standardEditForm.isCaptionCheckboxChecked());
+        ImageDialogAdvancedEditForm advancedEditForm = imageDialogEditModal.switchToAdvancedTab();
+        assertEquals("center", advancedEditForm.getAlignment());
+        imageDialogEditModal.clickCancel();
+
+        // Verify that the link is still set.
+        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        LinkSelectorModal linkSelectorModal = editor.clickLinkButton();
+        assertEquals("doc", linkSelectorModal.getSelectedResourceType());
+        assertEquals("Main.WebHome", linkSelectorModal.getSelectedResourceReference());
+        linkSelectorModal.clickCancel();
+
+        // Change the caption to ensure that saving again works.
+        editor.executeOnIframe(
+            () -> setup.getDriver().findElement(By.cssSelector("figcaption"))
+                // Go to the start of the caption and insert "New ".
+                .sendKeys(Keys.HOME, "New "));
+        savedPage = wysiwygEditPage.clickSaveAndView();
+
+        assertEquals("[[~[~[New Caption~>~>image:image.gif~|~|data-xwiki-image-style-alignment=\"center\"~]~]"
+            + ">>doc:Main.WebHome]]", savedPage.editWiki().getContent());
+    }
+
+    @Test
+    @Order(10)
+    void editLegacyCenteredImage(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Upload an attachment to test with.
+        String attachmentName = "image.gif";
+        ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
+
+        WikiEditPage wikiEditPage = newPage.editWiki();
+        wikiEditPage.setContent("(% style='text-align: center' %)\n"
+            + "[[image:image.gif]]");
+        ViewPage viewPage = wikiEditPage.clickSaveAndView();
+
+        // Move to the WYSIWYG edition page.
+        WYSIWYGEditPage wysiwygEditPage = viewPage.editWYSIWYG();
+        new CKEditor("content").waitToLoad();
+
+        ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
+
+        assertEquals("[[image:image.gif||data-xwiki-image-style-alignment=\"center\"]]",
+            savedPage.editWiki().getContent());
     }
 
     private static void createAndLoginStandardUser(TestUtils setup)

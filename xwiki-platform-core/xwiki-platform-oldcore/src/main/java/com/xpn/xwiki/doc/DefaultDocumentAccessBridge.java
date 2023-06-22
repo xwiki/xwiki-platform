@@ -179,13 +179,15 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     @Override
     public DocumentReference getCurrentDocumentReference()
     {
-        XWikiDocument currentDocument = null;
-        XWikiContext context = getContext();
-        if (context != null) {
-            currentDocument = context.getDoc();
-        }
-
+        DocumentModelBridge currentDocument = getCurrentDocument();
         return currentDocument == null ? null : currentDocument.getDocumentReference();
+    }
+
+    @Override
+    public DocumentModelBridge getCurrentDocument()
+    {
+        XWikiContext xcontext = getContext();
+        return xcontext != null ? xcontext.getDoc() : null;
     }
 
     @Override

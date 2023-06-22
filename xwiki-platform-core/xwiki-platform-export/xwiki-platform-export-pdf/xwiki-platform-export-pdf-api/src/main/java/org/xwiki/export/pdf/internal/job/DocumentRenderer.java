@@ -107,10 +107,22 @@ public class DocumentRenderer
         // included in the same parent document).
         parameters.setIdGenerator(this.idGenerator);
 
-        DocumentModelBridge document = this.documentAccessBridge.getTranslatedDocumentInstance(documentReference);
-        XDOM xdom = display(document, parameters, withTitle);
+        XDOM xdom = display(getDocument(documentReference), parameters, withTitle);
         String html = renderXDOM(xdom, targetSyntax);
         return new DocumentRenderingResult(documentReference, xdom, html, this.idGenerator.resetLocalIds());
+    }
+
+    private DocumentModelBridge getDocument(DocumentReference documentReference) throws Exception
+    {
+        // If the current document is included in the PDF export then we use the document instance from the XWiki
+        // context in order to match what the user sees in view mode (e.g. the user might be looking at a document
+        // revision).
+        DocumentModelBridge currentDocument = this.documentAccessBridge.getCurrentDocument();
+        if (currentDocument != null && documentReference.equals(currentDocument.getDocumentReference())) {
+            return currentDocument;
+        } else {
+            return this.documentAccessBridge.getTranslatedDocumentInstance(documentReference);
+        }
     }
 
     private XDOM display(DocumentModelBridge document, DocumentDisplayerParameters parameters, boolean withTitle)

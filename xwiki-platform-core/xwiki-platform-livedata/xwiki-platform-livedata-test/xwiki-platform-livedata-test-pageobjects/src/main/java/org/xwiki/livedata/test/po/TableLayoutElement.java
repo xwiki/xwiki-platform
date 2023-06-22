@@ -72,6 +72,8 @@ public class TableLayoutElement extends BaseElement
 
     private static final String CLASS_HTML_ATTRIBUTE = "class";
 
+    private final LiveDataElement liveData;
+
     /**
      * A matcher for the cell containing links. The matcher assert of a given {@link WebElement} contains a {@code a}
      * tag with the expected text and link.
@@ -202,17 +204,15 @@ public class TableLayoutElement extends BaseElement
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TableLayoutElement.class);
 
-    private final String liveDataId;
-
     /**
      * Default constructor. Initializes a live data table layout page object.
      *
-     * @param liveDataId the live data id
-     * @since 12.10.9
+     * @param liveData the live data object corresponding to this table layout
+     * @since 15.5
      */
-    public TableLayoutElement(String liveDataId)
+    public TableLayoutElement(LiveDataElement liveData)
     {
-        this.liveDataId = liveDataId;
+        this.liveData = liveData;
     }
 
     /**
@@ -390,13 +390,13 @@ public class TableLayoutElement extends BaseElement
             }
             // And the count of row is greater than the expected count.
             int count = countRows();
-            LOGGER.info("LiveTableElement#waitUntilRowCountGreaterThan/refresh(): count = [{}]", count);
+            LOGGER.info("TableLayoutElement#waitUntilRowCountGreaterThan/refresh(): count = [{}]", count);
             return count >= minimalExpectedRowCount;
         }, timeout);
     }
 
     /**
-     * Waits until a the number of rows displayed in the live data matches the expected count.
+     * Waits until the number of rows displayed in the live data matches the expected count.
      *
      * @param expectedRowCount the number of expected rows
      * @see #waitUntilRowCountEqualsTo(int, int) if you want to define a custom timeout
@@ -407,21 +407,50 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
-     * Waits until a the number of rows displayed in the live data matches the expected count.
+     * Waits until the number of rows displayed in the live data matches the expected count.
+     *
+     * @param expectedRowCount the number of expected rows
+     * @param refresh when {@code true}, the Live Data is reloaded before each count
+     * @see #waitUntilRowCountEqualsTo(int, int) if you want to define a custom timeout
+     */
+    public void waitUntilRowCountEqualsTo(int expectedRowCount, boolean refresh)
+    {
+        waitUntilRowCountEqualsTo(expectedRowCount, getDriver().getTimeout(), refresh);
+    }
+
+    /**
+     * Waits until the number of rows displayed in the live data matches the expected count.
      *
      * @param expectedRowCount the number of expected rows
      * @param timeout a custom timeout before stopping the wait and raising an error
      */
     public void waitUntilRowCountEqualsTo(int expectedRowCount, int timeout)
     {
+        waitUntilRowCountEqualsTo(expectedRowCount, timeout, false);
+    }
+
+    /**
+     * Waits until the number of rows displayed in the live data matches the expected count.
+     *
+     * @param expectedRowCount the number of expected rows
+     * @param timeout a custom timeout before stopping the wait and raising an error
+     * @param refresh if {@code true}, the 
+     */
+    public void waitUntilRowCountEqualsTo(int expectedRowCount, int timeout, boolean refresh)
+    {
         getDriver().waitUntilCondition(webDriver -> {
+            if (refresh) {
+                this.liveData.refresh();
+            }
+
             // Cells are displayed. And they are loaded.
             if (isEmpty() || !areCellsLoaded()) {
                 return false;
             }
+            
             // And the count of row is greater than the expected count.
             int count = countRows();
-            LOGGER.info("LiveTableElement#waitUntilRowCountEqualsTo/refresh(): count = [{}]", count);
+            LOGGER.info("TableLayoutElement#waitUntilRowCountEqualsTo/refresh(): count = [{}]", count);
             return count == expectedRowCount;
         }, timeout);
     }
@@ -542,7 +571,7 @@ public class TableLayoutElement extends BaseElement
      */
     public int countRows()
     {
-        return getRoot().findElements(By.cssSelector("tbody tr td:first-child")).size();
+        return getDriver().findElementsWithoutWaiting(getRoot(), By.cssSelector("tbody tr td:first-child")).size();
     }
 
     /**
@@ -569,10 +598,11 @@ public class TableLayoutElement extends BaseElement
      */
     public int getRowIndexForElement(By by)
     {
-        WebElement rowElement = getRoot().findElement(by);
+        WebElement rowElement = getDriver().findElementWithoutWaiting(getRoot(), by);
         if (rowElement.isDisplayed()) {
-            // Count the preceding rows.
-            return rowElement.findElements(By.xpath("./ancestor::tr[1]/preceding-sibling::tr")).size() + 1;
+            // Count the preceding rows without waiting.
+            return getDriver().findElementsWithoutWaiting(rowElement,
+                By.xpath("./ancestor::tr[1]/preceding-sibling::tr")).size() + 1;
         }
         return 0;
     }
@@ -776,7 +806,7 @@ public class TableLayoutElement extends BaseElement
 
     private WebElement getRoot()
     {
-        return getDriver().findElement(By.id(this.liveDataId));
+        return getDriver().findElement(By.id(this.liveData.getId()));
     }
 
     private int findColumnIndex(String columnLabel)

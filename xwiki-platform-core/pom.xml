@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>15.5-SNAPSHOT</version>
+    <version>15.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -150,6 +150,27 @@
                   <code>java.method.numberOfParametersChanged</code>
                   <old>method javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, boolean, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</old>
                   <new>method javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, boolean, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</new>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <differences>
+                <item>
+                  <code>java.method.addedToInterface</code>
+                  <new>method org.xwiki.bridge.DocumentModelBridge org.xwiki.bridge.DocumentAccessBridge::getCurrentDocument()</new>
+                  <justification>This change was necessary in order to fix XWIKI-20897 (Cannot export with client-side PDF a given revision of a page)</justification>
+                  <criticality>highlight</criticality>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.addedToInterface</code>
+                  <new>method long org.xwiki.attachment.validation.AttachmentValidationConfiguration::getMaxUploadSize(org.xwiki.model.reference.EntityReference)</new>
+                  <justification>Young API</justification>
+                  <criticality>documented</criticality>
                 </item>
               </differences>
             </revapi.differences>

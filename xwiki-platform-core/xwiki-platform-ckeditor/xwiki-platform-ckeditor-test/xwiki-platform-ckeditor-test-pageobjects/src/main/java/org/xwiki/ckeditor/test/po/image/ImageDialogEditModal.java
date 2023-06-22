@@ -50,9 +50,25 @@ public class ImageDialogEditModal extends BaseElement
      */
     public void clickInsert()
     {
+        By buttonSelector = By.cssSelector(".image-editor-modal .btn-primary");
+        clickCloseButton(buttonSelector);
+    }
+
+    /**
+     * Click on the cancel button to close the modal.
+     * @since 14.10.13
+     * @since 15.5RC1
+     */
+    public void clickCancel()
+    {
+        By buttonSelector = By.cssSelector(".image-editor-modal [data-dismiss='modal']");
+        clickCloseButton(buttonSelector);
+    }
+
+    private void clickCloseButton(By buttonSelector)
+    {
         // Wait for the button to be enabled before clicking.
         // Wait for the button to be hidden before continuing.
-        By buttonSelector = By.cssSelector(".image-editor-modal .btn-primary");
         WebElement buttonElement = getDriver().findElement(buttonSelector);
         getDriver().waitUntilElementIsEnabled(buttonElement);
         buttonElement.click();

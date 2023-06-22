@@ -19,10 +19,6 @@
  */
 package org.xwiki.image.style.internal.rendering;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -31,22 +27,10 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.listener.ListenerProvider;
-import org.xwiki.rendering.listener.QueueListener;
 import org.xwiki.rendering.listener.chaining.ChainingListener;
-import org.xwiki.rendering.listener.chaining.EventType;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
-import org.xwiki.rendering.listener.chaining.LookaheadChainingListener;
-import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.syntax.Syntax;
 
-import static org.apache.commons.lang3.StringUtils.SPACE;
-import static org.xwiki.image.style.internal.rendering.CaptionedImageRenderListenerProvider.DATA_XWIKI_IMAGE_STYLE;
-import static org.xwiki.image.style.internal.rendering.CaptionedImageRenderListenerProvider.DATA_XWIKI_IMAGE_STYLE_ALIGNMENT;
-import static org.xwiki.image.style.internal.rendering.CaptionedImageRenderListenerProvider.DATA_XWIKI_IMAGE_STYLE_BORDER;
-import static org.xwiki.image.style.internal.rendering.CaptionedImageRenderListenerProvider.DATA_XWIKI_IMAGE_STYLE_TEXT_WRAP;
-import static org.xwiki.image.style.internal.rendering.CaptionedImageRenderListenerProvider.STYLE_PROPERTY;
-import static org.xwiki.image.style.internal.rendering.CaptionedImageRenderListenerProvider.STYLE_SEPARATOR;
-import static org.xwiki.image.style.internal.rendering.CaptionedImageRenderListenerProvider.WIDTH_PROPERTY;
 import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_0;
 import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_1;
 
@@ -64,99 +48,10 @@ public class CaptionedImageParseListenerProvider implements ListenerProvider
 {
     private static final Set<Syntax> ACCEPTED_SYNTAX = Set.of(XWIKI_2_0, XWIKI_2_1);
 
-    private static class InternalChainingListener extends LookaheadChainingListener
-    {
-        private static final Set<String> KNOWN_PARAMETERS = Set.of(
-            WIDTH_PROPERTY,
-            DATA_XWIKI_IMAGE_STYLE,
-            DATA_XWIKI_IMAGE_STYLE_ALIGNMENT,
-            DATA_XWIKI_IMAGE_STYLE_BORDER,
-            DATA_XWIKI_IMAGE_STYLE_TEXT_WRAP
-        );
-
-        private final Deque<Map<String, String>> figureParametersQueue = new ArrayDeque<>();
-
-        /**
-         * Default constructor.
-         *
-         * @param listenerChain the listener chainer to set for this listener
-         */
-        protected InternalChainingListener(ListenerChain listenerChain)
-        {
-            super(listenerChain, 1);
-        }
-
-        @Override
-        public void beginFigure(Map<String, String> parameters)
-        {
-            this.figureParametersQueue.push(parameters);
-            super.beginFigure(parameters);
-        }
-
-        @Override
-        public void onImage(ResourceReference reference, boolean freestanding, String id,
-            Map<String, String> parameters)
-        {
-            QueueListener.Event nextEvent = getPreviousEvents().peekLast();
-            if (nextEvent != null && nextEvent.eventType == EventType.BEGIN_FIGURE) {
-                // Merge the image parameters to the figure parameters when the image is wrapped in a figure.
-                Object[] eventParameters = nextEvent.eventParameters;
-                // Sanity check to make sure that we are handling the expected case.
-                if (eventParameters.length == 1 && eventParameters[0] instanceof Map<?, ?>) {
-                    Map<String, String> figureParameters = this.figureParametersQueue.pop();
-                    Map<String, String> mergedMap = new LinkedHashMap<>(figureParameters);
-                    KNOWN_PARAMETERS.stream()
-                        .filter(parameters::containsKey)
-                        .forEach(key -> mergeParameter(key, mergedMap, parameters, figureParameters));
-                    this.figureParametersQueue.push(mergedMap);
-                    eventParameters[0] = mergedMap;
-                }
-            }
-
-            super.onImage(reference, freestanding, id, parameters);
-        }
-
-        private void mergeParameter(String key, Map<String, String> mergedMap,
-            Map<String, String> imageParameters, Map<String, String> figureParameters)
-        {
-            String imageParameter = imageParameters.get(key);
-            if (Objects.equals(key, WIDTH_PROPERTY)) {
-                mergeWidthParameter(mergedMap, figureParameters, imageParameters.get(WIDTH_PROPERTY));
-            } else {
-                mergedMap.put(key, imageParameter);
-            }
-        }
-
-        private void mergeWidthParameter(Map<String, String> mergedMap, Map<String, String> figureParameters,
-            String imageWidthParameter)
-        {
-            String styleValue = String.format("width: %spx;", imageWidthParameter);
-            if (figureParameters.containsKey(STYLE_PROPERTY)) {
-                if (figureParameters.get(STYLE_PROPERTY).contains("width:")) {
-                    styleValue = figureParameters.get(STYLE_PROPERTY);
-                } else {
-                    if (!figureParameters.get(STYLE_PROPERTY).endsWith(STYLE_SEPARATOR)) {
-                        styleValue = STYLE_SEPARATOR + SPACE + styleValue;
-                    } else {
-                        styleValue = SPACE + styleValue;
-                    }
-                    styleValue = figureParameters.get(STYLE_PROPERTY) + styleValue;
-                }
-            }
-            mergedMap.put(STYLE_PROPERTY, styleValue);
-        }
-
-        @Override
-        public void endFigure(Map<String, String> parameters)
-        {
-            super.endFigure(this.figureParametersQueue.pop());
-        }
-    }
-
     @Override
     public ChainingListener getListener(ListenerChain listenerChain)
     {
-        return new InternalChainingListener(listenerChain);
+        return new CaptionedImageParseChainingListener(listenerChain);
     }
 
     @Override

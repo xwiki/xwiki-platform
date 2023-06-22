@@ -86,7 +86,7 @@ public class ScopeNotificationFilter implements NotificationFilter
         // scope preference.
         WatchedLocationState state
                 = stateComputer.isLocationWatched(filterPreferences, eventEntity, event.getType(), format, false,
-            checkInclusiveFilters);
+                checkInclusiveFilters, false);
 
         // We dismiss the event if:
         //    1. the location is not watched without any starting date (default behaviour in case of no filter, but
@@ -98,7 +98,7 @@ public class ScopeNotificationFilter implements NotificationFilter
         } else {
             if (state.isWatched() && state.getStartingDate().after(event.getDate())) {
                 return FilterPolicy.FILTER;
-            } else if (!state.isWatched() && event.getDate().before(event.getDate())) {
+            } else if (!state.isWatched() && state.getStartingDate().before(event.getDate())) {
                 return FilterPolicy.FILTER;
             }
         }

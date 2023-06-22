@@ -71,7 +71,7 @@
             ## <div><label id="xwikiuploadnamelabel" for="xwikiuploadname">$services.localization.render('core.viewers.attachments.upload.filename')</label></div>
             <div><input id="xwikiuploadname" type="hidden" name="filename" value="" /></div>
             <div class="package-upload">
-              <label for="xwikiuploadfile" class="hidden">
+              <label for="xwikiuploadfile" class="sr-only">
                 $escapetool.xml($services.localization.render('core.viewers.attachments.upload.file'))
               </label>
               <input id="xwikiuploadfile" type="file" name="filepath" class="uploadFileInput noitems"

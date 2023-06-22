@@ -41,6 +41,8 @@ public class ExtendedMimeMessage extends MimeMessage
 
     private static final String MESSAGE_ID_HEADER = "Message-ID";
     private static final String TO_HEADER = "To";
+    private static final String BCC_HEADER = "Bcc";
+    private static final String CC_HEADER = "Cc";
     private static final String XMAIL_TYPE_HEADER = "X-MailType";
 
     private String uniqueMessageId;
@@ -172,11 +174,16 @@ public class ExtendedMimeMessage extends MimeMessage
     @Override
     public void setHeader(String name, String value) throws MessagingException
     {
-        if (uniqueMessageId != null && MESSAGE_ID_HEADER.equals(name) || TO_HEADER.equals(name)) {
+        if (uniqueMessageId != null && MESSAGE_ID_HEADER.equals(name) || isRecipientHeader(name)) {
             // Clear cached unique messageId when the headers used to compute it are changed
             uniqueMessageId = null;
         }
         super.setHeader(name, value);
+    }
+
+    private boolean isRecipientHeader(String name)
+    {
+        return TO_HEADER.equals(name) || CC_HEADER.equals(name) || BCC_HEADER.equals(name);
     }
 
     /**

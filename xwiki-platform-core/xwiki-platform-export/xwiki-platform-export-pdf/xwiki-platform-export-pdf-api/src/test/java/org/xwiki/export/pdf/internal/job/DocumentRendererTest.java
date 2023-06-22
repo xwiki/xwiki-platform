@@ -56,6 +56,8 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -152,5 +154,18 @@ class DocumentRendererTest
         expectedIdMap.put("Hheading", "Hheading-1");
         expectedIdMap.put("Hheading-1", "Hheading-2");
         assertEquals(expectedIdMap, result.getIdMap());
+    }
+
+    @Test
+    void renderCurrentDocument() throws Exception
+    {
+        DocumentReference currentDocumentReference = new DocumentReference("test", "Some", "Page");
+        DocumentModelBridge currentDocument = mock(DocumentModelBridge.class);
+        when(currentDocument.getDocumentReference()).thenReturn(currentDocumentReference);
+        when(this.documentAccessBridge.getCurrentDocument()).thenReturn(currentDocument);
+
+        this.documentRenderer.render(currentDocumentReference, false);
+
+        verify(this.documentDisplayer).display(same(currentDocument), any(DocumentDisplayerParameters.class));
     }
 }

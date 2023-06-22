@@ -35,7 +35,7 @@ import org.xwiki.search.solr.SolrException;
 
 /**
  * Initialize the Solr core dedicated to events storage.
- * 
+ *
  * @version $Id$
  * @since 12.10
  */
@@ -66,7 +66,7 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
 
     /**
      * Index the list of components in a full text search friendly manner.
-     * 
+     *
      * @since 13.3RC1
      */
     public static final String SOLR_FIELD_COMPONENTS_INDEX = Extension.FIELD_COMPONENTS + INDEX_SUFFIX;
@@ -96,6 +96,50 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
      */
     public static final String SOLR_FIELD_INDEX_DATE = "s_indexDate";
 
+    /**
+     * The name of the field storing the score of the most critical CVE know for an extension.
+     *
+     * @see #SECURITY_CVE_CVSS for the list of individual CVSS values of the CVEs known for the extension
+     * @since 15.5RC1
+     */
+    public static final String SECURITY_MAX_CVSS = "security_maxCVSS";
+
+    /**
+     * The name of the field storing the IDs of the known CVEs for an extension.
+     *
+     * @since 15.5RC1
+     */
+    public static final String SECURITY_CVE_ID = "security_cveID";
+
+    /**
+     * The link of the CVEs known for an extension.
+     *
+     * @since 15.5RC1
+     */
+    public static final String SECURITY_CVE_LINK = "security_cveLink";
+
+    /**
+     * The values of the individual CVEs known for an extension.
+     *
+     * @see #SECURITY_MAX_CVSS stores the maxium value of this collection
+     */
+    public static final String SECURITY_CVE_CVSS = "security_cveCVSS";
+
+    /**
+     * The number of CVEs know for an extension.
+     */
+    public static final String SECURITY_CVE_COUNT = "security_cveCount";
+
+    /**
+     * The computed minimal version where all the vulnerabilities are fixed.
+     */
+    public static final String SECURITY_FIX_VERSION = "security_fixVersion";
+
+    /**
+     * A textual explanation of what to do about this extension to fix the security vulnerabilities.
+     */
+    public static final String SECURITY_ADVICE = "security_advice";
+
     private static final Pattern COMPONENT_SPECIAL_CHARS = Pattern.compile("[<>,]+");
 
     private static final long SCHEMA_VERSION_12_9 = 120900000;
@@ -104,10 +148,12 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
 
     private static final long SCHEMA_VERSION_14_0 = 140000000;
 
+    private static final long SCHEMA_VERSION_15_5 = 150500000;
+
     @Override
     protected long getVersion()
     {
-        return SCHEMA_VERSION_14_0;
+        return SCHEMA_VERSION_15_5;
     }
 
     @Override
@@ -170,6 +216,16 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
 
         if (cversion < SCHEMA_VERSION_14_0) {
             setStringField(InstalledExtension.FIELD_INSTALLED_NAMESPACES, true, false);
+        }
+
+        if (cversion < SCHEMA_VERSION_15_5) {
+            setPDoubleField(SECURITY_MAX_CVSS, false, false);
+            setStringField(SECURITY_CVE_ID, true, false);
+            setStringField(SECURITY_CVE_LINK, true, false);
+            setPDoubleField(SECURITY_CVE_CVSS, true, false);
+            setPIntField(SECURITY_CVE_COUNT, false, false);
+            setStringField(SECURITY_FIX_VERSION, false, false);
+            setStringField(SECURITY_ADVICE, false, false);
         }
     }
 

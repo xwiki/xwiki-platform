@@ -35,21 +35,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>{{box cssClass="floatinginfobox"}}
-{{velocity}}
-{{html clean="false"}}
-## Chrome's XSS Auditor blocks the preview action if:
-## * the submitted content has an iframe with an external URL
-## * the preview action displays the submitted iframe
-## The workaround is to make sure the submitted content (the macro markers) don't match the preview HTML.
-## See XWIKI-14818: Preview triggers ERR_BLOCKED_BY_XSS_AUDITOR in Chrome
-#set ($iframe = 'iframe')
-&lt;$iframe src="https://www.youtube.com/embed/9QTWrZ7OfzI" allowfullscreen&gt;&lt;/$iframe&gt;
-{{/html}}
-{{/velocity}}
-{{/box}}
-
-= Bem vindo ao seu wiki =
+  <content>= Bem vindo ao seu wiki =
 
 XWiki é a melhor ferramenta para organizar seus conhecimentos. Um //wiki// está organizado em uma hierarquia de //páginas//. Você pode criar multiplos wikis, cada um com suas devidas páginas.
 
@@ -59,11 +45,11 @@ XWiki pode ser usado como uma base de conhecimento (suporte, documentação, ven
 
 Para fazer a maioria de seus wikis, faça o login e:
 
-Use o botão {{html clean="false"}}&lt;span class="glyphicon glyphicon-pencil"&gt;&lt;/span&gt;{{/html}} para //editar// esta página e começar a customizar da maneira que você precisar.
+Use o botão {{displayIcon name="pencil"/}} para //editar// esta página e começar a customizar da maneira que você precisar.
 
-Use o botão {{html clean="false"}}&lt;span class="glyphicon glyphicon-plus"&gt;&lt;/span&gt;{{/html}} para //adicionar// mais páginas para seu wiki e criar a //hierarquia// que melhor organiza seus conteúdos.
+Use o botão {{displayIcon name="add"/}} para //adicionar// mais páginas para seu wiki e criar a //hierarquia// que melhor organiza seus conteúdos.
 
-Use o botão {{html clean="false"}}&lt;span class="glyphicon glyphicon-home fa fa-home"&gt;&lt;/span&gt;&lt;span class="fa fa-caret-down"&gt;&lt;/span&gt;{{/html}} localizado acima do título para //navegar// dentro de suas páginas. É fácil de perder em um gigante wiki sem essa navegação.
+Use o botão {{displayIcon name="home"/}} localizado acima do título para //navegar// dentro de suas páginas. É fácil de perder em um gigante wiki sem essa navegação.
 
 Você pode também utilizar a  [[Sandbox&gt;&gt;Sandbox.WebHome]] para mais demostração de conteúdos e geralmente será um lugar para experimentar as funcionalidades de seu wiki. 
 

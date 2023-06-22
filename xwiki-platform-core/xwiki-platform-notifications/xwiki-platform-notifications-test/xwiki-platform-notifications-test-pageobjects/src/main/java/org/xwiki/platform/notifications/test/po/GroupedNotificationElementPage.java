@@ -95,6 +95,17 @@ public class GroupedNotificationElementPage extends BaseElement
         return emitter.findElement(By.tagName("a")).getText();
     }
 
+    /**
+     * Get the number of notification details.
+     * @param notificationNumber The notification group number.
+     * @return the number of details row contained in the group
+     * @since 15.5
+     */
+    public int getNumberOfElements(int notificationNumber)
+    {
+        return findNotifications().get(notificationNumber).findElements(cssSelector(TEXT_SELECTOR)).size();
+    }
+
     protected List<WebElement> findNotifications()
     {
         return this.rootElement.findElements(cssSelector(NOTIFICATION_EVENT_SELECTOR));

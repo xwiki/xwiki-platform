@@ -91,8 +91,7 @@ public class WCAGContext
             // Set to true once the build doesn't fail this rule anymore
             entry("color-contrast", false),
             entry("definition-list", true),
-            // Set to true once the build doesn't fail this rule anymore
-            entry("dlitem", false),
+            entry("dlitem", true),
             entry("document-title", true),
             // Set to true once the build doesn't fail this rule anymore
             entry("duplicate-id-active", false),
@@ -118,8 +117,7 @@ public class WCAGContext
             entry("link-in-text-block", false),
             // Set to true once the build doesn't fail this rule anymore
             entry("link-name", false),
-            // Set to true once the build doesn't fail this rule anymore
-            entry("list", false),
+            entry("list", true),
             entry("listitem", true),
             entry("marquee", true),
             entry("meta-refresh", true),
@@ -128,7 +126,8 @@ public class WCAGContext
             entry("no-autoplay-audio", true),
             entry("object-alt", true),
             entry("role-img-alt", true),
-            entry("scrollable-region-focusable", true),
+            // Set to true once the build doesn't fail this rule anymore
+            entry("scrollable-region-focusable", false),
             // Set to true once the build doesn't fail this rule anymore
             entry("select-name", false),
             entry("server-side-image-map", true),

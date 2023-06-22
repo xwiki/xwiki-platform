@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.http.Cookie;
@@ -44,6 +45,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
@@ -87,6 +89,9 @@ class XWikiContextContextStoreTest
 
     @InjectMockComponents
     private XWikiContextContextStore store;
+
+    @MockComponent
+    private DocumentRevisionProvider documentRevisionProvider;
 
     private WikiDescriptor descriptor;
 
@@ -325,5 +330,41 @@ class XWikiContextContextStoreTest
         this.store.restore(contextStore);
 
         assertNull(this.oldcore.getXWikiContext().getUserReference());
+    }
+
+    @Test
+    void saveAndRestoreDocumentRevision() throws Exception
+    {
+        // Save
+
+        DocumentReference documentReference = new DocumentReference("test", "Some", "Page");
+        DocumentReference documentReferenceWithLocale = new DocumentReference(documentReference, Locale.FRENCH);
+        XWikiDocument documentRevision = new XWikiDocument(documentReferenceWithLocale);
+        documentRevision.setLocale(Locale.FRENCH);
+        documentRevision.setVersion("2.5");
+        this.oldcore.getXWikiContext().setDoc(documentRevision);
+        this.oldcore.getXWikiContext().put("rev", documentRevision.getVersion());
+
+        Map<String, Serializable> contextStore = new HashMap<>();
+        this.store.save(contextStore, Arrays.asList(XWikiContextContextStore.PROP_DOCUMENT_REFERENCE,
+            XWikiContextContextStore.PROP_DOCUMENT_REVISION));
+
+        assertEquals(documentReferenceWithLocale, contextStore.get(XWikiContextContextStore.PROP_DOCUMENT_REFERENCE));
+        assertEquals("2.5", contextStore.get(XWikiContextContextStore.PROP_DOCUMENT_REVISION));
+
+        // Restore
+
+        this.oldcore.getXWikiContext().setDoc(null);
+        this.oldcore.getXWikiContext().remove("rev");
+
+        XWikiDocument document = new XWikiDocument(documentReferenceWithLocale);
+        when(this.oldcore.getSpyXWiki().getDocument(documentReferenceWithLocale, this.oldcore.getXWikiContext()))
+            .thenReturn(document);
+        when(this.documentRevisionProvider.getRevision(document, "2.5")).thenReturn(documentRevision);
+
+        this.store.restore(contextStore);
+
+        assertEquals("2.5", this.oldcore.getXWikiContext().get("rev"));
+        assertEquals(documentRevision, this.oldcore.getXWikiContext().getDoc());
     }
 }

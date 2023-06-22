@@ -82,7 +82,6 @@ public class XWikiCachingRightService implements XWikiRightService
             .putAction("plain", Right.VIEW)
             .putAction("raw", Right.VIEW)
             .putAction("attach", Right.VIEW)
-            .putAction("charting", Right.VIEW)
             .putAction("skin", Right.VIEW)
             .putAction("download", Right.VIEW)
             .putAction("dot", Right.VIEW)

@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
@@ -37,6 +38,8 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.notifications.sources.ParametrizedNotificationManager;
 import org.xwiki.notifications.sources.internal.DefaultNotificationParametersFactory;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 /**
  * Default implementation of {@link PeriodicMimeMessageIterator}.
@@ -58,6 +61,10 @@ public class DefaultPeriodicMimeMessageIterator extends AbstractMimeMessageItera
     @Inject
     private GroupingEventManager groupingEventManager;
 
+    @Inject
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> userReferenceResolver;
+
     private Date lastTrigger;
 
     @Override
@@ -72,7 +79,6 @@ public class DefaultPeriodicMimeMessageIterator extends AbstractMimeMessageItera
     @Override
     protected List<CompositeEvent> retrieveCompositeEventList(DocumentReference user) throws NotificationException
     {
-        String serializedUser = this.serializer.serialize(user);
         NotificationParameters notificationParameters = new NotificationParameters();
         notificationParameters.user = user;
         notificationParameters.format = NotificationFormat.EMAIL;
@@ -80,8 +86,9 @@ public class DefaultPeriodicMimeMessageIterator extends AbstractMimeMessageItera
         notificationParameters.fromDate = this.lastTrigger;
         notificationParameters.endDateIncluded = false;
         notificationParametersFactory.useUserPreferences(notificationParameters);
+        UserReference userReference = this.userReferenceResolver.resolve(user);
 
         List<Event> rawEvents = this.notificationManager.getRawEvents(notificationParameters);
-        return this.groupingEventManager.getCompositeEvents(rawEvents, serializedUser, NotificationFormat.EMAIL.name());
+        return this.groupingEventManager.getCompositeEvents(rawEvents, userReference, NotificationFormat.EMAIL.name());
     }
 }

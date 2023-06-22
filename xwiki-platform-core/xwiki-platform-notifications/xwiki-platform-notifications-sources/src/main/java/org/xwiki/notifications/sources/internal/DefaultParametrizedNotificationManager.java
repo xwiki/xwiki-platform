@@ -45,6 +45,8 @@ import org.xwiki.notifications.sources.ParametrizedNotificationManager;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.group.GroupException;
 import org.xwiki.user.group.GroupManager;
 
@@ -97,6 +99,10 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
 
     @Inject
     private Logger logger;
+
+    @Inject
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> userReferenceResolver;
 
     @Override
     public List<CompositeEvent> getEvents(NotificationParameters parameters) throws NotificationException
@@ -159,7 +165,6 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
     {
         boolean done = false;
         // Add to the results the events the user has the right to see
-        List<Event> newEvents = new ArrayList<>();
         for (Event event : batch) {
             DocumentReference document = event.getDocument();
             // 1) Don't include events concerning a doc the passed user cannot see
@@ -175,18 +180,17 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
 
             // Record this event
             results.add(event);
-            newEvents.add(event);
 
             int reachedSize = results.size();
 
             // if what's requested is the composite events, then we only stop when the number of composite events
             // is reached
             if (compositeEvents != null) {
-                String userId = null;
+                UserReference userReference = null;
                 if (parameters.user != null) {
-                    userId = this.serializer.serialize(parameters.user);
+                    userReference = this.userReferenceResolver.resolve(parameters.user);
                 }
-                this.groupingEventManager.augmentCompositeEvents(compositeEvents, newEvents, userId,
+                this.groupingEventManager.augmentCompositeEvents(compositeEvents, List.of(event), userReference,
                     parameters.groupingEventTarget);
                 reachedSize = compositeEvents.size();
             }

@@ -21,11 +21,12 @@ package org.xwiki.search.solr.internal;
 
 import java.util.Arrays;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Unit tests for {@link SolrFieldStringEntityReferenceSerializer}.
@@ -33,7 +34,7 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @since 5.3RC1
  */
-public class SolrFieldStringEntityReferenceSerializerTest
+class SolrFieldStringEntityReferenceSerializerTest
 {
     /**
      * The object being tested.
@@ -41,12 +42,14 @@ public class SolrFieldStringEntityReferenceSerializerTest
     private SolrFieldStringEntityReferenceSerializer serializer = new SolrFieldStringEntityReferenceSerializer();
 
     @Test
-    public void serialize()
+    void serialize()
     {
-        assertNull(serializer.serialize(null));
-        assertEquals("math.My App.Code.Some Class.title", serializer.serialize(new ClassPropertyReference("title",
-            new DocumentReference("math", Arrays.asList("My App", "Code"), "Some Class"))));
-        assertEquals("ma..th.My..App.Co....de.Some..Class.ti..tle", serializer.serialize(new ClassPropertyReference(
-            "ti.tle", new DocumentReference("ma.th", Arrays.asList("My.App", "Co..de"), "Some.Class"))));
+        assertNull(this.serializer.serialize(null));
+        assertEquals(this.serializer.serialize(new ClassPropertyReference("title",
+            new DocumentReference("math", Arrays.asList("My App", "Code"), "Some Class"))),
+            "math.My App.Code.Some Class.title");
+        assertEquals(this.serializer.serialize(new ClassPropertyReference("ti.tle",
+            new DocumentReference("ma.th", Arrays.asList("My.App", "Co..de"), "Some.Class"))),
+            "ma..th.My..App.Co....de.Some..Class.ti..tle");
     }
 }

@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>15.5-SNAPSHOT</version>
+    <version>15.6-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>15.5-SNAPSHOT</version>
+  <version>15.6-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
@@ -57,12 +57,13 @@
     <pdfbox.version>2.0.28</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
     <jetty.version>9.4.49.v20220914</jetty.version>
-    <netty.version>4.1.93.Final</netty.version>
+    <netty.version>4.1.94.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <dockerJava.version>3.3.1</dockerJava.version>
+    <cvssCalculator.version>1.4.1</cvssCalculator.version>
 
     <!-- Versions of other software we need in our functional tests -->
-    <testcontainers.version>1.18.1</testcontainers.version>
+    <testcontainers.version>1.18.3</testcontainers.version>
     <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
          sure the new version is available from https://download.documentfoundation.org/libreoffice/stable/
          Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
@@ -96,7 +97,7 @@
     <!-- Versions of JDBC connectors we want to use in our distribution, in our tests and when using build tools -->
     <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
     <hsqldb.artifactId>hsqldb</hsqldb.artifactId>
-    <hsqldb.version>2.7.1</hsqldb.version>
+    <hsqldb.version>2.7.2</hsqldb.version>
     <mysql.groupId>com.mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-j</mysql.artifactId>
     <mysql.version>8.0.33</mysql.version>
@@ -363,7 +364,7 @@
         <version>${tika.version}</version>
       </dependency>
 
-      <!-- Rome is used in rss macro and feed api modules and in Tika -->
+      <!-- Rome is used in the feed api module and in Tika -->
       <dependency>
         <groupId>rome</groupId>
         <artifactId>rome</artifactId>
@@ -698,7 +699,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-ffi</artifactId>
-        <version>2.2.13</version>
+        <version>2.2.14</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -708,7 +709,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-posix</artifactId>
-        <version>3.1.16</version>
+        <version>3.1.17</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>

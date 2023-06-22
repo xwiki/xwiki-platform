@@ -1,0 +1,2 @@
+org.xwiki.notifications.notifiers.internal.email.live.DefaultLiveMimeMessageIterator
+500:org.xwiki.notifications.notifiers.internal.LegacyUserEventDispatcherListener

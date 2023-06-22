@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -30,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -56,6 +58,8 @@ import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.RemoteExtension;
 import org.xwiki.extension.index.IndexedExtensionQuery;
+import org.xwiki.extension.index.security.ExtensionSecurityAnalysisResult;
+import org.xwiki.extension.index.security.SecurityVulnerabilityDescriptor;
 import org.xwiki.extension.internal.ExtensionFactory;
 import org.xwiki.extension.internal.converter.ExtensionIdConverter;
 import org.xwiki.extension.rating.RatingExtension;
@@ -76,9 +80,19 @@ import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.search.solr.AbstractSolrCoreInitializer;
 import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.SolrUtils;
+
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_ADVICE;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_CVE_COUNT;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_CVE_CVSS;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_CVE_ID;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_CVE_LINK;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_FIX_VERSION;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_MAX_CVSS;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID;
 
 /**
  * An helper to manipulate the store of indexed extensions.
@@ -290,6 +304,55 @@ public class ExtensionIndexStore implements Initializable
         }
 
         add(document);
+    }
+
+    /**
+     * Update a given extension with the provided security analysis results.
+     *
+     * @param extensionId the extension id of the extension to update
+     * @param result the security analysis results
+     * @throws IOException If there is a low-level I/O error
+     * @throws SolrServerException if there is an error on the server
+     */
+    public void update(ExtensionId extensionId, ExtensionSecurityAnalysisResult result) throws SolrServerException, IOException
+    {
+        SolrInputDocument doc = new SolrInputDocument();
+
+        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID, toSolrId(extensionId), doc);
+
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SOLR_FIELD_EXTENSIONID, extensionId.getId(),
+            doc);
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, Extension.FIELD_VERSION,
+            extensionId.getVersion().getValue(), doc);
+
+        if (!result.getSecurityVulnerabilities().isEmpty()) {
+            this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_MAX_CVSS,
+                result.getMaxCVSS(), doc);
+        } else {
+            // Remove the CVSS score if the new list of security vulnerabilities becomes empty.
+            this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_REMOVE, SECURITY_MAX_CVSS, 0.0, Double.class, doc);
+        }
+        Stream<String> cveIds = result.getSecurityVulnerabilities().stream().map(SecurityVulnerabilityDescriptor::getId);
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_CVE_ID,
+            cveIds.collect(Collectors.toList()), doc);
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_CVE_LINK,
+            result.getSecurityVulnerabilities().stream()
+                .map(SecurityVulnerabilityDescriptor::getURL).collect(Collectors.toList()), doc);
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_CVE_CVSS,
+            result.getSecurityVulnerabilities().stream()
+                .map(SecurityVulnerabilityDescriptor::getScore).collect(Collectors.toList()), doc);
+        String fixVersion = result.getSecurityVulnerabilities().stream()
+            .map(SecurityVulnerabilityDescriptor::getFixVersion)
+            .max(Comparator.naturalOrder())
+            .map(Version::getValue)
+            .orElse(null);
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_FIX_VERSION, fixVersion, doc);
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_ADVICE, result.getAdvice(), doc);
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_CVE_COUNT,
+            result.getSecurityVulnerabilities().size(), doc);
+
+        add(doc);
+        commit();
     }
 
     /**
@@ -570,6 +633,25 @@ public class ExtensionIndexStore implements Initializable
     public SolrExtension getSolrExtension(ExtensionId extensionId) throws SolrServerException, IOException
     {
         return toSolrExtension(this.client.getById(toSolrId(extensionId)), extensionId);
+    }
+
+    /**
+     * @param extensionId the extension id
+     * @return the list of CVEs attached to a given extension id
+     * @throws IOException If there is a low-level I/O error
+     * @throws SolrServerException if there is an error on the server
+     */
+    public List<String> getCVEIDs(ExtensionId extensionId) throws SolrServerException, IOException
+    {
+        SolrDocument byId = this.client.getById(toSolrId(extensionId));
+        if (byId == null) {
+            return List.of();
+        }
+        List<String> securityCveID = (List<String>) byId.get(SECURITY_CVE_ID);
+        if (securityCveID == null) {
+            return List.of();
+        }
+        return securityCveID;
     }
 
     private ExtensionRepository getRepository(SolrDocument document)

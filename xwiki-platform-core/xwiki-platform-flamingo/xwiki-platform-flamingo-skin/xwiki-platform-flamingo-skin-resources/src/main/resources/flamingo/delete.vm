@@ -137,7 +137,7 @@
       $heading
       <div class="pull-right"><a class="panel-collapse-carret" role="button" data-toggle="collapse" href="#$panelId" aria-expanded="false" aria-controls="$panelId">
         <span class="caret"></span>
-        <label class='sr-only'>$escapetool.xml($services.localization.render('core.delete.affectChildren.dropDown.label'))</label>
+        <span class='sr-only'>$escapetool.xml($services.localization.render('core.delete.affectChildren.dropDown.label'))</span>
       </a></div>
     </div>
     <div class="panel-body collapse" id="$panelId">

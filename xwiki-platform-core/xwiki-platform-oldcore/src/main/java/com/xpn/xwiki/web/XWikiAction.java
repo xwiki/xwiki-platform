@@ -595,7 +595,7 @@ public abstract class XWikiAction implements LegacyAction
                 getProgress().startStep(this, "Search and execute entity resource handler");
 
                 // Call the new Entity Resource Reference Handler.
-                ResourceReferenceHandler entityResourceReferenceHandler = Utils.getComponent(
+                ResourceReferenceHandler<ResourceType> entityResourceReferenceHandler = Utils.getComponent(
                     new DefaultParameterizedType(null, ResourceReferenceHandler.class, ResourceType.class), "bin");
                 EntityResourceReference entityResourceReference =
                     (EntityResourceReference) Utils.getComponent(ResourceReferenceManager.class).getResourceReference();

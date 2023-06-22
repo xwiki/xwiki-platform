@@ -4191,7 +4191,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public String getTags(XWikiContext context)
     {
-        ListProperty prop = (ListProperty) getTagProperty(context);
+        ListProperty prop = (ListProperty) getTagProperty();
 
         // I don't know why we need to XML-escape the list of tags but for backwards compatibility we need to keep doing
         // this. When this method was added it was using ListProperty#getTextValue() which used to return
@@ -4204,7 +4204,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         List<String> tagList = null;
 
-        BaseProperty prop = getTagProperty(context);
+        BaseProperty prop = getTagProperty();
         if (prop != null) {
             tagList = (List<String>) prop.getValue();
         }
@@ -4212,7 +4212,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         return tagList;
     }
 
-    private BaseProperty getTagProperty(XWikiContext context)
+    private BaseProperty getTagProperty()
     {
         BaseObject tags = getObject(XWikiConstant.TAG_CLASS);
 
@@ -6961,7 +6961,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             return getDeltas(
                 Diff.diff(ToString.stringToArray(prevDoc.getContent()), ToString.stringToArray(getContent())));
         } catch (Exception ex) {
-            LOGGER.debug("Exception getting differences from previous version: " + ex.getMessage());
+            LOGGER.debug("Exception getting differences from previous version", ex);
         }
 
         return new ArrayList<Delta>();
@@ -8897,6 +8897,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @return <code>true</code> if the document is hidden and does not appear among the results of
      *         {@link com.xpn.xwiki.api.XWiki#searchDocuments(String)}, <code>false</code> otherwise.
      */
+    @Override
     public Boolean isHidden()
     {
         return this.hidden;

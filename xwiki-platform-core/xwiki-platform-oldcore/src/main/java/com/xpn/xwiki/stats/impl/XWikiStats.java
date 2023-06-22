@@ -247,6 +247,7 @@ public class XWikiStats extends BaseCollection
      * @param oel the XML root node containing statistics datas.
      * @throws XWikiException error when parsing XML schema.
      */
+    @Override
     public void fromXML(Element oel) throws XWikiException
     {
         Element cel = oel.element("class");

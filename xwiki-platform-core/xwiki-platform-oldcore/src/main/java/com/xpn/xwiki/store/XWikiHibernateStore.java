@@ -2958,7 +2958,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         return injectInSessionFactory(config);
     }
 
-    private SessionFactory injectInSessionFactory(Configuration config) throws XWikiException
+    private SessionFactory injectInSessionFactory(Configuration config)
     {
         return config.buildSessionFactory();
     }

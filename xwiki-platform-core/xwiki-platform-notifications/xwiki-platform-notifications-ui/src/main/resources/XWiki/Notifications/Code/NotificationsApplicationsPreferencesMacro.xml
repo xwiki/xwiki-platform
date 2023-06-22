@@ -1047,10 +1047,10 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'xwiki-bootstrap-switch', 
       &lt;td class="notificationCollapseButtonCell"&gt;
         &lt;button id="notifications-applications-preferences-macro-$appCount-button" type="button" class="btn btn-default btn-sm collapseButton"&gt;
           $services.icon.renderHTML('caret-down')
+          &lt;span class='sr-only'&gt;
+            $escapetool.xml($services.localization.render('notifications.settings.applications.table.dropdown.toggle.label',[$type.applicationName]))
+          &lt;/span&gt;
         &lt;/button&gt;
-        &lt;label for="notifications-applications-preferences-macro-$appCount-button" class='sr-only'&gt;
-        $escapetool.xml($services.localization.render('notifications.settings.applications.table.dropdown.toggle.label',[$type.applicationName]))
-        &lt;/label&gt;
       &lt;/td&gt;
     &lt;/tr&gt;
     ##

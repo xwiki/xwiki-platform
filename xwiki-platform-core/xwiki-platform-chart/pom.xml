@@ -34,7 +34,6 @@
   <modules>
     <!-- Sorted alphabetically -->
     <module>xwiki-platform-chart-macro</module>
-    <module>xwiki-platform-chart-plugin</module>
     <module>xwiki-platform-chart-renderer</module>
   </modules>
 </project>

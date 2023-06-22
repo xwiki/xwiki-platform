@@ -47,8 +47,10 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.test.ui.po.DateRangePicker;
 import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.SuggestInputElement;
+import org.xwiki.text.StringUtils;
 
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.hasItem;
@@ -518,6 +520,16 @@ public class TableLayoutElement extends BaseElement
         } else if (classes.contains("filter-text")) {
             element.clear();
             element.sendKeys(content);
+        } else if (classes.contains("filter-date")) {
+            element.click();
+            DateRangePicker picker = new DateRangePicker(element);
+            if (StringUtils.isNotBlank(content)) {
+                element.clear();
+                element.sendKeys(content);
+                picker.applyRange();
+            } else {
+                picker.clearRange();
+            }
         }
 
         if (wait) {

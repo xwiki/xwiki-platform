@@ -35,6 +35,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.GroupingEventManager;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.notifiers.email.NotificationEmailGroupingStrategy;
 import org.xwiki.notifications.notifiers.internal.email.AbstractMimeMessageIterator;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
@@ -60,6 +61,11 @@ public class DefaultPrefilteringLiveMimeMessageIterator extends AbstractMimeMess
     @Inject
     private LiveNotificationEmailEventFilter eventFilter;
 
+    // We used to have one email per event in live email, so we keep that strategy
+    @Inject
+    @Named("emailperevent")
+    private NotificationEmailGroupingStrategy liveEmailGroupingStrategy;
+
     private Map<DocumentReference, List<Event>> events;
 
     @Override
@@ -68,6 +74,12 @@ public class DefaultPrefilteringLiveMimeMessageIterator extends AbstractMimeMess
     {
         this.events = events;
         super.initialize(events.keySet().iterator(), factoryParameters, templateReference);
+    }
+
+    @Override
+    protected NotificationEmailGroupingStrategy getEmailGroupingStrategy()
+    {
+        return this.liveEmailGroupingStrategy;
     }
 
     /**

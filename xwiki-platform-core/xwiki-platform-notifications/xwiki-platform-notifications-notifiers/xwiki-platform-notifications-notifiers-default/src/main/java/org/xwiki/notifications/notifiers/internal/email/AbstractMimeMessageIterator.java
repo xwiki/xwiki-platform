@@ -215,7 +215,7 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
     protected abstract List<CompositeEvent> retrieveCompositeEventList(DocumentReference user)
         throws NotificationException;
 
-    private NotificationEmailGroupingStrategy getEmailGroupingStrategy()
+    protected NotificationEmailGroupingStrategy getEmailGroupingStrategy()
     {
         NotificationEmailGroupingStrategy strategy = this.fallbackNotificationEmailGroupingStrategy;
         String emailGroupingStrategyHint = this.notificationConfiguration.getEmailGroupingStrategyHint();

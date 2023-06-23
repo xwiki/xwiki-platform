@@ -1287,6 +1287,7 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The hint of the strategy component to use for email grouping notifications. Default strategy is to group all
 #-# notifications in a single email, but other strategies can be provided, e.g. to send as many emails as there was
 #-# type of notifications. Check online documentation related to notification to see the list of available strategies.
+#-# Note that this strategy does not apply to live email notifications.
 #-#
 #-# The default is :
 # notifications.emailGroupingStrategyHint = "default"

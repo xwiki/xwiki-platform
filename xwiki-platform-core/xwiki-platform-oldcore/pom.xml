@@ -227,12 +227,6 @@
       <groupId>org.apache.xmlgraphics</groupId>
       <artifactId>batik-svgrasterizer</artifactId>
     </dependency>
-    <!-- fop gets us batik but not batik-codec and we need this one for SVGPlugin -->
-    <dependency>
-      <groupId>org.apache.xmlgraphics</groupId>
-      <artifactId>batik-codec</artifactId>
-      <scope>runtime</scope>
-    </dependency>
 
     <!-- Misc -->
     <!-- Better date manipulation than what JDK provides -->
@@ -830,8 +824,6 @@
                 **/plugin/query/XWikiNamespaceResolver.java,
                 **/plugin/query/XWikiQueryConstants.java,
                 **/plugin/query/XWikiQuery.java,
-                **/plugin/svg/SVGPluginApi.java,
-                **/plugin/svg/SVGPlugin.java,
                 **/plugin/XWikiPluginManager.java,
                 **/pref/api/XWikiPrefService.java,
                 **/pref/impl/xwiki/XWikiPrefServiceImpl.java,
@@ -935,7 +927,6 @@
                 **/web/SaveAction.java,
                 **/web/SkinAction.java,
                 **/web/StatusAction.java,
-                **/web/SVGAction.java,
                 **/web/UploadAction.java,
                 **/web/Utils.java,
                 **/web/ViewAttachRevAction.java,

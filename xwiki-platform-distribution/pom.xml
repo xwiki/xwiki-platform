@@ -97,7 +97,6 @@
   com.xpn.xwiki.plugin.feed.FeedPlugin,\
   com.xpn.xwiki.plugin.mail.MailPlugin,\
   com.xpn.xwiki.plugin.packaging.PackagePlugin,\
-  com.xpn.xwiki.plugin.svg.SVGPlugin,\
   com.xpn.xwiki.plugin.fileupload.FileUploadPlugin,\
   com.xpn.xwiki.plugin.image.ImagePlugin,\
   com.xpn.xwiki.plugin.diff.DiffPlugin,\

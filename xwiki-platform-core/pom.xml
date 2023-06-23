@@ -228,6 +228,27 @@
                 </item>
               </differences>
             </revapi.differences>
+            <revapi.differences>
+              <justification>We voted to remove this old and unmaintained plugin for which there are alternatives.</justification>
+              <criticality>highlight</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class com.xpn.xwiki.plugin.svg.SVGPlugin</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class com.xpn.xwiki.plugin.svg.SVGPluginApi</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class com.xpn.xwiki.web.SVGAction</old>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

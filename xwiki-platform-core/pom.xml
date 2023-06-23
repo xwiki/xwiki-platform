@@ -336,7 +336,6 @@
     <module>xwiki-platform-skin</module>
     <module>xwiki-platform-statistics</module>
     <module>xwiki-platform-store</module>
-    <module>xwiki-platform-svg</module>
     <module>xwiki-platform-tag</module>
     <module>xwiki-platform-template</module>
     <module>xwiki-platform-test</module>

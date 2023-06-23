@@ -98,6 +98,7 @@ public class QuickActionsIT
             } catch (NoAlertPresentException e) {
                 // Do nothing.
             }
+        }
     }
     
     private static void createAndLoginStandardUser(TestUtils setup)

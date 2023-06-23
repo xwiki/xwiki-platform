@@ -155,13 +155,24 @@ public class CKEditor extends BaseElement
     }
     
     /**
-     * Open a Quick Actions drop-down.
-     * @return the new QuickActionsDropdown instance
-     * @since 15.5
+     * Clicks OK on a CKEditor dialog.
      */
-    public QuickActionsDropdown openQuickActionsDropdown()
+    public void submitDialog()
     {
-        this.getRichTextArea().sendKeys("/");
-        return new QuickActionsDropdown();
+        WebElement okButton = getDriver().findElement(By.className("cke_dialog_ui_button_ok"));
+        getDriver().waitUntilElementIsEnabled(okButton);
+        okButton.click();
+        getDriver().waitUntilElementDisappears(By.className("cke_dialog_contents"));
+    }
+    
+    /**
+     * Clicks close on a CKEditor dialog.
+     */
+    public void cancelDialog() 
+    {
+        WebElement cancelButton = getDriver().findElement(By.className("cke_dialog_ui_button_cancel"));
+        getDriver().waitUntilElementIsEnabled(cancelButton);
+        cancelButton.click();
+        getDriver().waitUntilElementDisappears(By.className("cke_dialog_contents"));
     }
 }

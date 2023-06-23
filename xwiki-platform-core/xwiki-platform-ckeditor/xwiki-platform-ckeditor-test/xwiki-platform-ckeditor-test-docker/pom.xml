@@ -58,6 +58,20 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
+    <dependency>
+      <!-- We need this to test the mentions Quick Action. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-mentions-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
+    <dependency>
+      <!-- We need this to test the code snippet Quick Action. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macros</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
     <!-- Test only dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

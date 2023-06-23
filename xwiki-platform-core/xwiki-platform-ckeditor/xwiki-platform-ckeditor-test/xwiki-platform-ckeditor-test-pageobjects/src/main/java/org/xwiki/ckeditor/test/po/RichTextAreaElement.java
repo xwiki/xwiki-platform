@@ -19,6 +19,7 @@
  */
 package org.xwiki.ckeditor.test.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.xwiki.stability.Unstable;
@@ -154,5 +155,19 @@ public class RichTextAreaElement extends BaseElement
     {
         getDriver().switchTo().frame(this.iframe);
         return getDriver().switchTo().activeElement();
+    }
+    
+    /**
+     * Waits until a macro appears in the document.
+     */
+    public void waitUntilMacroAppears()
+    {
+        try {
+            getDriver().waitUntilElementDisappears(this.iframe, By.tagName("iframe"));;
+            getDriver().switchTo().frame(this.iframe);
+            getDriver().findElement(By.className("macro"));
+        } finally {
+            getDriver().switchTo().defaultContent();
+        }
     }
 }

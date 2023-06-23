@@ -20,7 +20,6 @@
 package org.xwiki.ckeditor.test.po;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -32,13 +31,13 @@ import org.xwiki.test.ui.po.BaseElement;
  * @since 15.5
  */
 @Unstable
-public class QuickActionsDropdown extends BaseElement
+public class AutocompleteDropdown extends BaseElement
 {
     
     /**
      * Creates a new Quick Actions drop-down instance.
      */
-    public QuickActionsDropdown()
+    public AutocompleteDropdown()
     {
     }
     
@@ -46,19 +45,17 @@ public class QuickActionsDropdown extends BaseElement
      * Waits for the given Quick Action to be selected.
      * @param label - The name of the action
      */
-    public void waitForQuickActionSelected(String label)
+    public void waitForItemSelected(String label)
     {
-        WebElement item = getDriver().findElement(By.className("cke_autocomplete_selected"));
-        item.findElement(By.xpath("//*[text() = '" + label + "']"));
+        getDriver().findElement(By.xpath("//*[contains(@class, 'cke_autocomplete_selected')]//*[. = '" + label + "']"));
     }
     
     /**
      * Waits for the Quick Actions drop-down to disappear.
      */
-    public void waitForQuickActionSubmitted()
+    public void waitForItemSubmitted()
     {
         getDriver().waitUntilElementDisappears(By.cssSelector(
                 ".cke_autocomplete_opened .cke_autocomplete_selected"));
     }
-    
 }

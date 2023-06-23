@@ -1194,11 +1194,15 @@ public abstract class XWikiAction implements LegacyAction
 
         try {
             String jsonAnswerAsString = mapper.writeValueAsString(answer);
-            context.getResponse().setContentType("application/json");
-            context.getResponse().setContentLength(jsonAnswerAsString.length());
-            context.getResponse().setStatus(status);
-            context.getResponse().setCharacterEncoding(context.getWiki().getEncoding());
-            context.getResponse().getWriter().print(jsonAnswerAsString);
+            XWikiResponse response = context.getResponse();
+            String encoding = context.getWiki().getEncoding();
+            response.setContentType("application/json");
+            // Set the content length to the number of bytes, not the
+            // string length, so as to handle multi-byte encodings
+            response.setContentLength(jsonAnswerAsString.getBytes(encoding).length);
+            response.setStatus(status);
+            response.setCharacterEncoding(encoding);
+            response.getWriter().print(jsonAnswerAsString);
             context.setResponseSent(true);
         } catch (IOException e) {
             throw new XWikiException("Error while sending JSON answer.", e);

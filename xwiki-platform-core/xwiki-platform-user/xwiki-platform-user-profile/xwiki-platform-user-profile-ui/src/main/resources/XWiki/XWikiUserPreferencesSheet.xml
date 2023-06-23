@@ -212,8 +212,8 @@
   #set ($defaultValueHint = "($escapetool.xml($services.localization.render('userprofile.default')))")
   #if ($isEdit)
     #set ($escapedId = $escapetool.xml("XWiki.XWikiUsers_0_${fieldName}"))
-    #set ($escapedDescriptionId = $escapedSelectId + "_description")
-    &lt;select name="$escapedId" id="$escapedId" size="1" aria-describedby="$escapedDescriptionId"&gt;
+    #set ($escapedHintId = $escapedSelectId + "_hint")
+    &lt;select name="$escapedId" id="$escapedId" size="1" aria-describedby="$escapedHintId"&gt;
       #if ($defaultValue)
         &lt;option value=""&gt;---&lt;/option&gt;
       #end
@@ -249,11 +249,11 @@
 #macro (displayField $fieldName $label $defaultValue)
   #set ($hintKey = "XWiki.XWikiUsers_${fieldName}.hint")
   #set ($escapedSelectId = $escapetool.xml("XWiki.XWikiUsers_0_${fieldName}"))
-  #set ($escapedDescriptionId = $escapedSelectId + "_description")
+  #set ($escapedHintId = $escapedSelectId + "_hint")
   &lt;dt&gt;
     &lt;label for="$escapedSelectId"&gt;$!escapetool.xml($services.localization.render($label))&lt;/label&gt;
     #if ($services.localization.get($hintKey))
-      &lt;span id="$escapedDescriptionId" class='xHint'&gt;$!escapetool.xml($services.localization.render($hintKey))&lt;/span&gt;
+      &lt;span id="$escapedHintId" class='xHint'&gt;$!escapetool.xml($services.localization.render($hintKey))&lt;/span&gt;
     #end
   &lt;/dt&gt;
   &lt;dd data-user-property="$!escapetool.xml($fieldName)"&gt;

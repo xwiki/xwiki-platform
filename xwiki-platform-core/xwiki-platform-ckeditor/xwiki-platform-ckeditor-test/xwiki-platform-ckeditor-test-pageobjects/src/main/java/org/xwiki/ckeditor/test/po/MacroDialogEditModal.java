@@ -38,7 +38,8 @@ public class MacroDialogEditModal extends BaseElement
     public MacroDialogEditModal waitUntilReady()
     {
         getDriver().waitUntilElementIsVisible(
-                By.xpath("//*[contains(@class, 'editor-modal')]//*[contains(@class, 'macro-name')]"));
+                // We match *-editor-modal so the page object can be used in dashboard and ckeditor tests.
+                By.cssSelector("[class*=-editor-modal] .macro-name"));
         return this;
     }
 
@@ -48,6 +49,7 @@ public class MacroDialogEditModal extends BaseElement
     public void clickSubmit()
     {
         getDriver().findElement(
-                By.xpath("//*[contains(@class, 'editor-modal')]//*[contains(@class, 'modal-footer')]//*[contains(@class, 'btn-primary')]")).click();
+             // We match *-editor-modal so the page object can be used in dashboard and ckeditor tests.
+                By.cssSelector("[class*=-editor-modal] .modal-footer .btn-primary")).click();
     }
 }

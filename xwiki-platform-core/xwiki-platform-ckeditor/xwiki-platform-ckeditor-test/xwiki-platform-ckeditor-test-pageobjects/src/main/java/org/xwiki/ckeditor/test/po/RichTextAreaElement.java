@@ -163,7 +163,6 @@ public class RichTextAreaElement extends BaseElement
     public void waitUntilMacroAppears()
     {
         try {
-            getDriver().waitUntilElementDisappears(this.iframe, By.tagName("iframe"));;
             getDriver().switchTo().frame(this.iframe);
             getDriver().findElement(By.className("macro"));
         } finally {

@@ -20,35 +20,39 @@
 package org.xwiki.ckeditor.test.po;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.BaseElement;
 
-
 /**
- * Models an auto-complete drop-down.
+ * Models a CKEditor Dialog.
  *
  * @version $Id$
- * @since 15.5
+ * @since 1.15
  */
 @Unstable
-public class AutocompleteDropdown extends BaseElement
+public class CKEditorDialog extends BaseElement
 {
-
     /**
-     * Waits for the given item to be selected.
-     * @param label - The name of the item
+     * Clicks OK on a CKEditor dialog.
      */
-    public void waitForItemSelected(String label)
+    public void submitDialog()
     {
-        getDriver().findElement(By.xpath("//*[contains(@class, 'cke_autocomplete_selected')]//*[. = '" + label + "']"));
+        WebElement okButton = getDriver().findElement(By.className("cke_dialog_ui_button_ok"));
+        getDriver().waitUntilElementIsEnabled(okButton);
+        okButton.click();
+        getDriver().waitUntilElementDisappears(By.className("cke_dialog_contents"));
     }
     
     /**
-     * Waits for the auto-complete drop-down to disappear.
+     * Clicks close on a CKEditor dialog.
      */
-    public void waitForItemSubmitted()
+    public void cancelDialog() 
     {
-        getDriver().waitUntilElementDisappears(By.cssSelector(
-                ".cke_autocomplete_opened .cke_autocomplete_selected"));
+        getDriver().waitUntilElementIsVisible(By.className("cke_dialog_ui_button_cancel"));
+        WebElement cancelButton = getDriver().findElement(By.className("cke_dialog_ui_button_cancel"));
+        getDriver().waitUntilElementIsEnabled(cancelButton);
+        cancelButton.click();
+        getDriver().waitUntilElementDisappears(By.className("cke_dialog_contents"));
     }
 }

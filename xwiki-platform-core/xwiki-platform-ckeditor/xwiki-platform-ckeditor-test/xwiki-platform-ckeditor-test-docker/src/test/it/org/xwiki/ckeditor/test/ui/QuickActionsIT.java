@@ -20,12 +20,14 @@
 package org.xwiki.ckeditor.test.ui;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 import org.xwiki.ckeditor.test.po.CKEditor;
+import org.xwiki.ckeditor.test.po.CKEditorDialog;
 import org.xwiki.ckeditor.test.po.MacroDialogEditModal;
 import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
@@ -44,6 +46,7 @@ import org.xwiki.test.ui.po.editor.WikiEditPage;
  * @since 15.5
  */
 @UITest(extraJARs = {
+    // This is needed for the link action
     "org.xwiki.platform:xwiki-platform-search-solr-query",
     })
 public class QuickActionsIT 
@@ -106,7 +109,7 @@ public class QuickActionsIT
         // Write some text
         textArea.sendKeys(TEST_TEXT);
         
-        assert textArea.getContent().contains("<h1>" + TEST_TEXT + "<br></h1>");
+        Assertions.assertTrue(textArea.getContent().contains("<h1>" + TEST_TEXT + "<br></h1>"));
         
         // Switch back to paragraph
         textArea.sendKeys("/");
@@ -116,7 +119,7 @@ public class QuickActionsIT
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
         
-        assert textArea.getContent().contains("<p>" + TEST_TEXT + "<br></p>");
+        Assertions.assertTrue(textArea.getContent().contains("<p>" + TEST_TEXT + "<br></p>"));
     }
     
     @Test
@@ -141,7 +144,7 @@ public class QuickActionsIT
         // Write some text
         textArea.sendKeys(TEST_TEXT);
         
-        assert textArea.getContent().contains("<h2>" + TEST_TEXT + "<br></h2>");
+        Assertions.assertTrue(textArea.getContent().contains("<h2>" + TEST_TEXT + "<br></h2>"));
     }
     
     @Test
@@ -166,7 +169,7 @@ public class QuickActionsIT
         // Write some text
         textArea.sendKeys(TEST_TEXT);
         
-        assert textArea.getContent().contains("<h3>" + TEST_TEXT + "<br></h3>");
+        Assertions.assertTrue(textArea.getContent().contains("<h3>" + TEST_TEXT + "<br></h3>"));
     }
     
     @Test
@@ -189,7 +192,7 @@ public class QuickActionsIT
         // Write some text
         textArea.sendKeys(TEST_TEXT);
         
-        assert textArea.getContent().contains("<ul><li>" + TEST_TEXT + "<br></li></ul>");
+        Assertions.assertTrue(textArea.getContent().contains("<ul><li>" + TEST_TEXT + "<br></li></ul>"));
     }
 
     @Test
@@ -212,7 +215,7 @@ public class QuickActionsIT
         // Write some text
         textArea.sendKeys(TEST_TEXT);
         
-        assert textArea.getContent().contains("<ol><li>" + TEST_TEXT + "<br></li></ol>");
+        Assertions.assertTrue(textArea.getContent().contains("<ol><li>" + TEST_TEXT + "<br></li></ol>"));
     }
 
     @Test
@@ -233,7 +236,7 @@ public class QuickActionsIT
         qa.waitForItemSubmitted();
         
         // Click OK on the table insertion dialog
-        editor.submitDialog();
+        new CKEditorDialog().submitDialog();
         
         // Write some text
         textArea.sendKeys(TEST_TEXT);
@@ -264,7 +267,7 @@ public class QuickActionsIT
         // Write some text
         textArea.sendKeys(TEST_TEXT);
         
-        assert textArea.getContent().contains("<blockquote><p>" + TEST_TEXT + "<br></p></blockquote>");
+        Assertions.assertTrue(textArea.getContent().contains("<blockquote><p>" + TEST_TEXT + "<br></p></blockquote>"));
     }
     
     @Test
@@ -288,9 +291,9 @@ public class QuickActionsIT
         textArea.waitUntilMacroAppears();
         
         WikiEditPage wikiEditPage = editPage.clickSaveAndView().editWiki();
-        assert wikiEditPage.getContent().contains("{{info}}\n"
+        Assertions.assertTrue(wikiEditPage.getContent().contains("{{info}}\n"
                 + "Type your information message here.\n"
-                + "{{/info}}");
+                + "{{/info}}"));
     }
 
     @Test
@@ -314,9 +317,9 @@ public class QuickActionsIT
         textArea.waitUntilMacroAppears();
         
         WikiEditPage wikiEditPage = editPage.clickSaveAndView().editWiki();
-        assert wikiEditPage.getContent().contains("{{success}}\n"
+        Assertions.assertTrue(wikiEditPage.getContent().contains("{{success}}\n"
                 + "Type your success message here.\n"
-                + "{{/success}}");
+                + "{{/success}}"));
     }
     @Test
     @Order(10)
@@ -339,9 +342,9 @@ public class QuickActionsIT
         textArea.waitUntilMacroAppears();
         
         WikiEditPage wikiEditPage = editPage.clickSaveAndView().editWiki();
-        assert wikiEditPage.getContent().contains("{{warning}}\n"
+        Assertions.assertTrue(wikiEditPage.getContent().contains("{{warning}}\n"
                 + "Type your warning message here.\n"
-                + "{{/warning}}");
+                + "{{/warning}}"));
     }
 
     @Test
@@ -365,9 +368,9 @@ public class QuickActionsIT
         textArea.waitUntilMacroAppears();
         
         WikiEditPage wikiEditPage = editPage.clickSaveAndView().editWiki();
-        assert wikiEditPage.getContent().contains("{{error}}\n"
+        Assertions.assertTrue(wikiEditPage.getContent().contains("{{error}}\n"
                 + "Type your error message here.\n"
-                + "{{/error}}");
+                + "{{/error}}"));
     }
     
     @Test
@@ -387,7 +390,7 @@ public class QuickActionsIT
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
         
-        assert textArea.getContent().contains("<hr>");
+        Assertions.assertTrue(textArea.getContent().contains("<hr>"));
     }
     
     @Test
@@ -410,7 +413,7 @@ public class QuickActionsIT
         textArea.sendKeys("ali");
         AutocompleteDropdown link = new AutocompleteDropdown();
         link.waitForItemSelected("alice");
-        assert textArea.getText().contains("[");
+        Assertions.assertTrue(textArea.getText().contains("["));
     }
     
     @Test
@@ -452,7 +455,7 @@ public class QuickActionsIT
         
         AutocompleteDropdown mention = new AutocompleteDropdown();
         mention.waitForItemSelected("alice");
-        assert textArea.getText().contains("@");
+        Assertions.assertTrue(textArea.getText().contains("@"));
     }
     
     @Test
@@ -473,7 +476,7 @@ public class QuickActionsIT
         
         AutocompleteDropdown emoji = new AutocompleteDropdown();
         emoji.waitForItemSelected("🛩");
-        assert textArea.getText().contains(":sm");
+        Assertions.assertTrue(textArea.getText().contains(":sm"));
     }
     
     @Test
@@ -500,7 +503,7 @@ public class QuickActionsIT
         textArea.waitUntilMacroAppears();
         
         WikiEditPage wikiEditPage = editPage.clickSaveAndView().editWiki();
-        assert wikiEditPage.getContent().contains("{{include/}}");
+        Assertions.assertTrue(wikiEditPage.getContent().contains("{{include/}}"));
     }
     
     @Test
@@ -527,7 +530,7 @@ public class QuickActionsIT
         textArea.waitUntilMacroAppears();
         
         WikiEditPage wikiEditPage = editPage.clickSaveAndView().editWiki();
-        assert wikiEditPage.getContent().contains("{{code language=\"none\"}}{{/code}}");
+        Assertions.assertTrue(wikiEditPage.getContent().contains("{{code language=\"none\"}}{{/code}}"));
     }
     
     @Test
@@ -551,7 +554,7 @@ public class QuickActionsIT
         textArea.waitUntilMacroAppears();
         
         WikiEditPage wikiEditPage = editPage.clickSaveAndView().editWiki();
-        assert wikiEditPage.getContent().contains("{{toc/}}");
+        Assertions.assertTrue(wikiEditPage.getContent().contains("{{toc/}}"));
     }
     
     @Test
@@ -572,6 +575,6 @@ public class QuickActionsIT
         qa.waitForItemSubmitted();
         
         // Click close on the Find and Replace dialog
-        editor.cancelDialog();
+        new CKEditorDialog().cancelDialog();
     }
 }

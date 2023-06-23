@@ -68,9 +68,8 @@
     <dependency>
       <!-- We need this to test the code snippet Quick Action. -->
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-macros</artifactId>
+      <artifactId>xwiki-platform-rendering-macro-code</artifactId>
       <version>${project.version}</version>
-      <type>pom</type>
     </dependency>
     <!-- Test only dependencies. -->
     <dependency>

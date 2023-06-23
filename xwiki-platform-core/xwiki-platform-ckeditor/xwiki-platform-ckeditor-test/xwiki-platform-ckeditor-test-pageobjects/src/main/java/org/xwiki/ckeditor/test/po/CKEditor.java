@@ -153,26 +153,4 @@ public class CKEditor extends BaseElement
     {
         getDriver().findElement(By.className("cke_button__image_icon")).click();
     }
-    
-    /**
-     * Clicks OK on a CKEditor dialog.
-     */
-    public void submitDialog()
-    {
-        WebElement okButton = getDriver().findElement(By.className("cke_dialog_ui_button_ok"));
-        getDriver().waitUntilElementIsEnabled(okButton);
-        okButton.click();
-        getDriver().waitUntilElementDisappears(By.className("cke_dialog_contents"));
-    }
-    
-    /**
-     * Clicks close on a CKEditor dialog.
-     */
-    public void cancelDialog() 
-    {
-        WebElement cancelButton = getDriver().findElement(By.className("cke_dialog_ui_button_cancel"));
-        getDriver().waitUntilElementIsEnabled(cancelButton);
-        cancelButton.click();
-        getDriver().waitUntilElementDisappears(By.className("cke_dialog_contents"));
-    }
 }

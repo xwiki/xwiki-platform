@@ -26,6 +26,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoAlertPresentException;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.CKEditorDialog;
 import org.xwiki.ckeditor.test.po.MacroDialogEditModal;
@@ -45,10 +46,25 @@ import org.xwiki.test.ui.po.editor.WikiEditPage;
  * @version $Id$
  * @since 15.5
  */
-@UITest(extraJARs = {
-    // This is needed for the link action
-    "org.xwiki.platform:xwiki-platform-search-solr-query",
-    })
+
+@UITest(
+    properties = {
+        "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
+    },
+    extraJARs = {
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default",
+
+        // The macro service uses the extension index script service to get the list of uninstalled macros (from
+        // extensions) which expects an implementation of the extension index. The extension index script service is a
+        // core extension so we need to make the extension index also core.
+        "org.xwiki.platform:xwiki-platform-extension-index",
+        // This is needed for the link action
+        "org.xwiki.platform:xwiki-platform-search-solr-query"
+    },
+    resolveExtraJARs = true
+)
 public class QuickActionsIT 
 {
     
@@ -73,14 +89,15 @@ public class QuickActionsIT
     @AfterEach
     void exitEditMode(TestUtils setup, TestReference testReference)
     {
-        // Avoid the exit page dialog on next test
-        if (setup.isInWYSIWYGEditMode()) {
-            new WYSIWYGEditPage().clickCancel();
-        }
-        
-        if (setup.isInWikiEditMode()) {
-            new WikiEditPage().clickCancel();
-        }
+        if (setup.isInWYSIWYGEditMode() || setup.isInWikiEditMode()) {
+            // We pass the action because we don't want to wait for view mode to be loaded.
+            setup.gotoPage(testReference, "view");
+            try {
+                // Confirm the page leave (discard unsaved changes) if we are asked for.
+                setup.getDriver().switchTo().alert().accept();
+            } catch (NoAlertPresentException e) {
+                // Do nothing.
+            }
     }
     
     private static void createAndLoginStandardUser(TestUtils setup)
@@ -288,7 +305,7 @@ public class QuickActionsIT
         qa.waitForItemSubmitted();
         
         textArea = editor.getRichTextArea();
-        textArea.waitUntilMacroAppears();
+        textArea.waitUntilContentEditable();
         
         WikiEditPage wikiEditPage = editPage.clickSaveAndView().editWiki();
         Assertions.assertTrue(wikiEditPage.getContent().contains("{{info}}\n"
@@ -314,7 +331,7 @@ public class QuickActionsIT
         qa.waitForItemSubmitted();
         
         textArea = editor.getRichTextArea();
-        textArea.waitUntilMacroAppears();
+        textArea.waitUntilContentEditable();
         
         WikiEditPage wikiEditPage = editPage.clickSaveAndView().editWiki();
         Assertions.assertTrue(wikiEditPage.getContent().contains("{{success}}\n"
@@ -339,7 +356,7 @@ public class QuickActionsIT
         qa.waitForItemSubmitted();
         
         textArea = editor.getRichTextArea();
-        textArea.waitUntilMacroAppears();
+        textArea.waitUntilContentEditable();
         
         WikiEditPage wikiEditPage = editPage.clickSaveAndView().editWiki();
         Assertions.assertTrue(wikiEditPage.getContent().contains("{{warning}}\n"
@@ -365,7 +382,7 @@ public class QuickActionsIT
         qa.waitForItemSubmitted();
         
         textArea = editor.getRichTextArea();
-        textArea.waitUntilMacroAppears();
+        textArea.waitUntilContentEditable();
         
         WikiEditPage wikiEditPage = editPage.clickSaveAndView().editWiki();
         Assertions.assertTrue(wikiEditPage.getContent().contains("{{error}}\n"
@@ -500,7 +517,7 @@ public class QuickActionsIT
         new MacroDialogEditModal().waitUntilReady().clickSubmit();
         
         textArea = editor.getRichTextArea();
-        textArea.waitUntilMacroAppears();
+        textArea.waitUntilContentEditable();
         
         WikiEditPage wikiEditPage = editPage.clickSaveAndView().editWiki();
         Assertions.assertTrue(wikiEditPage.getContent().contains("{{include/}}"));
@@ -527,7 +544,7 @@ public class QuickActionsIT
         new MacroDialogEditModal().waitUntilReady().clickSubmit();
         
         textArea = editor.getRichTextArea();
-        textArea.waitUntilMacroAppears();
+        textArea.waitUntilContentEditable();
         
         WikiEditPage wikiEditPage = editPage.clickSaveAndView().editWiki();
         Assertions.assertTrue(wikiEditPage.getContent().contains("{{code language=\"none\"}}{{/code}}"));
@@ -551,7 +568,7 @@ public class QuickActionsIT
         qa.waitForItemSubmitted();
         
         textArea = editor.getRichTextArea();
-        textArea.waitUntilMacroAppears();
+        textArea.waitUntilContentEditable();
         
         WikiEditPage wikiEditPage = editPage.clickSaveAndView().editWiki();
         Assertions.assertTrue(wikiEditPage.getContent().contains("{{toc/}}"));

@@ -22,6 +22,7 @@ package org.xwiki.ckeditor.test.po;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -158,13 +159,13 @@ public class RichTextAreaElement extends BaseElement
     }
     
     /**
-     * Waits until a macro appears in the document.
+     * Waits until the content is editable.
      */
-    public void waitUntilMacroAppears()
+    public void waitUntilContentEditable()
     {
         try {
             getDriver().switchTo().frame(this.iframe);
-            getDriver().findElement(By.className("macro"));
+            getDriver().waitUntilElementHasAttributeValue(By.className("cke_editable"), "contenteditable", "true");
         } finally {
             getDriver().switchTo().defaultContent();
         }

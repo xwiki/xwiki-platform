@@ -108,6 +108,13 @@
       <scope>runtime</scope>
       <type>xar</type>
     </dependency>
+    <!-- Used by the macro service to include uninstalled macros (provided by extensions). -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Test dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

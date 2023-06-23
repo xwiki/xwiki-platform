@@ -38,9 +38,8 @@ public class CKEditorDialog extends BaseElement
      */
     public void submitDialog()
     {
-        WebElement okButton = getDriver().findElement(By.className("cke_dialog_ui_button_ok"));
-        getDriver().waitUntilElementIsEnabled(okButton);
-        okButton.click();
+        getDriver().waitUntilElementIsVisible(By.className("cke_dialog_ui_button_ok"));
+        getDriver().findElement(By.className("cke_dialog_ui_button_ok")).click();
         getDriver().waitUntilElementDisappears(By.className("cke_dialog_contents"));
     }
     
@@ -50,9 +49,7 @@ public class CKEditorDialog extends BaseElement
     public void cancelDialog() 
     {
         getDriver().waitUntilElementIsVisible(By.className("cke_dialog_ui_button_cancel"));
-        WebElement cancelButton = getDriver().findElement(By.className("cke_dialog_ui_button_cancel"));
-        getDriver().waitUntilElementIsEnabled(cancelButton);
-        cancelButton.click();
+        getDriver().findElement(By.className("cke_dialog_ui_button_cancel")).click();
         getDriver().waitUntilElementDisappears(By.className("cke_dialog_contents"));
     }
 }

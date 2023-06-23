@@ -85,7 +85,6 @@ public class XWikiCachingRightService implements XWikiRightService
             .putAction("skin", Right.VIEW)
             .putAction("download", Right.VIEW)
             .putAction("dot", Right.VIEW)
-            .putAction("svg", Right.VIEW)
             .putAction("pdf", Right.VIEW)
             // TODO: The "undelete" action is mapped to the right "undelete" in the legacy
             // implementation.  We should check whether the "undelete" right is actually used or not and

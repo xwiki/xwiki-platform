@@ -74,6 +74,10 @@ Mail.SendMailStatus_livetable.wiki=Вики
 Mail.SendMailStatus_livetable.error=Ошибка
 Mail.SendMailStatus_livetable.actions=Действия
 Mail.SendMailStatus_livetable.resend=Отправить повторно
+Mail.SendMailStatus_livetable.delete=Удалить
 mailSender.admin.resendSuccess=Письмо было повторно отправлено
-mailSender.admin.resendFailure=Ошибка повторной отправки. Нажмите для просмотра сведений.</content>
+mailSender.admin.resendFailure=Не удалось повторно отправить письмо. Нажмите для получения более подробной информации.
+mailSender.admin.deleteSuccess=Письмо успешно удалено
+mailSender.admin.deleteFailure=Не удалось удалить письмо. Нажмите для получения более подробной информации.
+</content>
 </xwikidoc>

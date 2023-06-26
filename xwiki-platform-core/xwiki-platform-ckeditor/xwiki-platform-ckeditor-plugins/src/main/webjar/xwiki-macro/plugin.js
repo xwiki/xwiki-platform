@@ -626,7 +626,7 @@
 
           macros.forEach(function (macro) {
             // Do not add macros that are already registered.
-            if (editor.quickActions.getAction(macro.id.id) ||
+            if (editor.quickActions.getAction('macro-' + macro.id.id) ||
               // Do not add macros that cannot be installed
               (macro.categories.some(function (cat) {
                 return cat.id === "_notinstalled";

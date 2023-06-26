@@ -20,36 +20,44 @@
 package org.xwiki.ckeditor.test.po;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
- * Page Object for the macro edition modal.
+ * Models a CKEditor Dialog.
  *
  * @version $Id$
- * @since 14.9
+ * @since 1.15
  */
-public class MacroDialogEditModal extends BaseElement
+@Unstable
+public class CKEditorDialog extends BaseElement
 {
+    
+    
     /**
-     * Wait until the macro selection edition is loaded.
-     *
-     * @return the current page object
+     * Creates a CKEditor Dialog instance.
      */
-    public MacroDialogEditModal waitUntilReady()
+    public CKEditorDialog()
     {
-        getDriver().waitUntilElementIsVisible(
-                // We match *-editor-modal so the page object can be used in dashboard and ckeditor tests.
-                By.cssSelector("[class*=-editor-modal] .macro-name"));
-        return this;
+        getDriver().waitUntilElementIsVisible(By.className("cke_dialog_contents"));
     }
-
+    
     /**
-     * Click on the macro submission button.
+     * Clicks OK on a CKEditor dialog.
      */
-    public void clickSubmit()
+    public void submitDialog()
     {
-        getDriver().findElement(
-             // We match *-editor-modal so the page object can be used in dashboard and ckeditor tests.
-                By.cssSelector("[class*=-editor-modal] .modal-footer .btn-primary")).click();
+        getDriver().findElement(By.className("cke_dialog_ui_button_ok")).click();
+        getDriver().waitUntilElementDisappears(By.className("cke_dialog_contents"));
+    }
+    
+    /**
+     * Clicks close on a CKEditor dialog.
+     */
+    public void cancelDialog() 
+    {
+        getDriver().findElement(By.className("cke_dialog_ui_button_cancel")).click();
+        getDriver().waitUntilElementDisappears(By.className("cke_dialog_contents"));
     }
 }

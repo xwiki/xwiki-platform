@@ -56,6 +56,7 @@ platform.flamingo.themes.title.preview=Предпросмотр
 platform.flamingo.themes.autorefresh=Автообновление
 platform.flamingo.themes.refresh=Обновить
 platform.flamingo.themes.refreshwarning=Обновление может занять несколько секунд.
+platform.flamingo.themes.preview.iframe.label=Предварительный просмотр цветовой темы.
 platform.flamingo.themes.loading=Загрузка...
 platform.flamingo.themes.category.logos=Логотипы
 platform.flamingo.themes.category.base-colors=Базовые цвета

@@ -19,6 +19,7 @@
  */
 package org.xwiki.ckeditor.test.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.xwiki.stability.Unstable;
@@ -154,5 +155,18 @@ public class RichTextAreaElement extends BaseElement
     {
         getDriver().switchTo().frame(this.iframe);
         return getDriver().switchTo().activeElement();
+    }
+    
+    /**
+     * Waits until the content is editable.
+     */
+    public void waitUntilContentEditable()
+    {
+        try {
+            getDriver().switchTo().frame(this.iframe);
+            getDriver().waitUntilElementHasAttributeValue(By.className("cke_editable"), "contenteditable", "true");
+        } finally {
+            getDriver().switchTo().defaultContent();
+        }
     }
 }

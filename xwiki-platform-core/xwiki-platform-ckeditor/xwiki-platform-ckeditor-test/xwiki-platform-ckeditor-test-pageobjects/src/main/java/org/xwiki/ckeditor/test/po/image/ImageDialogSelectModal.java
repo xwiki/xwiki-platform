@@ -57,6 +57,15 @@ public class ImageDialogSelectModal extends BaseElement
         element.click();
         return new ImageDialogEditModal().waitUntilReady();
     }
+    
+    /**
+     * Click on the cancel button.
+     */
+    public void clickCancel()
+    {
+        getDriver().findElement(By.cssSelector(".image-selector-modal .btn-default")).click();
+        getDriver().waitUntilElementDisappears(By.className("image-selector-modal"));
+    }
 
     /**
      * Click on the Tree tab to switch to the document tree selection form.

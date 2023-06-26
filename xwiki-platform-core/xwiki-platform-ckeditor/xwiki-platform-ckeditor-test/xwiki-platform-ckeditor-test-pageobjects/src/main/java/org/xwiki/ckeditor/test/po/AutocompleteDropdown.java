@@ -20,36 +20,35 @@
 package org.xwiki.ckeditor.test.po;
 
 import org.openqa.selenium.By;
+import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.BaseElement;
 
+
 /**
- * Page Object for the macro edition modal.
+ * Models an auto-complete drop-down.
  *
  * @version $Id$
- * @since 14.9
+ * @since 15.5
  */
-public class MacroDialogEditModal extends BaseElement
+@Unstable
+public class AutocompleteDropdown extends BaseElement
 {
-    /**
-     * Wait until the macro selection edition is loaded.
-     *
-     * @return the current page object
-     */
-    public MacroDialogEditModal waitUntilReady()
-    {
-        getDriver().waitUntilElementIsVisible(
-                // We match *-editor-modal so the page object can be used in dashboard and ckeditor tests.
-                By.cssSelector("[class*=-editor-modal] .macro-name"));
-        return this;
-    }
 
     /**
-     * Click on the macro submission button.
+     * Waits for the given item to be selected.
+     * @param label - The name of the item
      */
-    public void clickSubmit()
+    public void waitForItemSelected(String label)
     {
-        getDriver().findElement(
-             // We match *-editor-modal so the page object can be used in dashboard and ckeditor tests.
-                By.cssSelector("[class*=-editor-modal] .modal-footer .btn-primary")).click();
+        getDriver().findElement(By.xpath("//*[contains(@class, 'cke_autocomplete_selected')]//*[. = '" + label + "']"));
+    }
+    
+    /**
+     * Waits for the auto-complete drop-down to disappear.
+     */
+    public void waitForItemSubmitted()
+    {
+        getDriver().waitUntilElementDisappears(By.cssSelector(
+                ".cke_autocomplete_opened .cke_autocomplete_selected"));
     }
 }

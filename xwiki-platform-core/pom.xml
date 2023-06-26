@@ -156,16 +156,6 @@
             <revapi.differences>
               <differences>
                 <item>
-                  <code>java.method.addedToInterface</code>
-                  <new>method org.xwiki.bridge.DocumentModelBridge org.xwiki.bridge.DocumentAccessBridge::getCurrentDocument()</new>
-                  <justification>This change was necessary in order to fix XWIKI-20897 (Cannot export with client-side PDF a given revision of a page)</justification>
-                  <criticality>highlight</criticality>
-                </item>
-              </differences>
-            </revapi.differences>
-            <revapi.differences>
-              <differences>
-                <item>
                   <ignore>true</ignore>
                   <code>java.method.addedToInterface</code>
                   <new>method long org.xwiki.attachment.validation.AttachmentValidationConfiguration::getMaxUploadSize(org.xwiki.model.reference.EntityReference)</new>

@@ -24,14 +24,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-extension-security</artifactId>
-    <version>15.5-SNAPSHOT</version>
+    <version>15.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-extension-security-index</artifactId>
   <name>XWiki Platform - Extension - Security - Index</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Extension - Security - Index</description>
+  <description>Solr Indexer for the Extensions Security Vulnerabilities application</description>
   <properties>
-    <!-- It does not make sense to have this extension installed on several wikis, as it perform the security
+    <!-- It does not make sense to have this extension installed on several wikis, as it performs the security
       scan for all wikis. -->
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
     <!-- Name to display by the Extension Manager -->

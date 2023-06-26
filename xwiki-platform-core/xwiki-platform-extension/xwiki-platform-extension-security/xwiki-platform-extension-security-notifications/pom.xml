@@ -24,21 +24,21 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-extension-security</artifactId>
-    <version>15.5-SNAPSHOT</version>
+    <version>15.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-extension-security-notifications</artifactId>
   <name>XWiki Platform - Extension - Security - Notifications</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Extension - Security - Notifications</description>
+  <description>Notifications for the Extensions Security Vulnerabilities Application</description>
   <properties>
     <!-- It does not make sense to have this extension installed on several wikis, as it performs the security
       scan for all wikis. -->
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Notifications for the Extensions Security Vulnerabilities application</xwiki.extension.name>
+    <xwiki.extension.name>Notifications for the Security Vulnerabilities Application</xwiki.extension.name>
     <!-- Category for the Extension Manager -->
     <xwiki.extension.category>api</xwiki.extension.category>
-    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.66</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -50,6 +50,31 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-extension-security-api</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <!-- Test dependencies. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-page</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-web-templates</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-icon-script</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-notifications-api</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

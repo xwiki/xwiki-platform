@@ -131,7 +131,7 @@ public class SolrRatingsManagerTest
             .then(invocationOnMock -> ((SolrDocument) invocationOnMock.getArgument(0)).get("id"));
         when(this.solrUtils.get(any(), any()))
             .then(invocationOnMock ->
-                ((SolrDocument) invocationOnMock.getArgument(1)).get((String) invocationOnMock.getArgument(0)));
+                ((SolrDocument) invocationOnMock.getArgument(1)).get(invocationOnMock.getArgument(0)));
         doAnswer(invocationOnMock -> {
             String fieldName = invocationOnMock.getArgument(0);
             Object fieldValue = invocationOnMock.getArgument(1);

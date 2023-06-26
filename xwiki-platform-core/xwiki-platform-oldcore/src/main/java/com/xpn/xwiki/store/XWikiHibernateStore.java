@@ -1560,7 +1560,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         "select prop.name, prop.classType from BaseProperty as prop where prop.id.id = :id",
                         Object[].class);
                     query.setParameter("id", object.getId());
-                    for (Object[] result : (List<Object[]>) query.list()) {
+                    for (Object[] result : query.list()) {
                         String name = (String) result[0];
                         // No need to load fields already loaded from
                         // custom mapping
@@ -2958,7 +2958,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         return injectInSessionFactory(config);
     }
 
-    private SessionFactory injectInSessionFactory(Configuration config) throws XWikiException
+    private SessionFactory injectInSessionFactory(Configuration config)
     {
         return config.buildSessionFactory();
     }

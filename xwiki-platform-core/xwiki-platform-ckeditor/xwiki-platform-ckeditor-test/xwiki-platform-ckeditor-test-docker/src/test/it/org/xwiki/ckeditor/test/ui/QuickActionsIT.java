@@ -60,7 +60,7 @@ import org.xwiki.test.ui.po.editor.WikiEditPage;
         // extensions) which expects an implementation of the extension index. The extension index script service is a
         // core extension so we need to make the extension index also core.
         "org.xwiki.platform:xwiki-platform-extension-index",
-        // This is needed for the link action
+        // Solr search is used to get suggestions for the link quick action.
         "org.xwiki.platform:xwiki-platform-search-solr-query"
     },
     resolveExtraJARs = true

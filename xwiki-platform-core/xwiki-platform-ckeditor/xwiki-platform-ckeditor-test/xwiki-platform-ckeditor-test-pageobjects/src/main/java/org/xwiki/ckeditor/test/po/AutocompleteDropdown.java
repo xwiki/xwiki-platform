@@ -28,7 +28,8 @@ import org.xwiki.test.ui.po.BaseElement;
  * Models an auto-complete drop-down.
  *
  * @version $Id$
- * @since 15.5
+ * @since 15.5.1
+ * @since 15.6RC1
  */
 @Unstable
 public class AutocompleteDropdown extends BaseElement
@@ -42,7 +43,7 @@ public class AutocompleteDropdown extends BaseElement
     {
         getDriver().findElement(By.xpath("//*[contains(@class, 'cke_autocomplete_selected')]//*[. = '" + label + "']"));
     }
-    
+
     /**
      * Waits for the auto-complete drop-down to disappear.
      */

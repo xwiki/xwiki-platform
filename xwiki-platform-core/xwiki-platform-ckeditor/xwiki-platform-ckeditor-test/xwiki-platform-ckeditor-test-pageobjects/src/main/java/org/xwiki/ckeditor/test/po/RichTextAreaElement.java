@@ -156,9 +156,12 @@ public class RichTextAreaElement extends BaseElement
         getDriver().switchTo().frame(this.iframe);
         return getDriver().switchTo().activeElement();
     }
-    
+
     /**
      * Waits until the content is editable.
+     *
+     * @since 15.5.1
+     * @since 15.6RC1
      */
     public void waitUntilContentEditable()
     {

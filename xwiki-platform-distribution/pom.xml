@@ -99,7 +99,6 @@
   com.xpn.xwiki.plugin.packaging.PackagePlugin,\
   com.xpn.xwiki.plugin.fileupload.FileUploadPlugin,\
   com.xpn.xwiki.plugin.image.ImagePlugin,\
-  com.xpn.xwiki.plugin.diff.DiffPlugin,\
   com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin,\
   com.xpn.xwiki.plugin.jodatime.JodaTimePlugin,\
   com.xpn.xwiki.plugin.scheduler.SchedulerPlugin,\

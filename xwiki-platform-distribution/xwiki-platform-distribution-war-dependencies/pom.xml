@@ -643,13 +643,6 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- Diff plugin -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-diffplugin</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
 
     <!-- TODO: remove when https://jira.xwiki.org/browse/XWIKI-19932 is fixed
         In the non-legacy WAR because:

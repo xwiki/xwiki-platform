@@ -229,6 +229,32 @@
               </differences>
             </revapi.differences>
             <revapi.differences>
+              <justification>APIs moved to legacy but as we're analyzing transitive dependencies some other modules are reporting them.</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void com.xpn.xwiki.XWiki::renameByCopyAndDelete(com.xpn.xwiki.doc.XWikiDocument, org.xwiki.model.reference.DocumentReference, java.util.List&lt;org.xwiki.model.reference.DocumentReference&gt;, java.util.List&lt;org.xwiki.model.reference.DocumentReference&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void com.xpn.xwiki.doc.XWikiDocument::rename(org.xwiki.model.reference.DocumentReference, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void com.xpn.xwiki.doc.XWikiDocument::rename(org.xwiki.model.reference.DocumentReference, java.util.List&lt;org.xwiki.model.reference.DocumentReference&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void com.xpn.xwiki.doc.XWikiDocument::rename(org.xwiki.model.reference.DocumentReference, java.util.List&lt;org.xwiki.model.reference.DocumentReference&gt;, java.util.List&lt;org.xwiki.model.reference.DocumentReference&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
               <justification>We voted to remove this old and unmaintained plugin for which there are alternatives.</justification>
               <criticality>highlight</criticality>
               <differences>

@@ -57,9 +57,12 @@ public class ImageDialogSelectModal extends BaseElement
         element.click();
         return new ImageDialogEditModal().waitUntilReady();
     }
-    
+
     /**
      * Click on the cancel button.
+     *
+     * @since 15.5.1
+     * @since 15.6RC1
      */
     public void clickCancel()
     {

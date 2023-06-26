@@ -28,13 +28,12 @@ import org.xwiki.test.ui.po.BaseElement;
  * Models a CKEditor Dialog.
  *
  * @version $Id$
- * @since 1.15
+ * @since 15.5.1
+ * @since 15.6RC1
  */
 @Unstable
 public class CKEditorDialog extends BaseElement
 {
-    
-    
     /**
      * Creates a CKEditor Dialog instance.
      */
@@ -42,7 +41,7 @@ public class CKEditorDialog extends BaseElement
     {
         getDriver().waitUntilElementIsVisible(By.className("cke_dialog_contents"));
     }
-    
+
     /**
      * Clicks OK on a CKEditor dialog.
      */
@@ -51,7 +50,7 @@ public class CKEditorDialog extends BaseElement
         getDriver().findElement(By.className("cke_dialog_ui_button_ok")).click();
         getDriver().waitUntilElementDisappears(By.className("cke_dialog_contents"));
     }
-    
+
     /**
      * Clicks close on a CKEditor dialog.
      */

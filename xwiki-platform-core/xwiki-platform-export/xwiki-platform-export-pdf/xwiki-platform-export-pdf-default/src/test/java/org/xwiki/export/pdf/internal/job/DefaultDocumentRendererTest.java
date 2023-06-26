@@ -25,14 +25,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
@@ -51,28 +50,31 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link DocumentRenderer}.
+ * Unit tests for {@link DefaultDocumentRenderer}.
  * 
  * @version $Id$
  */
 @ComponentTest
-class DocumentRendererTest
+class DefaultDocumentRendererTest
 {
     @InjectMockComponents
-    private DocumentRenderer documentRenderer;
+    private DefaultDocumentRenderer documentRenderer;
 
     @MockComponent
-    private DocumentAccessBridge documentAccessBridge;
+    private Provider<XWikiContext> xcontextProvider;
 
     @MockComponent
     private RenderingContext renderingContext;
@@ -92,11 +94,30 @@ class DocumentRendererTest
     private BlockRenderer html5Renderer;
 
     @Mock
-    private DocumentModelBridge document;
+    private XWikiContext xcontext;
+
+    @Mock
+    private XWiki wiki;
+
+    private DocumentReference documentReference = new DocumentReference("test", "Some", "Page");
+
+    @Mock
+    private XWikiDocument document;
+
+    @Mock
+    private XWikiDocument translatedDocument;
 
     @BeforeEach
     void configure() throws Exception
     {
+        when(this.xcontextProvider.get()).thenReturn(this.xcontext);
+        when(this.xcontext.getWiki()).thenReturn(this.wiki);
+        when(this.wiki.getDocument(this.documentReference, this.xcontext)).thenReturn(document);
+        when(this.document.getTranslatedDocument(this.xcontext)).thenReturn(this.translatedDocument);
+        when(this.document.getDocumentReference()).thenReturn(this.documentReference);
+        when(this.translatedDocument.getDocumentReference()).thenReturn(this.documentReference);
+        when(this.entityReferenceSerializer.serialize(this.documentReference)).thenReturn("test:Some.Page");
+
         when(this.renderingContext.getTargetSyntax()).thenReturn(Syntax.HTML_5_0);
         when(this.contextComponentManager.getInstance(BlockRenderer.class, Syntax.HTML_5_0.toIdString()))
             .thenReturn(this.html5Renderer);
@@ -105,14 +126,9 @@ class DocumentRendererTest
     @Test
     void render() throws Exception
     {
-        DocumentReference documentReference = new DocumentReference("test", "Some", "Page");
-        when(this.documentAccessBridge.getTranslatedDocumentInstance(documentReference)).thenReturn(this.document);
-        when(this.document.getDocumentReference()).thenReturn(documentReference);
-        when(this.entityReferenceSerializer.serialize(documentReference)).thenReturn("test:Some.Page");
-
         XDOM titleXDOM = new XDOM(Arrays.asList(new WordBlock("title")));
         XDOM xdom = new XDOM(Arrays.asList(new WordBlock("content")));
-        when(this.documentDisplayer.display(same(this.document), any(DocumentDisplayerParameters.class)))
+        when(this.documentDisplayer.display(same(this.translatedDocument), any(DocumentDisplayerParameters.class)))
             .then(new Answer<XDOM>()
             {
                 @Override
@@ -159,13 +175,10 @@ class DocumentRendererTest
     @Test
     void renderCurrentDocument() throws Exception
     {
-        DocumentReference currentDocumentReference = new DocumentReference("test", "Some", "Page");
-        DocumentModelBridge currentDocument = mock(DocumentModelBridge.class);
-        when(currentDocument.getDocumentReference()).thenReturn(currentDocumentReference);
-        when(this.documentAccessBridge.getCurrentDocument()).thenReturn(currentDocument);
+        when(this.xcontext.getDoc()).thenReturn(this.document);
 
-        this.documentRenderer.render(currentDocumentReference, false);
+        this.documentRenderer.render(this.documentReference, false);
 
-        verify(this.documentDisplayer).display(same(currentDocument), any(DocumentDisplayerParameters.class));
+        verify(this.documentDisplayer).display(same(this.document), any(DocumentDisplayerParameters.class));
     }
 }

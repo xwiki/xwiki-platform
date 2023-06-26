@@ -357,6 +357,22 @@
                       <resource>properties.dtd</resource>
                     </resources>
                   </exception>
+                  <!-- Seems to be the same thing -->
+                  <exception>
+                    <conflictingDependencies>
+                      <dependency>
+                        <groupId>org.apache.httpcomponents.client5</groupId>
+                        <artifactId>httpclient5</artifactId>
+                      </dependency>
+                      <dependency>
+                        <groupId>org.apache.httpcomponents</groupId>
+                        <artifactId>httpclient</artifactId>
+                      </dependency>
+                    </conflictingDependencies>
+                    <resources>
+                      <resource>mozilla/public-suffix-list.txt</resource>
+                    </resources>
+                  </exception>
                   <!-- Remove when https://issues.redhat.com/browse/IPROTO-177 is fixed -->
                   <exception>
                     <conflictingDependencies>

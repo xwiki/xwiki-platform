@@ -163,6 +163,11 @@
           </execution>
         </executions>
       </plugin>
+      <!-- Add support for passing JVM arguments when running CKBuilder. -->
+      <plugin>
+        <groupId>com.google.code.maven-replacer-plugin</groupId>
+        <artifactId>replacer</artifactId>
+      </plugin>
       <!-- Build the CKEditor. -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>

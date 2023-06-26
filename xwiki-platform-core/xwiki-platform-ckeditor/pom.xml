@@ -123,6 +123,32 @@
             <overwrite>true</overwrite>
           </configuration>
         </plugin>
+        <!-- Add support for passing JVM arguments when running CKBuilder. -->
+        <plugin>
+          <groupId>com.google.code.maven-replacer-plugin</groupId>
+          <artifactId>replacer</artifactId>
+          <version>1.5.3</version>
+          <executions>
+            <execution>
+              <id>add-jvm-args</id>
+              <phase>process-resources</phase>
+              <goals>
+                <goal>replace</goal>
+              </goals>
+              <configuration>
+                <file>${ckeditor.builder.path}/build.sh</file>
+                <replacements>
+                  <replacement>
+                    <!-- The arguments that appear before -jar are passed to the JVM while those that appear after are
+                      passed to the Java application (CKBuilder in this case). -->
+                    <token>java -jar</token>
+                    <value>java \$JVM_ARGS -jar</value>
+                  </replacement>
+                </replacements>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>exec-maven-plugin</artifactId>
@@ -138,6 +164,10 @@
               </goals>
               <configuration>
                 <executable>${ckeditor.builder.path}/build.sh</executable>
+                <environmentVariables>
+                  <!-- See https://github.com/ckeditor/ckbuilder/issues/34 -->
+                  <JVM_ARGS>--add-exports java.desktop/sun.java2d=ALL-UNNAMED</JVM_ARGS>
+                </environmentVariables>
                 <arguments>
                   <!-- Exclude from release all plugins/skins that are not specified in build-config. -->
                   <argument>--skip-omitted-in-build-config</argument>

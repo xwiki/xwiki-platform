@@ -800,7 +800,6 @@
                 **/objects/StringListProperty.java,
                 **/pdf/impl/PdfExportImpl.java,
                 **/pdf/impl/PdfURLFactory.java,
-                **/plugin/autotag/FrenchStemmer.java,
                 **/plugin/mail/MailPluginApi.java,
                 **/plugin/mail/MailPlugin.java,
                 **/plugin/packaging/DocumentFilter.java,

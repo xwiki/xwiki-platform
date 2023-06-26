@@ -1101,6 +1101,12 @@
         <groupId>org.apache.hadoop</groupId>
         <artifactId>hadoop-annotations</artifactId>
         <version>3.2.4</version>
+        <exclusions>
+          <exclusion>
+            <groupId>ch.qos.reload4j</groupId>
+            <artifactId>reload4j</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.hadoop</groupId>
@@ -1224,6 +1230,8 @@
                 <features>
                   <!-- Should be ok for any version of log4j-over-slf4j (since log4j 1.x is dead) -->
                   log4j:log4j/1.2.17,
+                  <!-- Same for reload4j which is a clone of log4j but with some security fixes -->
+                  ch.qos.reload4j:reload4j,
 
                   <!-- Does not make sense to have both at the same time -->
                   org.slf4j:slf4j-log4j12

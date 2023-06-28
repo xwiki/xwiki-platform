@@ -731,7 +731,7 @@ var XWiki = (function(XWiki){
         containerTagName: 'a'
       });
       if (arr[i].url == null)  {
-        item.containerElement.setAttribute('href', 'javascript:void()');
+        item.containerElement.setAttribute('href', 'javascript:void(0)');
       }
       else item.containerElement.setAttribute('href', arr[i].url);
       item.listItemElement.addEventListener('focusin', (event) => pointer.setHighlight(event.currentTarget));

@@ -169,7 +169,7 @@ viewers.Tags = Class.create({
 
     new XWiki.widgets.Suggest(form.down('input[type=text]'), {
       script: "${xwiki.getURL('Main.WebHome', 'view', 'xpage=suggest&classname=XWiki.TagClass&fieldname=tags&firCol=-&secCol=-')}&",
-      parentContainer:"tag-add-form-suggest",
+      parentContainer: 'tag-add-form-suggest',
       varname: 'input',
       seps: "${xwiki.getDocument('XWiki.TagClass').xWikiClass.tags.getProperty('separators').value}",
       shownoresults : false,

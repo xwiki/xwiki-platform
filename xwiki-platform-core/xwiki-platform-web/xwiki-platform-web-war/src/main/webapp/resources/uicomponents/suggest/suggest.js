@@ -244,6 +244,7 @@ var XWiki = (function(XWiki){
     var checkPropagation = true;
 
     switch(key) {
+      case 32: // The space key
       case Event.KEY_RETURN:
         if (!this.iHighlighted && (Object.keys(this.aSuggestions).length == 1 && this.aSuggestions[Object.keys(this.aSuggestions)[0]].length == 1)) {
           this.highlightFirst();
@@ -730,7 +731,8 @@ var XWiki = (function(XWiki){
         noHighlight: true, // we do the highlighting ourselves
         containerTagName: 'a'
       });
-      item.containerElement.setAttribute('href', arr[i].url);
+      if (arr[i].url == null)  item.containerElement.setAttribute('href', '#0');
+      else item.containerElement.setAttribute('href', arr[i].url);
       item.listItemElement.addEventListener('focusin', (event) => pointer.setHighlight(event.currentTarget));
       list.addItem(item);
     }

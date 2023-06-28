@@ -39,7 +39,7 @@
 
          Following versions of some specific Jetty dependencies should be kept in sync when upgrading Jetty.
     -->
-    <jetty.version>10.0.12</jetty.version>
+    <jetty.version>10.0.15</jetty.version>
   </properties>
 
   <dependencies>

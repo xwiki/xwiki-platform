@@ -55,7 +55,6 @@ import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializ
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID;
 import static org.xwiki.extension.security.internal.livedata.ExtensionSecurityLiveDataConfigurationProvider.ADVICE;
 import static org.xwiki.extension.security.internal.livedata.ExtensionSecurityLiveDataConfigurationProvider.CVE_ID;
-import static org.xwiki.extension.security.internal.livedata.ExtensionSecurityLiveDataConfigurationProvider.EXTENSION_ID;
 import static org.xwiki.extension.security.internal.livedata.ExtensionSecurityLiveDataConfigurationProvider.FIX_VERSION;
 import static org.xwiki.extension.security.internal.livedata.ExtensionSecurityLiveDataConfigurationProvider.MAX_CVSS;
 import static org.xwiki.extension.security.internal.livedata.ExtensionSecurityLiveDataConfigurationProvider.NAME;
@@ -91,7 +90,6 @@ public class SolrToLiveDataEntryMapper
     {
         return ofEntries(
             entry(NAME, buildExtensionName(doc)),
-            entry(EXTENSION_ID, buildExtensionId(doc)),
             entry(MAX_CVSS, buildMaxCVSS(doc)),
             entry(CVE_ID, buildCVEList(doc)),
             entry(FIX_VERSION, buildFixVersion(doc)),
@@ -134,25 +132,33 @@ public class SolrToLiveDataEntryMapper
         return this.solrUtils.get(SOLR_FIELD_ID, doc);
     }
 
-    private String buildExtensionName(SolrDocument solrDoc)
+    private String buildExtensionName(SolrDocument doc)
     {
         String extensionName;
         // If the extension does not have a name and version indexed, we fall back to an extensionId parsing.
         // Note: this is not supposed to happen in practice.
-        ExtensionId extensionId = this.extensionIndexStore.getExtensionId(solrDoc);
+        ExtensionId extensionId = this.extensionIndexStore.getExtensionId(doc);
         List<BasicNameValuePair> parameters =
             buildExtensionURLParameters(extensionId.getId(), extensionId.getVersion().getValue());
-        if (solrDoc.get(FieldUtils.NAME) != null) {
-            extensionName = this.solrUtils.get(FieldUtils.NAME, solrDoc);
+        if (doc.get(FieldUtils.NAME) != null) {
+            extensionName = this.solrUtils.get(FieldUtils.NAME, doc);
         } else {
             // Fallback to the id in case the name is empty.
-            String[] versionId = this.solrUtils.getId(solrDoc).split("/");
+            String[] versionId = this.solrUtils.getId(doc).split("/");
             extensionName = versionId[0];
         }
         String url = this.documentAccessBridge.getDocumentURL(new LocalDocumentReference("XWiki", "Extensions"),
             VIEW_ACTION, URLEncodedUtils.format(parameters, Charset.defaultCharset()), null);
 
-        return String.format("<a href='%s'>%s</a>", escapeXml(url), escapeXml(String.valueOf(extensionName)));
+        String extensionNameEscaped = escapeXml(String.valueOf(extensionName));
+        String extensionIdEscaped = escapeXml(buildExtensionId(doc));
+        return String.format("<a href='%s' title='%s'>%s</a><br/><span class='xHint' title='%s'>%s</span>",
+            escapeXml(url),
+            extensionNameEscaped,
+            extensionNameEscaped,
+            extensionIdEscaped,
+            extensionIdEscaped
+        );
     }
 
     private static List<BasicNameValuePair> buildExtensionURLParameters(String extensionId, String extensionVersion)

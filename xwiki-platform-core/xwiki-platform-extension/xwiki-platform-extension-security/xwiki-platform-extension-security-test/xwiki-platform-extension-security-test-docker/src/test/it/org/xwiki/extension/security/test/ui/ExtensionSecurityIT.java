@@ -70,9 +70,9 @@ class ExtensionSecurityIT
         TableLayoutElement tableLayout = liveData.getTableLayout();
         tableLayout.waitUntilRowCountEqualsTo(1, true);
 
-        tableLayout.assertRow("Name", "org.xwiki.platform:xwiki-platform-administration-ui");
-        tableLayout.assertRow("Extension Id",
-            hasItem(new WebElementStartsWith("org.xwiki.platform:xwiki-platform-administration-ui/")));
+        tableLayout.assertRow("Name",
+            hasItem(new WebElementStartsWith("org.xwiki.platform:xwiki-platform-administration-ui\n"
+                + "org.xwiki.platform:xwiki-platform-administration-ui/")));
         tableLayout.assertRow("Wikis", "xwiki");
         tableLayout.assertRow("Max CVSS", "9.9");
         tableLayout.assertRow("CVE IDs", "GHSA-4v38-964c-xjmw (9.9)\n"

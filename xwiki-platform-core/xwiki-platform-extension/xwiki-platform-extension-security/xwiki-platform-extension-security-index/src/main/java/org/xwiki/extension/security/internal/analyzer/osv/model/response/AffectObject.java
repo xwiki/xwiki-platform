@@ -22,6 +22,7 @@ package org.xwiki.extension.security.internal.analyzer.osv.model.response;
 import java.util.List;
 
 import org.xwiki.extension.security.internal.analyzer.osv.model.PackageObject;
+import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * See the <a href="https://ossf.github.io/osv-schema/#affectedpackage-field">Open Source Vulnerability format API
@@ -66,5 +67,14 @@ public class AffectObject
     public void setRanges(List<RangeObject> ranges)
     {
         this.ranges = ranges;
+    }
+
+    @Override
+    public String toString()
+    {
+        return new XWikiToStringBuilder(this)
+            .append("package", getPackage())
+            .append("ranges", getRanges())
+            .toString();
     }
 }

@@ -24,6 +24,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.xwiki.text.XWikiToStringBuilder;
+
 /**
  * See the <a href="https://ossf.github.io/osv-schema/#affectedranges-field">Open Source Vulnerability format API
  * documentation</a>.
@@ -82,5 +84,13 @@ public class RangeObject
             .map(getFixed)
             .filter(Objects::nonNull)
             .findFirst();
+    }
+
+    @Override
+    public String toString()
+    {
+        return new XWikiToStringBuilder(this)
+            .append("events", getEvents())
+            .toString();
     }
 }

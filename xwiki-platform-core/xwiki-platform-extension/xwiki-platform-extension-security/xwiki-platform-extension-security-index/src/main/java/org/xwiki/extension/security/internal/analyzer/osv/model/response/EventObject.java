@@ -19,6 +19,8 @@
  */
 package org.xwiki.extension.security.internal.analyzer.osv.model.response;
 
+import org.xwiki.text.XWikiToStringBuilder;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -95,5 +97,15 @@ public class EventObject
     public void setLastAffected(String lastAffected)
     {
         this.lastAffected = lastAffected;
+    }
+
+    @Override
+    public String toString()
+    {
+        return new XWikiToStringBuilder(this)
+            .append("introduced", getIntroduced())
+            .append("fixed", getFixed())
+            .append("lastAffected", getLastAffected())
+            .toString();
     }
 }

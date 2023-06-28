@@ -21,6 +21,8 @@ package org.xwiki.extension.security.internal.analyzer.osv.model.response;
 
 import java.util.List;
 
+import org.xwiki.text.XWikiToStringBuilder;
+
 /**
  * POJO for the <a href="https://ossf.github.io/osv-schema/">Open Source Vulnerability format API response</a>.
  *
@@ -47,5 +49,13 @@ public class OsvResponse
     public void setVulns(List<VulnObject> vulns)
     {
         this.vulns = vulns;
+    }
+
+    @Override
+    public String toString()
+    {
+        return new XWikiToStringBuilder(this)
+            .append("vulns", getVulns())
+            .toString();
     }
 }

@@ -39,6 +39,8 @@ import org.xwiki.extension.security.internal.analyzer.osv.model.response.AffectO
 import org.xwiki.extension.security.internal.analyzer.osv.model.response.OsvResponse;
 import org.xwiki.extension.security.internal.analyzer.osv.model.response.RangeObject;
 import org.xwiki.extension.security.internal.analyzer.osv.model.response.VulnObject;
+import org.xwiki.extension.version.Version;
+import org.xwiki.extension.version.internal.DefaultVersion;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static org.xwiki.extension.security.internal.analyzer.osv.OsvExtensionSecurityAnalyzer.PLATFORM_PREFIX;
@@ -79,21 +81,23 @@ public class OsvResponseAnalyzer
                     vulnerability)
                     .ifPresent(matchingVulns::add));
         }
+        Version currentVersion = new DefaultVersion(version);
         ExtensionSecurityAnalysisResult extensionSecurityAnalysisResult = new ExtensionSecurityAnalysisResult()
-            .setResults(matchingVulns.stream().map(this::convert).collect(Collectors.toList()));
+            .setResults(matchingVulns.stream().map(vulnObject -> convert(vulnObject, currentVersion))
+                .collect(Collectors.toList()));
         if (!extensionSecurityAnalysisResult.getSecurityVulnerabilities().isEmpty()) {
             extensionSecurityAnalysisResult.setAdvice(UPGRADE_FROM_EM_ADVICE);
         }
         return extensionSecurityAnalysisResult;
     }
 
-    private SecurityVulnerabilityDescriptor convert(VulnObject vulnObject)
+    private SecurityVulnerabilityDescriptor convert(VulnObject vulnObject, Version currentVersion)
     {
         return new SecurityVulnerabilityDescriptor()
             .setId(vulnObject.getId())
             .setURL(vulnObject.getMainURL())
             .setSeverityScore(vulnObject.getSeverityCCSV3())
-            .setFixVersion(vulnObject.getMaxFixVersion().orElse(null));
+            .setFixVersion(vulnObject.getMaxFixVersion(currentVersion).orElse(null));
     }
 
     private Optional<VulnObject> analyzeVulnerability(String mavenId, String version, VulnObject vuln)

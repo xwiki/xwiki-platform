@@ -98,7 +98,7 @@ public class ExtensionSecurityLiveDataConfigurationProvider implements Provider<
         pagination.setShowPageSizeDropdown(true);
         meta.setPagination(pagination);
         LiveDataEntryDescriptor entryDescriptor = new LiveDataEntryDescriptor();
-        entryDescriptor.setIdProperty(ExtensionSecurityLiveDataSource.ID);
+        entryDescriptor.setIdProperty(EXTENSION_ID);
         input.setMeta(meta);
         meta.setEntryDescriptor(entryDescriptor);
         meta.setPropertyDescriptors(List.of(

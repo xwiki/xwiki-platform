@@ -38,7 +38,7 @@
     <xwiki.extension.name>Solr Indexer for the Extensions Security Vulnerabilities application</xwiki.extension.name>
     <!-- Category for the Extension Manager -->
     <xwiki.extension.category>api</xwiki.extension.category>
-    <xwiki.jacoco.instructionRatio>0.31</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.41</xwiki.jacoco.instructionRatio>
 
   </properties>
   <dependencies>

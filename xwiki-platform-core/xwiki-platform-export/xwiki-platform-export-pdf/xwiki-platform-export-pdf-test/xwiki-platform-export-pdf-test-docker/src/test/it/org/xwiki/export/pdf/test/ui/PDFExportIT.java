@@ -62,7 +62,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 14.4.2
  * @since 14.5
  */
-@UITest(extraJARs = {"org.xwiki.platform:xwiki-platform-resource-temporary"})
+@UITest(
+    extraJARs = {
+        "org.xwiki.platform:xwiki-platform-resource-temporary",
+        // Code macro highlighting works only if Jython is a core extension. It's not enough to use language=none in our
+        // test because we want to reproduce a bug in Paged.js where white-space between highlighted tokens is lost.
+        "org.python:jython-slim"
+    },
+    resolveExtraJARs = true
+)
 @ExtendWith(PDFExportExecutionCondition.class)
 class PDFExportIT
 {
@@ -657,15 +665,27 @@ class PDFExportIT
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
 
         try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
-            // We should have 2 pages: cover page and content page.
-            assertEquals(2, pdf.getNumberOfPages());
+            // We should have 3 pages: cover page and two content pages (the long code macro is split in two).
+            assertEquals(3, pdf.getNumberOfPages());
 
             String content = pdf.getTextFromPage(1);
             // A line break is inserted whenever a long line is wrapped, so we need to remove line breaks in order to
-            // verify that the entire code macro content is present.
-            assertTrue(content.replace("\n", "").contains(
-                "// This is a very long comment that gets cut when exported to PDF because it exceeds the print page "
-                    + "width and the code macro preserves spaces which means it has to be displayed on a single line."),
+            // verify that the entire line content is present.
+            assertTrue(
+                content.replace("\n", "")
+                    .contains("The id generator used when rendering wiki pages for PDF export. It collects a map of "
+                        + "{@code localId -> globalId} for each rendered page (see {@link #resetLocalIds()})"
+                        + " that can be used on the client side to refactor external links into"),
+                "Unexpected content: " + content);
+
+            // Verify that white-space between highlighted tokens is preserved, even when the code macro is split
+            // between print pages.
+            assertTrue(content.contains("import java.util.Map;"), "Unexpected content: " + content);
+            content = pdf.getTextFromPage(2);
+            assertTrue(content.contains("public void reset()"), "Unexpected content: " + content);
+
+            // Verify that white-space is preserved also when the code macro is in-line.
+            assertTrue(content.contains("before public static final String JOB_TYPE = \"export/pdf\";  after"),
                 "Unexpected content: " + content);
         }
     }

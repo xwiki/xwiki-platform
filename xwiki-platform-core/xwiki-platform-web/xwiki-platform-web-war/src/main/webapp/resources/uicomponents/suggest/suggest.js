@@ -244,7 +244,6 @@ var XWiki = (function(XWiki){
     var checkPropagation = true;
 
     switch(key) {
-      case 32: // The space key
       case Event.KEY_RETURN:
         if (!this.iHighlighted && (Object.keys(this.aSuggestions).length == 1 && this.aSuggestions[Object.keys(this.aSuggestions)[0]].length == 1)) {
           this.highlightFirst();

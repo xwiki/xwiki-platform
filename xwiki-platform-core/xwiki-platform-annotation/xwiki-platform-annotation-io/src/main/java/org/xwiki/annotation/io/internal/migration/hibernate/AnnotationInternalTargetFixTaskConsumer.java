@@ -47,7 +47,8 @@ import com.xpn.xwiki.objects.BaseObject;
  *
  * @version $Id$
  * @see <a href="https://jira.xwiki.org/browse/XWIKI-20699">XWIKI-20699</a>
- * @since 15.5
+ * @since 15.5.1
+ * @since 15.6RC1
  * @since 14.10.14
  */
 @Component
@@ -79,18 +80,14 @@ public class AnnotationInternalTargetFixTaskConsumer implements TaskConsumer
 
     private void task(XWikiDocument document) throws IndexException
     {
-        BaseObject xObject = document.getXObject(XWikiDocument.COMMENTSCLASS_REFERENCE);
-        String target = xObject.getStringValue(Annotation.TARGET_FIELD);
-        boolean update = false;
-        if (!StringUtils.isEmpty(target)) {
-            EntityReference resolve = this.referenceResolver.resolve(target, EntityType.DOCUMENT);
-            if (Objects.equals(resolve, document.getDocumentReference())) {
-                xObject.setStringValue(Annotation.TARGET_FIELD, "");
-                update = true;
+        boolean updated = false;
+        for (BaseObject xObject : document.getXObjects(XWikiDocument.COMMENTSCLASS_REFERENCE)) {
+            if (task(document, xObject)) {
+                updated = true;
             }
         }
 
-        if (update) {
+        if (updated) {
             XWikiContext context = this.contextProvider.get();
             try {
                 context.getWiki().saveDocument(document, "Updating annotation targets", context);
@@ -99,5 +96,19 @@ public class AnnotationInternalTargetFixTaskConsumer implements TaskConsumer
                     e);
             }
         }
+    }
+
+    private boolean task(XWikiDocument document, BaseObject xObject)
+    {
+        String target = xObject.getStringValue(Annotation.TARGET_FIELD);
+        boolean updated = false;
+        if (!StringUtils.isEmpty(target)) {
+            EntityReference resolve = this.referenceResolver.resolve(target, EntityType.DOCUMENT);
+            if (Objects.equals(resolve, document.getDocumentReference())) {
+                xObject.setStringValue(Annotation.TARGET_FIELD, "");
+                updated = true;
+            }
+        }
+        return updated;
     }
 }

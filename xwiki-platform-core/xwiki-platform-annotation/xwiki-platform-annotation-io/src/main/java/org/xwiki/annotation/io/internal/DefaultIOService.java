@@ -51,6 +51,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
+
 /**
  * Default {@link IOService} implementation, based on storing annotations in XWiki Objects in XWiki documents. The
  * targets manipulated by this implementation are XWiki references, such as xwiki:Space.Page for documents or with an
@@ -123,21 +125,21 @@ public class DefaultIOService implements IOService
                 documentFullName = this.serializer.serialize(docRef);
             }
             // now get the document with that name
-            XWikiContext deprecatedContext = getXWikiContext();
-            XWikiDocument document = deprecatedContext.getWiki().getDocument(documentFullName, deprecatedContext);
+            XWikiContext xcontext = getXWikiContext();
+            XWikiDocument document = xcontext.getWiki().getDocument(documentFullName, xcontext);
             // create a new object in this document to hold the annotation
             // Make sure to use a relative reference when creating the XObject, since we can`t use absolute references
             // for an object's class. This avoids ugly log warning messages.
             EntityReference annotationClassReference = this.configuration.getAnnotationClassReference();
             annotationClassReference =
                 annotationClassReference.removeParent(annotationClassReference.extractReference(EntityType.WIKI));
-            BaseObject object = document.newXObject(annotationClassReference, deprecatedContext);
-            updateObject(object, annotation, deprecatedContext);
+            BaseObject object = document.newXObject(annotationClassReference, xcontext);
+            updateObject(object, annotation, xcontext);
             // and set additional data: author to annotation author, date to now and the annotation target
-            object.set(Annotation.DATE_FIELD, new Date(), deprecatedContext);
+            object.set(Annotation.DATE_FIELD, new Date(), xcontext);
             // TODO: maybe we shouldn't trust what we receive from the caller but set the author from the context.
             // Or the other way around, set the author of the document from the annotations author.
-            object.set(Annotation.AUTHOR_FIELD, annotation.getAuthor(), deprecatedContext);
+            object.set(Annotation.AUTHOR_FIELD, annotation.getAuthor(), xcontext);
             // store the target of this annotation, serialized with a local serializer, to be exportable and importable
             // in a different wiki
             // TODO: figure out if this is the best idea in terms of target serialization
@@ -153,17 +155,17 @@ public class DefaultIOService implements IOService
                 // This makes it easier to have a valid annotation reference in case of page move/copy.
                 if (!Objects.equals(targetReference, object.getDocumentReference())) {
                     object.set(Annotation.TARGET_FIELD, this.localSerializer.serialize(targetReference),
-                        deprecatedContext);
+                        xcontext);
                 }
             } else {
-                object.set(Annotation.TARGET_FIELD, target, deprecatedContext);
+                object.set(Annotation.TARGET_FIELD, target, xcontext);
             }
             // set the author of the document to the current user
-            document.setAuthor(deprecatedContext.getUser());
+            document.setAuthor(xcontext.getUser());
             // Note: We make sure to only provide a few characters of contextual information in order to control the
             // size of the comment (we display the first 30 characters).
-            deprecatedContext.getWiki().saveDocument(document, "Added annotation on \""
-                + StringUtils.abbreviate(annotation.getSelection(), 30) + "\"", deprecatedContext);
+            xcontext.getWiki().saveDocument(document, "Added annotation on \""
+                + StringUtils.abbreviate(annotation.getSelection(), 30) + "\"", xcontext);
         } catch (XWikiException e) {
             throw new IOServiceException("An exception message has occurred while saving the annotation", e);
         }
@@ -398,9 +400,10 @@ public class DefaultIOService implements IOService
                     }
                     annotation.set(propName, value);
                 } catch (XWikiException e) {
-                    this.logger.warn(String.format(
-                        "Unable to get property %s from object %s[%d]. Will not be saved in the annotation.", propName,
-                        object.getXClassReference(), object.getNumber()), e);
+                    this.logger.warn(
+                        "Unable to get property [{}] from object [{}[{}]]. Will not be saved in the annotation. "
+                            + "Cause: [{}]", propName, object.getXClassReference(), object.getNumber(),
+                        getRootCauseMessage(e));
                 }
             }
         }

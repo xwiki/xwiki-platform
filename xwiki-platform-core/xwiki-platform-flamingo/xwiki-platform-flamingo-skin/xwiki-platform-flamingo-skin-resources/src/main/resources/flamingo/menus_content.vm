@@ -202,21 +202,30 @@
   ## Add the dynamic UIX to the list of of UIX to display
   #foreach($uix in $services.uix.getExtensions($name))
     #if ($services.security.authorization.hasAccess('admin', $uix.authorReference, $services.wiki.currentWikiDescriptor.reference))
+      #set ($separator = ("$!uix.getParameters().separator" == 'true'))
       #set ($order = $numbertool.toNumber($uix.getParameters().order).intValue())
       #if ("$!order" == '')
         ## Fallback for incomplete/invalid extension orders to avoid breaking the display.
         #set ($order = 0)
       #end
       #set ($uixMap = { 'content'  : $services.rendering.render($uix.execute(), 'html/5.0'),
-                        'order'    : $order})
+                        'order'    : $order,
+                        'separator': $separator})
       #set ($discard = $extensions.add($uixMap))
     #end
   #end
   ## Display them, sorted by order
+  #set ($canHaveMenuSeparator = false)
   #foreach($uix in $collectiontool.sort($extensions, 'order'))
+    ## Maybe display a menu separator
+    #if ("$!uix.separator" == 'true' && $canHaveMenuSeparator)
+      #submenuseparator()
+      #set ($canHaveMenuSeparator = false)
+    #end
     #set ($content = $uix.content.toString())
     $content
     #if ($stringtool.isNotBlank($content))
+      #set ($canHaveMenuSeparator = true)
       #set ($count = $count + 1)
     #end
   #end

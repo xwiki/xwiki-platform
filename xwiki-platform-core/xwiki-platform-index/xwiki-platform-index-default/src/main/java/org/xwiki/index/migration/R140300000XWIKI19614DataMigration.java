@@ -28,6 +28,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.internal.migration.AbstractDocumentsMigration;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -48,6 +49,7 @@ import static org.xwiki.index.internal.DefaultLinksTaskConsumer.LINKS_TASK_TYPE;
 @Singleton
 @Named(R140300000XWIKI19614DataMigration.HINT)
 @Deprecated(since = "14.8RC1")
+@Unstable
 public class R140300000XWIKI19614DataMigration extends AbstractDocumentsMigration
 {
     /**

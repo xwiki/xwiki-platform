@@ -141,6 +141,19 @@
                 </item>
               </differences>
             </revapi.differences>
+            <revapi.differences>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.added</code>
+                  <old>field org.xwiki.internal.migration.AbstractDocumentsMigration.documentReferenceResolver @ org.xwiki.index.migration.R140300000XWIKI19614DataMigration</old>
+                  <new>field org.xwiki.internal.migration.AbstractDocumentsMigration.documentReferenceResolver @ org.xwiki.index.migration.R140300000XWIKI19614DataMigration</new>
+                  <annotation>@javax.inject.Named("current")</annotation>
+                  <justification>Young API</justification>
+                  <criticality>documented</criticality>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

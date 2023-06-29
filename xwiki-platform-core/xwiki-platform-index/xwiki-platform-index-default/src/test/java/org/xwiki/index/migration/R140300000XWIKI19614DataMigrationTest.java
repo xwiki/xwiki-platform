@@ -21,6 +21,8 @@ package org.xwiki.index.migration;
 
 import java.util.List;
 
+import javax.inject.Named;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -78,6 +80,7 @@ class R140300000XWIKI19614DataMigrationTest
     private Execution execution;
 
     @MockComponent
+    @Named("current")
     private DocumentReferenceResolver<String> resolver;
 
     @RegisterExtension

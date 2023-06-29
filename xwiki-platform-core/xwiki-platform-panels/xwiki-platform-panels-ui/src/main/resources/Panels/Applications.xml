@@ -659,7 +659,7 @@ require(['scriptaculous/effects'], function() {
 .panel-width-Large .applicationsPanel &gt; li &gt; a:focus,
 .panel-width-Large .applicationsPanelMoreList &gt; li &gt; a:hover,
 .panel-width-Large .applicationsPanelMoreList &gt; li &gt; a:focus,
-.panel-width-Large .applicationPanelMoreContainer ul &gt; li &gt; a:hover
+.panel-width-Large .applicationPanelMoreContainer ul &gt; li &gt; a:hover,
 .panel-width-Large .applicationPanelMoreContainer ul &gt; li &gt; a:focus {
   background-color: transparent;
   text-decoration: underline;

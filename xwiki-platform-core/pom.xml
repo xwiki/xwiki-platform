@@ -204,29 +204,6 @@
                   <old>method void com.xpn.xwiki.doc.XWikiDocument::rename(org.xwiki.model.reference.DocumentReference, java.util.List&lt;org.xwiki.model.reference.DocumentReference&gt;, java.util.List&lt;org.xwiki.model.reference.DocumentReference&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
                 </item>
               </differences>
-              
-            </revapi.differences>
-            <revapi.differences>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.removed</code>
-                  <old>class com.xpn.xwiki.plugin.svg.SVGPlugin</old>
-                  <justification>ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE</justification>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.removed</code>
-                  <old>class com.xpn.xwiki.plugin.svg.SVGPluginApi</old>
-                  <justification>ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE</justification>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.removed</code>
-                  <old>class com.xpn.xwiki.web.SVGAction</old>
-                  <justification>ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE</justification>
-                </item>
-              </differences>
             </revapi.differences>
             <revapi.differences>
               <justification>We voted to remove this old and unmaintained plugin for which there are alternatives.</justification>

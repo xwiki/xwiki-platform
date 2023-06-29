@@ -109,7 +109,7 @@ public class R140300000XWIKI19614DataMigration extends AbstractDocumentsMigratio
     }
 
     @Override
-    protected void logBeforeQueuingTasks(List<XWikiDocument> documents)
+    protected void logBeforeQueuingTasks(List<String> documents)
     {
         XWikiContext context = getXWikiContext();
         if (context.getWiki().hasBacklinks(context)) {

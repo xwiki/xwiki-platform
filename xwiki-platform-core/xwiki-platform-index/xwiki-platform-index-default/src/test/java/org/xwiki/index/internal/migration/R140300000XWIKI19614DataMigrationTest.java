@@ -43,7 +43,6 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.hibernate.HibernateDataMigration;
@@ -119,24 +118,18 @@ class R140300000XWIKI19614DataMigrationTest
     {
         DocumentReference doc42 = new DocumentReference("xwiki", "XWiki", "Doc42");
         DocumentReference doc43 = new DocumentReference("xwiki", "XWiki", "Doc43");
-        XWikiDocument xWikiDocument42 = mock(XWikiDocument.class);
-        XWikiDocument xWikiDocument43 = mock(XWikiDocument.class);
 
         when(this.wiki.hasBacklinks(this.context)).thenReturn(true);
 
         when(this.query.execute()).thenReturn(List.of("xwiki.XWiki.Doc42", "xwiki.XWiki.Doc43"));
         when(this.resolver.resolve("xwiki.XWiki.Doc42")).thenReturn(doc42);
         when(this.resolver.resolve("xwiki.XWiki.Doc43")).thenReturn(doc43);
-        when(this.wiki.getDocument(doc42, this.context)).thenReturn(xWikiDocument42);
-        when(this.wiki.getDocument(doc43, this.context)).thenReturn(xWikiDocument43);
-        when(xWikiDocument42.getId()).thenReturn(42L);
-        when(xWikiDocument43.getId()).thenReturn(43L);
 
         this.migration.migrate();
 
         verify(this.query).setWiki("wiki1");
-        verify(this.taskManager).addTask("wiki1", 42L, "links");
-        verify(this.taskManager).addTask("wiki1", 43L, "links");
+        verify(this.taskManager).addTask("wiki1", -7672023672109484185L, "links");
+        verify(this.taskManager).addTask("wiki1", -3303915339101339304L, "links");
 
         assertEquals("[2] documents queued to task [links]", this.logCapture.getMessage(0));
         assertEquals(Level.INFO, this.logCapture.getLogEvent(0).getLevel());

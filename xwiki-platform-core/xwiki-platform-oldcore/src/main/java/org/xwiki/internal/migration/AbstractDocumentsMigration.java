@@ -20,7 +20,6 @@
 package org.xwiki.internal.migration;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -29,13 +28,9 @@ import org.slf4j.Logger;
 import org.xwiki.index.TaskManager;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * Allow to easily queue a document analysis task on a set documents to migrate. Sub-classes need to implement two
@@ -65,28 +60,13 @@ public abstract class AbstractDocumentsMigration extends AbstractHibernateDataMi
     @Override
     protected void hibernateMigrate() throws DataMigrationException
     {
-        List<XWikiDocument> documents = selectDocuments()
-            .stream()
-            .map(this::convert)
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .collect(toList());
-        logBeforeQueuingTasks(documents);
-        for (XWikiDocument document : documents) {
-            logBeforeQueuingTask(document);
-            this.taskManager.addTask(this.getXWikiContext().getWikiId(), document.getId(), getTaskType());
-        }
-    }
+        List<String> selectedDocuments = selectDocuments();
+        logBeforeQueuingTasks(selectedDocuments);
 
-    private Optional<XWikiDocument> convert(String documentReference)
-    {
-        XWikiContext context = getXWikiContext();
-        try {
-            return Optional.of(
-                context.getWiki().getDocument(this.documentReferenceResolver.resolve(documentReference), context));
-        } catch (XWikiException e) {
-            this.logger.error("Failed to resolve [{}]", documentReference, e);
-            return Optional.empty();
+        for (String documentReference : selectedDocuments) {
+            XWikiDocument document = new XWikiDocument(this.documentReferenceResolver.resolve(documentReference));
+            logBeforeQueuingTask(document);
+            this.taskManager.addTask(getXWikiContext().getWikiId(), document.getId(), getTaskType());
         }
     }
 
@@ -105,7 +85,7 @@ public abstract class AbstractDocumentsMigration extends AbstractHibernateDataMi
      *
      * @param documents the full list of documents that will be queued
      */
-    protected void logBeforeQueuingTasks(List<XWikiDocument> documents)
+    protected void logBeforeQueuingTasks(List<String> documents)
     {
         this.logger.info("[{}] documents queued to task [{}]", documents.size(), getTaskType());
     }

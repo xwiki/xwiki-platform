@@ -208,10 +208,11 @@ public class DefaultIOService implements IOService
             }
             for (BaseObject object : objects) {
                 // use the object number as annotation id
-                if (object != null && List.of(localTargetId, "")
-                    .contains(object.getStringValue(Annotation.TARGET_FIELD)))
-                {
-                    result.add(loadAnnotationFromObject(object, localTargetId));
+                if (object != null) {
+                    String targetField = object.getStringValue(Annotation.TARGET_FIELD);
+                    if (Objects.equals(localTargetId, targetField) || Objects.equals("", targetField)) {
+                        result.add(loadAnnotationFromObject(object, localTargetId));
+                    }
                 }
             }
             return result;
@@ -247,9 +248,8 @@ public class DefaultIOService implements IOService
             BaseObject object =
                 document.getXObject(this.configuration.getAnnotationClassReference(),
                     Integer.valueOf(annotationID));
-            if (object == null || !List.of(localTargetId, "")
-                .contains(object.getStringValue(Annotation.TARGET_FIELD)))
-            {
+            String targetField = object == null ? null : object.getStringValue(Annotation.TARGET_FIELD);
+            if (object == null || !(Objects.equals(localTargetId, targetField) || Objects.equals("", targetField))) {
                 return null;
             }
             // use the object number as annotation id

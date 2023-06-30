@@ -46,4 +46,4 @@ administration.templateProvider.creationRestrictions.none=Цей шаблон м
 administration.templateProvider.creationRestrictionsAreSuggestions=Обмеження створення як пропозиції
 administration.templateProvider.creationRestrictionsAreSuggestions.hint=Дозволяє користувачеві вибрати будь-яке розташування для створення сторінки з цим шаблоном, використовуючи перше обмеження створення як попередньо заповнене розташування за умовчанням, коли шаблон вибрано зі списку.
 </content>
-  </xwikidoc>
+</xwikidoc>

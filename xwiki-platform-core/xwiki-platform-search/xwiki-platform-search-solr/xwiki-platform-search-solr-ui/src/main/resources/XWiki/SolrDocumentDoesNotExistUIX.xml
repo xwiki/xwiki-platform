@@ -290,9 +290,10 @@
       #set ($suggestionDocument = $xwiki.getDocument($suggestionResultsDocReference))
       &lt;li&gt;&lt;a
       href="$escapetool.xml($suggestionDocument.getURL())"&gt;
-      #hierarchy($suggestionResultsDocReference,
-        {'label': $services.localization.render('web.hierarchy.label.document'),
-          'plain' : true, 'local' : true})
+      #hierarchy($suggestionResultsDocReference, {
+          'label': $services.model.serialize($docReference, 'local'),
+          'plain' : true, 'local' : true
+        })
       &lt;/a&gt;&lt;/li&gt;
     #end
     &lt;/ul&gt;

@@ -126,6 +126,8 @@
  *   excludeSelf: false, // whether the target reference has been excluded from the path
  *   selfIsActive: true, // whether the target reference should be marked as active or not
  *   limit: null // if any, enable the user to click on the ellipsis to expand the breadcrumb dynamically
+ *   label: '' // if any, generates a custom label which takes this value as a parameter
+ *      ! do not use a complete label here, only a readable name of the target object is expected. !
  * }
  * @param $entityReference (required if $option.limit is not null) the reference to the concerned entity.
  *#
@@ -147,12 +149,12 @@
     #end
   #end
   ## Set as a navigation role because it contains mostly links.
-  <nav aria-label="
+  <nav aria-label=
     #if("$!options.label" != '')
-      $escapetool.xml($services.localization.render('web.hierarchy.breadcrumb.label', [$options.label]))
+      "$escapetool.xml($services.localization.render('web.hierarchy.breadcrumb.label', [$options.label]))"
     #else
-      $escapetool.xml($services.localization.render('web.hierarchy.breadcrumb.label.empty'))
-    #end">
+      "$escapetool.xml($services.localization.render('web.hierarchy.breadcrumb.label.empty'))"
+    #end>
   <ol #if("$!options.id" != '')id="$options.id"#end class="$breadCrumbClassNames" $breadCrumbParameters>
   <li
     #foreach ($item in $pathData)
@@ -337,7 +339,7 @@
     #set ($discard = $path.add($doc.documentReference))
     #set ($options = {
       'id': 'hierarchy',
-      'label': $services.localization.render('web.hierarchy.label.currentPageParents'),
+      'label': $doc.getPageReference().getName(),
       'entities': {
         $doc.documentReference: $tdoc
       }

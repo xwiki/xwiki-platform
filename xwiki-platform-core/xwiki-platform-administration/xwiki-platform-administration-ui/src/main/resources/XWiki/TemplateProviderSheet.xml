@@ -184,7 +184,8 @@
           #set ($templateReference = $services.model.resolveDocument($template))
           #hierarchy($templateReference {
             'local': true,
-            'selfIsActive': false
+            'selfIsActive': false,
+            'label': $!escapetool.xml($services.localization.render($doc.getPageReference().getName()))
           })
         #end
       &lt;/dd&gt;

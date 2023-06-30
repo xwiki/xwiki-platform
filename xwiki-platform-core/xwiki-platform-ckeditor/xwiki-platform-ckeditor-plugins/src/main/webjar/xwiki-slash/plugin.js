@@ -244,8 +244,15 @@
   //----------------------------------
   var AutoComplete = CKEDITOR.plugins.autocomplete;
 
-  var View = AutoComplete.view;
-  var AdvancedView = function(editor) {
+  // Include the query in the view so that we can properly wait for the auto-complete drop-down in integration tests.
+  const originalAutoCompleteOpen = AutoComplete.prototype.open;
+  AutoComplete.prototype.open = function() {
+    originalAutoCompleteOpen.apply(this, arguments);
+    this.view.element.setAttribute('data-query', this.model.query);
+  };
+
+  var View = AutoComplete.view,
+  AdvancedView = function(editor) {
     // Call the parent class constructor.
     View.call(this, editor);
   };

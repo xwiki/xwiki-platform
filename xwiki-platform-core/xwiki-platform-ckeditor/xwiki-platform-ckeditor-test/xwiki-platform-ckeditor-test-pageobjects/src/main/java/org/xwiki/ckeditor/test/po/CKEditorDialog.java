@@ -20,8 +20,11 @@
 package org.xwiki.ckeditor.test.po;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.BaseElement;
+
+import static org.openqa.selenium.By.cssSelector;
 
 /**
  * Models a CKEditor Dialog.
@@ -34,7 +37,7 @@ import org.xwiki.test.ui.po.BaseElement;
 public class CKEditorDialog extends BaseElement
 {
     /**
-     * Creates a CKEditor Dialog instance.
+     * Creates a CKEditor dialog instance.
      */
     public CKEditorDialog()
     {
@@ -42,20 +45,25 @@ public class CKEditorDialog extends BaseElement
     }
 
     /**
-     * Clicks OK on a CKEditor dialog.
+     * Clicks the OK button to submit the CKEditor dialog.
      */
-    public void submitDialog()
+    public void submit()
     {
         getDriver().findElement(By.className("cke_dialog_ui_button_ok")).click();
         getDriver().waitUntilElementDisappears(By.className("cke_dialog_contents"));
     }
 
     /**
-     * Clicks close on a CKEditor dialog.
+     * Clicks on the Cancel button to close the CKEditor dialog.
      */
-    public void cancelDialog() 
+    public void cancel()
     {
         getDriver().findElement(By.className("cke_dialog_ui_button_cancel")).click();
         getDriver().waitUntilElementDisappears(By.className("cke_dialog_contents"));
+    }
+
+    protected WebElement getContainer()
+    {
+        return getDriver().findElement(cssSelector(".cke_dialog"));
     }
 }

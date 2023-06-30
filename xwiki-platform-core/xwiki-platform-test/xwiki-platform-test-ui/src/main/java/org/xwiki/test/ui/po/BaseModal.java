@@ -19,6 +19,8 @@
  */
 package org.xwiki.test.ui.po;
 
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -38,12 +40,16 @@ public class BaseModal extends BaseElement
     // so take care to create the modal before doing the action to open it.
     public BaseModal(By selector)
     {
-        this.container = getDriver().findElement(selector);
-        // The fade effect is deleted from the modal because there isn't an easy way for waiting on the modal to be
-        // shown. This fade in effect is also not necessary for the test.
-        String className = this.container.getAttribute("class");
-        className = className.replace("fade", "");
-        getDriver().executeScript("arguments[0].setAttribute(\"class\",arguments[1])", this.container, className);
+        List<WebElement> containers = getDriver().findElementsWithoutWaiting(selector);
+        if (!containers.isEmpty()) {
+            // The modal is present and most probably hidden.
+            this.container = containers.get(0);
+            // The fade effect is deleted from the modal because there isn't an easy way for waiting on the modal to be
+            // shown. This "fade in" effect is also not necessary for the test.
+            String className = this.container.getAttribute("class");
+            className = className.replace("fade", "");
+            getDriver().executeScript("arguments[0].setAttribute(\"class\",arguments[1])", this.container, className);
+        }
     }
 
     public String getTitle()

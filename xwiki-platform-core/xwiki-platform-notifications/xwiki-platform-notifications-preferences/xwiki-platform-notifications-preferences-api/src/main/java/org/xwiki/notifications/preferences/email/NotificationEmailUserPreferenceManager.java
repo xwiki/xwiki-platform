@@ -77,4 +77,18 @@ public interface NotificationEmailUserPreferenceManager
     {
         return this.getInterval();
     }
+
+    /**
+     * Retrieve the preferences related to email grouping strategy for the given user and the given interval.
+     * This method fallbacks on user's wiki preferences, then main wiki preferences, then global configuration.
+     * @param userReference the user for which to take the preferences
+     * @param interval the interval strategy for which to find the strategy to use
+     * @return the hint of the strategy to use
+     * @since 15.6RC1
+     */
+    @Unstable
+    default String getEmailGroupingStrategy(UserReference userReference, NotificationEmailInterval interval)
+    {
+        return "default";
+    }
 }

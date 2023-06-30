@@ -36,6 +36,8 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
 
+import com.xpn.xwiki.internal.event.XObjectPropertyAddedEvent;
+import com.xpn.xwiki.internal.event.XObjectPropertyDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
 import com.xpn.xwiki.objects.BaseObjectReference;
 
@@ -53,15 +55,15 @@ import static org.xwiki.extension.security.internal.configuration.DocConfigurati
  * @since 15.5RC1
  */
 @Component
-@Named(ExtensionSecurityConfigDelayXObjectPropertyUpdatedListener.NAME)
+@Named(ExtensionSecurityConfigDelayXObjectPropertyListener.NAME)
 @Singleton
-public class ExtensionSecurityConfigDelayXObjectPropertyUpdatedListener extends AbstractEventListener
+public class ExtensionSecurityConfigDelayXObjectPropertyListener extends AbstractEventListener
 
 {
     /**
      * The name of the event listener (and its component hint).
      */
-    public static final String NAME = "ExtensionSecurityConfigDelayXObjectPropertyUpdatedListener";
+    public static final String NAME = "ExtensionSecurityConfigDelayXObjectPropertyListener";
 
     private static final BaseObjectReference OBJECT_REFERENCE = new BaseObjectReference(XCLASS_REFERENCE, 0,
         new DocumentReference(XOBJECT_REFERENCE, new WikiReference(DEFAULT_MAIN_WIKI)));
@@ -75,9 +77,13 @@ public class ExtensionSecurityConfigDelayXObjectPropertyUpdatedListener extends 
     /**
      * Default constructor.
      */
-    public ExtensionSecurityConfigDelayXObjectPropertyUpdatedListener()
+    public ExtensionSecurityConfigDelayXObjectPropertyListener()
     {
-        super(NAME, List.of(new XObjectPropertyUpdatedEvent(OBJECT_PROPERTY_REFERENCE)));
+        super(NAME, List.of(
+            new XObjectPropertyAddedEvent(OBJECT_PROPERTY_REFERENCE),
+            new XObjectPropertyUpdatedEvent(OBJECT_PROPERTY_REFERENCE),
+            new XObjectPropertyDeletedEvent(OBJECT_PROPERTY_REFERENCE)
+        ));
     }
 
     @Override

@@ -20,25 +20,21 @@
 package org.xwiki.ckeditor.test.ui;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.NoAlertPresentException;
-import org.xwiki.ckeditor.test.po.CKEditor;
+import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.ckeditor.test.po.CKEditorDialog;
 import org.xwiki.ckeditor.test.po.MacroDialogEditModal;
-import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
-import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.ckeditor.test.po.image.ImageDialogSelectModal;
+import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
-import org.xwiki.test.ui.po.editor.WikiEditPage;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * All functional tests for Quick Actions.
@@ -47,7 +43,6 @@ import org.xwiki.test.ui.po.editor.WikiEditPage;
  * @since 15.5.1
  * @since 15.6RC1
  */
-
 @UITest(
     properties = {
         "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
@@ -66,450 +61,335 @@ import org.xwiki.test.ui.po.editor.WikiEditPage;
     },
     resolveExtraJARs = true
 )
-public class QuickActionsIT 
+public class QuickActionsIT extends AbstractCKEditorIT
 {
-
     /**
      * Test string that will be inserted to check formatting.
      */
     private static final String TEST_TEXT = "Hello, world!";
 
     @BeforeAll
-    void setUp(TestUtils setup)
+    void beforeAll(TestUtils setup, TestConfiguration testConfiguration) throws Exception
     {
-        // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
+        // Wait for Solr indexing to complete as the link search is based on Solr indexation.
+        setup.loginAsSuperAdmin();
+        waitForSolrIndexing(setup, testConfiguration);
+
         createAndLoginStandardUser(setup);
     }
 
     @BeforeEach
-    void cleanUp(TestUtils setup, TestReference testReference)
+    void beforeEach(TestUtils setup, TestReference testReference)
     {
-        setup.deletePage(testReference);
+        edit(setup, testReference);
     }
 
     @AfterEach
-    void exitEditMode(TestUtils setup, TestReference testReference)
+    void afterEach(TestUtils setup, TestReference testReference)
     {
-        if (setup.isInWYSIWYGEditMode() || setup.isInWikiEditMode()) {
-            // We pass the action because we don't want to wait for view mode to be loaded.
-            setup.gotoPage(testReference, "view");
-            try {
-                // Confirm the page leave (discard unsaved changes) if we are asked for.
-                setup.getDriver().switchTo().alert().accept();
-            } catch (NoAlertPresentException e) {
-                // Do nothing.
-            }
-        }
-    }
-
-    private static void createAndLoginStandardUser(TestUtils setup)
-    {
-        setup.createUserAndLogin("alice", "pa$$word", "editor", "Wysiwyg", "usertype", "Advanced");
+        maybeLeaveEditMode(setup, testReference);
     }
 
     @Test
     @Order(1)
-    void heading1AndParagraph(TestUtils setup, TestReference testReference) throws Exception
+    void heading1AndParagraph() throws Exception
     {
-        WYSIWYGEditPage editPage = setup.gotoPage(testReference).editWYSIWYG();
-        CKEditor editor = new CKEditor("content").waitToLoad();
-
-        RichTextAreaElement textArea = editor.getRichTextArea();
-
         // Switch to another style
-        textArea.sendKeys("/");
+        textArea.sendKeys("/hea");
         AutocompleteDropdown qa = new AutocompleteDropdown();
-        textArea.sendKeys("hea");
-        qa.waitForItemSelected("Heading 1");
+        qa.waitForItemSelected("/hea", "Heading 1");
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
 
         // Write some text
         textArea.sendKeys(TEST_TEXT);
 
-        Assertions.assertTrue(textArea.getContent().contains("<h1>" + TEST_TEXT + "<br></h1>"));
+        assertSourceEquals("= " + TEST_TEXT + " =");
+
+        // The rich text area is recreated when switching back to WYSIWYG mode.
+        textArea = editor.getRichTextArea();
 
         // Switch back to paragraph
-        textArea.sendKeys("/");
+        textArea.sendKeys("/parag");
         qa = new AutocompleteDropdown();
-        textArea.sendKeys("parag");
-        qa.waitForItemSelected("Paragraph");
+        qa.waitForItemSelected("/parag", "Paragraph");
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
 
-        Assertions.assertTrue(textArea.getContent().contains("<p>" + TEST_TEXT + "<br></p>"));
+        assertSourceEquals(TEST_TEXT);
     }
 
     @Test
     @Order(2)
-    void heading2(TestUtils setup, TestReference testReference) throws Exception
+    void heading2() throws Exception
     {
-        WYSIWYGEditPage editPage = setup.gotoPage(testReference).editWYSIWYG();
-        CKEditor editor = new CKEditor("content").waitToLoad();
-
-        RichTextAreaElement textArea = editor.getRichTextArea();
-
-        // Run the action
-        textArea.sendKeys("/");
+        textArea.sendKeys("/hea");
         AutocompleteDropdown qa = new AutocompleteDropdown();
-        textArea.sendKeys("hea");
-        qa.waitForItemSelected("Heading 1");
+        qa.waitForItemSelected("/hea", "Heading 1");
         textArea.sendKeys(Keys.DOWN);
-        qa.waitForItemSelected("Heading 2");
+        qa.waitForItemSelected("/hea", "Heading 2");
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
 
         // Write some text
         textArea.sendKeys(TEST_TEXT);
 
-        Assertions.assertTrue(textArea.getContent().contains("<h2>" + TEST_TEXT + "<br></h2>"));
+        assertSourceEquals("== " + TEST_TEXT + " ==");
     }
 
     @Test
     @Order(3)
-    void heading3(TestUtils setup, TestReference testReference) throws Exception
+    void heading3() throws Exception
     {
-        WYSIWYGEditPage editPage = setup.gotoPage(testReference).editWYSIWYG();
-        CKEditor editor = new CKEditor("content").waitToLoad();
-
-        RichTextAreaElement textArea = editor.getRichTextArea();
-
-        // Run the action
-        textArea.sendKeys("/");
+        textArea.sendKeys("/hea");
         AutocompleteDropdown qa = new AutocompleteDropdown();
-        textArea.sendKeys("hea");
-        qa.waitForItemSelected("Heading 1");
+        qa.waitForItemSelected("/hea", "Heading 1");
         textArea.sendKeys(Keys.DOWN, Keys.DOWN);
-        qa.waitForItemSelected("Heading 3");
+        qa.waitForItemSelected("/hea", "Heading 3");
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
 
         // Write some text
         textArea.sendKeys(TEST_TEXT);
 
-        Assertions.assertTrue(textArea.getContent().contains("<h3>" + TEST_TEXT + "<br></h3>"));
+        assertSourceEquals("=== " + TEST_TEXT + " ===");
     }
 
     @Test
     @Order(4)
-    void bulletedList(TestUtils setup, TestReference testReference) throws Exception
+    void bulletedList() throws Exception
     {
-        WYSIWYGEditPage editPage = setup.gotoPage(testReference).editWYSIWYG();
-        CKEditor editor = new CKEditor("content").waitToLoad();
-
-        RichTextAreaElement textArea = editor.getRichTextArea();
-
-        // Run the action
-        textArea.sendKeys("/");
+        textArea.sendKeys("/bu");
         AutocompleteDropdown qa = new AutocompleteDropdown();
-        textArea.sendKeys("bu");
-        qa.waitForItemSelected("Bulleted List");
+        qa.waitForItemSelected("/bu", "Bulleted List");
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
 
         // Write some text
         textArea.sendKeys(TEST_TEXT);
 
-        Assertions.assertTrue(textArea.getContent().contains("<ul><li>" + TEST_TEXT + "<br></li></ul>"));
+        assertSourceEquals("* " + TEST_TEXT);
     }
 
     @Test
     @Order(5)
-    void numberedList(TestUtils setup, TestReference testReference) throws Exception
+    void numberedList() throws Exception
     {
-        WYSIWYGEditPage editPage = setup.gotoPage(testReference).editWYSIWYG();
-        CKEditor editor = new CKEditor("content").waitToLoad();
-
-        RichTextAreaElement textArea = editor.getRichTextArea();
-
-        // Run the action
-        textArea.sendKeys("/");
+        textArea.sendKeys("/nu");
         AutocompleteDropdown qa = new AutocompleteDropdown();
-        textArea.sendKeys("nu");
-        qa.waitForItemSelected("Numbered List");
+        qa.waitForItemSelected("/nu", "Numbered List");
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
 
         // Write some text
         textArea.sendKeys(TEST_TEXT);
 
-        Assertions.assertTrue(textArea.getContent().contains("<ol><li>" + TEST_TEXT + "<br></li></ol>"));
+        assertSourceEquals("1. " + TEST_TEXT);
     }
 
     @Test
     @Order(6)
-    void table(TestUtils setup, TestReference testReference) throws Exception
+    void table() throws Exception
     {
-        WYSIWYGEditPage editPage = setup.gotoPage(testReference).editWYSIWYG();
-        CKEditor editor = new CKEditor("content").waitToLoad();
-
-        RichTextAreaElement textArea = editor.getRichTextArea();
-
-        // Run the action
-        textArea.sendKeys("/");
+        textArea.sendKeys("/tab");
         AutocompleteDropdown qa = new AutocompleteDropdown();
-        textArea.sendKeys("tab");
-        qa.waitForItemSelected("Table");
+        qa.waitForItemSelected("/tab", "Table");
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
 
         // Click OK on the table insertion dialog
-        new CKEditorDialog().submitDialog();
+        new CKEditorDialog().submit();
 
         // Write some text
         textArea.sendKeys(TEST_TEXT);
 
-        textArea.getContent().contains("<tbody><tr><td>" + TEST_TEXT + "<br></td><td><br></td></tr>"
-            + "<tr><td><br></td><td><br></td></tr>"
-            + "<tr><td><br></td><td><br></td></tr></tbody></table>");
+        assertSourceEquals("|" + TEST_TEXT + "| \n| | \n| | \n\n ");
     }
 
     @Test
     @Order(7)
-    void blockQuote(TestUtils setup, TestReference testReference) throws Exception
+    void blockQuote() throws Exception
     {
-        WYSIWYGEditPage editPage = setup.gotoPage(testReference).editWYSIWYG();
-        CKEditor editor = new CKEditor("content").waitToLoad();
-
-        RichTextAreaElement textArea = editor.getRichTextArea();
-
-        // Run the action
-        textArea.sendKeys("/");
+        textArea.sendKeys("/quo");
         AutocompleteDropdown qa = new AutocompleteDropdown();
-        textArea.sendKeys("quo");
-        qa.waitForItemSelected("Quote");
+        qa.waitForItemSelected("/quo", "Quote");
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
 
         // Write some text
         textArea.sendKeys(TEST_TEXT);
 
-        Assertions.assertTrue(textArea.getContent().contains("<blockquote><p>" + TEST_TEXT + "<br></p></blockquote>"));
+        assertSourceEquals(">" + TEST_TEXT);
     }
 
     @Test
     @Order(8)
-    void infoBox(TestUtils setup, TestReference testReference) throws Exception
+    void infoBox() throws Exception
     {
-        WYSIWYGEditPage editPage = setup.gotoPage(testReference).editWYSIWYG();
-        CKEditor editor = new CKEditor("content").waitToLoad();
-
-        RichTextAreaElement textArea = editor.getRichTextArea();
-
-        // Run the action
-        textArea.sendKeys("/");
+        textArea.sendKeys("/inf");
         AutocompleteDropdown qa = new AutocompleteDropdown();
-        textArea.sendKeys("inf");
-        qa.waitForItemSelected("Info Box");
+        qa.waitForItemSelected("/inf", "Info Box");
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
 
         textArea = editor.getRichTextArea();
         textArea.waitUntilContentEditable();
+        // Delete the default message text.
+        textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
+        textArea.sendKeys("my info message");
 
-        WikiEditPage wikiEditPage = editPage.clickSaveAndView().editWiki();
-        Assertions.assertTrue(wikiEditPage.getContent().contains("{{info}}\n"
-                + "Type your information message here.\n"
-                + "{{/info}}"));
+        assertSourceEquals("{{info}}\nmy info message\n{{/info}}\n\n ");
     }
 
     @Test
     @Order(9)
-    void successBox(TestUtils setup, TestReference testReference) throws Exception
+    void successBox() throws Exception
     {
-        WYSIWYGEditPage editPage = setup.gotoPage(testReference).editWYSIWYG();
-        CKEditor editor = new CKEditor("content").waitToLoad();
-
-        RichTextAreaElement textArea = editor.getRichTextArea();
-
-        // Run the action
-        textArea.sendKeys("/");
+        textArea.sendKeys("/suc");
         AutocompleteDropdown qa = new AutocompleteDropdown();
-        textArea.sendKeys("suc");
-        qa.waitForItemSelected("Success Box");
+        qa.waitForItemSelected("/suc", "Success Box");
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
 
         textArea = editor.getRichTextArea();
         textArea.waitUntilContentEditable();
+        // Delete the default message text.
+        textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
+        textArea.sendKeys("my success message");
 
-        WikiEditPage wikiEditPage = editPage.clickSaveAndView().editWiki();
-        Assertions.assertTrue(wikiEditPage.getContent().contains("{{success}}\n"
-                + "Type your success message here.\n"
-                + "{{/success}}"));
+        assertSourceEquals("{{success}}\nmy success message\n{{/success}}\n\n ");
     }
+
     @Test
     @Order(10)
-    void warningBox(TestUtils setup, TestReference testReference) throws Exception
+    void warningBox() throws Exception
     {
-        WYSIWYGEditPage editPage = setup.gotoPage(testReference).editWYSIWYG();
-        CKEditor editor = new CKEditor("content").waitToLoad();
-
-        RichTextAreaElement textArea = editor.getRichTextArea();
-
-        // Run the action
-        textArea.sendKeys("/");
+        textArea.sendKeys("/war");
         AutocompleteDropdown qa = new AutocompleteDropdown();
-        textArea.sendKeys("war");
-        qa.waitForItemSelected("Warning Box");
+        qa.waitForItemSelected("/war", "Warning Box");
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
 
         textArea = editor.getRichTextArea();
         textArea.waitUntilContentEditable();
+        // Delete the default message text.
+        textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
+        textArea.sendKeys("my warning message");
 
-        WikiEditPage wikiEditPage = editPage.clickSaveAndView().editWiki();
-        Assertions.assertTrue(wikiEditPage.getContent().contains("{{warning}}\n"
-                + "Type your warning message here.\n"
-                + "{{/warning}}"));
+        assertSourceEquals("{{warning}}\nmy warning message\n{{/warning}}\n\n ");
     }
 
     @Test
     @Order(11)
-    void errorBox(TestUtils setup, TestReference testReference) throws Exception
+    void errorBox() throws Exception
     {
-        WYSIWYGEditPage editPage = setup.gotoPage(testReference).editWYSIWYG();
-        CKEditor editor = new CKEditor("content").waitToLoad();
-
-        RichTextAreaElement textArea = editor.getRichTextArea();
-
-        // Run the action
-        textArea.sendKeys("/");
+        textArea.sendKeys("/err");
         AutocompleteDropdown qa = new AutocompleteDropdown();
-        textArea.sendKeys("err");
-        qa.waitForItemSelected("Error Box");
+        qa.waitForItemSelected("/err", "Error Box");
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
 
         textArea = editor.getRichTextArea();
         textArea.waitUntilContentEditable();
+        // Delete the default message text.
+        textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
+        textArea.sendKeys("my error message");
 
-        WikiEditPage wikiEditPage = editPage.clickSaveAndView().editWiki();
-        Assertions.assertTrue(wikiEditPage.getContent().contains("{{error}}\n"
-                + "Type your error message here.\n"
-                + "{{/error}}"));
+        assertSourceEquals("{{error}}\nmy error message\n{{/error}}\n\n ");
     }
 
     @Test
     @Order(12)
-    void divider(TestUtils setup, TestReference testReference) throws Exception
+    void divider() throws Exception
     {
-        WYSIWYGEditPage editPage = setup.gotoPage(testReference).editWYSIWYG();
-        CKEditor editor = new CKEditor("content").waitToLoad();
-
-        RichTextAreaElement textArea = editor.getRichTextArea();
-
-        // Run the action
-        textArea.sendKeys("/");
+        textArea.sendKeys("/div");
         AutocompleteDropdown qa = new AutocompleteDropdown();
-        textArea.sendKeys("div");
-        qa.waitForItemSelected("Divider");
+        qa.waitForItemSelected("/div", "Divider");
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
 
-        Assertions.assertTrue(textArea.getContent().contains("<hr>"));
+        assertSourceEquals("----\n\n ");
     }
 
     @Test
     @Order(13)
-    void link(TestUtils setup, TestReference testReference) throws Exception
+    void link() throws Exception
     {
-        WYSIWYGEditPage editPage = setup.gotoPage(testReference).editWYSIWYG();
-        CKEditor editor = new CKEditor("content").waitToLoad();
-
-        RichTextAreaElement textArea = editor.getRichTextArea();
-
-        // Run the action
-        textArea.sendKeys("/");
+        textArea.sendKeys("/lin");
         AutocompleteDropdown qa = new AutocompleteDropdown();
-        textArea.sendKeys("lin");
-        qa.waitForItemSelected("Link");
+        qa.waitForItemSelected("/lin", "Link");
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
 
-        textArea.sendKeys("ali");
         AutocompleteDropdown link = new AutocompleteDropdown();
-        link.waitForItemSelected("alice");
-        Assertions.assertTrue(textArea.getText().contains("["));
+        textArea.sendKeys("ali");
+        link.waitForItemSelected("[ali", "alice");
+        textArea.sendKeys(Keys.ENTER);
+        link.waitForItemSubmitted();
+
+        assertSourceEquals("[[alice>>XWiki.alice]] ");
     }
 
     @Test
     @Order(14)
-    void image(TestUtils setup, TestReference testReference) throws Exception
+    void image() throws Exception
     {
-        WYSIWYGEditPage editPage = setup.gotoPage(testReference).editWYSIWYG();
-        CKEditor editor = new CKEditor("content").waitToLoad();
-
-        RichTextAreaElement textArea = editor.getRichTextArea();
-
-        // Run the action
-        textArea.sendKeys("/");
+        textArea.sendKeys("/im");
         AutocompleteDropdown qa = new AutocompleteDropdown();
-        textArea.sendKeys("im");
-        qa.waitForItemSelected("Image");
+        qa.waitForItemSelected("/im", "Image");
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
 
-        new ImageDialogSelectModal().waitUntilReady().clickCancel();
+        new ImageDialogSelectModal().close();
     }
 
     @Test
     @Order(15)
-    void mention(TestUtils setup, TestReference testReference) throws Exception
+    void mention() throws Exception
     {
-        WYSIWYGEditPage editPage = setup.gotoPage(testReference).editWYSIWYG();
-        CKEditor editor = new CKEditor("content").waitToLoad();
-
-        RichTextAreaElement textArea = editor.getRichTextArea();
-
-        // Run the action
-        textArea.sendKeys("/");
+        textArea.sendKeys("/men");
         AutocompleteDropdown qa = new AutocompleteDropdown();
-        textArea.sendKeys("men");
-        qa.waitForItemSelected("Mention");
+        qa.waitForItemSelected("/men", "Mention");
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
 
         AutocompleteDropdown mention = new AutocompleteDropdown();
-        mention.waitForItemSelected("alice");
-        Assertions.assertTrue(textArea.getText().contains("@"));
+        textArea.sendKeys("al");
+        mention.waitForItemSelected("@al", "alice");
+        textArea.sendKeys(Keys.ENTER);
+        mention.waitForItemSubmitted();
+        // The mention is inserted as a macro, which means the rich text area is made read-only while the entire content
+        // is re-rendered (refreshed).
+        textArea.waitUntilContentEditable();
+
+        assertSourceContains("{{mention reference=\"XWiki.alice\"");
     }
 
     @Test
     @Order(16)
-    void emoji(TestUtils setup, TestReference testReference) throws Exception
+    void emoji() throws Exception
     {
-        WYSIWYGEditPage editPage = setup.gotoPage(testReference).editWYSIWYG();
-        CKEditor editor = new CKEditor("content").waitToLoad();
-
-        RichTextAreaElement textArea = editor.getRichTextArea();
-
-        // Run the action
-        textArea.sendKeys("/");
+        textArea.sendKeys("/emo");
         AutocompleteDropdown qa = new AutocompleteDropdown();
-        textArea.sendKeys("emo");
-        qa.waitForItemSelected("Emoji");
+        qa.waitForItemSelected("/emo", "Emoji");
         textArea.sendKeys(Keys.ENTER);
 
         AutocompleteDropdown emoji = new AutocompleteDropdown();
-        emoji.waitForItemSelected("🛩");
-        Assertions.assertTrue(textArea.getText().contains(":sm"));
+        assertEquals("🛩", emoji.getSelectedItem().getLabel());
+        textArea.sendKeys(Keys.BACK_SPACE, Keys.BACK_SPACE, "cat");
+        emoji.waitForItemSelected(":cat", "🐈");
+        textArea.sendKeys(Keys.ENTER);
+
+        assertSourceEquals("🐈");
     }
 
     @Test
     @Order(17)
-    void include(TestUtils setup, TestReference testReference) throws Exception
+    void include() throws Exception
     {
-        WYSIWYGEditPage editPage = setup.gotoPage(testReference).editWYSIWYG();
-        CKEditor editor = new CKEditor("content").waitToLoad();
-
-        RichTextAreaElement textArea = editor.getRichTextArea();
-
-        // Run the action
-        textArea.sendKeys("/");
+        textArea.sendKeys("/inc");
         AutocompleteDropdown qa = new AutocompleteDropdown();
-        textArea.sendKeys("inc");
-        qa.waitForItemSelected("Include Page");
+        qa.waitForItemSelected("/inc", "Include Page");
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
 
@@ -519,24 +399,16 @@ public class QuickActionsIT
         textArea = editor.getRichTextArea();
         textArea.waitUntilContentEditable();
 
-        WikiEditPage wikiEditPage = editPage.clickSaveAndView().editWiki();
-        Assertions.assertTrue(wikiEditPage.getContent().contains("{{include/}}"));
+        assertSourceEquals("{{include/}}");
     }
 
     @Test
     @Order(18)
-    void code(TestUtils setup, TestReference testReference) throws Exception
+    void code() throws Exception
     {
-        WYSIWYGEditPage editPage = setup.gotoPage(testReference).editWYSIWYG();
-        CKEditor editor = new CKEditor("content").waitToLoad();
-
-        RichTextAreaElement textArea = editor.getRichTextArea();
-
-        // Run the action
-        textArea.sendKeys("/");
+        textArea.sendKeys("/cod");
         AutocompleteDropdown qa = new AutocompleteDropdown();
-        textArea.sendKeys("cod");
-        qa.waitForItemSelected("Code Snippet");
+        qa.waitForItemSelected("/cod", "Code Snippet");
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
 
@@ -546,52 +418,36 @@ public class QuickActionsIT
         textArea = editor.getRichTextArea();
         textArea.waitUntilContentEditable();
 
-        WikiEditPage wikiEditPage = editPage.clickSaveAndView().editWiki();
-        Assertions.assertTrue(wikiEditPage.getContent().contains("{{code language=\"none\"}}{{/code}}"));
+        assertSourceEquals("{{code language=\"none\"}}{{/code}}");
     }
 
     @Test
     @Order(19)
-    void toc(TestUtils setup, TestReference testReference) throws Exception
+    void toc() throws Exception
     {
-        WYSIWYGEditPage editPage = setup.gotoPage(testReference).editWYSIWYG();
-        CKEditor editor = new CKEditor("content").waitToLoad();
-
-        RichTextAreaElement textArea = editor.getRichTextArea();
-
-        // Run the action
-        textArea.sendKeys("/");
+        textArea.sendKeys("/toc");
         AutocompleteDropdown qa = new AutocompleteDropdown();
-        textArea.sendKeys("toc");
-        qa.waitForItemSelected("Table of Contents");
+        qa.waitForItemSelected("/toc", "Table of Contents");
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
 
         textArea = editor.getRichTextArea();
         textArea.waitUntilContentEditable();
 
-        WikiEditPage wikiEditPage = editPage.clickSaveAndView().editWiki();
-        Assertions.assertTrue(wikiEditPage.getContent().contains("{{toc/}}"));
+        assertSourceEquals("{{toc/}}\n");
     }
 
     @Test
     @Order(20)
-    void find(TestUtils setup, TestReference testReference) throws Exception
+    void find() throws Exception
     {
-        WYSIWYGEditPage editPage = setup.gotoPage(testReference).editWYSIWYG();
-        CKEditor editor = new CKEditor("content").waitToLoad();
-
-        RichTextAreaElement textArea = editor.getRichTextArea();
-
-        // Run the action
-        textArea.sendKeys("/");
+        textArea.sendKeys("/fin");
         AutocompleteDropdown qa = new AutocompleteDropdown();
-        textArea.sendKeys("fin");
-        qa.waitForItemSelected("Find and Replace");
+        qa.waitForItemSelected("/fin", "Find and Replace");
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
 
         // Click close on the Find and Replace dialog
-        new CKEditorDialog().cancelDialog();
+        new CKEditorDialog().cancel();
     }
 }

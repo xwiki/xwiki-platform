@@ -61,4 +61,10 @@ public class AllIT
     class NestedQuickActionsIT extends QuickActionsIT
     {
     }
+
+    @Nested
+    @DisplayName("Undo / Redo")
+    class NestedUndoRedoIT extends UndoRedoIT
+    {
+    }
 }

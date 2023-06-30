@@ -23,8 +23,6 @@ import java.time.Duration;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.xwiki.ckeditor.test.po.image.ImageDialogEditModal;
-import org.xwiki.ckeditor.test.po.image.ImageDialogSelectModal;
 import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.BaseElement;
@@ -86,51 +84,41 @@ public class CKEditor extends BaseElement
     }
 
     /**
+     * @return the page object used to interact with the CKEditor tool bar
+     * @since 15.5.1
+     * @since 15.6RC1
+     */
+    public CKEditorToolBar getToolBar()
+    {
+        return new CKEditorToolBar(this);
+    }
+
+    /**
      * @return the rich text area
      */
     public RichTextAreaElement getRichTextArea()
     {
         // The in-line frame element is renewed while editing so we can't cache it.
-        return new RichTextAreaElement((WebElement) getDriver().executeScript(
-            "return CKEDITOR.instances[arguments[0]].ui.contentsElement.find('iframe').getItem(0).$;", this.name));
+        return new RichTextAreaElement(getIframe());
     }
 
     /**
-     * Click on the CKEditor image button.
-     *
-     * @return a page object for the image selection modal
-     * @since 14.7RC1
+     * @return the source text area, but you need to switch to Source first
      */
-    public ImageDialogSelectModal clickImageButton()
+    public WebElement getSourceTextArea()
     {
-        internalClickImageButton();
-        return new ImageDialogSelectModal().waitUntilReady();
+        return getDriver().findElementWithoutWaiting(getContainer(), By.className("cke_source"));
     }
 
-    /**
-     * Click on the link button on the toolbar.
-     *
-     * @return the page object to interact with the link selection modal
-     * @since 15.0RC1
-     * @since 14.10.3
-     */
-    public LinkSelectorModal clickLinkButton()
+    WebElement getContainer()
     {
-        getDriver().findElement(By.className("cke_button__link_icon")).click();
-        return new LinkSelectorModal();
+        return (WebElement) getDriver().executeScript("return CKEDITOR.instances[arguments[0]].container.$;",
+            this.name);
     }
 
-    /**
-     * Click on the CKEditor image button when an image widget is on focus (i.e., the image modal will be opened in edit
-     * mode).
-     *
-     * @return a page object for the image edit modal
-     * @since 14.8RC1
-     */
-    public ImageDialogEditModal clickImageButtonWhenImageExists()
+    private WebElement getIframe()
     {
-        internalClickImageButton();
-        return new ImageDialogEditModal().waitUntilReady();
+        return getDriver().findElementWithoutWaiting(getContainer(), By.className("cke_wysiwyg_frame"));
     }
 
     /**
@@ -142,15 +130,10 @@ public class CKEditor extends BaseElement
     public void executeOnIframe(Runnable runnable)
     {
         try {
-            getDriver().switchTo().frame(getDriver().findElement(By.cssSelector("iframe.cke_wysiwyg_frame")));
+            getDriver().switchTo().frame(getIframe());
             runnable.run();
         } finally {
             getDriver().switchTo().parentFrame();
         }
-    }
-
-    private void internalClickImageButton()
-    {
-        getDriver().findElement(By.className("cke_button__image_icon")).click();
     }
 }

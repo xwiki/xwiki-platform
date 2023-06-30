@@ -24,7 +24,7 @@ import org.openqa.selenium.WebElement;
 import org.xwiki.ckeditor.test.po.image.select.ImageDialogIconSelectForm;
 import org.xwiki.ckeditor.test.po.image.select.ImageDialogTreeSelectForm;
 import org.xwiki.ckeditor.test.po.image.select.ImageDialogUrlSelectForm;
-import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.test.ui.po.BaseModal;
 
 /**
  * Page Object for the image selection modal.
@@ -32,17 +32,24 @@ import org.xwiki.test.ui.po.BaseElement;
  * @version $Id$
  * @since 14.7RC1
  */
-public class ImageDialogSelectModal extends BaseElement
+public class ImageDialogSelectModal extends BaseModal
 {
     /**
-     * Wait until the modal is loaded.
-     *
-     * @return the current page object
+     * Default constructor.
      */
-    public ImageDialogSelectModal waitUntilReady()
+    public ImageDialogSelectModal()
     {
-        getDriver().waitUntilElementIsVisible(By.className("image-selector-modal"));
-        return this;
+        this(By.className("image-selector-modal"));
+    }
+
+    private ImageDialogSelectModal(By selector)
+    {
+        super(selector);
+
+        // This modal is added on demand so we can't rely on the base constructor to remove the "fade in" effect. We
+        // have to do the wait ourselves.
+        getDriver().waitUntilElementIsVisible(selector);
+        this.container = getDriver().findElementWithoutWaiting(selector);
     }
 
     /**
@@ -52,22 +59,10 @@ public class ImageDialogSelectModal extends BaseElement
      */
     public ImageDialogEditModal clickSelect()
     {
-        WebElement element = getDriver().findElement(By.cssSelector(".image-selector-modal .btn-primary"));
+        WebElement element = this.container.findElement(By.className("btn-primary"));
         getDriver().waitUntilElementIsEnabled(element);
         element.click();
-        return new ImageDialogEditModal().waitUntilReady();
-    }
-
-    /**
-     * Click on the cancel button.
-     *
-     * @since 15.5.1
-     * @since 15.6RC1
-     */
-    public void clickCancel()
-    {
-        getDriver().findElement(By.cssSelector(".image-selector-modal .btn-default")).click();
-        getDriver().waitUntilElementDisappears(By.className("image-selector-modal"));
+        return new ImageDialogEditModal();
     }
 
     /**
@@ -77,8 +72,7 @@ public class ImageDialogSelectModal extends BaseElement
      */
     public ImageDialogTreeSelectForm switchToTreeTab()
     {
-        getDriver().findElement(By.cssSelector(".image-selector-modal .image-selector a[href='#documentTree-0']"))
-            .click();
+        this.container.findElement(By.cssSelector(".image-selector a[href='#documentTree-0']")).click();
         return new ImageDialogTreeSelectForm();
     }
 
@@ -89,7 +83,7 @@ public class ImageDialogSelectModal extends BaseElement
      */
     public ImageDialogIconSelectForm switchToIconTab()
     {
-        getDriver().findElement(By.cssSelector(".image-selector-modal .image-selector a[href='#iconTab-0']")).click();
+        this.container.findElement(By.cssSelector(".image-selector a[href='#iconTab-0']")).click();
         return new ImageDialogIconSelectForm();
     }
 
@@ -100,7 +94,7 @@ public class ImageDialogSelectModal extends BaseElement
      */
     public ImageDialogUrlSelectForm switchToUrlTab()
     {
-        getDriver().findElement(By.cssSelector(".image-selector-modal .image-selector a[href='#urlTab-0']")).click();
+        this.container.findElement(By.cssSelector(".image-selector a[href='#urlTab-0']")).click();
         return new ImageDialogUrlSelectForm();
     }
 }

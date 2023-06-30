@@ -98,7 +98,7 @@
       #template('hierarchy_macros.vm')
       #hierarchy($event.document, {
       'id': 'hierarchy',
-      'label': $services.localization.render('web.hierarchy.label.currentPageParents'),
+      'label': $doc.getPageReference().getName(),
       'limit': 5, 'treeNavigation': false, 'plain': true})
     </div>
     #set ($document = $xwiki.getDocument($event.document))

@@ -54,7 +54,6 @@
   &lt;ul class="paths"&gt;
     #set ($hierarchyOptions = {
       'local': true,
-      'label': $services.localization.render('web.hierarchy.label.selectedPath')
       'selfIsActive': false
     })
     #set ($paths = $doc.getValue($property))
@@ -66,6 +65,7 @@
             value="$escapetool.xml($path)" /&gt;
         #end
         #set ($spaceReference = $services.model.resolveSpace($path))
+        #set ($discard = $hierarchyOptions.put('label', $escapetool.xml($path)))
         #hierarchy($spaceReference $hierarchyOptions)
       &lt;/li&gt;
     #end

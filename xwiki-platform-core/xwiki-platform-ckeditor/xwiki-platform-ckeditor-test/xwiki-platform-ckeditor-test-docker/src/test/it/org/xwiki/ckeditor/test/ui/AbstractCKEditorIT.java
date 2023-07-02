@@ -19,7 +19,7 @@
  */
 package org.xwiki.ckeditor.test.ui;
 
-import org.openqa.selenium.NoAlertPresentException;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.repository.test.SolrTestUtils;
@@ -80,10 +80,15 @@ public abstract class AbstractCKEditorIT
             // We pass the action because we don't want to wait for view mode to be loaded.
             setup.gotoPage(testReference, "view");
             try {
+                // The page leave confirmation is not displayed right away so we have to wait for it. This is not
+                // optimal because the alert might no be shown at all, but most of the tests are leaving the editor with
+                // unsaved changes.
+                setup.getDriver().waitUntilCondition(ExpectedConditions.alertIsPresent());
                 // Confirm the page leave (discard unsaved changes) if we are asked for.
                 setup.getDriver().switchTo().alert().accept();
-            } catch (NoAlertPresentException e) {
-                // Do nothing.
+            } catch (Exception e) {
+                // The page leave confirmation hasn't been shown, probably because there were no unsaved changes.
+                // Continue with the rest of the tests.
             }
         }
     }

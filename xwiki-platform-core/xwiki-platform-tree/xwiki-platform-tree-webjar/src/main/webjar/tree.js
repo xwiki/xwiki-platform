@@ -713,6 +713,13 @@ define([
       }
     }).on('xtree.openContextMenu', function(event, data) {
       var selectedNodes = data.tree.get_selected(true);
+
+      for (const [key, value] of Object.entries(data.menu)) {
+        var allowingPropertyName = "can" + key[0].toUpperCase() + key.substr(1);
+        value._disabled = (data.node.data && data.node.data[allowingPropertyName] != undefined
+                        && !data.node.data[allowingPropertyName]);
+      }
+
       if (data.menu.copy) {
         data.menu.copy._disabled = !canCopyNodes(selectedNodes);
       }
@@ -728,9 +735,6 @@ define([
       if (data.menu.remove) {
         data.menu.remove._disabled = !canRemoveNodes(selectedNodes);
       }
-      // TODO: allow to use generic check for actions (e.g. canAdminister, canDoStuff)
-
-
     }).on('changed.jstree', function(event, data) {
       if (data.instance.settings.xwiki && typeof data.instance.settings.xwiki.fieldName !== 'undefined') {
         var fieldName = data.instance.settings.xwiki.fieldName;

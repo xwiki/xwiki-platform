@@ -376,7 +376,7 @@
       'canDelete': $canDeleteDoc,
       'canMove': $canDeleteDoc,
       'canCopy': $canViewDoc,
-      'canAdminister': $canAdminister,
+      'canAdminister': $canAdministerDoc,
       'createDocumentURL': $xwiki.getURL($documentReference, 'create', $NULL),
       'deleteURL': $xwiki.getURL($documentReference, 'delete', $NULL),
       'copyURL': $xwiki.getURL($documentReference, 'view', 'xpage=copy'),

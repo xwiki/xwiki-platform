@@ -686,6 +686,31 @@ define([
     // Enable/Disable context menu items before the context menu is shown.
     //
 
+    }).on('xtree.contextMenu.copyToClipboard', function(event, data) {
+      var tree = $.jstree.reference(data.reference);
+      var node = tree.get_node(data.reference);
+      var copyValue = function (value) {
+        var tempNode = $('<input class="clipboard-tempelement" type="text">');
+        $('body').append(tempNode);
+        tempNode.val(value);
+        // We need to display the node so that the copy to clipboard is working but we don't want
+        // users to see it so we just put it to an absurd position. 
+        tempNode.css('position', 'absolute');
+        tempNode.css('left', '-10000px');
+        tempNode.select();
+        document.execCommand("copy");
+        tempNode.remove();
+        if (XWiki.widgets.Notification !== 'undefined') {
+          var successMessage = (data.parameters.successMessage) ? data.parameters.successMessage :
+          'Copied to clipboard';
+          new XWiki.widgets.Notification(successMessage, 'info');
+        }
+      }
+      if (data.parameters.dataToCopy) {
+        copyValue(node.data[data.parameters.dataToCopy]);
+      } else {
+        copyValue(node.data.id);
+      }
     }).on('xtree.openContextMenu', function(event, data) {
       var selectedNodes = data.tree.get_selected(true);
       if (data.menu.copy) {

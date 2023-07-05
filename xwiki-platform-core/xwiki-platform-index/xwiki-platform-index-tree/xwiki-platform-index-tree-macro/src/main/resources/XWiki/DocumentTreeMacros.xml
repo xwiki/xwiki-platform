@@ -933,7 +933,11 @@
     'copyReference': {
       'label': 'Copy reference',
       'separator_before': true,
-      'icon': 'fa fa-paste'
+      'icon': 'fa fa-paste',
+      'action': 'copyToClipboard',
+      'parameters': {
+        'successMessage': 'The reference has been copied to clipboard.'
+      }
     },
     'administer': {
       'label': 'Administer',

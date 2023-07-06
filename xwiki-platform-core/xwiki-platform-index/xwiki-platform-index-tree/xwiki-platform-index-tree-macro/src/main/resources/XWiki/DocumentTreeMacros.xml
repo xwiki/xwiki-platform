@@ -385,7 +385,8 @@
       'administerURL': $xwiki.getURL($adminDocumentReference, 'admin', $NULL)
     },
     'a_attr': {
-      'href': $xwiki.getURL($documentReference)
+      'href': $xwiki.getURL($documentReference),
+      'title': $label
     }
   }))
 #end

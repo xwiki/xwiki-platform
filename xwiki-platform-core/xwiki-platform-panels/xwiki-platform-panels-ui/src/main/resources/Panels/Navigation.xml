@@ -232,7 +232,7 @@
     + $services.model.serialize($exclusionReference, 'local')))
 #end
 #set ($exclusions = $stringtool.join($exclusions, ','))
-{{documentTree showTranslations="false" showAttachments="false" compact="true" openTo="document:$openToDoc"
+{{documentTree showTranslations="false" showAttachments="false" compact="true" readOnly="false" openTo="document:$openToDoc"
   exclusions="$exclusions" /}}
 #panelfooter()
 {{/velocity}}</content>

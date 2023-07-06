@@ -443,7 +443,8 @@ define([
       },
       plugins: [],
       contextmenu: {
-        items: getContextMenuItems
+        items: getContextMenuItems,
+        select_node: element.hasClass('jstree-no-links')
       },
       dnd: {
         is_draggable: areDraggable

@@ -706,7 +706,7 @@ define([
           'Copied to clipboard';
           new XWiki.widgets.Notification(successMessage, 'info');
         }
-      }
+      };
       if (data.parameters.dataToCopy) {
         copyValue(node.data[data.parameters.dataToCopy]);
       } else {
@@ -717,8 +717,8 @@ define([
 
       for (const [key, value] of Object.entries(data.menu)) {
         var allowingPropertyName = "can" + key[0].toUpperCase() + key.substr(1);
-        value._disabled = (data.node.data && data.node.data[allowingPropertyName] != undefined
-                        && !data.node.data[allowingPropertyName]);
+        value._disabled = (data.node.data && data.node.data[allowingPropertyName] != undefined &&
+          !data.node.data[allowingPropertyName]);
       }
 
       if (data.menu.copy) {

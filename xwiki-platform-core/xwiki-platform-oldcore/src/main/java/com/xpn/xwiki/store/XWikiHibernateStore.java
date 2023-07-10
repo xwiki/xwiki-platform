@@ -2523,8 +2523,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 String statement = sql;
 
                 if (whereParams != null) {
-                    statement += generateWhereStatement(whereParams,
-                        legacyOrdinal ? -1 : CollectionUtils.size(parameterValues.size()));
+                    statement +=
+                        generateWhereStatement(whereParams, legacyOrdinal ? -1 : CollectionUtils.size(parameterValues));
                 }
 
                 statement = filterSQL(statement);

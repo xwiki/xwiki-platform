@@ -252,10 +252,10 @@
                 #set ($currentTab = 'templates')
               #end
               &lt;dd class="flavor_template"&gt;
-                &lt;ul class="xwikitabbar"&gt;
-                  &lt;li #if($currentTab=='flavors')class="active"#end&gt;&lt;a href="#flavors"&gt;$services.localization.render('platform.wiki.create.wizard.flavortemplate.flavorTab')&lt;/a&gt;&lt;/li&gt;
-                  &lt;li #if($currentTab=='templates')class="active"#end&gt;&lt;a href="#templates"&gt;$services.localization.render('platform.wiki.create.wizard.flavortemplate.templateTab')&lt;/a&gt;&lt;/li&gt;
-                &lt;/ul&gt;
+                &lt;div class="xwikitabbar"&gt;
+                  &lt;button #if($currentTab=='flavors')class="active"#end&gt;&lt;a href="#flavors"&gt;$services.localization.render('platform.wiki.create.wizard.flavortemplate.flavorTab')&lt;/a&gt;&lt;/button&gt;
+                  &lt;button #if($currentTab=='templates')class="active"#end&gt;&lt;a href="#templates"&gt;$services.localization.render('platform.wiki.create.wizard.flavortemplate.templateTab')&lt;/a&gt;&lt;/button&gt;
+                &lt;/div&gt;
                 &lt;div class="xwiki-createwiki-tabs-content"&gt;
                   #set ($defaultFlavor = "$!request.flavor")
                   #if ($defaultFlavor == '')
@@ -460,7 +460,7 @@
     {{warning}}
       {{translation key="platform.wiki.csrf.error" /}}
     {{/warning}}
-    
+
     #stepMembers()
   #elseif("$!state" != '' &amp;&amp; $state != 'NONE')
     #creation()

@@ -11,7 +11,7 @@
 #rightPanels, #leftPanels,
 #mainmenu, #contentmenu, #menuview, #editmenu,
 #globallinks, #footerglobal,
-#commentform, .xwikitabbar button, #Historyshortcut, #Informationshortcut, .separator,
+#commentform, .xwikitabbar li, .xwikitabbar button, #Historyshortcut, #Informationshortcut, .separator,
 .commentheader .commenttools a, a.tag-delete , .tag-add a {
   display: none !important;
 }
@@ -38,7 +38,7 @@
   background-color: white;
 }
 
-.xwikitabbar button.active {
+.xwikitabbar button.active, .xwikitabbar li.active {
   display: block;
 }
 

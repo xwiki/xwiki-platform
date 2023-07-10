@@ -542,7 +542,7 @@ require(['scriptaculous/effects'], function() {
   height: 16px;
 }
 
-.panel-width-Medium .applicationsPanel li .application-img, 
+.panel-width-Medium .applicationsPanel li .application-img,
 .panel-width-Large .applicationsPanel li .application-img {
   display: block;
   float: left;
@@ -560,6 +560,12 @@ require(['scriptaculous/effects'], function() {
 .applicationPanelMoreContainer li a {
   font-size: 90%;
   line-height: 16px;
+}
+
+.applicationPanelMoreContainer > ul > li > a {
+  display: flex;
+  align-items: center;
+  gap: 1em;
 }
 
 .panel-width-Small .panel.Applications {
@@ -621,6 +627,10 @@ require(['scriptaculous/effects'], function() {
   color: $theme.textPrimaryColor;
 }
 
+.panel-width-Small .applicationPanelMoreContainer > ul > li > a {
+  justify-content: center;
+}
+
 .panel-width-Small .application-img {
   font-size: 24px;
 }
@@ -649,7 +659,7 @@ require(['scriptaculous/effects'], function() {
 .panel-width-Large .applicationsPanel &gt; li &gt; a:focus,
 .panel-width-Large .applicationsPanelMoreList &gt; li &gt; a:hover,
 .panel-width-Large .applicationsPanelMoreList &gt; li &gt; a:focus,
-.panel-width-Large .applicationPanelMoreContainer ul &gt; li &gt; a:hover 
+.panel-width-Large .applicationPanelMoreContainer ul &gt; li &gt; a:hover,
 .panel-width-Large .applicationPanelMoreContainer ul &gt; li &gt; a:focus {
   background-color: transparent;
   text-decoration: underline;
@@ -657,7 +667,7 @@ require(['scriptaculous/effects'], function() {
 
 /* Phone case */
 @media (max-width: 768px) {
-  .panel-width-Small .applicationsPanel li {
+  .panel-width-Small .applicationsPanel > li {
     float: left;
     width: 33%;
   }
@@ -670,7 +680,7 @@ require(['scriptaculous/effects'], function() {
 }
 
 @media (min-width: 768px) and (max-width: 992px) {
-  .panel-width-Small .applicationsPanel li{
+  .panel-width-Small .applicationsPanel > li {
     float: left;
     width: 20%;
   }
@@ -706,7 +716,7 @@ require(['scriptaculous/effects'], function() {
 }
 
 .skin-colibri .panel-width-Small .applicationsPanel li.active {
-  background-color: $theme.buttonPrimaryBackgroundColor;  
+  background-color: $theme.buttonPrimaryBackgroundColor;
 }
 
 .skin-colibri .panel-width-Small .applicationsPanel li.active a {
@@ -718,7 +728,7 @@ require(['scriptaculous/effects'], function() {
 }
 
 .skin-colibri .panel-width-Small .applicationsPanel li:hover a {
-  color: $theme.textPrimaryColor; 
+  color: $theme.textPrimaryColor;
 }
 </code>
     </property>

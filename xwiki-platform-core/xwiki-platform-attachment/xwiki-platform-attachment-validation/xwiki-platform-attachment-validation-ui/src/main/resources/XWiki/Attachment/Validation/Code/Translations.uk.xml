@@ -46,4 +46,4 @@ XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_allowedMimet
 XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_blockedMimetypes=Заблоковані типи MIME 
 XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_blockedMimetypes.hint=Визначте список відхилених MIME-типів вкладень. За умовчанням цей список порожній, але ви можете вказати відокремлений комами список заблокованих типів MIME. Зауважте, що джокер (*) можна використовувати для прийняття будь-якого типу медіа. Якщо цей список не порожній, будь-яке вкладення, що відповідає одному з указаних у списку типів MIME, буде відхилено. Наприклад, якщо ви бажаєте відхилити звичайний текст і будь-які зображення, ви можете встановити такий список: text/plain,image/*
 </content>
-  </xwikidoc>
+</xwikidoc>

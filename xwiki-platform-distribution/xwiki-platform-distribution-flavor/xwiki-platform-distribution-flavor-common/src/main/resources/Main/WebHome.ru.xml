@@ -35,21 +35,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>{{box cssClass="floatinginfobox"}}
-{{velocity}}
-{{html clean="false"}}
-## Chrome's XSS Auditor blocks the preview action if:
-## * the submitted content has an iframe with an external URL
-## * the preview action displays the submitted iframe
-## The workaround is to make sure the submitted content (the macro markers) don't match the preview HTML.
-## See XWIKI-14818: Preview triggers ERR_BLOCKED_BY_XSS_AUDITOR in Chrome
-#set ($iframe = 'iframe')
-&lt;$iframe src="https://www.youtube.com/embed/9QTWrZ7OfzI" title="YouTube-видео о XWiki" role="presentation" allowfullscreen&gt;&lt;/$iframe&gt;
-{{/html}}
-{{/velocity}}
-{{/box}}
-
-= Добро пожаловать в вашу вики =
+  <content>= Добро пожаловать в вашу вики =
 
 XWiki - это лучший инструмент для организации ваших знаний. //Вики// организована как иерархия //страниц//. Вы можете создать несколько вики, каждая из которых будет иметь собственный набор страниц.
 
@@ -59,11 +45,11 @@ XWiki может быть использована как база знаний 
 
 Для максимального использования возможностей вашей вики, авторизуйтесь и:
 
-Используйте кнопку {{velocity}}$services.icon.render('pencil'){{/velocity}} выше, чтобы //править// эту страницу и начать настраивать вики под ваши нужды.
+Используйте кнопку {{displayIcon name="pencil"/}} выше, чтобы //править// эту страницу и начать настраивать вики под ваши нужды.
 
-Используйте кнопку {{velocity}}$services.icon.render('add'){{/velocity}} выше, чтобы //добавить// больше страниц в вашу вики и создать //иерархию//, которая наилучшим образом упорядочит ваш контент.
+Используйте кнопку {{displayIcon name="add"/}} выше, чтобы //добавить// больше страниц в вашу вики и создать //иерархию//, которая наилучшим образом упорядочит ваш контент.
 
-Используйте {{velocity}}$services.icon.render('home'){{/velocity}} навигационные цепочки расположенные над заголовком для //навигации// по вашим страницам. Легко потеряться в большой вики без них.
+Используйте {{displayIcon name="home"/}} навигационные цепочки расположенные над заголовком для //навигации// по вашим страницам. Легко потеряться в большой вики без них.
 
 Вы также можете использовать [[Песочницу&gt;&gt;Sandbox.WebHome]] для большего количества демо-контента и в целом как место для экспериментов с возможностями вашей вики. 
 

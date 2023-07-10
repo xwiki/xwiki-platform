@@ -108,7 +108,7 @@ public class AttachmentListMetadataSerializer
                 + "different serializer.");
         }
         final List<XWikiAttachment> attachments = new ArrayList<XWikiAttachment>(docel.elements().size());
-        for (Element attach : ((List<Element>) docel.elements())) {
+        for (Element attach : docel.elements()) {
             attachments.add(this.attachSerializer.parse(attach));
         }
         return attachments;

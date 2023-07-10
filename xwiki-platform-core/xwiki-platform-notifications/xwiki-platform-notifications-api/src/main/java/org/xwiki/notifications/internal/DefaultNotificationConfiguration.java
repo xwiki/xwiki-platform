@@ -62,12 +62,6 @@ public class DefaultNotificationConfiguration implements NotificationConfigurati
     }
 
     @Override
-    public boolean isEventPrefilteringEnabled()
-    {
-        return configurationSource.getProperty(CONFIGURATION_PREFIX + "eventPrefilteringEnabled", true);
-    }
-
-    @Override
     public boolean isRestCacheEnabled()
     {
         return configurationSource.getProperty(CONFIGURATION_PREFIX + "rest.cache", true);

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-notifications</artifactId>
-    <version>15.5-SNAPSHOT</version>
+    <version>15.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-notifications-sources</artifactId>
   <name>XWiki Platform - Notifications - Sources</name>
@@ -33,6 +33,8 @@
   <properties>
     <xwiki.jacoco.instructionRatio>0.73</xwiki.jacoco.instructionRatio>
     <checkstyle.suppressions.location>${basedir}/src/main/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
+    <!-- Skipping revapi since xwiki-platform-legacy-notifications-sources wraps this module and runs checks on it -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
   </properties>
   <dependencies>
     <dependency>

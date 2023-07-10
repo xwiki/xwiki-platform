@@ -86,7 +86,7 @@ public class DefaultGroupManager implements GroupManager
     {
         Collection<String> cacheWikis;
 
-        switch ((WikiTarget) wikiTarget) {
+        switch (wikiTarget) {
             case ENTITY:
                 cacheWikis = Collections.singleton(reference.getWikiReference().getName());
                 break;

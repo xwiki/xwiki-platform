@@ -409,7 +409,14 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery', 'bootstrap'], function($) {
+      <code>define('xwiki-flamingo-theme-messages', {
+  prefix: 'platform.flamingo.themes.',
+  keys: [
+    'preview.iframe.label'
+  ]
+});
+
+require(['jquery', 'xwiki-l10n!xwiki-flamingo-theme-messages', 'bootstrap'], function($, l10n) {
   'use strict';
 
   var createPreview = function() {
@@ -420,7 +427,9 @@
     var iframe = $('&lt;iframe/&gt;').attr({
       src: new XWiki.Document('WebHome', 'Main').getURL('view', 'colortheme=no'),
       id: 'iframe',
-      'class': 'col-xs-12'
+      class: 'col-xs-12',
+      title: l10n.get('preview.iframe.label'),
+      'aria-label': l10n.get('preview.iframe.label')
     // We need to register the load listener before the iframe is attached to the DOM otherwise we can't catch reliably
     // the load event (because the iframe might load before we register our listener).
     }).on('load', function() {

@@ -63,8 +63,8 @@ import static org.mockito.Mockito.when;
 public class DeprecatedMailStorageScriptServiceTest
 {
     @Rule
-    public MockitoComponentMockingRule<MailStorageScriptService> mocker =
-        new MockitoComponentMockingRule<>(MailStorageScriptService.class);
+    public MockitoComponentMockingRule<DeprecatedMailStorageScriptService> mocker =
+        new MockitoComponentMockingRule<>(DeprecatedMailStorageScriptService.class);
 
     @Before
     public void setUp() throws Exception

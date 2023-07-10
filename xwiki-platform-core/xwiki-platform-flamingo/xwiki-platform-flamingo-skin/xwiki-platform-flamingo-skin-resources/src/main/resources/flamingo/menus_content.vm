@@ -431,7 +431,7 @@
         ## VIEW SOURCE
         ##
         #if ("$!request.rev" != '')
-          #set ($revisionParameter = "&rev=$request.rev")
+          #set ($revisionParameter = "&rev=$escapetool.url($request.rev)")
         #end
         #submenuitem($doc.getURL('view', "viewer=code$!{revisionParameter}") $services.localization.render('core.menu.view.source') 'tmViewSource', '', 'search', $extraAttributes)
         $viewersContent

@@ -252,9 +252,9 @@
                 #set ($currentTab = 'templates')
               #end
               &lt;dd class="flavor_template"&gt;
-                &lt;div class="xwikitabbar"&gt;
-                  &lt;button #if($currentTab=='flavors')class="active"#end&gt;&lt;a href="#flavors"&gt;$services.localization.render('platform.wiki.create.wizard.flavortemplate.flavorTab')&lt;/a&gt;&lt;/button&gt;
-                  &lt;button #if($currentTab=='templates')class="active"#end&gt;&lt;a href="#templates"&gt;$services.localization.render('platform.wiki.create.wizard.flavortemplate.templateTab')&lt;/a&gt;&lt;/button&gt;
+                &lt;div class="xwikitabbar" role='tablist'&gt;
+                  &lt;a href="#flavors"#if($currentTab=='flavors')class="active"#end role='tab'&gt;$services.localization.render('platform.wiki.create.wizard.flavortemplate.flavorTab')&lt;/a&gt;
+                  &lt;a href="#templates"#if($currentTab=='templates')class="active"#end role='tab'&gt;$services.localization.render('platform.wiki.create.wizard.flavortemplate.templateTab')&lt;/a&gt;
                 &lt;/div&gt;
                 &lt;div class="xwiki-createwiki-tabs-content"&gt;
                   #set ($defaultFlavor = "$!request.flavor")
@@ -1262,12 +1262,13 @@ return XWiki;
     <property>
       <code>
 #if (!$services.distribution.hasWikiDefaultUIExtension())
+require(['jquery', 'xwiki-tabList'], function($, TabList) { new TabList($("#flavor_template")); });
 /**************************************************************
  * Code to make the dynamic "flavor/template" tab bar
  **************************************************************/
 require(['jquery'], function($) {
   $(function(){
-    $('.flavor_template  &gt; .xwikitabbar &gt; li &gt; a').on('click', function(event) {
+    $('.flavor_template  &gt; .xwikitabbar &gt; a').on('click', function(event) {
       var thisTabWidget = $(this).parents('.flavor_template');
       // Change the tab bar
       var activeTab = thisTabWidget.find('.xwikitabbar .active');

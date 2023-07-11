@@ -240,7 +240,7 @@
 &lt;/ul&gt;
 &lt;ul class="applicationsPanel applicationsPanelMoreList nav"&gt;
   &lt;li&gt;
-    #set ($panelId = $doc.getXDOM().getIdGenerator().generateUniqueId('applicationPanelMoreContainer',''))
+    #set ($panelId = 'applicationPanelMoreContainer' + $util.generateRandomString(10))
     &lt;button class='applicationPanelMoreButton' aria-controls="$panelId"
       title="$services.localization.render('panels.applications.more')" aria-expanded='false' &gt;
       &lt;span class="application-img"&gt;$services.icon.renderHTML('add')&lt;/span&gt;

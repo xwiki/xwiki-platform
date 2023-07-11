@@ -79,11 +79,11 @@
   &lt;div id='tablistdescription' class='hidden'&gt;$escapetool.xml($services.localization.render('platform.index.tablist.description'))&lt;/div&gt;
   &lt;div id='allPagesTabs' class='xwikitabbar' role='tablist' aria-labelledby='tablistlabel' aria-describedby='tablistdescription'&gt;
 #foreach ($tab in $tabs)
-  &lt;button id="xwiki$tab['idSuffix']tab" href="$doc.getURL('view', "view=$tab['tabName']&amp;amp;$!param")"
+  &lt;a id="xwiki$tab['idSuffix']tab" href="$doc.getURL('view', "view=$tab['tabName']&amp;amp;$!param")"
     #if($view == $tab['tabName']) class="active" aria-selected="true"
     #else aria-selected="false" tabindex="-1" #end role="tab" aria-controls="xwiki$tab['idSuffix']pane"&gt;
     $services.localization.render($tab['translationKey'])
-  &lt;/button&gt;
+  &lt;/a&gt;
 #end
   &lt;/div&gt;
 &lt;/div&gt;

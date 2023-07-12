@@ -105,7 +105,7 @@ public class ResetPasswordIT
 
         String userName = "testUser" + RandomStringUtils.randomAlphanumeric(6);
         String password = "password";
-        String newPassword = "newPassword";
+        String newPassword = "newPasswörd";
 
         // Create a user
         setup.createUser(userName, password, null);

@@ -44,7 +44,7 @@ image.style.administation.defaultImageStyle.button=Оновити стиль з�
 image.style.imageStyleSheet.backToAdministration.link=Назад до адміністрування
 image.style.administration.liveData.doc.title=ідентифікатор
 image.style.administration.liveData._actions=Дії
-### Missing: image.style.administration.liveData.prettyName=Pretty Name
+image.style.administration.liveData.prettyName=Читабельне ім'я
 image.style.administration.liveData.prettyName.hint=Користувацька назва стилю зображення
 image.style.administration.liveData.type=Тип
 image.style.administration.liveData.type.hint=Тип стилю зображення (використовується як CSS клас)
@@ -76,11 +76,11 @@ Image.Style.Code.ImageStyleClass_defaultTextWrap=Обтікання тексто
 Image.Style.Code.ImageStyleClass_defaultTextWrap_hint=Якщо цей пункт позначено, за умовчанням текст буде обтікати зображення.
 Image.Style.Code.ImageStyleClass_defaultWidth=Ширина за умовчанням
 Image.Style.Code.ImageStyleClass_defaultWidth_hint=Ширина зображення за умовчанням. Якщо висоту залишити порожньою за умовчанням, її буде обчислено відповідно до співвідношення зображення. В іншому випадку зображення матиме фіксований розмір.
-### Missing: Image.Style.Code.ImageStyleClass_prettyName=Pretty Name
+Image.Style.Code.ImageStyleClass_prettyName=Читабельне ім'я
 Image.Style.Code.ImageStyleClass_prettyName_hint=Користувацька назва стилю зображення.
 Image.Style.Code.ImageStyleClass_type=Тип
 Image.Style.Code.ImageStyleClass_type_hint=Тип стилю зображення (використовується як CSS клас).
 Image.Style.Code.ConfigurationClass_defaultStyle=Стиль за умовчанням
 Image.Style.Code.ConfigurationClass_defaultStyle_hint=Стиль зображення за умовчанням для цієї вікі.
 </content>
-  </xwikidoc>
+</xwikidoc>

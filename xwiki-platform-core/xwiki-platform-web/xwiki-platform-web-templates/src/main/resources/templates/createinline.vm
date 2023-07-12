@@ -68,9 +68,11 @@
   <div class="box errormessage">
     #set($allowedSpaces = $createAllowedSpaces)
     #if ($allowedSpaces.size() == 1)
-      $services.localization.render('core.create.template.allowedspace.inline', [$templateProvider, $allowedSpaces.get(0)])
+      $escapetool.xml($services.localization.render('core.create.template.allowedspace.inline', [$templateProvider,
+        $allowedSpaces.get(0)]))
     #else
-      $services.localization.render('core.create.template.allowedspaces.inline', [$templateProvider, $allowedSpaces.toString()])
+      $escapetool.xml($services.localization.render('core.create.template.allowedspaces.inline', [$templateProvider,
+        $allowedSpaces.toString()]))
     #end
   </div>
 #end
@@ -79,7 +81,7 @@
   <div class='box errormessage'>
       ## Use the 'existingDocumentReference' context binding set by the create action for this case.
       $services.localization.render('core.create.page.error.docalreadyexists',
-        ["${existingDocumentReference}",
+        [$escapetool.xml("${existingDocumentReference}"),
          $xwiki.getURL($existingDocumentReference, 'view', ''),
          $xwiki.getURL($existingDocumentReference, 'edit', '')
         ]
@@ -90,7 +92,7 @@
 #if("$!exception" != '' && $exception.code == 11018)
 <div class='box errormessage'>
   ## Use the 'invalidNameReference' context binding set by the create action for this case.
-  $services.localization.render('entitynamevalidation.create.invalidname', [$invalidNameReference])
+  $escapetool.xml($services.localization.render('entitynamevalidation.create.invalidname', [$invalidNameReference]))
 </div>
 #end
 

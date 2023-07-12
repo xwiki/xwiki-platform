@@ -53,7 +53,7 @@ public interface WikiObjectFilter
     String PARAMETER_GUID = "guid";
 
     /**
-     * @param name the name of the object
+     * @param name the name part of the {@link org.xwiki.model.reference.ObjectReference}
      * @param parameters the properties of the object
      * @throws FilterException when failing to send event
      */
@@ -61,7 +61,7 @@ public interface WikiObjectFilter
         throws FilterException;
 
     /**
-     * @param name the name of the object
+     * @param name the name part of the {@link org.xwiki.model.reference.ObjectReference}
      * @param parameters the properties of the object
      * @throws FilterException when failing to send event
      */

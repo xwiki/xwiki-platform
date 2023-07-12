@@ -34,6 +34,7 @@
       key="filterDate"
       type="text"
       size="1"
+      :aria-label="$t('livedata.filter.date.label')"
       :value="valueFormatted"
     />
     <!-- A simple text input to filter date with text -->
@@ -44,6 +45,7 @@
       key="containsInput"
       type="text"
       size="1"
+      :aria-label="$t('livedata.filter.date.label')"
       :value="filterEntry.value"
       @input="applyFilterFromText"
     />

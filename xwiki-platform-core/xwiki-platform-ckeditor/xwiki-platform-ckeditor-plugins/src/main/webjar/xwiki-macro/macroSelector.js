@@ -32,41 +32,10 @@ define('macroSelectorTranslationKeys', [], [
   'install.notAllowed'
 ]);
 
-define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector', 'xwiki-selectize'], 
-  function($, $modal, translations) {
+define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector', 'macroService', 'xwiki-selectize'],
+  function($, $modal, translations, macroService) {
   'use strict';
-  var macrosBySyntax = {},
-
-  getMacros = function(syntaxId, force) {
-    var deferred = $.Deferred();
-    var macros = macrosBySyntax[syntaxId || ''];
-    if (macros && !force) {
-      deferred.resolve(macros);
-    } else {
-      var url = new XWiki.Document('MacroService', 'CKEditor').getURL('get', $.param({
-        outputSyntax: 'plain',
-        language: $('html').attr('lang')
-      }));
-      $.get(url, {data: 'list', syntaxId: syntaxId}).done(function(macros) {
-        // Bulletproofing: check if the returned data is json since it could some HTML representing an error
-        if (typeof macros === 'object' && Array.isArray(macros.list)) {
-          var macroList = macros.list;
-          if (Array.isArray(macros.notinstalled)) {
-            macroList = macroList.concat(macros.notinstalled);
-          }
-          macrosBySyntax[syntaxId || ''] = macroList;
-          deferred.resolve(macroList);
-        } else {
-          deferred.reject.apply(deferred, arguments);
-        }
-      }).fail(function() {
-        deferred.reject.apply(deferred, arguments);
-      });
-    }
-    return deferred.promise();
-  },
-
-  macroListTemplate = '<ul class="macro-list form-control" tabindex="0"></ul>',
+  var macroListTemplate = '<ul class="macro-list form-control" tabindex="0"></ul>',
   macroListItemTemplate =
     '<li data-macroCategories="" data-macroId="" ' +
         'data-extensionId="" data-extensionVersion="" data-extensionInstallAllowed="">' +
@@ -332,7 +301,7 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector', 'xwiki-selecti
         macroSelector.empty().addClass('loading')
           .attr('data-syntaxId', syntaxId)
           .prop('requestNumber', requestNumber);
-        getMacros(syntaxId, force).done(maybeDisplayMacros.bind(macroSelector, requestNumber))
+        macroService.getMacros(syntaxId, force).done(maybeDisplayMacros.bind(macroSelector, requestNumber))
           .fail(maybeShowError.bind(macroSelector, requestNumber));
       }
     };
@@ -353,9 +322,11 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector', 'xwiki-selecti
         if (!macroSelectorAPI) {
           // Create the macro selector.
           macroSelector.on('ready', function() {
+            macroSelectorAPI = macroSelector.data('macroSelectorAPI');
             macroSelectorAPI.select(input.macroId);
             macroSelector.find('.macro-textFilter').focus();
           }).on('change', function() {
+            macroSelectorAPI = macroSelector.data('macroSelectorAPI');
             var buttonText;
             var buttonTitle;
             var buttonDisabled = !macroSelectorAPI.getSelectedMacro();

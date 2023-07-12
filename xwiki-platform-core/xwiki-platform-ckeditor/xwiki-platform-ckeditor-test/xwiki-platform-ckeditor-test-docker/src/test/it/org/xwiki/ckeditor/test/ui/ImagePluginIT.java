@@ -28,8 +28,10 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.xwiki.ckeditor.test.po.CKEditor;
+import org.xwiki.ckeditor.test.po.LinkDialog;
 import org.xwiki.ckeditor.test.po.image.ImageDialogEditModal;
 import org.xwiki.ckeditor.test.po.image.ImageDialogSelectModal;
+import org.xwiki.ckeditor.test.po.image.edit.ImageDialogAdvancedEditForm;
 import org.xwiki.ckeditor.test.po.image.edit.ImageDialogStandardEditForm;
 import org.xwiki.ckeditor.test.po.image.select.ImageDialogIconSelectForm;
 import org.xwiki.ckeditor.test.po.image.select.ImageDialogUrlSelectForm;
@@ -45,6 +47,7 @@ import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test of the CKEditor Image Plugin.
@@ -76,14 +79,14 @@ class ImagePluginIT
         CKEditor editor = new CKEditor("content").waitToLoad();
 
         // Insert a first image.
-        ImageDialogSelectModal imageDialogSelectModal = editor.clickImageButton();
+        ImageDialogSelectModal imageDialogSelectModal = editor.getToolBar().insertImage();
         imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);
         ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
         imageDialogEditModal.clickInsert();
         // Move the focus out of the newly inserted image widget.
         editor.getRichTextArea().sendKeys(Keys.RIGHT);
         // Insert a second image, with a caption.
-        imageDialogSelectModal = editor.clickImageButton();
+        imageDialogSelectModal = editor.getToolBar().insertImage();
         imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);
         imageDialogEditModal = imageDialogSelectModal.clickSelect();
         imageDialogEditModal.switchToStandardTab().clickCaptionCheckbox();
@@ -130,7 +133,7 @@ class ImagePluginIT
         CKEditor editor = new CKEditor("content").waitToLoad();
 
         // Insert a first image.
-        ImageDialogSelectModal imageDialogSelectModal = editor.clickImageButton();
+        ImageDialogSelectModal imageDialogSelectModal = editor.getToolBar().insertImage();
         imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);
         ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
         ImageDialogStandardEditForm imageDialogStandardEditForm = imageDialogEditModal.switchToStandardTab();
@@ -153,7 +156,7 @@ class ImagePluginIT
         // Focus on the image to edit.
         editor.executeOnIframe(() -> setup.getDriver().findElement(By.id("Iimage.gif")).click());
 
-        imageDialogEditModal = editor.clickImageButtonWhenImageExists();
+        imageDialogEditModal = editor.getToolBar().editImage();
         imageDialogStandardEditForm = imageDialogEditModal.switchToStandardTab();
         assertEquals(Set.of("", "bordered"), imageDialogStandardEditForm.getListImageStyles());
         assertEquals("bordered", imageDialogStandardEditForm.getCurrentImageStyle());
@@ -175,7 +178,7 @@ class ImagePluginIT
         CKEditor editor = new CKEditor("content").waitToLoad();
 
         // Insert a first image.
-        ImageDialogSelectModal imageDialogSelectModal = editor.clickImageButton();
+        ImageDialogSelectModal imageDialogSelectModal = editor.getToolBar().insertImage();
         ImageDialogIconSelectForm imageDialogIconSelectForm = imageDialogSelectModal.switchToIconTab();
         imageDialogIconSelectForm.setIconValue("accept");
         ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
@@ -197,7 +200,7 @@ class ImagePluginIT
         CKEditor editor = new CKEditor("content").waitToLoad();
 
         // Insert a first image.
-        ImageDialogSelectModal imageDialogSelectModal = editor.clickImageButton();
+        ImageDialogSelectModal imageDialogSelectModal = editor.getToolBar().insertImage();
         ImageDialogUrlSelectForm imageDialogUrlSelectForm = imageDialogSelectModal.switchToUrlTab();
         imageDialogUrlSelectForm.setUrlValue("http://mysite.com/myimage.png");
         ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
@@ -228,14 +231,14 @@ class ImagePluginIT
         CKEditor editor = new CKEditor("content").waitToLoad();
 
         // Insert a first image.
-        ImageDialogSelectModal imageDialogSelectModal = editor.clickImageButton();
+        ImageDialogSelectModal imageDialogSelectModal = editor.getToolBar().insertImage();
         imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);
         ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
         imageDialogEditModal.clickInsert();
 
         editor.getRichTextArea().sendKeys(Keys.RIGHT, Keys.END, Keys.ENTER, "Some text", Keys.ENTER);
 
-        imageDialogSelectModal = editor.clickImageButton();
+        imageDialogSelectModal = editor.getToolBar().insertImage();
         imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);
         imageDialogEditModal = imageDialogSelectModal.clickSelect();
         imageDialogEditModal.clickInsert();
@@ -251,7 +254,7 @@ class ImagePluginIT
         editor = new CKEditor("content").waitToLoad();
         for (String id : List.of("Iimage.gif", "customID")) {
             editor.executeOnIframe(() -> setup.getDriver().findElement(By.id(id)).click());
-            imageDialogEditModal = editor.clickImageButtonWhenImageExists();
+            imageDialogEditModal = editor.getToolBar().editImage();
             imageDialogEditModal.switchToStandardTab().clickCaptionCheckbox();
             imageDialogEditModal.clickInsert();
         }
@@ -275,7 +278,7 @@ class ImagePluginIT
         CKEditor editor = new CKEditor("content").waitToLoad();
 
         // Insert a with caption and alignment to center.
-        ImageDialogSelectModal imageDialogSelectModal = editor.clickImageButton();
+        ImageDialogSelectModal imageDialogSelectModal = editor.getToolBar().insertImage();
         imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);
         ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
         imageDialogEditModal.switchToStandardTab().clickCaptionCheckbox();
@@ -294,7 +297,7 @@ class ImagePluginIT
         // Focus on the image to edit.
         editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
-        imageDialogEditModal = editor.clickImageButtonWhenImageExists();
+        imageDialogEditModal = editor.getToolBar().editImage();
         imageDialogEditModal.switchToStandardTab().clickCaptionCheckbox();
         imageDialogEditModal.clickInsert();
         savedPage = wysiwygEditPage.clickSaveAndView();
@@ -310,7 +313,7 @@ class ImagePluginIT
         // Focus on the image to edit.
         editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
-        imageDialogEditModal = editor.clickImageButtonWhenImageExists();
+        imageDialogEditModal = editor.getToolBar().editImage();
         imageDialogEditModal.switchToStandardTab().clickCaptionCheckbox();
         imageDialogEditModal.clickInsert();
         savedPage = wysiwygEditPage.clickSaveAndView();
@@ -372,17 +375,101 @@ class ImagePluginIT
         CKEditor editor = new CKEditor("content").waitToLoad();
 
         // Insert a with caption and alignment to center.
-        ImageDialogSelectModal imageDialogSelectModal = editor.clickImageButton();
+        ImageDialogSelectModal imageDialogSelectModal = editor.getToolBar().insertImage();
         imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);
         imageDialogSelectModal.clickSelect().clickInsert();
 
         editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
-        editor.clickLinkButton().setResourceValue("doc:", false).clickOK();
+        editor.getToolBar().insertOrEditLink().setResourceValue("doc:", false).submit();
 
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
         assertEquals("[[~[~[image:image.gif~]~]>>doc:]]", savedPage.editWiki().getContent());
+    }
+
+    @Test
+    @Order(9)
+    void imageWithLinkAndCaptionUI(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Upload an attachment to test with.
+        String attachmentName = "image.gif";
+        AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
+        ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
+
+        // Move to the WYSIWYG edition page.
+        WYSIWYGEditPage wysiwygEditPage = newPage.editWYSIWYG();
+        CKEditor editor = new CKEditor("content").waitToLoad();
+
+        // Insert a with caption and alignment to center.
+        ImageDialogSelectModal imageDialogSelectModal = editor.getToolBar().insertImage();
+        imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);
+        ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
+        imageDialogEditModal.switchToStandardTab().clickCaptionCheckbox();
+        imageDialogEditModal.switchToAdvancedTab().selectCenterAlignment();
+        imageDialogEditModal.clickInsert();
+
+        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+
+        editor.getToolBar().insertOrEditLink().setResourceValue("doc:Main.WebHome", false).submit();
+
+        ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
+
+        assertEquals("[[~[~[Caption~>~>image:image.gif~|~|data-xwiki-image-style-alignment=\"center\"~]~]"
+            + ">>doc:Main.WebHome]]", savedPage.editWiki().getContent());
+        // Test that when re-editing the image, the link, caption and alignment are still set.
+        wysiwygEditPage = savedPage.editWYSIWYG();
+        editor = new CKEditor("content").waitToLoad();
+
+        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+
+        imageDialogEditModal = editor.getToolBar().editImage();
+        // Verify that the caption and alignment are still set.
+        ImageDialogStandardEditForm standardEditForm = imageDialogEditModal.switchToStandardTab();
+        assertTrue(standardEditForm.isCaptionCheckboxChecked());
+        ImageDialogAdvancedEditForm advancedEditForm = imageDialogEditModal.switchToAdvancedTab();
+        assertEquals("center", advancedEditForm.getAlignment());
+        imageDialogEditModal.close();
+
+        // Verify that the link is still set.
+        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        LinkDialog linkSelectorModal = editor.getToolBar().insertOrEditLink();
+        assertEquals("doc", linkSelectorModal.getSelectedResourceType());
+        assertEquals("Main.WebHome", linkSelectorModal.getSelectedResourceReference());
+        linkSelectorModal.cancel();
+
+        // Change the caption to ensure that saving again works.
+        editor.executeOnIframe(
+            () -> setup.getDriver().findElement(By.cssSelector("figcaption"))
+                // Go to the start of the caption and insert "New ".
+                .sendKeys(Keys.HOME, "New "));
+        savedPage = wysiwygEditPage.clickSaveAndView();
+
+        assertEquals("[[~[~[New Caption~>~>image:image.gif~|~|data-xwiki-image-style-alignment=\"center\"~]~]"
+            + ">>doc:Main.WebHome]]", savedPage.editWiki().getContent());
+    }
+
+    @Test
+    @Order(10)
+    void editLegacyCenteredImage(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Upload an attachment to test with.
+        String attachmentName = "image.gif";
+        ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
+
+        WikiEditPage wikiEditPage = newPage.editWiki();
+        wikiEditPage.setContent("(% style='text-align: center' %)\n"
+            + "[[image:image.gif]]");
+        ViewPage viewPage = wikiEditPage.clickSaveAndView();
+
+        // Move to the WYSIWYG edition page.
+        WYSIWYGEditPage wysiwygEditPage = viewPage.editWYSIWYG();
+        new CKEditor("content").waitToLoad();
+
+        ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
+
+        assertEquals("[[image:image.gif||data-xwiki-image-style-alignment=\"center\"]]",
+            savedPage.editWiki().getContent());
     }
 
     private static void createAndLoginStandardUser(TestUtils setup)

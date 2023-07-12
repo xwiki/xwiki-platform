@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>15.5-SNAPSHOT</version>
+    <version>15.6-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>15.5-SNAPSHOT</version>
+  <version>15.6-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
@@ -54,15 +54,17 @@
     <batik.version>1.16</batik.version>
     <restlet.version>2.3.12</restlet.version>
     <tika.version>2.8.0</tika.version>
-    <pdfbox.version>2.0.28</pdfbox.version>
+    <pdfbox.version>2.0.29</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
     <jetty.version>9.4.49.v20220914</jetty.version>
-    <netty.version>4.1.93.Final</netty.version>
+    <netty.version>4.1.94.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
-    <dockerJava.version>3.3.1</dockerJava.version>
+    <dockerJava.version>3.3.2</dockerJava.version>
+    <cvssCalculator.version>1.4.1</cvssCalculator.version>
+    <solr.version>8.11.2</solr.version>
 
     <!-- Versions of other software we need in our functional tests -->
-    <testcontainers.version>1.18.1</testcontainers.version>
+    <testcontainers.version>1.18.3</testcontainers.version>
     <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
          sure the new version is available from https://download.documentfoundation.org/libreoffice/stable/
          Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
@@ -96,7 +98,7 @@
     <!-- Versions of JDBC connectors we want to use in our distribution, in our tests and when using build tools -->
     <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
     <hsqldb.artifactId>hsqldb</hsqldb.artifactId>
-    <hsqldb.version>2.7.1</hsqldb.version>
+    <hsqldb.version>2.7.2</hsqldb.version>
     <mysql.groupId>com.mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-j</mysql.artifactId>
     <mysql.version>8.0.33</mysql.version>
@@ -166,7 +168,7 @@
       <dependency>
         <groupId>org.liquibase</groupId>
         <artifactId>liquibase-core</artifactId>
-        <version>4.22.0</version>
+        <version>4.23.0</version>
         <exclusions>
           <!-- Not the right id -->
           <exclusion>
@@ -363,7 +365,7 @@
         <version>${tika.version}</version>
       </dependency>
 
-      <!-- Rome is used in rss macro and feed api modules and in Tika -->
+      <!-- Rome is used in the feed api module and in Tika -->
       <dependency>
         <groupId>rome</groupId>
         <artifactId>rome</artifactId>
@@ -698,7 +700,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-ffi</artifactId>
-        <version>2.2.13</version>
+        <version>2.2.14</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -708,7 +710,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-posix</artifactId>
-        <version>3.1.16</version>
+        <version>3.1.17</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -1013,6 +1015,130 @@
         <artifactId>docker-java-transport-zerodep</artifactId>
         <version>${dockerJava.version}</version>
       </dependency>
+
+      <!-- Solr -->
+      <dependency>
+        <groupId>org.apache.solr</groupId>
+        <artifactId>solr-solrj</artifactId>
+        <version>${solr.version}</version>
+        <exclusions>
+          <!-- We want a different version of Woodstox and the id changed -->
+          <exclusion>
+            <groupId>org.codehaus.woodstox</groupId>
+            <artifactId>woodstox-core-asl</artifactId>
+          </exclusion>
+          <!--
+            The version of the Jetty client libraries used by solrj often conflict with the version of Jetty used by XWiki.
+            The reason is generally that upgrading Jetty is always a pain and tend to lack behind.
+          -->
+          <exclusion>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.eclipse.jetty.http2</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.solr</groupId>
+        <artifactId>solr-core</artifactId>
+        <version>${solr.version}</version>
+        <exclusions>
+          <!-- We want a different version of Woodstox and the id changed -->
+          <exclusion>
+            <groupId>org.codehaus.woodstox</groupId>
+            <artifactId>woodstox-core-asl</artifactId>
+          </exclusion>
+          <!-- Exclude the dependencies which are only need by Solr when running as a standalone application -->
+          <exclusion>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-graphite</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-jetty9</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-jvm</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.restlet.jee</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.eclipse.jetty.http2</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+          <!-- We use slf4j in XWiki -->
+          <exclusion>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.xerial.snappy</groupId>
+        <artifactId>snappy-java</artifactId>
+        <version>1.1.10.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.calcite.avatica</groupId>
+        <artifactId>avatica-core</artifactId>
+        <version>1.23.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.hadoop</groupId>
+        <artifactId>hadoop-annotations</artifactId>
+        <version>3.2.4</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.hadoop</groupId>
+        <artifactId>hadoop-auth</artifactId>
+        <version>3.2.4</version>
+        <exclusions>
+          <exclusion>
+            <groupId>ch.qos.reload4j</groupId>
+            <artifactId>reload4j</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.hadoop</groupId>
+        <artifactId>hadoop-common</artifactId>
+        <version>3.2.4</version>
+        <exclusions>
+          <exclusion>
+            <groupId>ch.qos.reload4j</groupId>
+            <artifactId>reload4j</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.hadoop</groupId>
+        <artifactId>hadoop-hdfs-client</artifactId>
+        <version>3.2.4</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.calcite</groupId>
+        <artifactId>calcite-core</artifactId>
+        <version>1.34.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.calcite</groupId>
+        <artifactId>calcite-linq4j</artifactId>
+        <version>1.34.0</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>
@@ -1110,6 +1236,8 @@
                 <features>
                   <!-- Should be ok for any version of log4j-over-slf4j (since log4j 1.x is dead) -->
                   log4j:log4j/1.2.17,
+                  <!-- Same for reload4j which is a clone of log4j but with some security fixes -->
+                  ch.qos.reload4j:reload4j,
 
                   <!-- Does not make sense to have both at the same time -->
                   org.slf4j:slf4j-log4j12

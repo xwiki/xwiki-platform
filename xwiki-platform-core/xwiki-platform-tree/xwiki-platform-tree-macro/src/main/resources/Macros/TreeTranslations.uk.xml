@@ -67,4 +67,4 @@ rendering.macro.tree.parameter.limit.description=Максимальна кіль
 rendering.macro.tree.content.description=Ви можете використовувати вкладені невпорядковані списки HTML для опису деревоподібної структури. Додаткову інформацію можна знайти на веб-сторінці http://www.jstree.com/docs/html/.
 tree.macro.editModeWarning=Це дерево не може бути відображено в режимі редагування.
 </content>
-  </xwikidoc>
+</xwikidoc>

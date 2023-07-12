@@ -32,6 +32,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 
@@ -104,6 +105,31 @@ public class AttachmentValidationScriptService implements ScriptService
             .map(attachmentValidationConfiguration -> attachmentValidationConfiguration.getBlockerMimetypes(
                 documentReference))
             .orElse(List.of());
+    }
+
+    /**
+     * @param entityReference the entity reference to use as the context when resolving the configuration, or the
+     *     current entity of {@code null}
+     * @return the maximum file size allowed for a given entity, in bytes
+     * @since 15.5RC1
+     * @since 14.10.13
+     */
+    public long getUploadMaxSize(EntityReference entityReference)
+    {
+        return getAttachmentValidationConfiguration()
+            .map(attachmentValidationConfiguration -> attachmentValidationConfiguration
+                .getMaxUploadSize(entityReference))
+            .orElse(0L);
+    }
+
+    /**
+     * @return the maximum file size allowed for the current document, in bytes
+     * @since 15.5RC1
+     * @since 14.10.13
+     */
+    public long getUploadMaxSize()
+    {
+        return getUploadMaxSize(null);
     }
 
     private Optional<AttachmentValidationConfiguration> getAttachmentValidationConfiguration()

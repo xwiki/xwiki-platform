@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.xwiki.model.EntityType;
@@ -101,7 +102,7 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     private static final long serialVersionUID = 1L;
 
     /** Internal list of existing instances. */
-    private static final List<Right> VALUES = new ArrayList<Right>();
+    private static final List<Right> VALUES = new CopyOnWriteArrayList<>();
 
     /** Unmodifiable list of existing instance for public dissemination. */
     private static final List<Right> UNMODIFIABLE_VALUES = Collections.unmodifiableList(VALUES);

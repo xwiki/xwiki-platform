@@ -68,7 +68,7 @@ The part in ##( )## is required, while the parts in ##{ }## are optional.
 
 The full format of an image is either **##image~: (reference)##** or **##~[~[{caption&gt;&gt;}image~: (reference) {||parameters}]]##**
 
-* **##caption##**: An optional caption. May contain arbitrary XWiki 2.0 syntax but nested link syntax must be escaped using ##~~##. The caption is only supported when the image syntax is the only content of a paragraph.
+* **##caption##**: An optional caption. May contain arbitrary XWiki 2.0 syntax but nested link syntax must be escaped using ##~~##. The caption is only supported when the image syntax is the only content of a paragraph. The captioned image may also be wrapped in a link. In this case, the link will contain the image but not the caption.
 * **##image~:##** A required string identifying the resource as image.
 * **##reference##**: The reference to the image that shall be displayed in one of the following forms:
 ** **URL**: Any URL to an image in the form of **##http:~/~/path/imageName##**. Example: ##http:~/~/domain.org/path/img.png##
@@ -104,7 +104,7 @@ Legend: The parts are ##()## are required, while the parts in ##{}## are optiona
 
 The full format of an image is either **##image~: (reference)##** or **##~[~[{caption&gt;&gt;}image~: (reference) {||parameters}]]##**
 
-* **##caption##**: An optional caption. May contain arbitrary XWiki 2.1 syntax but nested link syntax must be escaped using ##~~##. The caption is only supported when the image syntax is the only content of a paragraph.
+* **##caption##**: An optional caption. May contain arbitrary XWiki 2.1 syntax but nested link syntax must be escaped using ##~~##. The caption is only supported when the image syntax is the only content of a paragraph. The captioned image may also be wrapped in a link. In this case, the link will contain the image but not the caption.
 * **##image~:##** A required string identifying the resource as image.
 * **##reference##**: The reference to the image that shall be displayed in one of the following forms:
 ** **URL**: Any URL to an image in the form of **##[url:](protocol:~/~/path/imageName)##**. Example: ##http:~/~/domain.org/path/img.png##

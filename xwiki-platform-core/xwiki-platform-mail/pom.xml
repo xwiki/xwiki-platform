@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>15.5-SNAPSHOT</version>
+    <version>15.6-SNAPSHOT</version>
   </parent>
   <packaging>pom</packaging>
   <artifactId>xwiki-platform-mail</artifactId>
@@ -35,6 +35,7 @@
     <!-- Sorted Alphabetically -->
     <module>xwiki-platform-mail-api</module>
     <module>xwiki-platform-mail-general</module>
+    <module>xwiki-platform-mail-resender-ui</module>
     <module>xwiki-platform-mail-script</module>
     <module>xwiki-platform-mail-send</module>
     <module>xwiki-platform-mail-ui</module>

@@ -168,7 +168,7 @@ public abstract class AbstractLiveDataResource extends XWikiResource
         StringMap icon = new StringMap();
         icon.putAll(descriptor.getIcon());
 
-        return (PropertyDescriptor) new PropertyDescriptor().withId(descriptor.getId()).withName(descriptor.getName())
+        return new PropertyDescriptor().withId(descriptor.getId()).withName(descriptor.getName())
             .withDescription(descriptor.getDescription()).withIcon(icon).withVisible(descriptor.isVisible())
             .withDisplayer(descriptor.getDisplayer()).withSortable(descriptor.isSortable())
             .withFilterable(descriptor.isFilterable()).withFilter(descriptor.getFilter()).withType(descriptor.getType())

@@ -77,4 +77,4 @@ Mail.SendMailStatus_livetable.resend=Надіслати повторно
 mailSender.admin.resendSuccess=Лист успішно надіслано повторно
 mailSender.admin.resendFailure=Не вдалося повторно надіслати. Натисніть, щоб отримати докладнішу інформацію.
 </content>
-  </xwikidoc>
+</xwikidoc>

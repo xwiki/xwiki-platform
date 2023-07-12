@@ -60,6 +60,9 @@ public class NotificationPreferenceEventGeneratorListener extends AbstractEventL
     private static final RegexEntityReference REFERENCE =
         BaseObjectReference.any(DefaultNotificationPreferenceModelBridge.NOTIFICATION_PREFERENCE_CLASS_STRING);
 
+    private static final RegexEntityReference GROUPING_STRATEGY_PREFERENCE_REFERENCE =
+        BaseObjectReference.any(NotificationEventGroupingStrategyPreferenceDocumentInitializer.REFERENCE_STRING);
+
     @Inject
     private ObservationManager observation;
 
@@ -68,8 +71,14 @@ public class NotificationPreferenceEventGeneratorListener extends AbstractEventL
      */
     public NotificationPreferenceEventGeneratorListener()
     {
-        super(NAME, new XObjectAddedEvent(REFERENCE), new XObjectUpdatedEvent(REFERENCE),
-            new XObjectDeletedEvent(REFERENCE));
+        super(NAME,
+            new XObjectAddedEvent(REFERENCE),
+            new XObjectUpdatedEvent(REFERENCE),
+            new XObjectDeletedEvent(REFERENCE),
+            new XObjectAddedEvent(GROUPING_STRATEGY_PREFERENCE_REFERENCE),
+            new XObjectUpdatedEvent(GROUPING_STRATEGY_PREFERENCE_REFERENCE),
+            new XObjectDeletedEvent(GROUPING_STRATEGY_PREFERENCE_REFERENCE)
+        );
     }
 
     @Override

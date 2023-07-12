@@ -22,7 +22,6 @@ package org.xwiki.platform.notifications.test.po.preferences.filters;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.platform.notifications.test.po.AbstractNotificationsSettingsPage;
-import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.XWikiWebDriver;
 
 /**
@@ -31,7 +30,6 @@ import org.xwiki.test.ui.XWikiWebDriver;
  * @version $Id$
  * @since 13.2RC1
  */
-@Unstable
 public class SystemNotificationFilterPreference extends AbstractNotificationFilterPreference
 {
     private String description;

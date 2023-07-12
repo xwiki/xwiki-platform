@@ -67,8 +67,8 @@ public class UserEventDispatcherListener extends AbstractEventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        // Don't do anything if notifications in general or pre filtering are disabled
-        if (this.notificationConfiguration.isEnabled() && this.notificationConfiguration.isEventPrefilteringEnabled()) {
+        // Don't do anything if notifications in general is disabled
+        if (this.notificationConfiguration.isEnabled()) {
             if (event instanceof EventStreamAddedEvent) {
                 // Find out the users to associate with the event
                 if (!this.remoteState.isRemoteState()) {

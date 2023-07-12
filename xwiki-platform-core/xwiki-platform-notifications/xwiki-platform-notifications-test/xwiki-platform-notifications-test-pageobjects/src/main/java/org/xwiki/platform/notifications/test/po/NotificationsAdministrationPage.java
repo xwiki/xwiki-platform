@@ -19,15 +19,12 @@
  */
 package org.xwiki.platform.notifications.test.po;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Represents the Notifications preferences in administration.
  *
  * @version $Id$
  * @since 13.2R1
  */
-@Unstable
 public class NotificationsAdministrationPage extends AbstractNotificationsSettingsPage
 {
     /**

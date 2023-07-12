@@ -1,0 +1,53 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.Extension.Security.Code.Translations" locale="fr">
+  <web>XWiki.Extension.Security.Code</web>
+  <name>Translations</name>
+  <language>fr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Extension.Security.Code.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>extension.security.admin.title=Vulnérabilités de sécurité
+extension.security.indexed.started=L''indexation a commencé à {0}.
+extension.security.indexed.on=Indexée à {0}. Toute extension installée après cette date ou toute vulnérabilité de sécurité publiée après cette date n''apparaîtra pas. De nouvelles analyses de sécurité sont effectuées périodiquement.
+extension.security.indexed.nojob=Aucune indexation antérieure n'a pu être trouvée.
+extension.security.admin.generalWarning=Veuillez noter que cette analyse de sécurité n'inclut pas toutes les extensions installées. Les extensions qui ne peuvent pas être mises à jour via le gestionnaire d'extensions ne sont actuellement pas incluses.
+extension.security.admin.configuration.title=Configuration
+extension.security.notification.message=Nous avons identifié {0} extensions présentant des vulnérabilités connues, voir les détails dans le rapport {1}
+XWiki.Extension.Security.Code.ConfigClass_scanEnabled=Scan activé
+XWiki.Extension.Security.Code.ConfigClass_scanEnabled.hint=Si la case n'est pas cochée, l'analyse de sécurité ne sera plus exécutée
+XWiki.Extension.Security.Code.ConfigClass_scanDelay=Délai d'analyse
+XWiki.Extension.Security.Code.ConfigClass_scanDelay.hint=Nombre d'heures d'attente entre deux analyses de sécurité (par défaut : 24h)
+XWiki.Extension.Security.Code.ConfigClass_scanURL=URL du scan
+XWiki.Extension.Security.Code.ConfigClass_scanURL.hint=L'URL à utiliser comme source distante pour l'analyse de sécurité (valeur par défaut : https://api.osv.dev/v1/query)
+</content>
+</xwikidoc>

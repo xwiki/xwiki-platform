@@ -122,7 +122,7 @@ public class ScriptVelocityContext extends XWikiVelocityContext
             return super.internalRemove(key);
         } finally {
             if (key instanceof String && !this.reservedBindings.contains(key)) {
-                this.scriptContext.removeAttribute((String) key, ScriptContext.ENGINE_SCOPE);
+                this.scriptContext.removeAttribute(key, ScriptContext.ENGINE_SCOPE);
             }
         }
     }

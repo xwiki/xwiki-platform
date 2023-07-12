@@ -23,6 +23,7 @@ import java.util.Collection;
 
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.InstalledExtension;
+import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.job.plan.ExtensionPlanAction;
 import org.xwiki.script.internal.safe.ScriptSafeProvider;
 import org.xwiki.script.wrap.AbstractWrappingObject;
@@ -55,6 +56,12 @@ public class SafeExtensionPlanAction extends AbstractWrappingObject<ExtensionPla
     public Extension getExtension()
     {
         return this.safeProvider.get(getWrapped().getExtension());
+    }
+
+    @Override
+    public LocalExtension getLocalExtension()
+    {
+        return this.safeProvider.get(getWrapped().getLocalExtension());
     }
 
     @Override

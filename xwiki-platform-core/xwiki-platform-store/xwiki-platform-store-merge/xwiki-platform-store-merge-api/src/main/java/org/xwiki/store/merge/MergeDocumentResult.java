@@ -123,7 +123,7 @@ public class MergeDocumentResult extends MergeManagerResult<DocumentModelBridge,
         /**
          * Merge of required rights.
          *
-         * @since 15.5RC1
+         * @since 15.6RC1
          */
         @Unstable
         REQUIRED_RIGHTS

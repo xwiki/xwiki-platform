@@ -3350,7 +3350,7 @@ public class Document extends Api
 
     /**
      * @return the required rights of the current document
-     * @since 15.5RC1
+     * @since 15.6RC1
      */
     @Unstable
     public RequiredRights getRequiredRights()

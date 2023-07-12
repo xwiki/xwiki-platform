@@ -41,7 +41,6 @@ import static org.xwiki.security.authorization.RuleState.UNDETERMINED;
 
 /**
  * Enumeration of the possible rights.
- *
  * @version $Id$
  * @since 4.0M2
  */

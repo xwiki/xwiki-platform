@@ -159,7 +159,7 @@ public class SecurityAuthorizationScriptService implements ScriptService
      * Update the execution context to ignore the required rights.
      *
      * @see #optInRequiredRights()
-     * @since 15.5RC1
+     * @since 15.6RC1
      */
     @Unstable
     public void optOutRequiredRights()
@@ -172,7 +172,7 @@ public class SecurityAuthorizationScriptService implements ScriptService
      * {@link #optOutRequiredRights()}
      *
      * @see #optOutRequiredRights()
-     * @since 15.5RC1
+     * @since 15.6RC1
      */
     @Unstable
     public void optInRequiredRights()

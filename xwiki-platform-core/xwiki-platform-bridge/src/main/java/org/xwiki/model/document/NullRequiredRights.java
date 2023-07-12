@@ -29,7 +29,7 @@ import org.xwiki.stability.Unstable;
  * always return {@code false} for activated.
  *
  * @version $Id$
- * @since 15.5RC1
+ * @since 15.6RC1
  */
 @Unstable
 public class NullRequiredRights implements RequiredRights

@@ -74,7 +74,7 @@ public interface AuthorizationSettler
      *     given document
      * @param requiredRightsActivated when {@code true}, the required rights are activated on the entity
      * @return the computed access for the given user
-     * @since 15.5RC1
+     * @since 15.6RC1
      */
     @Unstable
     default SecurityAccessEntry settle(UserSecurityReference user,

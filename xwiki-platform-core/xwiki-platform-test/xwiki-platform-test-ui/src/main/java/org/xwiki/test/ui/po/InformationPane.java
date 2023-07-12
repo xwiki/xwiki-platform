@@ -135,7 +135,7 @@ public class InformationPane extends BaseElement
 
     /**
      * @return the page object to edit the required rights in the information pane
-     * @since 15.5RC1
+     * @since 15.6RC1
      */
     public DocumentRequiredRightsPropertyPane editRequiredRights()
     {

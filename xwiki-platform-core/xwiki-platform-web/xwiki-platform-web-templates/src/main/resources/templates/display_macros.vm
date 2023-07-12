@@ -74,7 +74,7 @@
 ##
 ## Display the required rights document property.
 ## 
-## @since 15.5RC1
+## @since 15.6RC1
 ##
 #macro (displayDocumentProperty_requiredRights $displayMode)
   #set ($macro.parameters = {
@@ -161,7 +161,7 @@
 ## Dynamic part of the required rights property display. Displays either the current required rights configuration or a
 ## drop-down of the required rights available options.
 ## The text is written in terms understandable by end-users with not technical knowledge of our right system.
-## @since 15.5R1
+## @since 15.6RC1
 ## 
 #macro (displayProperty_requiredRights $parameters)
   #set ($isRRActivated = $parameters.requiredRights.activated())

@@ -49,11 +49,11 @@ import static org.xwiki.security.authorization.internal.RequiredRightsSkipContex
  * the current request parameters.
  *
  * @version $Id$
- * @since 15.5RC1
+ * @since 15.6RC1
  */
 @Component
 @Singleton
-@Named("requiredrights")
+@Named("requiredrights") // TODO: change path if sub-module of security + update usage of script service.
 @Unstable
 public class RequiredRightsScriptService implements ScriptService
 {

@@ -48,7 +48,7 @@ public interface SecurityAccess extends Cloneable
      * @param skipRequiredRights when {@code true}, the required rights are not considered when computing the rule
      *     state
      * @return the state of this right
-     * @since 15.5RC1
+     * @since 15.6RC1
      */
     @Unstable
     default RuleState get(Right right, boolean skipRequiredRights)

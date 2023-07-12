@@ -26,7 +26,7 @@ import org.openqa.selenium.support.ui.Select;
  * The pane used to display and edit in-place the document required rights.
  * 
  * @version $Id$
- * @since 15.5RC1
+ * @since 15.6RC1
  */
 public class DocumentRequiredRightsPropertyPane extends EditablePropertyPane<String>
 {

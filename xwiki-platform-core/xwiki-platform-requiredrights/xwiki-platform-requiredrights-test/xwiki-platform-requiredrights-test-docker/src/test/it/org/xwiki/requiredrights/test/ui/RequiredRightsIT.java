@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Test creating a page with required rights.
  *
  * @version $Id$
- * @since 15.5RC1
+ * @since 15.6RC1
  */
 @UITest
 class RequiredRightsIT

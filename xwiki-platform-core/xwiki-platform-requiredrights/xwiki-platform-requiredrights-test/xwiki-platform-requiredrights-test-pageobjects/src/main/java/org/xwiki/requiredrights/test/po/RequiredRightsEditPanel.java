@@ -27,7 +27,7 @@ import org.xwiki.test.ui.po.ViewPage;
  * Page Object for the required rights on the edit side panel.
  *
  * @version $Id$
- * @since 15.5RC1
+ * @since 15.6RC1
  */
 public class RequiredRightsEditPanel extends ViewPage
 {

@@ -65,19 +65,21 @@ public class DocumentStringUserReferenceSerializer implements UserReferenceSeria
         String result;
         if (userReference == null) {
             result = null;
-        } else if (SuperAdminUserReference.INSTANCE == userReference) {
-            result = SUPERADMIN_REFERENCE_STRING;
-        } else if (GuestUserReference.INSTANCE == userReference) {
-            result = GUEST_REFERENCE_STRING;
-        } else if (CurrentUserReference.INSTANCE == userReference) {
-            UserReference resolvedUserReference = this.currentUserReferenceUserReferenceResolver.resolve(null);
-            if (GuestUserReference.INSTANCE == resolvedUserReference) {
+        } else {
+            UserReference resolvedReference;
+            if (CurrentUserReference.INSTANCE == userReference) {
+                resolvedReference = this.currentUserReferenceUserReferenceResolver.resolve(null);
+            } else {
+                resolvedReference = userReference;
+            }
+
+            if (SuperAdminUserReference.INSTANCE == resolvedReference) {
+                result = SUPERADMIN_REFERENCE_STRING;
+            } else if (GuestUserReference.INSTANCE == resolvedReference) {
                 result = GUEST_REFERENCE_STRING;
             } else {
-                result = serializeInternal(resolvedUserReference, parameters);
+                result = serializeInternal(resolvedReference, parameters);
             }
-        } else {
-            result = serializeInternal(userReference, parameters);
         }
         return result;
     }

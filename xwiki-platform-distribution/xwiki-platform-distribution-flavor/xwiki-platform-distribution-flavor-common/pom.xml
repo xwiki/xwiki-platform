@@ -186,7 +186,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-requiredrights-ui</artifactId>
+      <artifactId>xwiki-platform-security-requiredrights-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
       <optional>true</optional>

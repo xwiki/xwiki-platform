@@ -39,7 +39,7 @@
   <content>{{velocity output="false"}}
 #macro (ckeditor_convert $text $toHTML $fromHTML $stripHTMLEnvelope)
   ## Update the required rights of the document based on the request parameters.
-  #set($discard = $services.requiredrights.loadFromRequest($tdoc))
+  #set($discard = $services.security.requiredrights.loadFromRequest($tdoc))
   #set ($sourceSyntax = $request.sourceSyntax)
   #if ("$!sourceSyntax" != '')
     #set ($sourceSyntax = $services.rendering.resolveSyntax($sourceSyntax))

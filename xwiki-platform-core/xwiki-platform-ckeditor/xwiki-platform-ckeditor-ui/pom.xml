@@ -117,7 +117,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-requiredrights-api</artifactId>
+      <artifactId>xwiki-platform-security-requiredrights-api</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

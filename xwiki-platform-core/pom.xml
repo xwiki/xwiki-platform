@@ -214,7 +214,6 @@
     <module>xwiki-platform-release</module>
     <module>xwiki-platform-rendering</module>
     <module>xwiki-platform-repository</module>
-    <module>xwiki-platform-requiredrights</module>
     <module>xwiki-platform-resource</module>
     <module>xwiki-platform-rest</module>
     <module>xwiki-platform-sandbox</module>

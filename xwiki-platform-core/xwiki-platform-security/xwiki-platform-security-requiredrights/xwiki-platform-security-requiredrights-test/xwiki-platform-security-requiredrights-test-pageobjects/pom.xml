@@ -18,22 +18,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>15.7-SNAPSHOT</version>
+    <artifactId>xwiki-platform-security-requiredrights-test</artifactId>
+    <version>15.6-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-security</artifactId>
-  <name>XWiki Platform - Security - Parent POM</name>
-  <description>Security APIs (Authentication, Authorization, and more)</description>
-  <packaging>pom</packaging>
-  <!-- Sorted Alphabetically -->
-  <modules>
-    <module>xwiki-platform-security-api</module>
-    <module>xwiki-platform-security-authentication</module>
-    <module>xwiki-platform-security-authorization</module>
-    <module>xwiki-platform-security-requiredrights</module>
-  </modules>
+  <artifactId>xwiki-platform-security-requiredrights-test-pageobjects</artifactId>
+  <name>XWiki Platform - Security - Required Rights - Tests - Page Objects</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - requiredrights - Tests - Page Objects</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-docker</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

@@ -3584,9 +3584,6 @@ public class XWiki implements EventListener
 
     public void flushCache(XWikiContext context)
     {
-        // We need to flush the virtual wiki list
-        this.initializedWikis = new ConcurrentHashMap<>();
-
         // We need to flush the group service cache
         if (this.groupService != null) {
             this.groupService.flushCache();

@@ -20,10 +20,14 @@
 package org.xwiki.extension.index.internal;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.solr.client.solrj.SolrQuery;
@@ -167,10 +171,8 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
 
     private static final long SCHEMA_VERSION_15_6 = 150600000;
 
-    private static final String ROOT_NAMESPACE = "{root}";
-
     @Inject
-    private InstalledExtensionRepository installedExtensionRepository;
+    private Provider<InstalledExtensionRepository> installedExtensionRepository;
 
     @Inject
     private SolrUtils solrUtils;
@@ -258,6 +260,11 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
         }
     }
 
+    /**
+     * Before XWiki 15.6-rc1/15.5.1/14.10.14, the old version of updated installed extensions was not correctly.
+     *
+     * @throws SolrException in case of issue when updating the extensions
+     */
     private void migrateInstalledExtensions() throws SolrException
     {
         try {
@@ -287,11 +294,17 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
             String solrId = this.solrUtils.getId(doc);
             String id = this.solrUtils.get(SOLR_FIELD_EXTENSIONID, doc);
             String version = this.solrUtils.get(FIELD_VERSION, doc);
+            if (id == null || version == null) {
+                continue;
+            }
             ExtensionId extensionId = new ExtensionId(id, version);
-            InstalledExtension actualNamespaces = this.installedExtensionRepository.getInstalledExtension(extensionId);
+            InstalledExtension actualNamespaces =
+                this.installedExtensionRepository.get().getInstalledExtension(extensionId);
             SolrInputDocument updateDocument = new SolrInputDocument();
             this.solrUtils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID, solrId, updateDocument);
-            this.solrUtils.set(FIELD_INSTALLED_NAMESPACES, actualNamespaces.getNamespaces(), updateDocument);
+            Collection<String> param = Optional.ofNullable(actualNamespaces).map(InstalledExtension::getNamespaces)
+                .orElseGet(List::of);
+            this.solrUtils.set(FIELD_INSTALLED_NAMESPACES, param, updateDocument);
             this.client.add(updateDocument);
         }
         return results;

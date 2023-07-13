@@ -20,9 +20,6 @@
 package org.xwiki.extension.index.internal;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
@@ -40,10 +37,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.DefaultExtensionComponent;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.RemoteExtension;
 import org.xwiki.extension.rating.RatingExtension;
-import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.search.solr.AbstractSolrCoreInitializer;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.SolrUtils;
@@ -169,18 +164,18 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
 
     private static final long SCHEMA_VERSION_15_5 = 150500000;
 
-    private static final long SCHEMA_VERSION_15_6 = 150600000;
-
-    @Inject
-    private Provider<InstalledExtensionRepository> installedExtensionRepository;
+    private static final long SCHEMA_VERSION_15_5_1 = 150501002;
 
     @Inject
     private SolrUtils solrUtils;
 
+    @Inject
+    private Provider<ExtensionIndexSolrUtil> extensionIndexSolrUtil;
+
     @Override
     protected long getVersion()
     {
-        return SCHEMA_VERSION_15_6;
+        return SCHEMA_VERSION_15_5_1;
     }
 
     @Override
@@ -255,13 +250,15 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
             setStringField(SECURITY_ADVICE, false, false);
         }
 
-        if (cversion < SCHEMA_VERSION_15_6) {
+        if (cversion < SCHEMA_VERSION_15_5_1) {
             migrateInstalledExtensions();
         }
     }
 
     /**
-     * Before XWiki 15.6-rc1/15.5.1/14.10.14, the old version of updated installed extensions was not correctly.
+     * Before XWiki 15.6-rc1/15.5.1, the old version of updated installed extensions was not correctly updated.
+     * Therefore, the old version was still considered as installed on some namespace after the upgrade. We need to
+     * define a migration to clean up outdated namespaces on old upgraded versions.
      *
      * @throws SolrException in case of issue when updating the extensions
      */
@@ -277,7 +274,7 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
                 results = updateBatch(batchSize, start);
             }
         } catch (SolrServerException | IOException e) {
-            throw new SolrException("Failed to update the ", e);
+            throw new SolrException("Failed to update the namespaces of installed extensions", e);
         }
     }
 
@@ -291,20 +288,16 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
         QueryResponse query = this.client.query(solrQuery);
         SolrDocumentList results = query.getResults();
         for (SolrDocument doc : results) {
-            String solrId = this.solrUtils.getId(doc);
             String id = this.solrUtils.get(SOLR_FIELD_EXTENSIONID, doc);
             String version = this.solrUtils.get(FIELD_VERSION, doc);
             if (id == null || version == null) {
                 continue;
             }
-            ExtensionId extensionId = new ExtensionId(id, version);
-            InstalledExtension actualNamespaces =
-                this.installedExtensionRepository.get().getInstalledExtension(extensionId);
             SolrInputDocument updateDocument = new SolrInputDocument();
-            this.solrUtils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID, solrId, updateDocument);
-            Collection<String> param = Optional.ofNullable(actualNamespaces).map(InstalledExtension::getNamespaces)
-                .orElseGet(List::of);
-            this.solrUtils.set(FIELD_INSTALLED_NAMESPACES, param, updateDocument);
+            String solrId = this.solrUtils.getId(doc);
+            this.solrUtils.set(SOLR_FIELD_ID, solrId, updateDocument);
+            this.extensionIndexSolrUtil.get().updateInstalledState(new ExtensionId(id, version), updateDocument);
+
             this.client.add(updateDocument);
         }
         return results;

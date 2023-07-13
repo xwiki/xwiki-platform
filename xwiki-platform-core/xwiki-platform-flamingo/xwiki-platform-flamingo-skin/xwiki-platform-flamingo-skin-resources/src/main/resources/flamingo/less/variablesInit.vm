@@ -99,7 +99,7 @@
   @panel-bg:                            $theme.panelBackgroundColor;
   @panel-default-text:                  $theme.panelTextColor;
   @xwiki-panel-header-bg:               $theme.panelHeaderBackgroundColor;
-  @xwiki-panel-header-text:             $theme.panelHeaderTextColor;
+  @panel-header-text:             $theme.panelHeaderTextColor;
 
   ##
   ## XWiki variables: LESS variables specific to XWiki
@@ -194,6 +194,7 @@
       "legend-border-color": "color",
       "panel-bg" : "color",
       "panel-default-text" : "color",
+      "panel-header-text" : "color",
       "breadcrumb-bg": "color",
       "breadcrumb-color": "color",
       "breadcrumb-separator": "escapedText",
@@ -226,7 +227,7 @@
   // Default
   @xwiki-border-color:                  $theme.borderColor;
   @xwiki-panel-header-bg:               $theme.panelHeaderBackgroundColor;
-  @xwiki-panel-header-text:             $theme.panelHeaderTextColor;
+  @panel-header-text:             $theme.panelHeaderTextColor;
   @xwiki-page-content-bg:               $theme.pageContentBackgroundColor;
   @xwiki-background-secondary-color:    $theme.backgroundSecondaryColor;
   @xwiki-page-header-bg-color:          $theme.pageHeaderBackgroundColor;

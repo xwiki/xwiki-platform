@@ -19,19 +19,34 @@
  */
 package org.xwiki.extension.index.internal;
 
+import java.io.IOException;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.DefaultExtensionComponent;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.RemoteExtension;
 import org.xwiki.extension.rating.RatingExtension;
+import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.search.solr.AbstractSolrCoreInitializer;
 import org.xwiki.search.solr.SolrException;
+import org.xwiki.search.solr.SolrUtils;
+
+import static org.xwiki.extension.Extension.FIELD_ID;
+import static org.xwiki.extension.Extension.FIELD_VERSION;
+import static org.xwiki.extension.InstalledExtension.FIELD_INSTALLED_NAMESPACES;
 
 /**
  * Initialize the Solr core dedicated to events storage.
@@ -150,10 +165,20 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
 
     private static final long SCHEMA_VERSION_15_5 = 150500000;
 
+    private static final long SCHEMA_VERSION_15_6 = 150600000;
+
+    private static final String ROOT_NAMESPACE = "{root}";
+
+    @Inject
+    private InstalledExtensionRepository installedExtensionRepository;
+
+    @Inject
+    private SolrUtils solrUtils;
+
     @Override
     protected long getVersion()
     {
-        return SCHEMA_VERSION_15_5;
+        return SCHEMA_VERSION_15_6;
     }
 
     @Override
@@ -166,7 +191,7 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
     protected void createSchema() throws SolrException
     {
         setStringField(SOLR_FIELD_EXTENSIONID, false, false);
-        setStringField(Extension.FIELD_VERSION, false, false);
+        setStringField(FIELD_VERSION, false, false);
 
         setStringField(Extension.FIELD_TYPE, false, false);
         setStringField(Extension.FIELD_REPOSITORY, false, false);
@@ -215,7 +240,7 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
         }
 
         if (cversion < SCHEMA_VERSION_14_0) {
-            setStringField(InstalledExtension.FIELD_INSTALLED_NAMESPACES, true, false);
+            setStringField(FIELD_INSTALLED_NAMESPACES, true, false);
         }
 
         if (cversion < SCHEMA_VERSION_15_5) {
@@ -227,6 +252,49 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
             setStringField(SECURITY_FIX_VERSION, false, false);
             setStringField(SECURITY_ADVICE, false, false);
         }
+
+        if (cversion < SCHEMA_VERSION_15_6) {
+            migrateInstalledExtensions();
+        }
+    }
+
+    private void migrateInstalledExtensions() throws SolrException
+    {
+        try {
+            int batchSize = 10000;
+            int start = 0;
+
+            SolrDocumentList results = updateBatch(batchSize, start);
+            while (results.size() >= batchSize) {
+                start = start + 1;
+                results = updateBatch(batchSize, start);
+            }
+        } catch (SolrServerException | IOException e) {
+            throw new SolrException("Failed to update the ", e);
+        }
+    }
+
+    private SolrDocumentList updateBatch(int batchSize, int start) throws SolrServerException, IOException
+    {
+        SolrQuery solrQuery = new SolrQuery()
+            .setRows(batchSize)
+            .setStart(start)
+            .setFilterQueries(FIELD_INSTALLED_NAMESPACES + ":[* TO *]")
+            .setFields(FIELD_ID, FIELD_VERSION, SOLR_FIELD_EXTENSIONID);
+        QueryResponse query = this.client.query(solrQuery);
+        SolrDocumentList results = query.getResults();
+        for (SolrDocument doc : results) {
+            String solrId = this.solrUtils.getId(doc);
+            String id = this.solrUtils.get(SOLR_FIELD_EXTENSIONID, doc);
+            String version = this.solrUtils.get(FIELD_VERSION, doc);
+            ExtensionId extensionId = new ExtensionId(id, version);
+            InstalledExtension actualNamespaces = this.installedExtensionRepository.getInstalledExtension(extensionId);
+            SolrInputDocument updateDocument = new SolrInputDocument();
+            this.solrUtils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID, solrId, updateDocument);
+            this.solrUtils.set(FIELD_INSTALLED_NAMESPACES, actualNamespaces.getNamespaces(), updateDocument);
+            this.client.add(updateDocument);
+        }
+        return results;
     }
 
     /**

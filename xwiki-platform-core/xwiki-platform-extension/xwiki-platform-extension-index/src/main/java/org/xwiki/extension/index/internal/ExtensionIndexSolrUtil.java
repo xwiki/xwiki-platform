@@ -32,9 +32,12 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.namespace.Namespace;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
+import org.xwiki.extension.internal.ExtensionFactory;
+import org.xwiki.extension.internal.converter.ExtensionIdConverter;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.search.solr.SolrUtils;
 
+import static org.xwiki.search.solr.SolrUtils.ATOMIC_UPDATE_MODIFIER_REMOVE;
 import static org.xwiki.search.solr.SolrUtils.ATOMIC_UPDATE_MODIFIER_SET;
 
 /**
@@ -55,6 +58,9 @@ public class ExtensionIndexSolrUtil
 
     @Inject
     private SolrUtils utils;
+
+    @Inject
+    private ExtensionFactory factory;
 
     /**
      * Update the installed state of a given extensionId. The provided {@link SolrInputDocument} is updated but need to
@@ -80,6 +86,9 @@ public class ExtensionIndexSolrUtil
             // We can already set those extensions as "incompatible" with those namespaces
             this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_INCOMPATIBLE_NAMESPACES, installedNamespaces,
                 document);
+        } else {
+            this.utils.setAtomic(ATOMIC_UPDATE_MODIFIER_REMOVE, InstalledExtension.FIELD_INSTALLED_NAMESPACES,
+                List.of(), document);
         }
     }
 
@@ -129,6 +138,25 @@ public class ExtensionIndexSolrUtil
             .map(this::fromStoredNamespace)
             .collect(Collectors.toList());
     }
+
+    /**
+     * @param solrId the identifier of the Solr document holding the extension
+     * @return the extension id
+     */
+    public ExtensionId fromSolrId(String solrId)
+    {
+        return ExtensionIdConverter.toExtensionId(solrId, null, this.factory);
+    }
+
+    /**
+     * @param extensionId the extension id
+     * @return the identifier of the Solr document holding the extension
+     */
+    public String toSolrId(ExtensionId extensionId)
+    {
+        return ExtensionIdConverter.toString(extensionId);
+    }
+
 
     /**
      * Convert a solr string representation to a string representation that can be stored in a {@link SolrExtension}.

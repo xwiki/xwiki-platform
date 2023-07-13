@@ -36,7 +36,6 @@ import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.DefaultExtensionComponent;
 import org.xwiki.extension.Extension;
-import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.RemoteExtension;
 import org.xwiki.extension.rating.RatingExtension;
 import org.xwiki.search.solr.AbstractSolrCoreInitializer;
@@ -164,13 +163,14 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
 
     private static final long SCHEMA_VERSION_15_5 = 150500000;
 
-    private static final long SCHEMA_VERSION_15_5_1 = 150501002;
+    // TODO: make sure to revert to 150501000 before merging...
+    private static final long SCHEMA_VERSION_15_5_1 = 150501005;
 
     @Inject
     private SolrUtils solrUtils;
 
     @Inject
-    private Provider<ExtensionIndexSolrUtil> extensionIndexSolrUtil;
+    private Provider<ExtensionIndexSolrUtil> extensionIndexSolrUtilProvider;
 
     @Override
     protected long getVersion()
@@ -273,6 +273,7 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
                 start = start + 1;
                 results = updateBatch(batchSize, start);
             }
+            this.client.commit();
         } catch (SolrServerException | IOException e) {
             throw new SolrException("Failed to update the namespaces of installed extensions", e);
         }
@@ -284,19 +285,15 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
             .setRows(batchSize)
             .setStart(start)
             .setFilterQueries(FIELD_INSTALLED_NAMESPACES + ":[* TO *]")
-            .setFields(FIELD_ID, FIELD_VERSION, SOLR_FIELD_EXTENSIONID);
+            .setFields(FIELD_ID);
         QueryResponse query = this.client.query(solrQuery);
         SolrDocumentList results = query.getResults();
         for (SolrDocument doc : results) {
-            String id = this.solrUtils.get(SOLR_FIELD_EXTENSIONID, doc);
-            String version = this.solrUtils.get(FIELD_VERSION, doc);
-            if (id == null || version == null) {
-                continue;
-            }
             SolrInputDocument updateDocument = new SolrInputDocument();
             String solrId = this.solrUtils.getId(doc);
             this.solrUtils.set(SOLR_FIELD_ID, solrId, updateDocument);
-            this.extensionIndexSolrUtil.get().updateInstalledState(new ExtensionId(id, version), updateDocument);
+            ExtensionIndexSolrUtil extensionIndexSolrUtil = this.extensionIndexSolrUtilProvider.get();
+            extensionIndexSolrUtil.updateInstalledState(extensionIndexSolrUtil.fromSolrId(solrId), updateDocument);
 
             this.client.add(updateDocument);
         }

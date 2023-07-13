@@ -212,8 +212,11 @@
   #set ($defaultValueHint = "($escapetool.xml($services.localization.render('userprofile.default')))")
   #if ($isEdit)
     #set ($escapedId = $escapetool.xml("XWiki.XWikiUsers_0_${fieldName}"))
-    #set ($escapedHintId = $escapedSelectId + "_hint")
-    &lt;select name="$escapedId" id="$escapedId" size="1" aria-describedby="$escapedHintId"&gt;
+    &lt;select name="$escapedId" id="$escapedId" size="1"
+      #if ($services.localization.get("XWiki.XWikiUsers_${fieldName}.hint"))
+        #set ($escapedHintId = $escapedSelectId + "_hint")
+        aria-describedby="$escapedHintId"
+      #end&gt;
       #if ($defaultValue)
         &lt;option value=""&gt;---&lt;/option&gt;
       #end

@@ -729,7 +729,7 @@ class IncludeMacroTest
         if (includedPageReference != null) {
             when(this.macroEntityReferenceResolver.resolve(eq(includedPageReferenceString), eq(EntityType.PAGE),
                 any(MacroBlock.class))).thenReturn(includedPageReference);
-            when(this.dab.getDocumentInstance((EntityReference) includedPageReference))
+            when(this.dab.getDocumentInstance(includedPageReference))
                 .thenReturn(this.includedDocument);
         }
 

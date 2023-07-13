@@ -658,6 +658,28 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 # extension.ignoredDependencies=xerces:xmlParserAPIs
 
 #-------------------------------------------------------------------------------------
+# Extension Manager - Security
+#-------------------------------------------------------------------------------------
+
+#-# [Since 15.5RC1]
+#-# When true, the security scan is enabled. This is the default; set to false to disable the scan.
+#-#
+# extension.security.scan.enabled = true
+
+#-# [Since 15.5RC1]
+#-# Specifies the delay before starting a new security scan after the last one has finished.
+#-# The default value is 24 hours.
+#-#
+# extension.security.scan.delay = 24
+
+#-# [Since 15.5RC1]
+#-# Specifies the url to use as the endpoint for the security scan rest queries.
+#-# The url must conform to the API documented here: https://google.github.io/osv.dev/post-v1-query/
+#-# The default value is https://api.osv.dev/v1/query.
+#-#
+# extension.security.scan.url = https://api.osv.dev/v1/query
+
+#-------------------------------------------------------------------------------------
 # Distribution Wizard
 #-------------------------------------------------------------------------------------
 
@@ -1381,15 +1403,6 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-------------------------------------------------------------------------------------
 # Refactoring
 #-------------------------------------------------------------------------------------
-
-#-# [Since 12.5RC1]
-#-# Indicate to use the old implementation based on copy and delete, or the new implementation using an atomic operation
-#-# on database (which is a lot more performant).
-#-# This property aims at being removed in the future once the atomic rename has been validated to work 100% fine.
-#-# Only use it if you are facing an issue with the move/rename features.
-#-#
-#-# The default value is:
-# refactoring.rename.useAtomicRename = true
 
 #-# [Since 12.9RC1]
 #-# Indicates whether skipping the recycle bin when deleting pages is allowed for Advanced users.

@@ -300,7 +300,7 @@ class AttachmentIT
 
     @Test
     @Order(5)
-    void filterAttachmentsLivetable(TestUtils setup, TestReference testReference) throws Exception
+    void filterAttachmentsLiveData(TestUtils setup, TestReference testReference) throws Exception
     {
         ViewPage viewPage = setup.createPage(testReference, "", "");
 

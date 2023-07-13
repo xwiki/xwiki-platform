@@ -47,8 +47,10 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.test.ui.po.DateRangePicker;
 import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.SuggestInputElement;
+import org.xwiki.text.StringUtils;
 
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.hasItem;
@@ -71,6 +73,8 @@ public class TableLayoutElement extends BaseElement
     private static final String INNER_HTML_ATTRIBUTE = "innerHTML";
 
     private static final String CLASS_HTML_ATTRIBUTE = "class";
+
+    private final LiveDataElement liveData;
 
     /**
      * A matcher for the cell containing links. The matcher assert of a given {@link WebElement} contains a {@code a}
@@ -202,17 +206,15 @@ public class TableLayoutElement extends BaseElement
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TableLayoutElement.class);
 
-    private final String liveDataId;
-
     /**
      * Default constructor. Initializes a live data table layout page object.
      *
-     * @param liveDataId the live data id
-     * @since 12.10.9
+     * @param liveData the live data object corresponding to this table layout
+     * @since 15.5
      */
-    public TableLayoutElement(String liveDataId)
+    public TableLayoutElement(LiveDataElement liveData)
     {
-        this.liveDataId = liveDataId;
+        this.liveData = liveData;
     }
 
     /**
@@ -390,13 +392,13 @@ public class TableLayoutElement extends BaseElement
             }
             // And the count of row is greater than the expected count.
             int count = countRows();
-            LOGGER.info("LiveTableElement#waitUntilRowCountGreaterThan/refresh(): count = [{}]", count);
+            LOGGER.info("TableLayoutElement#waitUntilRowCountGreaterThan/refresh(): count = [{}]", count);
             return count >= minimalExpectedRowCount;
         }, timeout);
     }
 
     /**
-     * Waits until a the number of rows displayed in the live data matches the expected count.
+     * Waits until the number of rows displayed in the live data matches the expected count.
      *
      * @param expectedRowCount the number of expected rows
      * @see #waitUntilRowCountEqualsTo(int, int) if you want to define a custom timeout
@@ -407,21 +409,50 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
-     * Waits until a the number of rows displayed in the live data matches the expected count.
+     * Waits until the number of rows displayed in the live data matches the expected count.
+     *
+     * @param expectedRowCount the number of expected rows
+     * @param refresh when {@code true}, the Live Data is reloaded before each count
+     * @see #waitUntilRowCountEqualsTo(int, int) if you want to define a custom timeout
+     */
+    public void waitUntilRowCountEqualsTo(int expectedRowCount, boolean refresh)
+    {
+        waitUntilRowCountEqualsTo(expectedRowCount, getDriver().getTimeout(), refresh);
+    }
+
+    /**
+     * Waits until the number of rows displayed in the live data matches the expected count.
      *
      * @param expectedRowCount the number of expected rows
      * @param timeout a custom timeout before stopping the wait and raising an error
      */
     public void waitUntilRowCountEqualsTo(int expectedRowCount, int timeout)
     {
+        waitUntilRowCountEqualsTo(expectedRowCount, timeout, false);
+    }
+
+    /**
+     * Waits until the number of rows displayed in the live data matches the expected count.
+     *
+     * @param expectedRowCount the number of expected rows
+     * @param timeout a custom timeout before stopping the wait and raising an error
+     * @param refresh if {@code true}, the 
+     */
+    public void waitUntilRowCountEqualsTo(int expectedRowCount, int timeout, boolean refresh)
+    {
         getDriver().waitUntilCondition(webDriver -> {
+            if (refresh) {
+                this.liveData.refresh();
+            }
+
             // Cells are displayed. And they are loaded.
             if (isEmpty() || !areCellsLoaded()) {
                 return false;
             }
+            
             // And the count of row is greater than the expected count.
             int count = countRows();
-            LOGGER.info("LiveTableElement#waitUntilRowCountEqualsTo/refresh(): count = [{}]", count);
+            LOGGER.info("TableLayoutElement#waitUntilRowCountEqualsTo/refresh(): count = [{}]", count);
             return count == expectedRowCount;
         }, timeout);
     }
@@ -489,6 +520,16 @@ public class TableLayoutElement extends BaseElement
         } else if (classes.contains("filter-text")) {
             element.clear();
             element.sendKeys(content);
+        } else if (classes.contains("filter-date")) {
+            element.click();
+            DateRangePicker picker = new DateRangePicker(element);
+            if (StringUtils.isNotBlank(content)) {
+                element.clear();
+                element.sendKeys(content);
+                picker.applyRange();
+            } else {
+                picker.clearRange();
+            }
         }
 
         if (wait) {
@@ -777,7 +818,7 @@ public class TableLayoutElement extends BaseElement
 
     private WebElement getRoot()
     {
-        return getDriver().findElement(By.id(this.liveDataId));
+        return getDriver().findElement(By.id(this.liveData.getId()));
     }
 
     private int findColumnIndex(String columnLabel)

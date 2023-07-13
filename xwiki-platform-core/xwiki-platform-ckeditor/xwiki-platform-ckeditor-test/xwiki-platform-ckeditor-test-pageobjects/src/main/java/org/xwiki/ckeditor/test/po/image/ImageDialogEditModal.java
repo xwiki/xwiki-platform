@@ -20,10 +20,9 @@
 package org.xwiki.ckeditor.test.po.image;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 import org.xwiki.ckeditor.test.po.image.edit.ImageDialogAdvancedEditForm;
 import org.xwiki.ckeditor.test.po.image.edit.ImageDialogStandardEditForm;
-import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.test.ui.po.BaseModal;
 
 /**
  * Page Object for the image edition/configuration modal.
@@ -31,18 +30,25 @@ import org.xwiki.test.ui.po.BaseElement;
  * @version $Id$
  * @since 14.7RC1
  */
-public class ImageDialogEditModal extends BaseElement
+public class ImageDialogEditModal extends BaseModal
 {
     /**
-     * Wait until the modal is loaded.
-     *
-     * @return the current page object
+     * Default constructor.
      */
-    public ImageDialogEditModal waitUntilReady()
+    public ImageDialogEditModal()
     {
-        getDriver().waitUntilElementIsVisible(By.className("image-editor-modal"));
-        getDriver().waitUntilElementDisappears(By.cssSelector(".image-editor-modal .loading"));
-        return this;
+        this(By.className("image-editor-modal"));
+    }
+
+    private ImageDialogEditModal(By selector)
+    {
+        super(selector);
+
+        // This modal is added on demand so we can't rely on the base constructor to remove the "fade in" effect. We
+        // have to do the wait ourselves.
+        getDriver().waitUntilElementIsVisible(selector);
+        this.container = getDriver().findElementWithoutWaiting(selector);
+        getDriver().waitUntilElementDisappears(this.container, By.className("loading"));
     }
 
     /**
@@ -50,29 +56,8 @@ public class ImageDialogEditModal extends BaseElement
      */
     public void clickInsert()
     {
-        By buttonSelector = By.cssSelector(".image-editor-modal .btn-primary");
-        clickCloseButton(buttonSelector);
-    }
-
-    /**
-     * Click on the cancel button to close the modal.
-     * @since 14.10.13
-     * @since 15.5RC1
-     */
-    public void clickCancel()
-    {
-        By buttonSelector = By.cssSelector(".image-editor-modal [data-dismiss='modal']");
-        clickCloseButton(buttonSelector);
-    }
-
-    private void clickCloseButton(By buttonSelector)
-    {
-        // Wait for the button to be enabled before clicking.
-        // Wait for the button to be hidden before continuing.
-        WebElement buttonElement = getDriver().findElement(buttonSelector);
-        getDriver().waitUntilElementIsEnabled(buttonElement);
-        buttonElement.click();
-        getDriver().waitUntilElementDisappears(buttonSelector);
+        this.container.findElement(By.className("btn-primary")).click();
+        waitForClosed();
     }
 
     /**
@@ -82,7 +67,7 @@ public class ImageDialogEditModal extends BaseElement
      */
     public ImageDialogStandardEditForm switchToStandardTab()
     {
-        getDriver().findElement(By.cssSelector(".image-editor-modal .image-editor a[href='#standard']")).click();
+        this.container.findElement(By.cssSelector(".image-editor a[href='#standard']")).click();
         return new ImageDialogStandardEditForm();
     }
 
@@ -93,7 +78,7 @@ public class ImageDialogEditModal extends BaseElement
      */
     public ImageDialogAdvancedEditForm switchToAdvancedTab()
     {
-        getDriver().findElement(By.cssSelector(".image-editor-modal .image-editor a[href='#advanced']")).click();
+        this.container.findElement(By.cssSelector(".image-editor a[href='#advanced']")).click();
         return new ImageDialogAdvancedEditForm();
     }
 }

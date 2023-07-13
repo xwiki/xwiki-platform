@@ -1,2 +1,0 @@
-org.xwiki.rendering.internal.macro.rss.RssMacro
-org.xwiki.rendering.internal.macro.rss.FeedItemContentCleaner

@@ -80,7 +80,7 @@ class XWikiWebSocketRequestStubTest
         assertArrayEquals(new String[] {"red", "blue"}, stub.getParameterValues("color"));
 
         assertEquals("xyz", stub.getCookie("validation").getValue());
-        assertEquals(5, stub.getCookies().length);
+        assertEquals(6, stub.getCookies().length);
 
         assertEquals(1212491130000L, stub.getDateHeader("daTe"));
         assertEquals(-1, stub.getDateHeader("missing"));

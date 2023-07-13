@@ -35,6 +35,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.bridge.event.WikiCreatedEvent;
 import org.xwiki.bridge.event.WikiCreatingEvent;
+import org.xwiki.extension.DefaultExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.UninstallException;
@@ -44,6 +45,7 @@ import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.job.internal.UninstallJob;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.test.MockitoRepositoryUtilsRule;
+import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtensionRepository;
 import org.xwiki.job.Job;
@@ -206,7 +208,15 @@ public class XarExtensionHandlerTest
             }
         }
 
-        return (XarInstalledExtension) this.xarExtensionRepository.resolve(extensionId);
+        XarInstalledExtension xarExtension;
+        if (extensionId.getVersion().getValue().endsWith("-SNAPSHOT")) {
+            xarExtension = (XarInstalledExtension) this.xarExtensionRepository.resolve(new DefaultExtensionDependency(
+                extensionId.getId(), new DefaultVersionConstraint(extensionId.getVersion())));
+        } else {
+            xarExtension = (XarInstalledExtension) this.xarExtensionRepository.resolve(extensionId);
+        }
+
+        return xarExtension;
     }
 
     private void uninstall(ExtensionId extensionId, String wiki) throws Throwable
@@ -1009,6 +1019,21 @@ public class XarExtensionHandlerTest
             getXWikiContext());
 
         assertTrue(pageWiki2.isNew());
+    }
+
+    @Test
+    public void testInstallLocalSNAPSHOT() throws Throwable
+    {
+        // install
+
+        install(new ExtensionId("snaplocalextension", "1.0-SNAPSHOT"), "wiki", this.contextUser);
+
+        // validate
+
+        XWikiDocument page =
+            this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"), getXWikiContext());
+
+        assertFalse(page.isNew());
     }
 
     // rights check

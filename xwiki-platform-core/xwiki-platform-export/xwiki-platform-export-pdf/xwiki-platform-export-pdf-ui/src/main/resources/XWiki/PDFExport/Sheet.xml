@@ -395,18 +395,19 @@ define('paged-polyfill-patched', ['paged-polyfill'], function(PagedPolyfill) {
    * This is a workaround for the Chrome / Paged.js bug that makes table rows hidden when they are split between print
    * pages. See https://github.com/pagedjs/pagedjs/issues/114 . See also https://jira.xwiki.org/browse/XWIKI-20741 .
    * TODO: Remove this hack once we upgrade to Paged.js 0.5.0 (as it seems the beta version is fixing the problem).
+   *
+   * See also https://pagedjs.org/documentation/10-handlers-hooks-and-custom-javascript/
    */
   class ShowInvisibleRowsOnPageBreaks extends Paged.Handler {
     constructor(chunker, polisher, caller) {
       super(chunker, polisher, caller);
     }
 
-    afterPageLayout(pageFragment) {
+    afterPageLayout(pageFragment, page) {
       // We don't need the column display once the print page layout is done, but we need to make sure the page content
       // doesn't overflow the page footer.
-      const pageContentWrapper = pageFragment.querySelector('.pagedjs_page_content');
-      pageContentWrapper.style.columnWidth = 'unset';
-      pageContentWrapper.style.overflow = 'hidden';
+      page.area.style.columnWidth = 'unset';
+      page.area.style.overflow = 'hidden';
     }
   }
 
@@ -663,6 +664,17 @@ require([
     });
   };
 
+  const preserveWhiteSpaceInCodeBlocks = () =&gt; {
+    // Paged.js removes / skips the white-space-only text nodes that are direct children of a block element (a DIV in
+    // our case) even if that element asks for white-space to be preserved (through CSS). The workaround we apply here
+    // is to wrapp all these white-space-only text nodes with a SPAN (so their parent is not a block element anymore).
+    // See XWIKI-20553: The whitespace between two highlighted code tokens is lost when exporting to PDF
+    // See also https://github.com/pagedjs/pagedjs/issues/45
+    $('#xwikicontent div.box &gt; div.code').contents().filter(function() {
+      return this.nodeType === 3;
+    }).wrap("&lt;span&gt;&lt;/span&gt;");
+  };
+
   // Adjust the exported content before performing the print layout.
   pageReady.afterPageReady(() =&gt; {
     refactorAnchors();
@@ -670,6 +682,7 @@ require([
     validateTableOfContentsAnchors();
     storeFormFieldValues();
     makeTableCellWidthRelative();
+    preserveWhiteSpaceInCodeBlocks();
   });
 
   // Trigger the print preview after the page is ready. Note that by returning a promise we're making the next page
@@ -1017,6 +1030,19 @@ require([
       choose is to make sure that the table text can always be split (hyphenate) on multiple lines. This is not a
       complete solution but it should cover most of the large tables. */
     .hyphenate();
+  }
+
+  // Make sure the content of the code macro is not cut when it exceeds the print page width by:
+  div.code {
+    // decreasing the font size when printing
+    font-size: 80%;
+  }
+  div.code, div.code * {
+    // and wrapping long lines, while still preserving the whitespace.
+    white-space: pre-wrap;
+  }
+  div.box &gt; div.code &gt; pre {
+    margin: 0;
   }
 }</code>
     </property>

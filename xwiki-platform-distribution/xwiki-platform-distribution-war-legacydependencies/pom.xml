@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>15.5-SNAPSHOT</version>
+    <version>15.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-war-legacydependencies</artifactId>
   <name>XWiki Platform - Distribution - War - Legacy Dependencies</name>
@@ -53,6 +53,7 @@
                   <excludes>
                     <exclude>org.xwiki.commons:xwiki-commons-component-default:*:jar:*</exclude>
                     <exclude>org.xwiki.commons:xwiki-platform-distribution-war-dependencies:*:jar:*</exclude>
+                    <exclude>org.xwiki.commons:xwiki-commons-component-api:*:jar:*</exclude>
                     <exclude>org.xwiki.rendering:xwiki-rendering-api:*:jar:*</exclude>
                     <exclude>org.xwiki.rendering:xwiki-rendering-transformation-macro:*:jar:*</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-extension-handler-xar:*:jar:*</exclude>
@@ -159,6 +160,11 @@
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-legacy-component-default</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-legacy-component-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
     <dependency>
@@ -465,11 +471,23 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-legacy-notifications-notifiers-default</artifactId>
       <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-oldcore</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-legacy-notifications-sources</artifactId>
       <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-component-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 </project>

@@ -48,6 +48,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.mandatory.XWikiPreferencesDocumentInitializer;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
@@ -333,26 +334,41 @@ public class DefaultNotificationPreferenceModelBridge implements NotificationPre
     public String getEventGroupingStrategyHint(DocumentReference userDocReference, String target)
         throws NotificationException
     {
-        String result = "default";
+        String result = null;
         XWikiContext context = contextProvider.get();
         try {
             XWikiDocument document = context.getWiki().getDocument(userDocReference, context);
-            List<BaseObject> objects =
-                document.getXObjects(NotificationEventGroupingStrategyPreferenceDocumentInitializer.REFERENCE);
-            for (BaseObject object : objects) {
-                if (StringUtils.equalsIgnoreCase(target,
-                    object.getStringValue(NotificationEventGroupingStrategyPreferenceDocumentInitializer.FIELD_TARGET)))
-                {
-                    result = object.getStringValue(
-                        NotificationEventGroupingStrategyPreferenceDocumentInitializer.FIELD_STRATEGY);
-                    break;
-                }
+            result = getEventGroupingStrategyHint(document, target);
+            if (result == null) {
+                DocumentReference xwikiPrefReference =
+                    new DocumentReference(XWikiPreferencesDocumentInitializer.LOCAL_REFERENCE,
+                        userDocReference.getWikiReference());
+                document = context.getWiki().getDocument(xwikiPrefReference, context);
+                result = getEventGroupingStrategyHint(document, target);
             }
         } catch (XWikiException e) {
             throw new NotificationException(
                 String.format("Error when trying to load the event grouping strategy preference for "
                 + "user [%s]", userDocReference), e);
         }
+        if (result == null) {
+            result = "default";
+        }
         return result;
+    }
+
+    private String getEventGroupingStrategyHint(XWikiDocument document, String target)
+    {
+        List<BaseObject> objects =
+            document.getXObjects(NotificationEventGroupingStrategyPreferenceDocumentInitializer.REFERENCE);
+        for (BaseObject object : objects) {
+            if (object != null && StringUtils.equalsIgnoreCase(target,
+                object.getStringValue(NotificationEventGroupingStrategyPreferenceDocumentInitializer.FIELD_TARGET)))
+            {
+                return object.getStringValue(
+                    NotificationEventGroupingStrategyPreferenceDocumentInitializer.FIELD_STRATEGY);
+            }
+        }
+        return null;
     }
 }

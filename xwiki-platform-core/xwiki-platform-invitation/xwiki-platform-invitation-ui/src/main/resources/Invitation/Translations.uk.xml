@@ -46,4 +46,4 @@ Invitation.WebHome_smtp_port.hint=Порт сервера SMTP, який пот�
 Invitation.WebHome_smtp_server.hint=SMTP-сервер, на який потрібно надіслати.
 Invitation.WebHome_javamail_extra_props.hint=Список додаткових властивостей JavaMail, які потрібно використовувати.
 </content>
-  </xwikidoc>
+</xwikidoc>

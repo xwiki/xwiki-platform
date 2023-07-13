@@ -31,7 +31,15 @@ import org.xwiki.test.docker.junit5.UITest;
  * @since 14.4.2
  * @since 14.5
  */
-@UITest(extraJARs = {"org.xwiki.platform:xwiki-platform-resource-temporary"})
+@UITest(
+    extraJARs = {
+        "org.xwiki.platform:xwiki-platform-resource-temporary",
+        // Code macro highlighting works only if Jython is a core extension. It's not enough to use language=none in our
+        // test because we want to reproduce a bug in Paged.js where white-space between highlighted tokens is lost.
+        "org.python:jython-slim"
+    },
+    resolveExtraJARs = true
+)
 @ExtendWith(PDFExportExecutionCondition.class)
 class AllIT
 {

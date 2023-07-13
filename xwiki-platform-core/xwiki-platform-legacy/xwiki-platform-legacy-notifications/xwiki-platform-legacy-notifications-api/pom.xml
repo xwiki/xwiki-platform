@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-legacy-notifications</artifactId>
-    <version>15.5-SNAPSHOT</version>
+    <version>15.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-legacy-notifications-api</artifactId>
   <name>XWiki Platform - Legacy - Notifications - API</name>
@@ -34,6 +34,7 @@
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Legacy Notifications API</xwiki.extension.name>
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-notifications-api</xwiki.extension.features>
+    <xwiki.jacoco.instructionRatio>0.50</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <!-- Trigger xwiki-platform-notifications-api dependencies (but without xwiki-platform-notifications-api jar itself) -->

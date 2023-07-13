@@ -91,9 +91,7 @@ public class ExtensionInstallListener extends AbstractEventListener
         String namespace) throws SolrServerException, IOException
     {
         for (InstalledExtension previousExtension : previousExtensions) {
-            if (previousExtension.getNamespaces() == null || previousExtension.getNamespaces().contains(namespace)) {
-                this.store.updateInstalled(previousExtension.getId(), namespace, false);
-            }
+            this.store.updateInstalled(previousExtension.getId(), namespace, false);
         }
 
         this.store.updateInstalled(extensionId, namespace, true);

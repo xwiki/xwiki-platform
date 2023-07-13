@@ -147,6 +147,7 @@ public class ExtensionSecuritySolrClient
         // Only include extensions with a computed CVSS score, meaning that they have at least one known security
         // vulnerability.
         solrQuery.addFilterQuery(String.format("%s:[0 TO 10]", SECURITY_MAX_CVSS));
+        solrQuery.addFilterQuery(FIELD_INSTALLED_NAMESPACES + ":[* TO *]");
     }
 
     private static void initSort(LiveDataQuery liveDataQuery, SolrQuery solrQuery)

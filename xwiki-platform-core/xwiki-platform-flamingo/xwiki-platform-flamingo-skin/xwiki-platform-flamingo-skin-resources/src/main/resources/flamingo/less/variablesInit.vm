@@ -254,6 +254,10 @@
   ## For the warning buttons, since the saturation is very high, we'd need to make the background way darker, going
   ## from an orangish yellow to complete brown. Instead, we change the text color to black.
   @btn-warning-color:                   #000;
+  ## The boxes should have enough contrast by default, we make it lighter than bootstrap.
+  @state-danger-bg:                     #f8ecec;
+  @state-success-bg:                    #e5f3df;
+  @state-info-bg:                       #e1f1f9;
 #end
 
 ##############################################

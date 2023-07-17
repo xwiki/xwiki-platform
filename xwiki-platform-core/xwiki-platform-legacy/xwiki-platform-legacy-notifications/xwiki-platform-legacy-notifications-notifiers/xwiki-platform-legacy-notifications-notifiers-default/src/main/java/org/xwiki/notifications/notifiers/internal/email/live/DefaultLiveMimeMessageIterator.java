@@ -65,7 +65,7 @@ public class DefaultLiveMimeMessageIterator extends AbstractMimeMessageIterator
             CompositeEvent event, DocumentReference templateReference)
     {
         this.compositeEvent = event;
-        super.initialize(userIterator, factoryParameters, templateReference);
+        super.initialize(userIterator, factoryParameters, templateReference, userIterator.getInterval());
     }
 
     /**

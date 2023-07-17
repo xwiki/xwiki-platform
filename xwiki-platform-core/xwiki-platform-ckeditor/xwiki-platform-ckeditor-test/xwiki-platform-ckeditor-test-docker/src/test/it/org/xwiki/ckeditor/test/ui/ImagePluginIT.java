@@ -212,8 +212,8 @@ class ImagePluginIT
     }
 
     /**
-     * Verify that the {@code wikigeneratedid} class is correctly preserved when the caption is activated on an
-     * existing image and thus the id is not persisted, see
+     * Verify that the {@code wikigeneratedid} class is correctly preserved when the caption is activated on an existing
+     * image and thus the id is not persisted, see
      * <a href="https://jira.xwiki.org/browse/XWIKI-20652">XWIKI-20652</a>.
      * Also verify that custom ids are preserved, nevertheless.
      */
@@ -470,6 +470,84 @@ class ImagePluginIT
 
         assertEquals("[[image:image.gif||data-xwiki-image-style-alignment=\"center\"]]",
             savedPage.editWiki().getContent());
+    }
+
+    @Test
+    @Order(11)
+    void updateImageSize(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Upload an attachment to test with.
+        String attachmentName = "image.gif";
+        AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
+        ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
+
+        WYSIWYGEditPage wysiwygEditPage = newPage.editWYSIWYG();
+        CKEditor editor = new CKEditor("content").waitToLoad();
+
+        // Insert a with caption and alignment to center.
+        ImageDialogSelectModal imageDialogSelectModal = editor.clickImageButton();
+        imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);
+        ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
+        imageDialogEditModal.switchToAdvancedTab().setWidth(100);
+        imageDialogEditModal.clickInsert();
+
+        ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
+
+        assertEquals("[[image:image.gif||height=\"100\" width=\"100\"]]", savedPage.editWiki().getContent());
+
+        wysiwygEditPage = savedPage.editWYSIWYG();
+        editor = new CKEditor("content").waitToLoad();
+
+        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+
+        imageDialogEditModal = editor.clickImageButtonWhenImageExists();
+        imageDialogEditModal.switchToAdvancedTab().setWidth(50);
+        imageDialogEditModal.clickInsert();
+
+        wysiwygEditPage.clickSaveAndView();
+
+        assertEquals("[[image:image.gif||height=\"50\" width=\"50\"]]", savedPage.editWiki().getContent());
+    }
+
+    @Test
+    @Order(12)
+    void updateExternalImageSize(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Upload an attachment to test with.
+        String attachmentName = "image.gif";
+        AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
+        ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
+
+        WYSIWYGEditPage wysiwygEditPage = newPage.editWYSIWYG();
+        CKEditor editor = new CKEditor("content").waitToLoad();
+
+        // Insert a with caption and alignment to center.
+        ImageDialogSelectModal imageDialogSelectModal = editor.clickImageButton();
+        // The WebHome part is important but is removed when serializing an attachment, adding it back before the 
+        // attachment name.
+        String imageURL = setup.getURL(attachmentReference, "download", "")
+            .replace("/" + attachmentName, "/WebHome/" + attachmentName);
+        imageDialogSelectModal.switchToUrlTab().setUrlValue(imageURL);
+        ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
+        imageDialogEditModal.switchToAdvancedTab().setWidth(100);
+        imageDialogEditModal.clickInsert();
+
+        ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
+
+        assertEquals("[[image:" + imageURL + "||height=\"100\" width=\"100\"]]", savedPage.editWiki().getContent());
+
+        wysiwygEditPage = savedPage.editWYSIWYG();
+        editor = new CKEditor("content").waitToLoad();
+
+        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+
+        imageDialogEditModal = editor.clickImageButtonWhenImageExists();
+        imageDialogEditModal.switchToAdvancedTab().setWidth(50);
+        imageDialogEditModal.clickInsert();
+
+        wysiwygEditPage.clickSaveAndView();
+
+        assertEquals("[[image:" + imageURL + "||height=\"50\" width=\"50\"]]", savedPage.editWiki().getContent());
     }
 
     private static void createAndLoginStandardUser(TestUtils setup)

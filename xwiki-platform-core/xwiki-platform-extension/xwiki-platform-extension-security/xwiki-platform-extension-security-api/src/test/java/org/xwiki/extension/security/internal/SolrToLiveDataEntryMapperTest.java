@@ -85,12 +85,13 @@ class SolrToLiveDataEntryMapperTest
             "wiki:s1"));
         when(this.l10n.getTranslationPlain("translation.key")).thenReturn("Translation Value");
         assertEquals(Map.of(
+            "extensionId","org.test:ext/7.5",
             "cveID", "",
             "fixVersion", "8.4",
             "maxCVSS", 5.0,
             "advice", "Translation Value",
             "name",
-            "<a href='null' title='Ext Name'>Ext Name</a><br/><span class='xHint' title='org.test:ext/7.5'>org.test:ext/7.5</span>",
+            "<a href='null'>Ext Name</a>",
             "wikis", "xwiki, s1"
         ), this.mapper.mapDocToEntries(this.doc));
     }

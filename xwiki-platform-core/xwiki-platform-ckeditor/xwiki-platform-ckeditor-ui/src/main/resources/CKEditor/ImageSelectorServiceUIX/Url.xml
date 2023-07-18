@@ -127,13 +127,17 @@
     <property>
       <code>require(['jquery', 'imageSelector'], function($, imageSelector) {
   function init(element) {
-    element.find('.urlTab input[type="text"]').on('input', function () {
+    const urlField = element.find('.urlTab input[name="urlField"]')
+    urlField.on('input', function () {
       if ($(this).val() === '') {
         imageSelector.updateSelectedImageReferences([], $(this));
       } else {
         imageSelector.updateSelectedImageReferences([{type: 'url', reference: $(this).val()}], $(this));
       }
     });
+    // Enable the field once the javascript is loaded as otherwise a value can be entered before the listener above
+    // is attached to the element.
+    urlField.prop( "disabled", false );
   }
 
   init($(document).find('.image-selector'));
@@ -293,7 +297,7 @@
       &lt;/span&gt;
     &lt;/dt&gt;
     &lt;dd&gt;
-      &lt;input name="urlField" type="text"
+      &lt;input name="urlField" type="text" disabled="disabled"
         placeholder="$escapetool.xml($services.localization.render('ckeditor.plugin.image.imageSelector.urlTab.url.placeholder'))" /&gt;
     &lt;/dd&gt;
   &lt;/dl&gt;

@@ -38,7 +38,6 @@ import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.search.solr.SolrUtils;
 
 import static org.xwiki.extension.InstalledExtension.FIELD_INSTALLED_NAMESPACES;
-import static org.xwiki.search.solr.SolrUtils.ATOMIC_UPDATE_MODIFIER_REMOVE;
 import static org.xwiki.search.solr.SolrUtils.ATOMIC_UPDATE_MODIFIER_SET;
 
 /**

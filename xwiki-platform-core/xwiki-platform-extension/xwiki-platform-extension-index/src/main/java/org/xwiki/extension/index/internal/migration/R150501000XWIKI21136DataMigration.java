@@ -35,6 +35,7 @@ import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.index.internal.ExtensionIndexSolrUtil;
 import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrException;
@@ -51,6 +52,9 @@ import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializ
 import static org.xwiki.search.solr.AbstractSolrCoreInitializer.SOLR_FIELD_ID;
 
 /**
+ * Update the {@link InstalledExtension#FIELD_INSTALLED_NAMESPACES} field of extensions, because they were not updated
+ * on extension upgrade before.
+ *
  * @version $Id$
  * @since 15.5.1
  * @since 15.6RC1
@@ -86,13 +90,14 @@ public class R150501000XWIKI21136DataMigration implements HibernateDataMigration
     @Override
     public String getDescription()
     {
-        return "TODO....";
+        return "Update the installedNamespaces of indexed extensions, because they were not updated on upgrade "
+            + "previously";
     }
 
     @Override
     public XWikiDBVersion getVersion()
     {
-        return new XWikiDBVersion(150501001);
+        return new XWikiDBVersion(150501000);
     }
 
     @Override

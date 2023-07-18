@@ -453,12 +453,12 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         public void dispose()
         {
             if (!disposed) {
+                DefaultSecurityCache.this.cache.remove(getKey());
+                DefaultSecurityCache.this.internalEntries.remove(getKey());
                 disposed = true;
 
                 disconnectFromParents();
                 disposeChildren();
-                DefaultSecurityCache.this.cache.remove(getKey());
-                DefaultSecurityCache.this.internalEntries.remove(getKey());
             }
         }
 
@@ -659,6 +659,14 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         return getInternal(getShadowEntryKey(userReference, wiki));
     }
 
+    /**
+     * Get a security cache entry from the cache or the internal map. In the latter case, the entry is re-inserted
+     * into the cache. This method can be called without locking, it uses the read lock internally.
+     *
+     * @param key the key of the entry to retrieve
+     * @throws IllegalStateException if the entry has been disposed (this should never happen)
+     * @return the entry corresponding to the given key, null if none is available in the cache
+     */
     private SecurityCacheEntry getInternal(String key)
     {
         readLock.lock();
@@ -678,6 +686,12 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                     this.cache.set(key, result);
                 }
             }
+
+            if (result != null && result.disposed) {
+                throw new IllegalCacheStateException(
+                    String.format("Entry [%s] has been disposed without being removed from the cache.", result));
+            }
+
             return result;
         } finally {
             readLock.unlock();
@@ -728,23 +742,21 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     /**
      * Add a new entry in the cache and prevent cache container deadlock (in cooperation with the entry dispose method)
      * in case adding the entry cause this same entry to be evicted.
-     * 
+     *
      * @param key the key of the entry to be added.
      * @param entry the entry to add.
-     * @throws ConflictingInsertionException when the entry have been disposed while being added, the full load should
-     *             be retried.
      */
-    private void addEntry(String key, SecurityCacheEntry entry) throws ConflictingInsertionException
+    private void addEntry(String key, SecurityCacheEntry entry)
     {
         cache.set(key, entry);
         this.internalEntries.put(key, entry);
+
         if (entry.disposed) {
-            // XWIKI-13746: The added entry have been disposed while being added, meaning that the eviction
-            // triggered by adding the entry has hit the entry itself, so remove it and fail.
-            // TODO: this should be impossible now.
-            throw new ConflictingInsertionException(String.format(
-                "The cache entry [%s] with key [%s] has been disposed by another thread while being added.", entry,
-                key));
+            // This should never happen as entries cannot be disposed while being added to the cache as both
+            // operations require the write lock. However, if it happens, there is a serious bug in the code so
+            // better fail with an exception.
+            throw new IllegalCacheStateException(
+                String.format("Entry [%s] has been disposed while being added to the cache.", entry));
         }
     }
 

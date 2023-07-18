@@ -289,8 +289,8 @@
       #set ($suggestionResultsDocReference = $services.solr.resolveDocument($suggestionResult))
       #set ($suggestionDocument = $xwiki.getDocument($suggestionResultsDocReference))
       &lt;li&gt;&lt;a
-      href="$escapetool.xml($suggestionDocument.getURL())"&gt;
-      #hierarchy($suggestionResultsDocReference, {
+        href="$escapetool.xml($suggestionDocument.getURL())"&gt;
+        #hierarchy($suggestionResultsDocReference, {
           'label': $services.model.serialize($docReference, 'local'),
           'plain' : true, 'local' : true
         })

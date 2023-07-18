@@ -86,7 +86,7 @@ public class ScopeNotificationFilter implements NotificationFilter
         // scope preference.
         WatchedLocationState state
                 = stateComputer.isLocationWatched(filterPreferences, eventEntity, event.getType(), format, false,
-            checkInclusiveFilters);
+                checkInclusiveFilters, false);
 
         // We dismiss the event if:
         //    1. the location is not watched without any starting date (default behaviour in case of no filter, but

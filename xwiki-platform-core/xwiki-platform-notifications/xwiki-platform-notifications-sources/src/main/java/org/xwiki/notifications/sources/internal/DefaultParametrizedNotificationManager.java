@@ -165,7 +165,6 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
     {
         boolean done = false;
         // Add to the results the events the user has the right to see
-        List<Event> newEvents = new ArrayList<>();
         for (Event event : batch) {
             DocumentReference document = event.getDocument();
             // 1) Don't include events concerning a doc the passed user cannot see
@@ -181,7 +180,6 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
 
             // Record this event
             results.add(event);
-            newEvents.add(event);
 
             int reachedSize = results.size();
 
@@ -192,7 +190,7 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
                 if (parameters.user != null) {
                     userReference = this.userReferenceResolver.resolve(parameters.user);
                 }
-                this.groupingEventManager.augmentCompositeEvents(compositeEvents, newEvents, userReference,
+                this.groupingEventManager.augmentCompositeEvents(compositeEvents, List.of(event), userReference,
                     parameters.groupingEventTarget);
                 reachedSize = compositeEvents.size();
             }

@@ -170,14 +170,6 @@ public interface DocumentAccessBridge
     DocumentReference getCurrentDocumentReference();
 
     /**
-     * @return the current document on the XWiki context or {@code null} if there's no document set on the XWiki context
-     * @since 14.10.2
-     * @since 15.5RC1
-     */
-    @Unstable
-    DocumentModelBridge getCurrentDocument();
-
-    /**
      * Check if a document exists or not in the wiki.
      * <p>
      * Since 14.9, if the check fail an exception is thrown.

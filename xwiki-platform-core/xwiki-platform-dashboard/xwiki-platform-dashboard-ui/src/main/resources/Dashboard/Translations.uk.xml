@@ -44,4 +44,4 @@ dashboard.gadgetEditor.gadgetTitle.label=Назва гаджета
 dashboard.gadgetEditor.gadgetTitle.hint=Назва цього гаджета відображається у верхній частині панелі гаджетів на інформаційній панелі (може містити код velocity).
 dashboard.initialization.saveMessage=Ініціалізувати налаштування інформаційної панелі за умовчанням
 </content>
-  </xwikidoc>
+</xwikidoc>

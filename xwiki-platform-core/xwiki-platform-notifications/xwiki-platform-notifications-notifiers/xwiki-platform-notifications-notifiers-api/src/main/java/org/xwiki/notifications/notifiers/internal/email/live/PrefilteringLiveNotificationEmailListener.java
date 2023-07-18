@@ -63,7 +63,7 @@ public class PrefilteringLiveNotificationEmailListener extends AbstractEventList
     private WikiDescriptorManager wikis;
 
     /**
-     * Constructs a new {@link LiveNotificationEmailListener}.
+     * Constructs a new {@link PrefilteringLiveNotificationEmailListener}.
      */
     public PrefilteringLiveNotificationEmailListener()
     {
@@ -75,8 +75,7 @@ public class PrefilteringLiveNotificationEmailListener extends AbstractEventList
     {
         // Check if the notifications are enabled in the wiki and if the mail option for the
         // notifications is enabled.
-        if (this.notificationConfiguration.isEnabled() && this.notificationConfiguration.areEmailsEnabled()
-            && this.notificationConfiguration.isEventPrefilteringEnabled()) {
+        if (this.notificationConfiguration.isEnabled() && this.notificationConfiguration.areEmailsEnabled()) {
             if (event instanceof MailEntityAddedEvent) {
                 if (!this.remoteState.isRemoteState()) {
                     // Add the event to the queue of mails to send (if the associated user enabled live mails)

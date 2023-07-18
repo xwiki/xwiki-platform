@@ -101,97 +101,98 @@
         }
       });
 
-      // Filter out placeholders when saving
+      // Filter out placeholders when saving or switching to Source.
       var filterPlaceholders = {
-        elements: {
-          '^': function (element) {
-            if (element.attributes[ATTRIBUTE_NAME] !== undefined) {
-              delete element.attributes[ATTRIBUTE_NAME];
-            }
+        attributes: {
+          [ATTRIBUTE_NAME]: function() {
+            return false;
           },
         }
       };
       var htmlFilter = editor.dataProcessor && editor.dataProcessor.htmlFilter;
-      htmlFilter.addRules(filterPlaceholders);
+      // The second parameter is important because it forces the filter to be applied also when the editor is read-only,
+      // which happens when the editor is put in loading state (e.g. before switching to Source).
+      htmlFilter.addRules(filterPlaceholders, {applyToAll: true});
 
-
-      // Create a TextWatcher instance to detect changes in the document
-      var placeholderTextWatcher = new CKEDITOR.plugins.textWatcher(editor, updatePlaceholder);
-
-      // The placeholder should update at every keystroke
-      placeholderTextWatcher.ignoredKeys = [];
-
-      editor.on('instanceReady', function () {
-        // Attach the textWatcher to the editor
-        placeholderTextWatcher.attach();
-
-        // The placeholder should update when the content is changed via menus.
-        // snapshots are created when that occurs
-        editor.on("saveSnapshot", function () {
-          placeholderTextWatcher.check(false);
+      [
+        // Update the placeholder when the edited content changes (e.g. the user types).
+        'change',
+        // Update the placeholder when the selection changes (e.g. the user moves the caret).
+        'selectionChange',
+        // Update (remove) the placeholder when the editor loses the focus. We need this also to avoid a conflict with
+        // the empty content placeholder that is displayed when the editor doesn't have the focus (if empty).
+        'blur'
+      ].forEach((eventName) => {
+        editor.on(eventName, (event) => {
+          maybeUpdateFocusedPlaceholder(event.editor);
         });
-
       });
 
-      // Using contentDom event in case the DOM Tree gets recreated by CKEditor (e.g. mode change)
-      editor.on("contentDom", function () {
-        var editable = editor.editable();
-        // The placeholder should update when the user clicks somewhere in the document.
-        editable.attachListener(editable, "click",
-          function () {
-            placeholderTextWatcher.check(false);
-          });
-
-        // The placeholder should update when the editor gains focus.
-        editable.attachListener(editable, "focus",
-          function () {
-            placeholderTextWatcher.check(false);
-          });
-
-        // The placeholder should disappear when the editor loses focus.
-        // (The empty document placeholder might appear)
-        editable.attachListener(editable, "blur",
-          function () {
-            removeAllPlaceholders(editor.editable().$);
-          });
-
-      });
+      function maybeUpdateFocusedPlaceholder(editor) {
+        const oldFocusedEmptyBlock = editor.editable()?.findOne("[" + ATTRIBUTE_NAME + "]");
+        const newFocusedEmptyBlock = getFocusedEmptyBlock(editor);
+        if (newFocusedEmptyBlock !== oldFocusedEmptyBlock) {
+          // The placeholder update shouldn't generate a separate entry in the editing history. Instead, we want to
+          // update the previous or the next history entry. This way, undo should restore the state before the
+          // placeholder update.
+          editor.fire('lockSnapshot');
+          oldFocusedEmptyBlock?.removeAttribute(ATTRIBUTE_NAME);
+          newFocusedEmptyBlock?.setAttribute(ATTRIBUTE_NAME, getPlaceholderContent(newFocusedEmptyBlock?.getName()));
+          editor.fire('unlockSnapshot');
+        }
+      }
 
       /**
-       * Removes any placeholder present in the document
+       * Checks if the editor is focused and the element that has the caret is empty.
        *
-       * @param {Object} document - the DOM Document
+       * @param {CKEDITOR.editor} editor - the editor instance
+       * @return the element that holds the caret and is empty, or undefined if no such element is present
        */
-      function removeAllPlaceholders(document) {
-        document.querySelectorAll("[" + ATTRIBUTE_NAME + "]").forEach(function (match) {
-          match.removeAttribute(ATTRIBUTE_NAME);
-        });
+      function getFocusedEmptyBlock(editor) {
+        const selection = editor.getSelection();
+        if (selection?.isCollapsed() && editor.focusManager.hasFocus) {
+          const container = selection.getRanges()[0].startContainer;
+          // Check first if the container itself is empty, in order to reduce the computations, since this method is
+          // called whenever the user types (and most of the time the caret is inside a text node that is not empty).
+          if (isEmpty(container)) {
+            // Find the ancestor for which a placeholder needs to be shown.
+            var ancestor = getFirstConfiguredAncestor(container);
+            if (ancestor && isEmpty(ancestor)) {
+              return ancestor;
+            }
+          }
+        }
+      }
+
+      /**
+       * Finds the first configured ancestor of a DOM Node
+       *
+       * @param {CKEDITOR.dom.node} node
+       * @return {Object} - The first configured ancestor, null if none were found
+       */
+      function getFirstConfiguredAncestor(node) {
+        while (node && (node.type !== CKEDITOR.NODE_ELEMENT ||
+            !editor.config["xwiki-focusedplaceholder"].placeholder[node.getName()])) {
+          node = node.getParent();
+        }
+        return node;
       }
 
       /**
        * Checks if a node should be considered empty
        *
-       * @param {Object} node - the DOM Node
+       * @param {CKEDITOR.dom.node} node - the DOM node to check
        * @return {bool} - True when the node is considered empty, false otherwise
        */
       function isEmpty(node) {
-
-        // Consider the length of a text node as its number of children
-        if (node.nodeName === "#text") {
-          return !Boolean(node.length);
+        if (node.type === CKEDITOR.NODE_TEXT) {
+          return node.isEmpty();
         }
 
-        var i;
-        for (i = 0; i < node.childNodes.length; i++) {
-          var child = node.childNodes[i];
-
-          // Child is not considered empty if it is not ignored if empty
-          if (!editor.config["xwiki-focusedplaceholder"].ignoreIfEmpty.includes(child.nodeName.toLowerCase())) {
-            return false;
-          }
-
-          // Child is not considered empty if it is not empty
-          if (!isEmpty(child)) {
+        for (var child = node.getFirst(); child; child = child.getNext()) {
+          // Child is not considered empty if it is not ignored if empty.
+          if (!editor.config["xwiki-focusedplaceholder"].ignoreIfEmpty.includes(child.getName?.()) ||
+              !isEmpty(child)) {
             return false;
           }
         }
@@ -200,66 +201,12 @@
       }
 
       /**
-       * Finds the first configured ancestor of a DOM Node
+       * Returns the expected placeholder text for a given tag name.
        *
-       * @param {Object} node
-       * @return {Object} - The first configured ancestor, null if none were found
-       */
-      function getFirstConfiguredAncestor(node) {
-
-        // No parents
-        if (node === null) {
-          return node;
-        }
-        if (node.parentNode === null) {
-          return node.parentNode;
-        }
-
-        // Configured element
-        if (node.tagName !== undefined &&
-          editor.config["xwiki-focusedplaceholder"].placeholder[node.tagName.toLowerCase()] !== undefined) {
-          return node;
-        }
-
-        return getFirstConfiguredAncestor(node.parentNode);
-
-      }
-
-      /**
-       * Updates the placeholder when the caret moves
-       *
-       * @param {CKEDITOR.dom.range}
-       */
-      function updatePlaceholder(range) {
-        // Clear previous placeholders
-        removeAllPlaceholders(range.root.$);
-
-        // No placeholder when a selection is occuring
-        if (!range.collapsed) {
-          return null;
-        }
-
-        // Find the matching ancestor
-        var ancestor = getFirstConfiguredAncestor(range.getCommonAncestor().$);
-        if (ancestor === null) {
-          // No placeholder when there is no configured ancestor
-          return;
-        }
-
-        // Add placeholder when ancestor is considered empty
-        if (isEmpty(ancestor)) {
-          ancestor.setAttribute(ATTRIBUTE_NAME, getPlaceholderContent(ancestor.tagName.toLowerCase()));
-        }
-      }
-
-      /**
-       * Returns the expected placeholder text for a given tagName
-       *
-       * @param {string} tag - Lowercase tagName
+       * @param {string} tag - Lowercase tag name
        * @return {string} - Placeholder text
        */
       function getPlaceholderContent(tag) {
-
         var translationKey = editor.config["xwiki-focusedplaceholder"].placeholder[tag];
 
         if (translationKey === undefined) {
@@ -268,9 +215,6 @@
 
         return editor.localization.get(translationKey);
       }
-
     },
-
-
   });
 })();

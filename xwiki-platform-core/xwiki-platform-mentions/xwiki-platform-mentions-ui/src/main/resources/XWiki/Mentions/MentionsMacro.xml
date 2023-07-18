@@ -224,20 +224,36 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], fun
       };
     }
 
-    function updateConfig(editor) {
-      editor.config.mentions = editor.config.mentions || [];
-      editor.config.mentions.push(getUserMentionsConfig(editor));
+    // Enable the user mentions for the CKEditor instances that have been already created.
+    Object.values(ckeditor.instances).forEach(maybeEnableUserMentions);
+    // Enable the user mentions for the CKEditor instances that are going to be created from now on.
+    ckeditor.on('instanceCreated', (event) =&gt; {
+      maybeEnableUserMentions(event.editor);
+    });
+
+    function maybeEnableUserMentions(editor) {
+      return waitForEditorReady(editor).then((editor) =&gt; {
+        // Check if the Mentions plugin is enabled for the given editor instance.
+        // TODO: Add support for disabling the user mentions for a particular editor instance (without disabling all
+        // types of mentions).
+        if (editor.plugins.mentions) {
+          editor.plugins.mentions.instances.push(new ckeditor.plugins.mentions(editor, getUserMentionsConfig(editor)));
+        }
+        return editor;
+      });
     }
 
-    ckeditor.on('instanceCreated', function(event) {
-      // The editor instance was created but it not yet initialized. Unfortunately the configuration object passed when
-      // the instance was created has not been merged with the global configuration yet.
-      event.editor.once('configLoaded', function(event) {
-        // The editor configuration has been loaded (the instance configuration has been merged with the global
-        // configuration) but the editor has not been fully initialized yet so we can modify the configuration.
-        updateConfig(event.editor);
+    function waitForEditorReady(editor) {
+      return new Promise((resolve, reject) =&gt; {
+        if (editor.status === 'ready') {
+          resolve(editor);
+        } else {
+          editor.once('instanceReady', (event) =&gt; {
+            resolve(event.editor);
+          });
+        }
       });
-    });
+    }
   });
 });</code>
     </property>

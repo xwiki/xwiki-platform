@@ -1,2 +1,0 @@
-org.xwiki.platform.svg.internal.BatikSVGRasterizer
-org.xwiki.platform.svg.script.SVGScriptService

@@ -34,7 +34,9 @@ import org.xwiki.notifications.filters.watch.AutomaticWatchMode;
 import org.xwiki.notifications.filters.watch.WatchedEntitiesConfiguration;
 import org.xwiki.notifications.filters.watch.WatchedEntitiesManager;
 import org.xwiki.notifications.filters.watch.WatchedEntityFactory;
+import org.xwiki.notifications.filters.watch.WatchedEntityReference;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.internal.document.DocumentUserReference;
@@ -100,6 +102,22 @@ public class NotificationWatchScriptService implements ScriptService
         watchedEntitiesManager.unwatchEntity(watchedEntityFactory.createWatchedLocationReference(location),
                 documentAccessBridge.getCurrentUserReference()
         );
+    }
+
+    /**
+     * Retrieve the specific watched status of a location for the current user.
+     *
+     * @param location the location
+     * @return the specific watched status of the location by the current user
+     * @throws NotificationException in case of errors
+     * @since 15.5RC1
+     */
+    @Unstable
+    public WatchedEntityReference.WatchedStatus getLocationWatchedStatus(EntityReference location)
+            throws NotificationException
+    {
+        return watchedEntityFactory.createWatchedLocationReference(location)
+                .getWatchedStatus(documentAccessBridge.getCurrentUserReference());
     }
 
     /**

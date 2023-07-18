@@ -29,57 +29,6 @@ define('macroEditorTranslationKeys', [], [
 ]);
 
 /**
- * Macro Service
- */
-define('macroService', ['jquery', 'xwiki-meta'], function($, xcontext) {
-  'use strict';
-
-  var macroDescriptors = {},
-
-  getMacroDescriptor = function(macroId, maybeSourceDocumentReference) {
-    var deferred = $.Deferred();
-    var macroDescriptor = macroDescriptors[macroId];
-    if (macroDescriptor) {
-      deferred.resolve(macroDescriptor);
-    } else {
-      var sourceDocumentReference = maybeSourceDocumentReference || XWiki.currentDocument.documentReference;
-      var url = new XWiki.Document(sourceDocumentReference).getURL('get', $.param({
-        outputSyntax: 'plain',
-        language: $('html').attr('lang'),
-        sheet: 'CKEditor.MacroService'
-      }));
-      $.get(url, {data: 'descriptor', macroId: macroId}).done(function(macroDescriptor) {
-        if (typeof macroDescriptor === 'object' && macroDescriptor !== null) {
-          macroDescriptors[macroId] = macroDescriptor;
-          deferred.resolve(macroDescriptor);
-        } else {
-          deferred.reject.apply(deferred, arguments);
-        }
-      }).fail(function() {
-        deferred.reject.apply(deferred, arguments);
-      });
-    }
-    return deferred.promise();
-  },
-
-  installMacro = function(extensionId, extensionVersion) {
-    var url = new XWiki.Document('MacroService', 'CKEditor').getURL('get', $.param({
-      outputSyntax: 'plain',
-      language: $('html').attr('lang')
-    }));
-
-    return $.post(url, {action: 'install', extensionId: extensionId, extensionVersion: extensionVersion,
-        /*jshint camelcase: false */
-    	'form_token': xcontext.form_token});
-  };
-
-  return {
-    getMacroDescriptor: getMacroDescriptor,
-    installMacro: installMacro
-  };
-});
-
-/**
  * Macro Parameter Tree Builder
  *
  * The result is a JavaScript plain object with a structure similar to this:

@@ -69,6 +69,9 @@ ckeditor.plugin.macro.buttonHint=XWiki Macro
 ckeditor.plugin.macro.editButtonHint=Edit Macro
 ckeditor.plugin.macro.refreshFailed=Failed to refresh the edited content.
 ckeditor.plugin.macro.dedicatedInsertButtonHint=Insert {0} macro
+ckeditor.plugin.macro.installPending=Installing {0} {1}...
+ckeditor.plugin.macro.installSuccessful=Successfully installed {0} {1}.
+ckeditor.plugin.macro.installFailed=Failed to install {0} {1}.
 
 ckeditor.plugin.office.importer.title=Import Office File
 ckeditor.plugin.office.importer.filePath=File Path
@@ -150,11 +153,13 @@ ckeditor.plugin.image.imageSelector.urlTab.url.title=Url
 ckeditor.plugin.image.imageSelector.urlTab.url.hint=The url of the image to display.
 ckeditor.plugin.image.imageSelector.urlTab.url.placeholder=https://...
 
-ckeditor.plugin.slash.group.structure=Structure
-ckeditor.plugin.slash.group.content=Content
-ckeditor.plugin.slash.group.macros=Macros
-ckeditor.plugin.slash.group.actions=Actions
-ckeditor.plugin.slash.group.table=Table
+ckeditor.plugin.slash.group.Layout=Layout
+ckeditor.plugin.slash.group.Content=Content
+ckeditor.plugin.slash.group.Formatting=Formatting
+ckeditor.plugin.slash.group.Navigation=Navigation
+ckeditor.plugin.slash.group.Actions=Actions
+ckeditor.plugin.slash.group.Table=Table
+ckeditor.plugin.slash.group.Macro=Macro
 
 ckeditor.plugin.slash.action.h1.hint=Big section heading.
 ckeditor.plugin.slash.action.h2.hint=Medium section heading.

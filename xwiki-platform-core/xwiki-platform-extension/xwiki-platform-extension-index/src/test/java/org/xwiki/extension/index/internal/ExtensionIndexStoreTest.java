@@ -65,17 +65,18 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
  * Validate the extension index store.
- * 
+ *
  * @version $Id$
  */
 @ComponentTest
-@ComponentList({ExtensionIndexStore.class, ExtensionIndexSolrCoreInitializer.class, ExtensionIdConverter.class,
-    ExtensionAuthorConverter.class, ExtensionFactory.class, ExtensionComponentConverter.class})
+@ComponentList({ ExtensionIndexStore.class, ExtensionIndexSolrCoreInitializer.class, ExtensionIdConverter.class,
+    ExtensionAuthorConverter.class, ExtensionFactory.class, ExtensionComponentConverter.class })
 @ReferenceComponentList
 @SolrComponentList
 class ExtensionIndexStoreTest
@@ -106,6 +107,9 @@ class ExtensionIndexStoreTest
     @InjectMockComponents
     private ExtensionIndexStore indexStore;
 
+    @MockComponent
+    private ExtensionIndexSolrUtil extensionIndexSolrUtil;
+
     @AfterComponent
     public void afterComponent() throws Exception
     {
@@ -120,6 +124,8 @@ class ExtensionIndexStoreTest
         when(this.testRepository.getDescriptor()).thenReturn(this.testRepositoryDescriptor);
         when(this.extensionManager.getRepository(this.testRepositoryDescriptor.getId()))
             .thenReturn(this.testRepository);
+        when(this.extensionIndexSolrUtil.toSolrId(any()))
+            .thenAnswer(invocation -> ExtensionIdConverter.toString(invocation.getArgument(0)));
     }
 
     private void assertSimpleSearch(String query, ExtensionId... expected) throws SearchException

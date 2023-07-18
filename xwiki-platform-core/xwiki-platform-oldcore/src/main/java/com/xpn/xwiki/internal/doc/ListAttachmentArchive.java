@@ -142,7 +142,7 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
         final XWikiAttachmentArchive arch = original.getAttachment_archive();
         try {
             original.setAttachment_archive(null);
-            return (XWikiAttachment) original.clone();
+            return original.clone();
         } finally {
             original.setAttachment_archive(arch);
         }

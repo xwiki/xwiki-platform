@@ -168,6 +168,11 @@ define('imageEditor', [
       img.onload = function () {
         promise.resolve(this);
       };
+
+      img.onerror = function () {
+        promise.reject(this);
+      };
+      
       var data = modal.data('input');
       // Resolve the image url and assign it to a transient image object to be able to access its width and height.
       img.src = getImageResourceURL(data.imageData.resourceReference, data.editor);
@@ -290,6 +295,9 @@ define('imageEditor', [
 
           return result;
 
+        }, function () {
+          // Don't compute a dimension when the url cannot be resolved to an image.
+          return undefined;
         });
       }
 
@@ -309,7 +317,9 @@ define('imageEditor', [
           imageWidthField.prop('disabled', true);
           imageHeightField.prop('disabled', true);
           return $.when(updateRatio(field, inputValue)).then(function (value) {
-            targetField.val(value);
+            if (value !== undefined) {
+              targetField.val(value);
+            }
             imageWidthField.prop('disabled', false);
             imageHeightField.prop('disabled', false);
             // In Edge, when the fields are disabled, the focus is lost and needs to be restored after the size is 
@@ -443,7 +453,13 @@ define('imageEditor', [
     }
 
     function getImageResourceURL(resourceReference, editor, params) {
-      return CKEDITOR.plugins.xwikiResource.getResourceURL(resourceReference, editor) + '&' + $.param(params || {});
+      var resourceURL = CKEDITOR.plugins.xwikiResource.getResourceURL(resourceReference, editor);
+      // Only set the params for resource reference that can support it. Sending the custom params to external urls does
+      // not make sense as they are not able to interpret them.
+      if (resourceReference.type !== 'url') {
+        resourceURL = resourceURL + '&' + $.param(params || {});
+      }
+      return resourceURL;
     }
 
     function updateAdvancedFromStyle(imageStyle, modal) {

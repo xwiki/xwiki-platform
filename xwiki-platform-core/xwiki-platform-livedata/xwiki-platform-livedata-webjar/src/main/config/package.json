@@ -9,8 +9,8 @@
     "test": "vue-cli-service test:unit"
   },
   "engines": {
-    "npm": "9.3.1",
-    "node": "18.14.0"
+    "npm": "9.5.1",
+    "node": "18.16.0"
   },
   "dependencies": {
     "vue": "2.7.14",
@@ -20,7 +20,7 @@
     "vuedraggable": "2.24.3",
     "vue-tippy": "4.16.0",
     "vue2-touch-events": "3.2.2",
-    "dompurify": "3.0.1"
+    "dompurify": "3.0.3"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "5.0.8",
@@ -33,7 +33,7 @@
     "less": "4.1.3",
     "less-loader": "11.1.0",
     "vue-template-compiler": "2.7.14",
-    "@vue/test-utils": "1.3.4",
+    "@vue/test-utils": "1.3.6",
     "jquery": "3.6.0",
     "@testing-library/jest-dom": "5.16.5",
     "flush-promises": "1.0.2",

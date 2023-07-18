@@ -142,17 +142,6 @@
     </init-param>
   </filter>
 
-  <!-- The Routing Filter decides how to route all requests and thus must be mapped to handle all incoming requests -->
-  <filter-mapping>
-    <filter-name>RoutingFilter</filter-name>
-    <url-pattern>/*</url-pattern>
-    <!-- Even though the Routing Filter is the first filter, users could add other filters that execute before it,
-         like the URLRewriteFilter, and if these filters do a forward, we still want our RoutingFilter to be called. -->
-    <dispatcher>REQUEST</dispatcher>
-    <dispatcher>INCLUDE</dispatcher>
-    <dispatcher>FORWARD</dispatcher>
-  </filter-mapping>
-
   <!-- The encoding filter MUST always be the first one, as setting the encoding does not work after accessing the
        request data. -->
   <filter-mapping>
@@ -167,6 +156,19 @@
   <filter-mapping>
     <filter-name>RequestRestorer</filter-name>
     <url-pattern>/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>INCLUDE</dispatcher>
+    <dispatcher>FORWARD</dispatcher>
+  </filter-mapping>
+
+  <!-- The Routing Filter decides how to route all requests and thus must be mapped to handle all incoming requests.
+   It is after the "Set Character Encoding" and "RequestRestorer" so these filters are applied independently of the
+   routing decision. -->
+  <filter-mapping>
+    <filter-name>RoutingFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+    <!-- Users could add other filters that execute before it, like the URLRewriteFilter, and if these filters do a
+    forward, we still want our RoutingFilter to be called. -->
     <dispatcher>REQUEST</dispatcher>
     <dispatcher>INCLUDE</dispatcher>
     <dispatcher>FORWARD</dispatcher>

@@ -46,6 +46,7 @@ import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -222,9 +223,8 @@ class TextAreaClassTest
         verify(this.oldcore.getMockContextualAuthorizationManager(), never()).hasAccess(Right.SCRIPT);
 
         assertEquals(1, this.logCaptureExtension.size());
-        assertEquals("Error while getting the syntax corresponding to object [null]."
-                + " Defaulting to using XWiki 1.0 syntax. Internal error [NullPointerException: ]",
-            this.logCaptureExtension.getMessage(0));
+        assertTrue(this.logCaptureExtension.getMessage(0).matches("\\QError while getting the syntax corresponding to "
+            + "object [null]. Defaulting to using XWiki 1.0 syntax. Internal error [NullPointerException:\\E.*]"));
     }
 
     private XWikiDocument getSpyDocument()

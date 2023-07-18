@@ -37,6 +37,7 @@ import org.xwiki.extension.internal.converter.ExtensionIdConverter;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.search.solr.SolrUtils;
 
+import static org.xwiki.extension.InstalledExtension.FIELD_INSTALLED_NAMESPACES;
 import static org.xwiki.search.solr.SolrUtils.ATOMIC_UPDATE_MODIFIER_REMOVE;
 import static org.xwiki.search.solr.SolrUtils.ATOMIC_UPDATE_MODIFIER_SET;
 
@@ -80,15 +81,14 @@ public class ExtensionIndexSolrUtil
                 installedNamespaces = installedExtension.getNamespaces().stream().map(this::toStoredNamespace)
                     .collect(Collectors.toList());
             }
-            this.utils.setAtomic(ATOMIC_UPDATE_MODIFIER_SET, InstalledExtension.FIELD_INSTALLED_NAMESPACES,
+            this.utils.setAtomic(ATOMIC_UPDATE_MODIFIER_SET, FIELD_INSTALLED_NAMESPACES,
                 installedNamespaces, document);
 
             // We can already set those extensions as "incompatible" with those namespaces
             this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_INCOMPATIBLE_NAMESPACES, installedNamespaces,
                 document);
         } else {
-            this.utils.setAtomic(ATOMIC_UPDATE_MODIFIER_REMOVE, InstalledExtension.FIELD_INSTALLED_NAMESPACES,
-                List.of(), document);
+            this.utils.setAtomic(ATOMIC_UPDATE_MODIFIER_SET, FIELD_INSTALLED_NAMESPACES, null, document);
         }
     }
 
@@ -156,7 +156,6 @@ public class ExtensionIndexSolrUtil
     {
         return ExtensionIdConverter.toString(extensionId);
     }
-
 
     /**
      * Convert a solr string representation to a string representation that can be stored in a {@link SolrExtension}.

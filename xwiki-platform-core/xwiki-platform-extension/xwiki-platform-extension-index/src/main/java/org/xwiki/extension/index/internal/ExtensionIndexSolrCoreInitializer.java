@@ -19,32 +19,19 @@
  */
 package org.xwiki.extension.index.internal;
 
-import java.io.IOException;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.DefaultExtensionComponent;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.RemoteExtension;
 import org.xwiki.extension.rating.RatingExtension;
 import org.xwiki.search.solr.AbstractSolrCoreInitializer;
 import org.xwiki.search.solr.SolrException;
-import org.xwiki.search.solr.SolrUtils;
-
-import static org.xwiki.extension.Extension.FIELD_ID;
-import static org.xwiki.extension.Extension.FIELD_VERSION;
-import static org.xwiki.extension.InstalledExtension.FIELD_INSTALLED_NAMESPACES;
 
 /**
  * Initialize the Solr core dedicated to events storage.
@@ -163,19 +150,10 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
 
     private static final long SCHEMA_VERSION_15_5 = 150500000;
 
-    // TODO: make sure to revert to 150501000 before merging...
-    private static final long SCHEMA_VERSION_15_5_1 = 150501005;
-
-    @Inject
-    private SolrUtils solrUtils;
-
-    @Inject
-    private Provider<ExtensionIndexSolrUtil> extensionIndexSolrUtilProvider;
-
     @Override
     protected long getVersion()
     {
-        return SCHEMA_VERSION_15_5_1;
+        return SCHEMA_VERSION_15_5;
     }
 
     @Override
@@ -188,7 +166,7 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
     protected void createSchema() throws SolrException
     {
         setStringField(SOLR_FIELD_EXTENSIONID, false, false);
-        setStringField(FIELD_VERSION, false, false);
+        setStringField(Extension.FIELD_VERSION, false, false);
 
         setStringField(Extension.FIELD_TYPE, false, false);
         setStringField(Extension.FIELD_REPOSITORY, false, false);
@@ -237,7 +215,7 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
         }
 
         if (cversion < SCHEMA_VERSION_14_0) {
-            setStringField(FIELD_INSTALLED_NAMESPACES, true, false);
+            setStringField(InstalledExtension.FIELD_INSTALLED_NAMESPACES, true, false);
         }
 
         if (cversion < SCHEMA_VERSION_15_5) {
@@ -249,55 +227,6 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
             setStringField(SECURITY_FIX_VERSION, false, false);
             setStringField(SECURITY_ADVICE, false, false);
         }
-
-        if (cversion < SCHEMA_VERSION_15_5_1) {
-            migrateInstalledExtensions();
-        }
-    }
-
-    /**
-     * Before XWiki 15.6-rc1/15.5.1, the old version of updated installed extensions was not correctly updated.
-     * Therefore, the old version was still considered as installed on some namespace after the upgrade. We need to
-     * define a migration to clean up outdated namespaces on old upgraded versions.
-     *
-     * @throws SolrException in case of issue when updating the extensions
-     */
-    private void migrateInstalledExtensions() throws SolrException
-    {
-        try {
-            int batchSize = 10000;
-            int start = 0;
-
-            SolrDocumentList results = updateBatch(batchSize, start);
-            while (results.size() >= batchSize) {
-                start = start + 1;
-                results = updateBatch(batchSize, start);
-            }
-            this.client.commit();
-        } catch (SolrServerException | IOException e) {
-            throw new SolrException("Failed to update the namespaces of installed extensions", e);
-        }
-    }
-
-    private SolrDocumentList updateBatch(int batchSize, int start) throws SolrServerException, IOException
-    {
-        SolrQuery solrQuery = new SolrQuery()
-            .setRows(batchSize)
-            .setStart(start)
-            .setFilterQueries(FIELD_INSTALLED_NAMESPACES + ":[* TO *]")
-            .setFields(FIELD_ID);
-        QueryResponse query = this.client.query(solrQuery);
-        SolrDocumentList results = query.getResults();
-        for (SolrDocument doc : results) {
-            SolrInputDocument updateDocument = new SolrInputDocument();
-            String solrId = this.solrUtils.getId(doc);
-            this.solrUtils.set(SOLR_FIELD_ID, solrId, updateDocument);
-            ExtensionIndexSolrUtil extensionIndexSolrUtil = this.extensionIndexSolrUtilProvider.get();
-            extensionIndexSolrUtil.updateInstalledState(extensionIndexSolrUtil.fromSolrId(solrId), updateDocument);
-
-            this.client.add(updateDocument);
-        }
-        return results;
     }
 
     /**

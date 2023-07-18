@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -116,7 +117,8 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
      * this to work, the only strong references to SecurityCacheEntry are stored during entry creation, in the cache
      * and in the list of parents.
      */
-    private ReferenceMap<String, SecurityCacheEntry> internalEntries;
+    private final Map<String, SecurityCacheEntry> internalEntries =
+        new ReferenceMap<>(AbstractReferenceMap.ReferenceStrength.HARD, AbstractReferenceMap.ReferenceStrength.WEAK);
 
     /**
      * @return a new configured security cache
@@ -141,8 +143,6 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     public void initialize() throws InitializationException
     {
         cache = newCache();
-        this.internalEntries = new ReferenceMap<>(AbstractReferenceMap.ReferenceStrength.HARD,
-            AbstractReferenceMap.ReferenceStrength.WEAK);
     }
 
     /**
@@ -667,7 +667,11 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
             if (result == null) {
                 // Try to get the entry from the internal map which may have, e.g., parents that are no longer in the
                 // cache but still referenced by entries in the cache.
-                result = this.internalEntries.get(key);
+                // Synchronize to avoid concurrent modification of the map as get() may trigger the eviction of
+                // garbage collected entries. All other operations are done under the write lock.
+                synchronized (this.internalEntries) {
+                    result = this.internalEntries.get(key);
+                }
 
                 if (result != null) {
                     // Try re-inserting the entry into the cache to give it another chance of being stored directly.

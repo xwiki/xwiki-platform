@@ -977,6 +977,8 @@
 @state-danger-bg: #f8ecec;
 @state-success-bg: #e5f3df;
 @state-info-bg: #e1f1f9;
+/* Input-color-placeholder is hardcoded in bootstrap, we need to override it. */
+@input-color-placeholder: @gray-light;
 
 /* Drawer */
 @xwiki-drawer-menu-item-hover-bg: @list-group-hover-bg;

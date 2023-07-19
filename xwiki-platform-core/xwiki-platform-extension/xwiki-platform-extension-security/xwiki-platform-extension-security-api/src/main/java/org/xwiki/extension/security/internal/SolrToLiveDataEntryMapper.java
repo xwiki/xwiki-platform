@@ -23,6 +23,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.IntStream;
 
 import javax.inject.Inject;
@@ -179,6 +180,7 @@ public class SolrToLiveDataEntryMapper
         return list.stream()
             .map(String::valueOf)
             .map(it -> it.replaceFirst("wiki:", ""))
+            .filter(it -> !Objects.equals(it, "{root}"))
             .collect(joining(", "));
     }
 }

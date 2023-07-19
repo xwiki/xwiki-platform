@@ -472,6 +472,84 @@ class ImagePluginIT
             savedPage.editWiki().getContent());
     }
 
+    @Test
+    @Order(11)
+    void updateImageSize(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Upload an attachment to test with.
+        String attachmentName = "image.gif";
+        AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
+        ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
+
+        WYSIWYGEditPage wysiwygEditPage = newPage.editWYSIWYG();
+        CKEditor editor = new CKEditor("content").waitToLoad();
+
+        // Insert a with caption and alignment to center.
+        ImageDialogSelectModal imageDialogSelectModal = editor.getToolBar().insertImage();
+        imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);
+        ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
+        imageDialogEditModal.switchToAdvancedTab().setWidth(100);
+        imageDialogEditModal.clickInsert();
+
+        ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
+
+        assertEquals("[[image:image.gif||height=\"100\" width=\"100\"]]", savedPage.editWiki().getContent());
+
+        wysiwygEditPage = savedPage.editWYSIWYG();
+        editor = new CKEditor("content").waitToLoad();
+
+        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+
+        imageDialogEditModal = editor.getToolBar().editImage();
+        imageDialogEditModal.switchToAdvancedTab().setWidth(50);
+        imageDialogEditModal.clickInsert();
+
+        wysiwygEditPage.clickSaveAndView();
+
+        assertEquals("[[image:image.gif||height=\"50\" width=\"50\"]]", savedPage.editWiki().getContent());
+    }
+
+    @Test
+    @Order(12)
+    void updateExternalImageSize(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Upload an attachment to test with.
+        String attachmentName = "image.gif";
+        AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
+        ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
+
+        WYSIWYGEditPage wysiwygEditPage = newPage.editWYSIWYG();
+        CKEditor editor = new CKEditor("content").waitToLoad();
+
+        // Insert a with caption and alignment to center.
+        ImageDialogSelectModal imageDialogSelectModal = editor.getToolBar().insertImage();
+        // The WebHome part is important but is removed when serializing an attachment, adding it back before the 
+        // attachment name.
+        String imageURL = setup.getURL(attachmentReference, "download", "")
+            .replace("/" + attachmentName, "/WebHome/" + attachmentName);
+        imageDialogSelectModal.switchToUrlTab().setUrlValue(imageURL);
+        ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
+        imageDialogEditModal.switchToAdvancedTab().setWidth(100);
+        imageDialogEditModal.clickInsert();
+
+        ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
+
+        assertEquals("[[image:" + imageURL + "||height=\"100\" width=\"100\"]]", savedPage.editWiki().getContent());
+
+        wysiwygEditPage = savedPage.editWYSIWYG();
+        editor = new CKEditor("content").waitToLoad();
+
+        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+
+        imageDialogEditModal = editor.getToolBar().editImage();
+        imageDialogEditModal.switchToAdvancedTab().setWidth(50);
+        imageDialogEditModal.clickInsert();
+
+        wysiwygEditPage.clickSaveAndView();
+
+        assertEquals("[[image:" + imageURL + "||height=\"50\" width=\"50\"]]", savedPage.editWiki().getContent());
+    }
+
     private static void createAndLoginStandardUser(TestUtils setup)
     {
         setup.createUserAndLogin("alice", "pa$$word", "editor", "Wysiwyg", "usertype", "Advanced");

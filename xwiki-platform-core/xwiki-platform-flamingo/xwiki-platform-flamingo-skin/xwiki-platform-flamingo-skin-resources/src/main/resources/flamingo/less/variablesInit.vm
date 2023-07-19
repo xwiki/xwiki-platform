@@ -237,6 +237,8 @@
   ## Make sure the links are dark enough in the tmDrawer
   @navbar-default-link-color:           #727272;
   @navbar-default-color:                #727272;
+  ## Make sure the placeholder are not too light (the default from bootstrap is #999, which does not have enough contrast with a white bg)
+  @input-color-placeholder:             #727272;
   ## Make sure the breadcrumb links are dark enough
   @breadcrumb-active-color:             #707070;
   @breadcrumb-color:                    #707070;

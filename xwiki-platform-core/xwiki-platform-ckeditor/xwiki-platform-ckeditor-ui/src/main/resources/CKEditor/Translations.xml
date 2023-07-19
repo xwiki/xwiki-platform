@@ -153,6 +153,14 @@ ckeditor.plugin.image.imageSelector.urlTab.url.title=Url
 ckeditor.plugin.image.imageSelector.urlTab.url.hint=The url of the image to display.
 ckeditor.plugin.image.imageSelector.urlTab.url.placeholder=https://...
 
+ckeditor.plugin.image.slash.currentPageBadge=This page
+ckeditor.plugin.image.slash.externalBadge=External
+ckeditor.plugin.image.slash.loading=Loading...
+ckeditor.plugin.image.slash.upload=Upload Image
+ckeditor.plugin.image.slash.uploadProgress=Uploading {0}...
+ckeditor.plugin.image.slash.uploadSuccess=Successfully uploaded {0}
+ckeditor.plugin.image.slash.uploadError=Failed to upload {0}
+
 ckeditor.plugin.slash.group.Layout=Layout
 ckeditor.plugin.slash.group.Content=Content
 ckeditor.plugin.slash.group.Formatting=Formatting

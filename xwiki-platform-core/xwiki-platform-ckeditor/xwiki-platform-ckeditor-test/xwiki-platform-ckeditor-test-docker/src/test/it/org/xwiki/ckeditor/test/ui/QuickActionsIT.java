@@ -339,8 +339,9 @@ public class QuickActionsIT extends AbstractCKEditorIT
         qa.waitForItemSelected("/im", "Image");
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
-
-        new ImageDialogSelectModal().close();
+        
+        // Wait for the image insertion dropdown to show
+        new AutocompleteDropdown();
     }
 
     @Test

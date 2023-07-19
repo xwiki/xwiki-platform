@@ -43,6 +43,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.xwiki.extension.InstalledExtension.FIELD_INSTALLED_NAMESPACES;
 import static org.xwiki.extension.security.internal.livedata.ExtensionSecurityLiveDataConfigurationProvider.FIX_VERSION;
 
 /**
@@ -79,6 +80,7 @@ class ExtensionSecuritySolrClientTest
 
         SolrQuery params = new SolrQuery();
         params.addFilterQuery("security_maxCVSS:[0 TO 10]");
+        params.addFilterQuery(FIELD_INSTALLED_NAMESPACES + ":[* TO *]");
         verify(this.extensionIndexStore)
             .search(ArgumentMatchers.<SolrQuery>argThat(
                 t -> Arrays.equals(t.getFilterQueries(), params.getFilterQueries())));
@@ -103,6 +105,7 @@ class ExtensionSecuritySolrClientTest
 
         SolrQuery params = new SolrQuery();
         params.addFilterQuery("security_maxCVSS:[0 TO 10]");
+        params.addFilterQuery(FIELD_INSTALLED_NAMESPACES + ":[* TO *]");
 
         verify(this.extensionIndexStore)
             .search(AdditionalMatchers.<SolrQuery>and(

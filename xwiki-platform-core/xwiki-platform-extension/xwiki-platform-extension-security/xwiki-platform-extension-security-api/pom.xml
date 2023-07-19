@@ -35,7 +35,7 @@
     <xwiki.extension.name>Security Vulnerabilities API</xwiki.extension.name>
     <!-- Category for the Extension Manager -->
     <xwiki.extension.category>api</xwiki.extension.category>
-    <xwiki.jacoco.instructionRatio>0.21</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.43</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

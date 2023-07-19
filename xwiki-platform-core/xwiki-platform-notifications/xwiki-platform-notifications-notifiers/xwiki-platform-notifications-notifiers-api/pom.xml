@@ -85,5 +85,12 @@
       <artifactId>javax.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
+    <!-- Needed for NotificationUserIteratorTest -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-notifications-preferences-default</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 </project>

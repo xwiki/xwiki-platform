@@ -158,6 +158,7 @@ notifications.settings.applications.title=Applications
 notifications.settings.applications.hint=This is the list of applications that can send notifications. You can enable or disable any of them.
 notifications.settings.applications.forGuest=Log in or register to handle your notification settings.
 notifications.settings.applications.appName=Name
+notifications.settings.applications.table.dropdown.toggle.label=Toggle the details for notifications from the {0} application.
 notifications.settings.events=Events
 notifications.settings.watch.title=Watched Pages
 notifications.settings.watch.autowatchmode=Automatic page watching

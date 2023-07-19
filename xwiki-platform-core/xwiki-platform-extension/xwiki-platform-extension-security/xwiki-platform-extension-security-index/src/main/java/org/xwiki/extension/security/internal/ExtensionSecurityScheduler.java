@@ -118,6 +118,8 @@ public class ExtensionSecurityScheduler implements Runnable, Disposable
     @Override
     public void dispose()
     {
-        this.executor.shutdownNow();
+        if (this.executor != null) {
+            this.executor.shutdownNow();
+        }
     }
 }

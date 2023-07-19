@@ -55,10 +55,6 @@ import static org.xwiki.extension.security.internal.analyzer.osv.OsvExtensionSec
 @Singleton
 public class OsvResponseAnalyzer
 {
-    /**
-     * Shared constant when the suggestion is to upgrade the extension from the Extension Manager.
-     */
-    private static final String UPGRADE_FROM_EM_ADVICE = "extension.security.analysis.advice.upgradeFromEM";
 
     @Inject
     private Logger logger;
@@ -81,14 +77,10 @@ public class OsvResponseAnalyzer
                     vulnerability)
                     .ifPresent(matchingVulns::add));
         }
-        Version currentVersion = new DefaultVersion(version);
-        ExtensionSecurityAnalysisResult extensionSecurityAnalysisResult = new ExtensionSecurityAnalysisResult()
-            .setResults(matchingVulns.stream().map(vulnObject -> convert(vulnObject, currentVersion))
+
+        return new ExtensionSecurityAnalysisResult()
+            .setResults(matchingVulns.stream().map(vulnObject -> convert(vulnObject, new DefaultVersion(version)))
                 .collect(Collectors.toList()));
-        if (!extensionSecurityAnalysisResult.getSecurityVulnerabilities().isEmpty()) {
-            extensionSecurityAnalysisResult.setAdvice(UPGRADE_FROM_EM_ADVICE);
-        }
-        return extensionSecurityAnalysisResult;
     }
 
     private SecurityVulnerabilityDescriptor convert(VulnObject vulnObject, Version currentVersion)

@@ -41,18 +41,48 @@
 {{velocity}}
 #if($services.security.authorization.hasAccess('admin') &amp;&amp; $services.extension.index.security.isSecurityScanEnabled())
 #set($discard = $xwiki.ssx.use("XWiki.Extension.Security.Code.Admin"))
-{{warning}}
-{{translation key="extension.security.admin.generalWarning"/}}
-{{/warning}}
+
+{{html clean='false' wiki='true'}}
+&lt;ul class="nav nav-tabs" role="tablist"&gt;
+  &lt;li role="presentation" class="active"&gt;&lt;a href="#extension-vulnerabilities" aria-controls="extension-vulnerabilities" role="tab" data-toggle="tab"&gt;Extension Vulnerabilities&lt;/a&gt;&lt;/li&gt;
+  &lt;li role="presentation"&gt;&lt;a href="#environment-vulnerabilities" aria-controls="environment-vulnerabilities" 
+  role="tab" data-toggle="tab"&gt;Environment Vulnerabilities&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;div class="tab-content"&gt;
+  &lt;div role="tabpanel" class="tab-pane active" id="extension-vulnerabilities"&gt;
 
 {{liveData
   id="extension-vulnerabilities-list"
   source="extensionSecurity"
+  sourceParameters="isFromEnvironment=false"
   properties="name,wikis,maxCVSS,cveID,fixVersion,advice"
   showPageSizeDropdown="false"}}
 {{/liveData}}
 
-{{html}}
+&lt;/div&gt;
+
+&lt;div role="tabpanel" class="tab-pane" id="environment-vulnerabilities"&gt;
+
+(((&amp;nbsp;)))
+{{warning}}
+Extensions listed in this section have known vulnerabilities, but are outside of the scope of XWiki.
+This means that the extensions are provided by the environment running XWiki (e.g., its servlet engine), and can't be
+ fixed by upgrading XWiki or one of its extension.
+{{/warning}}
+
+{{liveData
+  id="environment-vulnerabilities-list"
+  source="extensionSecurity"
+  sourceParameters="isFromEnvironment=true"
+  properties="name,wikis,maxCVSS,cveID,fixVersion"
+  showPageSizeDropdown="false"}}
+{{/liveData}}
+
+  &lt;/div&gt;
+&lt;/div&gt;
+
 #set ($indexJobStatus = $services.job.getJobStatus(['extension_security']))
 #if ($indexJobStatus)
   &lt;div class="box infomessage"&gt;
@@ -73,7 +103,8 @@
     #else
       &lt;div class="box warningmessage"&gt;$escapetool.xml($services.localization.render('extension.security.indexed.nojob'))&lt;/div&gt;
     #end
-{{/html}}
+  &lt;/div&gt;
+  {{/html}}
 #end
 {{/velocity}}
 
@@ -443,7 +474,8 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>#extension-vulnerabilities-list {
+      <code>#extension-vulnerabilities-list,
+#environment-vulnerabilities-list {
   td,
   th {
     inline-size: min-content;
@@ -463,6 +495,11 @@
   .property-name {
     word-wrap: break-word;
     white-space: break-spaces;
+  }
+
+  .security-vulnerability-detail-modal {
+    white-space: normal;
+    word-wrap: normal;
   }
 }
 </code>

@@ -75,9 +75,9 @@ class ExtensionSecurityIT
                 + "org.xwiki.platform:xwiki-platform-administration-ui/")));
         tableLayout.assertRow("Wikis", "xwiki");
         tableLayout.assertRow("Max CVSS", "9.9");
-        tableLayout.assertRow("CVE IDs", "GHSA-4v38-964c-xjmw (9.9)\n"
-            + "GHSA-9j36-3cp4-rh4j (9.9)\n"
-            + "GHSA-mgjw-2wrp-r535 (8.8)");
+        tableLayout.assertRow("CVE IDs", "GHSA-4v38-964c-xjmw  (9.9) \n"
+            + "GHSA-9j36-3cp4-rh4j  (9.9) \n"
+            + "GHSA-mgjw-2wrp-r535  (8.8) ");
         tableLayout.assertRow("Latest Fix Version", "140.10.2");
     }
 

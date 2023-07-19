@@ -22,6 +22,9 @@ package org.xwiki.extension.security.internal;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.script.ScriptContext;
+
 import org.apache.solr.common.SolrDocument;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -29,8 +32,10 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.index.internal.ExtensionIndexStore;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.script.ScriptContextManager;
 import org.xwiki.search.solr.SolrUtils;
 import org.xwiki.search.solr.internal.api.FieldUtils;
+import org.xwiki.template.TemplateManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -66,12 +71,26 @@ class SolrToLiveDataEntryMapperTest
     @MockComponent
     private ExtensionIndexStore extensionIndexStore;
 
+    @MockComponent
+    private ScriptContextManager scriptContextManager;
+
+    @MockComponent
+    private TemplateManager templateManager;
+
+
     @Mock
     private SolrDocument doc;
+
+    @Mock
+    private ScriptContext scriptContext;
 
     @Test
     void mapDocToEntries()
     {
+        when(this.scriptContextManager.getCurrentScriptContext()).thenReturn(this.scriptContext);
+        when(this.templateManager.renderNoException("extension/security/liveData/cveID.vm"))
+            .thenReturn("template content");
+        
         when(this.extensionIndexStore.getExtensionId(this.doc)).thenReturn(new ExtensionId("org.test:ext", "7.5"));
         when(this.doc.get(FieldUtils.NAME)).thenReturn("Ext Name");
         when(this.solrUtils.get(FieldUtils.NAME, this.doc)).thenReturn("Ext Name");
@@ -85,8 +104,8 @@ class SolrToLiveDataEntryMapperTest
             "wiki:s1"));
         when(this.l10n.getTranslationPlain("translation.key")).thenReturn("Translation Value");
         assertEquals(Map.of(
-            "cveID", "",
-            "fixVersion", "8.4",
+            "cveID", "template content",
+            "fixVersion", "",
             "maxCVSS", 5.0,
             "advice", "Translation Value",
             "name",

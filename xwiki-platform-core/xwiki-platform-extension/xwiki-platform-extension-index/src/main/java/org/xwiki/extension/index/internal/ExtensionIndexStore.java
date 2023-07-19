@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -82,6 +83,10 @@ import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.SolrUtils;
 
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_INSTALLED_EXTENSION;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_SAFE_EXPLANATIONS;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_FROM_ENVIRONMENT;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_REVIEWED_SAFE;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_ADVICE;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_CVE_COUNT;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_CVE_CVSS;
@@ -311,7 +316,7 @@ public class ExtensionIndexStore implements Initializable
                 result.getMaxCVSS(), doc);
         } else {
             // Remove the CVSS score if the new list of security vulnerabilities becomes empty.
-            this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_REMOVE, SECURITY_MAX_CVSS, 0.0, Double.class, doc);
+            this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_MAX_CVSS, null, doc);
         }
         Stream<String> cveIds =
             result.getSecurityVulnerabilities().stream().map(SecurityVulnerabilityDescriptor::getId);
@@ -325,6 +330,7 @@ public class ExtensionIndexStore implements Initializable
                 .map(SecurityVulnerabilityDescriptor::getScore).collect(Collectors.toList()), doc);
         String fixVersion = result.getSecurityVulnerabilities().stream()
             .map(SecurityVulnerabilityDescriptor::getFixVersion)
+            .filter(Objects::nonNull)
             .max(Comparator.naturalOrder())
             .map(Version::getValue)
             .orElse(null);
@@ -332,6 +338,20 @@ public class ExtensionIndexStore implements Initializable
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_ADVICE, result.getAdvice(), doc);
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_CVE_COUNT,
             result.getSecurityVulnerabilities().size(), doc);
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, IS_FROM_ENVIRONMENT, result.isFromEnvironment(),
+            doc);
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, IS_INSTALLED_EXTENSION,
+            result.isInstalledExtension(), doc);
+        List<Boolean> safeMapping = result.getSecurityVulnerabilities()
+            .stream()
+            .map(SecurityVulnerabilityDescriptor::isSafe)
+            .collect(Collectors.toList());
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, IS_REVIEWED_SAFE, safeMapping, doc);
+        List<String> reviewExplanations = result.getSecurityVulnerabilities()
+            .stream()
+            .map(SecurityVulnerabilityDescriptor::getReviews)
+            .collect(Collectors.toList());
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, IS_SAFE_EXPLANATIONS, reviewExplanations, doc);
 
         add(doc);
         commit();
@@ -450,7 +470,7 @@ public class ExtensionIndexStore implements Initializable
         }
 
         if (incompatible != null) {
-            this.utils.setAtomic(incompatible.booleanValue() ? SolrUtils.ATOMIC_UPDATE_MODIFIER_ADD_DISTINCT 
+            this.utils.setAtomic(incompatible.booleanValue() ? SolrUtils.ATOMIC_UPDATE_MODIFIER_ADD_DISTINCT
                     : SolrUtils.ATOMIC_UPDATE_MODIFIER_REMOVE,
                 ExtensionIndexSolrCoreInitializer.SOLR_FIELD_INCOMPATIBLE_NAMESPACES,
                 this.extensionIndexSolrUtil.toStoredNamespace(namespace), document);

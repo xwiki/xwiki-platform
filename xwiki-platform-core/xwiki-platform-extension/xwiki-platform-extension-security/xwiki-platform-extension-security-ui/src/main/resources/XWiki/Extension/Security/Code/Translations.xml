@@ -48,7 +48,9 @@ XWiki.Extension.Security.Code.ConfigClass_scanEnabled.hint=When unchecked, the s
 XWiki.Extension.Security.Code.ConfigClass_scanDelay=Scan Delay
 XWiki.Extension.Security.Code.ConfigClass_scanDelay.hint=The number of hours to wait between two security scan (default: 24h)
 XWiki.Extension.Security.Code.ConfigClass_scanURL=Scan URL
-XWiki.Extension.Security.Code.ConfigClass_scanURL.hint=The url to use as the remote source for the security scan (default value: https://api.osv.dev/v1/query)</content>
+XWiki.Extension.Security.Code.ConfigClass_scanURL.hint=The url to use as the remote source for the security scan (default value: https://api.osv.dev/v1/query)
+XWiki.Extension.Security.Code.ConfigClass_falsePositiveURL=Reviews URL
+XWiki.Extension.Security.Code.ConfigClass_falsePositiveURL.hint=The url to use as the remote source for the security scan reviews (default value: https://extensions.xwiki.org/xwiki/bin/view/Extension/Extension/Security/Code/Reviews)</content>
   <object>
     <name>XWiki.Extension.Security.Code.Translations</name>
     <number>0</number>

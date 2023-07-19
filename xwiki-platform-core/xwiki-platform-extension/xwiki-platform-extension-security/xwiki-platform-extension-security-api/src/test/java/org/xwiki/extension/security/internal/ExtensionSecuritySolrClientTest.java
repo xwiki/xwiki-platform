@@ -47,6 +47,7 @@ import static org.mockito.Mockito.when;
 import static org.xwiki.extension.InstalledExtension.FIELD_INSTALLED_NAMESPACES;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_FROM_ENVIRONMENT;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_INSTALLED_EXTENSION;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_REVIEWED_SAFE;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_MAX_CVSS;
 import static org.xwiki.extension.security.internal.livedata.ExtensionSecurityLiveDataConfigurationProvider.FIX_VERSION;
 
@@ -86,6 +87,7 @@ class ExtensionSecuritySolrClientTest
         params.addFilterQuery(String.format("%s:{0 TO 10]", SECURITY_MAX_CVSS));
         params.addFilterQuery(String.format("(%s:[* TO *] OR %s:false)", FIELD_INSTALLED_NAMESPACES,
             IS_INSTALLED_EXTENSION));
+        params.addFilterQuery(String.format("%s:false", IS_REVIEWED_SAFE));
         verify(this.extensionIndexStore)
             .search(ArgumentMatchers.<SolrQuery>argThat(
                 t -> Arrays.equals(t.getFilterQueries(), params.getFilterQueries())));
@@ -123,7 +125,7 @@ class ExtensionSecuritySolrClientTest
                 argThat(t -> Objects.equals(t.getSorts(), params.getSorts())))
             );
     }
-    
+
     @Test
     void solrQueryIsFromEnvironment() throws Exception
     {

@@ -679,6 +679,13 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 #-#
 # extension.security.scan.url = https://api.osv.dev/v1/query
 
+#-# [Since 15.6RC1]
+#-# Specifies the url to use as the endpoint for the security scan false-positive fetching rest queries.
+#-# The url must conform to the API documented here: http://e.x.o.doc...
+#-# The default value is https://extensions.xwiki.org/xwiki/bin/view/Extension/Extension/Security/Code/Reviews
+#-#
+# extension.security.reviews.url = https://extensions.xwiki.org/xwiki/bin/view/Extension/Extension/Security/Code/Reviews
+
 #-------------------------------------------------------------------------------------
 # Distribution Wizard
 #-------------------------------------------------------------------------------------

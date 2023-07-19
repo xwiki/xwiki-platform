@@ -46,6 +46,7 @@ import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.security.ExtensionSecurityIndexationEndEvent;
 import org.xwiki.extension.security.analyzer.ExtensionSecurityAnalyzer;
+import org.xwiki.extension.security.analyzer.ReviewsFetcher;
 import org.xwiki.extension.security.internal.analyzer.VulnerabilityIndexer;
 import org.xwiki.extension.security.internal.analyzer.osv.OsvExtensionSecurityAnalyzer;
 import org.xwiki.job.AbstractJob;
@@ -86,6 +87,9 @@ public class ExtensionSecurityJob
     @Inject
     private ExecutionContextManager executionContextManager;
 
+    @Inject
+    private ReviewsFetcher reviewsFetcher;
+
     @Override
     public String getType()
     {
@@ -99,9 +103,7 @@ public class ExtensionSecurityJob
         Collection<CoreExtension> coreExtensions = this.coreExtensionRepository.getCoreExtensions();
         this.progressManager.pushLevelProgress(installedExtensions.size() + coreExtensions.size(), this);
 
-        // TODO: Replace with an actual remote reviews fetch. 
-        ReviewsMap reviewsMap = new ReviewsMap();
-
+        ReviewsMap reviewsMap = fetchReviewsMap();
         try {
             ExecutorService executorService = Executors.newFixedThreadPool(10);
 
@@ -122,6 +124,19 @@ public class ExtensionSecurityJob
         } finally {
             this.progressManager.popLevelProgress(this);
         }
+    }
+
+    private ReviewsMap fetchReviewsMap()
+    {
+        ReviewsMap reviewsMap;
+        try {
+            reviewsMap = this.reviewsFetcher.fetch().orElseGet(ReviewsMap::new);
+        } catch (ExtensionSecurityException e) {
+            this.logger.warn("Vulnerabilities reviews fetch failed. All the security issues are going to be displayed "
+                + "without reviews. Cause: [{}]", getRootCauseMessage(e));
+            reviewsMap = new ReviewsMap();
+        }
+        return reviewsMap;
     }
 
     private long consumeTasks(List<Future<Boolean>> tasks) throws InterruptedException

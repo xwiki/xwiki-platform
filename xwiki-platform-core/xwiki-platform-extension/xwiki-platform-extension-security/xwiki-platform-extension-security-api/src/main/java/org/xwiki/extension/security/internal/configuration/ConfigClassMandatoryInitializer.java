@@ -27,6 +27,7 @@ import org.xwiki.component.annotation.Component;
 import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
+import static org.xwiki.extension.security.internal.configuration.DefaultExtensionSecurityConfiguration.REVIEWS_URL;
 import static org.xwiki.extension.security.internal.configuration.DefaultExtensionSecurityConfiguration.SCAN_DELAY;
 import static org.xwiki.extension.security.internal.configuration.DefaultExtensionSecurityConfiguration.SCAN_ENABLED;
 import static org.xwiki.extension.security.internal.configuration.DefaultExtensionSecurityConfiguration.SCAN_URL;
@@ -58,5 +59,6 @@ public class ConfigClassMandatoryInitializer extends AbstractMandatoryClassIniti
         xclass.addBooleanField(SCAN_ENABLED, "Scan Enabled", "checkbox", true);
         xclass.addNumberField(SCAN_DELAY, "Scan Delay", 30, "integer");
         xclass.addTextField(SCAN_URL, "Scan URL", 30);
+        xclass.addTextField(REVIEWS_URL, "Reviews URL", 30);
     }
 }

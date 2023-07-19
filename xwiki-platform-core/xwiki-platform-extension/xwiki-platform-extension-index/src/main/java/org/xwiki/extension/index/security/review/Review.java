@@ -37,6 +37,8 @@ public class Review
 
     private String explanation;
 
+    private String filter;
+
     private ReviewResult result;
 
     /**
@@ -91,6 +93,24 @@ public class Review
         this.result = result;
     }
 
+    /**
+     * @return a regex filter, when {@code null} the review is always used, otherwise it is only used if the regex is
+     *     matching the extension id of an installed extension
+     */
+    public String getFilter()
+    {
+        return this.filter;
+    }
+
+    /**
+     * @param filter a regex filter, when {@code null} the review is always used, otherwise it is only used if the
+     *     regex is matching the extension id of an installed extension
+     */
+    public void setFilter(String filter)
+    {
+        this.filter = filter;
+    }
+
     @Override
     public boolean equals(Object o)
     {
@@ -108,6 +128,7 @@ public class Review
             .append(this.emitter, review.emitter)
             .append(this.explanation, review.explanation)
             .append(this.result, review.result)
+            .append(this.filter, review.filter)
             .isEquals();
     }
 
@@ -118,6 +139,7 @@ public class Review
             .append(this.emitter)
             .append(this.explanation)
             .append(this.result)
+            .append(this.filter)
             .toHashCode();
     }
 
@@ -128,7 +150,7 @@ public class Review
             .append("emitter", this.emitter)
             .append("explanation", this.explanation)
             .append("result", this.result)
+            .append("filter", this.filter)
             .toString();
     }
-
 }

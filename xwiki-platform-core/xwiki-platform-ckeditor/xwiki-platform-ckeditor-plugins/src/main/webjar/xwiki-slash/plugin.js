@@ -344,8 +344,11 @@
           // Get the text before the caret.
           var left = text.slice(0, offset),
               // Will look for the marker followed by text.
-              match = left.match(new RegExp(escapeRegExp(config.marker) + '.{0,30}$'));
-          if (match) {
+              match = left.match(new RegExp(escapeRegExp(config.marker) + '.{0,30}$')),
+              // Do not show the Quick Actions dropdown when the query contains '::'
+              // Because another dropdown might appear
+              subMatch = left.match(new RegExp(escapeRegExp(config.marker) + '.{0,30}::\\S{0,30}$'));
+          if (match && !subMatch) {
             return {
               start: match.index,
               end: offset
@@ -619,7 +622,7 @@
           name: editor.lang.common.image,
           iconClass: 'fa fa-image',
           description: editor.localization.get('xwiki-slash.action.img.hint'),
-          command: 'image'
+          outputHTML: '/img::'
         }, {
           group: 'Content',
           id: 'mention',

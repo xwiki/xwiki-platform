@@ -1216,6 +1216,10 @@ public class TestUtils
         for (EntityReference singleReference : spaceReference.removeParent(wikiReference).getReversedReferenceChain()) {
             path.add(singleReference.getName());
         }
+        // Add the page for attachments
+        if (reference.getType() == EntityType.ATTACHMENT) {
+            path.add(reference.getParent().getName());
+        }
         if (reference.getType() == EntityType.DOCUMENT || reference.getType() == EntityType.ATTACHMENT) {
             path.add(reference.getName());
         }

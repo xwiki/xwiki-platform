@@ -53,6 +53,7 @@ require(['jquery', 'bootstrap'], function($) {
 });
 
 require(['jquery'], function($) {
+
   $(function() {
     var tmDrawerActivator = $('.drawer-toggle').first()
       .on('click', function(event){
@@ -61,37 +62,42 @@ require(['jquery'], function($) {
           .addClass('opened')
           .trigger('drawer.opened');
       })
+    let closeDrawer = () => $('#tmDrawer')
+        .trigger('drawer.closed')
+        .removeClass('opened')
+        .addClass('closed');
+    let focusOutDrawer = function (event) {
+      if(!this.contains(event.relatedTarget) || event.relatedTarget.class === 'drawer-overlay') {
+        closeDrawer();
+      }
+    }
     // Note that the 'drawer-open' and 'drawer-close' CSS classes are added before the open and close animations end
     // which prevents us from using them in automated tests. We need something more reliable so we listen to
     // 'drawer.opened' and 'drawer.closed' events and add our own markers.
     var tmDrawer = $('#tmDrawer');
-    $('#tmDrawer').on('drawer.opened', function(event) {
+    var focusableElements = tmDrawer.find('button, a, input:not([type="hidden"]), select, textarea, [tabindex]:not([tabindex="-1"])');
+    tmDrawer.on('drawer.opened', function(event) {
       $('#tmDrawerActivator').attr('aria-expanded', 'true');
       //Focus the first focusable element in tmDrawer.
-      tmDrawer.find('button, a, input:not([type="hidden"]), select, textarea, [tabindex]:not([tabindex="-1"])')
-        .first()
+      focusableElements.first()
         .focus();
-      let closeDrawer = () => $('#tmDrawer')
-        .removeClass('opened')
-        .addClass('closed')
-        .trigger('drawer.closed');
       // Drawer can be closed by pressing the ESC key.
       tmDrawer.on('keydown', function (event) {
         if (event.key === 'Escape') {
           closeDrawer();
         }
-      });
-      // It can also be closed by getting the focus out of it.
-      document.getElementById('tmDrawer').addEventListener('focusout',
-        function (event) {
-        if(!this.contains(event.relatedTarget)) {
+      })
+      focusableElements.on('focusout', function () {
+        if ($(document.activeElement).closest('#tmDrawer').length === 0)
+        {
           closeDrawer();
         }
-      });
+      })
     }).on('drawer.closed', function(event) {
       $('#tmDrawerActivator').attr('aria-expanded', 'false');
       // We remove the listeners
-      tmDrawer.off('keydown focusout');
+      tmDrawer.off('keydown');
+      focusableElements.off('focusout');
     });
   });
 });

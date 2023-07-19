@@ -825,7 +825,8 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
             }
         }
 
-        // Force a GC to try emptying the reference map as much as possible to purge the docRef/userRef access entry.
+        // Force a GC to try emptying the reference map as much as possible to validate that it indeed keeps the
+        // referenced entries.
         // All "internal" entries should be kept as they should be referenced through parents of the access entries
         // still in the cache.
         System.gc();

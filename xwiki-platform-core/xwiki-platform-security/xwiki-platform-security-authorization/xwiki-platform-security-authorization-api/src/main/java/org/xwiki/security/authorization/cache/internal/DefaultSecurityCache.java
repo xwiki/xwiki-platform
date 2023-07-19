@@ -749,7 +749,13 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     private void addEntry(String key, SecurityCacheEntry entry)
     {
         cache.set(key, entry);
-        this.internalEntries.put(key, entry);
+        // Don't store access entries in the internal entries as they can never be the parent of another entry, and
+        // thus it is not important to keep them outside the cache. While this could be seen as an additional "cache"
+        // layer for access entries, this is not the purpose of the internal entries map. Instead, the size of the
+        // cache should be increased if this is desired.
+        if (!(entry.getEntry() instanceof SecurityAccessEntry)) {
+            this.internalEntries.put(key, entry);
+        }
 
         if (entry.disposed) {
             // This should never happen as entries cannot be disposed while being added to the cache as both

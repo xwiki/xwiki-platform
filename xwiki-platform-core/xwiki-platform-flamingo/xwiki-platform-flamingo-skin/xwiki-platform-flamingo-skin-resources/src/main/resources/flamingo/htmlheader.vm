@@ -114,8 +114,6 @@
     ## ---------------------------------------------------------------------------------------------------------------
     ## Hook for inserting Link extensions. This will be replaced with the pulled link references.
     ## ---------------------------------------------------------------------------------------------------------------
-    <!-- com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin -->
-    <link href="$services.webjars.url('drawer', 'css/drawer.min.css')" rel="stylesheet" type="text/css" />
     #template("stylesheets.vm")
     #template("javascript.vm")
   </head>

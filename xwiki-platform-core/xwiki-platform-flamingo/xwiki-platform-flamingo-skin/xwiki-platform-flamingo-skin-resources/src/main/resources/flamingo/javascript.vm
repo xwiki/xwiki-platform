@@ -76,7 +76,6 @@
   'paths': {
     'bootstrap': "#removeJsSuffix($services.webjars.url('bootstrap', ""js/bootstrap${jsExtension}""))",
     'deferred': $xwiki.getSkinFile('uicomponents/require/deferred.js'),
-    'drawer': "#removeJsSuffix($services.webjars.url('drawer', ""js/drawer${jsExtension}""))",
     'iscroll': "#removeJsSuffix($services.webjars.url('org.webjars.npm:iscroll', 'build/iscroll-lite.js'))",
     'jquery': "#removeJsSuffix($services.webjars.url('jquery', ""jquery${jsExtension}""))",
     'jquery-migrate': "#removeJsSuffix($services.webjars.url('jquery-migrate', ""jquery-migrate${jsExtension}""))",

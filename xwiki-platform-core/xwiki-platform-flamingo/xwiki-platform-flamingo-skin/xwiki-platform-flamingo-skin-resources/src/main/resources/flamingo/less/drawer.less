@@ -20,87 +20,127 @@
 @xwiki-drawer-menu-category-bg:          @xwiki-drawer-menu-item-seperator-color;
 @xwiki-drawer-menu-category-color:       lighten(@xwiki-drawer-menu-item-color, 10%);
 
-.drawer-overlay {
-  z-index: 5200;
-}
-
 .drawer--right .drawer-nav {
   right: -@xwiki-drawer-width;
 }
 
+
+
 .drawer-nav {
   background-color: @xwiki-drawer-bg;
   width: @xwiki-drawer-width;
-  z-index: 5300;
+  z-index: 5200;
+  position: fixed;
+  top: 0;
+  overflow: hidden;
+  height: 100vh;
+  transition: right .6s cubic-bezier(0.190, 1.000, 0.220, 1.000);
 
-  // Brand =================================================================
-  .drawer-brand {
-    background-color: @xwiki-drawer-brand-bg;
-    border-bottom: 1px solid @xwiki-drawer-brand-border;
-    font-weight: 400;
-    line-height: inherit;
-    padding: 20px 16px;
-
-    a {
-      display: block;
-      color: @xwiki-drawer-brand-link-color;
-      padding: 0;
-
-      &:hover, &:focus {
-        color: @xwiki-drawer-brand-link-hover-color;
-        text-decoration: none;
-      }
-    }
-
-    // Avatar styling
-    img {
-      border-radius: 50%;
-      float: left;
-      height: 50px;
-      width: 50px;
-    }
-
-    .brand-links {
-      float: left;
-      margin-left: 16px;
-      margin-top: 8px;
-
-      a {
-        font-size: 14px;
-      }
-
-      // Resetting avatar styling
-      img {
-        border-radius: 0;
-        float: none;
-        height: auto;
-        width: auto;
-      }
-
-      .brand-user {
-        color: @xwiki-drawer-brand-user-color;
-        font-weight: 400;
-      }
-    }
+  &.closed {
+    display: none;
+  }
+  &.opened {
+    right: 0;
   }
 
+  .drawer-overlay {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    opacity: 0.2;
+    background-color: #fff - @xwiki-page-content-bg;
+  }
 
-  // Menu Item =============================================================
-  a.drawer-menu-item {
-    font-size: @xwiki-drawer-menu-item-size;
-    font-weight: 400;
-    margin-top: 0;
-    padding: @xwiki-drawer-menu-item-padding;
+  & .drawer-menu {
+    position: relative;
+    z-index: 5300;
+    margin: 0;
+    padding: 0;
+    list-style: none;
 
-    &, &:hover, &:focus {
-      background-color: @xwiki-drawer-menu-item-bg;
-      color: @xwiki-drawer-menu-item-color;
+    & .drawer-menu-item {
+      font-size: 1rem;
+      display: block;
+      padding: .75rem;
       text-decoration: none;
+      color: #222;
     }
 
-    &:hover {
-      background-color: @xwiki-drawer-menu-item-hover-bg;
-      color: @xwiki-drawer-menu-item-hover-color;
+    & .drawer-menu-item:hover {
+      color: #555;
+      background-color: transparent;
+    }
+
+    // Brand =================================================================
+    .drawer-brand {
+      background-color: @xwiki-drawer-brand-bg;
+      border-bottom: 1px solid @xwiki-drawer-brand-border;
+      font-weight: 400;
+      line-height: inherit;
+      padding: 20px 16px;
+
+      a {
+        display: block;
+        color: @xwiki-drawer-brand-link-color;
+        padding: 0;
+
+        &:hover, &:focus {
+          color: @xwiki-drawer-brand-link-hover-color;
+          text-decoration: none;
+        }
+      }
+
+      // Avatar styling
+      img {
+        border-radius: 50%;
+        float: left;
+        height: 50px;
+        width: 50px;
+      }
+
+      .brand-links {
+        float: left;
+        margin-left: 16px;
+        margin-top: 8px;
+
+        a {
+          font-size: 14px;
+        }
+
+        // Resetting avatar styling
+        img {
+          border-radius: 0;
+          float: none;
+          height: auto;
+          width: auto;
+        }
+
+        .brand-user {
+          color: @xwiki-drawer-brand-user-color;
+          font-weight: 400;
+        }
+      }
+    }
+
+    // Menu Item =============================================================
+    a.drawer-menu-item {
+      font-size: @xwiki-drawer-menu-item-size;
+      font-weight: 400;
+      margin-top: 0;
+      padding: @xwiki-drawer-menu-item-padding;
+
+      &, &:hover, &:focus {
+        background-color: @xwiki-drawer-menu-item-bg;
+        color: @xwiki-drawer-menu-item-color;
+        text-decoration: none;
+      }
+
+      &:hover {
+        background-color: @xwiki-drawer-menu-item-hover-bg;
+        color: @xwiki-drawer-menu-item-hover-color;
+      }
     }
   }
 
@@ -140,11 +180,6 @@
 .drawer-menuseparator {
   border-top: 1px solid @xwiki-drawer-menu-item-seperator-color;
   margin: 12px 0;
-}
-
-//Make the drawer invisible to any reader when it's closed off.
-.drawer-close .drawer-menu {
-  display: none;
 }
 
 // Special styling for login/logout/register =============================

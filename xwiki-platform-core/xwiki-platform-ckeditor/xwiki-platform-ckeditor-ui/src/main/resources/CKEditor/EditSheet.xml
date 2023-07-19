@@ -162,45 +162,9 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>/*
-#if ($services.debug.minify)
-  #set ($jsExtension = '.min')
-#else
-  #set ($jsExtension = '')
-#end
-#set ($ckeditorPath = $services.webjars.url('org.xwiki.platform:xwiki-platform-ckeditor-webjar', 'ckeditor'))
-#set ($ckeditorBasePath = $stringtool.removeEnd($stringtool.removeEnd($ckeditorPath, '.js'), 'ckeditor'))
-#set ($resourcePickerBundlePath = "${ckeditorBasePath}plugins/xwiki-resource/resourcePicker.bundle$jsExtension")
-#set ($macroWizardBundlePath = "${ckeditorBasePath}plugins/xwiki-macro/macroWizard.bundle$jsExtension")
-#set ($imageWizardBundlePath = "${ckeditorBasePath}plugins/xwiki-image/imageWizard.bundle$jsExtension")
-#set ($modalPath = "${ckeditorBasePath}plugins/xwiki-dialog/modal.min")
-#set ($l10nPath = "${ckeditorBasePath}plugins/xwiki-localization/l10n.min")
-*/
+      <code>XWiki.locale = document.documentElement.getAttribute('lang') || '';
+
 require.config({
-  paths: {
-    ckeditor: '$!ckeditorPath',
-    resourcePickerBundle: '$!resourcePickerBundlePath',
-    modal: '$!modalPath',
-    l10n: '$!l10nPath',
-    macroWizard: '$!macroWizardBundlePath',
-    imageWizard: '$!imageWizardBundlePath',
-    // This is used by the resource suggest picker on the link modal.
-    'bootstrap3-typeahead': $jsontool.serialize($services.webjars.url('org.webjars.npm:bootstrap-3-typeahead',
-      'bootstrap3-typeahead.min')),
-    // This is used to preserve the selection when switching between WYSIWYG and Source modes.
-    'fast-diff': $jsontool.serialize($services.webjars.url('org.webjars.npm:fast-diff', 'diff'))
-  },
-  bundles: {
-    'resourcePickerBundle': ['resource', 'resourcePicker', 'entityResourcePicker', 'entityResourceSuggester',
-      'entityResourceDisplayer']
-  },
-  shim: {
-    ckeditor: {
-      exports: 'CKEDITOR',
-      // This includes dependencies of the plugins bundled with the CKEditor code.
-      deps: ['jquery', 'resource', 'resourcePicker', 'macroWizard', 'imageWizard']
-    }
-  },
   config: {
     l10n: {
       // We need to specify the language because this URL can be used after the page is loaded and thus after the
@@ -208,27 +172,24 @@ require.config({
       // a different language specified). We take the current language from the page HTML, rather than using Velocity,
       // in order to avoid having the current language cached.
       url: new XWiki.Document('Translator', 'CKEditor').getURL('get', 'outputSyntax=plain&amp;language=' +
-        encodeURIComponent(document.documentElement.getAttribute('lang') || ''))
+        encodeURIComponent(XWiki.locale))
     }
   }
 });
 
-window.CKEDITOR_BASEPATH = "$!ckeditorBasePath";
-
 define('xwiki-ckeditor', [
   'jquery',
+  // The CKEditor standard API.
   'ckeditor',
   // Used to access the form token required by the upload URL.
   'xwiki-meta',
+  // CKEditor plugins specific to XWiki.
+  'xwiki-ckeditor-plugins',
   // Used to catch form action events fired from Prototype.js code (actionButtons.js).
   'xwiki-events-bridge',
-  // Configures the path to the tree widget module and its dependencies which are used by the page and attachment
-  // pickers on the link, image and macro dialogs to select pages and attachments.
-  "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {'evaluate': true})"
+  // Load the translations for our custom CKEditor plugins.
+  new XWiki.Document('Translations', 'CKEditor').getURL('jsx', 'language=' + encodeURIComponent(XWiki.locale))
 ], function($, ckeditor, xwikiMeta) {
-  var deferred = $.Deferred();
-  var currentLocale = $('html').attr('lang') || '';
-
   // We have to pass the plugin that makes the request (the initiator) because the expected response can be different
   // (e.g. between the filebrowser and filetools plugins).
   var getUploadURL = function(document, initiator) {
@@ -237,7 +198,7 @@ define('xwiki-ckeditor', [
       outputSyntax: 'plain',
       // The syntax and language are important especially when the upload request creates a new document.
       syntax: document.syntax,
-      language: currentLocale,
+      language: XWiki.locale,
       form_token: xwikiMeta.form_token,
       initiator: initiator
     }));
@@ -268,7 +229,7 @@ define('xwiki-ckeditor', [
           feed: sourceDocument.getURL('get', $.param({
             sheet: 'CKEditor.LinkSuggestions',
             outputSyntax: 'plain',
-            language: currentLocale
+            language: XWiki.locale
           // Prevent the curly brackets from being URL encoded because they mark a placeholder that will be replaced
           // with the text typed by the user (and CKEditor takes care of URL encoding it).
           }) + '&amp;input={encodedQuery}'),
@@ -303,7 +264,7 @@ define('xwiki-ckeditor', [
         labelGenerator: sourceDocument.getURL('get', $.param({
           sheet: 'CKEditor.LinkLabelGenerator',
           outputSyntax: 'plain',
-          language: currentLocale
+          language: XWiki.locale
         }))
       }
     };
@@ -360,291 +321,14 @@ define('xwiki-ckeditor', [
     object[key] = newValue;
   };
 
-  require([
-    // We cannot add these modules to the list of dependencies because they need the tree module to be configured first.
-    'entityResourcePicker', 'entityResourceSuggester', 'entityResourceDisplayer',
-    // Load the translations for our custom CKEditor plugins. We didn't add this as a dependency to the xwiki-ckeditor
-    // module because some of our plugins load their dependencies with RequireJS and thus they are loaded with a small
-    // delay. The plugin needs to be defined before calling CKEDITOR.plugins.setLang().
-    new XWiki.Document('Translations', 'CKEditor').getURL('jsx', $.param({
-      language: currentLocale
-    }))
-  ], function() {
-    deferred.resolve(ckeditor);
-  });
-
-  return deferred.promise();
+  return $.Deferred().resolve(ckeditor).promise();
 });</code>
     </property>
     <property>
       <name>CKEditor Module</name>
     </property>
     <property>
-      <parse>1</parse>
-    </property>
-    <property>
-      <use>onDemand</use>
-    </property>
-  </object>
-  <object>
-    <name>CKEditor.EditSheet</name>
-    <number>1</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>b97f476f-dc62-43d1-a85a-a3d05acb8f22</guid>
-    <class>
-      <name>XWiki.JavaScriptExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <defaultValue>long</defaultValue>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <contenttype>PureText</contenttype>
-        <disabled>0</disabled>
-        <editor>PureText</editor>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <restricted>0</restricted>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>// Fix CKEDITOR.tools.escapeCss() for browsers that don't support CSS.escape()
-// See https://github.com/ckeditor/ckeditor4/issues/681
-require(['jquery', 'ckeditor'], function($, ckeditor) {
-  // Test if CKEDITOR.tools.escapeCss() works as expected.
-  if (ckeditor.tools.escapeCss('.') === '.') {
-    // Special CSS characters were not escaped so we need to fix this.
-    // Use jQuery's escapeSelector() if available (only since jQuery 3.0), otherwise use some naive implementation.
-    ckeditor.tools.escapeCss = $.escapeSelector || function(selector) {
-      if (typeof selector === 'string') {
-        // Simple implementation.
-        // See https://learn.jquery.com/using-jquery-core/faq/how-do-i-select-an-element-by-an-id-that-has-characters-used-in-css-notation/
-        return selector.replace(/(:|\.|\[|\]|,|=|@)/g, '\\$1');
-      } else {
-        return selector;
-      }
-    };
-  }
-});
-
-// Fix the path to the arrow icon that indicates the presence of a sub-menu in the context menu.
-if (CKEDITOR_BASEPATH.indexOf('?') &gt;= 0) {
-  // The WebJar resource path was specified in the query string before 7.1M1 which prevented the browser from resolving
-  // relative paths. See XWIKI-10880 (A CSS file inside a webjar cannot use a resource from that webjar).
-  require(['ckeditor'], function(ckeditor) {
-    ckeditor.on('instanceReady', function(event) {
-      if (event.editor.contextMenu) {
-        event.editor.contextMenu._.panelDefinition.css.push(
-          '.cke_menuarrow {' +
-            'background-image: url("' + CKEDITOR_BASEPATH + 'skins/moono-lisa/images/arrow.png") !important;' +
-          '}'
-        );
-      }
-    });
-  });
-}
-
-// Polyfill for the xwiki:actions:beforeSave and xwiki:actions:beforePreview events (available since 7.4.1)
-// We have to use Prototype.js because it is loaded before jQuery and we need to register our save and preview listeners
-// before the actionButtons.js does it, as otherwise the CKEditor doesn't get the chance to update the text area before
-// the form is submitted.
-(function() {
-  var submitActions = ['save', 'preview'];
-  var beforeSubmitWasTriggered = false;
-  var onBeforeSubmit = function(event) {
-    beforeSubmitWasTriggered = true;
-    if (!(event.memo || {}).polyfill) {
-      removeListeners();
-    }
-  };
-  var onSubmit = function(event) {
-    if (!beforeSubmitWasTriggered &amp;&amp; jQuery) {
-      // Our CKEditor plugins use jQuery to listen to events.
-      var parts = event.eventName.split(':');
-      var data = event.memo || {};
-      data.polyfill = true;
-      jQuery(document).triggerHandler(getBeforeEventName(parts[parts.length - 1]), data);
-    }
-    beforeSubmitWasTriggered = false;
-  };
-  var getBeforeEventName = function(action) {
-    return 'xwiki:actions:before' + action.substr(0, 1).toUpperCase() + action.substr(1);
-  };
-  var removeListeners = function() {
-    submitActions.forEach(function(action) {
-      document.stopObserving(getBeforeEventName(action), onBeforeSubmit);
-      document.stopObserving('xwiki:actions:' + action, onSubmit);
-    });
-  };
-  if (typeof document.observe == 'function') {
-    submitActions.forEach(function(action) {
-      document.observe(getBeforeEventName(action), onBeforeSubmit);
-      document.observe('xwiki:actions:' + action, onSubmit);
-    });
-  }
-})();
-
-// Make sure the "Back To Edit" button from the Preview mode works as expected on XWiki versions older than 8.2 (where
-// CKEditor is not the default editor).
-require(['jquery'], function($) {
-  if (/&amp;sheet=CKEditor.EditSheet\b/.test(window.location.href)) {
-    // Make sure the CKEditor.EditSheet is preserved when coming back from Preview mode.
-    $('form#inline').find('input[name="xcontinue"]').val(function(index, oldValue) {
-      return oldValue + '&amp;sheet=CKEditor.EditSheet';
-    });
-  }
-});
-
-// Polyfill for entityReference.js
-require(['jquery'], function($) {
-  if (typeof XWiki.EntityType.byName !== 'function') {
-    // Before 6.4.1
-    var entityTypeByName = {
-      wiki: XWiki.EntityType.WIKI,
-      space: XWiki.EntityType.SPACE,
-      document: XWiki.EntityType.DOCUMENT,
-      attachment: XWiki.EntityType.ATTACHMENT
-    };
-    XWiki.EntityType.byName = function(name) {
-      return entityTypeByName[name];
-    };
-  }
-
-  if (typeof XWiki.EntityType.getName !== 'function') {
-    // Before 6.4.1
-    var entityTypes = ['wiki', 'space', 'document', 'attachment'];
-    XWiki.EntityType.getName = function(entityType) {
-      return entityTypes[entityType];
-    }
-  }
-
-  if (typeof XWiki.EntityReference.prototype.getReversedReferenceChain !== 'function') {
-    // Before 7.2M2
-    XWiki.EntityReference.prototype.getReversedReferenceChain = function() {
-      return this._extractComponents().reverse();
-    };
-  }
-
-  if (typeof XWiki.currentDocument.getDocumentReference !== 'function') {
-    // Before 7.2M3
-    // Take the current document full name.
-    var currentDocumentReference = $('meta[name="document"]').attr('content');
-    // Resolve the local reference.
-    currentDocumentReference = XWiki.Model.resolve(currentDocumentReference, XWiki.EntityType.DOCUMENT);
-    // Add the wiki component.
-    currentDocumentReference.getReversedReferenceChain()[0].parent = new XWiki.WikiReference(XWiki.currentWiki);
-    XWiki.currentDocument.getDocumentReference = function() {
-      return currentDocumentReference;
-    };
-  }
-
-  var reference = XWiki.Model.resolve('S', XWiki.EntityType.SPACE, new XWiki.WikiReference('W'));
-  if (!reference.parent) {
-    // The resolve method did not support a default value provider before 7.2M1.
-    var oldResolve = XWiki.Model.resolve;
-    XWiki.Model.resolve = function(representation, entityType, defaultValueProvider) {
-      var reference = oldResolve.apply(this, arguments);
-      if (reference &amp;&amp; defaultValueProvider &amp;&amp; typeof defaultValueProvider.extractReference === 'function') {
-        // The given default value provider is an entity reference (normally a document reference).
-        var root = reference.getReversedReferenceChain()[0];
-        // We cover the document and attachment references mainly,
-        var defaultRoot = defaultValueProvider.extractReference(root.type) || {parent: defaultValueProvider};
-        // Nested spaces were introduced in 7.2M1 so we can safely assume that the given default value provider has only
-        // one space reference component.
-        root.parent = defaultRoot.parent;
-      }
-      return reference;
-    };
-  }
-});
-
-// Fix the layout to be consistent with the Wiki edit mode (tested with the Flamingo Skin).
-require(['jquery'], function($) {
-  var ckeEditMeta = $('.cke-editMeta');
-  if (ckeEditMeta.length != 1) {
-    // Fix the layout only when the CKEditor.EditSheet is applied.
-    return;
-  }
-  // Hide the page title because the edit form has an input field to edit the title. This is consistent with the Wiki
-  // edit mode. Remove the 'editMeta' id because the edit sheet adds an element with the same id.
-  // NOTE: In order to rely on Chrome's Back-Forward cache we must not remove or move form elements. We can only hide.
-  $('#document-title').parent('#editMeta').removeAttr('id').parent('.row').hide();
-  // Move the content menu before the editMeta element so that they are displayed on the same row.
-  ckeEditMeta.attr('id', 'editMeta').addClass('col-md-pull-5')
-    .before($('#contentmenu').parent('.col-md-5').addClass('col-md-push-7'));
-});</code>
-    </property>
-    <property>
-      <name>Various fixes and polyfills</name>
-    </property>
-    <property>
-      <parse>1</parse>
+      <parse>0</parse>
     </property>
     <property>
       <use>onDemand</use>
@@ -780,7 +464,7 @@ require(['jquery'], function($) {
       <name>CKEditor Loader</name>
     </property>
     <property>
-      <parse>1</parse>
+      <parse>0</parse>
     </property>
     <property>
       <use>onDemand</use>
@@ -892,53 +576,8 @@ require(['jquery'], function($) {
       <cache>long</cache>
     </property>
     <property>
-      <code>#template('colorThemeInit.vm')
-
-/*
-#set ($ckeditorSkinPath = $services.webjars.url('org.xwiki.platform:xwiki-platform-ckeditor-webjar', 'skins/moono-lisa'))
-#if ($ckeditorSkinPath.indexOf('?') &gt;= 0)
-  ## The WebJar resource path was specified in the query string before 7.1M1 which prevented the browser from resolving
-  ## relative paths. See XWIKI-10880 (A CSS file inside a webjar cannot use a resource from that webjar).
-  */
-  a.cke_button &gt; span.cke_button_icon {
-    background-image: url("$ckeditorSkinPath/icons.png") !important;
-  }
-  .cke_hidpi a.cke_button &gt; span.cke_button_icon {
-    background-image: url("$ckeditorSkinPath/icons_hidpi.png") !important;
-  }
-  .cke_notification_close, a.cke_dialog_close_button {
-    background-image: url("$ckeditorSkinPath/images/close.png") !important;
-  }
-  .cke_hidpi .cke_dialog_close_button {
-    background-image: url("$ckeditorSkinPath/images/hidpi/close.png") !important;
-  }
-  .cke_dialog a.cke_btn_reset {
-    background-image: url("$ckeditorSkinPath/images/refresh.png") !important;
-  }
-  .cke_hidpi .cke_dialog a.cke_btn_reset {
-    background-image: url("$ckeditorSkinPath/images/hidpi/refresh.png") !important;
-  }
-  .cke_dialog a.cke_btn_locked {
-    background-image: url("$ckeditorSkinPath/images/lock.png") !important;
-  }
-  .cke_hidpi .cke_dialog a.cke_btn_locked {
-    background-image: url("$ckeditorSkinPath/images/hidpi/lock.png") !important;
-  }
-  .cke_dialog a.cke_btn_unlocked {
-    background-image: url("$ckeditorSkinPath/images/lock-open.png") !important;
-  }
-  .cke_hidpi .cke_dialog a.cke_btn_unlocked {
-    background-image: url("$ckeditorSkinPath/images/hidpi/lock-open.png") !important;
-  }
-  .cke_menuarrow {
-    background-image: url("$ckeditorSkinPath/images/arrow.png") !important;
-  }
-  /*
-#end
-*/
-
-a.cke_button_disabled &gt; span.cke_button_icon.loading {
-  background-image: url("$xwiki.getSkinFile('icons/xwiki/spinner.gif')") !important;
+      <code>a.cke_button_disabled &gt; span.cke_button_icon.loading {
+  background-image: url(@xwiki-icon-spinner) !important;
   background-position: 0 0 !important;
 }
 
@@ -974,7 +613,7 @@ body &gt; .selectize-dropdown {
 }
 
 .cke_maximized .buttons {
-  background-color: $theme.backgroundSecondaryColor;
+  background-color: @well-bg;
   padding: .5em;
 }
 
@@ -1082,7 +721,7 @@ body[data-maximized] .xdialog-modal-container {
   box-sizing: border-box;
 }
 .resourcePicker .resourceDisplay.loading {
-  background-image: url("$xwiki.getSkinFile('icons/xwiki/spinner.gif')");
+  background-image: url(@xwiki-icon-spinner);
   background-repeat: no-repeat;
 }
 
@@ -1106,7 +745,7 @@ td.cke_dialog_contents_body {
    * tree finder = 48px
    * footer = 69px
    */
-  max-height: calc(100vh - 268px);
+  max-height: calc(~"100vh - 268px");
   overflow-y: auto;
 }
 
@@ -1180,20 +819,49 @@ ul.cke_autocomplete_panel {
   font: inherit;
   padding: 5px 0;
   width: auto;
-  max-width: 100%;
+  max-width: 324px;
   min-width: 200px;
 }
+.cke_autocomplete_panel &gt; li.ckeditor-autocomplete-group,
 .cke_autocomplete_panel &gt; li.ckeditor-autocomplete-item {
-  padding: 3px 12px;
+  padding: 5px 20px;
 }
-.cke_autocomplete_panel &gt; li.ckeditor-autocomplete-item &gt; div {
+.cke_autocomplete_panel &gt; li.ckeditor-autocomplete-group {
+  border-top: 1px solid @xwiki-border-color;
+  color: @text-muted;
+  font-size: smaller;
+  margin-top: 9px;
+  padding-top: 14px;
+}
+.cke_autocomplete_panel &gt; li.ckeditor-autocomplete-group h6 {
+  font-size: inherit;
+  margin: 0;
+}
+.cke_autocomplete_panel &gt; li.ckeditor-autocomplete-group:first-child {
+  border-top: 0 none;
+  margin-top: 0;
+  padding-top: 5px;
+}
+.cke_autocomplete_panel &gt; li.ckeditor-autocomplete-group:hover {
+  background-color: transparent;
+  cursor: inherit;
+}
+.ckeditor-autocomplete-group h6,
+.ckeditor-autocomplete-item-label,
+.ckeditor-autocomplete-item-shortcut {
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
+}
+.ckeditor-autocomplete-item-head {
+  display: flex;
+  align-items: center;
 }
 .ckeditor-autocomplete-item-icon-wrapper {
   display: inline-block;
   height: 14px;
   line-height: 14px;
-  margin-right: .3em;
+  margin-right: .5em;
   text-align: center;
   width: 14px;
 }
@@ -1208,134 +876,40 @@ ul.cke_autocomplete_panel {
 .ckeditor-autocomplete-item-icon-wrapper img[src=""] {
   display: none;
 }
+.ckeditor-autocomplete-item-label {
+  /* Push the shortcut to the right edge of the item. */
+  flex-grow: 1;
+}
+.ckeditor-autocomplete-item-shortcut:not(:empty) {
+  background-color: @xwiki-border-color;
+  border-radius: @border-radius-base;
+  padding: 2px 5px;
+  margin-left: .5em;
+}
+.ckeditor-autocomplete-item-shortcut,
+.ckeditor-autocomplete-item-badge,
 .ckeditor-autocomplete-item-hint {
-  color: $theme.textSecondaryColor;
+  color: @text-muted;
   font-size: smaller;
+}
+.ckeditor-autocomplete-item-badge {
+  background-color: @xwiki-border-color;
+  font-weight: normal;
+}
+.ckeditor-autocomplete-item-hint {
+  /* Limit to 3 lines of text (based on line height). */
+  max-height: calc(3 * 20em / 14);
+  overflow: hidden;
+  /* Put the ellipsis at the end of the last line when the text is cut. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
 .ckeditor-autocomplete-item-hint:empty {
   margin-top: 0;
-}</code>
-    </property>
-    <property>
-      <contentType>CSS</contentType>
-    </property>
-    <property>
-      <name>CKEditor Skin Fix</name>
-    </property>
-    <property>
-      <parse>1</parse>
-    </property>
-    <property>
-      <use>onDemand</use>
-    </property>
-  </object>
-  <object>
-    <name>CKEditor.EditSheet</name>
-    <number>1</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>8a0aaf64-f6fd-4a0b-8262-e64062f101f5</guid>
-    <class>
-      <name>XWiki.StyleSheetExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <defaultValue>long</defaultValue>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <contenttype>PureText</contenttype>
-        <disabled>0</disabled>
-        <editor>PureText</editor>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <restricted>0</restricted>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <contentType>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>contentType</name>
-        <number>6</number>
-        <prettyName>Content Type</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>CSS|LESS</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </contentType>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>/**
+}
+
+/**
  * Source mode
  */
 
@@ -1437,7 +1011,7 @@ body[data-maximized="true"] {
       <contentType>LESS</contentType>
     </property>
     <property>
-      <name>LESS</name>
+      <name/>
     </property>
     <property>
       <parse>0</parse>
@@ -1578,11 +1152,724 @@ body[data-maximized="true"] {
       <extensionPointId>org.xwiki.platform.requirejs.module</extensionPointId>
     </property>
     <property>
-      <name>org.xwiki.platform.requirejs.module.ckeditor</name>
+      <name>org.xwiki.platform.requirejs.module.xwiki-ckeditor</name>
     </property>
     <property>
       <parameters>id=xwiki-ckeditor
 path=$xwiki.getURL('CKEditor.EditSheet', 'jsx', $escapetool.url({'v': $services.extension.installed.getInstalledExtension('org.xwiki.platform:xwiki-platform-ckeditor-ui', "wiki:$xcontext.database").version.value, 'xwiki-version': $services.extension.core.getCoreExtension('org.xwiki.platform:xwiki-platform-tree-webjar').version.value, 'fast-diff-version': $services.extension.installed.getInstalledExtension('org.webjars.npm:fast-diff', "wiki:$xcontext.database").version.value, 'bs3typeahead-version': $services.extension.installed.getInstalledExtension('org.webjars.npm:bootstrap-3-typeahead', "wiki:$xcontext.database").version.value}))</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
+  <object>
+    <name>CKEditor.EditSheet</name>
+    <number>1</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>e2cb2c4d-1b95-4e0a-ae87-04e436c75174</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>3</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>4</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>, </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>2</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>1</number>
+        <prettyName>Executed Content</prettyName>
+        <restricted>0</restricted>
+        <rows>25</rows>
+        <size>120</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>5</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>6</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>parameters</name>
+        <number>7</number>
+        <prettyName>Extension Parameters</prettyName>
+        <restricted>0</restricted>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>8</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
+      <content/>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.platform.requirejs.module</extensionPointId>
+    </property>
+    <property>
+      <name>org.xwiki.platform.requirejs.module.fusejs</name>
+    </property>
+    <property>
+      <parameters>id=fuse
+path=$services.webjars.url('org.webjars.npm:fuse.js', 'dist/fuse.basic.min.js')</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
+  <object>
+    <name>CKEditor.EditSheet</name>
+    <number>2</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>4f627a23-ece1-4be2-bcd2-1fcacff217b7</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>3</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>4</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>, </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>2</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>1</number>
+        <prettyName>Executed Content</prettyName>
+        <restricted>0</restricted>
+        <rows>25</rows>
+        <size>120</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>5</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>6</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>parameters</name>
+        <number>7</number>
+        <prettyName>Extension Parameters</prettyName>
+        <restricted>0</restricted>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>8</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
+      <content/>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.platform.requirejs.module</extensionPointId>
+    </property>
+    <property>
+      <name>org.xwiki.platform.requirejs.module.bootstrap3-typeahead</name>
+    </property>
+    <property>
+      <parameters>id=bootstrap3-typeahead
+path=$services.webjars.url('org.webjars.npm:bootstrap-3-typeahead', 'bootstrap3-typeahead.min')</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
+  <object>
+    <name>CKEditor.EditSheet</name>
+    <number>3</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>793a9403-7f5a-4a54-9b5f-895914f303d7</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>3</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>4</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>, </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>2</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>1</number>
+        <prettyName>Executed Content</prettyName>
+        <restricted>0</restricted>
+        <rows>25</rows>
+        <size>120</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>5</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>6</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>parameters</name>
+        <number>7</number>
+        <prettyName>Extension Parameters</prettyName>
+        <restricted>0</restricted>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>8</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
+      <content/>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.platform.requirejs.module</extensionPointId>
+    </property>
+    <property>
+      <name>org.xwiki.platform.requirejs.module.fast-diff</name>
+    </property>
+    <property>
+      <parameters>id=fast-diff
+path=$services.webjars.url('org.webjars.npm:fast-diff', 'diff')</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
+  <object>
+    <name>CKEditor.EditSheet</name>
+    <number>4</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>334b3450-20cd-4a80-b8fb-dcf9077231be</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>3</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>4</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>, </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>2</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>1</number>
+        <prettyName>Executed Content</prettyName>
+        <restricted>0</restricted>
+        <rows>25</rows>
+        <size>120</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>5</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>6</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>parameters</name>
+        <number>7</number>
+        <prettyName>Extension Parameters</prettyName>
+        <restricted>0</restricted>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>8</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
+      <content/>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.platform.requirejs.module</extensionPointId>
+    </property>
+    <property>
+      <name>org.xwiki.platform.requirejs.module.ckeditor</name>
+    </property>
+    <property>
+      <parameters>id=ckeditor
+path=$services.webjars.url('org.xwiki.platform:xwiki-platform-ckeditor-webjar', 'ckeditor')
+exports=CKEDITOR</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
+  <object>
+    <name>CKEditor.EditSheet</name>
+    <number>5</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>a747591e-9071-4992-b583-e4d0af13b7e6</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>3</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>4</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>, </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>2</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>1</number>
+        <prettyName>Executed Content</prettyName>
+        <restricted>0</restricted>
+        <rows>25</rows>
+        <size>120</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>5</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>6</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>parameters</name>
+        <number>7</number>
+        <prettyName>Extension Parameters</prettyName>
+        <restricted>0</restricted>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>8</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
+      <content/>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.platform.requirejs.module</extensionPointId>
+    </property>
+    <property>
+      <name>org.xwiki.platform.requirejs.module.xwiki-ckeditor-plugins</name>
+    </property>
+    <property>
+      <parameters>id=xwiki-ckeditor-plugins
+path=$services.webjars.url('org.xwiki.platform:xwiki-platform-ckeditor-plugins', 'webjar.bundle.min')
+bundles=resource, resourcePicker, entityResourcePicker, entityResourceSuggester, entityResourceDisplayer, modal, l10n, macroWizard, imageWizard
+deps=jquery, ckeditor</parameters>
     </property>
     <property>
       <scope>wiki</scope>

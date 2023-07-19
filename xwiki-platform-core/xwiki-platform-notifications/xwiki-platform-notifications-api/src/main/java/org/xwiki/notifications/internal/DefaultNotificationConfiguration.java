@@ -62,12 +62,6 @@ public class DefaultNotificationConfiguration implements NotificationConfigurati
     }
 
     @Override
-    public boolean isEventPrefilteringEnabled()
-    {
-        return configurationSource.getProperty(CONFIGURATION_PREFIX + "eventPrefilteringEnabled", true);
-    }
-
-    @Override
     public boolean isRestCacheEnabled()
     {
         return configurationSource.getProperty(CONFIGURATION_PREFIX + "rest.cache", true);
@@ -83,5 +77,11 @@ public class DefaultNotificationConfiguration implements NotificationConfigurati
     public int getAsyncPoolSize()
     {
         return configurationSource.getProperty(CONFIGURATION_PREFIX + "async.poolSize", 2);
+    }
+
+    @Override
+    public String getEmailGroupingStrategyHint()
+    {
+        return configurationSource.getProperty(CONFIGURATION_PREFIX + "emailGroupingStrategyHint", "default");
     }
 }

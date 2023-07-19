@@ -37,14 +37,14 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>rightsmanager.like=Уподобання
-### Missing: like.unlike.modal.title=Unlike confirmation
+like.unlike.modal.title=Підтвердження не уподобання
 like.unlike.modal.body=Ви впевнені, що бажаєте видалити уподобання зі сторінки {0}?
 like.unlike.modal.closeButton=Закрити
 like.unlike.modal.unlikeButton=Не вподобати сторінку
 like.unlike.modal.viewLikersButton=Уподобання
 like.newlike.success=Сторінка вподобана.
 like.newlike.error=Помилка під час спроби уподобати сторінку.
-### Missing: like.unlike.success=The page has been unliked.
+like.unlike.success=Уподобання сторінки було скасоване.
 like.unlike.error=Помилка під час спроби скасовувати уподобання сторінки.
 like.userprofile.menu=Сторінки, які сподобалися
 like.button.title=Кількість уподобань на цій сторінці: {0}
@@ -52,7 +52,7 @@ like.button.title.like=Натисніть, щоб уподобати поточ�
 like.button.title.unlike=Натисніть, щоб скасувати уподобання поточної сторінки. Кількість уподобань на цій сторінці: {0}.
 like.likers.empty=Ця сторінка ще нікому не сподобалась.
 like.likers.number={0} особі(ам) подобається ця сторінка:
-### Missing: like.likers.title=People liking {0}
+like.likers.title=Користувачі, яким подобається {0}
 like.livetable.column.title=Назва
 like.livetable.column.location=Розташування
 like.livetable.column.likes=Уподобання
@@ -64,4 +64,4 @@ XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Кількість упод
 XWiki.Like.LikeConfigurationClass_enabled=Увімкнути функцію Уподобання
 XWiki.Like.LikeConfigurationClass_enabled.hint=Якщо не обрано, функція Уподобання буде вимкнена, а інформація, пов'язана з цим, буде прихована.
 </content>
-  </xwikidoc>
+</xwikidoc>

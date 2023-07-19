@@ -144,10 +144,6 @@
   #set ($discard = $xwiki.linkx.use($url, {'type': 'text/css', 'rel': 'stylesheet'}))
 #end
 
-#macro (importCKEditorCSS $path $evaluate)
-  #ckeditor_importCSS('org.xwiki.platform' 'xwiki-platform-ckeditor-webjar' $path $evaluate)
-#end
-
 #macro (importCKEditorResources)
   #set ($discard = $xwiki.ssx.use('CKEditor.EditSheet'))
   ## Add the version of each JavaScript dependency of CKEditor Integration to the URL used to load the CKEditor in order
@@ -163,8 +159,7 @@
     'bs3typeahead-version': $services.extension.installed.getInstalledExtension('org.webjars.npm:bootstrap-3-typeahead',
       "wiki:$xcontext.database").version.value
   }))
-  #importCKEditorCSS('plugins/xwiki-resource/resourcePicker.min.css' true)
-  #importCKEditorCSS('plugins/xwiki-macro/macroWizard.min.css' true)
+  #ckeditor_importCSS('org.xwiki.platform' 'xwiki-platform-ckeditor-plugins' 'webjar.bundle.min.css' true)
   ## Tree styles needed for the document/attachment tree picker.
   #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css',
     {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))

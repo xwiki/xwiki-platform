@@ -132,6 +132,7 @@ class AttachmentIT
         // TODO: remove when https://jira.xwiki.org/browse/XWIKI-15513 is fixed
         setup.getDriver().navigate().refresh();
         viewPage.waitForDocExtraPaneActive("attachments");
+        attachmentsPane.waitForAttachmentsLiveData();
 
         attachmentsPane.getAttachmentLink(SECOND_ATTACHMENT).click();
         assertEquals("This is another small attachment.", setup.getDriver().findElement(By.tagName("html")).getText());
@@ -299,7 +300,7 @@ class AttachmentIT
 
     @Test
     @Order(5)
-    void filterAttachmentsLivetable(TestUtils setup, TestReference testReference) throws Exception
+    void filterAttachmentsLiveData(TestUtils setup, TestReference testReference) throws Exception
     {
         ViewPage viewPage = setup.createPage(testReference, "", "");
 

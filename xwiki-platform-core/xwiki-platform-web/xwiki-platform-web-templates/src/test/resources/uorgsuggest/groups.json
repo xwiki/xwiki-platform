@@ -8,6 +8,7 @@
       "iconSetType": "IMAGE",
       "url": "/xwiki/skins/flamingo/icons/silk/group.png"
     },
-    "url": "/xwiki/bin/view/XWiki/G1"
+    "url": "/xwiki/bin/view/XWiki/G1",
+    "hint": null
   }
 ]

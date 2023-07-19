@@ -214,10 +214,16 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
       xDropdown.toggleClass('open');
       setDropdownButtonTitle(dropDownButton);
     });
-    dropDownHeader.append($(this).contents()[0]);
-    dropDownHeader.append(dropDownButton);
-    $(this).prepend(dropDownHeader);
-    $(dropDownHeader).next().addClass('xDropdown-menu');
+      let dropDownContent = $(this).contents();
+      // We put all the content of the entry in the header,
+      // except for the last one which is the content of the dropdown. This dropdown stays where it is.
+      for (let index = 0; index &lt; dropDownContent.length - 1 ; index++) {
+        let item = dropDownContent[index];
+        dropDownHeader.append(item);
+      }
+      dropDownHeader.append(dropDownButton);
+      $(this).prepend(dropDownHeader);
+      $(dropDownHeader).next().addClass('xDropdown-menu');
   });
 
   $('.menu-horizontal .xDropdown').each(function() {
@@ -851,12 +857,6 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
               padding: 0;
               display: inherit;
             }
-            /* Place the arrow on the right */
-            &amp;:after {
-              position: absolute;
-              margin-top: @line-height-computed / 2;
-              right: 8px;
-            }
           }
           /* Separator horizontal inside menu */
           &amp;:empty {
@@ -1241,11 +1241,11 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
 #end
 #if($type.contains('horizontal'))
   ## Make sure the id is non-empty for horizontal menus as otherwise the toggle doesn't work.
-  #if ("$!id" != '')
+  #if ("$!id" == '')
     #set ($id = $wikimacro.context.getXDOM().getIdGenerator().generateUniqueId("M", "GeneratedMenuId"))
   #end
   (% role='navigation' class='menu-horizontal-toggle'
-  aria-label="${services.rendering.escape($label), 'xwiki/2.1')}" %)(((
+  aria-label="${services.rendering.escape($label, 'xwiki/2.1')}" %)(((
     (% class="navbar-header" %)(((
       {{html}}
         &lt;button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#$!{escapetool.xml($id)}" aria-expanded="false"&gt;

@@ -36,7 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: authentication.admin.failureStrategy.label=Failure strategies
+  <content>authentication.admin.failureStrategy.label=Невдалі стратегії
 authentication.admin.failureStrategy.hint=Стратегії, які слід використовувати у випадку багаторазової помилки автентифікації. Можна обрати кілька стратегій.
 authentication.admin.failureStrategy.disableAccount.name=Відключити обліковий запис
 authentication.admin.failureStrategy.captcha.name=CAPTCHA
@@ -57,4 +57,4 @@ security.authservice.admin.component.noService=Неможливо знайти �
 security.authservice.admin.other.warning=Поточну службу автентифікації не можна змінити, оскільки її впроваджено користувацькою системою.
 security.authservice.admin.class.warning=Поточну службу автентифікації не можна змінити, оскільки вона контролюється файлом конфігурації xwiki.cfg.
 </content>
-  </xwikidoc>
+</xwikidoc>

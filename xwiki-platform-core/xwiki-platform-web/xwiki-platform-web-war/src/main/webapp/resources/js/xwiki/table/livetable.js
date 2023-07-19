@@ -1033,7 +1033,7 @@ var LiveTablePagination = Class.create({
       'aria-label': '$escapetool.javascript($services.localization.render("platform.livetable.selectPageSize.label"))'
     });
     for (var i=this.startValue; i<=this.maxValue; i += this.step) {
-      var attrs = {'value':i, 'text':i};
+      var attrs = {'value':i};
       if (i == this.currentValue) {
         attrs.selected = true;
       } else {
@@ -1041,7 +1041,6 @@ var LiveTablePagination = Class.create({
         if (this.currentValue > prevStep && this.currentValue < i) {
           select.appendChild(new Element('option', {
             value: this.currentValue,
-            text: this.currentValue,
             selected: true
           }).update(this.currentValue));
         }

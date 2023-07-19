@@ -45,7 +45,7 @@ rendering.macro.mention.parameter.style.description=Вибір стилю зга
 rendering.macro.mention.parameter.anchor.name=Якір
 rendering.macro.mention.parameter.anchor.description=Якір, яка буде використана для посилання на цю згадку (який має бути якомога більше унікальною для документа).
 rendering.macro.mention.parameter.type.name=Тип
-### Missing: rendering.macro.mention.parameter.type.description=The type of the mentioned actor.
+rendering.macro.mention.parameter.type.description=Тип згаданого користувача.
 org.xwiki.mentions.DisplayStyle.FULL_NAME=Повне ім'я користувача
 org.xwiki.mentions.DisplayStyle.FIRST_NAME=Лише ім'я користувача
 org.xwiki.mentions.DisplayStyle.LOGIN=Ім'я користувача
@@ -57,4 +57,4 @@ XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=Визначає, 
 mentions.tip=Під час редагування у WYSIWYG введіть @, а потім почніть вводити літери, щоб отримати пропозиції щодо згадування користувача.
 mentions.configuration.heading=Налаштування згадок
 </content>
-  </xwikidoc>
+</xwikidoc>

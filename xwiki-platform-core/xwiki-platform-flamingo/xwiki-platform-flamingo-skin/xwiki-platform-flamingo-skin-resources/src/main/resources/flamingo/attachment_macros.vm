@@ -163,7 +163,7 @@
   <div class="user" data-reference="$escapetool.xml($userName)">
     <span class="user-avatar-wrapper">
       #getUserAvatarURL($userName $avatarURL 120)
-      <img class="user-avatar" src="$escapetool.xml($avatarURL.url)" />
+      <img class="user-avatar" src="$escapetool.xml($avatarURL.url)" alt="" />
     </span>
     $xwiki.getUserName($userName)
   </div>

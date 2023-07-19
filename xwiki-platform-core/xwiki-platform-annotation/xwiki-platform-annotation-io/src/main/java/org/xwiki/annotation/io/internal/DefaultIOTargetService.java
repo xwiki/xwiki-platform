@@ -94,15 +94,15 @@ public class DefaultIOTargetService implements IOTargetService
     public String getSource(String reference) throws IOServiceException
     {
         try {
-            EntityReference ref = referenceResolver.resolve(reference, EntityType.DOCUMENT);
+            EntityReference ref = this.referenceResolver.resolve(reference, EntityType.DOCUMENT);
             if (ref.getType() == EntityType.OBJECT_PROPERTY) {
                 return getObjectPropertyContent(new ObjectPropertyReference(ref));
             } else if (ref.getType() == EntityType.DOCUMENT) {
-                return dab.getTranslatedDocumentInstance(new DocumentReference(ref)).getContent();
+                return this.dab.getTranslatedDocumentInstance(new DocumentReference(ref)).getContent();
             } else {
                 // it was parsed as something else, just ignore the parsing and get the document content as its initial
                 // name was
-                return dab.getDocumentContent(reference);
+                return this.dab.getDocumentContent(reference);
             }
         } catch (Exception e) {
             throw new IOServiceException("An exception has occurred while getting the source for " + reference, e);
@@ -113,14 +113,14 @@ public class DefaultIOTargetService implements IOTargetService
     public String getSourceSyntax(String reference) throws IOServiceException
     {
         try {
-            EntityReference ref = referenceResolver.resolve(reference, EntityType.DOCUMENT);
+            EntityReference ref = this.referenceResolver.resolve(reference, EntityType.DOCUMENT);
             EntityReference docRef = ref.extractReference(EntityType.DOCUMENT);
             if (docRef != null) {
                 // return the syntax of the document in this reference, regardless of the type of reference, obj prop or
                 // doc
-                return dab.getTranslatedDocumentInstance(new DocumentReference(docRef)).getSyntax().toIdString();
+                return this.dab.getTranslatedDocumentInstance(new DocumentReference(docRef)).getSyntax().toIdString();
             } else {
-                return dab.getDocumentSyntaxId(reference);
+                return this.dab.getDocumentSyntaxId(reference);
             }
         } catch (Exception e) {
             throw new IOServiceException(
@@ -143,7 +143,7 @@ public class DefaultIOTargetService implements IOTargetService
             sourceSyntaxId = getSourceSyntax(reference);
         }
         try {
-            EntityReference ref = referenceResolver.resolve(reference, EntityType.DOCUMENT);
+            EntityReference ref = this.referenceResolver.resolve(reference, EntityType.DOCUMENT);
             if (ref.getType() == EntityType.OBJECT_PROPERTY) {
                 return getTransformedXDOM(getObjectPropertyContent(new ObjectPropertyReference(ref)), sourceSyntaxId);
             } else if (ref.getType() == EntityType.DOCUMENT) {
@@ -151,7 +151,7 @@ public class DefaultIOTargetService implements IOTargetService
             } else {
                 // it was parsed as something else, just ignore the parsing and get the document content as its initial
                 // name was
-                return getTransformedXDOM(dab.getDocumentContent(reference), sourceSyntaxId);
+                return getTransformedXDOM(this.dab.getDocumentContent(reference), sourceSyntaxId);
             }
         } catch (Exception e) {
             throw new IOServiceException("An exception has occurred while getting the XDOM for " + reference, e);
@@ -163,21 +163,21 @@ public class DefaultIOTargetService implements IOTargetService
         DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
         parameters.setExecutionContextIsolated(true);
         parameters.setContentTranslated(true);
-        parameters.setTargetSyntax(renderingContext.getTargetSyntax());
+        parameters.setTargetSyntax(this.renderingContext.getTargetSyntax());
 
-        return documentDisplayer.display(dab.getDocumentInstance(reference), parameters);
+        return this.documentDisplayer.display(this.dab.getDocumentInstance(reference), parameters);
     }
 
     private XDOM getTransformedXDOM(String content, String sourceSyntaxId)
         throws ParseException, org.xwiki.component.manager.ComponentLookupException, TransformationException
     {
-        Parser parser = componentManager.getInstance(Parser.class, sourceSyntaxId);
+        Parser parser = this.componentManager.getInstance(Parser.class, sourceSyntaxId);
         XDOM xdom = parser.parse(new StringReader(content));
 
         // run transformations
         TransformationContext txContext =
             new TransformationContext(xdom, Syntax.valueOf(sourceSyntaxId));
-        TransformationManager transformationManager = componentManager.getInstance(TransformationManager.class);
+        TransformationManager transformationManager = this.componentManager.getInstance(TransformationManager.class);
         transformationManager.performTransformations(xdom, txContext);
 
         return xdom;
@@ -188,10 +188,11 @@ public class DefaultIOTargetService implements IOTargetService
         BaseObjectReference objRef = new BaseObjectReference(reference.getParent());
         DocumentReference docRef = new DocumentReference(objRef.getParent());
         if (objRef.getObjectNumber() != null) {
-            return dab.getProperty(docRef, objRef.getXClassReference(), objRef.getObjectNumber(), reference.getName())
+            return this.dab.getProperty(docRef, objRef.getXClassReference(), objRef.getObjectNumber(),
+                    reference.getName())
                 .toString();
         } else {
-            return dab.getProperty(docRef, objRef.getXClassReference(), reference.getName()).toString();
+            return this.dab.getProperty(docRef, objRef.getXClassReference(), reference.getName()).toString();
         }
     }
 }

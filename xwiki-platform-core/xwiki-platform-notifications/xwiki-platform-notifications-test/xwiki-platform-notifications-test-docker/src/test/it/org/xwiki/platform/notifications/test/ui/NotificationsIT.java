@@ -22,12 +22,14 @@ package org.xwiki.platform.notifications.test.ui;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.platform.notifications.test.po.GroupedNotificationElementPage;
 import org.xwiki.platform.notifications.test.po.NotificationsRSS;
 import org.xwiki.platform.notifications.test.po.NotificationsTrayPage;
 import org.xwiki.platform.notifications.test.po.NotificationsUserProfilePage;
@@ -92,6 +94,7 @@ public class NotificationsIT
     @BeforeEach
     public void setup(TestUtils setup) throws Exception
     {
+        setup.loginAsSuperAdmin();
         // Create the two users we will be using
         setup.createUser(FIRST_USER_NAME, FIRST_USER_PASSWORD, "", "");
         setup.createUser(SECOND_USER_NAME, SECOND_USER_PASSWORD, "", "");
@@ -122,6 +125,7 @@ public class NotificationsIT
     {
         setup.deletePage("XWiki", FIRST_USER_NAME);
         setup.deletePage("XWiki", SECOND_USER_NAME);
+        setup.forceGuestUser();
     }
 
     @Test
@@ -146,6 +150,13 @@ public class NotificationsIT
         p = NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);
         p.getApplication(SYSTEM).setCollapsed(false);
         p.setEventTypeState(SYSTEM, CREATE, ALERT_FORMAT, BootstrapSwitch.State.ON);
+
+        tray.showNotificationTray();
+        assertFalse(tray.isPageOnlyWatched());
+        assertFalse(tray.arePageAndChildrenWatched());
+        assertFalse(tray.isWikiWatched());
+        // And he will watch the entire wiki.
+        tray.setWikiWatchedState(true);
 
         // We create a lot of pages in order to test the notification badge
         setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
@@ -216,7 +227,7 @@ public class NotificationsIT
     {
         NotificationsUserProfilePage p;
         NotificationsTrayPage tray;
-        // Now we enable "create", "update" and "comment" for user 2
+        // We enable "create", "update" and "comment" for user 2
         setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         p = NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);
         p.getApplication(SYSTEM).setCollapsed(false);
@@ -226,31 +237,45 @@ public class NotificationsIT
 
         assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT));
         p.setEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT, BootstrapSwitch.State.ON);
+
+        List<SystemNotificationFilterPreference> minorEvent = p.getSystemNotificationFilterPreferences()
+                .stream()
+                .filter(fp -> fp.getFilterName().equals("Minor Event (Alert)"))
+                .collect(Collectors.toList());
+
+        assertEquals(1, minorEvent.size());
+        minorEvent.get(0).setEnabled(false);
         setup.gotoPage("Main", "WebHome");
         tray = new NotificationsTrayPage();
+        tray.showNotificationTray();
         tray.clearAllNotifications();
+        // Watch the entire wiki so that we receive notifications
+        tray.setWikiWatchedState(true);
 
-        // Create a page, edit it twice, and finally add a comment
+        // Create a page, edit it 20 times, and finally add a comment
         setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
-        setup.createPage(testReference.getLastSpaceReference().getName(),
-            "Linux", "Simple content", "Linux as a title");
-        ViewPage page = setup.gotoPage(testReference.getLastSpaceReference().getName(), "Linux");
+        ViewPage page = setup.createPage(testReference, "Simple content", "Linux as a title");
         page.edit();
         WikiEditPage edit = new WikiEditPage();
-        edit.setContent("Linux is a part of GNU/Linux");
-        edit.clickSaveAndView(true);
-        page = new ViewPage();
+        StringBuilder originalContent = new StringBuilder("Linux is a part of GNU/Linux - it's the kernel");
+        edit.setContent(originalContent.toString());
+        page = edit.clickSaveAndView();
         page.edit();
         edit = new WikiEditPage();
-        edit.setContent("Linux is a part of GNU/Linux - it's the kernel");
-        edit.clickSaveAndView(true);
-        page = setup.gotoPage(testReference.getLastSpaceReference().getName(), "Linux");
+
+        for (int i = 0; i < 20; i++) {
+            String newContent = String.format("\nAdding some content iteration %s", i);
+            originalContent.append(newContent);
+            edit.setContent(originalContent.toString());
+            edit.clickSaveAndContinue();
+        }
+        page = edit.clickSaveAndView();
         CommentsTab commentsTab = page.openCommentsDocExtraPane();
         commentsTab.postComment("Linux is a great OS", true);
 
         // Check that events have been grouped together (see: https://jira.xwiki.org/browse/XWIKI-14114)
         setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
-        setup.gotoPage(testReference.getLastSpaceReference().getName(), "WebHome");
+        setup.gotoPage("Main", "WebHome");
         NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki", 2);
         tray = new NotificationsTrayPage();
         assertEquals(2, tray.getNotificationsCount());
@@ -265,6 +290,9 @@ public class NotificationsIT
         obtainedComment = tray.getNotificationDescription(1);
         assertTrue(obtainedComment.startsWith(expectedComment), String.format("Expected description start: [%s]. "
             + "Actual description: [%s]", expectedComment, obtainedComment));
+        GroupedNotificationElementPage groupedNotificationsPage = tray.getGroupedNotificationsPage();
+        groupedNotificationsPage.openGroup(1);
+        assertEquals(22, groupedNotificationsPage.getNumberOfElements(1));
 
         NotificationsRSS notificationsRSS = tray.getNotificationRSS(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         ServletEngine servletEngine = testConfiguration.getServletEngine();
@@ -320,6 +348,11 @@ public class NotificationsIT
             p.getApplication(SYSTEM).setCollapsed(false);
             p.setEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT, BootstrapSwitch.State.ON);
 
+            // Watch the entire wiki so that we receive notifications
+            NotificationsTrayPage tray = new NotificationsTrayPage();
+            tray.showNotificationTray();
+            tray.setWikiWatchedState(true);
+
             // Login as second user and modify ARandomPageThatShouldBeModified
             setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
 
@@ -336,7 +369,7 @@ public class NotificationsIT
 
             // Ensure the notification has been received.
             NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + FIRST_USER_NAME, "xwiki", 1);
-            NotificationsTrayPage tray = new NotificationsTrayPage();
+            tray = new NotificationsTrayPage();
             assertEquals("This is a test template", tray.getNotificationRawContent(0));
         } finally {
             setup.loginAsSuperAdmin();
@@ -361,6 +394,12 @@ public class NotificationsIT
             p.setApplicationState(SYSTEM, "alert", BootstrapSwitch.State.ON);
             assertEquals("Own Events Filter", preferences.get(2).getFilterName());
             preferences.get(2).setEnabled(false);
+
+            // Watch the entire wiki so that we receive notifications
+            NotificationsTrayPage tray = new NotificationsTrayPage();
+            tray.showNotificationTray();
+            tray.setWikiWatchedState(true);
+
             setup.createPage(testReference, "", "");
             // Ensure the notification has been received.
             NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + FIRST_USER_NAME, "xwiki", 1);

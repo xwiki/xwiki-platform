@@ -424,7 +424,9 @@ Object.extend(XWiki, {
                         'platform.core.rendering.noRendererForSectionEdit'));
                       editSectionLink.href = '#' + (node.id || '');
                   } else {
-                      editSectionLink.href = window.docediturl + "?section=" + sectionCount;
+                      // FIXME: Use the xwiki-meta module to get the form token when we switch to jQuery/RequireJS.
+                      var formToken = document.documentElement.getAttribute('data-xwiki-form-token');
+                      editSectionLink.href = window.docediturl + "?section=" + sectionCount + '&form_token=' + formToken;
                   }
 
                   node.appendChild(editSectionLink);
@@ -1457,8 +1459,11 @@ XWiki.Attachment = Class.create({
    * Gets a URL pointing to this attachment.
    */
   getURL : function(queryString, fragment) {
-    var attachmentURL = this.document.getURL('download') +
-      (this.document.page.name == 'WebHome' ? this.document.page.name : '') + '/' + encodeURIComponent(this.filename);
+    // Make sure to not have a double // in the computed URL for WebHome documents since that will fail on Tomcat by
+    // default.
+    var downloadURL = this.document.getURL('download');
+    var attachmentURL = downloadURL + (downloadURL.endsWith('/') ? 'WebHome/' : '/')
+        + encodeURIComponent(this.filename);
     if (queryString) {
       attachmentURL += '?' + queryString;
     }

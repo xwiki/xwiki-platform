@@ -139,10 +139,8 @@
     new XWiki.Document('EditSheet', 'CKEditor').getURL('ssx'),
     // Custom styles for the edited content.
     new XWiki.Document('ContentSheet', 'CKEditor').getURL('ssx'),
-    $jsontool.serialize($services.webjars.url('org.xwiki.platform:xwiki-platform-ckeditor-webjar',
-      'plugins/xwiki-resource/resourcePicker.min.css', {'evaluate': true})),
-    $jsontool.serialize($services.webjars.url('org.xwiki.platform:xwiki-platform-ckeditor-webjar',
-      'plugins/xwiki-macro/macroWizard.min.css', {'evaluate': true})),
+    $jsontool.serialize($services.webjars.url('org.xwiki.platform:xwiki-platform-ckeditor-plugins',
+      'webjar.bundle.min.css', {'evaluate': true})),
     $jsontool.serialize($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css',
       {'evaluate': true})),
     $jsontool.serialize($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'finder.min.css',

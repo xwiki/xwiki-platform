@@ -91,8 +91,7 @@ public class WCAGContext
             // Set to true once the build doesn't fail this rule anymore
             entry("color-contrast", false),
             entry("definition-list", true),
-            // Set to true once the build doesn't fail this rule anymore
-            entry("dlitem", false),
+            entry("dlitem", true),
             entry("document-title", true),
             // Set to true once the build doesn't fail this rule anymore
             entry("duplicate-id-active", false),
@@ -118,8 +117,7 @@ public class WCAGContext
             entry("link-in-text-block", false),
             // Set to true once the build doesn't fail this rule anymore
             entry("link-name", false),
-            // Set to true once the build doesn't fail this rule anymore
-            entry("list", false),
+            entry("list", true),
             entry("listitem", true),
             entry("marquee", true),
             entry("meta-refresh", true),
@@ -128,7 +126,8 @@ public class WCAGContext
             entry("no-autoplay-audio", true),
             entry("object-alt", true),
             entry("role-img-alt", true),
-            entry("scrollable-region-focusable", true),
+            // Set to true once the build doesn't fail this rule anymore
+            entry("scrollable-region-focusable", false),
             // Set to true once the build doesn't fail this rule anymore
             entry("select-name", false),
             entry("server-side-image-map", true),
@@ -165,9 +164,9 @@ public class WCAGContext
     private static final class WCAGTestResults
     {
         private String failReport = "";
-        private final long failAmount;
+        private final long failCount;
         private String warnReport = "";
-        private final long warnAmount;
+        private final long warnCount;
 
         /**
          * @param testMethodName the method in which the validation happened
@@ -185,8 +184,8 @@ public class WCAGContext
                 // the default behavior will be to add it to the fails.
                 // In order to resolve these test-suite fails quickly, set them as "false" in FAILS_ON_RULE.
                 .collect(Collectors.toList());
-            this.failAmount = failingViolations.size();
-            if (this.failAmount != 0) {
+            this.failCount = numberOfViolations(failingViolations);
+            if (this.failCount != 0) {
                 this.failReport = AbstractXWikiCustomAxeReporter.getReadableAxeResults(testMethodName, pageClassName,
                     url, failingViolations);
             }
@@ -195,12 +194,18 @@ public class WCAGContext
                 .stream()
                 .filter(rule -> FAILS_ON_RULE.containsKey(rule.getId()) && !FAILS_ON_RULE.get(rule.getId()))
                 .collect(Collectors.toList());
-            this.warnAmount = warningViolations.size();
-            if (this.warnAmount != 0) {
+            this.warnCount = numberOfViolations(warningViolations);
+            if (this.warnCount != 0) {
                 this.warnReport = AbstractXWikiCustomAxeReporter.getReadableAxeResults(testMethodName, pageClassName,
                     url, warningViolations);
             }
         }
+
+        private int numberOfViolations(List<Rule> violations)
+        {
+            return violations.stream().mapToInt(rule -> rule.getNodes().size()).sum();
+        }
+
         String getFailReport()
         {
             return this.failReport;
@@ -213,6 +218,8 @@ public class WCAGContext
     }
 
     private List<WCAGTestResults> wcagResults = new ArrayList<>();
+
+    private Map<String, Integer> violationCountPerRule = new HashMap<>();
 
     private boolean wcagEnabled;
 
@@ -260,6 +267,16 @@ public class WCAGContext
         return this.testMethodName;
     }
 
+    protected Map<String, Integer> getViolationCountPerRule()
+    {
+        return violationCountPerRule;
+    }
+
+    protected Boolean isFailing(String ruleID)
+    {
+        return FAILS_ON_RULE.get(ruleID);
+    }
+
     /**
      * Instantiate and initialize an axe builder with context options.
      *
@@ -287,6 +304,20 @@ public class WCAGContext
     }
 
     /**
+     * Record the count of violations per rule in order to display it in logs at the end of the test suite.
+     * @param newViolations with which the counts should be updated
+     */
+    private void updateViolationCountPerRule(Results newViolations)
+    {
+        for (Rule violation : newViolations.getViolations()) {
+            String violationID = violation.getId();
+            int violationCount = violation.getNodes().size();
+            violationCountPerRule.put(violationID,
+                violationCountPerRule.getOrDefault(violationID, 0) + violationCount);
+        }
+    }
+
+    /**
      * Appends WCAG results to the current context.
      *
      * @param url the URL of the page analyzed
@@ -297,16 +328,17 @@ public class WCAGContext
     {
         // Whatever the case, keep a trace of the current report.
         WCAGTestResults wcagTestResults =  new WCAGTestResults(getTestMethodName(), url, className, newViolations);
-        if (wcagTestResults.failAmount != 0) {
+        updateViolationCountPerRule(newViolations);
+        if (wcagTestResults.failCount != 0) {
             LOGGER.error("[{} : {}] Found [{}] failing WCAG violations.",
-                url, className, wcagTestResults.failAmount);
+                url, className, wcagTestResults.failCount);
         }
-        if (wcagTestResults.warnAmount != 0) {
+        if (wcagTestResults.warnCount != 0) {
             LOGGER.warn("[{} : {}] Found [{}] warning WCAG violations.",
-                url, className, wcagTestResults.warnAmount);
+                url, className, wcagTestResults.warnCount);
         }
-        this.wcagFailCount += wcagTestResults.failAmount;
-        this.wcagWarnCount += wcagTestResults.warnAmount;
+        this.wcagFailCount += wcagTestResults.failCount;
+        this.wcagWarnCount += wcagTestResults.warnCount;
         this.wcagResults.add(wcagTestResults);
         if (isNotCached(url, className)) {
             // Avoid duplicate entries in the cache.
@@ -332,17 +364,17 @@ public class WCAGContext
     }
 
     /**
-     * @return the total amount of failing wcag violations.
+     * @return the total count of failing wcag violations.
      */
-    public long getWCAGFailAmount()
+    public long getWCAGFailCount()
     {
         return this.wcagFailCount;
     }
 
     /**
-     * @return the total amount of non failing wcag violations.
+     * @return the total count of non failing wcag violations.
      */
-    public long getWCAGWarnAmount()
+    public long getWCAGWarnCount()
     {
         return this.wcagWarnCount;
     }
@@ -387,7 +419,7 @@ public class WCAGContext
         StringBuilder mergedReport = new StringBuilder();
         boolean failStillEmpty = true;
         for (WCAGTestResults result : this.wcagResults) {
-            if (result.failAmount != 0) {
+            if (result.failCount != 0) {
                 if (failStillEmpty) {
                     mergedReport.append(String.format("WCAG fails in the test class [%s]:", getTestClassName()));
                     mergedReport.append(System.lineSeparator());
@@ -409,7 +441,7 @@ public class WCAGContext
         StringBuilder mergedReport = new StringBuilder();
         boolean warnStillEmpty = true;
         for (WCAGTestResults result : this.wcagResults) {
-            if (result.warnAmount != 0) {
+            if (result.warnCount != 0) {
                 if (warnStillEmpty) {
                     mergedReport.append(String.format("WCAG warnings in the test class [%s]:", getTestClassName()));
                     mergedReport.append(System.lineSeparator());

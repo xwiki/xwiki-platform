@@ -141,4 +141,25 @@ public class MergeManagerResultTest
         assertNotEquals(mergeManagerResult, otherMergeManager);
         assertNotEquals(mergeManagerResult.hashCode(), otherMergeManager.hashCode());
     }
+
+    @Test
+    void getConflictsNumber()
+    {
+        MergeManagerResult mergeManagerResult = new MergeManagerResult();
+        assertEquals(0, mergeManagerResult.getConflictsNumber());
+
+        mergeManagerResult.addConflicts(Collections.singletonList(mock(Conflict.class)));
+        mergeManagerResult.getLog().error("A new conflict");
+        assertEquals(1, mergeManagerResult.getConflictsNumber());
+
+        mergeManagerResult.getLog().error("Another new conflict");
+        assertEquals(2, mergeManagerResult.getConflictsNumber());
+
+        mergeManagerResult.getLog().error("Another one");
+        assertEquals(3, mergeManagerResult.getConflictsNumber());
+
+        mergeManagerResult.addConflicts(Collections.singletonList(mock(Conflict.class)));
+        mergeManagerResult.getLog().error("A new conflict");
+        assertEquals(4, mergeManagerResult.getConflictsNumber());
+    }
 }

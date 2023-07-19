@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor</artifactId>
-    <version>15.4-SNAPSHOT</version>
+    <version>15.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Parent POM</name>
@@ -281,7 +281,7 @@
                 /xwiki/bin/view/Main/AllDocs?view=deletedDocs
                 /xwiki/bin/view/Main/AllDocs?view=deletedAttachments
               </urlsToTestAsAdmin>
-              <urlsToTestAsGuest></urlsToTestAsGuest>
+              <urlsToTestAsGuest />
               <rssUrlsToTestAsAdmin>
                 /xwiki/bin/view/Main/DatabaseSearch?xpage=plain&amp;outputSyntax=plain&amp;text=wiki
                 /xwiki/bin/get/Main/DatabaseSearch?outputSyntax=plain&amp;space=&amp;text=wiki

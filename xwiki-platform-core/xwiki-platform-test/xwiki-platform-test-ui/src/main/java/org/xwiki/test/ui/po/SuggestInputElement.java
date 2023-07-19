@@ -86,6 +86,23 @@ public class SuggestInputElement extends BaseElement
         }
 
         /**
+         * @return {@code true} if the hint is present, {@code false} otherwise
+         */
+        public boolean hasHint()
+        {
+            return !getDriver().findElementsWithoutWaiting(this.suggestion, By.className("xwiki-selectize-option-hint"))
+                .isEmpty();
+        }
+
+        /**
+         * @return the text displayed on hover
+         */
+        public String getTooltip()
+        {
+            return this.suggestion.getAttribute("title");
+        }
+
+        /**
          * Deletes this suggestion from the list of selected suggestions.
          */
         public void delete()

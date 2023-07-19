@@ -491,7 +491,7 @@ class DisplayMacroTest
         if (displayedPageReference != null) {
             when(this.macroEntityReferenceResolver.resolve(eq(displayedPageReferenceString), eq(EntityType.PAGE),
                 any(MacroBlock.class))).thenReturn(displayedPageReference);
-            when(this.dab.getDocumentInstance((EntityReference) displayedPageReference))
+            when(this.dab.getDocumentInstance(displayedPageReference))
                 .thenReturn(this.displayedDocument);
         }
 

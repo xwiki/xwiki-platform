@@ -66,7 +66,7 @@ Mail.SendMailConfigClass_sendWaitTime.hint=Затримка між надсил�
 Mail.SendMailConfigClass_discardSuccessStatuses=Скасувати статуси успіху?
 Mail.SendMailConfigClass_discardSuccessStatuses.hint=Незалежно від того, чи зберігаються статуси пошти про успішно надіслані листи (за умовчанням значення true)
 Mail.SendMailStatus_livetable.date=Дата
-### Missing: Mail.SendMailStatus_livetable.batchId=Batch ID
+Mail.SendMailStatus_livetable.batchId=ID пакету
 Mail.SendMailStatus_livetable.type=Тип
 Mail.SendMailStatus_livetable.recipients=Одержувачі
 Mail.SendMailStatus_livetable.state=Статус
@@ -74,7 +74,10 @@ Mail.SendMailStatus_livetable.wiki=Вікі
 Mail.SendMailStatus_livetable.error=Помилка
 Mail.SendMailStatus_livetable.actions=Дії
 Mail.SendMailStatus_livetable.resend=Надіслати повторно
+Mail.SendMailStatus_livetable.delete=Видалити
 mailSender.admin.resendSuccess=Лист успішно надіслано повторно
 mailSender.admin.resendFailure=Не вдалося повторно надіслати. Натисніть, щоб отримати докладнішу інформацію.
+mailSender.admin.deleteSuccess=Лист успішно видалено
+mailSender.admin.deleteFailure=Не вдалося видалити лист. Натисніть, щоб дізнатися більше.
 </content>
-  </xwikidoc>
+</xwikidoc>

@@ -30,6 +30,7 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.preferences.NotificationPreference;
+import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -98,6 +99,14 @@ public class NotificationParameters
      */
     public Collection<NotificationFilter> filters = new ArrayList<>();
 
+    /**
+     * The output target of the notification for composite events computation with the
+     * {@link org.xwiki.notifications.GroupingEventManager}.
+     * @since 15.5RC1
+     */
+    @Unstable
+    public String groupingEventTarget = "alert";
+
     @Override
     public boolean equals(Object o)
     {
@@ -123,6 +132,7 @@ public class NotificationParameters
             .append(preferences, that.preferences)
             .append(filterPreferences, that.filterPreferences)
             .append(filters, that.filters)
+            .append(groupingEventTarget, that.groupingEventTarget)
             .isEquals();
     }
 
@@ -141,6 +151,7 @@ public class NotificationParameters
             .append(preferences)
             .append(filterPreferences)
             .append(filters)
+            .append(groupingEventTarget)
             .toHashCode();
     }
 
@@ -159,6 +170,7 @@ public class NotificationParameters
             .append("preferences", preferences)
             .append("filterPreferences", filterPreferences)
             .append("filters", filters)
+            .append("notificationGroupingStrategyHint", groupingEventTarget)
             .toString();
     }
 }

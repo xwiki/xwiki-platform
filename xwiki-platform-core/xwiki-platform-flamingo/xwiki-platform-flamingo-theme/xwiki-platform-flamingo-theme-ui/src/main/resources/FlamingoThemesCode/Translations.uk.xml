@@ -1,0 +1,97 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc locale="uk">
+  <web>FlamingoThemesCode</web>
+  <name>Translations</name>
+  <language>uk</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>FlamingoThemesCode.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>platform.flamingo.themes.home.title=Теми для Flamingo
+platform.flamingo.themes.home.currenttheme=Поточна тема
+platform.flamingo.themes.home.otherthemes=Інші доступні теми
+platform.flamingo.themes.home.warningOldColorThemeInstalled=Це програма для керування темами Flamingo. Тема Flamingo — це настроювана варіація будь-яких скинів на основі Flamingo. Якщо ви хочете керувати кольоровими темами для скинів на основі Colibri, перейдіть до {0}програми Colibri Color Themes{1}.
+platform.flamingo.themes.home.warningCurrentOldColorTheme=Поточна тема — це кольорова тема Colibri, яка не оптимізована для роботи зі скіном на основі Flamingo. Ми зробили все можливе, щоб зробити його сумісним, але результати можуть бути не оптимальними.
+platform.flamingo.themes.home.useThisTheme=Використати цю тему
+platform.flamingo.themes.home.newThemeName=Назва теми…
+platform.flamingo.themes.home.create=Створити нову тему
+platform.flamingo.themes.home.create.invalid=Недійсна назва теми!
+platform.flamingo.themes.home.create.csrf=З міркувань безпеки підтвердьте, що ви хочете створити тему під назвою "{0}".
+platform.flamingo.themes.home.create.confirm=Підтвердити
+platform.flamingo.themes.home.set.success=Встановлено тему "{0}".
+platform.flamingo.themes.title.variables=Змінні
+platform.flamingo.themes.title.preview=Попередній перегляд
+platform.flamingo.themes.autorefresh=Автоматичне оновлення
+platform.flamingo.themes.refresh=Оновити
+platform.flamingo.themes.refreshwarning=Оновлення може зайняти декілька секунд.
+platform.flamingo.themes.preview.iframe.label=Попередній перегляд кольорової теми.
+platform.flamingo.themes.loading=Завантаження...
+platform.flamingo.themes.category.logos=Логотипи
+platform.flamingo.themes.category.base-colors=Базові кольори
+platform.flamingo.themes.category.typography=Типографія
+platform.flamingo.themes.category.forms=Форми
+platform.flamingo.themes.category.buttons=Кнопки
+platform.flamingo.themes.category.tables=Таблиці
+platform.flamingo.themes.category.navbar=Панель навігації
+platform.flamingo.themes.category.dropdowns=Випадаючі меню
+platform.flamingo.themes.category.panels=Панелі
+platform.flamingo.themes.category.breadcrumb=Навігаційний ланцюг
+platform.flamingo.themes.category.advanced=Додатково
+platform.flamingo.themes.defaultvalue=За умовчанням
+platform.flamingo.themes.lessCode.description=У цьому полі ви можете безпосередньо написати LESS код, який буде додано до скіну.
+platform.flamingo.themes.local=Локальні
+platform.flamingo.themes.global=Загальні
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 7.3M1
+#######################################
+platform.flamingo.themes.lessCode.warning=На жаль, це поле не враховується під час попереднього перегляду.
+
+#######################################
+## until 12.9RC1
+#######################################
+platform.flamingo.themes.incompatiblebrowser=Вибачте, але попередній перегляд не працює з цією версією Internet Explorer. Вам потрібно використовувати новіший браузер.
+
+#@deprecatedend
+</content>
+</xwikidoc>

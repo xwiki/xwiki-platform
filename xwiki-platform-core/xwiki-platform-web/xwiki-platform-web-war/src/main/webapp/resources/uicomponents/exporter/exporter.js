@@ -18,10 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 /*!
-#set ($paths = {
-  'treeRequireConfig': $services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js',
-    {'evaluate': true, 'minify': $services.debug.minify})
-})
 #set ($l10nKeys = [
   'core.exporter.selectChildren',
   'core.exporter.unselectChildren'
@@ -37,13 +33,13 @@
 #end
 #[[*/
 // Start JavaScript-only code.
-(function(paths, l10n, icons) {
+(function(l10n, icons) {
   "use strict";
 
 /**
  * Export Tree
  */
-define('xwiki-export-tree', ['jquery', 'tree', 'xwiki-entityReference'], function($) {
+define('xwiki-export-tree', ['jquery', 'xwiki-tree', 'xwiki-entityReference'], function($) {
   var selectChildNodes = function(tree, parentNode) {
     parentNode = parentNode || tree.get_node($.jstree.root);
     selectNodes(tree, parentNode.children);
@@ -398,7 +394,7 @@ define('xwiki-export-tree-filter', ['jquery', 'bootstrap', 'xwiki-export-tree'],
   });
 });
 
-require(['jquery', paths.treeRequireConfig], function ($) {
+require(['jquery'], function ($) {
   // Fill the form with the selected pages from the export tree.
   var createHiddenInputsFromExportTree = function(exportTree, container, filterHiddenPages) {
     var exportPages = exportTree.getExportPages();
@@ -626,4 +622,4 @@ require(['jquery', paths.treeRequireConfig], function ($) {
 });
 
 // End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$paths, $l10n, $icons]));
+}).apply(']]#', $jsontool.serialize([$l10n, $icons]));

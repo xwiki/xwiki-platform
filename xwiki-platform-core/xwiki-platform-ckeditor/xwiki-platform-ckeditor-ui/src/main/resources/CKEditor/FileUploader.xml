@@ -80,6 +80,8 @@
   #set ($fileName = $xwiki.fileupload.getFileName('upload'))
   #if ("$!fileName" != '')
     #if ($services.csrf.isTokenValid($request.form_token))
+      ## Note: This is not useful anymore and files are expected to have their definitive name on upload.
+      ## Kept for legacy.
       #if ($fileName.startsWith('__fileCreatedFromDataURI__.'))
         ## We need to generate a new name so that we don't overwrite existing attachments.
         #set ($extension = $stringtool.substringAfter($fileName, '.'))
@@ -109,6 +111,8 @@
         #set ($fileName = $request.filename)
       #else
         #set ($fileName = $request.getPart('upload').getSubmittedFileName())
+        ## Note: this is not useful anymore and files are expected to have their definitive name on upload.
+        ## Kept for legacy.
         #if ($fileName.startsWith('__fileCreatedFromDataURI__.'))
           ## We need to generate a new name so that we don't overwrite existing attachments.
           #set ($extension = $stringtool.substringAfter($fileName, '.'))

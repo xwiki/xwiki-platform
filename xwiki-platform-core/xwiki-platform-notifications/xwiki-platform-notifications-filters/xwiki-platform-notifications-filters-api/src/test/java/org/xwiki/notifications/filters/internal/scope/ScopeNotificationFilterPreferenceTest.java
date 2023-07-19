@@ -65,7 +65,7 @@ public class ScopeNotificationFilterPreferenceTest
     @BeforeEach
     public void setUp() throws Exception
     {
-        referenceResolver = (EntityReferenceResolver<String>) mock(EntityReferenceResolver.class);
+        referenceResolver = mock(EntityReferenceResolver.class);
 
         when(referenceResolver.resolve("wiki", EntityType.WIKI)).thenReturn(WIKI_REFERENCE);
         when(referenceResolver.resolve("wiki:space", EntityType.SPACE)).thenReturn(SPACE_REFERENCE);

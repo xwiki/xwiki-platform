@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>15.4-SNAPSHOT</version>
+    <version>15.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-war-legacydependencies</artifactId>
   <name>XWiki Platform - Distribution - War - Legacy Dependencies</name>
@@ -53,6 +53,7 @@
                   <excludes>
                     <exclude>org.xwiki.commons:xwiki-commons-component-default:*:jar:*</exclude>
                     <exclude>org.xwiki.commons:xwiki-platform-distribution-war-dependencies:*:jar:*</exclude>
+                    <exclude>org.xwiki.commons:xwiki-commons-component-api:*:jar:*</exclude>
                     <exclude>org.xwiki.rendering:xwiki-rendering-api:*:jar:*</exclude>
                     <exclude>org.xwiki.rendering:xwiki-rendering-transformation-macro:*:jar:*</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-extension-handler-xar:*:jar:*</exclude>
@@ -62,6 +63,9 @@
                     <exclude>org.xwiki.platform:xwiki-platform-rendering-macro-include:*:jar:*</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-rendering-wikimacro-api:*:jar:*</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-rendering-wikimacro-store:*:jar:*</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-instance:*:jar:*</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-mail-send-storage:*:jar:*</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-notifications-api:*:jar:*</exclude>
                   </excludes>
                   <message>We should not get both the clean and the legacy JARs</message>
                 </bannedDependencies>
@@ -125,6 +129,30 @@
           <groupId>org.xwiki.platform</groupId>
           <artifactId>xwiki-platform-extension-handler-xar</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-instance</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-mail-send-storage</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-notifications-notifiers-default</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-notifications-filters-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-notifications-notifiers-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-notifications-api</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
 
@@ -132,6 +160,11 @@
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-legacy-component-default</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-legacy-component-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
     <dependency>
@@ -386,6 +419,73 @@
         <exclusion>
           <groupId>org.xwiki.commons</groupId>
           <artifactId>xwiki-commons-component-default</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-legacy-instance</artifactId>
+      <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-component-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-oldcore</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-legacy-mail-send-storage</artifactId>
+      <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-component-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-oldcore</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-legacy-notifications-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-legacy-notifications-filters-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-legacy-notifications-notifiers-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-legacy-notifications-notifiers-default</artifactId>
+      <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-oldcore</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-legacy-notifications-sources</artifactId>
+      <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-component-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

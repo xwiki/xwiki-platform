@@ -1,0 +1,67 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="XWiki.Ratings.RatingsTranslations" locale="uk">
+  <web>XWiki.Ratings</web>
+  <name>RatingsTranslations</name>
+  <language>uk</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Ratings.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>admin.ratings=Рейтинги
+rating.rate=Оцінити!
+rating.saveexception=Помилка під час збереження рейтингу.
+rating.votenotvalid=Ви не можете проголосувати зі значенням 0.
+rating.voteoutofbounds=Голосування вийшло за ліміт.
+rating.setvote.inprogress=Ваш голос зберігається...
+rating.setvote.success=Ваш голос збережено!
+rating.setvote.error=Помилка при зберіганні вашого голосу.
+XWiki.Ratings.RatingsConfigurationClass_enabled=Увімкнути рейтинги
+XWiki.Ratings.RatingsConfigurationClass_enabled.hint=Увімкнення рейтингів дозволяє користувачам голосувати на сторінках і відображати середні голоси. Їх вимкнення не видаляє наявне голосування, а лише приховує інтерфейс.
+
+#@deprecatedstart
+
+## until 12.9RC1
+admin.ratings.activateratings=Активувати рейтинги на цій вікі
+admin.ratings.activateratingsinfo=Активація рейтингів у цій вікі відобразить візуальну середню оцінку (складену із зірочок) у верхньому правому куті кожного документа цієї вікі (крім тих, що розміщені у просторі *XWiki*). Авторизовані користувачі зможуть оцінювати документи, натискаючи відповідні зірочки. Альтернативою цьому є використання *Панелі рейтингів*, наприклад, щоб увімкнути оцінки лише в потрібних місцях. Щоб скористатися нею, будь ласка, відвідайте розділ адміністрування *Майстер панелі*.
+admin.ratings.resetratings=Скинути всі рейтинги в цій вікі. Це змусить відображатись усі документи без оцінки. Майте на увазі, що ця операція є незворотною, окрім того, ще відбудеться відкат для кожного документа. Скидання всіх рейтингів може зайняти деякий час, якщо у вікі є велика кількість документів, які вже мають оцінки.
+admin.ratings.uninstallratings=Видалення програми рейтингу призведе до видалення документів, які містяться у програмі, але *усі голоси щодо оціненого документа будуть збережені*. Якщо ви пізніше перевстановите програму, документи матимуть збережену середньою оцінкою, яку вони мали перед видаленням програми. Зрештою, видалення програми рейтингів *видалить категорію рейтингів* з адміністрування вікі.
+admin.ratings.ratingsactivated=Рейтинги активовані
+admin.ratings.ratingsdeactivated=Рейтинги вимкнено
+admin.ratings.illegalrequest=Протиправний запит
+rating.yourvote=Ваш голос
+rating.logintorate=Увійдіть, щоб оцінити
+rating.novotes=Ще немає голосів
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+</xwikidoc>

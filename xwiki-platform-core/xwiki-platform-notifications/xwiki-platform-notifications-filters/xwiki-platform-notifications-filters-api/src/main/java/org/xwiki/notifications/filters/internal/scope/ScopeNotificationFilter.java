@@ -80,19 +80,27 @@ public class ScopeNotificationFilter implements NotificationFilter
         // targets an user. We still check the exclusive one in case the user would want to avoid spam.
         boolean checkInclusiveFilters = event.getTarget() == null || event.getTarget().isEmpty();
 
-        // We dismiss the event if the location is not watched or if the starting date of the location is after
-        // the date of the event.
+
         // Note: the filtering on the date is not handled on the HQL-side because the request used to be too long and
         // used to generate stack overflows. So we won't make it worse by adding a date condition on each different
         // scope preference.
         WatchedLocationState state
                 = stateComputer.isLocationWatched(filterPreferences, eventEntity, event.getType(), format, false,
-            checkInclusiveFilters);
-        if (!state.isWatched() || (state.getStartingDate() != null
-            // We only filter if the inclusive filter is strictly after the event date.
-            // Event that occurs at the same date that the inclusive filters are kept.
-            && state.getStartingDate().after(event.getDate()))) {
-            return FilterPolicy.FILTER;
+                checkInclusiveFilters, false);
+
+        // We dismiss the event if:
+        //    1. the location is not watched without any starting date (default behaviour in case of no filter, but
+        //    only if it's not a target event)
+        //    2. the location is not watched because of a filter that has been added before the event date
+        //    3. the location is now watched because of a filter, but the event has been sent before the filter exists
+        if (state.getStartingDate() == null) {
+            return (!state.isWatched() && checkInclusiveFilters) ? FilterPolicy.FILTER : FilterPolicy.NO_EFFECT;
+        } else {
+            if (state.isWatched() && state.getStartingDate().after(event.getDate())) {
+                return FilterPolicy.FILTER;
+            } else if (!state.isWatched() && state.getStartingDate().before(event.getDate())) {
+                return FilterPolicy.FILTER;
+            }
         }
 
         // Otherwise, we have nothing to say

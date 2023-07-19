@@ -43,6 +43,14 @@ Get the actual notifications.
 ## We use POST since we are sending the reference of the document and we want to avoid special characters in the URL.
 #if ('get' == $xcontext.action &amp;&amp; 'POST' == $request.method &amp;&amp; 'getNotifications' == $request.action)
   #set ($requestedDocumentReference = $services.model.resolveDocument($request.document))
+  #macro (displayCheckedIfWatched $scope)
+    #set ($watchedStatus = $services.notification.watch.getLocationWatchedStatus($scope))
+    #if ($watchedStatus == 'WATCHED_FOR_ALL_EVENTS_AND_FORMATS')
+      checked="checked"
+    #elseif ($watchedStatus == 'WATCHED_FOR_SOME_EVENTS_OR_FORMATS')
+      data-indeterminate="true"
+    #end
+  #end
   #macro (generateNotificationInput $id $reference $label)
     &lt;label class="sr-only" for="$id"&gt;$services.localization.render($label)&lt;/label&gt;##
     &lt;input type="checkbox" id="$id" name="$id" #displayCheckedIfWatched($reference)/&gt;##
@@ -75,7 +83,6 @@ Get the actual notifications.
       ##
       #if ($services.notification.watch.isEnabled())
         &lt;div class="notifications-toggles clearfix" data-enabled="$services.notification.preferences.hasAnyEnabledNotificationPreferences()"&gt;
-          #macro(displayCheckedIfWatched $scope)#if($services.notification.watch.isLocationWatchedWithAllEventTypes($scope))checked="checked"#end#end
           #generateNotificationInput('notificationPageOnly' $requestedDocumentReference 'notifications.filters.preferences.label.page')
           #generateNotificationInput('notificationPageAndChildren' $requestedDocumentReference.lastSpaceReference 'notifications.filters.preferences.label.space')
           #generateNotificationInput('notificationWiki' $requestedDocumentReference.wikiReference 'notifications.filters.preferences.label.wiki')
@@ -158,9 +165,9 @@ Get the actual notifications.
   #if ("$!request.currentDoc" != '')
     #set ($currentDoc = $services.model.resolveDocument($request.currentDoc))
     #set ($states = {
-      'document': $services.notification.watch.isLocationWatchedWithAllEventTypes($currentDoc),
-      'space': $services.notification.watch.isLocationWatchedWithAllEventTypes($currentDoc.lastSpaceReference),
-      'wiki': $services.notification.watch.isLocationWatchedWithAllEventTypes($currentDoc.wikiReference)
+      'document': $services.notification.watch.getLocationWatchedStatus($currentDoc),
+      'space': $services.notification.watch.getLocationWatchedStatus($currentDoc.lastSpaceReference),
+      'wiki': $services.notification.watch.getLocationWatchedStatus($currentDoc.wikiReference)
     })
     #set ($discard = $response.setContentType('application/json'))
     $jsontool.serialize($states)
@@ -604,6 +611,16 @@ require(['jquery', 'xwiki-meta', 'xwiki-bootstrap-switch'], function ($, xm) {
 
     allWatchSwitches.bootstrapSwitch('size', 'small');
 
+    var setSwitchStatus = function (switchBtn, status) {
+        if (status === 'WATCHED_FOR_ALL_EVENTS_AND_FORMATS') {
+          switchBtn.bootstrapSwitch('state', true, true);
+        } else if (status === 'WATCHED_FOR_SOME_EVENTS_OR_FORMATS') {
+          switchBtn.bootstrapSwitch('indeterminate', true);
+        } else {
+          switchBtn.bootstrapSwitch('state', false, true);
+        }
+    }
+
     /**
      * Change the watchlist status of a document/space/wiki.
      */
@@ -624,9 +641,9 @@ require(['jquery', 'xwiki-meta', 'xwiki-bootstrap-switch'], function ($, xm) {
         // Unfortunately, bootstrap switch does not allow to change the state if it is disabled
         allWatchSwitches.bootstrapSwitch('disabled', false);
         // Update states
-        watchPageSwitch.bootstrapSwitch('state', data.document, true);
-        watchSpaceSwitch.bootstrapSwitch('state', data.space, true);
-        watchWikiSwitch.bootstrapSwitch('state', data.wiki, true);
+        setSwitchStatus(watchPageSwitch, data.document);
+        setSwitchStatus(watchSpaceSwitch, data.space);
+        setSwitchStatus(watchWikiSwitch, data.wiki);
         // Display success message
         notification.replace(new XWiki.widgets.Notification(
           "$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done'));

@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-configuration</artifactId>
-    <version>15.4-SNAPSHOT</version>
+    <version>15.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-configuration-default</artifactId>
   <name>XWiki Platform - Rendering - Configuration - Implementation</name>
   <packaging>jar</packaging>
   <description>XWiki-specific Rendering Configuration Implementation</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.81</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.80</xwiki.jacoco.instructionRatio>
     </properties>
   <dependencies>
     <dependency>
@@ -55,11 +55,6 @@
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-test</artifactId>
       <version>${rendering.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

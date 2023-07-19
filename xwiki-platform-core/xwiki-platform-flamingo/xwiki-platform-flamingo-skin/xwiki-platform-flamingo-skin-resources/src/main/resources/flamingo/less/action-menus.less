@@ -81,7 +81,9 @@
 }
 
 #globalsearch {
-
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
   margin: 0;
   padding: 0;
 
@@ -119,34 +121,30 @@
     border-radius: 0;
     border: 0;
     min-width: 0;
-    transition: width 0.3s, padding 0.3s;
+    transform-origin: 100% 50%;
+    transition: transform 300ms ease-in-out;
     width: 200px; // we need to set a width in pixels otherwise the transition is not applied nicely
   }
 
-  // When the global search is close
-  &.globalsearch-close {
-    // The button is taking the normal values
-    .btn {
-      background-color: @navbar-default-bg;
-      color: @navbar-default-link-color;
-      border: 0;
-      // Except when it is hovering
-      &:hover,
-      &:focus {
-        background-color: @navbar-default-link-hover-bg;
-        color: @navbar-default-link-hover-color;
-        box-shadow: none;
-      }
-      &:active {
-        background-color: @navbar-default-link-active-bg;
-        color: @navbar-default-link-active-color;
-      }
+  // When the global search is closed
+  .btn[aria-expanded='false'] {
+    background-color: @navbar-default-bg;
+    color: @navbar-default-link-color;
+    border: 0;
+    // Except when it is hovering
+    &:hover,
+    &:focus {
+      background-color: @navbar-default-link-hover-bg;
+      color: @navbar-default-link-hover-color;
+      box-shadow: none;
     }
-
+    &:active {
+      background-color: @navbar-default-link-active-bg;
+      color: @navbar-default-link-active-color;
+    }
     // The input has no width (it's hidden basically, but we need to set the width to 0 to have the nice transition)
-    #headerglobalsearchinput { // we need to be that specific to be applied
-      padding: 0;
-      width: 0;
+    & + #headerglobalsearchinput { // we need to be that specific to be applied
+      transform: scaleX(0);
     }
   }
 }
@@ -311,6 +309,11 @@
       color: @headings-color;
       padding: @font-size-large;
     }
+  }
+  a.btn.disabled {
+    opacity: 1;
+    .text-muted;
+    background-color: transparent;
   }
 
   .flat-buttons();

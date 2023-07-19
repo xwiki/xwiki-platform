@@ -20,6 +20,7 @@
 package org.xwiki.notifications;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Get the configuration options concerning the Notification module.
@@ -51,15 +52,6 @@ public interface NotificationConfiguration
     int liveNotificationsGraceTime();
 
     /**
-     * @return true if pre filtering should be used for ALERT user notifications
-     * @since 12.6
-     */
-    default boolean isEventPrefilteringEnabled()
-    {
-        return false;
-    }
-
-    /**
      * @return true if the REST/async cache is enabled.
      * @since 12.2
      */
@@ -84,5 +76,15 @@ public interface NotificationConfiguration
     default int getAsyncPoolSize()
     {
         return 2;
+    }
+
+    /**
+     * @return the hint of the component to be used for the email grouping strategy.
+     * @since 15.5RC1
+     */
+    @Unstable
+    default String getEmailGroupingStrategyHint()
+    {
+        return "default";
     }
 }

@@ -43,4 +43,4 @@ captcha.admin.configure.title=Configurează {0}
 captcha.admin.sample.title=Exemplu de CAPTCHA
 captcha.admin.sample.description=Exemplu de cum arată CAPTCHA configurat atunci când va fi afișat într-un formular.
 </content>
-  </xwikidoc>
+</xwikidoc>

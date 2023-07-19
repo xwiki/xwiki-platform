@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @version $Id$
  * @since 7.4.1
  */
-public class ExtendedMimeMessageTest
+class ExtendedMimeMessageTest
 {
     private static final String XMAIL_TYPE_HEADER = "X-MailType";
 
@@ -70,7 +70,7 @@ public class ExtendedMimeMessageTest
     }
 
     @Test
-    public void wrap() throws Exception
+    void wrap() throws Exception
     {
         ExtendedMimeMessage extendedMimeMessage = new ExtendedMimeMessage();
         assertThat(ExtendedMimeMessage.wrap(extendedMimeMessage), sameInstance(extendedMimeMessage));
@@ -81,7 +81,7 @@ public class ExtendedMimeMessageTest
     }
 
     @Test
-    public void isEmpty() throws Exception
+    void isEmpty() throws Exception
     {
         ExtendedMimeMessage message = new ExtendedMimeMessage();
         assertThat(message.isEmpty(), is(true));
@@ -91,7 +91,7 @@ public class ExtendedMimeMessageTest
     }
 
     @Test
-    public void setType() throws Exception
+    void setType() throws Exception
     {
         ExtendedMimeMessage message = new ExtendedMimeMessage();
         message.setType(TEST_XMAIL_TYPE);
@@ -100,7 +100,7 @@ public class ExtendedMimeMessageTest
     }
 
     @Test
-    public void setTypeWhenException()
+    void setTypeWhenException()
     {
         Throwable exception = assertThrows(RuntimeException.class, () -> {
             ExtendedMimeMessage message = new ThrowingeExtendedMimeMessage();
@@ -111,7 +111,7 @@ public class ExtendedMimeMessageTest
     }
 
     @Test
-    public void getType() throws Exception
+    void getType() throws Exception
     {
         ExtendedMimeMessage message = new ExtendedMimeMessage();
         message.setHeader(XMAIL_TYPE_HEADER, TEST_XMAIL_TYPE);
@@ -120,7 +120,7 @@ public class ExtendedMimeMessageTest
     }
 
     @Test
-    public void getTypeWhenException()
+    void getTypeWhenException()
     {
         Throwable exception = assertThrows(RuntimeException.class, () -> {
             ExtendedMimeMessage message = new ThrowingeExtendedMimeMessage();
@@ -131,7 +131,7 @@ public class ExtendedMimeMessageTest
     }
 
     @Test
-    public void getMessageIdAndEnsureSaved() throws Exception
+    void getMessageIdAndEnsureSaved() throws Exception
     {
         ExtendedMimeMessage message = new ExtendedMimeMessage();
         message.setText(TEST_CONTENT);
@@ -142,25 +142,39 @@ public class ExtendedMimeMessageTest
     }
 
     @Test
-    public void getUniqueMessageId() throws Exception
+    void getUniqueMessageId() throws Exception
     {
         ExtendedMimeMessage message = new ExtendedMimeMessage();
         message.setText(TEST_CONTENT);
         message.setMessageId(TEST_MESSAGE_ID);
         assertThat(message.getUniqueMessageId(), equalTo("wmK5jlxm4kPv2caEGeVtsDOT3zk="));
 
+        // Verify that the unique id is modified.
         message.setRecipients(Message.RecipientType.TO, "john.doe@example.com");
+        assertThat(message.getUniqueMessageId(), equalTo("g9tEjV2+qAGNIFaQ44+P+iZtZZw="));
+
+        // Verify that the unique id is the same since the Cc address is the same as the To one.
+        message.removeHeader("To");
+        message.setRecipients(Message.RecipientType.CC, "john.doe@example.com");
+        assertThat(message.getUniqueMessageId(), equalTo("g9tEjV2+qAGNIFaQ44+P+iZtZZw="));
+
+        // Verify that the unique id is the same since the Bcc address is the same as the Cc and To ones.
+        message.removeHeader("Cc");
+        message.setRecipients(Message.RecipientType.BCC, "john.doe@example.com");
         assertThat(message.getUniqueMessageId(), equalTo("g9tEjV2+qAGNIFaQ44+P+iZtZZw="));
 
         message.setMessageId("AnotherID");
         assertThat(message.getUniqueMessageId(), equalTo("hdr6yyK2Tq9fKpv5hr5eMOL8XYA="));
 
+        // Verify that the unique id is back to what it was above
         message.setMessageId(TEST_MESSAGE_ID);
+        message.removeHeader("Bcc");
+        message.setRecipients(Message.RecipientType.TO, "john.doe@example.com");
         assertThat(message.getUniqueMessageId(), equalTo("g9tEjV2+qAGNIFaQ44+P+iZtZZw="));
     }
 
     @Test
-    public void setMessageIdWhenException()
+    void setMessageIdWhenException()
     {
         Throwable exception = assertThrows(RuntimeException.class, () -> {
             ExtendedMimeMessage message = new ThrowingeExtendedMimeMessage();

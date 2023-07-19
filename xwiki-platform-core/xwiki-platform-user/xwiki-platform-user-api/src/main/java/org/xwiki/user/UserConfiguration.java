@@ -22,6 +22,7 @@ package org.xwiki.user;
 import java.util.Properties;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Configuration options for the User module.
@@ -46,4 +47,19 @@ public interface UserConfiguration
      * @return the overriding preferences for the guest user
      */
     Properties getGuestPreference();
+
+    /**
+     * When displaying an user in a compact mode we usually rely only on the user avatar and their full name. If this is
+     * not enough to properly identify the user then this configuration can be used to display additional information.
+     * 
+     * @return the name of the user property to be used as qualifier (hint) when displaying the user in a compact mode,
+     *         or {@code null} if no additional information should be displayed
+     * @since 14.10.12
+     * @since 15.5RC1
+     */
+    @Unstable
+    default String getUserQualifierProperty()
+    {
+        return null;
+    }
 }

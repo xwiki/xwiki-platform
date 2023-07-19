@@ -57,8 +57,7 @@
 ###    Toplevel Left Menu
 ###
 #macro(xwikitopmenuleftstart)
-  <ul class="nav navbar-nav navbar-left"
-    aria-label="$escapetool.xml($services.localization.render('core.menu.navbar.left.label'))">
+  <ul class='nav navbar-nav navbar-left'>
 #end
 
 ###

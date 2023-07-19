@@ -70,8 +70,8 @@ entitynamevalidation.replacementCharacter.removeCharacter.remove=Видалит�
 entitynamevalidation.replacementCharacter.remove.inProgress=Видаляється заборонений символ...
 entitynamevalidation.replacementCharacter.remove.done=Заборонений символ видалено.
 entitynamevalidation.replacementCharacter.remove.failed=Помилка при видаленні забороненого символу.
-### Missing: entitynamevalidation.replacementCharacter.emptyReplacementCharacter=None
+entitynamevalidation.replacementCharacter.emptyReplacementCharacter=Нічого
 entitynamevalidation.admin.heading=Стратегії іменування
 admin.namestrategies=Стратегії іменування
 </content>
-  </xwikidoc>
+</xwikidoc>

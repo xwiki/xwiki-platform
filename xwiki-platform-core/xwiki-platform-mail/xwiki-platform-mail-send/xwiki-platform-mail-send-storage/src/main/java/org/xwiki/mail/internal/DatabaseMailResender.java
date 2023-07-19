@@ -132,8 +132,9 @@ public class DatabaseMailResender implements MailResender
         SingleMailResender singleMailResender)
     {
         // Only try to resend if the mail didn't fail because it couldn't be prepared, as this would mean the message
-        // was never saved and thus we cannot resend it...
+        // was never saved, and thus we cannot resend it...
         if (!MailState.PREPARE_ERROR.toString().equals(status.getState())) {
+            this.logger.debug("Resending mail message [{}]...", status);
             try {
                 results.add(new ImmutablePair<>(status,
                     singleMailResender.resendSingleMessage(status.getBatchId(), status.getMessageId())));

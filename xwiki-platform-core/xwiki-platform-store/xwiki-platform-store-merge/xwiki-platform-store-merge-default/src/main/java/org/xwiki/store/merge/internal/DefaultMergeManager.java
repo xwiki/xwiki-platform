@@ -19,8 +19,8 @@
  */
 package org.xwiki.store.merge.internal;
 
-import java.io.IOException;
 import java.io.StringReader;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -45,6 +45,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.store.merge.MergeConflictDecisionsManager;
 import org.xwiki.store.merge.MergeDocumentResult;
 import org.xwiki.store.merge.MergeManager;
+import org.xwiki.store.merge.MergeManagerResult;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -53,7 +54,6 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeConfiguration.ConflictFallbackVersion;
-import org.xwiki.store.merge.MergeManagerResult;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.ElementInterface;
@@ -606,7 +606,7 @@ public class DefaultMergeManager implements MergeManager
                 result.add("");
             }
 
-        } catch (IOException e) {
+        } catch (UncheckedIOException e) {
             // Should never happen
             result = null;
         }

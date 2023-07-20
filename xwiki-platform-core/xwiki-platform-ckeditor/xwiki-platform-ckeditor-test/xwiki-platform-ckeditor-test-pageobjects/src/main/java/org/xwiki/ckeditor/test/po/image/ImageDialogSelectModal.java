@@ -44,8 +44,6 @@ public class ImageDialogSelectModal extends BaseModal
 
     private ImageDialogSelectModal(By selector)
     {
-        super(selector);
-
         // This modal is added on demand so we can't rely on the base constructor to remove the "fade in" effect. We
         // have to do the wait ourselves.
         getDriver().waitUntilElementIsVisible(selector);

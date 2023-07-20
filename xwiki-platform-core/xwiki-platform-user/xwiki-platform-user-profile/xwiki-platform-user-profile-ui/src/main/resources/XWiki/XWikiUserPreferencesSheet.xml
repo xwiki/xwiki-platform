@@ -254,7 +254,7 @@
   #set ($escapedSelectId = $escapetool.xml("XWiki.XWikiUsers_0_${fieldName}"))
   #set ($escapedHintId = $escapedSelectId + "_hint")
   &lt;dt&gt;
-    &lt;label for="$escapedSelectId"&gt;$!escapetool.xml($services.localization.render($label))&lt;/label&gt;
+    &lt;label #if($isEdit)for="$escapedSelectId"#end&gt;$!escapetool.xml($services.localization.render($label))&lt;/label&gt;
     #if ($services.localization.get($hintKey))
       &lt;span id="$escapedHintId" class='xHint'&gt;$!escapetool.xml($services.localization.render($hintKey))&lt;/span&gt;
     #end

@@ -551,7 +551,7 @@ require(['scriptaculous/effects'], function() {
 }
 
 .applicationPanelMoreButton {
-  padding: 10px 0 0 0;
+  padding: 0;
   border: 0;
   color: $theme.linkColor;
   box-shadow: none;
@@ -559,6 +559,11 @@ require(['scriptaculous/effects'], function() {
   width: 100%;
   display: flex;
   text-align: left;
+}
+
+.applicationPanelMoreButton:hover,
+.applicationPanelMoreButton:focus {
+  background-color: $theme.highlightColor;
 }
 
 .applicationPanelMoreButton .application-label {

@@ -152,6 +152,7 @@ notifications.settings.applications.title=Додатки
 notifications.settings.applications.hint=Це список додатків, які можуть надсилати сповіщення. Ви можете ввімкнути або вимкнути будь-який із них.
 notifications.settings.applications.forGuest=Увійдіть або зареєструйтесь, щоб керувати своїми налаштуваннями сповіщень.
 notifications.settings.applications.appName=Назва
+notifications.settings.applications.table.dropdown.toggle.label=Перемкнути деталі для сповіщень від додатків {0}.
 notifications.settings.events=Події
 notifications.settings.watch.title=Відстежувані сторінки
 notifications.settings.watch.autowatchmode=Автоматичне спостереження за сторінкою
@@ -217,9 +218,9 @@ rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=Ціль
 rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=Ціль макросу (може бути "user" для поточного користувача або "wiki" для поточної вікі)
 
 ## Toggle notification filters labels
-### Missing: notifications.filters.preferences.label.page=Toggle Page notifications only
-### Missing: notifications.filters.preferences.label.space=Toggle Page and children notifications
-### Missing: notifications.filters.preferences.label.wiki=Toggle Wiki notifications
+notifications.filters.preferences.label.page=Перемкнути лише сповіщення сторінки
+notifications.filters.preferences.label.space=Перемкнути сповіщення для сторінки та її нащадків
+notifications.filters.preferences.label.wiki=Перемкнути сповіщення вікі
 
 ## Notifications switches
 notifications.switches.tooltip.page=Спостерігати за цією сторінку
@@ -233,7 +234,7 @@ notifications.switches.changeStatusError=Не вдалося змінити ст
 
 ## until 13.2RC1
 notifications.settings.filters.preferences.title=Фільтри
-### Missing: notifications.settings.filters.preferences.hint=Create filters to more precisely control when the active events should trigger notifications.
+notifications.settings.filters.preferences.hint=Створіть фільтри, щоб точніше контролювати, коли активні події мають ініціювати сповіщення.
 notifications.settings.filters.preferences.forGuest=Увійдіть або зареєструйтеся, щоб керувати своїми фільтрами сповіщень.
 ## Header definition for notification filter preferences
 notifications.settings.filters.preferences.table.name=Назва

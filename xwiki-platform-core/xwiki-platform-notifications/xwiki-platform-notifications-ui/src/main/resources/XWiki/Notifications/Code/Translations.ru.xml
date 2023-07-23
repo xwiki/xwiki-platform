@@ -150,6 +150,7 @@ notifications.settings.applications.title=Приложения
 notifications.settings.applications.hint=Список приложений, которые могут отправлять уведомления. Вы можете включить или отключить любое из них.
 notifications.settings.applications.forGuest=Войдите в систему или зарегистрируйтесь для настройки ваших уведомлений.
 notifications.settings.applications.appName=Название
+notifications.settings.applications.table.dropdown.toggle.label=Отобразить\\скрыть сведения об уведомлениях из приложения {0}.
 notifications.settings.events=События
 notifications.settings.watch.title=Наблюдаемые страницы
 notifications.settings.watch.autowatchmode=Автонаблюдение за страницей

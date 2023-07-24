@@ -81,6 +81,7 @@
   #else
 
     (%class="message-table"%)(((
+     #set($checkboxCount = 0)
      #foreach($field in $fieldsToDisplay)
        #if($field == '_history')
          |=(%class="history"%)$services.localization.render('xe.invitation.displayMessageTable.history')##
@@ -95,7 +96,6 @@
        #end
      #end
 
-     #set($checkboxCount = 0)
      #foreach($message in $messages)
        #foreach($field in $fieldsToDisplay)
          #if($field == 'sendingUser')
@@ -124,8 +124,8 @@
            |$services.localization.render('xe.invitation.displayMessageTable.multipleRecipients',
                      [$numberOfRecipientsByMessage.get($message.get('recipient'))])
          #elseif($field == '_checkbox')
-           |&lt;label for="messageCheckboxID$checkboxCount"&gt;
-             $escapetool.xml($services.localization.render('xe.invitation.displayMessageTable.checkbox.input.label', [$checkboxCount]))
+           |&lt;label for="messageCheckboxID$checkboxCount" class='sr-only'&gt;
+             $escapetool.xml($services.localization.render('xe.invitation.displayMessageTable.checkbox.input.label'))
            &lt;/label&gt;
            &lt;input type="checkbox" id="messageCheckboxID$checkboxCount" name="messageCheckboxID$checkboxCount"
             value="$message.getProperty('messageID').getValue()" ##

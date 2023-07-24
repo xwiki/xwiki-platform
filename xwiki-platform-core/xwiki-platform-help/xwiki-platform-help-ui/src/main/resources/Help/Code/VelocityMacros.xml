@@ -425,19 +425,19 @@ li.card {
   width: 49%;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: @screen-lg-min) {
   li.card {
     width: 32%;
   }
 }
 
-@media (max-width: 992px) {
+@media (max-width: @screen-md-min) {
   .card-list > li.card {
     width: 49%;
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: @screen-sm-min) {
   .card-list > li.card {
     width: 100%;
   }

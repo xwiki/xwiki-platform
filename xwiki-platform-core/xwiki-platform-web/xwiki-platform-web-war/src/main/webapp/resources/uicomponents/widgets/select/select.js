@@ -40,7 +40,7 @@ require(['jquery'], function($) {
 
     /**
      * Callback used when an option from the select widget is hovered
-     * @since 15.5RC1
+     * @since 15.7RC1
      */
     self.onOptionHovered = function () {
       self.changeHighlight($(this), true);
@@ -78,7 +78,7 @@ require(['jquery'], function($) {
 
     /**
      * Highlights the option given as a parameter.
-     * @since 15.5RC1
+     * @since 15.7RC1
      */
      self.changeHighlight = function(option, dontSetFocus) {
        if(!option) option = self.selectWidget.find('.xwiki-select-option-selected');
@@ -93,7 +93,7 @@ require(['jquery'], function($) {
     /**
      * Callback when the enter or space key is pressed when focusing an option.
      * Essential for keyboard support of select.
-     * @since 15.5RC1
+     * @since 15.7RC1
      */
      self.onOptionSelectHighlighted = function() {
        let highlightedOption = self.selectWidget.find('.xwiki-select-option-highlighted');
@@ -104,7 +104,7 @@ require(['jquery'], function($) {
      * Callback used when the left arrow key is pressed while navigating the select.
      * This will move the highlight to the previous option,
      * and loop around to the last option if triggered on the first option of the select.
-     * @since 15.5RC1
+     * @since 15.7RC1
      */
     self.onOptionLeftKeyPressed = function() {
       let highlightedOption = self.selectWidget.find('.xwiki-select-option-highlighted');
@@ -121,7 +121,7 @@ require(['jquery'], function($) {
      * Callback used when the right arrow key is pressed while navigating the select.
      * This will move the highlight to the next option,
      * and loop around to the first option if triggered on the last option of the select.
-     * @since 15.5RC1
+     * @since 15.7RC1
      */
     self.onOptionRightKeyPressed = function() {
       let highlightedOption = self.selectWidget.find('.xwiki-select-option-highlighted');
@@ -138,7 +138,7 @@ require(['jquery'], function($) {
      * Callback used when the up arrow key is pressed while navigating the select.
      * This will move the highlight to the previous 'first of its group' option,
      * and loop around to the last 'first of its group' option if triggered on the first option of the select.
-     * @since 15.5RC1
+     * @since 15.7RC1
      */
     self.onOptionUpKeyPressed = function() {
       let highlightedOption = self.selectWidget.find('.xwiki-select-option-highlighted');
@@ -162,7 +162,7 @@ require(['jquery'], function($) {
      * Callback used when the down arrow key is pressed while navigating the select.
      * This will move the highlight to the next 'first of its group' option,
      * and loop around to the first option if triggered on an option of the last group in the select.
-     * @since 15.5RC1
+     * @since 15.7RC1
      */
     self.onOptionDownKeyPressed = function() {
       let highlightedOption = self.selectWidget.find('.xwiki-select-option-highlighted');
@@ -183,7 +183,7 @@ require(['jquery'], function($) {
     /**
      * Callback used when the home key is pressed while navigating the select.
      * This will move the highlight to the first option of the select.
-     * @since 15.5RC1
+     * @since 15.7RC1
      */
     self.onOptionHomeKeyPressed = function() {
       self.changeHighlight(self.selectWidget.find('.xwiki-select-option:visible').first());
@@ -192,7 +192,7 @@ require(['jquery'], function($) {
     /**
      * Callback used when the end key is pressed while navigating the select.
      * This will move the highlight to the last option of the select.
-     * @since 15.5RC1
+     * @since 15.7RC1
      */
     self.onOptionEndKeyPressed = function() {
       self.changeHighlight(self.selectWidget.find('.xwiki-select-option:visible').last());
@@ -200,7 +200,7 @@ require(['jquery'], function($) {
 
     /**
      * Callback used when a key is pressed down when selecting the options.
-     * @since 15.5RC1
+     * @since 15.7RC1
      */
     self.onOptionKeyPressed = function (event) {
       var key = event.keyCode;

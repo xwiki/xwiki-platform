@@ -91,8 +91,8 @@
 #if($docextras.size() > 0)
   <div id="xwikidatacontents">
     <div class="floatcontainer" id="docExtraTabs">
-      <div id='tablistlabel' class='hidden'>$escapetool.xml($services.localization.render('docextra.tablist.label'))</div>
-      <div id='tablistdescription' class='hidden'>$escapetool.xml($services.localization.render('docextra.tablist.description'))</div>
+      <div id='tablistlabel' class='sr-only'>$escapetool.xml($services.localization.render('docextra.tablist.label'))</div>
+      <div id='tablistdescription' class='sr-only'>$escapetool.xml($services.localization.render('docextra.tablist.description'))</div>
       <div class='xwikitabbar' id='docExtrasTabsUl' role='tablist'
         aria-labelledby='tablistlabel' aria-describedby='tablistdescription'>
         #foreach($docextra in $docextras)
@@ -108,7 +108,7 @@
     ##
     <div id="docextrapanes">
       #foreach($docextra in $docextras)
-        <div id="${docextra.get(0)}pane" class="hidden empty" role="tabpanel" aria-labelledby="${docextra.get(0)}tab"></div>
+        <div id="${docextra.get(0)}pane" class="sr-only empty" role="tabpanel" aria-labelledby="${docextra.get(0)}tab"></div>
       #end
     </div>
     ##

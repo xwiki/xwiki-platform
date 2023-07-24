@@ -104,14 +104,18 @@ class ExtensionSecurityIT
     private String createPageFromFile(TestUtils setup, DocumentReference testDocumentReference, String name)
         throws IOException
     {
-        setup.createPage(testDocumentReference, "");
-        WikiEditPage wikiEditPage = new ViewPage().editWiki();
+        ViewPage viewPage = setup.createPage(testDocumentReference, "");
+        WikiEditPage wikiEditPage = viewPage.editWiki();
         // Can't create the content using setup.createPage as the content is too large.
         wikiEditPage.setContent("{{velocity wiki='false'}}\n"
             + IOUtils.toString(getClass().getClassLoader().getResourceAsStream(name),
             Charset.defaultCharset())
             + "{{/velocity}}");
         wikiEditPage.clickSaveAndView(false);
+        // We don't use gotoPage here as it relies on some markers to ensure the page is properly loaded, which is not
+        // properly working when navigating from a JSON answer.
+        // Here we just want to navigate away from the JSON.
+        setup.getDriver().get(setup.getURL("Main", "WebHome"));
         return getLocalRestURL(setup, testDocumentReference);
     }
 

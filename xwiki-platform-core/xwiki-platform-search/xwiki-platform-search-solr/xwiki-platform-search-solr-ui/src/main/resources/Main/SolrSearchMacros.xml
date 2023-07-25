@@ -447,7 +447,7 @@
 
 #macro (displaySearchResult_document $searchResult)
   #displaySearchResultTitle()
-  #displaySearchResultLocation($searchResult $escapetool.xml($searchResult.title_))
+  #displaySearchResultLocation($searchResult $searchResult.title_)
   &lt;div class="search-result-author"&gt;
     $services.localization.render('core.footer.modification', [
       "#displayUserProfileLink($searchResult.author $searchResult.author_display)",
@@ -470,7 +470,7 @@
       $escapetool.xml($searchResult.attversion)
     &lt;/a&gt;
   &lt;/h2&gt;
-  #displaySearchResultLocation($searchResult $escapetool.xml($searchResultReference.name))
+  #displaySearchResultLocation($searchResult $searchResultReference.name)
   &lt;div class="search-result-uploader"&gt;
     #set ($uploader = "#displayUserProfileLink($searchResult.attauthor.get(0) $searchResult.attauthor_display.get(0))")
     #set ($uploadDate = $xwiki.formatDate($searchResult.attdate.get(0)))
@@ -486,14 +486,14 @@
     $services.icon.renderHTML('cubes')
     $escapetool.xml("${searchResult.get('class').get(0)}[$searchResult.number]")
   &lt;/h2&gt;
-  #displaySearchResultLocation($searchResult $escapetool.xml("${searchResult.get('class').get(0)}[$searchResult.number]"))
+  #displaySearchResultLocation($searchResult "${searchResult.get('class').get(0)}[$searchResult.number]")
 #end
 
 #macro (displaySearchResult_object_property $searchResult)
   &lt;h2 class="search-result-title"&gt;
     $services.icon.renderHTML('cube') $escapetool.xml($searchResult.propertyname)
   &lt;/h2&gt;
-  #displaySearchResultLocation($searchResult $escapetool.xml($searchResult.propertyname))
+  #displaySearchResultLocation($searchResult $searchResult.propertyname)
 #end
 
 #macro (displaySearchResultTitle)

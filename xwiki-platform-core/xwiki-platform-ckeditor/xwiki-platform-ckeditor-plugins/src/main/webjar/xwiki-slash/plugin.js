@@ -506,6 +506,42 @@
           }
         }, {
           group: 'Layout',
+          id: 'h4',
+          name: editor.lang.format.tag_h4, // jshint ignore:line
+          iconClass: 'fa fa-header',
+          description: editor.localization.get('xwiki-slash.action.h4.hint'),
+          command: {
+            name: 'xwiki-applyStyle',
+            data: {
+              element: 'h4'
+            }
+          }
+        }, {
+          group: 'Layout',
+          id: 'h5',
+          name: editor.lang.format.tag_h5, // jshint ignore:line
+          iconClass: 'fa fa-header',
+          description: editor.localization.get('xwiki-slash.action.h5.hint'),
+          command: {
+            name: 'xwiki-applyStyle',
+            data: {
+              element: 'h5'
+            }
+          }
+        }, {
+          group: 'Layout',
+          id: 'h6',
+          name: editor.lang.format.tag_h6, // jshint ignore:line
+          iconClass: 'fa fa-header',
+          description: editor.localization.get('xwiki-slash.action.h6.hint'),
+          command: {
+            name: 'xwiki-applyStyle',
+            data: {
+              element: 'h6'
+            }
+          }
+        }, {
+          group: 'Layout',
           id: 'p',
           name: editor.localization.get('xwiki-slash.action.p.name'),
           iconClass: 'fa fa-paragraph',

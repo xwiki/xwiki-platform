@@ -65,7 +65,7 @@
             value="$escapetool.xml($path)" /&gt;
         #end
         #set ($spaceReference = $services.model.resolveSpace($path))
-        #set ($discard = $hierarchyOptions.put('label', $escapetool.xml($path)))
+        #set ($discard = $hierarchyOptions.put('label', $path))
         #hierarchy($spaceReference $hierarchyOptions)
       &lt;/li&gt;
     #end

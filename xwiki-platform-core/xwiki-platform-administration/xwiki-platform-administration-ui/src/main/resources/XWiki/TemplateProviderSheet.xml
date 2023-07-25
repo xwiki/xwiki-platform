@@ -185,7 +185,7 @@
           #hierarchy($templateReference {
             'local': true,
             'selfIsActive': false,
-            'label': $!escapetool.xml($services.localization.render($doc.getPageReference().getName()))
+            'label': $!services.localization.render($doc.getPageReference().getName())
           })
         #end
       &lt;/dd&gt;

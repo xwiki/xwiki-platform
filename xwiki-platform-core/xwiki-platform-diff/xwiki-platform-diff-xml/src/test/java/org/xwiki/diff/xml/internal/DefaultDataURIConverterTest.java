@@ -98,8 +98,8 @@ class DefaultDataURIConverterTest
     @BeforeComponent
     public void configureCacheManager() throws CacheException
     {
-        this.cache = mock();
-        this.failureCache = mock();
+        this.cache = mock(Cache.class);
+        this.failureCache = mock(Cache.class);
 
         when(this.configuration.isEnabled()).thenReturn(true);
 
@@ -120,7 +120,7 @@ class DefaultDataURIConverterTest
     {
         when(this.userReferenceSerializer.serialize(CurrentUserReference.INSTANCE)).thenReturn(CURRENT_USER);
 
-        XWikiContext xwikiContext = mock();
+        XWikiContext xwikiContext = mock(XWikiContext.class);
         when(this.xwikiContextProvider.get()).thenReturn(xwikiContext);
         XWikiServletRequestStub request = new XWikiServletRequestStub.Builder()
             .setHeaders(Map.of("forwarded", List.of("host=localhost:8080;proto=http")))

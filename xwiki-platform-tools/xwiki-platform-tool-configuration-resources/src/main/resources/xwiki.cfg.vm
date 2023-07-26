@@ -443,17 +443,6 @@ xwiki.plugins=$!xwikiCfgPlugins
 # xwiki.monitor.lastlistsize=20
 
 #---------------------------------------
-# GraphViz Plugin
-#
-
-#-# GraphViz plugin configuration. The GraphViz plugin is not configured by default.
-#-# To enable it, add "com.xpn.xwiki.plugin.graphviz.GraphVizPlugin" to the list of plugins
-#-# in the xwiki.plugins property.
-#-# Uncomment and set the locations of the Dot and Neato executables
-# xwiki.plugin.graphviz.dotpath=c:/Program Files/ATT/GraphViz/bin/dot.exe
-# xwiki.plugin.graphviz.neatopath=c:/Program Files/ATT/GraphViz/bin/neato.exe
-
-#---------------------------------------
 # Image Plugin
 #
 

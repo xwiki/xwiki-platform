@@ -25,7 +25,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -38,7 +37,6 @@ import org.xwiki.notifications.GroupingEventStrategy;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.user.UserReference;
-import org.xwiki.user.UserReferenceResolver;
 
 /**
  * Default implementation of {@link GroupingEventManager}.
@@ -54,9 +52,6 @@ public class DefaultGroupingEventManager implements GroupingEventManager
     private GroupingEventStrategy defaultGroupingEventStrategy;
 
     @Inject
-    private UserReferenceResolver<String> userReferenceResolver;
-
-    @Inject
     private NotificationPreferenceManager notificationPreferenceManager;
 
     @Inject
@@ -67,26 +62,25 @@ public class DefaultGroupingEventManager implements GroupingEventManager
     private Logger logger;
 
     @Override
-    public List<CompositeEvent> getCompositeEvents(List<Event> events, String userId, String target) throws
-        NotificationException
+    public List<CompositeEvent> getCompositeEvents(List<Event> events, UserReference userReference, String target)
+            throws NotificationException
     {
-        return getStrategy(userId, target).group(events);
+        return getStrategy(userReference, target).group(events);
     }
 
     @Override
-    public void augmentCompositeEvents(List<CompositeEvent> compositeEvents, List<Event> newEvents, String userId,
-        String target) throws NotificationException
+    public void augmentCompositeEvents(List<CompositeEvent> compositeEvents, List<Event> newEvents,
+                                       UserReference userReference, String target) throws NotificationException
     {
-        getStrategy(userId, target).group(compositeEvents, newEvents);
+        getStrategy(userReference, target).group(compositeEvents, newEvents);
     }
 
-    private GroupingEventStrategy getStrategy(String userId, String target) throws NotificationException
+    private GroupingEventStrategy getStrategy(UserReference userReference, String target) throws NotificationException
     {
         GroupingEventStrategy groupingEventStrategy = this.defaultGroupingEventStrategy;
 
         // FIXME: We should have a way to fallback on wiki preference
-        if (!StringUtils.isBlank(userId)) {
-            UserReference userReference = this.userReferenceResolver.resolve(userId);
+        if (userReference != null) {
             String strategyHint =
                 this.notificationPreferenceManager.getNotificationGroupingStrategy(userReference, target);
 

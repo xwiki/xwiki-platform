@@ -108,4 +108,4 @@ XWiki.PDFExport.ConfigurationClass_maxContentSize.hint=Максимальний 
 XWiki.PDFExport.ConfigurationClass_replaceFOP=Замінити FOP
 XWiki.PDFExport.ConfigurationClass_replaceFOP.hint=Замінити старий експорт PDF на основі Apache FOP.
 </content>
-  </xwikidoc>
+</xwikidoc>

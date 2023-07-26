@@ -442,7 +442,7 @@
         ## VIEW SOURCE
         ##
         #if ("$!request.rev" != '')
-          #set ($revisionParameter = "&rev=$request.rev")
+          #set ($revisionParameter = "&rev=$escapetool.url($request.rev)")
         #end
         <dd>
           <ul>

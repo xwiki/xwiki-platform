@@ -20,6 +20,8 @@
 package org.xwiki.localization;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.stability.Unstable;
 
 /**
  * A helper for {@link LocalizationManager} which get the {@link java.util.Locale} from {@link LocalizationContext} and
@@ -51,4 +53,23 @@ public interface ContextualLocalizationManager
      * @see #getTranslation(String)
      */
     String getTranslationPlain(String key, Object... parameters);
+
+    /**
+     * Find a translation in the current language.
+     *
+     * @param key the key identifying the message to look for
+     * @param targetSyntax the syntax in which to render the translation
+     * @param parameters the parameters
+     * @return the translation in the current language, rendered in the target syntax, null if no translation could be
+     *         found or it couldn't be rendered
+     * @throws LocalizationException if there's an error while getting the Renderer for the passed syntax
+     * @see #getTranslation(String)
+     * @since 15.5RC1
+     * @since 14.10.12
+     */
+    @Unstable
+    default String getTranslation(String key, Syntax targetSyntax, Object... parameters) throws LocalizationException
+    {
+        return null;
+    }
 }

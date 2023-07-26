@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-extension</artifactId>
-    <version>15.5-SNAPSHOT</version>
+    <version>15.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-extension-index</artifactId>
   <name>XWiki Platform - Extension - Index</name>
@@ -57,6 +57,11 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-flavor-api</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>us.springett</groupId>
+      <artifactId>cvss-calculator</artifactId>
+      <version>${cvssCalculator.version}</version>
     </dependency>
 
     <!-- Test dependencies -->

@@ -19,6 +19,8 @@
  */
 package org.xwiki.test.ui.po;
 
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -33,6 +35,13 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 public class BaseModal extends BaseElement
 {
     protected WebElement container;
+
+    /**
+     * Default constructor when we want to manually set the container. This should be used with caution.
+     */
+    protected BaseModal()
+    {
+    }
 
     // This constructor remove the fade effect, but it only takes effect before the modal is opened
     // so take care to create the modal before doing the action to open it.

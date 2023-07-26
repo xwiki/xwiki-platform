@@ -64,4 +64,4 @@ XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Кількість упод
 XWiki.Like.LikeConfigurationClass_enabled=Увімкнути функцію Уподобання
 XWiki.Like.LikeConfigurationClass_enabled.hint=Якщо не обрано, функція Уподобання буде вимкнена, а інформація, пов'язана з цим, буде прихована.
 </content>
-  </xwikidoc>
+</xwikidoc>

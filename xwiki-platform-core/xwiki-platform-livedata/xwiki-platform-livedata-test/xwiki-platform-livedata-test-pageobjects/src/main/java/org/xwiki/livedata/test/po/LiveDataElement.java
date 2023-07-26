@@ -60,7 +60,7 @@ public class LiveDataElement extends BaseElement
      */
     public TableLayoutElement getTableLayout()
     {
-        TableLayoutElement tableLayoutElement = new TableLayoutElement(this.id);
+        TableLayoutElement tableLayoutElement = new TableLayoutElement(this);
         tableLayoutElement.waitUntilReady();
         return tableLayoutElement;
     }
@@ -103,6 +103,26 @@ public class LiveDataElement extends BaseElement
         return isVueLoaded() && areComponentsLoaded();
     }
 
+    /**
+     * Click on the refresh button from the actions menu.
+     *
+     * @since 15.5
+     */
+    public void refresh()
+    {
+        WebElement dropdownMenu = getRootElement().findElement(By.cssSelector(".livedata-dropdown-menu "));
+        dropdownMenu.click();
+        dropdownMenu.findElement(By.cssSelector(".livedata-action-refresh")).click();
+    }
+
+    /**
+     * @return the id of the Live Data
+     */
+    public String getId()
+    {
+        return this.id;
+    }
+
     private void waitUntilReady()
     {
         getDriver().waitUntilCondition(input -> isVueLoaded());
@@ -114,7 +134,7 @@ public class LiveDataElement extends BaseElement
     {
         // Once the Vue template is loaded, a div with the loading class is inserted until the rest of the data
         // and components required to display the Live Data are loaded too.
-        return getDriver().findElement(By.id(this.id)).findElements(By.cssSelector(".xwiki-livedata .loading"))
+        return getRootElement().findElements(By.cssSelector(".xwiki-livedata > .loading"))
             .isEmpty();
     }
 
@@ -138,5 +158,10 @@ public class LiveDataElement extends BaseElement
     {
         return getDriver().findElementWithoutWaiting(By.id(this.id))
             .findElements(By.cssSelector(".footnotes > .footnote"));
+    }
+
+    private WebElement getRootElement()
+    {
+        return getDriver().findElement(By.id(this.id));
     }
 }

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor</artifactId>
-    <version>15.5-SNAPSHOT</version>
+    <version>15.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-mainwiki</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Main Wiki</name>
@@ -64,6 +64,21 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-menu-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <optional>true</optional>
+    </dependency>
+    <!-- Add the Mail Resending UI. It's only added in the main wiki XS flavor so that it's not installed
+         in subwikis (as we want a single mail resender located in the main wiki) -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-mail-resender-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-security-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
       <optional>true</optional>

@@ -424,9 +424,9 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
         readButton.addClass('notification-event-read-button').addClass('btn btn-xs');
         // Insert the cross icon and an accessible label
         var readButtonIcon = $("$escapetool.javascript($services.icon.renderHTML('check'))");
-        var readButtonLabel= $('&lt;span class="sr-only"/&gt;');
-        readButtonLabel.text("$escapetool.javascript($services.localization.render('notifications.macro.markEventAsRead'))");
-        readButton.append(readButtonIcon).append(readButtonLabel);
+        readButton.attr('aria-label', "$escapetool.javascript($services.localization.render('notifications.macro.markEventAsRead'))");
+        readButton.attr('title', "$escapetool.javascript($services.localization.render('notifications.macro.markEventAsRead'))");
+        readButton.append(readButtonIcon);
         // On click
         readButton.on('click', function() {
           var notif = $(this).parents('div.notification-event');
@@ -604,9 +604,9 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
           readButton.addClass('notification-event-read-button').addClass('btn btn-xs');
           // Insert the cross icon and an accessible label
           var readButtonIcon = $("$escapetool.javascript($services.icon.renderHTML('check'))");
-          var readButtonLabel= $('&lt;span class="sr-only"/&gt;');
-          readButtonLabel.text("$escapetool.javascript($services.localization.render('notifications.macro.markEventAsRead'))");
-          readButton.append(readButtonIcon).append(readButtonLabel);
+          readButton.attr('aria-label', "$escapetool.javascript($services.localization.render('notifications.macro.markEventAsRead'))");
+          readButton.attr('title', "$escapetool.javascript($services.localization.render('notifications.macro.markEventAsRead'))");
+          readButton.append(readButtonIcon);
           // On click
           readButton.on('click', function() {
             var notif = $(this).parents('div.notification-event');

@@ -98,7 +98,7 @@ public interface WikiAttachmentFilter
     String VALUE_REVISION_CONTENT_ALIAS_CURRENT = "";
 
     /**
-     * @param name the name of the attachment
+     * @param name the name part of the {@link org.xwiki.model.reference.AttachmentReference}
      * @param content the binary content of the attachment
      * @param size the size of the attachment
      * @param parameters the properties of the attachment
@@ -108,7 +108,7 @@ public interface WikiAttachmentFilter
         @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters) throws FilterException;
 
     /**
-     * @param name the name of the attachment
+     * @param name the name part of the {@link org.xwiki.model.reference.AttachmentReference}
      * @param content the binary content of the attachment
      * @param size the size of the attachment
      * @param parameters the properties of the attachment
@@ -121,7 +121,7 @@ public interface WikiAttachmentFilter
     }
 
     /**
-     * @param name the name of the attachment
+     * @param name the name part of the {@link org.xwiki.model.reference.AttachmentReference}
      * @param content the binary content of the attachment
      * @param size the size of the attachment
      * @param parameters the properties of the attachment

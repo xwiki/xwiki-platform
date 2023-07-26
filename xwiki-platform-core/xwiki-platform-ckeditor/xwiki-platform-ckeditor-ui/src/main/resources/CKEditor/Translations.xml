@@ -69,6 +69,9 @@ ckeditor.plugin.macro.buttonHint=XWiki Macro
 ckeditor.plugin.macro.editButtonHint=Edit Macro
 ckeditor.plugin.macro.refreshFailed=Failed to refresh the edited content.
 ckeditor.plugin.macro.dedicatedInsertButtonHint=Insert {0} macro
+ckeditor.plugin.macro.installPending=Installing {0} {1}...
+ckeditor.plugin.macro.installSuccessful=Successfully installed {0} {1}.
+ckeditor.plugin.macro.installFailed=Failed to install {0} {1}.
 
 ckeditor.plugin.office.importer.title=Import Office File
 ckeditor.plugin.office.importer.filePath=File Path
@@ -150,15 +153,28 @@ ckeditor.plugin.image.imageSelector.urlTab.url.title=Url
 ckeditor.plugin.image.imageSelector.urlTab.url.hint=The url of the image to display.
 ckeditor.plugin.image.imageSelector.urlTab.url.placeholder=https://...
 
-ckeditor.plugin.slash.group.structure=Structure
-ckeditor.plugin.slash.group.content=Content
-ckeditor.plugin.slash.group.macros=Macros
-ckeditor.plugin.slash.group.actions=Actions
-ckeditor.plugin.slash.group.table=Table
+ckeditor.plugin.image.slash.currentPageBadge=This page
+ckeditor.plugin.image.slash.externalBadge=External
+ckeditor.plugin.image.slash.loading=Loading...
+ckeditor.plugin.image.slash.upload=Upload Image
+ckeditor.plugin.image.slash.uploadProgress=Uploading {0}...
+ckeditor.plugin.image.slash.uploadSuccess=Successfully uploaded {0}
+ckeditor.plugin.image.slash.uploadError=Failed to upload {0}
+
+ckeditor.plugin.slash.group.Layout=Layout
+ckeditor.plugin.slash.group.Content=Content
+ckeditor.plugin.slash.group.Formatting=Formatting
+ckeditor.plugin.slash.group.Navigation=Navigation
+ckeditor.plugin.slash.group.Actions=Actions
+ckeditor.plugin.slash.group.Table=Table
+ckeditor.plugin.slash.group.Macro=Macro
 
 ckeditor.plugin.slash.action.h1.hint=Big section heading.
 ckeditor.plugin.slash.action.h2.hint=Medium section heading.
 ckeditor.plugin.slash.action.h3.hint=Small section heading.
+ckeditor.plugin.slash.action.h4.hint=Smaller section heading.
+ckeditor.plugin.slash.action.h5.hint=Tiny section heading.
+ckeditor.plugin.slash.action.h6.hint=Tiniest section heading.
 ckeditor.plugin.slash.action.p.name=Paragraph
 ckeditor.plugin.slash.action.p.hint=Create a paragraph of plain text.
 ckeditor.plugin.slash.action.ul.hint=Create a simple bulleted list.

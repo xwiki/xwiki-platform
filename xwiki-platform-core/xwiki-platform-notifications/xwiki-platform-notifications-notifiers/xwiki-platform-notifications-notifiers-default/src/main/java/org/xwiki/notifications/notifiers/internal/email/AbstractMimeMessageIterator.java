@@ -37,8 +37,11 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.eventstream.EntityEvent;
 import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.internal.DefaultEntityEvent;
@@ -53,11 +56,18 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.CompositeEvent;
+import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.notifiers.email.NotificationEmailGroupingStrategy;
 import org.xwiki.notifications.notifiers.email.NotificationEmailRenderer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Attachment;
+import org.xwiki.notifications.preferences.NotificationEmailInterval;
+import org.xwiki.notifications.preferences.email.NotificationEmailUserPreferenceManager;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.user.UserReferenceSerializer;
 
 /**
  * Abstract iterator for sending MIME notification messages (usually emails).
@@ -126,6 +136,20 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
+    @Inject
+    @Named("context")
+    private ComponentManager componentManager;
+
+    @Inject
+    private NotificationEmailGroupingStrategy fallbackNotificationEmailGroupingStrategy;
+
+    @Inject
+    private NotificationEmailUserPreferenceManager notificationEmailUserPreferenceManager;
+
+    @Inject
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> documentReferenceUserReferenceResolver;
+
     private final MailListener listener = new VoidMailListener()
     {
         @Override
@@ -153,6 +177,8 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
 
     private EntityReference templateReference;
 
+    private Iterator<List<CompositeEvent>> processingEvents = null;
+
     private List<CompositeEvent> currentEvents = Collections.emptyList();
 
     private DocumentReference currentUser;
@@ -163,6 +189,8 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
 
     private boolean hasNext;
 
+    private NotificationEmailInterval interval;
+
     /**
      * Initialize the iterator. A class extending {@link AbstractMimeMessageIterator} should implement a same initialize
      * method that calls this one at the end of its execution.
@@ -172,11 +200,12 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
      * @param templateReference reference to the mail template
      */
     protected void initialize(Iterator<DocumentReference> userIterator, Map<String, Object> factoryParameters,
-        EntityReference templateReference)
+        EntityReference templateReference, NotificationEmailInterval interval)
     {
         this.userIterator = userIterator;
         this.factoryParameters = factoryParameters;
         this.templateReference = templateReference;
+        this.interval = interval;
 
         computeNext();
     }
@@ -198,32 +227,69 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
     protected abstract List<CompositeEvent> retrieveCompositeEventList(DocumentReference user)
         throws NotificationException;
 
+    private NotificationEmailGroupingStrategy getEmailGroupingStrategy(DocumentReference userDocReference)
+    {
+        NotificationEmailGroupingStrategy strategy = this.fallbackNotificationEmailGroupingStrategy;
+        UserReference userReference = this.documentReferenceUserReferenceResolver.resolve(userDocReference);
+        String emailGroupingStrategyHint =
+                this.notificationEmailUserPreferenceManager.getEmailGroupingStrategy(userReference, this.interval);
+        if (this.componentManager.hasComponent(NotificationEmailGroupingStrategy.class, emailGroupingStrategyHint)) {
+            try {
+                strategy = this.componentManager
+                        .getInstance(NotificationEmailGroupingStrategy.class, emailGroupingStrategyHint);
+            } catch (ComponentLookupException e) {
+                this.logger.warn("Error while loading NotificationEmailGroupingStrategy with hint [{}] for user " +
+                                "[{}] and interval [{}]. " +
+                                "Fallback on default strategy. Root cause: [{}]",
+                        emailGroupingStrategyHint,
+                        userReference,
+                        this.interval,
+                        ExceptionUtils.getRootCauseMessage(e));
+                this.logger.debug("Root cause of the error was: ", e);
+            }
+        } else {
+            this.logger.warn("Cannot find a NotificationEmailGroupingStrategy with hint [{}] for user [{}] " +
+                    "and interval [{}]. " +
+                    "Fallback on default strategy.",
+                    emailGroupingStrategyHint,
+                    userReference,
+                    this.interval);
+        }
+        return strategy;
+    }
+
     /**
      * Compute the message that will be sent to the next user in the iterator.
      */
     protected void computeNext()
     {
-        this.currentEvents = Collections.emptyList();
-        this.currentUserEmail = null;
-        while ((this.currentEvents.isEmpty() || this.currentUserEmail == null) && this.userIterator.hasNext()) {
-            this.currentUser = this.userIterator.next();
-            try {
-                this.currentUserEmail = new InternetAddress(getUserEmail(this.currentUser));
-            } catch (AddressException e) {
-                // The user has not written a valid email
-                continue;
-            }
+        if (this.processingEvents == null || !this.processingEvents.hasNext()) {
+            this.currentEvents = Collections.emptyList();
+            this.currentUserEmail = null;
+            while ((this.currentEvents.isEmpty() || this.currentUserEmail == null) && this.userIterator.hasNext()) {
+                this.currentUser = this.userIterator.next();
+                try {
+                    this.currentUserEmail = new InternetAddress(getUserEmail(this.currentUser));
+                } catch (AddressException e) {
+                    // The user has not written a valid email
+                    continue;
+                }
 
-            try {
-                // TODO: in a next version, it will be important to paginate these results and to send several emails
-                // if there is too much content
-                this.currentEvents = retrieveCompositeEventList(this.currentUser);
-            } catch (NotificationException e) {
-                logger.error(ERROR_MESSAGE, this.currentUser, e);
+                try {
+                    List<CompositeEvent> compositeEvents = retrieveCompositeEventList(this.currentUser);
+                    if (!compositeEvents.isEmpty()) {
+                        this.processingEvents = getEmailGroupingStrategy(this.currentUser)
+                                .groupEventsPerMail(compositeEvents).iterator();
+                        this.currentEvents = this.processingEvents.next();
+                    }
+                } catch (NotificationException e) {
+                    logger.error(ERROR_MESSAGE, this.currentUser, e);
+                }
             }
+            this.currentUsedId = this.serializer.serialize(this.currentUser);
+        } else {
+            this.currentEvents = this.processingEvents.next();
         }
-        this.currentUsedId = this.serializer.serialize(this.currentUser);
-
         this.hasNext = this.currentUserEmail != null && !this.currentEvents.isEmpty();
     }
 

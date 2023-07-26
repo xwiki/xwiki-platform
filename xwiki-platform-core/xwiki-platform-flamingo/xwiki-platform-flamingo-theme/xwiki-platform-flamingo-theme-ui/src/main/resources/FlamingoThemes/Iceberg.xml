@@ -973,6 +973,8 @@
 @gray-light: #727272;
 /* Gray-light is too light on a light backgrounds. @gray for muted text is easier to read. */
 @text-muted: @gray;
+/* Input-color-placeholder is hardcoded in bootstrap, we need to override it. */
+@input-color-placeholder: @gray-light;
 
 /* Drawer */
 @xwiki-drawer-menu-item-hover-bg: @list-group-hover-bg;

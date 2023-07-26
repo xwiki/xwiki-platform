@@ -227,6 +227,7 @@ public class NotificationsTrayPage extends ViewPage
      */
     public void showNotificationTray()
     {
+        getDriver().scrollTo(this.watchListButton);
         if (!isMenuOpen()) {
             this.watchListButton.click();
             getDriver().waitUntilCondition(webDriver -> isMenuOpen());
@@ -510,5 +511,14 @@ public class NotificationsTrayPage extends ViewPage
     public WebElement getNotificationsButton()
     {
         return this.notificationsButton;
+    }
+
+    /**
+     * @return a new instance of {@link GroupedNotificationElementPage}.
+     * @since 15.5
+     */
+    public GroupedNotificationElementPage getGroupedNotificationsPage()
+    {
+        return new GroupedNotificationElementPage(this.getNotificationsButton());
     }
 }

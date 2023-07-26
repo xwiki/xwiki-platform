@@ -59,8 +59,11 @@ public class CachedModelBridgeInvalidatorListener extends AbstractEventListener
      */
     public CachedModelBridgeInvalidatorListener()
     {
-        super(NAME, new NotificationPreferenceAddedEvent(), new NotificationPreferenceUpdatedEvent(),
-            new NotificationPreferenceDeletedEvent());
+        super(NAME,
+            new NotificationPreferenceAddedEvent(),
+            new NotificationPreferenceUpdatedEvent(),
+            new NotificationPreferenceDeletedEvent()
+        );
     }
 
     @Override

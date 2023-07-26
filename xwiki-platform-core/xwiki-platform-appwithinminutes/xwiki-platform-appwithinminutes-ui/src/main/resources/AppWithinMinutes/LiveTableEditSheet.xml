@@ -42,7 +42,7 @@
 
 {{velocity output="false"}}
 #macro (listAvailableColumns $classReference)
-  &lt;select id="availableColumns"&gt;
+  &lt;select id="availableColumns" aria-describedby='availableColumnsDescription'&gt;
     #set ($classFields = $xwiki.getDocument($classReference).getxWikiClass().properties)
     #if ($classFields.size() &gt; 0)
       &lt;optgroup label="$escapetool.xml($services.localization.render(
@@ -150,8 +150,8 @@
     &lt;/dt&gt;
     &lt;dd&gt;#displayPropertyValue('description')&lt;/dd&gt;
     &lt;dt&gt;
-      &lt;label for="AppWithinMinutes.LiveTableClass_0_columns"&gt;$doc.displayPrettyName('columns', false, false)&lt;/label&gt;
-      &lt;span class="xHint"&gt;$services.localization.render('platform.appwithinminutes.liveTableEditorColumnsHint')&lt;/span&gt;
+      &lt;label for="availableColumns"&gt;$doc.displayPrettyName('columns', false, false)&lt;/label&gt;
+      &lt;span id='availableColumnsDescription' class="xHint"&gt;$services.localization.render('platform.appwithinminutes.liveTableEditorColumnsHint')&lt;/span&gt;
     &lt;/dt&gt;
     &lt;dd&gt;#displayPropertyValue('columns')&lt;/dd&gt;
   &lt;/dl&gt;

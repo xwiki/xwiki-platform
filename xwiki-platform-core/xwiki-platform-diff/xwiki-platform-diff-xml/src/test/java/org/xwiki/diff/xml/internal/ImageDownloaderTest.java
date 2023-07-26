@@ -29,13 +29,12 @@ import javax.inject.Provider;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpStatus;
-import org.apache.hc.core5.http.ProtocolVersion;
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -69,8 +68,6 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class ImageDownloaderTest
 {
-    private static final ProtocolVersion HTTP_VERSION = new ProtocolVersion("HTTP", 1, 1);
-
     private static final URI IMAGE_URI = URI.create("https://www.example.com/image.png");
 
     private static final String IMAGE_CONTENT_TYPE = "image/png";
@@ -97,7 +94,7 @@ class ImageDownloaderTest
     private CloseableHttpClient httpClient;
 
     @Mock
-    private CloseableHttpResponse httpResponse;
+    private ClassicHttpResponse httpResponse;
 
     @Mock
     private XWikiContext xwikiContext;

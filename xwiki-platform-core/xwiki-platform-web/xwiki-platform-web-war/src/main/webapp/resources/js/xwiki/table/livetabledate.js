@@ -82,7 +82,8 @@
             } else {
               input.val(picker.startDate.format(dateFormat) + ' - ' + picker.endDate.format(dateFormat));
             }
-            hidden.val(picker.startDate.format('x') + '-' + picker.endDate.format('x'));
+            // Make sure that the end time is the end of the minute.
+            hidden.val(picker.startDate.format('x') + '-' + picker.endDate.seconds(59).milliseconds(999).format('x'));
           }
           $(document).trigger("xwiki:livetable:" + $(livetable).attr('id') + ":filtersChanged");
         }

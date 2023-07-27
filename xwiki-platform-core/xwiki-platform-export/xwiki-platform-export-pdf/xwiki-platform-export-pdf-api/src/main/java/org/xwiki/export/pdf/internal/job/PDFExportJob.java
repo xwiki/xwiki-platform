@@ -140,8 +140,16 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
                     this.progressManager.startStep(this);
                     if (hasAccess(Right.VIEW, documentReference)) {
                         contentSize += render(documentReference);
-                        if (contentSize > maxContentSize && maxContentSize > 0) {
-                            throw new RuntimeException("Maximum content size limit exceeded.");
+                        // We enforce the maximum content size (if specified) only when multiple pages are exported
+                        // because for computing the aggregated table of contents we're currently keeping in memory the
+                        // XDOM of each of the included pages which for large exports can take a considerable amount of
+                        // memory. See https://jira.xwiki.org/browse/XWIKI-20377 .
+                        if (contentSize > maxContentSize && maxContentSize > 0 && documentReferences.size() > 1) {
+                            throw new RuntimeException(String.format(
+                                "The content size exceeds the configured %sKB limit."
+                                    + " Wiki administrators can increase or disable this limit from the PDF Export "
+                                    + "administration section or from XWiki properties.",
+                                this.configuration.getMaxContentSize()));
                         }
                     }
                     Thread.yield();

@@ -19,7 +19,10 @@
  */
 package org.xwiki.security.authentication;
 
+import java.util.List;
+
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Configuration of the authentication properties.
@@ -53,5 +56,17 @@ public interface AuthenticationConfiguration
     default boolean isAuthenticationSecurityEnabled()
     {
         return true;
+    }
+
+    /**
+     * @return the list of cookie domains to use for the authentication cookies. Domains are prefix with a dot.
+     * @since 14.10.15
+     * @since 15.5.1
+     * @since 15.6
+     */
+    @Unstable
+    default List<String> getCookieDomains()
+    {
+        return List.of();
     }
 }

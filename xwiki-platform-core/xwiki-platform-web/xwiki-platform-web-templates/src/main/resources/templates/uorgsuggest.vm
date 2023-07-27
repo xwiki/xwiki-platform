@@ -69,9 +69,15 @@
 ##
 #macro (addResultData $result $results $wikiReference)
   #set ($reference = $services.model.resolveDocument($result, $wikiReference))
+  #set ($hint = $NULL)
   #if ($request.uorg == 'user')
     #set ($label = $xwiki.getPlainUserName($reference))
     #set ($defaultIcon = $services.icon.getMetaData('user'))
+    #set ($userQualifierProperty = $services.user.configuration.userQualifierProperty)
+    #if ("$!userQualifierProperty" != '')
+      #set ($userProperties = $services.user.getProperties("$reference"))
+      #set ($hint = $userProperties.getProperty($userQualifierProperty))
+    #end
   #else
     #set ($label = $xwiki.getDocument($reference).plainTitle)
     #set ($defaultIcon = $services.icon.getMetaData('group'))
@@ -94,7 +100,8 @@
     'value': $value,
     'label': $label,
     'icon': $icon,
-    'url': $xwiki.getURL($reference)
+    'url': $xwiki.getURL($reference),
+    'hint': $hint
   }))
 #end
 ##

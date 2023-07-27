@@ -135,7 +135,10 @@
   <div class="panel $!panelClass">
     <div class="panel-heading">
       $heading
-      <div class="pull-right"><a class="panel-collapse-carret" role="button" data-toggle="collapse" href="#$panelId" aria-expanded="false" aria-controls="$panelId"><span class="caret"></span></a></div>
+      <div class="pull-right"><a class="panel-collapse-carret" role="button" data-toggle="collapse" href="#$panelId" aria-expanded="false" aria-controls="$panelId">
+        <span class="caret"></span>
+        <span class='sr-only'>$escapetool.xml($services.localization.render('core.delete.affectChildren.dropDown.label'))</span>
+      </a></div>
     </div>
     <div class="panel-body collapse" id="$panelId">
       $body
@@ -161,7 +164,7 @@
         #set ($forceAffectChildren = " checked='checked'")
       #end
       #define($heading)
-        <input name="affectChildren" id="affectChildren" type="checkbox" $!{forceAffectChildren}/><label for="affectChildren">$services.localization.render('core.delete.affectChildren')</label> ($childCount)
+        <input name="affectChildren" id="affectChildren" type="checkbox" $!{forceAffectChildren}/><label for="affectChildren">$escapetool.xml($services.localization.render('core.delete.affectChildren')) ($childCount)</label>
       #end
       #define($body)
         ##

@@ -39,6 +39,13 @@ public class AdministrationSectionPage extends ViewPage
     private WebElement saveButton;
 
     /**
+     * There's no id to get only the admin page content so getting the main content area (which includes the
+     * breadcrumb and title) is the best we can do, until we add some id for the content of admin pages.
+     */
+    @FindBy(id = "mainContentArea")
+    private WebElement content;
+
+    /**
      * The admin-page-content div is being treated as a form since it may contain multiple forms and we want to be able
      * to access elements in them all.
      */
@@ -180,5 +187,11 @@ public class AdministrationSectionPage extends ViewPage
                     + "&& XWiki.actionButtons.EditActions != undefined "
                     + "&& XWiki.actionButtons.AjaxSaveAndContinue != undefined");
         }
+    }
+
+    @Override
+    public String getContent()
+    {
+        return this.content.getText();
     }
 }

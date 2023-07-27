@@ -110,7 +110,10 @@
   <div class="panel $!panelClass">
     <div class="panel-heading">
       $heading
-      <div class="pull-right"><a class="panel-collapse-carret" role="button" data-toggle="collapse" href="#$panelId" aria-expanded="false" aria-controls="$panelId"><span class="caret"></span></a></div>
+      <div class="pull-right"><a class="panel-collapse-carret" role="button" data-toggle="collapse" href="#$panelId" aria-expanded="false" aria-controls="$panelId">
+        <span class="caret"></span>
+        <span class='sr-only'>$escapetool.xml($services.localization.render('core.delete.affectChildren.dropDown.label'))</span>
+      </a></div>
     </div>
     <div class="panel-body collapse" id="$panelId">
       $body
@@ -126,7 +129,7 @@
   ## Only propose to restore the batch if it also contains other documents than the current one.
   #if ($batchDeletedDocuments.size() > 1)
     #define($heading)
-      <input name="includeBatch" id="includeBatch" type="checkbox" value="true"/><label for="includeBatch">$services.localization.render('core.restore.includeBatch')</label> ($batchDeletedDocuments.size())
+      <input name="includeBatch" id="includeBatch" type="checkbox" value="true"/><label for="includeBatch">$escapetool.xml($services.localization.render('core.restore.includeBatch')) ($batchDeletedDocuments.size())</label>
     #end
     #define($body)
       ##

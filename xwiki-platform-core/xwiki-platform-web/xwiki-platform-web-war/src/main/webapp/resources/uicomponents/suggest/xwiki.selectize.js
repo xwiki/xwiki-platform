@@ -119,7 +119,7 @@ define('xwiki-selectize', [
     // the user) than to miss some suggestions because they were wrongly removed. We could try to patch Selectize to fix
     // the way it handles custom user suggestions but it's safer to simply enable persistence.
     persist: true,
-    preload: 'focus',
+    preload: true,
     render: {
       item: renderItem,
       option: renderOption,

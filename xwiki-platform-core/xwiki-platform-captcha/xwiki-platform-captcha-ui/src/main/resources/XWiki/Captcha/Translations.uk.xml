@@ -43,4 +43,4 @@ captcha.admin.configure.title=Налаштувати {0}
 captcha.admin.sample.title=Зразок CAPTCHA
 captcha.admin.sample.description=Приклад, як виглядає налаштована CAPTCHA, коли вона буде відображатися у формі.
 </content>
-  </xwikidoc>
+</xwikidoc>

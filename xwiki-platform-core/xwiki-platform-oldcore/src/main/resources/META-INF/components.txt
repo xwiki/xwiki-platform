@@ -259,7 +259,6 @@ com.xpn.xwiki.web.RollbackAction
 com.xpn.xwiki.web.SaveAction
 com.xpn.xwiki.web.SaveAndContinueAction
 com.xpn.xwiki.web.SkinAction
-com.xpn.xwiki.web.SVGAction
 com.xpn.xwiki.web.UndeleteAction
 com.xpn.xwiki.web.UnknownAction
 com.xpn.xwiki.web.UploadAction

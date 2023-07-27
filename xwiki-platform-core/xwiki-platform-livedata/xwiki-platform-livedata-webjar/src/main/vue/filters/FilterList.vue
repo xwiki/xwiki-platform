@@ -24,7 +24,9 @@
 <template>
   <!-- A simple text input that will be enhanced by the selectize widget. -->
   <span v-if="isReady" v-show="isVisible">
-    <input :value="value" class="filter-list livedata-filter" ref="input"/>
+    <input :value="value" class="filter-list livedata-filter" ref="input"
+      :aria-label="this.$t('livedata.filter.list.label')"
+    />
   </span>
   <XWikiLoader v-else/>
 </template>

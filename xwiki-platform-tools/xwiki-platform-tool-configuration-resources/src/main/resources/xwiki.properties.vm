@@ -658,6 +658,35 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 # extension.ignoredDependencies=xerces:xmlParserAPIs
 
 #-------------------------------------------------------------------------------------
+# Extension Manager - Security
+#-------------------------------------------------------------------------------------
+
+#-# [Since 15.5RC1]
+#-# When true, the security scan is enabled. This is the default; set to false to disable the scan.
+#-#
+# extension.security.scan.enabled = true
+
+#-# [Since 15.5RC1]
+#-# Specifies the delay before starting a new security scan after the last one has finished.
+#-# The default value is 24 hours.
+#-#
+# extension.security.scan.delay = 24
+
+#-# [Since 15.5RC1]
+#-# Specifies the url to use as the endpoint for the security scan rest queries.
+#-# The url must conform to the API documented here: https://google.github.io/osv.dev/post-v1-query/
+#-# The default value is https://api.osv.dev/v1/query.
+#-#
+# extension.security.scan.url = https://api.osv.dev/v1/query
+
+#-# [Since 15.6RC1]
+#-# Specifies the url to use as the endpoint for the security scan false-positive fetching rest queries.
+#-# The url must conform to the API documented here: http://e.x.o.doc...
+#-# The default value is https://extensions.xwiki.org/xwiki/bin/view/Extension/Extension/Security/Code/Reviews
+#-#
+# extension.security.reviews.url = https://extensions.xwiki.org/xwiki/bin/view/Extension/Extension/Security/Code/Reviews
+
+#-------------------------------------------------------------------------------------
 # Distribution Wizard
 #-------------------------------------------------------------------------------------
 
@@ -1117,12 +1146,6 @@ store.file.directory=$xwikiPropertiesStoreFileDirectory
 # mail item in the send queue has been sent.
 # mail.sender.sendQueueCapacity = 1000
 
-#-# [Since 12.9RC1]
-#-# Decides if XWiki should resend automatically mails that were prepared but not sent, at restart.
-#-# Note that emails that were in the prepare_error state are not resent since they failed to be saved and thus cannot
-#-# be resent.
-# mail.sender.database.resendAutomaticallyAtStartup = true
-
 #-------------------------------------------------------------------------------------
 # Debug
 #-------------------------------------------------------------------------------------
@@ -1259,14 +1282,6 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The default is :
 # notifications.rest.cache = true
 
-#-# [Since 12.6]
-#-# When this option is enabled the relation between users and events is evaluated and stored when the events are
-#-# generated instead of each time they are displayed.
-#-# /!\ The capability to disable the prefiltering is now deprecated and will be removed probably in 15.x XWiki cycle.
-#-#
-#-# The default is :
-# notifications.eventPrefilteringEnabled = true
-
 #-# [Since 12.5RC1]
 #-# The async notifications renderer is using a dedicated thread pool to limit the impact on the rest of the XWiki
 #-# instance.
@@ -1274,6 +1289,14 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-#
 #-# The default is :
 # notifications.async.poolSize = 2
+
+#-# [Since 15.5RC1]
+#-# The hint of the strategy component to use for email grouping notifications. Default strategy is to group all
+#-# notifications in a single email, but other strategies can be provided, e.g. to send as many emails as there was
+#-# type of notifications. Check online documentation related to notification to see the list of available strategies.
+#-#
+#-# The default is :
+# notifications.emailGroupingStrategyHint = "default"
 
 #-------------------------------------------------------------------------------------
 # Mentions
@@ -1375,18 +1398,18 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# user.preferences.guest.displayHiddenDocuments = 1
 #-# user.preferences.guest.editor = Text
 
+#-# [Since 14.10.12]
+#-# [Since 15.5RC1]
+#-# When displaying an user in a compact mode we usually rely only on the user avatar and their full name. If this is
+#-# not enough to properly identify the user then this configuration can be used to display additional information.
+#-#
+#-# The name of the user property to be used as qualifier (hint) when displaying the user in a compact mode. This
+#-# configuration is not set by default, which means no additional information is displayed:
+# user.display.qualifierProperty =
+
 #-------------------------------------------------------------------------------------
 # Refactoring
 #-------------------------------------------------------------------------------------
-
-#-# [Since 12.5RC1]
-#-# Indicate to use the old implementation based on copy and delete, or the new implementation using an atomic operation
-#-# on database (which is a lot more performant).
-#-# This property aims at being removed in the future once the atomic rename has been validated to work 100% fine.
-#-# Only use it if you are facing an issue with the move/rename features.
-#-#
-#-# The default value is:
-# refactoring.rename.useAtomicRename = true
 
 #-# [Since 12.9RC1]
 #-# Indicates whether skipping the recycle bin when deleting pages is allowed for Advanced users.
@@ -1532,5 +1555,28 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 # whatsnew.source.xwikiorg.rssURL = https://extensions.xwiki.org/news
 # whatsnew.sources = xwikisas = xwikiblog
 # whatsnew.sources.xwikisas.rssURL = https://xwiki.com/news
+
+#-------------------------------------------------------------------------------------
+# XML Diff
+#-------------------------------------------------------------------------------------
+
+#-# [Since 14.10.15, 15.5.1, 15.6]
+#-# If the compared documents contain images, they can be embedded as data URI to compare the images themselves
+#-# instead of their URLs. For this, images are downloaded via HTTP and embedded as data URI. Images are only
+#-# downloaded from trusted domains when enabled above. Still, this can be a security and stability risk as
+#-# downloading images can easily increase the server load. If this option is set to "false", no images are
+#-# downloaded by the diff and images are compared by URL instead.
+#-# Default is "true".
+# diff.xml.dataURI.enabled = true
+
+#-# [Since 14.10.15, 15.5.1, 15.6]
+#-# Configure the maximum size in bytes of an image to be embedded into the XML diff output as data URI.
+#-# Default is 1MB.
+# diff.xml.dataURI.maximumContentSize = 1048576
+
+#-# [Since 14.10.15, 15.5.1, 15.6]
+#-# Configure the timeout in seconds for downloading an image via HTTP to embed it into the XML diff output as data URI.
+#-# Default is 10 seconds.
+# diff.xml.dataURI.httpTimeout = 10
 
 $!xwikiPropertiesAdditionalProperties

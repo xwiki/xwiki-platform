@@ -21,6 +21,7 @@ package org.xwiki.notifications.notifiers.internal.email.live;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Named;
@@ -29,11 +30,11 @@ import javax.inject.Provider;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
+import org.xwiki.eventstream.Event;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.SessionFactory;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -84,10 +85,10 @@ public class PrefilteringLiveNotificationEmailSenderTest
 
         when(this.mailListenerProvider.get()).thenReturn(Mockito.mock(MailListener.class));
 
-        CompositeEvent event1 = mock(CompositeEvent.class);
+        Event event1 = mock(Event.class);
         DocumentReference userReference = new DocumentReference("wiki", "XWiki", "user");
-        Map<DocumentReference, CompositeEvent> events = new HashMap<>();
-        events.put(userReference, event1);
+        Map<DocumentReference, List<Event>> events = new HashMap<>();
+        events.put(userReference, List.of(event1));
 
         this.sender.sendMails(events);
 

@@ -30,8 +30,11 @@
     constructor(config) {
       this.config = Object.assign({
         // Default values for quick action / group fields.
-        defaultAction: {group: '', id: '', name: '', description: '', iconClass: '', iconURL: '', shortcut: ''},
-        defaultGroup: {id: '', name: '', order: Infinity}
+        defaultAction: {group: '', id: '', name: '', description: '',
+          iconClass: '', iconURL: '', shortcut: '',
+        },
+        defaultGroup: {id: '', name: '', order: Infinity},
+        maxBadges: 3,
       }, config);
 
       // Configuration for the quick actions search.
@@ -51,6 +54,16 @@
           {name: 'group.nameTokens', weight: 1}
         ]
       }, this.config.search);
+
+      //Default value for badges
+      this.config.defaultAction = Object.assign(
+        Array(this.config.maxBadges)
+        .fill()
+        .map(function (_, i) {return i;})
+        .reduce(function (acc, element)
+            {return ({...acc, ['badge' + (element+1)]: ''});}, {}
+                ),
+        this.config.defaultAction);
 
       // Start with an empty list of quick actions and no groups;
       this.actions = [];
@@ -108,6 +121,19 @@
     }
 
     /**
+      * Get an action definition based on its id
+      * @param {String} The action id
+      * @return {Object} The action if it exists
+      */
+    getAction(id) {
+      for (var action of this.actions) {
+        if (action.id === id) {
+          return action;
+        }
+      }
+    }
+
+    /**
      * Defines one or more quick action groups.
      *
      * @param {Object | Array} the groups to add
@@ -132,6 +158,17 @@
       group.nameTokens = (group.name || '').split(/\s+/);
       this.groups[group.id] = group;
       return group;
+    }
+
+
+    /**
+     * Get a group definition based on its id
+     *
+     * @param {String} The group id
+     * @return {Object} The group
+     */
+    getGroup(id) {
+      return this.groups[id];
     }
 
     /**
@@ -207,8 +244,15 @@
   //----------------------------------
   var AutoComplete = CKEDITOR.plugins.autocomplete;
 
-  var View = AutoComplete.view;
-  var AdvancedView = function(editor) {
+  // Include the query in the view so that we can properly wait for the auto-complete drop-down in integration tests.
+  const originalAutoCompleteOpen = AutoComplete.prototype.open;
+  AutoComplete.prototype.open = function() {
+    originalAutoCompleteOpen.apply(this, arguments);
+    this.view.element.setAttribute('data-query', this.model.query);
+  };
+
+  var View = AutoComplete.view,
+  AdvancedView = function(editor) {
     // Call the parent class constructor.
     View.call(this, editor);
   };
@@ -300,8 +344,11 @@
           // Get the text before the caret.
           var left = text.slice(0, offset),
               // Will look for the marker followed by text.
-              match = left.match(new RegExp(escapeRegExp(config.marker) + '.{0,30}$'));
-          if (match) {
+              match = left.match(new RegExp(escapeRegExp(config.marker) + '.{0,30}$')),
+              // Do not show the Quick Actions dropdown when the query contains '::'
+              // Because another dropdown might appear
+              subMatch = left.match(new RegExp(escapeRegExp(config.marker) + '.{0,30}::\\S{0,30}$'));
+          if (match && !subMatch) {
             return {
               start: match.index,
               end: offset
@@ -387,34 +434,42 @@
     init: function(editor) {
       editor.quickActions.addGroups([
         {
-          id: 'structure',
-          name: editor.localization.get('xwiki-slash.group.structure'),
+          id: 'Layout',
+          name: editor.localization.get('xwiki-slash.group.Layout'),
           order: 100
         }, {
-          id: 'content',
-          name: editor.localization.get('xwiki-slash.group.content'),
+          id: 'Content',
+          name: editor.localization.get('xwiki-slash.group.Content'),
           order: 200
         }, {
-          id: 'macros',
-          name: editor.localization.get('xwiki-slash.group.macros'),
-          order: 400
+          id: 'Formatting',
+          name: editor.localization.get('xwiki-slash.group.Formatting'),
+          order: 300
         }, {
-          id: 'actions',
-          name: editor.localization.get('xwiki-slash.group.actions'),
+          id: 'Navigation',
+          name: editor.localization.get('xwiki-slash.group.Navigation'),
+          order: 500
+        }, {
+          id: 'Actions',
+          name: editor.localization.get('xwiki-slash.group.Actions'),
           order: 600
         }, {
-          id: 'table',
-          name: editor.localization.get('xwiki-slash.group.table'),
+          id: 'Table',
+          name: editor.localization.get('xwiki-slash.group.Table'),
           order: 700
+        }, {
+          id: 'Macro',
+          name: editor.localization.get('xwiki-slash.group.Macro'),
+          order: 800
         }
       ]);
 
       editor.quickActions.addActions([
         //
-        // Structure
+        // Layout
         //
         {
-          group: 'structure',
+          group: 'Layout',
           id: 'h1',
           name: editor.lang.format.tag_h1, // jshint ignore:line
           iconClass: 'fa fa-header',
@@ -426,7 +481,7 @@
             }
           }
         }, {
-          group: 'structure',
+          group: 'Layout',
           id: 'h2',
           name: editor.lang.format.tag_h2, // jshint ignore:line
           iconClass: 'fa fa-header',
@@ -438,7 +493,7 @@
             }
           }
         }, {
-          group: 'structure',
+          group: 'Layout',
           id: 'h3',
           name: editor.lang.format.tag_h3, // jshint ignore:line
           iconClass: 'fa fa-header',
@@ -450,7 +505,43 @@
             }
           }
         }, {
-          group: 'structure',
+          group: 'Layout',
+          id: 'h4',
+          name: editor.lang.format.tag_h4, // jshint ignore:line
+          iconClass: 'fa fa-header',
+          description: editor.localization.get('xwiki-slash.action.h4.hint'),
+          command: {
+            name: 'xwiki-applyStyle',
+            data: {
+              element: 'h4'
+            }
+          }
+        }, {
+          group: 'Layout',
+          id: 'h5',
+          name: editor.lang.format.tag_h5, // jshint ignore:line
+          iconClass: 'fa fa-header',
+          description: editor.localization.get('xwiki-slash.action.h5.hint'),
+          command: {
+            name: 'xwiki-applyStyle',
+            data: {
+              element: 'h5'
+            }
+          }
+        }, {
+          group: 'Layout',
+          id: 'h6',
+          name: editor.lang.format.tag_h6, // jshint ignore:line
+          iconClass: 'fa fa-header',
+          description: editor.localization.get('xwiki-slash.action.h6.hint'),
+          command: {
+            name: 'xwiki-applyStyle',
+            data: {
+              element: 'h6'
+            }
+          }
+        }, {
+          group: 'Layout',
           id: 'p',
           name: editor.localization.get('xwiki-slash.action.p.name'),
           iconClass: 'fa fa-paragraph',
@@ -462,36 +553,36 @@
             }
           }
         }, {
-          group: 'structure',
+          group: 'Layout',
           id: 'ul',
           name: editor.localization.get('xwiki-toolbar.bulletedlist'),
           iconClass: 'fa fa-list-ul',
           description: editor.localization.get('xwiki-slash.action.ul.hint'),
           command: 'bulletedlist'
         }, {
-          group: 'structure',
+          group: 'Layout',
           id: 'ol',
           name: editor.localization.get('xwiki-toolbar.numberedlist'),
           iconClass: 'fa fa-list-ol',
           description: editor.localization.get('xwiki-slash.action.ol.hint'),
           command: 'numberedlist'
         }, {
-          group: 'structure',
+          group: 'Layout',
           id: 'table',
           name: editor.lang.table.toolbar,
           iconClass: 'fa fa-table',
           description: editor.localization.get('xwiki-slash.action.table.hint'),
           command: 'table'
         }, {
-          group: 'structure',
+          group: 'Layout',
           id: 'blockquote',
           name: editor.localization.get('xwiki-slash.action.blockquote.name'),
           iconClass: 'fa fa-quote-left',
           description: editor.localization.get('xwiki-slash.action.blockquote.hint'),
           command: 'blockquote'
         }, {
-          group: 'structure',
-          id: 'info',
+          group: 'Layout',
+          id: 'macro-info',
           name: editor.localization.get('xwiki-toolbar.infoBox'),
           iconClass: 'fa fa-info-circle',
           description: editor.localization.get('xwiki-slash.action.info.hint'),
@@ -503,8 +594,8 @@
             }
           }
         }, {
-          group: 'structure',
-          id: 'success',
+          group: 'Layout',
+          id: 'macro-success',
           name: editor.localization.get('xwiki-toolbar.successBox'),
           iconClass: 'fa fa-check-circle',
           description: editor.localization.get('xwiki-slash.action.success.hint'),
@@ -516,8 +607,8 @@
             }
           }
         }, {
-          group: 'structure',
-          id: 'warning',
+          group: 'Layout',
+          id: 'macro-warning',
           name: editor.localization.get('xwiki-toolbar.warningBox'),
           iconClass: 'fa fa-exclamation-triangle',
           description: editor.localization.get('xwiki-slash.action.warning.hint'),
@@ -529,8 +620,8 @@
             }
           }
         }, {
-          group: 'structure',
-          id: 'error',
+          group: 'Layout',
+          id: 'macro-error',
           name: editor.localization.get('xwiki-toolbar.errorBox'),
           iconClass: 'fa fa-exclamation-circle',
           description: editor.localization.get('xwiki-slash.action.error.hint'),
@@ -542,7 +633,7 @@
             }
           }
         }, {
-          group: 'structure',
+          group: 'Layout',
           id: 'hr',
           name: editor.localization.get('xwiki-toolbar.horizontalrule'),
           iconClass: 'fa fa-minus',
@@ -554,7 +645,7 @@
         // Content
         //
         {
-          group: 'content',
+          group: 'Content',
           id: 'a',
           name: editor.lang.link.toolbar,
           iconClass: 'fa fa-link',
@@ -562,14 +653,14 @@
           description: editor.localization.get('xwiki-slash.action.a.hint'),
           outputHTML: '['
         }, {
-          group: 'content',
+          group: 'Content',
           id: 'img',
           name: editor.lang.common.image,
           iconClass: 'fa fa-image',
           description: editor.localization.get('xwiki-slash.action.img.hint'),
-          command: 'image'
+          outputHTML: '/img::'
         }, {
-          group: 'content',
+          group: 'Content',
           id: 'mention',
           name: editor.localization.get('xwiki-slash.action.mention.name'),
           iconClass: 'fa fa-user-o',
@@ -577,21 +668,33 @@
           description: editor.localization.get('xwiki-slash.action.mention.hint'),
           outputHTML: '@'
         }, {
-          group: 'content',
+          group: 'Content',
           id: 'emoji',
           name: editor.localization.get('xwiki-slash.action.emoji.name'),
           iconClass: 'fa fa-smile-o',
           shortcut: ':',
           description: editor.localization.get('xwiki-slash.action.emoji.hint'),
           outputHTML: ':sm'
+        }, {
+          group: 'Content',
+          id: 'macro-include',
+          name: editor.localization.get('xwiki-toolbar.include'),
+          iconClass: 'fa fa-file-text-o',
+          description: editor.localization.get('xwiki-slash.action.include.hint'),
+          command: {
+            name: 'xwiki-macro',
+            data: {
+              name: 'include'
+            }
+          }
         },
 
         //
-        // Macros
+        // Formatting
         //
         {
-          group: 'macros',
-          id: 'code',
+          group: 'Formatting',
+          id: 'macro-code',
           name: editor.localization.get('xwiki-toolbar.code'),
           iconClass: 'fa fa-code',
           description: editor.localization.get('xwiki-slash.action.code.hint'),
@@ -604,9 +707,14 @@
               },
             }
           }
-        }, {
-          group: 'macros',
-          id: 'toc',
+        },
+
+        //
+        // Navigation
+        //
+        {
+          group: 'Navigation',
+          id: 'macro-toc',
           name: editor.localization.get('xwiki-toolbar.toc'),
           iconClass: 'fa fa-list',
           description: editor.localization.get('xwiki-slash.action.toc.hint'),
@@ -616,32 +724,13 @@
               name: 'toc'
             }
           }
-        }, {
-          group: 'macros',
-          id: 'include',
-          name: editor.localization.get('xwiki-toolbar.include'),
-          iconClass: 'fa fa-file-text-o',
-          description: editor.localization.get('xwiki-slash.action.include.hint'),
-          command: {
-            name: 'xwiki-macro',
-            data: {
-              name: 'include'
-            }
-          }
-        }, {
-          group: 'macros',
-          id: 'macros',
-          name: editor.localization.get('xwiki-slash.action.macros.name'),
-          iconClass: 'fa fa-th-list',
-          description: editor.localization.get('xwiki-slash.action.macros.hint'),
-          command: 'xwiki-macro'
         },
 
         //
         // Actions
         //
         {
-          group: 'actions',
+          group: 'Actions',
           id: 'find',
           name: editor.lang.find.title,
           iconClass: 'fa fa-search',
@@ -655,21 +744,21 @@
 
         // Rows
         {
-          group: 'table',
+          group: 'Table',
           id: 'table_row_before',
           name: editor.lang.table.row.insertBefore,
           iconClass: 'fa fa-plus',
           description: editor.localization.get('xwiki-slash.action.table_row_before.hint'),
           command: 'rowInsertBefore'
         }, {
-          group: 'table',
+          group: 'Table',
           id: 'table_row_after',
           name: editor.lang.table.row.insertAfter,
           iconClass: 'fa fa-plus',
           description: editor.localization.get('xwiki-slash.action.table_row_after.hint'),
           command: 'rowInsertAfter'
         }, {
-          group: 'table',
+          group: 'Table',
           id: 'table_row_delete',
           name: editor.localization.get('xwiki-slash.action.table_row_delete.name'),
           iconClass: 'fa fa-trash',
@@ -679,21 +768,21 @@
 
         // Columns
         {
-          group: 'table',
+          group: 'Table',
           id: 'table_col_before',
           name: editor.lang.table.column.insertBefore,
           iconClass: 'fa fa-plus',
           description: editor.localization.get('xwiki-slash.action.table_col_before.hint'),
           command: 'columnInsertBefore'
         }, {
-          group: 'table',
+          group: 'Table',
           id: 'table_col_after',
           name: editor.lang.table.column.insertAfter,
           iconClass: 'fa fa-plus',
           description: editor.localization.get('xwiki-slash.action.table_col_after.hint'),
           command: 'columnInsertAfter'
         }, {
-          group: 'table',
+          group: 'Table',
           id: 'table_col_delete',
           name: editor.localization.get('xwiki-slash.action.table_col_delete.name'),
           iconClass: 'fa fa-trash',
@@ -703,49 +792,49 @@
 
         // Cells
         {
-          group: 'table',
+          group: 'Table',
           id: 'table_cell_split_horizontal',
           name: editor.lang.table.cell.splitHorizontal,
           iconClass: 'fa fa-bars',
           description: editor.localization.get('xwiki-slash.action.table_cell_split_horizontal.hint'),
           command: 'cellHorizontalSplit'
         }, {
-          group: 'table',
+          group: 'Table',
           id: 'table_cell_split_vertical',
           name: editor.lang.table.cell.splitVertical,
           iconClass: 'fa fa-columns',
           description: editor.localization.get('xwiki-slash.action.table_cell_split_vertical.hint'),
           command: 'cellVerticalSplit'
         }, {
-          group: 'table',
+          group: 'Table',
           id: 'table_cell_merge_right',
           name: editor.localization.get('xwiki-slash.action.table_cell_merge_right.name'),
           iconClass: 'fa fa-compress',
           description: editor.localization.get('xwiki-slash.action.table_cell_merge_right.hint'),
           command: 'cellMergeRight'
         }, {
-          group: 'table',
+          group: 'Table',
           id: 'table_cell_merge_down',
           name: editor.localization.get('xwiki-slash.action.table_cell_merge_down.name'),
           iconClass: 'fa fa-compress',
           description: editor.localization.get('xwiki-slash.action.table_cell_merge_down.hint'),
           command: 'cellMergeDown'
         }, {
-          group: 'table',
+          group: 'Table',
           id: 'table_cell_before',
           name: editor.lang.table.cell.insertBefore,
           iconClass: 'fa fa-plus',
           description: editor.localization.get('xwiki-slash.action.table_cell_before.hint'),
           command: 'cellInsertBefore'
         }, {
-          group: 'table',
+          group: 'Table',
           id: 'table_cell_after',
           name: editor.lang.table.cell.insertAfter,
           iconClass: 'fa fa-plus',
           description: editor.localization.get('xwiki-slash.action.table_cell_after.hint'),
           command: 'cellInsertAfter'
         }, {
-          group: 'table',
+          group: 'Table',
           id: 'table_cell_delete',
           name: editor.localization.get('xwiki-slash.action.table_cell_delete.name'),
           iconClass: 'fa fa-trash',
@@ -754,7 +843,7 @@
         },
 
         {
-          group: 'table',
+          group: 'Table',
           id: 'table_delete',
           name: editor.lang.table.deleteTable,
           iconClass: 'fa fa-trash',
@@ -798,6 +887,10 @@
               '</span>',
               '<span class="ckeditor-autocomplete-item-label">{name}</span>',
               '<span class="ckeditor-autocomplete-item-shortcut">{shortcut}</span>',
+            '</div>',
+            '<div class="ckeditor-autocomplete-item-badges">',
+            ...Array(editor.quickActions.config.maxBadges).fill().map(function (_, i)
+              {return '<span class="badge ckeditor-autocomplete-item-badge">{badge' + (i+1) + '}</span>';}),
             '</div>',
             '<div class="ckeditor-autocomplete-item-hint">{description}</div>',
           '</li>'].join(''),

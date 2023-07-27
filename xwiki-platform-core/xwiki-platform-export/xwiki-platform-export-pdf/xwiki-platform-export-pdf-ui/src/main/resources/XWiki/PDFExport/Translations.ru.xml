@@ -59,7 +59,7 @@ admin.export.pdf=Экспорт PDF
 admin.export.pdf.description=Настройте способ экспорта вики-страниц в PDF.
 export.pdf.admin.status=Статус
 export.pdf.admin.configuration=Конфигурация
-export.pdf.admin.saveComment=Обновлена конфигурация экспорта PDF.
+export.pdf.admin.saveComment=Обновлена конфигурация экспорта PDF
 export.pdf.admin.reset=Сброс
 export.pdf.admin.reset.hint=Восстановить конфигурацию по умолчанию
 export.pdf.admin.reset.confirmation=Вы уверены, что хотите восстановить конфигурацию по умолчанию? Все ваши изменения будут потеряны.
@@ -108,4 +108,4 @@ XWiki.PDFExport.ConfigurationClass_maxContentSize.hint=Максимальный 
 XWiki.PDFExport.ConfigurationClass_replaceFOP=Заменить FOP
 XWiki.PDFExport.ConfigurationClass_replaceFOP.hint=Замените старый экспорт PDF на основе Apache Formatting Objects Processor (FOP).
 </content>
-  </xwikidoc>
+</xwikidoc>

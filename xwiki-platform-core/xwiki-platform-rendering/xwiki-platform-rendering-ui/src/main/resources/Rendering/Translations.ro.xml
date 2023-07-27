@@ -41,4 +41,4 @@ admin.syntaxes.description=Alege sintaxa implicită a paginii și configurează 
 Rendering.RenderingConfigClass_disabledSyntaxes=Sintaxele dezactivate
 Rendering.RenderingConfigClass_disabledSyntaxes.hint=Lista cu sintaxe markup in care paginile nu pot fi scrise
 </content>
-  </xwikidoc>
+</xwikidoc>

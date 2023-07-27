@@ -21,6 +21,8 @@ package org.xwiki.test.ui.po.editor;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 /**
  * Represents the actions possible in WYSIWYG edit mode.
@@ -44,7 +46,15 @@ public class WYSIWYGEditPage extends PreviewableEditPage
      */
     public static WYSIWYGEditPage gotoPage(String space, String page)
     {
-        getUtil().gotoPage(space, page, "edit", "editor=wysiwyg");
+        return gotoPage(new LocalDocumentReference(space, page));
+    }
+
+    /**
+     * Go to the passed page in WYSIWYG edit mode.
+     */
+    public static WYSIWYGEditPage gotoPage(EntityReference targetPageReference)
+    {
+        getUtil().gotoPage(targetPageReference, "edit", "editor=wysiwyg");
         return new WYSIWYGEditPage();
     }
 

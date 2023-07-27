@@ -159,8 +159,8 @@ public class NotificationsEmailsIT
         DocumentReference page1 = new DocumentReference("xwiki", NOTIFICATIONS_EMAIL_TEST, "Page1");
         DocumentReference page2 = new DocumentReference("xwiki", NOTIFICATIONS_EMAIL_TEST, "Page2");
 
-        testUtils.createPage(NOTIFICATIONS_EMAIL_TEST, "Page1", "Content 1", "Title 1");
-        testUtils.createPage(NOTIFICATIONS_EMAIL_TEST, "Page2", "Content 2", "Title 2");
+        testUtils.createPage(page1, "Content 1", "Title 1");
+        testUtils.createPage(page2, "Content 2", "Title 2");
 
         // Wait for the notifications to be handled.
         testUtils.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);

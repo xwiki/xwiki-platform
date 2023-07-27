@@ -252,26 +252,36 @@ class NotificationsSettingsIT
             assertFalse(trayPage.arePageAndChildrenWatched());
             assertFalse(trayPage.isWikiWatched());
 
-            // Unwatch the wiki
-            trayPage.setWikiWatchedState(false);
-            // Verify all other buttons are updated
-            assertFalse(trayPage.isPageOnlyWatched());
-            assertFalse(trayPage.arePageAndChildrenWatched());
-
             // Go back to the preferences to ensure the filter has been created
             notificationsUserProfilePage = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
             List<CustomNotificationFilterPreference> preferences =
-                notificationsUserProfilePage.getCustomNotificationFilterPreferences();
+                    notificationsUserProfilePage.getCustomNotificationFilterPreferences();
             assertEquals(1, preferences.size());
 
             // Filter 0
-            assertTrue(preferences.get(0).getFilterName().contains("Wiki"));
-            assertEquals("", preferences.get(0).getLocation());
-            assertEquals(CustomNotificationFilterPreference.FilterAction.IGNORE_EVENT,
-                preferences.get(0).getFilterAction());
+            assertTrue(preferences.get(0).getFilterName().contains("Page only"));
+            assertEquals(testReference.getLastSpaceReference().getName() + ".WebHome",
+                    preferences.get(0).getLocation());
+            assertEquals(CustomNotificationFilterPreference.FilterAction.NOTIFY_EVENT,
+                    preferences.get(0).getFilterAction());
             assertTrue(preferences.get(0).getEventTypes().isEmpty());
             assertTrue(preferences.get(0).getFormats().containsAll(List.of("Email", "Alert")));
             assertTrue(preferences.get(0).isEnabled());
+
+            // back to the page
+            testUtils.gotoPage(testReference.getLastSpaceReference().getName(), testReference.getName());
+            trayPage = new NotificationsTrayPage();
+            // Unwatch the page
+            trayPage.setPageOnlyWatchedState(false);
+            // Verify all other buttons are updated
+            assertFalse(trayPage.isPageOnlyWatched());
+            assertFalse(trayPage.arePageAndChildrenWatched());
+            assertFalse(trayPage.isWikiWatched());
+
+            // Go back to the preferences to ensure the filter has been deleted
+            notificationsUserProfilePage = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+            preferences = notificationsUserProfilePage.getCustomNotificationFilterPreferences();
+            assertTrue(preferences.isEmpty());
 
             // back to the page
             testUtils.gotoPage(testReference.getLastSpaceReference().getName(), testReference.getName());
@@ -286,17 +296,17 @@ class NotificationsSettingsIT
             // Go back to the preferences to ensure the filter has been created
             notificationsUserProfilePage = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
             preferences = notificationsUserProfilePage.getCustomNotificationFilterPreferences();
-            assertEquals(2, preferences.size());
+            assertEquals(1, preferences.size());
 
             // Filter 1
-            assertTrue(preferences.get(1).getFilterName().contains("Page and children"));
+            assertTrue(preferences.get(0).getFilterName().contains("Page and children"));
             assertEquals(testReference.getLastSpaceReference().getName() + ".WebHome",
-                preferences.get(1).getLocation());
+                preferences.get(0).getLocation());
             assertEquals(CustomNotificationFilterPreference.FilterAction.NOTIFY_EVENT,
-                preferences.get(1).getFilterAction());
-            assertTrue(preferences.get(1).getEventTypes().isEmpty());
-            assertTrue(preferences.get(1).getFormats().containsAll(List.of("Email", "Alert")));
-            assertTrue(preferences.get(1).isEnabled());
+                preferences.get(0).getFilterAction());
+            assertTrue(preferences.get(0).getEventTypes().isEmpty());
+            assertTrue(preferences.get(0).getFormats().containsAll(List.of("Email", "Alert")));
+            assertTrue(preferences.get(0).isEnabled());
 
             // back to the page
             testUtils.gotoPage(testReference.getLastSpaceReference().getName(), testReference.getName());
@@ -313,28 +323,37 @@ class NotificationsSettingsIT
             // Go back to the preferences
             notificationsUserProfilePage = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
             preferences = notificationsUserProfilePage.getCustomNotificationFilterPreferences();
-            assertEquals(3, preferences.size());
+            assertEquals(2, preferences.size());
 
             // Filter 2
-            assertTrue(preferences.get(2).getFilterName().contains("Page only"));
+            assertTrue(preferences.get(1).getFilterName().contains("Page only"));
             assertEquals(testReference.getLastSpaceReference().getName() + "." + testReference.getName(),
-                preferences.get(2).getLocation());
+                preferences.get(1).getLocation());
             assertEquals(CustomNotificationFilterPreference.FilterAction.IGNORE_EVENT,
-                preferences.get(2).getFilterAction());
-            assertTrue(preferences.get(2).getEventTypes().isEmpty());
-            assertTrue(preferences.get(2).getFormats().containsAll(List.of("Email", "Alert")));
-            assertTrue(preferences.get(2).isEnabled());
+                preferences.get(1).getFilterAction());
+            assertTrue(preferences.get(1).getEventTypes().isEmpty());
+            assertTrue(preferences.get(1).getFormats().containsAll(List.of("Email", "Alert")));
+            assertTrue(preferences.get(1).isEnabled());
 
-            // Disable filter 6
-            preferences.get(0).setEnabled(false);
+            // Disable filter 2
+            preferences.get(1).setEnabled(false);
             // Refresh the page
             notificationsUserProfilePage = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
             preferences = notificationsUserProfilePage.getCustomNotificationFilterPreferences();
             // Verify the change have been saved
-            assertFalse(preferences.get(0).isEnabled());
+            assertFalse(preferences.get(1).isEnabled());
 
-            // Delete these new filters
-            preferences.get(2).delete();
+            // Go back to the page to check how it impacts the watch
+            testUtils.gotoPage(testReference.getLastSpaceReference().getName(), testReference.getName());
+            trayPage = new NotificationsTrayPage();
+            trayPage.showNotificationTray();
+            // Verify the whole status
+            assertTrue(trayPage.isPageOnlyWatched());
+            assertTrue(trayPage.arePageAndChildrenWatched());
+            assertFalse(trayPage.isWikiWatched());
+
+            // Delete the filters
+            notificationsUserProfilePage = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
             // The livetable page is refreshed so we need to load back the filter preferences
             notificationsUserProfilePage.getCustomNotificationFilterPreferences().get(1).delete();
             notificationsUserProfilePage.getCustomNotificationFilterPreferences().get(0).delete();
@@ -343,9 +362,9 @@ class NotificationsSettingsIT
             testUtils.gotoPage(testReference.getLastSpaceReference().getName(), testReference.getName());
             trayPage = new NotificationsTrayPage();
             trayPage.showNotificationTray();
-            assertTrue(trayPage.isPageOnlyWatched());
-            assertTrue(trayPage.arePageAndChildrenWatched());
-            assertTrue(trayPage.isWikiWatched());
+            assertFalse(trayPage.isPageOnlyWatched());
+            assertFalse(trayPage.arePageAndChildrenWatched());
+            assertFalse(trayPage.isWikiWatched());
 
             // Go back to the preferences
             notificationsUserProfilePage = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
@@ -509,7 +528,7 @@ class NotificationsSettingsIT
         assertEquals(UNDETERMINED, notificationsUserProfilePage.getApplicationState(SYSTEM, EMAIL_FORMAT));
         assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT));
         assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, ADD_COMMENT, EMAIL_FORMAT));
-        assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, CREATE, ALERT_FORMAT));
+        assertEquals(OFF, notificationsUserProfilePage.getEventTypeState(SYSTEM, CREATE, ALERT_FORMAT));
         assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, CREATE, EMAIL_FORMAT));
         assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, DELETE, ALERT_FORMAT));
         assertEquals(ON, notificationsUserProfilePage.getEventTypeState(SYSTEM, DELETE, EMAIL_FORMAT));

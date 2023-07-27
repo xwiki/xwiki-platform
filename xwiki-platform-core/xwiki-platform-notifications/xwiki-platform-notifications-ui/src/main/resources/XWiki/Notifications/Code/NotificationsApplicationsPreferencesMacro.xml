@@ -1005,7 +1005,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'xwiki-bootstrap-switch', 
         &lt;/th&gt;
         #set ($colsCount = 3)
       #end
-      &lt;th scope="col"&gt;&lt;/th&gt;
+      &lt;td&gt;&lt;/td&gt;
     &lt;/tr&gt;
   &lt;/thead&gt;
   ##
@@ -1044,7 +1044,12 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'xwiki-bootstrap-switch', 
       #end
       ## Collapse button
       &lt;td class="notificationCollapseButtonCell"&gt;
-        &lt;button type="button" class="btn btn-default btn-sm collapseButton"&gt;$services.icon.renderHTML('caret-down')&lt;/button&gt;
+        &lt;button type="button" class="btn btn-default btn-sm collapseButton"&gt;
+          $services.icon.renderHTML('caret-down')
+          &lt;span class='sr-only'&gt;
+            $escapetool.xml($services.localization.render('notifications.settings.applications.table.dropdown.toggle.label',[$type.applicationName]))
+          &lt;/span&gt;
+        &lt;/button&gt;
       &lt;/td&gt;
     &lt;/tr&gt;
     ##

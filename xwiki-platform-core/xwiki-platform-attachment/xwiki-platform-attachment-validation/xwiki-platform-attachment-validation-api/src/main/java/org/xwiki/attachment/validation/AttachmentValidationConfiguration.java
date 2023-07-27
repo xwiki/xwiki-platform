@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -64,4 +65,12 @@ public interface AttachmentValidationConfiguration
      * @since 15.0RC1
      */
     List<String> getBlockerMimetypes(DocumentReference documentReference);
+
+    /**
+     * @param entityReference the entity reference to use as the context when looking for the configuration
+     * @return the max allowed file size in bytes
+     * @since 15.5RC1
+     * @since 14.10.13
+     */
+    long getMaxUploadSize(EntityReference entityReference);
 }

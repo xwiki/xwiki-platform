@@ -62,7 +62,7 @@ public class PersonalMessageStreamNotificationFilter extends AbstractMessageStre
         }
 
         String sender = this.serializer.serialize(event.getUser());
-        return this.preferencesGetter.isUsedFollowed(sender, filterPreferences, format) ? FilterPolicy.KEEP
+        return this.preferencesGetter.isUserFollowed(sender, filterPreferences, format) ? FilterPolicy.KEEP
                 : FilterPolicy.FILTER;
     }
 

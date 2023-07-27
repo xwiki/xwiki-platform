@@ -26,18 +26,15 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.Optional;
+import java.util.TreeMap;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
 import javax.websocket.server.HandshakeRequest;
-
-import org.apache.commons.lang3.StringUtils;
 
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
@@ -52,8 +49,6 @@ public class XWikiWebSocketRequestStub extends XWikiServletRequestStub
 {
     private final HandshakeRequest request;
 
-    private final Map<String, Cookie> cookies;
-
     /**
      * Creates a new XWiki request that wraps the given WebSocket handshake request.
      * 
@@ -61,40 +56,39 @@ public class XWikiWebSocketRequestStub extends XWikiServletRequestStub
      */
     public XWikiWebSocketRequestStub(HandshakeRequest request)
     {
-        super(null, adaptParameterMap(request.getParameterMap()));
+        super(buildFromHandshakeRequest(request));
 
         this.request = request;
-        this.cookies = parseCookies();
     }
 
-    @Override
-    public String getHeader(String name)
+    private static Builder buildFromHandshakeRequest(HandshakeRequest request)
     {
-        List<String> values = getHeaderValues(name);
-        return values != null && !values.isEmpty() ? values.get(0) : null;
+        Map<String, List<String>> headers = getHeaders(request);
+        Optional<String> cookieHeader = headers.getOrDefault("Cookie", Collections.emptyList()).stream().findFirst();
+        return new Builder().setRequestParameters(adaptParameterMap(request.getParameterMap()))
+            .setCookies(parseCookies(cookieHeader)).setHeaders(headers)
+            // The WebSocket API (JSR-356) doesn't expose the client IP address but at least we can avoid a null pointer
+            // exception.
+            .setRemoteAddr("");
     }
 
-    private List<String> getHeaderValues(String name)
+    private static Map<String, List<String>> getHeaders(HandshakeRequest request)
     {
-        for (Map.Entry<String, List<String>> entry : this.request.getHeaders().entrySet()) {
-            if (StringUtils.equalsIgnoreCase(name, entry.getKey())) {
-                return entry.getValue();
-            }
+        // Make sure header names are matched case insensitive.
+        Map<String, List<String>> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        headers.putAll(request.getHeaders());
+        return headers;
+    }
+
+    private static Cookie[] parseCookies(Optional<String> cookieHeader)
+    {
+        if (cookieHeader.isEmpty()) {
+            return new Cookie[0];
+        } else {
+            String[] cookieStrings = cookieHeader.get().split("\\s*;\\s*");
+            return Arrays.asList(cookieStrings).stream().map(HttpCookie::parse).flatMap(Collection::stream)
+                .map(cookie -> new Cookie(cookie.getName(), cookie.getValue())).toArray(size -> new Cookie[size]);
         }
-        return null;
-    }
-
-    @Override
-    public Enumeration<String> getHeaderNames()
-    {
-        return Collections.enumeration(this.request.getHeaders().keySet());
-    }
-
-    @Override
-    public Enumeration<String> getHeaders(String name)
-    {
-        List<String> values = getHeaderValues(name);
-        return values != null ? Collections.enumeration(values) : Collections.emptyEnumeration();
     }
 
     @Override
@@ -105,42 +99,6 @@ public class XWikiWebSocketRequestStub extends XWikiServletRequestStub
             return ZonedDateTime.parse(value, DateTimeFormatter.RFC_1123_DATE_TIME).toInstant().toEpochMilli();
         } else {
             return -1;
-        }
-    }
-
-    @Override
-    public int getIntHeader(String name)
-    {
-        String value = getHeader(name);
-        if (value != null) {
-            return Integer.parseInt(value);
-        } else {
-            return -1;
-        }
-    }
-
-    @Override
-    public Cookie getCookie(String cookieName)
-    {
-        return this.cookies.get(cookieName);
-    }
-
-    @Override
-    public Cookie[] getCookies()
-    {
-        return this.cookies.values().toArray(new Cookie[] {});
-    }
-
-    private Map<String, Cookie> parseCookies()
-    {
-        String cookieHeader = getHeader("Cookie");
-        if (cookieHeader == null) {
-            return Collections.emptyMap();
-        } else {
-            String[] cookieStrings = cookieHeader.split("\\s*;\\s*");
-            return Arrays.asList(cookieStrings).stream().map(HttpCookie::parse).flatMap(Collection::stream)
-                .map(cookie -> new Cookie(cookie.getName(), cookie.getValue()))
-                .collect(Collectors.toMap(Cookie::getName, Function.identity()));
         }
     }
 

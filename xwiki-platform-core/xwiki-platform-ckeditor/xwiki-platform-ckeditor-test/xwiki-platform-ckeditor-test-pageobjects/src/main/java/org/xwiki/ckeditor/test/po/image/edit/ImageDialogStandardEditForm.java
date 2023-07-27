@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.BaseElement;
 import org.xwiki.test.ui.po.SuggestInputElement;
 
@@ -35,11 +36,27 @@ import org.xwiki.test.ui.po.SuggestInputElement;
 public class ImageDialogStandardEditForm extends BaseElement
 {
     /**
+     * The image caption checkbox.
+     */
+    @FindBy(id = "imageCaptionActivation")
+    private WebElement captionCheckbox;
+
+    /**
      * Click on the caption checkbox field.
      */
     public void clickCaptionCheckbox()
     {
-        getDriver().findElement(By.id("imageCaptionActivation")).click();
+        this.captionCheckbox.click();
+    }
+
+    /**
+     * @return true if the caption checkbox is checked
+     * @since 14.10.13
+     * @since 15.5RC1
+     */
+    public boolean isCaptionCheckboxChecked()
+    {
+        return this.captionCheckbox.isSelected();
     }
 
     /**

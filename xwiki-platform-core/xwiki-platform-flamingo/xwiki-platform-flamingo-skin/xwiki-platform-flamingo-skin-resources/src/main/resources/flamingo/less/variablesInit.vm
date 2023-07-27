@@ -249,7 +249,7 @@
   @btn-primary-bg:                      #386da7;
   ## Make sure all kinds of buttons have proper contrast
   @btn-danger-bg:                       #ca302c;
-  @brand-success:                       #31754f;
+  @brand-success:                       #077537;
   ## For the warning buttons, since the saturation is very high, we'd need to make the background way darker, going
   ## from an orangish yellow to complete brown. Instead, we change the text color to black.
   @btn-warning-color:                   #000;

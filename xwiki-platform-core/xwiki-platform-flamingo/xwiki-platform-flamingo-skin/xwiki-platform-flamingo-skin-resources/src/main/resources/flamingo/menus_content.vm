@@ -213,7 +213,7 @@
   #foreach($uix in $collectiontool.sort($extensions, 'order'))
     ## Maybe display a menu separator
     #if ("$!uix.separator" == 'true' && $canHaveMenuSeparator)
-      #submenuseparator()
+      #xwikiactionmenuseparator()
       #set ($canHaveMenuSeparator = false)
     #end
     #set ($content = $uix.content.toString())

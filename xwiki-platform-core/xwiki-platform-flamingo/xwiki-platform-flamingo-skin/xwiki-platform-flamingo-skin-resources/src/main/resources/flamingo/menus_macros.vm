@@ -170,6 +170,13 @@
 ###    Menu submenu separator
 ###
 #macro(submenuseparator)
+  <li class="divider" role="separator"></li>
+#end
+
+###
+### Action menu separator
+###
+#macro(xwikiactionmenuseparator)
     </ul>
   </dd>
   <dd>

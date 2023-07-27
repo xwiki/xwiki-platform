@@ -120,7 +120,7 @@
   #set ($end = $range.get(1))
   #if ($end)
     #set ($endParameterName = $parameterNamePrefix + '_end')
-    #set ($discard = $constraints.add("$fieldNameWithAlias < :$endParameterName"))
+    #set ($discard = $constraints.add("$fieldNameWithAlias <= :$endParameterName"))
     #set ($discard = $queryParameters.add({
       'name': $endParameterName,
       'match': 'exact',

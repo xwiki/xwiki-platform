@@ -82,7 +82,7 @@ platform.wiki.dependencies.user.missing=O componente java "Wiki User" não está
 
 ## Create
 platform.wiki.create.button=Criar Wiki
-platform.wiki.create.title=Criar uma nova divisão
+platform.wiki.create.title=Criar uma nova wiki
 platform.wiki.create.members=MEMBROS
 platform.wiki.create.prettyname.empty=Nome de exibição não pode ser vazio
 platform.wiki.create.error=Criação da divisão "{0}" falhou\: {1}.
@@ -171,7 +171,7 @@ platform.wiki.browse.wikiprettyname=Nome
 platform.wiki.browse.description=Descrição
 platform.wiki.browse.owner=Dono
 platform.wiki.browse.membershipType=Tipo de Membro
-### Missing: platform.wiki.browse.doc.creationDate=Creation Date
+platform.wiki.browse.doc.creationDate=Data da Criação
 platform.wiki.browse._actions=Ações
 ### Missing: platform.wiki.browse._actions.join=Join
 platform.wiki.browse._actions.requestJoin=Solicitar Entrada
@@ -185,7 +185,7 @@ WikiManager.WikiUserClass_membershipType_open=Aberto para qualquer usuário part
 WikiManager.WikiUserClass_membershipType_request=Qualquer usuário global pode solicitar para entrar, mas um administrador deve aceitar
 WikiManager.WikiUserClass_membershipType_invite=Apenas um administrador pode enviar convites para entrar nesta wiki
 WikiManager.WikiUserClass_userScope_local_only=Somente usuários locais estão disponíveis na wiki
-WikiManager.WikiUserClass_userScope_global_only=Somente usuários locais estão disponíveis na wiki
+WikiManager.WikiUserClass_userScope_global_only=Somente usuários globais estão disponíveis na wiki
 WikiManager.WikiUserClass_userScope_local_and_global=Usuários globais e locais estão disponíveis na wiki
 platform.wiki.prop.wikiname=Identificador Wiki
 platform.wiki.prop.wikiprettyname=Nome de exibição
@@ -226,12 +226,12 @@ platform.wiki.create.wizard.step.dw=Após clicar no botão "Criar", a wiki será
 platform.wiki.create.wizard.step.previous=Passo anterior
 platform.wiki.create.wizard.step.next=Próxima Etapa
 platform.wiki.create.wizard.step.create=Criar
-### Missing: platform.wiki.create.wizard.step.creation=Wiki creation
+platform.wiki.create.wizard.step.creation=Criação da wiki
 platform.wiki.create.wizard.step.creation.wait=Aguarde até que a wiki seja criada.
 platform.wiki.create.wizard.step.creation.complete=A wiki {0} foi criada com sucesso. Agora você pode acessá-la.
 platform.wiki.create.wizard.step.creation.errorlog=No entanto, erro(s) foram gerados durante esse processo e você pode querer revisá-los.
 platform.wiki.create.wizard.step.creation.error=A criação da wiki {0} falhou. É recomendável excluí-la.
-### Missing: platform.wiki.create.wizard.step.creation.go=Go to the wiki
+platform.wiki.create.wizard.step.creation.go=Ir para a wiki
 
 ## Admin
 admin.wikis.description=Gerenciamento das wikis.

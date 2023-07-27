@@ -117,12 +117,12 @@ public interface PDFExportConfiguration
      * @return the maximum content size, in kilobytes (KB), an user is allowed to export to PDF; in order to compute the
      *         content size we sum the size of the HTML rendering for each of the XWiki documents included in the
      *         export; the size of external resources, such as images, style sheets, JavaScript code is not taken into
-     *         account; {@code 0} means no limit; defaults to {@code 100KB}
+     *         account; {@code 0} means no limit; defaults to {@code 5MB}
      * @since 14.10
      */
     default int getMaxContentSize()
     {
-        return 100;
+        return 5000;
     }
 
     /**

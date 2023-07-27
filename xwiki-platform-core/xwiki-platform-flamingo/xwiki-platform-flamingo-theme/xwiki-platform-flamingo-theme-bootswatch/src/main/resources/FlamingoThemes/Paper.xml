@@ -1414,7 +1414,7 @@
 //## Define colors for form feedback states and, by default, alerts.
 
 @state-success-text:             @brand-success;
-@state-success-bg:               #dff0d8;
+@state-success-bg:               #e5f3df;
 @state-success-border:           darken(spin(@state-success-bg, -10), 5%);
 
 @state-info-text:                @brand-info;

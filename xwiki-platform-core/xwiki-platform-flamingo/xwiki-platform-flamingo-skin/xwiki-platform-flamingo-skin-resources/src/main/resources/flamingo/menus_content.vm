@@ -168,17 +168,11 @@
           <span class="sr-only">$services.localization.render('core.menu.toggleDropdown')</span>
         </button>
       #end
-      #if ("$!actionUrl" == '')
-        ## We use another component for the more action menu, since it has
-        ## a more complex structure with submenus.
-        <dl class='dropdown-menu dropdown-menu-right'>
-          $menuContent
-        </dl>
-      #else
-        <ul class='dropdown-menu'>
-          $menuContent
-        </ul>
-      #end
+      ## We use another component for the more action menu, since it has
+      ## a more complex structure with submenus.
+      <dl class='dropdown-menu dropdown-menu-right'>
+        $menuContent
+      </dl>
     #end
   </div>
 #end
@@ -318,7 +312,11 @@
   ## Display all the extensions points, including the static ones
   ##
   #define ($menuContent)
-    #displaySecureUIX('org.xwiki.plaftorm.editactions', $staticExtensions)
+    <dd>
+     <ul>
+        #displaySecureUIX('org.xwiki.plaftorm.editactions', $staticExtensions)
+     </ul>
+    </dd>
   #end
   #displayMenu('tmEdit', 'pencil', $menuContent, 'core.menu.edit', true, $defaultEditURL, $extraAttributes)
 #end

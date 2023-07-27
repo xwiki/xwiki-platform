@@ -98,7 +98,7 @@
     #set($linkName = $linkWords.get(1))
     #set($linkTitle = "${linkWords.get(0)}: ${linkWords.get(1)}")
   #end
-  <li class="dropdown dropdown-split text-left" #if(!$stringtool.isBlank($id))id="$id"#end>
+  <dd class="dropdown dropdown-split text-left" #if(!$stringtool.isBlank($id))id="$id"#end>
     ## The menu label. On large screens (tablet and desktop) the label is a link that triggers the default menu action
     ## (e.g. navigation) and the menu is opened using a separated caret. On extra small screens (phones) the label opens
     ## the menu and the default menu action is the first item in the menu.
@@ -170,7 +170,10 @@
 ###    Menu submenu separator
 ###
 #macro(submenuseparator)
-  <li class="divider" role="separator"></li>
+    </ul>
+  </dd>
+  <dd>
+    <ul>
 #end
 
 ###

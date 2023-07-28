@@ -30,13 +30,17 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ComparePage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.diff.RenderedChanges;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -46,10 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @version $Id$
  */
-@UITest(properties = {
-    // Trust picsum.photos to allow the rendered diff to download images from it
-    "xwikiPropertiesAdditionalProperties=url.trustedDomains=picsum.photos"
-})
+@UITest
 class CompareIT
 {
     private static final String ATTACHMENT_NAME_1 = "image.gif";
@@ -60,19 +61,29 @@ class CompareIT
 
     private static final String IMAGE_SYNTAX = "[[image:%s]]";
 
-    private String getLocalAttachmentURL(TestUtils setup, TestReference testReference, String attachmentName)
+    private String getLocalAttachmentURL(TestUtils setup, TestReference testReference,
+        TestConfiguration testConfiguration, String attachmentName)
         throws URISyntaxException
     {
-        AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
-        URI attachmentURL = new URI(setup.getURL(attachmentReference, "download", null));
-        // Replace host and port with localhost and 8080 to make the URL usable from the container.
-        return (new URI("http", null, "localhost", 8080, attachmentURL.getPath(),
-            attachmentURL.getQuery(), attachmentURL.getFragment())).toString();
+        // If the Servlet Engine is standalone, then we need to replace the host and port in the attachment URL,
+        // otherwise we just return the attachment name.
+        ServletEngine servletEngine = testConfiguration.getServletEngine();
+        if (servletEngine == ServletEngine.JETTY_STANDALONE) {
+            AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
+            URI attachmentURL = new URI(setup.getURL(attachmentReference, "download", null));
+            // Replace host and port with host and port of the servlet engine as the outside port doesn't work from
+            // the inside.
+            return (new URI("http", null, servletEngine.getHostIP(), servletEngine.getPort(), attachmentURL.getPath(),
+                attachmentURL.getQuery(), attachmentURL.getFragment())).toString();
+        } else {
+            return attachmentName;
+        }
     }
 
     @Test
     @Order(1)
-    void compareRenderedImageChanges(TestUtils setup, TestReference testReference) throws Exception
+    void compareRenderedImageChanges(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
     {
         setup.loginAsSuperAdmin();
         setup.attachFile(testReference, ATTACHMENT_NAME_1,
@@ -81,11 +92,11 @@ class CompareIT
         // for comparison when changing the URL to the second image.
         setup.attachFile(testReference, ATTACHMENT_NAME_2,
             getClass().getResourceAsStream("/AttachmentIT/image.gif"), false);
-        String url1 = getLocalAttachmentURL(setup, testReference, ATTACHMENT_NAME_1);
+        String url1 = getLocalAttachmentURL(setup, testReference, testConfiguration, ATTACHMENT_NAME_1);
         ViewPage viewPage = setup.createPage(testReference, String.format(IMAGE_SYNTAX, url1));
         String firstRevision = viewPage.getMetaDataValue("version");
         // Create a second revision with the new image.
-        String url2 = getLocalAttachmentURL(setup, testReference, ATTACHMENT_NAME_2);
+        String url2 = getLocalAttachmentURL(setup, testReference, testConfiguration, ATTACHMENT_NAME_2);
         viewPage = setup.createPage(testReference, String.format(IMAGE_SYNTAX, url2));
         String secondRevision = viewPage.getMetaDataValue("version");
 
@@ -99,7 +110,7 @@ class CompareIT
             getClass().getResourceAsStream("/AttachmentIT/SmallSizeAttachment.png"), false);
 
         // Create a third revision with the new image.
-        String url3 = getLocalAttachmentURL(setup, testReference, ATTACHMENT_NAME_3);
+        String url3 = getLocalAttachmentURL(setup, testReference, testConfiguration, ATTACHMENT_NAME_3);
         viewPage = setup.createPage(testReference, String.format(IMAGE_SYNTAX, url3));
         String thirdRevision = viewPage.getMetaDataValue("version");
 
@@ -118,9 +129,9 @@ class CompareIT
         WebElement deletedImage = firstChange.findElement(By.tagName("img"));
         WebElement insertedImage = secondChange.findElement(By.tagName("img"));
 
-        // Check that the src attribute of the deleted image ends with the image2 (don't check the start as it
-        // depends on the container setup and the nested/non-nested test execution).
-        assertEquals(url2, deletedImage.getAttribute("src"));
+        // Check that the src attribute of the deleted image contains image2 (the concrete value depends on the
+        // servlet container as we either use an attachment link which will contain a revision or a plain URL).
+        assertThat(deletedImage.getAttribute("src"), containsString(ATTACHMENT_NAME_2));
 
         // Compute the expected base64-encoded content of the inserted image. The HTML diff embeds both images but
         // replaces the deleted image by the original URL again after the diff computation.

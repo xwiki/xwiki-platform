@@ -28,7 +28,6 @@ import org.openqa.selenium.Keys;
 import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.ckeditor.test.po.CKEditorDialog;
 import org.xwiki.ckeditor.test.po.MacroDialogEditModal;
-import org.xwiki.ckeditor.test.po.image.ImageDialogSelectModal;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;

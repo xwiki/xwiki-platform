@@ -44,10 +44,10 @@
     var bindInputs = function(livetable) {
       $(livetable).find('input[data-type="date"]').each(function(i, element) {
         var input = $(element);
-        var hidden = input.prev('input[type="hidden"]');
+        var hidden = input.parent().prevAll('input[type="hidden"]');
         var dateFormat = moment().toMomentFormatString(input.attr('data-dateformat'));
+
         input.daterangepicker({
-          parentEl: '#'+$.escapeSelector(this.parentElement.id),
           drops: 'down',
           opens: 'center',
           autoUpdateInput: false,
@@ -72,7 +72,10 @@
           }
         });
 
-        input.parent().attr('aria-controls', input.attr('id')+'-picker');
+        // Connect the input to the picker via the aria-controls attribute.
+        const pickerId = input.attr('id') + '-picker';
+        input.data('daterangepicker').container.attr("id", pickerId);
+        input.parent().attr('aria-controls', pickerId);
 
         var updateInput = function(element, event, picker) {
           if (event.type == 'cancel') {
@@ -108,15 +111,8 @@
           }
         });
 
-        input.on('showCalendar.daterangepicker', function(event) {
-          event.target.next('.daterangepicker').setAttribute('style',
-            'display:block; width: max-content;');
-        });
-
         input.on('show.daterangepicker', function(event) {
           event.target.parentElement.setAttribute('aria-expanded', true);
-          event.target.next('.daterangepicker').setAttribute('style',
-            'display:block; width: max-content;');
         });
 
         input.on('hide.daterangepicker', function(event) {

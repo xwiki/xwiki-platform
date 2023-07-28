@@ -275,7 +275,7 @@
                 `'${XWiki.contextPath}/${XWiki.servletpath}` +
                 `skin/resources/uicomponents/suggest/suggestAttachments.js'` +
                 `defer='defer'></script>`;
-              $(editor.document.$).loadRequiredSkinExtensions(requiredSkinExtensions);
+              $(CKEDITOR.document.$).loadRequiredSkinExtensions(requiredSkinExtensions);
 
               require(['attachmentService',
                   'xwiki-attachments-store',

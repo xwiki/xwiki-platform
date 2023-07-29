@@ -45,11 +45,11 @@ admin.indexinguser.explanation.part1=Індексатор виконується
 admin.indexinguser.explanation.part2=Щоб мати можливість показувати той самий заголовок у результатах пошуку, необхідно надати індексатору користувача, який має доступ до сторінок шаблону. Рекомендується створити окремий заблокований обліковий запис без спеціальних прав.
 admin.indexinguser.explanation.security.head=Примітка про безпеку:
 admin.indexinguser.explanation.security.content=Використання облікового запису з більшими правами перегляду, ніж інші користувачі, може спричинити витік назв сторінок зі сторінок, які ці користувачі зазвичай не бачать.
-### Missing: admin.indexinguser.explanation.part3=Changes to this setting are applied only to pages indexed after the change; a full reindex is recommended for consistent application of the change.  
-### Missing: admin.indexinguser.explanation.mainwikionly=This setting can only be done in the main wiki as the Solr indexer runs from the main wiki.
+admin.indexinguser.explanation.part3=Зміни в цьому параметрі застосовуються лише до сторінок, проіндексованих після внесення змін; для послідовного застосування змін рекомендується повне пере індексування.  
+admin.indexinguser.explanation.mainwikionly=Це налаштування можна зробити лише в головній вікі, оскільки індексатор Solr запускається з основної вікі.
 
 ## keys used by the configuration class
-### Missing: XWiki.SolrSearchAdminIndexingUser_indexer.description=Indexing User
-### Missing: XWiki.SolrSearchAdminIndexingUser_indexer.hint=The XWiki User Account used to index pages in the background.
+XWiki.SolrSearchAdminIndexingUser_indexer.description=Користувач індексації
+XWiki.SolrSearchAdminIndexingUser_indexer.hint=Обліковий запис користувача XWiki, що використовується для індексації сторінок у фоновому режимі.
 </content>
   </xwikidoc>

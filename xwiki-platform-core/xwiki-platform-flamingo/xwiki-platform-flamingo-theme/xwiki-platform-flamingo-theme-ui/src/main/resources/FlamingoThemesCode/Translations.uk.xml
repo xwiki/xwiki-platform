@@ -56,6 +56,7 @@ platform.flamingo.themes.title.preview=Попередній перегляд
 platform.flamingo.themes.autorefresh=Автоматичне оновлення
 platform.flamingo.themes.refresh=Оновити
 platform.flamingo.themes.refreshwarning=Оновлення може зайняти декілька секунд.
+platform.flamingo.themes.preview.iframe.label=Попередній перегляд кольорової теми.
 platform.flamingo.themes.loading=Завантаження...
 platform.flamingo.themes.category.logos=Логотипи
 platform.flamingo.themes.category.base-colors=Базові кольори

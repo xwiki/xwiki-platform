@@ -104,4 +104,4 @@ AnnotationCode.AnnotationConfig_displayHighlight=Виділити примітк
 AnnotationCode.AnnotationConfig_displayHighlight.hint=Вирішіть, чи має відображатися виділена примітка завжди, чи лише під час наведення курсора на примітку чи структуру примітки
 AnnotationCode.AnnotationConfig_annotationClass=Клас XWiki, що визначає структуру приміток
 </content>
-  </xwikidoc>
+</xwikidoc>

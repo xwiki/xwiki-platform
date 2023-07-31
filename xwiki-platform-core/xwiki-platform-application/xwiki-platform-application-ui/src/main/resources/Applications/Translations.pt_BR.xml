@@ -20,10 +20,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc reference="Applications.Translations" locale="pt-BR">
+<xwikidoc reference="Applications.Translations" locale="pt_BR">
   <web>Applications</web>
   <name>Translations</name>
-  <language>pt-BR</language>
+  <language>pt_BR</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <parent>Applications.WebHome</parent>

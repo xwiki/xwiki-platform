@@ -59,11 +59,11 @@
         <dl>
           #set ($prop = $class.first_name)
           <dt><label for="register_${prop.name}">$services.localization.render('core.register.firstName')</label></dt>
-          <dd>$doc.displayEdit($prop, 'register_',  $obj)</dd>
+          <dd>$doc.displayEdit($prop, 'register_',  $obj).replace('type=', 'autocomplete="given-name" type=')</dd>
 
           #set ($prop = $class.last_name)
           <dt><label for="register_${prop.name}">$services.localization.render('core.register.lastName')</label></dt>
-          <dd>$doc.displayEdit($prop, 'register_',  $obj)</dd>
+          <dd>$doc.displayEdit($prop, 'register_',  $obj).replace('type=', 'autocomplete="family-name" type=')</dd>
 
           <dt>
             <label for="register_username">
@@ -72,7 +72,7 @@
             </label>
           </dt>
           <dd>
-            <input name="xwikiname" id="register_username" type="text" size="20"
+            <input name="xwikiname" id="register_username" type="text" autocomplete='username' size="20"
               onfocus="prepareName(document.forms.register);" />
           </dd>
 
@@ -95,7 +95,7 @@
 
           #set ($prop = $class.email)
           <dt><label for="register_${prop.name}">$services.localization.render('core.register.email')</label></dt>
-          <dd>$doc.displayEdit($prop, 'register_',  $obj)</dd>
+          <dd>$doc.displayEdit($prop, 'register_',  $obj).replace('type=', 'autocomplete="email" type=')</dd>
         </dl>
       </div>
       <div class="buttons">

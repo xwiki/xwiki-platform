@@ -20,33 +20,26 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="Index.Translations" locale="pt">
-  <web>Index</web>
+<xwikidoc reference="Applications.Translations" locale="pt-BR">
+  <web>Applications</web>
   <name>Translations</name>
-  <language>pt</language>
+  <language>pt-BR</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
+  <parent>Applications.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>Index.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
+  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title/>
+  <title>Translations</title>
+  <defaultTemplate/>
+  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.spacesMacro.title=Espaços
-index.spacesMacro.spaceIndex.title=Ver o índice do espaço
-### Missing: index.spacesMacro.spaceIndex.alt=Space Index
-index.spacesMacro.spaceAdministration.title=Ver a administração do espaço
-### Missing: index.spacesMacro.spaceAdministration.alt=Administer Space
-index.spacesMacro.createSpace.link=Criar um novo espaço
-index.spacesMacro.createSpace.defaultSpaceName=Nome do Espaço
-index.spacesMacro.createSpace.submit=Criar
-### Missing: index.deletedDocuments.deleteAll=Delete all
-index.administration.remainingTasks.heading=Tarefas restantes de análise de documentos
-index.administration.remainingTasks.emptyQueue=Nenhuma tarefa restante.
-admin.documentanalysis=Análise Documento
+  <content>application.index.title=Índice de Aplicativos
+application.index.drawer=Índice de Aplicativos
 </content>
 </xwikidoc>

@@ -552,6 +552,7 @@ require(['scriptaculous/effects'], function() {
 
 .applicationPanelMoreButton {
   padding: 0;
+  margin: 10px 0 0 0;
   border: 0;
   color: $theme.linkColor;
   box-shadow: none;

@@ -67,11 +67,11 @@
     &lt;/div&gt;
     &lt;div class="col-xs-12 col-sm-6"&gt;
       &lt;div class="input-group"&gt;
+        &lt;label class="sr-only" for='search-page-bar-input'&gt;
+        $services.localization.render('search.page.bar.query.title')
+        &lt;/label&gt;
         &lt;input id='search-page-bar-input' type="search" name="text" class="form-control withTip useTitleAsTip"
           title="$services.localization.render('search.page.bar.query.title')" value="$escapetool.xml($text)"/&gt;
-        &lt;label class="sr-only" for='search-page-bar-input'&gt;
-          $services.localization.render('search.page.bar.query.title')
-        &lt;/label&gt;
         &lt;span class="input-group-btn"&gt;
           &lt;button type="submit" class="btn btn-primary"&gt;
             $services.icon.renderHTML('search')

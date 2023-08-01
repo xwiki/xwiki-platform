@@ -184,7 +184,8 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
         ## Internal error, not translated.
         #showHeading($appName, $headingShowing)
 
-        {{error}}Internal error: All objects were filtered out for application: $appName.{{/error}}
+        {{error}}Internal error: All objects were filtered out for application:
+        $services.rendering.escape($appName, 'xwiki/2.1').{{/error}}
 
       #else
         #set($formAction = $xwiki.getURL($app.getFullName(), 'save'))

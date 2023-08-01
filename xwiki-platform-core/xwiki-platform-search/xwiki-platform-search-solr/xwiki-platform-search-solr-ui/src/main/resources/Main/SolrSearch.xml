@@ -201,30 +201,18 @@
   var addFacetValueCheckbox = function(index) {
     // Create an id unique to the facet value.
     let facetContainer = $(this).parents('.search-facet').first();
-    let checkBoxId = facetContainer.attr('data-name') + '-' + index.toString() + '-checkbox';
-
+    $(this).attr('id', facetContainer.attr('data-name') + '-' + index.toString());
     // Initialize the checkbox.
     let checkBox = $(document.createElement('input')).attr('type', 'checkbox');
-    checkBox.attr('id', checkBoxId);
-
-    // Initialize the checkbox label.
-    let checkBoxLabel = $(document.createElement('label'));
-    checkBoxLabel.attr('for', checkBoxId);
-    checkBoxLabel.addClass('sr-only');
-    // We duplicate the content of the anchor in the facet value instead of having it be a label
-    // because we want to keep the use case "Open in a new page" possible.
-    $(this).contents().clone().appendTo(checkBoxLabel);
-
+    checkBox.attr('aria-labelledby',$(this).attr('id') );
     checkBox.prop('checked', $(this).hasClass('selected'));
     // Add the 'checked' attribute so that it can be easily located with CSS.
     checkBox.prop('checked') &amp;&amp; checkBox.attr('checked', 'checked');
     checkBox.on('click', this.click.bind(this));
-    // Remove the 'selected' class because the selected state is marked using the check box.
+    // Remove the 'selected' class because the selected state is already marked using the check box.
     $(this).removeClass('selected')
-
-    // Add the checkbox and its label to the DOM
+    // Add the checkbox to the DOM
     $(this).before(checkBox)
-    $(this).before(checkBoxLabel);
   };
 
   var enhanceSearchFacets = function() {

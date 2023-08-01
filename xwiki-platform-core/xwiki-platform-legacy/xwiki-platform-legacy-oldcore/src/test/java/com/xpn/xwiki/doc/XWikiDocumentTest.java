@@ -19,12 +19,20 @@
  */
 package com.xpn.xwiki.doc;
 
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.ResourceBundle;
-
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass;
+import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.web.XWikiMessageTool;
 import org.jmock.Mock;
+import org.jmock.core.Constraint;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
 import org.xwiki.display.internal.DisplayConfiguration;
@@ -38,17 +46,11 @@ import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.PropertyClass;
-import com.xpn.xwiki.objects.classes.TextAreaClass;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
-import com.xpn.xwiki.user.api.XWikiRightService;
-import com.xpn.xwiki.web.XWikiMessageTool;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.ResourceBundle;
 
 /**
  * Unit tests for {@link XWikiDocument}.
@@ -301,5 +303,37 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         doc.setParentReference(new DocumentReference("docwiki", "docspace", "docpage2"));
         assertEquals("docspace.docpage2", doc.getParent());
+    }
+
+    /**
+     * Validate rename does not crash when the document has 1.0 syntax (it does not support everything but it does not
+     * crash).
+     */
+    public void testRename10() throws XWikiException
+    {
+        this.document.setContent("[pageinsamespace]");
+        this.document.setSyntax(Syntax.XWIKI_1_0);
+        DocumentReference targetReference = new DocumentReference("newwikiname", "newspace", "newpage");
+        XWikiDocument targetDocument = this.document.duplicate(targetReference);
+
+        this.mockXWiki.stubs().method("copyDocument").will(returnValue(true));
+        this.mockXWiki.stubs().method("getDocument").with(eq(targetReference)).will(returnValue(targetDocument));
+
+        this.mockXWiki.expects(once()).method("renameByCopyAndDelete")
+                .with(new Constraint[]{
+                        eq(this.document),
+                        eq(targetReference),
+                        eq(Collections.emptyList()),
+                        eq(Collections.emptyList()),
+                        eq(this.getContext())
+                }).will(returnValue(null));
+
+        this.document.rename(targetReference,
+                Collections.emptyList(), Collections.emptyList(),
+                this.getContext());
+
+        // Test links
+        assertEquals("[pageinsamespace]", this.document.getContent());
+
     }
 }

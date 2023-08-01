@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-ckeditor-test</artifactId>
-    <version>15.6-SNAPSHOT</version>
+    <version>15.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-ckeditor-test-docker</artifactId>
   <name>XWiki Platform - CKEditor - Tests - Docker</name>
@@ -57,6 +57,25 @@
       <artifactId>xwiki-platform-image-style-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
+    </dependency>
+    <dependency>
+      <!-- We need this to test the mentions Quick Action. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-mentions-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
+    <dependency>
+      <!-- We need this to test the code snippet Quick Action. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-code</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <!-- We need this to test that uninstalled macros are listed in the Quick Actions. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-index</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <!-- Test only dependencies. -->
     <dependency>

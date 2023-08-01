@@ -19,6 +19,8 @@
  */
 package org.xwiki.extension.security.internal.analyzer.osv.model;
 
+import org.xwiki.text.XWikiToStringBuilder;
+
 /**
  * See the <a href="https://ossf.github.io/osv-schema/">Open Source Vulnerability format API documentation</a>.
  *
@@ -65,5 +67,14 @@ public class PackageObject
     {
         this.name = name;
         return this;
+    }
+
+    @Override
+    public String toString()
+    {
+        return new XWikiToStringBuilder(this)
+            .append("ecosystem", getEcosystem())
+            .append("name", getName())
+            .toString();
     }
 }

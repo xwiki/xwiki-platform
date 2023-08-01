@@ -214,7 +214,9 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
             for (GroupSecurityReference group : groupRefs.keySet()) {
                 if (groupRefs.get(group).contains(user.getReference())) {
                     if (group.getOriginalReference().getWikiReference()
-                        .equals(user.getWikiReference().getOriginalWikiReference())) {
+                        .equals(user.getWikiReference().getOriginalWikiReference())
+                        || group.isGlobal())
+                    {
                         groups.add(group);
                     }
                 }
@@ -654,8 +656,7 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
             if (ref.isGlobal()) {
                 for (SecurityReference wiki : Arrays.asList(wikiRef, anotherWikiRef)) {
                     SecurityShadowEntry entry = mockSecurityShadowEntry(ref, wiki);
-                    assertThat(((DefaultSecurityCache) securityCache).get(AddUserEntry(entry)),
-                        sameInstance((SecurityEntry) entry));
+                    assertThat(securityCache.get(AddUserEntry(entry)), sameInstance((SecurityEntry) entry));
                     allEntries.add(entry);
                 }
             }
@@ -666,8 +667,7 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
             if (ref.isGlobal()) {
                 for (SecurityReference wiki : Arrays.asList(wikiRef, anotherWikiRef)) {
                     SecurityShadowEntry entry = mockSecurityShadowEntry(ref, wiki);
-                    assertThat(((DefaultSecurityCache) securityCache).get(AddUserEntry(entry)),
-                        sameInstance((SecurityEntry) entry));
+                    assertThat(securityCache.get(AddUserEntry(entry)), sameInstance((SecurityEntry) entry));
                     allEntries.add(entry);
                 }
             }
@@ -678,8 +678,7 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
             if (ref.isGlobal()) {
                 for (SecurityReference wiki : Arrays.asList(wikiRef, anotherWikiRef)) {
                     SecurityShadowEntry entry = mockSecurityShadowEntry(ref, wiki);
-                    assertThat(((DefaultSecurityCache) securityCache).get(AddUserEntry(entry)),
-                        sameInstance((SecurityEntry) entry));
+                    assertThat(securityCache.get(AddUserEntry(entry)), sameInstance((SecurityEntry) entry));
                     allEntries.add(entry);
                 }
             }
@@ -816,20 +815,27 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         entries.putAll(InsertEntities());
         entries.putAll(InsertAccess());
 
-        final Map<SecurityReference, String> keys = new HashMap<SecurityReference, String>();
-
         for (Map.Entry<String, SecurityEntry> entry : entries.entrySet()) {
-            if (entry.getValue() instanceof SecurityRuleEntry) {
-                keys.put(entry.getValue().getReference(), entry.getKey());
+            // Remove all "internal" entries and remove one access entry for the docRef/userRef.
+            if (!(entry.getValue() instanceof SecurityAccessEntry)
+                || (entry.getValue().getReference() == this.docRef
+                && ((SecurityAccessEntry) entry.getValue()).getUserReference() == this.userRef))
+            {
+                this.cache.remove(entry.getKey());
             }
         }
 
-        removerTest(entries, new Remover()
+        // Force a GC to try emptying the reference map as much as possible to validate that it indeed keeps the
+        // referenced entries.
+        // All "internal" entries should be kept as they should be referenced through parents of the access entries
+        // still in the cache.
+        System.gc();
+
+        checkEntries(entries, new Keeper()
         {
-            @Override
-            public void remove(SecurityReference ref)
+            public boolean keepAccess(SecurityAccessEntry entry)
             {
-                cache.remove(keys.get(ref));
+                return entry.getReference() != docRef || entry.getUserReference() != userRef;
             }
         });
     }

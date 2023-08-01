@@ -76,7 +76,7 @@ public class LegacyDefaultNotificationFilterManager extends DefaultNotificationF
             while (it.hasNext()) {
                 NotificationFilter filter = it.next();
                 boolean filterActivation = filterActivations.getOrDefault(filter.getName(), true);
-                if (!this.shouldFilterBeSelected(filter, filterActivation, onlyEnabled, filteringPhase,
+                if (!this.legacyShouldFilterBeSelected(filter, filterActivation, onlyEnabled, filteringPhase,
                     false))
                 {
                     it.remove();
@@ -86,14 +86,14 @@ public class LegacyDefaultNotificationFilterManager extends DefaultNotificationF
         }
     }
 
-    private boolean shouldFilterBeSelected(NotificationFilter filter, boolean filterActivation, boolean onlyEnabled,
+    private boolean legacyShouldFilterBeSelected(NotificationFilter filter, boolean filterActivation, boolean onlyEnabled,
         NotificationFilter.FilteringPhase filteringPhase, boolean onlyExactPhase)
     {
-        return shouldFilterBeSelectedBasedOnStatus(filterActivation, onlyEnabled)
-            && shouldFilterBeSelectedBasedOnFilteringPhase(filter, filteringPhase, onlyExactPhase);
+        return legacyShouldFilterBeSelectedBasedOnStatus(filterActivation, onlyEnabled)
+            && legacyShouldFilterBeSelectedBasedOnFilteringPhase(filter, filteringPhase, onlyExactPhase);
     }
 
-    private boolean shouldFilterBeSelectedBasedOnStatus(boolean filterActivation, boolean onlyEnabled)
+    private boolean legacyShouldFilterBeSelectedBasedOnStatus(boolean filterActivation, boolean onlyEnabled)
     {
         boolean result = false;
         // if we don't care to get only the enabled one, we can return all of them.
@@ -106,7 +106,7 @@ public class LegacyDefaultNotificationFilterManager extends DefaultNotificationF
         return result;
     }
 
-    private boolean shouldFilterBeSelectedBasedOnFilteringPhase(NotificationFilter filter,
+    private boolean legacyShouldFilterBeSelectedBasedOnFilteringPhase(NotificationFilter filter,
         NotificationFilter.FilteringPhase filteringPhase, boolean prefilteringEnabled)
     {
         boolean result;

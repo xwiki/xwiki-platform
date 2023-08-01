@@ -19,22 +19,22 @@
  */
 package org.xwiki.extension.security.internal.analyzer.osv;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.extension.index.security.ExtensionSecurityAnalysisResult;
 import org.xwiki.extension.index.security.SecurityVulnerabilityDescriptor;
-import org.xwiki.extension.security.internal.analyzer.osv.model.response.AffectObject;
-import org.xwiki.extension.security.internal.analyzer.osv.model.response.EventObject;
 import org.xwiki.extension.security.internal.analyzer.osv.model.response.OsvResponse;
-import org.xwiki.extension.security.internal.analyzer.osv.model.response.RangeObject;
-import org.xwiki.extension.security.internal.analyzer.osv.model.response.SeverityObject;
-import org.xwiki.extension.security.internal.analyzer.osv.model.response.VulnObject;
-import org.xwiki.extension.security.internal.analyzer.osv.model.response.VulnReferenceObject;
 import org.xwiki.extension.version.internal.DefaultVersion;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -58,27 +58,45 @@ class OsvResponseAnalyzerTest
     }
 
     @Test
+    void analyzeOsvResponseOrgXWikiPlatform()
+    {
+        OsvResponse osvResponse = readJson("analyzeOsvResponseOrgXWikiPlatform.json");
+
+        ExtensionSecurityAnalysisResult expected = new ExtensionSecurityAnalysisResult();
+        SecurityVulnerabilityDescriptor securityVulnerabilityDescriptor0 = new SecurityVulnerabilityDescriptor();
+        securityVulnerabilityDescriptor0.setId("GHSA-4v38-964c-xjmw");
+        securityVulnerabilityDescriptor0.setURL(
+            "https://github.com/xwiki/xwiki-platform/security/advisories/GHSA-4v38-964c-xjmw");
+        securityVulnerabilityDescriptor0.setScore(9.9);
+        securityVulnerabilityDescriptor0.setFixVersion(new DefaultVersion("14.10.2"));
+        SecurityVulnerabilityDescriptor securityVulnerabilityDescriptor1 = new SecurityVulnerabilityDescriptor();
+        securityVulnerabilityDescriptor1.setId("GHSA-9j36-3cp4-rh4j");
+        securityVulnerabilityDescriptor1.setURL(
+            "https://github.com/xwiki/xwiki-platform/security/advisories/GHSA-9j36-3cp4-rh4j");
+        securityVulnerabilityDescriptor1.setScore(9.9);
+        securityVulnerabilityDescriptor1.setFixVersion(new DefaultVersion("13.10.11"));
+        SecurityVulnerabilityDescriptor securityVulnerabilityDescriptor2 = new SecurityVulnerabilityDescriptor();
+        securityVulnerabilityDescriptor2.setId("GHSA-rfh6-mg6h-h668");
+        securityVulnerabilityDescriptor2.setURL(
+            "https://github.com/xwiki/xwiki-platform/security/advisories/GHSA-rfh6-mg6h-h668");
+        securityVulnerabilityDescriptor2.setScore(9.9);
+        securityVulnerabilityDescriptor2.setFixVersion(new DefaultVersion("13.10.11"));
+        expected.setResults(List.of(
+            securityVulnerabilityDescriptor0,
+            securityVulnerabilityDescriptor1,
+            securityVulnerabilityDescriptor2
+        ));
+
+        assertEquals(expected,
+            this.analyzer.analyzeOsvResponse("org.xwiki.platform:xwiki-platform-administration-ui", "13.10",
+                osvResponse));
+    }
+
+    @Test
     void analyzeOsvResponse()
     {
-        OsvResponse osvResponse = new OsvResponse();
-        VulnObject vulnObject = new VulnObject();
-        AffectObject affectObject = new AffectObject();
-        RangeObject rangeObject = new RangeObject();
-        EventObject eventObject = new EventObject();
-        eventObject.setFixed("15.7");
-        rangeObject.setEvents(List.of(eventObject));
-        affectObject.setRanges(List.of(rangeObject));
-        vulnObject.setAffected(List.of(affectObject));
-        vulnObject.setId("VULN_ID");
-        VulnReferenceObject webReference = new VulnReferenceObject();
-        webReference.setType("WEB");
-        webReference.setUrl("https://main.ref/");
-        vulnObject.setReferences(List.of(webReference));
-        SeverityObject severityObject = new SeverityObject();
-        severityObject.setType("CVSS_V3");
-        severityObject.setScore("CVSS:3.0/AV:N/AC:L/PR:H/UI:R/S:C/C:H/I:L/A:L");
-        vulnObject.setSeverity(List.of(severityObject));
-        osvResponse.setVulns(List.of(vulnObject));
+        OsvResponse osvResponse = readJson("analyzeOsvResponse.json");
+
         ExtensionSecurityAnalysisResult expected = new ExtensionSecurityAnalysisResult();
         SecurityVulnerabilityDescriptor securityVulnerabilityDescriptor = new SecurityVulnerabilityDescriptor();
         securityVulnerabilityDescriptor.setId("VULN_ID");
@@ -86,9 +104,31 @@ class OsvResponseAnalyzerTest
         securityVulnerabilityDescriptor.setScore(7.5);
         securityVulnerabilityDescriptor.setFixVersion(new DefaultVersion("15.7"));
         expected.setResults(List.of(securityVulnerabilityDescriptor));
-        expected.setAdvice("extension.security.analysis.advice.upgradeFromEM");
 
         assertEquals(expected,
             this.analyzer.analyzeOsvResponse("org.test:my-ext", "7.5", osvResponse));
+    }
+
+    @Test
+    void fixVersion()
+    {
+        OsvResponse osvResponse = readJson("org.apache.hadoop-hadoop-common-3.2.2.json");
+        ExtensionSecurityAnalysisResult extensionSecurityAnalysisResult =
+            this.analyzer.analyzeOsvResponse("org.apache.hadoop:hadoop-common", "3.2.2", osvResponse);
+        assertEquals(new DefaultVersion("3.2.4"),
+            extensionSecurityAnalysisResult.getSecurityVulnerabilities().get(0).getFixVersion());
+    }
+
+    private OsvResponse readJson(String name)
+    {
+        InputStream resourceAsStream = getClass().getClassLoader().getResourceAsStream(name);
+        try {
+            return new ObjectMapper()
+                .setSerializationInclusion(NON_NULL)
+                .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+                .readValue(resourceAsStream, OsvResponse.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

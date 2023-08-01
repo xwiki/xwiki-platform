@@ -19,6 +19,8 @@
  */
 package org.xwiki.extension.security.internal.analyzer.osv.model.response;
 
+import org.xwiki.text.XWikiToStringBuilder;
+
 /**
  * See the <a href="https://ossf.github.io/osv-schema/">Open Source Vulnerability format API documentation</a>.
  *
@@ -61,5 +63,14 @@ public class VulnReferenceObject
     public void setUrl(String url)
     {
         this.url = url;
+    }
+
+    @Override
+    public String toString()
+    {
+        return new XWikiToStringBuilder(this)
+            .append("type", getType())
+            .append("url", getUrl())
+            .toString();
     }
 }

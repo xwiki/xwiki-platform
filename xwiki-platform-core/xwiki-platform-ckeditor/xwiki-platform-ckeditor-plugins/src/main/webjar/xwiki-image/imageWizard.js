@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-define('imageWizard', ['imageSelector', 'imageEditor'], function(imageSelector, imageEditor) {
+define('imageWizard', ['jquery', 'imageSelector', 'imageEditor'], function($, imageSelector, imageEditor) {
   'use strict';
 
   function backToSelectionOrFinish(data) {
@@ -48,6 +48,12 @@ define('imageWizard', ['imageSelector', 'imageEditor'], function(imageSelector, 
     if (CKEDITOR.currentInstance) {
       params.currentDocument = CKEDITOR.currentInstance.config.sourceDocument.documentReference;
     }
+
+    // Skip the wizard if setImageData is set.
+    if (params.setImageData) {
+      return $.Deferred().resolve(params.setImageData);
+    }
+
     if (params.isInsert === false) {
       return editOnly(params);
     } else {

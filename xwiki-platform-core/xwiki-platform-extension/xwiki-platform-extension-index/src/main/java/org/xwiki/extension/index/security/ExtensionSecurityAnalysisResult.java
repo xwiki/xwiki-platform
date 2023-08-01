@@ -41,6 +41,10 @@ public class ExtensionSecurityAnalysisResult
 
     private String advice;
 
+    private boolean fromEnvironment;
+
+    private boolean isInstalledExtension;
+
     /**
      * @param securityVulnerabilities the security vulnerabilities associated with the analyzed extension
      * @return the current object
@@ -66,6 +70,32 @@ public class ExtensionSecurityAnalysisResult
     public String getAdvice()
     {
         return this.advice;
+    }
+
+    /**
+     * @return {@code true} when the extension is provided by the environment (e.g., from a servlet engine),
+     *     {@code false} when the extension is from xwiki core, an installable extension, or their transitive
+     *     dependencies
+     * @since 15.6RC1
+     */
+    @Unstable
+    public boolean isFromEnvironment()
+    {
+        return this.fromEnvironment;
+    }
+
+    /**
+     * @param fromEnvironment {@code true} when the extension is provided by the environment (e.g., from a servlet
+     *     engine), {@code false} when the extension is from xwiki core, an installable extension, or their transitive
+     *     dependencies
+     * @return the current object
+     * @since 15.6RC1
+     */
+    @Unstable
+    public ExtensionSecurityAnalysisResult setFromEnvironment(boolean fromEnvironment)
+    {
+        this.fromEnvironment = fromEnvironment;
+        return this;
     }
 
     /**
@@ -95,6 +125,26 @@ public class ExtensionSecurityAnalysisResult
         }
     }
 
+    /**
+     * @param isInstalledExtension {@code true} when the extension is installed, {@code false} otherwise
+     * @since 15.6RC1
+     */
+    @Unstable
+    public void setInstalledExtension(boolean isInstalledExtension)
+    {
+        this.isInstalledExtension = isInstalledExtension;
+    }
+
+    /**
+     * @return {@code true} when the extension is installed, {@code false} otherwise
+     * @since 15.6RC1
+     */
+    @Unstable
+    public boolean isInstalledExtension()
+    {
+        return this.isInstalledExtension;
+    }
+
     @Override
     public boolean equals(Object o)
     {
@@ -111,6 +161,8 @@ public class ExtensionSecurityAnalysisResult
         return new EqualsBuilder()
             .append(this.securityVulnerabilities, that.securityVulnerabilities)
             .append(this.advice, that.advice)
+            .append(this.fromEnvironment, that.fromEnvironment)
+            .append(this.isInstalledExtension, that.isInstalledExtension)
             .isEquals();
     }
 
@@ -120,6 +172,8 @@ public class ExtensionSecurityAnalysisResult
         return new HashCodeBuilder(17, 37)
             .append(this.securityVulnerabilities)
             .append(this.advice)
+            .append(this.fromEnvironment)
+            .append(this.isInstalledExtension)
             .toHashCode();
     }
 
@@ -129,6 +183,8 @@ public class ExtensionSecurityAnalysisResult
         return new XWikiToStringBuilder(this)
             .append("securityVulnerabilities", this.securityVulnerabilities)
             .append("advice", this.advice)
+            .append("fromEnvironment", this.fromEnvironment)
+            .append("isInstalledExtension", this.isInstalledExtension)
             .toString();
     }
 }

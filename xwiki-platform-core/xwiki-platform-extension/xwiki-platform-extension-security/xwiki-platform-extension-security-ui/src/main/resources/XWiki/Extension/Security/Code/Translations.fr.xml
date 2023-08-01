@@ -50,4 +50,4 @@ XWiki.Extension.Security.Code.ConfigClass_scanDelay.hint=Nombre d'heures d'atten
 XWiki.Extension.Security.Code.ConfigClass_scanURL=URL du scan
 XWiki.Extension.Security.Code.ConfigClass_scanURL.hint=L'URL à utiliser comme source distante pour l'analyse de sécurité (valeur par défaut : https://api.osv.dev/v1/query)
 </content>
-  </xwikidoc>
+</xwikidoc>

@@ -24,8 +24,6 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.pagefactory.AjaxElementLocatorFactory;
 import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.test.ui.PersistentTestContext;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
@@ -38,8 +36,6 @@ import org.xwiki.test.ui.XWikiWebDriver;
  */
 public class BaseElement
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BaseElement.class);
-
     private static PersistentTestContext context;
 
     /** Used so that AllTests can set the persistent test context. */

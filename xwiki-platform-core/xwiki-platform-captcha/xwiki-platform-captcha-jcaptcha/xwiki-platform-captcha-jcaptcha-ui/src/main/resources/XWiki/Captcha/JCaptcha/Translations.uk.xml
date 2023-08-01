@@ -62,4 +62,4 @@ captcha.jcaptcha.engine.com.octo.captcha.engine.sound.gimpy.SimpleListSoundCaptc
 captcha.jcaptcha.engine.org.xwiki.captcha.internal.SimpleMathCaptchaEngine=Проста математика
 captcha.jcaptcha.engine.custom=Користувацький:
 </content>
-  </xwikidoc>
+</xwikidoc>

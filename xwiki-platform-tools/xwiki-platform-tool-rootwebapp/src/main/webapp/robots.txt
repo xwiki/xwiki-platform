@@ -38,7 +38,6 @@ Disallow: /xwiki/bin/upload/
 Disallow: /xwiki/bin/temp/
 Disallow: /xwiki/bin/downloadrev/
 Disallow: /xwiki/bin/dot/
-Disallow: /xwiki/bin/svg/
 Disallow: /xwiki/bin/delattachment/
 Disallow: /xwiki/bin/skin/
 Disallow: /xwiki/bin/jsx/

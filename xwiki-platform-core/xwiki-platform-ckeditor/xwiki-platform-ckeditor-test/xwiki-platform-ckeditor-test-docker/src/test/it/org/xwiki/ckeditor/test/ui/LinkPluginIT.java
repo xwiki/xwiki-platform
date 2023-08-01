@@ -23,12 +23,9 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
-import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
@@ -45,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @UITest(extraJARs = {
     "org.xwiki.platform:xwiki-platform-search-solr-query"
 })
-class LinkPluginIT
+class LinkPluginIT extends AbstractCKEditorIT
 {
     @Test
     void insertLinks(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration) throws Exception
@@ -56,25 +53,25 @@ class LinkPluginIT
         uploadAttachment(setup, new DocumentReference("subPage", testReference.getLastSpaceReference()), "image.gif");
 
         // Wait for SOLR indexing to complete as the link search is based on solr indexation.
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
+        waitForSolrIndexing(setup, testConfiguration);
 
         ViewPage page = setup.gotoPage(testReference);
         WYSIWYGEditPage wysiwygEditPage = page.editWYSIWYG();
         CKEditor editor = new CKEditor("content").waitToLoad();
 
         String spaceName = testReference.getLastSpaceReference().getParent().getName();
-        editor.clickLinkButton()
+        editor.getToolBar().insertOrEditLink()
             .setResourceValue("subPage")
             .selectPageItem(String.format("%s / insertLinks", spaceName), "subPage")
-            .clickOK();
+            .submit();
 
         editor.getRichTextArea().sendKeys(Keys.RIGHT, Keys.ENTER);
 
-        editor.clickLinkButton()
+        editor.getToolBar().insertOrEditLink()
             .setResourceType("attach")
             .setResourceValue("image")
             .selectPageItem(String.format("%s / insertLinks / subPage", spaceName), "image.gif")
-            .clickOK();
+            .submit();
 
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
@@ -91,12 +88,5 @@ class LinkPluginIT
         setup.attachFile(testReference, attachmentName,
             getClass().getResourceAsStream("/ResourcePicker/" + attachmentName), false);
         return newPage;
-    }
-
-    private String computedHostURL(TestConfiguration testConfiguration)
-    {
-        ServletEngine servletEngine = testConfiguration.getServletEngine();
-        return String.format("http://%s:%d%s", servletEngine.getIP(), servletEngine.getPort(),
-            XWikiExecutor.DEFAULT_CONTEXT);
     }
 }

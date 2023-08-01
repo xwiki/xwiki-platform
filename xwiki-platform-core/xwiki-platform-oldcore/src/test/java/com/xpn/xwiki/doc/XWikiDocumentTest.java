@@ -23,7 +23,6 @@ import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -728,29 +727,6 @@ public class XWikiDocumentTest
 
         assertEquals("<p><strong>bold</strong></p>",
             this.document.getRenderedContent("**bold**", "xwiki/2.0", this.oldcore.getXWikiContext()));
-    }
-
-    /**
-     * Validate rename does not crash when the document has 1.0 syntax (it does not support everything but it does not
-     * crash).
-     */
-    @Test
-    public void rename10() throws XWikiException
-    {
-        this.document.setContent("[pageinsamespace]");
-        this.document.setSyntax(Syntax.XWIKI_1_0);
-        DocumentReference targetReference = new DocumentReference("newwikiname", "newspace", "newpage");
-        XWikiDocument targetDocument = this.document.duplicate(targetReference);
-
-        when(this.xWiki.copyDocument(any(), any(), any())).thenReturn(true);
-        when(this.xWiki.getDocument(eq(targetReference), any())).thenReturn(targetDocument);
-
-        this.document.rename(new DocumentReference("newwikiname", "newspace", "newpage"),
-            Collections.emptyList(), Collections.emptyList(),
-            this.oldcore.getXWikiContext());
-
-        // Test links
-        assertEquals("[pageinsamespace]", this.document.getContent());
     }
 
     /**

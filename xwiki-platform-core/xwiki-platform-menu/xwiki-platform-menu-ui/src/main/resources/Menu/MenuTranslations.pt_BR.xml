@@ -37,23 +37,23 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content># Class fields
-### Missing: Menu.MenuClass_content1=Menu Structure
+Menu.MenuClass_content1=Estrutura do Menu
 
 # Live table generic keys
-### Missing: menu.livetable.doc.title=Page title
+menu.livetable.doc.title=Título da página
 menu.livetable.doc.name=Nome da página
-### Missing: menu.livetable.doc.location=Location
-### Missing: menu.livetable.doc.space=Space
+menu.livetable.doc.location=Localização
+menu.livetable.doc.space=Espaço
 ### Missing: menu.livetable.doc.fullname=Page full name
 menu.livetable.doc.author=Último Autor
-### Missing: menu.livetable.doc.creator=Creator
+menu.livetable.doc.creator=Criador
 menu.livetable.doc.date=Data de atualização
 ### Missing: menu.livetable.doc.creationDate=Creation date
 ### Missing: menu.livetable._avatar=Avatar
-### Missing: menu.livetable._images=Images
-### Missing: menu.livetable._attachments=Attachments
+menu.livetable._images=Imagens
+menu.livetable._attachments=Anexos
 ### Missing: menu.livetable._actions=Actions
-### Missing: menu.livetable._actions.edit=Edit
+menu.livetable._actions.edit=Editar
 ### Missing: menu.livetable._actions.delete=Delete
 ### Missing: menu.livetable.emptyvalue=-
 
@@ -64,26 +64,34 @@ menu.livetable.doc.date=Data de atualização
 ### Missing: admin.menu.name=Menus
 
 # UIX keys
-### Missing: menu.uix.extensionPoint.label=Menu Display Location
-### Missing: menu.uix.extensionPoint.hint=Specifies where to display the menu. The menu is displayed either horizontally or vertically, based on the chosen location.
-### Missing: menu.uix.extensionPoint.value.nowhere=Nowhere
-### Missing: menu.uix.extensionPoint.value.template.header.after=After the Page Header
-### Missing: menu.uix.extensionPoint.value.panels.rightPanels=Inside a Right Panel
-### Missing: menu.uix.extensionPoint.value.panels.leftPanels=Inside a Left Panel
+menu.uix.extensionPoint.label=Local de Exibição do Menu
+menu.uix.extensionPoint.hint=Especifica onde exibir o menu. O menu é exibido na horizontal ou na vertical, com base no local escolhido.
+menu.uix.extensionPoint.value.nowhere=Em lugar nenhum
+menu.uix.extensionPoint.value.template.header.after=Após o cabeçalho da página
+menu.uix.extensionPoint.value.panels.rightPanels=Dentro de um painel direito
+menu.uix.extensionPoint.value.panels.leftPanels=Dentro de um painel esquerdo
 ### Missing: menu.uix.content.label=UI Extension Content
-### Missing: menu.uix.content.hint=If you can see this then it probably means you have JavaScript disabled. You should select the same value as for the menu display location.
-### Missing: menu.uix.scope.label=Menu Visibility Scope
-### Missing: menu.uix.scope.hint=Specifies in which context the menu is visible.
+menu.uix.content.hint=Se você pode ver isso, provavelmente significa que você desativou o JavaScript. Você deve selecionar o mesmo valor para o local de exibição do menu.
+menu.uix.scope.label=Escopo de visibilidade do menu
+menu.uix.scope.hint=Especifica em qual contexto o menu é visível.
 
 # Menu Macro
 ### Missing: rendering.macro.menu.name=Menu
-### Missing: rendering.macro.menu.description=Displays a menu created using simple wiki syntax (nested lists and links).
+rendering.macro.menu.description=Exibe um menu criado usando sintaxe wiki simples (listas e links aninhados).
 ### Missing: rendering.macro.menu.parameter.id.name=Id
-### Missing: rendering.macro.menu.parameter.id.description=Optional menu identifier that will be set on the HTML element that wraps the menu. You can use this identifier in JavaScript code to access the menu DOM or in functional tests to assert the menu items.
+rendering.macro.menu.parameter.id.description=Identificador de menu opcional que será definido no elemento HTML que envolve o menu. Você pode usar esse identificador no código JavaScript para acessar o menu DOM ou em testes funcionais para afirmar os itens do menu.
+rendering.macro.menu.parameter.label.name=Rótulo
+rendering.macro.menu.parameter.label.description=Rótulo de menu opcional usado para descrever o conteúdo do menu. Especialmente importante para tecnologias assistivas e acessibilidade do menu.
 ### Missing: rendering.macro.menu.parameter.type.name=Type
-### Missing: rendering.macro.menu.parameter.type.description=The optional menu type determines the menu appearance and behaviour. The supported values are: horizontal (default value) and vertical.
-### Missing: rendering.macro.menu.content.description=Define the menu structure using wiki syntax. Each menu item should be a list item and should contain the menu item label or link. You can use nested lists for sub-menu items.
+rendering.macro.menu.parameter.type.description=O tipo de menu opcional determina a aparência e o comportamento do menu. Os valores suportados são: horizontal (valor padrão) e vertical.
+rendering.macro.menu.content.description=Defina a estrutura do menu usando a sintaxe wiki. Cada item de menu deve ser um item de lista e deve conter o rótulo ou link do item de menu. Você pode usar listas aninhadas para itens de submenu.
+
+# Menu UI
+menu.ui.openSubMenu=Abra o submenu.
+menu.ui.closeSubMenu=Fechar o submenu.
+menu.ui.horizontal.toggler.description=Alternar o menu horizontal.
 
 # Menu WebHome
-### Missing: menu.description=This is a simple application that helps you create navigation menus to be displayed either horizontally as a top bar after the page header or vertically in a side panel.</content>
+menu.description=Este é um aplicativo simples que ajuda a criar menus de navegação para serem exibidos horizontalmente como uma barra superior após o cabeçalho da página ou verticalmente em um painel lateral.
+</content>
 </xwikidoc>

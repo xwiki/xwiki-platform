@@ -244,8 +244,15 @@
   //----------------------------------
   var AutoComplete = CKEDITOR.plugins.autocomplete;
 
-  var View = AutoComplete.view;
-  var AdvancedView = function(editor) {
+  // Include the query in the view so that we can properly wait for the auto-complete drop-down in integration tests.
+  const originalAutoCompleteOpen = AutoComplete.prototype.open;
+  AutoComplete.prototype.open = function() {
+    originalAutoCompleteOpen.apply(this, arguments);
+    this.view.element.setAttribute('data-query', this.model.query);
+  };
+
+  var View = AutoComplete.view,
+  AdvancedView = function(editor) {
     // Call the parent class constructor.
     View.call(this, editor);
   };
@@ -337,8 +344,11 @@
           // Get the text before the caret.
           var left = text.slice(0, offset),
               // Will look for the marker followed by text.
-              match = left.match(new RegExp(escapeRegExp(config.marker) + '.{0,30}$'));
-          if (match) {
+              match = left.match(new RegExp(escapeRegExp(config.marker) + '.{0,30}$')),
+              // Do not show the Quick Actions dropdown when the query contains '::'
+              // Because another dropdown might appear
+              subMatch = left.match(new RegExp(escapeRegExp(config.marker) + '.{0,30}::\\S{0,30}$'));
+          if (match && !subMatch) {
             return {
               start: match.index,
               end: offset
@@ -496,6 +506,42 @@
           }
         }, {
           group: 'Layout',
+          id: 'h4',
+          name: editor.lang.format.tag_h4, // jshint ignore:line
+          iconClass: 'fa fa-header',
+          description: editor.localization.get('xwiki-slash.action.h4.hint'),
+          command: {
+            name: 'xwiki-applyStyle',
+            data: {
+              element: 'h4'
+            }
+          }
+        }, {
+          group: 'Layout',
+          id: 'h5',
+          name: editor.lang.format.tag_h5, // jshint ignore:line
+          iconClass: 'fa fa-header',
+          description: editor.localization.get('xwiki-slash.action.h5.hint'),
+          command: {
+            name: 'xwiki-applyStyle',
+            data: {
+              element: 'h5'
+            }
+          }
+        }, {
+          group: 'Layout',
+          id: 'h6',
+          name: editor.lang.format.tag_h6, // jshint ignore:line
+          iconClass: 'fa fa-header',
+          description: editor.localization.get('xwiki-slash.action.h6.hint'),
+          command: {
+            name: 'xwiki-applyStyle',
+            data: {
+              element: 'h6'
+            }
+          }
+        }, {
+          group: 'Layout',
           id: 'p',
           name: editor.localization.get('xwiki-slash.action.p.name'),
           iconClass: 'fa fa-paragraph',
@@ -612,7 +658,7 @@
           name: editor.lang.common.image,
           iconClass: 'fa fa-image',
           description: editor.localization.get('xwiki-slash.action.img.hint'),
-          command: 'image'
+          outputHTML: '/img::'
         }, {
           group: 'Content',
           id: 'mention',

@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -87,10 +86,8 @@ public class TreeElement extends BaseElement
      */
     public TreeElement openTo(String nodeId)
     {
-        if (getDriver() instanceof JavascriptExecutor) {
-            ((JavascriptExecutor) getDriver()).executeScript(
-                "jQuery.jstree.reference(jQuery(arguments[0])).openTo(arguments[1])", this.element, nodeId);
-        }
+        getDriver().executeScript("jQuery.jstree.reference(jQuery(arguments[0])).openTo(arguments[1])", this.element,
+            nodeId);
         waitForNodeSelected(nodeId);
 
         return this;
@@ -104,10 +101,8 @@ public class TreeElement extends BaseElement
      */
     public TreeElement clearSelection()
     {
-        if (getDriver() instanceof JavascriptExecutor) {
-            ((JavascriptExecutor) getDriver()).executeScript(
-                "jQuery.jstree.reference(jQuery(arguments[0])).deselect_all()", this.element);
-        }
+        getDriver().executeScript("jQuery.jstree.reference(jQuery(arguments[0])).deselect_all()", this.element);
+
         return this;
     }
 
@@ -160,15 +155,8 @@ public class TreeElement extends BaseElement
     @SuppressWarnings("unchecked")
     public List<String> getSelectedNodeIDs()
     {
-        if (getDriver() instanceof JavascriptExecutor) {
-            List<String> selectedNodeIDs =
-                (List<String>) ((JavascriptExecutor) getDriver()).executeScript(
-                    "return jQuery.jstree.reference(jQuery(arguments[0])).get_selected()", this.element);
-
-            return selectedNodeIDs;
-        }
-
-        return new ArrayList<String>();
+        return (List<String>) getDriver()
+            .executeScript("return jQuery.jstree.reference(jQuery(arguments[0])).get_selected()", this.element);
     }
 
     /**
@@ -176,17 +164,12 @@ public class TreeElement extends BaseElement
      */
     public List<String> getNodeIDs()
     {
-        if (getDriver() instanceof JavascriptExecutor) {
-            String[] selectedNodeIDs =
-                (String[]) ((JavascriptExecutor) getDriver()).executeScript(
-                    "return jQuery.jstree.reference(jQuery(arguments[0])).get_json('#', "
-                        + "{flat:true, no_data:true, no_state:true})" + ".map(function(element) {return element.id});",
-                    this.element);
+        String[] selectedNodeIDs = (String[]) getDriver().executeScript(
+            "return jQuery.jstree.reference(jQuery(arguments[0])).get_json('#', "
+                + "{flat:true, no_data:true, no_state:true})" + ".map(function(element) {return element.id});",
+            this.element);
 
-            return Arrays.asList(selectedNodeIDs);
-        }
-
-        return new ArrayList<String>();
+        return Arrays.asList(selectedNodeIDs);
     }
 
     /**

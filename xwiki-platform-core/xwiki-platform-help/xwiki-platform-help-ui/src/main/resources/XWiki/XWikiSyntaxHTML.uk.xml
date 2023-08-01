@@ -54,4 +54,4 @@
 
 |=Синтаксис XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Результат
 |{{{{{html}}&lt;abbr title="HyperText Markup Language"&gt;HTML&lt;/abbr&gt;{{/html}}}}}|{{html}}&lt;abbr title="HyperText Markup Language"&gt;HTML &lt;/abbr&gt;{{/html}}</content>
-  </xwikidoc>
+</xwikidoc>

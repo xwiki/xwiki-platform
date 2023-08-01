@@ -200,7 +200,7 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
     {
         final QueryManager qm = xcontext.getWiki().getStore().getQueryManager();
         final Query q = qm.getNamedQuery("getWikiMacroDocuments");
-        return (List<Object[]>) (List) q.execute();
+        return (List) q.execute();
     }
 
     /**

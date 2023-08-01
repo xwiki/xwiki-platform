@@ -19,6 +19,8 @@
  */
 package org.xwiki.extension.security.internal.analyzer.osv.model.response;
 
+import org.xwiki.text.XWikiToStringBuilder;
+
 /**
  * See the <a href="https://ossf.github.io/osv-schema/#severity-field">Open Source Vulnerability format API
  * documentation</a>.
@@ -66,5 +68,14 @@ public class SeverityObject
     public void setScore(String score)
     {
         this.score = score;
+    }
+
+    @Override
+    public String toString()
+    {
+        return new XWikiToStringBuilder(this)
+            .append("type", getType())
+            .append("score", getScore())
+            .toString();
     }
 }

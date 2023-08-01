@@ -477,20 +477,22 @@ require([
 
   const exportToPDF = function(data) {
     return runPDFExportJob(data).then(job =&gt; {
+      // Remove the exception name from the start of the error message to make it less technical.
+      const lastError = ((job.lastError || '') + '').replace(/^\w+Exception: /, '');
       if (job.canceled) {
         // Do nothing.
       } else if (job.failed || (config.serverSide &amp;&amp; !job.pdfFileURL)) {
         // Either the job failed, or the PDF file should have been generated server-side but it wasn't.
-        return Promise.reject(job.lastError);
+        return Promise.reject(lastError);
       } else if (job.pdfFileURL) {
         // The PDF file was generated on the server-side. The user just needs to download it.
         window.location.href = job.pdfFileURL;
       } else {
         // The PDF file is going to be generated using the user's own web browser.
-        if (job.lastError) {
+        if (lastError) {
           // The PDF export job log contains some error messages that might explain why the PDF file doesn't have the
           // expected content.
-          new XWiki.widgets.Notification(l10n.get('export.pdf.lastError', job.lastError), 'warning',
+          new XWiki.widgets.Notification(l10n.get('export.pdf.lastError', lastError), 'warning',
             // Increase a bit the timeout so that the user has the time to read the warning message.
             {timeout : 10});
         }

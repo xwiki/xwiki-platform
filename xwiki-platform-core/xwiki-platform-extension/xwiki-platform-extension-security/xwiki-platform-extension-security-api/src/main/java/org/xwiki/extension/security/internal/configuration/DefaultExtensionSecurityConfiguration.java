@@ -53,6 +53,13 @@ public class DefaultExtensionSecurityConfiguration implements ExtensionSecurityC
      */
     public static final String SCAN_URL = "scanURL";
 
+    /**
+     * The URL where the reviews are fetched.
+     *
+     * @since 15.6RC1
+     */
+    public static final String REVIEWS_URL = "reviewsURL";
+
     @Inject
     @Named("xwikiproperties")
     private ConfigurationSource xwikiPropertiesConfigurationSource;
@@ -77,6 +84,13 @@ public class DefaultExtensionSecurityConfiguration implements ExtensionSecurityC
     public String getScanURL()
     {
         return getWithFallback(SCAN_URL, "extension.security.scan.url", "https://api.osv.dev/v1/query");
+    }
+
+    @Override
+    public String getReviewsURL()
+    {
+        return getWithFallback(REVIEWS_URL, "extension.security.reviews.url",
+            "https://extensions.xwiki.org/xwiki/bin/view/Extension/Extension/Security/Code/Reviews");
     }
 
     private <T> T getWithFallback(String classKey, String propertiesKey, T fallbackValue)

@@ -29,7 +29,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -66,16 +65,14 @@ public class CachedNotificationPreferenceModelBridge implements NotificationPref
     private EntityReferenceFactory referenceFactory;
 
     private Map<EntityReference, List<NotificationPreference>> preferenceCache;
-    private Map<Pair<EntityReference, String>, String> eventGroupingStrategyCache;
+    private Map<EntityReference, Map<String, String>> eventGroupingStrategyCache;
 
     @Override
     public void initialize() throws InitializationException
     {
         // TODO: optimize the invalidation not not be on every user document modification
         this.preferenceCache = this.cacheManager.createCache(CACHE_NAME, true);
-
-        // FIXME: should probably be a cache, but it cannot be created with UnboundedEntityCacheManager
-        this.eventGroupingStrategyCache = new HashMap<>();
+        this.eventGroupingStrategyCache = this.cacheManager.createCache(EVENT_GROUPING_CACHE_NAME, true);
     }
 
     @Override
@@ -147,12 +144,13 @@ public class CachedNotificationPreferenceModelBridge implements NotificationPref
     public String getEventGroupingStrategyHint(DocumentReference userDocReference, String target)
         throws NotificationException
     {
-        String strategyHint = this.eventGroupingStrategyCache.get(Pair.of(userDocReference, target));
-        if (strategyHint == null) {
-            strategyHint =
+        Map<String, String> strategyHints =
+                this.eventGroupingStrategyCache.computeIfAbsent(userDocReference, reference -> new HashMap<>());
+        if (!strategyHints.containsKey(target)) {
+            String strategyHint =
                 this.notificationPreferenceModelBridge.getEventGroupingStrategyHint(userDocReference, target);
-            this.eventGroupingStrategyCache.put(Pair.of(userDocReference, target), strategyHint);
+            strategyHints.put(target, strategyHint);
         }
-        return strategyHint;
+        return strategyHints.get(target);
     }
 }

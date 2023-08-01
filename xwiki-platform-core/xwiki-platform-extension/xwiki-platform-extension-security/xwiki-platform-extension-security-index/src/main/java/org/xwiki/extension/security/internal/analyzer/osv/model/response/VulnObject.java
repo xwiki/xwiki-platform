@@ -26,6 +26,7 @@ import java.util.Optional;
 
 import org.xwiki.extension.version.Version;
 import org.xwiki.extension.version.internal.DefaultVersion;
+import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * See the <a href="https://ossf.github.io/osv-schema/">Open Source Vulnerability format API documentation</a>.
@@ -127,6 +128,9 @@ public class VulnObject
      */
     public String getSeverityCCSV3()
     {
+        if (this.severity == null) {
+            return "";
+        }
         return this.severity.stream()
             .filter(s -> Objects.equals("CVSS_V3", s.getType()))
             .map(SeverityObject::getScore)
@@ -135,9 +139,10 @@ public class VulnObject
     }
 
     /**
+     * @param currentVersion the currently analyzed version, the fix version cannot be before the current version
      * @return the most recent fix version for the ranges related to this vulnerability
      */
-    public Optional<Version> getMaxFixVersion()
+    public Optional<Version> getMaxFixVersion(Version currentVersion)
     {
         return this.affected.stream()
             .flatMap(affect -> affect.getRanges().stream())
@@ -145,6 +150,18 @@ public class VulnObject
             .map(EventObject::getFixed)
             .filter(Objects::nonNull)
             .<Version>map(DefaultVersion::new)
-            .max(Comparator.naturalOrder());
+            .filter(it -> it.compareTo(currentVersion) > 0)
+            .min(Comparator.naturalOrder());
+    }
+
+    @Override
+    public String toString()
+    {
+        return new XWikiToStringBuilder(this)
+            .append("affected", getAffected())
+            .append("id", getId())
+            .append("references", getReferences())
+            .append("severity", getSeverity())
+            .toString();
     }
 }

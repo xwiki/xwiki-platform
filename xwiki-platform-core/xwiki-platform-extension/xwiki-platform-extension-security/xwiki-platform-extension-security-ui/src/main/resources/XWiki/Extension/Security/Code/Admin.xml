@@ -40,18 +40,47 @@
 
 {{velocity}}
 #if($services.security.authorization.hasAccess('admin') &amp;&amp; $services.extension.index.security.isSecurityScanEnabled())
-{{warning}}
-{{translation key="extension.security.admin.generalWarning"/}}
-{{/warning}}
+#set($discard = $xwiki.ssx.use("XWiki.Extension.Security.Code.Admin"))
+
+{{html clean='false' wiki='true'}}
+&lt;ul class="nav nav-tabs" role="tablist"&gt;
+  &lt;li role="presentation" class="active"&gt;&lt;a href="#extension-vulnerabilities" aria-controls="extension-vulnerabilities" role="tab" data-toggle="tab"&gt;Extension Vulnerabilities&lt;/a&gt;&lt;/li&gt;
+  &lt;li role="presentation"&gt;&lt;a href="#environment-vulnerabilities" aria-controls="environment-vulnerabilities" 
+  role="tab" data-toggle="tab"&gt;Environment Vulnerabilities&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;div class="tab-content"&gt;
+  &lt;div role="tabpanel" class="tab-pane active" id="extension-vulnerabilities"&gt;
 
 {{liveData
   id="extension-vulnerabilities-list"
   source="extensionSecurity"
-  properties="name,extensionId,wikis,maxCVSS,cveID,fixVersion,advice"
+  sourceParameters="isFromEnvironment=false"
+  properties="name,wikis,maxCVSS,cveID,fixVersion,advice"
   showPageSizeDropdown="false"}}
 {{/liveData}}
 
-{{html}}
+&lt;/div&gt;
+
+&lt;div role="tabpanel" class="tab-pane" id="environment-vulnerabilities"&gt;
+
+(((&amp;nbsp;)))
+{{warning}}
+$escapetool.xml($services.localization.render('extension.security.admin.environment.explanation'))
+{{/warning}}
+
+{{liveData
+  id="environment-vulnerabilities-list"
+  source="extensionSecurity"
+  sourceParameters="isFromEnvironment=true"
+  properties="name,wikis,maxCVSS,cveID,fixVersion"
+  showPageSizeDropdown="false"}}
+{{/liveData}}
+
+  &lt;/div&gt;
+&lt;/div&gt;
+
 #set ($indexJobStatus = $services.job.getJobStatus(['extension_security']))
 #if ($indexJobStatus)
   &lt;div class="box infomessage"&gt;
@@ -72,7 +101,8 @@
     #else
       &lt;div class="box warningmessage"&gt;$escapetool.xml($services.localization.render('extension.security.indexed.nojob'))&lt;/div&gt;
     #end
-{{/html}}
+  &lt;/div&gt;
+  {{/html}}
 #end
 {{/velocity}}
 
@@ -334,6 +364,155 @@
     </property>
     <property>
       <sectionOrder>400</sectionOrder>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Extension.Security.Code.Admin</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>a2f5df4e-b1aa-40a8-a8bb-e0cbe4d7239b</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#extension-vulnerabilities-list,
+#environment-vulnerabilities-list {
+  td,
+  th {
+    inline-size: min-content;
+  }
+
+  td[data-title="Name"] .html-wrapper {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 280px;
+  }
+
+  td[data-title="CVE IDs"] {
+    white-space: nowrap;
+  }
+
+  .property-name {
+    word-wrap: break-word;
+    white-space: break-spaces;
+  }
+
+  .security-vulnerability-detail-modal {
+    white-space: normal;
+    word-wrap: normal;
+  }
+}
+</code>
+    </property>
+    <property>
+      <contentType>LESS</contentType>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
     </property>
   </object>
 </xwikidoc>

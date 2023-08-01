@@ -241,7 +241,12 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
                 #showHeading($appName, $headingShowing)
 
                 {{error}}
-                  {{translation key="xe.admin.configurable.noObjectOfConfigurationClassFound" parameters="$objClass.getName(), $app.getFullName()"/}}
+                  #set($escapedObjClassName =
+                    $services.rendering.escape($escapetool.java($objClass.getName()), 'xwiki/2.1'))
+                  #set($translationEscapedAppName =
+                    $services.rendering.escape($escapetool.java($app.getFullName()), 'xwiki/2.1'))
+                  {{translation key="xe.admin.configurable.noObjectOfConfigurationClassFound"
+                    parameters="~"$escapedObjClassName~", ~"$translationEscapedAppName~""/}}
                 {{/error}}
 
               #else

@@ -161,6 +161,9 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
             {{warning}}{{translation key="xe.admin.configurable.cannotLockNoJavascript"/}}{{/warning}}
 
           &lt;/noscript&gt;
+        {{/html}}
+
+        {{html clean=false}}
           &lt;script&gt;
             document.observe("xwiki:dom:loaded", function() {
               XWiki.DocumentLock &amp;&amp; new XWiki.DocumentLock('$escapetool.javascript($app.prefixedFullName)').lock();
@@ -446,8 +449,8 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
 
   ## Finally we display an error message if there are any applications which we were unable to view.
   #if($appsUserCannotView.size() &gt; 0)
-
-    {{error}}$services.localization.render('xe.admin.configurable.noViewAccessSomeApplications', [$appsUserCannotView]){{/error}}
+    {{error}}$services.localization.render('xe.admin.configurable.noViewAccessSomeApplications',
+      'xwiki/2.1', [$appsUserCannotView]){{/error}}
 
   #end
 #end## If we should be looking at the main administration page.

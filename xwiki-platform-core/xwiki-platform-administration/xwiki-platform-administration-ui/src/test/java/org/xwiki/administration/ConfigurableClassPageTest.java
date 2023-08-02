@@ -100,6 +100,8 @@ class ConfigurableClassPageTest extends PageTest
 
     private static final String MY_SECTION_SERIALIZED = "XWiki.]],{{noscript /}}";
 
+    private static final String WEB_HOME = "WebHome";
+
     @Mock
     private QueryManagerScriptService queryService;
 
@@ -201,7 +203,7 @@ class ConfigurableClassPageTest extends PageTest
         // Make sure the section document is returned by the query.
         when(this.query.execute()).thenReturn(List.of(MY_SECTION_SERIALIZED)).thenReturn(List.of());
 
-        DocumentReference docRef = new DocumentReference(WIKI_NAME, "\">{{/html}}{{noscript /}}", "WebHome");
+        DocumentReference docRef = new DocumentReference(WIKI_NAME, "\">{{/html}}{{noscript /}}", WEB_HOME);
         XWikiDocument contextDoc = new XWikiDocument(docRef);
         this.xwiki.saveDocument(contextDoc, this.context);
         this.context.setDoc(contextDoc);
@@ -232,7 +234,7 @@ class ConfigurableClassPageTest extends PageTest
         // Set a new document with space ">{{/html}}{{noscript /}} as context document to check escaping of the
         // current space.
         String spaceName = "\">{{/html}}{{noscript /}}";
-        DocumentReference docRef = new DocumentReference(WIKI_NAME, spaceName, "WebHome");
+        DocumentReference docRef = new DocumentReference(WIKI_NAME, spaceName, WEB_HOME);
         XWikiDocument contextDoc = new XWikiDocument(docRef);
         this.xwiki.saveDocument(contextDoc, this.context);
         this.context.setDoc(contextDoc);
@@ -246,5 +248,40 @@ class ConfigurableClassPageTest extends PageTest
             .filter(pair -> pair.getName().equals("space"))
             .findFirst()
             .ifPresentOrElse(pair -> assertEquals(spaceName, pair.getValue()), () -> fail("No space parameter in URL"));
+    }
+
+    @Test
+    void escapeClassNameForMissingObject() throws Exception
+    {
+        // Create a new document named "/}}{{noscript /}}.WebHome
+        String spaceName = "\"/}}{{noscript /}}";
+        String referenceSerialized = spaceName + "." + WEB_HOME;
+        DocumentReference documentReference = new DocumentReference(WIKI_NAME, spaceName, WEB_HOME);
+        XWikiDocument doc = new XWikiDocument(documentReference);
+        doc.getXClass().addTextField("field", "My Field", 30);
+        BaseObject object = doc.newXObject(CONFIGURABLE_CLASS, this.context);
+        object.setStringValue("displayInCategory", "other");
+        object.setStringValue("displayInSection", "other");
+        object.setStringValue("scope", "WIKI+ALL_SPACES");
+        object.setStringValue("configurationClass", referenceSerialized);
+        this.xwiki.saveDocument(doc, this.context);
+
+        when(this.query.execute()).thenReturn(List.of(referenceSerialized)).thenReturn(List.of());
+        when(this.oldcore.getMockRightService()
+            .hasAccessLevel(eq("edit"), any(), any(), any())).thenReturn(true);
+
+        this.request.put("section", "other");
+
+        XWikiDocument contextDoc = new XWikiDocument(new DocumentReference(WIKI_NAME, SPACE_NAME, WEB_HOME));
+        this.xwiki.saveDocument(contextDoc, this.context);
+        this.context.setDoc(contextDoc);
+
+        XWikiDocument configurableClassDoc = loadPage(CONFIGURABLE_CLASS);
+        Document htmlPage = renderHTMLPage(configurableClassDoc);
+
+        String expectedMessage =
+            String.format("xe.admin.configurable.noObjectOfConfigurationClassFound [%s, %s]", referenceSerialized,
+                referenceSerialized);
+        assertEquals(expectedMessage, Objects.requireNonNull(htmlPage.selectFirst("div.errormessage")).text());
     }
 }

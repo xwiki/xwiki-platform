@@ -206,7 +206,13 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
             ## Can't use $configurableObj.display('heading', 'view', false) to have proper heading id (because of the html macro)
             ## FIXME: find a cleaner solution
             #set($void = $doc.dropPermissions())
-            == #evaluate($heading) ==
+            #if ($services.security.authorization.hasAccess("script",
+              $app.authors.effectiveMetadataAuthor, $app.documentReference) &amp;&amp; !$app.restricted)
+              #set($evaluatedHeading = "#evaluate($heading)")
+            #else
+              #set($evaluatedHeading = $heading)
+            #end
+            == $services.rendering.escape($evaluatedHeading, 'xwiki/2.1') ==
           #end
           ## Display code to execute
           #if($codeToExecute != '')

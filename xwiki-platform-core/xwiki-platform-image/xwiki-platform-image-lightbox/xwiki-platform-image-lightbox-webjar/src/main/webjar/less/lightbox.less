@@ -77,6 +77,20 @@
     transform: translateZ(0);
   }
 }
+
+.lightbox-toggle {
+  display:none;
+  min-width: @target-size-recommended;
+  min-height: @target-size-recommended;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+
+  &.focused {
+    display: inline-block;
+  }
+}
+
 #imageToolbarTemplate {
   display: none;
 }

@@ -21,13 +21,15 @@ define('xwiki-lightbox-messages', {
   prefix: 'core.viewers.attachments.',
   keys: [
     'date',
-    'author'
+    'author',
+    'toggle.label'
   ]
 });
 
 define('xwiki-lightbox-config', ['jquery'], function($) {
   var config = JSON.parse($('#lightbox-config').text());
   $('body').append($(config.HTMLTemplate));
+  var toggler = $(config.togglerTemplate);
 });
 
 define('xwiki-lightbox-description', [
@@ -165,10 +167,11 @@ define('xwiki-lightbox', [
   'jquery',
   'xwiki-lightbox-description',
   'blueimp-gallery',
+  'xwiki-l10n!xwiki-lightbox-messages',
   'xwiki-lightbox-config',
   'blueimp-gallery-fullscreen',
   'blueimp-gallery-indicator'
-], function($, lightboxDescription, gallery) {
+], function($, lightboxDescription, gallery, l10n) {
   var openedLightbox;
   var slidesData;
   var lightboxImages;
@@ -238,6 +241,19 @@ define('xwiki-lightbox', [
         $('.popover .copyImageId').attr('data-imageId', imageId);
         $('.popover .copyImageId').parent().removeClass('hidden');
       }
+    });
+    // We add the sr-only buttons to expand the lightbox
+    lightboxImages.each(function() {
+      let lightboxToggle = toggler.clone();
+      lightboxToggle.on('focus', function() {this.classList.add('focused');});
+      lightboxToggle.on('focusout', function() {this.classList.remove('focused');});
+      lightboxToggle.on('click', function(e) {
+        clearTimeout(showTimeout);
+        popoverContainer.css({top: e.pageY, left: e.pageX});
+        popoverContainer.popover('show');
+      });
+      lightboxToggle.setAttribute('aria-label', l10n.get('toggle.label'));
+      lightboxToggle.insertAfter();
     });
     lightboxImages.on('mouseenter', function(e) {
       clearTimeout(hideTimeout);

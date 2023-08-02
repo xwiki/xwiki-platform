@@ -22,11 +22,15 @@ package org.xwiki.ckeditor.test.ui;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.LinkDialog;
 import org.xwiki.ckeditor.test.po.image.ImageDialogEditModal;
@@ -37,16 +41,22 @@ import org.xwiki.ckeditor.test.po.image.select.ImageDialogIconSelectForm;
 import org.xwiki.ckeditor.test.po.image.select.ImageDialogUrlSelectForm;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rest.model.jaxb.Object;
 import org.xwiki.rest.model.jaxb.Property;
+import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.test.docker.junit5.TestLocalReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.WikisSource;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -56,14 +66,27 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 14.7RC1
  */
 @UITest
-class ImagePluginIT
+class ImagePluginIT extends AbstractCKEditorIT
 {
+    
+    @BeforeAll
+    void beforeAll(TestUtils setup, TestConfiguration testConfiguration) throws Exception {
+        setup.loginAsSuperAdmin();
+        waitForSolrIndexing(setup, testConfiguration);
+    }
+    
     @BeforeEach
     void setUp(TestUtils setup, TestReference testReference)
     {
         // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
         createAndLoginStandardUser(setup);
         setup.deletePage(testReference);
+    }
+    
+    @AfterEach
+    void afterEach(TestUtils setup, TestReference testReference)
+    {
+        maybeLeaveEditMode(setup, testReference);
     }
 
     @Test
@@ -548,17 +571,119 @@ class ImagePluginIT
 
         assertEquals("[[image:" + imageURL + "||height=\"50\" width=\"50\"]]", savedPage.editWiki().getContent());
     }
-
-    private static void createAndLoginStandardUser(TestUtils setup)
+    
+    @Test
+    @Order(13)
+    void quickInsertImageThisPage(TestUtils setup,
+            TestReference testReference) throws Exception
     {
-        setup.createUserAndLogin("alice", "pa$$word", "editor", "Wysiwyg", "usertype", "Advanced");
+        
+        // Upload an attachment to the page.
+        String attachmentName = "image.gif";
+        AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
+        uploadAttachment(setup, testReference, attachmentName);
+        
+        // Move to the WYSIWYG edition page.
+        edit(setup, testReference, false);
+        
+        // Run the image quick action.
+        textArea.sendKeys("/image");
+        AutocompleteDropdown qa = new AutocompleteDropdown().waitForItemSelected("/image", "Image");
+        textArea.sendKeys(Keys.ENTER);
+        qa.waitForItemSubmitted();
+        
+        // Select the newly uploaded image.
+        textArea.sendKeys("image");
+        AutocompleteDropdown img = new AutocompleteDropdown().waitForItemSelected("img::image", attachmentName);
+        assertIterableEquals(List.of("This page"), img.getSelectedItem().getBadges());
+        textArea.sendKeys(Keys.ENTER);
+        img.waitForItemSubmitted();
+
+        // Using absolute reference until we fix XWIKI-21182.
+        assertSourceEquals("[[image:" + setup.serializeReference(attachmentReference) + "]]");
     }
 
-    private ViewPage uploadAttachment(TestUtils setup, TestReference testReference, String attachmentName)
+    @Test
+    @Order(14)
+    void quickInsertImageOtherPage(TestUtils setup,
+            TestReference testReference) throws Exception
+    {
+        // Create a child page.
+        DocumentReference otherPage = new DocumentReference("attachmentOtherPage",
+                        testReference.getLastSpaceReference());
+        
+        // Attach an image named "otherImage.gif" to the other page.
+        String otherAttachmentName = "otherImage.gif";
+        AttachmentReference attachmentReference = new AttachmentReference(otherAttachmentName, otherPage);
+        uploadAttachment(setup, otherPage, otherAttachmentName);
+        
+        String attachmentName = "image.gif";
+        uploadAttachment(setup, testReference, attachmentName);
+
+        // Move to the WYSIWYG edition page.
+        edit(setup, testReference, false);
+        
+        // Run the image quick action.
+        textArea.sendKeys("/image");
+        AutocompleteDropdown qa = new AutocompleteDropdown().waitForItemSelected("/image", "Image");
+        textArea.sendKeys(Keys.ENTER);
+        qa.waitForItemSubmitted();
+        
+        // With the query "image", the image from the current page should be first.
+        textArea.sendKeys("image");
+        AutocompleteDropdown img = new AutocompleteDropdown().waitForItemSelected("img::image", attachmentName);
+        assertIterableEquals(List.of("This page"), img.getSelectedItem().getBadges());
+        // The image from the other page should be right after, because last uploaded on the instance.
+        textArea.sendKeys(Keys.DOWN);
+        img.waitForItemSelected("img::image", otherAttachmentName);
+        assertIterableEquals(List.of(""), img.getSelectedItem().getBadges());
+        textArea.sendKeys(Keys.ENTER);
+        img.waitForItemSubmitted();
+        
+        // Using absolute reference until we fix XWIKI-21182.
+        assertSourceEquals("[[image:" + setup.serializeReference(attachmentReference) + "]]");
+    }
+    
+    @ParameterizedTest
+    @WikisSource(mainWiki = false)
+    @Order(15)
+    void quickInsertImageSubWiki(WikiReference wiki, TestUtils setup,
+            TestLocalReference testLocalReference, TestReference testReference) throws Exception
+    {
+        DocumentReference subwikiDocumentReference = new DocumentReference(testLocalReference, wiki);
+
+        // Upload image to subwiki.
+        String attachmentName = "image.gif";
+        AttachmentReference attachmentReference = new AttachmentReference(attachmentName, subwikiDocumentReference);
+        uploadAttachment(setup, subwikiDocumentReference, attachmentName);
+        
+        // Move to the WYSIWYG edition page on the main wiki.
+        // We update the currentWiki attribute manually because TestUtils.gotoPage updates it only after
+        // navigating to the target page.
+        setup.setCurrentWiki("xwiki");
+        edit(setup, testReference, false);
+        
+        // Run the image quick action.
+        textArea.sendKeys("/image");
+        AutocompleteDropdown qa = new AutocompleteDropdown().waitForItemSelected("/image", "Image");
+        textArea.sendKeys(Keys.ENTER);
+        qa.waitForItemSubmitted();
+        
+        // Since there is no image on the current page, the image from the subwiki should be first.
+        textArea.sendKeys("image");
+        AutocompleteDropdown img = new AutocompleteDropdown().waitForItemSelected("img::image", attachmentName);
+        assertIterableEquals(List.of("External"), img.getSelectedItem().getBadges());
+        textArea.sendKeys(Keys.ENTER);
+        img.waitForItemSubmitted();
+        
+        assertSourceEquals("[[image:" + setup.serializeReference(attachmentReference) + "]]");
+    }
+
+    private ViewPage uploadAttachment(TestUtils setup, EntityReference entityReference, String attachmentName)
         throws Exception
     {
-        ViewPage newPage = setup.createPage(testReference, "", "");
-        setup.attachFile(testReference, attachmentName,
+        ViewPage newPage = setup.createPage(entityReference, "", "");
+        setup.attachFile(entityReference, attachmentName,
             getClass().getResourceAsStream("/ImagePlugin/" + attachmentName), false);
         return newPage;
     }

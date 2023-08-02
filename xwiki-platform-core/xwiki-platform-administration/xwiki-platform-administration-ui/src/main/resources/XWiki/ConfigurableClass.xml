@@ -407,7 +407,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   #if($globaladmin)
     #set($queryString = "editor=globaladmin&amp;amp;section=")
   #else
-    #set($queryString = "space=${currentSpace}&amp;amp;section=")
+    #set($queryString = "space=$escapetool.url($currentSpace)&amp;amp;section=")
     #if($request.getParameter('editor'))
       #set($queryString = "editor=$escapetool.url($request.getParameter('editor'))&amp;amp;$queryString")
     #end

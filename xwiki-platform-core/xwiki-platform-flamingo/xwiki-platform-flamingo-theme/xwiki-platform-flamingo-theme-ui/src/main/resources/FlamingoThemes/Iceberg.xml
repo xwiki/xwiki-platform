@@ -845,7 +845,7 @@
       <brand-primary/>
     </property>
     <property>
-      <brand-success>#56b881</brand-success>
+      <brand-success>#077537</brand-success>
     </property>
     <property>
       <brand-warning/>
@@ -890,7 +890,7 @@
       <btn-primary-color>#fff</btn-primary-color>
     </property>
     <property>
-      <btn-success-bg>#31754f</btn-success-bg>
+      <btn-success-bg/>
     </property>
     <property>
       <btn-success-color/>

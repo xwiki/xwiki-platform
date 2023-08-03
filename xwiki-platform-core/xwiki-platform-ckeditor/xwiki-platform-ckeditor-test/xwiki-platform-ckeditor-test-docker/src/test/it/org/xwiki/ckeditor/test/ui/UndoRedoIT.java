@@ -51,6 +51,12 @@ public class UndoRedoIT extends AbstractCKEditorIT
         edit(setup, testReference);
     }
 
+    @AfterEach
+    void afterEach(TestUtils setup, TestReference testReference)
+    {
+        maybeLeaveEditMode(setup, testReference);
+    }
+
     @Test
     @Order(1)
     void undoRedoWithPlaceholder(TestUtils setup, TestReference testReference) throws Exception
@@ -64,8 +70,5 @@ public class UndoRedoIT extends AbstractCKEditorIT
         textArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, "zz"));
 
         assertSourceEquals("one\n\ntwo\n\n ");
-        
-        // Clean up for following tests.
-        maybeLeaveEditMode(setup, testReference);
     }
 }

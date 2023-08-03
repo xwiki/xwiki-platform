@@ -188,6 +188,7 @@
       <code>#template('colorThemeInit.vm')
 
 .search-facet-body .selectedLocation .breadcrumb {
+  display: flex;
   margin: .5em 0;
 }
 .search-facet-body .selectedLocation .breadcrumb li {

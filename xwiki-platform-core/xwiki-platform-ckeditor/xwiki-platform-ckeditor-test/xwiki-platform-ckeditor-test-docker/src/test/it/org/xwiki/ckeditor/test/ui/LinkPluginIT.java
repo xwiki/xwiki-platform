@@ -19,18 +19,18 @@
  */
 package org.xwiki.ckeditor.test.ui;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
-import org.xwiki.ckeditor.test.po.CKEditor;
+import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
-import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Test of the CKEditor Link Plugin.
@@ -44,20 +44,29 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 })
 class LinkPluginIT extends AbstractCKEditorIT
 {
+    @BeforeAll
+    void beforeAll(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        // Wait for Solr indexing to complete as the link search is based on Solr indexation.
+        setup.loginAsSuperAdmin();
+        waitForSolrIndexing(setup, testConfiguration);
+
+        createAndLoginStandardUser(setup);
+    }
+
+    @AfterEach
+    void afterEach(TestUtils setup, TestReference testReference)
+    {
+        maybeLeaveEditMode(setup, testReference);
+    }
+
     @Test
     void insertLinks(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration) throws Exception
     {
-        setup.loginAsSuperAdmin();
-        setup.deletePage(testReference);
         // Create a sub-page with an attachment, to have something to link to.
         uploadAttachment(setup, new DocumentReference("subPage", testReference.getLastSpaceReference()), "image.gif");
 
-        // Wait for SOLR indexing to complete as the link search is based on solr indexation.
-        waitForSolrIndexing(setup, testConfiguration);
-
-        ViewPage page = setup.gotoPage(testReference);
-        WYSIWYGEditPage wysiwygEditPage = page.editWYSIWYG();
-        CKEditor editor = new CKEditor("content").waitToLoad();
+        edit(setup, testReference);
 
         String spaceName = testReference.getLastSpaceReference().getParent().getName();
         editor.getToolBar().insertOrEditLink()
@@ -73,12 +82,28 @@ class LinkPluginIT extends AbstractCKEditorIT
             .selectPageItem(String.format("%s / insertLinks / subPage", spaceName), "image.gif")
             .submit();
 
-        ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
-
         // Verify that the content matches what we did using CKEditor.
-        assertEquals("[[type the link label>>doc:subPage]]\n"
-            + "\n"
-            + "[[type the link label>>attach:subPage@image.gif]]", savedPage.editWiki().getContent());
+        assertSourceEquals("[[type the link label>>doc:subPage]]\n\n[[type the link label>>attach:subPage@image.gif]]");
+    }
+
+    @Test
+    void useLinkShortcutWhenTargetPageNameHasSpecialCharacters(TestUtils setup, TestReference testReference,
+        TestConfiguration testConfiguration) throws Exception
+    {
+        // Create the link target page with special characters in its name.
+        LocalDocumentReference childPageReference =
+            new LocalDocumentReference("\"Quote\" and 'Apostrophe'", testReference.getLastSpaceReference());
+        setup.createPage(childPageReference, "", "");
+
+        edit(setup, testReference);
+
+        textArea.sendKeys("[quo");
+        AutocompleteDropdown linkDropDown = new AutocompleteDropdown();
+        linkDropDown.waitForItemSelected("[quo", childPageReference.getName());
+        textArea.sendKeys(Keys.ENTER);
+        linkDropDown.waitForItemSubmitted();
+
+        assertSourceEquals(String.format("[[%1$s>>%1$s]] ", childPageReference.getName()));
     }
 
     private ViewPage uploadAttachment(TestUtils setup, DocumentReference testReference, String attachmentName)

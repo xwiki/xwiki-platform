@@ -48,7 +48,7 @@ public abstract class AbstractCKEditorIT
 
     void edit(TestUtils setup, TestReference testReference)
     {
-        setup.deletePage(testReference);
+        setup.deletePage(testReference, true);
         WYSIWYGEditPage.gotoPage(testReference);
         this.editor = new CKEditor("content").waitToLoad();
         this.textArea = this.editor.getRichTextArea();

@@ -204,7 +204,7 @@
     $(this).attr('id', facetContainer.attr('data-name') + '-' + index.toString());
     // Initialize the checkbox.
     let checkBox = $(document.createElement('input')).attr('type', 'checkbox');
-    checkBox.attr('aria-labelledby',$(this).attr('id') );
+    checkBox.attr('aria-labelledby', $(this).attr('id'));
     checkBox.prop('checked', $(this).hasClass('selected'));
     // Add the 'checked' attribute so that it can be easily located with CSS.
     checkBox.prop('checked') &amp;&amp; checkBox.attr('checked', 'checked');

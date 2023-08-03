@@ -29,7 +29,6 @@ define('xwiki-lightbox-messages', {
 define('xwiki-lightbox-config', ['jquery'], function($) {
   var config = JSON.parse($('#lightbox-config').text());
   $('body').append($(config.HTMLTemplate));
-  var toggler = $(config.togglerTemplate);
 });
 
 define('xwiki-lightbox-description', [
@@ -167,11 +166,10 @@ define('xwiki-lightbox', [
   'jquery',
   'xwiki-lightbox-description',
   'blueimp-gallery',
-  'xwiki-l10n!xwiki-lightbox-messages',
   'xwiki-lightbox-config',
   'blueimp-gallery-fullscreen',
   'blueimp-gallery-indicator'
-], function($, lightboxDescription, gallery, l10n) {
+], function($, lightboxDescription, gallery) {
   var openedLightbox;
   var slidesData;
   var lightboxImages;
@@ -243,17 +241,24 @@ define('xwiki-lightbox', [
       }
     });
     // We add the sr-only buttons to expand the lightbox
+    let toggler = $(JSON.parse($('#lightbox-config').text()).togglerTemplate);
     lightboxImages.each(function() {
       let lightboxToggle = toggler.clone();
-      lightboxToggle.on('focus', function() {this.classList.add('focused');});
-      lightboxToggle.on('focusout', function() {this.classList.remove('focused');});
-      lightboxToggle.on('click', function(e) {
+      lightboxToggle.get(0).addEventListener('focus', (e)=> {e.target.classList.remove('sr-only');});
+      lightboxToggle.get(0).addEventListener('focusout', (e) => {e.target.classList.add('sr-only');});
+      lightboxToggle.get(0).addEventListener('click', (e) => {
         clearTimeout(showTimeout);
+        if (e.pageX === 0 && e.pageY === 0) {
+          // When the click is triggered from keyboard,
+          // we display the lightbox menu modal from the middle of the toggler.
+          let offset = lightboxToggle.offset();
+          e.pageX = offset.left;
+          e.pageY = offset.top;
+        }
         popoverContainer.css({top: e.pageY, left: e.pageX});
         popoverContainer.popover('show');
       });
-      lightboxToggle.setAttribute('aria-label', l10n.get('toggle.label'));
-      lightboxToggle.insertAfter();
+      lightboxToggle.insertAfter(this);
     });
     lightboxImages.on('mouseenter', function(e) {
       clearTimeout(hideTimeout);

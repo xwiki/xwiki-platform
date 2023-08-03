@@ -79,16 +79,11 @@
 }
 
 .lightbox-toggle {
-  display:none;
   min-width: @target-size-recommended;
   min-height: @target-size-recommended;
-  position: absolute;
-  top: 5px;
-  right: 5px;
-
-  &.focused {
-    display: inline-block;
-  }
+  position: relative;
+  bottom: @target-size-recommended;
+  right: @target-size-recommended;
 }
 
 #imageToolbarTemplate {

@@ -70,7 +70,7 @@
         &lt;label class='sr-only' for='search-page-bar-input'&gt;
         $services.localization.render('search.page.bar.query.title')
         &lt;/label&gt;
-        &lt;input id='search-page-bar-input' type="search" name="text" class="form-control withTip useTitleAsTip"
+        &lt;input id='search-page-bar-input' type='search' name='text' class='form-control withTip useTitleAsTip'
           title="$services.localization.render('search.page.bar.query.title')" value="$escapetool.xml($text)"/&gt;
         &lt;span class="input-group-btn"&gt;
           &lt;button type="submit" class="btn btn-primary"&gt;

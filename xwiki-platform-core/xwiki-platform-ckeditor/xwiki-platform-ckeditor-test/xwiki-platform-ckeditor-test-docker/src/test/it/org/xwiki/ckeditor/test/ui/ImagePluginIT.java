@@ -523,10 +523,9 @@ class ImagePluginIT
 
         // Insert a with caption and alignment to center.
         ImageDialogSelectModal imageDialogSelectModal = editor.getToolBar().insertImage();
-        // The WebHome part is important but is removed when serializing an attachment, adding it back before the 
-        // attachment name.
-        String imageURL = setup.getURL(attachmentReference, "download", "")
-            .replace("/" + attachmentName, "/WebHome/" + attachmentName);
+
+        String imageURL = setup.getURL(attachmentReference, "download", "");
+        
         imageDialogSelectModal.switchToUrlTab().setUrlValue(imageURL);
         ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
         imageDialogEditModal.switchToAdvancedTab().setWidth(100);

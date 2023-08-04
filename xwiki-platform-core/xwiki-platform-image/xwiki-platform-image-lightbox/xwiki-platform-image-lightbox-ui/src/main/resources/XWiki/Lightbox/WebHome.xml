@@ -403,7 +403,7 @@ bundles=blueimp-gallery,blueimp-helper,blueimp-gallery-fullscreen,blueimp-galler
     <property>
       <content>{{velocity}}
 #macro (lightboxTogglerTemplate)
-  <button class='lightbox-toggle btn btn-default sr-only'
+  <button class='lightbox-toggle btn btn-xs sr-only'
     aria-label="$escapetool.xml($services.localization.render('image.lightbox.toggler.label'))">
     $services.icon.renderHTML('more-vertical')
   </button>

@@ -78,12 +78,11 @@
   }
 }
 
-.lightbox-toggle {
-  min-width: @target-size-recommended;
-  min-height: @target-size-recommended;
-  position: relative;
-  bottom: @target-size-recommended;
-  right: @target-size-recommended;
+img + .lightbox-toggle {
+  min-width: @target-size-minimum;
+  min-height: @target-size-minimum;
+  vertical-align: top;
+  margin: 0 0 0 -@target-size-minimum;
 }
 
 #imageToolbarTemplate {

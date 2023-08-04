@@ -244,19 +244,40 @@ define('xwiki-lightbox', [
     let toggler = $(JSON.parse($('#lightbox-config').text()).togglerTemplate);
     lightboxImages.each(function() {
       let lightboxToggle = toggler.clone();
-      lightboxToggle.get(0).addEventListener('focus', (e)=> {e.target.classList.remove('sr-only');});
-      lightboxToggle.get(0).addEventListener('focusout', (e) => {e.target.classList.add('sr-only');});
-      lightboxToggle.get(0).addEventListener('click', (e) => {
+      lightboxToggle.get(0)
+        .addEventListener('focus', (e)=> {lightboxToggle.get(0).classList.remove('sr-only');});
+      lightboxToggle.get(0)
+        .addEventListener('focusout', (e) => {lightboxToggle.get(0).classList.add('sr-only');});
+      lightboxToggle.get(0)
+        .addEventListener('click', (e) => {
         clearTimeout(showTimeout);
-        if (e.pageX === 0 && e.pageY === 0) {
+        popoverContainer.data('target', this);
+        let offsetX = e.pageX;
+        let offsetY = e.pageY;
+        if (offsetX === 0 && offsetY === 0) {
           // When the click is triggered from keyboard,
-          // we display the lightbox menu modal from the middle of the toggler.
+          // we display the lightbox menu modal from the toggler.
           let offset = lightboxToggle.offset();
-          e.pageX = offset.left;
-          e.pageY = offset.top;
+          offsetX = offset.left;
+          offsetY = offset.top;
         }
-        popoverContainer.css({top: e.pageY, left: e.pageX});
+        popoverContainer.css({left: offsetX, top: offsetY});
         popoverContainer.popover('show');
+        $('.openLightbox').focus();
+        // We add a tabbable element to the popover Container to avoid leaving the document focus
+        // when reaching the end of the popover with keyboard
+        popoverContainer.append($("<div id='popoverKeyboardEscaper' class='sr-only' tabindex='0'>"));
+        // When the popover is accessed through keyboard, it's also closed with keyboard navigation.
+        let focusLeavingPopover = function (event) {
+          event.preventDefault();
+          if (!popoverContainer.children().get(0).contains(event.relatedTarget)) {
+            popoverContainer.get(0).removeEventListener('focusout',focusLeavingPopover);
+            lightboxToggle.focus();
+            popoverContainer.popover('hide');
+            $('#popoverKeyboardEscaper').remove();
+          }
+        };
+        popoverContainer.get(0).addEventListener('focusout', focusLeavingPopover);
       });
       lightboxToggle.insertAfter(this);
     });

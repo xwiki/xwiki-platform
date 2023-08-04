@@ -134,6 +134,12 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
+    <!-- Needed for CompareIT -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-diff-xml</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- ================================
          Test only dependencies
          ================================ -->

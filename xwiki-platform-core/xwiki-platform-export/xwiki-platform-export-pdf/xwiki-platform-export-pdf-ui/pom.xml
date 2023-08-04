@@ -124,7 +124,7 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>pagedjs</artifactId>
-      <version>0.4.1</version>
+      <version>0.4.3</version>
       <scope>runtime</scope>
       <!-- Exclude all transitive dependencies because they aren't really needed and, what's worse, they fail the build. -->
       <exclusions>

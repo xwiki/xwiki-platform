@@ -2642,10 +2642,10 @@ Recursive title display detected!##
       <input type="text" id="${escapedId}-filter" class="xwiki-select-filter"
         placeholder="$escapetool.xml($services.localization.render('web.widgets.select.filter.placeholder'))" />
     </p>
-    <span id="${escapedId}-listbox-label" class="sr-only">
+    <span id="${escapedId}-listbox-label" hidden>
       $escapetool.xml($services.localization.render('web.widgets.select.listbox.label', [$fieldName]))
     </span>
-    <span id="${escapedId}-listbox-description" class="sr-only">
+    <span id="${escapedId}-listbox-description" hidden>
       $escapetool.xml($services.localization.render('web.widgets.select.listbox.description'))
     </span>
     <div id="${escapedId}-listbox" role='listbox' class='xwiki-select-options' tabindex='0'

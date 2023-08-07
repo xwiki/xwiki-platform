@@ -26,7 +26,7 @@
 
 
 
-.drawer-nav {
+#tmDrawer.drawer-nav {
   background-color: @xwiki-drawer-bg;
   width: @xwiki-drawer-width;
   z-index: 5200;
@@ -34,23 +34,29 @@
   top: 0;
   overflow: hidden;
   height: 100vh;
-  transition: right .6s cubic-bezier(0.190, 1.000, 0.220, 1.000);
-
+  right: -@xwiki-drawer-width;
+  transition: right .6s cubic-bezier(0.190, 1.000, 0.220, 1.000), visibility .6s cubic-bezier(0.190, 1.000, 0.220, 1.000);
   &.closed {
-    display: none;
+    // We use visibility here to avoid breaking the animations.
+    visibility: hidden;
   }
   &.opened {
     right: 0;
   }
 
-  .drawer-overlay {
+  & + .drawer-overlay {
     position: fixed;
+    display: none;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
     opacity: 0.2;
     background-color: #fff - @xwiki-page-content-bg;
+  }
+
+  &.opened + .drawer-overlay {
+  display: block;
   }
 
   & .drawer-menu {

@@ -55,49 +55,56 @@ require(['jquery', 'bootstrap'], function($) {
 require(['jquery'], function($) {
 
   $(function() {
-    var tmDrawerActivator = $('.drawer-toggle').first()
-      .on('click', function(event){
-        $('#tmDrawer')
-          .removeClass('closed')
-          .addClass('opened')
-          .trigger('drawer.opened');
-      })
-    let closeDrawer = () => $('#tmDrawer')
-        .trigger('drawer.closed')
-        .removeClass('opened')
-        .addClass('closed');
-    let focusOutDrawer = function (event) {
-      if(!this.contains(event.relatedTarget) || event.relatedTarget.class === 'drawer-overlay') {
-        closeDrawer();
-      }
-    }
+    var drawerContainer = $('#tmDrawer');
+    var drawerContainerToggler = $('#tmDrawerActivator');
+    var drawerOverlay = $(".drawer-overlay");
+
     // Note that the 'drawer-open' and 'drawer-close' CSS classes are added before the open and close animations end
     // which prevents us from using them in automated tests. We need something more reliable so we listen to
     // 'drawer.opened' and 'drawer.closed' events and add our own markers.
-    var tmDrawer = $('#tmDrawer');
-    var focusableElements = tmDrawer.find('button, a, input:not([type="hidden"]), select, textarea, [tabindex]:not([tabindex="-1"])');
-    tmDrawer.on('drawer.opened', function(event) {
-      $('#tmDrawerActivator').attr('aria-expanded', 'true');
-      //Focus the first focusable element in tmDrawer.
-      focusableElements.first()
-        .focus();
+    let openDrawer = () => drawerContainer.trigger('drawer.opened');
+    let closeDrawer = () => drawerContainer.trigger('drawer.closed');
+    drawerContainerToggler
+      .on('click', openDrawer);
+    drawerOverlay
+      .on('click', closeDrawer);
+
+    drawerContainer.on('drawer.opened', function(event) {
+      drawerContainerToggler
+        .attr('aria-expanded', 'true');
+      drawerContainer
+        .removeClass('closed')
+        .addClass('opened');
       // Drawer can be closed by pressing the ESC key.
-      tmDrawer.on('keydown', function (event) {
+      $("body").on('keydown', function (event) {
         if (event.key === 'Escape') {
           closeDrawer();
         }
-      })
-      focusableElements.on('focusout', function () {
-        if ($(document.activeElement).closest('#tmDrawer').length === 0)
-        {
+      });
+      let focusableElements = drawerContainer.find('button, a, input:not([type="hidden"]), ' +
+          'select, textarea, [tabindex]:not([tabindex="-1"])');
+      focusableElements.on('focusout', function (event) {
+        if (event.relatedTarget != null
+          && event.relatedTarget.closest("#tmDrawer") == null) {
           closeDrawer();
         }
-      })
+      });
+      // Focus the first focusable element in tmDrawer.
+      // There should be enough time between this and the start of the animation so that the first element is visible.
+      focusableElements.first()
+        .focus();
     }).on('drawer.closed', function(event) {
-      $('#tmDrawerActivator').attr('aria-expanded', 'false');
+    // We update the state of the drawer
+      drawerContainer
+        .removeClass('opened')
+        .addClass('closed');
+      drawerContainerToggler.attr('aria-expanded', 'false');
       // We remove the listeners
-      tmDrawer.off('keydown');
+      $("body").off('keydown');
+      let focusableElements = drawerContainer.find('button, a, input:not([type="hidden"]), ' +
+        'select, textarea, [tabindex]:not([tabindex="-1"])');
       focusableElements.off('focusout');
     });
   });
 });
+

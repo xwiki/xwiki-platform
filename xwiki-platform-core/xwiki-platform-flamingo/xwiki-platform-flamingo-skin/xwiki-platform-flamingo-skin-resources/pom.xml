@@ -118,11 +118,6 @@
       <artifactId>Keypress</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>drawer</artifactId>
-      <version>3.2.2</version>
-    </dependency>
-    <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>iscroll</artifactId>
       <version>5.2.0</version>

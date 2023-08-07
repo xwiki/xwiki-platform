@@ -21,7 +21,6 @@
 ##
 ## Display the drawer
 ##
-<span role='presentation' class='drawer-overlay'></span>
 <nav class="drawer-nav closed" id="tmDrawer"
 aria-label="$escapetool.xml($services.localization.render('core.menu.drawer.label'))">
   <ul class="drawer-menu">
@@ -101,6 +100,7 @@ aria-label="$escapetool.xml($services.localization.render('core.menu.drawer.labe
     #end
   </ul>
 </nav>
+<span role='presentation' class='drawer-overlay'></span>
 #**
  * Display the UI extensions.
  *

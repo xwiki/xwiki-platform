@@ -2534,7 +2534,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
                 if (whereParams != null) {
                     int parameterIndex = CollectionUtils.size(parameterValues);
-                    if (legacyOrdinal) {
+                    if (!legacyOrdinal) {
                         ++parameterIndex;
                     }
                     for (Object[] whereParam : whereParams) {

@@ -383,6 +383,7 @@ panels.MoreApplicationsButtonListener = Class.create({
   toggle: function() {
     this.isToggling = true;
     if (this.container.hasClassName('hidden')) {
+      this.container.style.display = "none";
       this.container.removeClassName('hidden');
       Effect.BlindDown(this.container.id, {
         duration: 0.1,

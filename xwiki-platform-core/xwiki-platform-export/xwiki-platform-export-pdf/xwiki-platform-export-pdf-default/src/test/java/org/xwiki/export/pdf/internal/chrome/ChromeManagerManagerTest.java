@@ -156,6 +156,8 @@ class ChromeManagerManagerTest
     void getWithConfigurationChange() throws Exception
     {
         when(this.configuration.getChromeHost()).thenReturn("remote-chrome");
+        // For the purpose of this test we assume that Chrome remains connected after we establish the connection.
+        when(this.chromeManager.isConnected()).thenReturn(true);
 
         assertEquals(this.chromeManager, this.chromeManagerManager.get());
         assertEquals(this.chromeManager, this.chromeManagerManager.get());
@@ -168,5 +170,29 @@ class ChromeManagerManagerTest
         verify(this.chromeManager).connect("remote-chrome", this.configuration.getChromeRemoteDebuggingPort());
         verify(this.chromeManager).connect("another-chrome", this.configuration.getChromeRemoteDebuggingPort());
         verify(this.chromeManager, times(2)).close();
+    }
+
+    @Test
+    void getAfterRemoteChromeDisconnects() throws Exception
+    {
+        when(this.configuration.getChromeHost()).thenReturn("remote-chrome");
+
+        assertEquals(this.chromeManager, this.chromeManagerManager.get());
+        // Assume that we manage to connect with Chrome.
+        when(this.chromeManager.isConnected()).thenReturn(true);
+
+        // This shouldn't trigger a reconnect because the configuration didn't change and Chrome is still connected.
+        assertEquals(this.chromeManager, this.chromeManagerManager.get());
+
+        // Simulate that Chrome disconnected.
+        when(this.chromeManager.isConnected()).thenReturn(false);
+
+        // Both should trigger a reconnect because Chrome is not connected anymore.
+        assertEquals(this.chromeManager, this.chromeManagerManager.get());
+        assertEquals(this.chromeManager, this.chromeManagerManager.get());
+
+        verify(this.chromeManager, times(3)).connect("remote-chrome",
+            this.configuration.getChromeRemoteDebuggingPort());
+        verify(this.chromeManager, times(3)).close();
     }
 }

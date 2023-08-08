@@ -19,6 +19,7 @@
  */
 package org.xwiki.export.pdf.internal.chrome;
 
+import java.net.URI;
 import java.util.Arrays;
 
 import javax.inject.Named;
@@ -70,12 +71,12 @@ class ChromeManagerManagerTest
     private String containerIpAddress = "172.17.0.2";
 
     @BeforeEach
-    void configure()
+    void configure() throws Exception
     {
         when(this.configuration.getChromeDockerContainerName()).thenReturn("test-pdf-printer");
         when(this.configuration.getChromeDockerImage()).thenReturn("test/chrome:latest");
         when(this.configuration.getChromeRemoteDebuggingPort()).thenReturn(1234);
-        when(this.configuration.getXWikiHost()).thenReturn("xwiki-host");
+        when(this.configuration.getXWikiURI()).thenReturn(new URI("//xwiki-host"));
 
         mockNetwork("bridge");
 
@@ -94,7 +95,7 @@ class ChromeManagerManagerTest
         this.hostConfig = mock(HostConfig.class);
         when(this.containerManager.getHostConfig(networkIdOrName, this.configuration.getChromeRemoteDebuggingPort()))
             .thenReturn(this.hostConfig);
-        when(this.hostConfig.withExtraHosts(this.configuration.getXWikiHost() + ":host-gateway"))
+        when(this.hostConfig.withExtraHosts("xwiki-host:host-gateway"))
             .thenReturn(this.hostConfig);
     }
 

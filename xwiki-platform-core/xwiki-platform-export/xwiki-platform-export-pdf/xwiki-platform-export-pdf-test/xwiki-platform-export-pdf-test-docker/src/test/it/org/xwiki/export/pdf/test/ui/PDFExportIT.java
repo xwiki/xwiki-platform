@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -722,7 +723,8 @@ class PDFExportIT
 
     @Test
     @Order(14)
-    void pageRevision(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration) throws Exception
+    void pageRevision(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
     {
         setup.createPage(testReference, "Parent initial content.", "Parent Initial Title");
         setup.rest().savePage(testReference, "Parent modified content.", "Parent Modified Title");
@@ -777,6 +779,37 @@ class PDFExportIT
             assertTrue(contentPageText.contains("Child Modified Title\nChild modified content.\n"),
                 "Unexpected child page content: " + contentPageText);
         }
+    }
+
+    @Test
+    @Order(15)
+    void restartChrome(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        Callable<Void> verifyPDFExport = () -> {
+            ViewPage viewPage = setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent",
+                "Child"), "WebHome"));
+            PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+            try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+                // We should have 3 pages: cover page, table of contents and one page for the content.
+                assertEquals(3, pdf.getNumberOfPages());
+
+                // Verify the content page.
+                String contentPageText = pdf.getTextFromPage(2);
+                assertTrue(contentPageText.startsWith("Child\n3 / 3\nSection 1\nContent of first section.\n"),
+                    "Unexpected content: " + contentPageText);
+            }
+
+            return null;
+        };
+
+        verifyPDFExport.call();
+
+        // Restart Chrome to verify that we reconnect automatically before executing a new PDF export.
+        DockerTestUtils.cleanupContainersWithLabels(ContainerManager.DEFAULT_LABELS);
+
+        verifyPDFExport.call();
     }
 
     private URL getHostURL(TestConfiguration testConfiguration) throws Exception

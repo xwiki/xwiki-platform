@@ -518,7 +518,8 @@
     #set ($locationOptions = {
       'excludeSelf': true,
       'limit': 6,
-      'label': $searchResultLabel
+      'label': $searchResultLabel,
+      'navigation': false
     })
     #hierarchy($searchResultReference $locationOptions)
   &lt;/div&gt;

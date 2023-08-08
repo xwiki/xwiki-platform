@@ -1448,11 +1448,18 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The port number used for communicating with the headless Chrome web browser.
 # export.pdf.chromeRemoteDebuggingPort = 9222
 
-#-# The host name or IP address that the headless Chrome browser should use to access the XWiki instance (i.e. the print
-#-# preview page). Defaults to "host.xwiki.internal" which means the host running the Docker daemon; if XWiki runs
-#-# itself inside a Docker container then you should use the assigned network alias, provided both containers (XWiki and
-#-# Chrome) are in the same Docker network.
-# export.pdf.xwikiHost = host.xwiki.internal
+#-# [Since 14.10.15]
+#-# [Since 15.5.2]
+#-# [Since 15.7RC1]
+#-# The base URI that the headless Chrome browser should use to access the XWiki instance (i.e. the print preview page).
+#-# The host (domain or IP address) is mandatory but the scheme and port number are optional (they default on the scheme
+#-# and port number used when triggering the PDF export). Defaults to "host.xwiki.internal" which means the host running
+#-# the Docker daemon; if XWiki runs itself inside a Docker container then you should use the assigned network alias,
+#-# provided both containers (XWiki and Chrome) are in the same Docker network.
+#-#
+#-# Note that this configuration replaces the old "export.pdf.xwikiHost" configuration which is currently still taken
+#-# into account as a fall back in case this configuration is not set.
+# export.pdf.xwikiURI = host.xwiki.internal
 
 #-# The Docker image used to create the Docker container running the headless Chrome web browser.
 # export.pdf.chromeDockerImage = zenika/alpine-chrome:latest

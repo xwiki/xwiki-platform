@@ -111,7 +111,7 @@ class PDFExportIT
             // for PDF export) to access XWiki its own Docker container has to be in the same network and we also need
             // to pass the internal host name or IP address used by XWiki.
             adminSection.setDockerNetwork(Network.SHARED.getId());
-            adminSection.setXWikiHost(testConfiguration.getServletEngine().getInternalIP());
+            adminSection.setXWikiURI(testConfiguration.getServletEngine().getInternalIP());
         }
 
         adminSection.clickSave();

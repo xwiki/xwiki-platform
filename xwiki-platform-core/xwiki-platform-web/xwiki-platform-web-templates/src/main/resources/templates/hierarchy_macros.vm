@@ -128,6 +128,7 @@
  *   limit: null // if any, enable the user to click on the ellipsis to expand the breadcrumb dynamically
  *   label: '' // if any, generates a custom label which takes this value as a parameter
  *      ! do not use a complete label here, only a readable name of the target object is expected. !
+ *   navigation: true // whether the breadcrumb generate should be considered as a navigation
  * }
  * @param $entityReference (required if $option.limit is not null) the reference to the concerned entity.
  *#
@@ -148,8 +149,10 @@
       #set ($breadCrumbParameters = "$breadCrumbParameters data-${option.toLowerCase()}='$escapetool.xml($options.get($option))'")
     #end
   #end
-  ## Set as a navigation role because it contains mostly links.
-  <nav aria-label=
+  ## Set as a navigation role because it contains mostly links
+  ## Except if the 'navigation' option is set to false, for special cases where a navigation would clutter
+  ## See discussion on https://forum.xwiki.org/t/ui-accesibility-breadcrumbs-in-the-document-index/12866
+  <#if($!options.navigation == false)div#{else}nav#end aria-label=
     #if("$!options.label" != '')
       "$escapetool.xml($services.localization.render('web.hierarchy.breadcrumb.label', [$options.label]))"
     #else
@@ -178,7 +181,7 @@
       #end
       >#end$item.label#if ($item.url)</a>#end$treeNavigation$closingTag##
     #end##
-  </li></ol></nav>
+  </li></ol></#if("$!options.navigation" == 'false')div#{else}nav#end>
 #end
 
 #macro (getTreeNavigation $pathData $index $options)

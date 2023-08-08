@@ -220,12 +220,8 @@ public class XarPackage
             ZipArchiveEntry entry = zipEntries.nextElement();
 
             if (!entry.isDirectory()) {
-                InputStream stream = zipFile.getInputStream(entry);
-
-                try {
+                try (InputStream stream = zipFile.getInputStream(entry)) {
                     readEntry(stream, entry.getName());
-                } finally {
-                    stream.close();
                 }
             }
         }
@@ -262,23 +258,27 @@ public class XarPackage
         }
     }
 
-    private void readEntry(InputStream stream, String entryName) throws XarException, IOException
+    private void readEntry(InputStream stream, String entryName) throws XarException
     {
-        if (entryName.equals(XarModel.PATH_PACKAGE)) {
-            readDescriptor(stream);
-        } else {
-            LocalDocumentReference reference = XarUtils.getReference(stream);
+        try {
+            if (entryName.equals(XarModel.PATH_PACKAGE)) {
+                readDescriptor(stream);
+            } else {
+                LocalDocumentReference reference = XarUtils.getReference(stream);
 
-            // Get current action associated to the document
-            int defaultAction = getDefaultAction(reference);
-            // Get current type associated to the document
-            String entryType = getEntryType(reference);
+                // Get current action associated to the document
+                int defaultAction = getDefaultAction(reference);
+                // Get current type associated to the document
+                String entryType = getEntryType(reference);
 
-            // Create entry
-            XarEntry xarEntry = new XarEntry(reference, entryName, defaultAction, entryType);
+                // Create entry
+                XarEntry xarEntry = new XarEntry(reference, entryName, defaultAction, entryType);
 
-            // Register entry
-            putEntry(xarEntry);
+                // Register entry
+                putEntry(xarEntry);
+            }
+        } catch (Exception e) {
+            throw new XarException("Failed to read entry with name [" + entryName + "]", e);
         }
     }
 

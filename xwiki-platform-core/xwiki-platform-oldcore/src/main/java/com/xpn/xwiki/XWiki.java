@@ -4752,7 +4752,10 @@ public class XWiki implements EventListener
 
             // Update the archive
             context.getWiki().getVersioningStore().saveXWikiDocArchive(archive, true, context);
-            document.setDocumentArchive(archive);
+            // Make sure the cached document archive is updated too
+            XWikiDocument cachedDocument =
+                context.getWiki().getDocument(document.getDocumentReferenceWithLocale(), context);
+            cachedDocument.setDocumentArchive(archive);
 
             // There are still some versions left.
             // If we delete the most recent (current) version, then rollback to latest undeleted version.

@@ -35,7 +35,7 @@
   overflow: hidden;
   height: 100vh;
   right: -@xwiki-drawer-width;
-  transition: right .6s cubic-bezier(0.190, 1.000, 0.220, 1.000), visibility .6s cubic-bezier(0.190, 1.000, 0.220, 1.000);
+  transition: right .6s cubic-bezier(0.190, 1.000, 0.220, 1.000), visibility .6s;
   &.closed {
     // We use visibility here to avoid breaking the animations.
     visibility: hidden;
@@ -56,7 +56,7 @@
   }
 
   &.opened + .drawer-overlay {
-  display: block;
+    display: block;
   }
 
   & .drawer-menu {

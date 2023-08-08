@@ -40,11 +40,14 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.AdditionalAnswers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.mail.GeneralMailConfiguration;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.AttachmentReference;
@@ -75,6 +78,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.BooleanClass;
+import com.xpn.xwiki.objects.classes.EmailClass;
 import com.xpn.xwiki.objects.classes.ListItem;
 import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
@@ -129,6 +133,9 @@ class DocumentSolrMetadataExtractorTest
 
     @MockComponent
     private SolrFieldNameEncoder fieldNameEncoder;
+
+    @MockComponent
+    private GeneralMailConfiguration mailConfiguration;
 
     @MockComponent
     @Named("document")
@@ -483,6 +490,72 @@ class DocumentSolrMetadataExtractorTest
                 "author : " + commentAuthor, "date : " + commentDate, "list : " + commentList.get(0),
                 "list : " + commentList.get(1), "likes : " + commentLikes, "enabled : true"));
         assertEquals(8, objectProperties.size());
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = { true, false })
+    void getDocumentWithEmailObject(boolean obfuscate) throws Exception
+    {
+        when(this.mailConfiguration.shouldObfuscate()).thenReturn(obfuscate);
+
+        // Mock the user object
+        BaseObject userObject = mock(BaseObject.class);
+        // Mock the email property
+        String email = "test@example.com";
+        BaseProperty<EntityReference> emailField = mock(BaseProperty.class);
+        when(emailField.getName()).thenReturn("email");
+        when(emailField.getValue()).thenReturn(email);
+        when(emailField.getObject()).thenReturn(userObject);
+
+        // Mock the class reference
+        DocumentReference userClassRef = new DocumentReference("wiki", "space", "userClass");
+
+        // Add the mocked email object
+        when(this.document.getXObjects())
+            .thenReturn(Collections.singletonMap(userClassRef, Arrays.asList(userObject)));
+
+        // Mock the class
+        BaseClass xclass = mock(BaseClass.class);
+        when(userObject.getXClass(this.xcontext)).thenReturn(xclass);
+        when(userObject.getFieldList()).thenReturn(List.of(emailField));
+        when(userObject.getRelativeXClassReference())
+            .thenReturn(userClassRef.removeParent(userClassRef.getWikiReference()));
+
+        when(xclass.get("email")).thenReturn(mock(EmailClass.class));
+
+        //
+        // Call
+        //
+        SolrInputDocument solrDocument = this.metadataExtractor.getSolrDocument(this.frenchDocumentReference);
+
+        //
+        // Assert and verify
+        //
+        String serializedUserClass = "space.userClass";
+        assertEquals(List.of(serializedUserClass), solrDocument.getFieldValues(FieldUtils.CLASS));
+
+        // Make sure the password is not indexed (neither as a string nor as a localized text).
+        String emailProperty = "property." + serializedUserClass + ".email";
+        String emailString = emailProperty + "_string";
+        String emailSortString = emailProperty + "_sortString";
+        if (obfuscate) {
+            assertNull(solrDocument.getFieldValue(emailString));
+            assertNull(solrDocument.getFieldValue(emailSortString));
+
+            assertNull(solrDocument
+                .getFieldValue(FieldUtils.getFieldName(emailProperty, Locale.FRENCH)));
+        } else {
+            assertEquals(email, solrDocument.getFieldValue(emailString));
+            assertEquals(email, solrDocument.getFieldValue(emailSortString));
+        }
+
+        Collection<Object> objectProperties =
+            solrDocument.getFieldValues(FieldUtils.getFieldName("object." + serializedUserClass, Locale.FRENCH));
+        assertEquals(obfuscate ? null : List.of(email), objectProperties);
+
+        objectProperties =
+            solrDocument.getFieldValues(FieldUtils.getFieldName(FieldUtils.OBJECT_CONTENT, Locale.FRENCH));
+        assertEquals(obfuscate ? null : List.of("email : " + email), objectProperties);
     }
 
     /**

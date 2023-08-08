@@ -260,7 +260,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
     }
 
     @Override
-    protected void setPropertyValue(SolrInputDocument solrDocument, BaseProperty<EntityReference> property,
+    protected void setPropertyValue(SolrInputDocument solrDocument, BaseProperty<?> property,
         TypedValue typedValue, Locale locale)
     {
         Object value = typedValue.getValue();

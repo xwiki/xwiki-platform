@@ -25,8 +25,10 @@ import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.mail.GeneralMailConfigurationUpdatedEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.search.solr.internal.api.SolrIndexer;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -100,5 +102,16 @@ class SolrIndexEventListenerTest
         verify(this.indexer).index(documentReference, false);
         verify(this.indexer).index(new DocumentReference(documentReference, Locale.FRENCH), false);
         verify(this.indexer).index(new DocumentReference(documentReference, Locale.GERMAN), false);
+    }
+
+    @Test
+    void onGeneralMailConfigurationUpdatedEvent()
+    {
+        this.listener.onEvent(new GeneralMailConfigurationUpdatedEvent(), null, null);
+        verify(this.indexer).index(null, true);
+
+        String otherWiki = "otherwiki";
+        this.listener.onEvent(new GeneralMailConfigurationUpdatedEvent(otherWiki), otherWiki, null);
+        verify(this.indexer).index(new WikiReference(otherWiki), true);
     }
 }

@@ -165,7 +165,8 @@ public class ChromeManagerManager implements Disposable
                 if (BRIDGE_NETWORK.equals(network)) {
                     // The extra host is needed in order for the created container to be able to access the XWiki
                     // instance running on the same machine as the Docker daemon.
-                    hostConfig = hostConfig.withExtraHosts(this.configuration.getXWikiHost() + ":host-gateway");
+                    hostConfig =
+                        hostConfig.withExtraHosts(this.configuration.getXWikiURI().getHost() + ":host-gateway");
                 }
 
                 this.containerId = containerManager.createContainer(imageName, containerName,

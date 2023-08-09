@@ -225,7 +225,7 @@
 #end
 
 #macro (submenuheader $titleKey)
-  <dt class="dropdown-header">$services.localization.render($titleKey)</dt>
+  <dt class="dropdown-header">$escapetool.xml($services.localization.render($titleKey))</dt>
 #end
 
 #**
@@ -310,6 +310,10 @@
   ## Display all the extensions points, including the static ones
   ##
   #define ($menuContent)
+    ## Title for the dropdown content
+    <dt class="dropdown-header sr-only">
+      $escapetool.xml($services.localization.render('core.menu.edit.dropdown.hint'))
+    </dt>
     <dd>
      <ul>
         #displaySecureUIX('org.xwiki.plaftorm.editactions', $staticExtensions)

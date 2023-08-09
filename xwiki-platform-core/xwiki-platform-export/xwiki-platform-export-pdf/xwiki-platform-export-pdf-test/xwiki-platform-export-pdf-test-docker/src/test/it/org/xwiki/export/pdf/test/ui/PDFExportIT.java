@@ -811,6 +811,38 @@ class PDFExportIT
         verifyPDFExport.call();
     }
 
+    @Test
+    @Order(16)
+    void exportWithoutPagedPolyfill(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        // Paged.js (the polyfill for CSS Paged Media module) is used only if the user asks for a table of contents,
+        // headers or footers (which require the Paged Media module). Let's verify that the export works fine when these
+        // options are unchecked (i.e. when Paged.js is not used).
+        // See XWIKI-21213: The PDF export has an extra blank page when selecting only the cover page option
+
+        ViewPage viewPage =
+            setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent", "Child"), "WebHome"));
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+        // Leave only the cover page option checked.
+        exportOptions.getTocCheckbox().click();
+        exportOptions.getHeaderCheckbox().click();
+        exportOptions.getFooterCheckbox().click();
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // We should have 2 pages: cover page and one page for the content.
+            assertEquals(2, pdf.getNumberOfPages());
+
+            // Verify the cover page.
+            String coverPageText = pdf.getTextFromPage(0);
+            assertTrue(coverPageText.startsWith("Child\nVersion 1.1 authored by superadmin"),
+                "Unexpected cover page text: " + coverPageText);
+
+            // Verify the content page.
+            assertEquals("Section 1\nContent of first section.\n", pdf.getTextFromPage(1));
+        }
+    }
+
     private URL getHostURL(TestConfiguration testConfiguration) throws Exception
     {
         return new URL(String.format("http://%s:%d", testConfiguration.getServletEngine().getIP(),

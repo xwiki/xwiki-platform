@@ -270,7 +270,7 @@
 
 #macro (verticalNavigation $menu $options)
   {{html clean="false"}}
-  &lt;div id="$!options.id" class="panel-group $!options.cssClass" role="tablist" aria-multiselectable="true"&gt;
+  &lt;div id="$!options.id" class="panel-group $!options.cssClass"&gt;
     &lt;div class="panel xform"&gt;
       &lt;label for="adminsearchmenu" class="hidden"&gt;$services.localization.render('search')&lt;/label&gt;
       &lt;input type="text" class="form-control panel-group-filter" autocomplete="off" id="adminsearchmenu"
@@ -302,11 +302,11 @@
     #set ($children = [])
     #sortCollectionOfMapsByField($item.children, 'order', 99999, 'asc', $children)
     &lt;div class="panel panel-default"&gt;
-      &lt;a class="panel-heading#if (!$isActive) collapsed#end" role="tab" id="panel-heading-$escapedId"
+      &lt;a class="panel-heading#if (!$isActive) collapsed#end" id="panel-heading-$escapedId"
         href="$!item.url" data-toggle="collapse"#if ("$!options.id" != '') data-parent="#$options.id" #end
         data-target="#panel-body-$escapedId" aria-expanded="$isActive" aria-controls="panel-body-$escapedId"
         title="$!escapetool.xml($item.description)"&gt;$!services.icon.renderHTML($item.icon)$escapetool.xml($name)&lt;/a&gt;
-      &lt;div class="panel-collapse collapse#if ($isActive) in#end" role="tabpanel" id="panel-body-$escapedId"
+      &lt;div role='region' class="panel-collapse collapse#if ($isActive) in#end" id="panel-body-$escapedId"
           aria-labelledby="panel-heading-$escapedId"&gt;
         &lt;div class="list-group"&gt;
           #foreach ($child in $children)

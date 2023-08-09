@@ -168,9 +168,7 @@
           <span class="sr-only">$services.localization.render('core.menu.toggleDropdown')</span>
         </button>
       #end
-      ## We use another component for the more action menu, since it has
-      ## a more complex structure with submenus.
-      <dl class='dropdown-menu dropdown-menu-right'>
+      <dl class="dropdown-menu #if("$!actionUrl" == '')dropdown-menu-right#end">
         $menuContent
       </dl>
     #end

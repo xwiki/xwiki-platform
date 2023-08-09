@@ -39,6 +39,14 @@ require(['jquery'], function($) {
     };
 
     /**
+     * Callback used when an option from the select widget is hovered
+     * @since 15.7RC1
+     */
+    self.onOptionHovered = function () {
+      self.changeHighlight($(this), true);
+    };
+
+    /**
      * Callback used when an option from the select widget is clicked
      */
     self.onOptionClicked = function () {
@@ -51,9 +59,187 @@ require(['jquery'], function($) {
         return;
       }
       input.prop('checked', true);
-      self.selectWidget.find('.xwiki-select-option-selected').removeClass('xwiki-select-option-selected');
+      // Clear the previous option selected
+      let previousSelection = self.selectWidget.find('.xwiki-select-option-selected');
+      previousSelection.removeClass('xwiki-select-option-selected');
+      previousSelection.removeAttr('aria-selected');
+      // Clear the previous option highlighted
+      let previousHighlight = self.selectWidget.find('.xwiki-select-option-highlighted');
+      if (previousHighlight) previousHighlight.removeClass('xwiki-select-option-highlighted');
+      // Set aria-activedescendant on the second level parent, which should be the listbox object.
+      option.parent().parent().attr('aria-activedescendant', option.attr('id'));
+      // Update the new highlighted option
+      self.changeHighlight(option);
+      // Update the new selected option
       option.addClass('xwiki-select-option-selected');
+      option.attr('aria-selected', 'true');
       self.triggerSelectionChange();
+    };
+
+    /**
+     * Highlights the option given as a parameter.
+     * @since 15.7RC1
+     */
+     self.changeHighlight = function(option, dontSetFocus) {
+       if(!option) option = self.selectWidget.find('.xwiki-select-option-selected');
+       let previousHighlight = self.selectWidget.find('.xwiki-select-option-highlighted');
+       previousHighlight.removeClass('xwiki-select-option-highlighted');
+       previousHighlight.removeAttr('tabindex');
+       option.addClass('xwiki-select-option-highlighted');
+       option.attr('tabindex',0);
+       if(!dontSetFocus) option.focus();
+     };
+
+    /**
+     * Callback when the enter or space key is pressed when focusing an option.
+     * Essential for keyboard support of select.
+     * @since 15.7RC1
+     */
+     self.onOptionSelectHighlighted = function() {
+       let highlightedOption = self.selectWidget.find('.xwiki-select-option-highlighted');
+       highlightedOption.trigger('click');
+     };
+
+    /**
+     * Callback used when the left arrow key is pressed while navigating the select.
+     * This will move the highlight to the previous option,
+     * and loop around to the last option if triggered on the first option of the select.
+     * @since 15.7RC1
+     */
+    self.onOptionLeftKeyPressed = function() {
+      let highlightedOption = self.selectWidget.find('.xwiki-select-option-highlighted');
+      let options = $('.xwiki-select-option:visible');
+      let previousOption = options.eq(options.index(highlightedOption) - 1);
+      if (previousOption && $.contains(self.selectWidget.get(0), previousOption.get(0))) {
+        self.changeHighlight(previousOption)
+      } else {
+        self.onOptionEndKeyPressed();
+      }
+    };
+
+    /**
+     * Callback used when the right arrow key is pressed while navigating the select.
+     * This will move the highlight to the next option,
+     * and loop around to the first option if triggered on the last option of the select.
+     * @since 15.7RC1
+     */
+    self.onOptionRightKeyPressed = function() {
+      let highlightedOption = self.selectWidget.find('.xwiki-select-option-highlighted');
+      let options = $('.xwiki-select-option:visible');
+      let nextOption = options.eq(options.index(highlightedOption) + 1);
+      if (nextOption && $.contains(self.selectWidget.get(0), nextOption.get(0))) {
+        self.changeHighlight(nextOption)
+      } else {
+        self.onOptionHomeKeyPressed();
+      }
+    };
+
+    /**
+     * Callback used when the up arrow key is pressed while navigating the select.
+     * This will move the highlight to the previous 'first of its group' option,
+     * and loop around to the last 'first of its group' option if triggered on the first option of the select.
+     * @since 15.7RC1
+     */
+    self.onOptionUpKeyPressed = function() {
+      let highlightedOption = self.selectWidget.find('.xwiki-select-option-highlighted');
+      // The selector hereafter supposes that the first visible element of a category is always its label.
+      let firstOptions = $();
+      $('.xwiki-select-category').each(function( index ) {
+        firstOptions = firstOptions.add($(this).find(".xwiki-select-option:visible:eq(0)"));
+      });
+
+      let previousGroupFirstElement = firstOptions.eq(firstOptions.index(highlightedOption) - 1);
+      if (previousGroupFirstElement && $.contains(self.selectWidget.get(0), previousGroupFirstElement.get(0))) {
+        self.changeHighlight(previousGroupFirstElement);
+      } else {
+        let lastGroupFirstElement =
+            self.selectWidget.find('.xwiki-select-category .xwiki-select-option:nth-child(2)').last();
+        self.changeHighlight(lastGroupFirstElement);
+      }
+    };
+
+    /**
+     * Callback used when the down arrow key is pressed while navigating the select.
+     * This will move the highlight to the next 'first of its group' option,
+     * and loop around to the first option if triggered on an option of the last group in the select.
+     * @since 15.7RC1
+     */
+    self.onOptionDownKeyPressed = function() {
+      let highlightedOption = self.selectWidget.find('.xwiki-select-option-highlighted');
+      // The selector hereafter supposes that the first element of a category is always its label.
+      let firstOptions = $();
+      $('.xwiki-select-category').each(function( index ) {
+        firstOptions = firstOptions.add($(this).find(".xwiki-select-option:visible:eq(0)"));
+      });
+
+      let nextGroupFirstElement = firstOptions.eq(firstOptions.index(highlightedOption) + 1);
+      if (nextGroupFirstElement && $.contains(self.selectWidget.get(0), nextGroupFirstElement.get(0))) {
+        self.changeHighlight(nextGroupFirstElement);
+      } else {
+        self.onOptionHomeKeyPressed();
+      }
+    };
+
+    /**
+     * Callback used when the home key is pressed while navigating the select.
+     * This will move the highlight to the first option of the select.
+     * @since 15.7RC1
+     */
+    self.onOptionHomeKeyPressed = function() {
+      self.changeHighlight(self.selectWidget.find('.xwiki-select-option:visible').first());
+    };
+
+    /**
+     * Callback used when the end key is pressed while navigating the select.
+     * This will move the highlight to the last option of the select.
+     * @since 15.7RC1
+     */
+    self.onOptionEndKeyPressed = function() {
+      self.changeHighlight(self.selectWidget.find('.xwiki-select-option:visible').last());
+    };
+
+    /**
+     * Callback used when a key is pressed down when selecting the options.
+     * @since 15.7RC1
+     */
+    self.onOptionKeyPressed = function (event) {
+      var key = event.keyCode;
+      let preventDefault = true;
+      switch (key) {
+        case 37: {
+          self.onOptionLeftKeyPressed();
+          break;
+        }
+        case 39: {
+          self.onOptionRightKeyPressed();
+          break;
+        }
+        case 38: {
+          self.onOptionUpKeyPressed();
+          break;
+        }
+        case 40: {
+          self.onOptionDownKeyPressed();
+          break;
+        }
+        case 13:
+        case 32: {
+          self.onOptionSelectHighlighted();
+          break;
+        }
+        case 36: {
+          self.onOptionHomeKeyPressed();
+          break;
+        }
+        case 35: {
+          self.onOptionEndKeyPressed();
+          break;
+        }
+        default:
+          preventDefault = false;
+          break;
+      }
+      if (preventDefault) event.preventDefault();
     };
 
     /**
@@ -80,7 +266,7 @@ require(['jquery'], function($) {
           var label = option.find('label').text().toLowerCase();
           var hint  = option.find('.xHint').text().toLowerCase();
           var optionText = label + ' ' + hint;
-          // We look if the label match all the values of the filer.
+          // We look if the label match all the values of the filter.
           var optionShouldBeVisible = true;
           for (var k = 0; k < filterValues.length; ++k) {
             var filterValue = filterValues[k].toLowerCase();
@@ -131,6 +317,8 @@ require(['jquery'], function($) {
      */
     self.init = function () {
       self.selectWidget.find('.xwiki-select-option').on('click', self.onOptionClicked);
+      self.selectWidget.find('.xwiki-select-option').on('mouseenter', self.onOptionHovered);
+      self.selectWidget.find('.xwiki-select-options').on('keydown', self.onOptionKeyPressed);
       self.selectWidget.find('input.xwiki-select-filter').on('change', self.onFilterChange)
         .on('keyup', self.onFilterChange);
     };

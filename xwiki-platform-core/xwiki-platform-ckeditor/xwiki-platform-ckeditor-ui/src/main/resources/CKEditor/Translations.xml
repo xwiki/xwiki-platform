@@ -114,6 +114,9 @@ ckeditor.plugin.syntax.update.done=WYSIWYG editor updated
 ckeditor.plugin.syntax.update.failed=Failed to update the WYSIWYG editor
 ckeditor.plugin.syntax.wysiwygModeUnsupported=The WYSIWYG edit mode is not supported by the {0} syntax.
 
+ckeditor.plugin.icon.iconsFetchFailed=Failed to retreive the icon list.
+ckeditor.plugin.icon.iconThemesFetchFailed=Failed to retreive the available icon themes.
+
 ckeditor.plugin.image.imageEditor.standardTab.title=Standard
 ckeditor.plugin.image.imageEditor.advancedTab.title=Advanced
 ckeditor.plugin.image.imageEditor.standardTab.imageStyles.label=Image Styles
@@ -193,6 +196,8 @@ ckeditor.plugin.slash.action.error.defaultContent=Type your error message here.
 ckeditor.plugin.slash.action.hr.hint=Mark a thematic break between blocks of content: for example, a change of scene in a story, or a shift of topic within a section.
 ckeditor.plugin.slash.action.a.hint=Create a link to another page.
 ckeditor.plugin.slash.action.img.hint=Embed or upload an image.
+ckeditor.plugin.slash.action.icon.name=Icon
+ckeditor.plugin.slash.action.icon.hint=Embed an icon.
 ckeditor.plugin.slash.action.mention.name=Mention
 ckeditor.plugin.slash.action.mention.hint=Mention someone to send them a notification.
 ckeditor.plugin.slash.action.emoji.name=Emoji

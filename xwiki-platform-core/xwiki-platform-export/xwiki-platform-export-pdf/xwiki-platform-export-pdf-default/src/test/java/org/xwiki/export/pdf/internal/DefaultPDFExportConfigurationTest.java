@@ -19,6 +19,7 @@
  */
 package org.xwiki.export.pdf.internal;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -106,5 +107,20 @@ class DefaultPDFExportConfigurationTest
         when(this.documentReferenceResolver.resolve("secondTemplate")).thenReturn(secondTemplateRef);
 
         assertEquals(Arrays.asList(firstTemplateRef, secondTemplateRef), this.config.getTemplates());
+    }
+
+    void getXWikiURI() throws Exception
+    {
+        // The old way to configure the XWiki URI was through the "xwikiHost" property. We keep supporting it for
+        // backward compatibility with old XWiki instances that have this configuration set.
+        when(this.xwikiProperties.getProperty("export.pdf.xwikiHost", "host.xwiki.internal")).thenReturn("xwiki-old");
+        assertEquals(new URI("//xwiki-old"), this.config.getXWikiURI());
+
+        when(this.xwikiProperties.getProperty("export.pdf.xwikiURI", "xwiki-old")).thenReturn("//xwiki-new:9293");
+        assertEquals(new URI("//xwiki-new:9293"), this.config.getXWikiURI());
+
+        when(this.configDocument.containsKey("xwikiURI")).thenReturn(true);
+        when(this.configDocument.getProperty("xwikiURI", "xwiki-old")).thenReturn("https://xwiki-new:9293");
+        assertEquals(new URI("https://xwiki-new:9293"), this.config.getXWikiURI());
     }
 }

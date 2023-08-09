@@ -57,7 +57,7 @@
     <pdfbox.version>2.0.29</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
     <jetty.version>9.4.49.v20220914</jetty.version>
-    <netty.version>4.1.94.Final</netty.version>
+    <netty.version>4.1.96.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <dockerJava.version>3.3.2</dockerJava.version>
     <cvssCalculator.version>1.4.1</cvssCalculator.version>
@@ -1090,7 +1090,7 @@
       <dependency>
         <groupId>org.xerial.snappy</groupId>
         <artifactId>snappy-java</artifactId>
-        <version>1.1.10.1</version>
+        <version>1.1.10.3</version>
       </dependency>
       <dependency>
         <groupId>org.apache.calcite.avatica</groupId>
@@ -1132,12 +1132,12 @@
       <dependency>
         <groupId>org.apache.calcite</groupId>
         <artifactId>calcite-core</artifactId>
-        <version>1.34.0</version>
+        <version>1.35.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.calcite</groupId>
         <artifactId>calcite-linq4j</artifactId>
-        <version>1.34.0</version>
+        <version>1.35.0</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

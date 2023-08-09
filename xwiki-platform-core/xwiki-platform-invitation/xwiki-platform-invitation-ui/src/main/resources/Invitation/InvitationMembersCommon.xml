@@ -81,6 +81,7 @@
   #else
 
     (%class="message-table"%)(((
+     #set($checkboxCount = 0)
      #foreach($field in $fieldsToDisplay)
        #if($field == '_history')
          |=(%class="history"%)$services.localization.render('xe.invitation.displayMessageTable.history')##
@@ -123,8 +124,13 @@
            |$services.localization.render('xe.invitation.displayMessageTable.multipleRecipients',
                      [$numberOfRecipientsByMessage.get($message.get('recipient'))])
          #elseif($field == '_checkbox')
-           |&lt;input type="checkbox" name="messageID" value="$message.getProperty('messageID').getValue()" ##
-           ## If there is only one message in the group, add the convienence of checking the box by default.
+           |&lt;label for="messageCheckboxID$checkboxCount" class='sr-only'&gt;
+             $escapetool.xml($services.localization.render('xe.invitation.displayMessageTable.checkbox.input.label'))
+           &lt;/label&gt;
+           &lt;input type="checkbox" id="messageCheckboxID$checkboxCount" name="messageID"
+            value="$message.getProperty('messageID').getValue()" ##
+           #set($checkboxCount = $checkboxCount + 1)
+           ## If there is only one message in the group, add the convenience of checking the box by default.
            #if($messages.size() == 1)
              checked="checked" ##
            #end

@@ -19,6 +19,7 @@
  */
 package org.xwiki.export.pdf.internal.script;
 
+import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -86,7 +87,7 @@ public class SafePDFExportConfiguration extends AbstractSafeObject<PDFExportConf
     }
 
     @Override
-    public String getXWikiHost()
+    public URI getXWikiURI()
     {
         return null;
     }

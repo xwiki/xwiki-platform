@@ -206,8 +206,28 @@ class PDFExportJobTest
             this.pdfExportJob.runInternal();
             fail();
         } catch (Exception e) {
-            assertEquals("Maximum content size limit exceeded.", e.getMessage());
+            assertEquals(
+                "The content size exceeds the configured 1KB limit. Wiki administrators can increase"
+                    + " or disable this limit from the PDF Export administration section or from XWiki properties.",
+                e.getMessage());
         }
+    }
+
+    @Test
+    void singlePageExportIgnoresTheSizeLimit() throws Exception
+    {
+        DocumentRenderingResult largeResult = new DocumentRenderingResult(this.secondPageReference,
+            new XDOM(Collections.singletonList(new WordBlock("second"))), StringUtils.repeat('x', 1000));
+        when(this.documentRenderer.render(this.secondPageReference, false)).thenReturn(largeResult);
+
+        // Single page export.
+        this.request.setDocuments(Collections.singletonList(this.secondPageReference));
+
+        this.pdfExportJob.initialize(this.request);
+        this.pdfExportJob.runInternal();
+
+        PDFExportJobStatus jobStatus = this.pdfExportJob.getStatus();
+        assertEquals(1000, jobStatus.getDocumentRenderingResults().get(0).getHTML().length());
     }
 
     @Test

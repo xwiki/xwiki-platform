@@ -127,7 +127,7 @@
            |&lt;label for="messageCheckboxID$checkboxCount" class='sr-only'&gt;
              $escapetool.xml($services.localization.render('xe.invitation.displayMessageTable.checkbox.input.label'))
            &lt;/label&gt;
-           &lt;input type="checkbox" id="messageCheckboxID$checkboxCount" name="messageCheckboxID$checkboxCount"
+           &lt;input type="checkbox" id="messageCheckboxID$checkboxCount" name="messageID"
             value="$message.getProperty('messageID').getValue()" ##
            #set($checkboxCount = $checkboxCount + 1)
            ## If there is only one message in the group, add the convenience of checking the box by default.

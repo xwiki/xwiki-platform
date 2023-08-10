@@ -245,7 +245,7 @@ define('xwiki-lightbox', [
     lightboxImages.each(function() {
       let lightboxToggle = toggler.clone();
       lightboxToggle.get(0)
-        .addEventListener('focus', (e)=> {lightboxToggle.get(0).classList.remove('sr-only');});
+        .addEventListener('focus', (e) => {lightboxToggle.get(0).classList.remove('sr-only');});
       lightboxToggle.get(0)
         .addEventListener('focusout', (e) => {lightboxToggle.get(0).classList.add('sr-only');});
       lightboxToggle.get(0)

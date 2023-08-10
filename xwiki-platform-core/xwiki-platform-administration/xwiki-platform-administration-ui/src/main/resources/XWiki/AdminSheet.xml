@@ -270,7 +270,8 @@
 
 #macro (verticalNavigation $menu $options)
   {{html clean="false"}}
-  &lt;div id="$!options.id" class="panel-group $!options.cssClass"&gt;
+  &lt;section id="$!options.id" class="panel-group $!options.cssClass"
+    aria-label="$escapetool.xml($services.localization.render('administration.menu.label'))"&gt;
     &lt;div class="panel xform"&gt;
       &lt;label for="adminsearchmenu" class="hidden"&gt;$services.localization.render('search')&lt;/label&gt;
       &lt;input type="text" class="form-control panel-group-filter" autocomplete="off" id="adminsearchmenu"
@@ -286,7 +287,7 @@
         $escapetool.xml($services.localization.render('administration.menu.search.noResults'))
       &lt;/div&gt;
     &lt;/div&gt;
-  &lt;/div&gt;
+  &lt;/section&gt;
   {{/html}}
 #end
 
@@ -306,14 +307,14 @@
         href="$!item.url" data-toggle="collapse"#if ("$!options.id" != '') data-parent="#$options.id" #end
         data-target="#panel-body-$escapedId" aria-expanded="$isActive" aria-controls="panel-body-$escapedId"
         title="$!escapetool.xml($item.description)"&gt;$!services.icon.renderHTML($item.icon)$escapetool.xml($name)&lt;/a&gt;
-      &lt;div role='region' class="panel-collapse collapse#if ($isActive) in#end" id="panel-body-$escapedId"
+      &lt;nav class="panel-collapse collapse#if ($isActive) in#end" id="panel-body-$escapedId"
           aria-labelledby="panel-heading-$escapedId"&gt;
         &lt;div class="list-group"&gt;
           #foreach ($child in $children)
             #verticalNavigationItem($child $options)
           #end
         &lt;/div&gt;
-      &lt;/div&gt;
+      &lt;/nav&gt;
     &lt;/div&gt;
   #else
     &lt;a class="list-group-item#if ($isActive) active#end" data-id="$escapedId"

@@ -248,8 +248,8 @@ define('xwiki-lightbox', [
         .addEventListener('focus', (e) => {lightboxToggle.get(0).classList.remove('sr-only');});
       lightboxToggle.get(0)
         .addEventListener('focusout', (e) => {lightboxToggle.get(0).classList.add('sr-only');});
-      lightboxToggle.get(0)
-        .addEventListener('click', (e) => {
+
+      lightboxToggle.get(0).addEventListener('click', (e) => {
         clearTimeout(showTimeout);
         popoverContainer.data('target', this);
         let offsetX = e.pageX;

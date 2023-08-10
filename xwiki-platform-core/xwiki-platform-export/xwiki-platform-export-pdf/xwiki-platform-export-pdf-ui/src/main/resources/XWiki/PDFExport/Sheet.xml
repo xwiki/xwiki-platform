@@ -816,7 +816,6 @@ require([
 
   .pdf-cover {
     page: cover;
-    break-after: page;
   }
 
   /**
@@ -827,7 +826,6 @@ require([
 
   .pdf-toc {
     page: toc;
-    break-after: page;
   }
 
   .pdf-toc ul {

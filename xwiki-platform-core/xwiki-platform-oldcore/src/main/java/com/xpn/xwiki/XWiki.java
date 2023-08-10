@@ -112,6 +112,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.edit.EditConfiguration;
 import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.job.internal.UninstallJob;
+import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
@@ -491,6 +492,8 @@ public class XWiki implements EventListener
 
     private ReferenceUpdater referenceUpdater;
 
+    private CoreExtensionRepository coreExtensions;
+
     private ConfigurationSource getConfiguration()
     {
         if (this.xwikicfg == null) {
@@ -857,6 +860,15 @@ public class XWiki implements EventListener
         }
 
         return this.authServices;
+    }
+
+    public CoreExtensionRepository getCoreExtensionRepository()
+    {
+        if (this.coreExtensions == null) {
+            this.coreExtensions = Utils.getComponent(CoreExtensionRepository.class);
+        }
+
+        return this.coreExtensions;
     }
 
     private String localizePlainOrKey(String key, Object... parameters)
@@ -1648,21 +1660,23 @@ public class XWiki implements EventListener
     public String getVersion()
     {
         if (this.version == null) {
-            try {
-                InputStream is = getResourceAsStream(VERSION_FILE);
-                try {
+            try (InputStream is = getResourceAsStream(VERSION_FILE)) {
+                if (is != null) {
                     XWikiConfig properties = new XWikiConfig(is);
                     this.version = properties.getProperty(VERSION_FILE_PROPERTY);
-                } finally {
-                    IOUtils.closeQuietly(is);
                 }
             } catch (Exception e) {
-                // Failed to retrieve the version, log a warning and default to "Unknown"
-                LOGGER.warn("Failed to retrieve XWiki's version from [" + VERSION_FILE + "], using the ["
-                    + VERSION_FILE_PROPERTY + "] property.", e);
-                this.version = "Unknown version";
+                // Failed to retrieve the version, log a warning
+                LOGGER.warn("Failed to retrieve XWiki's version from [{}], using the [{}] property.", VERSION_FILE,
+                    VERSION_FILE_PROPERTY, e);
+            }
+
+            if (this.version == null) {
+                // Fallback on the version of the environment extension
+                this.version = getCoreExtensionRepository().getEnvironmentExtension().getId().getVersion().getValue();
             }
         }
+
         return this.version;
     }
 
@@ -4738,7 +4752,10 @@ public class XWiki implements EventListener
 
             // Update the archive
             context.getWiki().getVersioningStore().saveXWikiDocArchive(archive, true, context);
-            document.setDocumentArchive(archive);
+            // Make sure the cached document archive is updated too
+            XWikiDocument cachedDocument =
+                context.getWiki().getDocument(document.getDocumentReferenceWithLocale(), context);
+            cachedDocument.setDocumentArchive(archive);
 
             // There are still some versions left.
             // If we delete the most recent (current) version, then rollback to latest undeleted version.

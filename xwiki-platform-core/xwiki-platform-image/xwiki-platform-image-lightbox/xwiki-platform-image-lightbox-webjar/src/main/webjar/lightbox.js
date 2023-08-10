@@ -271,7 +271,7 @@ define('xwiki-lightbox', [
         let focusLeavingPopover = function (event) {
           event.preventDefault();
           if (!popoverContainer.children().get(0).contains(event.relatedTarget)) {
-            popoverContainer.get(0).removeEventListener('focusout',focusLeavingPopover);
+            popoverContainer.get(0).removeEventListener('focusout', focusLeavingPopover);
             lightboxToggle.focus();
             popoverContainer.popover('hide');
             $('#popoverKeyboardEscaper').remove();

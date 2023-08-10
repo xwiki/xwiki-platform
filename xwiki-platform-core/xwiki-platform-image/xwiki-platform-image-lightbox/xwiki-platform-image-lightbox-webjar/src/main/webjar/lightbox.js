@@ -278,7 +278,6 @@ define('xwiki-lightbox', [
         popoverContainer.append($("<div id='popoverKeyboardEscaper' class='sr-only' tabindex='0'>"));
         // When the popover is accessed through keyboard, it's also closed with keyboard navigation.
         let focusLeavingPopover = function (event) {
-          event.preventDefault();
           if (!popoverContainer.children().get(0).contains(event.relatedTarget)) {
             popoverContainer.get(0).removeEventListener('focusout', focusLeavingPopover);
             lightboxToggle.focus();

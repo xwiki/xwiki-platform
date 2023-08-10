@@ -264,8 +264,17 @@ define('xwiki-lightbox', [
         popoverContainer.css({left: offsetX, top: offsetY});
         popoverContainer.popover('show');
         $('.openLightbox').focus();
-        // We add a tabbable element to the popover Container to avoid leaving the document focus
-        // when reaching the end of the popover with keyboard
+        /* The lightbox modal is generated at the end of the DOM tree.
+          Navigating with the keyboard to its end makes the focus cursor leave the document,
+          and it's not possible to force it back where we want it.
+          Since this position in the DOM is artificial and this behavior is unexpected, we want to prevent it.
+          In order to do so, we introduce an invisible element that will shortly receive focus
+          (instead of focus leaving to the browser tabs for example)
+          before focus can be moved back to its expected position.
+          This does not create a focus trap since this element and the lightbox can only be
+          accessed from and leaving to a specific context.
+          Moving the modal its proper place in the DOM involves UI changes that would need
+          a complete overhaul of the modal element, making it a worse alternative. */
         popoverContainer.append($("<div id='popoverKeyboardEscaper' class='sr-only' tabindex='0'>"));
         // When the popover is accessed through keyboard, it's also closed with keyboard navigation.
         let focusLeavingPopover = function (event) {

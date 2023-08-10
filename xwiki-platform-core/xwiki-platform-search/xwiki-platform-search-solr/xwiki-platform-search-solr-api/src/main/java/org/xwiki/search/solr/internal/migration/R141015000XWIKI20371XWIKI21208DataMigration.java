@@ -86,9 +86,7 @@ public class R141015000XWIKI20371XWIKI21208DataMigration implements HibernateDat
     @Override
     public XWikiDBVersion getVersion()
     {
-        // Change to 141015000 for 14.10.15.
-        // Use 15.05.02 for 15.5.2 and 15.7RC1 as 15.05.01 is the most recent migration.
-        return new XWikiDBVersion(150502000);
+        return new XWikiDBVersion(141015000);
     }
 
     @Override
@@ -105,13 +103,8 @@ public class R141015000XWIKI20371XWIKI21208DataMigration implements HibernateDat
     @Override
     public boolean shouldExecute(XWikiDBVersion startupVersion)
     {
-        XWikiDBVersion ltsVersion = new XWikiDBVersion(141015000);
-        XWikiDBVersion afterLTSVersion = new XWikiDBVersion(150000000);
-        // Execute the migration if the version is either before the LTS version or equal to or larger than the
-        // afterLTSVersion and before the version of this migration.
         // We only need to execute this migration once on the main wiki.
-        return getXWikiContext().isMainWiki() && (startupVersion.compareTo(ltsVersion) < 0
-            || (startupVersion.compareTo(afterLTSVersion) >= 0 && startupVersion.compareTo(getVersion()) < 0));
+        return getXWikiContext().isMainWiki();
     }
 
     @Override

@@ -113,8 +113,8 @@ class GeneralMailConfigurationUpdatedEventGeneratorTest
     private void mockCache(MockitoComponentManager componentManager) throws CacheException
     {
         // Can't use @Mock annotation as mocks are injected too late.
-        this.mainWikiCache = mock();
-        this.currentWikiCache = mock();
+        this.mainWikiCache = mock(Cache.class);
+        this.currentWikiCache = mock(Cache.class);
         when(this.cacheManager.createNewCache(any())).then(invocation -> {
             CacheConfiguration configuration = invocation.getArgument(0);
             if (configuration.getConfigurationId().equals(CURRENT_WIKI_CACHE_ID)) {
@@ -144,15 +144,15 @@ class GeneralMailConfigurationUpdatedEventGeneratorTest
         // Register the listener explicitly as it seems that it isn't registered automatically.
         this.observationManager.addListener(this.eventGenerator);
 
-        EventListener allWikiListener = mock();
+        EventListener allWikiListener = mock(EventListener.class);
         when(allWikiListener.getEvents()).thenReturn(List.of(new GeneralMailConfigurationUpdatedEvent()));
         when(allWikiListener.getName()).thenReturn("allWiki");
 
-        EventListener currentWikiListener = mock();
+        EventListener currentWikiListener = mock(EventListener.class);
         when(currentWikiListener.getEvents()).thenReturn(List.of(new GeneralMailConfigurationUpdatedEvent(wiki)));
         when(currentWikiListener.getName()).thenReturn("currentWiki");
 
-        EventListener wikiListener = mock();
+        EventListener wikiListener = mock(EventListener.class);
         when(wikiListener.getEvents()).thenReturn(List.of(new GeneralMailConfigurationUpdatedEvent("wiki")));
         when(wikiListener.getName()).thenReturn("wiki");
 

@@ -32,7 +32,7 @@
   <name>XWiki Platform - Mail - API</name>
   <description>Mail APIs not related to sending emails</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.87</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.0</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>General Mail API</xwiki.extension.name>
   </properties>

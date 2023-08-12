@@ -599,20 +599,27 @@ define([
       if (!entityId || data.parent === data.old_parent) {
         return;
       }
-      disableNodeBeforeLoading(data.instance, data.node);
-      moveEntity(data.instance, data.node).then(() => {
-        data.instance.refreshNode(data.parent);
-      }).catch(() => {
-        // Undo the move.
-        // Disconnect the node from the associated entity to prevent moving the entity.
-        data.node.data.id = null;
-        data.instance.move_node(data.node, data.old_parent, data.old_position);
-        // Reconnect the tree node to the entity as soon as possible.
-        setTimeout(function() {
-          data.node.data.id = entityId;
-          enableNodeAfterLoading(data.instance, data.node);
-        }, 0);
-      });
+      try {
+        disableNodeBeforeLoading(data.instance, data.node);
+        moveEntity(data.instance, data.node).then(() => {
+          data.instance.refreshNode(data.parent);
+        }).catch((error) => {
+          // Handle move entity error
+        console.error('Entity Move Failed:', error);
+          // Undo the move.
+          // Disconnect the node from the associated entity to prevent moving the entity.
+          data.node.data.id = null;
+          data.instance.move_node(data.node, data.old_parent, data.old_position);
+          // Reconnect the tree node to the entity as soon as possible.
+          setTimeout(function() {
+            data.node.data.id = entityId;
+            enableNodeAfterLoading(data.instance, data.node);
+          }, 0);
+        });
+      } catch(error){
+        // Handle other errors
+        console.error('An error occurred:', error);
+      }
 
     }).on('copy_node.jstree', function(event, data) {
       var entityId = data.original.data && data.original.data.id;

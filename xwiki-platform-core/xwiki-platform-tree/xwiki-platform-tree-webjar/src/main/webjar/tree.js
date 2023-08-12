@@ -71,7 +71,17 @@ define([
         urlParams[pair[0]] = pair[1];
       }
     }
-    return $.post(new URL('?', url), $.param($.extend(urlParams, data), true));
+    return $.post(new URL('?', url), $.param($.extend(urlParams, data), true))
+    .done(function(response) {
+      // Handle successful response
+      console.log('AJAX Request Successful:', response);
+      // Perform actions with the response data
+    })
+    .fail(function(xhr, status, error) {
+      // Handle AJAX request failure
+      console.error('AJAX Request Failed:', error);
+      // You can provide user-friendly error messages or take appropriate actions here
+    });
   };
 
   var getChildren = function(node, callback, parameters) {

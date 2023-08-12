@@ -575,9 +575,12 @@ define([
         // Create a new entity.
         disableNodeBeforeLoading(data.instance, data.node);
         createEntity(data.instance, data.node).then(() => {
+          // Success
           data.instance.refreshNode(data.node.parent);
-        }).catch(() => {
+        }).catch((error) => {
           data.instance.delete_node(data.node);
+          // Log the error
+          console.error('Entity Creation Failed:', error);
         });
       }
 

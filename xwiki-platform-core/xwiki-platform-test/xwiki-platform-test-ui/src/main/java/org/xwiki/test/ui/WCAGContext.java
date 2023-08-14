@@ -23,19 +23,15 @@ import com.deque.html.axecore.results.Results;
 import com.deque.html.axecore.results.Rule;
 import com.deque.html.axecore.selenium.AxeBuilder;
 
-import java.io.File;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.io.Writer;
-import java.io.OutputStreamWriter;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import com.google.common.base.Functions;
+import com.google.common.collect.Ordering;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.test.ui.po.BasePage;
@@ -166,9 +162,9 @@ public class WCAGContext
         private String warnReport = "";
         private final long warnCount;
 
-        private final long violationCount;
-        private final long incompleteCount;
-        private final long passCount;
+        private long violationCount;
+        private long incompleteCount;
+        private long passCount;
 
         /**
          * @param testMethodName the method in which the validation happened
@@ -229,7 +225,7 @@ public class WCAGContext
     private Map<String, Integer> violationCountPerRule = new HashMap<>();
     private Map<String, Integer> incompleteCountPerRule = new HashMap<>();
     private Map<String, Integer> passCountPerRule = new HashMap<>();
-
+    private Map<String, Integer> allCountPerRule = new HashMap<>();
     private boolean wcagEnabled;
 
     private long wcagTimer;
@@ -353,6 +349,10 @@ public class WCAGContext
         updateStatusCountPerRule(violationCountPerRule, axeResults.getViolations());
         updateStatusCountPerRule(incompleteCountPerRule, axeResults.getIncomplete());
         updateStatusCountPerRule(passCountPerRule, axeResults.getPasses());
+        updateStatusCountPerRule(allCountPerRule,
+            Stream.of(axeResults.getViolations(), axeResults.getIncomplete(), axeResults.getPasses())
+            .flatMap(x -> x.stream())
+            .collect(Collectors.toList()));
 
         if (wcagTestResults.failCount != 0) {
             LOGGER.error("[{} : {}] Found [{}] failing WCAG violations.",
@@ -484,16 +484,70 @@ public class WCAGContext
         }
         return mergedReport.toString();
     }
+
+    /**
+     * Build the content of the wcag analysis overview. This overview contains stats on all the checks done
+     * in this test suite.
+     * @return a readable overview of WCAG results.
+     */
+    public String buildOverview()
+    {
+        StringBuilder overview = new StringBuilder();
+        int totalChecks = this.wcagViolationCount + this.wcagIncompleteCount + this.wcagPassCount;
+        if (totalChecks > 0) {
+            overview.append(String.format("This test suite conducted [%s] checks. Out of those:", totalChecks));
+            overview.append(System.lineSeparator());
+            overview.append(String.format("  [%d](%.1f%%) were fails",
+                this.wcagViolationCount, 100 * (float) this.wcagViolationCount / totalChecks));
+            overview.append(System.lineSeparator());
+            overview.append(String.format("  [%d](%.1f%%) were incomplete",
+                this.wcagIncompleteCount, 100 * (float) this.wcagIncompleteCount / totalChecks));
+            overview.append(System.lineSeparator());
+            overview.append(String.format("  [%d](%.1f%%) were passed",
+                    this.wcagPassCount, 100 * (float) this.wcagPassCount / totalChecks));
+
+
+            buildResultStatusOverview(overview, this.wcagViolationCount,
+                    "Here a list of the rule IDs, sorted by the number of failed checks:",
+                    this.getViolationCountPerRule(), "FAIL");
+            buildResultStatusOverview(overview, this.wcagIncompleteCount,
+                    "Here a list of the rule IDs, sorted by the number of incomplete checks:",
+                    this.getIncompleteCountPerRule(), "INCOMPLETE");
+            buildResultStatusOverview(overview, this.wcagPassCount,
+                    "Here a list of the rule IDs, sorted by the number of passed checks:",
+                    this.getPassCountPerRule(), "PASS");
+        }
+        overview.append(System.lineSeparator());
+        return overview.toString();
+    }
+
+    private void buildResultStatusOverview(StringBuilder overview, Integer statusCount, String descriptionString,
+        Map<String, Integer> statusCounts, String statusID)
+    {
+        if (statusCount > 0) {
+            overview.append(System.lineSeparator());
+            overview.append(System.lineSeparator());
+            overview.append(descriptionString);
+            Ordering.natural().onResultOf(Functions.forMap(statusCounts));
+            for (String ruleID : statusCounts.keySet()) {
+                overview.append(System.lineSeparator());
+                overview.append(String.format("  %s ruleID:[%s] [%d](%.1f%%)",
+                        statusID, ruleID, statusCounts.get(ruleID),
+                        100 * (float) statusCounts.get(ruleID) / allCountPerRule.get(ruleID)));
+            }
+        }
+    }
+
     /**
      * Writes a WCAG report to a file for proper accessibility warnings and failures examination.
      *
      * @param outputFile the file to write the test results to
      * @param output the test results to write
      */
-    public static void writeWCAGReportToFile(final File outputFile, final String output) throws IOException
+    public static void writeWCAGReportToFile(File outputFile, String output) throws IOException
     {
-        Writer writer = new OutputStreamWriter(
-                    new FileOutputStream(outputFile), StandardCharsets.UTF_8);
+        FileWriter writer = new FileWriter(outputFile, StandardCharsets.UTF_8);
         writer.write(output);
+        writer.close();
     }
 }

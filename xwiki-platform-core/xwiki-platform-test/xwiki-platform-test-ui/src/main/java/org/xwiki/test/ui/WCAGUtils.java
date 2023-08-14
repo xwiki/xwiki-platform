@@ -102,22 +102,21 @@ public class WCAGUtils
             getWCAGContext().getTestClassName(), totalTime);
 
         File wcagDir = new File(getWCAGReportPathOnHost());
+        Files.createDirectory(wcagDir.toPath());
+        String outputName = "wcagOverview.txt";
+        File overviewFile = new File(wcagDir, outputName);
+        WCAGContext.writeWCAGReportToFile(overviewFile, this.wcagContext.buildOverview());
+
         if (this.wcagContext.hasWCAGWarnings()) {
-            String outputName = "wcagWarnings.txt";
+            outputName = "wcagWarnings.txt";
             LOGGER.warn("There are [{}] accessibility warnings in the test suite. See [{}/{}] for more details.",
                 this.wcagContext.getWCAGWarnCount(), getWCAGReportPathOnHost(), outputName);
             logViolationCount(false);
-            if (!wcagDir.exists()) {
-                Files.createDirectory(wcagDir.toPath());
-            }
             File warningsFile = new File(wcagDir, outputName);
             WCAGContext.writeWCAGReportToFile(warningsFile, this.wcagContext.buildWarningsReport());
         }
         if (this.wcagContext.hasWCAGFails()) {
-            if (!wcagDir.exists()) {
-                Files.createDirectory(wcagDir.toPath());
-            }
-            String outputName = "wcagFails.txt";
+            outputName = "wcagFails.txt";
             LOGGER.error("There are [{}] accessibility fails in the test suite.", this.wcagContext.getWCAGFailCount());
             logViolationCount(true);
             File failsFile = new File(wcagDir, outputName);

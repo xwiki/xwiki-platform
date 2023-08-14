@@ -84,7 +84,7 @@ class WebJarsScriptServiceTest
     }
 
     @Test
-    void computeURLWithoutVersion() throws Exception
+    void computeURLWithoutExtendionId() throws Exception
     {
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("math");
 
@@ -99,6 +99,24 @@ class WebJarsScriptServiceTest
             .thenReturn(new ExtendedURL(Arrays.asList("xwiki", "angular", "2.1.11", "angular.css")));
 
         assertEquals("/xwiki/angular/2.1.11/angular.css", this.scriptService.url("angular", "angular.css"));
+    }
+
+    @Test
+    void computeURLWithoutTimestampedSNAPSHOTExtendionId() throws Exception
+    {
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("math");
+
+        InstalledExtension extension = mock(InstalledExtension.class);
+        when(this.installedExtensionRepository.getInstalledExtension("org.webjars:angular", "wiki:math"))
+            .thenReturn(extension);
+        when(extension.getId()).thenReturn(new ExtensionId("org.webjars:angular", "2.1-20230702.094921-16"));
+
+        WebJarsResourceReference resourceReference =
+            new WebJarsResourceReference("wiki:math", Arrays.asList("angular", "2.1-SNAPSHOT", "angular.css"));
+        when(this.serializer.serialize(resourceReference))
+            .thenReturn(new ExtendedURL(Arrays.asList("xwiki", "angular", "2.1-SNAPSHOT", "angular.css")));
+
+        assertEquals("/xwiki/angular/2.1-SNAPSHOT/angular.css", this.scriptService.url("angular", "angular.css"));
     }
 
     @Test

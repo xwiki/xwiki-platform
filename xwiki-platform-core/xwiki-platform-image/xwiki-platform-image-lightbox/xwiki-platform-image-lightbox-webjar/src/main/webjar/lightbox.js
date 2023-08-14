@@ -274,7 +274,7 @@ define('xwiki-lightbox', [
           before focus can be moved back to its expected position.
           This does not create a focus trap since this element and the lightbox can only be
           accessed from and leaving to a specific context.
-          Moving the modal its proper place in the DOM involves UI changes that would need
+          Moving the modal to its proper place in the DOM involves UI changes that would need
           a complete overhaul of the modal element, making it a worse alternative. */
         popoverContainer.append($("<div id='popoverKeyboardEscaper' class='sr-only' tabindex='0'>"));
         // Make sure the popover can be exited with basic keyboard navigation.

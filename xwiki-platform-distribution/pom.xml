@@ -28,8 +28,6 @@
     <version>15.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution</artifactId>
-  <!-- Needed for feature-deploy-* build as otherwise versions:set fails... -->
-  <version>15.7-SNAPSHOT</version>
   <name>XWiki Platform - Distribution - Parent POM</name>
   <packaging>pom</packaging>
   <description>Parent pom of the default XWiki distribution. Can also be used as parent for custom distributions.</description>

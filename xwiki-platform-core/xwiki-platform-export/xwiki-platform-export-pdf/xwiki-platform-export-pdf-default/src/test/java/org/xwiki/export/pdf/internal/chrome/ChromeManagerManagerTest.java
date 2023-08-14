@@ -19,6 +19,7 @@
  */
 package org.xwiki.export.pdf.internal.chrome;
 
+import java.net.URI;
 import java.util.Arrays;
 
 import javax.inject.Named;
@@ -70,12 +71,12 @@ class ChromeManagerManagerTest
     private String containerIpAddress = "172.17.0.2";
 
     @BeforeEach
-    void configure()
+    void configure() throws Exception
     {
         when(this.configuration.getChromeDockerContainerName()).thenReturn("test-pdf-printer");
         when(this.configuration.getChromeDockerImage()).thenReturn("test/chrome:latest");
         when(this.configuration.getChromeRemoteDebuggingPort()).thenReturn(1234);
-        when(this.configuration.getXWikiHost()).thenReturn("xwiki-host");
+        when(this.configuration.getXWikiURI()).thenReturn(new URI("//xwiki-host"));
 
         mockNetwork("bridge");
 
@@ -94,7 +95,7 @@ class ChromeManagerManagerTest
         this.hostConfig = mock(HostConfig.class);
         when(this.containerManager.getHostConfig(networkIdOrName, this.configuration.getChromeRemoteDebuggingPort()))
             .thenReturn(this.hostConfig);
-        when(this.hostConfig.withExtraHosts(this.configuration.getXWikiHost() + ":host-gateway"))
+        when(this.hostConfig.withExtraHosts("xwiki-host:host-gateway"))
             .thenReturn(this.hostConfig);
     }
 
@@ -155,6 +156,8 @@ class ChromeManagerManagerTest
     void getWithConfigurationChange() throws Exception
     {
         when(this.configuration.getChromeHost()).thenReturn("remote-chrome");
+        // For the purpose of this test we assume that Chrome remains connected after we establish the connection.
+        when(this.chromeManager.isConnected()).thenReturn(true);
 
         assertEquals(this.chromeManager, this.chromeManagerManager.get());
         assertEquals(this.chromeManager, this.chromeManagerManager.get());
@@ -167,5 +170,29 @@ class ChromeManagerManagerTest
         verify(this.chromeManager).connect("remote-chrome", this.configuration.getChromeRemoteDebuggingPort());
         verify(this.chromeManager).connect("another-chrome", this.configuration.getChromeRemoteDebuggingPort());
         verify(this.chromeManager, times(2)).close();
+    }
+
+    @Test
+    void getAfterRemoteChromeDisconnects() throws Exception
+    {
+        when(this.configuration.getChromeHost()).thenReturn("remote-chrome");
+
+        assertEquals(this.chromeManager, this.chromeManagerManager.get());
+        // Assume that we manage to connect with Chrome.
+        when(this.chromeManager.isConnected()).thenReturn(true);
+
+        // This shouldn't trigger a reconnect because the configuration didn't change and Chrome is still connected.
+        assertEquals(this.chromeManager, this.chromeManagerManager.get());
+
+        // Simulate that Chrome disconnected.
+        when(this.chromeManager.isConnected()).thenReturn(false);
+
+        // Both should trigger a reconnect because Chrome is not connected anymore.
+        assertEquals(this.chromeManager, this.chromeManagerManager.get());
+        assertEquals(this.chromeManager, this.chromeManagerManager.get());
+
+        verify(this.chromeManager, times(3)).connect("remote-chrome",
+            this.configuration.getChromeRemoteDebuggingPort());
+        verify(this.chromeManager, times(3)).close();
     }
 }

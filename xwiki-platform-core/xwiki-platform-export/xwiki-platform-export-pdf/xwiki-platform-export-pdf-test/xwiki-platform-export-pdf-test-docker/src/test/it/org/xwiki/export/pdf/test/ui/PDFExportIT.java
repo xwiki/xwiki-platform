@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -111,7 +112,7 @@ class PDFExportIT
             // for PDF export) to access XWiki its own Docker container has to be in the same network and we also need
             // to pass the internal host name or IP address used by XWiki.
             adminSection.setDockerNetwork(Network.SHARED.getId());
-            adminSection.setXWikiHost(testConfiguration.getServletEngine().getInternalIP());
+            adminSection.setXWikiURI(testConfiguration.getServletEngine().getInternalIP());
         }
 
         adminSection.clickSave();
@@ -722,7 +723,8 @@ class PDFExportIT
 
     @Test
     @Order(14)
-    void pageRevision(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration) throws Exception
+    void pageRevision(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
     {
         setup.createPage(testReference, "Parent initial content.", "Parent Initial Title");
         setup.rest().savePage(testReference, "Parent modified content.", "Parent Modified Title");
@@ -776,6 +778,69 @@ class PDFExportIT
                 "Unexpected header and footer on the content page: " + contentPageText);
             assertTrue(contentPageText.contains("Child Modified Title\nChild modified content.\n"),
                 "Unexpected child page content: " + contentPageText);
+        }
+    }
+
+    @Test
+    @Order(15)
+    void restartChrome(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        Callable<Void> verifyPDFExport = () -> {
+            ViewPage viewPage = setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent",
+                "Child"), "WebHome"));
+            PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+            try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+                // We should have 3 pages: cover page, table of contents and one page for the content.
+                assertEquals(3, pdf.getNumberOfPages());
+
+                // Verify the content page.
+                String contentPageText = pdf.getTextFromPage(2);
+                assertTrue(contentPageText.startsWith("Child\n3 / 3\nSection 1\nContent of first section.\n"),
+                    "Unexpected content: " + contentPageText);
+            }
+
+            return null;
+        };
+
+        verifyPDFExport.call();
+
+        // Restart Chrome to verify that we reconnect automatically before executing a new PDF export.
+        DockerTestUtils.cleanupContainersWithLabels(ContainerManager.DEFAULT_LABELS);
+
+        verifyPDFExport.call();
+    }
+
+    @Test
+    @Order(16)
+    void exportWithoutPagedPolyfill(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        // Paged.js (the polyfill for CSS Paged Media module) is used only if the user asks for a table of contents,
+        // headers or footers (which require the Paged Media module). Let's verify that the export works fine when these
+        // options are unchecked (i.e. when Paged.js is not used).
+        // See XWIKI-21213: The PDF export has an extra blank page when selecting only the cover page option
+
+        ViewPage viewPage =
+            setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent", "Child"), "WebHome"));
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+        // Leave only the cover page option checked.
+        exportOptions.getTocCheckbox().click();
+        exportOptions.getHeaderCheckbox().click();
+        exportOptions.getFooterCheckbox().click();
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // We should have 2 pages: cover page and one page for the content.
+            assertEquals(2, pdf.getNumberOfPages());
+
+            // Verify the cover page.
+            String coverPageText = pdf.getTextFromPage(0);
+            assertTrue(coverPageText.startsWith("Child\nVersion 1.1 authored by superadmin"),
+                "Unexpected cover page text: " + coverPageText);
+
+            // Verify the content page.
+            assertEquals("Section 1\nContent of first section.\n", pdf.getTextFromPage(1));
         }
     }
 

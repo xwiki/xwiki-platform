@@ -73,5 +73,13 @@
       <artifactId>javax.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
+    <!-- Needed for ReferenceComponentList -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 </project>

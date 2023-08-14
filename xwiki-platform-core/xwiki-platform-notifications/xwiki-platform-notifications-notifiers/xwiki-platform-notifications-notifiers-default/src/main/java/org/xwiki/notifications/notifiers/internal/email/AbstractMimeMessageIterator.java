@@ -56,18 +56,16 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.CompositeEvent;
-import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.notifiers.email.NotificationEmailGroupingStrategy;
 import org.xwiki.notifications.notifiers.email.NotificationEmailRenderer;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.api.Attachment;
 import org.xwiki.notifications.preferences.NotificationEmailInterval;
 import org.xwiki.notifications.preferences.email.NotificationEmailUserPreferenceManager;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
-import org.xwiki.user.UserReferenceSerializer;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.api.Attachment;
 
 /**
  * Abstract iterator for sending MIME notification messages (usually emails).

@@ -236,83 +236,64 @@
     }
   }
 
-  //----------------------------------
-  // Extend the autocomplete feature with support for:
-  // * grouping items
-  // * skipping groups when navigating the items with the keyboard
-  // * having a different output template per item
-  //----------------------------------
-  var AutoComplete = CKEDITOR.plugins.autocomplete;
+  //
+  // Fix Autocomplete issues (that affect other features such as link and mentions, not just quick actions).
+  //
 
-  // Include the query in the view so that we can properly wait for the auto-complete drop-down in integration tests.
-  const originalAutoCompleteOpen = AutoComplete.prototype.open;
-  AutoComplete.prototype.open = function() {
-    originalAutoCompleteOpen.apply(this, arguments);
-    this.view.element.setAttribute('data-query', this.model.query);
-  };
+  const AutoComplete = CKEDITOR.plugins.autocomplete,
+    View = AutoComplete.view,
+    originalAutoCompletePrototype = CKEDITOR.tools.copy(AutoComplete.prototype),
+    originalViewPrototype = CKEDITOR.tools.copy(View.prototype);
 
-  var View = AutoComplete.view,
-  AdvancedView = function(editor) {
-    // Call the parent class constructor.
-    View.call(this, editor);
-  };
-  // Inherit the view methods.
-  AdvancedView.prototype = CKEDITOR.tools.prototypedCopy(View.prototype);
+  Object.assign(AutoComplete.prototype, {
+    open: function() {
+      originalAutoCompletePrototype.open.apply(this, arguments);
+      // Include the query in the view so that we can properly wait for the auto-complete drop-down in our integration
+      // tests.
+      this.view.element.setAttribute('data-query', this.model.query);
+    },
+    getHtmlToInsert: function(...args) {
+      return withStrictHTMLEncoding(() => {
+        return originalAutoCompletePrototype.getHtmlToInsert.apply(this, args);
+      });
+    }
+  });
 
-  /**
-   * Opens the suggest panel.
-   */
-  AdvancedView.prototype.open = function() {
-    // The mouse over listener registered by the AutoComplete checks all the ascendants of the event target in order to
-    // find the wrapping item. There's no wrapping item when the mouse is over a group so the root document is reached.
-    // Unfortunately the mouse over listener calls hasAttribute without checking the node type and the document node
-    // doesn't have this method. The following is a workaround for this bug.
-    CKEDITOR.dom.document.prototype.hasAttribute = function() {
-      return false;
-    };
-    return View.prototype.open.apply(this, arguments);
-  };
-
-  /**
-   * Closes the suggest panel.
-   */
-  AdvancedView.prototype.close = function() {
-    // Remove the hack in order to limit the side effects only for the time the suggest panel is open.
-    delete CKEDITOR.dom.document.prototype.hasAttribute;
-    return View.prototype.close.apply(this, arguments);
-  };
+  Object.assign(View.prototype, {
+    // Bulletproof item retrieval by id in order to support ids that contain special CSS characters.
+    // See "Cannot insert link to page containing quotes with the quick action"
+    // https://jira.xwiki.org/browse/XWIKI-21164
+    getItemById: function(...args) {
+      // The first argument is the item id and it is used in the original function to build a CSS selector which is why
+      // we need to escape CSS special characters (e.g. the item id can be a wiki page reference).
+      args[0] = CSS.escape(args[0]);
+      return originalViewPrototype.getItemById.apply(this, args);
+    },
+    createItem: function(...args) {
+      return withStrictHTMLEncoding(() => {
+        return originalViewPrototype.createItem.apply(this, args);
+      });
+    }
+  });
 
   /**
-   * Updates the list of items in the suggest panel. Overwrites the inherited behaviour in order to add support for
-   * grouping items.
+   * Make CKEDITOR.tools.htmlEncode temporarily behave as CKEDITOR.tools.htmlEncodeAttr while the given action is
+   * executed. This is useful to enfore more strict HTML encoding, e.g. to encode quotes also.
    *
-   * @param {CKEDITOR.plugins.autocomplete.model.item[]} items - the items that match the current query (typed text)
+   * @param {Function} action - the function to execute
    */
-  AdvancedView.prototype.updateItems = function(items) {
-    var fragment = new CKEDITOR.dom.documentFragment(this.document);
-    var previousGroupId;
-    items.forEach(function(item) {
-      if (item.group && previousGroupId !== item.group.id) {
-        previousGroupId = item.group.id;
-        fragment.append(this.createGroup(item.group));
-      }
-      fragment.append(this.createItem(item));
-    }.bind(this));
-
-    this.appendItems(fragment);
-    this.selectedItemId = null;
-  };
-
-  /**
-   * Creates the group element based on the {@link #groupTemplate}.
-   *
-   * @param {Object} group - the group for which an element will be created
-   * @returns {CKEDITOR.dom.element}
-   */
-  AdvancedView.prototype.createGroup = function(group) {
-    var encodedGroup = encodeItem(group),
-      groupElement = CKEDITOR.dom.element.createFromHtml(this.groupTemplate.output(encodedGroup), this.document);
-    return groupElement;
+  const withStrictHTMLEncoding = function(action) {
+    const originalHTMLEncode = CKEDITOR.tools.htmlEncode;
+    try {
+      // Follow the implementation of CKEDITOR.tools.htmlEncodeAttr which we cannot call direcly because it calls
+      // CKEDITOR.tools.htmlEncode thus leading to an infinite recursion.
+      CKEDITOR.tools.htmlEncode = function(text) {
+        return originalHTMLEncode(text).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+      };
+      return action();
+    } finally {
+      CKEDITOR.tools.htmlEncode = originalHTMLEncode;
+    }
   };
 
   /**
@@ -320,19 +301,90 @@
    *
    * @param {Object} item - the item to encode
    */
-  var encodeItem = function(item) {
+  const encodeItem = function(item) {
     return CKEDITOR.tools.array.reduce(CKEDITOR.tools.object.keys(item), function(encodedItem, key) {
-      encodedItem[key] = CKEDITOR.tools.htmlEncode(item[key]);
+      encodedItem[key] = CKEDITOR.tools.htmlEncodeAttr(item[key]);
       return encodedItem;
     }, {});
   };
+
+  //----------------------------------
+  // Extend the autocomplete feature with support for:
+  // * grouping items
+  // * skipping groups when navigating the items with the keyboard
+  // * having a different output template per item
+  //----------------------------------
+  const AdvancedView = function(editor) {
+    // Call the parent class constructor.
+    View.call(this, editor);
+  };
+  // Inherit the view methods.
+  AdvancedView.prototype = CKEDITOR.tools.prototypedCopy(View.prototype);
+
+  Object.assign(AdvancedView.prototype, {
+    /**
+     * Opens the suggest panel.
+     */
+    open: function() {
+      // The mouse over listener registered by the AutoComplete checks all the ascendants of the event target in order
+      // to find the wrapping item. There's no wrapping item when the mouse is over a group so the root document is
+      // reached. Unfortunately the mouse over listener calls hasAttribute without checking the node type and the
+      // document node doesn't have this method. The following is a workaround for this bug.
+      CKEDITOR.dom.document.prototype.hasAttribute = function() {
+        return false;
+      };
+      return View.prototype.open.apply(this, arguments);
+    },
+
+    /**
+     * Closes the suggest panel.
+     */
+    close: function() {
+      // Remove the hack in order to limit the side effects only for the time the suggest panel is open.
+      delete CKEDITOR.dom.document.prototype.hasAttribute;
+      return View.prototype.close.apply(this, arguments);
+    },
+
+    /**
+     * Updates the list of items in the suggest panel. Overwrites the inherited behaviour in order to add support for
+     * grouping items.
+     *
+     * @param {CKEDITOR.plugins.autocomplete.model.item[]} items - the items that match the current query (typed text)
+     */
+    updateItems: function(items) {
+      var fragment = new CKEDITOR.dom.documentFragment(this.document);
+      var previousGroupId;
+      items.forEach(function(item) {
+        if (item.group && previousGroupId !== item.group.id) {
+          previousGroupId = item.group.id;
+          fragment.append(this.createGroup(item.group));
+        }
+        fragment.append(this.createItem(item));
+      }.bind(this));
+
+      this.appendItems(fragment);
+      this.selectedItemId = null;
+    },
+
+    /**
+     * Creates the group element based on the {@link #groupTemplate}.
+     *
+     * @param {Object} group - the group for which an element will be created
+     * @returns {CKEDITOR.dom.element}
+     */
+    createGroup: function(group) {
+      var encodedGroup = encodeItem(group),
+        groupElement = CKEDITOR.dom.element.createFromHtml(this.groupTemplate.output(encodedGroup), this.document);
+      return groupElement;
+    }
+  });
 
   // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions#escaping
   function escapeRegExp(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
   }
 
-  var AdvancedAutoComplete = function(editor, config) {
+  const AdvancedAutoComplete = function(editor, config) {
     config = Object.assign({}, {
       textTestCallback: function(range) {
         // Suggest actions only when the selection is collapsed (caret).
@@ -371,44 +423,46 @@
   // Inherit the autocomplete methods.
   AdvancedAutoComplete.prototype = CKEDITOR.tools.prototypedCopy(AutoComplete.prototype);
 
-  /**
-   * Overwrite to return the advanced view.
-   */
-  AdvancedAutoComplete.prototype.getView = function() {
-    return new AdvancedView(this.editor);
-  };
+  Object.assign(AdvancedAutoComplete.prototype, {
+    /**
+     * Overwrite to return the advanced view.
+     */
+    getView: function() {
+      return new AdvancedView(this.editor);
+    },
 
-  /**
-   * Returns HTML that should be inserted into the editor when the item is committed, optionally triggering an editor
-   * command.
-   *
-   * See also the {@link #commit} method.
-   *
-   * @param {CKEDITOR.plugins.autocomplete.model.item} item
-   * @returns {String} The HTML to insert.
-   */
-  AdvancedAutoComplete.prototype.getHtmlToInsert = function(item) {
-    // Schedule the command execution after the AutoComplete panel is closed.
-    this.maybeScheduleCommand(item);
-    return item.outputHTML || '';
-  };
+    /**
+     * Returns HTML that should be inserted into the editor when the item is committed, optionally triggering an editor
+     * command.
+     *
+     * See also the {@link #commit} method.
+     *
+     * @param {CKEDITOR.plugins.autocomplete.model.item} item
+     * @returns {String} The HTML to insert.
+     */
+    getHtmlToInsert: function(item) {
+      // Schedule the command execution after the AutoComplete panel is closed.
+      this.maybeScheduleCommand(item);
+      return item.outputHTML || '';
+    },
 
-  /**
-   * If the given item specifies an editor command then schedule its execution on the next event cycle.
-   *
-   * @param {Object} item - the selected AutoComplete item
-   */
-  AdvancedAutoComplete.prototype.maybeScheduleCommand = function(item) {
-    var command = item.command || {};
-    if (typeof command === 'string') {
-      command = {name: command};
+    /**
+     * If the given item specifies an editor command then schedule its execution on the next event cycle.
+     *
+     * @param {Object} item - the selected AutoComplete item
+     */
+    maybeScheduleCommand: function(item) {
+      var command = item.command || {};
+      if (typeof command === 'string') {
+        command = {name: command};
+      }
+      if (command.name) {
+        setTimeout(function() {
+          this.editor.execCommand(command.name, command.data);
+        }.bind(this), 0);
+      }
     }
-    if (command.name) {
-      setTimeout(function() {
-        this.editor.execCommand(command.name, command.data);
-      }.bind(this), 0);
-    }
-  };
+  });
 
   // Expose the advanced autocomplete so it can be used later.
   CKEDITOR.plugins.AdvancedAutoComplete = AdvancedAutoComplete;
@@ -502,6 +556,42 @@
             name: 'xwiki-applyStyle',
             data: {
               element: 'h3'
+            }
+          }
+        }, {
+          group: 'Layout',
+          id: 'h4',
+          name: editor.lang.format.tag_h4, // jshint ignore:line
+          iconClass: 'fa fa-header',
+          description: editor.localization.get('xwiki-slash.action.h4.hint'),
+          command: {
+            name: 'xwiki-applyStyle',
+            data: {
+              element: 'h4'
+            }
+          }
+        }, {
+          group: 'Layout',
+          id: 'h5',
+          name: editor.lang.format.tag_h5, // jshint ignore:line
+          iconClass: 'fa fa-header',
+          description: editor.localization.get('xwiki-slash.action.h5.hint'),
+          command: {
+            name: 'xwiki-applyStyle',
+            data: {
+              element: 'h5'
+            }
+          }
+        }, {
+          group: 'Layout',
+          id: 'h6',
+          name: editor.lang.format.tag_h6, // jshint ignore:line
+          iconClass: 'fa fa-header',
+          description: editor.localization.get('xwiki-slash.action.h6.hint'),
+          command: {
+            name: 'xwiki-applyStyle',
+            data: {
+              element: 'h6'
             }
           }
         }, {

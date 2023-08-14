@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Vector;
 
 import javax.inject.Inject;
@@ -244,7 +245,7 @@ public abstract class XWikiAction implements LegacyAction
         // TODO: Review all calls to localizePlainOrKey() and once this is done change this method implementation to
         // use:
         //   return localizeOrKey(key, Syntax.PLAIN_1_0, parameters)
-        return XMLUtils.escape(StringUtils.defaultString(getLocalization().getTranslationPlain(key, parameters), key));
+        return XMLUtils.escape(Objects.toString(getLocalization().getTranslationPlain(key, parameters), key));
     }
 
     /**
@@ -256,7 +257,7 @@ public abstract class XWikiAction implements LegacyAction
     {
         String result;
         try {
-            result = StringUtils.defaultString(getLocalization().getTranslation(key, syntax, parameters), key);
+            result = Objects.toString(getLocalization().getTranslation(key, syntax, parameters), key);
         } catch (LocalizationException e) {
             // Return the key in case of error but log a warning
             LOGGER.warn("Error rendering the translation for key [{}] in syntax [{}]. Using the translation key "

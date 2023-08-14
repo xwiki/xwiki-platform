@@ -198,14 +198,21 @@
     }
   };
 
-  var addFacetValueCheckbox = function() {
-    var checkBox = $(document.createElement('input')).attr('type', 'checkbox');
+  var addFacetValueCheckbox = function(index) {
+    // Create an id unique to the facet value.
+    let facetContainer = $(this).parents('.search-facet').first();
+    $(this).attr('id', facetContainer.attr('data-name') + '-' + index.toString());
+    // Initialize the checkbox.
+    let checkBox = $(document.createElement('input')).attr('type', 'checkbox');
+    checkBox.attr('aria-labelledby', $(this).attr('id'));
     checkBox.prop('checked', $(this).hasClass('selected'));
     // Add the 'checked' attribute so that it can be easily located with CSS.
     checkBox.prop('checked') &amp;&amp; checkBox.attr('checked', 'checked');
     checkBox.on('click', this.click.bind(this));
-    // Remove the 'selected' class because the selected state is marked using the check box.
-    $(this).removeClass('selected').before(checkBox);
+    // Remove the 'selected' class because the selected state is already marked using the check box.
+    $(this).removeClass('selected')
+    // Add the checkbox to the DOM
+    $(this).before(checkBox)
   };
 
   var enhanceSearchFacets = function() {
@@ -784,6 +791,8 @@ a.search-result-highlightAll:after {
 }
 
 .search-facet-body li {
+  display: flex;
+  flex-wrap: wrap;
   padding: .1em .2em;
 }
 
@@ -808,7 +817,6 @@ a.search-result-highlightAll:after {
 }
 
 .search-facet-body input[type="checkbox"] {
-  float: left;
   margin: .2em 0;
 }
 
@@ -839,8 +847,8 @@ a.search-result-highlightAll:after {
 }
 
 .search-facet-body .itemCount {
-  float: right;
   padding: .1em 0;
+  margin-left: auto;
 }
 
 @media (max-width: 768px) {

@@ -102,8 +102,7 @@ public class WCAGContext
             entry("form-field-multiple-labels", true),
             entry("frame-focusable-content", true),
             entry("frame-title-unique", true),
-            // Set to true once the build doesn't fail this rule anymore
-            entry("frame-title", false),
+            entry("frame-title", true),
             entry("html-has-lang", true),
             entry("html-lang-valid", true),
             entry("html-xml-lang-mismatch", true),
@@ -115,8 +114,7 @@ public class WCAGContext
             entry("label", false),
             // Set to true once the build doesn't fail this rule anymore
             entry("link-in-text-block", false),
-            // Set to true once the build doesn't fail this rule anymore
-            entry("link-name", false),
+            entry("link-name", true),
             entry("list", true),
             entry("listitem", true),
             entry("marquee", true),

@@ -22,6 +22,7 @@ package org.xwiki.export.pdf.browser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.LinkedList;
@@ -125,7 +126,7 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
      * transformations that don't happen for the web browser we're using for PDF printing.</li>
      * <li>For safety reasons the Docker container running the web browser uses its own separate network interface,
      * which means for it 'localhost' doesn't point to the host running XWiki, but the Docker container itself. See
-     * {@link PDFExportConfiguration#getXWikiHost()}.</li>
+     * {@link PDFExportConfiguration#getXWikiURI()}.</li>
      * </ul>
      * 
      * @param printPreviewURL the print preview URL used by the user's browser
@@ -149,10 +150,20 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
         // 1. Try first with the same URL as the user (this may work in a domain-based multi-wiki setup).
         browserPrintPreviewURLs.add(printPreviewURL);
 
-        // 2. Try with the configured host.
+        // 2. Try with the configured XWiki URI.
         try {
-            browserPrintPreviewURLs.add(
-                new URIBuilder(printPreviewURL.toURI()).setHost(this.configuration.getXWikiHost()).build().toURL());
+            URI xwikiURI = this.configuration.getXWikiURI();
+            URIBuilder uriBuilder = new URIBuilder(printPreviewURL.toURI());
+            if (xwikiURI.getScheme() != null) {
+                uriBuilder.setScheme(xwikiURI.getScheme());
+            }
+            if (xwikiURI.getHost() != null) {
+                uriBuilder.setHost(xwikiURI.getHost());
+            }
+            if (xwikiURI.getPort() != -1) {
+                uriBuilder.setPort(xwikiURI.getPort());
+            }
+            browserPrintPreviewURLs.add(uriBuilder.build().toURL());
         } catch (URISyntaxException e) {
             throw new IOException(e);
         }

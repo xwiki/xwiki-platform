@@ -61,6 +61,11 @@ ckeditor.plugin.link.anchor=Anchor
 ckeditor.plugin.link.queryString=Query String
 ckeditor.plugin.link.defaultLabel=type the link label
 ckeditor.plugin.link.openInNewTab=Open Link in New Tab
+ckeditor.plugin.link.upload=Upload Attachment
+ckeditor.plugin.link.uploadHint=Link to a newly uploaded attachment.
+ckeditor.plugin.link.uploadProgress=Uploading {0}...
+ckeditor.plugin.link.uploadSuccess=Successfully uploaded {0}
+ckeditor.plugin.link.uploadError=Failed to upload {0}
 
 ckeditor.plugin.list.listType.none=None
 

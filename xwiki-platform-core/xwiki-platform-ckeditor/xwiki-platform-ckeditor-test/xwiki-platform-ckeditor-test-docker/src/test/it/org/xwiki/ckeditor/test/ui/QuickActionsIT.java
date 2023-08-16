@@ -374,7 +374,7 @@ public class QuickActionsIT extends AbstractCKEditorIT
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
 
-        AutocompleteDropdown link = new AutocompleteDropdown();
+        AutocompleteDropdown link = new AutocompleteDropdown().waitForItemSelected("[", "Upload Attachment");
         textArea.sendKeys("ali");
         link.waitForItemSelected("[ali", "alice");
         textArea.sendKeys(Keys.ENTER);

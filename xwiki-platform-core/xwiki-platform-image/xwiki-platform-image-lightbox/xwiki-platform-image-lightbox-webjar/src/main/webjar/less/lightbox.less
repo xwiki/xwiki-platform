@@ -1,5 +1,6 @@
 #blueimp-gallery {
-  background-color: rgba(0, 0, 0, 0.9);
+  background-color: @panel-bg;
+  opacity: 0.9;
 
   > div.slides {
     padding: 2% 0;
@@ -25,8 +26,9 @@
   }
 
   .lightboxDescription {
-    background-color: rgba(0, 0, 0, 0.6);
-    color: #FFFFFF;
+    background-color: @panel-bg;
+    opacity: 0.6;
+    color: @panel-default-text;
     overflow-wrap: break-word;
     display: flex;
     flex-direction: column;
@@ -52,12 +54,13 @@
 }
 .blueimp-gallery {
   .action:hover {
-    color: @text-color;
+    color: @panel-default-text;
     opacity: 1;
   }
 
   .action {
-    color: @xwiki-page-content-bg;
+    color: @panel-default-text;
+    opacity: 0.8;
     display: none;
   }
 

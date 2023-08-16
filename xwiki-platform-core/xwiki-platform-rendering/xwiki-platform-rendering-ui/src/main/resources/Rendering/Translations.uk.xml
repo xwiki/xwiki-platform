@@ -41,4 +41,4 @@ admin.syntaxes.description=Вибрати синтаксис сторінки з
 Rendering.RenderingConfigClass_disabledSyntaxes=Вимкнені синтаксиси
 Rendering.RenderingConfigClass_disabledSyntaxes.hint=Список синтаксисів розмітки, в яких сторінки не можуть бути написані
 </content>
-  </xwikidoc>
+</xwikidoc>

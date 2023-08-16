@@ -74,7 +74,10 @@ Mail.SendMailStatus_livetable.wiki=Вікі
 Mail.SendMailStatus_livetable.error=Помилка
 Mail.SendMailStatus_livetable.actions=Дії
 Mail.SendMailStatus_livetable.resend=Надіслати повторно
+Mail.SendMailStatus_livetable.delete=Видалити
 mailSender.admin.resendSuccess=Лист успішно надіслано повторно
 mailSender.admin.resendFailure=Не вдалося повторно надіслати. Натисніть, щоб отримати докладнішу інформацію.
+mailSender.admin.deleteSuccess=Лист успішно видалено
+mailSender.admin.deleteFailure=Не вдалося видалити лист. Натисніть, щоб дізнатися більше.
 </content>
-  </xwikidoc>
+</xwikidoc>

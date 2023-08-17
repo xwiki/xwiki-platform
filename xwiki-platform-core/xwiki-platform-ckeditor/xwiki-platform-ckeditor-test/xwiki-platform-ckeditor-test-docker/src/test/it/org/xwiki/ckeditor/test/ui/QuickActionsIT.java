@@ -520,5 +520,27 @@ public class QuickActionsIT extends AbstractCKEditorIT
         textArea.sendKeys(Keys.ENTER);
 
         assertSourceEquals("🐈");
+
+    @Test
+    @Order(25)
+    void icon() throws Exception
+    {
+        textArea.sendKeys("/icon");
+        AutocompleteDropdown qa = new AutocompleteDropdown();
+        qa.waitForItemSelected("/icon", "Icon");
+        textArea.sendKeys(Keys.ENTER);
+        qa.waitForItemSubmitted();
+
+        // Search and insert the wiki icon.
+        textArea.sendKeys("wiki");
+        AutocompleteDropdown icon = new AutocompleteDropdown().waitForItemSelected("icon::wiki", "wiki");
+        textArea.sendKeys(Keys.ENTER);
+        icon.waitForItemSubmitted();
+
+        // We wait for the editor to update because the icon quick action is using a macro.
+        textArea = editor.getRichTextArea();
+        textArea.waitUntilContentEditable();
+
+        assertSourceEquals("{{displayIcon name=\"wiki\"/}} ");
     }
 }

@@ -20,7 +20,7 @@
     "vuedraggable": "2.24.3",
     "vue-tippy": "4.16.0",
     "vue2-touch-events": "3.2.2",
-    "dompurify": "3.0.3"
+    "dompurify": "3.0.5"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "5.0.8",

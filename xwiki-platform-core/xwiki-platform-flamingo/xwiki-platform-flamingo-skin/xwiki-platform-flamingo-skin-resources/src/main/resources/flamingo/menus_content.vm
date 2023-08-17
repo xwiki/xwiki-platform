@@ -310,15 +310,19 @@
   ## Display all the extensions points, including the static ones
   ##
   #define ($menuContent)
-    ## Title for the dropdown content
-    <dt class="dropdown-header sr-only">
-      $escapetool.xml($services.localization.render('core.menu.edit.dropdown.hint'))
-    </dt>
-    <dd>
-     <ul>
-        #displaySecureUIX('org.xwiki.plaftorm.editactions', $staticExtensions)
-     </ul>
-    </dd>
+    #define ($editContent)#displaySecureUIX('org.xwiki.plaftorm.editactions', $staticExtensions))#end
+    ## We need to check that the content is not empty to not generate an empty architecture around it.
+    #if ($stringtool.isNotBlank("$!editContent"))
+      ## Title for the dropdown content
+      <dt class="dropdown-header sr-only">
+        $escapetool.xml($services.localization.render('core.menu.edit.dropdown.hint'))
+      </dt>
+      <dd>
+        <ul>
+          $editContent
+        </ul>
+      </dd>
+    #end
   #end
   #displayMenu('tmEdit', 'pencil', $menuContent, 'core.menu.edit', true, $defaultEditURL, $extraAttributes)
 #end

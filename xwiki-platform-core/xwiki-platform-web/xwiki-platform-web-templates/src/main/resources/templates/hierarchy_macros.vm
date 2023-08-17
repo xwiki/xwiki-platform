@@ -152,12 +152,13 @@
   ## Set as a navigation role because it contains mostly links
   ## Except if the 'navigation' option is set to false, for special cases where a navigation would clutter
   ## See discussion on https://forum.xwiki.org/t/ui-accesibility-breadcrumbs-in-the-document-index/12866
-  <#if($!options.navigation == false)div#{else}nav#end aria-label=
+  <#if($!options.navigation == false)div#{else}nav aria-label=
     #if("$!options.label" != '')
       "$escapetool.xml($services.localization.render('web.hierarchy.breadcrumb.label', [$options.label]))"
     #else
       "$escapetool.xml($services.localization.render('web.hierarchy.breadcrumb.label.empty'))"
-    #end>
+    #end
+  #end>
   <ol #if("$!options.id" != '')id="$options.id"#end class="$breadCrumbClassNames" $breadCrumbParameters>
   <li
     #foreach ($item in $pathData)

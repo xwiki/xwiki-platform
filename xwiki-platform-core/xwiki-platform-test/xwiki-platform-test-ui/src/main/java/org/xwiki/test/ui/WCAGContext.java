@@ -23,10 +23,15 @@ import com.deque.html.axecore.results.Results;
 import com.deque.html.axecore.results.Rule;
 import com.deque.html.axecore.selenium.AxeBuilder;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.function.Function;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -161,10 +166,10 @@ public class WCAGContext
         private final long failCount;
         private String warnReport = "";
         private final long warnCount;
-
-        private long violationCount;
-        private long incompleteCount;
-        private long passCount;
+        private String incompleteReport = "";
+        private final long incompleteCount;
+        private final long violationCount;
+        private final long passCount;
 
         /**
          * @param testMethodName the method in which the validation happened
@@ -176,8 +181,12 @@ public class WCAGContext
         {
             // Count the amount of checks with each status
             this.violationCount = amountOfChecks(axeResults.getViolations());
-            this.incompleteCount = amountOfChecks(axeResults.getIncomplete());
             this.passCount = amountOfChecks(axeResults.getPasses());
+            this.incompleteCount = amountOfChecks(axeResults.getIncomplete());
+            if (this.incompleteCount != 0) {
+                this.incompleteReport = AbstractXWikiCustomAxeReporter.getReadableAxeResults(testMethodName,
+                    pageClassName, url, axeResults.getIncomplete());
+            }
 
             // Generate the report as soon as the results are in.
             List<Rule> failingViolations = axeResults.getViolations()
@@ -217,6 +226,11 @@ public class WCAGContext
         String getWarnReport()
         {
             return this.warnReport;
+        }
+
+        String getIncompleteReport()
+        {
+            return this.incompleteReport;
         }
     }
 
@@ -410,6 +424,14 @@ public class WCAGContext
     }
 
     /**
+     * @return the total count of incomplete wcag checks.
+     */
+    public long getWCAGIncompleteCount()
+    {
+        return this.wcagIncompleteCount;
+    }
+
+    /**
      * @param wcag validation enabled setup parameter to use in the test suite.
      */
     public void setWCAGEnabled(boolean wcag)
@@ -426,6 +448,14 @@ public class WCAGContext
     }
 
     /**
+     * @return any of the validations found an incomplete check.
+     */
+    public boolean hasWCAGIncomplete()
+    {
+        return this.wcagIncompleteCount != 0;
+    }
+
+    /**
      * @return any of the validations found a failing violation.
      */
     public boolean hasWCAGFails()
@@ -439,6 +469,29 @@ public class WCAGContext
     public boolean hasWCAGWarnings()
     {
         return this.wcagWarnCount != 0;
+    }
+
+    /**
+     * @return a readable report of WCAG incomplete tests found so far.
+     */
+    public String buildIncompleteReport()
+    {
+        StringBuilder mergedReport = new StringBuilder();
+        boolean incompleteStillEmpty = true;
+        for (WCAGTestResults result : this.wcagResults) {
+            if (result.incompleteCount != 0) {
+                if (incompleteStillEmpty) {
+                    mergedReport.append(String.format("WCAG incomplete checks in the test class [%s]:",
+                        getTestClassName()));
+                    mergedReport.append(System.lineSeparator());
+                    incompleteStillEmpty = false;
+                }
+                mergedReport.append(result.getIncompleteReport());
+                mergedReport.append(System.lineSeparator());
+                mergedReport.append(System.lineSeparator());
+            }
+        }
+        return mergedReport.toString();
     }
 
     /**
@@ -529,12 +582,14 @@ public class WCAGContext
             overview.append(System.lineSeparator());
             overview.append(descriptionString);
             Ordering.natural().onResultOf(Functions.forMap(statusCounts));
-            for (String ruleID : statusCounts.keySet()) {
-                overview.append(System.lineSeparator());
-                overview.append(String.format("  %s ruleID:[%s] [%d](%.1f%%)",
-                        statusID, ruleID, statusCounts.get(ruleID),
-                        100 * (float) statusCounts.get(ruleID) / allCountPerRule.get(ruleID)));
-            }
+            statusCounts.entrySet().stream()
+                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                .forEach(entry -> {
+                    overview.append(System.lineSeparator());
+                    overview.append(String.format("  %s %s [%d](%.1f%%)",
+                        statusID, entry.getKey(), entry.getValue(),
+                        100 * (float) entry.getValue() / allCountPerRule.get(entry.getKey())));
+                });
         }
     }
 

@@ -67,6 +67,10 @@ public class AutocompleteDropdown extends BaseElement
                 .findElementWithoutWaiting(this.container, By.className("ckeditor-autocomplete-item-shortcut"))
                 .getText();
         }
+        
+        public void click() {
+            container.click();
+        }
     }
 
     /**

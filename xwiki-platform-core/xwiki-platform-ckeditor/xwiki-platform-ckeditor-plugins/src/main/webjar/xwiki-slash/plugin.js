@@ -256,6 +256,15 @@
       return withStrictHTMLEncoding(() => {
         return originalAutoCompletePrototype.getHtmlToInsert.apply(this, args);
       });
+    },
+    getTextWatcher: function(...args) {
+      // When pressing enter to select a shortcut Quick Action, the shortcut's textWatcher catches the event
+      // and opens the new drop-down. It however doesn't catch click events by default, which is an other
+      // way to select a Quick Action. This mitigation ensures the textWatchers are updated after
+      // a shortcut Quick Action's html is inserted.
+      const textWatcher = originalAutoCompletePrototype.getTextWatcher.apply(this, args);
+      this.editor.on("afterInsertHtml", function () {textWatcher.check(false);});
+      return textWatcher;
     }
   });
 

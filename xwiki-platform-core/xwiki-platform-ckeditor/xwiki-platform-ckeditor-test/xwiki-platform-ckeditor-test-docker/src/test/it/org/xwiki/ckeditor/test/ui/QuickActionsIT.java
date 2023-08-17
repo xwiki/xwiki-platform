@@ -429,8 +429,7 @@ public class QuickActionsIT extends AbstractCKEditorIT
         qa.waitForItemSelected("/emo", "Emoji");
         textArea.sendKeys(Keys.ENTER);
 
-        AutocompleteDropdown emoji = new AutocompleteDropdown();
-        assertEquals("🛩", emoji.getSelectedItem().getLabel());
+        AutocompleteDropdown emoji = new AutocompleteDropdown().waitForItemSelected(":sm", "🛩");
         textArea.sendKeys(Keys.BACK_SPACE, Keys.BACK_SPACE, "cat");
         emoji.waitForItemSelected(":cat", "🐈");
         textArea.sendKeys(Keys.ENTER);
@@ -504,5 +503,23 @@ public class QuickActionsIT extends AbstractCKEditorIT
 
         // Click close on the Find and Replace dialog
         new CKEditorDialog().cancel();
+    }
+    
+    @Test
+    @Order(24)
+    void emojiClickTriggersDropDown() throws Exception
+    {
+        textArea.sendKeys("/emo");
+        AutocompleteDropdown qa = new AutocompleteDropdown();
+        qa.waitForItemSelected("/emo", "Emoji");
+        // Click on the emoji Quick Action.
+        qa.getSelectedItem().click();
+
+        AutocompleteDropdown emoji = new AutocompleteDropdown();
+        textArea.sendKeys(Keys.BACK_SPACE, Keys.BACK_SPACE, "cat");
+        emoji.waitForItemSelected(":cat", "🐈");
+        textArea.sendKeys(Keys.ENTER);
+
+        assertSourceEquals("🐈");
     }
 }

@@ -103,12 +103,12 @@
     },
     init: function(editor) {
 
-      // Register the the /img:: autocomplete using the ckeditor mentions plugin.
+      // Register the the img:: autocomplete using the ckeditor mentions plugin.
       editor.config.mentions = editor.config.mentions || [];
 
       editor.config.mentions.push({
-        marker: '/img::',
-        pattern: /\/img::\S{0,30}$/,
+        marker: 'img::',
+        pattern: /img::\S{0,30}$/,
         minChars: 0,
         itemsLimit: 5,
         itemTemplate: '<li data-id="{id}">' +
@@ -263,7 +263,7 @@
 
           // Do not do anything when the loading entry is submitted.
           if (item.id === "_loading") {
-            return "/img::" + item.query;
+            return "img::" + item.query;
           }
 
           if (item.id === "_uploadImage") {
@@ -275,7 +275,7 @@
                 `'${XWiki.contextPath}/${XWiki.servletpath}` +
                 `skin/resources/uicomponents/suggest/suggestAttachments.js'` +
                 `defer='defer'></script>`;
-              $(editor.document.$).loadRequiredSkinExtensions(requiredSkinExtensions);
+              $(CKEDITOR.document.$).loadRequiredSkinExtensions(requiredSkinExtensions);
 
               require(['attachmentService',
                   'xwiki-attachments-store',

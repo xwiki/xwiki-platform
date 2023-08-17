@@ -57,7 +57,9 @@ public class ImageDialogSelectModal extends BaseModal
      */
     public ImageDialogEditModal clickSelect()
     {
-        WebElement element = this.container.findElement(By.className("btn-primary"));
+        // We find the primary button in the footer because the Selection modal has other primary buttons.
+        // See XWIKI-21206.
+        WebElement element = this.container.findElement(By.cssSelector(".modal-footer .btn-primary"));
         getDriver().waitUntilElementIsEnabled(element);
         element.click();
         return new ImageDialogEditModal();

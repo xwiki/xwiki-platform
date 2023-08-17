@@ -158,7 +158,8 @@
     #else
       "$escapetool.xml($services.localization.render('web.hierarchy.breadcrumb.label.empty'))"
     #end
-  >#end
+    >
+  #end
   <ol #if("$!options.id" != '')id="$options.id"#end class="$breadCrumbClassNames" $breadCrumbParameters>
   <li
     #foreach ($item in $pathData)
@@ -182,7 +183,7 @@
       #end
       >#end$item.label#if ($item.url)</a>#end$treeNavigation$closingTag##
     #end##
-  </li></ol>#if("$!options.navigation" == 'true')</nav>#end
+  </li></ol>#if($!options.navigation == true)</nav>#end
 #end
 
 #macro (getTreeNavigation $pathData $index $options)

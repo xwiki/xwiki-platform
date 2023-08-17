@@ -520,6 +520,7 @@ public class QuickActionsIT extends AbstractCKEditorIT
         textArea.sendKeys(Keys.ENTER);
 
         assertSourceEquals("🐈");
+    }
 
     @Test
     @Order(25)

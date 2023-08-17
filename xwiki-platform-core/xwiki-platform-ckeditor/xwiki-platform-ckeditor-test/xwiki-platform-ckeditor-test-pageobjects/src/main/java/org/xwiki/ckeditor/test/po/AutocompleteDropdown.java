@@ -69,6 +69,10 @@ public class AutocompleteDropdown extends BaseElement
                 .getText();
         }
         
+        /**
+         * Clicks on the item.
+         * @since 15.7RC1
+        */
         public void click() {
             container.click();
         }

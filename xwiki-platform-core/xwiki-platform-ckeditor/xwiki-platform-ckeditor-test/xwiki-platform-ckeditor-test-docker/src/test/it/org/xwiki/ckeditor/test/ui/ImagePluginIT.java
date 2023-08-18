@@ -580,7 +580,6 @@ class ImagePluginIT extends AbstractCKEditorIT
         
         // Upload an attachment to the page.
         String attachmentName = "image.gif";
-        AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
         uploadAttachment(setup, testReference, attachmentName);
         
         // Move to the WYSIWYG edition page.
@@ -599,8 +598,7 @@ class ImagePluginIT extends AbstractCKEditorIT
         textArea.sendKeys(Keys.ENTER);
         img.waitForItemSubmitted();
 
-        // Using absolute reference until we fix XWIKI-21182.
-        assertSourceEquals("[[image:" + setup.serializeReference(attachmentReference) + "]]");
+        assertSourceEquals("[[image:image.gif]]");
     }
 
     @Test
@@ -639,9 +637,8 @@ class ImagePluginIT extends AbstractCKEditorIT
         assertIterableEquals(List.of(""), img.getSelectedItem().getBadges());
         textArea.sendKeys(Keys.ENTER);
         img.waitForItemSubmitted();
-        
-        // Using absolute reference until we fix XWIKI-21182.
-        assertSourceEquals("[[image:" + setup.serializeReference(attachmentReference) + "]]");
+
+        assertSourceEquals("[[image:attachmentOtherPage@otherImage.gif]]");
     }
     
     @ParameterizedTest

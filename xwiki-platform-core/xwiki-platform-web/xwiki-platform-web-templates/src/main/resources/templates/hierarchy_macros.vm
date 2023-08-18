@@ -128,7 +128,7 @@
  *   limit: null // if any, enable the user to click on the ellipsis to expand the breadcrumb dynamically
  *   label: '' // if any, generates a custom label which takes this value as a parameter
  *      ! do not use a complete label here, only a readable name of the target object is expected. !
- *   navigation: true // whether the breadcrumb generate should be considered as a navigation
+ *   navigation: false // whether the breadcrumb generate should be considered as a navigation
  * }
  * @param $entityReference (required if $option.limit is not null) the reference to the concerned entity.
  *#
@@ -344,6 +344,7 @@
     #set ($discard = $path.add($doc.documentReference))
     #set ($options = {
       'id': 'hierarchy',
+      'navigation': true,
       'label': $doc.getPageReference().getName(),
       'entities': {
         $doc.documentReference: $tdoc

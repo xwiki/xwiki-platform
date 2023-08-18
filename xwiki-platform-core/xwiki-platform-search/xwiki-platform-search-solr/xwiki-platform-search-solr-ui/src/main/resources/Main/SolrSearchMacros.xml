@@ -68,7 +68,7 @@
     &lt;div class="col-xs-12 col-sm-6"&gt;
       &lt;div class="input-group"&gt;
         &lt;label class='sr-only' for='search-page-bar-input'&gt;
-        $services.localization.render('search.page.bar.query.title')
+          $services.localization.render('search.page.bar.query.title')
         &lt;/label&gt;
         &lt;input id='search-page-bar-input' type='search' name='text' class='form-control withTip useTitleAsTip'
           title="$services.localization.render('search.page.bar.query.title')" value="$escapetool.xml($text)"/&gt;
@@ -447,7 +447,7 @@
 
 #macro (displaySearchResult_document $searchResult)
   #displaySearchResultTitle()
-  #displaySearchResultLocation($searchResult $searchResult.title_)
+  #displaySearchResultLocation($searchResult)
   &lt;div class="search-result-author"&gt;
     $services.localization.render('core.footer.modification', [
       "#displayUserProfileLink($searchResult.author $searchResult.author_display)",
@@ -470,7 +470,7 @@
       $escapetool.xml($searchResult.attversion)
     &lt;/a&gt;
   &lt;/h2&gt;
-  #displaySearchResultLocation($searchResult $searchResultReference.name)
+  #displaySearchResultLocation($searchResult)
   &lt;div class="search-result-uploader"&gt;
     #set ($uploader = "#displayUserProfileLink($searchResult.attauthor.get(0) $searchResult.attauthor_display.get(0))")
     #set ($uploadDate = $xwiki.formatDate($searchResult.attdate.get(0)))
@@ -486,14 +486,14 @@
     $services.icon.renderHTML('cubes')
     $escapetool.xml("${searchResult.get('class').get(0)}[$searchResult.number]")
   &lt;/h2&gt;
-  #displaySearchResultLocation($searchResult "${searchResult.get('class').get(0)}[$searchResult.number]")
+  #displaySearchResultLocation($searchResult)
 #end
 
 #macro (displaySearchResult_object_property $searchResult)
   &lt;h2 class="search-result-title"&gt;
     $services.icon.renderHTML('cube') $escapetool.xml($searchResult.propertyname)
   &lt;/h2&gt;
-  #displaySearchResultLocation($searchResult $searchResult.propertyname)
+  #displaySearchResultLocation($searchResult)
 #end
 
 #macro (displaySearchResultTitle)
@@ -512,14 +512,12 @@
   &lt;/h2&gt;
 #end
 
-#macro (displaySearchResultLocation $searchResult $searchResultLabel)
+#macro (displaySearchResultLocation $searchResult)
   &lt;div class="search-result-location"&gt;
     $services.localization.render('solr.result.locatedIn')
     #set ($locationOptions = {
       'excludeSelf': true,
-      'limit': 6,
-      'label': $searchResultLabel,
-      'navigation': false
+      'limit': 6
     })
     #hierarchy($searchResultReference $locationOptions)
   &lt;/div&gt;

@@ -74,6 +74,9 @@
         #if(!$options.label && $titleField.label)
           #set($options.label = $titleField.label)
         #end
+        #if($options.label)
+          #set($options.navigation = true)
+        #end
         #hierarchy($options.parent.reference $options)
         #locationPickerActions($options)
       </div>

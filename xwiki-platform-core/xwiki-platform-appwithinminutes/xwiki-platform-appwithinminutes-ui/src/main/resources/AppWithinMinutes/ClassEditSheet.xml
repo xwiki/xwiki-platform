@@ -256,7 +256,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #set ($class = 'wikicreatelink')
     #set ($action = 'create')
     #set ($discard = $params.put('parent', $doc.fullName))
-    #set ($title = $services.localization.render('core.create.inline.label',[$reference.name]))
+    #set ($title = $escapetool.xml($services.localization.render('core.create.inline.label',[$reference.name])))
   #end
   &lt;span class="$class" #if(!$xwiki.exists($reference))title="$title"#end&gt;
     &lt;a href="$escapetool.xml($xwiki.getURL($reference, $action, $escapetool.url($params)))"&gt;

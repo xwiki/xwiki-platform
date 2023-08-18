@@ -525,8 +525,8 @@ class ImagePluginIT
         ImageDialogSelectModal imageDialogSelectModal = editor.clickImageButton();
         // The WebHome part is important but is removed when serializing an attachment, adding it back before the 
         // attachment name.
-        String imageURL = setup.getURL(attachmentReference, "download", "")
-            .replace("/" + attachmentName, "/WebHome/" + attachmentName);
+        String imageURL = setup.getURL(attachmentReference, "download", "");
+
         imageDialogSelectModal.switchToUrlTab().setUrlValue(imageURL);
         ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
         imageDialogEditModal.switchToAdvancedTab().setWidth(100);
